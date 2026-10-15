@@ -128,7 +128,7 @@ jobs:
           NO_PROXY: 127.0.0.1,localhost
         run: >-
           uv run --offline pytest -q -m "not live and not perf" -p no:cacheprovider
-          --junitxml=var/junit.xml -o junit_family=xunit2
+          --junitxml=var/junit.xml -o junit_family=xunit1
       - name: Upload JUnit report
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

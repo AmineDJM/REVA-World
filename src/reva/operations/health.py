@@ -15,6 +15,11 @@ acquisitions of a connector (all registered versions):
   fingerprints differ from those previously seen for the same item.
 * ``completeness`` – item completeness of the latest run and the share of
   acquisitions in the window that passed validation (not quarantined).
+* ``connector_state`` – for promoted template connectors
+  (:func:`reva.autonomy.health.connector_state` of the newest version): ``active``,
+  ``retired`` or ``template_changed``; ``template_changed`` (the reviewed template
+  code changed since promotion, so the version is no longer loaded) makes the
+  status ``quarantined``. ``None`` for built-in connectors.
 
 Rows written here carry ``metrics.kind = 'health_vector'`` and are excluded
 when reading run records.
@@ -23,11 +28,14 @@ when reading run records.
 from __future__ import annotations
 
 import json
+import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import Any
 
 from sqlalchemy import Engine, text
+
+log = logging.getLogger("reva.health")
 
 WINDOW = 20
 LATE_CADENCES = 2.0
@@ -64,6 +72,18 @@ def _acquisitions(conn: Any, cv_ids: list[Any], origin: str | None, window: int)
     return [dict(r) for r in rows]
 
 
+def _connector_state(conn: Any, connector_version_id: Any) -> str | None:
+    """Promotion state of a template connector version (None for built-ins / unavailable)."""
+    try:
+        from reva.autonomy.health import connector_state
+
+        with conn.begin_nested():
+            return connector_state(conn, connector_version_id)
+    except Exception as e:  # the health vector is still recorded; the state is reported unknown
+        log.warning("connector state unavailable for %s: %s", connector_version_id, type(e).__name__)
+        return None
+
+
 def connector_health_vector(
     engine: Engine, connector_name: str, cadence_seconds: int, *, origin: str | None = None, window: int = WINDOW
 ) -> dict[str, Any] | None:
@@ -89,6 +109,7 @@ def connector_health_vector(
             ),
             {"ids": list(cvs), "o": origin},
         ).scalar_one()
+        state = _connector_state(conn, cvs[0])
 
     ratios = [float(r["metrics"].get("request_success_ratio", 0.0)) for r in runs]
     success_ratio = sum(ratios) / len(ratios) if ratios else None
@@ -108,7 +129,7 @@ def connector_health_vector(
 
     if not runs and not acqs:
         status = "unknown"
-    elif latest is not None and latest["status"] == "quarantined":
+    elif state == "template_changed" or (latest is not None and latest["status"] == "quarantined"):
         status = "quarantined"
     elif ((success_ratio is not None and success_ratio < MIN_SUCCESS)
           or lag_cadences is None or lag_cadences > LATE_CADENCES or drift_items
@@ -139,6 +160,7 @@ def connector_health_vector(
             "latest_run_item_completeness": completeness_latest,
             "validated_acquisition_ratio": validated / len(acqs) if acqs else None,
         },
+        "connector_state": state,
         "status": status,
     }
 

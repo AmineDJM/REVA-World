@@ -25,6 +25,17 @@ from reva.settings import Settings
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
+@pytest.fixture(autouse=True)
+def _no_public_sandbox_probe(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Tests never send packets to the internet: point the sandbox's public-network
+    probe at a closed local port (it is only a reachability check)."""
+    try:
+        import reva.autonomy.sandbox as sandbox
+    except ImportError:  # pragma: no cover
+        return
+    monkeypatch.setattr(sandbox, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))
+
+
 @dataclass
 class DB:
     settings: Settings

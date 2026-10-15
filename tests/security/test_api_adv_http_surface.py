@@ -68,12 +68,25 @@ def _concrete(path: str) -> str:
     return re.sub(r"\{([a-z_]+)(?::[a-z]+)?\}", sub, path)
 
 
+def _flat_routes(routes: list[Any]) -> Iterator[Any]:
+    """Every concrete route, descending into included routers (FastAPI wraps them in an include node)."""
+    for r in routes:
+        inner = getattr(r, "original_router", None)
+        if inner is not None:
+            yield from _flat_routes(inner.routes)
+        else:
+            yield r
+
+
 def _routes(app: Any) -> list[tuple[str, str]]:
     out = []
-    for r in app.routes:
+    for r in _flat_routes(app.router.routes):
         methods = getattr(r, "methods", None) or set()
         for m in sorted(methods - {"HEAD", "OPTIONS"}):
             out.append((m, r.path))
+    # Cross-check with the public contract: nothing documented may be missed by the walk.
+    documented = {(m.upper(), path) for path, ops in app.openapi()["paths"].items() for m in ops}
+    assert documented <= set(out), documented - set(out)
     return out
 
 
@@ -122,12 +135,15 @@ def test_api_routes_all_declare_an_auth_dependency() -> None:
             names |= calls(d)
         return names
 
-    for r in app.routes:
+    seen = 0
+    for r in _flat_routes(app.router.routes):
         if not isinstance(r, APIRoute) or any((m, r.path) in PUBLIC for m in r.methods):
             continue
         names = calls(r.dependant)
         assert names & {authenticated.__name__, "require_read", "require_simulate", "require_ingest",
                         "require_review"}, r.path
+        seen += 1
+    assert seen >= 30
 
 
 @pytest.mark.usefixtures("clean_env")

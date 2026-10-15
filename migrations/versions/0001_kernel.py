@@ -54,15 +54,27 @@ $$;
 
 -- recorded_at is server-generated (§6.1). Generic BEFORE INSERT trigger body,
 -- attached to every table with a recorded_at column in 0007: runtime roles can
--- never choose (backdate) the value. Only the table owner (the migration role:
--- registry maintenance, tests constructing historical fixtures) may supply one.
+-- never choose (backdate) the value. Only a session whose *login* (session_user)
+-- owns the table (the migration role: registry maintenance, tests constructing
+-- historical fixtures) may supply one. (R5-14) Keyed on session_user, not
+-- current_user: inside a SECURITY DEFINER function current_user is the owner, so
+-- a definer function forwarding a caller's value would otherwise reopen R-08.
+-- A value supplied by anyone else is rejected (not silently replaced) unless it
+-- is the column default (clock_timestamp(), evaluated just before this trigger);
+-- the stored value is always the server clock.
 CREATE FUNCTION meta.force_recorded_at() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE server_now timestamptz := pg_catalog.clock_timestamp();
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c
-                 WHERE c.oid = TG_RELID AND c.relowner = (SELECT r.oid FROM pg_catalog.pg_roles r
-                                                          WHERE r.rolname = current_user)) THEN
-    NEW.recorded_at := clock_timestamp();
+  IF EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_roles r ON r.oid = c.relowner
+             WHERE c.oid = TG_RELID AND r.rolname = session_user) THEN
+    RETURN NEW;
   END IF;
+  IF NEW.recorded_at IS NOT NULL
+     AND abs(extract(epoch FROM (NEW.recorded_at - server_now))) > 1 THEN
+    RAISE EXCEPTION 'recorded_at is server-generated: %.% does not accept a caller-supplied value (%)',
+      TG_TABLE_SCHEMA, TG_TABLE_NAME, NEW.recorded_at USING ERRCODE = '42501';
+  END IF;
+  NEW.recorded_at := server_now;
   RETURN NEW;
 END $$;
 
@@ -72,18 +84,27 @@ END $$;
 -- not older than our own top-level xid (subtransaction xids are newer) is ours.
 -- Callers pass the xmin of a row they could see. The 32-bit xmin is widened
 -- with the current epoch; an unfrozen xmin is less than 2^31 xids old, so a
--- value more than 2^31 ahead belongs to the previous epoch (not ours). Fails
--- closed (false) for frozen/special xids and for the practically unreachable
--- case of a subtransaction crossing an epoch boundary.
+-- value more than 2^31 ahead belongs to the previous epoch (not ours).
+-- Returns false (never raises) for NULL/special xids, for candidates outside
+-- [our xid, our xid + 2^31), and when pg_xact_status cannot classify the
+-- candidate (R5-13: a frozen tuple's raw xmin widened into the current epoch
+-- can lie beyond nextXid, for which pg_xact_status raises "in the future").
+-- Residual, theoretical case: after ~4e9 xids a frozen raw xmin could equal a
+-- concurrently running newer xid of our own transaction tree.
 CREATE FUNCTION meta.inserted_in_current_xact(x xid) RETURNS boolean
   LANGUAGE plpgsql VOLATILE AS $$
-DECLARE cur bigint; cand bigint;
+DECLARE cur bigint; cand bigint; st text;
 BEGIN
   IF x IS NULL OR x::text::bigint < 3 THEN RETURN false; END IF;
   cur := pg_catalog.pg_current_xact_id()::text::bigint;
   cand := (cur & ~4294967295::bigint) | x::text::bigint;
   IF cand < cur OR cand > cur + 2147483647 THEN RETURN false; END IF;
-  RETURN COALESCE(pg_catalog.pg_xact_status(cand::text::xid8) = 'in progress', false);
+  BEGIN
+    st := pg_catalog.pg_xact_status(cand::text::xid8);
+  EXCEPTION WHEN OTHERS THEN
+    RETURN false;
+  END;
+  RETURN COALESCE(st = 'in progress', false);
 END $$;
 
 CREATE TABLE meta.artifact (
@@ -294,6 +315,18 @@ CREATE TABLE world.support (
 );
 CREATE INDEX support_geometry ON world.support USING gist(geometry_4326);
 CREATE INDEX support_time ON world.support USING gist(valid_range);
+
+-- (R5-03) The one definition of a support's reference year, shared by the
+-- belief.input trigger (via evidence.observation_is_eligible) and belief
+-- selection: the UTC calendar year of lower(valid_range). NULL ("unknown") when
+-- the support has no range, an unbounded lower end or an infinite lower bound.
+-- An unknown year is never covered by a years-scoped eligibility decision.
+CREATE FUNCTION world.support_ref_year(sp uuid) RETURNS integer LANGUAGE sql STABLE AS $$
+  SELECT CASE WHEN s.valid_range IS NULL OR lower_inf(s.valid_range) OR NOT isfinite(lower(s.valid_range))
+              THEN NULL
+              ELSE extract(year FROM lower(s.valid_range) AT TIME ZONE 'UTC')::integer END
+  FROM world.support s WHERE s.id = sp
+$$;
 
 -- Display geometries (Natural Earth): explicitly not authoritative boundaries.
 CREATE TABLE world.display_geometry (

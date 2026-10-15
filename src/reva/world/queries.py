@@ -1112,6 +1112,140 @@ def aggregate_flows(
 
 
 # ---------------------------------------------------------------------------
+# Publication pauses: stale estimates (connector self-healing, architecture §10.3)
+# ---------------------------------------------------------------------------
+
+# Marker namespace written by reva.autonomy.repair.pause_belief_publication (not imported:
+# the read library stays free of the autonomy stack). ops.dirty_node is readable by reva_api.
+PAUSE_MARKER_PREFIX = "publication_pause:belief:"
+SCHEMA_QUARANTINE = "source_schema_quarantine"
+
+_WITHHELD_PAUSED_SQL = """
+SELECT a.parameters->'withheld_paused' FROM belief.release r
+JOIN meta.activity a ON a.id = r.provenance_activity_id WHERE r.id = :r
+"""
+
+_PAUSE_MARKERS_SQL = """
+SELECT node_key, reason, accumulated_error_bound, updated_at FROM ops.dirty_node
+WHERE node_key LIKE :p AND (CAST(:as_of AS timestamptz) IS NULL OR updated_at <= :as_of)
+ORDER BY node_key
+"""
+
+_LAST_RELEASE_WITH_CONCEPT_SQL = """
+SELECT r.id, p.sequence, r.knowledge_cutoff, p.published_at FROM belief.release r
+JOIN ops.publication p ON p.release_id = r.id
+WHERE r.origin = :o AND p.sequence < :seq
+  AND EXISTS (SELECT 1 FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id
+              WHERE e.release_id = r.id AND cv.concept_id = :c)
+ORDER BY p.sequence DESC LIMIT 1
+"""
+
+
+def publication_staleness(
+    conn: Connection, release: dict[str, Any], *, as_of: datetime | None = None
+) -> dict[str, dict[str, Any]]:
+    """concept_id -> stale mark for estimates read through ``release``.
+
+    A concept is stale when (a) the release itself withheld it because its
+    publication was paused (recorded durably in the publication activity's
+    ``withheld_paused`` parameters), or (b) a pause marker that began at/before
+    ``as_of`` (``None`` = now) is active for it. The mark carries the reason
+    (``source_schema_quarantine``), the pause detail and the repair ``proposal_id``.
+    """
+    require_aware(as_of, "as_of")
+    marks: dict[str, dict[str, Any]] = {}
+    recorded = conn.execute(text(_WITHHELD_PAUSED_SQL), {"r": release["id"]}).scalar_one_or_none()
+    for w in recorded or []:
+        if isinstance(w, dict) and w.get("concept_id"):
+            marks[str(w["concept_id"])] = {
+                "stale": True, "reason": w.get("reason") or SCHEMA_QUARANTINE, "pause_reason": w.get("pause_reason"),
+                "proposal_id": w.get("proposal_id"), "paused_since": w.get("paused_since"),
+                "withheld_in_release": True}
+    for r in conn.execute(text(_PAUSE_MARKERS_SQL), {"p": PAUSE_MARKER_PREFIX + "%", "as_of": as_of}).mappings():
+        concept = str(r["node_key"])[len(PAUSE_MARKER_PREFIX):]
+        bound = dict(r["accumulated_error_bound"] or {})
+        mark = marks.setdefault(concept, {
+            "stale": True, "reason": bound.get("basis") or SCHEMA_QUARANTINE, "pause_reason": r["reason"],
+            "proposal_id": bound.get("proposal_id"), "paused_since": r["updated_at"].isoformat(),
+            "withheld_in_release": False})
+        mark["pause_active"] = True
+    return marks
+
+
+def _annotate(row: dict[str, Any], mark: dict[str, Any] | None, served_from: UUID | Any,
+              fallback: bool) -> dict[str, Any]:
+    row["stale"] = mark is not None
+    row["stale_reason"] = None if mark is None else mark["reason"]
+    row["proposal_id"] = None if mark is None else mark.get("proposal_id")
+    row["pause_reason"] = None if mark is None else mark.get("pause_reason")
+    row["served_from_release_id"] = served_from
+    row["served_as"] = "last_accepted_release" if fallback else "pinned_release"
+    return row
+
+
+@dataclass(frozen=True)
+class ReleaseEstimates:
+    release: dict[str, Any] | None
+    estimates: tuple[dict[str, Any], ...]
+    stale_concepts: dict[str, dict[str, Any]]
+    notes: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"release": self.release, "estimates": list(self.estimates), "stale_concepts": self.stale_concepts,
+                "notes": list(self.notes)}
+
+
+def release_estimates(
+    conn: Connection,
+    *,
+    release_id: UUID | None = None,
+    as_of: datetime | None = None,
+    origin: str | None = None,
+    subject_id: UUID | None = None,
+    concept_id: str | None = None,
+) -> ReleaseEstimates:
+    """Estimates of the pinned release (``release_id``, else the release published at ``as_of``),
+    with publication-pause staleness.
+
+    Every row carries ``stale`` / ``stale_reason`` / ``proposal_id`` / ``pause_reason`` /
+    ``served_from_release_id``. For a concept the release withheld because its publication
+    was paused, the estimates of the last earlier release (same origin) that published it
+    are returned instead, marked stale (``served_as = "last_accepted_release"``): the
+    previous accepted values stay selectable, never silently fresh.
+    """
+    from reva.belief.snapshots import estimates as release_rows
+    from reva.belief.snapshots import release_by_id
+
+    require_aware(as_of, "as_of")
+    notes: list[str] = []
+    rel = release_by_id(conn, release_id) if release_id is not None else release_as_of(conn, as_of, origin)
+    if rel is None or rel.get("sequence") is None:
+        return ReleaseEstimates(None, (), {}, ("no published belief release is available for this query",))
+    marks = publication_staleness(conn, rel, as_of=as_of)
+    out = [_annotate(r, marks.get(r["concept_id"]), rel["id"], False)
+           for r in release_rows(conn, rel["id"], subject_id=subject_id, concept_id=concept_id)]
+    for concept, mark in sorted(marks.items()):
+        if not mark.get("withheld_in_release") or (concept_id is not None and concept != concept_id):
+            continue
+        prev = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL),
+                            {"o": rel["origin"], "seq": rel["sequence"], "c": concept}).mappings().one_or_none()
+        if prev is None:
+            notes.append(f"{concept}: withheld ({mark['reason']}) and no earlier release published it")
+            continue
+        have = {(r["subject_id"], r["support_id"]) for r in out if r["concept_id"] == concept}
+        rows = [r for r in release_rows(conn, prev["id"], subject_id=subject_id, concept_id=concept)
+                if (r["subject_id"], r["support_id"]) not in have]
+        out.extend(_annotate(r, mark, prev["id"], True) for r in rows)
+        notes.append(f"{concept}: publication paused ({mark['reason']}); serving release sequence "
+                     f"{prev['sequence']} as stale")
+    for concept, mark in sorted(marks.items()):
+        if not mark.get("withheld_in_release") and any(r["concept_id"] == concept for r in out):
+            notes.append(f"{concept}: publication paused since {mark['paused_since']} ({mark['reason']}); "
+                         "estimates are stale")
+    return ReleaseEstimates(rel, tuple(out), marks, tuple(notes))
+
+
+# ---------------------------------------------------------------------------
 # Source claim vs accepted estimate
 # ---------------------------------------------------------------------------
 
@@ -1253,10 +1387,19 @@ def compare_claims(
     if release is None:
         notes.append("no published belief release is available for this query")
     else:
-        for r in conn.execute(text(_ESTIMATES_SQL), {**params, "release": release["id"]}).mappings():
-            d = dict(r)
-            estimates.append(
-                {
+        mark = publication_staleness(conn, release, as_of=as_of).get(concept_id)
+        served = [(release["id"], False)]
+        if mark is not None and mark.get("withheld_in_release") and release.get("sequence") is not None:
+            prev = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL), {
+                "o": release["origin"], "seq": release["sequence"], "c": concept_id}).mappings().one_or_none()
+            if prev is not None:
+                served.append((prev["id"], True))
+        for rel_id, fallback in served:
+            if fallback and estimates:
+                break
+            for r in conn.execute(text(_ESTIMATES_SQL), {**params, "release": rel_id}).mappings():
+                d = dict(r)
+                est = {
                     "estimate_id": str(d["id"]),
                     "modality": d["modality"],
                     "value": d["value"],
@@ -1267,7 +1410,13 @@ def compare_claims(
                     "concept_version": d["concept_version"],
                     "input_observation_ids": [str(x) for x in d["input_observation_ids"]],
                 }
-            )
+                if mark is not None:
+                    _annotate(est, mark, str(rel_id), fallback)
+                estimates.append(est)
+        if mark is not None:
+            notes.append(f"publication of {concept_id} is paused ({mark['reason']}); accepted estimates are stale"
+                         + (" (served from the last release that published it)"
+                            if any(e.get("served_as") == "last_accepted_release" for e in estimates) else ""))
         if not estimates:
             notes.append("the release holds no accepted estimate for this subject/concept/support")
         if any(e["modality"] == "selected_report" for e in estimates):
