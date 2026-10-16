@@ -475,7 +475,15 @@ class AtlasLinkReader:
             d.skipped["row_cap_reached"] += 1
             rows = rows[:cap]
         d.considered = len(rows)
-        too_few = int(rows[0]["too_few"]) if rows else 0
+        if rows:
+            too_few = int(rows[0]["too_few"])
+        else:  # nothing passed the minimum: count what was below it
+            cnt = self._rows(
+                f"WITH {self._vote_groups(**kw).strip()} "
+                f"SELECT count(*) AS k FROM g WHERE n_common < {MIN_COMMON_ROLLCALLS}",
+                (),
+            )
+            too_few = int(cnt[0]["k"]) if cnt else 0
         if too_few:
             d.skipped["fewer_than_min_common_rollcalls"] += too_few
         for r in rows:

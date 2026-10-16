@@ -51,7 +51,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.oecd.batis"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
 PARSER_VERSION = "atlas_batis/1"
 SOURCE_KEY = "oecd.sdmx"
 SOURCE = "oecd"

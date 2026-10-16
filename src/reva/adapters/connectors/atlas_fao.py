@@ -71,7 +71,7 @@ from reva.atlas.tables import ATLAS_SCHEMA, country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.fao"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
 PARSER_VERSION = "atlas_fao/1"
 SOURCE_KEY = "fao.faostat"
 SOURCE = "fao"

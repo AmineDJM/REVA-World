@@ -42,7 +42,7 @@ from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.whr"
-CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
+CONNECTOR_VERSION = "1.1.1"  # 1.1.0: atlas source platform; 1.1.1: TWNMAP (Taiwan maps)
 PARSER_VERSION = "atlas_whr/1"
 SOURCE_KEY = "whr.figure21"
 SOURCE = "whr"

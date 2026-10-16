@@ -46,7 +46,7 @@ from reva.ports.connectors import (
 )
 
 CONNECTOR_NAME = "atlas.geonames_countryinfo"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
 SOURCE_KEY = "geonames.countryinfo"
 PARSER_VERSION = "atlas-geonames-countryinfo/1"
 ATLAS_SOURCE = "geonames"

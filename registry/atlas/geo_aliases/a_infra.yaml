@@ -2,7 +2,8 @@
 # Every alias names the provider row it was read from; anything not listed stays unmapped (kept, listed in
 # each table's manifest). Nothing is guessed: historical states (GCAT SU, CSSR, CSFR, HKUK, TTPI),
 # intergovernmental organisations (GCAT I-*), OpenFlights "West Bank" (one airport, Jerusalem Atarot) and
-# OurAirports XP (Paracel Islands, disputed) / ZZ (unknown) are deliberately NOT mapped.
+# OurAirports XP (Paracel Islands, disputed) / ZZ (unknown), NGA WPI QM/QW/XU (parts of UMI) and GCAT ESCN/ESIB
+# (Canary / Balearic Islands, parts of Spain whose GCAT code E is already mapped) are deliberately NOT mapped.
 schemes:
   # OurAirports iso_country: ISO 3166-1 alpha-2 plus XK (Kosovo).
   ourairports:
@@ -14,13 +15,12 @@ schemes:
           OurAirports countries.csv row: 302720,"XK","Kosovo","EU" (https://davidmegginson.github.io/ourairports-data/countries.csv,
           retrieved 2026-10-16). XKX is the crosswalk key of Kosovo.
     source: {kind: provider_data, url: "https://davidmegginson.github.io/ourairports-data/countries.csv", retrieved_at: "2026-10-16T00:15:00Z"}
-  # NGA World Port Index countryCode: ISO 3166-1 alpha-2 except three US minor outlying islands (GENC-style codes).
+  # NGA World Port Index countryCode: ISO 3166-1 alpha-2, except three US minor outlying islands coded QM (Midway
+  # Islands), QW (Wake Island), XU (Johnston Atoll). All three are parts of ISO UM (UMI); mapping them would make three
+  # provider geographies one country (the atlas refuses that: REVA must not sum or choose), so they stay unmapped.
   nga_wpi:
     base: iso2
-    aliases:
-      - {code: QM, iso3: UMI, source: "NGA WPI (msi.nga.mil world-port-index CSV, 2026-10-16) row countryCode=QM countryName='Midway Islands'; ISO 3166-1 UM (United States Minor Outlying Islands) comprises Midway"}
-      - {code: QW, iso3: UMI, source: "NGA WPI row countryCode=QW countryName='Wake Island'; ISO 3166-1 UM comprises Wake Island"}
-      - {code: XU, iso3: UMI, source: "NGA WPI row countryCode=XU countryName='Johnston Atoll'; ISO 3166-1 UM comprises Johnston Atoll"}
+    aliases: []
     source: {kind: provider_data, url: "https://msi.nga.mil/api/publications/world-port-index?output=csv", retrieved_at: "2026-10-16T18:11:46Z"}
   # OpenFlights airports.dat country names that the provider's own countries.dat spells differently
   # (all other names are mapped at run time through countries.dat name -> ISO alpha-2, provider data).
@@ -149,12 +149,6 @@ schemes:
       - code: "EG"
         iso3: EGY
         source: "GCAT orgs.tsv row Code=EG Type=CY Name=\"Jumhuriyat Misr al-Arabiyah\" ShortEName=\"Egypt\" TStart=1922 Feb 22 TStop=-"
-      - code: "ESCN"
-        iso3: ESP
-        source: "GCAT orgs.tsv row Code=ESCN Type=CYP Name=\"Islas Canarias\" ShortEName=\"Canary Is\" TStart=1479 TStop=- (a Spanish autonomous community; GCAT type CYP, parent E)"
-      - code: "ESIB"
-        iso3: ESP
-        source: "GCAT orgs.tsv row Code=ESIB Type=CYP Name=\"Islas Baleares\" ShortEName=\"Balaeric Is.\" TStart=1983 TStop=- (a Spanish autonomous community; GCAT type CYP, parent E)"
       - code: "ET"
         iso3: ETH
         source: "GCAT orgs.tsv row Code=ET Type=CY Name=\"ye Itiyoppya Federalawi Demokirasiyawi Ripebilik\" ShortEName=\"Ethiopia\" TStart=1941 TStop=-"
