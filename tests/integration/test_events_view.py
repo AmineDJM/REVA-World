@@ -162,25 +162,28 @@ def test_interval_inconsistency_and_bce(graph) -> None:  # type: ignore[no-untyp
 
 def test_listing_filters_and_pagination(graph) -> None:  # type: ignore[no-untyped-def]
     with graph.api.connect() as c:
-        wars = ev.list_events(c, types=["war"], recorded=EMPTY, origin="test_fixture")
+        # (other test modules may share the session database: always filter on a window or a country)
+        wars = ev.list_events(c, types=["war"], start="1950", end="1999", recorded=EMPTY, origin="test_fixture",
+                              limit=200)
         ids = [i["id"] for i in wars["items"]]
         assert "evsyn:war1" in ids and "evsyn:op1" in ids and "evsyn:battle1" not in ids
-        assert "evsyn:undated1" not in ids or ids[-1] == "evsyn:undated1"
+        assert "evsyn:undated1" not in ids
         conf = ev.list_events(c, types=["armed_conflict"], start="1956", end="1956", recorded=EMPTY,
                               origin="test_fixture")
         assert {i["id"] for i in conf["items"]} >= {"evsyn:war1", "evsyn:battle1"}
         assert "evsyn:undated1" not in {i["id"] for i in conf["items"]}
         dz = ev.list_events(c, types=["armed_conflict"], country="Q262", recorded=EMPTY, origin="test_fixture")
-        assert {i["id"] for i in dz["items"]} == {"evsyn:war1", "evsyn:battle1"}
+        assert {i["id"] for i in dz["items"] if i["id"].startswith("evsyn:")} == {"evsyn:war1", "evsyn:battle1"}
         fr = ev.list_events(c, types=["war"], country="Q142", recorded=EMPTY, origin="test_fixture")
-        assert fr["items"] == []
-        fr = ev.list_events(c, types=["war"], country="Q142", involving=True, recorded=EMPTY, origin="test_fixture")
-        assert [i["id"] for i in fr["items"]] == ["evsyn:war1"]
+        assert [i["id"] for i in fr["items"] if i["id"].startswith("evsyn:")] == []
+        fr = ev.list_events(c, types=["war"], country="Q142", involving=True, recorded=EMPTY, origin="test_fixture",
+                            limit=200)
+        assert [i["id"] for i in fr["items"] if i["id"].startswith("evsyn:")] == ["evsyn:war1"]
         seen: list[str] = []
         cur = None
-        for _ in range(10):
-            page = ev.list_events(c, types=["armed_conflict"], limit=1, cursor=cur, include_undated=True,
-                                  recorded=EMPTY, origin="test_fixture")
+        for _ in range(200):
+            page = ev.list_events(c, types=["armed_conflict"], limit=2, cursor=cur, include_undated=True,
+                                  start="1955", end="1957", recorded=EMPTY, origin="test_fixture")
             seen += [i["id"] for i in page["items"]]
             cur = page["next"]
             if cur is None:
@@ -230,9 +233,10 @@ def test_api_listing_and_types(api) -> None:  # type: ignore[no-untyped-def]
     r = get(api, "/v1/events/search", type="armed_conflict", country="DZA", origin="test_fixture")
     assert r.status_code == 200, r.text
     assert {i["id"] for i in r.json()["data"]["items"]} >= {"evsyn:war1", "evsyn:battle1"}
-    r = get(api, "/v1/events/search", type="armed_conflict", limit=1, origin="test_fixture")
+    r = get(api, "/v1/events/search", type="armed_conflict", country="DZA", limit=1, origin="test_fixture")
     assert r.json()["next_cursor"]
-    r2 = get(api, "/v1/events/search", type="armed_conflict", limit=1, origin="test_fixture", cursor=r.json()["next_cursor"])
+    r2 = get(api, "/v1/events/search", type="armed_conflict", country="DZA", limit=1, origin="test_fixture",
+             cursor=r.json()["next_cursor"])
     assert r2.status_code == 200 and r2.json()["data"]["items"][0]["id"] != r.json()["data"]["items"][0]["id"]
     assert get(api, "/v1/events/search", type="no_such_type").status_code == 422
     assert get(api, "/v1/events/search", **{"from": "1970", "to": "1960"}).status_code == 422

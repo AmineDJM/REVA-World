@@ -466,6 +466,18 @@ def causal_claims(env: Env) -> dict[str, Any]:
     return causal.refresh(env.owner, origin="test_fixture")
 
 
+@pytest.fixture(autouse=True)
+def _roomy_rate_limit(env: Env, request: pytest.FixtureRequest) -> Iterator[None]:
+    """The causal questions below run after the module's other questions: a per-test limiter keeps the
+    per-minute rate limit (tested above) from refusing them."""
+    if "causal_claims" not in request.fixturenames:
+        yield
+        return
+    env.app.state.nlqa_rate_limiter = _RateLimiter(100)
+    yield
+    del env.app.state.nlqa_rate_limiter
+
+
 def test_why_answers_from_real_causal_claims_with_source_and_tier(env: Env, causal_claims: dict[str, Any]) -> None:
     assert causal_claims["loaded"]["inserted"] >= 1, causal_claims
     b = ask(env, "Quelles sont les causes du traité de Tordesillas ?").json()
@@ -490,11 +502,7 @@ def test_causal_chain_is_a_composition_with_each_hop_sourced(env: Env, causal_cl
     b = ask(env, "Chaîne causale entre premier voyage de Christophe Colomb et traité de Tordesillas ?").json()
     cited(b)
     assert [o["op"] for o in b["plan"]["operations"]] == ["entity_lookup", "entity_lookup", "causal_chain"]
-    if not any(s["kind"] == "path" for s in b["sentences"]):
-        # the grader may grade an undated, unreferenced statement below the chain search's default minimum (D):
-        # then "no chain" is said, never a guess
-        assert "cela ne prouve ni l'absence ni l'existence d'un lien causal" in b["answer_text"], b["answer_text"]
-        return
+    # the claim is graded D (T4, undated): within the chain search's default minimum grade (D)
     head = next(s for s in b["sentences"] if s["kind"] == "path")
     assert "Chaîne composée par REVA à partir de 1 affirmation(s) distincte(s)" in head["text"]
     assert "force = maillon le plus faible" in head["text"]

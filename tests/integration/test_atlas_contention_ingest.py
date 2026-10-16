@@ -48,7 +48,7 @@ def _spec(name: str) -> Any:
 
 async def test_navco_ingest(db: Any, tmp_path: Path) -> None:
     s = await _run(db, _spec("atlas.navco"), options={"claims_staging": str(tmp_path)})
-    assert s["atlas"]["n13_cy"]["created"] and s["atlas"]["n21_cy"]["created"]
+    assert all(s["atlas"][ds]["created"] for ds in ("n13_cy", "n21_cy", "n30_cy"))
     assert not s["kg"]["rejected"], s["kg"]
     assert s["kg"]["statements_inserted"] == s["kg_counts"]["statements"]
     _check_delivery(s)

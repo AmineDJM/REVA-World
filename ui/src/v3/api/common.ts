@@ -92,6 +92,7 @@ const WARNING_FR: Record<string, string | null> = {
   fixture_data: 'Données de test (test_fixture), pas des données publiées.',
   truncated: 'Recherche ou liste bornée par le serveur : d’autres résultats peuvent exister.',
   display_only: 'Géométrie d’affichage seulement.',
+  licence_restricted: 'Certaines valeurs proviennent de sources sous licence restrictive (par exemple non commerciale) : voir les licences ci-dessous.',
 };
 
 export function warningsFr(ws: { code: string; message: string }[]): string[] {

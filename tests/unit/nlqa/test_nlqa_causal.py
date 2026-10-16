@@ -321,3 +321,19 @@ def test_ui_fixture_is_the_current_pipeline_output() -> None:
     if os.environ.get("REVA_REGEN_UI_FIXTURE") == "1":
         UI_FIXTURE.write_text(json.dumps(fresh, ensure_ascii=False, indent=1) + "\n")
     assert json.loads(UI_FIXTURE.read_text()) == fresh, "stale UI fixture: regenerate (see its _note)"
+
+
+def test_adapter_reads_why_lanes_as_causcore_returns_them() -> None:
+    """reva.causal.graph.why returns lanes as a list of {lane, label, claims} plus dissent (denials)."""
+    why = {
+        "id": "Q361",
+        "lanes": [
+            {"lane": "immediate", "label": {"fr": "causes immédiates"}, "claims": [C.SARAJEVO]},
+            {"lane": "coded", "label": {"fr": "déclencheurs codés"}, "claims": [C.JULY, C.CANDIDATE]},
+        ],
+        "dissent": [C.IMPERIAL_DENIED],
+    }
+    a = CausalServiceAdapter(lambda *_: why, lambda *_: {"paths": []})
+    res = a.explain("Q361", direction="causes", limit=10)
+    assert [c.claim_key for c in res.claims] == [C.SARAJEVO["claim_key"], C.JULY["claim_key"]]
+    assert [c.stance for c in res.dissent] == ["denies"]

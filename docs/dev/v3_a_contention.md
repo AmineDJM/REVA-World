@@ -9,11 +9,11 @@ yet, so no live run); claims delivered through CAUSCORE's interface shape (stage
 
 | Piece | Path |
 |---|---|
-| NAVCO 1.2 / 1.3 / 2.1 + MEC connector (`atlas.navco`, `atlas.mec`) and the shared helpers (Dataverse version checks, tab reader, places, counting, KG predicates, claims) | `src/reva/adapters/connectors/atlas_navco.py` |
+| NAVCO 1.2 / 1.3 / 2.1 / 3.0 + MEC connector (`atlas.navco`, `atlas.mec`) and the shared helpers (Dataverse version checks, tab reader, places, counting, KG predicates, claims) | `src/reva/adapters/connectors/atlas_navco.py` |
 | Mass Mobilization connector (`atlas.massmob`) | `src/reva/adapters/connectors/atlas_massmob.py` |
 | Sources | `registry/sources/{navco,mec,massmob}.yaml` |
 | Location-name schemes `navco_loc`, `mec_loc`, `mmp_loc` (every provider name, with evidence) | `registry/atlas/geo_aliases/a_contention.yaml` |
-| Atlas catalog (37 concepts, domain `contention`, theme `politics`) | `registry/atlas/catalog/contention.yaml` |
+| Atlas catalog (40 concepts, domain `contention`, theme `politics`) | `registry/atlas/catalog/contention.yaml` |
 | Budget request | `registry/atlas/budget_requests/a_contention.yaml` |
 | Fixtures (slices of the real downloads, hash-pinned) | `tests/fixtures/source/atlas.{navco,mec,massmob}/` (186 KB, 54 KB, 63 KB) |
 | Tests | `tests/unit/test_atlas_contention.py` (offline), `tests/integration/test_atlas_contention_ingest.py` (throwaway DB, fixture mode) |
@@ -35,6 +35,7 @@ listed in the version with the pinned md5.
 | NAVCO 1.3 list | `doi:10.7910/DVN/ON9XND` v1.0, file 3769104 (73,204 B; 622 campaigns 1900-2019) | method, goals, outcome as of 2019-12-31 | atlas `navco.n13_cy`, KG, claims |
 | NAVCO 2.1 | `doi:10.7910/DVN/MHOXDV` v2.1, file 3620879 (1,384,763 B; 384 campaigns, 2,717 campaign-years 1945-2013) | day-precision dates, yearly method/goal/size, repression level, regime-inflicted fatalities, defection, progress, success | atlas `navco.n21_cy`, KG, claims |
 | MEC v3.0 (Chenoweth & Kang) | `doi:10.7910/DVN/JQWQNW` v3.0, file 13992597 (1,333,438 B; 2,734 episodes 1955-2018) | category 2 reformist / 4 maximalist, day dates, goals with coder notes, size, regviol, defect, outcome (345 UNKNOWN) | atlas `mec.episodes_cy`, KG, claims |
+| NAVCO 3.0 (Chenoweth, Pinckney & Lewis) | `doi:10.7910/DVN/INNYEO` v1.0, file 3612128 `navco3-0full.xlsx` (20,662,692 B, not ingested by Dataverse: md5 checked) | 112,381 CAMEO-style action lines (actor-verb-target per country-day), 26 countries 1990-2012 | atlas `navco.n30_cy` only (counts) |
 | Mass Mobilization v5.1 (Clark & Regan) | `doi:10.7910/DVN/HTTWYL` v5.1, file 4291456 (15,625,472 B; 15,239 protests + 1,906 `protest = 0` country-years, 1990-2020) | protests of >= 50 people against the government: dates, location text, protester violence, participants, identity, 4 demands, 7 state responses | atlas `mmp.protests_cy`, KG, claims |
 
 **Not stored**: MMP `sources` (newspaper citations with journalists' names) and `notes` (news excerpts, third-party
@@ -43,10 +44,9 @@ NAVCO/MEC campaign names, targets and actors, MEC goal descriptions, MMP locatio
 
 **Not ingested (decisions)**
 
-* **NAVCO 3.0** (`doi:10.7910/DVN/INNYEO`, CC0): event-level CAMEO-coded country-day data for 26 countries
-  1990-2012 (≈20 MB xlsx). Each row carries `event_desc` (a pasted news lead) and `event_actor_list` (named people);
-  the useful, non-textual part is per-country-day counts. Left for a follow-up: an atlas count table (events per
-  country-year by actor type and tactic) without the text columns.
+* **NAVCO 3.0 in the KG**: each row carries `event_desc` (a pasted news lead), `source_title`, `localities` and
+  `event_actor_list` (named people); only the coded columns are used (atlas counts), nothing textual is stored
+  and the fixture slice drops those columns.
 * **GDELT** (event database, CC-like "unlimited use with citation"): not ingested in bulk. The 1979-present event
   files run to hundreds of GB (15-minute updates since 2015), far beyond this agent's 300 MB disk cap and the KG
   size target; events are machine-coded from news by CAMEO dictionaries with heavy duplication and no codebook-level
@@ -60,7 +60,7 @@ NAVCO/MEC campaign names, targets and actors, MEC goal descriptions, MMP locatio
 
 Provider location names → crosswalk keys through `registry/atlas/geo_aliases/a_contention.yaml`, one scheme per
 dataset family (`navco_loc` 173 names: 133 exact crosswalk-label matches, 29 decisions, 11 unmapped; `mec_loc` 180:
-149 / 23 / 8; `mmp_loc` 166: 144 / 16 / 6). Decisions cite the provider's own code on the same rows (NAVCO 2.1
+149 / 23 / 8; `mmp_loc` 166: 144 / 16 / 6; `navco3_loc` 26 lower-case NAVCO 3.0 names, each by its `cowcode`). Decisions cite the provider's own code on the same rows (NAVCO 2.1
 `loc_iso` ISO numeric, MEC `ccode` COW, MMP `ccode` Polity), e.g. `Burma/Myanmar` → MMR (loc_iso 104),
 `Tibet` → CHN (NAVCO 2.1 loc_iso 156 / MEC ccode 710: the providers place Tibet campaigns in China; the atlas cell
 lists the provider name), `Northern Ireland` → GBR (MEC ccode 200), `Hyderabad` / `Travancore` → IND (loc_iso 356).
@@ -86,6 +86,7 @@ Soviet Union existed, stays `navco:place:ussr`).
 |---|---|---|
 | `navco.n13_cy` | `campaigns_active` (BYEAR ≤ y ≤ EYEAR; EYEAR = peak year, or end year when the peak is unknown), by `method=` nonviolent/violent and `goal=`; `campaign_onsets` (+ method); `campaigns_eyear` and `|outcome=success/limited/failure/ongoing` | 40,590 |
 | `navco.n21_cy` | `campaign_years` and by `prim_method=`, `repression=none/mild/moderate/extreme/unknown`, `progress=0..5`, `goal=0..5`, `sec_defect=1`, `success=1` | 46,838 |
+| `navco.n30_cy` | `action_lines` (NAVCO 3.0 coded lines dated in the year; one news event can give several lines and reciprocal actions are coded once per side — a count of coded actions, not of events), by `actor=` (state, non_state, international, nonaligned, local_state), `tactic=` (violent, nonviolent, mixed), `verb=` (the 21 root verbs, e.g. `14_protest`, `18_repress_and_abuse`), `state_posture=1..7` | N30_ROWS |
 | `mec.episodes_cy` | `episodes_active` ([bdate, edate] overlaps y), by `category=` reformist/maximalist, `tactics=`, `regviol=1`; `episode_onsets` (+ category); `episodes_ending` and `|outcome=success/limited/failure/ongoing/unknown` | 56,144 |
 | `mmp.protests_cy` | `protests` (MMP year = start year), `protester_violence=0/1`, `demand=` (7), `response=` (7 incl. `ignore`), `participants_category=` (6) | 112,148 |
 
@@ -139,8 +140,10 @@ Loaded when CAUSCORE's loader and schema exist; otherwise staged as JSON in `run
 
 | Relation (direction as `registry/causal/relations.yaml`) | Claims | Codebook term (quoted) |
 |---|---|---|
-| `coded_outcome`: cause = campaign/episode, effect = its `:outcome` entity | NAVCO 1.2 389 − 0, NAVCO 1.3 620 (2 rows have no outcome flag), NAVCO 2.1 per campaign with an end year, MEC 2,389 (345 UNKNOWN: no claim) | SUCCESS / LIMITED / FAILURE / ONGOING (ongoing rows use ONGOING: "Campaigns coded as ongoing are also coded as failures"); NAVCO 2.1 `success` |
-| `reaction_to`: cause = campaign/protest, effect = the state repression / response | NAVCO 2.1 repression ≥ 1 per campaign-year; NAVCO 1.2 REGVIOL = 1; MEC regviol = 1; MMP any response other than `ignore` | 2.1 "most repressive episode or activity perpetrated by the state in response to campaign activity"; 1.2/MEC "used violence to crack down on campaign" (MEC table: "retaliate against the campaign"); MMP "actions (or inaction) the state might take in response to protests" |
+| `coded_outcome`: cause = campaign/episode, effect = its `:outcome` entity | NAVCO 1.2: 389 · NAVCO 1.3: 620 (2 rows carry no outcome flag) · NAVCO 2.1: 278 (campaigns with an end-year row: progress + success) · MEC: 2,389 (345 UNKNOWN: no claim) | SUCCESS / LIMITED / FAILURE / ONGOING (ongoing rows use ONGOING: "Campaigns coded as ongoing are also coded as failures"); NAVCO 2.1 `success` |
+| `reaction_to`: cause = campaign/protest, effect = the state repression / response | NAVCO 2.1: 2,629 campaign-years with repression ≥ 1 · NAVCO 1.2: 352 (REGVIOL = 1) · MEC: 1,115 (regviol = 1) · MMP: 7,221 protests with a response other than `ignore` | 2.1 "most repressive episode or activity perpetrated by the state in response to campaign activity"; 1.2/MEC "used violence to crack down on campaign" (MEC table: "retaliate against the campaign"); MMP "actions (or inaction) the state might take in response to protests" |
+
+Total 14,993 T1 claims (`coded_outcome` 3,676, `reaction_to` 11,317).
 
 Decisions: MMP `ignore` makes no claim (manual: it may be the press ignoring the response rather than the state
 not responding). Demands and goals are what protesters seek, not causes (context statements only). Defection,
@@ -167,6 +170,6 @@ FULLSCALE_PLACEHOLDER
 
 ## 9. Gaps
 
-NAVCO 3.0 event counts (above); MMP stops in 2020 and MEC in 2018 (no open successor checked); NAVCO 1.3 has no
+MMP stops in 2020 and MEC in 2018 (no open successor checked); NAVCO 1.3 has no
 repression variable (only 1.2 / 2.1 / MEC do); participation figures are conservative provider estimates
 ("thousands" = 2,001); MMP participants are kept as reported text ("1000s", "50+"), not converted.

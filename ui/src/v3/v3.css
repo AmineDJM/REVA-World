@@ -117,6 +117,18 @@
   color: #31506e;
   border: 1px solid #cddbe9;
 }
+.v3-badge-licence {
+  background: #fdf0ec;
+  color: #8a3b1e;
+  border: 1px solid #efc6b6;
+}
+.v3-licences {
+  margin: 8px 0;
+}
+.v3-licences h3 {
+  font-size: 0.95rem;
+  margin: 4px 0;
+}
 .v3-badge-causal {
   background: var(--v3-causal-bg);
   color: var(--v3-causal);

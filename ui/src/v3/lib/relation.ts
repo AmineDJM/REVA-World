@@ -43,7 +43,7 @@ export function themeOf(kind: string): ThemeId {
 }
 
 export const VOTE_CAVEAT =
-  'Indice calculé par REVA à partir des votes nominaux (Voeten et al.) : part des votes où les deux pays ont voté pareil (oui, non ou abstention) parmi ceux où les deux ont voté. C’est une part de votes identiques — elle ne mesure ni une amitié ni une convergence d’intérêts ; le choix des votes et le codage par thème l’influencent.';
+  'Indice calculé par REVA à partir des votes nominaux (Voeten et al.) : part des votes où les deux pays ont voté pareil (oui, non ou abstention) parmi ceux où les deux ont voté. C’est une part stricte de votes identiques (une abstention face à un oui ou un non compte 0) — ce n’est pas l’indice « agree » de Voeten et Bailey, qui compte une abstention pour moitié : les valeurs ne sont pas comparables à celles de la littérature. Elle ne mesure ni une amitié ni une convergence d’intérêts ; le choix des votes et le codage par thème l’influencent. La période affichée est celle des votes réellement utilisés (décennie partielle signalée).';
 
 export const ISSUE_LABEL: Record<string, string> = {
   all: 'tous les votes',
@@ -157,8 +157,8 @@ function linkItem(l: PairLink, kindLabel: string, labels: PairLinksData['labels'
   const from = nodeName(labels, l.subject, names);
   const to = nodeName(labels, l.object, names);
   const via = l.via.length ? ` (via ${l.via.map((v) => nodeName(labels, v, names)).join(', ')})` : '';
-  const dates = linkDates(l.temporal);
   const t = l.temporal;
+  const dates = censoredDates(l, linkDates(t));
   const phys = physicalDetail(l);
   const yearFrom = phys.since ?? (t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.start));
   const yearTo = t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.end);
@@ -176,6 +176,20 @@ function linkItem(l: PairLink, kindLabel: string, labels: PairLinksData['labels'
     citations: l.evidence.map(citeLinkEvidence),
     serverText: l.text?.fr ?? null,
   };
+}
+
+/**
+ * CSH-1 (review V3b): a period that starts on the dataset's first day (CShapes 2.0: 1886-01-01) is left-censored —
+ * the situation may be older (Algeria: French rule from 1830). Its start is shown as "≤ 1886", never as a date.
+ */
+export function censoredDates(l: PairLink, d: { text: string; undated: boolean }): { text: string; undated: boolean } {
+  const b = (l.basis ?? {}) as Record<string, unknown>;
+  if (b.left_censored !== true || l.temporal.kind !== 'interval') return d;
+  const a = yearOfPartial(l.temporal.start);
+  const z = yearOfPartial(l.temporal.end);
+  const since = typeof b.coverage_start === 'string' ? b.coverage_start : String(a ?? '');
+  const span = z !== null ? `≤ ${a} – ${z}` : `depuis ≤ ${a}`;
+  return { text: `${span} (début de couverture de la source au ${since} : la situation peut être antérieure)`, undated: d.undated };
 }
 
 const PHYSICAL_ITEMS = new Set(['submarine_cable', 'air_routes_2014']);
@@ -251,9 +265,12 @@ function voteRows(k: PairKind): VoteRow[] {
       const b = (l.basis ?? {}) as Record<string, unknown>;
       const issue = String(b.issue ?? (l.facet ?? '').replace(/^issue=/, '') ?? 'all') || 'all';
       const grain = String(b.grain ?? 'decade');
-      const a = yearOfPartial(l.temporal.start);
-      const z = yearOfPartial(l.temporal.end);
-      const period = grain === 'year' || a === z ? String(a ?? '') : `${a ?? '…'}–${z ?? '…'}`;
+      // VOTE-1/2: the years the value was computed on (server: decade ∩ requested window ∩ data coverage)
+      const used = Array.isArray(b.years_used) ? (b.years_used as unknown[]).map((x) => (typeof x === 'number' ? x : null)) : [];
+      const a = used[0] ?? yearOfPartial(l.temporal.start);
+      const z = used[1] ?? yearOfPartial(l.temporal.end);
+      const span = grain === 'year' || a === z ? String(a ?? '') : `${a ?? '…'}–${z ?? '…'}`;
+      const period = b.partial_period === true ? `${span} (décennie partielle)` : span;
       const num = (v: unknown) => (typeof v === 'number' ? v : typeof v === 'string' && /^\d+$/.test(v) ? Number(v) : null);
       return {
         key: `vote-${i}`,

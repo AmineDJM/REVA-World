@@ -6,6 +6,7 @@ import { useApi } from '../../lib/useApi';
 import { warningsFr } from '../api/common';
 import { conceptLabel, getAtlasCatalog, getAtlasCoverage, getAtlasMap, type AtlasConcept, type AtlasMapResponse } from '../api/atlas';
 import { FixtureBadge, MissingCell, ProviderDeclaredBadge } from '../components/Honesty';
+import { LicenceList } from '../components/Licence';
 import { V3Empty, V3Error, V3Loading } from '../components/States';
 import { buildScale, cellText, countryStates, iso3OfFeatureKey, legendRows, NO_SOURCE_REASON, OUTSIDE, ranking } from '../lib/choropleth';
 import { flagLines, frInt } from '../lib/format';
@@ -253,6 +254,7 @@ function Legend({ data, scaleRows }: { data: AtlasMapResponse; scaleRows: { colo
       <p className="field-hint">
         Ordre déclaré (« meilleure disponible ») : {d.concept.source_order.join(' → ') || 'non déclaré'}. Aucun mélange, aucune imputation.
       </p>
+      <LicenceList licences={d.licences} title="Licences des sources de cette carte" />
       {flagged.length > 0 && (
         <p>
           <strong>Drapeaux du fournisseur</strong> sur {flagged.length} cellule(s) : {flagKinds.join(', ')}.

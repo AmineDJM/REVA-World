@@ -76,7 +76,8 @@ async def test_cshapes_independence_is_derived_and_labelled(datasets: Any) -> No
         dz = [e for e in evs if e["territory"] == "cshapes:gw:615"]
         assert [e["date"] for e in dz] == ["1962-07-05"]
         card = ev.event_card(c, dz[0]["id"], origin="test_fixture")
-        listed = ev.list_events(c, types=["independence"], start="1962", end="1962", origin="test_fixture")
+        listed = ev.list_events(c, types=["independence"], start="1962", end="1962", origin="test_fixture",
+                                limit=200)
         dza = ev.list_events(c, types=["independence"], country="Q262", origin="test_fixture")
     assert card is not None and card["derived"]["method"] == "reva.events.cshapes_status_change/1"
     assert card["types"]["primary"][0]["id"] == "independence"

@@ -1115,6 +1115,11 @@ def case_atlas_rows(
                     }
                     if sp.label:
                         meta["sender"] = sp.label
+                    meta["sender_dates"] = (
+                        "own dates of this sender"
+                        if sp.label
+                        else "the case's dates (the dataset codes no dates per additional sender)"
+                    )
                     dyad.add((f"{ind}|{dim}", geo, y), c, sp.end_basis, meta)
 
     def emit(acc: _Acc, defs: Mapping[str, str], table: str) -> list[dict[str, Any]]:

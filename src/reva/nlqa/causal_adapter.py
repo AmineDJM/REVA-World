@@ -135,12 +135,12 @@ def _lists(data: Any, keys: Sequence[str]) -> list[Any]:
     if isinstance(data, Mapping):
         for k in keys:
             v = data.get(k)
+            if isinstance(v, list) and k == "lanes":  # why lanes: [{"lane": "immediate", "claims": [...]}, ...]
+                return [c for lane in v if isinstance(lane, Mapping) for c in lane.get("claims") or []]
             if isinstance(v, list):
                 return v
             if isinstance(v, Mapping):  # why lanes: {"immediate": [...], ...}
                 return [c for lane in v.values() for c in (lane if isinstance(lane, list) else [])]
-            if isinstance(v, list) and k == "lanes":  # why lanes: [{"lane": "immediate", "claims": [...]}, ...]
-                return [c for lane in v if isinstance(lane, Mapping) for c in lane.get("claims") or []]
     return []
 
 

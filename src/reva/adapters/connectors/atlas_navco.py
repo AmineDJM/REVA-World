@@ -24,14 +24,14 @@ must still be listed in the version with the pinned md5 (the quotes come from th
 * ``mec`` MEC v3.0 (``doi:10.7910/DVN/JQWQNW`` v3.0, file 13992597 "MEC Data Release.tab"): 2,734 episodes
   1955-2018, category 2 = reformist / 4 = maximalist, day-precision dates, goals, size, regime violence,
   defection, outcome.
-
-NAVCO 3.0 (event-level, 26 countries 1990-2012, xlsx per country with news lead text) is not ingested yet
-(``docs/dev/v3_a_contention.md``).
+* ``n30`` NAVCO 3.0 (``doi:10.7910/DVN/INNYEO`` v1.0, file 3612128 ``navco3-0full.xlsx``, md5 checked: Dataverse
+  did not ingest it): 112,381 CAMEO-style action lines (actor - verb - target per country-day), 26 countries
+  1990-2012 -> atlas counts only; the news leads, source titles, localities, actor names and notes are not used.
 
 Outputs
 -------
 * atlas tables (COMPUTED counts per country-year, exact, every row says how): ``navco.n13_cy``,
-  ``navco.n21_cy``, ``mec.episodes_cy``. Provider location names map to crosswalk countries through the
+  ``navco.n21_cy``, ``navco.n30_cy``, ``mec.episodes_cy``. Provider location names map to crosswalk countries through the
   schemes ``navco_loc`` / ``mec_loc`` of ``registry/atlas/geo_aliases/a_contention.yaml``; names of the same
   country are counted together (``provider_geo`` = the crosswalk key, ``flags.provider_locations`` lists the
   names); unmapped names (USSR, Yugoslavia, ...) keep ``provider_geo`` = the provider name. Only

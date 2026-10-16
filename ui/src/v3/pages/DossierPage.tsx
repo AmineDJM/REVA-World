@@ -7,6 +7,7 @@ import { getKgTimeline } from '../api/kg';
 import { getCountryLinks, LINK_STATUS_LABEL, linkNodeLabel, linkTypeLabel, type CountryLink, type CountryLinksResponse } from '../api/links';
 import { CitationChip } from '../components/CitationChip';
 import { FixtureBadge, MissingCell, ProviderDeclaredBadge } from '../components/Honesty';
+import { LicenceBadge, LicenceList } from '../components/Licence';
 import { Sparkline } from '../components/Sparkline';
 import { V3Error, V3Loading } from '../components/States';
 import { citeAtlasCell, citeLinkEvidence } from '../lib/citations';
@@ -116,6 +117,7 @@ export default function DossierPage() {
               </details>
             )}
           </p>
+          <LicenceList licences={dossier.data.data.licences} title="Licences restrictives des sources de ce dossier" />
           {domains.map((d) => (
             <DomainSection key={d.domain} d={d} conceptById={conceptById} />
           ))}
@@ -215,7 +217,7 @@ function ConceptRow({ c, def }: { c: AtlasDossierConcept; def?: AtlasConcept }) 
         <span className="muted"> · {c.years} an(s) {c.year_min}–{c.year_max}</span>
       </td>
       <td>
-        <CitationChip c={citeAtlasCell(cell)} />
+        <CitationChip c={citeAtlasCell(cell)} /> <LicenceBadge rights={cell.rights} />
         {c.sources_used.length > 1 && <span className="muted"> · série issue de {c.sources_used.length} sources (par ordre déclaré, jamais mélangées dans une année)</span>}
       </td>
       <td>{c.series && <Sparkline points={c.series} latestSeries={cell.series} />}</td>

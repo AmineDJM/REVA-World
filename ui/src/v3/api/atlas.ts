@@ -30,6 +30,26 @@ export const AtlasProvenance = z.looseObject({
   dataset_id: nullishString,
 });
 
+/** Licence and terms of a source table (review V3b LIC-1): served with every cell and listed per answer. */
+export const AtlasRights = z.looseObject({
+  licence: z.string(),
+  licence_url: nullishString,
+  attribution: nullishString,
+  commercial_use: z.string().default('unknown'),
+  non_commercial: z.boolean().default(false),
+  share_alike: z.boolean().default(false),
+  no_derivatives: z.boolean().default(false),
+  open_licence: z.boolean().nullish().transform((v) => v ?? null),
+  restricted: z.boolean().default(false),
+  basis: z.string().default('table_artifact'),
+  restriction: nullishString,
+});
+export type AtlasRights = z.output<typeof AtlasRights>;
+
+export const AtlasLicence = AtlasRights.extend({ source: z.string() });
+export type AtlasLicence = z.output<typeof AtlasLicence>;
+const licences = z.array(AtlasLicence).nullish().transform((v) => v ?? []);
+
 export const AtlasCell = z.looseObject({
   iso3: nullishString,
   year: z.number().int().nullish().transform((v) => v ?? null),
@@ -46,6 +66,7 @@ export const AtlasCell = z.looseObject({
   period_end: z.string(),
   flags: JsonRecord.default({}),
   provenance: AtlasProvenance,
+  rights: AtlasRights.nullish().transform((v) => v ?? null),
   source_rank: z.number().nullish().transform((v) => v ?? null),
   sources_reporting: z.number().nullish().transform((v) => v ?? null),
 });
@@ -96,6 +117,7 @@ export const AtlasDossierConcept = z.looseObject({
   year_min: z.number(),
   year_max: z.number(),
   sources_used: z.array(z.string()).default([]),
+  licences,
   series: z.array(AtlasSeriesPoint).nullish().transform((v) => v ?? null),
 });
 export type AtlasDossierConcept = z.output<typeof AtlasDossierConcept>;
@@ -115,6 +137,7 @@ export const AtlasDossierResponse = z.looseObject({
     concepts_with_data: z.number(),
     concepts_without_data: z.number(),
     non_annual_cells: z.number().nullish(),
+    licences,
   }),
   snapshot: AtlasSnapshotRef,
   notes: z.array(z.string()).default([]),
@@ -131,6 +154,7 @@ export const AtlasMapResponse = z.looseObject({
     countries_with_value: z.number(),
     countries_without_value: z.array(z.string()).default([]),
     by_source: z.record(z.string(), z.number()).default({}),
+    licences,
   }),
   snapshot: AtlasSnapshotRef,
   notes: z.array(z.string()).default([]),
@@ -145,6 +169,7 @@ export const AtlasSeriesResponse = z.looseObject({
     best: z.array(AtlasCell),
     per_source: z.array(z.looseObject({ series: z.string(), source: z.string(), cells: z.array(AtlasCell) })).default([]),
     sources_without_data: z.array(z.string()).default([]),
+    licences,
   }),
   snapshot: AtlasSnapshotRef,
   notes: z.array(z.string()).default([]),

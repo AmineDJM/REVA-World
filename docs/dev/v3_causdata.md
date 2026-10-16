@@ -3,7 +3,8 @@
 Agent CAUSDATA, 2026-10-16. Specs: `docs/roadmap/v3_causality.md` (T1 = expert-coded research dataset with a codebook
 definition), `docs/dev/v3_causal_interface.md` (CAUSCORE `load_dataset_claims`), `docs/dev/v3_atlas_interface.md` §7
 (atlas source platform). Status: three connectors, relation registry, fixtures, offline + throwaway-DB tests done;
-full-scale load of the real files into a throwaway DB done (§5); budgets requested (ICB needs a merge, §6).
+full-scale load of the real files into a throwaway DB done, claims loaded and graded through CAUSCORE (§5); budgets
+requested (ICB needs a merge, §6).
 
 ## 1. What exists
 
@@ -105,7 +106,28 @@ Atlas tables (all COMPUTED counts, only state-years with ≥ 1 case): `icb.actor
 
 ## 5. Full-scale load (real 2026-10-16 bytes, throwaway DB, dropped afterwards)
 
-See §5 table (filled from `fullscale_stats.json`).
+All three sources on the full real files (ICB through a scratch fixture root holding the untouched downloads — its
+live budget is not merged yet; MID and UCDP also **live**, budget-metered: `pytest -m "live and db"
+tests/integration/test_causdata_live.py` → MID 3 requests / 4.25 MB, UCDP 5 / 2.0 MB, policy `budgets-1.3.6`, no
+refusal, codebook PDFs = pinned sha256, identical counts). CAUSCORE's migration `0015_causal` and
+`reva.causal.model.load_dataset_claims` were present, so claims were **loaded and graded**, not staged.
+
+| Source | Time | Rows parsed | Atlas rows | KG entities / statements (rejected) | T1 claims (rejected) |
+|---|---|---|---|---|---|
+| ICB v16 | 37 s | 512 crises, 1,131 actors | `icb.actor_cy` 1,770 | 6,084 / 29,904 (0) | icb1: 511 `coded_trigger` + 511 `coded_outcome`; icb2: 1,126 `coded_trigger` + 1,126 `reaction_to` + 1,124 `coded_outcome` (0) |
+| COW MID 5.0/5.01 | 48 s | 2,436 disputes, 5,883 participations, 4,482 incidents, 9,619 incident participations | `cow.mid5_cy` 14,838 | 9,337 / 80,076 (0) | 2,419 `coded_outcome` (17 disputes with outcome -9: none) (0) |
+| UCDP term. + PA | 13 s | 2,752 conflict-years → 614 episodes, 505 terminated; 374 agreements | `ucdp.term_cy` 561, `ucdp.pa_cy` 234 | 1,493 / 7,913 (0) | 505 `coded_outcome` + 382 `reaction_to` (0) |
+
+Grading (`grade_claims`, rules v1) of the 7,704 claims: **7,703 B, 1 E** (A needs independent corroboration, which a
+single coded dataset cannot give itself). Temporal check: 4,945 consistent, 2,753 overlapping (by definition for
+`coded_trigger`: the trigger's perception date *is* the crisis start), 5 undetermined (missing dates), **1
+inconsistent**: ICB crisis 232, actor case 539 — major response coded 1970-03-24, trigger perceived 1970-04-19; kept,
+graded E, shown — a source inconsistency, never corrected. Peace-agreement claims are all `consistent` because the
+connector dates KGGEOPOL's `ucdp:conflict:<id>` with `P580` = ACD `start_date` (replicated in the termination file);
+before that they were all `undetermined` (KGGEOPOL stores the start as `ucdp:start_date`). Two episodes (20901,
+1528301) have two terminal rows in the provider file: the last one is used and the case is reported (`anomalies`).
+`kg.statement` for the whole throwaway DB (with a KGGEOPOL fixture load): 112 MB; `kg.causal_claim` 14 MB,
+`kg.causal_grade` 7 MB.
 
 ## 6. Claims delivery and budgets
 
