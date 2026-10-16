@@ -1,9 +1,9 @@
 # V3 (agent A-CONTENTION): NAVCO (Nonviolent and Violent Campaigns and Outcomes) data project, Harvard Dataverse.
-# Connector: src/reva/adapters/connectors/atlas_navco.py (atlas.navco) -> atlas tables navco.n13_cy, navco.n21_cy
+# Connector: src/reva/adapters/connectors/atlas_navco.py (atlas.navco) -> atlas tables navco.n13_cy, navco.n21_cy, navco.n30_cy
 # (COMPUTED country-year counts) + KG events navco12:/navco13:/navco21: + staged causal claims (coded_outcome,
 # reaction_to). See docs/dev/v3_a_contention.md.
 source_key: harvard.dataverse.navco
-title: NAVCO 1.2 (v2.0), NAVCO 1.3 campaign list (v1.0) and NAVCO 2.1 campaign-year data (v2.1)
+title: NAVCO 1.2 (v2.0), NAVCO 1.3 campaign list (v1.0), NAVCO 2.1 campaign-year data (v2.1) and NAVCO 3.0 action data (v1.0)
 provider_url: https://dataverse.harvard.edu/dataverse/navco
 lineage_family: navco_chenoweth
 rights:
@@ -11,7 +11,8 @@ rights:
   licence_url: http://creativecommons.org/publicdomain/zero/1.0
   attribution: >-
     Chenoweth, Erica; Shay, Christopher Wiley: NAVCO 1.2 Dataset (doi:10.7910/DVN/0UZOTX, V2), List of Campaigns
-    in NAVCO 1.3 (doi:10.7910/DVN/ON9XND, V1), NAVCO 2.1 Dataset (doi:10.7910/DVN/MHOXDV, V2.1), Harvard Dataverse.
+    in NAVCO 1.3 (doi:10.7910/DVN/ON9XND, V1), NAVCO 2.1 Dataset (doi:10.7910/DVN/MHOXDV, V2.1); Chenoweth, Erica;
+    Pinckney, Jonathan; Lewis, Orion A.: NAVCO 3.0 Dataset (doi:10.7910/DVN/INNYEO, V1), Harvard Dataverse.
   licence_evidence: Dataverse version metadata (license.name "CC0 1.0") of each pinned version, checked by the connector on every run (read 2026-10-16).
 metadata:
   allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
@@ -22,10 +23,13 @@ metadata:
     - https://dataverse.harvard.edu/api/access/datafile/3769104   # NAVCO 1.3 List.tab (73,204 B)
     - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/2.1?persistentId=doi:10.7910/DVN/MHOXDV
     - https://dataverse.harvard.edu/api/access/datafile/3620879   # NAVCO2-1_ForPublication.tab (1,384,763 B)
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/1.0?persistentId=doi:10.7910/DVN/INNYEO
+    - https://dataverse.harvard.edu/api/access/datafile/3612128   # navco3-0full.xlsx (20,662,692 B, md5 checked)
   codebooks:   # quoted in atlas_navco.CODEBOOK; md5 must still be listed in the pinned version
     - {file_id: 3621197, name: "NAVCO 1.2 Codebook.pdf", md5: c7b56af6082e09abf6b250bd1e154678}
     - {file_id: 3769105, name: "NAVCO 1.3 Codebook List.pdf", md5: d5196bd992a93efa3ccfd9c492cb35bc}
     - {file_id: 3648624, name: "NAVCO_2.1_codebook.pdf", md5: 680ed263cd9c856add89b8eeeae6eed0}
+    - {file_id: 3612135, name: "navco3-0codebook.pdf", md5: f2438e3acad36dbaab0c6151fce8f053}
   access_note: >-
     Files are downloaded by id (redirect to the Dataverse S3 bucket). The .tab exports are checked against the
     version record's filesize (Dataverse's md5 is of the original xlsx/dta upload). NAVCO 3.0
