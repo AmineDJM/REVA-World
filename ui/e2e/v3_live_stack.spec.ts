@@ -291,6 +291,96 @@ test('Demander "Quel est le salaire minimum en France ?": keyword planner, every
   await expect(page.locator('.v3-plan')).toContainText('keyword_fallback');
 });
 
+test('stack: the link store was materialised after the atlas snapshot (pair links exist)', async () => {
+  expect(V3!.links?.status, JSON.stringify(V3!.links)).toBe('completed');
+  expect(V3!.links.link_count).toBeGreaterThan(0);
+  for (const kind of ['bilateral_trade', 'migrant_stock', 'colonial_rule_cshapes', 'co_party', 'shared_official_language']) expect(V3!.links.counts[kind] ?? 0, kind).toBeGreaterThan(0);
+});
+
+test('Pays ↔ Pays Brésil–Portugal: every link kind of the pair view shown with citations, predecessor states with their succession chain', async ({ page }) => {
+  const api = await apiGet(page.request, '/v1/links/pair?a=BRA&b=PRT');
+  const kinds = Object.keys(api.data.kinds);
+  expect(kinds.length, 'the fixture store holds BRA–PRT links').toBeGreaterThan(0);
+  expect(api.data.store).not.toBeNull(); // served from the materialised link store
+
+  const resp = page.waitForResponse((r) => r.url().includes('/v1/links/pair'), SLOW);
+  await page.goto('/v3/relation?a=BRA&b=PRT');
+  expect((await resp).status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1, name: /Brésil et Portugal/ })).toBeVisible(SLOW);
+  await expect(page.getByTestId('link-not-cause')).toContainText('Un lien n’est pas une cause.');
+  const result = page.getByTestId('relation-result');
+  await expect(result).toContainText('donnée de test');
+  await expect(page.getByTestId('relation-kind')).toHaveCount(kinds.length, SLOW);
+  for (const kind of kinds) {
+    const block = page.locator(`[data-testid="relation-kind"][data-kind="${kind}"]`);
+    await expect(block).toBeVisible();
+    expect(await block.getByTestId('citation').count(), `${kind} has no citation`).toBeGreaterThan(0);
+    await expect(block).not.toContainText('aucune citation');
+  }
+  await expect(page.getByTestId('relation-lane')).toHaveCount(kinds.length);
+  // treaty co-parties (A-TREATIES): the treaty is named, both UNTC party statements are cited
+  if (api.data.kinds.co_party) {
+    const treaty = page.locator('[data-testid="relation-kind"][data-kind="co_party"]');
+    await expect(treaty).toContainText('via ');
+    await expect(treaty).toContainText(/untc\.mtdsg/);
+  }
+  // links with predecessor states, each with its succession chain
+  await expect(page.getByTestId('relation-predecessor')).toHaveCount(api.data.predecessor_links.length);
+  if (api.data.predecessor_links.length) {
+    await expect(page.getByTestId('relation-predecessor').first()).toContainText('Brésil');
+    await expect(page.getByTestId('succession-chain').first()).toContainText('successeur de');
+  }
+  // kinds without links are listed as "aucun lien" (never zero)
+  const without = page.getByTestId('relation-without');
+  await expect(without).toContainText(`${api.data.kinds_without_links.length} type(s) (≠ zéro)`);
+  await expect(result).not.toContainText(/alliance de vote|vote.*alliance/i);
+});
+
+test('Pays ↔ Pays Algérie–France: trade per direction, migrant stocks, colonial rule (CShapes), exact values cited', async ({ page }) => {
+  const api = await apiGet(page.request, '/v1/links/pair?a=DZA&b=FRA');
+  await page.goto('/v3/relation?a=DZA&b=FRA');
+  await expect(page.getByRole('heading', { level: 1, name: /Pays ↔ Pays — .+ et .+/ })).toBeVisible(SLOW);
+  const trade = api.data.kinds.bilateral_trade;
+  if (trade) {
+    const block = page.locator('[data-testid="relation-kind"][data-kind="bilateral_trade"]');
+    const directions = new Set(trade.links.map((l: any) => `${l.iso3[0]}>${l.iso3[1]}`));
+    await expect(block.getByTestId('relation-series')).toHaveCount(directions.size, SLOW);
+    const first = trade.links[0];
+    const shown = String(first.weight).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+    await expect(block).toContainText(shown);
+  }
+  for (const kind of ['migrant_stock', 'colonial_rule_cshapes']) {
+    if (api.data.kinds[kind]) await expect(page.locator(`[data-testid="relation-kind"][data-kind="${kind}"]`)).toBeVisible();
+  }
+  if (api.data.kinds.colonial_rule_cshapes) await expect(page.locator('[data-kind="colonial_rule_cshapes"][data-testid="relation-kind"]')).toContainText('1886');
+});
+
+test('Dossier pays BRA: links grouped by kind from the link store, partners open the Pays ↔ Pays screen', async ({ page }) => {
+  const api = await apiGet(page.request, '/v1/links/BRA');
+  expect(api.data.by_kind).toBeTruthy();
+  await page.goto('/v3/pays/BRA');
+  const groups = page.getByTestId('link-kind');
+  await expect(groups.first()).toBeVisible(SLOW);
+  await expect(groups).toHaveCount(Object.keys(api.data.by_kind).length);
+  const toPrt = page.locator('#dom-links a[href="/v3/relation?a=BRA&b=PRT"]').first();
+  await expect(toPrt).toBeVisible();
+  await toPrt.click();
+  await expect(page.getByRole('heading', { level: 1, name: /Pays ↔ Pays/ })).toBeVisible(SLOW);
+});
+
+test('Chemin advanced options: non-transit languages and ordered steps reach /v1/links/path', async ({ page }) => {
+  const req = page.waitForRequest((r) => r.url().includes('/v1/links/path'), SLOW);
+  await page.goto('/v3/chemin?from=Q7322&to=Q5146&etapes=6&non_transit=P37%2CP2936&types=P1891');
+  const q = new URL((await req).url()).searchParams;
+  expect(q.getAll('non_transit')).toEqual(['P37', 'P2936']);
+  expect(q.getAll('steps')).toEqual(['P1891']);
+  const result = page.getByTestId('paths-result');
+  await expect(result).toBeVisible(SLOW);
+  const api = await apiGet(page.request, '/v1/links/path?from=Q7322&to=Q5146&k=3&max_hops=6&non_transit=P37&non_transit=P2936&steps=P1891');
+  await expect(page.getByTestId('path-chain')).toHaveCount(api.data.paths.length, SLOW);
+  await expect(page.getByTestId('path-advanced')).toHaveAttribute('open', '');
+});
+
 test('V3 routes refuse unauthenticated calls (the live specs above use a real session)', async ({ browser }) => {
   const ctx = await browser.newContext({ baseURL: BASE_URL, storageState: { cookies: [], origins: [] } });
   const r = await ctx.request.get('/v1/kg/entities/Q155');

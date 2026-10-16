@@ -426,7 +426,7 @@ LINK_GROUPS: dict[str, tuple[str, ...]] = {
     "succession": ("successor_of",),
     "membership": ("co_member",),
     "alliance": ("alliance_co_member",),
-    "treaty": ("co_signatory",),
+    "treaty": ("co_signatory", "co_party"),
     "conflict": ("conflict_co_participant", "conflict_same_side", "conflict_opposing_sides"),
     "diplomatic": ("diplomatic_relation", "unga_vote_agreement"),
     "trade": ("bilateral_trade", "bilateral_trade_imports", "bilateral_trade_baci"),

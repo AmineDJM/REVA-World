@@ -1,0 +1,13 @@
+{
+  "kind": "resolve",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "query": "SELECT DISTINCT ?part ?a_l ?a_item ?a_sl ?c_item ?c_l ?lk_l ?lk_item ?lk_sl WHERE { { VALUES ?a_l { \"Marie Curie\"@en \"Marie Skłodowska-Curie\"@en \"Maria Skłodowska-Curie\"@en } ?a_item rdfs:label ?a_l ; wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . BIND(\"anchor\" AS ?part) } UNION { VALUES ?c_item { wd:Q5 wd:Q116 wd:Q901 wd:Q6256 wd:Q7275 wd:Q9174 wd:Q11063 wd:Q18805 wd:Q19546 wd:Q35637 wd:Q36180 wd:Q36834 wd:Q37922 wd:Q38104 wd:Q39631 wd:Q42857 wd:Q42973 wd:Q44585 wd:Q47064 wd:Q47170 wd:Q48349 wd:Q49757 wd:Q65997 wd:Q80061 wd:Q81096 wd:Q82594 wd:Q82955 wd:Q126236 wd:Q133156 wd:Q161243 wd:Q164142 wd:Q169470 wd:Q170790 wd:Q188094 wd:Q189290 wd:Q193391 wd:Q201788 wd:Q205375 wd:Q212980 wd:Q214917 wd:Q219477 wd:Q244741 wd:Q254651 wd:Q372436 wd:Q382844 wd:Q417175 wd:Q593644 wd:Q864503 wd:Q901402 wd:Q1028181 wd:Q1234713 wd:Q1281618 wd:Q1402561 wd:Q1763527 wd:Q2306091 wd:Q2374149 wd:Q2401485 wd:Q2526255 wd:Q3024240 wd:Q3242115 wd:Q3624078 wd:Q4964182 wd:Q6625963 wd:Q11774202 wd:Q11900058 wd:Q15253558 wd:Q15627169 wd:Q15995642 } OPTIONAL { ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = \"en\") } BIND(\"class\" AS ?part) } }\nLIMIT 3000",
+  "query_sha256": "7dc78b166483f79324a5aa5a1c151a0c23dd3d50b8b953049049f85e709072ef",
+  "raw_file": "resolve_2.srj",
+  "body_sha256": "e6309a8b18cea3cf5d91005037de9802627b7a83ea4a7ffd8f7aab6adc4bf3f3",
+  "archive_sha256": "150c2248988aa8b93f90f6c56186c612c4ba4390c69edf6fa8602ac6ff2be457",
+  "retrieved_at": "2026-10-16T19:23:49.808764+00:00",
+  "rows": 68,
+  "elapsed_seconds": 1098.44,
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)"
+}

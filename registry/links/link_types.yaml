@@ -328,6 +328,31 @@ derived_links:
     status: derivable
     path_cost: 1.0
 
+  - id: co_party
+    labels: {fr: "parties à un même traité (UNTC)", en: "parties to the same treaty (UNTC)"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_subject
+      properties: ["untc:party", "untc:former_party"]
+      sources: [untc]
+      via: treaty
+      notes: >-
+        Added by LINKWIRE over A-TREATIES' KG statements (source key untc.mtdsg): two states both objects of
+        untc:party statements of the same treaty (multilateral treaties deposited with the UN Secretary-General) over
+        overlapping periods; start = date of each State's consent instrument as listed by UNTC (entry into force for
+        the State may be later), end = the date of effect of a withdrawal when UNTC states one. untc:former_party rows
+        (withdrawal without a stated date of effect) and participants outside the crosswalk (untc:participant:*, e.g.
+        the European Union) give no link (counted). Near-universal treaties (more than 150 parties) are not expanded
+        pairwise (recorded as near_universal_treaty_not_expanded with the party count); at most 200,000 pairs. Treaty
+        nodes are mostly untc:treaty:<MTDSG number> (a few have Wikidata QIDs). UN Terms of Use: not an open licence.
+    temporal: {kind: interval, description: "intersection of the two party statements (consent instrument .. withdrawal effect)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : parties à {via} sur la même période (selon la Collection des traités de l'ONU)", en: "connected via: both parties to {via} over the same period (per the UN Treaty Collection)"}
+    causal: false
+    status: derivable
+    path_cost: 1.2
+
   # ---------------------------------------------------------------- conflicts
   - id: conflict_co_participant
     labels: {fr: "participants à un même conflit", en: "participants in the same conflict"}
@@ -759,5 +784,7 @@ statement_edges:
   - {property: "glottolog:wikidata_item", labels: {fr: "élément Wikidata (selon Wikidata P1394)", en: "Wikidata item (per Wikidata P1394)"}, inverse_labels: {fr: "languoïde Glottolog de", en: "Glottolog languoid of"}, path_cost: 0.5}
   - {property: "unpk:contributed_personnel_to", labels: {fr: "a fourni du personnel en uniforme à (opération de paix de l'ONU)", en: "contributed uniformed personnel to (UN peace operation)"}, inverse_labels: {fr: "a reçu du personnel en uniforme de", en: "received uniformed personnel from"}, path_cost: 1.2}
   - {property: "unpk:mission_country", labels: {fr: "pays de la mission (selon l'ONU)", en: "mission country (as reported by the UN)"}, inverse_labels: {fr: "pays d'accueil de la mission de l'ONU", en: "country of UN mission (as reported)"}, path_cost: 1.0}
+  - {property: "untc:party", labels: {fr: "a pour partie (Collection des traités de l'ONU)", en: "has party (UN Treaty Collection)"}, inverse_labels: {fr: "partie à (Collection des traités de l'ONU)", en: "party to (UN Treaty Collection)"}, path_cost: 1.2}
+  - {property: "untc:former_party", labels: {fr: "a eu pour partie, retrait (UNTC, date d'effet non indiquée)", en: "had as party, withdrawn (UNTC, date of effect not stated)"}, inverse_labels: {fr: "ancienne partie à (UNTC)", en: "former party to (UNTC)"}, path_cost: 1.5}
   - {property: "glottolog:family", labels: {fr: "appartient à la famille de langues (Glottolog)", en: "belongs to the language family (Glottolog)"}, inverse_labels: {fr: "famille de langues de (Glottolog)", en: "language family of (Glottolog)"}, path_cost: 1.5}
   - {property: "glottolog:in_group", labels: {fr: "appartient au groupe de langues (Glottolog)", en: "belongs to the language group (Glottolog)"}, inverse_labels: {fr: "groupe de langues de (Glottolog)", en: "language group of (Glottolog)"}, path_cost: 1.5}

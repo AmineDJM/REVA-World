@@ -137,8 +137,8 @@ V3_ATLAS_SOURCES = (
     "atlas.fao",
 )
 #: LINKWIRE: link-bearing atlas sources replayed with --v3-fixtures as well (UN DESA migrant stock, UNGA votes,
-#: CShapes borders/colonial rule, UCDP conflict sides, BACI trade), so the materialised link store holds pair links
-V3_LINK_ATLAS_SOURCES = ("atlas.un_ims", "atlas.unga_votes", "atlas.cshapes", "atlas.ucdp", "atlas.baci")
+#: CShapes borders/colonial rule, UCDP conflict sides, BACI trade, UNTC treaty parties), so the materialised link store holds pair links
+V3_LINK_ATLAS_SOURCES = ("atlas.un_ims", "atlas.unga_votes", "atlas.cshapes", "atlas.ucdp", "atlas.baci", "atlas.untc")
 #: source key of the links fixture in kg.*: the live harvest's key, so the KG treats these real Wikidata
 #: statements exactly as harvested ones (community-edited label); only the origin (test_fixture) differs.
 #: (tests/integration/test_links_db.py loads the same file under "wikidata.links_fixture", which

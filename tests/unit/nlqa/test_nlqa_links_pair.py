@@ -219,6 +219,7 @@ def test_every_link_type_has_a_user_level_group() -> None:
         ("peacekeeping_contributor_to_host", "peacekeeping"),
         ("shared_polity_territory", "historical_polity"),
         ("shared_language_glottolog", "shared_language"),
+        ("co_party", "treaty"),
     ):
         assert link_kind(t) == g
 

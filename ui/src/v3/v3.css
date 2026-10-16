@@ -1032,3 +1032,68 @@
     transition: none;
   }
 }
+
+/* ---- Pays ↔ Pays (LINKWIRE) */
+.v3-rel-overview {
+  margin: 12px 0 20px;
+}
+.v3-rel-lanes {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.v3-rel-lane {
+  display: grid;
+  grid-template-columns: minmax(140px, 28%) 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--border);
+}
+.v3-rel-lane-label {
+  font-size: 0.85em;
+}
+.v3-rel-track {
+  position: relative;
+  height: 12px;
+  background: var(--panel);
+  border-radius: 3px;
+}
+.v3-rel-mark {
+  position: absolute;
+  top: 2px;
+  height: 8px;
+  min-width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  opacity: 0.75;
+}
+.v3-rel-kind {
+  margin: 10px 0 18px;
+}
+.v3-rel-kind h3 {
+  margin-bottom: 4px;
+}
+.v3-rel-items {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.v3-rel-items > li {
+  margin: 4px 0;
+}
+.v3-rel-chain {
+  margin: 2px 0 6px;
+}
+.v3-rel-series {
+  margin: 6px 0 10px;
+}
+.v3-rel-series caption {
+  text-align: left;
+  font-weight: 600;
+  padding: 2px 0;
+}
+@media (max-width: 720px) {
+  .v3-rel-lane {
+    grid-template-columns: 1fr;
+  }
+}

@@ -4,7 +4,7 @@ import { getLocations } from '../../api/client';
 import { useApi, type ApiState } from '../../lib/useApi';
 import { conceptLabel, getAtlasCatalog, getAtlasDossier, type AtlasConcept, type AtlasDossierConcept, type AtlasDossierDomain } from '../api/atlas';
 import { getKgTimeline } from '../api/kg';
-import { getCountryLinks, LINK_STATUS_LABEL, LINK_TYPE_LABEL, linkNodeLabel, type CountryLink, type CountryLinksResponse } from '../api/links';
+import { getCountryLinks, LINK_STATUS_LABEL, linkNodeLabel, linkTypeLabel, type CountryLink, type CountryLinksResponse } from '../api/links';
 import { CitationChip } from '../components/CitationChip';
 import { FixtureBadge, MissingCell, ProviderDeclaredBadge } from '../components/Honesty';
 import { Sparkline } from '../components/Sparkline';
@@ -13,8 +13,9 @@ import { citeAtlasCell, citeLinkEvidence } from '../lib/citations';
 import { iso3OfFeatureKey } from '../lib/choropleth';
 import { DOMAIN_ORDER, domainLabel, domainRank } from '../lib/domains';
 import { cellText } from '../lib/choropleth';
-import { flagLines } from '../lib/format';
+import { flagLines, frDecimal, frValue } from '../lib/format';
 import { linkDates } from '../lib/paths';
+import { THEMES, themeOf } from '../lib/relation';
 import { buildTimeline } from '../lib/timeline';
 
 export default function DossierPage() {
@@ -255,8 +256,14 @@ function KgHistory({ links }: { links: ApiState<CountryLinksResponse> }) {
 }
 
 function CountryLinks({ links, iso3 }: { links: ApiState<CountryLinksResponse>; iso3: string }) {
-  const groups = useMemo(() => {
-    if (links.status !== 'ok') return [];
+  const kinds = useMemo(() => {
+    if (links.status !== 'ok' || !links.data.data.by_kind) return null;
+    return Object.entries(links.data.data.by_kind)
+      .map(([kind, k]) => ({ kind, k, label: linkTypeLabel(kind, k.labels), total: k.groups.reduce((n, g) => n + (g.total ?? g.links.length), 0) }))
+      .sort((a, b) => THEMES.findIndex((t) => t.id === themeOf(a.kind)) - THEMES.findIndex((t) => t.id === themeOf(b.kind)) || a.label.localeCompare(b.label));
+  }, [links.status, links.data]);
+  const flat = useMemo(() => {
+    if (links.status !== 'ok' || links.data.data.by_kind) return [];
     const m = new Map<string, CountryLink[]>();
     for (const l of links.data.data.links) m.set(l.link_type, [...(m.get(l.link_type) ?? []), l]);
     return [...m.entries()].sort((a, b) => b[1].length - a[1].length);
@@ -268,36 +275,42 @@ function CountryLinks({ links, iso3 }: { links: ApiState<CountryLinksResponse>; 
       {links.status === 'error' && <V3Error error={links.error} what={`Les liens de ${iso3}`} onRetry={links.reload} />}
       {links.status === 'ok' && (
         <>
+          <p className="field-hint">
+            Un lien dit « relié via » une source, jamais « parce que ». Les quantités sont celles rapportées par la source, dans leur unité ; une part de votes identiques
+            n’est pas une mesure d’amitié. {links.data.data.mode === 'on_demand' ? 'Liens dérivés à la demande (aucun magasin de liens matérialisé).' : 'Premiers partenaires par type, sens et période (magasin de liens).'}
+          </p>
           {links.data.data.truncated && <p className="v3-notice">Voisinage tronqué par le serveur : d’autres liens peuvent exister.</p>}
-          {groups.map(([type, list]) => (
+          {kinds?.map(({ kind, k, label, total }) => (
+            <details key={kind} className="v3-link-group" open={total <= 6} data-testid="link-kind" data-kind={kind}>
+              <summary>
+                {label} <span className="muted">({total})</span>
+              </summary>
+              {k.groups.map((g, gi) => (
+                <div key={`${g.direction}-${g.facet ?? ''}-${gi}`} className="v3-link-subgroup">
+                  <p className="muted">
+                    {groupTitle(g.direction, !!k.directed)}
+                    {g.period ? ` · ${g.period}` : ''}
+                    {g.facet && !/=(all|TOTAL)$/.test(g.facet) ? ` · ${g.facet}` : ''}
+                    {g.total !== null && g.total !== undefined && g.total > g.links.length ? ` · ${g.links.length} premiers sur ${g.total}` : ''}
+                  </p>
+                  <ul>
+                    {g.links.map((l, i) => (
+                      <LinkLine key={`${l.subject}-${l.object}-${i}`} l={l} self={links.data.data.qid} selfIso3={iso3} labels={links.data.data.labels} />
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </details>
+          ))}
+          {flat.map(([type, list]) => (
             <details key={type} className="v3-link-group" open={list.length <= 6}>
               <summary>
-                {LINK_TYPE_LABEL[type] ?? type.replace(/_/g, ' ')} <span className="muted">({list.length})</span>
+                {linkTypeLabel(type)} <span className="muted">({list.length})</span>
               </summary>
               <ul>
-                {list.slice(0, 200).map((l, i) => {
-                  const self = links.data.data.qid;
-                  const other = l.subject === self ? l.object : l.subject;
-                  const t = l.temporal;
-                  const dates = linkDates(t).text;
-                  return (
-                    <li key={`${other}-${i}`}>
-                      <Link to={`/v3/chemin?from=${encodeURIComponent(self)}&to=${encodeURIComponent(other)}`}>{linkNodeLabel(links.data.data.labels, other)}</Link>{' '}
-                      <span className={t.kind === 'undated' ? 'v3-undated' : 'muted'}>{dates}</span>
-                      {l.via.length > 0 && <span className="muted"> · via {l.via.map((v) => linkNodeLabel(links.data.data.labels, v)).join(', ')}</span>}
-                      {l.weight && (
-                        <span>
-                          {' '}
-                          · {l.weight} {l.unit}
-                        </span>
-                      )}{' '}
-                      {l.evidence.slice(0, 3).map((e, j) => (
-                        <CitationChip key={j} c={citeLinkEvidence(e)} compact />
-                      ))}
-                      {l.evidence.length > 3 && <span className="muted"> +{l.evidence.length - 3} preuve(s)</span>}
-                    </li>
-                  );
-                })}
+                {list.slice(0, 200).map((l, i) => (
+                  <LinkLine key={`${l.subject}-${l.object}-${i}`} l={l} self={links.data.data.qid} selfIso3={iso3} labels={links.data.data.labels} />
+                ))}
               </ul>
             </details>
           ))}
@@ -306,7 +319,7 @@ function CountryLinks({ links, iso3 }: { links: ApiState<CountryLinksResponse>; 
             <ul>
               {Object.entries(links.data.data.link_types).map(([t, s]) => (
                 <li key={t}>
-                  {LINK_TYPE_LABEL[t] ?? t} : {s.derived} lien(s) — {LINK_STATUS_LABEL[s.status] ?? s.status}
+                  {linkTypeLabel(t)} : {s.derived} lien(s) — {LINK_STATUS_LABEL[s.status] ?? s.status}
                 </li>
               ))}
             </ul>
@@ -314,5 +327,40 @@ function CountryLinks({ links, iso3 }: { links: ApiState<CountryLinksResponse>; 
         </>
       )}
     </section>
+  );
+}
+
+function groupTitle(direction: string, directed: boolean): string {
+  if (!directed || direction === 'both') return 'Partenaires';
+  return direction === 'outgoing' ? 'Depuis ce pays vers' : 'Vers ce pays depuis';
+}
+
+function LinkLine({ l, self, selfIso3, labels }: { l: CountryLink; self: string; selfIso3: string; labels: Record<string, Record<string, string>> }) {
+  const selfIsSubject = l.subject === self || l.iso3?.[0] === selfIso3;
+  const other = selfIsSubject ? l.object : l.subject;
+  const otherIso = (selfIsSubject ? l.iso3?.[1] : l.iso3?.[0]) ?? (/^iso3:([A-Z]{3})$/.exec(other)?.[1] || null);
+  const t = l.temporal;
+  return (
+    <li>
+      {otherIso && otherIso !== selfIso3 ? (
+        <Link to={`/v3/relation?a=${selfIso3}&b=${otherIso}`} title="Tous les liens entre les deux pays">
+          {linkNodeLabel(labels, other)}
+        </Link>
+      ) : (
+        <Link to={`/v3/chemin?from=${encodeURIComponent(self)}&to=${encodeURIComponent(other)}`}>{linkNodeLabel(labels, other)}</Link>
+      )}{' '}
+      <span className={t.kind === 'undated' ? 'v3-undated' : 'muted'}>{linkDates(t).text}</span>
+      {l.via.length > 0 && <span className="muted"> · via {l.via.map((v) => linkNodeLabel(labels, v)).join(', ')}</span>}
+      {l.weight && (
+        <span title={l.weight}>
+          {' '}
+          · {l.link_type === 'unga_vote_agreement' ? `part de votes identiques ${frDecimal(l.weight, 4)}` : `${frValue(l.weight, l.unit)} ${l.unit ?? ''}`}
+        </span>
+      )}{' '}
+      {l.evidence.slice(0, 3).map((e, j) => (
+        <CitationChip key={j} c={citeLinkEvidence(e)} compact />
+      ))}
+      {l.evidence.length > 3 && <span className="muted"> +{l.evidence.length - 3} preuve(s)</span>}
+    </li>
   );
 }

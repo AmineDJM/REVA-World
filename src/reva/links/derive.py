@@ -64,6 +64,12 @@ GENEALOGY_PROPERTIES = ("P279", "P361", "glottolog:parent", "glottolog:in_group"
 GLOTTOLOG_XREF = "glottolog:wikidata_item"
 GLOTTOLOG_SPOKEN_IN = "glottolog:spoken_in"
 COVERED_TERRITORY = "geo:covered_territory_of"
+#: A-TREATIES (UN Treaty Collection): ``treaty —untc:party→ state`` (start = consent instrument, end = withdrawal effect)
+UNTC_PARTY = "untc:party"
+UNTC_FORMER_PARTY = "untc:former_party"
+#: a treaty with more parties than this is near-universal: its pairs say little and would dominate the store, so it
+#: is not expanded pairwise (recorded as ``near_universal_treaty_not_expanded`` with its party count)
+MAX_CO_PARTY_PARTIES = 150
 
 
 @dataclass
@@ -736,6 +742,73 @@ def derive_shared_subject(
     return d.finish()
 
 
+def derive_co_party(
+    index: KgIndex,
+    *,
+    focus: set[str] | None = None,
+    max_parties: int = MAX_CO_PARTY_PARTIES,
+    max_pairs: int = MAX_SHARED_SUBJECT_PAIRS,
+) -> Derivation:
+    """``co_party``: two states party to the same treaty (A-TREATIES ``untc:party``, treaty → state) over overlapping
+    periods (consent instrument .. withdrawal effect). Participants outside the crosswalk (``untc:participant:*``, e.g.
+    the European Union) are not states and are left out (counted). ``untc:former_party`` rows (withdrawal without a
+    stated date of effect) give no link: their end is unknown, so an overlap cannot be asserted (counted). A treaty
+    with more than ``max_parties`` parties is not expanded pairwise (``near_universal_treaty_not_expanded``) and at
+    most ``max_pairs`` links are produced (``pair_cap_reached``); every bound is recorded."""
+    d = Derivation("co_party")
+    produced = 0
+    groups: dict[str, list[Stmt]] = defaultdict(list)
+    for s in index.by_prop.get(UNTC_PARTY, ()):
+        if s.object is None:
+            continue
+        if s.object.startswith("untc:participant:"):
+            d.skip("non_state_participant", via=s.subject, participant=s.object)
+            continue
+        groups[s.subject].append(s)
+    for s in index.by_prop.get(UNTC_FORMER_PARTY, ()):
+        d.skip("former_party_end_not_stated", via=s.subject, participant=s.object)
+    for treaty, stmts in sorted(groups.items()):
+        members = {s.object for s in stmts}
+        if len(members) < 2:
+            continue
+        if len(members) > max_parties:
+            d.skip("near_universal_treaty_not_expanded", via=treaty, parties=len(members), bound=max_parties)
+            continue
+        for sa, sb in itertools.combinations(sorted(stmts, key=lambda s: (str(s.object), s.statement_id)), 2):
+            if sa.object == sb.object or sa.object is None or sb.object is None:
+                continue
+            if focus is not None and sa.object not in focus and sb.object not in focus:
+                continue
+            ov = sa.temporal.overlap(sb.temporal)
+            if ov is None:
+                d.skip("disjoint_periods", via=treaty, pair=[sa.object, sb.object])
+                continue
+            if produced >= max_pairs:
+                d.skip("pair_cap_reached", cap=max_pairs)
+                return d.finish()
+            produced += 1
+            a, b = (sa, sb) if sa.object < sb.object else (sb, sa)
+            assert a.object is not None and b.object is not None
+            d.add(
+                Link(
+                    a.object,
+                    b.object,
+                    "co_party",
+                    False,
+                    ov,
+                    _ev(a, b),
+                    via=(treaty,),
+                    basis={
+                        "property": UNTC_PARTY,
+                        "parties": len(members),
+                        "temporal_basis": "undated" if ov.kind == "undated" else "intersection",
+                        "start_basis": "date of each consent instrument listed by UNTC (entry into force may be later)",
+                    },
+                )
+            )
+    return d.finish()
+
+
 # ---------------------------------------------------------------------------------------------- atlas
 _ISO3 = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -909,6 +982,7 @@ def derive_all(
     co, al = derive_co_membership(index, pol, focus=fset, max_members=max_members)
     out["co_member"], out["alliance_co_member"] = co, al
     out["co_signatory"] = derive_co_signatory(index, focus=fset)
+    out["co_party"] = derive_co_party(index, focus=fset)
     out["conflict_co_participant"] = derive_conflict_co_participants(index, None, focus=fset)
     out["conflict_same_side"], out["conflict_opposing_sides"] = derive_conflict_sides(index, focus=fset)
     out["shared_language_glottolog"] = derive_shared_subject(

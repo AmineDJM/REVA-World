@@ -453,3 +453,147 @@ export const LOCATIONS = envelope(
 );
 
 export const NOT_FOUND_ROUTE = { type: 'about:blank', title: 'Not Found', status: 404, detail: 'Not Found', code: 'not_found' };
+
+// ------------------------------------------------------------------ Pays ↔ Pays (/v1/links/pair), test data only
+function atlasEv(source: string, subject: string, object: string, selector: string) {
+  return { kind: 'atlas_row', source, subject, object, pid: `fixture|partner=${object}`, raw_sha256: 'e'.repeat(64), selector, origin: 'test_fixture' };
+}
+const kindMeta = (fr: string, directed: boolean, temporal: string) => ({ labels: { fr, en: fr }, inverse_labels: { fr, en: fr }, honesty: { fr: `relié via : ${fr}`, en: '' }, directed, status: 'derivable', temporal, weight: { kind: 'none', unit: null }, sources: [] });
+const tradeLink = (from: string, to: string, iso: [string, string], year: number, v: string) => ({
+  subject: from,
+  object: to,
+  link_type: 'bilateral_trade',
+  directed: true,
+  temporal: { kind: 'snapshot', year },
+  via: [],
+  evidence: [atlasEv('imf', iso[0], iso[1], `{"series":"${iso[0]}.XG_FOB_USD.${iso[1]}.A","time_period":"${year}"}`)],
+  sources: ['imf'],
+  weight: v,
+  unit: 'US dollars',
+  basis: { method: 'atlas_dyadic', reported_by: iso[0] },
+  iso3: iso,
+  facet: '',
+  text: { fr: `exportations ${iso[0]} → ${iso[1]} = ${v} US dollars (${year}) [fixture]` },
+  weight_kind: 'source_quantity',
+});
+const voteLink = (lo: number, share: string, n: number, k: number, issue = 'all') => ({
+  subject: 'Q155',
+  object: 'Q45',
+  link_type: 'unga_vote_agreement',
+  directed: false,
+  temporal: { kind: 'interval', start: `${lo}-01-01`, end: `${lo + 9}-12-31` },
+  via: [],
+  evidence: [atlasEv('unga', 'BRA', 'PRT', `{"pair":["BRA","PRT"],"years":[${lo},${lo + 9}],"issue":"${issue}"}`)],
+  sources: ['unga'],
+  weight: share,
+  unit: 'share of identical votes (0-1)',
+  basis: { method: 'derived', issue, grain: 'decade', n_common: n, n_identical: k, caveat: 'not an alliance' },
+  iso3: ['BRA', 'PRT'],
+  facet: `issue=${issue}`,
+  weight_kind: 'derived_index',
+});
+export const PAIR_BRA_PRT = envelope(
+  {
+    a: 'BRA',
+    b: 'PRT',
+    from_year: null,
+    to_year: null,
+    store: { materialisation_id: 7, atlas_snapshot_sha256: 'f'.repeat(64), top_k: 10 },
+    atlas_snapshot: { snapshot_sha256: 'f'.repeat(64), origin: 'test_fixture' },
+    kinds: {
+      bilateral_trade: {
+        ...kindMeta('exportations de biens déclarées par l’exportateur', true, 'snapshot'),
+        count: 3,
+        first_year: 2000,
+        last_year: 2025,
+        links: [tradeLink('Q155', 'Q45', ['BRA', 'PRT'], 2000, '379774421'), tradeLink('Q155', 'Q45', ['BRA', 'PRT'], 2025, '3299445083'), tradeLink('Q45', 'Q155', ['PRT', 'BRA'], 2025, '1202294976')],
+      },
+      unga_vote_agreement: {
+        ...kindMeta('part de votes identiques à l’AG de l’ONU', false, 'interval'),
+        count: 2,
+        first_year: 1950,
+        last_year: 1969,
+        links: [voteLink(1950, '0.5989', 187, 112), voteLink(1960, '0.3902', 205, 80)],
+      },
+      co_party: {
+        ...kindMeta('parties à un même traité (UNTC)', false, 'interval'),
+        count: 1,
+        first_year: 2002,
+        last_year: null,
+        links: [
+          {
+            subject: 'Q155',
+            object: 'Q45',
+            link_type: 'co_party',
+            directed: false,
+            temporal: { kind: 'interval', start: '2002-06-20' },
+            via: ['untc:treaty:XVIII-10'],
+            evidence: [
+              { kind: 'kg_statement', source: 'untc.mtdsg', statement_id: 'party:XVIII-10:brazil', subject: 'untc:treaty:XVIII-10', pid: 'untc:party', object: 'Q155', source_revision: 'untc@2026-10-16', origin: 'test_fixture' },
+              { kind: 'kg_statement', source: 'untc.mtdsg', statement_id: 'party:XVIII-10:portugal', subject: 'untc:treaty:XVIII-10', pid: 'untc:party', object: 'Q45', source_revision: 'untc@2026-10-16', origin: 'test_fixture' },
+            ],
+            sources: ['untc.mtdsg'],
+            basis: { property: 'untc:party', parties: 127 },
+            iso3: ['BRA', 'PRT'],
+            facet: '',
+          },
+        ],
+      },
+      shared_official_language: {
+        ...kindMeta('langue officielle commune', false, 'interval'),
+        count: 1,
+        first_year: null,
+        last_year: null,
+        links: [{ subject: 'Q155', object: 'Q45', link_type: 'shared_official_language', directed: false, temporal: { kind: 'undated' }, via: ['Q5146'], evidence: [ev('Q155', 'P37', 40), ev('Q45', 'P37', 41)], sources: ['wikidata'], iso3: ['BRA', 'PRT'], facet: '' }],
+      },
+    },
+    kinds_without_links: ['migrant_stock', 'land_border'],
+    vote_detail: null,
+    predecessor_links: [
+      {
+        country: 'BRA',
+        predecessor_of: 'PRT',
+        predecessor: 'Q200464',
+        link: { subject: 'Q155', object: 'Q200464', link_type: 'former_colony_of', directed: true, temporal: { kind: 'interval', start: '1500', end: '1822' }, via: ['fixture:colonia'], evidence: [ev('Q155', 'P1365', 42)], sources: ['wikidata'], iso3: [null, null], facet: '' },
+        succession: [{ subject: 'Q45', object: 'Q200464', link_type: 'successor_of', directed: true, temporal: { kind: 'undated' }, via: [], evidence: [ev('Q45', 'P1365', 43)], sources: ['wikidata'], iso3: [null, null], facet: '' }],
+      },
+    ],
+    labels: {
+      'iso3:BRA': { en: 'Brazil' },
+      'iso3:PRT': { en: 'Portugal' },
+      Q155: { fr: 'Brésil', en: 'Brazil' },
+      Q45: { fr: 'Portugal', en: 'Portugal' },
+      Q5146: { fr: 'portugais' },
+      Q200464: { fr: 'Empire colonial portugais' },
+      'fixture:colonia': { fr: 'Brésil colonial' },
+      'untc:treaty:XVIII-10': { fr: 'Statut de Rome de la Cour pénale internationale' },
+    },
+    truncated: [],
+    notes: [],
+  },
+  { warnings: [{ code: 'link_not_causal', message: 'A link says connected via, never because.' }, { code: 'derived_index', message: 'unga_vote_agreement is computed by REVA.' }] },
+);
+
+/** /v1/links/{iso3} with by_kind groups (store-backed country view). */
+export const LINKS_BRA_BY_KIND = envelope({
+  mode: 'materialised',
+  qid: 'Q155',
+  query: 'BRA',
+  iso3: 'BRA',
+  node: 'Q155',
+  store: { materialisation_id: 7 },
+  truncated: false,
+  labels: { Q155: { fr: 'Brésil' }, Q45: { fr: 'Portugal' }, Q148: { fr: 'Chine' }, Q5146: { fr: 'portugais' } },
+  links: [],
+  by_kind: {
+    bilateral_trade: {
+      ...kindMeta('exportations de biens déclarées par l’exportateur', true, 'snapshot'),
+      groups: [{ direction: 'outgoing', facet: '', period: '2025', total: 180, links: [tradeLink('Q155', 'Q148', ['BRA', 'CHN'], 2025, '99940244710')] }],
+    },
+    shared_official_language: {
+      ...kindMeta('langue officielle commune', false, 'interval'),
+      groups: [{ direction: 'both', facet: '', period: null, total: 1, links: [{ subject: 'Q155', object: 'Q45', link_type: 'shared_official_language', directed: false, temporal: { kind: 'undated' }, via: ['Q5146'], evidence: [ev('Q155', 'P37', 44)], sources: ['wikidata'], iso3: ['BRA', 'PRT'] }] }],
+    },
+  },
+  link_types: { bilateral_trade: { status: 'derivable', derived: 180, stored: 180 }, shared_official_language: { status: 'derivable', derived: 1, stored: 1 } },
+});

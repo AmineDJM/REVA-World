@@ -33,6 +33,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import shutil
 import tempfile
 import threading
@@ -55,8 +56,8 @@ from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
 from reva.ports.storage import ArtifactStore
 
-DB_FORMAT = "atlas-duckdb/4"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
-DB_SUFFIX = "-v4.duckdb"
+DB_FORMAT = "atlas-duckdb/5"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
+DB_SUFFIX = "-v5.duckdb"
 #: Non-calendar cells attach to a year view when they span 150..1097 days (semesters, 12-month fiscal
 #: years, survey and 3-year windows): to ``flags.label_year`` when the provider labels the cell with a
 #: year inside the period, else to the year containing the period's last day. Shorter (monthly,
@@ -73,6 +74,7 @@ CREATE TABLE cells (sid INTEGER NOT NULL, iso3 VARCHAR, year INTEGER, has_value 
                     period_start DATE NOT NULL, period_end DATE NOT NULL, value VARCHAR, value_text VARCHAR,
                     unit VARCHAR NOT NULL, flags VARCHAR NOT NULL, raw_sha256 VARCHAR NOT NULL,
                     selector VARCHAR NOT NULL, table_sha VARCHAR NOT NULL, period_basis VARCHAR NOT NULL);
+CREATE TABLE cells_s AS SELECT * FROM cells LIMIT 0;
 """
 
 
@@ -94,8 +96,7 @@ CELL_SELECT = (
 )
 
 #: Year attachment of every cell (see ATTACH_*): calendar years; else label_year or the last day's year.
-CELLS_INSERT = f"""
-INSERT INTO cells
+CELLS_SELECT = f"""
 WITH pre AS (
   SELECT s.sid, r.*,
          (month(r.period_start) = 1 AND day(r.period_start) = 1
@@ -118,11 +119,11 @@ ranked AS (
                                ORDER BY cal DESC, (value IS NOT NULL OR value_text IS NOT NULL) DESC,
                                         period_end DESC, period_start DESC) AS rn
   FROM att)
-SELECT sid, iso3, CASE WHEN attach IS NOT NULL AND rn = 1 THEN attach END,
-       (value IS NOT NULL OR value_text IS NOT NULL), concept_id, provider_geo, entity_qid, period_start,
-       period_end, value, value_text, unit, flags, raw_sha256, selector, table_sha, basis
+SELECT sid, iso3, CAST(CASE WHEN attach IS NOT NULL AND rn = 1 THEN attach END AS INTEGER) AS year,
+       (value IS NOT NULL OR value_text IS NOT NULL) AS has_value, concept_id AS concept_hint, provider_geo,
+       entity_qid, period_start, period_end, value, value_text, unit, flags, raw_sha256, selector, table_sha,
+       basis AS period_basis
 FROM ranked
-ORDER BY iso3 NULLS LAST, sid, period_start
 """
 
 
@@ -198,43 +199,8 @@ def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: 
             return final
         work = Path(tempfile.mkdtemp(prefix=f"build-{snapshot.sha256[:12]}-", dir=d))
         try:
-            files = []
-            for t in snapshot.tables:
-                p = work / f"{t['artifact_sha256']}.parquet"
-                _fetch_verified(store, t["artifact_sha256"], p)
-                files.append(str(p))
             tmp_db = work / "atlas.duckdb"
-            con = duckdb.connect(str(tmp_db))
-            try:
-                con.execute(f"SET temp_directory = '{work / 'spill'}'")
-                con.execute(DDL)
-                if files:
-                    listing = "[" + ",".join("'" + f.replace("'", "''") + "'" for f in files) + "]"
-                    con.execute(
-                        f"""CREATE TEMP VIEW raw AS
-                            SELECT *, regexp_extract(filename, '([0-9a-f]{{64}})\\.parquet$', 1) AS table_sha
-                            FROM read_parquet({listing}, filename = true)"""
-                    )
-                    con.execute(
-                        """INSERT INTO series
-                           SELECT CAST(row_number() OVER (ORDER BY source, dataset, indicator) AS INTEGER),
-                                  source, dataset, indicator
-                           FROM (SELECT DISTINCT source, dataset, indicator FROM raw)"""
-                    )
-                    con.execute(CELLS_INSERT)
-                # the same cells ordered by series first: series/year filters (maps, coverage) prune row groups
-                con.execute("CREATE TABLE cells_s AS SELECT * FROM cells ORDER BY sid, year, iso3")
-                n = con.execute("SELECT count(*) FROM cells").fetchone()[0]  # type: ignore[index]
-                expected = sum(int(t["row_count"]) for t in snapshot.tables)
-                if n != expected:
-                    raise IntegrityFailure("atlas snapshot row count mismatch", rows=n, expected=expected)
-                con.execute(
-                    "CREATE TABLE meta AS SELECT ? AS format, ? AS snapshot_sha256, ? AS origin, ? AS cutoff",
-                    [DB_FORMAT, snapshot.sha256, snapshot.origin, snapshot.cutoff.isoformat()],
-                )
-                con.execute("CHECKPOINT")
-            finally:
-                con.close()
+            _build_db(snapshot, store, work, tmp_db)
             digest = {"format": DB_FORMAT, "snapshot_sha256": snapshot.sha256, "sha256": _file_sha256(tmp_db)}
             side_tmp = work / "atlas.duckdb.sha256"
             side_tmp.write_text(json.dumps(digest))
@@ -244,6 +210,68 @@ def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: 
             shutil.rmtree(work, ignore_errors=True)
         _evict(d, keep=final)
     return final
+
+
+def _build_db(snapshot: AtlasSnapshot, store: ArtifactStore, work: Path, tmp_db: Path) -> None:
+    """Load the pinned tables one at a time (bounded memory and spill; ~5 M rows per table at most).
+
+    The series table is built first over every file (three columns only). Each table's cells are then
+    computed (year attachment, per series) into a temporary table and appended to ``cells`` (sorted by
+    country) and ``cells_s`` (sorted by series). Tables are loaded in (source, dataset) order, so
+    ``cells_s`` is globally ordered by series id (ids follow that order); ``cells`` is ordered by
+    country within each table's segment (zone maps still prune). Each Parquet copy is deleted as soon
+    as it is loaded. Memory: ``REVA_ATLAS_BUILD_MEMORY`` (default 3GB), threads ``REVA_ATLAS_BUILD_THREADS``
+    (default 2); spill goes to the private work directory."""
+    tables = sorted(snapshot.tables, key=lambda t: str(t["dataset_key"]))
+    files: list[Path] = []
+    for t in tables:
+        p = work / f"{t['artifact_sha256']}.parquet"
+        _fetch_verified(store, t["artifact_sha256"], p)
+        files.append(p)
+    con = duckdb.connect(str(tmp_db))
+    try:
+        mem = os.environ.get("REVA_ATLAS_BUILD_MEMORY", "3GB")
+        threads = int(os.environ.get("REVA_ATLAS_BUILD_THREADS", "2"))
+        if not re.fullmatch(r"[0-9]+(\.[0-9]+)?\s*[KMGT]?i?B", mem):
+            raise ValidationProblem("REVA_ATLAS_BUILD_MEMORY must look like 3GB", value=mem[:20])
+        con.execute(f"SET memory_limit = '{mem}'")
+        con.execute(f"SET threads = {max(1, threads)}")
+        con.execute("SET preserve_insertion_order = true")
+        con.execute(f"SET temp_directory = '{work / 'spill'}'")
+        con.execute(DDL)
+        if files:
+            listing = "[" + ",".join("'" + str(f).replace("'", "''") + "'" for f in files) + "]"
+            con.execute(
+                f"""INSERT INTO series
+                    SELECT CAST(row_number() OVER (ORDER BY source, dataset, indicator) AS INTEGER),
+                           source, dataset, indicator
+                    FROM (SELECT DISTINCT source, dataset, indicator FROM read_parquet({listing}))"""
+            )
+        for f in files:
+            q = "'" + str(f).replace("'", "''") + "'"
+            con.execute(
+                f"""CREATE OR REPLACE TEMP VIEW raw AS
+                    SELECT *, regexp_extract(filename, '([0-9a-f]{{64}})\\.parquet$', 1) AS table_sha
+                    FROM read_parquet({q}, filename = true)"""
+            )
+            con.execute(f"CREATE OR REPLACE TEMP TABLE t AS {CELLS_SELECT}")
+            con.execute("INSERT INTO cells SELECT * FROM t ORDER BY iso3 NULLS LAST, sid, period_start")
+            con.execute("INSERT INTO cells_s SELECT * FROM t ORDER BY sid, year, iso3")
+            con.execute("DROP TABLE t")
+            con.execute("DROP VIEW raw")
+            f.unlink(missing_ok=True)
+        n = con.execute("SELECT count(*) FROM cells").fetchone()[0]  # type: ignore[index]
+        n_s = con.execute("SELECT count(*) FROM cells_s").fetchone()[0]  # type: ignore[index]
+        expected = sum(int(t["row_count"]) for t in snapshot.tables)
+        if n != expected or n_s != expected:
+            raise IntegrityFailure("atlas snapshot row count mismatch", rows=n, expected=expected)
+        con.execute(
+            "CREATE TABLE meta AS SELECT ? AS format, ? AS snapshot_sha256, ? AS origin, ? AS cutoff",
+            [DB_FORMAT, snapshot.sha256, snapshot.origin, snapshot.cutoff.isoformat()],
+        )
+        con.execute("CHECKPOINT")
+    finally:
+        con.close()
 
 
 def _evict(d: Path, keep: Path) -> None:

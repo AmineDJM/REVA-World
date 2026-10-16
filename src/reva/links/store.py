@@ -42,7 +42,7 @@ INSERT_BATCH = 5_000
 MAX_KG_ROWS = 5_000_000
 KG_LINK_PROPERTIES = (
     "P47", "P530", "P37", "P2936", "P38", "P35", "P463", "P1891", "P710", "P1344", "P607",
-    "P1365", "P1366", "P155", "P156", "P17", "P361", "glottolog:spoken_in",
+    "P1365", "P1366", "P155", "P156", "P17", "P361", "glottolog:spoken_in", "untc:party", "untc:former_party",
 )  # fmt: skip
 LANGUAGE_GENEALOGY = (
     "P279", "P361", "glottolog:parent", "glottolog:in_group", "glottolog:family", "glottolog:wikidata_item",

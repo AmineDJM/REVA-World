@@ -11,6 +11,7 @@ const FrisePage = lazy(() => import('./pages/FrisePage'));
 const AtlasPage = lazy(() => import('./pages/AtlasPage'));
 const DossierPage = lazy(() => import('./pages/DossierPage'));
 const DemanderPage = lazy(() => import('./pages/DemanderPage'));
+const RelationPage = lazy(() => import('./pages/RelationPage'));
 
 /** All V3 screens under /v3/* (one lazy chunk per screen), with their own sub-navigation. */
 export default function V3App() {
@@ -25,7 +26,7 @@ export default function V3App() {
             </NavLink>
           </li>
           {V3_SCREENS.map((s) => {
-            const base = s.to.split('/').slice(0, 3).join('/');
+            const base = s.to.split('?')[0]!.split('/').slice(0, 3).join('/');
             const active = pathname.startsWith(base);
             return (
               <li key={s.to}>
@@ -46,6 +47,7 @@ export default function V3App() {
           <Route path="atlas" element={<AtlasPage />} />
           <Route path="pays" element={<Navigate to="/v3/pays/FRA" replace />} />
           <Route path="pays/:iso3" element={<DossierPage />} />
+          <Route path="relation" element={<RelationPage />} />
           <Route path="demander" element={<DemanderPage />} />
           <Route path="*" element={<p>Écran inconnu. Choisissez un écran dans la navigation.</p>} />
         </Routes>

@@ -151,7 +151,7 @@ def _min(q: str) -> str:
 
 
 def resolve_query(specs: dict[str, dict[str, Any]], labels: list[str],
-                  lookup_labels: tuple[str, ...] = LOOKUP_LABELS) -> str:
+                  lookup_labels: tuple[str, ...] = LOOKUP_LABELS, anchor_qids: tuple[str, ...] = ()) -> str:
     """Anchor label -> human QIDs (``?a_l ?a_item ?a_sl``), English labels of every class QID the specs use
     (``?c_item ?c_l``) and candidate-class label lookups (``?lk_l ?lk_item ?lk_sl``); rows tagged ``?part``."""
     classes = sorted(set().union(*(spec_class_qids(s) for s in specs.values())), key=lambda q: int(q[1:]))
@@ -161,6 +161,10 @@ def resolve_query(specs: dict[str, dict[str, Any]], labels: list[str],
         f"{{ VALUES ?c_item {{ {' '.join('wd:' + q for q in classes)} }} "
         f"OPTIONAL {{ ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = \"en\") }} BIND(\"class\" AS ?part) }}",
     ]
+    if anchor_qids:  # reverse check: QID -> English label (rows tagged "anchor" too)
+        branches.append(f"{{ VALUES ?a_item {{ {' '.join('wd:' + q for q in anchor_qids)} }} ?a_item rdfs:label ?a_l ; "
+                        f"wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . FILTER(LANG(?a_l) = \"en\") "
+                        f"BIND(\"anchor\" AS ?part) }}")
     if lookup_labels:  # an empty VALUES would leave ?lk_l unbound: a scan of every label (WDQS timeout)
         branches.append(f"{{ VALUES ?lk_l {{ {_lits(lookup_labels)} }} ?lk_item rdfs:label ?lk_l ; "
                         f"wikibase:sitelinks ?lk_sl . FILTER(?lk_sl >= 10) BIND(\"lookup\" AS ?part) }}")

@@ -1,0 +1,81 @@
+{
+ "anchor": "brazil_official_languages",
+ "query": "SELECT ?country ?statement ?language ?rank ?start ?end ?pit ?part WHERE {\n  VALUES ?country { wd:Q155 wd:Q45 }\n  ?country p:P37 ?statement .\n  ?statement ps:P37 ?language ; wikibase:rank ?rank .\n  FILTER(?rank != wikibase:DeprecatedRank)\n  OPTIONAL { ?statement pq:P580 ?start }\n  OPTIONAL { ?statement pq:P582 ?end }\n  OPTIONAL { ?statement pq:P585 ?pit }\n  OPTIONAL { ?statement pq:P518 ?part }\n}",
+ "raw_sha256": "ef866b1050e28d042d6c9c320a1108fcef58c8ced75ebd48d3fcb172d423d50d",
+ "response": {
+  "head": {
+   "vars": [
+    "country",
+    "statement",
+    "language",
+    "rank",
+    "start",
+    "end",
+    "pit",
+    "part"
+   ]
+  },
+  "results": {
+   "bindings": [
+    {
+     "country": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q155"
+     },
+     "language": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q5146"
+     },
+     "rank": {
+      "type": "uri",
+      "value": "http://wikiba.se/ontology#PreferredRank"
+     },
+     "statement": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/statement/Q155-9d6dd154-4bc2-bfe0-3bab-6dd9f6eee729"
+     }
+    },
+    {
+     "country": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q155"
+     },
+     "language": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q3436689"
+     },
+     "rank": {
+      "type": "uri",
+      "value": "http://wikiba.se/ontology#NormalRank"
+     },
+     "statement": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/statement/Q155-bfe726e6-4460-33e9-b504-27f9e00f1c4d"
+     }
+    },
+    {
+     "country": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q45"
+     },
+     "language": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q5146"
+     },
+     "rank": {
+      "type": "uri",
+      "value": "http://wikiba.se/ontology#NormalRank"
+     },
+     "statement": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/statement/q45-8996BD0E-3EF8-4340-9806-7CFB7E5FA364"
+     }
+    }
+   ]
+  }
+ },
+ "response_sha256": "531d9062abc8ecbf4594bd3f08983b4c0e08c3ec5d366052911079f0625586aa",
+ "retrieved_at": "2026-10-16T19:23:39.160415+00:00",
+ "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
+ "spec": "country_official_languages.yaml"
+}

@@ -156,6 +156,12 @@ def kg_allowlist() -> set[str]:
         out |= set(UNPK_PROPERTIES)
     except ImportError:  # pragma: no cover
         pass
+    try:  # A-TREATIES (UN Treaty Collection): untc:party, untc:former_party, untc:mtdsg_number
+        from reva.adapters.connectors.atlas_treaties import KG_PROPERTIES as UNTC_PROPERTIES
+
+        out |= {str(p["pid"]) for p in UNTC_PROPERTIES}
+    except ImportError:  # pragma: no cover
+        pass
     return out
 
 

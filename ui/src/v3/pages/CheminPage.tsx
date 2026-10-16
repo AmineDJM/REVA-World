@@ -8,6 +8,7 @@ import { EntityPicker, type PickedEntity } from '../components/EntityPicker';
 import { PathNotCauseBanner } from '../components/Honesty';
 import { V3Empty, V3Error, V3Loading } from '../components/States';
 import { fromKg, fromLinks, reasonFr, type PathsView, type PathView } from '../lib/paths';
+import { NODE_RE, NON_TRANSIT_PRESETS, parseList, parseSteps, PROP_RE } from '../lib/pathOptions';
 import { prefersReducedMotion } from '../../lib/useApi';
 
 type Engine = 'links' | 'kg';
@@ -26,15 +27,26 @@ export default function CheminPage() {
   const [params, setParams] = useSearchParams();
   const from = params.get('from');
   const to = params.get('to');
-  const hops = intParam(params.get('etapes'), 4, 1, 6);
+  const hops = intParam(params.get('etapes'), 4, 1, 8);
   const k = intParam(params.get('k'), 3, 1, 10);
   const year = params.get('annee') && /^-?\d+$/.test(params.get('annee')!) ? Number(params.get('annee')) : null;
   const engine: Engine = params.get('moteur') === 'kg' ? 'kg' : 'links';
+  // advanced (links engine): ordered hop-type steps, unordered waypoints, non-transit properties
+  const stepsText = params.get('types') ?? '';
+  const viaAnyText = params.get('via_un') ?? '';
+  const viaAllText = params.get('via_tous') ?? '';
+  const nonTransitText = params.get('non_transit') ?? '';
+  const advanced = { steps: stepsText, viaAny: viaAnyText, viaAll: viaAllText, nonTransit: nonTransitText };
+  const advancedKey = JSON.stringify(advanced);
   const [labels, setLabels] = useState<Record<string, string>>({});
   const [result, setResult] = useState<Result>({ status: 'idle' });
-  const [draft, setDraft] = useState({ hops, k, year: year === null ? '' : String(year), engine });
+  const [draft, setDraft] = useState({ hops, k, year: year === null ? '' : String(year), engine, ...advanced });
+  const [draftError, setDraftError] = useState<string | null>(null);
 
-  useEffect(() => setDraft({ hops, k, year: year === null ? '' : String(year), engine }), [hops, k, year, engine]);
+  useEffect(
+    () => setDraft({ hops, k, year: year === null ? '' : String(year), engine, ...(JSON.parse(advancedKey) as typeof advanced) }),
+    [hops, k, year, engine, advancedKey],
+  );
 
   // Resolve labels of ids given in the URL (deep links, palette).
   useEffect(() => {
@@ -58,8 +70,26 @@ export default function CheminPage() {
         view: fromKg(r.data),
         warnings: warningsFr(r.warnings),
       }));
+    const adv = JSON.parse(advancedKey) as typeof advanced;
+    const steps = parseSteps(adv.steps) ?? [];
+    const viaAny = parseList(adv.viaAny, NODE_RE) ?? [];
+    const viaAll = parseList(adv.viaAll, NODE_RE) ?? [];
+    const nonTransit = parseList(adv.nonTransit, PROP_RE) ?? [];
     const viaLinks = () =>
-      getLinksPath({ from, to, k, max_hops: hops, ...(year !== null ? { as_of: year } : {}) }, ctrl.signal).then((r) => ({
+      getLinksPath(
+        {
+          from,
+          to,
+          k,
+          max_hops: hops,
+          ...(year !== null ? { as_of: year } : {}),
+          ...(steps.length ? { steps } : {}),
+          ...(viaAny.length ? { via_any: viaAny } : {}),
+          ...(viaAll.length ? { via_all: viaAll } : {}),
+          ...(nonTransit.length ? { non_transit: nonTransit } : {}),
+        },
+        ctrl.signal,
+      ).then((r) => ({
         view: fromLinks(r.data),
         warnings: warningsFr(r.warnings),
       }));
@@ -79,7 +109,7 @@ export default function CheminPage() {
         if (!ctrl.signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setResult({ status: 'error', error });
       });
     return () => ctrl.abort();
-  }, [from, to, hops, k, year, engine]);
+  }, [from, to, hops, k, year, engine, advancedKey]);
 
   const set = (patch: Record<string, string | null>) => {
     const p = new URLSearchParams(params);
@@ -92,8 +122,37 @@ export default function CheminPage() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    set({ etapes: String(draft.hops), k: String(draft.k), annee: draft.year.trim() || null, moteur: draft.engine === 'kg' ? 'kg' : null });
+    const steps = parseSteps(draft.steps);
+    const bad =
+      steps === null
+        ? 'types d’étapes : identifiants de propriétés (P37) ou de liens (link:co_member), séparés par « , » dans une étape et « > » entre étapes'
+        : steps.length > draft.hops
+          ? 'pas plus d’étapes typées que d’étapes max.'
+          : parseList(draft.viaAny, NODE_RE) === null || parseList(draft.viaAll, NODE_RE) === null
+            ? 'points de passage : identifiants Wikidata (Q…) ou codes ISO3'
+            : parseList(draft.nonTransit, PROP_RE) === null
+              ? 'propriétés non traversables : identifiants de propriétés (P37…)'
+              : null;
+    setDraftError(bad);
+    if (bad) return;
+    set({
+      etapes: String(draft.hops),
+      k: String(draft.k),
+      annee: draft.year.trim() || null,
+      moteur: draft.engine === 'kg' ? 'kg' : null,
+      types: draft.steps.trim() || null,
+      via_un: draft.viaAny.trim() || null,
+      via_tous: draft.viaAll.trim() || null,
+      non_transit: draft.nonTransit.trim() || null,
+    });
   };
+  const nonTransitSet = new Set(parseList(draft.nonTransit, PROP_RE) ?? []);
+  const togglePreset = (pid: string) => {
+    const cur = parseList(draft.nonTransit, PROP_RE) ?? [];
+    const next = cur.includes(pid) ? cur.filter((x) => x !== pid) : [...cur, pid];
+    setDraft((d) => ({ ...d, nonTransit: next.join(',') }));
+  };
+  const advancedOn = !!(stepsText || viaAnyText || viaAllText || nonTransitText);
 
   const pick = (key: 'from' | 'to') => (e: PickedEntity | null) => {
     if (e) setLabels((l) => ({ ...l, [e.qid]: e.label }));
@@ -113,7 +172,7 @@ export default function CheminPage() {
         <label>
           Étapes max.
           <select value={draft.hops} onChange={(e) => setDraft((d) => ({ ...d, hops: Number(e.target.value) }))}>
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
@@ -141,6 +200,51 @@ export default function CheminPage() {
             <option value="kg">graphe brut</option>
           </select>
         </label>
+        <details className="v3-path-advanced" open={advancedOn} data-testid="path-advanced">
+          <summary>Options avancées (moteur de liens typés)</summary>
+          <label>
+            Types d’étapes, dans l’ordre
+            <input
+              value={draft.steps}
+              onChange={(e) => setDraft((d) => ({ ...d, steps: e.target.value }))}
+              placeholder="P1891,P710 > P37"
+              aria-describedby="path-steps-hint"
+            />
+          </label>
+          <p className="field-hint" id="path-steps-hint">
+            Une étape = un ou plusieurs types de saut séparés par « , » (propriété Wikidata P…, prédicat de jeu de données « untc:party », lien dérivé « link:co_member ») ; les
+            étapes sont séparées par « &gt; » et doivent apparaître dans cet ordre (d’autres sauts peuvent s’intercaler).
+          </p>
+          <label>
+            Passer par l’un de
+            <input value={draft.viaAny} onChange={(e) => setDraft((d) => ({ ...d, viaAny: e.target.value }))} placeholder="Q45, PRT" />
+          </label>
+          <label>
+            Passer par tous
+            <input value={draft.viaAll} onChange={(e) => setDraft((d) => ({ ...d, viaAll: e.target.value }))} placeholder="Q155" />
+          </label>
+          <fieldset className="v3-path-nontransit">
+            <legend>Ne jamais traverser les objets de</legend>
+            {NON_TRANSIT_PRESETS.map((p) => (
+              <label key={p.pid} className="v3-check">
+                <input type="checkbox" checked={nonTransitSet.has(p.pid)} onChange={() => togglePreset(p.pid)} /> {p.label} ({p.pid})
+              </label>
+            ))}
+            <label>
+              Autres propriétés
+              <input value={draft.nonTransit} onChange={(e) => setDraft((d) => ({ ...d, nonTransit: e.target.value }))} placeholder="P37, P2936" />
+            </label>
+          </fieldset>
+          <p className="field-hint">
+            Ces contraintes ne s’appliquent qu’au moteur de liens typés. Une langue, un continent ou une période peut terminer un chemin sans servir de passage : « parlent la
+            même langue » n’est pas une étape d’une chaîne.
+          </p>
+        </details>
+        {draftError && (
+          <p className="v3-notice" role="alert">
+            {draftError}
+          </p>
+        )}
         <button type="submit" className="primary">
           Appliquer
         </button>

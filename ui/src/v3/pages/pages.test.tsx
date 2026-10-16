@@ -112,6 +112,80 @@ describe('Chemin', () => {
   });
 });
 
+describe('Chemin — options avancées', () => {
+  it('sends ordered steps, waypoints and non-transit properties to /v1/links/path and refuses malformed ones', async () => {
+    const { calls } = mockFetch({ ...KG_ROUTES, 'GET /v1/links/path': { body: F.LINKS_PATH_COL_BRA } });
+    at('/v3/chemin?from=Q7322&to=Q5146&etapes=8&types=P1891%2CP710%20%3E%20P37&via_tous=BRA&non_transit=P37%2CP2936');
+    await screen.findAllByTestId('path-chain');
+    const call = calls.find((c) => c.url.includes('/v1/links/path'))!;
+    const q = new URL(call.url, 'http://x').searchParams;
+    expect(q.get('max_hops')).toBe('8');
+    expect(q.getAll('steps')).toEqual(['P1891,P710', 'P37']);
+    expect(q.getAll('via_all')).toEqual(['BRA']);
+    expect(q.getAll('non_transit')).toEqual(['P37', 'P2936']);
+    expect(q.getAll('via_any')).toEqual([]);
+    const adv = screen.getByTestId('path-advanced');
+    expect(within(adv).getByRole('checkbox', { name: /langue officielle \(P37\)/ })).toBeChecked();
+    expect(within(adv).getByRole('checkbox', { name: /continent \(P30\)/ })).not.toBeChecked();
+    const steps = within(adv).getByLabelText('Types d’étapes, dans l’ordre');
+    await userEvent.clear(steps);
+    await userEvent.type(steps, 'pas un type!');
+    await userEvent.click(screen.getByRole('button', { name: 'Appliquer' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('types d’étapes');
+  });
+});
+
+describe('Pays ↔ Pays', () => {
+  it('shows every link kind between two countries with citations, vote shares with counts and caveat, predecessors with their succession', async () => {
+    const { calls } = mockFetch({ 'GET /v1/links/pair': { body: F.PAIR_BRA_PRT }, 'GET /v1/locations': { body: F.LOCATIONS } });
+    at('/v3/relation?a=BRA&b=PRT');
+    expect(await screen.findByRole('heading', { level: 1, name: /Brésil et Portugal/ })).toBeInTheDocument();
+    const q = new URL(calls.find((c) => c.url.includes('/v1/links/pair'))!.url, 'http://x').searchParams;
+    expect([q.get('a'), q.get('b')]).toEqual(['BRA', 'PRT']);
+    expect(screen.getByTestId('link-not-cause')).toHaveTextContent('Un lien n’est pas une cause.');
+    // trade: one series per direction, exact values in their unit, each year cited
+    const trade = document.querySelector('[data-kind="bilateral_trade"][data-testid="relation-kind"]') as HTMLElement;
+    const series = within(trade).getAllByTestId('relation-series');
+    expect(series).toHaveLength(2);
+    expect(series[0]).toHaveTextContent('Brésil → Portugal');
+    expect(series[0]).toHaveTextContent('3 299 445 083');
+    expect(series[1]).toHaveTextContent('Portugal → Brésil');
+    expect(within(series[0]!).getAllByTestId('citation').length).toBe(2);
+    // votes: a share of identical votes with n_identical / n_common, never "alliance"
+    const votes = document.querySelector('[data-kind="unga_vote_agreement"][data-testid="relation-kind"]') as HTMLElement;
+    expect(within(votes).getByTestId('vote-caveat')).toHaveTextContent('part de votes identiques');
+    const row = votes.querySelector('tr[data-period="1950–1959"]')!;
+    expect(row).toHaveTextContent('0,5989');
+    expect(row).toHaveTextContent('112 / 187');
+    expect(votes.textContent).not.toMatch(/alliance/i);
+    // treaty co-parties with the treaty named, cited by its UNTC statements
+    const treaty = document.querySelector('[data-kind="co_party"][data-testid="relation-kind"]') as HTMLElement;
+    expect(treaty).toHaveTextContent('via Statut de Rome de la Cour pénale internationale');
+    expect(treaty).toHaveTextContent('depuis 2002');
+    expect(within(treaty).getAllByTestId('citation')).toHaveLength(2);
+    // undated link said undated
+    expect(document.querySelector('[data-kind="shared_official_language"][data-testid="relation-kind"]')).toHaveTextContent('non daté dans la source');
+    // predecessor state with its succession chain
+    const pred = screen.getByTestId('relation-predecessor');
+    expect(pred).toHaveTextContent('Brésil — ancienne colonie de (via Brésil colonial) → Empire colonial portugais');
+    expect(within(pred).getByTestId('succession-chain')).toHaveTextContent('Portugal — successeur de → Empire colonial portugais');
+    // kinds without links: "aucun lien", never zero
+    const without = screen.getByTestId('relation-without');
+    expect(without).toHaveTextContent('≠ zéro');
+    expect(without.querySelector('[data-kind="migrant_stock"]')).not.toBeNull();
+    // overview lanes (one per kind with links)
+    expect(screen.getAllByTestId('relation-lane')).toHaveLength(4);
+  });
+
+  it('asks for two different countries and reports an unknown country as such', async () => {
+    mockFetch({ 'GET /v1/links/pair': { status: 404, body: { title: 'Not Found', status: 404, detail: 'not a crosswalk country', code: 'not_found' } }, 'GET /v1/locations': { body: F.LOCATIONS } });
+    at('/v3/relation?a=BRA&b=BRA');
+    expect(await screen.findByText(/Choisissez deux pays différents/)).toBeInTheDocument();
+    at('/v3/relation?a=BRA&b=ZZZ');
+    expect(await screen.findByText('Introuvable')).toBeInTheDocument();
+  });
+});
+
 describe('Atlas', () => {
   it('renders gaps as "manquant" with a reason (never 0), the legend with sources and the ranking', async () => {
     mockFetch({
@@ -163,6 +237,26 @@ describe('Dossier pays', () => {
     expect(await screen.findByText(/Ouvrir la frise complète/)).toBeInTheDocument();
   });
 
+  it('groups the links by kind (store groups), with direction, period and a Pays ↔ Pays link per partner', async () => {
+    mockFetch({
+      'GET /v1/atlas/countries/BRA': { status: 404, body: { title: 'Not Found', status: 404, detail: 'no atlas snapshot recorded', code: 'atlas_snapshot_unavailable' } },
+      'GET /v1/atlas/concepts': { body: F.CONCEPTS },
+      'GET /v1/links/BRA': { body: F.LINKS_BRA_BY_KIND },
+      'GET /v1/kg/entities/Q155/timeline': { body: F.TIMELINE_Q155 },
+      'GET /v1/locations': { body: F.LOCATIONS },
+    });
+    at('/v3/pays/BRA');
+    const group = (await screen.findAllByTestId('link-kind')).find((e) => e.dataset.kind === 'bilateral_trade')!;
+    expect(group).toHaveTextContent('exportations de biens déclarées');
+    expect(group).toHaveTextContent('(180)');
+    expect(group).toHaveTextContent('Depuis ce pays vers · 2025 · 1 premiers sur 180');
+    expect(group).toHaveTextContent('99 940 244 710 US dollars');
+    expect(within(group).getByRole('link', { name: 'Chine' })).toHaveAttribute('href', '/v3/relation?a=BRA&b=CHN');
+    const lang = document.querySelector('[data-testid="link-kind"][data-kind="shared_official_language"]') as HTMLElement;
+    expect(within(lang).getByRole('link', { name: 'Portugal' })).toHaveAttribute('href', '/v3/relation?a=BRA&b=PRT');
+    expect(lang).toHaveTextContent('via portugais');
+  });
+
   it('a dossier with no atlas snapshot says "aucune donnée chargée"', async () => {
     mockFetch({
       'GET /v1/atlas/countries/FRA': { status: 404, body: { title: 'Not Found', status: 404, detail: 'no atlas snapshot recorded', code: 'atlas_snapshot_unavailable' } },
@@ -197,7 +291,7 @@ describe('Home', () => {
   it('lists every V3 screen and the availability of services', async () => {
     mockFetch({ 'GET /v1/kg/search': { body: F.SEARCH_BRESIL }, 'GET /v1/atlas/concepts': { body: F.CONCEPTS }, 'GET /v1/atlas/coverage': { status: 404, body: F.NOT_FOUND_ROUTE }, 'GET /v1/links/FRA': { body: F.LINKS_FRA } });
     at('/v3');
-    for (const name of ['Neurones', 'Chemin', 'Frise', 'Atlas', 'Dossier pays', 'Demander']) expect((await screen.findAllByRole('link', { name: new RegExp(name) })).length).toBeGreaterThan(0);
+    for (const name of ['Neurones', 'Chemin', 'Frise', 'Atlas', 'Dossier pays', 'Pays ↔ Pays', 'Demander']) expect((await screen.findAllByRole('link', { name: new RegExp(name) })).length).toBeGreaterThan(0);
     expect(await screen.findByText('pas encore disponible')).toBeInTheDocument();
   });
 });
