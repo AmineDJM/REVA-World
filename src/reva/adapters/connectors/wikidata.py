@@ -237,6 +237,10 @@ class Archive:
     compress: bool = True
     _ed_index: dict[str, tuple[str, str, str]] | None = field(default=None, repr=False)
     _ed_index_size: int = field(default=-1, repr=False)
+    _snap_index: dict[str, list[tuple[str, str, str, frozenset[str] | None]]] = field(default_factory=dict,
+                                                                                       repr=False)
+    _snap_offset: int = field(default=0, repr=False)
+    _snap_cache: dict[str, Any] = field(default_factory=dict, repr=False)
 
     def put(self, body: bytes, media_type: str, meta: Mapping[str, Any]) -> str:
         import gzip
@@ -278,7 +282,12 @@ class Archive:
         hit = self._ed_index.get(eid)
         if hit is None:
             return None
+        return self._load_hit(hit, max_age_seconds)
+
+    def _load_hit(self, hit: tuple[str, str, str], max_age_seconds: float) -> tuple[bytes, str, datetime] | None:
         sha, when, enc = hit
+        if self.store is None:
+            return None
         retrieved = datetime.fromisoformat(when)
         if (datetime.now(UTC) - retrieved).total_seconds() > max_age_seconds:
             return None
@@ -289,6 +298,75 @@ class Archive:
         except Exception:
             return None
         return (gzip.decompress(data) if enc == "gzip" else data), sha, retrieved
+
+    def recent_snapshot(self, eid: str, max_age_seconds: float,
+                        props: Sequence[str]) -> tuple[dict[str, Any], str, datetime] | None:
+        """The most recent archived snapshot of ``eid`` (Special:EntityData, or a successful ``wbgetentities``
+        response whose props cover ``props``) younger than ``max_age_seconds``: (raw entity, archived sha,
+        original retrieval time). Lets overlapping specs reuse what was fetched for another spec instead of
+        requesting it again (the archived response is cited, so provenance is unchanged)."""
+        if max_age_seconds <= 0 or self.store is None or self.index_path is None or not self.index_path.exists():
+            return None
+        self._refresh_snapshot_index()
+        want = set(props)
+        best: tuple[str, str, str] | None = None
+        for sha, when, enc, have in self._snap_index.get(eid, ()):
+            if (have is None or want <= have) and (best is None or when >= best[1]):  # tie: latest archived
+                best = (sha, when, enc)
+        if best is None:
+            return None
+        doc = self._snap_cache.get(best[0])
+        if doc is None:
+            loaded = self._load_hit(best, max_age_seconds)
+            if loaded is None:
+                return None
+            try:
+                doc = json.loads(loaded[0])
+            except ValueError:
+                return None
+            self._snap_cache = {best[0]: doc, **dict(list(self._snap_cache.items())[:3])}
+        retrieved = datetime.fromisoformat(best[1])
+        if (datetime.now(UTC) - retrieved).total_seconds() > max_age_seconds:
+            return None
+        ents = doc.get("entities") or {} if isinstance(doc, dict) else {}
+        ent = ents.get(eid)
+        if ent is None and len(ents) == 1:  # Special:EntityData of a redirected id is keyed by the target
+            ent = next(iter(ents.values()))
+        if not isinstance(ent, dict) or "missing" in ent or "id" not in ent:
+            return None
+        return ent, best[0], retrieved
+
+    def _refresh_snapshot_index(self) -> None:
+        assert self.index_path is not None
+        size = self.index_path.stat().st_size
+        if size < self._snap_offset:  # rewritten: start over
+            self._snap_index, self._snap_offset = {}, 0
+        if size == self._snap_offset:
+            return
+        with self.index_path.open("rb") as f:
+            f.seek(self._snap_offset)
+            data = f.read(size - self._snap_offset)
+        end = data.rfind(b"\n") + 1  # only complete lines
+        for raw in data[:end].splitlines():
+            if b'"entitydata"' not in raw and b'"wbgetentities"' not in raw:
+                continue
+            try:
+                e = json.loads(raw)
+            except ValueError:
+                continue
+            kind = e.get("kind")
+            if e.get("status", 200) != 200 or not e.get("ids") or not e.get("retrieved_at"):
+                continue
+            if kind == "entitydata":
+                have = None  # every prop
+            elif kind == "wbgetentities" and e.get("props") and "info" in e["props"] and not e.get("languages"):
+                have = frozenset(e["props"])
+            else:
+                continue
+            rec = (e["sha256"], e["retrieved_at"], e.get("encoding", "identity"), have)
+            for i in e["ids"]:
+                self._snap_index.setdefault(i, []).append(rec)
+        self._snap_offset += end
 
 
 # --------------------------------------------------------------------------- results
@@ -618,6 +696,25 @@ class WikidataClient:
         requests = 0
         retrieved = datetime.now(UTC)
         times: list[datetime] = []  # linked-data mode: per-entity retrieval times (archive reuse keeps the original)
+        if self.reuse_seconds > 0:  # any mode: archived snapshots (EntityData or wbgetentities) still recent enough
+            live: list[str] = []
+            for eid0 in todo:
+                hit = self.archive.recent_snapshot(eid0, self.reuse_seconds, props)
+                if hit is None:
+                    live.append(eid0)
+                    continue
+                ent, sha, when = hit
+                ent = _prune(ent, props, languages)
+                eid = ent.get("id", eid0)
+                if eid != eid0:
+                    redirects[eid0] = eid
+                entities[eid] = ent
+                sha_by_id[eid] = sha
+                if sha not in shas:
+                    shas.append(sha)
+                times.append(when)
+                self.stats.reused += 1
+            todo = live
         if self.mode in ("linked_data", "hybrid"):
             batch_size = 1
         queue: list[list[str]] = [todo[i:i + batch_size] for i in range(0, len(todo), batch_size)]

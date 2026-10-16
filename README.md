@@ -49,6 +49,23 @@ An independent scientific review of the V2 models is in
 [docs/dev/review_science_v2.md](docs/dev/review_science_v2.md). Its findings and
 the fixes are tracked in the agents' reports.
 
+### V3 "the whole planet, connected" (2026-10-16; completion report [docs/final_report_v3.md](docs/final_report_v3.md))
+
+V3 adds four connected layers. The [world graph](docs/roadmap/v3_world_graph.md) and
+[causality](docs/roadmap/v3_causality.md) roadmaps hold the honesty rules: every
+statement keeps its source, a path is not a cause, a causal link is a claim made
+by a named source and graded, and missing data stays missing.
+
+| Capability | API (read scope) | Label / limit |
+|---|---|---|
+| **Atlas**: 108 sources, ~9,250 concepts, 251 country entities. A headline layer (27 concepts) names the answering source and every series consulted | `/v1/atlas/{concepts,countries/{iso3},map,series,coverage}`, `/v1/atlas/headline/{concepts,map,series,coverage}` | Cells are what each source reports. Projections never answer by default. Source changes inside a series are flagged. Licences are shown per cell (`licence_restricted`) |
+| **Knowledge graph**: Wikidata plus specialised datasets (UCDP, UN votes, CShapes, Cliopatria, Glottolog, treaties, …) | `/v1/kg/entities/{qid}[/neighbours,/timeline]`, `/v1/kg/path`, `/v1/kg/search` | Wikidata is labelled community-edited. The Wikidata harvest is partial: WDQS was throttled, and countries plus historical and sovereign states are loaded in a separate harvest database |
+| **Links** ("neurons"): 38 country–country link types, materialised store, constrained path engine | `/v1/links/{iso3}`, `/v1/links/pair?a=BRA&b=PRT`, `/v1/links/path` | "Connected via", never a cause. Every link cites its statement or raw cell |
+| **Events and causality**: 82 event types; causal claims from Wikidata (T3/T4) and expert-coded datasets (T1: ICB, MID, UCDP, NAVCO, Archigos, …), deterministic A–E grades; quarantined Wikipedia candidates (T5) | `/v1/events[/{id},/search,/types]`, `/v1/causal/events/{id}[/causes,/effects,/why]`, `/v1/causal/chain`, `/v1/causal/consistency`, `/v1/causal/candidates` | REVA asserts no causation ("selon <source>"). A chain is REVA's composition, graded by its weakest hop. No claim is reviewed |
+| **Simulations for all countries**: cohort projection 1.1.0 (UN WPP 2024, 231 countries), retirement age 1.1.0 / 1.2.0 (163 WBL 2026 rule tables, pension coverage) | as V2 (`/v1/simulations`, `model_version`) | Experimental, maintainer review pending. Conditional projections, not forecasts |
+| **Questions**: `POST /v1/ask` (French/English), answers only from cited KG, atlas, links and causal evidence | `/v1/ask` | The LLM planner is not verified live (no credits); the deterministic keyword planner runs |
+| **UI "Planète"** (`/v3`): Neurones, Chemin, Frise, Atlas, Dossier pays, Pays ↔ Pays, Causes & conséquences, Demander | — | Same API, same labels |
+
 ## Run it locally
 
 Requirements: Docker (PostGIS), [uv](https://docs.astral.sh/uv/) with Python

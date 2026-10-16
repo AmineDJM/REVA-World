@@ -26,6 +26,8 @@ links_app = typer.Typer(no_args_is_help=True, help="V3 links: materialised link 
 app.add_typer(links_app, name="links")
 causal_app = typer.Typer(no_args_is_help=True, help="V3 causality: sourced causal claims and their grades")
 app.add_typer(causal_app, name="causal")
+kg_app = typer.Typer(no_args_is_help=True, help="V3 knowledge graph: governed imports")
+app.add_typer(kg_app, name="kg")
 
 
 def _out(obj: Any) -> None:
@@ -583,6 +585,21 @@ def causal_refresh_cmd(
     settings = get_settings()
     out = refresh(make_engine("worker", settings), get_store(), origin=p["origin"])
     _out({"status": "completed", "origin": p["origin"], **out})
+
+
+# --------------------------------------------------------------------------- kg (V3, LOADALL)
+@kg_app.command("import-harvest")
+def kg_import_harvest_cmd(
+    from_db: str = typer.Option(..., "--from-db", help="throwaway harvest database, e.g. reva_kg_wdharvest"),
+    sources: list[str] = typer.Option(["wikidata*"], "--sources", help="kg.load source_key glob(s)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="derive and count, write nothing"),
+    no_verify: bool = typer.Option(False, "--no-verify", help="skip the source/target content comparison"),
+) -> None:
+    """Re-load a Wikidata harvest into the configured KG database from the ARCHIVED raw responses
+    (re-derived with the harvester's extraction, written through load_batch; never row copies)."""
+    from reva.kg.import_harvest import run
+
+    _out(run(from_db, sources=tuple(sources), dry_run=dry_run, verify=not no_verify))
 
 
 def main() -> None:  # pragma: no cover

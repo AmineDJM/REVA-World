@@ -1139,9 +1139,12 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
     session: BudgetedSession | None = None
     try:
         budget = load_budget()
-        res_q = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WDQS,
+        # One ledger operation per source key: with a shared job id both reservations had the same
+        # operation_id (the wbapi row was dropped by ON CONFLICT DO NOTHING and every wbapi request was
+        # charged to the wdqs account; settling overwrote one count with the other) -- WDRUN 2026-10-16.
+        res_q = reserve_ingest(engine, job_id=f"{run_id}-wdqs", attempt=1, source_key=SOURCE_WDQS,
                                planned_requests=planned_wdqs, budget=budget)
-        res_a = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WBAPI,
+        res_a = reserve_ingest(engine, job_id=f"{run_id}-wbapi", attempt=1, source_key=SOURCE_WBAPI,
                                planned_requests=planned_wbapi, budget=budget)
         wdqs = metered(inner, engine, res_q, budget=budget)
         wbapi = metered(inner, engine, res_a, budget=budget)

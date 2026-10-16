@@ -807,3 +807,35 @@ def test_whatlinkshere_page_parsing() -> None:
     assert _re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html) == ["Q30", "Q327"]
     m = _re.search(r'<a href="[^"]*[?&;]from=([0-9]+)[^"]*"[^>]*class="mw-nextlink"', html)
     assert m and m.group(1) == "12345"
+
+
+async def test_archived_snapshots_are_reused_across_specs(tmp_path: Path) -> None:
+    """WDRUN: an entity already archived (wbgetentities or EntityData, recent enough, props covering the request)
+    is served from the archive -- citing the archived sha and original retrieval time -- and only the rest is
+    requested."""
+
+    def router(url: str) -> tuple[int, bytes, dict[str, str]]:
+        ids = url.split("ids=")[1].split("&")[0].split("|")
+        out = {}
+        for i in ids:
+            ent = entity_json()
+            ent["id"] = i
+            out[i] = ent
+        return 200, json.dumps({"entities": out}).encode(), {}
+
+    http = ScriptedHttp(router=router)
+    c = client_for(http, tmp_path)
+    c.reuse_seconds = 10 * 365 * 86400.0
+    first = await c.get_entities(["Q1", "Q2", "Q3"], props=wd.LABEL_PROPS)
+    assert first.requests == 1 and len(http.calls) == 1
+    # label-only archive does not cover a full (claims) request: Q2 is fetched again with Q4
+    full = await c.get_entities(["Q2", "Q4"])
+    assert full.requests == 1 and "ids=Q2|Q4" in http.calls[-1][0]
+    # labels of Q1 (label archive), Q2/Q4 (full archive) are reused; only Q5 is requested
+    lab = await c.get_entities(["Q1", "Q2", "Q4", "Q5"], props=wd.LABEL_PROPS)
+    assert lab.requests == 1 and "ids=Q5&" in http.calls[-1][0] and c.stats.reused == 3
+    assert "claims" not in lab.entities["Q2"] and lab.entities["Q2"]["lastrevid"]
+    assert lab.raw_sha_by_id["Q1"] == first.raw_sha256s[0] and lab.raw_sha_by_id["Q2"] == full.raw_sha256s[0]
+    c.reuse_seconds = 0.0  # reuse disabled: everything is requested
+    again = await c.get_entities(["Q1"], props=wd.LABEL_PROPS)
+    assert again.requests == 1
