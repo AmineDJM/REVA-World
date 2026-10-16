@@ -279,6 +279,8 @@ test('Demander "Quel est le salaire minimum en France ?": keyword planner, every
   const wageSentences = (body.sentences as any[]).filter((s) => /salaire minimum|minimum wage/i.test(s.text) && s.kind !== 'unsupported');
   if (atlasCells.length > 0) {
     expect(wageSentences.some((s) => s.citations.some((id: string) => atlasCells.some((e) => e.id === id)))).toBe(true);
+    // Data present: never worded as absent (a concept tie is a choice or an ambiguity, not "not covered").
+    await expect(answer).not.toContainText('Non couvert par les données de REVA');
   } else {
     expect((body.sentences as any[]).some((s) => s.kind === 'unsupported' || s.kind === 'missing') || body.unsupported.length > 0).toBe(true);
     await expect(answer).toContainText(/Non couvert|manquant|absente|ne couvre pas/);

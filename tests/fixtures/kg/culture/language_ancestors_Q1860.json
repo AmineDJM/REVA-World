@@ -1,0 +1,62 @@
+{
+ "anchor": "language_ancestors_Q1860",
+ "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?lang { wd:Q1860 }\n  ?lang wdt:P220 ?iso .\n  ?lang wdt:P279+ ?item .\n  ?item wdt:P1394 ?glottocode .\n}",
+ "raw_sha256": "71ea19bc67ed96c4ee724dac20e6f119b9cef2e6e6b6eb4f6d49da1c0e6f4e5e",
+ "response": {
+  "head": {
+   "vars": [
+    "item"
+   ]
+  },
+  "results": {
+   "bindings": [
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q1346342"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q5329170"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q13137302"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q19860"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q21200"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q26721"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q30134"
+     }
+    }
+   ]
+  }
+ },
+ "response_sha256": "3685f5cfdb7242c60f43bb82d1749d6e7467bddd827e57587fa8921eda9d98c2",
+ "retrieved_at": "2026-10-16T00:24:08.414116+00:00",
+ "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
+ "spec": "language_ancestors.yaml"
+}

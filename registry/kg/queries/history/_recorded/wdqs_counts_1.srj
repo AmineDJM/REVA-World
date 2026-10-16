@@ -1,0 +1,78 @@
+{
+  "head" : {
+    "vars" : [ "k", "n" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "k" : {
+        "type" : "literal",
+        "value" : "empires"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "27"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "colonies"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "16840"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "wars"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2755"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "treaties_all"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "8127"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "expeditions"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2071"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "revolutions"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "221"
+      }
+    }, {
+      "k" : {
+        "type" : "literal",
+        "value" : "eras_all"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4297"
+      }
+    } ]
+  }
+}

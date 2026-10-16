@@ -1,0 +1,621 @@
+{
+ "bytes": 946067,
+ "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)",
+ "derivation": "wbgetentities props=info|claims|sitelinks; claims reduced to the listed properties, deprecated rank dropped, values compacted (entity id / time / amount / text); the raw responses are archived content-addressed in var/kg/objects under archive_sha256 (not committed: several MB)",
+ "endpoint": "https://www.wikidata.org/w/api.php",
+ "entities": {
+  "Q15824050": {
+   "archive_sha256": "001e1d0a90e866fce4a09ac5abf7ec3b576b5a8903894e08e56d7516ae7fe082",
+   "claims": [
+    {
+     "o": "+1878-00-00T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q15824050$C2A1125C-C4FF-4B21-BE3B-C500DB8BBF9B"
+    },
+    {
+     "o": "Q865588",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q15824050$E8EFE8C0-B259-49BD-8872-4B9857AFE2CD"
+    },
+    {
+     "o": "Q31",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q15824050$1563b7d0-4bcd-bbed-7d33-4114c7057719"
+    }
+   ],
+   "enwiki": "Committee for Studies of the Upper Congo",
+   "lastrevid": 2515976306,
+   "sitelinks": 5
+  },
+  "Q1773926": {
+   "archive_sha256": "001e1d0a90e866fce4a09ac5abf7ec3b576b5a8903894e08e56d7516ae7fe082",
+   "claims": [
+    {
+     "o": "Q8683",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q1773926$6cb0a978-42bd-b1d0-5d7f-b2567912c416"
+    },
+    {
+     "o": "+1960-06-01T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q1773926$f6f75be3-482e-2bdc-65dc-69e6a136a74b"
+    },
+    {
+     "o": "+1966-11-01T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q1773926$b1103883-4466-b3d6-3c14-80712c4c6b8a"
+    },
+    {
+     "o": "Q350604",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1773926$BD78B7A4-0080-4A62-B17B-DF937C09FCDB"
+    },
+    {
+     "o": "Q381072",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1773926$70aceb98-4060-f053-cbb5-89ab691d67fc"
+    },
+    {
+     "o": "Q618399",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q1773926$8C19B2EB-BB26-40E9-A306-5E5038D2D2D6"
+    }
+   ],
+   "enwiki": "Congo Crisis",
+   "lastrevid": 2554757929,
+   "sitelinks": 46
+  },
+  "Q31": {
+   "archive_sha256": "001e1d0a90e866fce4a09ac5abf7ec3b576b5a8903894e08e56d7516ae7fe082",
+   "claims": [
+    {
+     "o": "Q213107",
+     "p": "P1313",
+     "rank": "normal",
+     "statement": "Q31$c1b35bf8-489d-f0f9-c6ea-b6d7911bede7"
+    },
+    {
+     "o": "Q223933",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1830-10-04T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$329d9fd2-4cd1-6abb-3401-c0e647028d1e"
+    },
+    {
+     "o": "Q1160895",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1839-04-19T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$56f34b90-46f6-2d47-0a6a-72938236e884"
+    },
+    {
+     "o": "+1830-10-04T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q31$EF674F89-C48E-4921-8845-4C58EBCDC2CD"
+    },
+    {
+     "o": "Q13592862",
+     "p": "P1906",
+     "rank": "normal",
+     "statement": "Q31$307a9768-409c-80ea-88e3-6da24b491891"
+    },
+    {
+     "o": "Q7411",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "q31$8F3B300A-621A-4882-B4EE-65CE7C21E692"
+    },
+    {
+     "o": "Q150",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "q31$4650C0AA-D1B0-46B5-A43D-B31C3658EEC5"
+    },
+    {
+     "o": "Q188",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "q31$3A666D6A-F7CD-4776-856D-E5544ABF9E04"
+    },
+    {
+     "o": "Q46",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "q31$639B3CF8-46BA-4888-95FB-E0504D8E7F74"
+    },
+    {
+     "o": "Q239",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "q31$9B8AB21C-B781-48FC-B5BB-32056C1B7C06"
+    },
+    {
+     "o": "Q1079522",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1831-02-25T00:00:00Z"
+      ],
+      "P582": [
+       "+1831-07-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "q31$B83EEA38-9FA4-4C73-91CC-C318AB95A178"
+    },
+    {
+     "o": "Q12971",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1831-06-04T00:00:00Z"
+      ],
+      "P582": [
+       "+1865-12-10T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$6740e848-49b5-c949-9e1a-428c0ba7be11"
+    },
+    {
+     "o": "Q12967",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1865-12-17T00:00:00Z"
+      ],
+      "P582": [
+       "+1909-12-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$46c168df-41d4-a838-a01e-2f2b3287acfc"
+    },
+    {
+     "o": "Q55008046",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1909-12-23T00:00:00Z"
+      ],
+      "P582": [
+       "+1934-02-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$47e5a8fe-424e-4d78-23b8-be601713508a"
+    },
+    {
+     "o": "Q12973",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1934-02-23T00:00:00Z"
+      ],
+      "P582": [
+       "+1944-09-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$bce1e9c0-4247-2f03-0f52-0e2bdcb13df3"
+    },
+    {
+     "o": "Q445553",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1944-09-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1950-07-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$85cb0549-4602-a2ca-4941-6cb7d4c98246"
+    },
+    {
+     "o": "Q12973",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1950-07-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1950-08-11T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$aaed550e-48f0-49b2-7dd6-aa3a238a3021"
+    },
+    {
+     "o": "Q12976",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1950-08-11T00:00:00Z"
+      ],
+      "P582": [
+       "+1951-07-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$ce869be3-426f-0108-4fc4-fa1b03a9c76b"
+    },
+    {
+     "o": "Q12976",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1951-07-17T00:00:00Z"
+      ],
+      "P582": [
+       "+1993-07-31T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$c0e1e007-4a45-1982-0ab4-01054ac7d689"
+    },
+    {
+     "o": "Q3911",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1993-08-09T00:00:00Z"
+      ],
+      "P582": [
+       "+2013-07-21T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$27cdcb2c-4e50-0db7-39fd-dad49ea7cd13"
+    },
+    {
+     "o": "Q155004",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+2013-07-21T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q31$c87aceee-4c1f-0280-3445-a0f7c466ce75"
+    },
+    {
+     "o": "Q18434995",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2019-10-27T00:00:00Z"
+      ],
+      "P582": [
+       "+2020-10-01T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "q31$42cc4f87-48d5-bcf1-8273-644634846f62"
+    },
+    {
+     "o": "Q950958",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2014-10-11T00:00:00Z"
+      ],
+      "P582": [
+       "+2019-10-27T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$50e8d501-4873-0fee-7157-fb336cfb57e8"
+    },
+    {
+     "o": "Q476596",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2020-10-01T00:00:00Z"
+      ],
+      "P582": [
+       "+2025-02-03T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$21d6c4e3-4721-af91-2390-5a834dcc2b4a"
+    },
+    {
+     "o": "Q336599",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2025-02-03T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q31$4a51d2df-4e01-9210-8181-c6f1573869eb"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P31",
+     "rank": "preferred",
+     "statement": "q31$B3580D37-D30E-4BC6-A591-2CE49253CAB4"
+    },
+    {
+     "o": "Q6256",
+     "p": "P31",
+     "rank": "preferred",
+     "statement": "q31$5c117765-4eb5-0073-f352-9a9b81f21f59"
+    },
+    {
+     "o": "Q20181813",
+     "p": "P31",
+     "q": {
+      "P582": [
+       "+1960-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q31$b65243f9-44ce-dadc-2a40-24cb6319cb78"
+    },
+    {
+     "o": "Q1250464",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q31$70ece441-44a7-d64a-4de3-5c420fffc43c"
+    },
+    {
+     "o": "Q9337",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$40685705-4f8f-3626-7700-81e9b19d371f"
+    },
+    {
+     "o": "Q240",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$5c7714d1-49ea-8c2c-8f62-abd7184895ce"
+    },
+    {
+     "o": "Q9331",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$71a31ba4-4d15-ccca-27c9-0ee30c911994"
+    },
+    {
+     "o": "Q89959",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$274b5283-40f2-7a20-8f01-7bb8b2b1c281"
+    },
+    {
+     "o": "Q90027",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$b5b57649-4842-b2b8-21ee-dbc344099584"
+    },
+    {
+     "o": "Q231",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "q31$aab27793-44ea-d7f4-f59d-58b5cddfcacd"
+    },
+    {
+     "o": "Q100103",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$4B9AFAB2-7DCC-42E7-80D0-E967D4A5A126"
+    },
+    {
+     "o": "Q102172",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$30ACFD8B-D889-4B45-B979-F1CB94A76A02"
+    },
+    {
+     "o": "Q2107617",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$6202E2D9-B835-4A20-AA13-64F9BD2682D9"
+    },
+    {
+     "o": "Q3217332",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$80386710-41B5-4849-8957-C8D0CCE64CD1"
+    },
+    {
+     "o": "Q7411",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$0F76B873-25A3-43F9-9BC1-DB421441B00E"
+    },
+    {
+     "o": "Q9051",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$F0E72DAE-8DDB-4BA9-B2D7-B69037C8686F"
+    },
+    {
+     "o": "Q188",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$BB43F37B-B52D-4996-A8D6-9B392BF57F4E"
+    },
+    {
+     "o": "Q150",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$6F30D315-A54C-4256-996B-B9798B261252"
+    },
+    {
+     "o": "Q34024",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$FD64FC3C-514F-4721-94E7-8F13029A8D0E"
+    },
+    {
+     "o": "Q34219",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$0D2DA7BC-6D04-4153-892D-08E8074269D6"
+    },
+    {
+     "o": "Q430018",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$19b14258-4aba-8915-0be3-db93bf807f38"
+    },
+    {
+     "o": "Q671198",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$4809268f-494c-075a-be75-269ca7a7a562"
+    },
+    {
+     "o": "Q151156",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$9ebd7c14-4b87-ec19-5c38-f2251d56556d"
+    },
+    {
+     "o": "Q34147",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$3f99e575-44fc-18f4-9a2e-612559143228"
+    },
+    {
+     "o": "Q1404296",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$c311e876-41aa-0f4e-e4c6-afbf4e6983c6"
+    },
+    {
+     "o": "Q815549",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$be206478-46e1-d72d-e3b4-0239ca5bde8f"
+    },
+    {
+     "o": "Q2668371",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$b26a4aa2-42f4-9ddb-ffe2-f715ff3448bd"
+    },
+    {
+     "o": "Q8641",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$254c88d2-4262-9474-5ea6-c20b36c126bf"
+    },
+    {
+     "o": "Q33282",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$e6d3d0c7-4a7e-447a-aea8-f77700cf333d"
+    },
+    {
+     "o": "Q1793299",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q31$2cecc238-4f02-9f82-d86d-49066d2fb57f"
+    },
+    {
+     "o": "Q15864",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q31$A72A0283-118A-4EE0-9914-4027C3BECBB8"
+    },
+    {
+     "o": "Q31",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q31$2739FF39-3EAA-4848-A9E2-41A06DD1F447"
+    },
+    {
+     "o": "Q25271",
+     "p": "P1344",
+     "rank": "normal",
+     "statement": "Q31$c33ea0b9-3338-454f-8e05-e982f10dc4ee"
+    }
+   ],
+   "enwiki": "Belgium",
+   "lastrevid": 2556209623,
+   "sitelinks": 383
+  }
+ },
+ "kind": "snapshot_claims",
+ "missing": [],
+ "properties_kept": [
+  "P1001",
+  "P108",
+  "P112",
+  "P127",
+  "P131",
+  "P1313",
+  "P1336",
+  "P1344",
+  "P1365",
+  "P1366",
+  "P137",
+  "P1427",
+  "P1444",
+  "P1478",
+  "P1479",
+  "P150",
+  "P1536",
+  "P1537",
+  "P1542",
+  "P155",
+  "P156",
+  "P17",
+  "P1891",
+  "P1906",
+  "P2348",
+  "P27",
+  "P276",
+  "P279",
+  "P2936",
+  "P30",
+  "P3005",
+  "P31",
+  "P35",
+  "P36",
+  "P361",
+  "P37",
+  "P39",
+  "P527",
+  "P571",
+  "P576",
+  "P580",
+  "P582",
+  "P585",
+  "P6",
+  "P607",
+  "P61",
+  "P710",
+  "P790",
+  "P793",
+  "P828",
+  "P945"
+ ],
+ "redirects": {},
+ "requests": 1,
+ "retrieved_at": "2026-10-16T00:27:30.950450+00:00"
+}

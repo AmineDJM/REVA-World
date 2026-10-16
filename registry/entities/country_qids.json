@@ -3,7 +3,7 @@
  "review_status": "machine_derived_pending_maintainer_review",
  "built_by": "reva.kg.harvest map-countries (wdharvest/1.0.0, agent WDHARVEST)",
  "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
- "method": "Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).\n\n    Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character\n    query limit) gives every item holding one of the ISO 3166-1 alpha-3 codes; their snapshots are read with\n    wbgetentities (props info|claims|labels) and each code is assigned from the items' own P298 statements:\n    non-deprecated, without end time (P582), on items without dissolution date (P576). Several candidates ->\n    the one classed as a country/sovereign state/territory (P31); still several -> left unmapped (listed).\n    Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title. ``extra_codes`` (TWN)\n    are mapped even when the crosswalk does not list them yet (flagged ``not_in_crosswalk``).",
+ "method": "Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).\n\n    Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character\n    query limit) gives every item holding one of the ISO 3166-1 alpha-3 codes; their snapshots are read with\n    wbgetentities (props info|claims|labels) and each code is assigned from the items' own P298 statements:\n    non-deprecated, without end time (P582), on items without dissolution date (P576). Several candidates ->\n    the one classed as a country/sovereign state/territory (P31); still several -> left unmapped (listed).\n    Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title. ``extra_codes`` (TWN)\n    are mapped even when the crosswalk does not list them yet (flagged ``not_in_crosswalk``).\nCandidates came from Special:WhatLinksHere/Property:P298 (page view) and snapshots from Special:EntityData (the action API was saturated for the shared egress on 2026-10-15/16); every code is still read from the item's own P298 claim.",
  "sources": {
   "endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
   "retrieved_at": "2026-10-16T00:14:24.567142+00:00",
@@ -304,14 +304,14 @@
  "crosswalk_sha256": "9e71dbfdde68717a0c47246d718883cf7f4a04ac66c07e256784308d25cb0ea9",
  "stats": {
   "crosswalk_entities": 251,
-  "mapped": 249,
-  "mapped_crosswalk": 249,
-  "unmapped": 2,
+  "mapped": 250,
+  "mapped_crosswalk": 250,
+  "unmapped": 1,
   "by_method": {
-   "P298": 247,
+   "P298": 248,
    "enwiki_sitelink": 2
   },
-  "distinct_qids": 249,
+  "distinct_qids": 250,
   "shared_qids": {}
  },
  "countries": {
@@ -3467,20 +3467,37 @@
    "lastrevid": 2547611570,
    "raw_sha256": "4261e878ac93a97f71afbab59e56ff09030b18370006227a92f5814c9e5b72f5",
    "crosswalk_label": "Zimbabwe"
+  },
+  "PSE": {
+   "qid": "Q219060",
+   "method": "P298",
+   "label_en": "Palestine",
+   "label_fr": "État de Palestine",
+   "classes": [
+    "Q10711424",
+    "Q3624078",
+    "Q6256"
+   ],
+   "raw_sha256": "f3c795d9ee36fc8b9a93ebbe0c1a9463ac822df3fd9710e5b4794d6e73c3bca5",
+   "crosswalk_label": "State of Palestine",
+   "note": "several items hold the code; kept the only one classed in tier 1 (country, sovereign state, state with limited recognition)",
+   "other_candidates": [
+    "Q407199"
+   ],
+   "resolved_after_run": "class-tier rule added to map_countries_search; applied to the archived snapshot (no new request)",
+   "lastrevid": 2556939471
   }
  },
  "unmapped": [
-  "ATA",
-  "PSE"
+  "ATA"
  ],
  "ambiguous": {
   "ATA": [
    "Q51",
    "Q10372207"
-  ],
-  "PSE": [
-   "Q219060",
-   "Q407199"
   ]
+ },
+ "ambiguous_notes": {
+  "ATA": "Q51 (Antarctica, continent) and Q10372207 (Antarctic Treaty area) both hold a non-deprecated P298=ATA and neither is classed as a country/territory; left unmapped rather than guessed. ISO 3166-1 ATA denotes the territory south of 60°S (closest to Q10372207); most KG statements (continent, borders) use Q51."
  }
 }

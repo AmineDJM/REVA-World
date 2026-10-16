@@ -1,0 +1,11 @@
+{
+  "kind": "wdqs_counts",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "query": "SELECT ?k (COUNT(DISTINCT ?item) AS ?n) WHERE {\n  { ?item wdt:P31/wdt:P279* wd:Q48349 . BIND(\"empires\" AS ?k) }\n  UNION { VALUES ?root { wd:Q133156 wd:Q164142 wd:Q161243 } ?item wdt:P31/wdt:P279* ?root . BIND(\"colonies\" AS ?k) }\n  UNION { ?item wdt:P31/wdt:P279* wd:Q198 . BIND(\"wars\" AS ?k) }\n  UNION { ?item wdt:P31/wdt:P279* wd:Q131569 . BIND(\"treaties_all\" AS ?k) }\n  UNION { ?item wdt:P31/wdt:P279* wd:Q2401485 . BIND(\"expeditions\" AS ?k) }\n  UNION { ?item wdt:P31/wdt:P279* wd:Q10931 . BIND(\"revolutions\" AS ?k) }\n  UNION { ?item wdt:P31/wdt:P279* wd:Q11514315 . BIND(\"eras_all\" AS ?k) }\n}\nGROUP BY ?k",
+  "query_sha256": "24fc78ba96983cce04e67950216bfc5b6cdb910c2af3f0889d776f1765a15d9d",
+  "raw_file": "wdqs_counts_1.srj",
+  "body_sha256": "d4e2fa0b32a5e569c0109ead2c110bea3b37b2199f629a865b653c9ed3c98c70",
+  "archive_sha256": "5e33845f077007781d09745a779d0b5fef0cd6423d8b78ad7f188a3a8aee395e",
+  "retrieved_at": "2026-10-16T00:41:21.982361+00:00",
+  "elapsed_seconds": 2063.9
+}

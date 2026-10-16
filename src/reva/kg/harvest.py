@@ -1198,6 +1198,12 @@ COUNTRY_CLASSES = {"Q6256": "country", "Q3624078": "sovereign state", "Q161243":
                    "Q46395": "British Overseas Territory", "Q15634554": "state with limited recognition",
                    "Q1763527": "constituent country", "Q202216": "overseas department and region of France",
                    "Q1048835": "political territorial entity", "Q10711424": "state with limited recognition"}
+#: Disambiguation order for items sharing an ISO code: states first, then territories, then the broad class.
+CLASS_TIERS = (
+    frozenset({"Q6256", "Q3624078", "Q15634554", "Q10711424"}),
+    frozenset({"Q161243", "Q46395", "Q1763527", "Q202216"}),
+    frozenset({"Q1048835"}),
+)
 MAP_QUERY = """SELECT ?item ?code ?rank ?end ?dissolved ?class WHERE {
   VALUES ?code { %s }
   ?item p:P298 ?st . ?st ps:P298 ?code ; wikibase:rank ?rank .
@@ -1390,10 +1396,16 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
         if len(opts) == 1:
             pick = opts[0]
         elif len(opts) > 1:
-            classed = [q for q in opts if info[q]["classes"]]
-            if len(classed) == 1:
-                pick, note = classed[0], "several items hold the code; kept the one classed as a country/territory"
-            else:
+            for tier, tier_classes in enumerate(CLASS_TIERS, start=1):
+                classed = [q for q in opts if set(info[q]["classes"]) & tier_classes]
+                if len(classed) == 1:
+                    pick = classed[0]
+                    note = (f"several items hold the code; kept the only one classed in tier {tier} "
+                            f"({', '.join(sorted(COUNTRY_CLASSES[c] for c in tier_classes))})")
+                    break
+                if len(classed) > 1:
+                    break
+            if not pick:
                 ambiguous[code] = opts
         if pick:
             countries[code] = {"qid": pick, "method": "P298", **{k: info[pick][k] for k in

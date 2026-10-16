@@ -231,6 +231,8 @@ class Archive:
     store: Any | None
     index_path: Path | None = None
     compress: bool = True
+    _ed_index: dict[str, tuple[str, str, str]] | None = field(default=None, repr=False)
+    _ed_index_size: int = field(default=-1, repr=False)
 
     def put(self, body: bytes, media_type: str, meta: Mapping[str, Any]) -> str:
         import gzip
@@ -251,6 +253,38 @@ class Archive:
                                     "encoding": "gzip" if self.compress else "identity", **meta},
                                    sort_keys=True, default=str) + "\n")
         return sha
+
+    def recent_entitydata(self, eid: str, max_age_seconds: float) -> tuple[bytes, str, datetime] | None:
+        """The most recent archived Special:EntityData snapshot of ``eid`` younger than ``max_age_seconds``."""
+        if max_age_seconds <= 0 or self.store is None or self.index_path is None or not self.index_path.exists():
+            return None
+        if self._ed_index is None or self.index_path.stat().st_size != self._ed_index_size:
+            idx: dict[str, tuple[str, str, str]] = {}
+            with self.index_path.open() as f:
+                for line in f:
+                    if '"entitydata"' not in line:
+                        continue
+                    try:
+                        e = json.loads(line)
+                    except ValueError:
+                        continue
+                    if e.get("kind") == "entitydata" and e.get("ids") and e.get("retrieved_at"):
+                        idx[e["ids"][0]] = (e["sha256"], e["retrieved_at"], e.get("encoding", "identity"))
+            self._ed_index, self._ed_index_size = idx, self.index_path.stat().st_size
+        hit = self._ed_index.get(eid)
+        if hit is None:
+            return None
+        sha, when, enc = hit
+        retrieved = datetime.fromisoformat(when)
+        if (datetime.now(UTC) - retrieved).total_seconds() > max_age_seconds:
+            return None
+        import gzip
+
+        try:
+            data = self.store.get("raw", sha)
+        except Exception:  # noqa: BLE001 - missing object: fetch again
+            return None
+        return (gzip.decompress(data) if enc == "gzip" else data), sha, retrieved
 
 
 # --------------------------------------------------------------------------- results
@@ -288,12 +322,13 @@ class ClientStats:
     throttled: int = 0
     timeouts: int = 0
     maxlag_relaxed: int = 0
+    reused: int = 0
     lock_wait_seconds: float = 0.0
     by_endpoint: dict[str, int] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {"requests": self.requests, "bytes": self.bytes, "retries": self.retries,
-                "throttled": self.throttled, "timeouts": self.timeouts, "maxlag_relaxed": self.maxlag_relaxed,
+                "throttled": self.throttled, "timeouts": self.timeouts, "maxlag_relaxed": self.maxlag_relaxed, "reused": self.reused,
                 "lock_wait_seconds": round(self.lock_wait_seconds, 2), "by_endpoint": dict(self.by_endpoint)}
 
 
@@ -342,6 +377,7 @@ class WikidataClient:
         lock: MachineLock | None = None,
         max_retries: int = 12,
         mode: str = "api",
+        reuse_seconds: float = 0.0,
         sleep: Any = asyncio.sleep,
     ) -> None:
         self.wdqs_http = wdqs_http
@@ -357,6 +393,9 @@ class WikidataClient:
         #: CDN-cacheable, same JSON + lastrevid) and the MediaWiki REST search (<= 100 hits, no paging).
         #: ``hybrid``: action-API search (paging, few requests) + Special:EntityData snapshots (the bulk).
         self.mode = mode
+        #: Special:EntityData snapshots archived less than ``reuse_seconds`` ago are reused (raw sha and original
+        #: retrieval time cited) instead of being requested again.
+        self.reuse_seconds = reuse_seconds
         self._sleep = sleep
         self.stats = ClientStats()
 
@@ -530,18 +569,23 @@ class WikidataClient:
         while queue:
             if self.mode in ("linked_data", "hybrid"):
                 eid0 = queue.pop(0)[0]
-                try:
-                    result, sha = await self._request(
-                        self.wbapi_http, ENTITYDATA_URL.format(id=eid0), endpoint="entitydata",
-                        accept="application/json", meta={"kind": "entitydata", "ids": [eid0], **(meta or {})})
-                except EntityMissing:
-                    missing.append(eid0)
-                    continue
-                requests += 1
-                nbytes += len(result.body)
+                cached = self.archive.recent_entitydata(eid0, self.reuse_seconds)
+                if cached is not None:  # archived snapshot of the same entity, recent enough: no request
+                    body, sha, retrieved = cached
+                    self.stats.reused += 1
+                else:
+                    try:
+                        result, sha = await self._request(
+                            self.wbapi_http, ENTITYDATA_URL.format(id=eid0), endpoint="entitydata",
+                            accept="application/json", meta={"kind": "entitydata", "ids": [eid0], **(meta or {})})
+                    except EntityMissing:
+                        missing.append(eid0)
+                        continue
+                    requests += 1
+                    nbytes += len(result.body)
+                    body, retrieved = result.body, result.retrieved_at
                 shas.append(sha)
-                retrieved = result.retrieved_at
-                for key, ent in (_json(result.body).get("entities") or {}).items():
+                for key, ent in (_json(body).get("entities") or {}).items():
                     ent = _prune(ent, props, languages)
                     eid = ent.get("id", key)
                     if eid != eid0:

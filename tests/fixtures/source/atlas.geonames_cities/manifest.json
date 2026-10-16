@@ -26,5 +26,19 @@
     "licence": "CC BY 4.0",
     "excerpt": "real rows of countries ['AU', 'BO', 'EH', 'IL', 'MS', 'MY', 'PS', 'PT', 'PW', 'XK']",
     "excerpt_of_raw_sha256": "1da92a6323a5fec3176f3f743bf4cf4040fd56a876da55e46fbca23c863aa60a"
+  },
+  {
+    "request_fingerprint": "a8dd0a56504963632e4bc8ed480ce954bca5b8acdd09727c6f40fbc5ebefb230",
+    "url": "https://download.geonames.org/export/dump/alternateNamesV2.zip",
+    "file": "a8dd0a5650496363.zip",
+    "sha256": "5f8ba32c42056b1db04df49ee34b7069548537721c6dd3840d1f03b00011f3c3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T00:14:25+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real lines of alternateNamesV2.txt: every language for geonameid 2267057 (Lisbon), fr/en/pt/link for the other fixture places; first 2000 bytes of iso-languagecodes.txt; members of the full zip: ['iso-languagecodes.txt', 'alternateNamesV2.txt']",
+    "excerpt_of_raw_sha256": "8f3e7b963d0bd31c3465df489fc59f2eda4930f1b28d0c0a6a4d0b37bb3dbe51"
   }
 ]

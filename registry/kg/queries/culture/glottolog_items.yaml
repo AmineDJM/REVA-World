@@ -1,0 +1,26 @@
+id: culture.glottolog_items
+domain: culture
+owner: KGLANG
+description: >-
+  Every Wikidata item carrying a non-deprecated Glottolog code (P1394), ~11.8k items (WDQS count 2026-10-16:
+  11,963 statements on 11,782 items). Complements culture.languages / language_families / language_ancestors
+  (KGCULT), which seed ISO 639-3 languages, Q25295 families and Glottocode-bearing ancestors: this spec also
+  covers Glottocode-bearing dialects, varieties, pidgins, sign languages and groupings that none of them seeds,
+  so that every object of KGLANG's glottolog:<code> --glottolog:wikidata_item--> Q edges (atlas_glottolog,
+  source key wikidata.wdqs) has a labelled entity snapshot. Items already seeded by KGCULT are not re-fetched.
+purpose: seed_entities
+entity_kind: language
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item p:P1394 ?st .
+    ?st wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+max_rows: 16000
+expand_hops: 0
+depends_on: [culture.languages, culture.language_families, culture.language_ancestors]
+properties: [P31, P279, P361, P4913, P1394, P220, P1999]
+notes: >-
+  Seeds entity snapshots only; the glottolog -> Wikidata edges themselves are built by atlas.glottolog_wikidata
+  from one WDQS statement query (statement ids, ranks). Genealogy stays Glottolog's (glottolog:parent /
+  glottolog:family); Wikidata P279/P361 are kept as Wikidata says them, never merged with Glottolog's.
