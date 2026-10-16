@@ -1,0 +1,22 @@
+{
+  "kind": "title_lookup",
+  "endpoint": "https://www.wikidata.org/w/api.php",
+  "requests": [
+    {
+      "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=Congo+Crisis|Congolese+independence|Republic+of+the+Congo+%28L%C3%A9opoldville%29|Belgian+colonial+empire|International+Association+of+the+Congo|Zaire&props=info|sitelinks&sitefilter=enwiki&format=json&maxlag=5",
+      "raw_file": "title_lookup3_0.json.raw",
+      "body_sha256": "1b2479f800bb6230d39084c55083ad3be7013a8f4b82081957b63ac2db2f54dc",
+      "archive_sha256": "86b0a066d9d0e2033451c06b0df30d05f17b32abebfb0686150c2ac02b55a0a3",
+      "retrieved_at": "2026-10-16T00:12:15.366511+00:00",
+      "titles": [
+        "Congo Crisis",
+        "Congolese independence",
+        "Republic of the Congo (Léopoldville)",
+        "Belgian colonial empire",
+        "International Association of the Congo",
+        "Zaire"
+      ]
+    }
+  ],
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)"
+}

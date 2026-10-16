@@ -335,3 +335,17 @@ def test_rates_year_falls_back_and_stale_rates_are_refused() -> None:
     assert y is not None and y <= 2022
     assert rw.rates_year(emp, act, min(emp) - 1) is None
     assert rw.rates_year({2000: emp[y]}, {2000: act[y]}, 2022) is None  # older than MAX_RATES_AGE
+
+
+def test_oversized_runs_are_refused_with_a_typed_gap() -> None:
+    from uuid import uuid4
+
+    from reva.simulation.plugins import ResultRow
+
+    row = ResultRow(
+        "x", "SEN", uuid4(), "L1", {"kind": "decimal", "value": "1", "notes": "n" * 2000}, {"status": "unknown"}, {}
+    )
+    CW.result_size_guard([row] * 10, "m")  # small: fine
+    with pytest.raises(CapabilityGap) as e:
+        CW.result_size_guard([row] * 20_000, "m")
+    assert e.value.details["capability"] == "simulation.result_size"

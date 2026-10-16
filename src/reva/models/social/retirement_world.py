@@ -892,6 +892,9 @@ class RetirementAgeWorldModel:
         for plan in compiled.countries:
             if plan.status == "ready":
                 rows.extend(rows_for_country(plan, compiled, fidelity, ResultRow))
+        from reva.models.population.cohort_world import result_size_guard
+
+        result_size_guard(rows, f"{MODEL_KEY}@{MODEL_VERSION}")
         return sorted(rows, key=lambda r: r.sort_key())
 
     def manifest(self) -> dict[str, Any]:

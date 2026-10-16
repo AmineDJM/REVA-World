@@ -77,8 +77,8 @@ labels each with its property ("official language", "replaces", "part of").
 ### Property requests
 
 `registry/kg/property_requests/kgcult.yaml`: P219, P305, P1394, P4913, P1999, P3823, P1018, P506,
-P144, P498, P2012, P2614 (main) and P1107, P1098, P1114 (qualifiers). Until WDHARVEST merges them,
-`python -m reva.kg.harvest validate` reports the 7 specs that use them as invalid (no other errors).
+P144, P498, P2012, P2614 (main) and P1107, P1098, P1114 (qualifiers) — merged by WDHARVEST;
+`python -m reva.kg.harvest validate registry/kg/queries/culture` → 18/18 valid.
 
 ## 2. UNESCO World Heritage List → atlas (`src/reva/adapters/connectors/atlas_unesco_whc.py`)
 
@@ -126,8 +126,9 @@ captured through the locked `WikidataClient`).
   `atlas_ingest(run)`, discovered by module name; run with
   `uv run python -m reva.atlas.ingest atlas.unesco_whc [--fixture]`). The seeded deployment needs
   the lead's `register_atlas_connector_versions` seed step (already planned by ATLASCORE).
-* **ATLASCORE:** merge `registry/atlas/budget_requests/kgcult.yaml` (`unesco.whc`). Until merged,
-  `tests/invariants/test_invariant_30_budgets.py::test_budget_keys_are_registered_sources_and_cover_every_connector`
-  sees `unesco.whc` in `registry/sources/` without a budget key.
-* **WDHARVEST:** merge `registry/kg/property_requests/kgcult.yaml`; run the culture specs
-  (`religion_ancestors` after `religions`).
+* **ATLASCORE:** merged `unesco.whc: 4` into `budgets.yaml` (done). The live, budgeted ingest into a
+  throwaway database passed on 2026-10-16 (`pytest -m live tests/integration/test_atlas_unesco_whc_ingest.py`:
+  2 metered requests, table `atlas.unesco_whc.whc001` registered).
+* **WDHARVEST:** run the culture specs (`religion_ancestors` after `religions`). Bounds are upper
+  estimates (no full COUNT queries were possible under the WDQS throttling); a `row_bound_exceeded`
+  failure should be reported back rather than the bound raised blindly.

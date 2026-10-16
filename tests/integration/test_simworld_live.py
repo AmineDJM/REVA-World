@@ -310,16 +310,18 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
                 "first_birth_year": 1965,
             }
             ref = job("retirement_target_62", target, "L1")
-            with engines["migration"].connect() as c:
-                rows = c.execute(
-                    text("""SELECT applicability->>'country' AS c, output_key, value->>'value' AS v FROM sim.result
-                            WHERE run_id=:r AND period_start = '2030-01-01'
-                              AND output_key IN ('employment_change_55_64', 'pension_recipients_change_55_64')"""),
-                    {"r": ref["run_id"]},
-                ).all()
-            stats["retirement_target_62"]["values_2030"] = {}
-            for iso, key, v in rows:
-                stats["retirement_target_62"]["values_2030"].setdefault(iso, {})[key] = v
+            if ref is not None:
+                with engines["migration"].connect() as c:
+                    rows = c.execute(
+                        text("""SELECT applicability->>'country' AS c, output_key, value->>'value' AS v FROM sim.result
+                                WHERE run_id=:r AND period_start = '2030-01-01'
+                                  AND output_key IN ('employment_change_55_64', 'pension_recipients_change_55_64')"""),
+                        {"r": ref["run_id"]},
+                    ).all()
+                stats["retirement_target_62"]["values_2030"] = {}
+                for iso, key, v in rows:
+                    stats["retirement_target_62"]["values_2030"].setdefault(iso, {})[key] = v
+                dump()
 
             # back-test 2013 -> 2023 of every country, from the datasets the release pinned
             t0 = time.perf_counter()

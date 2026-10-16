@@ -136,7 +136,7 @@ Latest-year coverage of the headline series (crosswalk entities; 251 in the cros
 | RCS `CHRPC` (Christians %) | 235 | 2015: 235 | 16: uninhabited / sub-national territories (ATA, BVT, HMD, SGS, UMI, IOT, ATF, CCK, CXR, NFK, SJM, ALA, BLM, MAF) and Guernsey/Jersey (RCS has the Channel Islands as one unit → CHI) |
 | RCS `MAJID` | 231 | 2015: 226 | as above + a few units without a (super)majority code |
 | WRP `chrstgenpct` | 193 | 2010: 193 | territories and microstates outside the COW system |
-| HIEF `EFindex` | 156 | 2013: 156 | 95 — HIEF covers 162 units with ≥ 500,000 inhabitants; **France has no row in HIEF V2** |
+| HIEF `EFindex` | 156 | 2013: 156 | 95 — HIEF covers 162 units (no territories, no microstates); **France has no row in HIEF V2** |
 | SSCP `ethnic_frac` / `language_frac` / `religion_frac` | 227 / 215 / 234 | cross-section | 24 / 36 / 17 (uninhabited territories; language missing for 25 polities "No value in any source") |
 | CDPD `Deathpenalty` | 194 | 2022: 194 (110 abolished, 7 ordinary crimes only, 43 abolished in practice, 34 retained) | territories (CDPD covers independent states) |
 | WHO `VIOLENCE_HOMICIDERATE` both sexes | 185 | 2021: 185 | WHO member states only |

@@ -224,6 +224,7 @@ class CohortComponentWorldModel(CC.CohortComponentModel):
             }
             if r.variant != CC.RANGE_VARIANT:
                 r.uncertainty = unc
+        result_size_guard(rows, f"{C.MODEL_KEY}@{MODEL_VERSION}")
         return rows
 
     def manifest(self) -> dict[str, Any]:
@@ -274,6 +275,27 @@ class CohortComponentWorldModel(CC.CohortComponentModel):
 
     def implementation_files(self) -> tuple[Path, ...]:
         return (Path(C.__file__), Path(CC.__file__), Path(wpp.__file__), Path(__file__))
+
+
+#: The platform stores one result manifest per run, bounded by sim.register_artifact (32 MiB). A run whose
+#: rows would not fit is refused before publication with a typed gap (split the countries into batches)
+#: instead of failing inside the publication transaction.
+RESULT_MANIFEST_BUDGET_BYTES = 28 * 1024 * 1024
+
+
+def result_size_guard(rows: list[ResultRow], model: str) -> None:
+    import json
+
+    approx = sum(len(json.dumps(r.value)) + len(json.dumps(r.uncertainty)) + 220 for r in rows)
+    if approx > RESULT_MANIFEST_BUDGET_BYTES:
+        raise CapabilityGap(
+            f"{model}: {len(rows)} result rows (~{approx // 2**20} MiB) exceed the run's result-manifest bound; "
+            "run fewer countries, outputs or variants per scenario (e.g. split countries ['ALL'] into batches)",
+            capability="simulation.result_size",
+            result_rows=len(rows),
+            approx_bytes=approx,
+            budget_bytes=RESULT_MANIFEST_BUDGET_BYTES,
+        )
 
 
 def _uncertainty(source: str) -> dict[str, Any]:
