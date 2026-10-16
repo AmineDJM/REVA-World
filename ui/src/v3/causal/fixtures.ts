@@ -288,39 +288,60 @@ export const E_ARMISTICE = claim({
 export const CAUSES = [C_SARAJEVO, C_JULY, C_ALLIANCES, C_NAVAL, C_IMPERIALISM, C_IMPERIALISM_DENIED, C_TEMPORAL_BAD, C_UNGRADED];
 export const EFFECTS = [E_VERSAILLES, E_REVOLUTION, E_ARMISTICE];
 
+/** GET /v1/causal/events/Q361 as reva.causal.graph.event() shapes it (context = KG statements, not causal). */
 export const EVENT_WW1 = envelope({
   id: 'Q361',
-  labels: { fr: 'Première Guerre mondiale', en: 'World War I' },
-  descriptions: { fr: 'conflit mondial (donnée de test)' },
-  kind: 'event',
-  event_type: { id: 'war', labels: { fr: 'guerre', en: 'war' } },
-  dates: { start: day('1914-07-28', 'P580'), end: day('1918-11-11', 'P582') },
-  places: [{ id: 'fixture:europe', label: 'Europe' }],
-  participants: [
-    { entity: { id: 'fixture:france', label: 'France' }, role: 'side', side: 'Alliés' },
-    { entity: { id: 'fixture:germany', label: 'Empire allemand' }, role: 'side', side: 'Empires centraux' },
+  event: { id: 'Q361', label: 'World War I', label_fr: 'Première Guerre mondiale', kind: 'war' },
+  dates: {
+    start: { from: '1914-07-28', to: '1914-07-28', basis: 'P580', precision: 11, times: ['+1914-07-28T00:00:00Z'] },
+    end: { from: '1918-11-11', to: '1918-11-11', basis: 'P582', precision: 11, times: ['+1918-11-11T00:00:00Z'] },
+  },
+  causes: { cause: { A: 1, B: 3, D: 1, E: 2, ungraded: 1 } },
+  effects: { cause: { B: 2, C: 1 } },
+  context: [
+    ctx('Q361', 'P276', 'lieu', 'location', { id: 'fixture:europe', label: 'Europe' }),
+    ctx('Q361', 'P710', 'participant', 'participant', { id: 'fixture:france', label: 'France' }),
+    ctx('Q361', 'P710', 'participant', 'participant', { id: 'fixture:germany', label: 'German Empire', label_fr: 'Empire allemand' }),
   ],
-  context: [{ relation: 'participant', relation_label: { fr: 'participant' }, other: { id: 'fixture:france', label: 'France' } }],
-  counts: { causes: CAUSES.length, effects: EFFECTS.length, candidates: 2 },
-  origin: 'test_fixture',
+  context_truncated: false,
+  context_note: 'Context edges (part of, follows, participants, places) are not causal and are never counted.',
+  candidates: 2,
+  candidates_note: 'Unsourced candidates (text-mined T5 / model-proposed T6), quarantined.',
+  note: 'Causal links are claims made by the named sources; REVA does not establish causation.',
+  origins: ['test_fixture'],
 });
+
+function ctx(event: string, property: string, fr: string, en: string, other: Record<string, string>) {
+  return {
+    subject: { id: event, label: 'World War I', label_fr: 'Première Guerre mondiale', kind: 'war' },
+    property,
+    label: { en, fr },
+    object: { ...other, kind: null },
+    source_key: 'wikidata',
+    statement_key: `wikidata:${event}$FIXTURE-${property}-${other.id}`,
+    origin: 'test_fixture',
+    causal: false,
+  };
+}
 
 export const CAUSES_WW1 = envelope({ event: { id: 'Q361', label: 'Première Guerre mondiale' }, claims: CAUSES });
 export const EFFECTS_WW1 = envelope({ event: { id: 'Q361', label: 'Première Guerre mondiale' }, claims: EFFECTS });
 
+/** GET /v1/causal/events/Q361/why as reva.causal.graph.why() shapes it (lanes as a list; dissent = denials + contested). */
 export const WHY_WW1 = envelope({
-  event: { id: 'Q361', label: 'Première Guerre mondiale' },
-  lanes: {
-    immediate: [C_SARAJEVO],
-    underlying: [C_ALLIANCES, C_IMPERIALISM],
-    contributing: [C_NAVAL],
-    general: [C_TEMPORAL_BAD, C_UNGRADED],
-    coded: [C_JULY],
-    reaction: [],
-    prevention: [],
-  },
-  dissent: [C_IMPERIALISM_DENIED],
-  note: 'causes asserted by sources, by lane; REVA asserts none',
+  id: 'Q361',
+  label: 'World War I',
+  lanes: [
+    { lane: 'immediate', label: { en: 'immediate causes', fr: 'causes immédiates' }, claims: [C_SARAJEVO] },
+    { lane: 'underlying', label: { en: 'underlying causes', fr: 'causes profondes' }, claims: [C_ALLIANCES, C_IMPERIALISM] },
+    { lane: 'contributing', label: { en: 'contributing factors', fr: 'facteurs contributifs' }, claims: [C_NAVAL] },
+    { lane: 'general', label: { en: 'causes', fr: 'causes' }, claims: [C_TEMPORAL_BAD, C_UNGRADED] },
+    { lane: 'coded', label: { en: 'coded triggers', fr: 'déclencheurs codés' }, claims: [C_JULY] },
+  ],
+  mechanisms: [],
+  dissent: [C_IMPERIALISM_DENIED, C_IMPERIALISM],
+  truncated: false,
+  summary_fr: '7 affirmation(s) causale(s) sourcée(s) sur Première Guerre mondiale ; chacune est attribuée à sa source. REVA n’établit pas de causalité.',
 });
 
 export const CHAIN_SARAJEVO_VERSAILLES = envelope({
@@ -342,10 +363,19 @@ export const CHAIN_SARAJEVO_VERSAILLES = envelope({
     },
   ],
   note: 'composition by REVA of separately asserted claims; chain grade = weakest hop',
+  note_fr: 'composition par REVA d’affirmations causales énoncées séparément ; note de la chaîne = maillon le plus faible.',
   search: { levels_expanded: 2, edges_scanned: 14, truncated: false, truncation_reasons: [], elapsed_ms: 3, time_budget_ms: 5000 },
 });
 
-export const CHAIN_NONE = envelope({ from: 'Q361', to: 'fixture:unrelated', found: false, max_hops: 4, paths: [], note: null, search: { truncated: false } });
+export const CHAIN_NONE = envelope({
+  from: { id: 'Q361', label: 'World War I', label_fr: 'Première Guerre mondiale', kind: 'war' },
+  to: { id: 'fixture:unrelated', label: 'fixture:unrelated', label_fr: null, kind: null },
+  found: false,
+  paths: [],
+  note_fr: 'composition par REVA d’affirmations causales énoncées séparément ; note de la chaîne = maillon le plus faible.',
+  not_found_reason: 'no causal chain within max_hops among claims graded at least D',
+  search: { truncated: false, ungraded_skipped: 0 },
+});
 
 export const CANDIDATES_WW1 = envelope({
   event: 'Q361',
@@ -357,12 +387,10 @@ export const CANDIDATES_WW1 = envelope({
       effect: WW1,
       relation: 'has_cause',
       tier: 'T5',
-      extractor_id: 'causcand.patterns',
-      extractor_version: '1',
-      source_key: 'wikipedia.fr',
-      source_revision: '999000111',
+      extractor: { id: 'causcand.patterns', version: '1' },
+      source: { source_key: 'wikipedia.fr', source_revision: '999000111', selector: { page: 'FIXTURE', section: 'Causes', sentence: 3 }, raw_sha256: SHA },
       source_sentence: 'FIXTURE sentence: nationalism is often cited among the causes of the war.',
-      selector: { page: 'FIXTURE', section: 'Causes', sentence: 3 },
+      label: 'unsourced candidate (non sourcé — candidat)',
       promotion_status: 'not_promoted',
       origin: 'test_fixture',
     },

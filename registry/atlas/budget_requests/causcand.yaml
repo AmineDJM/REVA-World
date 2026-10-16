@@ -1,0 +1,16 @@
+# Budget request from agent CAUSCAND (causal candidates mined from Wikipedia text). ATLASCORE merges into
+# registry/policies/budgets.yaml (per_source_daily_requests). Until merged, live runs use an in-memory
+# overlay of exactly this request on the pinned policy, ledger in the throwaway database reva_causcand
+# (reva.causal_candidates.fetch.requested_budget_overlay; policy version suffixed "+causcand_request").
+agent: CAUSCAND
+requests:
+  - source_key: wikipedia.causal_text
+    daily_requests: 600
+    expected_bytes_per_day: 150000000
+    reason: >-
+      en/fr.wikipedia.org action API. Initial run: 500 articles (250 events x EN + FR) at 4 titles per
+      request = ~126 content requests (~60-80 MB of wikitext; long articles exceeding the API result size are
+      re-requested one by one) + ~100-150 link-resolution requests (50 titles each, pageprops only, ~20 kB).
+      One request at a time, >= 10 s apart per host. Observed 2026-10-16: Wikimedia answered most content
+      requests with 429 + Retry-After ~50 s (shared egress IP); each waited-out retry is a metered request, so a
+      full run costs ~2 requests per batch. 600/day covers one full run with retries.

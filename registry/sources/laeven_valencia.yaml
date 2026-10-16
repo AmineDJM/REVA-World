@@ -1,0 +1,34 @@
+# V3 (agent A-ECRISES): Laeven & Valencia, Systemic Banking Crises Database II (IMF Economic Review 2020).
+# Connector: src/reva/adapters/connectors/atlas_ecrises.py (atlas.ecrises.laeven_valencia) -> atlas table
+# laeven_valencia.sbcd, crisis events (KG + dataset ecrises.laeven_valencia.events) and context relations
+# (twin / triple crises, dataset ecrises.laeven_valencia.coded_relations).
+source_key: laeven_valencia.sbcd
+title: Laeven & Valencia (2020) Systemic Banking Crises Database II - data file (crisis dates 1970-2017, outcomes)
+provider_url: https://doi.org/10.1057/s41308-020-00107-3
+lineage_family: laeven_valencia
+rights:
+  licence: "(c) International Monetary Fund 2020 - IMF data terms (reuse with attribution); not an open licence"
+  licence_url: https://www.imf.org/en/About/copyright-and-terms
+  attribution: >-
+    Laeven, L. and Valencia, F. (2020), "Systemic Banking Crises Database II", IMF Economic Review 68, 307-361,
+    doi:10.1057/s41308-020-00107-3 (electronic supplementary material 1).
+  licence_evidence: >-
+    Springer article page (read 2026-10-16): "© 2020 International Monetary Fund", not open access; the data file is
+    the article's electronic supplementary material, downloadable without login. IMF Copyright and Usage page (read
+    2026-10-16), "Special Terms for Statistical Data": "Users may download, extract, copy, create derivative works,
+    publish, distribute, and use Data obtained from IMF Sites subject to these conditions: ... attribution to the
+    IMF as the source"; general content is "personal, noncommercial usage only".
+  open_licence: false
+  review_flag: >-
+    Whether the IMF statistical-data terms cover this research dataset (an IMF working-paper / IMF Economic Review
+    data file) is for a maintainer to confirm before any redistribution beyond research use.
+metadata:
+  allowed_hosts: [static-content.springer.com]
+  files:
+    - https://static-content.springer.com/esm/art%3A10.1057%2Fs41308-020-00107-3/MediaObjects/41308_2020_107_MOESM1_ESM.xlsx
+  access_note: >-
+    The IMF copy of the 2018 working-paper dataset (imf.org .../datasets/wp18206.ashx) returns HTTP 404 (2026-10-16);
+    the 2020 journal data file (same 1970-2017 coverage, 151 banking crises) is the current version.
+  definitions: "WP/18/206 sections II and IV (banking, currency and sovereign crisis definitions); data file footnotes"
+  authentication: none
+  cadence: static release (2020); semi-annual check

@@ -43,8 +43,9 @@ class ScriptedHttp:
 
     origin = "test_fixture"
 
-    def __init__(self, script: dict[str, list[tuple[int, bytes, dict[str, str]]]] | None = None,
-                 router: Any = None) -> None:
+    def __init__(
+        self, script: dict[str, list[tuple[int, bytes, dict[str, str]]]] | None = None, router: Any = None
+    ) -> None:
         self.script = script or {}
         self.router = router
         self.calls: list[tuple[str, dict[str, Any]]] = []
@@ -74,8 +75,7 @@ def client_for(http: Any, tmp_path: Path, clock: FakeClock | None = None) -> wd.
     clock = clock or FakeClock()
     lock = wd.MachineLock(tmp_path / "locks", clock=clock, sleep=clock.sleep)
     store = FilesystemArtifactStore(tmp_path / "objects")
-    return wd.WikidataClient(http, archive=wd.Archive(store, tmp_path / "index.jsonl"), lock=lock,
-                             sleep=clock.sleep)
+    return wd.WikidataClient(http, archive=wd.Archive(store, tmp_path / "index.jsonl"), lock=lock, sleep=clock.sleep)
 
 
 def snak(pid: str, value: Any, kind: str = "item") -> dict[str, Any]:
@@ -95,32 +95,71 @@ def snak(pid: str, value: Any, kind: str = "item") -> dict[str, Any]:
 
 
 def entity_json() -> dict[str, Any]:
-    t = {"time": "-0044-03-15T00:00:00Z", "precision": 11, "calendarmodel": wd.ENTITY_PREFIX + "Q1985786",
-         "timezone": 0, "before": 0, "after": 0}
+    t = {
+        "time": "-0044-03-15T00:00:00Z",
+        "precision": 11,
+        "calendarmodel": wd.ENTITY_PREFIX + "Q1985786",
+        "timezone": 0,
+        "before": 0,
+        "after": 0,
+    }
     return {
-        "id": "Q17167", "type": "item", "lastrevid": 2_000_000_001, "modified": "2026-10-01T00:00:00Z",
-        "labels": {"en": {"language": "en", "value": "Roman Republic"},
-                   "fr": {"language": "fr", "value": "République romaine"}},
+        "id": "Q17167",
+        "type": "item",
+        "lastrevid": 2_000_000_001,
+        "modified": "2026-10-01T00:00:00Z",
+        "labels": {
+            "en": {"language": "en", "value": "Roman Republic"},
+            "fr": {"language": "fr", "value": "République romaine"},
+        },
         "descriptions": {"en": {"language": "en", "value": "period of ancient Roman civilization"}},
         "aliases": {"en": [{"language": "en", "value": "Res publica Romana"}]},
-        "sitelinks": {"enwiki": {"site": "enwiki", "title": "Roman Republic"},
-                      "frwiki": {"site": "frwiki", "title": "République romaine"},
-                      "lawiki": {"site": "lawiki", "title": "Res publica Romana"}},
+        "sitelinks": {
+            "enwiki": {"site": "enwiki", "title": "Roman Republic"},
+            "frwiki": {"site": "frwiki", "title": "République romaine"},
+            "lawiki": {"site": "lawiki", "title": "Res publica Romana"},
+        },
         "claims": {
-            "P31": [{"id": "Q17167$A", "rank": "normal", "mainsnak": snak("P31", "Q3024240")},
-                    {"id": "Q17167$B", "rank": "deprecated", "mainsnak": snak("P31", "Q6256")}],
-            "P576": [{"id": "Q17167$C", "rank": "preferred", "mainsnak": snak("P576", t, "time"),
-                      "references": [{"snaks": {"P248": [snak("P248", "Q123")],
-                                                "P854": [snak("P854", "https://example.org/x", "url")],
-                                                "P9999": [snak("P9999", "dropped", "string")]}}]}],
-            "P36": [{"id": "Q17167$D", "rank": "normal", "mainsnak": snak("P36", "Q220"),
-                     "qualifiers": {"P580": [snak("P580", {**t, "time": "-0509-00-00T00:00:00Z",
-                                                           "precision": 9}, "time")],
-                                    "P1480": [snak("P1480", "Q5727902")],
-                                    "P9998": [snak("P9998", "Q1")]}}],
-            "P1082": [{"id": "Q17167$E", "rank": "normal",
-                       "mainsnak": snak("P1082", {"amount": "+4063000", "unit": "1"}, "quantity"),
-                       "qualifiers": {"P585": [{"snaktype": "somevalue", "property": "P585"}]}}],
+            "P31": [
+                {"id": "Q17167$A", "rank": "normal", "mainsnak": snak("P31", "Q3024240")},
+                {"id": "Q17167$B", "rank": "deprecated", "mainsnak": snak("P31", "Q6256")},
+            ],
+            "P576": [
+                {
+                    "id": "Q17167$C",
+                    "rank": "preferred",
+                    "mainsnak": snak("P576", t, "time"),
+                    "references": [
+                        {
+                            "snaks": {
+                                "P248": [snak("P248", "Q123")],
+                                "P854": [snak("P854", "https://example.org/x", "url")],
+                                "P9999": [snak("P9999", "dropped", "string")],
+                            }
+                        }
+                    ],
+                }
+            ],
+            "P36": [
+                {
+                    "id": "Q17167$D",
+                    "rank": "normal",
+                    "mainsnak": snak("P36", "Q220"),
+                    "qualifiers": {
+                        "P580": [snak("P580", {**t, "time": "-0509-00-00T00:00:00Z", "precision": 9}, "time")],
+                        "P1480": [snak("P1480", "Q5727902")],
+                        "P9998": [snak("P9998", "Q1")],
+                    },
+                }
+            ],
+            "P1082": [
+                {
+                    "id": "Q17167$E",
+                    "rank": "normal",
+                    "mainsnak": snak("P1082", {"amount": "+4063000", "unit": "1"}, "quantity"),
+                    "qualifiers": {"P585": [{"snaktype": "somevalue", "property": "P585"}]},
+                }
+            ],
             "P18": [{"id": "Q17167$F", "rank": "normal", "mainsnak": snak("P18", "x.jpg", "commonsMedia")}],
             "P47": [{"id": "Q17167$G", "rank": "normal", "mainsnak": {"snaktype": "novalue", "property": "P47"}}],
         },
@@ -206,15 +245,14 @@ async def test_wdqs_timeout_is_typed_and_not_retried(tmp_path: Path) -> None:
 
 
 async def test_bad_query_is_typed(tmp_path: Path) -> None:
-    http = ScriptedHttp({"wdqs": [(400, b"MalformedQueryException: Encountered \" \"}\"", {})]})
+    http = ScriptedHttp({"wdqs": [(400, b'MalformedQueryException: Encountered " "}"', {})]})
     with pytest.raises(wd.SparqlSyntaxError):
         await client_for(http, tmp_path).sparql("SELECT ?x WHERE { ")
 
 
 async def test_maxlag_is_backed_off_and_entities_parsed(tmp_path: Path) -> None:
     maxlag = json.dumps({"error": {"code": "maxlag", "info": "Waiting for a database server: 6 seconds lagged"}})
-    ok = json.dumps({"entities": {"Q17167": entity_json(), "Q404": {"id": "Q404", "missing": ""}},
-                     "success": 1})
+    ok = json.dumps({"entities": {"Q17167": entity_json(), "Q404": {"id": "Q404", "missing": ""}}, "success": 1})
     http = ScriptedHttp({"wbapi": [(200, maxlag.encode(), {"retry-after": "5"}), (200, ok.encode(), {})]})
     c = client_for(http, tmp_path)
     res = await c.get_entities(["Q404", "Q17167"])
@@ -273,8 +311,9 @@ def test_kg_conversion_handles_bce_julian_and_inferred_precision() -> None:
     assert hv.to_kg_statement(by["Q17167$G"]).value == {"type": "novalue"}
     ent = hv.to_kg_entity(e)
     assert ent.kind == hv.LABEL_KIND and ent.source_revision == "2000000001" and ent.sitelinks == 3
-    labels_only = wd.extract_entity({k: v for k, v in entity_json().items() if k != "claims"}, allow,
-                                    raw_sha256="a" * 64, retrieved_at=NOW)
+    labels_only = wd.extract_entity(
+        {k: v for k, v in entity_json().items() if k != "claims"}, allow, raw_sha256="a" * 64, retrieved_at=NOW
+    )
     assert not labels_only.claims_fetched and hv.to_kg_entity(labels_only).source_revision == "2000000001:labels"
     # WDQS dates carry no precision and their shape says nothing about it (review KG-2): a century written
     # -0400-01-01 must not become a year. Unknown unless the spec selects wikibase:timePrecision.
@@ -314,9 +353,14 @@ def _spec(tmp_path: Path, data: dict[str, Any], domain: str = "history") -> hv.S
     return hv.load_spec(p)
 
 
-BASE = {"id": "history.empires", "domain": "history", "description": "Every empire item.",
-        "purpose": "seed_entities", "sparql": "SELECT DISTINCT ?item WHERE { ?item wdt:P31 wd:Q48349 . }",
-        "max_rows": 10}
+BASE = {
+    "id": "history.empires",
+    "domain": "history",
+    "description": "Every empire item.",
+    "purpose": "seed_entities",
+    "sparql": "SELECT DISTINCT ?item WHERE { ?item wdt:P31 wd:Q48349 . }",
+    "max_rows": 10,
+}
 
 
 def test_registry_specs_are_valid() -> None:
@@ -341,8 +385,10 @@ def test_readme_examples_validate(tmp_path: Path) -> None:
         ({"sparql": "SELECT ?item WHERE { ?item wdt:P31 wd:Q5 } LIMIT 10"}, "LIMIT"),
         ({"sparql": "SELECT ?item WHERE { ?item wdt:P31 wd:Q5 . SERVICE wikibase:label { } }"}, "label"),
         ({"split": {"by": "year", "from": 1500, "to": 1600, "step": 10}}, "placeholders"),
-        ({"purpose": "statements", "columns": {"subject": "item", "object": "item", "property": "P18"}},
-         "not allow-listed"),
+        (
+            {"purpose": "statements", "columns": {"subject": "item", "object": "item", "property": "P18"}},
+            "not allow-listed",
+        ),
         ({"id": "people.empires"}, "must start with"),
         ({"max_rows": 0}, "schema"),
         ({"unknown_field": 1}, "schema"),
@@ -354,18 +400,38 @@ def test_invalid_specs_are_rejected(tmp_path: Path, patch: dict[str, Any], needl
 
 
 def test_chunk_rendering(tmp_path: Path) -> None:
-    years = _spec(tmp_path, {**BASE, "sparql": "SELECT ?item WHERE { ?item wdt:P571 ?d . "
-                             "FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}}) }",
-                             "split": {"by": "year", "from": -100, "to": 120, "step": 100}})
+    years = _spec(
+        tmp_path,
+        {
+            **BASE,
+            "sparql": "SELECT ?item WHERE { ?item wdt:P571 ?d . "
+            "FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}}) }",
+            "split": {"by": "year", "from": -100, "to": 120, "step": 100},
+        },
+    )
     ch = hv.render_chunks(years)
     assert [c.key for c in ch] == ["year:-100..-1", "year:0..99", "year:100..120"]
     assert "YEAR(?d) >= -100 && YEAR(?d) <= -1" in ch[0].query
-    vals = _spec(tmp_path, {**BASE, "id": "history.v", "sparql": "SELECT ?item WHERE { VALUES ?item { {{values}} } }",
-                            "split": {"by": "values", "source": "list", "qids": ["Q1", "Q2", "Q3"], "chunk_size": 2}})
+    vals = _spec(
+        tmp_path,
+        {
+            **BASE,
+            "id": "history.v",
+            "sparql": "SELECT ?item WHERE { VALUES ?item { {{values}} } }",
+            "split": {"by": "values", "source": "list", "qids": ["Q1", "Q2", "Q3"], "chunk_size": 2},
+        },
+    )
     ch = hv.render_chunks(vals)
     assert len(ch) == 2 and "wd:Q1 wd:Q2" in ch[0].query and "wd:Q3" in ch[1].query
-    pre = _spec(tmp_path, {**BASE, "id": "history.p", "sparql": "SELECT ?item WHERE { ?item wdt:P31 wd:Q5 {{qid_filter}} }",
-                           "split": {"by": "qid_prefix", "prefixes": ["1", "2"]}})
+    pre = _spec(
+        tmp_path,
+        {
+            **BASE,
+            "id": "history.p",
+            "sparql": "SELECT ?item WHERE { ?item wdt:P31 wd:Q5 {{qid_filter}} }",
+            "split": {"by": "qid_prefix", "prefixes": ["1", "2"]},
+        },
+    )
     ch = hv.render_chunks(pre)
     assert 'STRSTARTS(STR(?item), "http://www.wikidata.org/entity/Q2")' in ch[1].query
     assert hv.with_limit("SELECT ?x WHERE {}", 11).endswith("LIMIT 11")
@@ -420,34 +486,64 @@ async def test_row_bound_is_enforced_not_truncated(tmp_path: Path) -> None:
 
 async def test_statement_rows(tmp_path: Path) -> None:
     rows = [
-        {"person": uri("Q1"), "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q1-ABC"},
-         "position": uri("Q30461"), "start": {"type": "literal", "datatype": wd.XSD + "dateTime",
-                                              "value": "1789-04-30T00:00:00Z"},
-         "sp": {"type": "literal", "datatype": wd.XSD + "integer", "value": "11"},
-         "rank": {"type": "uri", "value": "http://wikiba.se/ontology#NormalRank"}},
-        {"person": uri("Q2"), "position": uri("Q30461"),
-         "rank": {"type": "uri", "value": "http://wikiba.se/ontology#DeprecatedRank"}},
+        {
+            "person": uri("Q1"),
+            "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q1-ABC"},
+            "position": uri("Q30461"),
+            "start": {"type": "literal", "datatype": wd.XSD + "dateTime", "value": "1789-04-30T00:00:00Z"},
+            "sp": {"type": "literal", "datatype": wd.XSD + "integer", "value": "11"},
+            "rank": {"type": "uri", "value": "http://wikiba.se/ontology#NormalRank"},
+        },
+        {
+            "person": uri("Q2"),
+            "position": uri("Q30461"),
+            "rank": {"type": "uri", "value": "http://wikiba.se/ontology#DeprecatedRank"},
+        },
         {"person": {"type": "literal", "value": "not an item"}, "position": uri("Q30461")},
     ]
-    spec = _spec(tmp_path, {
-        "id": "people.potus", "domain": "people", "description": "Holders of a position.", "purpose": "statements",
-        "sparql": "SELECT ?person ?st ?position ?start ?sp ?rank WHERE { ?person p:P39 ?st . ?st ps:P39 ?position ; "
-                  "wikibase:rank ?rank . OPTIONAL { ?st pqv:P580 [ wikibase:timeValue ?start ; "
-                  "wikibase:timePrecision ?sp ] } }",
-        "columns": {"subject": "person", "property": "P39", "object": "position", "statement": "st",
-                    "start": "start", "start_precision": "sp", "rank": "rank"},
-        "max_rows": 10}, domain="people")
-    http = ScriptedHttp(router=lambda url: (200, sparql_body(["person", "st", "position", "start", "rank"], rows), {})
-                        if url.startswith(wd.WDQS_URL) else
-                        (200, json.dumps({"entities": {"Q1": {"id": "Q1", "labels": {}}}}).encode(), {}))
+    spec = _spec(
+        tmp_path,
+        {
+            "id": "people.potus",
+            "domain": "people",
+            "description": "Holders of a position.",
+            "purpose": "statements",
+            "sparql": "SELECT ?person ?st ?position ?start ?sp ?rank WHERE { ?person p:P39 ?st . ?st ps:P39 ?position ; "
+            "wikibase:rank ?rank . OPTIONAL { ?st pqv:P580 [ wikibase:timeValue ?start ; "
+            "wikibase:timePrecision ?sp ] } }",
+            "columns": {
+                "subject": "person",
+                "property": "P39",
+                "object": "position",
+                "statement": "st",
+                "start": "start",
+                "start_precision": "sp",
+                "rank": "rank",
+            },
+            "max_rows": 10,
+        },
+        domain="people",
+    )
+    http = ScriptedHttp(
+        router=lambda url: (
+            (200, sparql_body(["person", "st", "position", "start", "rank"], rows), {})
+            if url.startswith(wd.WDQS_URL)
+            else (200, json.dumps({"entities": {"Q1": {"id": "Q1", "labels": {}}}}).encode(), {})
+        )
+    )
     h = hv.Harvester(client_for(http, tmp_path), hv.NullSink(), state_dir=tmp_path / "state")
     res = await h.client.sparql("SELECT ...")
     stmts, skipped = h.rows_to_statements(spec, res)
     assert skipped == 1 and stmts[1] is None  # deprecated row dropped
     s = stmts[0]
     assert s is not None and s.statement_id == "Q1$ABC" and s.source_key == wd.SOURCE_WDQS
-    assert s.start == {"time": "+1789-04-30T00:00:00Z", "precision": 11, "calendar": None, "astronomical": True,
-                       "precision_unknown": False}  # selected through pqv:P580/wikibase:timePrecision
+    assert s.start == {
+        "time": "+1789-04-30T00:00:00Z",
+        "precision": 11,
+        "calendar": None,
+        "astronomical": True,
+        "precision_unknown": False,
+    }  # selected through pqv:P580/wikibase:timePrecision
     kg = hv.to_kg_statement(s)
     assert kg.start.iso.startswith("+1789-04-30") and kg.start.precision == 11 and kg.object_qid == "Q30461"
     # WDQS gives no entity revision: explicitly unknown, versioned by retrieval time
@@ -480,7 +576,7 @@ def _search_router(pages: dict[str, list[str]], entities: dict[str, dict[str, An
         if q.get("list") == ["search"]:
             hits = pages.get(q["srsearch"][0], [])
             off, lim = int(q["sroffset"][0]), int(q["srlimit"][0])
-            page = [{"title": h} for h in hits[off:off + lim]]
+            page = [{"title": h} for h in hits[off : off + lim]]
             return 200, json.dumps({"query": {"searchinfo": {"totalhits": len(hits)}, "search": page}}).encode(), {}
         ids = q["ids"][0].split("|")
         return 200, json.dumps({"entities": {i: entities[i] for i in ids}}).encode(), {}
@@ -496,8 +592,7 @@ async def test_api_seeds_follow_subclasses_and_page(tmp_path: Path) -> None:
     }
     http = ScriptedHttp(router=_search_router(pages, {}))
     h = hv.Harvester(client_for(http, tmp_path), hv.NullSink(), state_dir=tmp_path / "state", via="api")
-    spec = _spec(tmp_path, {**BASE, "max_rows": 1000,
-                            "api_search": {"instance_of": ["Q3024240"], "subclass_depth": 2}})
+    spec = _spec(tmp_path, {**BASE, "max_rows": 1000, "api_search": {"instance_of": ["Q3024240"], "subclass_depth": 2}})
     seeds, info = await h.api_seeds(spec)
     assert len(seeds) == 700 and info["classes"] == 2 and not info["window_exceeded"]
     offsets = [u.split("sroffset=")[1].split("&")[0] for u, _ in http.calls if "P31%3D" in u]
@@ -506,8 +601,16 @@ async def test_api_seeds_follow_subclasses_and_page(tmp_path: Path) -> None:
 
 async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cw = tmp_path / "cw.json"
-    cw.write_text(json.dumps({"entities": [{"key": "FRA", "iso3": "FRA", "label": "France"},
-                                           {"key": "SRB", "iso3": "SRB", "label": "Serbia"}]}))
+    cw.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {"key": "FRA", "iso3": "FRA", "label": "France"},
+                    {"key": "SRB", "iso3": "SRB", "label": "Serbia"},
+                ]
+            }
+        )
+    )
     monkeypatch.setattr(hv, "CROSSWALK", cw)
 
     def p298(code: str, *, ended: bool = False) -> dict[str, Any]:
@@ -517,12 +620,26 @@ async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytes
         return c
 
     ents = {
-        "Q142": {"id": "Q142", "lastrevid": 1, "labels": {"fr": {"value": "France"}},
-                 "claims": {"P298": [p298("FRA")], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]}},
+        "Q142": {
+            "id": "Q142",
+            "lastrevid": 1,
+            "labels": {"fr": {"value": "France"}},
+            "claims": {"P298": [p298("FRA")], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]},
+        },
         "Q403": {"id": "Q403", "lastrevid": 2, "claims": {"P298": [p298("SRB")]}},
-        "Q37024": {"id": "Q37024", "lastrevid": 3,  # Serbia and Montenegro: dissolved
-                   "claims": {"P298": [p298("SRB", ended=True)], "P576": [{"rank": "normal", "mainsnak": snak(
-                       "P576", {"time": "+2006-06-05T00:00:00Z", "precision": 11}, "time")}]}},
+        "Q37024": {
+            "id": "Q37024",
+            "lastrevid": 3,  # Serbia and Montenegro: dissolved
+            "claims": {
+                "P298": [p298("SRB", ended=True)],
+                "P576": [
+                    {
+                        "rank": "normal",
+                        "mainsnak": snak("P576", {"time": "+2006-06-05T00:00:00Z", "precision": 11}, "time"),
+                    }
+                ],
+            },
+        },
         "Q865": {"id": "Q865", "lastrevid": 4, "claims": {"P298": [p298("TWN")]}},
     }
     pages = {"haswbstatement:P298=FRA|P298=SRB|P298=TWN": ["Q142", "Q403", "Q37024", "Q865"]}
@@ -536,16 +653,25 @@ async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytes
     assert stats["mapped_crosswalk"] == 2 and doc["unmapped"] == []
 
 
-async def test_map_countries_never_picks_between_several_holders(tmp_path: Path,
-                                                                 monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_map_countries_never_picks_between_several_holders(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     cw = tmp_path / "cw.json"
     cw.write_text(json.dumps({"entities": [{"key": "PSE", "iso3": "PSE", "label": "State of Palestine"}]}))
     monkeypatch.setattr(hv, "CROSSWALK", cw)
     claim = {"rank": "normal", "mainsnak": snak("P298", "PSE", "external-id")}
-    ents = {"Q219060": {"id": "Q219060", "lastrevid": 1, "claims": {
-                "P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]}},
-            "Q407199": {"id": "Q407199", "lastrevid": 2, "claims": {
-                "P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q1048835")}]}}}
+    ents = {
+        "Q219060": {
+            "id": "Q219060",
+            "lastrevid": 1,
+            "claims": {"P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]},
+        },
+        "Q407199": {
+            "id": "Q407199",
+            "lastrevid": 2,
+            "claims": {"P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q1048835")}]},
+        },
+    }
     http = ScriptedHttp(router=_search_router({"haswbstatement:P298=PSE": ["Q219060", "Q407199"]}, ents))
     out = tmp_path / "q.json"
     await hv.map_countries_search(client_for(http, tmp_path), out_path=out, extra_codes=())
@@ -580,14 +706,25 @@ async def test_wdqs_rows_with_statement_ids_are_replaced_by_snapshot_claims(tmp_
     explicitly unknown revision."""
     ent = entity_json()
     rows = [
-        {"s": uri("Q17167"), "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q17167-D"},
-         "o": uri("Q220")},  # matches claim Q17167$D (capital, start precision 9 in the snapshot)
+        {
+            "s": uri("Q17167"),
+            "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q17167-D"},
+            "o": uri("Q220"),
+        },  # matches claim Q17167$D (capital, start precision 9 in the snapshot)
         {"s": uri("Q17167"), "o": uri("Q999")},  # no statement id: stays a WDQS row
     ]
-    spec = _spec(tmp_path, {
-        "id": "history.capitals", "domain": "history", "description": "Capitals of states.", "purpose": "statements",
-        "sparql": "SELECT ?s ?st ?o WHERE { ?s p:P36 ?st . ?st ps:P36 ?o }",
-        "columns": {"subject": "s", "property": "P36", "object": "o", "statement": "st"}, "max_rows": 10})
+    spec = _spec(
+        tmp_path,
+        {
+            "id": "history.capitals",
+            "domain": "history",
+            "description": "Capitals of states.",
+            "purpose": "statements",
+            "sparql": "SELECT ?s ?st ?o WHERE { ?s p:P36 ?st . ?st ps:P36 ?o }",
+            "columns": {"subject": "s", "property": "P36", "object": "o", "statement": "st"},
+            "max_rows": 10,
+        },
+    )
 
     def route(url: str) -> tuple[int, bytes, dict[str, str]]:
         if url.startswith(wd.WDQS_URL):
@@ -659,10 +796,12 @@ async def test_auto_mode_falls_back_to_entitydata_on_429(tmp_path: Path) -> None
 
 
 def test_whatlinkshere_page_parsing() -> None:
-    html = ('<ul id="mw-whatlinkshere-list"><li><bdi dir="ltr"><a href="/wiki/Q30" title="x">US</a></bdi></li>'
-            '<li><bdi dir="ltr"><a href="/wiki/Q327">Brittany</a></bdi></li></ul>'
-            '<a href="/w/index.php?title=Special:WhatLinksHere/Q3024240&amp;from=12345&amp;back=0" '
-            'class="mw-nextlink">next 5,000</a>')
+    html = (
+        '<ul id="mw-whatlinkshere-list"><li><bdi dir="ltr"><a href="/wiki/Q30" title="x">US</a></bdi></li>'
+        '<li><bdi dir="ltr"><a href="/wiki/Q327">Brittany</a></bdi></li></ul>'
+        '<a href="/w/index.php?title=Special:WhatLinksHere/Q3024240&amp;from=12345&amp;back=0" '
+        'class="mw-nextlink">next 5,000</a>'
+    )
     import re as _re
 
     assert _re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html) == ["Q30", "Q327"]

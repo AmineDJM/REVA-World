@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "2b47e9cb5e12dcd5d524fba7cd6cbeba0f96cf6b1ea53f3e582261095f27ab1e",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/3.0?persistentId=doi:10.7910/DVN/JQWQNW",
+    "file": "2b47e9cb5e12dcd5.json",
+    "sha256": "d6c62886869446d65590a5fe90e193fe0c0620d98a3168071a673aa491677295",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 3.0 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "6a4e0ad0b2c395689bdd7fd7ebd3e0be34362196d9a2d535103e7936f1790a28",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/13992597",
+    "file": "6a4e0ad0b2c39568.tab",
+    "sha256": "8a5ea700fe43c70ea087504814e7e104fcb3221f801cd33ca7b150a3ebcc5353",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of MEC Data Release.tab: header + 96 of the real rows (selected countries, a few blank rows kept), lines byte-identical; real file sha256 6fd1a0b96e46983133ace16f5562bb9f26b74fad63fea5b60f8e7cc2a7f60ac1"
+  }
+]

@@ -1,0 +1,475 @@
+# REVA event taxonomy (owner: EVENTS; code: src/reva/events/taxonomy.py, view: src/reva/events/view.py).
+#
+# Which KG entities are events, of which type, and what each statement property means for an event.
+# * `wikidata_classes`: every QID was confirmed by a recorded lookup (labels + P279 claims + revision + raw sha256)
+#   in registry/events/_recorded/wikidata_verification.json (`python -m reva.events.verify`); a unit test refuses
+#   a class without such a record. An item is of a type when one of its P31 claims (any non-deprecated rank, not
+#   only the truthy ones) reaches one of these classes through recorded P279 chains (KG statements first,
+#   recorded lookups as fallback). A class is mapped to one type only.
+# * `roles`: typical participant roles (fr/en). `properties`: the role of each statement property in the view
+#   (family time | place | participant | structure | coded; `direction: in` = the event is the statement's
+#   object; `source_key` = a source-specific role overriding the generic one).
+# * `dataset_kinds`: dataset records that are events by construction (UCDP conflicts, COW wars, UN peace
+#   operations, UNTC treaties). `derived`: events REVA derives from coded periods (CShapes), always labelled so.
+# Nothing here is causal: participation, place, time and structure are context.
+version: 1
+schema: reva-events-taxonomy/1
+
+roles:
+  - {id: participant, label_en: participant, label_fr: participant}
+  - {id: actor, label_en: actor, label_fr: acteur}
+  - {id: belligerent, label_en: belligerent, label_fr: belligérant}
+  - {id: supporting_party, label_en: supporting party (with troops), label_fr: partie en soutien (avec troupes)}
+  - {id: target, label_en: target, label_fr: cible}
+  - {id: victim, label_en: victim, label_fr: victime}
+  - {id: perpetrator, label_en: perpetrator, label_fr: auteur}
+  - {id: organizer, label_en: organizer, label_fr: organisateur}
+  - {id: operator, label_en: operator, label_fr: opérateur}
+  - {id: signatory, label_en: signatory, label_fr: signataire}
+  - {id: party, label_en: party (treaty), label_fr: partie (traité)}
+  - {id: former_party, label_en: former party (treaty), label_fr: ancienne partie (traité)}
+  - {id: candidate, label_en: candidate, label_fr: candidat}
+  - {id: winner, label_en: winner, label_fr: vainqueur}
+  - {id: contributor, label_en: personnel contributor, label_fr: contributeur en personnel}
+  - {id: former_ruler, label_en: former ruling state, label_fr: ancien État souverain}
+
+types:
+  - id: event
+    label_en: event
+    label_fr: événement
+    parent: null
+    wikidata_classes: [Q1190554]  # occurrence
+    roles: [participant]
+    description: Root type. Any item whose P31 chain reaches 'occurrence' is an event of unknown sub-type.
+
+  # -------------------------------------------------------------- armed conflict
+  - id: armed_conflict
+    label_en: armed conflict
+    label_fr: conflit armé
+    parent: event
+    wikidata_classes: [Q350604]
+    roles: [belligerent, supporting_party, victim]
+  - id: war
+    label_en: war
+    label_fr: guerre
+    parent: armed_conflict
+    wikidata_classes: [Q198]
+    roles: [belligerent, supporting_party, victim]
+  - id: civil_war
+    label_en: civil war
+    label_fr: guerre civile
+    parent: war
+    wikidata_classes: [Q8465]
+    roles: [belligerent, supporting_party, victim]
+  - id: war_of_independence
+    label_en: war of independence
+    label_fr: guerre d'indépendance
+    parent: war
+    wikidata_classes: [Q21994376]
+    roles: [belligerent, supporting_party, victim]
+  - id: world_war
+    label_en: world war
+    label_fr: guerre mondiale
+    parent: war
+    wikidata_classes: [Q103495]
+    roles: [belligerent, supporting_party]
+  - id: battle
+    label_en: battle
+    label_fr: bataille
+    parent: armed_conflict
+    wikidata_classes: [Q178561]
+    roles: [belligerent]
+  - id: siege
+    label_en: siege
+    label_fr: siège
+    parent: battle
+    wikidata_classes: [Q188055]
+    roles: [belligerent, victim]
+  - id: military_operation
+    label_en: military operation
+    label_fr: opération militaire
+    parent: armed_conflict
+    wikidata_classes: [Q645883]
+    roles: [belligerent, operator, target]
+  - id: invasion
+    label_en: invasion
+    label_fr: invasion
+    parent: military_operation
+    wikidata_classes: [Q467011]
+    roles: [belligerent, target]
+  - id: military_occupation
+    label_en: military occupation
+    label_fr: occupation militaire
+    parent: armed_conflict
+    wikidata_classes: [Q188686]
+    roles: [belligerent, target]
+  - id: interstate_armed_conflict
+    label_en: interstate armed conflict (UCDP coding)
+    label_fr: conflit armé interétatique (codage UCDP)
+    parent: armed_conflict
+    wikidata_classes: []
+    roles: [belligerent, supporting_party]
+    description: UCDP type 2 — between two or more states.
+  - id: intrastate_armed_conflict
+    label_en: intrastate armed conflict (UCDP coding)
+    label_fr: conflit armé intra-étatique (codage UCDP)
+    parent: armed_conflict
+    wikidata_classes: []
+    roles: [belligerent, supporting_party]
+    description: UCDP types 3 and 4 — government vs internal opposition (4 = internationalised, with foreign troops).
+  - id: extrasystemic_armed_conflict
+    label_en: extrasystemic armed conflict (UCDP coding)
+    label_fr: conflit armé extrasystémique (codage UCDP)
+    parent: armed_conflict
+    wikidata_classes: []
+    roles: [belligerent, supporting_party]
+    description: UCDP type 1 — between a state and a non-state group outside its own territory (colonial wars).
+  - id: genocide
+    label_en: genocide
+    label_fr: génocide
+    parent: event
+    wikidata_classes: [Q41397]
+    roles: [perpetrator, victim]
+  - id: massacre
+    label_en: massacre
+    label_fr: massacre
+    parent: event
+    wikidata_classes: [Q3199915]
+    roles: [perpetrator, victim]
+  - id: terrorist_attack
+    label_en: terrorist attack
+    label_fr: attentat terroriste
+    parent: event
+    wikidata_classes: [Q2223653]
+    roles: [perpetrator, victim, target]
+
+  # -------------------------------------------------------------- political change and contention
+  - id: revolution
+    label_en: revolution
+    label_fr: révolution
+    parent: event
+    wikidata_classes: [Q10931]
+    roles: [actor, participant, target]
+  - id: coup
+    label_en: coup d'état
+    label_fr: coup d'État
+    parent: event
+    wikidata_classes: [Q45382]
+    roles: [perpetrator, target, actor]
+  - id: assassination
+    label_en: assassination
+    label_fr: assassinat
+    parent: event
+    wikidata_classes: [Q3882219]
+    roles: [perpetrator, victim]
+  - id: rebellion
+    label_en: rebellion
+    label_fr: rébellion
+    parent: event
+    wikidata_classes: [Q124734]
+    roles: [actor, belligerent, target]
+  - id: protest
+    label_en: protest
+    label_fr: manifestation de protestation
+    parent: event
+    wikidata_classes: [Q273120]
+    roles: [actor, organizer, participant, target]
+  - id: demonstration
+    label_en: demonstration
+    label_fr: manifestation
+    parent: protest
+    wikidata_classes: [Q175331]
+    roles: [organizer, participant, target]
+  - id: riot
+    label_en: riot
+    label_fr: émeute
+    parent: protest
+    wikidata_classes: [Q124757]
+    roles: [participant, victim]
+  - id: strike
+    label_en: strike
+    label_fr: grève
+    parent: protest
+    wikidata_classes: [Q49776]
+    roles: [organizer, participant, target]
+  - id: election
+    label_en: election
+    label_fr: élection
+    parent: event
+    wikidata_classes: [Q40231]
+    roles: [candidate, winner, organizer]
+  - id: referendum
+    label_en: referendum
+    label_fr: référendum
+    parent: event
+    wikidata_classes: [Q43109]
+    roles: [organizer]
+  - id: reform
+    label_en: reform
+    label_fr: réforme
+    parent: event
+    wikidata_classes: []
+    roles: [actor, organizer]
+    description: No Wikidata class confirmed yet (see docs/dev/v3_events.md); populated by future datasets.
+  - id: independence
+    label_en: independence
+    label_fr: indépendance
+    parent: event
+    wikidata_classes: []
+    roles: [actor, former_ruler, participant]
+    description: Accession to independence; CShapes status changes are derived events of this type.
+  - id: annexation
+    label_en: annexation
+    label_fr: annexion
+    parent: event
+    wikidata_classes: [Q194465]
+    roles: [actor, target]
+  - id: partition
+    label_en: partition
+    label_fr: partition
+    parent: event
+    wikidata_classes: [Q518554]
+    roles: [actor, target]
+  - id: crisis
+    label_en: crisis
+    label_fr: crise
+    parent: event
+    wikidata_classes: [Q381072]
+    roles: [actor, participant, target]
+  - id: peacekeeping_mission
+    label_en: peace operation (UN)
+    label_fr: opération de paix (ONU)
+    parent: event
+    wikidata_classes: []
+    roles: [contributor, organizer]
+    description: UN peace operations from the UN Peace and Security Data Hub (dataset kind).
+  - id: migration_wave
+    label_en: migration wave
+    label_fr: vague migratoire
+    parent: event
+    wikidata_classes: []
+    roles: [participant, victim]
+    description: No Wikidata class confirmed yet (see docs/dev/v3_events.md).
+  - id: sanction_episode
+    label_en: sanction episode
+    label_fr: épisode de sanctions
+    parent: event
+    wikidata_classes: []
+    roles: [actor, target]
+    description: No Wikidata class verified (KGGEOPOL found none); reserved for sanctions datasets.
+
+  # -------------------------------------------------------------- diplomacy
+  - id: treaty
+    label_en: treaty
+    label_fr: traité
+    parent: event
+    wikidata_classes: [Q131569]
+    roles: [signatory, party, former_party]
+  - id: peace_treaty
+    label_en: peace treaty
+    label_fr: traité de paix
+    parent: treaty
+    wikidata_classes: [Q625298]
+    roles: [signatory, party]
+
+  # -------------------------------------------------------------- economy
+  - id: economic_crisis
+    label_en: economic crisis
+    label_fr: crise économique
+    parent: crisis
+    wikidata_classes: [Q290178]
+    roles: [participant]
+  - id: financial_crisis
+    label_en: financial crisis
+    label_fr: crise financière
+    parent: economic_crisis
+    wikidata_classes: [Q114380]
+    roles: [participant]
+  - id: stock_market_crash
+    label_en: stock market crash
+    label_fr: krach boursier
+    parent: financial_crisis
+    wikidata_classes: [Q1020018]
+    roles: [participant]
+  - id: recession
+    label_en: recession
+    label_fr: récession
+    parent: economic_crisis
+    wikidata_classes: [Q176494]
+    roles: [participant]
+  - id: depression
+    label_en: economic depression
+    label_fr: dépression économique
+    parent: economic_crisis
+    wikidata_classes: [Q1814941]
+    roles: [participant]
+  - id: hyperinflation
+    label_en: hyperinflation
+    label_fr: hyperinflation
+    parent: economic_crisis
+    wikidata_classes: [Q185565]
+    roles: [participant]
+
+  # -------------------------------------------------------------- disasters and health
+  - id: disaster
+    label_en: natural disaster
+    label_fr: catastrophe naturelle
+    parent: event
+    wikidata_classes: [Q8065]
+    roles: [victim]
+  - id: earthquake
+    label_en: earthquake
+    label_fr: séisme
+    parent: disaster
+    wikidata_classes: [Q7944]
+    roles: [victim]
+  - id: tsunami
+    label_en: tsunami
+    label_fr: tsunami
+    parent: disaster
+    wikidata_classes: [Q8070]
+    roles: [victim]
+  - id: volcanic_eruption
+    label_en: volcanic eruption
+    label_fr: éruption volcanique
+    parent: disaster
+    wikidata_classes: [Q7692360]
+    roles: [victim]
+  - id: flood
+    label_en: flood
+    label_fr: inondation
+    parent: disaster
+    wikidata_classes: [Q8068]
+    roles: [victim]
+  - id: tropical_cyclone
+    label_en: tropical cyclone
+    label_fr: cyclone tropical
+    parent: disaster
+    wikidata_classes: [Q8092]
+    roles: [victim]
+  - id: famine
+    label_en: famine
+    label_fr: famine
+    parent: event
+    wikidata_classes: [Q168247]
+    roles: [victim]
+  - id: epidemic
+    label_en: epidemic
+    label_fr: épidémie
+    parent: event
+    wikidata_classes: [Q44512]
+    roles: [victim]
+  - id: pandemic
+    label_en: pandemic
+    label_fr: pandémie
+    parent: epidemic
+    wikidata_classes: [Q12184]
+    roles: [victim]
+  - id: disease_outbreak
+    label_en: disease outbreak
+    label_fr: flambée épidémique
+    parent: event
+    wikidata_classes: [Q3241045]
+    roles: [victim]
+
+  # -------------------------------------------------------------- exploration and science
+  - id: expedition
+    label_en: expedition
+    label_fr: expédition
+    parent: event
+    wikidata_classes: [Q2401485]
+    roles: [participant, organizer]
+  - id: discovery
+    label_en: discovery
+    label_fr: découverte
+    parent: event
+    wikidata_classes: [Q12772819]
+    roles: [actor]
+
+properties:
+  # time
+  - {pid: P585, family: time, role: point_in_time}
+  - {pid: P580, family: time, role: start}
+  - {pid: P582, family: time, role: end}
+  - {pid: P571, family: time, role: inception}
+  - {pid: P576, family: time, role: dissolved}
+  - {pid: "ucdp:start_date", family: time, role: start, note: "UCDP: date of the first battle-related death"}
+  - {pid: "ucdp:episode_end", family: time, role: episode_end, note: "UCDP: last date of an episode"}
+  - {pid: "unpk:start_date", family: time, role: start}
+  - {pid: "unpk:end_date", family: time, role: end}
+  # place
+  - {pid: P276, family: place, role: location}
+  - {pid: P17, family: place, role: country}
+  - {pid: P131, family: place, role: admin_area}
+  - {pid: "ucdp:location", family: place, role: country, note: "UCDP location: government(s) whose territory is disputed"}
+  - {pid: "unpk:mission_country", family: place, role: country}
+  - {pid: "unpk:hq_location", family: place, role: location}
+  # participants (out: the event is the subject; in: the event is the object)
+  - {pid: P710, family: participant, role: participant}
+  - {pid: P1344, family: participant, role: participant, direction: in, note: "X participant in event"}
+  - {pid: P1344, family: participant, role: belligerent, direction: in, source_key: cow.data, note: "COW war participation spell (side, initiator, outcome coded)"}
+  - {pid: P607, family: participant, role: belligerent, direction: in, note: "X participated in conflict"}
+  - {pid: P664, family: participant, role: organizer}
+  - {pid: P137, family: participant, role: operator}
+  - {pid: P1346, family: participant, role: winner}
+  - {pid: P1891, family: participant, role: signatory}
+  - {pid: "untc:party", family: participant, role: party}
+  - {pid: "untc:former_party", family: participant, role: former_party}
+  - {pid: "ucdp:primary_party", family: participant, role: belligerent}
+  - {pid: "ucdp:secondary_party", family: participant, role: supporting_party}
+  - {pid: "ucdp:nonstate_side", family: participant, role: belligerent}
+  - {pid: "unpk:contributed_personnel_to", family: participant, role: contributor, direction: in}
+  # structure (context, never causal)
+  - {pid: P361, family: structure, role: part_of}
+  - {pid: P527, family: structure, role: has_part}
+  - {pid: P155, family: structure, role: follows}
+  - {pid: P156, family: structure, role: followed_by}
+  - {pid: P793, family: structure, role: significant_event}
+
+dataset_kinds:
+  - id_prefix: "ucdp:conflict:"
+    source_key: ucdp.downloads
+    type: armed_conflict
+    label_en: UCDP/PRIO armed conflict
+    coded_type_property: "ucdp:conflict_type"
+    coded_type_map: {interstate: interstate_armed_conflict, intrastate: intrastate_armed_conflict,
+                     internationalized intrastate: intrastate_armed_conflict, extrasystemic: extrasystemic_armed_conflict}
+    coded_properties: ["ucdp:conflict_type", "ucdp:incompatibility", "ucdp:territory_name", "ucdp:intensity_level"]
+    note: UCDP codes a conflict-year when ≥ 25 battle-related deaths occur; types per the UCDP/PRIO codebook.
+  - id_prefix: "cow:war:"
+    source_key: cow.data
+    type: war
+    label_en: Correlates of War war
+    interval_from_incoming: [P1344]
+    note: COW Inter-/Extra-State War v4.0; event dates are not coded at war level here (participation spells are).
+  - id_prefix: "unpk:mission:"
+    source_key: un.psdata
+    type: peacekeeping_mission
+    label_en: UN peace operation
+    coded_properties: ["unpk:initial_mandate", "unpk:lead_entity"]
+    note: UN Peace and Security Data Hub (CC BY 3.0 IGO); includes special political missions present in the files.
+  - id_prefix: "untc:treaty:"
+    source_key: untc.mtdsg
+    type: treaty
+    label_en: UN-deposited multilateral treaty (UNTC)
+    coded_properties: ["untc:mtdsg_number"]
+    note: Treaties not yet mapped to a Wikidata item (untc:treaty:<MTDSG>).
+  - id_prefix: ""
+    marker_property: "untc:mtdsg_number"
+    source_key: untc.mtdsg
+    type: treaty
+    label_en: UN-deposited multilateral treaty (UNTC, Wikidata-keyed)
+    coded_properties: ["untc:mtdsg_number"]
+    note: Treaties A-TREATIES mapped to their Wikidata item (registry/entities/treaty_qids.json); recognised by UNTC's MTDSG number statement even when no Wikidata snapshot is loaded.
+
+derived:
+  cshapes_independence:
+    enabled: true
+    type: independence
+    label_en: independence (CShapes status change)
+    method: reva.events.cshapes_status_change/1
+    caveat: >-
+      Derived by REVA: CShapes 2.0 codes polity periods with a status (colony, protectorate, mandate, occupied,
+      independent). A period coded 'independent' that follows a period with another status is shown as an
+      independence event dated at the start of that period. It is not a source-reported event record, and it is
+      not a claim about why the status changed.

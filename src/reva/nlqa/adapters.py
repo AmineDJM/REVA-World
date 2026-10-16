@@ -328,6 +328,7 @@ def _atlas_cell(c: Mapping[str, Any], concept_id: str, snapshot: str | None) -> 
                 "dataset_key": prov.get("dataset_key"),
                 "atlas_snapshot_sha256": snapshot,
                 "provider_geo": c.get("provider_geo"),
+                "rights": c.get("rights"),  # LIC-1: licence/terms of the source table
             }.items()
             if v
         },
@@ -900,6 +901,12 @@ def build_backends(
             b.notes.append(f"capability_unavailable: atlas ({e.message})")
     if b.links is None:
         b.notes.append("capability_unavailable: interconnection layer (LINKS) not wired")
+    if engine is not None:
+        from reva.nlqa.causal_adapter import wire_causal
+
+        b.causal = wire_causal(engine, origin="live" if getattr(settings, "reva_env", "") == "production" else None)
+    if b.causal is None:
+        b.notes.append("capability_unavailable: causal claims service (reva.causal) not wired")
     if search_get is not None:  # a budget-metered Wikidata GET (WDHARVEST) — not wired by default
         b.search = WikidataSearchAdapter(search_get)
     return b

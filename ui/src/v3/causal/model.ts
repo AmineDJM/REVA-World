@@ -279,7 +279,7 @@ export function precisionFr(p: number | null | undefined): string {
 export interface GraphNode {
   id: string;
   label: string;
-  side: 'focal' | 'cause' | 'effect';
+  side: 'focal' | 'cause' | 'effect' | 'both';
   x: number;
   y: number;
 }
@@ -307,18 +307,24 @@ export function buildGraph(focal: { id: string; label: string }, causes: CausalC
   const nodes = new Map<string, GraphNode>();
   nodes.set(focal.id, { id: focal.id, label: focal.label, side: 'focal', x: 0, y: 0 });
   const order = (a: CausalClaim, b: CausalClaim) => FAMILIES.indexOf(familyOf(a)) - FAMILIES.indexOf(familyOf(b)) || byGrade(a, b);
-  const column = (claims: CausalClaim[], side: 'cause' | 'effect') => {
+  const endsOf = (claims: CausalClaim[], side: 'cause' | 'effect') => {
     const ends: NodeRef[] = [];
     for (const c of [...claims].sort(order)) {
       const n = side === 'cause' ? c.cause : c.effect;
-      if (c.stance !== 'denies' && n.id !== focal.id && !ends.some((e) => e.id === n.id) && !nodes.has(n.id)) ends.push(n);
+      if (c.stance !== 'denies' && n.id !== focal.id && !ends.some((e) => e.id === n.id)) ends.push(n);
     }
-    ends.forEach((n, i) => {
-      nodes.set(n.id, { id: n.id, label: n.label, side, x: side === 'cause' ? -COL : COL, y: (i - (ends.length - 1) / 2) * ROW });
-    });
+    return ends;
   };
-  column(causes, 'cause');
-  column(effects, 'effect');
+  const causeEnds = endsOf(causes, 'cause');
+  const effectEnds = endsOf(effects, 'effect');
+  // a node asserted both as a cause and as an effect of the event sits under it, in the middle column
+  const both = causeEnds.filter((n) => effectEnds.some((e) => e.id === n.id));
+  const only = (ends: NodeRef[]) => ends.filter((n) => !both.some((b) => b.id === n.id));
+  const place = (ends: NodeRef[], side: GraphNode['side'], x: number) =>
+    ends.forEach((n, i) => nodes.set(n.id, { id: n.id, label: n.label, side, x, y: (i - (ends.length - 1) / 2) * ROW }));
+  place(only(causeEnds), 'cause', -COL);
+  place(only(effectEnds), 'effect', COL);
+  both.forEach((n, i) => nodes.set(n.id, { id: n.id, label: n.label, side: 'both', x: 0, y: 2 * ROW + i * ROW }));
   const edges: GraphEdge[] = [];
   for (const c of [...causes, ...effects]) {
     // a denial is not a causal edge: it is listed and shown in the dissent panel, never drawn as a cause

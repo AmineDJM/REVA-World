@@ -1,0 +1,37 @@
+# V3 (agent CAUSDATA): International Crisis Behavior (ICB) data, version 16 (Duke University ICB project).
+# Connector: src/reva/adapters/connectors/atlas_icb.py -> atlas table icb.actor_cy (computed counts),
+# KG events icb:crisis:* (source_key icb.data) and T1 causal claims (coded_trigger, reaction_to, coded_outcome)
+# through reva.causal.load_dataset_claims. Relation semantics: registry/causal/relations_datasets.yaml.
+source_key: icb.data
+title: International Crisis Behavior data v16 (ICB1 system level, ICB2 actor level, codebooks), 1918-2021
+provider_url: https://sites.duke.edu/icbdata/data-collections/
+lineage_family: icb
+rights:
+  licence: "ICB terms: free download, citation requested (no open licence stated)"
+  licence_url: https://sites.duke.edu/icbdata/data-collections/
+  attribution: >-
+    Brecher, Michael and Jonathan Wilkenfeld (1997). A Study of Crisis. Ann Arbor: University of Michigan Press.
+    Brecher, Michael, Jonathan Wilkenfeld, Kyle Beardsley, Patrick James and David Quinn (2025). International
+    Crisis Behavior Data Codebook, Version 16. http://sites.duke.edu/icbdata/data-collections/
+  licence_evidence: >-
+    sites.duke.edu/icbdata/data-collections/ (read 2026-10-16): "To give attribution of the data, we ask that users
+    cite both the Brecher and Wilkenfeld (2000) A Study of Crisis book ... and the Brecher, Wilkenfeld, Beardsley,
+    James and Quinn (2025) data codebook". No licence text is published with the files.
+  open_licence: false
+  redistribution: not stated by the provider; derived records carry the citation; flagged for maintainer review
+metadata:
+  allowed_hosts: [duke.box.com, duke.app.box.com, public.boxcloud.com, cran.r-project.org]
+  files:
+    - https://duke.box.com/shared/static/h6fodyhoq2deul0v5ekuqgb4zblx557c.csv   # icb1v16.csv (113 KB)
+    - https://duke.box.com/shared/static/oc99j12bgywnkzrpbhypkicwjcdglh8l.csv   # icb2v16.csv (274 KB)
+    - https://duke.box.com/shared/static/ravjtawv20aszptx3xhn43p7gd2q02dq.pdf   # ICB1 codebook v16 (442 KB)
+    - https://duke.box.com/shared/static/d7zxijj57ukexpc08j1039vvw4cvrpzy.pdf   # ICB2 codebook v16 (394 KB)
+  access_note: >-
+    Public Box shared links from the project's data page, no account or registration; each download follows 3
+    redirects (duke.box.com -> duke.app.box.com -> public.boxcloud.com, the SafeHttpClient maximum).
+  code_crosswalk: >-
+    ICB actor codes "correspond to those presented by Gleditsch and Ward" (codebook v16, Table 1) -> crosswalk
+    entities through KGGEOPOL's StateCodeCrosswalk (gw system, countrycode 1.9.0 panel archived with every run).
+  authentication: none
+  cadence: irregular releases (v15 2023, v16 2025); quarterly check
+  review_flag: no open licence stated (cite-only) -- maintainer to confirm redistribution in REVA

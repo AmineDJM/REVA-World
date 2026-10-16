@@ -1,0 +1,238 @@
+# Economic and financial crises (agent A-ECRISES): provider-declared crisis indicators by country-year, exactly
+# as published by four expert-coded datasets. Each dataset uses its own definition, so each series is its own
+# concept (no cross-dataset "best available" order: a Laeven-Valencia banking crisis and a JST or
+# Reinhart-Rogoff banking crisis are different codings, shown side by side, never blended).
+# Rights: none is an unrestricted open licence; JST is NON-COMMERCIAL (CC BY-NC-SA 4.0) - see registry/sources.
+domain: crises_economic
+labels: {fr: "Crises économiques et financières", en: "Economic and financial crises"}
+maintainer: A-ECRISES
+concepts:
+  # ---------------------------------------------------------------- Laeven & Valencia (2020), 1970-2017
+  - id: ecrises.lv.systemic_banking_crisis_start
+    labels: {fr: "Début de crise bancaire systémique (Laeven-Valencia)", en: "Start of a systemic banking crisis (Laeven-Valencia)"}
+    definition: >-
+      1 in the year a systemic banking crisis starts: significant signs of financial distress in the banking system
+      (bank runs, losses, liquidations) and significant banking policy intervention measures (at least three of six:
+      deposit freezes/bank holidays, nationalizations, restructuring costs >= 3% of GDP, liquidity support >= 5% of
+      deposits and liabilities to non-residents, significant guarantees, asset purchases >= 5% of GDP); severe losses
+      alone suffice (Laeven and Valencia 2018/2020).
+    unit: "1 = year listed by the authors as the start of a crisis of this type"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.crisis_start|type=systemic_banking"]
+    provider_declared: true
+    notes: "Only start years are listed (no 0 rows): a country-year without a row is not a crisis start in this database (1970-2017 coverage)."
+  - id: ecrises.lv.currency_crisis_start
+    labels: {fr: "Crise de change (Laeven-Valencia)", en: "Currency crisis (Laeven-Valencia)"}
+    definition: >-
+      1 in the year of a currency crisis: a year-on-year nominal depreciation against the US dollar of at least 30%
+      that is also at least 10 percentage points higher than the previous year's depreciation (first year of each
+      five-year window when the criteria hold several years; early-transition economies excluded).
+    unit: "1 = year listed by the authors as the start of a crisis of this type"
+    domain: crises_economic
+    subdomain: currency
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.crisis_start|type=currency"]
+    provider_declared: true
+  - id: ecrises.lv.sovereign_debt_crisis_start
+    labels: {fr: "Crise de la dette souveraine (Laeven-Valencia)", en: "Sovereign debt crisis (Laeven-Valencia)"}
+    definition: >-
+      1 in the year of a sovereign default to private creditors and/or restructuring; when debt was restructured
+      without a suspension of payments the crisis year is the year of the restructuring.
+    unit: "1 = year listed by the authors as the start of a crisis of this type"
+    domain: crises_economic
+    subdomain: sovereign_debt
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.crisis_start|type=sovereign_debt"]
+    provider_declared: true
+  - id: ecrises.lv.sovereign_debt_restructuring
+    labels: {fr: "Restructuration de la dette souveraine (Laeven-Valencia)", en: "Sovereign debt restructuring (Laeven-Valencia)"}
+    definition: "1 in the year of a sovereign debt restructuring as dated by the authors."
+    unit: "1 = year listed by the authors as the start of a crisis of this type"
+    domain: crises_economic
+    subdomain: sovereign_debt
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.crisis_start|type=sovereign_debt_restructuring"]
+    provider_declared: true
+  - id: ecrises.lv.banking_crisis_output_loss
+    labels: {fr: "Perte de production d'une crise bancaire (Laeven-Valencia)", en: "Output loss of a banking crisis (Laeven-Valencia)"}
+    definition: >-
+      Cumulative sum of the differences between actual and trend real GDP over [T, T+3], in percent of trend real
+      GDP, T = first crisis year; trend = HP filter (lambda 100) over [T-20, T-1]. Shown at the crisis start year.
+    unit: "% of trend real GDP (cumulative over [T, T+3])"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.output_loss"]
+    provider_declared: true
+  - id: ecrises.lv.banking_crisis_fiscal_cost
+    labels: {fr: "Coût budgétaire brut d'une crise bancaire (Laeven-Valencia)", en: "Gross fiscal cost of a banking crisis (Laeven-Valencia)"}
+    definition: "Fiscal outlays directly related to the restructuring of the financial sector, % of GDP, at the crisis start year."
+    unit: "% of GDP"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.fiscal_cost_gross"]
+    provider_declared: true
+  - id: ecrises.lv.banking_crisis_peak_npl
+    labels: {fr: "Pic des prêts non performants d'une crise bancaire (Laeven-Valencia)", en: "Peak non-performing loans of a banking crisis (Laeven-Valencia)"}
+    definition: "Peak non-performing loans during the crisis, % of total loans, at the crisis start year."
+    unit: "% of total loans"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.peak_npl"]
+    provider_declared: true
+  - id: ecrises.lv.banking_crisis_public_debt_increase
+    labels: {fr: "Hausse de la dette publique liée à une crise bancaire (Laeven-Valencia)", en: "Increase in public debt of a banking crisis (Laeven-Valencia)"}
+    definition: >-
+      Increase in public debt, % of GDP (for episodes from 2007: change in debt projections over [T-1, T+3] relative
+      to pre-crisis projections), at the crisis start year.
+    unit: "% of GDP"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["laeven_valencia.sbcd.public_debt_increase"]
+    provider_declared: true
+  # ---------------------------------------------------------------- Reinhart & Rogoff, 1800-2016
+  - id: ecrises.rr.banking_crisis
+    labels: {fr: "Année de crise bancaire (Reinhart-Rogoff)", en: "Banking crisis year (Reinhart-Rogoff)"}
+    definition: >-
+      1 in each year of a banking crisis as coded by Reinhart and Rogoff (bank runs leading to closure, merger or
+      public takeover of financial institutions, or, without runs, closure/merger/takeover or large-scale government
+      assistance of an important institution that marks the start of similar outcomes for others), 0 otherwise.
+    unit: "1 = crisis year, 0 = no crisis (RR coding)"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.banking_crisis"]
+    provider_declared: true
+  - id: ecrises.rr.systemic_crisis
+    labels: {fr: "Année de crise systémique (Reinhart-Rogoff)", en: "Systemic crisis year (Reinhart-Rogoff)"}
+    definition: "1 in each year coded by Reinhart and Rogoff as a systemic crisis, 0 otherwise (no further definition in the file)."
+    unit: "1 = systemic crisis year, 0 = no (RR coding)"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.systemic_crisis"]
+    provider_declared: true
+  - id: ecrises.rr.currency_crisis
+    labels: {fr: "Année de crise de change (Reinhart-Rogoff)", en: "Currency crisis year (Reinhart-Rogoff)"}
+    definition: >-
+      1 in a year of currency crash as coded by Reinhart and Rogoff (an annual depreciation against the US dollar or
+      the relevant anchor currency of 15% or more), 0 otherwise; the file also publishes an undocumented code 2
+      (38 country-years), kept as published and flagged.
+    unit: "1 = currency crisis year, 0 = no; code 2 as published (undocumented)"
+    domain: crises_economic
+    subdomain: currency
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.currency_crisis"]
+    provider_declared: true
+  - id: ecrises.rr.inflation_crisis
+    labels: {fr: "Année de crise d'inflation (Reinhart-Rogoff)", en: "Inflation crisis year (Reinhart-Rogoff)"}
+    definition: "1 in a year of inflation crisis as coded by Reinhart and Rogoff (annual inflation of 20% or more), 0 otherwise."
+    unit: "1 = inflation crisis year, 0 = no"
+    domain: crises_economic
+    subdomain: inflation
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.inflation_crisis"]
+    provider_declared: true
+  - id: ecrises.rr.domestic_debt_default
+    labels: {fr: "Défaut sur la dette intérieure (Reinhart-Rogoff)", en: "Domestic debt in default (Reinhart-Rogoff)"}
+    definition: "1 in each year the sovereign's domestic debt is in default as coded by Reinhart and Rogoff, 0 otherwise."
+    unit: "1 = domestic debt in default, 0 = not"
+    domain: crises_economic
+    subdomain: sovereign_debt
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.domestic_debt_default"]
+    provider_declared: true
+  - id: ecrises.rr.external_default_private
+    labels: {fr: "Défaut sur la dette extérieure, série 1 (Reinhart-Rogoff)", en: "External debt default or restructuring, series 1 (Reinhart-Rogoff)"}
+    definition: >-
+      1 in each year of sovereign external default or restructuring, 1800-2012; excludes defaults on WWI debt to the
+      United States and United Kingdom and post-1975 defaults on official external creditors.
+    unit: "1 = in default/restructuring, 0 = not (series 1: excl. post-1975 official-creditor defaults)"
+    domain: crises_economic
+    subdomain: sovereign_debt
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.external_default_1"]
+    provider_declared: true
+  - id: ecrises.rr.external_default_incl_official
+    labels: {fr: "Défaut sur la dette extérieure, série 2 (Reinhart-Rogoff)", en: "External debt default or restructuring, series 2 (Reinhart-Rogoff)"}
+    definition: >-
+      1 in each year of sovereign external default or restructuring, 1800-2012; excludes defaults on WWI debt to the
+      United States and United Kingdom but includes post-1975 defaults on official external creditors.
+    unit: "1 = in default/restructuring, 0 = not (series 2: incl. post-1975 official-creditor defaults)"
+    domain: crises_economic
+    subdomain: sovereign_debt
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.external_default_2"]
+    provider_declared: true
+  - id: ecrises.rr.inflation
+    labels: {fr: "Inflation annuelle (Reinhart-Rogoff)", en: "Annual inflation (Reinhart-Rogoff)"}
+    definition: "Inflation, annual percentage change of average consumer prices, as published in the Reinhart-Rogoff crisis file."
+    unit: "% per year (change of average consumer prices)"
+    domain: crises_economic
+    subdomain: inflation
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.inflation"]
+    provider_declared: true
+  - id: ecrises.rr.gold_standard
+    labels: {fr: "Étalon-or (Reinhart-Rogoff)", en: "Gold standard (Reinhart-Rogoff)"}
+    definition: "1 when the country is on the gold standard in the year, 0 otherwise, as coded in the Reinhart-Rogoff crisis file."
+    unit: "1 = on the gold standard, 0 = not"
+    domain: crises_economic
+    subdomain: monetary_regime
+    theme: economy
+    source_order: ["reinhart_rogoff.global_crises.gold_standard"]
+    provider_declared: true
+  # ---------------------------------------------------------------- Jordà-Schularick-Taylor R6, 1870-2020
+  - id: ecrises.jst.systemic_financial_crisis_start
+    labels: {fr: "Début de crise financière systémique (Jordà-Schularick-Taylor)", en: "Start of a systemic financial crisis (Jordà-Schularick-Taylor)"}
+    definition: >-
+      crisisJST: 1 in the first year a country experiences a systemic banking crisis (major bank failures, banking
+      panics, substantial losses in the banking sector, significant recapitalization and/or significant government
+      intervention), 0 otherwise (JST Macrohistory Database R6; coding of R5 onwards).
+    unit: "1 = first year of a systemic financial crisis, 0 = not"
+    domain: crises_economic
+    subdomain: banking
+    theme: economy
+    source_order: ["jst.macrohistory.crisisJST"]
+    provider_declared: true
+    tags: [non_commercial]
+    notes: "CC BY-NC-SA 4.0 (non-commercial). The R1-R4 coding is jst.macrohistory.crisisJST_old (not a separate concept)."
+  - id: ecrises.jst.currency_peg
+    labels: {fr: "Ancrage de change (Jordà-Schularick-Taylor)", en: "Exchange-rate peg (Jordà-Schularick-Taylor)"}
+    definition: "Peg dummy of the JST Macrohistory Database R6 (1 = the currency is pegged in the year)."
+    unit: "1 = peg, 0 = not"
+    domain: crises_economic
+    subdomain: monetary_regime
+    theme: economy
+    source_order: ["jst.macrohistory.peg"]
+    provider_declared: true
+    tags: [non_commercial]
+  # ---------------------------------------------------------------- ESRB European financial crises database
+  - id: ecrises.esrb.systemic_crisis_start
+    labels: {fr: "Début de crise systémique (base de crises financières du CERS)", en: "Start of a systemic crisis (ESRB financial crises database)"}
+    definition: >-
+      1 in the year a systemic financial crisis starts in the ESRB European financial crises database (events
+      identified with a financial stress index and expert judgement of national and European authorities; start
+      month in the flags).
+    unit: "1 = an event of this sheet starts in the year"
+    domain: crises_economic
+    subdomain: financial
+    theme: economy
+    source_order: ["esrb.fcdb.systemic|event_start"]
+    provider_declared: true
+  - id: ecrises.esrb.residual_stress_event_start
+    labels: {fr: "Début d'un épisode de tensions financières non systémique (CERS)", en: "Start of a residual (non-systemic) financial stress event (ESRB)"}
+    definition: >-
+      1 in the year a residual episode of elevated financial (market) stress starts that does not meet the systemic
+      crisis criteria of the ESRB European financial crises database.
+    unit: "1 = an event of this sheet starts in the year"
+    domain: crises_economic
+    subdomain: financial
+    theme: economy
+    source_order: ["esrb.fcdb.residual|event_start"]
+    provider_declared: true

@@ -1,0 +1,25 @@
+# V3 (agent A-CONTENTION): Major Episodes of Contention (MEC), Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_navco.py (atlas.mec) -> atlas table mec.episodes_cy (COMPUTED
+# country-year counts) + KG events mec:<id> + staged causal claims. See docs/dev/v3_a_contention.md.
+source_key: harvard.dataverse.mec
+title: Major Episodes of Contention (Chenoweth & Kang), dataset version 3.0, MEC Data Release.tab
+provider_url: https://doi.org/10.7910/DVN/JQWQNW
+lineage_family: navco_chenoweth
+rights:
+  licence: CC0 1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: Chenoweth, Erica; Kang, Sooyeon, "Major Episodes of Contention", Harvard Dataverse, doi:10.7910/DVN/JQWQNW, V3.
+  licence_evidence: Dataverse version 3.0 metadata (license.name "CC0 1.0"), checked by the connector on every run (read 2026-10-16).
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/3.0?persistentId=doi:10.7910/DVN/JQWQNW
+    - https://dataverse.harvard.edu/api/access/datafile/13992597   # MEC Data Release.tab (1,333,438 B)
+  codebooks:
+    - {file_id: 11543083, name: MEC_Codebook_2024.docx, md5: 4c314592b77409036f1d152791383d0c}
+  access_note: >-
+    2,734 episodes 1955-2018 (category 2 reformist, 4 maximalist); MEC shares its team and parts of its sources with
+    NAVCO (lineage family navco_chenoweth: not independent corroboration).
+  code_crosswalk: provider location names -> geo scheme mec_loc (registry/atlas/geo_aliases/a_contention.yaml).
+  authentication: none
+  cadence: pinned version; re-check twice a year

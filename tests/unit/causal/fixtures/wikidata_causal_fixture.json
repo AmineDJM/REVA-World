@@ -82,22 +82,21 @@
    "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
    "seed": false
   },
-  "Q160649": {
+  "Q161393": {
    "descriptions": {
-    "en": "group of infectious diseases",
-    "fr": "groupe de maladies"
+    "en": "subtype of the influenza A virus, with some strains that are swine flue, others avian flue",
+    "fr": "sous-type du virus de la grippe A"
    },
    "instance_of": [
-    "Q112193867",
-    "Q16521"
+    "Q19862317"
    ],
    "labels": {
-    "en": "typhus",
-    "fr": "typhus"
+    "en": "influenza A virus subtype H1N1",
+    "fr": "Influenzavirus A sous-type H1N1"
    },
-   "lastrevid": 2555586364,
-   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
-   "seed": true
+   "lastrevid": 2544299890,
+   "raw_sha256": "8fe292cf110417a44947c80fb9c258db515b198036ec7fbddd6ee3f6634e33bb",
+   "seed": false
   },
   "Q177859": {
    "descriptions": {
@@ -116,6 +115,23 @@
    "lastrevid": 2538334021,
    "raw_sha256": "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
    "seed": false
+  },
+  "Q178275": {
+   "descriptions": {
+    "en": "1918–1920 global influenza pandemic caused by the H1N1 influenza A virus",
+    "fr": "pandémie de grippe A (H1N1)"
+   },
+   "instance_of": [
+    "Q2723958",
+    "Q182672"
+   ],
+   "labels": {
+    "en": "1918–1920 flu pandemic",
+    "fr": "grippe espagnole"
+   },
+   "lastrevid": 2557626283,
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "seed": true
   },
   "Q179848": {
    "descriptions": {
@@ -167,21 +183,6 @@
    "raw_sha256": "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
    "seed": false
   },
-  "Q1975198": {
-   "descriptions": {
-    "en": "family of bacteria"
-   },
-   "instance_of": [
-    "Q16521"
-   ],
-   "labels": {
-    "en": "Rickettsiaceae",
-    "fr": "Rickettsiaceae"
-   },
-   "lastrevid": 2498508177,
-   "raw_sha256": "fc0569b59ad1f262589a781bc1d5a424e5175a6731226476972fbb8a1f600402",
-   "seed": false
-  },
   "Q199820": {
    "descriptions": {
     "en": "meeting of the Allied Powers after World War I",
@@ -212,7 +213,7 @@
    },
    "lastrevid": 2526486888,
    "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
-   "seed": false
+   "seed": true
   },
   "Q215669": {
    "descriptions": {
@@ -440,6 +441,22 @@
    "raw_sha256": "6754969a08d285bc8b02761c5351d2c235c4f4f1beb6d0549fd683b9d5e59daa",
    "seed": false
   },
+  "Q696482": {
+   "descriptions": {
+    "en": "severe economic crisis in the USA in the 1930s",
+    "fr": "grave crise économique aux États-Unis dans les années 1930"
+   },
+   "instance_of": [
+    "Q290178"
+   ],
+   "labels": {
+    "en": "Great Depression in the United States",
+    "fr": "Grande Dépression aux États-Unis"
+   },
+   "lastrevid": 2535713693,
+   "raw_sha256": "f5f506b7f2df0a07afbdcd20f11c1adef392c3bf2e56f53971c95a1e8d9e4c67",
+   "seed": false
+  },
   "Q79911": {
    "descriptions": {
     "en": "multi-sided civil war in the former Russian Empire, November 1917-October 1922",
@@ -494,7 +511,7 @@
   }
  },
  "meta": {
-  "captured_at": "2026-10-16T20:30:32+00:00",
+  "captured_at": "2026-10-16T20:39:52+00:00",
   "client": "reva.adapters.connectors.wikidata.WikidataClient (machine-wide lock, linked_data mode)",
   "community_edited": true,
   "description": "Real Wikidata causal statements (CC0, community-edited) for offline CAUSCORE tests.",
@@ -502,8 +519,8 @@
   "filter": "causal properties with both ends in the fixture; dates P580/P582/P585/P571/P576; P31 of seeds; deprecated rank dropped; references and qualifiers as extracted by WDHARVEST",
   "one_hop": [
    "Q2910703",
-   "Q201684",
-   "Q1975198",
+   "Q696482",
+   "Q161393",
    "Q18121382",
    "Q199820",
    "Q215669",
@@ -536,7 +553,6 @@
    "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
    "218e5f52bac5766328714cfc313ba356818bd14ca96a05a07c0deb8fb85d273a",
    "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
-   "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
    "36169c5c000f57c09a0567b0336601cc97384954ac2c0b7d52a1dfdf54f23356",
    "38d1a9b298c19887cabb0f87942a34f333a2276dd52849a436805d9e51d3ac7f",
    "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
@@ -548,19 +564,22 @@
    "710feb723f704f13ad4be16d5c56b967b5a11ec1a13b1f6852096ae22cd02e48",
    "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
    "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "8fe292cf110417a44947c80fb9c258db515b198036ec7fbddd6ee3f6634e33bb",
    "9d0dbf3f752f2dbae87cbbceffd4a25c24dc0aefb91752a33daa6745d6ff3c56",
+   "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
    "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
    "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
    "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
    "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
    "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
    "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
-   "fc0569b59ad1f262589a781bc1d5a424e5175a6731226476972fbb8a1f600402"
+   "f5f506b7f2df0a07afbdcd20f11c1adef392c3bf2e56f53971c95a1e8d9e4c67"
   ],
-  "retrieved_at": "2026-10-16T20:28:09.561536+00:00",
+  "retrieved_at": "2026-10-16T20:37:40.978297+00:00",
   "seeds": [
    "Q8698",
-   "Q160649",
+   "Q201684",
+   "Q178275",
    "Q361"
   ],
   "user_agent": "REVA-World/0.3 (research world knowledge graph; https://github.com/AmineDJM/REVA-World) reva-kg-harvest/0.3"
@@ -883,51 +902,6 @@
   },
   {
    "end": null,
-   "object_qid": "Q112193867",
-   "point_in_time": null,
-   "property_pid": "P31",
-   "qualifiers": {},
-   "rank": "normal",
-   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
-   "references": [],
-   "source_revision": "2555586364",
-   "start": null,
-   "statement_id": "Q160649$1ACA9F15-53BC-49E3-B9D9-C932315F7105",
-   "subject_qid": "Q160649",
-   "value": null
-  },
-  {
-   "end": null,
-   "object_qid": "Q16521",
-   "point_in_time": null,
-   "property_pid": "P31",
-   "qualifiers": {},
-   "rank": "normal",
-   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
-   "references": [],
-   "source_revision": "2555586364",
-   "start": null,
-   "statement_id": "Q160649$8AE75B62-29CB-4FFD-96F2-A906CB09764D",
-   "subject_qid": "Q160649",
-   "value": null
-  },
-  {
-   "end": null,
-   "object_qid": "Q1975198",
-   "point_in_time": null,
-   "property_pid": "P828",
-   "qualifiers": {},
-   "rank": "normal",
-   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
-   "references": [],
-   "source_revision": "2555586364",
-   "start": null,
-   "statement_id": "Q160649$5121e945-41fe-f840-42f9-92486811b96d",
-   "subject_qid": "Q160649",
-   "value": null
-  },
-  {
-   "end": null,
    "object_qid": "Q361",
    "point_in_time": null,
    "property_pid": "P1537",
@@ -960,6 +934,106 @@
     "time": "+1892-08-17T00:00:00Z",
     "type": "time"
    }
+  },
+  {
+   "end": null,
+   "object_qid": "Q161393",
+   "point_in_time": null,
+   "property_pid": "P1478",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "Q178275$29ea6c1c-4f82-06ef-acfc-0573bcd690ee",
+   "subject_qid": "Q178275",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q182672",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "Q178275$6ba59ddf-4d3e-e9d1-fb6f-583581f13e8a",
+   "subject_qid": "Q178275",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q2723958",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "q178275$e3135b68-44ed-5b05-7d57-c6617b00730d",
+   "subject_qid": "Q178275",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "Q178275$c44a5932-4ee3-c4b1-b56c-333bb190a229",
+   "subject_qid": "Q178275",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 10,
+    "time": "+1918-01-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "Q178275$16fdf092-4394-844c-007a-f3958561054f",
+   "subject_qid": "Q178275",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 10,
+    "time": "+1920-12-01T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a4a9895493b2fb9e3fe46a17f44587b2adbb1472f42b961860c5fbf21e73fdc4",
+   "references": [],
+   "source_revision": "2557626283",
+   "start": null,
+   "statement_id": "Q178275$27004a68-41f5-4a2d-f8f4-1ecf2951ac6c",
+   "subject_qid": "Q178275",
+   "value": null
   },
   {
    "end": null,
@@ -1142,6 +1216,40 @@
    "source_revision": "2526486888",
    "start": null,
    "statement_id": "Q201684$35074256-4023-dd59-b841-50b8ea01390c",
+   "subject_qid": "Q201684",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q696482",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {
+    "P2868": [
+     "Q20204892"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$b6f117c3-4137-9923-41c4-2d77a73644d2",
+   "subject_qid": "Q201684",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q1020018",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$34addc4e-402d-025f-4bc6-26a69081c28e",
    "subject_qid": "Q201684",
    "value": null
   },
@@ -2224,6 +2332,121 @@
    "start": null,
    "statement_id": "Q4763720$decca35a-4b42-ca56-ae7e-d14320cc8efa",
    "subject_qid": "Q4763720",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "f5f506b7f2df0a07afbdcd20f11c1adef392c3bf2e56f53971c95a1e8d9e4c67",
+   "references": [
+    {
+     "P248": [
+      "Q13421502"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P248": [
+      "Q193563"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://data.bnf.fr/ark:/12148/cb11937041r"
+     ]
+    }
+   ],
+   "source_revision": "2535713693",
+   "start": null,
+   "statement_id": "Q696482$3349227b-4e02-9373-ec95-cd0c6bacb43c",
+   "subject_qid": "Q696482",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1929-10-24T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "f5f506b7f2df0a07afbdcd20f11c1adef392c3bf2e56f53971c95a1e8d9e4c67",
+   "references": [
+    {
+     "P248": [
+      "Q13421502"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P248": [
+      "Q193563"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://data.bnf.fr/ark:/12148/cb120988849"
+     ]
+    }
+   ],
+   "source_revision": "2535713693",
+   "start": null,
+   "statement_id": "Q696482$86ba5193-47b6-bad9-41ea-3229993f9690",
+   "subject_qid": "Q696482",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1939-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q201684",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {
+    "P3831": [
+     "Q20204892"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "f5f506b7f2df0a07afbdcd20f11c1adef392c3bf2e56f53971c95a1e8d9e4c67",
+   "references": [],
+   "source_revision": "2535713693",
+   "start": null,
+   "statement_id": "Q696482$befd816e-4bfd-139b-fa6e-f3644d6b902a",
+   "subject_qid": "Q696482",
    "value": null
   },
   {

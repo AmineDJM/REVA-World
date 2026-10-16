@@ -1,0 +1,26 @@
+# Budget request from agent CAUSDATA (expert-coded crisis / conflict datasets). ATLASCORE merges into
+# registry/policies/budgets.yaml (merge = max(current, request) per source, never the sum). Every file is a bulk
+# download; each run also fetches the countrycode 1.9.0 tarball from CRAN (0.54 MB) for state codes.
+agent: CAUSDATA
+requests:
+  - source_key: icb.data
+    # NEW source (registry/sources/icb.yaml). duke.box.com shared files: icb1v16.csv (113 KB), icb2v16.csv
+    # (274 KB), two codebook PDFs (442 + 394 KB) + countrycode = 5 requests / ~1.8 MB per run (planned 8).
+    daily_requests: 16
+    expected_bytes_per_day: 4000000
+    reason: "ICB v16: 2 CSVs + 2 codebook PDFs + countrycode per run (5 requests, ~1.8 MB)"
+  - source_key: cow.data
+    # Existing source (A-HISTECON 26/day). atlas.mid adds MID-5-Data-and-Supporting-Materials.zip (3.2 MB),
+    # Incident_Level_5.01.zip (0.5 MB) + countrycode = 3 requests / ~4.3 MB per run (planned 5).
+    daily_requests: 34
+    expected_bytes_per_day: 10000000
+    reason: "atlas.mid (COW MID 5.0/5.01): 2 zips + countrycode per run, on top of atlas.cow's 26/day"
+  - source_key: ucdp.downloads
+    # Existing source (KGGEOPOL 16/day). atlas.ucdp_term adds the termination CSV (0.55 MB), the peace agreement
+    # workbook (0.38 MB), two codebook PDFs (0.18 + 0.35 MB) + countrycode = 5 requests / ~2 MB (planned 7).
+    daily_requests: 30
+    expected_bytes_per_day: 5000000
+    reason: "atlas.ucdp_term (UCDP termination v4-2024 + peace agreements 22.2): 5 requests per run, on top of atlas.ucdp"
+daily_totals_increase:
+  http_requests_total: "+38"
+  http_bytes_total: "+19_000_000"

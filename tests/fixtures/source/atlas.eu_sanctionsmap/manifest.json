@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "9021aed5104792be098573874b0a76b6766abc1d6cbdde917426a0051f8b04c5",
+    "url": "https://www.sanctionsmap.eu/api/v1/regime",
+    "file": "9021aed5104792be.json",
+    "sha256": "5023a1b33752123c3303abc3c610951884bce8e8828163802aeb64d233aeb867",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "no licence stated (disclaimer only)",
+    "note": "slice of api/v1/regime (2026-10-16): regimes 1,2,20,10,46,61,18,40 verbatim, meta verbatim"
+  }
+]

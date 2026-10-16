@@ -169,7 +169,7 @@ PAIR_OP = op("s1", "links_pair", country="BRA", other_country="PRT", link_kinds=
 
 
 def test_plan_schema_and_validation() -> None:
-    assert PROMPT_VERSION == "nlqa-plan-1.1.0"
+    assert PROMPT_VERSION == "nlqa-plan-1.2.0"  # 1.1.0 added links_pair; 1.2.0 added why / causal_chain
     props = output_schema()["properties"]["operations"]["items"]["properties"]
     assert "links_pair" in props["op"]["enum"] and "other_country" in props
     q = "Quels liens entre le Brésil et le Portugal ?"
@@ -311,8 +311,10 @@ def test_lookup_refs_resolve_to_countries() -> None:
 @pytest.mark.parametrize(
     "question,expect",
     [
-        ("Quels sont les liens entre le Brésil et le Portugal ?", "lookups"),
-        ("Quelle relation entre le Brésil et le Portugal depuis 1990 ?", "lookups"),
+        # review V3b ASK-8: French country names are in the planner's country table (iso-codes fr translation)
+        ("Quels sont les liens entre le Brésil et le Portugal ?", ("BRA", "PRT")),
+        ("Quelle relation entre le Brésil et le Portugal depuis 1990 ?", ("BRA", "PRT")),
+        ("Quels sont les liens entre la Bretagne et le Portugal ?", "lookups"),
         ("What are the links between Brazil and Portugal?", ("BRA", "PRT")),
         ("relations between France and Algeria 1950 2000", ("FRA", "DZA")),
     ],
@@ -325,7 +327,7 @@ def test_keyword_planner_recognises_pair_questions(question: str, expect: Any) -
     a = pair[0].args
     if expect == "lookups":
         lookups = {o.id: o.args["text"] for o in p.operations if o.op == "entity_lookup"}
-        assert [lookups[a["country"]], lookups[a["other_country"]]] == ["Brésil", "Portugal"]
+        assert [lookups[a["country"]], lookups[a["other_country"]]] == ["Bretagne", "Portugal"]
     else:
         assert (a["country"], a["other_country"]) == expect
     if "1990" in question:

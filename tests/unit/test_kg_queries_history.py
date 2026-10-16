@@ -52,8 +52,27 @@ ANCHORS = {
     "Q30": "United States",
 }
 # Current countries used by the anchors and chains; all must be crosswalk countries (values: countries split).
-COUNTRIES_USED = {"Q155", "Q45", "Q29", "Q30", "Q142", "Q145", "Q96", "Q843", "Q668", "Q262", "Q252", "Q916",
-                  "Q928", "Q790", "Q43", "Q159", "Q717", "Q974", "Q1033"}
+COUNTRIES_USED = {
+    "Q155",
+    "Q45",
+    "Q29",
+    "Q30",
+    "Q142",
+    "Q145",
+    "Q96",
+    "Q843",
+    "Q668",
+    "Q262",
+    "Q252",
+    "Q916",
+    "Q928",
+    "Q790",
+    "Q43",
+    "Q159",
+    "Q717",
+    "Q974",
+    "Q1033",
+}
 
 # Root classes of the class-closure seed specs (the test checks they occur in the spec's SPARQL).
 CLASS_SPECS = {
@@ -98,8 +117,7 @@ def _objs(q: str, prop: str) -> list[str]:
     e = _snapshot().get(q)
     if not e:
         return []
-    return [t["o"] for t in e["claims"]
-            if t["p"] == prop and isinstance(t["o"], str) and re.fullmatch(r"Q\d+", t["o"])]
+    return [t["o"] for t in e["claims"] if t["p"] == prop and isinstance(t["o"], str) and re.fullmatch(r"Q\d+", t["o"])]
 
 
 def _requested() -> set[str]:
@@ -240,8 +258,11 @@ def _selection() -> dict[str, tuple[frozenset[str], frozenset[str]]]:
             seeds = {q for q in seeds if _sitelinks(q) >= 5}
         out[spec_id] = (frozenset(seeds), frozenset())
     empires = out["history.empires"][0]
-    terr = {q for q in snap if _instance_of_any(q, TERRITORY_CLASSES)
-            and (set(_objs(q, "P361")) | set(_objs(q, "P17"))) & empires}
+    terr = {
+        q
+        for q in snap
+        if _instance_of_any(q, TERRITORY_CLASSES) and (set(_objs(q, "P361")) | set(_objs(q, "P17"))) & empires
+    }
     for e in empires:
         terr |= {x for x in _objs(e, "P527") + _objs(e, "P150") if x in snap and _instance_of_any(x, TERRITORY_CLASSES)}
     out["history.empire_territories"] = (frozenset(terr), frozenset())
@@ -270,12 +291,18 @@ def _selection() -> dict[str, tuple[frozenset[str], frozenset[str]]]:
     out["history.country_events"] = (frozenset(), frozenset(countries | events))
     out["history.empire_event_items"] = (frozenset(o for e in empires for o in _objs(e, "P793")), frozenset())
     discoverers = {(c, o) for c in countries for o in _objs(c, "P61")}
-    out["history.country_discoverers"] = (frozenset(), frozenset({c for c, _ in discoverers} | {o for _, o in discoverers}))
+    out["history.country_discoverers"] = (
+        frozenset(),
+        frozenset({c for c, _ in discoverers} | {o for _, o in discoverers}),
+    )
     voyages = out["history.expeditions"][0]
-    rows = {(q, o) for q in snap if "Q5" in _objs(q, "P31")
-            for o in _objs(q, "P1344") + _objs(q, "P793") if o in voyages}
+    rows = {
+        (q, o) for q in snap if "Q5" in _objs(q, "P31") for o in _objs(q, "P1344") + _objs(q, "P793") if o in voyages
+    }
     out["history.explorer_voyages"] = (frozenset(), frozenset({q for q, _ in rows} | {o for _, o in rows}))
-    polities = {q for q in snap if _instance_of_any(q, ["Q3024240", "Q48349", "Q133156", "Q164142", "Q161243", "Q6256"])}
+    polities = {
+        q for q in snap if _instance_of_any(q, ["Q3024240", "Q48349", "Q133156", "Q164142", "Q161243", "Q6256"])
+    }
     succ: set[str] = set()
     for q in polities:
         for p in ("P1365", "P1366", "P155", "P156"):
@@ -379,8 +406,13 @@ def test_anchor_chains_file_is_well_formed() -> None:
 
 def test_owner_examples_are_among_the_chains() -> None:
     ids = {c["id"] for c in _chains_doc()["chains"]}
-    for needed in ("columbus_portuguese_brazil", "tordesillas_brazil", "napoleon_louisiana_usa",
-                   "berlin_conference_congo", "suez_crisis_usa_decolonisation"):
+    for needed in (
+        "columbus_portuguese_brazil",
+        "tordesillas_brazil",
+        "napoleon_louisiana_usa",
+        "berlin_conference_congo",
+        "suez_crisis_usa_decolonisation",
+    ):
         assert needed in ids
 
 
@@ -465,9 +497,19 @@ def witness_path(chain: dict[str, Any], *, budget: int = 3_000_000) -> list[tupl
 
     # Prefer explanatory hops (succession, sovereignty, signatures, participation) over loose ones, and entities
     # whose claims were recorded; search by increasing length so the witness is a shortest admissible path.
-    rank = {"state_succession": 0, "treaty_signatory": 0, "official_language": 0, "participation": 1,
-            "territorial": 1, "voyage_geography": 1, "asserted_causation": 1, "leadership": 2, "location": 2,
-            "significant_event": 3, "era": 3}
+    rank = {
+        "state_succession": 0,
+        "treaty_signatory": 0,
+        "official_language": 0,
+        "participation": 1,
+        "territorial": 1,
+        "voyage_geography": 1,
+        "asserted_causation": 1,
+        "leadership": 2,
+        "location": 2,
+        "significant_event": 3,
+        "era": 3,
+    }
 
     def order(item: tuple[str, str, bool]) -> tuple[int, int, str]:
         m, p, _ = item
@@ -481,8 +523,11 @@ def witness_path(chain: dict[str, Any], *, budget: int = 3_000_000) -> list[tupl
             return
         if node == dst:
             ns = set(nodes)
-            if (not via_any or via_any & ns) and via_all <= ns and _steps_match(
-                    [prop_classes[h[1]] for h in hops], chain["steps"]):
+            if (
+                (not via_any or via_any & ns)
+                and via_all <= ns
+                and _steps_match([prop_classes[h[1]] for h in hops], chain["steps"])
+            ):
                 found.append(list(hops))
             return
         if len(hops) >= limit or (node in non_transit and node != src):

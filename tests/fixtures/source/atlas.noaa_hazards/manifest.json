@@ -1,0 +1,210 @@
+[
+  {
+    "request_fingerprint": "867723c55edf062a4ea738e4b0a5988c6264672d42c978acecec5ad51f21684e",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/earthquakes?minYear=2018&maxYear=2018&page=1",
+    "file": "867723c55edf062a.json",
+    "sha256": "1e04f85cbef1c656a6d54887bf3ad954b292a23cdff2c52a6efae0a593d8e654",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:09.511073+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "410fb314cd18dffa7e6d70fdb56f0b20c817ba90d9ae0d24863173fe7d29a959",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/events?minYear=2018&maxYear=2018&page=1",
+    "file": "410fb314cd18dffa.json",
+    "sha256": "2f088731dc6b3e0e7dee53a829c4b29184c11fb21fbe4bc898b432d2cf5c5af2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:11.850437+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "1bc9b909639af7440fbffd9b7747d1588368b2043b05933ffe5654269845d5db",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/runups?sourceMinYear=2018&sourceMaxYear=2018&page=1",
+    "file": "1bc9b909639af744.json",
+    "sha256": "cccd8d4bbd2d9b0c51f05fd3cf08573506deb522979af4345a5f623099cc31ec",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:13.557414+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "d7888e80b376039bb773bee2a561c18f7655a2df1b7f9d40b91945ff845fda6f",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/runups?sourceMinYear=2018&sourceMaxYear=2018&page=2",
+    "file": "d7888e80b376039b.json",
+    "sha256": "20d00f64ce36f652e461eae184482d96eab08f8a143e1f80ce3feb1dbd5231ea",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:15.409444+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "7113cd80212c2fd1c2ba7de91967f7c7fa7846b01392e32dfeadd39dfa4bd95c",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/runups?sourceMinYear=2018&sourceMaxYear=2018&page=3",
+    "file": "7113cd80212c2fd1.json",
+    "sha256": "1d8c1598b9227b9f5af2b671f4893153da80804cf100cb7121358651745e1e7a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:16.912100+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "e064d3835b74f9a7a520af5f3b208973ec905c35e18676200890ad426607bc75",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/runups?sourceMinYear=2018&sourceMaxYear=2018&page=4",
+    "file": "e064d3835b74f9a7.json",
+    "sha256": "f9975f96aedf3829473cd2909a58181b8b41233b5c2d26fbc7eda55ee7d4843d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:18.435043+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "6341e21f96439160c738b65427f8dcf4c487effc66e2887b7e77d9c2acba2d78",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/runups?sourceMinYear=2018&sourceMaxYear=2018&page=5",
+    "file": "6341e21f96439160.json",
+    "sha256": "701a5ff8eca30c02a01c1e00dc630465a0a25eec41a475dc128446c58d52dc7b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:19.835264+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "03a5603efcaefd5c7109df044cedcdee9ebe381d4d63970edd9457da3d40a553",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/volcanoes?minYear=2018&maxYear=2018&page=1",
+    "file": "03a5603efcaefd5c.json",
+    "sha256": "3b7ccd9e7ea49ed7aa506613454ce528adb5fae15d12c758165233543cbd8e46",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:21.174469+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI response, run option min_year=2018,max_year=2018"
+  },
+  {
+    "request_fingerprint": "1c5f74a0dbbcd29f22a49e99a55d7ade851669635322317f2e23e5995cd7b4bd",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/causes",
+    "file": "1c5f74a0dbbcd29f.json",
+    "sha256": "ccb91b45bedcf0f834163841dcc14f325ab03f2e9701c8485240f2656b30ee7f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:22.529351+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "4306569207ebdef3397d859eb725df3e5d6390eaeb1a5063a535bbdbfdddad3a",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/validity",
+    "file": "4306569207ebdef3.json",
+    "sha256": "081f620e302567b25ee1e763ecd2d62dbf3a2fa05eb438df0a7535e69583bb0c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:23.865776+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "b6659a58ca886a71e7e67a49d1540a1d12c80e92c4837703e3dae5d180cfd0ca",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/effect/people",
+    "file": "b6659a58ca886a71.json",
+    "sha256": "5b3b6737bf899faf22a1d2d90372ac2e712e9cd0de5911a0fb370e89b2e87a90",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:25.158464+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "fd339e8f1da76d9ffcedbe15dfb79e7f3749b9d45cc11b5c7a97c205aa293267",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/effect/houses",
+    "file": "fd339e8f1da76d9f.json",
+    "sha256": "c303e8b9c6beda7faccec0148996295d871a3e02728c12911fcaf74afd63a0a9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:26.797653+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "623063fd062cc3aa4327fe97b53677ec427ea00ec3f4971c862909584d2b5957",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/effect/damage",
+    "file": "623063fd062cc3aa.json",
+    "sha256": "e95eb10b74e2c490669f2d8632859671ed60bcf37f05f77b4d3c036fe7e1c399",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:28.551467+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "6e81eefecbdb640303a514e5cc57052f739048e68ba458677538da314500a418",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/volcano/agents",
+    "file": "6e81eefecbdb6403.json",
+    "sha256": "bef65251d970885efec2640c2c683073379b40f1ffc2d4c0fa88af7f903e89f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:30.788438+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "58bf6f148778e2bd9843d6211f3f6179de22199dba0d60c8b7ae442842af1fd0",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/warning-statuses",
+    "file": "58bf6f148778e2bd.json",
+    "sha256": "4434ecda62d6ec361f57f3a5ffcf652a94b5fc6a39cc3b32c49a966b594fc3ea",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:32.076382+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  },
+  {
+    "request_fingerprint": "a4ba5c77cdf4bd7920481002619f7f076b8afaf6011e3f0b815a734963842d57",
+    "url": "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/runup/measurement-types",
+    "file": "a4ba5c77cdf4bd79.json",
+    "sha256": "5825c786308e79bd4fc249ba67bc77481d3f815d401420e565247a2da5b3efaa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:38:33.406338+00:00",
+    "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: 'Access to this dataset is unrestricted'",
+    "fixture_note": "verbatim NCEI descriptor response"
+  }
+]

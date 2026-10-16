@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { CitationChip } from '../components/CitationChip';
 import { FixtureBadge } from '../components/Honesty';
 import { wikidataItemUrl } from '../lib/citations';
+import { kindLabel } from '../lib/kinds';
 import type { CausalCandidate, CausalClaim, CausalEvent, Grade, Tier, WhyGroup } from './api';
 import { GRADES } from './api';
 import {
@@ -160,7 +161,8 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         ) : (
           <strong>Affirmé {selon(c)}</strong>
         )}{' '}
-        : {relationFr(c)} <span className="muted">({FAMILY_STYLE[fam].label})</span>
+        : {relationFr(c)}
+        {!FAMILY_STYLE[fam].label.startsWith(relationFr(c)) && <span className="muted"> ({FAMILY_STYLE[fam].label})</span>}
         {c.polarity && <span className="muted"> · polarité : {c.polarity === 'inhibits' ? 'inhibe' : c.polarity === 'promotes' ? 'favorise' : c.polarity}</span>}. REVA n’affirme
         aucune causalité : il rapporte cette affirmation.
       </p>
@@ -172,7 +174,6 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         <dt>Source affirmante</dt>
         <dd>
           {sourceName(c)} <CitationChip c={citeClaim(c)} />
-          {c.origin === 'test_fixture' && <FixtureBadge />}
         </dd>
         <dt>Déclaration / ligne</dt>
         <dd data-testid="claim-statement">
@@ -308,7 +309,7 @@ export function EventCard({ e }: { e: CausalEvent }) {
       <h2 className="v3-entity-title">{e.label}</h2>
       <p className="v3-entity-sub">
         <span className="v3-chip" data-testid="event-type">
-          {e.typeLabel ?? e.type ?? 'type non indiqué'}
+          {e.typeLabel ?? (e.type ? kindLabel(e.type) : 'type non indiqué')}
         </span>{' '}
         {wd ? (
           <a href={wd} target="_blank" rel="noreferrer noopener">
@@ -374,10 +375,12 @@ export function EventCard({ e }: { e: CausalEvent }) {
               <ul className="v3-plain">
                 {e.context.slice(0, 12).map((c, i) => (
                   <li key={`${c.other.id}-${i}`}>
-                    {c.relation} : {c.other.label} <span className="muted">— relation de contexte, pas une cause</span>
+                    {c.eventIsSubject ? `${c.relation} : ${c.other.label}` : `${c.other.label} — ${c.relation}`}
+                    <span className="muted"> — relation de contexte, pas une cause</span>
                   </li>
                 ))}
               </ul>
+              {(e.context.length > 12 || e.contextTruncated) && <span className="muted">liste bornée</span>}
             </dd>
           </>
         )}

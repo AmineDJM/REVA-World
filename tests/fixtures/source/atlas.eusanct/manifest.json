@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "904b2ac0c5ce6ada3c42485add06588e30c631c24c1facf5c48a5e01f75ef468",
+    "url": "https://kondata.uni-konstanz.de/radar/de/dataset/lCfLfgbpdRKseQvp/datasetBinaryTreeStream",
+    "file": "904b2ac0c5ce6ada.tar",
+    "sha256": "da7ce3b81c2f6dbea0a00193b4a5577d7aa128ab66a1f2268c5d26a52a856148",
+    "status": 200,
+    "headers": {
+      "content-type": "application/tar"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of the RADAR tar of doi:10.48606/10 (real download sha256 ec1c2de2a90eed14f73266b5d845c99409c045b78e2b95fc0deea4935aec0923): only EUSANCT_Dataset_Case-level.csv, header + 23 selected rows, original row text"
+  }
+]

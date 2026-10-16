@@ -112,7 +112,7 @@ def top_seeds(seeds: Sequence[Seed], limit: int, classes: Mapping[str, str] = EV
 
 
 def load_seeds(path: Path) -> dict[str, Any]:
-    doc = json.loads(Path(path).read_text())
+    doc: dict[str, Any] = json.loads(Path(path).read_text())
     doc["seeds"] = [Seed(**s) for s in doc["seeds"]]
     return doc
 

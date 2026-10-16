@@ -21,11 +21,54 @@ concepts:
         justification: >-
           World Bank WDI "Population, total": "midyear estimates ... based on the de facto definition of
           population, which counts all residents regardless of legal status or citizenship" (WDI series
-          metadata). Same definition; the WDI takes WPP for most economies and national statistics for some.
-        caveats: "For economies where the WDI uses national sources the value can differ from WPP."
+          metadata). The WDI takes the UN WPP for most economies (then the same quantity, same estimate) and
+          national statistics (census, Eurostat, national statistical offices) for others: for those the
+          value is a different estimate, often usually-resident (de jure) rather than de facto. It answers
+          only where WPP has no estimate, and every switch from WPP to WDI in a country's series is flagged
+          (source_break, with both values of the last year both report).
+        caveats: >-
+          Review V3b (2023, WDI vs WPP): 39 of 216 countries differ by more than 1 %, 11 by more than 5 % (VIR
+          +22 %, MDA -20 %, CUW -17 %, ALB -14 %, TGO -12 %, QAT -11 %, TTO -9 %, ISR +6 %, SYC -6 %, POL -5 %,
+          BGR -5 %): census-based national figures or another territorial scope. Countries whose scope differs
+          are excluded below (not_equivalent_for); the others are answered with a source_break flag.
+        not_equivalent_for:
+          - iso3: [FRA]
+            reason: >-
+              Territorial scope: WPP "France" is metropolitan France (Corsica included); Guadeloupe, Martinique,
+              French Guiana, Réunion and Mayotte are separate WPP locations (and separate REVA entities GLP, MTQ,
+              GUF, REU, MYT). WDI France includes the overseas departments (2023: WDI 68,372,286 vs WPP
+              66,438,822, +2.9 %). Splicing them adds the overseas departments to France from one year to the
+              next (and counts them twice next to their own entities).
+          - iso3: [MDA]
+            reason: >-
+              Territorial scope: WPP "Republic of Moldova" includes Transnistria; the WDI follows the National
+              Bureau of Statistics of Moldova, which excludes the territories on the left bank of the Dniester
+              (2023: WDI 2,457,783 vs WPP 3,067,070, -19.9 %; a spliced series falls 21.7 % from 2023 to 2024).
+        cell_rules:
+          - estimate_kind: projection_upstream
+            year_after: 2023
+            upstream: "UN WPP 2024, medium-variant projection (republished by the World Bank)"
+            label: {fr: "projection (ONU WPP via la Banque mondiale)", en: "projection (UN WPP via World Bank)"}
+            basis: >-
+              WDI SP.POP.TOTL source note: "(1) United Nations Population Division. World Population Prospects:
+              2024 Revision; (2) Census reports and other statistical publications from national statistical
+              offices ...". WPP 2024 estimates end in 2023; later WPP years are projections. The WDI does not
+              say per economy which source a value comes from, so every WDI value after 2023 is treated as
+              possibly the WPP projection (review V3b: equal to it to the person for 129 of 216 countries in
+              2024 and 120 of 216 in 2025; India 2025 = 1,463,865,525 = WPP medium variant).
+          - estimate_kind: extrapolated
+            footnote_matches: "(?i)^extrapolated"
+            label: {fr: "extrapolation (Banque mondiale)", en: "extrapolation (World Bank)"}
+            basis: >-
+              The cell's own WDI footnote says so ("Extrapolated assuming the same growth rate as previous 6
+              months" / "... as previous year"): not an estimate of the year.
     caveats: >-
-      WPP and WDI agree in definition; values may differ where WDI uses a national census-based series.
-      Fallback order is WPP then WDI, per country and year.
+      WPP estimates answer first (1950-2023). The WDI answers only where WPP has no estimate; WDI values after
+      2023 are treated as the WPP 2024 projection the World Bank republishes (estimate_kind
+      projection_upstream: excluded by default, shown flagged when projections are requested), WDI cells
+      footnoted as extrapolated likewise. WPP and WDI differ in definition for some countries (national
+      usually-resident figures, territorial scope): FRA and MDA are never answered by the WDI; every other
+      switch of source within a country's series is flagged source_break with both values of the overlap year.
     not_equivalent:
       - series: "imf.weo.LP"
         reason: >-
@@ -54,6 +97,14 @@ concepts:
         justification: >-
           WDI "Population density (people per sq. km of land area)": "midyear population divided by land area
           in square kilometers" (WDI metadata) — exactly this definition.
+        cell_rules:
+          - estimate_kind: projection_upstream
+            year_after: 2023
+            upstream: "UN WPP 2024 medium-variant population (via the WDI population SP.POP.TOTL)"
+            label: {fr: "projection (population ONU WPP via la Banque mondiale)", en: "projection (UN WPP population via World Bank)"}
+            basis: >-
+              The WDI density divides the WDI mid-year population (SP.POP.TOTL), which after 2023 is for most
+              economies the UN WPP 2024 projection (see reva.population.total), by land area.
     derived:
       formula: ratio
       alternatives:

@@ -26,7 +26,7 @@ from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
 from reva.links.derive import Derivation, KgIndex, _ev, derive_shared_subject  # noqa: F401 (re-export)
-from reva.links.model import Link, Stmt, Temporal
+from reva.links.model import Link, PartialDate, Stmt, Temporal
 
 CORRESPONDS = "geopol:corresponds_to_iso3"
 CSHAPES_BORDER = "cshapes:shares_border_with"
@@ -40,6 +40,27 @@ DATASET_PROPERTIES = (
 )  # fmt: skip
 #: bound on derived peacekeeping links (one per contribution statement x mission country; linear, not pairwise)
 MAX_PEACEKEEPING_LINKS = 200_000
+#: CSH-1 (review V3b): CShapes 2.0 starts on 1886-01-01. A period starting that day is *left-censored*: the rule
+#: or border may be older (Algeria: French rule from 1830). Its start is served at year precision and the basis
+#: says so; renderers show "≤ 1886", never the day.
+CSHAPES_COVERAGE_START = PartialDate(1886, 1, 1, 11)
+CSHAPES_START_BASIS = (
+    "dataset coverage start (CShapes 2.0 begins 1886-01-01): the situation began on or before this date; "
+    "the start is not a date of the relation"
+)
+
+
+def _left_censor(t: Temporal, basis: dict[str, Any]) -> Temporal:
+    """A temporal whose start is CShapes' first day: start at year precision + ``left_censored`` in ``basis``."""
+    if t.kind != "interval" or t.start is None or t.start.key() > CSHAPES_COVERAGE_START.key():
+        return t
+    if t.start.key() < CSHAPES_COVERAGE_START.key():  # earlier than the dataset: from another source, kept
+        return t
+    basis["left_censored"] = True
+    basis["coverage_start"] = CSHAPES_COVERAGE_START.iso()
+    basis["start_basis"] = CSHAPES_START_BASIS
+    return Temporal("interval", PartialDate(CSHAPES_COVERAGE_START.year), t.end)
+
 
 NodeOf = Callable[[str], str]
 
@@ -99,22 +120,13 @@ def derive_cshapes_borders(
                 if focus is not None and na not in focus and nb not in focus:
                     continue
                 a, b = sorted((na, nb))
-                d.add(
-                    Link(
-                        a,
-                        b,
-                        "land_border_cshapes",
-                        False,
-                        tb,
-                        _ev(s, *ea, *eb),
-                        basis={
-                            "property": CSHAPES_BORDER,
-                            "territories": [s.subject, s.object],
-                            "iso3": sorted(x for x in (ia, ib) if x),
-                            "licence": "CC BY-NC-SA 4.0 (CShapes 2.0): non-commercial",
-                        },
-                    )
-                )
+                basis: dict[str, Any] = {
+                    "property": CSHAPES_BORDER,
+                    "territories": [s.subject, s.object],
+                    "iso3": sorted(x for x in (ia, ib) if x),
+                    "licence": "CC BY-NC-SA 4.0 (CShapes 2.0): non-commercial",
+                }
+                d.add(Link(a, b, "land_border_cshapes", False, _left_censor(tb, basis), _ev(s, *ea, *eb), basis=basis))
                 if ia is None or ib is None:
                     d.skip("territory_without_country", statement=s.statement_id)
     return d.finish()
@@ -152,23 +164,24 @@ def derive_cshapes_colonial(
                     continue
                 if focus is not None and na not in focus and nb not in focus:
                     continue
+                cbasis: dict[str, Any] = {
+                    "property": CSHAPES_RULED_BY,
+                    "status": (s.qualifier("status") or ("?",))[0],
+                    "territory": s.subject,
+                    "ruler": s.object,
+                    "territory_mapping": mapping,
+                    "iso3": [ia, ib],
+                    "licence": "CC BY-NC-SA 4.0 (CShapes 2.0): non-commercial",
+                }
                 d.add(
                     Link(
                         na,
                         nb,
                         "colonial_rule_cshapes",
                         True,
-                        tb,
+                        _left_censor(tb, cbasis),
                         _ev(s, *ea, *eb),
-                        basis={
-                            "property": CSHAPES_RULED_BY,
-                            "status": (s.qualifier("status") or ("?",))[0],
-                            "territory": s.subject,
-                            "ruler": s.object,
-                            "territory_mapping": mapping,
-                            "iso3": [ia, ib],
-                            "licence": "CC BY-NC-SA 4.0 (CShapes 2.0): non-commercial",
-                        },
+                        basis=cbasis,
                     )
                 )
     return d.finish()

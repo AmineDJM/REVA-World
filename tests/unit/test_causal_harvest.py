@@ -124,6 +124,7 @@ def test_causal_statements_keep_full_references_and_qualifiers_others_unchanged(
     assert after["Q8698$A"].qualifiers == {"P1480": ["Q18912752"]}
     assert after["Q8698$D"] == before["Q8698$D"]
     assert core.causal_objects(e2) == ["Q205020", "Q170314"]
+    assert core.is_dated(e2)
     assert core.reference_class(after["Q8698$A"].references) == "scholarly"
     assert core.reference_class(after["Q8698$C"].references) == "none"
     assert core.reference_class([{"P143": ["Q328"]}]) == "wikimedia_import_only"
@@ -288,3 +289,45 @@ def test_ingest_loads_subset_and_expands_one_hop(tmp_path: Path) -> None:
     assert set(st.frontier) == {"Q170314"}
     st.add("Q8698", tier=0, reason="again")  # fetched entities are never queued again
     assert "Q8698" not in st.frontier
+
+
+def test_wdqs_listing_loads_only_rows_touching_the_seed_reach(tmp_path: Path) -> None:
+    from reva.adapters.connectors.wikidata import SparqlResult
+
+    E = "http://www.wikidata.org/entity/"
+
+    def row(s: str, sid: str, o: str) -> dict[str, Any]:
+        return {
+            "item": {"type": "uri", "value": E + s},
+            "statement": {"type": "uri", "value": f"{E}statement/{sid}"},
+            "object": {"type": "uri", "value": E + o},
+            "rank": {"type": "uri", "value": "http://wikiba.se/ontology#NormalRank"},
+        }
+
+    calls: list[str] = []
+
+    class FakeWdqs:
+        async def sparql(self, query: str, *, meta: Any = None) -> SparqlResult:
+            calls.append(meta["spec"])
+            rows = (
+                [row("Q1", "Q1-A", "Q2"), row("Q3", "Q3-B", "Q1"), row("Q8", "Q8-C", "Q9")] if len(calls) == 1 else []
+            )
+            return SparqlResult(
+                ("item", "statement", "object", "rank"), rows, "q" * 64, "d" * 64, 10, datetime.now(UTC), 0.1
+            )
+
+    sink = _Sink()
+    sess = type("S", (), {"sink": sink, "wdqs_client": FakeWdqs()})()
+    st = live.State(tmp_path / "s.json")
+    st.fetched["Q1"] = {"rev": 1}
+    hv = live.CausalHarvest(sess, st)  # type: ignore[arg-type]
+    out = asyncio.run(hv.wdqs_listings())
+    assert out["status"] == "done" and len(calls) == 9 + 9 + 4  # P828/P1542 split by QID prefix
+    loaded = [s for b in sink.batches for s in b.statements]
+    assert [(s.subject, s.object_qid) for s in loaded] == [("Q3", "Q1")]  # Q1's own claims come from snapshots
+    assert loaded[0].source_key == "wikidata.wdqs" and loaded[0].references == []
+    assert set(st.frontier) == {"Q2", "Q3"} and "Q8" not in st.frontier
+    first = st.data["wdqs"]["causal.contributing_factor_of"]
+    assert first["status"] == "done"
+    chunk = next(iter(first["chunks"].values()))
+    assert chunk["statements"] == 3 and chunk["touching_seed_reach"] == 2 and chunk["loaded_as_wdqs_rows"] == 1

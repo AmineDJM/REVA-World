@@ -36,6 +36,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     r.add_argument("--discover", default="", help="pid=pages,... CirrusSearch discovery pages (500 hits each)")
     r.add_argument("--minutes", type=float, default=None)
     r.add_argument("--max-entities", type=int, default=live.MAX_ENTITIES)
+    r.add_argument(
+        "--mode",
+        choices=("api", "auto", "linked_data"),
+        default="auto",
+        help="auto: one wbgetentities try per batch when the API is not cooling down, else Special:EntityData",
+    )
+    r.add_argument("--batch-size", type=int, default=10)
+    r.add_argument("--linger", action="store_true", help="with --minutes: stay for hourly WDQS attempts")
     rp = sub.add_parser("report", help="consistency report over the loaded causal statements")
     rp.add_argument("--db", default=live.DEFAULT_DB)
     rp.add_argument("--chains", type=int, default=12)
@@ -86,6 +94,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                     discover_pages=pages,
                     until=until,
                     max_entities=args.max_entities,
+                    mode=args.mode,
+                    batch_size=args.batch_size,
+                    linger=args.linger,
                 )
             )
         except BudgetExhausted as e:

@@ -8,6 +8,8 @@ sentence by sentence, against the template sentence and the evidence it cites:
 * every capitalised word (names, labels) not at the start of the sentence appears in the
   template sentence or its cited evidence;
 * no causal wording ("because", "à cause de", "led to", …) unless the template sentence has it;
+* a causal claim keeps its attribution verbatim ("selon <source> (T3", "according to <source> (T1") and a chain
+  keeps "composée par REVA" / "composed by REVA";
 * the honesty markers of the template sentence ("selon", "Wikidata", "pas une cause", "aucune
   source", "community-edited", "projection", "estimate", …) are kept;
 * every value keeps its entity: a value of a cited atlas cell stays in the same clause as the names
@@ -226,6 +228,10 @@ def pairing_problems(original: str, rephrased: str, values: set[str]) -> list[st
     return sorted(set(problems))
 
 
+#: attribution of a causal claim in a template sentence (folded text): "selon wikidata (t3", "according to icb.data/icb2 (t1"
+_ATTRIBUTION = re.compile(r"(?:selon|according to) [^()]{1,80}? \(t[1-4]")
+
+
 def check_sentence(
     original: str, rephrased: str, evidence: str, *, values: set[str] | frozenset[str] = frozenset()
 ) -> list[str]:
@@ -252,6 +258,14 @@ def check_sentence(
     for name, stem in STEM_MARKERS.items():
         if stem.search(fo) and not stem.search(fr_):
             problems.append(f"marker_dropped:{name}")
+    for attribution in _ATTRIBUTION.findall(fo):
+        # a causal claim keeps its attribution verbatim: "selon <source> (Tn" / "according to <source> (Tn"
+        if attribution not in fr_:
+            problems.append("causal_attribution_dropped")
+    if "composee par reva" in fo and "composee par reva" not in fr_:
+        problems.append("marker_dropped:composée par REVA")
+    if "composed by reva" in fo and "composed by reva" not in fr_:
+        problems.append("marker_dropped:composed by REVA")
     problems.extend(pairing_problems(original, rephrased, set(values)))
     if len(rephrased) > 2 * len(original) + 60:
         problems.append("too_long")

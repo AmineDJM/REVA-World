@@ -1,0 +1,122 @@
+# Atlas catalog of agent A-SANCTIONS (src/reva/adapters/connectors/atlas_sanctions.py). Provider-declared, not
+# human-reviewed. Every count is a REVA count of coded cases/regimes/programs (flags.computed_from + method); a
+# country-year without a row has no coded case in the source -- never a zero. Country-pair (dyadic) series are
+# link-layer tables for LINKS, not country concepts: ties.dyad_year / eusanct.dyad_year
+# CASES_STARTED|partner=*, CASES_ACTIVE|partner=*, IMPOSITIONS_ACTIVE|partner=* (row = sender, partner = target,
+# flags.partner_iso3; unmapped targets as |partner_code=cow:<n>) and ofac.programs ACTIVE_PROGRAMS|partner=*
+# (row USA). Event-level detail (senders, stage dates, issues, types, coded outcomes) is in the KG
+# (ties:case:<id>, eusanct:case:<id>; docs/dev/v3_a_sanctions.md). Every series string is checked against the
+# fixture tables by tests/unit/test_atlas_sanctions.py.
+domain: sanctions
+labels:
+  en: International sanctions
+  fr: Sanctions internationales
+maintainer: A-SANCTIONS
+concepts:
+- id: sanctions.ties.target_cases_started
+  labels:
+    en: Sanctions cases started against the country (TIES, threats or impositions)
+    fr: Épisodes de sanctions ouverts contre le pays (TIES, menaces ou impositions)
+  definition: Number of TIES 4.1 sanctions cases (1945-2005) whose target is the country and that begin in the year.
+    A TIES case begins when a sender threatens sanctions, or imposes them without prior threat; one case has
+    exactly one target and one issue (TIES users' manual v4). Count of distinct case ids computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ties.country_year.TARGET_CASES_STARTED
+  provider_declared: true
+  notes: Includes threat-only cases (about 40 % of TIES cases never reach imposition). Historical states (USSR, both
+    Germanies, Yugoslavia...) keep iso3 null and their historical-state QID.
+- id: sanctions.ties.target_cases_active
+  labels:
+    en: Sanctions cases active against the country (TIES)
+    fr: Épisodes de sanctions en cours contre le pays (TIES)
+  definition: Number of TIES 4.1 cases targeting the country that are active in the year, from the case start year to
+    its coded end year; a case without coded end runs to its 'ongoing as of' (last reported incident) year, else is
+    counted in its start year only (flags.end_basis gives the split). Computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ties.country_year.TARGET_CASES_ACTIVE
+  provider_declared: true
+- id: sanctions.ties.target_impositions_active
+  labels:
+    en: Cases with sanctions imposed on the country (TIES)
+    fr: Épisodes avec sanctions imposées au pays (TIES)
+  definition: Number of TIES 4.1 cases targeting the country in which sanctions were imposed, active from the
+    imposition start year to the case end year (same end rule as sanctions.ties.target_cases_active). Computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ties.country_year.TARGET_IMPOSITIONS_ACTIVE
+  provider_declared: true
+- id: sanctions.ties.sender_cases_started
+  labels:
+    en: Sanctions cases started by the country as a sender (TIES)
+    fr: Épisodes de sanctions ouverts par le pays émetteur (TIES)
+  definition: Number of TIES 4.1 cases begun in the year in which the country is one of the (up to five) sender
+    States. The EEC/EU acting collectively (TIES code 1000) is not a country and is not counted here. Computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ties.country_year.SENDER_CASES_STARTED
+  provider_declared: true
+- id: sanctions.eusanct.target_cases_active
+  labels:
+    en: EU, US or UN sanctions cases active against the country (EUSANCT)
+    fr: Épisodes de sanctions UE, États-Unis ou ONU en cours contre le pays (EUSANCT)
+  definition: Number of EUSANCT 1.0 cases (threats and impositions by the EU, the US and/or the UN, coverage
+    1989-2015) targeting the country that are active in the year, from the earliest sender start to the latest
+    sender end; cases coded 'ongoing' run to 2015, the last coverage year (flags.end_basis). Computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - eusanct.country_year.TARGET_CASES_ACTIVE
+  provider_declared: true
+  notes: Cases begun before 1989 but ongoing then are included by EUSANCT (e.g. US sanctions on North Korea from 1950).
+- id: sanctions.eusanct.target_impositions_active
+  labels:
+    en: EU, US or UN sanctions imposed on the country (EUSANCT)
+    fr: Sanctions UE, États-Unis ou ONU imposées au pays (EUSANCT)
+  definition: Number of EUSANCT 1.0 cases targeting the country with sanctions imposed by at least one of the EU, the
+    US or the UN, from the earliest imposition start to the case end (same end rule as
+    sanctions.eusanct.target_cases_active). Computed by REVA.
+  unit: cases
+  domain: sanctions
+  subdomain: episodes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - eusanct.country_year.TARGET_IMPOSITIONS_ACTIVE
+  provider_declared: true
+- id: sanctions.eu_map.regimes_listed
+  labels:
+    en: Sanctions regimes in force in the EU listed under the country (EU Sanctions Map)
+    fr: Régimes de sanctions en vigueur dans l'UE classés sous le pays (carte des sanctions de l'UE)
+  definition: Number of country regimes (EU autonomous, UN, or UN and EU) that the EU Sanctions Map lists under the
+    country on the retrieval day. A regime listed under a country may target persons or entities linked to it rather
+    than the State itself (flags.regime_ids; per-regime rows eusanctionsmap.regimes REGIME|regime=<id> give the
+    specification, measure types, legal acts, last amendment and expiry). Computed by REVA.
+  unit: regimes
+  domain: sanctions
+  subdomain: regimes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - eusanctionsmap.regimes.REGIMES_LISTED
+  provider_declared: true

@@ -1,0 +1,24 @@
+# Budget request from agent A-CONTENTION (NAVCO, MEC, Mass Mobilization). ATLASCORE merges into
+# registry/policies/budgets.yaml. All three are pinned Harvard Dataverse versions downloaded whole: per file one
+# version record (5-14 KB) + one .tab export (redirect dataverse.harvard.edu -> dvn-cloud-iqss.s3.amazonaws.com).
+# A full refresh of the three sources is 10 requests / ~18.4 MB. No other provider traffic.
+agent: A-CONTENTION
+requests:
+  - source_key: harvard.dataverse.navco
+    # NAVCO 1.2 (83 KB), 1.3 list (73 KB), 2.1 (1.38 MB) + 3 version records. CC0. planned_requests 8 (6 + retries).
+    daily_requests: 16
+    expected_bytes_per_day: 4000000
+    reason: "NAVCO 1.2/1.3/2.1 pinned versions: 6 requests per run (~1.6 MB)"
+  - source_key: harvard.dataverse.mec
+    # MEC Data Release.tab (1.33 MB) + version record. CC0. planned_requests 3.
+    daily_requests: 6
+    expected_bytes_per_day: 3000000
+    reason: "MEC v3.0: 2 requests per run (~1.35 MB)"
+  - source_key: harvard.dataverse.massmob
+    # mmALL_073120_csv.tab (15.6 MB) + version record. CC0. planned_requests 3.
+    daily_requests: 6
+    expected_bytes_per_day: 33000000
+    reason: "Mass Mobilization v5.1: 2 requests per run (~15.6 MB)"
+daily_totals_increase:
+  http_requests_total: "+28"
+  http_bytes_total: "+40_000_000"

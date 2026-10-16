@@ -1,0 +1,32 @@
+# V3 (agent A-COUPS): REIGN-format leader list (leaderlist.xlsx) linked on jonathanmpowell.com/coups.
+# Connector: src/reva/adapters/connectors/atlas_leaders.py (atlas.reign_leaders) -> atlas table reign.leaders_cy
+# (COMPUTED counts) + KG reign:leader:<leadid> spells (source_key reign.leaderlist). See docs/dev/v3_a_coups.md.
+source_key: reign.leaderlist
+title: REIGN-format leader list 1945-2026 (leaderlist.xlsx, updated 2026-04-14)
+provider_url: https://jonathanmpowell.com/coups/
+lineage_family: reign
+rights:
+  licence: "No licence stated (checked 2026-10-16): the workbook is linked without terms; REIGN (One Earth Future, discontinued August 2021) asked users to cite Bell, Besaw & Frank (2021)."
+  licence_url: https://jonathanmpowell.com/coups/
+  attribution: >-
+    Bell, Curtis, Clayton Besaw and Matthew Frank (2021). The Rulers, Elections, and Irregular Governance (REIGN)
+    Dataset. Broomfield, CO: One Earth Future. Leader list as updated on jonathanmpowell.com/coups (2026-04-14).
+  licence_evidence: >-
+    oefdatascience.github.io/REIGN.github.io/menu/citation.html (read 2026-10-16) gives the citation; no licence
+    file in the OEFDataScience/REIGN.github.io repository; jonathanmpowell.com/coups states no terms.
+  open_licence: false
+  commercial_use: not_granted
+  redistribution: not stated by the provider; flagged for maintainer review
+metadata:
+  allowed_hosts: [jonathanmpowell.com, cran.r-project.org]
+  files:
+    - https://jonathanmpowell.com/coups/                                       # page: newest leaderlist.xlsx link
+    - https://jonathanmpowell.com/wp-content/uploads/2026/04/leaderlist.xlsx  # 2,739 rows, 196 KB
+  provenance_note: >-
+    Same columns as REIGN's leader_list_8_21.csv (stateabb, ccode, leadid, leader, sdate, smonth, syear, emonth,
+    eyear, birthyear, gender, militarycareer) plus `updated`; leadids "A2.9-*" are Archigos 2.9 ids, "cb-*"/"ctb-*"
+    REIGN coder ids (98 rows have none). The authorship of updates after 2021 is not stated on the page.
+  code_crosswalk: Correlates of War ccode -> crosswalk entities through StateCodeCrosswalk (cow system, date-aware).
+  authentication: none
+  cadence: irregular updates; monthly check
+  review_flag: no open licence stated -- maintainer to confirm redistribution in REVA

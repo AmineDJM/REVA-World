@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "40c2426744b8470f3f3769dea54cac591318e1b97c8a8de0b9001a85a4752037",
+    "url": "https://www.esrb.europa.eu/pub/fcdb/esrb.fcdb20220120.en.xlsx",
+    "file": "40c2426744b8470f.xlsx",
+    "sha256": "bf3535247da708b5ed77a43a356640b8436b5c7e35038b6bbe5d69241abc5a87",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "ESRB website copyright terms: free use with accurate reproduction and citation of the ESRB as the source",
+    "fixture_note": "live"
+  }
+]

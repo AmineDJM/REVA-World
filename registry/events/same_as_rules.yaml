@@ -1,0 +1,60 @@
+# Evidence rules for `events:same_as` links (owner: EVENTS; code: src/reva/events/same_as.py).
+#
+# A link says that two KG records denote the same real event. It is created ONLY from evidence:
+#   * a shared identifier (both records carry the same value of a declared event key, or a dataset record's own
+#     id equals the value of a verified Wikidata identifier property stated on an item);
+#   * an evidenced mapping table (a reviewed table with per-entry evidence).
+# Never from name or date similarity. A value held by several records on one side is reported as ambiguous and
+# never linked. Only rules with `status: active` run; the others document why no link can be made today.
+version: 1
+rules:
+  - id: untc_mtdsg_number
+    kind: same_property
+    property: "untc:mtdsg_number"
+    status: active
+    max_group: 2
+    note: >-
+      UNTC's MTDSG number (e.g. XXVII-7-d) is the depositary's own key of a multilateral treaty; two KG records
+      carrying the same number denote the same treaty (e.g. a record loaded before A-TREATIES mapped the treaty
+      to its Wikidata item and the item itself).
+  - id: ucdp_conflict_id_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "ucdp:conflict:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      No Wikidata property holding UCDP conflict ids was found. Checked 2026-10-16: P7166 (suggested) is not a
+      UCDP identifier (registry/events/_recorded/wikidata_verification.json), and none of the external-id claims
+      on the archived snapshots of the Algerian War (Q200790, UCDP conflict 246), the Suez Crisis (Q49101) and 10
+      other war items carries a UCDP-keyed value. Activate with the property id once one is verified.
+  - id: cow_war_number_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "cow:war:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      No Wikidata property holding Correlates of War war numbers was found on the archived war snapshots (same
+      check as above). COW and UCDP records also share no identifier with each other: no COW <-> UCDP link.
+  - id: unpk_mission_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "unpk:mission:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      UN peace operations are keyed by their acronym in the UN Peace and Security Data Hub; no Wikidata
+      identifier property for these keys is known. Acronym-to-label matching would be name matching: not done.
+mapping_tables:
+  - id: untc_treaty_qids
+    path: registry/entities/treaty_qids.json
+    owner: A-TREATIES
+    status: active
+    entries_field: entries
+    accept_status: [verified]
+    left_template: "untc:treaty:{mtdsg}"
+    right_field: qid
+    key_fields: [mtdsg, untc_title]
+    evidence_fields: [status, basis, wikidata_revision, raw_sha256]
+    note: >-
+      Per-entry evidence: the Wikidata item (fetched with its revision id and raw sha256) has P31 and its English
+      label or alias equals the UNTC page title. Links an `untc:treaty:<mtdsg>` record (loaded before the mapping
+      existed) to the item; pending maintainer review like the table itself.

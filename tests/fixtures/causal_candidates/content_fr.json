@@ -1,0 +1,29 @@
+{
+ "batchcomplete": true,
+ "query": {
+  "pages": [
+   {
+    "pageid": 2757,
+    "ns": 0,
+    "title": "Seconde Guerre mondiale",
+    "pageprops": {
+     "wikibase_item": "Q362"
+    },
+    "revisions": [
+     {
+      "revid": 240347813,
+      "parentid": 0,
+      "timestamp": "2026-10-13T22:30:59Z",
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "content": "\nProvoquée par le [[Conséquences de la Première Guerre mondiale|règlement insatisfaisant de la Première Guerre mondiale]] et par les ambitions [[Impérialisme|expansionnistes]] et [[Hégémonie|hégémoniques]] des trois principales nations de l'Axe (le [[Troisième Reich]], l'[[Royaume d'Italie (1861-1946)|Italie fasciste]] et l'[[empire du Japon]]), la Seconde Guerre mondiale est favorisée par la convergence d'un ensemble de tensions et conflits régionaux, notamment en [[Afrique]] ([[seconde guerre italo-éthiopienne]] dès 1935), en [[Espagne]] (où la [[guerre d'Espagne|guerre civile]] commence le {{date|18 juillet 1936}}), en [[République de Chine (1912-1949)|Chine]] (où les [[Seconde guerre sino-japonaise|agressions du Japon]] débutent le {{date|7 juillet 1937}}) et en [[Europe centrale]] (où [[Anschluss|l'Allemagne annexe autoritairement l'Autriche]] le {{date|13 mars 1938}}, puis [[Accords de Munich|les territoires des Sudètes]] pris à la [[Première République (Tchécoslovaquie)|Tchécoslovaquie]] entre le {{1er}} et le {{date|10 octobre 1938}}<ref>{{Lien web |langue=en |auteur institutionnel=United States Holocaust Memorial Museum |titre=September 29, 1938 Munich Agreement |url=https://encyclopedia.ushmm.org/content/en/timeline-event/holocaust/1933-1938/munich-agreement |consulté le=11 octobre 2026}}</ref>).\n\n== Massacre de Nankin ==\nLe {{date|9 juin}}, le [[Kuomintang]] ordonne la destruction des digues du fleuve Jaune dans le [[Henan]], provoquant des [[Inondation du fleuve Jaune de 1938|inondations]], qui entraînent des [[noyade]]s et des épidémies tuant des centaines de milliers de personnes<ref name=\":3\" />.\n\n== Notes et références ==\n[[Appeasement]] a provoqué les [[Accords de Munich]].\n"
+       }
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

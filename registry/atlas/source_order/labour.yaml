@@ -11,12 +11,33 @@ concepts:
     series:
       - series: "ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15"
         justification: "ILOSTAT 'Unemployment rate -- ILO modelled estimates', both sexes, ages 15+: the reference series."
+        cell_rules:
+          - estimate_kind: nowcast
+            year_after: 2024
+            unless_flag: obs_status
+            upstream: "ILO modelled estimates (ILOEST), November 2025 vintage"
+            label: {fr: "prévision immédiate de l'OIT (année du millésime)", en: "ILO nowcast (vintage year)"}
+            basis: >-
+              ILO modelled estimates, November 2025 vintage: years after the vintage (2026-2027) are flagged
+              projections by the connector; the vintage year 2025 is a nowcast (ILOEST methodology: current-year
+              values are nowcasts from partial-year and economic indicators), and no 2025 cell carries an ILO
+              obs_status, while the benchmarked years carry obs_status R. Update year_after with the next vintage.
       - series: "wb.wdi_social.SL.UEM.TOTL.ZS"
         justification: >-
           WDI "Unemployment, total (% of total labor force) (modeled ILO estimate)" republishes the same ILO
           modelled series (possibly an earlier ILO vintage).
         caveats: "The WDI may carry an older ILO modelled vintage; values can differ slightly."
-    caveats: "Modelled estimates include ILO imputations; ILO projection years are excluded."
+        cell_rules:
+          - estimate_kind: projection_upstream
+            year_after: 2024
+            upstream: "ILO modelled estimates (republished by the World Bank)"
+            label: {fr: "prévision ou projection de l'OIT (via la Banque mondiale)", en: "ILO nowcast or projection (via World Bank)"}
+            basis: >-
+              The WDI republishes an ILO modelled vintage that is not newer than ILOSTAT's (November 2025): a WDI
+              value for 2025 or later is an ILO nowcast or projection, not an estimate benchmarked on observations.
+    caveats: >-
+      Modelled estimates include ILO imputations; ILO projection years are excluded, and so is the vintage year
+      (2025, an ILO nowcast without obs_status; review V3b LAB-1) unless projections are requested.
     not_equivalent:
       - series: "ilostat.une_deap_sex_age_rt_a / wb SL.UEM.TOTL.NE.ZS"
         reason: "National estimates (national definitions and coverage): see reva.labour.unemployment_rate_national."

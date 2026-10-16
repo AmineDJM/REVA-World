@@ -60,11 +60,13 @@ def relations() -> dict[str, Any]:
 
 
 def dataset_entry(key: str) -> dict[str, Any]:
-    return relations()["datasets"][key]
+    out: dict[str, Any] = relations()["datasets"][key]
+    return out
 
 
 def document(key: str) -> dict[str, Any]:
-    return relations()["documents"][key]
+    out: dict[str, Any] = relations()["documents"][key]
+    return out
 
 
 def value_label(dataset: str, variable: str, code: Any) -> str | None:
@@ -73,7 +75,8 @@ def value_label(dataset: str, variable: str, code: Any) -> str | None:
         return None
     vals = dataset_entry(dataset).get("values", {}).get(variable, {})
     try:
-        return vals.get(int(str(code).strip()))
+        label = vals.get(int(str(code).strip()))
+        return None if label is None else str(label)
     except ValueError:
         return None
 
@@ -211,7 +214,15 @@ def coded_stmt(
     if label is None:
         return None
     return string_stmt(
-        key, subject, pid, label, raw_sha256=raw_sha256, selector=selector, code=str(code).strip(), variable=variable, **qual
+        key,
+        subject,
+        pid,
+        label,
+        raw_sha256=raw_sha256,
+        selector=selector,
+        code=str(code).strip(),
+        variable=variable,
+        **qual,
     )
 
 
@@ -281,16 +292,24 @@ class ClaimDelivery:
         )
 
 
-def causal_available(engine: Any) -> bool:
-    """CAUSCORE's loader and schema are both present (``reva.causal.load_dataset_claims`` + ``kg.causal_claim``)."""
-    try:
-        import reva.causal as causal
+def _causal_api(name: str) -> Any:
+    """``name`` from ``reva.causal`` (the documented import), else from the CAUSCORE module defining it
+    (``reva.causal.model`` / ``reva.causal.grader``); ``None`` when CAUSCORE is not installed."""
+    import importlib
 
-        if not hasattr(causal, "load_dataset_claims"):
-            return False
-    except ImportError:
-        return False
-    if engine is None:
+    for mod in ("reva.causal", "reva.causal.model", "reva.causal.grader"):
+        try:
+            m = importlib.import_module(mod)
+        except ImportError:
+            continue
+        if hasattr(m, name):
+            return getattr(m, name)
+    return None
+
+
+def causal_available(engine: Any) -> bool:
+    """CAUSCORE's loader and schema are both present (``load_dataset_claims`` + ``kg.causal_claim``)."""
+    if _causal_api("load_dataset_claims") is None or engine is None:
         return False
     from sqlalchemy import text
 
@@ -299,11 +318,11 @@ def causal_available(engine: Any) -> bool:
 
 
 def _load_one(engine: Any, store: Any, d: ClaimDelivery) -> dict[str, Any]:
-    from reva.causal import Codebook, DatasetClaim, load_dataset_claims
-
-    cb = Codebook(**d.codebook)
+    codebook_cls, claim_cls = _causal_api("Codebook"), _causal_api("DatasetClaim")
+    load_dataset_claims = _causal_api("load_dataset_claims")
+    cb = codebook_cls(**d.codebook)
     claims = [
-        DatasetClaim(
+        claim_cls(
             cause_id=c.cause_id,
             effect_id=c.effect_id,
             relation=c.relation,
@@ -347,7 +366,11 @@ def deliver_claims(run: Any, deliveries: Sequence[ClaimDelivery]) -> dict[str, A
     staging = (getattr(run, "options", None) or {}).get("claims_staging")
     if causal_available(getattr(run, "engine", None)):
         for d in deliveries:
-            out[d.dataset] = {"status": "loaded", "claims": len(d.claims), "report": _load_one(run.engine, run.store, d)}
+            out[d.dataset] = {
+                "status": "loaded",
+                "claims": len(d.claims),
+                "report": _load_one(run.engine, run.store, d),
+            }
         return out
     for d in deliveries:
         if staging:
@@ -370,9 +393,7 @@ def load_staged(engine: Any, store: Any, directory: str | Path, *, grade: bool =
         d = ClaimDelivery.from_json(json.loads(f.read_text(encoding="utf-8")))
         out[f.name] = _load_one(engine, store, d)
     if grade:
-        from reva.causal import grade_claims
-
-        rep = grade_claims(engine)
+        rep = _causal_api("grade_claims")(engine)
         out["grading"] = rep.as_dict() if hasattr(rep, "as_dict") else str(rep)
     return out
 
@@ -382,34 +403,215 @@ def load_staged(engine: Any, store: Any, directory: str | Path, *, grade: bool =
 #: Dataset predicates of the CAUSDATA connectors: pid -> (value kind, reva predicate, en label, fr label, inverse
 #: name, inverse en label). None is causal: causal links are claims (kg.causal_claim), never KG predicates.
 CAUSDATA_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]] = {
-    "causdata:event_type": ("string", "causdata_event_type", "event type (dataset kind)", "type d'événement (jeu de données)", None, None),
-    "causdata:coded_issue": ("string", "coded_issue", "coded issue at stake (dataset coding, not a cause)", "enjeu codé (codage du jeu de données, pas une cause)", None, None),
-    "causdata:coded_issue_of": ("item", "coded_issue_holder", "issue sought by (state coded as revisionist)", "enjeu porté par (État codé révisionniste)", "coded_issue_holder_in", "holds a coded issue in"),
-    "causdata:agreement_in_termination_window": ("item", "agreement_in_termination_window", "peace agreement dated in the termination window (REVA pairing, not causal)", "accord de paix daté dans la fenêtre de fin (appariement REVA, non causal)", "termination_window_agreement_of", "agreement dated in the termination window of"),
-    "icb:trigger_type": ("string", "icb_trigger_type", "trigger type (ICB TRIGGR/BREAK)", "type de déclencheur (ICB)", None, None),
-    "icb:triggering_entity": ("item", "icb_triggering_entity", "triggering entity (ICB TRIGENT)", "entité déclenchante (ICB)", "icb_triggered", "triggered (ICB TRIGENT)"),
-    "icb:triggering_entity_kind": ("string", "icb_triggering_entity_kind", "triggering entity kind (ICB TRIGENT 995/996/997)", "nature de l'entité déclenchante (ICB)", None, None),
-    "icb:trigger_location": ("string", "icb_trigger_location", "external or internal trigger (ICB TRIGLOC)", "déclencheur externe ou interne (ICB)", None, None),
-    "icb:response_type": ("string", "icb_response_type", "major response (ICB MAJRES)", "réponse principale (ICB)", None, None),
-    "icb:gravity": ("string", "icb_gravity", "gravity of value threat (ICB GRAVCR/GRAVTY)", "gravité de la menace (ICB)", None, None),
-    "icb:violence": ("string", "icb_violence", "violence in the crisis (ICB VIOL)", "violence de la crise (ICB)", None, None),
-    "icb:crisis_management": ("string", "icb_crisis_management", "crisis management technique (ICB CRISMG)", "technique de gestion de crise (ICB)", None, None),
-    "icb:outcome_form": ("string", "icb_outcome_form", "form of outcome (ICB FOROUT/OUTFOR)", "forme de l'issue (ICB)", None, None),
-    "icb:outcome_content": ("string", "icb_outcome_content", "content of outcome (ICB SUBOUT/OUTCOM)", "contenu de l'issue (ICB)", None, None),
-    "icb:outcome_satisfaction": ("string", "icb_outcome_satisfaction", "satisfaction about outcome (ICB EXSAT/OUTEVL)", "satisfaction quant à l'issue (ICB)", None, None),
-    "icb:tension_after_outcome": ("string", "icb_tension_after_outcome", "escalation or reduction of tension (ICB OUTESR)", "escalade ou réduction des tensions (ICB)", None, None),
-    "mid:hostility_level": ("string", "mid_hostility_level", "hostility level (MID HostLev)", "niveau d'hostilité (MID)", None, None),
-    "mid:highest_action": ("string", "mid_highest_action", "highest action / action (MID HiAct/Action)", "action la plus élevée (MID)", None, None),
-    "mid:fatality_level": ("string", "mid_fatality_level", "fatality level (MID Fatality)", "niveau de pertes (MID)", None, None),
-    "mid:reciprocated": ("string", "mid_reciprocated", "reciprocated dispute (MID Recip)", "différend réciproque (MID)", None, None),
+    "causdata:event_type": (
+        "string",
+        "causdata_event_type",
+        "event type (dataset kind)",
+        "type d'événement (jeu de données)",
+        None,
+        None,
+    ),
+    "causdata:coded_issue": (
+        "string",
+        "coded_issue",
+        "coded issue at stake (dataset coding, not a cause)",
+        "enjeu codé (codage du jeu de données, pas une cause)",
+        None,
+        None,
+    ),
+    "causdata:agreement_in_termination_window": (
+        "item",
+        "agreement_in_termination_window",
+        "peace agreement dated in the termination window (REVA pairing, not causal)",
+        "accord de paix daté dans la fenêtre de fin (appariement REVA, non causal)",
+        "termination_window_agreement_of",
+        "agreement dated in the termination window of",
+    ),
+    "icb:trigger_type": (
+        "string",
+        "icb_trigger_type",
+        "trigger type (ICB TRIGGR/BREAK)",
+        "type de déclencheur (ICB)",
+        None,
+        None,
+    ),
+    "icb:triggering_entity": (
+        "item",
+        "icb_triggering_entity",
+        "triggering entity (ICB TRIGENT)",
+        "entité déclenchante (ICB)",
+        "icb_triggered",
+        "triggered (ICB TRIGENT)",
+    ),
+    "icb:triggering_entity_kind": (
+        "string",
+        "icb_triggering_entity_kind",
+        "triggering entity kind (ICB TRIGENT 995/996/997)",
+        "nature de l'entité déclenchante (ICB)",
+        None,
+        None,
+    ),
+    "icb:trigger_location": (
+        "string",
+        "icb_trigger_location",
+        "external or internal trigger (ICB TRIGLOC)",
+        "déclencheur externe ou interne (ICB)",
+        None,
+        None,
+    ),
+    "icb:response_type": (
+        "string",
+        "icb_response_type",
+        "major response (ICB MAJRES)",
+        "réponse principale (ICB)",
+        None,
+        None,
+    ),
+    "icb:gravity": (
+        "string",
+        "icb_gravity",
+        "gravity of value threat (ICB GRAVCR/GRAVTY)",
+        "gravité de la menace (ICB)",
+        None,
+        None,
+    ),
+    "icb:violence": (
+        "string",
+        "icb_violence",
+        "violence in the crisis (ICB VIOL)",
+        "violence de la crise (ICB)",
+        None,
+        None,
+    ),
+    "icb:crisis_management": (
+        "string",
+        "icb_crisis_management",
+        "crisis management technique (ICB CRISMG)",
+        "technique de gestion de crise (ICB)",
+        None,
+        None,
+    ),
+    "icb:outcome_form": (
+        "string",
+        "icb_outcome_form",
+        "form of outcome (ICB FOROUT/OUTFOR)",
+        "forme de l'issue (ICB)",
+        None,
+        None,
+    ),
+    "icb:outcome_content": (
+        "string",
+        "icb_outcome_content",
+        "content of outcome (ICB SUBOUT/OUTCOM)",
+        "contenu de l'issue (ICB)",
+        None,
+        None,
+    ),
+    "icb:outcome_satisfaction": (
+        "string",
+        "icb_outcome_satisfaction",
+        "satisfaction about outcome (ICB EXSAT/OUTEVL)",
+        "satisfaction quant à l'issue (ICB)",
+        None,
+        None,
+    ),
+    "icb:tension_after_outcome": (
+        "string",
+        "icb_tension_after_outcome",
+        "escalation or reduction of tension (ICB OUTESR)",
+        "escalade ou réduction des tensions (ICB)",
+        None,
+        None,
+    ),
+    "mid:hostility_level": (
+        "string",
+        "mid_hostility_level",
+        "hostility level (MID HostLev)",
+        "niveau d'hostilité (MID)",
+        None,
+        None,
+    ),
+    "mid:highest_action": (
+        "string",
+        "mid_highest_action",
+        "highest action / action (MID HiAct/Action)",
+        "action la plus élevée (MID)",
+        None,
+        None,
+    ),
+    "mid:fatality_level": (
+        "string",
+        "mid_fatality_level",
+        "fatality level (MID Fatality)",
+        "niveau de pertes (MID)",
+        None,
+        None,
+    ),
+    "mid:reciprocated": (
+        "string",
+        "mid_reciprocated",
+        "reciprocated dispute (MID Recip)",
+        "différend réciproque (MID)",
+        None,
+        None,
+    ),
     "mid:outcome": ("string", "mid_outcome", "dispute outcome (MID Outcome)", "issue du différend (MID)", None, None),
-    "mid:settlement": ("string", "mid_settlement", "settlement of dispute (MID Settle)", "règlement du différend (MID)", None, None),
-    "ucdpterm:outcome": ("string", "ucdp_termination_outcome", "termination outcome (UCDP c_outcome)", "issue de la fin d'épisode (UCDP)", None, None),
-    "ucdppa:agreement_type": ("string", "ucdp_pa_type", "peace agreement type (UCDP pa_type)", "type d'accord de paix (UCDP)", None, None),
-    "ucdppa:inclusive": ("string", "ucdp_pa_inclusive", "comprehensive or dyadic agreement (UCDP inclusive)", "accord global ou dyadique (UCDP)", None, None),
-    "ucdppa:ceasefire_provision": ("string", "ucdp_pa_ceasefire", "ceasefire provision (UCDP cease)", "clause de cessez-le-feu (UCDP)", None, None),
-    "ucdppa:conflict": ("item", "ucdp_pa_conflict", "agreement of conflict (UCDP conflict_id)", "accord relatif au conflit (UCDP)", "ucdp_pa_of_conflict", "has peace agreement (UCDP)"),
-    "ucdppa:ended_on": ("time", "ucdp_pa_ended_on", "agreement ended on (UCDP duration)", "fin de l'accord (UCDP)", None, None),
+    "mid:settlement": (
+        "string",
+        "mid_settlement",
+        "settlement of dispute (MID Settle)",
+        "règlement du différend (MID)",
+        None,
+        None,
+    ),
+    "ucdpterm:outcome": (
+        "string",
+        "ucdp_termination_outcome",
+        "termination outcome (UCDP c_outcome)",
+        "issue de la fin d'épisode (UCDP)",
+        None,
+        None,
+    ),
+    "ucdppa:agreement_type": (
+        "string",
+        "ucdp_pa_type",
+        "peace agreement type (UCDP pa_type)",
+        "type d'accord de paix (UCDP)",
+        None,
+        None,
+    ),
+    "ucdppa:inclusive": (
+        "string",
+        "ucdp_pa_inclusive",
+        "comprehensive or dyadic agreement (UCDP inclusive)",
+        "accord global ou dyadique (UCDP)",
+        None,
+        None,
+    ),
+    "ucdppa:ceasefire_provision": (
+        "string",
+        "ucdp_pa_ceasefire",
+        "ceasefire provision (UCDP cease)",
+        "clause de cessez-le-feu (UCDP)",
+        None,
+        None,
+    ),
+    "ucdppa:conflict": (
+        "item",
+        "ucdp_pa_conflict",
+        "agreement of conflict (UCDP conflict_id)",
+        "accord relatif au conflit (UCDP)",
+        "ucdp_pa_of_conflict",
+        "has peace agreement (UCDP)",
+    ),
+    "ucdppa:ended_on": (
+        "time",
+        "ucdp_pa_ended_on",
+        "agreement ended on (UCDP duration)",
+        "fin de l'accord (UCDP)",
+        None,
+        None,
+    ),
 }
 #: Wikidata properties used as context / dates, with WDHARVEST's own definitions (registry/kg/properties.yaml).
 WIKIDATA_PIDS = ("P361", "P155", "P580", "P582", "P585", "P710")
@@ -424,7 +626,9 @@ def ensure_kg_properties(engine: Any) -> None:
     if len(props) != len(WIKIDATA_PIDS):
         raise ValueError(f"{WIKIDATA_PIDS} must all be in registry/kg/properties.yaml")
     props += [
-        KgProperty(pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv, inverse_label_en=ile)
+        KgProperty(
+            pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv, inverse_label_en=ile
+        )
         for p, (k, rp, le, lf, inv, ile) in CAUSDATA_PROPERTIES.items()
     ]
     register_properties(engine, props)
@@ -479,8 +683,15 @@ def load_kg(
             retrieved_at=retrieved_at,
             origin=origin,
         )
-        for k in ("entities_inserted", "entities_unchanged", "statements_inserted", "statements_unchanged",
-                  "statements_new_revision", "statements_conflicting", "statements_stale"):
+        for k in (
+            "entities_inserted",
+            "entities_unchanged",
+            "statements_inserted",
+            "statements_unchanged",
+            "statements_new_revision",
+            "statements_conflicting",
+            "statements_stale",
+        ):
             totals[k] += getattr(rep, k)
         rejected.update(rep.rejected_counts)
         sample.extend((r.reason, r.key) for r in rep.rejected[:5])
@@ -562,7 +773,9 @@ def count_atlas_rows(
     return out
 
 
-def read_csv_bytes(body: bytes, *, name: str, required: Sequence[str], encoding: str = "utf-8-sig") -> list[dict[str, str]]:
+def read_csv_bytes(
+    body: bytes, *, name: str, required: Sequence[str], encoding: str = "utf-8-sig"
+) -> list[dict[str, str]]:
     """Rows of a CSV body (declared encoding, strict) after checking the header has every required column."""
     import csv
     import io

@@ -42,6 +42,7 @@ const STYLE: cytoscape.StylesheetJson = [
   { selector: 'node.focal', style: { 'background-color': '#ffd166', width: 36, height: 36, 'font-size': 13, 'font-weight': 'bold' } },
   { selector: 'node.cause', style: { 'background-color': '#f08c5a', shape: 'round-rectangle' } },
   { selector: 'node.effect', style: { 'background-color': '#69b3e7', shape: 'round-rectangle' } },
+  { selector: 'node.both', style: { 'background-color': '#c3a6f2', shape: 'round-rectangle' } },
   {
     selector: 'edge',
     style: {
@@ -103,6 +104,8 @@ export default function CausalGraph({
       if (n.data('side') !== 'focal') cb.current.onOpenNode(String(n.id()));
     });
     cyRef.current = cy;
+    // read-only handle for the end-to-end suite (edge positions on the canvas); no behaviour depends on it
+    (el.current as HTMLDivElement & { __cy?: cytoscape.Core }).__cy = cy;
     return () => {
       cy.destroy();
       cyRef.current = null;
@@ -128,6 +131,7 @@ export default function CausalGraph({
       cy.zoom(1.3);
       cy.center();
     }
+    el.current?.setAttribute('data-edges', String(model.edges.length));
     if (!prefersReducedMotion()) {
       cy.edges().forEach((e, i) => {
         const o = Number(e.style('opacity'));

@@ -15,7 +15,8 @@ CCP in A-LAW). Definition (quoted from the archived page): coups are "illegal an
 military or other elites within the state apparatus to unseat the sitting executive"; "Successes are treated as
 episodes in which the perpetrators (or their agents) control power for at least 7 days." ``coup`` 2 =
 successful, 1 = failed. Country code = Correlates of War ``ccode`` (``ccode_gw``/``ccode_polity`` are empty in
-the 2026 file).
+the 2026 file; ``ccode_polity`` is filled in 8 rows -- Russia 1991 = 364, Pakistan 769, Sudan 626 -- and kept
+verbatim in flags).
 
 Outputs
 -------
@@ -28,8 +29,9 @@ Outputs
 * KG: one event entity per coup ``ptcoup:<ccode>:<YYYY-MM-DD>`` (kind ``event``; P&T has no event ids, and no
   two events share code and day), statements: ``coup:event_type`` = ``coup``, ``coup:outcome``, ``P585`` (point in
   time, day precision; what the causal grader reads), ``coup:against_state`` (the state the coup targeted: a
-  Wikidata QID through the crosswalk, else ``cow:<code>``). Leaders removed are linked by
-  :mod:`reva.adapters.connectors.atlas_leaders` (Archigos), never here: P&T do not code the leader.
+  Wikidata QID through the crosswalk, else ``cow:<code>``). P&T do not code the leader: leaders
+  removed in coups come from Archigos (:mod:`reva.adapters.connectors.atlas_leaders`, its own coup events), linked
+  to these events only by a context edge ``coup:same_state_and_day_as``.
 
 COW codes map to crosswalk entities through ``StateCodeCrosswalk`` (KGGEOPOL, date-aware, at the event day;
 countrycode 1.9.0 panel fetched and archived by every run). Historical states (South Vietnam 817, South Yemen
@@ -168,6 +170,7 @@ class CoupEvent:
     day: date
     coup: str  # "1" | "2"
     version: str
+    ccode_polity: str | None = None  # Polity IV code when P&T give one (8 rows in 2026), verbatim
 
     @property
     def outcome(self) -> str:
@@ -212,12 +215,15 @@ def parse_csv(body: bytes, *, strict: bool = True) -> list[CoupEvent]:
         if (cc, d) in seen:  # P&T have no event id: (code, day) must stay a key
             raise _drift(f"coup list lines {seen[(cc, d)]} and {i}: two events with the same code and day")
         seen[(cc, d)] = i
-        out.append(CoupEvent(i, (r["country"] or "").strip(), cc, d, coup, ver))
+        pol = (r.get("ccode_polity") or "").strip() or None
+        out.append(CoupEvent(i, (r["country"] or "").strip(), cc, d, coup, ver, pol))
     versions = {e.version for e in out}
     if len(versions) != 1:
         raise _drift(f"coup list: several dataset versions {sorted(versions)}")
     if strict and len(out) < MIN_ROWS_LIVE:
-        raise CoupParseError(f"coup list: {len(out)} rows < {MIN_ROWS_LIVE} (truncated?)", retryable=False, kind="incomplete")
+        raise CoupParseError(
+            f"coup list: {len(out)} rows < {MIN_ROWS_LIVE} (truncated?)", retryable=False, kind="incomplete"
+        )
     return out
 
 
@@ -230,6 +236,8 @@ def csv_file_name(url: str) -> str:
 
 def _base_flags(e: CoupEvent, res: Any) -> dict[str, Any]:
     flags: dict[str, Any] = {"pt_country": e.country, "cow_code": e.ccode, "code_resolution": res.reason}
+    if e.ccode_polity:
+        flags["pt_ccode_polity"] = e.ccode_polity
     if res.iso3 is None and res.label:
         flags["historical_state"] = res.label
     return flags
@@ -327,17 +335,61 @@ def country_year_rows(
 
 #: Dataset predicates: pid -> (value kind, reva predicate, en, fr, inverse name, inverse en, inverse fr)
 COUP_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None, str | None]] = {
-    "coup:event_type": ("string", "coup_event_type", "event type (coup dataset)", "type d'événement (coups)",
-                        None, None, None),
-    "coup:outcome": ("string", "coup_outcome", "coup outcome as coded (successful / failed)",
-                     "issue du coup d'État telle que codée (réussi / échoué)", None, None, None),
-    "coup:against_state": ("item", "coup_against_state", "coup attempt against the government of",
-                           "tentative de coup d'État contre le gouvernement de", "coup_attempt_in",
-                           "coup attempts in", "tentatives de coup d'État"),
-    "coup:leader_removed": ("item", "coup_leader_removed", "leader removed (coded by Archigos, same state and day)",
-                            "dirigeant renversé (codé par Archigos, même État et même jour)", "removed_in_coup",
-                            "removed in coup event", "renversé lors du coup d'État"),
-}  # fmt: skip
+    "coup:event_type": (
+        "string",
+        "coup_event_type",
+        "event type (coup dataset)",
+        "type d'événement (coups)",
+        None,
+        None,
+        None,
+    ),
+    "coup:outcome": (
+        "string",
+        "coup_outcome",
+        "coup outcome as coded (successful / failed)",
+        "issue du coup d'État telle que codée (réussi / échoué)",
+        None,
+        None,
+        None,
+    ),
+    "coup:against_state": (
+        "item",
+        "coup_against_state",
+        "coup attempt against the government of",
+        "tentative de coup d'État contre le gouvernement de",
+        "coup_attempt_in",
+        "coup attempts in",
+        "tentatives de coup d'État",
+    ),
+    "coup:leader_removed": (
+        "item",
+        "coup_leader_removed",
+        "leader removed from office by the coup (as coded by the dataset)",
+        "dirigeant renversé par le coup d'État (tel que codé par le jeu de données)",
+        "removed_in_coup",
+        "removed from office in coup",
+        "renversé lors du coup d'État",
+    ),
+    "coup:perpetrator_type": (
+        "string",
+        "coup_perpetrator_type",
+        "perpetrator type as coded (military / other government actors)",
+        "type d'auteur tel que codé (militaires / autres acteurs gouvernementaux)",
+        None,
+        None,
+        None,
+    ),
+    "coup:same_state_and_day_as": (
+        "item",
+        "coup_same_state_and_day_as",
+        "coded in the same state on the same day as (context, not identity)",
+        "codé dans le même État le même jour que (contexte, pas identité)",
+        "coup_same_state_and_day_as",
+        "coded in the same state on the same day as (context, not identity)",
+        "codé dans le même État le même jour que (contexte, pas identité)",
+    ),
+}
 
 
 def kg_properties() -> list[Any]:
@@ -346,10 +398,18 @@ def kg_properties() -> list[Any]:
     from reva.kg.model import KgProperty
 
     props = [
-        KgProperty(pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv,
-                   inverse_label_en=ile, inverse_label_fr=ilf)
+        KgProperty(
+            pid=p,
+            value_kind=k,
+            reva_predicate=rp,
+            label_en=le,
+            label_fr=lf,
+            inverse_name=inv,
+            inverse_label_en=ile,
+            inverse_label_fr=ilf,
+        )
         for p, (k, rp, le, lf, inv, ile, ilf) in COUP_PROPERTIES.items()
-    ]  # fmt: skip
+    ]
     return props + wikidata_time_properties()
 
 
@@ -382,25 +442,54 @@ def kg_records(
                 descriptions={"en": f"coup event as listed by Powell & Thyne ({e.version}); state: {place}"},
             )
         )
-        q = {"dataset_version": e.version, "pt_country": e.country, "cow_code": e.ccode}
+        q: dict[str, Any] = {"dataset_version": e.version, "pt_country": e.country, "cow_code": e.ccode}
+        if e.ccode_polity:
+            q["pt_ccode_polity"] = e.ccode_polity
         if page and page.note_date and e.day >= page.note_date and "tentative" in (page.note_text or "").lower():
             q["provisional"] = f"provider note ({page.note_date.isoformat()}): {page.note_text}"
         day = e.day.isoformat()
         sts += [
-            KgStatement(key=f"{eid}:type", subject=eid, property="coup:event_type",
-                        value={"type": "string", "value": "coup"}, qualifiers=q, raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"{eid}:outcome", subject=eid, property="coup:outcome",
-                        value={"type": "string", "value": e.outcome}, point_in_time=day, pit_precision=11,
-                        qualifiers={**q, "provider_code": e.coup, "definition_success": DEFINITION_SUCCESS},
-                        raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"{eid}:date", subject=eid, property="P585",
-                        value={"type": "time", "time": day, "precision": 11}, qualifiers=q,
-                        raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"{eid}:state", subject=eid, property="coup:against_state",
-                        object_qid=resolver.entity("cow", e.ccode, e.day, e.country), point_in_time=day,
-                        pit_precision=11, qualifiers={**q, "code_resolution": res.reason},
-                        raw_sha256=raw_sha256, selector=sel),
-        ]  # fmt: skip
+            KgStatement(
+                key=f"{eid}:type",
+                subject=eid,
+                property="coup:event_type",
+                value={"type": "string", "value": "coup"},
+                qualifiers=q,
+                raw_sha256=raw_sha256,
+                selector=sel,
+            ),
+            KgStatement(
+                key=f"{eid}:outcome",
+                subject=eid,
+                property="coup:outcome",
+                value={"type": "string", "value": e.outcome},
+                point_in_time=day,
+                pit_precision=11,
+                qualifiers={**q, "provider_code": e.coup, "definition_success": DEFINITION_SUCCESS},
+                raw_sha256=raw_sha256,
+                selector=sel,
+            ),
+            KgStatement(
+                key=f"{eid}:date",
+                subject=eid,
+                property="P585",
+                value={"type": "time", "time": day, "precision": 11},
+                qualifiers=q,
+                raw_sha256=raw_sha256,
+                selector=sel,
+            ),
+            KgStatement(
+                key=f"{eid}:state",
+                subject=eid,
+                property="coup:against_state",
+                object_qid=resolver.entity("cow", e.ccode, e.day, e.country),
+                point_in_time=day,
+                pit_precision=11,
+                qualifiers={**q, "code_resolution": res.reason},
+                raw_sha256=raw_sha256,
+                selector=sel,
+            ),
+        ]
     return ents, sts
 
 
@@ -432,10 +521,25 @@ def load_kg_records(
     chunks += [([], sts[i : i + MAX_STATEMENTS_PER_BATCH]) for i in range(0, len(sts), MAX_STATEMENTS_PER_BATCH)]
     for be, bs in chunks:
         used = sorted({s.raw_sha256 for s in bs if s.raw_sha256} or set(raw_sha256s))
-        rep = load_batch(engine, store, entities=be, statements=bs, source_key=source_key, raw_sha256s=used,
-                         retrieved_at=retrieved_at, origin=origin)  # fmt: skip
-        for k in ("entities_inserted", "entities_unchanged", "statements_inserted", "statements_unchanged",
-                  "statements_new_revision", "statements_conflicting", "statements_stale"):  # fmt: skip
+        rep = load_batch(
+            engine,
+            store,
+            entities=be,
+            statements=bs,
+            source_key=source_key,
+            raw_sha256s=used,
+            retrieved_at=retrieved_at,
+            origin=origin,
+        )
+        for k in (
+            "entities_inserted",
+            "entities_unchanged",
+            "statements_inserted",
+            "statements_unchanged",
+            "statements_new_revision",
+            "statements_conflicting",
+            "statements_stale",
+        ):
             totals[k] += getattr(rep, k)
         rejected.update(rep.rejected_counts)
         samples.extend((r.reason, r.key) for r in rep.rejected[:5])
@@ -480,13 +584,18 @@ def build(
 
 async def fetch_coup_list(run: Any) -> tuple[Any, Any, PageInfo]:
     """Page + newest CSV through the run's client (not archived yet: callers archive after parsing)."""
-    page_raw = await run.get(PAGE_URL, key="powell_thyne:coups_page", media_types=("text/html",),
-                             max_bytes=MAX_PAGE_BYTES)  # fmt: skip
+    page_raw = await run.get(
+        PAGE_URL, key="powell_thyne:coups_page", media_types=("text/html",), max_bytes=MAX_PAGE_BYTES
+    )
     page = parse_page(page_raw.body)
     if not page.csv_url.startswith(f"https://{HOST}/"):
         raise _drift("coup list link leaves the provider host")
-    csv_raw = await run.get(page.csv_url, key=f"powell_thyne:{page.csv_stamp}",
-                            media_types=("text/csv", "application/octet-stream"), max_bytes=MAX_CSV_BYTES)  # fmt: skip
+    csv_raw = await run.get(
+        page.csv_url,
+        key=f"powell_thyne:{page.csv_stamp}",
+        media_types=("text/csv", "application/octet-stream"),
+        max_bytes=MAX_CSV_BYTES,
+    )
     return page_raw, csv_raw, page
 
 
@@ -547,16 +656,24 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         f"Powell & Thyne coup list {out['version']} ({csv_file_name(page.csv_url)}), "
         f"{res['years'][0]}-{res['years'][1]}, COW codes"
     )
-    rights = {**RIGHTS, "definition_coup": page.definition_coup, "definition_success": page.definition_success,
-              "definition_evidence_sha256": page_sha}  # fmt: skip
+    rights = {
+        **RIGHTS,
+        "definition_coup": page.definition_coup,
+        "definition_success": page.definition_success,
+        "definition_evidence_sha256": page_sha,
+    }
     for ds, cov in (
         ("coup_events", note + "; one row per listed event (value 2 = successful, 1 = failed)"),
-        ("coups_cy", "COMPUTED from the " + note + "; exact counts of listed events per country-year, only "
-         "country-years with at least one event"),
-    ):  # fmt: skip
+        (
+            "coups_cy",
+            "COMPUTED from the " + note + "; exact counts of listed events per country-year, only "
+            "country-years with at least one event",
+        ),
+    ):
         if run.wants(ds):
-            r = run.register(dataset=ds, frame=atlas_frame(out[ds]), raw_sha256s=[sha], rights=rights,
-                             coverage_note=cov)  # fmt: skip
+            r = run.register(
+                dataset=ds, frame=atlas_frame(out[ds]), raw_sha256s=[sha], rights=rights, coverage_note=cov
+            )
             res["atlas"][ds] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
     res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
     if run.dataset is None and kg_available(run.engine):

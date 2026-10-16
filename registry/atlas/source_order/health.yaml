@@ -12,8 +12,31 @@ concepts:
         justification: "UN WPP 2024 \"Life expectancy at birth, both sexes\" (estimates 1950-2023): the reference series."
       - series: "wb.wdi_social.SP.DYN.LE00.IN"
         justification: >-
-          WDI "Life expectancy at birth, total (years)" is derived from the UN WPP (with national sources for a
-          few economies) — the same definition and model.
+          WDI "Life expectancy at birth, total (years)" is derived from the UN WPP (with national sources for some
+          economies: Eurostat, national statistical offices, U.S. Census Bureau) — the same definition; the
+          national life tables are another estimate (review V3b, 2023: 10 countries differ from WPP by more than
+          1 year). It answers only where WPP has no estimate; every switch is flagged source_break.
+        not_equivalent_for:
+          - iso3: [FRA]
+            reason: >-
+              Territorial scope: WPP "France" is metropolitan France (the overseas departments are separate WPP
+              locations and REVA entities); the WDI value for France covers France including the overseas
+              departments (national/Eurostat life tables).
+          - iso3: [MDA]
+            reason: >-
+              Territorial scope: WPP "Republic of Moldova" includes Transnistria; the WDI follows the National
+              Bureau of Statistics of Moldova, which excludes it (the WDI population differs by -20 % in 2023).
+        cell_rules:
+          - estimate_kind: projection_upstream
+            year_after: 2023
+            upstream: "UN WPP 2024, medium-variant projection (republished by the World Bank)"
+            label: {fr: "projection (ONU WPP via la Banque mondiale)", en: "projection (UN WPP via World Bank)"}
+            basis: >-
+              WDI SP.DYN.LE00.IN source note: "(1) United Nations Population Division. World Population Prospects:
+              2024 Revision. (2) Statistical databases and publications from national statistical offices ...".
+              WPP 2024 estimates end in 2023, so a WDI value after 2023 is, for most economies, the WPP projection
+              (review V3b: WDI 2024 within 0.01 years of the WPP 2024 projection for 162 of 216 countries); the WDI
+              does not say per economy which source it used, so every value after 2023 is treated as one.
       - series: "undp.hdr25.le"
         justification: >-
           UNDP HDR 2025 life expectancy (HDI component) is taken from UN WPP 2024 per the HDR25 codebook — the same
@@ -28,6 +51,11 @@ concepts:
       - series: spc.pocket.LEBM / spc.pocket.LEBF
         reason: Sex-specific values only; a both-sexes value is not published in the pocket summary (never averaged by
           REVA).
+    caveats: >-
+      WPP estimates (1950-2023) answer first; WDI values after 2023 are the WPP 2024 projection for most economies
+      (estimate_kind projection_upstream: excluded by default, shown flagged when projections are requested).
+      FRA and MDA are never answered by the WDI (territorial scope); every other change of source within a
+      country's series is flagged source_break with both values of the overlap year.
     related_catalog_concepts: [un.wpp.life_expectancy, health.life_expectancy_birth, quality_of_life.le]
 
   - id: reva.health.life_expectancy_national_tables

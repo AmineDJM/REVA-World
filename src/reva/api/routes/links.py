@@ -53,9 +53,33 @@ FACET_PATTERN = r"^[a-z][a-z0-9_]{0,31}=[A-Za-z0-9_.-]{1,32}$"
 LINK_KIND_PATTERN = r"^[a-z][a-z0-9_]{1,63}$"
 DERIVED_WARNING = s.ApiWarning(
     code="derived_index",
-    message="unga_vote_agreement is computed by REVA (share of identical votes, formula and counts in basis); "
-    "it is not an alliance, friendship or alignment of interests.",
+    message="unga_vote_agreement is computed by REVA (strict share of identical votes: abstain vs yes/no counts 0; "
+    "not Voeten/Bailey's 'agree' index, which gives half credit to abstentions, so values are not comparable with "
+    "it; formula, counts and the years used in basis); it is not an alliance, friendship or alignment of interests.",
 )
+
+
+def _licence_warning(links: list[dict[str, Any]]) -> list[s.ApiWarning]:
+    """LIC-2: one warning naming the restricted terms (non-commercial, not open) stored on the returned links."""
+    terms: dict[str, set[str]] = {}
+    for lk in links:
+        b = lk.get("basis") or {}
+        lic = b.get("licence")
+        if not isinstance(lic, str) or not lic:
+            continue
+        if b.get("open_licence") is False or re.search(r"non[- ]?commercial|by-nc|not an open", lic, re.I):
+            terms.setdefault(lic, set()).add(str(lk.get("link_type")))
+    if not terms:
+        return []
+    msg = "; ".join(f"{', '.join(sorted(k))}: {lic}" for lic, k in sorted(terms.items()))
+    return [
+        s.ApiWarning(
+            code="licence_restricted",
+            message=("Some links come from data under restricted terms (reuse must respect them): " + msg)[:1000],
+        )
+    ]
+
+
 LINK_WARNING = s.ApiWarning(
     code="link_not_causal",
     message="A link says 'connected via', never 'because'; missing data gives no link (never a zero-weight link).",
@@ -305,6 +329,7 @@ def get_pair_links(
     env["warnings"].insert(0, LINK_WARNING)
     if "unga_vote_agreement" in data["kinds"]:
         env["warnings"].append(DERIVED_WARNING)
+    env["warnings"].extend(_licence_warning([lk for k in data["kinds"].values() for lk in k["links"]]))
     if data["truncated"]:
         env["warnings"].append(
             s.ApiWarning(code="truncated", message=("bounded read: " + ", ".join(data["truncated"]))[:500])
@@ -372,11 +397,17 @@ def get_country_links(
     env["warnings"].insert(0, LINK_WARNING)
     if "unga_vote_agreement" in data.get("by_kind", {}):
         env["warnings"].append(DERIVED_WARNING)
+    env["warnings"].extend(_licence_warning(data["links"]))
     if data.get("truncated"):
         env["warnings"].append(
             s.ApiWarning(
                 code="truncated",
-                message=f"neighbourhood read bounded at {len(data.get('truncated_nodes') or [])} node(s): "
+                message=(
+                    "bounded atlas read (row cap reached; the oldest and smallest rows were left out, the latest "
+                    "period is ranked over what was read): " + ", ".join(data["truncated_kinds"])
+                )[:500]
+                if data.get("truncated_kinds")
+                else f"neighbourhood read bounded at {len(data.get('truncated_nodes') or [])} node(s): "
                 "links beyond the read caps are not listed",
             )
         )

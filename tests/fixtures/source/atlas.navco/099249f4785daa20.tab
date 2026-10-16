@@ -1,0 +1,46 @@
+NAVCOID	CAMPAIGN	LOCATION	BYEAR	EYEAR	TARGET	SUCCESS	LIMITED	FAILURE	ONGOING	NONVIOL	VIOL	REGCHANGE	FSELFDET	SECESSION	OTHER	DURATION	PARTICIPATION	PERCENTAGEPOPULARPARTICIPATION	REGVIOL	DEFECT	VIOLENTFLANK	VIOLSIM	REGAID	STATESUP
+4.0	"Afghans"	"Afghanistan"	1978.0	1979.0	"Afghan government"	1.0	0.0	0.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	613.0	10000.0	6.41025641025641E-4	1.0	1.0		1.0	1.0	1.0
+3.0	"Afghan resistance"	"Afghanistan"	1980.0	1989.0	"Soviet occupation"	1.0	0.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	3281.0	10000.0	6.849315068493151E-4	1.0	0.0		1.0	0.0	1.0
+218.0	"Taliban/anti-government forces"	"Afghanistan"	1992.0	1996.0	"Afghan regime"	1.0	0.0	0.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	1370.0	20000.0	8.928571428571428E-4	1.0	0.0		1.0	0.0	0.0
+217.0	"Taliban"	"Afghanistan"	2001.0	2014.0	"Afghan government"	0.0	0.0	1.0	1.0	0.0	1.0	1.0	0.0	0.0	0.0	4391.0	60000.0	0.001625087494033559	1.0	1.0		1.0	1.0	0.0
+405.0	"Myanmar Regime Change Campaign"	"Burma/Myanmar"	1948.0	1962.0	"Burmese government"	0.0	0.0	1.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	5475.0	25000.0	0.0011	1.0	0.0		1.0	1.0	0.0
+408.0	"Karens"	"Burma/Myanmar"	1948.0	2013.0	"Burmese government"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	16852.0	10000.0	2.3412501849880303E-4	1.0	0.0		0.0	1.0	0.0
+406.0	"Myanmar Regime Change Campaign"	"Burma/Myanmar"	1962.0	1988.0	"Burmese government"	0.0	0.0	1.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	9855.0	50000.0	0.0013	1.0	0.0		1.0	1.0	0.0
+349.0	"Naga Insurgency"	"Burma/Myanmar"	1988.0	2014.0	"Burmese and Indian rule"	0.0	0.0	1.0	1.0	0.0	1.0	0.0	0.0	1.0	0.0	9848.0	2000.0	3.710771073366879E-5	1.0	0.0		1.0	0.0	0.0
+407.0	"Myanmar Regime Change Campaign"	"Burma/Myanmar"	1988.0	2014.0	"Burmese government"	0.0	0.0	1.0	1.0	0.0	1.0	1.0	0.0	0.0	0.0	9490.0	36000.0	7.0E-4	1.0	0.0		1.0	1.0	0.0
+273.0	"Saffron Revolution"	"Burma/Myanmar"	2007.0	2007.0	"Government"	0.0	0.0	1.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	41.0	130000.0	0.002627337339928462	1.0	0.0	0.0	1.0	0.0	0.0
+425.0	"Chinese communist movement"	"China"	1946.0	1949.0	"Kuomintang regime"	1.0	0.0	0.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	8250.0	1000000.0	0.0018461424852770137	1.0	1.0		0.0	0.0	1.0
+216.0	"Taiwanese Revolt"	"China"	1947.0	1947.0	"Chinese occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	21.0	30000.0	5.511068982050448E-5	1.0	0.0		0.0	0.0	0.0
+92.0	"Hundred Flowers Movement"	"China"	1956.0	1957.0	"Communist regime"	0.0	0.0	1.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	455.0	550000.0	8.688783570300158E-4	1.0	0.0	0.0	0.0	0.0	0.0
+228.0	"Tibetan resistance"	"China"	1956.0	1959.0	"Chinese occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	1139.0	22500.0	3.4403669724770645E-5	1.0	0.0		0.0	0.0	0.0
+63.0	"Cultural Revolution Red Guards"	"China"	1967.0	1968.0	"anti-Maoists"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	0.0	1.0	601.0	1000000.0	0.001288659793814433	0.0	0.0		1.0	0.0	0.0
+66.0	"Democracy Movement"	"China"	1976.0	1979.0	"Communist regime"	0.0	0.0	1.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	1365.0	100000.0	1.0288065843621399E-4	1.0	0.0	0.0	0.0	0.0	0.0
+226.0	"Tiananmen Square"	"China"	1989.0	1989.0	"Communist regime"	0.0	0.0	1.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	49.0	1000000.0	8.928571428571428E-4	1.0	0.0	0.0	0.0	0.0	0.0
+64.0	"Czech uprising"	"Czechoslovakia"	1968.0	1968.0	"Soviet occupation"	0.0	0.0	1.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	228.0		0.0	1.0	0.0	0.0	0.0	0.0	0.0
+240.0	"Velvet Revolution"	"Czechoslovakia"	1989.0	1989.0	"Communist regime"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	24.0	500000.0	0.04854368932038835	1.0	0.0	0.0	0.0	1.0	0.0
+392.0	"First Southern Ossetian Separatist Campaign"	"Georgia"	1991.0	1992.0	"Gov't of Georgia"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	536.0	3000.0	5.612066991617817E-4	1.0	0.0		1.0	0.0	1.0
+329.0	"Georgia-Abkhazia War"	"Georgia"	1992.0	1994.0	"Georgian occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	840.0	5750.0	0.001182738193187428	1.0	0.0		1.0	1.0	1.0
+183.0	"Rose Revolution"	"Georgia"	2003.0	2003.0	"Shevardnadze regime"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	19.0	200000.0	0.046500813764240874	0.0	1.0	0.0	0.0	0.0	1.0
+332.0	"Anti-Saakashvili Campaign"	"Georgia"	2007.0	2013.0	"Government of Georgia"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	2186.0	50000.0	0.011400207711784509	1.0	0.0	0.0	0.0	0.0	0.0
+434.0	"Third South Ossetian Campaign"	"Georgia"	2008.0	2008.0	"Georgian government"	1.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	8.0	73000.0	0.016807535301580138	1.0	0.0		0.0	1.0	1.0
+83.0	"Franco-Madagascan"	"Madagascar"	1947.0	1948.0	"French occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	613.0	5500.0	0.0013365735115431349	1.0	0.0		0.0	0.0	0.0
+271.0	"Anti-Tsiranana"	"Madagascar"	1972.0	1972.0	"Tsiranana regime"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	6.0	100000.0	0.014119447703683622	0.0	0.0	0.0	0.0	0.0	0.0
+1.0	"Active Voices"	"Madagascar"	1991.0	1993.0	"Didier Radsiraka"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	611.0	400000.0	0.031557040138977206	1.0	0.0	0.0	0.0	0.0	0.0
+130.0	"pro-democracy movement"	"Madagascar"	2002.0	2002.0	"Radsiraka regime"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	158.0	500000.0	0.02982383003948019	0.0	0.0	0.0	0.0	0.0	0.0
+272.0	"anti-Ravalomanana movement"	"Madagascar"	2009.0	2009.0	"Ravalomanana government"	1.0	0.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	53.0	30000.0	0.001458496938201686	1.0	1.0	0.0	0.0	1.0	0.0
+185.0	"pro-dem movement"	"Russia"	1990.0	1991.0	"Anti-coup"	1.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	1.0	564.0	700000.0	0.004709871891484552	1.0	1.0	0.0	0.0	1.0	0.0
+399.0	"Anti-Yeltsin"	"Russia"	1993.0	1993.0	"Gov't of Russia (Yeltsin)"	0.0	0.0	1.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	12.0	10000.0	6.736918761470572E-5	1.0	0.0		0.0	0.0	0.0
+55.0	"Chechen separatists"	"Russia"	1994.0	2009.0	"Russian occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	1.0	0.0	5240.0	15000.0	1.0505280016768108E-4	1.0	1.0		1.0	0.0	0.0
+343.0	"Caucasus Emirate"	"Russia"	2007.0	2014.0	"Russian goverment"	0.0	0.0	1.0	1.0	0.0	1.0	0.0	0.0	1.0	0.0	2275.0	1000.0	6.946146781014227E-6	1.0	0.0	0.0	1.0	0.0	0.0
+335.0	"Snow Revolution"	"Russia"	2010.0	2014.0	"Putin"	0.0	0.0	1.0	1.0	1.0	0.0	1.0	0.0	0.0	0.0	1442.0	160000.0	0.0011113834849622764	1.0	0.0	0.0	0.0	0.0	0.0
+141.0	"Muslim Brotherhood"	"Syria"	1980.0	1982.0	"Syrian regime"	0.0	0.0	1.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	784.0	30000.0	0.0031879304104545413	1.0	0.0		0.0	0.0	0.0
+282.0	"Syrian Civil War"	"Syria"	2011.0	2014.0	"Assad regime"	0.0	0.0	1.0	1.0	0.0	1.0	1.0	0.0	0.0	0.0	792.0	140000.0	0.007656797401195456	1.0	1.0	0.0	0.0	1.0	1.0
+282.0	"Syrian Uprising"	"Syria"	2011.0	2011.0	"Assad regime"	0.0	0.0	1.0	0.0	1.0	0.0	1.0	0.0	0.0	0.0	230.0	100000.0	0.0047929463933389935	1.0	1.0	1.0	1.0	1.0	1.0
+356.0	"Islamic State"	"Syria"	2013.0	2014.0	"Syrian government"	0.0	0.0	1.0	1.0	0.0	1.0	1.0	0.0	0.0	0.0	267.0	25000.0	0.0012375270269715055	1.0	0.0		1.0	1.0	1.0
+227.0	"Tibetan independence movement"	"Tibet"	1987.0	1989.0	"Chinese occupation"	0.0	0.0	1.0	0.0	1.0	0.0	0.0	1.0	0.0	0.0	525.0	10000.0	8.92857142857143E-6	1.0	0.0	0.0	0.0	1.0	0.0
+238.0	"Ukrainian rebellion"	"USSR"	1946.0	1951.0	"Communist regime"	0.0	0.0	1.0	0.0	0.0	1.0	1.0	0.0	0.0	0.0	2190.0	50000.0	4.807692307692308E-4	1.0	0.0		1.0	0.0	0.0
+242.0	"West Papua rebels"	"West Papua"	1965.0	1978.0	"Indonesian occupation"	0.0	0.0	1.0	0.0	0.0	1.0	0.0	1.0	0.0	0.0	4645.0	10000.0	6.802721088435374E-5	1.0	0.0		1.0	0.0	0.0
+242.0	"West Papua self-determination struggle"	"West Papua"	1979.0	2014.0	"Indonesian occupation"	0.0	0.0	1.0	1.0	1.0	0.0	0.0	1.0	0.0	0.0	12783.0	10000.0	3.7481964615676055E-5	1.0	0.0	1.0	1.0	0.0	0.0
+	""	""			""																			
+	""	""			""																			
+	""	""			""																			

@@ -1,0 +1,133 @@
+# Coded relations of the economic / financial crisis datasets (owner: agent A-ECRISES).
+#
+# Every relation REVA records from these datasets is listed here with the codebook text that justifies it.
+# REVA asserts nothing: each relation names its asserting source (dataset file, sheet/cell, raw sha256) and is
+# loaded by the causal loader (CAUSCORE) from the evidence datasets ecrises.<source>.coded_relations
+# (concept causal.coded_relations; columns: relation_id, family, relation, subject_id, object_id, tier, rule_id,
+# coded_as, polarity, mechanism, qualifiers, asserting_source, raw_sha256).
+#
+# Policy applied (docs/roadmap/v3_causality.md):
+#   * a CAUSAL relation only where the codebook defines the coded field as the factor/trigger/outcome of the event;
+#   * co-occurrence windows ("twin crises") and plain sequences are CONTEXT edges (same_period / follows), never
+#     causal;
+#   * free narrative text (crisis descriptions, RR notes, JST chronology) is never mined here (candidate space,
+#     CAUSCAND), and is kept verbatim as event attributes only.
+version: 1
+owner: A-ECRISES
+connector: src/reva/adapters/connectors/atlas_ecrises.py
+rules:
+  - id: esrb_fcdb_accelerator
+    source_key: esrb.fcdb
+    dataset: "ESRB European financial crises database (esrb.fcdb20220120.en.xlsx), sheets 'Systemic crises' and 'Residual events'"
+    field: "Accelerator and motivation"
+    family: causal
+    relation: contributing_factor
+    polarity: promotes
+    tier: T1
+    cause: "condition entity ecrises:condition:esrb_objective:<objective> (one of the five ESRB intermediate macroprudential objectives)"
+    effect: "the ESRB event (ecrises:esrb:<systemic|residual>:<ISO3>:<YYYY-MM>)"
+    codebook: >-
+      ESRB Occasional Paper No 13 (2017), Annex A: "Accelerator and motivation - Indicator of one or more of the five
+      ESRB intermediate macroprudential objectives (excessive credit growth and leverage, mismatches and market
+      illiquidity, exposure concentration, misaligned incentives, infrastructure resilience) - see the Recommendation
+      of the ESRB of 4 April 2013 on intermediate objectives and instruments of macroprudential policy (ESRB/2013/1)."
+    rationale: >-
+      The codebook defines the field as the coded set of vulnerabilities that accelerated the event (assessed by the
+      national authorities). "Accelerator" is weaker than a cause: it maps to the weakest causal relation of the
+      closed vocabulary, contributing_factor (polarity promotes), never to has_cause / immediate_cause.
+    extraction: >-
+      Only the part of the cell before "Motivation:" is read; an objective is coded when its name appears there
+      (case-insensitive patterns: "excessive credit growth", the word "mismatches", "exposure concentration",
+      "misaligned incentives", "infrastructure resilience"). Cells naming no objective (e.g. "Exogenous health crisis
+      due to Covid-19 outbreak", "External shock.", "Transition crisis.", "Accelerator: tensions in sovereign bonds
+      markets in the euro area.") produce no claim and are listed in the build report (accelerator_not_coded).
+    mechanism: the whole cell text, verbatim (accelerator and motivation)
+    temporal_check: undetermined (the condition is undated in the source)
+  - id: lv2020_twin_banking_currency
+    source_key: laeven_valencia.sbcd
+    dataset: "Laeven & Valencia (2020) data file, sheet 'Crisis Frequency', footnote 1/"
+    family: context
+    relation: same_period
+    tier: T1
+    subject: "systemic banking crisis starting in year t"
+    object: "currency crisis starting in [t-1, t+1], same country"
+    codebook: >-
+      "1/ Twin crisis indicates banking crisis in year t and a currency or sovereign crisis during [t-1, t+1],
+      excluding triple crises."
+    rationale: >-
+      A coded coincidence window, not a sequence or a cause (WP/18/206 section IV: banking and currency/sovereign
+      crises "can coincide, either because the entire economy is hit by a large shock, or because there are sizeable
+      spillovers" - explicitly undecided). Context edge only.
+    derivation: >-
+      The data file gives the twin/triple counts per year, not the pairs: REVA applies the published definition to
+      the published crisis years (sheet 'Crisis Years') and checks the per-year totals against the authors'
+      counts. Result 2026-10-16: triple 11/11, banking-sovereign 3/3, currency-sovereign 20/20 match;
+      banking-currency 32 vs 31 (1992: 3 vs 2), consistent with the authors' yearly currency count for 1992 (6
+      published vs 9 listed in 'Crisis Years'). Each edge carries published_count_check.
+  - id: lv2020_twin_banking_sovereign
+    source_key: laeven_valencia.sbcd
+    family: context
+    relation: same_period
+    tier: T1
+    subject: "systemic banking crisis starting in year t"
+    object: "sovereign debt crisis in [t-1, t+1], same country"
+    codebook: "footnote 1/ (as above)"
+    rationale: "as lv2020_twin_banking_currency"
+  - id: lv2020_twin_currency_sovereign
+    source_key: laeven_valencia.sbcd
+    family: context
+    relation: same_period
+    tier: T1
+    subject: "currency crisis starting in year t"
+    object: "sovereign debt crisis in [t-1, t+1], same country"
+    codebook: >-
+      "For twin crises comprising currency and sovereign crises, we look for currency crises in year t and sovereign
+      crises in [t-1, t+1], excluding triple crises." (REVA reading: a currency crisis that belongs to a triple
+      crisis is excluded; this reading reproduces the authors' counts exactly.)
+    rationale: "as lv2020_twin_banking_currency"
+  - id: lv2020_triple
+    source_key: laeven_valencia.sbcd
+    family: context
+    relation: same_period
+    tier: T1
+    subject: "systemic banking crisis starting in year t"
+    object: "each currency crisis and each sovereign debt crisis in [t-1, t+1], same country"
+    codebook: >-
+      "2/ Triple crisis indicates banking crisis in year t and currency crisis during [t-1, t+1] and debt crisis
+      during [t-1, t+1]."
+    rationale: "as lv2020_twin_banking_currency"
+not_mapped:
+  - source_key: laeven_valencia.sbcd
+    field: "Sovereign Debt Restructuring (year) vs Sovereign Debt Crisis (year)"
+    reason: >-
+      The authors date defaults and restructurings separately but do not pair a restructuring with a specific
+      default (Argentina: crises 1982, 1989, 2001, 2014; restructurings 1993, 2005, 2016). Pairing them would be
+      REVA's inference: no coded_outcome, no follows edge. Both are events of their own.
+  - source_key: laeven_valencia.sbcd
+    field: "WP/18/206 Figure 5 sequencing (currency and sovereign crises 'tend to coincide or follow banking crises')"
+    reason: an aggregate statistical pattern, not a coded relation between dated events
+  - source_key: laeven_valencia.sbcd
+    field: "Additional Details-Bk Crises / Brief description of crisis"
+    reason: free narrative text (kept verbatim as the event description; candidate space only)
+  - source_key: reinhart_rogoff.bffs
+    field: "Banking_Crisis_Notes, Domestic_Debt_ Notes/Sources, Defaults_External_Notes"
+    reason: >-
+      Free notes (e.g. "Oil and interest rate shocks", "Depression") with no codebook definition as causes; kept
+      verbatim as atlas text and event attributes only.
+  - source_key: reinhart_rogoff.bffs
+    field: "co-occurring banking / currency / default years"
+    reason: RR code no twin or sequence relation; no context edge is derived
+  - source_key: jst.macrohistory
+    field: "crisisJST; JST Financial Crisis Chronology narratives and 'Reason:' comparison notes"
+    reason: start-year dummy only; the narratives are free text (not fetched, not mined)
+  - source_key: esrb.fcdb
+    field: "Domestic vs imported (0 domestic, 1 abroad, 2 both)"
+    reason: >-
+      Codes where the event originated but names no originating event: an event attribute
+      (attributes.domestic_vs_imported), not an edge.
+  - source_key: esrb.fcdb
+    field: "Currency / BoP / Capital flow, Sovereign, Banking, Significant asset price correction, Transition"
+    reason: the codebook defines them as symptoms/categories of the event (attributes.categories), not as relations
+  - source_key: esrb.fcdb
+    field: "Date of the first default / debt restructuring / recapitalisation"
+    reason: a coded date of the event (KG ecrises:coded_date), not a separate event

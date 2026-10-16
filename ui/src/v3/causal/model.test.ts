@@ -75,7 +75,7 @@ describe('views', () => {
     expect(g.edges.some((e) => e.claim.stance === 'denies')).toBe(false);
     const n = new Map(g.nodes.map((x) => [x.id, x]));
     expect(n.get('fixture:sarajevo_1914')!.x).toBeLessThan(0);
-    expect(n.get('fixture:versailles')!.side).toBe('cause'); // Versailles is also an asserted (inconsistent) cause
+    expect(n.get('fixture:versailles')!.side).toBe('both'); // asserted as an effect and as an (inconsistent) cause: middle column
     expect(n.get('fixture:armistice_1918')!.x).toBeGreaterThan(0);
     expect(g.edges.find((e) => e.id === F.C_UNGRADED.claim_key)!.grade).toBeNull();
   });

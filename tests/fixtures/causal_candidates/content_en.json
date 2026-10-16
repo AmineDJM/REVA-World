@@ -1,0 +1,29 @@
+{
+ "batchcomplete": true,
+ "query": {
+  "pages": [
+   {
+    "pageid": 32927,
+    "ns": 0,
+    "title": "World War II",
+    "pageprops": {
+     "wikibase_item": "Q362"
+    },
+    "revisions": [
+     {
+      "revid": 1379691426,
+      "parentid": 0,
+      "timestamp": "2026-10-11T10:27:00Z",
+      "slots": {
+       "main": {
+        "contentmodel": "wikitext",
+        "contentformat": "text/x-wiki",
+        "content": "== War breaks out in Europe (1939–1940) ==\nIn August 1940, Hitler imposed the [[Second Vienna Award]] on Romania which led to the transfer of [[Northern Transylvania]] to Hungary.\n\n== Western Europe (1940–1941) ==\n[[Norway Debate|British discontent over the Norwegian campaign]] led to the resignation of Prime Minister [[Neville Chamberlain]], who was replaced by [[Winston Churchill]] on 10{{spaces}}May 1940.\n\n== Aftermath ==\nA [[denazification]] program in Germany led to the prosecution of Nazi war criminals in the [[Nuremberg trials]] and the removal of ex-Nazis from power, although this policy moved towards amnesty and re-integration of ex-Nazis into West German society.\n\n== References ==\n[[Appeasement]] led to [[Munich Agreement]].\n{{Reflist}}\n[[Category:World War II]]\n"
+       }
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

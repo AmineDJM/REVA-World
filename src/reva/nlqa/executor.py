@@ -28,10 +28,13 @@ from typing import Any
 from reva.nlqa.catalog import QaCatalog, fold
 from reva.nlqa.plan import PlanOp, QueryPlan
 from reva.nlqa.ports import (
+    CLAIM_TIERS,
     AtlasCell,
     AtlasResult,
     Backends,
     CapabilityUnavailable,
+    CausalChain,
+    CausalClaim,
     CountryLink,
     Entity,
     EntityMatch,
@@ -50,6 +53,9 @@ MAX_STATEMENTS = 25
 MAX_TIMELINE = 30
 MAX_PATHS = 3
 MAX_SERIES_POINTS = 60
+#: Causal claims read per ``why`` (the answer words at most :data:`reva.nlqa.compose.MAX_CAUSAL_SENTENCES`).
+MAX_CAUSAL_CLAIMS = 60
+MAX_CAUSAL_CHAINS = 3
 #: ``atlas_value`` with ``country=ALL``: one year only, at most this many cells as evidence (SEC-1).
 MAX_ALL_CELLS = 300
 #: Wall-clock budget of one question's execution; operations started after it are not run (SEC-1).
@@ -222,6 +228,49 @@ class Evidence:
                 "supporting_evidence": list(cited),
                 "citation": {"source": link.source or link.derived_by, "status": "derived_link"},
                 **extra,
+            },
+        )
+
+    def claim(self, c: CausalClaim) -> str:
+        """A causal claim *made by a named source* (never REVA's): its source, tier, statement or dataset row,
+        revision, raw artifact, grade with rule ids, temporal check, corroboration and contesting claims."""
+        wd = c.source_key.startswith("wikidata")
+        stmt_subject = c.statement_id.split("$")[0] if c.statement_id and "$" in c.statement_id else None
+        return self._add(
+            ("causal_claim", c.claim_key),
+            {
+                "kind": "causal_claim",
+                "claim_key": c.claim_key,
+                "cause": {"id": c.cause_id, "labels": dict(c.cause_labels)},
+                "effect": {"id": c.effect_id, "labels": dict(c.effect_labels)},
+                "relation": c.relation,
+                "lane": c.lane,
+                "stance": c.stance,
+                "polarity": c.polarity,
+                "mechanism": c.mechanism,
+                "grade": c.grade,
+                "grade_rules": list(c.grade_rules),
+                "rules_version": c.rules_version,
+                "temporal_check": c.temporal_check,
+                "corroboration": c.corroboration,
+                "contested_by": list(c.contested_by),
+                "review_status": c.review_status,
+                "origin": c.origin,
+                "citation": {
+                    "source": c.source_key,
+                    "tier": c.tier,
+                    "dataset": c.dataset,
+                    "statement_id": c.statement_id,
+                    "selector": dict(c.selector) if c.selector else None,
+                    "revision": c.source_revision,
+                    **(wikidata_urls(stmt_subject or c.effect_id, None, c.source_revision) if wd else {}),
+                    "raw_sha256": c.raw_sha256,
+                    "reference": dict(c.citation) if c.citation else None,
+                    "codebook": dict(c.codebook) if c.codebook else None,
+                    "references": [dict(r) for r in c.references][:10],
+                    "origin": c.origin,
+                    "status": "community_edited" if wd else "source_reported",
+                },
             },
         )
 
@@ -449,7 +498,70 @@ class Executor:
             return OpResult(op, "ok", data={"iso3": iso3, "links": rows}, consulted=consulted)
         if op.op == "links_pair":
             return self._links_pair(op, lookups, ev)
+        if op.op == "why":
+            return self._why(op, lookups, ev)
+        if op.op == "causal_chain":
+            return self._causal_chain(op, lookups, ev)
         raise CapabilityUnavailable(f"operation {op.op} has no executor", backend="plan")
+
+    # ------------------------------------------------------------------ causality (claims only, never candidates)
+    def _need_causal(self) -> Any:
+        if self.b.causal is None:
+            raise CapabilityUnavailable("the causal claims service is not available on this server", backend="causal")
+        return self.b.causal
+
+    def _why(self, op: PlanOp, lookups: dict[str, Resolved], ev: Evidence) -> OpResult:
+        a = op.args
+        r = self._entity(a["entity"], lookups)
+        if r.entity is None:
+            return OpResult(op, "unresolved", data={"lookup": a["entity"]})
+        port = self._need_causal()
+        res = port.explain(r.entity.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
+        consulted = [port.name]
+        claims = [c for c in res.claims if _is_claim(c)]
+        dissent = [c for c in res.dissent if _is_claim(c) and c.claim_key not in {x.claim_key for x in claims}]
+        data: dict[str, Any] = {"entity": r.entity, "direction": a["direction"], "truncated": res.truncated}
+        if not claims and not dissent:
+            data["absence"] = ev.absence(
+                f"causal_{a['direction']}", consulted, event=r.entity.qid, note="no sourced causal claim"
+            )
+            return OpResult(op, "empty", data=data, consulted=consulted)
+        data["claims"] = [(c, ev.claim(c)) for c in claims]
+        data["dissent"] = [(c, ev.claim(c)) for c in dissent]
+        return OpResult(op, "ok", data=data, consulted=consulted)
+
+    def _causal_chain(self, op: PlanOp, lookups: dict[str, Resolved], ev: Evidence) -> OpResult:
+        a = op.args
+        ra, rb = self._entity(a["from_entity"], lookups), self._entity(a["to_entity"], lookups)
+        if ra.entity is None or rb.entity is None:
+            return OpResult(
+                op, "unresolved", data={"lookup": a["from_entity"] if ra.entity is None else a["to_entity"]}
+            )
+        port = self._need_causal()
+        chains = port.chains(ra.entity.qid, rb.entity.qid, max_hops=a["max_hops"], limit=MAX_CAUSAL_CHAINS)
+        consulted = [port.name]
+        kept: list[CausalChain] = []
+        for ch in chains:
+            hops = [h for h in ch.hops if h.claims and all(_is_claim(c) for c in h.claims)]
+            # a chain is only kept whole: every hop asserted by sourced claims (asserting, not denying)
+            if (
+                ch.hops
+                and len(hops) == len(ch.hops)
+                and len(hops) <= a["max_hops"]
+                and all(any(c.stance == "asserts" for c in h.claims) for h in hops)
+            ):
+                kept.append(ch)
+        data: dict[str, Any] = {"from": ra.entity, "to": rb.entity, "max_hops": a["max_hops"]}
+        if not kept:
+            data["absence"] = ev.absence(
+                "causal_chain", consulted, from_id=ra.entity.qid, to_id=rb.entity.qid, max_hops=a["max_hops"]
+            )
+            return OpResult(op, "empty", data=data, consulted=consulted)
+        data["chains"] = [
+            (ch, [(h, [ev.claim(c) for c in h.claims if c.stance == "asserts"]) for h in ch.hops])
+            for ch in kept[:MAX_CAUSAL_CHAINS]
+        ]
+        return OpResult(op, "ok", data=data, consulted=consulted)
 
     def _links_pair(self, op: PlanOp, lookups: dict[str, Resolved], ev: Evidence) -> OpResult:
         a = op.args
@@ -678,6 +790,11 @@ def pair_links_shown(g: PairLinkGroup) -> list[CountryLink]:
 
 def _single_year(period: str | None) -> bool:
     return bool(period) and re.fullmatch(r"-?\d{1,4}", str(period)) is not None
+
+
+def _is_claim(c: CausalClaim) -> bool:
+    """A sourced claim of the claim space (T1–T4) with a named source; candidates (T5/T6) never pass."""
+    return c.tier in CLAIM_TIERS and bool(c.source_key) and bool(c.claim_key)
 
 
 def _choose(matches: list[EntityMatch], kind: str | None) -> tuple[EntityMatch, list[Entity]]:

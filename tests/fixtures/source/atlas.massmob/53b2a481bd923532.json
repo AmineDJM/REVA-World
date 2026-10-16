@@ -1,0 +1,315 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 334304,
+  "datasetId": 2775555,
+  "datasetPersistentId": "doi:10.7910/DVN/HTTWYL",
+  "datasetType": "dataset",
+  "storageIdentifier": "s3://10.7910/DVN/HTTWYL",
+  "versionNumber": 5,
+  "internalVersionNumber": 4,
+  "versionMinorNumber": 1,
+  "versionState": "RELEASED",
+  "latestVersionPublishingState": "RELEASED",
+  "deaccessionLink": "",
+  "UNF": "UNF:6:F/k8KUqKpCa5UssBbL/gzg==",
+  "lastUpdateTime": "2022-10-10T14:49:06Z",
+  "releaseTime": "2022-10-10T14:49:06Z",
+  "createTime": "2022-10-10T14:48:40Z",
+  "publicationDate": "2016-01-13",
+  "citationDate": "2016-01-13",
+  "effectiveDatasetFileCountLimit": 1000,
+  "datasetFileUploadsAvailable": 989,
+  "license": {
+   "name": "CC0 1.0",
+   "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+   "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+   "rightsIdentifier": "CC0-1.0",
+   "rightsIdentifierScheme": "SPDX",
+   "schemeUri": "https://spdx.org/licenses/",
+   "languageCode": "en"
+  },
+  "fileAccessRequest": false,
+  "metadataBlocks": {
+   "citation": {
+    "displayName": "Citation Metadata",
+    "name": "citation",
+    "fields": [
+     {
+      "typeName": "title",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Mass Mobilization Protest Data"
+     },
+     {
+      "typeName": "subtitle",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Protests against governments"
+     },
+     {
+      "typeName": "author",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Clark, David"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Binghamton University"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Regan, Patrick"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "University of Notre Dame"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "datasetContact",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "datasetContactName": {
+         "typeName": "datasetContactName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Clark, David"
+        },
+        "datasetContactAffiliation": {
+         "typeName": "datasetContactAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Binghamton University"
+        },
+        "datasetContactEmail": {
+         "typeName": "datasetContactEmail",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "dclark@binghamton.edu"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "dsDescription",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "dsDescriptionValue": {
+         "typeName": "dsDescriptionValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Mass Mobillization Data project protests against governments, all countries, 1990-2020. Visit the project page at https://massmobilization.github.io"
+        },
+        "dsDescriptionDate": {
+         "typeName": "dsDescriptionDate",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2019-02-07"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "subject",
+      "multiple": true,
+      "typeClass": "controlledVocabulary",
+      "value": [
+       "Social Sciences"
+      ]
+     },
+     {
+      "typeName": "keyword",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "protests"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "demonstrations"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "notesText",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "version 4.0 - 1990-March 31, 2020\n\nUpdate includes formerly missing notes for 2700+ cases."
+     },
+     {
+      "typeName": "producer",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "producerName": {
+         "typeName": "producerName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "David H. Clark"
+        },
+        "producerAffiliation": {
+         "typeName": "producerAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Binghamton University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "grantNumber",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "grantNumberAgency": {
+         "typeName": "grantNumberAgency",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Political Instability Task Force / CIA"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "depositor",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Clark, David"
+     },
+     {
+      "typeName": "dateOfDeposit",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2016-01-13"
+     },
+     {
+      "typeName": "timePeriodCovered",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "timePeriodCoveredStart": {
+         "typeName": "timePeriodCoveredStart",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "1990-01-01"
+        },
+        "timePeriodCoveredEnd": {
+         "typeName": "timePeriodCoveredEnd",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2020-03-31"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "kindOfData",
+      "multiple": true,
+      "typeClass": "primitive",
+      "value": [
+       "event"
+      ]
+     }
+    ]
+   }
+  },
+  "files": [
+   {
+    "description": ".csv file, 1/1/1990-3/31/2020",
+    "label": "mmALL_073120_csv.tab",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 334304,
+    "dataFile": {
+     "id": 4291456,
+     "persistentId": "",
+     "filename": "mmALL_073120_csv.tab",
+     "contentType": "text/tab-separated-values",
+     "friendlyType": "Tab-Delimited",
+     "filesize": 55022,
+     "description": ".csv file, 1/1/1990-3/31/2020",
+     "storageIdentifier": "s3://dvn-cloud:176e7aa657e-abb48a689291",
+     "originalFileFormat": "text/csv",
+     "originalFormatLabel": "Comma Separated Values",
+     "originalFileSize": 15058276,
+     "originalFileName": "mmALL_073120_csv.csv",
+     "UNF": "UNF:6:Le3OAZozkadOWsrtX3Agyg==",
+     "rootDataFileId": -1,
+     "md5": "e6fa8a2e9d120eff0167a788e8a3ea7f",
+     "checksum": {
+      "type": "MD5",
+      "value": "e6fa8a2e9d120eff0167a788e8a3ea7f"
+     },
+     "tabularData": true,
+     "creationDate": "2021-01-09",
+     "publicationDate": "2021-01-09",
+     "lastUpdateTime": "2022-10-10T14:49:06Z",
+     "fileAccessRequest": false
+    }
+   },
+   {
+    "description": "Codebook",
+    "label": "MM_users_manual_0515.pdf",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 334304,
+    "dataFile": {
+     "id": 2775560,
+     "persistentId": "doi:10.7910/DVN/HTTWYL/TJJZNG",
+     "pidURL": "https://doi.org/10.7910/DVN/HTTWYL/TJJZNG",
+     "filename": "MM_users_manual_0515.pdf",
+     "contentType": "application/pdf",
+     "friendlyType": "Adobe PDF",
+     "filesize": 122934,
+     "description": "Codebook",
+     "storageIdentifier": "s3://dvn-cloud:1523be84feb-a282faf51a08",
+     "rootDataFileId": -1,
+     "md5": "efb7ca11ee0eadae9122b2b7cee08560",
+     "checksum": {
+      "type": "MD5",
+      "value": "efb7ca11ee0eadae9122b2b7cee08560"
+     },
+     "tabularData": false,
+     "creationDate": "2016-01-13",
+     "publicationDate": "2016-01-13",
+     "lastUpdateTime": "2022-10-10T14:49:06Z",
+     "fileAccessRequest": false
+    }
+   }
+  ]
+ }
+}

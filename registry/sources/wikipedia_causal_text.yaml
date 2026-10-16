@@ -1,0 +1,39 @@
+# V3 (agent CAUSCAND): sentences with explicit causal connectives mined from English and French Wikipedia
+# event articles (revision-pinned) -> causal *candidates* (tier T5, candidate space only, never claims).
+# Code: src/reva/causal_candidates/ (fetch.py = the only network path; budget key = this source_key).
+source_key: wikipedia.causal_text
+title: Wikipedia event articles (EN/FR), causal-connective sentences (text-mined candidates, T5)
+provider_url: https://www.mediawiki.org/wiki/API:Main_page
+lineage_family: wikipedia_text
+rights:
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: >-
+    Wikipedia contributors, "<article title>", en.wikipedia.org / fr.wikipedia.org, revision <revid>
+    (stored with every candidate together with https://<lang>.wikipedia.org/w/index.php?oldid=<revid>)
+  share_alike: stored sentences are CC BY-SA 4.0 text and are redistributed under the same licence
+metadata:
+  allowed_hosts: [en.wikipedia.org, fr.wikipedia.org]
+  api: >-
+    https://{en,fr}.wikipedia.org/w/api.php action=query (GET, no key, no personal data, generic project
+    User-Agent): prop=revisions|pageprops (rvprop=ids|timestamp|content, rvslots=main, 4 titles per request)
+    for article text; prop=pageprops (ppprop=wikibase_item|disambiguation, redirects=1, 50 titles per request)
+    to resolve the wikilinks used as arguments to Wikidata items. maxlag=5.
+  terms_of_use: >-
+    Wikipedia text is CC BY-SA 4.0 (Wikimedia Terms of Use, section 7). Only the matched sentences (rendered
+    and verbatim wikitext) are stored, each with article title, revision id, section and licence; full
+    articles are not archived (the revision id pins the exact text and can be re-read).
+  editorial_status: >-
+    community-edited encyclopedia text; a matched sentence is what an article says at one revision, not an
+    asserted fact. Candidates are tier T5 (text-mined), quarantined from causal claims, never promoted
+    automatically (docs/roadmap/v3_causality.md principle 7).
+  coverage: >-
+    initial run 2026-10-16: the 250 event items with most sitelinks among direct instances of war, civil
+    war, world war, revolution, coup, rebellion, riot, crises, famine, epidemic/pandemic, disasters,
+    earthquake, tsunami, genocide, massacre, terrorist attack, invasion, conquest (Wikidata snapshot) ->
+    their English and French articles (<= 500 articles)
+  authentication: none
+  rate_limits: >-
+    Wikimedia throttles anonymous API traffic per IP (HTTP 429 seen by other agents on 2026-10-16): one
+    request at a time, >= 10 s between requests per host; a second 429 stops the run (resumable)
+  cadence: on demand (re-extraction runs offline on the stored sentences)

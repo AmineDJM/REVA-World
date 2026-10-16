@@ -48,7 +48,8 @@ const unavailable = (l: Load<unknown> | null) => l?.status === 'error' && classi
 
 export const CAUSES_EXAMPLES = [
   { id: 'Q361', label: 'Première Guerre mondiale' },
-  { id: 'Q6534', label: 'Révolution française' },
+  { id: 'Q8698', label: 'Grande Dépression' },
+  { id: 'Q160649', label: 'Grippe de 1918' },
 ];
 
 export default function CausesPage() {
@@ -66,6 +67,13 @@ export default function CausesPage() {
     setSelected(null);
     setShowCandidates(false);
   }, [event]);
+
+  // bring the opened claim into view (edge tap, "détails", "ouvrir")
+  useEffect(() => {
+    if (!selected) return;
+    const el = document.querySelector('.v3-claim-panel');
+    if (el && 'scrollIntoView' in el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [selected]);
 
   const ev = useLoad<{ event: CausalEvent; warnings: string[] }>(event, (s) => getCausalEvent(event!, s));
   const causes = useLoad<ClaimsResult>(event, (s) => getCausalClaims(event!, 'causes', s));
@@ -223,6 +231,7 @@ export default function CausesPage() {
               set(patch);
             }}
             onOpen={openClaim}
+            onLabels={(l) => setLabels((old) => ({ ...l, ...old }))}
           />
           <section className="v3-candidates-section" aria-labelledby="cand-title">
             <h2 id="cand-title">Espace des candidats</h2>

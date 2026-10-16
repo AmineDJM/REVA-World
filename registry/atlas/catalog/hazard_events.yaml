@@ -1,0 +1,208 @@
+# Natural hazard events (agent A-HAZARDS). Atlas table ncei_hazards.country_year: COUNTS AND SUMS COMPUTED BY REVA from
+# the NOAA NCEI/WDS Global Historical Hazard Database (US Government work, public domain in the US). Per NCEI country
+# (present-day country of the location) and event year in astronomical years (NCEI B.C. years converted). Sums cover
+# only records that publish the number (no imputation, no zero filled); earthquake, tsunami and eruption series are
+# separate and must never be added (NCEI 'total' effects of one hazard include its secondary hazards). Each cell's flags
+# give the record count, records with/without a value and the NCEI country names. See docs/dev/v3_a_hazards.md.
+domain: hazard_events
+labels: {fr: "Catastrophes naturelles : séismes, tsunamis, éruptions (NCEI)", en: "Natural hazard events: earthquakes, tsunamis, eruptions (NCEI)"}
+maintainer: A-HAZARDS
+concepts:
+  - id: hazard_events.eq_events
+    labels: {fr: "Séismes significatifs (nombre, calculé, NCEI)", en: "Significant earthquakes (count, computed, NCEI)"}
+    definition: "COMPUTED by REVA: number of records of the NCEI/WDS Global Significant Earthquake Database whose NCEI country is the country, per event year (astronomical; 2150 BC to present). NCEI inclusion criteria: moderate damage (approximately $1 million or more), 10 or more deaths, magnitude 7.5 or greater, Modified Mercalli Intensity X or greater, or the earthquake generated a tsunami. Only country-years with at least one record are listed."
+    unit: "events"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_events]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.eq_deaths
+    labels: {fr: "Décès dus aux séismes significatifs (somme publiée, NCEI)", en: "Deaths from significant earthquakes (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of the NCEI 'deaths' field (deaths from the earthquake) over the country-year's significant-earthquake records that publish a number; records with only a description code or nothing are not counted (flags give records_with_value / records_without_value). Historical figures as published by NCEI, often uncertain."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_deaths]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.eq_deaths_total
+    labels: {fr: "Décès dus aux séismes et à leurs effets secondaires (somme publiée, NCEI)", en: "Deaths from earthquakes and their secondary effects (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'deathsTotal' ('total number of deaths from the earthquake and secondary effects (eg Tsunami)') over the country-year's earthquake records that publish it. Includes tsunami deaths of the same event: never add to ts_deaths."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_deaths_total]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.eq_injuries
+    labels: {fr: "Blessés lors des séismes significatifs (somme publiée, NCEI)", en: "Injuries from significant earthquakes (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'injuries' (from the earthquake) over the country-year's records that publish a number."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_injuries]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.eq_damage_musd
+    labels: {fr: "Dommages des séismes significatifs (somme publiée, millions US$ courants, NCEI)", en: "Damage from significant earthquakes (published sum, million US$ at the time, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'damageMillionsDollars' over the country-year's records that publish an amount. NCEI: 'The dollar value listed is the value at the time of the event' (not inflation-adjusted; foreign currencies converted at the time of the event)."
+    unit: "million US$ (value at the time of the event)"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_damage_musd]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.eq_houses_destroyed
+    labels: {fr: "Maisons détruites par les séismes significatifs (somme publiée, NCEI)", en: "Houses destroyed by significant earthquakes (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'housesDestroyed' (by the earthquake) over the country-year's records that publish a number."
+    unit: "houses"
+    domain: hazard_events
+    subdomain: earthquakes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.eq_houses_destroyed]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_events
+    labels: {fr: "Tsunamis dont la source est dans le pays (nombre, calculé, NCEI)", en: "Tsunamis with their source in the country (count, computed, NCEI)"}
+    definition: "COMPUTED by REVA: number of NCEI/WDS Global Historical Tsunami Database source records whose NCEI country is the country, per source-event year, all validity levels except -1 (erroneous entry): includes very doubtful (1) and questionable (2) tsunamis and seiches (0)."
+    unit: "events"
+    domain: hazard_events
+    subdomain: tsunamis
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_events]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_events_valid34
+    labels: {fr: "Tsunamis probables ou certains dont la source est dans le pays (nombre, calculé, NCEI)", en: "Probable or definite tsunamis with their source in the country (count, computed, NCEI)"}
+    definition: "COMPUTED by REVA: as ts_events, restricted to NCEI event validity 3 (probable tsunami) or 4 (definite tsunami) — the validity filter of NCEI's own default tsunami query."
+    unit: "events"
+    domain: hazard_events
+    subdomain: tsunamis
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_events_valid34]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_deaths
+    labels: {fr: "Décès dus aux tsunamis, par pays source (somme publiée, NCEI)", en: "Tsunami deaths by source country (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of the NCEI tsunami source record 'deaths' (deaths from the tsunami) over the country-year's source records (validity != -1) that publish a number. Attributed to the SOURCE country; deaths may have occurred elsewhere (see ts_runup_deaths)."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: tsunamis
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_deaths]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_deaths_total
+    labels: {fr: "Décès totaux des événements tsunamigènes, par pays source (somme publiée, NCEI)", en: "Total deaths of tsunami events by source country (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'deathsTotal' of tsunami source records ('Total Effects (Earthquake and Tsunami, Volcano, etc.)') per source country-year. Overlaps eq_deaths_total / vo_deaths_total of the same events: never add."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: tsunamis
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_deaths_total]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_runups
+    labels: {fr: "Relevés de runup de tsunami dans le pays (nombre, calculé, NCEI)", en: "Tsunami runup records in the country (count, computed, NCEI)"}
+    definition: "COMPUTED by REVA: number of NCEI runup records (locations where tsunami effects were observed or measured) whose NCEI country is the country, per year of the tsunami source event. A count of observation records, not of tsunamis."
+    unit: "runup records"
+    domain: hazard_events
+    subdomain: runups
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_runups]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.ts_runup_deaths
+    labels: {fr: "Décès dus aux tsunamis dans le pays touché (somme publiée des runups, NCEI)", en: "Tsunami deaths in the affected country (published sum over runups, NCEI)"}
+    definition: "COMPUTED by REVA: sum of the NCEI runup record 'deaths' over the runup records located in the country, per year of the tsunami source event; records without a number are not counted."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: runups
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.ts_runup_deaths]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_eruptions
+    labels: {fr: "Éruptions volcaniques significatives (nombre, calculé, NCEI)", en: "Significant volcanic eruptions (count, computed, NCEI)"}
+    definition: "COMPUTED by REVA: number of NCEI/WDS Global Significant Volcanic Eruptions Database records whose NCEI country is the country, per event year (4360 BC to present). NCEI: a significant eruption 'caused fatalities, caused moderate damage (approximately $1 million or more), with a Volcanic Explosivity Index (VEI) of 6 or larger, caused a tsunami, or was associated with a major earthquake'."
+    unit: "eruptions"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_eruptions]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_deaths
+    labels: {fr: "Décès dus aux éruptions significatives (somme publiée, NCEI)", en: "Deaths from significant volcanic eruptions (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of the NCEI eruption record 'deaths' (from the eruption) over the country-year's records that publish a number."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_deaths]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_deaths_total
+    labels: {fr: "Décès dus aux éruptions et à leurs effets secondaires (somme publiée, NCEI)", en: "Deaths from eruptions and their secondary effects (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI 'deathsTotal' of eruption records (the eruption and secondary effects such as tsunamis) per country-year. Overlaps ts_deaths_total: never add."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_deaths_total]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_injuries
+    labels: {fr: "Blessés lors des éruptions significatives (somme publiée, NCEI)", en: "Injuries from significant volcanic eruptions (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI eruption record 'injuries' over the country-year's records that publish a number."
+    unit: "persons"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_injuries]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_damage_musd
+    labels: {fr: "Dommages des éruptions significatives (somme publiée, millions US$ courants, NCEI)", en: "Damage from significant volcanic eruptions (published sum, million US$ at the time, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI eruption record 'damageMillionsDollars' (value at the time of the event) over the country-year's records that publish an amount."
+    unit: "million US$ (value at the time of the event)"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_damage_musd]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]
+  - id: hazard_events.vo_houses_destroyed
+    labels: {fr: "Maisons détruites par les éruptions significatives (somme publiée, NCEI)", en: "Houses destroyed by significant volcanic eruptions (published sum, NCEI)"}
+    definition: "COMPUTED by REVA: sum of NCEI eruption record 'housesDestroyed' over the country-year's records that publish a number."
+    unit: "houses"
+    domain: hazard_events
+    subdomain: volcanoes
+    theme: environment
+    value_kind: numeric
+    source_order: [ncei_hazards.country_year.vo_houses_destroyed]
+    provider_declared: true
+    tags: [computed, natural_hazards, ncei]

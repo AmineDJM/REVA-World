@@ -1,0 +1,41 @@
+{
+ "batchcomplete": true,
+ "query": {
+  "normalized": [],
+  "redirects": [],
+  "pages": [
+   {
+    "pageid": 1000,
+    "ns": 0,
+    "title": "Conséquences de la Première Guerre mondiale",
+    "pageprops": {
+     "wikibase_item": "Q2519948"
+    }
+   },
+   {
+    "pageid": 1001,
+    "ns": 0,
+    "title": "Inondation du fleuve Jaune de 1938",
+    "pageprops": {
+     "wikibase_item": "Q129151"
+    }
+   },
+   {
+    "pageid": 1002,
+    "ns": 0,
+    "title": "Noyade",
+    "pageprops": {
+     "wikibase_item": "Q506616"
+    }
+   },
+   {
+    "pageid": 1003,
+    "ns": 0,
+    "title": "Royaume d'Italie (1861-1946)",
+    "pageprops": {
+     "wikibase_item": "Q172579"
+    }
+   }
+  ]
+ }
+}

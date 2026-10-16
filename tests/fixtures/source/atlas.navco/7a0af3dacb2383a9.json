@@ -1,0 +1,230 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 444409,
+  "datasetId": 3612159,
+  "datasetPersistentId": "doi:10.7910/DVN/MHOXDV",
+  "datasetType": "dataset",
+  "storageIdentifier": "s3://10.7910/DVN/MHOXDV",
+  "versionNumber": 2,
+  "internalVersionNumber": 5,
+  "versionMinorNumber": 1,
+  "versionState": "RELEASED",
+  "latestVersionPublishingState": "RELEASED",
+  "UNF": "UNF:6:FP+ODWheBImScIr0p0aMrw==",
+  "lastUpdateTime": "2025-05-09T19:32:41Z",
+  "releaseTime": "2025-05-09T19:32:41Z",
+  "createTime": "2025-05-09T19:29:10Z",
+  "publicationDate": "2019-11-06",
+  "citationDate": "2019-11-06",
+  "effectiveDatasetFileCountLimit": 1000,
+  "datasetFileUploadsAvailable": 997,
+  "license": {
+   "name": "CC0 1.0",
+   "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+   "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+   "rightsIdentifier": "CC0-1.0",
+   "rightsIdentifierScheme": "SPDX",
+   "schemeUri": "https://spdx.org/licenses/",
+   "languageCode": "en"
+  },
+  "fileAccessRequest": false,
+  "metadataBlocks": {
+   "citation": {
+    "displayName": "Citation Metadata",
+    "name": "citation",
+    "fields": [
+     {
+      "typeName": "title",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "NAVCO 2.1 Dataset"
+     },
+     {
+      "typeName": "author",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Christopher Wiley Shay"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "datasetContact",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "datasetContactName": {
+         "typeName": "datasetContactName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "datasetContactAffiliation": {
+         "typeName": "datasetContactAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        },
+        "datasetContactEmail": {
+         "typeName": "datasetContactEmail",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "erica_chenoweth@hks.harvard.edu"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "dsDescription",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "dsDescriptionValue": {
+         "typeName": "dsDescriptionValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Campaign-year data for 384 maximalist campaigns from 1945-2013, with several new variables, including aggregate participation counts, fatality ranges, and a nuanced set of variables regarding violent flanks. The data are posted here with the project codebook. NAVCO 2.2, which will provide a further update of the country-year data, is currently in progress, with a release date TBD."
+        },
+        "dsDescriptionDate": {
+         "typeName": "dsDescriptionDate",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2019-10-31"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "subject",
+      "multiple": true,
+      "typeClass": "controlledVocabulary",
+      "value": [
+       "Social Sciences"
+      ]
+     },
+     {
+      "typeName": "keyword",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "protest, resistance, repression, civil conflict"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "depositor",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Chenoweth, Erica"
+     },
+     {
+      "typeName": "dateOfDeposit",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2019-10-31"
+     }
+    ]
+   }
+  },
+  "files": [
+   {
+    "description": "NAVCO 2.1 Codebook",
+    "label": "NAVCO_2.1_codebook.pdf",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 444409,
+    "dataFile": {
+     "id": 3648624,
+     "persistentId": "doi:10.7910/DVN/MHOXDV/WXVKGK",
+     "pidURL": "https://doi.org/10.7910/DVN/MHOXDV/WXVKGK",
+     "filename": "NAVCO_2.1_codebook.pdf",
+     "contentType": "application/pdf",
+     "friendlyType": "Adobe PDF",
+     "filesize": 262169,
+     "description": "NAVCO 2.1 Codebook",
+     "storageIdentifier": "s3://dvn-cloud:16f1a7201ca-f7d590f453f1",
+     "rootDataFileId": -1,
+     "md5": "680ed263cd9c856add89b8eeeae6eed0",
+     "checksum": {
+      "type": "MD5",
+      "value": "680ed263cd9c856add89b8eeeae6eed0"
+     },
+     "tabularData": false,
+     "creationDate": "2019-12-18",
+     "publicationDate": "2019-12-18",
+     "lastUpdateTime": "2025-05-09T19:32:41Z",
+     "fileAccessRequest": false
+    }
+   },
+   {
+    "description": ".dta file",
+    "label": "NAVCO2-1_ForPublication.tab",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 444409,
+    "dataFile": {
+     "id": 3620879,
+     "persistentId": "doi:10.7910/DVN/MHOXDV/YBHTBD",
+     "pidURL": "https://doi.org/10.7910/DVN/MHOXDV/YBHTBD",
+     "filename": "NAVCO2-1_ForPublication.tab",
+     "contentType": "text/tab-separated-values",
+     "friendlyType": "Tab-Delimited",
+     "filesize": 148986,
+     "description": ".dta file",
+     "storageIdentifier": "s3://dvn-cloud:16e41c8a261-cfc4ff05e6ee",
+     "originalFileFormat": "application/x-stata-14",
+     "originalFormatLabel": "Stata 14 Binary",
+     "originalFileSize": 9631705,
+     "originalFileName": "NAVCO2-1_ForPublication.dta",
+     "UNF": "UNF:6:FP+ODWheBImScIr0p0aMrw==",
+     "rootDataFileId": -1,
+     "md5": "9b13562f733c91412a20177506530166",
+     "checksum": {
+      "type": "MD5",
+      "value": "9b13562f733c91412a20177506530166"
+     },
+     "tabularData": true,
+     "creationDate": "2019-11-06",
+     "publicationDate": "2019-11-06",
+     "lastUpdateTime": "2025-05-09T19:32:41Z",
+     "fileAccessRequest": false
+    }
+   }
+  ]
+ }
+}

@@ -455,3 +455,55 @@ def test_keyword_planner_concept_ties_are_resolved_or_reported_as_ambiguity(env:
         assert any(s["kind"] == "ambiguous" and "labour.mw.v6" in s["text"] for s in b["sentences"])
     finally:
         env.app.state.nlqa_catalog, env.app.state.nlqa_backends.atlas = saved
+
+
+# --------------------------------------------------------------------------- why / causal_chain (agent CAUSUI)
+@pytest.fixture(scope="module")
+def causal_claims(env: Env) -> dict[str, Any]:
+    """The fixture graph's Wikidata causal statement (P828: traité de Tordesillas has cause premier voyage de
+    Christophe Colomb) loaded as a claim and graded by CAUSCORE's real loader and grader (reva.causal.refresh)."""
+    causal = pytest.importorskip("reva.causal")
+    return causal.refresh(env.owner, origin="test_fixture")
+
+
+def test_why_answers_from_real_causal_claims_with_source_and_tier(env: Env, causal_claims: dict[str, Any]) -> None:
+    assert causal_claims["loaded"]["inserted"] >= 1, causal_claims
+    b = ask(env, "Quelles sont les causes du traité de Tordesillas ?").json()
+    cited(b)
+    assert b["planner"] == "keyword_fallback" and b["prompt_version"] == "nlqa-plan-1.2.0"
+    assert [o["op"] for o in b["plan"]["operations"]] == ["entity_lookup", "why"]
+    causal = [s for s in b["sentences"] if s["kind"] == "causal"]
+    assert len(causal) == 1, b["answer_text"]
+    assert causal[0]["text"].startswith(
+        "Selon Wikidata (T4, déclaration Wikidata sans référence ; donnée communautaire), traité de Tordesillas a pour "
+        "cause premier voyage de Christophe Colomb"
+    ), causal[0]["text"]
+    ev = {e["id"]: e for e in b["evidence"]}
+    claim = ev[causal[0]["citations"][0]]
+    assert claim["kind"] == "causal_claim" and claim["citation"]["tier"] == "T4"
+    assert claim["citation"]["statement_id"] == "Q90000001$FIXTURE-0002" and claim["origin"] == "test_fixture"
+    assert claim["grade"] in ("D", "E") and claim["grade_rules"]
+    assert "REVA n'établit aucune causalité" in b["answer_text"]
+
+
+def test_causal_chain_is_a_composition_with_each_hop_sourced(env: Env, causal_claims: dict[str, Any]) -> None:
+    b = ask(env, "Chaîne causale entre premier voyage de Christophe Colomb et traité de Tordesillas ?").json()
+    cited(b)
+    assert [o["op"] for o in b["plan"]["operations"]] == ["entity_lookup", "entity_lookup", "causal_chain"]
+    if not any(s["kind"] == "path" for s in b["sentences"]):
+        # the grader may grade an undated, unreferenced statement below the chain search's default minimum (D):
+        # then "no chain" is said, never a guess
+        assert "cela ne prouve ni l'absence ni l'existence d'un lien causal" in b["answer_text"], b["answer_text"]
+        return
+    head = next(s for s in b["sentences"] if s["kind"] == "path")
+    assert "Chaîne composée par REVA à partir de 1 affirmation(s) distincte(s)" in head["text"]
+    assert "force = maillon le plus faible" in head["text"]
+    hop = next(s for s in b["sentences"] if s["kind"] == "causal")
+    assert "selon Wikidata (T4," in hop["text"]
+
+
+def test_no_claim_is_missing_never_inferred(env: Env, causal_claims: dict[str, Any]) -> None:
+    b = ask(env, "Pourquoi le Brésil ?").json()
+    cited(b)
+    assert not [s for s in b["sentences"] if s["kind"] == "causal"]
+    assert "Aucune affirmation causale sourcée sur les causes de Brésil (Q155)" in b["answer_text"], b["answer_text"]

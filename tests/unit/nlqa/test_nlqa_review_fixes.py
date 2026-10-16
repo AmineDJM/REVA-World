@@ -245,3 +245,24 @@ def test_atlas_adapter_latest_prefers_an_actual_cell() -> None:
 
     (c,) = AtlasQueryAdapter(Q(), Cat()).values("x", ["USA"], None).cells
     assert c.year == 2025
+
+
+# --------------------------------------------------------------------------- review V3b LIC-1 (agent REVFIX2)
+def test_restricted_licence_of_a_cited_atlas_source_is_stated_in_the_answer() -> None:
+    from dataclasses import replace
+
+    from reva.atlas.snapshot import normalise_rights
+
+    rights = normalise_rights({"licence": "CC-BY-NC-SA-4.0", "non_commercial": True}, basis="table_artifact")
+    open_r = normalise_rights({"licence": "CC-BY-4.0"}, basis="table_artifact")
+    cells = [
+        replace(c, provenance={**c.provenance, "rights": rights if c.iso3 == "SGP" else open_r})
+        for c in F.CELLS
+        if c.concept_id == DENS and c.iso3 in ("SGP", "MCO")
+    ]
+    ops = [{"id": "s1", "op": "atlas_value", "concept": DENS, "country": "SGP", "year": 2022}]
+    x, out = _run("Population density of Singapore in 2022", ops, cells, lang="fr")
+    notes = [s for s in out.sentences if s.op_id == "licence"]
+    assert notes and all("CC-BY-NC-SA-4.0" in n.text and "usage non commercial" in n.text for n in notes)
+    cited = [x.evidence.get(e) for n in notes for e in n.citations]
+    assert cited and all(c["citation"]["rights"]["restricted"] and c["iso3"] == "SGP" for c in cited)

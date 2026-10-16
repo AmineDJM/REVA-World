@@ -1,0 +1,263 @@
+# Crises and conflict outcomes (agent CAUSDATA). Provider-declared concepts (not human-reviewed), all COMPUTED counts
+# from expert-coded case datasets: ICB v16 (icb.actor_cy), COW MID 5.0 (cow.mid5_cy), UCDP Conflict Termination
+# v4-2024 (ucdp.term_cy) and Peace Agreements 22.2 (ucdp.pa_cy). Case-level records (events, coded triggers and
+# outcomes as T1 causal claims) are in the KG / kg.causal_claim; see docs/dev/v3_causdata.md.
+domain: crises
+labels:
+  fr: Crises internationales, différends militarisés, fins de conflits (jeux de données codés par des experts)
+  en: International crises, militarized disputes, conflict terminations (expert-coded datasets)
+maintainer: CAUSDATA
+concepts:
+- id: crises.icb_crises_as_actor
+  labels:
+    fr: Crises internationales comme acteur de crise (ICB, calculé)
+    en: International crises as crisis actor (ICB, computed)
+  definition: 'COMPUTED by REVA from the International Crisis Behavior actor-level data v16: number of distinct ICB international
+    crises in which the state is a crisis actor (a state whose decision makers perceived a threat to basic values, time pressure
+    and heightened probability of military hostilities), by the year the actor perceived its trigger. 1918-2021. Only state-years
+    with at least one crisis are listed (absence is not a reported zero).'
+  unit: count
+  domain: crises
+  subdomain: international_crises
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - icb.actor_cy.icb_crises_as_actor
+  provider_declared: true
+  notes: ICB codes are Gleditsch-Ward codes (codebook v16); historical states keep iso3 = null.
+- id: crises.icb_crises_triggered
+  labels:
+    fr: Crises internationales déclenchées (entité déclenchante ICB, calculé)
+    en: International crises triggered (ICB triggering entity, computed)
+  definition: 'COMPUTED by REVA from ICB actor-level data v16: number of distinct ICB international crises in which the state
+    is coded as the triggering entity (TRIGENT: the entity that ''initiated the act which was perceived by a state as creating
+    a threat to basic values, time pressure and heightened probability of military hostilities'') of at least one actor''s
+    foreign policy crisis, by that actor''s trigger year. 1918-2021.'
+  unit: count
+  domain: crises
+  subdomain: international_crises
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - icb.actor_cy.icb_crises_triggered
+  provider_declared: true
+  notes: 'A coded triggering entity, not a judgement of responsibility: see registry/causal/relations_datasets.yaml.'
+- id: crises.icb_crises_as_actor_war
+  labels:
+    fr: Crises internationales avec guerre totale, comme acteur (ICB, calculé)
+    en: International crises with full-scale war, as crisis actor (ICB, computed)
+  definition: 'COMPUTED by REVA from ICB actor-level data v16: number of distinct ICB international crises in which the state
+    is a crisis actor and the actor-level violence variable VIOL is 4 (full-scale war), by trigger year. 1918-2021.'
+  unit: count
+  domain: crises
+  subdomain: international_crises
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - icb.actor_cy.icb_crises_as_actor_war
+  provider_declared: true
+- id: crises.mid_disputes_onset
+  labels:
+    fr: Différends interétatiques militarisés commencés (COW MID, calculé)
+    en: Militarized interstate disputes joined (COW MID, computed)
+  definition: 'COMPUTED by REVA from the Correlates of War Militarized Interstate Dispute data 5.0 (MIDB participants, 1816-2014):
+    number of distinct militarized interstate disputes in which the state''s participation spell starts in the year (MIDB
+    StYear). Only state-years with at least one dispute are listed.'
+  unit: count
+  domain: crises
+  subdomain: militarized_disputes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - cow.mid5_cy.mid_disputes_onset
+  provider_declared: true
+  notes: 'COW state numbers; historical states keep iso3 = null. COW terms: cite, no charging for access.'
+- id: crises.mid_disputes_onset_side_a
+  labels:
+    fr: Différends militarisés commencés du côté A (COW MID, calculé)
+    en: Militarized interstate disputes joined on side A (COW MID, computed)
+  definition: 'COMPUTED by REVA from the Correlates of War Militarized Interstate Dispute data 5.0 (MIDB participants, 1816-2014):
+    number of distinct disputes whose participation starts in the year with the state on side A (by convention the side of
+    the state(s) that first crossed the threat-display-use of force threshold; the MID manual calls the side designation ''ultimately
+    arbitrary''). Only state-years with at least one dispute are listed.'
+  unit: count
+  domain: crises
+  subdomain: militarized_disputes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - cow.mid5_cy.mid_disputes_onset_side_a
+  provider_declared: true
+  notes: 'COW state numbers; historical states keep iso3 = null. COW terms: cite, no charging for access.'
+- id: crises.mid_disputes_onset_revisionist
+  labels:
+    fr: Différends militarisés commencés comme État révisionniste (COW MID, calculé)
+    en: Militarized interstate disputes joined as revisionist state (COW MID, computed)
+  definition: 'COMPUTED by REVA from the Correlates of War Militarized Interstate Dispute data 5.0 (MIDB participants, 1816-2014):
+    number of distinct disputes whose participation starts in the year with the state coded revisionist (RevState = 1: a state
+    that ''seeks to change the status quo''). Only state-years with at least one dispute are listed.'
+  unit: count
+  domain: crises
+  subdomain: militarized_disputes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - cow.mid5_cy.mid_disputes_onset_revisionist
+  provider_declared: true
+  notes: 'COW state numbers; historical states keep iso3 = null. COW terms: cite, no charging for access.'
+- id: crises.mid_disputes_onset_use_of_force
+  labels:
+    fr: Différends militarisés commencés avec usage de la force (COW MID, calculé)
+    en: Militarized interstate disputes joined with own use of force (COW MID, computed)
+  definition: 'COMPUTED by REVA from the Correlates of War Militarized Interstate Dispute data 5.0 (MIDB participants, 1816-2014):
+    number of distinct disputes whose participation starts in the year in which the state''s own hostility level is 4 (use
+    of force) or 5 (war). Only state-years with at least one dispute are listed.'
+  unit: count
+  domain: crises
+  subdomain: militarized_disputes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - cow.mid5_cy.mid_disputes_onset_use_of_force
+  provider_declared: true
+  notes: 'COW state numbers; historical states keep iso3 = null. COW terms: cite, no charging for access.'
+- id: crises.mid_disputes_active
+  labels:
+    fr: Différends interétatiques militarisés actifs (COW MID, calculé)
+    en: Active militarized interstate disputes (COW MID, computed)
+  definition: 'COMPUTED by REVA from the Correlates of War Militarized Interstate Dispute data 5.0 (MIDB participants, 1816-2014):
+    number of distinct disputes with a participation spell of the state overlapping the year (StYear..EndYear). Only state-years
+    with at least one dispute are listed.'
+  unit: count
+  domain: crises
+  subdomain: militarized_disputes
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - cow.mid5_cy.mid_disputes_active
+  provider_declared: true
+  notes: 'COW state numbers; historical states keep iso3 = null. COW terms: cite, no charging for access.'
+- id: crises.ucdp_episodes_ended_peace_agreement
+  labels:
+    fr: Épisodes de conflit armé terminés par accord de paix (UCDP, calculé)
+    en: Armed conflict episodes ended by peace agreement (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 1 (peace agreement). Only country-years with at least one ended episode
+    are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_peace_agreement
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_episodes_ended_ceasefire
+  labels:
+    fr: Épisodes de conflit armé terminés par cessez-le-feu (UCDP, calculé)
+    en: Armed conflict episodes ended by ceasefire (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 2 (ceasefire). Only country-years with at least one ended episode
+    are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_ceasefire
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_episodes_ended_victory_government
+  labels:
+    fr: Épisodes de conflit armé terminés par victoire du gouvernement (UCDP, calculé)
+    en: Armed conflict episodes ended by victory for the government side (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 3 (victory for the government side). Only country-years with at least
+    one ended episode are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_victory_government
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_episodes_ended_victory_rebels
+  labels:
+    fr: Épisodes de conflit armé terminés par victoire du camp non étatique (UCDP, calculé)
+    en: Armed conflict episodes ended by victory for the non-state side (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 4 (victory for the non-state side). Only country-years with at least
+    one ended episode are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_victory_rebels
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_episodes_ended_low_activity
+  labels:
+    fr: Épisodes de conflit armé terminés par faible activité (UCDP, calculé)
+    en: Armed conflict episodes ended by low activity (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 5 (low activity). Only country-years with at least one ended episode
+    are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_low_activity
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_episodes_ended_actor_ceased
+  labels:
+    fr: Épisodes de conflit armé terminés par disparition d'un acteur (UCDP, calculé)
+    en: Armed conflict episodes ended by an actor ceasing to exist (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Conflict Termination Dataset v4-2024 (conflict level, 1946-2024): number of
+    distinct state-based armed conflict episodes located in the country (gwno_loc) that terminated in the year (c_epterm =
+    1, c_ep_endyear) with the coded outcome c_outcome = 6 (an actor ceasing to exist). Only country-years with at least one
+    ended episode are listed.'
+  unit: count
+  domain: crises
+  subdomain: conflict_termination
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.term_cy.term_episodes_ended_actor_ceased
+  provider_declared: true
+  notes: Outcome categories are UCDP's codings (codebook definitions in registry/causal/relations_datasets.yaml); 'low activity'
+    carries no information on why fighting declined.
+- id: crises.ucdp_peace_agreements_signed
+  labels:
+    fr: Accords de paix signés (UCDP, calculé)
+    en: Peace agreements signed (UCDP, computed)
+  definition: 'COMPUTED by REVA from the UCDP Peace Agreement Dataset 22.2 (1975-2021): number of distinct peace agreements
+    (''a formal agreement between at least two opposing primary warring parties, which addresses the disputed incompatibility'')
+    whose incompatibility is located in the country (gwno), by year of signature. Only country-years with at least one agreement
+    are listed.'
+  unit: count
+  domain: crises
+  subdomain: peace_agreements
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp.pa_cy.pa_signed
+  provider_declared: true

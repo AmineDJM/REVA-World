@@ -1,0 +1,50 @@
+{
+ "licence": "CC BY-SA 4.0",
+ "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+ "files": {
+  "content_en.json": {
+   "kind": "action API prop=revisions|pageprops response (formatversion 2), EXCERPT",
+   "excerpt_of": {
+    "wiki": "enwiki",
+    "title": "World War II",
+    "revision_id": 1379691426,
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1379691426",
+    "api_response_sha256": "34665c1328f0831c2c30fb05d37510c4a38bee2f747050b45f263036fcf31170",
+    "retrieved_at": "2026-10-16T20:39:59.496684+00:00"
+   },
+   "note": "verbatim wikitext sentences of the revision (section headings kept) wrapped in the API envelope; the final heading and line are written for the test (reference sections are skipped)",
+   "attribution": "Wikipedia contributors, \"World War II\", en.wikipedia.org, revision 1379691426"
+  },
+  "content_fr.json": {
+   "kind": "action API prop=revisions|pageprops response (formatversion 2), EXCERPT",
+   "excerpt_of": {
+    "wiki": "frwiki",
+    "title": "Seconde Guerre mondiale",
+    "revision_id": 240347813,
+    "url": "https://fr.wikipedia.org/w/index.php?oldid=240347813",
+    "api_response_sha256": "c3b152bde1f0414691ed5b8c74adaf31f9076ca8d2a47399ce7439e9ce2fb38d",
+    "retrieved_at": "2026-10-16T20:40:00.351222+00:00"
+   },
+   "note": "verbatim wikitext sentences of the revision (section headings kept) wrapped in the API envelope; the final heading and line are written for the test (reference sections are skipped)",
+   "attribution": "Wikipedia contributors, \"Seconde Guerre mondiale\", fr.wikipedia.org, revision 240347813"
+  },
+  "resolve_en.json": {
+   "kind": "action API prop=pageprops&redirects=1 response (formatversion 2), RECONSTRUCTED",
+   "note": "titles/QIDs as resolved live on 2026-10-16 (resolution cache of the smoke run); page ids are placeholders; the redirect, missing and disambiguation entries are written for the test",
+   "api_response_sha256s": [
+    "216a08045bce6ab52264301daff7e5fe7b14bf18ec900b6d2bc4e49a64656a0d"
+   ]
+  },
+  "resolve_fr.json": {
+   "kind": "action API prop=pageprops&redirects=1 response (formatversion 2), RECONSTRUCTED",
+   "note": "titles/QIDs as resolved live on 2026-10-16 (resolution cache of the smoke run); page ids are placeholders; ",
+   "api_response_sha256s": [
+    "e69c852367965f18138a63d5e3578aeff00e0bdc099540133b6f6c3da1840920"
+   ]
+  },
+  "event_seeds_2026-10-16.json": {
+   "kind": "recorded WDQS seed snapshot (CC0)",
+   "note": "full snapshot of the live query"
+  }
+ }
+}

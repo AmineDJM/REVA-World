@@ -1,0 +1,50 @@
+# V3 (agent A-HAZARDS): NOAA NCEI / World Data Service Global Historical Hazard Database (HazEL hazard-service API v1).
+# Connector: src/reva/adapters/connectors/atlas_noaa_hazards.py -> atlas table ncei_hazards.country_year (COMPUTED
+# counts and sums), KG events (source key noaa.ncei_hazards) and T1 coded_trigger causal claims (earthquake/eruption ->
+# tsunami as coded by NCEI). Documentation: docs/dev/v3_a_hazards.md.
+source_key: noaa.ncei_hazards
+title: >-
+  NCEI/WDS Global Historical Hazard Database: Significant Earthquake Database (2150 BC-), Global Historical Tsunami
+  Database (sources and runups, 2000 BC-), Significant Volcanic Eruptions Database (4360 BC-)
+provider_url: https://www.ngdc.noaa.gov/hazel/view/hazards
+lineage_family: noaa_ncei_hazards
+rights:
+  licence: "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: access unrestricted"
+  licence_url: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ngdc.mgg.hazards:G012153
+  attribution: >-
+    National Geophysical Data Center / World Data Service (NGDC/WDS): NCEI/WDS Global Significant Earthquake Database
+    (doi:10.7289/V5TD9V7K); NCEI/WDS Global Historical Tsunami Database (doi:10.7289/V5PN93H7); NCEI/WDS Global
+    Significant Volcanic Eruptions Database (doi:10.7289/V5JW8BSH). NOAA National Centers for Environmental
+    Information. [access date]
+  licence_evidence: >-
+    NCEI ISO 19115-2 metadata landing pages gov.noaa.ngdc.mgg.hazards:G012153 (earthquakes, page sha256
+    ac0f7f7b87b68067d2992e6749ebeb09c8d0c6df94e2c4d87589bf6cb59e39f8), G02151 (tsunamis,
+    3b95f10438f1cd64137eaab90fcb7f94538c2de13ed6d921b0962587e4d02bcc) and G10147 (volcanoes, 0ec64f2cef3373432eef60908c435e84bf7f4fcc0a23d17446d24e56270a0c6a),
+    read 2026-10-16: "Access Constraints: Access to this dataset is unrestricted."; "Fees: Free online"; "Cite as:
+    ... doi:..."; Use Constraints: no-warranty disclaimer only. NOAA is a US federal agency: works of the US Government
+    are not subject to copyright in the US (17 U.S.C. 105).
+metadata:
+  allowed_hosts: [www.ngdc.noaa.gov]
+  api:
+    openapi: https://www.ngdc.noaa.gov/hazel/hazard-service/docs/api.json
+    openapi_sha256: efd460d2e6f66f43a4eda7acf288a10609e0eba692aa2d1ef921c0f9b0ce16d9
+    base: https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1
+    endpoints: [earthquakes, tsunamis/events, tsunamis/runups, volcanoes, "descriptors/*"]
+    paging: "page=N; itemsPerPage <= 200 (larger values are refused: 'must be less than or equal to 200')"
+    requests_per_full_run: "~240 (earthquakes 34 pages, tsunami events 16, runups 176, volcanoes 5, 8 descriptors; 2026-10-16)"
+  year_convention: >-
+    NCEI years are B.C. negative without a year 0 (HazEL search form help: "Year, example: 200 B.C. = -200"; no record
+    has year 0); REVA stores astronomical years (NCEI y < 0 -> y + 1).
+  field_definitions_evidence: >-
+    HazEL web application help texts (https://www.ngdc.noaa.gov/hazel/static/js/main.4768c122.js, sha256
+    174dc6c34a03658d5b636dbecb8a7691808ae314f2fcdd4288997bd54224b61d, read 2026-10-16): "Whenever possible, total number
+    of deaths from the earthquake and secondary effects are listed." (deathsTotal ...); damage: "it was listed in the
+    Damage column in millions of U.S. dollars. The dollar value listed is the value at the time of the event."; Volcano
+    Number: "Smithsonian Global Volcanism Program (GVP) provides permanent unique identifiers (Volcano Numbers)".
+  not_ingested: >-
+    Record comments (prose with literature references; one request per record via /{id}/info), tsunami deposits and
+    marigrams, the volcano locations list (volcano attributes come from the eruption records). EM-DAT (CRED,
+    UCLouvain) is not used: access needs a registered account and the data are "open access for non-commercial use"
+    (emdat.be, 2026-10-16). GDACS alerts not used (near-real-time model-based alerts; terms page not located).
+  authentication: none
+  cadence: continuously updated by NCEI; REVA refresh monthly

@@ -698,6 +698,33 @@ datasets:
         3: Display of force
         4: Use of force
         5: War
+      HiAct:
+        0: No militarized action
+        1: Threat to use force
+        2: Threat to blockade
+        3: Threat to occupy territory
+        4: Threat to declare war
+        5: Threat to use CBR weapons
+        6: Threat to join war
+        7: Show of force
+        8: Alert
+        9: Nuclear alert
+        10: Mobilization
+        11: Fortify border
+        12: Border violation
+        13: Blockade
+        14: Occupation of territory
+        15: Seizure
+        16: Attack
+        17: Clash
+        18: Declaration of war
+        19: Use of CBR weapons
+        20: Begin interstate war
+        21: Join interstate war
+        -9: Missing
+      Recip:
+        1: 'Yes'
+        0: 'No'
       Fatality:
         0: None
         1: 1-25 deaths
@@ -869,6 +896,14 @@ datasets:
       why: 'UCDP incompatibility (territory / government) is the contested issue of the conflict (UCDP definition of armed
         conflict: ''a contested incompatibility that concerns government and/or territory''): coded issue, not a cause. Also
         present as ucdp:incompatibility on ucdp:conflict:<id> (KGGEOPOL).'
+    - variables:
+      - start_date
+      - start_prec
+      reva_kind: context
+      predicate: P580 start time on ucdp:conflict:<conflict_id>
+      causal: false
+      why: Conflict start date (date of the first battle-related death, replicated from the UCDP/PRIO ACD) so the temporal
+        check of reaction_to claims (conflict -> peace agreement) has a dated cause.
     - variables:
       - c_epid
       - conflict_id

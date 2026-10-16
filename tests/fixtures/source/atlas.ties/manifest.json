@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "6d7ffaa25e8a5e0cc44ce1ff11f132d9a65141d29984e51ed6c40c01cfbf738d",
+    "url": "https://sanctions.web.unc.edu/wp-content/uploads/sites/18834/2021/04/TIESv4-1.xls",
+    "file": "6d7ffaa25e8a5e0c.xls",
+    "sha256": "3ef2bc393e7a7d9681d5cd2f8549a9a1d99e5c1de19ef0cd75e5ea01325dd21a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.ms-excel"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "no licence stated (citation requested)",
+    "note": "full TIESv4-1.xls (TIES 4.1), byte-identical to the live download of 2026-10-16"
+  }
+]

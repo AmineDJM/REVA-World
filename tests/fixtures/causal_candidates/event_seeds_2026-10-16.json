@@ -1,0 +1,3631 @@
+{
+ "kind": "causcand_event_seeds",
+ "query": "SELECT ?item ?sl ?class ?classLabel ?enTitle ?frTitle WHERE {\n  VALUES ?class { wd:Q198 wd:Q8465 wd:Q103495 wd:Q1006311 wd:Q350604 wd:Q10931 wd:Q45382 wd:Q124734 wd:Q124757 wd:Q114380 wd:Q290178 wd:Q176494 wd:Q3002150 wd:Q168247 wd:Q44512 wd:Q12184 wd:Q3839081 wd:Q8065 wd:Q7944 wd:Q8070 wd:Q41397 wd:Q3199915 wd:Q2223653 wd:Q467011 wd:Q1361229 }\n  ?item wdt:P31 ?class ; wikibase:sitelinks ?sl .\n  FILTER(?sl >= 40)\n  OPTIONAL { ?class rdfs:label ?classLabel FILTER(LANG(?classLabel) = \"en\") }\n  OPTIONAL { ?en schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> ; schema:name ?enTitle }\n  OPTIONAL { ?fr schema:about ?item ; schema:isPartOf <https://fr.wikipedia.org/> ; schema:name ?frTitle }\n}",
+ "query_sha256": "cf7022aa579db84084ce7e0d064d1c2921432dd0676355638a9d7a8fc058a815",
+ "raw_sha256": "f0dcc612989a3e14e950ada0e2659ed083123edb48857c5708b4aa1c8891b352",
+ "retrieved_at": "2026-10-16T20:28:47.383453+00:00",
+ "endpoint": "https://query.wikidata.org/sparql",
+ "licence": "Wikidata: CC0 1.0",
+ "min_sitelinks": 40,
+ "classes": {
+  "Q198": "war",
+  "Q8465": "civil war",
+  "Q103495": "world war",
+  "Q1006311": "war of independence",
+  "Q350604": "armed conflict",
+  "Q10931": "revolution",
+  "Q45382": "coup d'état",
+  "Q124734": "rebellion",
+  "Q124757": "riot",
+  "Q114380": "financial crisis",
+  "Q290178": "economic crisis",
+  "Q176494": "economic depression",
+  "Q3002150": "crisis (political/international)",
+  "Q168247": "famine",
+  "Q44512": "epidemic",
+  "Q12184": "pandemic",
+  "Q3839081": "disaster",
+  "Q8065": "natural disaster",
+  "Q7944": "earthquake",
+  "Q8070": "tsunami",
+  "Q41397": "genocide",
+  "Q3199915": "massacre",
+  "Q2223653": "terrorist attack",
+  "Q467011": "invasion",
+  "Q1361229": "conquest"
+ },
+ "class_labels": {
+  "Q198": "war",
+  "Q1361229": "conquest",
+  "Q8465": "civil war",
+  "Q350604": "armed conflict",
+  "Q1006311": "war of national liberation",
+  "Q10931": "revolution",
+  "Q467011": "invasion",
+  "Q7944": "earthquake",
+  "Q2223653": "terrorist attack",
+  "Q103495": "world war",
+  "Q41397": "genocide",
+  "Q124734": "rebellion",
+  "Q114380": "financial crisis",
+  "Q3199915": "massacre",
+  "Q8065": "natural disaster",
+  "Q3839081": "disaster",
+  "Q124757": "riot",
+  "Q12184": "pandemic",
+  "Q45382": "coup d'état",
+  "Q290178": "economic crisis",
+  "Q8070": "tsunami",
+  "Q168247": "famine",
+  "Q176494": "recession",
+  "Q44512": "epidemic",
+  "Q3002150": "aircraft crash"
+ },
+ "items_matching": 388,
+ "limit": 500,
+ "budget": [
+  {
+   "policy": "budgets-1.3.6",
+   "source_key": "wikidata.wdqs",
+   "reserved_requests": 2,
+   "consumed_requests": 1,
+   "consumed_bytes": 326422,
+   "refused_requests": 0
+  },
+  {
+   "policy": "budgets-1.3.6",
+   "source_key": "wikidata.wbapi",
+   "reserved_requests": 0,
+   "consumed_requests": 0,
+   "consumed_bytes": 0,
+   "refused_requests": 0
+  }
+ ],
+ "seeds": [
+  {
+   "qid": "Q362",
+   "sitelinks": 291,
+   "classes": [
+    "Q103495"
+   ],
+   "enwiki": "World War II",
+   "frwiki": "Seconde Guerre mondiale"
+  },
+  {
+   "qid": "Q361",
+   "sitelinks": 265,
+   "classes": [
+    "Q103495"
+   ],
+   "enwiki": "World War I",
+   "frwiki": "Première Guerre mondiale"
+  },
+  {
+   "qid": "Q81068910",
+   "sitelinks": 214,
+   "classes": [
+    "Q12184"
+   ],
+   "enwiki": "COVID-19 pandemic",
+   "frwiki": "Pandémie de Covid-19"
+  },
+  {
+   "qid": "Q12199",
+   "sitelinks": 209,
+   "classes": [
+    "Q12184"
+   ],
+   "enwiki": "HIV/AIDS",
+   "frwiki": "Syndrome d'immunodéficience acquise"
+  },
+  {
+   "qid": "Q2763",
+   "sitelinks": 204,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "The Holocaust",
+   "frwiki": "Shoah"
+  },
+  {
+   "qid": "Q6534",
+   "sitelinks": 196,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "French Revolution",
+   "frwiki": "Révolution française"
+  },
+  {
+   "qid": "Q110999040",
+   "sitelinks": 176,
+   "classes": [
+    "Q198",
+    "Q467011"
+   ],
+   "enwiki": "Russo-Ukrainian war (2022–present)",
+   "frwiki": "Invasion de l'Ukraine par la Russie"
+  },
+  {
+   "qid": "Q8676",
+   "sitelinks": 170,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "American Civil War",
+   "frwiki": "Guerre de Sécession"
+  },
+  {
+   "qid": "Q8663",
+   "sitelinks": 145,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Korean War",
+   "frwiki": "Guerre de Corée"
+  },
+  {
+   "qid": "Q8698",
+   "sitelinks": 134,
+   "classes": [
+    "Q176494",
+    "Q290178"
+   ],
+   "enwiki": "Great Depression",
+   "frwiki": "Grande Dépression"
+  },
+  {
+   "qid": "Q8729",
+   "sitelinks": 132,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Russian Revolution",
+   "frwiki": "Révolution russe"
+  },
+  {
+   "qid": "Q42005",
+   "sitelinks": 130,
+   "classes": [
+    "Q12184"
+   ],
+   "enwiki": "Black Death",
+   "frwiki": "Peste noire"
+  },
+  {
+   "qid": "Q10859",
+   "sitelinks": 128,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Spanish Civil War",
+   "frwiki": "Guerre d'Espagne"
+  },
+  {
+   "qid": "Q12551",
+   "sitelinks": 128,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Hundred Years' War",
+   "frwiki": "Guerre de Cent Ans"
+  },
+  {
+   "qid": "Q80034",
+   "sitelinks": 125,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Armenian genocide",
+   "frwiki": "Génocide arménien"
+  },
+  {
+   "qid": "Q43059",
+   "sitelinks": 124,
+   "classes": [
+    "Q8065"
+   ],
+   "enwiki": "Drought",
+   "frwiki": "Sécheresse"
+  },
+  {
+   "qid": "Q8690",
+   "sitelinks": 123,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Cultural Revolution",
+   "frwiki": "Révolution culturelle"
+  },
+  {
+   "qid": "Q15860072",
+   "sitelinks": 121,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Ukrainian war",
+   "frwiki": "Guerre russo-ukrainienne"
+  },
+  {
+   "qid": "Q122962941",
+   "sitelinks": 120,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Gaza war",
+   "frwiki": "Guerre de Gaza depuis 2023"
+  },
+  {
+   "qid": "Q42976",
+   "sitelinks": 117,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "October Revolution",
+   "frwiki": "Révolution d'Octobre"
+  },
+  {
+   "qid": "Q178810",
+   "sitelinks": 117,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Syrian civil war",
+   "frwiki": "Guerre civile syrienne"
+  },
+  {
+   "qid": "Q40949",
+   "sitelinks": 115,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "American Revolutionary War",
+   "frwiki": "Guerre d'indépendance des États-Unis"
+  },
+  {
+   "qid": "Q37643",
+   "sitelinks": 114,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Gulf War",
+   "frwiki": "Guerre du Golfe"
+  },
+  {
+   "qid": "Q33761",
+   "sitelinks": 112,
+   "classes": [
+    "Q8465",
+    "Q10931",
+    "Q124734"
+   ],
+   "enwiki": "Arab Spring",
+   "frwiki": "Printemps arabe"
+  },
+  {
+   "qid": "Q545449",
+   "sitelinks": 111,
+   "classes": [
+    "Q198",
+    "Q467011"
+   ],
+   "enwiki": "Iraq War",
+   "frwiki": "Guerre d'Irak"
+  },
+  {
+   "qid": "Q49077",
+   "sitelinks": 109,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Six-Day War",
+   "frwiki": "Guerre des Six Jours"
+  },
+  {
+   "qid": "Q79911",
+   "sitelinks": 105,
+   "classes": [
+    "Q8465",
+    "Q350604"
+   ],
+   "enwiki": "Russian Civil War",
+   "frwiki": "Guerre civile russe"
+  },
+  {
+   "qid": "Q126065",
+   "sitelinks": 102,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Iranian Revolution",
+   "frwiki": "Révolution iranienne"
+  },
+  {
+   "qid": "Q83085",
+   "sitelinks": 101,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Soviet–Afghan War",
+   "frwiki": "Guerre d'Afghanistan (1979-1989)"
+  },
+  {
+   "qid": "Q254106",
+   "sitelinks": 100,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Crimean War",
+   "frwiki": "Guerre de Crimée"
+  },
+  {
+   "qid": "Q80330",
+   "sitelinks": 99,
+   "classes": [
+    "Q198",
+    "Q8465"
+   ],
+   "enwiki": "English Civil War",
+   "frwiki": "Première révolution anglaise"
+  },
+  {
+   "qid": "Q33143",
+   "sitelinks": 98,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Seven Years' War",
+   "frwiki": "Guerre de Sept Ans"
+  },
+  {
+   "qid": "Q46083",
+   "sitelinks": 97,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Franco-Prussian War",
+   "frwiki": "Guerre franco-allemande de 1870"
+  },
+  {
+   "qid": "Q82664",
+   "sitelinks": 96,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Iran–Iraq War",
+   "frwiki": "Guerre Iran-Irak"
+  },
+  {
+   "qid": "Q49100",
+   "sitelinks": 95,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Yom Kippur War",
+   "frwiki": "Guerre du Kippour"
+  },
+  {
+   "qid": "Q36204",
+   "sitelinks": 93,
+   "classes": [
+    "Q8070"
+   ],
+   "enwiki": "2011 Tōhoku earthquake and tsunami",
+   "frwiki": "Séisme de 2011 de la côte Pacifique du Tōhoku"
+  },
+  {
+   "qid": "Q134949",
+   "sitelinks": 93,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Winter War",
+   "frwiki": "Guerre d'Hiver"
+  },
+  {
+   "qid": "Q159950",
+   "sitelinks": 93,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Japanese War",
+   "frwiki": "Guerre russo-japonaise"
+  },
+  {
+   "qid": "Q83055",
+   "sitelinks": 92,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Operation Barbarossa",
+   "frwiki": "Opération Barbarossa"
+  },
+  {
+   "qid": "Q165058",
+   "sitelinks": 92,
+   "classes": [
+    "Q41397",
+    "Q168247"
+   ],
+   "enwiki": "Holodomor",
+   "frwiki": "Holodomor"
+  },
+  {
+   "qid": "Q192769",
+   "sitelinks": 91,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "American Revolution",
+   "frwiki": "Révolution américaine"
+  },
+  {
+   "qid": "Q124086054",
+   "sitelinks": 91,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Gaza genocide",
+   "frwiki": "Génocide à Gaza"
+  },
+  {
+   "qid": "Q99717",
+   "sitelinks": 90,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "1989 Tiananmen Square protests and massacre",
+   "frwiki": "Manifestations de la place Tian'anmen"
+  },
+  {
+   "qid": "Q170314",
+   "sitelinks": 90,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Sino-Japanese War",
+   "frwiki": "Seconde guerre sino-japonaise"
+  },
+  {
+   "qid": "Q189266",
+   "sitelinks": 90,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Eastern Front (World War II)",
+   "frwiki": "Front de l'Est (Seconde Guerre mondiale)"
+  },
+  {
+   "qid": "Q12583",
+   "sitelinks": 89,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Spanish–American War",
+   "frwiki": "Guerre hispano-américaine"
+  },
+  {
+   "qid": "Q26013",
+   "sitelinks": 89,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of 1812",
+   "frwiki": "Guerre anglo-américaine de 1812"
+  },
+  {
+   "qid": "Q81545",
+   "sitelinks": 89,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Libyan civil war (2011)",
+   "frwiki": "Première guerre civile libyenne"
+  },
+  {
+   "qid": "Q131297",
+   "sitelinks": 89,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Rwandan genocide",
+   "frwiki": "Génocide des Tutsis du Rwanda"
+  },
+  {
+   "qid": "Q11264",
+   "sitelinks": 88,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Cuban Revolution",
+   "frwiki": "Révolution cubaine"
+  },
+  {
+   "qid": "Q79967",
+   "sitelinks": 88,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2011 Norway attacks",
+   "frwiki": "Attentats d'Oslo et d'Utøya"
+  },
+  {
+   "qid": "Q101534",
+   "sitelinks": 88,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "February Revolution",
+   "frwiki": "Révolution de Février"
+  },
+  {
+   "qid": "Q130754",
+   "sitelinks": 87,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q8070",
+    "Q3839081"
+   ],
+   "enwiki": "2004 Indian Ocean earthquake and tsunami",
+   "frwiki": "Séisme et tsunami de 2004 dans l'océan Indien"
+  },
+  {
+   "qid": "Q179975",
+   "sitelinks": 85,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Chinese Civil War",
+   "frwiki": "Guerre civile chinoise"
+  },
+  {
+   "qid": "Q182865",
+   "sitelinks": 84,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War in Afghanistan (2001–2021)",
+   "frwiki": "Guerre d'Afghanistan (2001-2021)"
+  },
+  {
+   "qid": "Q620735",
+   "sitelinks": 84,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Georgian War",
+   "frwiki": "Guerre russo-géorgienne"
+  },
+  {
+   "qid": "Q43777",
+   "sitelinks": 83,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "2010 Haiti earthquake",
+   "frwiki": "Séisme de 2010 en Haïti"
+  },
+  {
+   "qid": "Q363",
+   "sitelinks": 82,
+   "classes": [
+    "Q103495"
+   ],
+   "enwiki": "World War III",
+   "frwiki": "Troisième Guerre mondiale"
+  },
+  {
+   "qid": "Q33745",
+   "sitelinks": 82,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Peloponnesian War",
+   "frwiki": "Guerre du Péloponnèse"
+  },
+  {
+   "qid": "Q129864",
+   "sitelinks": 82,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Indian Rebellion of 1857",
+   "frwiki": "Révolte des cipayes"
+  },
+  {
+   "qid": "Q164348",
+   "sitelinks": 82,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Hungarian Revolution of 1956",
+   "frwiki": "Révolution hongroise de 1956"
+  },
+  {
+   "qid": "Q127751",
+   "sitelinks": 81,
+   "classes": [
+    "Q198",
+    "Q8465"
+   ],
+   "enwiki": "Wars of the Roses",
+   "frwiki": "Guerre des Deux-Roses"
+  },
+  {
+   "qid": "Q896666",
+   "sitelinks": 81,
+   "classes": [
+    "Q114380"
+   ],
+   "enwiki": "2008 financial crisis",
+   "frwiki": "Crise financière mondiale de 2007-2008"
+  },
+  {
+   "qid": "Q29269",
+   "sitelinks": 80,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Chechen War",
+   "frwiki": "Première guerre de Tchétchénie"
+  },
+  {
+   "qid": "Q160077",
+   "sitelinks": 80,
+   "classes": [
+    "Q1361229"
+   ],
+   "enwiki": "Fall of Constantinople",
+   "frwiki": "Chute de Constantinople"
+  },
+  {
+   "qid": "Q180548",
+   "sitelinks": 80,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Neolithic Revolution",
+   "frwiki": "Révolution néolithique"
+  },
+  {
+   "qid": "Q150812",
+   "sitelinks": 79,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Invasion of Poland",
+   "frwiki": "Campagne de Pologne (1939)"
+  },
+  {
+   "qid": "Q151616",
+   "sitelinks": 79,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Great Northern War",
+   "frwiki": "Grande guerre du Nord"
+  },
+  {
+   "qid": "Q179250",
+   "sitelinks": 79,
+   "classes": [
+    "Q198",
+    "Q467011"
+   ],
+   "enwiki": "French invasion of Russia",
+   "frwiki": "Campagne de Russie"
+  },
+  {
+   "qid": "Q150229",
+   "sitelinks": 78,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Boxer Rebellion",
+   "frwiki": "Révolte des Boxers"
+  },
+  {
+   "qid": "Q150701",
+   "sitelinks": 78,
+   "classes": [
+    "Q103495"
+   ],
+   "enwiki": "War of the Spanish Succession",
+   "frwiki": "Guerre de Succession d'Espagne"
+  },
+  {
+   "qid": "Q177918",
+   "sitelinks": 78,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Balkan War",
+   "frwiki": "Première guerre balkanique"
+  },
+  {
+   "qid": "Q178687",
+   "sitelinks": 77,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Sino-Japanese War",
+   "frwiki": "Première guerre sino-japonaise"
+  },
+  {
+   "qid": "Q191282",
+   "sitelinks": 77,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Opium War",
+   "frwiki": "Première guerre de l'opium"
+  },
+  {
+   "qid": "Q15224558",
+   "sitelinks": 77,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "Euromaidan",
+   "frwiki": "Euromaïdan"
+  },
+  {
+   "qid": "Q62066211",
+   "sitelinks": 77,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Christchurch mosque shootings",
+   "frwiki": "Attentats de Christchurch"
+  },
+  {
+   "qid": "Q134900605",
+   "sitelinks": 77,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Twelve-Day War",
+   "frwiki": "Guerre des Douze Jours"
+  },
+  {
+   "qid": "Q6271",
+   "sitelinks": 76,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Punic War",
+   "frwiki": "Deuxième guerre punique"
+  },
+  {
+   "qid": "Q6683",
+   "sitelinks": 76,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Mexican–American War",
+   "frwiki": "Guerre américano-mexicaine"
+  },
+  {
+   "qid": "Q134301",
+   "sitelinks": 76,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Katyn massacre",
+   "frwiki": "Massacre de Katyń"
+  },
+  {
+   "qid": "Q164432",
+   "sitelinks": 76,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Eighty Years' War",
+   "frwiki": "Guerre de Quatre-Vingts Ans"
+  },
+  {
+   "qid": "Q174205",
+   "sitelinks": 76,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Russo-Turkish War (1877–1878)",
+   "frwiki": "Guerre russo-turque de 1877-1878"
+  },
+  {
+   "qid": "Q18718876",
+   "sitelinks": 75,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Charlie Hebdo shooting",
+   "frwiki": "Attentat contre Charlie Hebdo"
+  },
+  {
+   "qid": "Q19830062",
+   "sitelinks": 75,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "April 2015 Nepal earthquake",
+   "frwiki": "Séismes de 2015 au Népal"
+  },
+  {
+   "qid": "Q104705419",
+   "sitelinks": 75,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "January 6 United States Capitol attack",
+   "frwiki": "Assaut du Capitole par des partisans de Donald Trump"
+  },
+  {
+   "qid": "Q49104",
+   "sitelinks": 74,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "2006 Lebanon War",
+   "frwiki": "Conflit israélo-libanais de 2006"
+  },
+  {
+   "qid": "Q163891",
+   "sitelinks": 74,
+   "classes": [
+    "Q41397",
+    "Q3199915"
+   ],
+   "enwiki": "St. Bartholomew's Day massacre",
+   "frwiki": "Massacre de la Saint-Barthélemy"
+  },
+  {
+   "qid": "Q170334",
+   "sitelinks": 74,
+   "classes": [
+    "Q41397",
+    "Q3199915"
+   ],
+   "enwiki": "Srebrenica massacre",
+   "frwiki": "Génocide de Srebrenica"
+  },
+  {
+   "qid": "Q185729",
+   "sitelinks": 74,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War on terror",
+   "frwiki": "Guerre contre le terrorisme"
+  },
+  {
+   "qid": "Q182062",
+   "sitelinks": 73,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Greek War of Independence",
+   "frwiki": "Guerre d'indépendance grecque"
+  },
+  {
+   "qid": "Q190029",
+   "sitelinks": 73,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Kosovo War",
+   "frwiki": "Guerre du Kosovo"
+  },
+  {
+   "qid": "Q192055",
+   "sitelinks": 73,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Nanjing Massacre",
+   "frwiki": "Massacre de Nankin"
+  },
+  {
+   "qid": "Q16335075",
+   "sitelinks": 73,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "War in Donbas",
+   "frwiki": "Guerre du Donbass"
+  },
+  {
+   "qid": "Q99659280",
+   "sitelinks": 73,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Nagorno-Karabakh War",
+   "frwiki": "Deuxième guerre du Haut-Karabagh"
+  },
+  {
+   "qid": "Q133574091",
+   "sitelinks": 73,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2025 Myanmar earthquake",
+   "frwiki": "Séisme de 2025 en Birmanie"
+  },
+  {
+   "qid": "Q6743",
+   "sitelinks": 72,
+   "classes": [
+    "Q124757"
+   ],
+   "enwiki": "May 68",
+   "frwiki": "Mai 68"
+  },
+  {
+   "qid": "Q200790",
+   "sitelinks": 72,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Algerian War",
+   "frwiki": "Guerre d'Algérie"
+  },
+  {
+   "qid": "Q111467700",
+   "sitelinks": 72,
+   "classes": [
+    "Q41397",
+    "Q3199915"
+   ],
+   "enwiki": "Bucha massacre",
+   "frwiki": "Massacre de Boutcha"
+  },
+  {
+   "qid": "Q184928",
+   "sitelinks": 71,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Russian Revolution of 1905",
+   "frwiki": "Révolution russe de 1905"
+  },
+  {
+   "qid": "Q186284",
+   "sitelinks": 71,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Polish–Soviet War",
+   "frwiki": "Guerre soviéto-polonaise"
+  },
+  {
+   "qid": "Q25893254",
+   "sitelinks": 71,
+   "classes": [
+    "Q2223653",
+    "Q3199915"
+   ],
+   "enwiki": "2016 Nice truck attack",
+   "frwiki": "Attentat du 14 juillet 2016 à Nice"
+  },
+  {
+   "qid": "Q184183",
+   "sitelinks": 70,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Balkan War",
+   "frwiki": "Deuxième guerre balkanique"
+  },
+  {
+   "qid": "Q23365300",
+   "sitelinks": 70,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2016 Brussels bombings",
+   "frwiki": "Attentats du 22 mars 2016 à Bruxelles"
+  },
+  {
+   "qid": "Q190517",
+   "sitelinks": 69,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "1911 Revolution",
+   "frwiki": "Révolution chinoise de 1911"
+  },
+  {
+   "qid": "Q214426",
+   "sitelinks": 69,
+   "classes": [
+    "Q8465",
+    "Q10931"
+   ],
+   "enwiki": "Mexican Revolution",
+   "frwiki": "Révolution mexicaine"
+  },
+  {
+   "qid": "Q119860532",
+   "sitelinks": 69,
+   "classes": [
+    "Q124734",
+    "Q350604"
+   ],
+   "enwiki": "Wagner Group rebellion",
+   "frwiki": "Rébellion du groupe Wagner"
+  },
+  {
+   "qid": "Q153650",
+   "sitelinks": 68,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Austro-Prussian War",
+   "frwiki": "Guerre austro-prussienne"
+  },
+  {
+   "qid": "Q200485",
+   "sitelinks": 68,
+   "classes": [
+    "Q1361229"
+   ],
+   "enwiki": "Norman Conquest",
+   "frwiki": "Conquête normande de l'Angleterre"
+  },
+  {
+   "qid": "Q234738",
+   "sitelinks": 68,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Turkish War of Independence",
+   "frwiki": "Guerre d'indépendance turque"
+  },
+  {
+   "qid": "Q836386",
+   "sitelinks": 68,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Orange Revolution",
+   "frwiki": "Révolution orange"
+  },
+  {
+   "qid": "Q117716414",
+   "sitelinks": 68,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Sudanese civil war (2023–present)",
+   "frwiki": "Guerre civile soudanaise depuis 2023"
+  },
+  {
+   "qid": "Q32929",
+   "sitelinks": 67,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Austrian Succession",
+   "frwiki": "Guerre de Succession d'Autriche"
+  },
+  {
+   "qid": "Q152499",
+   "sitelinks": 67,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Peninsular War",
+   "frwiki": "Guerre d'indépendance espagnole"
+  },
+  {
+   "qid": "Q188371",
+   "sitelinks": 67,
+   "classes": [
+    "Q168247"
+   ],
+   "enwiki": "Great Famine (Ireland)",
+   "frwiki": "Grande famine irlandaise"
+  },
+  {
+   "qid": "Q192408",
+   "sitelinks": 67,
+   "classes": [
+    "Q8465",
+    "Q124734"
+   ],
+   "enwiki": "Taiping Rebellion",
+   "frwiki": "Révolte des Taiping"
+  },
+  {
+   "qid": "Q214028",
+   "sitelinks": 67,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "July Revolution",
+   "frwiki": "Trois Glorieuses"
+  },
+  {
+   "qid": "Q371394",
+   "sitelinks": 67,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Bangladesh Liberation War",
+   "frwiki": "Guerre de libération du Bangladesh"
+  },
+  {
+   "qid": "Q381375",
+   "sitelinks": 67,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Nagorno-Karabakh War",
+   "frwiki": "Première guerre du Haut-Karabagh"
+  },
+  {
+   "qid": "Q418151",
+   "sitelinks": 67,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Opium War",
+   "frwiki": "Seconde guerre de l'opium"
+  },
+  {
+   "qid": "Q748780",
+   "sitelinks": 67,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Indochina War",
+   "frwiki": "Guerre d'Indochine"
+  },
+  {
+   "qid": "Q152004",
+   "sitelinks": 66,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Pacific",
+   "frwiki": "Guerre du Pacifique (1879-1884)"
+  },
+  {
+   "qid": "Q189508",
+   "sitelinks": 66,
+   "classes": [
+    "Q10931",
+    "Q45382"
+   ],
+   "enwiki": "Glorious Revolution",
+   "frwiki": "Glorieuse Révolution"
+  },
+  {
+   "qid": "Q215112",
+   "sitelinks": 66,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Boer War",
+   "frwiki": "Seconde guerre des Boers"
+  },
+  {
+   "qid": "Q49097",
+   "sitelinks": 65,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "1948 Palestine war",
+   "frwiki": "Guerre israélo-arabe de 1948"
+  },
+  {
+   "qid": "Q183421",
+   "sitelinks": 65,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "My Lai massacre",
+   "frwiki": "Massacre de Mỹ Lai"
+  },
+  {
+   "qid": "Q193245",
+   "sitelinks": 65,
+   "classes": [
+    "Q10931",
+    "Q45382"
+   ],
+   "enwiki": "Carnation Revolution",
+   "frwiki": "Révolution des Œillets"
+  },
+  {
+   "qid": "Q19671417",
+   "sitelinks": 65,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "Germanwings Flight 9525",
+   "frwiki": "Crash de l'A320 de Germanwings"
+  },
+  {
+   "qid": "Q137612545",
+   "sitelinks": 65,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "2025–2026 Iranian protests",
+   "frwiki": "Manifestations en Iran depuis 2025"
+  },
+  {
+   "qid": "Q6286",
+   "sitelinks": 64,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Punic War",
+   "frwiki": "Première guerre punique"
+  },
+  {
+   "qid": "Q68969",
+   "sitelinks": 64,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Croatian War of Independence",
+   "frwiki": "Guerre de Croatie"
+  },
+  {
+   "qid": "Q120843",
+   "sitelinks": 64,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Chechen War",
+   "frwiki": "Seconde guerre de Tchétchénie"
+  },
+  {
+   "qid": "Q182817",
+   "sitelinks": 64,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Velvet Revolution",
+   "frwiki": "Révolution de Velours"
+  },
+  {
+   "qid": "Q208484",
+   "sitelinks": 64,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Lebanese Civil War",
+   "frwiki": "Guerre du Liban"
+  },
+  {
+   "qid": "Q202578",
+   "sitelinks": 63,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "First Jewish–Roman War",
+   "frwiki": "Première guerre judéo-romaine"
+  },
+  {
+   "qid": "Q275918",
+   "sitelinks": 63,
+   "classes": [
+    "Q1361229"
+   ],
+   "enwiki": "Early Muslim conquests",
+   "frwiki": "Expansion de l'islam"
+  },
+  {
+   "qid": "Q6334",
+   "sitelinks": 62,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Third Punic War",
+   "frwiki": "Troisième guerre punique"
+  },
+  {
+   "qid": "Q170682",
+   "sitelinks": 62,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Gaza War (2008–2009)",
+   "frwiki": "Guerre de Gaza de 2008-2009"
+  },
+  {
+   "qid": "Q203824",
+   "sitelinks": 62,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Italo-Turkish War",
+   "frwiki": "Guerre italo-turque"
+  },
+  {
+   "qid": "Q470596",
+   "sitelinks": 62,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Year of the Four Emperors",
+   "frwiki": "Année des quatre empereurs"
+  },
+  {
+   "qid": "Q11086137",
+   "sitelinks": 62,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Boston Marathon bombing",
+   "frwiki": "Double attentat du marathon 2013 de Boston"
+  },
+  {
+   "qid": "Q191293",
+   "sitelinks": 61,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "1556 Shaanxi earthquake",
+   "frwiki": "Séisme du 23 janvier 1556 au Shaanxi"
+  },
+  {
+   "qid": "Q193689",
+   "sitelinks": 61,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Easter Rising",
+   "frwiki": "Insurrection de Pâques 1916"
+  },
+  {
+   "qid": "Q229007",
+   "sitelinks": 61,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Munich massacre",
+   "frwiki": "Prise d'otages des Jeux olympiques de Munich"
+  },
+  {
+   "qid": "Q316817",
+   "sitelinks": 61,
+   "classes": [
+    "Q290178"
+   ],
+   "enwiki": "1973 oil crisis",
+   "frwiki": "Premier choc pétrolier"
+  },
+  {
+   "qid": "Q689128",
+   "sitelinks": 61,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Haitian Revolution",
+   "frwiki": "Révolution haïtienne"
+  },
+  {
+   "qid": "Q19686631",
+   "sitelinks": 61,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Yemeni civil war (2014–present)",
+   "frwiki": "Guerre civile yéménite"
+  },
+  {
+   "qid": "Q105180889",
+   "sitelinks": 61,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "2021 Myanmar coup d'état",
+   "frwiki": "Coup d'État de 2021 en Birmanie"
+  },
+  {
+   "qid": "Q58947",
+   "sitelinks": 60,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Paraguayan War",
+   "frwiki": "Guerre de la Triple-Alliance"
+  },
+  {
+   "qid": "Q153813",
+   "sitelinks": 60,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Extermination camp",
+   "frwiki": "Centres d'extermination nazis"
+  },
+  {
+   "qid": "Q170306",
+   "sitelinks": 60,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "German revolution of 1918–1919",
+   "frwiki": "Révolution allemande de 1918-1919"
+  },
+  {
+   "qid": "Q202161",
+   "sitelinks": 60,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Gallic Wars",
+   "frwiki": "Guerre des Gaules"
+  },
+  {
+   "qid": "Q211855",
+   "sitelinks": 60,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Finnish Civil War",
+   "frwiki": "Guerre civile finlandaise"
+  },
+  {
+   "qid": "Q233583",
+   "sitelinks": 60,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "India–Pakistan war of 1965",
+   "frwiki": "Deuxième guerre indo-pakistanaise"
+  },
+  {
+   "qid": "Q1413732",
+   "sitelinks": 60,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Kashmir conflict",
+   "frwiki": "Conflit du Cachemire"
+  },
+  {
+   "qid": "Q15989108",
+   "sitelinks": 60,
+   "classes": [
+    "Q44512"
+   ],
+   "enwiki": "Western African Ebola epidemic",
+   "frwiki": "Épidémie de maladie à virus Ebola en Afrique de l'Ouest"
+  },
+  {
+   "qid": "Q122351413",
+   "sitelinks": 60,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2023 Al Haouz earthquake",
+   "frwiki": "Séisme de 2023 au Maroc"
+  },
+  {
+   "qid": "Q122976243",
+   "sitelinks": 60,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "October 7 attacks",
+   "frwiki": "Attaques du 7 octobre 2023"
+  },
+  {
+   "qid": "Q127013",
+   "sitelinks": 59,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Final Solution",
+   "frwiki": "Solution finale"
+  },
+  {
+   "qid": "Q190882",
+   "sitelinks": 59,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Phoney War",
+   "frwiki": "Drôle de guerre"
+  },
+  {
+   "qid": "Q191055",
+   "sitelinks": 59,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "1755 Lisbon earthquake",
+   "frwiki": "Séisme de 1755 à Lisbonne"
+  },
+  {
+   "qid": "Q214456",
+   "sitelinks": 59,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Philippine–American War",
+   "frwiki": "Guerre américano-philippine"
+  },
+  {
+   "qid": "Q24561572",
+   "sitelinks": 59,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Pulse nightclub shooting",
+   "frwiki": "Fusillade du 12 juin 2016 à Orlando"
+  },
+  {
+   "qid": "Q190758",
+   "sitelinks": 58,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "War in Darfur",
+   "frwiki": "Guerre du Darfour"
+  },
+  {
+   "qid": "Q207318",
+   "sitelinks": 58,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "French Revolutionary Wars",
+   "frwiki": "Guerres de la Révolution française"
+  },
+  {
+   "qid": "Q208300",
+   "sitelinks": 58,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Kronstadt rebellion",
+   "frwiki": "Révolte de Kronstadt"
+  },
+  {
+   "qid": "Q246863",
+   "sitelinks": 58,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Livonian War",
+   "frwiki": "Guerre de Livonie"
+  },
+  {
+   "qid": "Q473716",
+   "sitelinks": 58,
+   "classes": [
+    "Q10931",
+    "Q1006311"
+   ],
+   "enwiki": "Hungarian Revolution of 1848",
+   "frwiki": "Révolution hongroise de 1848"
+  },
+  {
+   "qid": "Q94916",
+   "sitelinks": 57,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Italo-Ethiopian War",
+   "frwiki": "Seconde guerre italo-éthiopienne"
+  },
+  {
+   "qid": "Q154510",
+   "sitelinks": 57,
+   "classes": [
+    "Q176494"
+   ],
+   "enwiki": "Great Recession",
+   "frwiki": "Grande Récession de 2008"
+  },
+  {
+   "qid": "Q887684",
+   "sitelinks": 57,
+   "classes": [
+    "Q198",
+    "Q1361229"
+   ],
+   "enwiki": "Muslim conquest of Persia",
+   "frwiki": "Conquête musulmane de la Perse"
+  },
+  {
+   "qid": "Q21282782",
+   "sitelinks": 57,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Metrojet Flight 9268",
+   "frwiki": "Vol Metrojet 9268"
+  },
+  {
+   "qid": "Q80880",
+   "sitelinks": 56,
+   "classes": [
+    "Q114380"
+   ],
+   "enwiki": "1997 Asian financial crisis",
+   "frwiki": "Crise économique asiatique"
+  },
+  {
+   "qid": "Q151835",
+   "sitelinks": 56,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q8070",
+    "Q3839081"
+   ],
+   "enwiki": "2010 Chile earthquake",
+   "frwiki": "Séisme de 2010 au Chili"
+  },
+  {
+   "qid": "Q154697",
+   "sitelinks": 56,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "French and Indian War",
+   "frwiki": "Guerre de la Conquête"
+  },
+  {
+   "qid": "Q208694",
+   "sitelinks": 56,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Sino-Indian War",
+   "frwiki": "Guerre sino-indienne"
+  },
+  {
+   "qid": "Q239060",
+   "sitelinks": 56,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Arab Revolt",
+   "frwiki": "Révolte arabe de 1916-1918"
+  },
+  {
+   "qid": "Q18683047",
+   "sitelinks": 56,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "Indonesia AirAsia Flight 8501",
+   "frwiki": "Vol Indonesia AirAsia 8501"
+  },
+  {
+   "qid": "Q49103",
+   "sitelinks": 55,
+   "classes": [
+    "Q198",
+    "Q350604"
+   ],
+   "enwiki": "1982 Lebanon War",
+   "frwiki": "Invasion israélienne du Liban de 1982"
+  },
+  {
+   "qid": "Q87138",
+   "sitelinks": 55,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Greco-Turkish War (1919–1922)",
+   "frwiki": "Guerre gréco-turque (1919-1922)"
+  },
+  {
+   "qid": "Q152033",
+   "sitelinks": 55,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2008 Sichuan earthquake",
+   "frwiki": "Séisme de 2008 au Sichuan"
+  },
+  {
+   "qid": "Q213394",
+   "sitelinks": 55,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Sri Lankan civil war",
+   "frwiki": "Guerre civile du Sri Lanka"
+  },
+  {
+   "qid": "Q223933",
+   "sitelinks": 55,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Belgian Revolution",
+   "frwiki": "Révolution belge"
+  },
+  {
+   "qid": "Q242099",
+   "sitelinks": 55,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Mukden incident",
+   "frwiki": "Incident de Mukden"
+  },
+  {
+   "qid": "Q622774",
+   "sitelinks": 55,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "French Revolution of 1848",
+   "frwiki": "Révolution française de 1848"
+  },
+  {
+   "qid": "Q748042",
+   "sitelinks": 55,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Irish Civil War",
+   "frwiki": "Guerre civile irlandaise"
+  },
+  {
+   "qid": "Q2305266",
+   "sitelinks": 55,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Soviet invasion of Poland",
+   "frwiki": "Invasion soviétique de la Pologne"
+  },
+  {
+   "qid": "Q8628",
+   "sitelinks": 54,
+   "classes": [
+    "Q8465",
+    "Q3199915"
+   ],
+   "enwiki": "War in the Vendée",
+   "frwiki": "Guerre de Vendée"
+  },
+  {
+   "qid": "Q68750",
+   "sitelinks": 54,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Mexican War of Independence",
+   "frwiki": "Guerre d'indépendance du Mexique"
+  },
+  {
+   "qid": "Q74623",
+   "sitelinks": 54,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Great Turkish War",
+   "frwiki": "Grande guerre turque"
+  },
+  {
+   "qid": "Q152218",
+   "sitelinks": 54,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Nine Years' War",
+   "frwiki": "Guerre de la Ligue d'Augsbourg"
+  },
+  {
+   "qid": "Q188972",
+   "sitelinks": 54,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Greek Civil War",
+   "frwiki": "Guerre civile grecque"
+  },
+  {
+   "qid": "Q193733",
+   "sitelinks": 54,
+   "classes": [
+    "Q2223653",
+    "Q3199915"
+   ],
+   "enwiki": "Beslan school siege",
+   "frwiki": "Prise d'otages de Beslan"
+  },
+  {
+   "qid": "Q194378",
+   "sitelinks": 54,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Third Servile War",
+   "frwiki": "Troisième guerre servile"
+  },
+  {
+   "qid": "Q243620",
+   "sitelinks": 54,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Somali Civil War",
+   "frwiki": "Guerre civile somalienne"
+  },
+  {
+   "qid": "Q404517",
+   "sitelinks": 54,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Kargil War",
+   "frwiki": "Conflit de Kargil"
+  },
+  {
+   "qid": "Q28036573",
+   "sitelinks": 54,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "2016 Berlin truck attack",
+   "frwiki": "Attentat du 19 décembre 2016 à Berlin"
+  },
+  {
+   "qid": "Q154940",
+   "sitelinks": 53,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Lapland War",
+   "frwiki": "Guerre de Laponie"
+  },
+  {
+   "qid": "Q163883",
+   "sitelinks": 53,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Ten-Day War",
+   "frwiki": "Guerre de Slovénie"
+  },
+  {
+   "qid": "Q210137",
+   "sitelinks": 53,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2005 Kashmir earthquake",
+   "frwiki": "Séisme du 8 octobre 2005 au Cachemire"
+  },
+  {
+   "qid": "Q212618",
+   "sitelinks": 53,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "1960 Valdivia earthquake",
+   "frwiki": "Séisme de 1960 à Valdivia"
+  },
+  {
+   "qid": "Q219470",
+   "sitelinks": 53,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Rose Revolution",
+   "frwiki": "Révolution des Roses"
+  },
+  {
+   "qid": "Q309184",
+   "sitelinks": 53,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Boshin War",
+   "frwiki": "Guerre de Boshin"
+  },
+  {
+   "qid": "Q829875",
+   "sitelinks": 53,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Nigerian Civil War",
+   "frwiki": "Guerre du Biafra"
+  },
+  {
+   "qid": "Q852236",
+   "sitelinks": 53,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Sayfo",
+   "frwiki": "Génocide assyrien"
+  },
+  {
+   "qid": "Q28094271",
+   "sitelinks": 53,
+   "classes": [
+    "Q2223653",
+    "Q3199915"
+   ],
+   "enwiki": "Istanbul nightclub shooting",
+   "frwiki": "Attentat de 2017 à Istanbul"
+  },
+  {
+   "qid": "Q114065797",
+   "sitelinks": 53,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Mahsa Amini protests",
+   "frwiki": "Manifestations consécutives à la mort de Mahsa Amini"
+  },
+  {
+   "qid": "Q117571",
+   "sitelinks": 52,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Romani Holocaust",
+   "frwiki": "Porajmos"
+  },
+  {
+   "qid": "Q211386",
+   "sitelinks": 52,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "1906 San Francisco earthquake",
+   "frwiki": "Séisme de 1906 à San Francisco"
+  },
+  {
+   "qid": "Q329203",
+   "sitelinks": 52,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Boer War",
+   "frwiki": "Première guerre des Boers"
+  },
+  {
+   "qid": "Q334502",
+   "sitelinks": 52,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Bar Kokhba Revolt",
+   "frwiki": "Révolte de Bar Kokhba"
+  },
+  {
+   "qid": "Q382116",
+   "sitelinks": 52,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Caucasian War",
+   "frwiki": "Guerre du Caucase"
+  },
+  {
+   "qid": "Q462195",
+   "sitelinks": 52,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "1976 Tangshan earthquake",
+   "frwiki": "Séisme de 1976 à Tangshan"
+  },
+  {
+   "qid": "Q75756",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Congo War",
+   "frwiki": "Deuxième guerre du Congo"
+  },
+  {
+   "qid": "Q138107",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Sixth Coalition",
+   "frwiki": "Guerre de la Sixième Coalition"
+  },
+  {
+   "qid": "Q154981",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Schleswig War",
+   "frwiki": "Guerre des Duchés"
+  },
+  {
+   "qid": "Q190819",
+   "sitelinks": 51,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Bloody Sunday (1972)",
+   "frwiki": "Bloody Sunday (1972)"
+  },
+  {
+   "qid": "Q204213",
+   "sitelinks": 51,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Romanian revolution",
+   "frwiki": "Révolution roumaine de 1989"
+  },
+  {
+   "qid": "Q214148",
+   "sitelinks": 51,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Haymarket affair",
+   "frwiki": "Massacre de Haymarket Square"
+  },
+  {
+   "qid": "Q223085",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Football War",
+   "frwiki": "Guerre de Cent Heures"
+  },
+  {
+   "qid": "Q249232",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Third Coalition",
+   "frwiki": "Guerre de la Troisième Coalition"
+  },
+  {
+   "qid": "Q422082",
+   "sitelinks": 51,
+   "classes": [
+    "Q198",
+    "Q10931"
+   ],
+   "enwiki": "Philippine Revolution",
+   "frwiki": "Révolution philippine"
+  },
+  {
+   "qid": "Q473670",
+   "sitelinks": 51,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "January Uprising",
+   "frwiki": "Insurrection de Janvier"
+  },
+  {
+   "qid": "Q593774",
+   "sitelinks": 51,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "1953 Iranian coup d'état",
+   "frwiki": "Opération Ajax"
+  },
+  {
+   "qid": "Q734004",
+   "sitelinks": 51,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Black January",
+   "frwiki": "Janvier Noir"
+  },
+  {
+   "qid": "Q821711",
+   "sitelinks": 51,
+   "classes": [
+    "Q12184"
+   ],
+   "enwiki": "Plague of Justinian",
+   "frwiki": "Peste de Justinien"
+  },
+  {
+   "qid": "Q856670",
+   "sitelinks": 51,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "1973 Chilean coup d'état",
+   "frwiki": "Coup d'État de 1973 au Chili"
+  },
+  {
+   "qid": "Q1922071",
+   "sitelinks": 51,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "India–Pakistan war of 1971",
+   "frwiki": "Troisième guerre indo-pakistanaise"
+  },
+  {
+   "qid": "Q2454958",
+   "sitelinks": 51,
+   "classes": [
+    "Q168247"
+   ],
+   "enwiki": "Great Chinese Famine",
+   "frwiki": "Grande famine chinoise"
+  },
+  {
+   "qid": "Q41522095",
+   "sitelinks": 51,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "2017 Las Vegas shooting",
+   "frwiki": "Fusillade de Las Vegas"
+  },
+  {
+   "qid": "Q49092",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "1948 Arab–Israeli War",
+   "frwiki": "Guerre israélo-arabe de 1948-1949"
+  },
+  {
+   "qid": "Q108413",
+   "sitelinks": 50,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Wounded Knee Massacre",
+   "frwiki": "Massacre de Wounded Knee"
+  },
+  {
+   "qid": "Q122100",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Continuation War",
+   "frwiki": "Guerre de Continuation"
+  },
+  {
+   "qid": "Q208156",
+   "sitelinks": 50,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Mongol invasions of Japan",
+   "frwiki": "Invasions mongoles du Japon"
+  },
+  {
+   "qid": "Q217528",
+   "sitelinks": 50,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Oklahoma City bombing",
+   "frwiki": "Attentat d'Oklahoma City"
+  },
+  {
+   "qid": "Q223126",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Chaco War",
+   "frwiki": "Guerre du Chaco"
+  },
+  {
+   "qid": "Q462964",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "November Uprising",
+   "frwiki": "Insurrection de Novembre"
+  },
+  {
+   "qid": "Q620965",
+   "sitelinks": 50,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "Coup of 18 Brumaire",
+   "frwiki": "Coup d'État du 18 Brumaire"
+  },
+  {
+   "qid": "Q623171",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Sino-Vietnamese War",
+   "frwiki": "Guerre sino-vietnamienne"
+  },
+  {
+   "qid": "Q652285",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "India–Pakistan war of 1947–1948",
+   "frwiki": "Première guerre indo-pakistanaise"
+  },
+  {
+   "qid": "Q989092",
+   "sitelinks": 50,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Anglo-Afghan War",
+   "frwiki": "Première guerre anglo-afghane"
+  },
+  {
+   "qid": "Q25007917",
+   "sitelinks": 50,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2016 Atatürk Airport attack",
+   "frwiki": "Attentat de l'aéroport Atatürk d'Istanbul"
+  },
+  {
+   "qid": "Q29113584",
+   "sitelinks": 50,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2017 Saint Petersburg Metro bombing",
+   "frwiki": "Attentat du métro de Saint-Pétersbourg"
+  },
+  {
+   "qid": "Q3699",
+   "sitelinks": 49,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "German revolutions of 1848–1849",
+   "frwiki": "Révolution de Mars"
+  },
+  {
+   "qid": "Q107802",
+   "sitelinks": 49,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "2003 invasion of Iraq",
+   "frwiki": "Invasion de l'Irak par les États-Unis en 2003"
+  },
+  {
+   "qid": "Q162665",
+   "sitelinks": 49,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Nika riots",
+   "frwiki": "Sédition Nika"
+  },
+  {
+   "qid": "Q212658",
+   "sitelinks": 49,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Polish Succession",
+   "frwiki": "Guerre de Succession de Pologne (1733-1738)"
+  },
+  {
+   "qid": "Q213531",
+   "sitelinks": 49,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2004 Madrid train bombings",
+   "frwiki": "Attentats de Madrid du 11 mars 2004"
+  },
+  {
+   "qid": "Q477973",
+   "sitelinks": 49,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Gothic War (535–554)",
+   "frwiki": "Guerre des Goths (535-553)"
+  },
+  {
+   "qid": "Q1050999",
+   "sitelinks": 49,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Turkish invasion of Cyprus",
+   "frwiki": "Invasion turque de Chypre"
+  },
+  {
+   "qid": "Q1238338",
+   "sitelinks": 49,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Caesar's civil war",
+   "frwiki": "Guerre civile de César"
+  },
+  {
+   "qid": "Q1780431",
+   "sitelinks": 49,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Egyptian revolution of 1952",
+   "frwiki": "Coup d'État de 1952 en Égypte"
+  },
+  {
+   "qid": "Q12055176",
+   "sitelinks": 49,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Angolan Civil War",
+   "frwiki": "Guerre civile angolaise"
+  },
+  {
+   "qid": "Q16954835",
+   "sitelinks": 49,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Nagorno-Karabakh conflict",
+   "frwiki": "Conflit du Haut-Karabagh"
+  },
+  {
+   "qid": "Q107461898",
+   "sitelinks": 49,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "2021 Taliban offensive",
+   "frwiki": "Offensive des talibans de 2021"
+  },
+  {
+   "qid": "Q11694",
+   "sitelinks": 48,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "American Airlines Flight 11",
+   "frwiki": "Vol American Airlines 11"
+  },
+  {
+   "qid": "Q285280",
+   "sitelinks": 48,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Transnistrian War",
+   "frwiki": "Guerre du Dniestr"
+  },
+  {
+   "qid": "Q468823",
+   "sitelinks": 48,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "March on Rome",
+   "frwiki": "Marche sur Rome"
+  },
+  {
+   "qid": "Q1332160",
+   "sitelinks": 48,
+   "classes": [
+    "Q198",
+    "Q10931"
+   ],
+   "enwiki": "Indonesian National Revolution",
+   "frwiki": "Révolution nationale indonésienne"
+  },
+  {
+   "qid": "Q77924746",
+   "sitelinks": 48,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "2019–20 Australian bushfire season",
+   "frwiki": "Feux de brousse de 2019-2020 en Australie"
+  },
+  {
+   "qid": "Q106775117",
+   "sitelinks": 48,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "2021 Israel–Palestine crisis",
+   "frwiki": "Crise israélo-palestinienne de 2021"
+  },
+  {
+   "qid": "Q107529288",
+   "sitelinks": 48,
+   "classes": [
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "2021 European floods",
+   "frwiki": "Inondations de juillet 2021 en Europe"
+  },
+  {
+   "qid": "Q121789683",
+   "sitelinks": 48,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "2023 Wagner Group plane crash",
+   "frwiki": "Crash de l'avion du groupe Wagner"
+  },
+  {
+   "qid": "Q131552728",
+   "sitelinks": 48,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "Azerbaijan Airlines Flight 8243",
+   "frwiki": "Vol Azerbaijan Airlines 8243"
+  },
+  {
+   "qid": "Q18817",
+   "sitelinks": 47,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the First Coalition",
+   "frwiki": "Guerre de la première coalition"
+  },
+  {
+   "qid": "Q126306",
+   "sitelinks": 47,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Decembrist revolt",
+   "frwiki": "Insurrection décembriste"
+  },
+  {
+   "qid": "Q211087",
+   "sitelinks": 47,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Pan Am Flight 103",
+   "frwiki": "Attentat de Lockerbie"
+  },
+  {
+   "qid": "Q214866",
+   "sitelinks": 47,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "Kobe earthquake",
+   "frwiki": "Séisme de 1995 à Kobe"
+  },
+  {
+   "qid": "Q223604",
+   "sitelinks": 47,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Greco-Italian War",
+   "frwiki": "Guerre italo-grecque"
+  },
+  {
+   "qid": "Q228911",
+   "sitelinks": 47,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Anglo-Zulu War",
+   "frwiki": "Guerre anglo-zouloue"
+  },
+  {
+   "qid": "Q322607",
+   "sitelinks": 47,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of Attrition",
+   "frwiki": "Guerre d'usure dans le conflit israélo-arabe"
+  },
+  {
+   "qid": "Q522837",
+   "sitelinks": 47,
+   "classes": [
+    "Q168247"
+   ],
+   "enwiki": "Bengal famine of 1943",
+   "frwiki": "Famine du Bengale de 1943"
+  },
+  {
+   "qid": "Q605977",
+   "sitelinks": 47,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Fourth Coalition",
+   "frwiki": "Guerre de la Quatrième Coalition"
+  },
+  {
+   "qid": "Q1455917",
+   "sitelinks": 47,
+   "classes": [
+    "Q198",
+    "Q467011",
+    "Q1361229"
+   ],
+   "enwiki": "Muslim conquest of the Iberian Peninsula",
+   "frwiki": "Conquête musulmane de l'Hispanie"
+  },
+  {
+   "qid": "Q2578778",
+   "sitelinks": 47,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Circassian genocide",
+   "frwiki": "Nettoyage ethnique des Circassiens"
+  },
+  {
+   "qid": "Q2946372",
+   "sitelinks": 47,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Mali War",
+   "frwiki": "Guerre du Mali"
+  },
+  {
+   "qid": "Q15733401",
+   "sitelinks": 47,
+   "classes": [
+    "Q10931",
+    "Q45382"
+   ],
+   "enwiki": "Revolution of Dignity",
+   "frwiki": "Révolution de la Dignité"
+  },
+  {
+   "qid": "Q26689701",
+   "sitelinks": 47,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "August 2016 Central Italy earthquake",
+   "frwiki": "Séisme du 24 août 2016 en Italie"
+  },
+  {
+   "qid": "Q81360866",
+   "sitelinks": 47,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "Ukraine International Airlines Flight 752",
+   "frwiki": "Vol Ukraine International Airlines 752"
+  },
+  {
+   "qid": "Q139676879",
+   "sitelinks": 47,
+   "classes": [
+    "Q44512"
+   ],
+   "enwiki": "MV Hondius hantavirus outbreak",
+   "frwiki": "Cas d'hantavirus sur le MV Hondius"
+  },
+  {
+   "qid": "Q26749",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Second Coalition",
+   "frwiki": "Guerre de la deuxième coalition"
+  },
+  {
+   "qid": "Q85125",
+   "sitelinks": 46,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Population transfer in the Soviet Union",
+   "frwiki": "Déportation des peuples en URSS"
+  },
+  {
+   "qid": "Q123070",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Turkish War (1768–1774)",
+   "frwiki": "Guerre russo-turque de 1768-1774"
+  },
+  {
+   "qid": "Q255352",
+   "sitelinks": 46,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Basmachi movement",
+   "frwiki": "Révolte basmatchi"
+  },
+  {
+   "qid": "Q318250",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Ogaden War",
+   "frwiki": "Guerre de l'Ogaden"
+  },
+  {
+   "qid": "Q498871",
+   "sitelinks": 46,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Peasants' Revolt",
+   "frwiki": "Révolte des paysans anglais"
+  },
+  {
+   "qid": "Q540978",
+   "sitelinks": 46,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Second Italian War of Independence",
+   "frwiki": "Campagne d'Italie (1859)"
+  },
+  {
+   "qid": "Q576338",
+   "sitelinks": 46,
+   "classes": [
+    "Q198",
+    "Q467011"
+   ],
+   "enwiki": "Imjin War",
+   "frwiki": "Guerre d'Imjin"
+  },
+  {
+   "qid": "Q635533",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Cambodian–Vietnamese War",
+   "frwiki": "Guerre entre le Cambodge et le Vietnam"
+  },
+  {
+   "qid": "Q656186",
+   "sitelinks": 46,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "The Fronde",
+   "frwiki": "Fronde (histoire)"
+  },
+  {
+   "qid": "Q684324",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "War of the Fifth Coalition",
+   "frwiki": "Guerre de la cinquième coalition"
+  },
+  {
+   "qid": "Q726261",
+   "sitelinks": 46,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Ottoman Interregnum",
+   "frwiki": "Interrègne ottoman"
+  },
+  {
+   "qid": "Q736268",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Finnish War",
+   "frwiki": "Guerre de Finlande"
+  },
+  {
+   "qid": "Q913640",
+   "sitelinks": 46,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "Great Smog of London",
+   "frwiki": "Grand smog de Londres"
+  },
+  {
+   "qid": "Q989115",
+   "sitelinks": 46,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Italo-Ethiopian War",
+   "frwiki": "Première guerre italo-éthiopienne"
+  },
+  {
+   "qid": "Q1146739",
+   "sitelinks": 46,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Tokyo subway sarin attack",
+   "frwiki": "Attentat au sarin dans le métro de Tokyo"
+  },
+  {
+   "qid": "Q1773926",
+   "sitelinks": 46,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "Congo Crisis",
+   "frwiki": "Crise congolaise"
+  },
+  {
+   "qid": "Q2092950",
+   "sitelinks": 46,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Hamidian massacres",
+   "frwiki": "Massacres hamidiens"
+  },
+  {
+   "qid": "Q3119132",
+   "sitelinks": 46,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "India–Pakistan wars and conflicts",
+   "frwiki": "Conflit indo-pakistanais"
+  },
+  {
+   "qid": "Q4298662",
+   "sitelinks": 46,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Young Turk Revolution",
+   "frwiki": "Révolution des Jeunes-Turcs"
+  },
+  {
+   "qid": "Q62018034",
+   "sitelinks": 46,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "Ethiopian Airlines Flight 302",
+   "frwiki": "Vol Ethiopian Airlines 302"
+  },
+  {
+   "qid": "Q117100709",
+   "sitelinks": 46,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "2023 Nigerien coup d'état",
+   "frwiki": "Coup d'État de 2023 au Niger"
+  },
+  {
+   "qid": "Q130314422",
+   "sitelinks": 46,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2024 Lebanon electronic device attacks",
+   "frwiki": "Explosions de bipeurs et de talkies-walkies au Liban"
+  },
+  {
+   "qid": "Q154288",
+   "sitelinks": 45,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Black September",
+   "frwiki": "Septembre noir (1970-1971)"
+  },
+  {
+   "qid": "Q157682",
+   "sitelinks": 45,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "East German uprising of 1953",
+   "frwiki": "Insurrection de juin 1953 en Allemagne de l'Est"
+  },
+  {
+   "qid": "Q209312",
+   "sitelinks": 45,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Turkish War (1806–1812)",
+   "frwiki": "Guerre russo-turque de 1806-1812"
+  },
+  {
+   "qid": "Q233507",
+   "sitelinks": 45,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Second Anglo-Afghan War",
+   "frwiki": "Seconde guerre anglo-afghane"
+  },
+  {
+   "qid": "Q287942",
+   "sitelinks": 45,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Turkish War (1828–1829)",
+   "frwiki": "Guerre russo-turque de 1828-1829"
+  },
+  {
+   "qid": "Q646322",
+   "sitelinks": 45,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Franco-Dutch War",
+   "frwiki": "Guerre de Hollande"
+  },
+  {
+   "qid": "Q838695",
+   "sitelinks": 45,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "First Congo War",
+   "frwiki": "Première guerre du Congo"
+  },
+  {
+   "qid": "Q856650",
+   "sitelinks": 45,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Iraqi invasion of Kuwait",
+   "frwiki": "Invasion du Koweït"
+  },
+  {
+   "qid": "Q1123201",
+   "sitelinks": 45,
+   "classes": [
+    "Q1006311"
+   ],
+   "enwiki": "Spanish American wars of independence",
+   "frwiki": "Guerres d'indépendance hispano-américaines"
+  },
+  {
+   "qid": "Q124060919",
+   "sitelinks": 45,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2024 Noto earthquake",
+   "frwiki": "Séisme de 2024 dans la péninsule de Noto"
+  },
+  {
+   "qid": "Q51650",
+   "sitelinks": 44,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "People's Crusade",
+   "frwiki": "Croisade populaire"
+  },
+  {
+   "qid": "Q208199",
+   "sitelinks": 44,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Sabra and Shatila massacre",
+   "frwiki": "Massacre de Sabra et Chatila"
+  },
+  {
+   "qid": "Q518753",
+   "sitelinks": 44,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Sharpeville massacre",
+   "frwiki": "Massacre de Sharpeville"
+  },
+  {
+   "qid": "Q541369",
+   "sitelinks": 44,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Anglo-Soviet invasion of Iran",
+   "frwiki": "Invasion anglo-soviétique de l'Iran"
+  },
+  {
+   "qid": "Q815567",
+   "sitelinks": 44,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "1988 Armenian earthquake",
+   "frwiki": "Séisme de 1988 en Arménie"
+  },
+  {
+   "qid": "Q817206",
+   "sitelinks": 44,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Cambodian Civil War",
+   "frwiki": "Guerre civile cambodgienne (1967-1975)"
+  },
+  {
+   "qid": "Q828435",
+   "sitelinks": 44,
+   "classes": [
+    "Q1361229"
+   ],
+   "enwiki": "Spanish conquest of the Aztec Empire",
+   "frwiki": "Chute de l'Empire aztèque"
+  },
+  {
+   "qid": "Q838980",
+   "sitelinks": 44,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "May Revolution",
+   "frwiki": "Révolution de Mai"
+  },
+  {
+   "qid": "Q846876",
+   "sitelinks": 44,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Stockholm Bloodbath",
+   "frwiki": "Bain de sang de Stockholm"
+  },
+  {
+   "qid": "Q849176",
+   "sitelinks": 44,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Kościuszko Uprising",
+   "frwiki": "Insurrection de Kościuszko"
+  },
+  {
+   "qid": "Q1122110",
+   "sitelinks": 44,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Tajikistani Civil War",
+   "frwiki": "Guerre civile du Tadjikistan"
+  },
+  {
+   "qid": "Q1341539",
+   "sitelinks": 44,
+   "classes": [
+    "Q10931"
+   ],
+   "enwiki": "Saur Revolution",
+   "frwiki": "Révolution de Saur"
+  },
+  {
+   "qid": "Q2092093",
+   "sitelinks": 44,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Mongol conquests",
+   "frwiki": "Conquêtes mongoles"
+  },
+  {
+   "qid": "Q125289722",
+   "sitelinks": 44,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2024 Hualien earthquake",
+   "frwiki": "Séisme de 2024 à Hualien"
+  },
+  {
+   "qid": "Q134044277",
+   "sitelinks": 44,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "2025 Pahalgam attack",
+   "frwiki": "Attentat de Pahalgam"
+  },
+  {
+   "qid": "Q137383251",
+   "sitelinks": 44,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Bondi Beach shooting",
+   "frwiki": "Attentat de la plage de Bondi"
+  },
+  {
+   "qid": "Q53692",
+   "sitelinks": 43,
+   "classes": [
+    "Q350604"
+   ],
+   "enwiki": "2012 Gaza War",
+   "frwiki": "Guerre de Gaza de 2012"
+  },
+  {
+   "qid": "Q208261",
+   "sitelinks": 43,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Ionian Revolt",
+   "frwiki": "Révolte de l'Ionie"
+  },
+  {
+   "qid": "Q638587",
+   "sitelinks": 43,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Turkish War (1735–1739)",
+   "frwiki": "Guerre austro-russo-turque de 1735-1739"
+  },
+  {
+   "qid": "Q638603",
+   "sitelinks": 43,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "United Airlines Flight 93",
+   "frwiki": "Vol United Airlines 93"
+  },
+  {
+   "qid": "Q651008",
+   "sitelinks": 43,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Corinthian War",
+   "frwiki": "Guerre de Corinthe"
+  },
+  {
+   "qid": "Q695020",
+   "sitelinks": 43,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Massacres of Poles in Volhynia and Eastern Galicia",
+   "frwiki": "Massacres des Polonais en Volhynie"
+  },
+  {
+   "qid": "Q735349",
+   "sitelinks": 43,
+   "classes": [
+    "Q198",
+    "Q1361229"
+   ],
+   "enwiki": "Russian conquest of Siberia",
+   "frwiki": "Conquête de la Sibérie"
+  },
+  {
+   "qid": "Q877450",
+   "sitelinks": 43,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Laotian Civil War",
+   "frwiki": "Guerre civile laotienne"
+  },
+  {
+   "qid": "Q956475",
+   "sitelinks": 43,
+   "classes": [
+    "Q290178"
+   ],
+   "enwiki": "Greek government-debt crisis",
+   "frwiki": "Crise de la dette publique grecque"
+  },
+  {
+   "qid": "Q1134220",
+   "sitelinks": 43,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Mongol invasion of Kievan Rus'",
+   "frwiki": "Invasion mongole des principautés russes"
+  },
+  {
+   "qid": "Q6165880",
+   "sitelinks": 43,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Soviet invasion of Manchuria",
+   "frwiki": "Offensive soviétique de Mandchourie"
+  },
+  {
+   "qid": "Q7930888",
+   "sitelinks": 43,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Maccabean Revolt",
+   "frwiki": "Révolte des Maccabées"
+  },
+  {
+   "qid": "Q131704535",
+   "sitelinks": 43,
+   "classes": [
+    "Q8065"
+   ],
+   "enwiki": "January 2025 Southern California wildfires",
+   "frwiki": "Incendies de 2025 à Los Angeles"
+  },
+  {
+   "qid": "Q138414208",
+   "sitelinks": 43,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "2026 Afghanistan–Pakistan war",
+   "frwiki": "Guerre de 2026 entre l'Afghanistan et le Pakistan"
+  },
+  {
+   "qid": "Q169072",
+   "sitelinks": 42,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Colombian conflict",
+   "frwiki": "Conflit armé colombien"
+  },
+  {
+   "qid": "Q221111",
+   "sitelinks": 42,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Operation Dragoon",
+   "frwiki": "Débarquement de Provence"
+  },
+  {
+   "qid": "Q234132",
+   "sitelinks": 42,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "Hillsborough disaster",
+   "frwiki": "Catastrophe de Hillsborough"
+  },
+  {
+   "qid": "Q502073",
+   "sitelinks": 42,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "Halifax Explosion",
+   "frwiki": "Explosion d'Halifax"
+  },
+  {
+   "qid": "Q599141",
+   "sitelinks": 42,
+   "classes": [
+    "Q12184"
+   ],
+   "enwiki": "Antonine Plague",
+   "frwiki": "Peste antonine"
+  },
+  {
+   "qid": "Q641479",
+   "sitelinks": 42,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Khmelnytsky Uprising",
+   "frwiki": "Soulèvement de Khmelnytsky"
+  },
+  {
+   "qid": "Q654006",
+   "sitelinks": 42,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Northern War of 1655–1660",
+   "frwiki": "Première guerre du Nord"
+  },
+  {
+   "qid": "Q862099",
+   "sitelinks": 42,
+   "classes": [
+    "Q45382"
+   ],
+   "enwiki": "1993 Russian constitutional crisis",
+   "frwiki": "Crise constitutionnelle russe"
+  },
+  {
+   "qid": "Q1145682",
+   "sitelinks": 42,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Ilinden–Preobrazhenie Uprising",
+   "frwiki": "Insurrection d'Ilinden"
+  },
+  {
+   "qid": "Q1417059",
+   "sitelinks": 42,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "First Fitna",
+   "frwiki": "Grande discorde"
+  },
+  {
+   "qid": "Q2888837",
+   "sitelinks": 42,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "German invasion of Greece",
+   "frwiki": "Bataille de Grèce"
+  },
+  {
+   "qid": "Q16338015",
+   "sitelinks": 42,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "Sinking of MV Sewol",
+   "frwiki": "Naufrage du Sewol"
+  },
+  {
+   "qid": "Q30274958",
+   "sitelinks": 42,
+   "classes": [
+    "Q3839081"
+   ],
+   "enwiki": "Grenfell Tower fire",
+   "frwiki": "Incendie de la tour Grenfell"
+  },
+  {
+   "qid": "Q130731262",
+   "sitelinks": 42,
+   "classes": [
+    "Q8065"
+   ],
+   "enwiki": "2024 Spanish floods",
+   "frwiki": "Inondations de 2024 en Espagne"
+  },
+  {
+   "qid": "Q31944",
+   "sitelinks": 41,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Mahdist War",
+   "frwiki": "Guerre des mahdistes"
+  },
+  {
+   "qid": "Q163780",
+   "sitelinks": 41,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Slovak National Uprising",
+   "frwiki": "Soulèvement national slovaque"
+  },
+  {
+   "qid": "Q215687",
+   "sitelinks": 41,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Boston Massacre",
+   "frwiki": "Massacre de Boston"
+  },
+  {
+   "qid": "Q257724",
+   "sitelinks": 41,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Ethiopian Civil War",
+   "frwiki": "Guerres civiles en Éthiopie"
+  },
+  {
+   "qid": "Q501866",
+   "sitelinks": 41,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "United States invasion of Grenada",
+   "frwiki": "Invasion de la Grenade par les États-Unis"
+  },
+  {
+   "qid": "Q631799",
+   "sitelinks": 41,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Turkish War (1568–1570)",
+   "frwiki": "Guerre russo-turque de 1568-1570"
+  },
+  {
+   "qid": "Q677316",
+   "sitelinks": 41,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Social War (91–87 BC)",
+   "frwiki": "Guerre sociale (Rome)"
+  },
+  {
+   "qid": "Q697842",
+   "sitelinks": 41,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Invasion of Yugoslavia",
+   "frwiki": "Invasion de la Yougoslavie"
+  },
+  {
+   "qid": "Q1194400",
+   "sitelinks": 41,
+   "classes": [
+    "Q124757"
+   ],
+   "enwiki": "Massacre of Tbilisi",
+   "frwiki": "Tragédie du 9 avril"
+  },
+  {
+   "qid": "Q18951344",
+   "sitelinks": 41,
+   "classes": [
+    "Q3002150"
+   ],
+   "enwiki": "TransAsia Airways Flight 235",
+   "frwiki": "Vol TransAsia Airways 235"
+  },
+  {
+   "qid": "Q100437698",
+   "sitelinks": 41,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "Murder of Samuel Paty",
+   "frwiki": "Assassinat de Samuel Paty"
+  },
+  {
+   "qid": "Q151850",
+   "sitelinks": 40,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "2011 Christchurch earthquake",
+   "frwiki": "Séisme de 2011 en Nouvelle-Zélande"
+  },
+  {
+   "qid": "Q168556",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Schmalkaldic War",
+   "frwiki": "Guerre de Smalkalde"
+  },
+  {
+   "qid": "Q207918",
+   "sitelinks": 40,
+   "classes": [
+    "Q7944"
+   ],
+   "enwiki": "2009 L'Aquila earthquake",
+   "frwiki": "Séisme du 6 avril 2009 à L'Aquila"
+  },
+  {
+   "qid": "Q210005",
+   "sitelinks": 40,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "Yemeni revolution",
+   "frwiki": "Révolution yéménite"
+  },
+  {
+   "qid": "Q253774",
+   "sitelinks": 40,
+   "classes": [
+    "Q124734"
+   ],
+   "enwiki": "An Lushan rebellion",
+   "frwiki": "Révolte d'An Lushan"
+  },
+  {
+   "qid": "Q312492",
+   "sitelinks": 40,
+   "classes": [
+    "Q41397"
+   ],
+   "enwiki": "Herero and Nama genocide",
+   "frwiki": "Génocide des Héréros et des Namas"
+  },
+  {
+   "qid": "Q459282",
+   "sitelinks": 40,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "United States invasion of Panama",
+   "frwiki": "Invasion du Panama par les États-Unis"
+  },
+  {
+   "qid": "Q463237",
+   "sitelinks": 40,
+   "classes": [
+    "Q2223653"
+   ],
+   "enwiki": "American Airlines Flight 77",
+   "frwiki": "Vol American Airlines 77"
+  },
+  {
+   "qid": "Q487163",
+   "sitelinks": 40,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "Nepalese royal massacre",
+   "frwiki": "Massacre de la famille royale du Népal"
+  },
+  {
+   "qid": "Q631991",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Polish–Russian War (1654–1667)",
+   "frwiki": "Guerre russo-polonaise (1654-1667)"
+  },
+  {
+   "qid": "Q657055",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Greco-Turkish War (1897)",
+   "frwiki": "Guerre gréco-turque (1897)"
+  },
+  {
+   "qid": "Q696848",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Anglo-Iraqi War",
+   "frwiki": "Guerre anglo-irakienne"
+  },
+  {
+   "qid": "Q714644",
+   "sitelinks": 40,
+   "classes": [
+    "Q467011"
+   ],
+   "enwiki": "Italian invasion of Albania",
+   "frwiki": "Invasion italienne de l'Albanie"
+  },
+  {
+   "qid": "Q842774",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Polish–Ukrainian War",
+   "frwiki": "Guerre polono-ukrainienne"
+  },
+  {
+   "qid": "Q1420115",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Russo-Persian War (1826–1828)",
+   "frwiki": "Guerre russo-persane de 1826-1828"
+  },
+  {
+   "qid": "Q1676845",
+   "sitelinks": 40,
+   "classes": [
+    "Q198"
+   ],
+   "enwiki": "Boer Wars",
+   "frwiki": "Guerre des Boers"
+  },
+  {
+   "qid": "Q1988505",
+   "sitelinks": 40,
+   "classes": [
+    "Q168247"
+   ],
+   "enwiki": "Great Famine of 1315–1317",
+   "frwiki": "Grande famine de 1315-1317"
+  },
+  {
+   "qid": "Q2002975",
+   "sitelinks": 40,
+   "classes": [
+    "Q8465"
+   ],
+   "enwiki": "Nepalese Civil War",
+   "frwiki": "Guerre civile népalaise"
+  },
+  {
+   "qid": "Q18641076",
+   "sitelinks": 40,
+   "classes": [
+    "Q3199915"
+   ],
+   "enwiki": "2014 Peshawar school massacre",
+   "frwiki": "Massacre de l'école militaire de Peshawar"
+  },
+  {
+   "qid": "Q101003145",
+   "sitelinks": 40,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "2020 Aegean Sea earthquake",
+   "frwiki": "Séisme de 2020 en mer Égée"
+  },
+  {
+   "qid": "Q131692964",
+   "sitelinks": 40,
+   "classes": [
+    "Q7944",
+    "Q8065",
+    "Q3839081"
+   ],
+   "enwiki": "2025 Tibet earthquake",
+   "frwiki": "Séisme de 2025 au Tibet"
+  }
+ ]
+}

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "reva-atlas-source-order/1",
   "title": "REVA headline concepts with a cross-source fallback order (registry/atlas/source_order/<theme>.yaml)",
-  "description": "A REVA headline concept lists, in best-available order, provider series that define the same quantity the same way (each with a written justification); the query layer picks per country and calendar year the first series that reports it and names it, listing every series consulted and which had no value. Series with a different definition are not listed (they may be recorded under not_equivalent with the reason). An optional derived step computes the concept from two sourced inputs with an exact formula, same country and same year only, when no listed series reports the cell.",
+  "description": "A REVA headline concept lists, in best-available order, provider series that define the same quantity the same way (each with a written justification); the query layer picks per country and calendar year the first series that reports it and names it, listing every series consulted and which had no value. Series with a different definition are not listed (they may be recorded under not_equivalent with the reason). An optional derived step computes the concept from two sourced inputs with an exact formula, same country and same year only, when no listed series reports the cell. A listed series may carry cell_rules (cells that are upstream projections, nowcasts or extrapolations: excluded unless projections are requested) and not_equivalent_for (countries for which its definition differs). Every change of the answering series within one country's series is flagged as a source_break.",
   "type": "object",
   "additionalProperties": false,
   "required": ["theme", "concepts"],
@@ -32,7 +32,33 @@
         "reported_unit": {"type": "string", "minLength": 1, "maxLength": 100, "description": "The cell unit this entry accepts (cells with another unit are skipped and reported). Required when scale is not 1."},
         "scale": {"$ref": "#/$defs/decimal", "description": "Exact decimal factor from the reported unit to the concept unit (e.g. 1000 for thousands -> persons)."},
         "justification": {"type": "string", "minLength": 20, "maxLength": 2000},
-        "caveats": {"type": "string", "maxLength": 2000}
+        "caveats": {"type": "string", "maxLength": 2000},
+        "cell_rules": {"type": "array", "maxItems": 10, "items": {"$ref": "#/$defs/cell_rule"}, "description": "Documented rules marking cells of this series that are not observations of the year (upstream projections, nowcasts, extrapolations): excluded unless projections are requested, then flagged."},
+        "not_equivalent_for": {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/country_exception"}, "description": "Countries for which this series does not define the same quantity (e.g. another territorial scope): it never answers for them."}
+      }
+    },
+    "cell_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimate_kind", "label", "basis"],
+      "properties": {
+        "estimate_kind": {"enum": ["projection_upstream", "nowcast", "extrapolated"]},
+        "year_after": {"type": "integer", "minimum": -10000, "maximum": 3000, "description": "Applies to cells whose year is greater than this year"},
+        "footnote_matches": {"type": "string", "minLength": 1, "maxLength": 200, "description": "Regular expression on the cell's provider footnote (flags.footnote)"},
+        "unless_flag": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,59}$", "description": "Does not apply to a cell carrying this flag (e.g. obs_status)"},
+        "upstream": {"type": "string", "minLength": 1, "maxLength": 200, "description": "The provider and series the value comes from"},
+        "label": {"$ref": "#/$defs/labels"},
+        "basis": {"type": "string", "minLength": 20, "maxLength": 2000, "description": "Where the rule comes from (provider metadata, release notes)"}
+      },
+      "anyOf": [{"required": ["year_after"]}, {"required": ["footnote_matches"]}]
+    },
+    "country_exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iso3", "reason"],
+      "properties": {
+        "iso3": {"type": "array", "minItems": 1, "maxItems": 50, "items": {"type": "string", "pattern": "^[A-Z]{3}$"}},
+        "reason": {"type": "string", "minLength": 20, "maxLength": 2000}
       }
     },
     "operand": {

@@ -20,12 +20,15 @@ export function ChainFinder({
   labels,
   onChange,
   onOpen,
+  onLabels,
 }: {
   from: string | null;
   to: string | null;
   labels: Record<string, string>;
   onChange: (patch: { from?: PickedEntity | null; to?: PickedEntity | null }) => void;
   onOpen: (c: CausalClaim) => void;
+  /** labels of the chain ends learned from the response (the pickers show names, not ids) */
+  onLabels?: (l: Record<string, string>) => void;
 }) {
   const [state, setState] = useState<State>({ status: 'idle' });
   const [hops, setHops] = useState(4);
@@ -38,11 +41,18 @@ export function ChainFinder({
     const ctrl = new AbortController();
     setState({ status: 'loading' });
     getCausalChain(from, to, { max_hops: hops }, ctrl.signal)
-      .then((r) => !ctrl.signal.aborted && setState({ status: 'ok', r }))
+      .then((r) => {
+        if (ctrl.signal.aborted) return;
+        setState({ status: 'ok', r });
+        const l: Record<string, string> = {};
+        for (const n of [r.from, r.to, ...r.chains.flatMap((c) => c.hops.flatMap((h) => [h.from, h.to]))]) if (n && n.id && n.label !== n.id) l[n.id] = n.label;
+        if (Object.keys(l).length) onLabels?.(l);
+      })
       .catch((error: unknown) => {
         if (!ctrl.signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setState({ status: 'error', error });
       });
     return () => ctrl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to, hops]);
 
   return (
@@ -91,6 +101,7 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
           <strong>Aucune chaîne d’affirmations causales</strong>
           {r.maxHops ? ` d’au plus ${r.maxHops} maillons` : ''} dans les données consultées. Cela ne prouve ni l’absence de lien causal, ni son existence.
         </p>
+        {r.notFoundReason && <p className="muted">Raison donnée par le serveur : {r.notFoundReason}</p>}
       </V3Empty>
     );
   }
@@ -103,7 +114,12 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
           ))}
         </ul>
       )}
-      {r.note && <p className="field-hint">{r.note}</p>}
+      {r.note && (
+        <details className="v3-hop-server">
+          <summary>Note du serveur</summary>
+          <p>{r.note}</p>
+        </details>
+      )}
       <ol className="v3-chain-list">
         {r.chains.map((ch, i) => {
           const grade = chainGrade(ch);

@@ -74,7 +74,12 @@ export function CausalTimeline({ focal, causes, effects }: { focal: { id: string
           {focalItem && (
             <g className="v3-ctl-focal" data-testid="timeline-focal">
               <rect x={x(focalItem.from)} y={focalY - 12} width={Math.max(x(focalItem.to) - x(focalItem.from), 6)} height={22} rx={4} />
-              <text x={x(focalItem.from)} y={focalY - 16} className="v3-ctl-label v3-ctl-focal-label">
+              <text
+                x={x(focalItem.from) > W * 0.55 ? Math.max(x(focalItem.to), x(focalItem.from) + 6) : x(focalItem.from)}
+                y={focalY - 16}
+                className="v3-ctl-label v3-ctl-focal-label"
+                textAnchor={x(focalItem.from) > W * 0.55 ? 'end' : 'start'}
+              >
                 {focalItem.label} ({focalItem.dateText})
               </text>
             </g>

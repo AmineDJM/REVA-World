@@ -1,0 +1,16 @@
+# Budget request from agent A-HAZARDS (NOAA NCEI Global Historical Hazard Database). ATLASCORE merges into
+# registry/policies/budgets.yaml. The source key has its registry/sources entry (noaa_hazards.yaml).
+# atlas.noaa_hazards_wikidata runs on the existing WDHARVEST key wikidata.wdqs (1 WDQS query, <= 3 requests per run):
+# no new key requested for it.
+agent: A-HAZARDS
+requests:
+  - source_key: noaa.ncei_hazards
+    daily_requests: 600
+    expected_bytes_per_day: 60000000
+    reason: >-
+      atlas.noaa_hazards: paged JSON API (<= 200 records per page): earthquakes ~34 pages, tsunami events ~16, runups
+      ~176, volcanoes ~5, 8 code-list descriptors = ~240 requests, ~25 MB per full run (planned_requests 260); monthly.
+      600/day allows one retry run after a failure.
+daily_totals_increase:
+  http_requests_total: "+600"
+  http_bytes_total: "+60_000_000"

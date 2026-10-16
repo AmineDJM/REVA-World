@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "GPL-3 (countrycode R package; code lists are facts)",
+    "note": "same slice as tests/fixtures/source/atlas.ucdp (only data/codelist_panel.rda, byte-identical member); real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "f7e4299b21eaafde84c5c63a5d023ee3dc42a94edf87484438ba158b6b3b3ab3",
+    "url": "https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip",
+    "file": "f7e4299b21eaafde.zip",
+    "sha256": "7bd8b88c63cd00e133992a0563077e54612f23eaea1e822c190fdf06c2749500",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "COW terms of use: cite the data; users cannot charge for access",
+    "note": "re-zipped slice of MID-5-Data-and-Supporting-Materials.zip: MIDA/MIDB rows of disputes ['2', '3', '258', '3551', '4182', '4339'] (original header and row text) + the two coding manuals byte-identical; real zip sha256 f1d2f47ed02cd62e348e755a37108e302cb6a6e576a5fa03f6f7a8d5cbdc8009"
+  },
+  {
+    "request_fingerprint": "980191447b81eee1f5e198033b911c679eb530975269b6feda3f3421faccf1d7",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Incident_Level_5.01.zip",
+    "file": "980191447b81eee1.zip",
+    "sha256": "b916b8df7efe62b53b52abc0604a78ef03bc33059ca84d61a1c88f1eed2a78cd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "COW terms of use: cite the data; users cannot charge for access",
+    "note": "re-zipped slice of Incident_Level_5.01.zip: incidents of the same disputes + the codebook byte-identical; real zip sha256 45847bad82ab5019cff1a417e8cc786a826acea8ccba566244ccd721dd126b25"
+  }
+]

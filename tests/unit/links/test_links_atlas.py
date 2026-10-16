@@ -177,7 +177,9 @@ def test_vote_agreement_is_a_share_of_identical_votes_with_counts() -> None:
     co = by_issue["co"]
     assert (co.basis["n_common"], co.basis["n_identical"], co.weight) == (12, 9, "0.7500")
     assert co.basis["both_abstain"] == 3 and co.unit == "share of identical votes (0-1)"
-    assert co.temporal.kind == "interval" and (co.temporal.first_year, co.temporal.last_year) == (1960, 1969)
+    # VOTE-2 (review V3b): the decade is labelled with the years the roll-call data cover (here 1960-1961)
+    assert co.temporal.kind == "interval" and (co.temporal.first_year, co.temporal.last_year) == (1960, 1961)
+    assert co.basis["decade"] == [1960, 1969] and co.basis["partial_reason"] == "roll-call data coverage"
     assert co.basis["method"] == "derived" and co.basis["method_version"] == "links-vote-agreement/1"
     sel = json.loads(co.evidence[0].selector or "")
     assert sel["pair"] == ["GBR", "USA"] and sel["issue"] == "co" and co.evidence[0].raw_sha256 == SHA

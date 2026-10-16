@@ -1,0 +1,143 @@
+# Regime events: coups and leaders (agent A-COUPS). Provider-declared concepts (not human-reviewed). Atlas tables:
+# powell_thyne.coups_cy (COMPUTED exact counts of the events listed by Powell & Thyne, version V2026.08.29),
+# powell_thyne.coup_events (one row per listed event), archigos.leaders_cy (COMPUTED from Archigos 4.1 leader spells,
+# 1840-2015), reign.leaders_cy (COMPUTED from the REIGN-format leader list updated 2026-04-14).
+# Licences: none stated by any of the three providers (citation requested; no redistribution or commercial-use grant).
+# Every count lists only state-years with at least one event: a missing cell is "no listed event", never a reported 0.
+# Archigos and the REIGN-format list are kept as separate concepts (different coverage, end precision and ids).
+# See docs/dev/v3_a_coups.md.
+domain: regime_events
+labels: {fr: "Événements de régime (coups d'État, dirigeants)", en: "Regime events (coups, leaders)"}
+maintainer: A-COUPS
+concepts:
+  - id: regime_events.coup_attempts
+    labels: {fr: "Tentatives de coup d'État (réussies et échouées, Powell & Thyne)", en: "Coup attempts (successful and failed, Powell & Thyne)"}
+    definition: >-
+      Number of coup events listed by Powell & Thyne for the state and dated in the calendar year, successful and
+      failed. Coups are "illegal and overt attempts by the military or other elites within the state apparatus to
+      unseat the sitting executive" (Powell & Thyne). 1950 to present. Counted exactly from the list; years without
+      a listed event have no cell.
+    unit: events
+    domain: regime_events
+    subdomain: coups
+    theme: politics
+    value_kind: numeric
+    source_order: [powell_thyne.coups_cy.COUP_EVENTS]
+    provider_declared: true
+    notes: "State = Correlates of War code at mid-year (USSR, South Vietnam, North/South Yemen stay historical states). The latest events can be provisional (provider note, flag `provisional` on the event row)."
+  - id: regime_events.coups_successful
+    labels: {fr: "Coups d'État réussis (Powell & Thyne)", en: "Successful coups (Powell & Thyne)"}
+    definition: >-
+      Number of coup events coded 2 (successful) by Powell & Thyne in the year: "episodes in which the perpetrators
+      (or their agents) control power for at least 7 days". Counted exactly from the list.
+    unit: events
+    domain: regime_events
+    subdomain: coups
+    theme: politics
+    value_kind: numeric
+    source_order: [powell_thyne.coups_cy.COUPS_SUCCESSFUL]
+    provider_declared: true
+  - id: regime_events.coups_failed
+    labels: {fr: "Tentatives de coup d'État échouées (Powell & Thyne)", en: "Failed coup attempts (Powell & Thyne)"}
+    definition: Number of coup events coded 1 (failed) by Powell & Thyne in the year. Counted exactly from the list.
+    unit: events
+    domain: regime_events
+    subdomain: coups
+    theme: politics
+    value_kind: numeric
+    source_order: [powell_thyne.coups_cy.COUPS_FAILED]
+    provider_declared: true
+  - id: regime_events.leaders_in_office_archigos
+    labels: {fr: "Dirigeants effectifs au pouvoir dans l'année (Archigos)", en: "Effective leaders in office during the year (Archigos)"}
+    definition: >-
+      Number of Archigos 4.1 leader spells (the effective ruler of the state) whose start-end interval overlaps the
+      calendar year; 2 or more means at least one change of leader that year. 1840-2015 (spells still in office end
+      at 2015-12-31, Archigos coverage end).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: [archigos.leaders_cy.LEADERS_IN_OFFICE]
+    provider_declared: true
+  - id: regime_events.leader_entries_irregular
+    labels: {fr: "Arrivées au pouvoir irrégulières (Archigos)", en: "Irregular entries into office (Archigos)"}
+    definition: >-
+      Number of leaders who entered office in the year in a manner Archigos codes Irregular (in contravention of
+      explicit rules and established conventions; a coup perpetrator who takes power is always coded Irregular).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: ["archigos.leaders_cy.LEADER_ENTRIES|entry=irregular"]
+    provider_declared: true
+  - id: regime_events.leader_exits
+    labels: {fr: "Départs de dirigeants (Archigos)", en: "Leader exits from office (Archigos)"}
+    definition: Number of Archigos leader spells ending in the year, whatever the manner (spells still in office at 2015-12-31 are not exits).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: [archigos.leaders_cy.LEADER_EXITS]
+    provider_declared: true
+  - id: regime_events.leader_exits_irregular
+    labels: {fr: "Évictions irrégulières de dirigeants (Archigos)", en: "Irregular removals of leaders (Archigos)"}
+    definition: >-
+      Number of leaders removed from office in the year in a manner Archigos codes Irregular: "removed in
+      contravention of explicit rules and established conventions ... overwhelmingly the result of the threat or use
+      of force as exemplified in coups, (popular) revolts and assassinations" (Archigos 4.1 codebook).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: ["archigos.leaders_cy.LEADER_EXITS|exit=irregular"]
+    provider_declared: true
+  - id: regime_events.leader_removals_by_military
+    labels: {fr: "Dirigeants renversés par l'armée, sans soutien étranger (Archigos)", en: "Leaders removed by the military without foreign support (Archigos)"}
+    definition: >-
+      Number of leaders whose irregular removal Archigos codes "Removed by Military, without Foreign Support" in the
+      year -- "the classic military coup" (Archigos 4.1 codebook).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: ["archigos.leaders_cy.LEADER_EXITS|exitcode=removed_by_military_without_foreign_support"]
+    provider_declared: true
+  - id: regime_events.leader_removals_foreign
+    labels: {fr: "Dirigeants renversés par un État étranger (Archigos)", en: "Leaders removed by a foreign state (Archigos)"}
+    definition: >-
+      Number of leaders whose exit Archigos codes Foreign in the year: a foreign state directly removed the leader,
+      for example through invasion or kidnapping (coups by domestic forces orchestrated from abroad are Irregular).
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: ["archigos.leaders_cy.LEADER_EXITS|exit=foreign"]
+    provider_declared: true
+  - id: regime_events.leaders_in_office_reign
+    labels: {fr: "Dirigeants au pouvoir dans l'année (liste REIGN)", en: "Leaders in office during the year (REIGN-format list)"}
+    definition: >-
+      Number of spells of the REIGN-format leader list (updated 2026-04-14) overlapping the calendar year, from the
+      start day to the end month; spells without an end are counted through 2026. 1945-2026.
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: [reign.leaders_cy.LEADERS_IN_OFFICE]
+    provider_declared: true
+  - id: regime_events.leader_entries_reign
+    labels: {fr: "Arrivées au pouvoir de dirigeants (liste REIGN)", en: "Leaders taking office (REIGN-format list)"}
+    definition: Number of spells of the REIGN-format leader list starting in the year (manner of entry not coded). 1945-2026.
+    unit: leaders
+    domain: regime_events
+    subdomain: leaders
+    theme: politics
+    value_kind: numeric
+    source_order: [reign.leaders_cy.LEADER_ENTRIES]
+    provider_declared: true

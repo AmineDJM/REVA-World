@@ -135,7 +135,8 @@ CREATE TABLE kg.causal_claim (
   retrieved_at timestamptz NOT NULL,
   reinstates_row_id bigint,
   -- KG-derived claims (T3/T4) restate their kg.statement row; dataset claims (T1/T2) cite a raw artifact.
-  CHECK ((source_tier IN ('T3','T4')) = (statement_row_id IS NOT NULL)),
+  CHECK (statement_row_id IS NULL OR source_tier IN ('T2','T3','T4')),
+  CHECK (statement_row_id IS NOT NULL OR source_tier IN ('T1','T2')),
   CHECK ((statement_row_id IS NULL) = (statement_key IS NULL)),
   CHECK (starts_with(claim_key, 'kg:') = (statement_row_id IS NOT NULL)),
   CHECK (statement_row_id IS NOT NULL OR (raw_sha256 IS NOT NULL AND dataset IS NOT NULL)),

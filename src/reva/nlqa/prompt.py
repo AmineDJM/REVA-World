@@ -21,7 +21,7 @@ from typing import Any
 from reva.nlqa.catalog import ENTITY_KINDS, QaCatalog
 from reva.nlqa.plan import OPS
 
-PROMPT_VERSION = "nlqa-plan-1.1.0"
+PROMPT_VERSION = "nlqa-plan-1.2.0"
 SCHEMA_NAME = "reva_query_plan"
 REPHRASE_PROMPT_VERSION = "nlqa-rephrase-1.0.0"
 REPHRASE_SCHEMA_NAME = "reva_answer_rephrase"
@@ -63,6 +63,13 @@ colonial ties, trade, migration, alliances, memberships, conflicts, diplomatic).
 countries over time (trade both ways, migrant stocks both ways, share of identical UN General Assembly \
 votes, colonial rule, borders, shared languages, treaty parties, conflicts, peacekeeping); country and \
 other_country = ISO3 codes or ids of entity_lookup steps; link_kinds [] = all. Use it for "links/relations between X and Y".
+ - why(entity, causal_direction): causal claims made by named sources about a looked-up event; \
+causal_direction "causes" for "why did X happen", "causes of X", "pourquoi X", "quelles sont les causes de X"; \
+"effects" for "consequences/effects of X", "conséquences de X". The server answers only with claims a source \
+asserts; it never infers causes.
+ - causal_chain(from_entity, to_entity, max_hops): chains of separately sourced causal claims from a cause \
+event to an effect event (max_hops 1-6, default 4). Use it for "how did X lead to Y", "causal chain between X \
+and Y", "comment X a-t-il conduit à Y". Never use kg_path for a causal question.
 5. Use the fewest operations that cover the question (at most 12). A historical or political question \
 (positions, relations, events) uses entity_lookup + kg_neighbours / kg_timeline / kg_path with \
 as_of or years from the question. A question about an indicator uses an atlas operation with a \
@@ -70,8 +77,9 @@ concept from CATALOGUE.concepts whose meaning matches; if none matches exactly, 
 with another concept: add an unsupported item instead.
 6. Years: copy only years the user states (a decade "les années 1950-60" is from_year 1950, to_year \
 1969). Never invent a year.
-7. unsupported: each part of the question no operation can answer (an opinion, a prediction, a cause \
-not expressible as a lookup, a concept not in the catalogue). text = the user's own words for that part.
+7. unsupported: each part of the question no operation can answer (an opinion, a prediction, a \
+counterfactual "what if", a concept not in the catalogue). Questions about causes or consequences of an event \
+use why / causal_chain. text = the user's own words for that part.
 8. restatement: one neutral sentence restating the question in the user's language. input_language: \
 "fr", "en" or "other".
 
@@ -103,6 +111,7 @@ def output_schema() -> dict[str, Any]:
         "order": {"type": ["string", "null"], "enum": ["desc", "asc", None]},
         "limit": ni,
         "link_kinds": {"type": "array", "items": s},
+        "causal_direction": {"type": ["string", "null"], "enum": ["causes", "effects", None]},
     }
     return {
         "type": "object",

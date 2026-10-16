@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "df6a095ab58f81ffedbe162bb2baa1d184f2ee87bc0059a1b09ee058d262729a",
+    "url": "https://static-content.springer.com/esm/art%3A10.1057%2Fs41308-020-00107-3/MediaObjects/41308_2020_107_MOESM1_ESM.xlsx",
+    "file": "df6a095ab58f81ff.xlsx",
+    "sha256": "24545e4d95e459dd83264fd92531dc9f02fcb13831b9170f77c7d0c4ef0814aa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "(c) International Monetary Fund 2020 - IMF data terms (reuse with attribution); not an open licence, pending maintainer review",
+    "fixture_note": "live"
+  }
+]

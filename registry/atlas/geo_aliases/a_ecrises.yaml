@@ -1,0 +1,207 @@
+# Geography schemes of agent A-ECRISES (economic and financial crises). Generated from the provider files and
+# reviewed by the agent; every alias says why. Nothing here is guessed: names that match a crosswalk name field
+# exactly say which field; the others are agent-mapped with the reason (IMF naming conventions, renamed
+# countries, spacing variants of the same file).
+schemes:
+  # Laeven & Valencia (2020) data file: countries are given by NAME (IMF-style short names). Lookup is
+  # case-insensitive and ignores surrounding whitespace; a trailing footnote marker ('Argentina 8/') is removed
+  # by the parser before lookup (and kept in the row flags).
+  # Kept unmapped: Yugoslavia, SFR - Socialist Federal Republic of Yugoslavia (dissolved 1992): not a crosswalk entity; kept unmapped
+  laeven_valencia:
+    base: null
+    aliases:
+      - {code: "Albania", iso3: ALB, source: "exact match of crosswalk label \"Albania\"; first seen Crisis Years!A3"}
+      - {code: "Algeria", iso3: DZA, source: "exact match of crosswalk label \"Algeria\"; first seen Crisis Years!A4"}
+      - {code: "Angola", iso3: AGO, source: "exact match of crosswalk label \"Angola\"; first seen Crisis Years!A5"}
+      - {code: "Argentina", iso3: ARG, source: "exact match of crosswalk label \"Argentina\"; first seen Crisis Years!A6"}
+      - {code: "Armenia", iso3: ARM, source: "exact match of crosswalk label \"Armenia\"; first seen Crisis Years!A7"}
+      - {code: "Australia", iso3: AUS, source: "exact match of crosswalk label \"Australia\"; first seen Crisis Years!A8"}
+      - {code: "Austria", iso3: AUT, source: "exact match of crosswalk label \"Austria\"; first seen Crisis Years!A9"}
+      - {code: "Azerbaijan", iso3: AZE, source: "exact match of crosswalk label \"Azerbaijan\"; first seen Crisis Years!A10"}
+      - {code: "Bangladesh", iso3: BGD, source: "exact match of crosswalk label \"Bangladesh\"; first seen Crisis Years!A11"}
+      - {code: "Barbados", iso3: BRB, source: "exact match of crosswalk label \"Barbados\"; first seen Crisis Years!A12"}
+      - {code: "Belarus", iso3: BLR, source: "exact match of crosswalk label \"Belarus\"; first seen Crisis Years!A13"}
+      - {code: "Belgium", iso3: BEL, source: "exact match of crosswalk label \"Belgium\"; first seen Crisis Years!A14"}
+      - {code: "Belize", iso3: BLZ, source: "exact match of crosswalk label \"Belize\"; first seen Crisis Years!A15"}
+      - {code: "Benin", iso3: BEN, source: "exact match of crosswalk label \"Benin\"; first seen Crisis Years!A16"}
+      - {code: "Bhutan", iso3: BTN, source: "exact match of crosswalk label \"Bhutan\"; first seen Crisis Years!A17"}
+      - {code: "Bolivia", iso3: BOL, source: "exact match of crosswalk worldbank_name \"Bolivia\"; first seen Crisis Years!A18"}
+      - {code: "Bosnia and Herzegovina", iso3: BIH, source: "exact match of crosswalk label \"Bosnia and Herzegovina\"; first seen Crisis Years!A19"}
+      - {code: "Botswana", iso3: BWA, source: "exact match of crosswalk label \"Botswana\"; first seen Crisis Years!A20"}
+      - {code: "Brazil", iso3: BRA, source: "exact match of crosswalk label \"Brazil\"; first seen Crisis Years!A21"}
+      - {code: "Brunei", iso3: BRN, source: "agent-mapped: crosswalk BRN \"Brunei Darussalam\"; first seen Crisis Years!A22"}
+      - {code: "Bulgaria", iso3: BGR, source: "exact match of crosswalk label \"Bulgaria\"; first seen Crisis Years!A23"}
+      - {code: "Burkina Faso", iso3: BFA, source: "exact match of crosswalk label \"Burkina Faso\"; first seen Crisis Years!A24"}
+      - {code: "Burundi", iso3: BDI, source: "exact match of crosswalk label \"Burundi\"; first seen Crisis Years!A25"}
+      - {code: "Cambodia", iso3: KHM, source: "exact match of crosswalk label \"Cambodia\"; first seen Crisis Years!A26"}
+      - {code: "Cameroon", iso3: CMR, source: "exact match of crosswalk label \"Cameroon\"; first seen Crisis Years!A27"}
+      - {code: "Canada", iso3: CAN, source: "exact match of crosswalk label \"Canada\"; first seen Crisis Years!A28"}
+      - {code: "Cape Verde", iso3: CPV, source: "agent-mapped: crosswalk CPV \"Cabo Verde\" (former English short name Cape Verde); first seen Crisis Years!A29"}
+      - {code: "Central African Rep", iso3: CAF, source: "agent-mapped: abbreviation of \"Central African Republic\" (crosswalk CAF); first seen Crisis Resolution and Outcomes!A26"}
+      - {code: "Central African Rep.", iso3: CAF, source: "exact match of crosswalk comtrade_reporter_label \"Central African Rep.\"; first seen Crisis Years!A30"}
+      - {code: "Chad", iso3: TCD, source: "exact match of crosswalk label \"Chad\"; first seen Crisis Years!A31"}
+      - {code: "Chile", iso3: CHL, source: "exact match of crosswalk label \"Chile\"; first seen Crisis Years!A32"}
+      - {code: "China, Mainland", iso3: CHN, source: "agent-mapped: IMF naming \"China, P.R.: Mainland\" = crosswalk CHN; first seen Crisis Resolution and Outcomes!A32"}
+      - {code: "China, P.R.", iso3: CHN, source: "agent-mapped: IMF naming \"China, People's Republic of\" = crosswalk CHN; first seen Crisis Years!A33"}
+      - {code: "China, P.R.: Hong Kong", iso3: HKG, source: "agent-mapped: IMF naming \"China, P.R.: Hong Kong\" = crosswalk HKG; first seen Crisis Years!A70"}
+      - {code: "Colombia", iso3: COL, source: "exact match of crosswalk label \"Colombia\"; first seen Crisis Years!A34"}
+      - {code: "Comoros", iso3: COM, source: "exact match of crosswalk label \"Comoros\"; first seen Crisis Years!A35"}
+      - {code: "Congo, Dem Rep", iso3: COD, source: "agent-mapped: IMF naming \"Congo, Democratic Republic of the\" = crosswalk COD; first seen Crisis Resolution and Outcomes!A35"}
+      - {code: "Congo, Dem. Rep. of", iso3: COD, source: "agent-mapped: IMF naming \"Congo, Democratic Republic of the\" = crosswalk COD; first seen Crisis Years!A36"}
+      - {code: "Congo, Rep", iso3: COG, source: "agent-mapped: IMF naming \"Congo, Republic of\" = crosswalk COG; first seen Crisis Resolution and Outcomes!A38"}
+      - {code: "Congo, Rep. of", iso3: COG, source: "agent-mapped: IMF naming \"Congo, Republic of\" = crosswalk COG; first seen Crisis Years!A37"}
+      - {code: "Costa Rica", iso3: CRI, source: "exact match of crosswalk label \"Costa Rica\"; first seen Crisis Years!A38"}
+      - {code: "Cote d'Ivoire", iso3: CIV, source: "exact match of crosswalk worldbank_name \"Cote d'Ivoire\"; first seen Crisis Resolution and Outcomes!A41"}
+      - {code: "Croatia", iso3: HRV, source: "exact match of crosswalk label \"Croatia\"; first seen Crisis Years!A40"}
+      - {code: "Cyprus", iso3: CYP, source: "exact match of crosswalk label \"Cyprus\"; first seen Crisis Years!A42"}
+      - {code: "Czech Republic", iso3: CZE, source: "agent-mapped: crosswalk CZE \"Czechia\" (Czech Republic); first seen Crisis Years!A41"}
+      - {code: "CzechRepublic", iso3: CZE, source: "agent-mapped: same name without the space (monthly sheet); crosswalk CZE; first seen Monthly Crisis Dates!A30"}
+      - {code: "Côte d’Ivoire", iso3: CIV, source: "exact match of crosswalk label \"Côte d’Ivoire\"; first seen Crisis Years!A39"}
+      - {code: "Denmark", iso3: DNK, source: "exact match of crosswalk label \"Denmark\"; first seen Crisis Years!A43"}
+      - {code: "Djibouti", iso3: DJI, source: "exact match of crosswalk label \"Djibouti\"; first seen Crisis Years!A44"}
+      - {code: "Dominica", iso3: DMA, source: "exact match of crosswalk label \"Dominica\"; first seen Crisis Years!A45"}
+      - {code: "Dominican Rep", iso3: DOM, source: "agent-mapped: abbreviation of \"Dominican Republic\" (crosswalk DOM); first seen Crisis Resolution and Outcomes!A47"}
+      - {code: "Dominican Republic", iso3: DOM, source: "exact match of crosswalk label \"Dominican Republic\"; first seen Crisis Years!A46"}
+      - {code: "Ecuador", iso3: ECU, source: "exact match of crosswalk label \"Ecuador\"; first seen Crisis Years!A47"}
+      - {code: "Egypt", iso3: EGY, source: "exact match of crosswalk label \"Egypt\"; first seen Crisis Years!A48"}
+      - {code: "El Salvador", iso3: SLV, source: "exact match of crosswalk label \"El Salvador\"; first seen Crisis Years!A49"}
+      - {code: "Equatorial Guinea", iso3: GNQ, source: "exact match of crosswalk label \"Equatorial Guinea\"; first seen Crisis Years!A50"}
+      - {code: "Eritrea", iso3: ERI, source: "exact match of crosswalk label \"Eritrea\"; first seen Crisis Years!A51"}
+      - {code: "Estonia", iso3: EST, source: "exact match of crosswalk label \"Estonia\"; first seen Crisis Years!A52"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact match of crosswalk label \"Ethiopia\"; first seen Crisis Years!A53"}
+      - {code: "Fiji", iso3: FJI, source: "exact match of crosswalk label \"Fiji\"; first seen Crisis Years!A54"}
+      - {code: "Finland", iso3: FIN, source: "exact match of crosswalk label \"Finland\"; first seen Crisis Years!A55"}
+      - {code: "France", iso3: FRA, source: "exact match of crosswalk label \"France\"; first seen Crisis Years!A56"}
+      - {code: "Gabon", iso3: GAB, source: "exact match of crosswalk label \"Gabon\"; first seen Crisis Years!A57"}
+      - {code: "Gambia, The", iso3: GMB, source: "exact match of crosswalk worldbank_name \"Gambia, The\"; first seen Crisis Years!A58"}
+      - {code: "Georgia", iso3: GEO, source: "exact match of crosswalk label \"Georgia\"; first seen Crisis Years!A59"}
+      - {code: "Germany", iso3: DEU, source: "exact match of crosswalk label \"Germany\"; first seen Crisis Years!A60"}
+      - {code: "Ghana", iso3: GHA, source: "exact match of crosswalk label \"Ghana\"; first seen Crisis Years!A61"}
+      - {code: "Greece", iso3: GRC, source: "exact match of crosswalk label \"Greece\"; first seen Crisis Years!A62"}
+      - {code: "Grenada", iso3: GRD, source: "exact match of crosswalk label \"Grenada\"; first seen Crisis Years!A63"}
+      - {code: "Guatemala", iso3: GTM, source: "exact match of crosswalk label \"Guatemala\"; first seen Crisis Years!A64"}
+      - {code: "Guinea", iso3: GIN, source: "exact match of crosswalk label \"Guinea\"; first seen Crisis Years!A65"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "exact match of crosswalk label \"Guinea-Bissau\"; first seen Crisis Years!A66"}
+      - {code: "Guyana", iso3: GUY, source: "exact match of crosswalk label \"Guyana\"; first seen Crisis Years!A67"}
+      - {code: "Haiti", iso3: HTI, source: "exact match of crosswalk label \"Haiti\"; first seen Crisis Years!A68"}
+      - {code: "Honduras", iso3: HND, source: "exact match of crosswalk label \"Honduras\"; first seen Crisis Years!A69"}
+      - {code: "Hungary", iso3: HUN, source: "exact match of crosswalk label \"Hungary\"; first seen Crisis Years!A71"}
+      - {code: "Iceland", iso3: ISL, source: "exact match of crosswalk label \"Iceland\"; first seen Crisis Years!A72"}
+      - {code: "India", iso3: IND, source: "exact match of crosswalk label \"India\"; first seen Crisis Years!A73"}
+      - {code: "Indonesia", iso3: IDN, source: "exact match of crosswalk label \"Indonesia\"; first seen Crisis Years!A74"}
+      - {code: "Iran, I.R. of", iso3: IRN, source: "agent-mapped: IMF naming \"Iran, Islamic Republic of\" = crosswalk IRN; first seen Crisis Years!A75"}
+      - {code: "Ireland", iso3: IRL, source: "exact match of crosswalk label \"Ireland\"; first seen Crisis Years!A76"}
+      - {code: "Israel", iso3: ISR, source: "exact match of crosswalk label \"Israel\"; first seen Crisis Years!A77"}
+      - {code: "Italy", iso3: ITA, source: "exact match of crosswalk label \"Italy\"; first seen Crisis Years!A78"}
+      - {code: "Jamaica", iso3: JAM, source: "exact match of crosswalk label \"Jamaica\"; first seen Crisis Years!A79"}
+      - {code: "Japan", iso3: JPN, source: "exact match of crosswalk label \"Japan\"; first seen Crisis Years!A80"}
+      - {code: "Jordan", iso3: JOR, source: "exact match of crosswalk label \"Jordan\"; first seen Crisis Years!A81"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "exact match of crosswalk label \"Kazakhstan\"; first seen Crisis Years!A82"}
+      - {code: "Kenya", iso3: KEN, source: "exact match of crosswalk label \"Kenya\"; first seen Crisis Years!A83"}
+      - {code: "Korea", iso3: KOR, source: "agent-mapped: IMF naming \"Korea\" = Republic of Korea (the DPRK is not an IMF member); crosswalk KOR; first seen Crisis Years!A84"}
+      - {code: "Kuwait", iso3: KWT, source: "exact match of crosswalk label \"Kuwait\"; first seen Crisis Years!A85"}
+      - {code: "Kyrgyz Rep", iso3: KGZ, source: "agent-mapped: abbreviation of \"Kyrgyz Republic\" (crosswalk KGZ worldbank_name); first seen Crisis Resolution and Outcomes!A83"}
+      - {code: "Kyrgyz Republic", iso3: KGZ, source: "exact match of crosswalk worldbank_name \"Kyrgyz Republic\"; first seen Crisis Years!A86"}
+      - {code: "Lao People’s Dem. Rep.", iso3: LAO, source: "agent-mapped: IMF naming \"Lao P.D.R.\" = crosswalk LAO; first seen Crisis Years!A87"}
+      - {code: "Latvia", iso3: LVA, source: "exact match of crosswalk label \"Latvia\"; first seen Crisis Years!A88"}
+      - {code: "Lebanon", iso3: LBN, source: "exact match of crosswalk label \"Lebanon\"; first seen Crisis Years!A89"}
+      - {code: "Lesotho", iso3: LSO, source: "exact match of crosswalk label \"Lesotho\"; first seen Crisis Years!A90"}
+      - {code: "Liberia", iso3: LBR, source: "exact match of crosswalk label \"Liberia\"; first seen Crisis Years!A91"}
+      - {code: "Libya", iso3: LBY, source: "exact match of crosswalk label \"Libya\"; first seen Crisis Years!A92"}
+      - {code: "Lithuania", iso3: LTU, source: "exact match of crosswalk label \"Lithuania\"; first seen Crisis Years!A93"}
+      - {code: "Luxembourg", iso3: LUX, source: "exact match of crosswalk label \"Luxembourg\"; first seen Crisis Years!A94"}
+      - {code: "Macedonia", iso3: MKD, source: "agent-mapped: North Macedonia (named Macedonia / FYR Macedonia before 2019); crosswalk MKD; first seen Crisis Years!A95"}
+      - {code: "Macedonia, FYR", iso3: MKD, source: "agent-mapped: IMF naming \"Macedonia, FYR\" (before 2019) = crosswalk MKD; first seen Crisis Resolution and Outcomes!A90"}
+      - {code: "Madagascar", iso3: MDG, source: "exact match of crosswalk label \"Madagascar\"; first seen Crisis Years!A96"}
+      - {code: "Malawi", iso3: MWI, source: "exact match of crosswalk label \"Malawi\"; first seen Crisis Years!A97"}
+      - {code: "Malaysia", iso3: MYS, source: "exact match of crosswalk label \"Malaysia\"; first seen Crisis Years!A98"}
+      - {code: "Maldives", iso3: MDV, source: "exact match of crosswalk label \"Maldives\"; first seen Crisis Years!A99"}
+      - {code: "Mali", iso3: MLI, source: "exact match of crosswalk label \"Mali\"; first seen Crisis Years!A100"}
+      - {code: "Mauritania", iso3: MRT, source: "exact match of crosswalk label \"Mauritania\"; first seen Crisis Years!A101"}
+      - {code: "Mauritius", iso3: MUS, source: "exact match of crosswalk label \"Mauritius\"; first seen Crisis Years!A102"}
+      - {code: "Mexico", iso3: MEX, source: "exact match of crosswalk label \"Mexico\"; first seen Crisis Years!A103"}
+      - {code: "Moldova", iso3: MDA, source: "exact match of crosswalk worldbank_name \"Moldova\"; first seen Crisis Years!A104"}
+      - {code: "Mongolia", iso3: MNG, source: "exact match of crosswalk label \"Mongolia\"; first seen Crisis Years!A105"}
+      - {code: "Morocco", iso3: MAR, source: "exact match of crosswalk label \"Morocco\"; first seen Crisis Years!A106"}
+      - {code: "Mozambique", iso3: MOZ, source: "exact match of crosswalk label \"Mozambique\"; first seen Crisis Years!A107"}
+      - {code: "Myanmar", iso3: MMR, source: "exact match of crosswalk label \"Myanmar\"; first seen Crisis Years!A108"}
+      - {code: "Namibia", iso3: NAM, source: "exact match of crosswalk label \"Namibia\"; first seen Crisis Years!A109"}
+      - {code: "Nepal", iso3: NPL, source: "exact match of crosswalk label \"Nepal\"; first seen Crisis Years!A110"}
+      - {code: "Netherlands", iso3: NLD, source: "exact match of crosswalk iso_name \"Netherlands\"; first seen Crisis Years!A111"}
+      - {code: "New Caledonia", iso3: NCL, source: "exact match of crosswalk label \"New Caledonia\"; first seen Crisis Years!A112"}
+      - {code: "New Zealand", iso3: NZL, source: "exact match of crosswalk label \"New Zealand\"; first seen Crisis Years!A113"}
+      - {code: "Nicaragua", iso3: NIC, source: "exact match of crosswalk label \"Nicaragua\"; first seen Crisis Years!A114"}
+      - {code: "Niger", iso3: NER, source: "exact match of crosswalk label \"Niger\"; first seen Crisis Years!A115"}
+      - {code: "Nigeria", iso3: NGA, source: "exact match of crosswalk label \"Nigeria\"; first seen Crisis Years!A116"}
+      - {code: "Norway", iso3: NOR, source: "exact match of crosswalk label \"Norway\"; first seen Crisis Years!A117"}
+      - {code: "Pakistan", iso3: PAK, source: "exact match of crosswalk label \"Pakistan\"; first seen Crisis Years!A118"}
+      - {code: "Panama", iso3: PAN, source: "exact match of crosswalk label \"Panama\"; first seen Crisis Years!A119"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "exact match of crosswalk label \"Papua New Guinea\"; first seen Crisis Years!A120"}
+      - {code: "Paraguay", iso3: PRY, source: "exact match of crosswalk label \"Paraguay\"; first seen Crisis Years!A121"}
+      - {code: "Peru", iso3: PER, source: "exact match of crosswalk label \"Peru\"; first seen Crisis Years!A122"}
+      - {code: "Philippines", iso3: PHL, source: "exact match of crosswalk label \"Philippines\"; first seen Crisis Years!A123"}
+      - {code: "Poland", iso3: POL, source: "exact match of crosswalk label \"Poland\"; first seen Crisis Years!A124"}
+      - {code: "Portugal", iso3: PRT, source: "exact match of crosswalk label \"Portugal\"; first seen Crisis Years!A125"}
+      - {code: "Romania", iso3: ROU, source: "exact match of crosswalk label \"Romania\"; first seen Crisis Years!A126"}
+      - {code: "Russia", iso3: RUS, source: "agent-mapped: crosswalk RUS \"Russian Federation\"; first seen Crisis Years!A127"}
+      - {code: "Rwanda", iso3: RWA, source: "exact match of crosswalk label \"Rwanda\"; first seen Crisis Years!A128"}
+      - {code: "Senegal", iso3: SEN, source: "exact match of crosswalk label \"Senegal\"; first seen Crisis Years!A131"}
+      - {code: "Serbia, Republic of", iso3: SRB, source: "agent-mapped: IMF naming \"Serbia, Republic of\" = crosswalk SRB; first seen Crisis Years!A132"}
+      - {code: "Seychelles", iso3: SYC, source: "exact match of crosswalk label \"Seychelles\"; first seen Crisis Years!A133"}
+      - {code: "Sierra Leone", iso3: SLE, source: "exact match of crosswalk label \"Sierra Leone\"; first seen Crisis Years!A134"}
+      - {code: "Singapore", iso3: SGP, source: "exact match of crosswalk label \"Singapore\"; first seen Crisis Years!A135"}
+      - {code: "Slovak Rep", iso3: SVK, source: "agent-mapped: abbreviation of \"Slovak Republic\" (crosswalk SVK worldbank_name); first seen Crisis Resolution and Outcomes!A122"}
+      - {code: "Slovak Republic", iso3: SVK, source: "exact match of crosswalk worldbank_name \"Slovak Republic\"; first seen Crisis Years!A136"}
+      - {code: "Slovenia", iso3: SVN, source: "exact match of crosswalk label \"Slovenia\"; first seen Crisis Years!A137"}
+      - {code: "South Africa", iso3: ZAF, source: "exact match of crosswalk label \"South Africa\"; first seen Crisis Years!A138"}
+      - {code: "South Sudan", iso3: SSD, source: "exact match of crosswalk label \"South Sudan\"; first seen Crisis Years!A139"}
+      - {code: "Spain", iso3: ESP, source: "exact match of crosswalk label \"Spain\"; first seen Crisis Years!A140"}
+      - {code: "Sri Lanka", iso3: LKA, source: "exact match of crosswalk label \"Sri Lanka\"; first seen Crisis Years!A141"}
+      - {code: "St. Kitts and Nevis", iso3: KNA, source: "exact match of crosswalk worldbank_name \"St. Kitts and Nevis\"; first seen Crisis Years!A129"}
+      - {code: "Sudan", iso3: SDN, source: "exact match of crosswalk label \"Sudan\"; first seen Crisis Years!A142"}
+      - {code: "Suriname", iso3: SUR, source: "exact match of crosswalk label \"Suriname\"; first seen Crisis Years!A143"}
+      - {code: "Swaziland", iso3: SWZ, source: "agent-mapped: Eswatini (named Swaziland before 2018); crosswalk SWZ; first seen Crisis Years!A144"}
+      - {code: "Sweden", iso3: SWE, source: "exact match of crosswalk label \"Sweden\"; first seen Crisis Years!A145"}
+      - {code: "Switzerland", iso3: CHE, source: "exact match of crosswalk label \"Switzerland\"; first seen Crisis Years!A147"}
+      - {code: "Syrian Arab Republic", iso3: SYR, source: "exact match of crosswalk label \"Syrian Arab Republic\"; first seen Crisis Years!A146"}
+      - {code: "São Tomé & Príncipe", iso3: STP, source: "agent-mapped: crosswalk STP \"Sao Tome and Principe\"; first seen Crisis Resolution and Outcomes!A119"}
+      - {code: "São Tomé and Principe", iso3: STP, source: "agent-mapped: crosswalk STP \"Sao Tome and Principe\"; first seen Crisis Years!A130"}
+      - {code: "Tajikistan", iso3: TJK, source: "exact match of crosswalk label \"Tajikistan\"; first seen Crisis Years!A148"}
+      - {code: "Tanzania", iso3: TZA, source: "exact match of crosswalk worldbank_name \"Tanzania\"; first seen Crisis Years!A149"}
+      - {code: "Thailand", iso3: THA, source: "exact match of crosswalk label \"Thailand\"; first seen Crisis Years!A150"}
+      - {code: "Togo", iso3: TGO, source: "exact match of crosswalk label \"Togo\"; first seen Crisis Years!A151"}
+      - {code: "Trinidad and Tobago", iso3: TTO, source: "exact match of crosswalk label \"Trinidad and Tobago\"; first seen Crisis Years!A152"}
+      - {code: "Tunisia", iso3: TUN, source: "exact match of crosswalk label \"Tunisia\"; first seen Crisis Years!A153"}
+      - {code: "Turkey", iso3: TUR, source: "agent-mapped: crosswalk TUR \"Türkiye\" (Turkey); first seen Crisis Years!A154"}
+      - {code: "Turkmenistan", iso3: TKM, source: "exact match of crosswalk label \"Turkmenistan\"; first seen Crisis Years!A155"}
+      - {code: "Uganda", iso3: UGA, source: "exact match of crosswalk label \"Uganda\"; first seen Crisis Years!A156"}
+      - {code: "Ukraine", iso3: UKR, source: "exact match of crosswalk label \"Ukraine\"; first seen Crisis Years!A157"}
+      - {code: "United Kingdom", iso3: GBR, source: "exact match of crosswalk iso_name \"United Kingdom\"; first seen Crisis Years!A158"}
+      - {code: "United States", iso3: USA, source: "exact match of crosswalk iso_name \"United States\"; first seen Crisis Years!A159"}
+      - {code: "UnitedKingdom", iso3: GBR, source: "agent-mapped: same name without the space (monthly sheet); crosswalk GBR; first seen Monthly Crisis Dates!A130"}
+      - {code: "UnitedStates", iso3: USA, source: "agent-mapped: same name without the space (monthly sheet); crosswalk USA; first seen Monthly Crisis Dates!A131"}
+      - {code: "Uruguay", iso3: URY, source: "exact match of crosswalk label \"Uruguay\"; first seen Crisis Years!A160"}
+      - {code: "Uzbekistan", iso3: UZB, source: "exact match of crosswalk label \"Uzbekistan\"; first seen Crisis Years!A161"}
+      - {code: "Venezuela", iso3: VEN, source: "exact match of crosswalk comtrade_reporter_label \"Venezuela\"; first seen Crisis Years!A162"}
+      - {code: "Vietnam", iso3: VNM, source: "agent-mapped: crosswalk VNM \"Viet Nam\"; first seen Crisis Years!A163"}
+      - {code: "Yemen", iso3: YEM, source: "exact match of crosswalk label \"Yemen\"; first seen Crisis Years!A164"}
+      - {code: "Zambia", iso3: ZMB, source: "exact match of crosswalk label \"Zambia\"; first seen Crisis Years!A166"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "exact match of crosswalk label \"Zimbabwe\"; first seen Crisis Years!A167"}
+    source:
+      kind: provider_data
+      url: "https://static-content.springer.com/esm/art%3A10.1057%2Fs41308-020-00107-3/MediaObjects/41308_2020_107_MOESM1_ESM.xlsx"
+      raw_sha256: "24545e4d95e459dd83264fd92531dc9f02fcb13831b9170f77c7d0c4ef0814aa"
+      retrieved_at: "2026-10-16"
+  # ESRB European financial crises database: ISO 3166-1 alpha-2 codes (Greece is GR, not Eurostat EL), plus
+  # 'UK' / 'UK*' for the United Kingdom, explained by the file's own note: '*The UK was excluded from the dataset in the
+  # latest update including crises from 2019 onwards.'
+  esrb:
+    base: iso2
+    aliases:
+      - {code: "UK*", iso3: GBR, source: "ESRB fcdb20220120 'Systemic crises' column A 'UK*' with the sheet note '*The UK was excluded from the dataset in the latest update including crises from 2019 onwards.'"}
+      - {code: "UK", iso3: GBR, source: "ESRB fcdb20220120 'Residual events' column A 'UK' (the same country as 'UK*' of the systemic sheet; ISO 3166 reserves UK for the United Kingdom)"}
+    source:
+      kind: provider_data
+      url: "https://www.esrb.europa.eu/pub/fcdb/esrb.fcdb20220120.en.xlsx"
+      raw_sha256: "bf3535247da708b5ed77a43a356640b8436b5c7e35038b6bbe5d69241abc5a87"
+      retrieved_at: "2026-10-16"

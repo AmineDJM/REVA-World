@@ -211,6 +211,11 @@ def causal_objects(entity: WdEntity) -> list[str]:
     return list(out)
 
 
+def is_dated(entity: WdEntity) -> bool:
+    """True when the item carries an event-like date (start / end / point in time): a priority hint only."""
+    return any(s.property in ("P580", "P582", "P585") for s in entity.statements)
+
+
 # --------------------------------------------------------------------------- seeds
 def seeds_from_recorded(paths: Iterable[Path]) -> dict[str, str]:
     """QID -> reason, from ``registry/kg/queries/*/_recorded/snapshot_claims_*.json`` files.

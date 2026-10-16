@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "538c505682eb5e1989999f43104c36cfd250b261e75475f9560e8ccefe57bf59",
+    "url": "https://ofac.treasury.gov/sanctions-programs-and-country-information",
+    "file": "538c505682eb5e19.html",
+    "sha256": "38e8a756347b35ebee0621a1bb05d834b5808aa786dab68a9468dcbe26ef1e12",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "public domain (17 U.S.C. 105)",
+    "note": "full page, byte-identical to the live download of 2026-10-16"
+  }
+]

@@ -204,6 +204,7 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
     entity_identification: 'identification',
     link: 'lien dérivé',
     absence: 'absence constatée',
+    causal_claim: 'affirmation causale (de la source)',
   };
   let what = '';
   if (e.kind === 'kg_statement') {
@@ -218,6 +219,11 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
     what = `rien trouvé (${String(x.what ?? '')}) · sources consultées : ${Array.isArray(x.sources_consulted) ? (x.sources_consulted as unknown[]).map(String).join(', ') : 'non précisées'}`;
   } else if (e.kind === 'link') {
     what = `lien ${String(x.link_kind ?? '')} ${String(x.a ?? '')} – ${String(x.b ?? '')}`;
+  } else if (e.kind === 'causal_claim') {
+    // a claim made by a named source (never REVA's): source, tier, grade
+    what = `${labelOf(x.cause)} → ${labelOf(x.effect)} · ${String(x.relation ?? '')}${x.stance === 'denies' ? ' (lien nié)' : ''} · selon ${source} (${s('tier') ?? '?'}) · ${
+      typeof x.grade === 'string' ? `preuve ${x.grade}` : 'non gradée'
+    }`;
   }
   return (
     <li id={`ev-${e.id}`} className={`v3-ev${active ? ' active' : ''}`} data-testid="evidence-item">

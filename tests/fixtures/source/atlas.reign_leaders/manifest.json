@@ -1,0 +1,43 @@
+[
+ {
+  "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+  "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+  "file": "b9eef8431dd6ce91.tar.gz",
+  "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-gzip"
+  },
+  "retrieved_at": "2026-10-15T22:05:00+00:00",
+  "licence": "CC BY 4.0",
+  "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+ },
+ {
+  "request_fingerprint": "35e1f545ebff8738ace93bb2c07e7c995747d924713125245c2171ca7f489a10",
+  "url": "https://jonathanmpowell.com/coups/",
+  "file": "35e1f545ebff8738.html",
+  "sha256": "dc6a950257dd0bf6c1d2cd39dbf1488d8291c0d2386ab7684fd9c146973150f0",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html"
+  },
+  "retrieved_at": "2026-10-16T20:20:00+00:00",
+  "licence": "page text: no licence stated",
+  "note": "trimmed copy of the coups page (body text, data links)",
+  "derived_from_sha256": "23bb01a0dae82ef5cd8b0316a26f6f1d384a24a06fb31325bbaeb2e2e2a422ce"
+ },
+ {
+  "request_fingerprint": "d29e9809af3c929a68401ce9238706c3af192778829b8539863ebf971e6de7ce",
+  "url": "https://jonathanmpowell.com/wp-content/uploads/2026/04/leaderlist.xlsx",
+  "file": "d29e9809af3c929a.xlsx",
+  "sha256": "1935f85479f8b3bfb1b2eb23a61c57b4d80bc3c181641f07952aa0bf2e060ba6",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-16T20:20:00+00:00",
+  "licence": "no licence stated by the provider (citation requested); test fixture subset only",
+  "note": "leaderlist.xlsx (2026-04-14) rows of COW [40, 91, 155, 160, 365, 436, 640, 800, 817] + 3 defect rows, rewritten workbook with original cell texts and row numbers",
+  "derived_from_sha256": "bfffef3c59f95adba6b07e38152543dc6c73381368ad1ae6ec20b327b8d0f650"
+ }
+]

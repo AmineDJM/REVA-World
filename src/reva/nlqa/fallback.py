@@ -1,8 +1,10 @@
 """Keyword planner used when the LLM is disabled: deterministic, lexical, documented as limited.
 
 It recognises (accent/case-insensitive) catalog concept labels (fr/en), crosswalk country
-names and ISO3 codes, years, ranking words, relation words ("lié", "connected", …) and
-capitalised names. The plan it writes goes through the same :func:`validate_plan` as an LLM
+names and ISO3 codes, years, ranking words, relation words ("lié", "connected", …),
+capitalised names, and causal questions ("pourquoi …", "quelles sont les causes de …",
+"conséquences de …", "chaîne causale entre X et Y", "why did …", "how did X lead to Y") which
+become ``why`` / ``causal_chain`` over a looked-up event. The plan it writes goes through the same :func:`validate_plan` as an LLM
 plan and is labelled ``planner: keyword_fallback``. It never guesses beyond these rules: a
 question it cannot map yields an empty plan and an unsupported item.
 """
@@ -28,6 +30,135 @@ _PAIR = re.compile(
     r"\b(liens?|relations?|rapports?|connexions?|links?|relations?hips?|ties|connections?)\s+(entre|between)\b",
     re.IGNORECASE,
 )
+# --- causal questions (why / causal_chain): the event phrase is taken from the question as written
+_END = r"\s*[?!.…]*\s*$"
+_CHAIN_PATTERNS = (
+    re.compile(
+        r"\b(?:cha[iî]nes?\s+causales?|liens?\s+(?:de\s+causalit[ée]|causals?)|causal\s+(?:chains?|links?|paths?))\s+"
+        r"(?:entre|between)\s+(?P<a>.+?)\s+(?:et|and)\s+(?P<b>.+?)" + _END,
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bcomment\s+(?P<a>.+?)\s+(?:a-t-(?:il|elle)|ont-(?:ils|elles))\s+(?:conduit|men[ée]|abouti|d[ée]bouch[ée])\s+"
+        r"(?:à|a|au|aux|sur)\s+(?P<b>.+?)" + _END,
+        re.IGNORECASE,
+    ),
+    re.compile(r"\bhow\s+did\s+(?P<a>.+?)\s+(?:lead|contribute)\s+to\s+(?P<b>.+?)" + _END, re.IGNORECASE),
+)
+_EFFECT_PATTERNS = (
+    re.compile(
+        r"\b(?:cons[ée]quences?|effets?|r[ée]percussions?)\s+(?:de\s+la|de\s+l['’]|du|des|de|d['’])\s*(?P<x>.+?)"
+        + _END,
+        re.IGNORECASE,
+    ),
+    re.compile(r"\b(?:consequences?|effects?|outcomes?|results?)\s+of\s+(?P<x>.+?)" + _END, re.IGNORECASE),
+)
+_CAUSE_PATTERNS = (
+    re.compile(
+        r"\b(?:causes?|raisons?)\s+(?:de\s+la|de\s+l['’]|du|des|de|d['’])\s*(?P<x>.+?)" + _END,
+        re.IGNORECASE,
+    ),
+    re.compile(r"\bpourquoi\s+(?P<why>.+?)" + _END, re.IGNORECASE),
+    re.compile(r"\b(?:causes?|reasons?)\s+(?:of|for)\s+(?P<x>.+?)" + _END, re.IGNORECASE),
+    re.compile(r"\bwhy\s+(?:did|was|were|is|are|does|do|has|had)\s+(?P<why>.+?)" + _END, re.IGNORECASE),
+    re.compile(r"\bwhat\s+caused\s+(?P<x>.+?)" + _END, re.IGNORECASE),
+)
+#: words that end an event phrase ("pourquoi la Révolution française a-t-elle eu lieu" → "Révolution française")
+_PHRASE_STOP = {
+    "a",
+    "ont",
+    "est",
+    "sont",
+    "fut",
+    "furent",
+    "eut",
+    "eurent",
+    "s'est",
+    "se",
+    "y",
+    "il",
+    "elle",
+    "ils",
+    "elles",
+    "éclate",
+    "eclate",
+    "éclaté",
+    "commence",
+    "commencé",
+    "commencee",
+    "eu",
+    "lieu",
+    "survenu",
+    "survenue",
+    "happen",
+    "happened",
+    "start",
+    "started",
+    "begin",
+    "began",
+    "break",
+    "broke",
+    "occur",
+    "occurred",
+    "end",
+    "ended",
+    "take",
+    "took",
+    "fail",
+    "failed",
+    "collapse",
+    "collapsed",
+    "fall",
+    "fell",
+}
+_LEADING_ARTICLES = re.compile(r"^(?:(?:le|la|les|un|une|the|a|an)\s+|l['’]\s*)", re.IGNORECASE)
+#: "pourquoi …" / "why …" name an event only with a capitalised word or a year ("pourquoi le ciel est-il bleu"
+#: is not an event question)
+_NAMED = re.compile(r"(?:^|\s)[A-ZÀ-ÖØ-Þ]|\d{3,4}")
+
+
+def event_phrase(text: str) -> str:
+    """The event named in a causal question, as written: cut at the verb, leading article dropped."""
+    words = text.strip().split()
+    out: list[str] = []
+    for w in words:
+        lw = w.lower()
+        if out and (lw in _PHRASE_STOP or "-t-" in lw or re.search(r"-(?:il|elle|ils|elles)$", lw)):
+            break
+        out.append(w)
+    phrase = " ".join(out).strip(" ,;:«»\"'")
+    return _LEADING_ARTICLES.sub("", phrase, count=1).strip()
+
+
+def causal_plan(question: str) -> list[dict[str, Any]] | None:
+    """Operations for a causal question ("pourquoi …", "quelles sont les causes de …", "conséquences de …",
+    "chaîne causale entre X et Y", "how did X lead to Y"), or ``None`` when the question is not causal."""
+    q = question.strip()
+    for rx in _CHAIN_PATTERNS:
+        m = rx.search(q)
+        if m:
+            a, b = event_phrase(m.group("a")), event_phrase(m.group("b"))
+            if a and b:
+                return [
+                    {"id": "s1", "op": "entity_lookup", "text": a, "kind": None},
+                    {"id": "s2", "op": "entity_lookup", "text": b, "kind": None},
+                    {"id": "s3", "op": "causal_chain", "from_entity": "s1", "to_entity": "s2", "max_hops": 4},
+                ]
+    for direction, patterns in (("effects", _EFFECT_PATTERNS), ("causes", _CAUSE_PATTERNS)):
+        for rx in patterns:
+            m = rx.search(q)
+            if m:
+                x = event_phrase(m.group("why") if "why" in m.groupdict() else m.group("x"))
+                if "why" in m.groupdict() and not _NAMED.search(x):
+                    continue
+                if x:
+                    return [
+                        {"id": "s1", "op": "entity_lookup", "text": x, "kind": None},
+                        {"id": "s2", "op": "why", "entity": "s1", "causal_direction": direction},
+                    ]
+    return None
+
+
 _CAP_SPAN = re.compile(
     r"(?:[A-ZÀ-ÖØ-Þ][\w'’-]+)(?:\s+(?:de|du|des|d'|la|le|of|the|von|van|da|di)?\s*[A-ZÀ-ÖØ-Þ][\w'’-]+)*"
 )
@@ -113,6 +244,22 @@ def _default_headlines() -> Any:
         return None
 
 
+def _not_equivalent_keys(h: Any) -> list[str]:
+    """Series named under a headline's ``not_equivalent`` ("a / b / c" lists, dataset-level keys allowed)."""
+    out = []
+    for x in getattr(h, "not_equivalent", ()) or ():
+        for part in str(x.get("series") or "").split(" / "):
+            part = part.strip()
+            if part:
+                out.append(part)
+    return out
+
+
+def _names_series(declared: str, key: str) -> bool:
+    """``declared`` (a not_equivalent entry: a series key, or a dataset key ``source.dataset``) covers ``key``."""
+    return key == declared or key.startswith(declared + "|") or key.startswith(declared + ".")
+
+
 def headline_tiebreak(question: str, tied: list[str], catalog: QaCatalog, headlines: Any) -> tuple[str, str] | None:
     """``(catalog concept, headline concept)`` chosen among equally matching catalog concepts by the
     headline layer, or ``None`` when it does not decide.
@@ -129,10 +276,13 @@ def headline_tiebreak(question: str, tied: list[str], catalog: QaCatalog, headli
     for h in sorted(headlines.concepts.values(), key=lambda h: h.id):
         keys = [s.key for s in h.series]
         related = list(h.related_catalog_concepts)
+        excluded = _not_equivalent_keys(h)
         for cid in tied:
             c = catalog.concepts.get(cid)
             if c is None:
                 continue
+            if any(_names_series(x, k) for k in c.source_order for x in excluded):
+                continue  # ASK-7: a series the headline declares not equivalent never stands for it
             ranks = [i for i, k in enumerate(keys) if k in c.source_order]
             if ranks or cid in related:
                 rel = related.index(cid) if cid in related else len(related)
@@ -181,6 +331,9 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
     lang = detect_language(question)
     years = [int(y) for y in _YEAR.findall(question)]
     ops: list[dict[str, Any]] = []
+    causal = causal_plan(question)
+    if causal is not None:
+        return {"input_language": lang, "restatement": "", "operations": causal, "unsupported": [], "ambiguities": []}
 
     def op(**kw: Any) -> dict[str, Any]:
         d = {"id": f"s{len(ops) + 1}", **kw}
@@ -197,18 +350,26 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
             concept = hb[0]
             ambiguity.update(resolution="headline", chosen=hb[0], headline=hb[1])
     ambiguous = [] if concept else ambiguous
-    # countries: crosswalk names / ISO3 codes, in order of appearance
-    found: list[tuple[int, str]] = []
+    # countries: crosswalk names (English and French, ASK-8) / ISO3 codes, in order of appearance; a name inside a
+    # longer matched name of another country ("Guinée" in "Guinée-Bissau") is not a mention
+    spans: list[tuple[int, int, str]] = []
     for c in catalog.countries.values():
+        best: tuple[int, int, str] | None = None
         for n in c.names:
             m = re.search(r"(?<!\w)" + re.escape(fold(n)) + r"(?!\w)", q)
-            if m and len(n) >= 4:
-                found.append((m.start(), c.iso3))
-                break
-        else:
+            if m and len(n) >= 4 and (best is None or m.end() - m.start() > best[1] - best[0]):
+                best = (m.start(), m.end(), c.iso3)
+        if best is None:
             m = re.search(r"(?<![A-Za-z])" + c.iso3 + r"(?![A-Za-z])", question)
             if m:
-                found.append((m.start(), c.iso3))
+                best = (m.start(), m.end(), c.iso3)  # question offsets; ISO3 codes never overlap names
+        if best is not None:
+            spans.append(best)
+    found = [
+        (a, iso)
+        for a, z, iso in spans
+        if not any(a2 <= a and z <= z2 and (z2 - a2) > (z - a) and iso2 != iso for a2, z2, iso2 in spans)
+    ]
     countries = [iso for _, iso in sorted(set(found))]
     if _PAIR.search(question):
         # links between two countries: crosswalk names / ISO3 codes, else the capitalised names (resolved by the

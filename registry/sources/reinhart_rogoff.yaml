@@ -1,0 +1,29 @@
+# V3 (agent A-ECRISES): Reinhart-Rogoff "This Time Is Different" crisis data (HBS BFFS Global Crises Data).
+# Connector: src/reva/adapters/connectors/atlas_ecrises.py (atlas.ecrises.reinhart_rogoff) -> atlas table
+# reinhart_rogoff.global_crises and crisis events (KG + dataset ecrises.reinhart_rogoff.events).
+source_key: reinhart_rogoff.bffs
+title: Reinhart & Rogoff Global Crises Data by Country (70 countries, 1800-2016; HBS Behavioral Finance & Financial Stability)
+provider_url: https://www.hbs.edu/behavioral-finance-and-financial-stability/data/Pages/global.aspx
+lineage_family: reinhart_rogoff
+rights:
+  licence: "no licence stated by the provider (Copyright President & Fellows of Harvard College); not an open licence"
+  licence_url: https://www.hbs.edu/behavioral-finance-and-financial-stability/data/Pages/global.aspx
+  attribution: >-
+    Reinhart, C. M. and Rogoff, K. S., This Time Is Different: Eight Centuries of Financial Folly (2009) and the
+    Global Crises Data by Country (with C. Trebesch and V. Reinhart), HBS Behavioral Finance & Financial Stability
+    project, file 20160923_global_crisis_data.xlsx.
+  licence_evidence: >-
+    Data page (read 2026-10-16): "On this page we present data collected over many years by Carmen Reinhart (with her
+    coauthors Ken Rogoff, Christoph Trebesch, and Vincent Reinhart) ... The BFFS Project keeps this data updated and
+    available for download." No terms of use are published; the site footer states the Harvard copyright.
+  open_licence: false
+  review_flag: no reuse terms published; redistribution in REVA to be confirmed by a maintainer (cite on every use)
+metadata:
+  allowed_hosts: [www.hbs.edu]
+  files:
+    - https://www.hbs.edu/behavioral-finance-and-financial-stability/Documents/ChartData/MapCharts/20160923_global_crisis_data.xlsx
+  provider_notes: >-
+    The file defines no codebook: the column '<' (no definition) is skipped and currency-crisis code 2 (38
+    country-years, undocumented) is kept as published and flagged.
+  authentication: none
+  cadence: the file is dated 2016-09-23; semi-annual check

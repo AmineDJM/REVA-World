@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mockFetch } from '../../test/fetchMock';
 import V3App from '../V3App';
 import * as F from './fixtures';
+import ASK from './ask_causal.fixture.json';
 
 // Cytoscape is not exercised in jsdom; its honest text alternative and the edge-tap callback are.
 vi.mock('./CausalGraph', () => ({
@@ -51,7 +52,9 @@ describe('Causes & conséquences', () => {
     expect(within(card).getByTestId('event-type')).toHaveTextContent('guerre');
     expect(within(card).getByTestId('event-dates')).toHaveTextContent('28 juil. 1914 – 11 nov. 1918');
     expect(within(card).getByTestId('event-dates')).toHaveTextContent('début au jour');
-    expect(card).toHaveTextContent('Empire allemand — side, Empires centraux');
+    expect(card).toHaveTextContent('Empire allemand — participant');
+    expect(card).toHaveTextContent('Europe');
+    expect(card).toHaveTextContent('8 cause(s) · 3 conséquence(s) affirmées · 2 candidat(s) en quarantaine');
     expect(within(card).getByTestId('event-context')).toHaveTextContent('relation de contexte, pas une cause');
     const canvas = await screen.findByTestId('causal-canvas');
     // 8 causes (one is a denial → not an edge) + 3 effects
@@ -188,5 +191,32 @@ describe('Causes & conséquences', () => {
     at('/v3/causes');
     expect(await screen.findByText('Choisissez un événement.')).toBeInTheDocument();
     expect(calls.filter((c) => c.url.startsWith('/v1/causal'))).toHaveLength(0);
+  });
+});
+
+describe('Demander — causal answers (real NLQA pipeline output over test fixtures)', () => {
+  it('every causal sentence names its source and tier; chain answers carry the composition caveat; claims are cited', async () => {
+    mockFetch({ 'POST /v1/ask': { body: ASK.why } });
+    at('/v3/demander');
+    await userEvent.type(await screen.findByLabelText('Votre question'), 'Pourquoi la Première Guerre mondiale a-t-elle éclaté ?');
+    await userEvent.click(screen.getByRole('button', { name: 'Demander' }));
+    const answer = await screen.findByTestId('ask-answer');
+    const causal = within(answer)
+      .getAllByTestId('answer-sentence')
+      .filter((s) => s.getAttribute('data-kind') === 'causal');
+    expect(causal.length).toBeGreaterThan(3);
+    for (const s of causal) expect(s).toHaveTextContent(/^Selon .+ \(T[1-4], /);
+    const items = within(answer).getAllByTestId('evidence-item');
+    expect(items.some((i) => /affirmation causale \(de la source\)/.test(i.textContent ?? '') && /selon icb\.data \(T1\)/.test(i.textContent ?? ''))).toBe(true);
+  });
+
+  it('chain answer', async () => {
+    mockFetch({ 'POST /v1/ask': { body: ASK.chain } });
+    at('/v3/demander');
+    await userEvent.type(await screen.findByLabelText('Votre question'), 'Chaîne causale ?');
+    await userEvent.click(screen.getByRole('button', { name: 'Demander' }));
+    const answer = await screen.findByTestId('ask-answer');
+    expect(answer).toHaveTextContent('Chaîne composée par REVA à partir de 2 affirmation(s) distincte(s)');
+    expect(answer).toHaveTextContent('force = maillon le plus faible (preuve C)');
   });
 });

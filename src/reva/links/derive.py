@@ -742,6 +742,17 @@ def derive_shared_subject(
     return d.finish()
 
 
+#: LIC-2 (review V3b): the UN Treaty Collection terms A-TREATIES records on its rows (atlas_treaties.LICENCE),
+#: carried on every co_party link so the API envelope and the relation page show them.
+UNTC_TERMS: dict[str, Any] = {
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no "
+    "redistribution or derivative compilations without permission -- not an open licence",
+    "licence_url": "https://www.un.org/en/about-us/terms-of-use",
+    "open_licence": False,
+    "non_commercial": True,
+}
+
+
 def derive_co_party(
     index: KgIndex,
     *,
@@ -803,6 +814,7 @@ def derive_co_party(
                         "parties": len(members),
                         "temporal_basis": "undated" if ov.kind == "undated" else "intersection",
                         "start_basis": "date of each consent instrument listed by UNTC (entry into force may be later)",
+                        **UNTC_TERMS,
                     },
                 )
             )

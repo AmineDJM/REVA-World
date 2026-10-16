@@ -33,6 +33,23 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 CATALOG_DIR = REPO_ROOT / "registry" / "atlas" / "catalog"
 CROSSWALK = REPO_ROOT / "registry" / "entities" / "country_crosswalk.json"
 PROPERTIES = REPO_ROOT / "registry" / "kg" / "properties.yaml"
+#: Debian iso-codes (the crosswalk's ISO 3166-1 mirror) and its French translation (review V3b ASK-8)
+ISO_CODES = REPO_ROOT / "registry" / "reference" / "iso-codes_4.20.1_iso_3166-1.json"
+ISO_CODES_FR = REPO_ROOT / "registry" / "reference" / "iso-codes_4.20.1_iso_3166-1_fr.po"
+#: Common names the ISO names and their French translation do not give (curated; matched on whole words)
+FR_ALIASES: dict[str, tuple[str, ...]] = {
+    "BLR": ("Biélorussie",),
+    "CPV": ("Cap-Vert",),
+    "GBR": ("Grande-Bretagne",),
+    "MKD": ("Macédoine",),
+    "MMR": ("Birmanie",),
+    "NLD": ("Hollande",),
+    "RUS": ("Russia",),
+    "SWZ": ("Swaziland",),
+    "TLS": ("Timor oriental",),
+    "VAT": ("Vatican",),
+    "VNM": ("Vietnam",),
+}
 
 #: Interconnection kinds (V3 spec, "Interconnections").
 LINK_KINDS: tuple[str, ...] = (
@@ -181,20 +198,76 @@ class Country:
 
 @lru_cache(maxsize=4)
 def load_countries(path: Path = CROSSWALK) -> tuple[Country, ...]:
+    """Crosswalk countries with their English names (crosswalk label, World Bank, Comtrade, ISO names) and their
+    French names (crosswalk ``label_fr``, the iso-codes French translation of the ISO name / common name /
+    official name, the short form before the comma when it names one country only, and :data:`FR_ALIASES`)."""
     if not path.exists():
         return ()
     doc = json.loads(path.read_text())
+    iso_names, fr = _iso_names(), _iso_fr()
     out = []
     for e in doc.get("entities", []):
         iso3 = e.get("iso3") or e.get("key")
         if not isinstance(iso3, str) or not re.fullmatch(r"[A-Z]{3}", iso3):
             continue
         names = {str(e.get("label") or iso3)}
-        for k in ("worldbank_name", "comtrade_reporter_label"):
+        for k in ("worldbank_name", "comtrade_reporter_label", "label_fr", "iso_name"):
             if e.get(k):
                 names.add(str(e[k]))
+        for n in iso_names.get(iso3, ()):
+            names.add(n)
+            if fr.get(n):
+                names.add(fr[n])
+        names.update(FR_ALIASES.get(iso3, ()))
         out.append(Country(iso3, str(e.get("label") or iso3), tuple(sorted(names))))
-    return tuple(out)
+    # "Russie, Fédération de" -> "Russie": the part before the comma, only when no other country shares it
+    heads: dict[str, set[str]] = {}
+    for c in out:
+        for n in c.names:
+            if "," in n:
+                heads.setdefault(fold(n.split(",", 1)[0]), set()).add(c.iso3)
+    return tuple(
+        Country(
+            c.iso3,
+            c.label,
+            tuple(
+                sorted(
+                    set(c.names)
+                    | {
+                        n.split(",", 1)[0].strip()
+                        for n in c.names
+                        if "," in n and heads.get(fold(n.split(",", 1)[0])) == {c.iso3}
+                    }
+                )
+            ),
+        )
+        for c in out
+    )
+
+
+def _iso_names() -> dict[str, tuple[str, ...]]:
+    try:
+        rows = json.loads(ISO_CODES.read_text())["3166-1"]
+    except (OSError, ValueError, KeyError):
+        return {}
+    return {
+        r["alpha_3"]: tuple(r[k] for k in ("name", "common_name", "official_name") if r.get(k))
+        for r in rows
+        if r.get("alpha_3")
+    }
+
+
+def _iso_fr() -> dict[str, str]:
+    """msgid -> msgstr of the iso-codes French translation (single-line entries; empty translations skipped)."""
+    try:
+        po = ISO_CODES_FR.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    out = {}
+    for m in re.finditer(r'^msgid "((?:[^"\\]|\\.)*)"\nmsgstr "((?:[^"\\]|\\.)*)"$', po, re.M):
+        if m.group(1) and m.group(2):
+            out[m.group(1).replace('\\"', '"')] = m.group(2).replace('\\"', '"')
+    return out
 
 
 @dataclass(frozen=True)

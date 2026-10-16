@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "53b2a481bd923532f569b2a9f7c78156ad6cb26afa335212ed0c3a5105797baf",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/5.1?persistentId=doi:10.7910/DVN/HTTWYL",
+    "file": "53b2a481bd923532.json",
+    "sha256": "d5401a76aef36b2e1170ac6f06db7ad821935852fcbe11c84ff6e66666740af1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 5.1 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "f1a0a116a4535b0eb57469e0d997bb59e63da8ce358e56912425a098e7078aa0",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/4291456",
+    "file": "f1a0a116a4535b0e.tab",
+    "sha256": "5bfffa668e09b4544edb08ba2efc65b7cfe7426f8231cc0d412ba827da373a69",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of mmALL_073120_csv.tab: header + 274 of the real rows (selected countries, a few blank rows kept), lines byte-identical except the sources and notes cells, emptied (news citations/excerpts are not redistributed); real file sha256 e4a3285b5f39fcc0723d98135679189eef37a0987b26f5ad549aaf43db542189"
+  }
+]

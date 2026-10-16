@@ -1,0 +1,32 @@
+# Budget request from agent A-SANCTIONS (TIES, EUSANCT, EU Sanctions Map, OFAC program list). ATLASCORE merges
+# into registry/policies/budgets.yaml. Every source is one bulk file / one page per run; TIES and EUSANCT runs also
+# fetch the countrycode 1.9.0 tarball from CRAN (0.54 MB) for COW -> ISO3. Regime/program level only: no request
+# ever goes to a designation list (persons/entities). A full refresh of all four is 6 requests / ~67 MB.
+agent: A-SANCTIONS
+requests:
+  - source_key: ties.unc
+    # sanctions.web.unc.edu: TIESv4-1.xls (0.49 MB) + cran.r-project.org countrycode. planned_requests 4.
+    daily_requests: 8
+    expected_bytes_per_day: 3000000
+    reason: "TIES 4.1: 1 workbook + countrycode per run (2 requests, ~1 MB); allow one retry"
+  - source_key: eusanct.kondata
+    # kondata.uni-konstanz.de: RADAR dataset tar (64.8 MB, CC BY 4.0) + countrycode. planned_requests 4.
+    daily_requests: 6
+    expected_bytes_per_day: 140000000
+    reason: "EUSANCT 1.0: 1 tar + countrycode per run (2 requests, ~65.4 MB); allow one retry"
+  - source_key: eu.sanctionsmap
+    # www.sanctionsmap.eu/api/v1/regime (0.4 MB JSON). planned_requests 2.
+    daily_requests: 4
+    expected_bytes_per_day: 2000000
+    reason: "EU Sanctions Map regime list: 1 request per run (~0.4 MB); weekly"
+  - source_key: ofac.programs
+    # ofac.treasury.gov/sanctions-programs-and-country-information (66 kB HTML). planned_requests 2.
+    daily_requests: 4
+    expected_bytes_per_day: 500000
+    reason: "OFAC active program list: 1 request per run (~66 kB); weekly"
+daily_totals_increase:
+  http_requests_total: "+22"
+  http_bytes_total: "+145_500_000"
+notes: >-
+  Not requested (documented in docs/dev/v3_a_sanctions.md): GSDB (request form with personal data,
+  no-redistribution clause), UN SC consolidated list and OFAC SDN lists (individual-level designations).

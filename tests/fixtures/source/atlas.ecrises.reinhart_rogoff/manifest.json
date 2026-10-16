@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "34ac7f3305b62bcb0779acad470ba072dbb9c6aa28d5ff44364e53282e5e9b7e",
+    "url": "https://www.hbs.edu/behavioral-finance-and-financial-stability/Documents/ChartData/MapCharts/20160923_global_crisis_data.xlsx",
+    "file": "34ac7f3305b62bcb.xlsx",
+    "sha256": "4f303acb8d71ca829504dcf2592e27c4f0c306907ddc65e7a3a95e213b1f4899",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "no licence stated by the provider (Copyright President & Fellows of Harvard College); data offered for download with citation - not an open licence, pending maintainer review",
+    "fixture_note": "TRIMMED: rows of ARG, USA, GBR, HUN (code 'HUN ' with trailing space), TWN, ISL, GRC + the 2 header rows (xl/worksheets/sheet1.xml rows filtered; every other workbook part unchanged)"
+  }
+]

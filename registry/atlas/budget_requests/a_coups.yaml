@@ -1,0 +1,23 @@
+agent: A-COUPS
+requests:
+  - source_key: powell_thyne.coups
+    daily_requests: 6
+    expected_bytes_per_day: 2000000
+    reason: >-
+      atlas.coups: jonathanmpowell.com/coups/ page (~120 kB, newest pt_YYYYMMDD.csv link + definitions) + the coup
+      list CSV (~20 kB) + countrycode 1.9.0 tarball (CRAN, ~0.54 MB) = 3 requests per run (4 if CRAN moved the
+      release to Archive/); monthly cadence; 6/day allows one retry.
+  - source_key: archigos.leaders
+    daily_requests: 18
+    expected_bytes_per_day: 14000000
+    reason: >-
+      atlas.archigos: Archigos_4.1_stata14.dta (2.9 MB, www.rochester.edu) + the P&T page and CSV (context edge) +
+      countrycode = 4 requests per run; option wikidata=1 adds 5 WDQS POST queries (query.wikidata.org, 250 enwiki
+      titles each, < 1 MB each, under the machine-wide Wikidata lock) = 9; frozen release, quarterly cadence; 18/day
+      allows one retry.
+  - source_key: reign.leaderlist
+    daily_requests: 6
+    expected_bytes_per_day: 2000000
+    reason: >-
+      atlas.reign_leaders: the coups page (newest leaderlist.xlsx link, ~120 kB) + leaderlist.xlsx (~0.2 MB) +
+      countrycode = 3 requests per run; monthly cadence; 6/day allows one retry.

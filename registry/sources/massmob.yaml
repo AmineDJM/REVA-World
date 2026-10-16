@@ -1,0 +1,25 @@
+# V3 (agent A-CONTENTION): Mass Mobilization Project protest data (Clark & Regan), Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_massmob.py (atlas.massmob) -> atlas table mmp.protests_cy (COMPUTED
+# country-year counts) + KG protest events mmp:<id> + staged reaction_to claims. See docs/dev/v3_a_contention.md.
+source_key: harvard.dataverse.massmob
+title: Mass Mobilization Protest Data (Clark & Regan), dataset version 5.1, mmALL_073120_csv.tab
+provider_url: https://doi.org/10.7910/DVN/HTTWYL
+lineage_family: mass_mobilization_project
+rights:
+  licence: CC0 1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: Clark, David; Regan, Patrick, "Mass Mobilization Protest Data", Harvard Dataverse, doi:10.7910/DVN/HTTWYL, V5.1.
+  licence_evidence: Dataverse version 5.1 metadata (license.name "CC0 1.0"), checked by the connector on every run (read 2026-10-16).
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/5.1?persistentId=doi:10.7910/DVN/HTTWYL
+    - https://dataverse.harvard.edu/api/access/datafile/4291456   # mmALL_073120_csv.tab (15,625,472 B)
+  codebooks:
+    - {file_id: 2775560, name: MM_users_manual_0515.pdf, md5: efb7ca11ee0eadae9122b2b7cee08560}
+  access_note: >-
+    15,239 protests and 1,906 protest = 0 country-years, 1990-2020. The sources (news citations, journalists'
+    names) and notes (news excerpts) columns are read for row checks only and never stored.
+  code_crosswalk: country names -> geo scheme mmp_loc (registry/atlas/geo_aliases/a_contention.yaml).
+  authentication: none
+  cadence: pinned version; re-check yearly

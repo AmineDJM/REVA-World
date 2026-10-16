@@ -17,12 +17,19 @@ The query side (``reva.atlas.query.AtlasQuery.headline_*``) picks per (country, 
 first listed series that reports a value (projections excluded unless allowed), names it, and lists
 every series consulted with its status (answered / also reported / no value / projection only /
 unit mismatch / not in the snapshot).
+
+Review V3b: a listed series may carry ``cell_rules`` (documented rules marking cells that are an upstream
+provider's projection, a nowcast or an extrapolation, e.g. WDI population after the WPP estimate horizon;
+excluded unless projections are requested, then flagged) and ``not_equivalent_for`` (countries whose
+territorial scope or definition differs: the series never answers for them). A change of the answering
+series inside one country's series is flagged ``source_break`` by the query layer.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from decimal import Decimal
 from functools import lru_cache
@@ -42,25 +49,67 @@ REVIEW_STATUS = "agent_declared_equivalence_not_human_reviewed"
 
 
 @dataclass(frozen=True)
+class CellRule:
+    """A documented rule marking cells of one series that are not an observation of their year (review V3b
+    HL-2, LAB-1): e.g. a WDI population after the UN WPP estimate horizon is, for most economies, the WPP
+    projection the World Bank republishes. Matching cells never answer unless projections are requested;
+    then they answer after any actual value and carry ``estimate_kind`` and the rule in their flags."""
+
+    estimate_kind: str  # projection_upstream | nowcast | extrapolated
+    label: dict[str, str]
+    basis: str
+    year_after: int | None = None
+    footnote_matches: str | None = None
+    unless_flag: str | None = None
+    upstream: str | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            k: v
+            for k, v in {
+                "estimate_kind": self.estimate_kind,
+                "year_after": self.year_after,
+                "footnote_matches": self.footnote_matches,
+                "unless_flag": self.unless_flag,
+                "upstream": self.upstream,
+                "label": dict(self.label),
+                "basis": self.basis,
+            }.items()
+            if v is not None
+        }
+
+
+@dataclass(frozen=True)
 class HeadlineSeries:
     series: Series
     justification: str
     scale: Decimal = Decimal(1)
     reported_unit: str | None = None
     caveats: str | None = None
+    cell_rules: tuple[CellRule, ...] = ()
+    #: (iso3 codes, reason): countries for which this series is NOT the concept (review V3b HL-1)
+    not_equivalent_for: tuple[tuple[tuple[str, ...], str], ...] = ()
 
     @property
     def key(self) -> str:
         return self.series.key
 
+    def excluded_countries(self) -> dict[str, str]:
+        return {c: reason for codes, reason in self.not_equivalent_for for c in codes}
+
     def as_dict(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "series": self.key,
             "justification": self.justification,
             "scale": str(self.scale),
             "reported_unit": self.reported_unit,
             "caveats": self.caveats,
         }
+        if self.cell_rules:
+            out["cell_rules"] = [r.as_dict() for r in self.cell_rules]
+        if self.not_equivalent_for:
+            out["not_equivalent_for"] = [{"iso3": list(c), "reason": r} for c, r in self.not_equivalent_for]
+        return out
 
 
 @dataclass(frozen=True)
@@ -159,6 +208,18 @@ def _operand(o: dict[str, Any]) -> Operand:
     return Operand(series=Series.parse(o["series"]), scale=_dec(o.get("scale")), reported_unit=o.get("reported_unit"))
 
 
+def _rule(r: dict[str, Any]) -> CellRule:
+    return CellRule(
+        estimate_kind=r["estimate_kind"],
+        label=dict(r["label"]),
+        basis=r["basis"],
+        year_after=r.get("year_after"),
+        footnote_matches=r.get("footnote_matches"),
+        unless_flag=r.get("unless_flag"),
+        upstream=r.get("upstream"),
+    )
+
+
 def _check_doc(doc: dict[str, Any], name: str, themes: set[str]) -> list[str]:
     v = jsonschema.Draft202012Validator(_schema())
     errs = [f"{'/'.join(str(p) for p in e.absolute_path) or '<root>'}: {e.message}" for e in v.iter_errors(doc)]
@@ -178,6 +239,12 @@ def _check_doc(doc: dict[str, Any], name: str, themes: set[str]) -> list[str]:
         for s in c.get("series") or []:
             if _dec(s.get("scale")) != 1 and not s.get("reported_unit"):
                 out.append(f"{c['id']}: {s['series']} has a scale but no reported_unit")
+            for r in s.get("cell_rules") or []:
+                if r.get("footnote_matches"):
+                    try:
+                        re.compile(r["footnote_matches"])
+                    except re.error:
+                        out.append(f"{c['id']}: {s['series']} cell rule footnote_matches is not a regex")
         d = c.get("derived") or {}
         for alt in d.get("alternatives") or []:
             if d.get("same_source", True) and all("series" in o for o in alt):
@@ -225,6 +292,10 @@ def load_headlines(directory: Path = SOURCE_ORDER_DIR, *, strict: bool = True) -
                         scale=_dec(s.get("scale")),
                         reported_unit=s.get("reported_unit"),
                         caveats=s.get("caveats"),
+                        cell_rules=tuple(_rule(r) for r in s.get("cell_rules") or ()),
+                        not_equivalent_for=tuple(
+                            (tuple(x["iso3"]), x["reason"]) for x in s.get("not_equivalent_for") or ()
+                        ),
                     )
                     for s in c.get("series") or ()
                 ),

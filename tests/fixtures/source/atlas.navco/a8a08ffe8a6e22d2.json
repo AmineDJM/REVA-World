@@ -1,0 +1,275 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 190702,
+  "datasetId": 3769103,
+  "datasetPersistentId": "doi:10.7910/DVN/ON9XND",
+  "datasetType": "dataset",
+  "storageIdentifier": "s3://10.7910/DVN/ON9XND",
+  "versionNumber": 1,
+  "internalVersionNumber": 5,
+  "versionMinorNumber": 0,
+  "versionState": "RELEASED",
+  "latestVersionPublishingState": "RELEASED",
+  "deaccessionLink": "",
+  "UNF": "UNF:6:GD3vspZ7XK7H7KFdiKFICw==",
+  "lastUpdateTime": "2020-03-17T21:09:02Z",
+  "releaseTime": "2020-03-17T21:09:02Z",
+  "createTime": "2020-03-17T21:06:39Z",
+  "publicationDate": "2020-03-17",
+  "citationDate": "2020-03-17",
+  "effectiveDatasetFileCountLimit": 1000,
+  "datasetFileUploadsAvailable": 998,
+  "license": {
+   "name": "CC0 1.0",
+   "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+   "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+   "rightsIdentifier": "CC0-1.0",
+   "rightsIdentifierScheme": "SPDX",
+   "schemeUri": "https://spdx.org/licenses/",
+   "languageCode": "en"
+  },
+  "fileAccessRequest": false,
+  "metadataBlocks": {
+   "citation": {
+    "displayName": "Citation Metadata",
+    "name": "citation",
+    "fields": [
+     {
+      "typeName": "title",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "List of Campaigns in NAVCO 1.3"
+     },
+     {
+      "typeName": "author",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        },
+        "authorIdentifierScheme": {
+         "typeName": "authorIdentifierScheme",
+         "multiple": false,
+         "typeClass": "controlledVocabulary",
+         "value": "ORCID"
+        },
+        "authorIdentifier": {
+         "typeName": "authorIdentifier",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "https://orcid.org/0000-0003-3113-2439"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Christopher Wiley Shay"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "datasetContact",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "datasetContactName": {
+         "typeName": "datasetContactName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "datasetContactAffiliation": {
+         "typeName": "datasetContactAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        },
+        "datasetContactEmail": {
+         "typeName": "datasetContactEmail",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "erica_chenoweth@hks.harvard.edu"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "dsDescription",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "dsDescriptionValue": {
+         "typeName": "dsDescriptionValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Includes 622 maximalist campaigns that set on from 1900-2019, correcting known coding errors and adding cases that were discovered through further research. Includes outcomes through 2019. Excludes data on violent flanks, peak participation size, regime and campaign support, security force defections, and state violence. These variables are in progress. The list and variables are preliminary and are subject to change with new information. The full NAVCO 1.3 dataset will be released by the end of 2020."
+        },
+        "dsDescriptionDate": {
+         "typeName": "dsDescriptionDate",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2019-03-17"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "subject",
+      "multiple": true,
+      "typeClass": "controlledVocabulary",
+      "value": [
+       "Social Sciences"
+      ]
+     },
+     {
+      "typeName": "keyword",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "protest"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "nonviolence"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "resistance"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "repression"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "civil conflict"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "depositor",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Chenoweth, Erica"
+     },
+     {
+      "typeName": "dateOfDeposit",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2020-03-17"
+     }
+    ]
+   }
+  },
+  "files": [
+   {
+    "description": "NAVCO 1.3 Codebook and Variable Descriptions",
+    "label": "NAVCO 1.3 Codebook List.pdf",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 190702,
+    "dataFile": {
+     "id": 3769105,
+     "persistentId": "doi:10.7910/DVN/ON9XND/PTMCCV",
+     "pidURL": "https://doi.org/10.7910/DVN/ON9XND/PTMCCV",
+     "filename": "NAVCO 1.3 Codebook List.pdf",
+     "contentType": "application/pdf",
+     "friendlyType": "Adobe PDF",
+     "filesize": 182616,
+     "description": "NAVCO 1.3 Codebook and Variable Descriptions",
+     "storageIdentifier": "s3://dvn-cloud:170ea50e073-073b276a7b99",
+     "rootDataFileId": -1,
+     "md5": "d5196bd992a93efa3ccfd9c492cb35bc",
+     "checksum": {
+      "type": "MD5",
+      "value": "d5196bd992a93efa3ccfd9c492cb35bc"
+     },
+     "tabularData": false,
+     "creationDate": "2020-03-17",
+     "publicationDate": "2020-03-17",
+     "lastUpdateTime": "2020-03-17T21:09:02Z",
+     "fileAccessRequest": false
+    }
+   },
+   {
+    "description": "NAVCO 1.3 Campaign List - Preliminary Data",
+    "label": "NAVCO 1.3 List.tab",
+    "restricted": false,
+    "version": 2,
+    "datasetVersionId": 190702,
+    "dataFile": {
+     "id": 3769104,
+     "persistentId": "doi:10.7910/DVN/ON9XND/XRA6WM",
+     "pidURL": "https://doi.org/10.7910/DVN/ON9XND/XRA6WM",
+     "filename": "NAVCO 1.3 List.tab",
+     "contentType": "text/tab-separated-values",
+     "friendlyType": "Tab-Delimited",
+     "filesize": 7949,
+     "description": "NAVCO 1.3 Campaign List - Preliminary Data",
+     "storageIdentifier": "s3://dvn-cloud:170ea50e600-de552c555a36",
+     "originalFileFormat": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+     "originalFormatLabel": "MS Excel Spreadsheet",
+     "originalFileSize": 64615,
+     "originalFileName": "NAVCO 1.3 List.xlsx",
+     "UNF": "UNF:6:GD3vspZ7XK7H7KFdiKFICw==",
+     "rootDataFileId": -1,
+     "md5": "0be2819dd4ccf87c9ecb335e1852cb7a",
+     "checksum": {
+      "type": "MD5",
+      "value": "0be2819dd4ccf87c9ecb335e1852cb7a"
+     },
+     "tabularData": true,
+     "creationDate": "2020-03-17",
+     "publicationDate": "2020-03-17",
+     "lastUpdateTime": "2020-03-17T21:09:02Z",
+     "fileAccessRequest": false
+    }
+   }
+  ]
+ }
+}

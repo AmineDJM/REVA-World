@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "f7e423a16c37fec3c16d83b51e9b9ab9fbcb2a309f5bb5f74280ed5fe1a5fc18",
+    "url": "https://www.macrohistory.net/database/licence-terms/",
+    "file": "f7e423a16c37fec3.html",
+    "sha256": "cc0f6d13d9e3263302d0aaca87fe62422119ffff89d3cf32411458fa607a91d9",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "CC BY-NC-SA 4.0",
+    "fixture_note": "live"
+  },
+  {
+    "request_fingerprint": "e25a7785f2902bc279d170cddf421f06a022fa666e58fcd4fdeda16db5171900",
+    "url": "https://www.macrohistory.net/app/download/9834512569/JSTdatasetR6.xlsx?t=1763503850",
+    "file": "e25a7785f2902bc2.xlsx",
+    "sha256": "1ea941dee5ca7397867ff1c5cc60bb6f255fe814d857f1a9cbc922adb05dcd32",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-16T20:20:00+00:00",
+    "licence": "CC BY-NC-SA 4.0",
+    "fixture_note": "TRIMMED: rows of USA, GBR, DEU, SWE, JPN + header (xl/worksheets/sheet1.xml rows filtered; other parts unchanged)"
+  }
+]

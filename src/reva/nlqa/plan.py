@@ -14,7 +14,10 @@ untrusted JSON into a :class:`QueryPlan` and enforces:
 * an ``entity_lookup`` text must come from the question (:func:`lookup_from_question`: the words
   as written or their dictionary form, e.g. "Brésil" for "Brésiliens"); a lookup the planner
   added on its own is rejected (``lookup_not_in_question``), with the operations that use it;
-* at most :data:`MAX_PATH_OPERATIONS` path searches per question (``too_many_path_operations``).
+* at most :data:`MAX_PATH_OPERATIONS` path searches (``kg_path``, ``causal_chain``) per question
+  (``too_many_path_operations``);
+* causal operations ``why`` (causes or effects of a looked-up event) and ``causal_chain`` (≤ 6 hops) only name
+  entities through lookup refs; they are answered from sourced causal claims only (never candidates).
 """
 
 from __future__ import annotations
@@ -36,7 +39,13 @@ OPS: tuple[str, ...] = (
     "atlas_series",
     "links",
     "links_pair",
+    "why",
+    "causal_chain",
 )
+#: Causal operations (v3_causality.md): answered only from claims asserted by named sources (T1–T4).
+CAUSAL_DIRECTIONS = ("causes", "effects")
+MAX_CHAIN_HOPS = 6
+DEFAULT_CHAIN_HOPS = 4
 MAX_OPERATIONS = 12
 #: Path searches are the expensive operations: at most this many per question (SEC-1).
 MAX_PATH_OPERATIONS = 3
@@ -214,7 +223,7 @@ def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str =
             args = _validate_args(name, o, catalog, lookups, plan)
             if name == "entity_lookup" and not lookup_from_question(args["text"], question):
                 raise _Reject("lookup_not_in_question")
-            if name == "kg_path":
+            if name in ("kg_path", "causal_chain"):
                 if n_paths >= MAX_PATH_OPERATIONS:
                     raise _Reject("too_many_path_operations")
                 n_paths += 1
@@ -320,6 +329,24 @@ def _validate_args(
             plan.warnings.append(f"max_hops_capped: {hops} -> {MAX_HOPS}")
             hops = MAX_HOPS
         return {"from_entity": a, "to_entity": b, "max_hops": int(hops), "as_of": _as_of(o.get("as_of"))}
+    if name == "why":
+        d = o.get("causal_direction") or "causes"
+        if d not in CAUSAL_DIRECTIONS:
+            raise ValueError("causal_direction must be causes or effects")
+        return {"entity": _ref(o, "entity", lookups), "direction": d}
+    if name == "causal_chain":
+        a, b = _ref(o, "from_entity", lookups), _ref(o, "to_entity", lookups)
+        if a == b:
+            raise _Reject("path_to_itself")
+        hops = o.get("max_hops")
+        if hops is None:
+            hops = DEFAULT_CHAIN_HOPS
+        if isinstance(hops, bool) or not isinstance(hops, int) or hops < 1:
+            raise ValueError("max_hops must be a positive integer")
+        if hops > MAX_CHAIN_HOPS:
+            plan.warnings.append(f"max_hops_capped: {hops} -> {MAX_CHAIN_HOPS}")
+            hops = MAX_CHAIN_HOPS
+        return {"from_entity": a, "to_entity": b, "max_hops": int(hops)}
     if name == "atlas_value":
         return {
             "concept": _concept(o, catalog),
@@ -440,6 +467,27 @@ def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
                 f"les chemins (≤ {a['max_hops']} étapes) reliant {ent(a['from_entity'])} à {ent(a['to_entity'])}"
                 if fr
                 else f"the paths (≤ {a['max_hops']} hops) connecting {ent(a['from_entity'])} to {ent(a['to_entity'])}"
+            )
+        elif o.op == "why":
+            if a["direction"] == "effects":
+                parts.append(
+                    f"les conséquences de {ent(a['entity'])} affirmées par des sources"
+                    if fr
+                    else f"the consequences of {ent(a['entity'])} asserted by sources"
+                )
+            else:
+                parts.append(
+                    f"les causes de {ent(a['entity'])} affirmées par des sources"
+                    if fr
+                    else f"the causes of {ent(a['entity'])} asserted by sources"
+                )
+        elif o.op == "causal_chain":
+            parts.append(
+                f"les chaînes d'affirmations causales sourcées (≤ {a['max_hops']} maillons) de {ent(a['from_entity'])} "
+                f"à {ent(a['to_entity'])}"
+                if fr
+                else f"the chains of sourced causal claims (≤ {a['max_hops']} hops) from {ent(a['from_entity'])} "
+                f"to {ent(a['to_entity'])}"
             )
         elif o.op == "atlas_value":
             parts.append(f"{concept(a['concept'])} — {country(a['country'])}, {year(a['year'])}")

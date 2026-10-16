@@ -554,3 +554,38 @@ schemes:
     #   Serbia and Montenegro: historical state (2003-2006 rows); kept unmapped
     #   USSR: historical state (1990-1991 rows); kept unmapped
     #   Yugoslavia: historical state (1990-2002 rows; ccode 345 and 347); kept unmapped
+  navco3_loc:
+    aliases:
+      - {code: "algeria", iso3: DZA, source: "NAVCO 3.0 country_name 'algeria' rows carry cowcode 615 (COW code of Algeria)"}
+      - {code: "bahrain", iso3: BHR, source: "NAVCO 3.0 country_name 'bahrain' rows carry cowcode 692 (COW code of Bahrain)"}
+      - {code: "china", iso3: CHN, source: "NAVCO 3.0 country_name 'china' rows carry cowcode 710 (COW code of China)"}
+      - {code: "egypt", iso3: EGY, source: "NAVCO 3.0 country_name 'egypt' rows carry cowcode 651 (COW code of Egypt)"}
+      - {code: "estonia", iso3: EST, source: "NAVCO 3.0 country_name 'estonia' rows carry cowcode 366 (COW code of Estonia)"}
+      - {code: "india", iso3: IND, source: "NAVCO 3.0 country_name 'india' rows carry cowcode 750 (COW code of India)"}
+      - {code: "iraq", iso3: IRQ, source: "NAVCO 3.0 country_name 'iraq' rows carry cowcode 645 (COW code of Iraq)"}
+      - {code: "jordan", iso3: JOR, source: "NAVCO 3.0 country_name 'jordan' rows carry cowcode 663 (COW code of Jordan)"}
+      - {code: "kenya", iso3: KEN, source: "NAVCO 3.0 country_name 'kenya' rows carry cowcode 501 (COW code of Kenya)"}
+      - {code: "libya", iso3: LBY, source: "NAVCO 3.0 country_name 'libya' rows carry cowcode 620 (COW code of Libya)"}
+      - {code: "madagascar", iso3: MDG, source: "NAVCO 3.0 country_name 'madagascar' rows carry cowcode 580 (COW code of Madagascar)"}
+      - {code: "mexico", iso3: MEX, source: "NAVCO 3.0 country_name 'mexico' rows carry cowcode 70 (COW code of Mexico)"}
+      - {code: "morocco", iso3: MAR, source: "NAVCO 3.0 country_name 'morocco' rows carry cowcode 600 (COW code of Morocco)"}
+      - {code: "pakistan", iso3: PAK, source: "NAVCO 3.0 country_name 'pakistan' rows carry cowcode 770 (COW code of Pakistan)"}
+      - {code: "sierra_leone", iso3: SLE, source: "NAVCO 3.0 country_name 'sierra_leone' rows carry cowcode 451 (COW code of Sierra Leone)"}
+      - {code: "south_korea", iso3: KOR, source: "NAVCO 3.0 country_name 'south_korea' rows carry cowcode 732 (COW code of South Korea)"}
+      - {code: "south_sudan", iso3: SSD, source: "NAVCO 3.0 country_name 'south_sudan' rows carry cowcode 626 (COW code of South Sudan)"}
+      - {code: "sudan", iso3: SDN, source: "NAVCO 3.0 country_name 'sudan' rows carry cowcode 625 (COW code of Sudan)"}
+      - {code: "syria", iso3: SYR, source: "NAVCO 3.0 country_name 'syria' rows carry cowcode 652 (COW code of Syria)"}
+      - {code: "tanzania", iso3: TZA, source: "NAVCO 3.0 country_name 'tanzania' rows carry cowcode 510 (COW code of Tanzania)"}
+      - {code: "tunisia", iso3: TUN, source: "NAVCO 3.0 country_name 'tunisia' rows carry cowcode 616 (COW code of Tunisia)"}
+      - {code: "turkey", iso3: TUR, source: "NAVCO 3.0 country_name 'turkey' rows carry cowcode 640 (COW code of Turkey)"}
+      - {code: "ukraine", iso3: UKR, source: "NAVCO 3.0 country_name 'ukraine' rows carry cowcode 369 (COW code of Ukraine)"}
+      - {code: "us", iso3: USA, source: "NAVCO 3.0 country_name 'us' rows carry cowcode 2 (COW code of United States)"}
+      - {code: "uzbekistan", iso3: UZB, source: "NAVCO 3.0 country_name 'uzbekistan' rows carry cowcode 704 (COW code of Uzbekistan)"}
+      - {code: "yemen", iso3: YEM, source: "NAVCO 3.0 country_name 'yemen' rows carry cowcode 679 (COW code of Yemen)"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu
+      retrieved_at: "2026-10-16T20:18:00Z"
+      raw_sha256:
+        "navco3-0full.xlsx": 5a3886ab4d00212700352f5a79e7cdd102ac41960ca3600f292e7f932134d4e7
+    # unmapped (kept with iso3 = null):

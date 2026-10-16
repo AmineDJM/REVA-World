@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import fcntl
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -50,10 +51,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from reva.atlas.catalog import Catalog, Series
-from reva.atlas.snapshot import AtlasSnapshot
-from reva.atlas.source_order import HeadlineConcept, HeadlineRegistry, Operand
+from reva.atlas.snapshot import AtlasSnapshot, normalise_rights
+from reva.atlas.source_order import CellRule, HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
-from reva.kernel.errors import IntegrityFailure, ValidationProblem
+from reva.kernel.errors import IntegrityFailure, RevaError, ValidationProblem
 from reva.ports.storage import ArtifactStore
 
 DB_FORMAT = "atlas-duckdb/6"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
@@ -66,6 +67,19 @@ DB_SUFFIX = "-v6.duckdb"
 ATTACH_MIN_DAYS = 150
 ATTACH_MAX_DAYS = 1097
 KEEP_SNAPSHOT_DBS = 2
+#: File naming the snapshot whose query file eviction never removes (the latest live one; review V3b SEC-3).
+PIN_FILE = "live-snapshot.pin"
+
+
+class SnapshotNotMaterialised(RevaError):
+    """The query file of a snapshot that is not the latest one does not exist: it is never built inside a
+    request (review V3b SEC-3: a read-scope ``?snapshot=`` must not force a multi-GB build and evict the live
+    file). Query files are built by the worker (``atlas_snapshot`` job with ``warm``) or for the latest
+    snapshot."""
+
+    code = "snapshot_not_materialised"
+    http_status = 409
+
 
 DDL = """
 CREATE TABLE series (sid INTEGER PRIMARY KEY, source VARCHAR NOT NULL, dataset VARCHAR NOT NULL,
@@ -183,8 +197,13 @@ def _fetch_verified(store: ArtifactStore, sha: str, dest: Path) -> None:
         raise IntegrityFailure("pinned atlas table does not have the atlas schema", sha256=sha)
 
 
-def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None) -> Path:
-    """Materialise (once, under a file lock) the DuckDB file of a snapshot; returns its path."""
+def build_snapshot_db(
+    snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None, *, build: bool = True
+) -> Path:
+    """Materialise (once, under a file lock) the DuckDB file of a snapshot; returns its path.
+
+    ``build=False`` (API reads of a snapshot that is not the latest): an existing verified file is used,
+    a missing one raises :class:`SnapshotNotMaterialised` instead of being built in the request."""
     from reva.atlas.cachedir import private_dir
 
     d = private_dir(directory) if directory is not None else cache_dir()
@@ -192,6 +211,12 @@ def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: 
     if final.exists():
         _verify_db(final, snapshot)
         return final
+    if not build:
+        raise SnapshotNotMaterialised(
+            "the query file of this atlas snapshot is not materialised; only the latest snapshot (or one whose "
+            "query file already exists) can be read",
+            snapshot=snapshot.sha256,
+        )
     lock_fd = os.open(d / f"atlas-{snapshot.sha256}.lock", os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     with os.fdopen(lock_fd, "w") as lockf:
         fcntl.flock(lockf, fcntl.LOCK_EX)
@@ -275,12 +300,40 @@ def _build_db(snapshot: AtlasSnapshot, store: ArtifactStore, work: Path, tmp_db:
         con.close()
 
 
+def pin_snapshot(sha256: str, directory: Path | None = None) -> None:
+    """Record ``sha256`` as the live snapshot whose query file :func:`_evict` never removes (SEC-3)."""
+    from reva.atlas.cachedir import private_dir
+
+    if not re.fullmatch(r"[0-9a-f]{64}", sha256):
+        raise ValidationProblem("not a snapshot sha256")
+    d = private_dir(directory) if directory is not None else cache_dir()
+    pin = d / PIN_FILE
+    try:
+        if pin.read_text().strip() == sha256:
+            return
+    except OSError:
+        pass
+    tmp = d / f".{PIN_FILE}.{os.getpid()}.{threading.get_ident()}"
+    tmp.write_text(sha256)
+    os.replace(tmp, pin)
+
+
+def _pinned(d: Path) -> str | None:
+    try:
+        v = (d / PIN_FILE).read_text().strip()
+    except OSError:
+        return None
+    return v if re.fullmatch(r"[0-9a-f]{64}", v) else None
+
+
 def _evict(d: Path, keep: Path) -> None:
+    pinned = _pinned(d)
     dbs = sorted(d.glob("atlas-*.duckdb"), key=lambda p: p.stat().st_mtime, reverse=True)
     for p in dbs[KEEP_SNAPSHOT_DBS:]:
-        if p != keep:
-            p.unlink(missing_ok=True)
-            p.with_name(p.name + ".sha256").unlink(missing_ok=True)
+        if p == keep or (pinned is not None and p.name == f"atlas-{pinned}{DB_SUFFIX}"):
+            continue  # the file just built, and the live snapshot's file, are never evicted
+        p.unlink(missing_ok=True)
+        p.with_name(p.name + ".sha256").unlink(missing_ok=True)
 
 
 @lru_cache(maxsize=65536)
@@ -300,12 +353,18 @@ def _json(v: str | None) -> Any:
 class AtlasQuery:
     """Read-only queries over one snapshot's DuckDB file (thread-safe: a cursor per call)."""
 
-    def __init__(self, snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None):
+    def __init__(
+        self, snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None, *, build: bool = True
+    ):
         self.snapshot = snapshot
-        self.path = build_snapshot_db(snapshot, store, directory)
+        self.path = build_snapshot_db(snapshot, store, directory, build=build)
         self._con = duckdb.connect(str(self.path), read_only=True)
         self._lock = threading.Lock()
         self.tables = {t["artifact_sha256"]: t for t in snapshot.tables}
+        # LIC-1: rights recorded with each pinned table artifact (manifest / meta.artifact)
+        self._table_rights = {
+            sha: normalise_rights(t.get("rights"), basis="table_artifact") for sha, t in self.tables.items()
+        }
         self._memo: dict[Any, Any] = {}
         rows = self._rows("SELECT sid, source, dataset, indicator FROM series")
         self.series_of: dict[int, tuple[str, str, str]] = {
@@ -365,6 +424,16 @@ class AtlasQuery:
         src, ds, ind = self.series_of[sid]
         return src, ds, ind, f"{src}.{ds}.{ind}"
 
+    def _light_source(self, r: dict[str, Any]) -> dict[str, Any]:
+        src, ds, _ind, key = self._series_key(r["sid"])
+        return {"source": src, "dataset": ds, "series": key}
+
+    def rights_of(self, table_sha: str | None, source: str) -> dict[str, Any] | None:
+        """LIC-1: the rights of the table a cell comes from (recorded with the table artifact), else the
+        licence its atlas source spec declares (``basis: atlas_source_spec``); ``None`` when neither is known."""
+        r = self._table_rights.get(table_sha or "")
+        return r if r is not None else source_spec_rights(source)
+
     def _cell(self, r: dict[str, Any]) -> dict[str, Any]:
         t = self.tables.get(r["table_sha"], {})
         src, ds, ind, key = self._series_key(r["sid"])
@@ -389,6 +458,7 @@ class AtlasQuery:
                 "dataset_key": t.get("dataset_key"),
                 "dataset_id": t.get("dataset_id"),
             },
+            "rights": self.rights_of(r["table_sha"], src),
         }
         if r.get("year") is not None:
             out["year"] = int(r["year"])
@@ -457,6 +527,7 @@ class AtlasQuery:
             "countries_without_value": sorted(known_country_keys() - have - other),
             "countries_with_other_period_cells": sorted(other),
             "by_source": _count_by(cells, "series"),
+            "licences": licence_summary(cells),
         }
 
     def series(self, catalog: Catalog, concept_id: str, iso3: str) -> dict[str, Any]:
@@ -494,6 +565,7 @@ class AtlasQuery:
             "best": best,
             "per_source": list(per_source.values()),
             "sources_without_data": [k for k in declared if k not in per_source],
+            "licences": licence_summary([*best, *(c for e in per_source.values() for c in e["cells"])]),
         }
 
     # ------------------------------------------------------------------ coverage
@@ -607,7 +679,7 @@ class AtlasQuery:
         points: dict[str, list[dict[str, Any]]] = {}
         if series:
             light = (
-                "x.sid, x.iso3, x.year, x.value, x.value_text, x.flags, x.unit, x.period_basis, "
+                "x.sid, x.iso3, x.year, x.value, x.value_text, x.flags, x.unit, x.period_basis, x.table_sha, "
                 f"{iso_date_sql('x.period_start')} AS period_start, {iso_date_sql('x.period_end')} AS period_end"
             )
             for r in self._rows(self._best_sql(series, where, light, "cells"), [iso3], series):
@@ -649,6 +721,12 @@ class AtlasQuery:
                 "year_min": pts[0]["year"],
                 "year_max": pts[-1]["year"],
                 "sources_used": sorted({self._series_key(r["sid"])[3] for r in pts}),
+                "licences": licence_summary(
+                    [
+                        {**self._light_source(r), "rights": self.rights_of(r["table_sha"], self.series_of[r["sid"]][0])}
+                        for r in pts
+                    ]
+                ),
             }
             if include_series:
                 item["series"] = [
@@ -669,6 +747,7 @@ class AtlasQuery:
         other = self._rows("SELECT count(*) AS n FROM cells WHERE iso3 = ? AND year IS NULL AND has_value", [iso3])
         return {
             "iso3": iso3,
+            "licences": _merge_licences(c.get("licences") or [] for d in domains.values() for c in d["concepts"]),
             "domains": list(domains.values()),
             "concepts_with_data": sum(len(d["concepts"]) for d in domains.values()),
             "concepts_without_data": sum(len(d["without_data"]) for d in domains.values()),
@@ -677,16 +756,25 @@ class AtlasQuery:
 
     # ------------------------------------------------------------------ headline concepts (ATLASOPS)
     def _resolve(
-        self, specs: Sequence[_Spec], *, iso3: str | None = None, year: int | None = None
+        self, specs: Sequence[_Spec], *, iso3: str | None = None, year: int | None = None, include: bool = False
     ) -> dict[str, dict[tuple[str, int], dict[str, Any]]]:
-        """Per spec and (iso3, year): ranks with an eligible value, projection-only ranks, unit
-        mismatches, and the best (lowest-rank eligible) cell. One DuckDB pass for every spec."""
+        """Per spec and (iso3, year): ranks with an eligible value, projection-only ranks (own flags or a
+        registry cell rule), unit mismatches, ranks not equivalent for the country, the values of every
+        eligible rank, and the best cell: the lowest-rank eligible actual value, else (projections allowed or
+        ``include``) the lowest-rank projection. One DuckDB pass for every spec."""
         hs: list[tuple[int, int, int, str | None, bool]] = []
+        hr: list[tuple[int, int, int, int | None, str | None, str | None]] = []
+        hx: list[tuple[int, int, str]] = []
         for i, sp in enumerate(specs):
             for rank, (ser, _scale, unit, _j) in enumerate(sp.series):
                 sid = self.sid_of.get((ser.source, ser.dataset, ser.indicator))
-                if sid is not None:
-                    hs.append((i, rank, sid, unit, sp.allow_projections))
+                if sid is None:
+                    continue
+                hs.append((i, rank, sid, unit, sp.allow_projections or include))
+                for ri, rule in enumerate(sp.rules[rank] if sp.rules else ()):
+                    hr.append((i, rank, ri, rule.year_after, rule.footnote_matches, rule.unless_flag))
+                for c in sorted(sp.excluded[rank] if sp.excluded else {}):
+                    hx.append((i, rank, c))
         out: dict[str, dict[tuple[str, int], dict[str, Any]]] = {sp.key: {} for sp in specs}
         if not hs:
             return out
@@ -699,6 +787,23 @@ class AtlasQuery:
                 "allow": pa.array([h[4] for h in hs], pa.bool_()),
             }
         )
+        rules = pa.table(
+            {
+                "ci": pa.array([h[0] for h in hr], pa.int32()),
+                "rank": pa.array([h[1] for h in hr], pa.int32()),
+                "ri": pa.array([h[2] for h in hr], pa.int32()),
+                "year_after": pa.array([h[3] for h in hr], pa.int32()),
+                "footnote": pa.array([h[4] for h in hr], pa.string()),
+                "unless_flag": pa.array([h[5] for h in hr], pa.string()),
+            }
+        )
+        excl = pa.table(
+            {
+                "ci": pa.array([h[0] for h in hx], pa.int32()),
+                "rank": pa.array([h[1] for h in hx], pa.int32()),
+                "iso3": pa.array([h[2] for h in hx], pa.string()),
+            }
+        )
         where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], list[Any]()
         if iso3 is not None:
             where.append("x.iso3 = ?")
@@ -709,11 +814,23 @@ class AtlasQuery:
         sids = sorted({h[2] for h in hs})
         sidf = "TRUE" if len(sids) > 64 else "x.sid IN (" + ",".join(str(x) for x in sids) + ")"
         table = "cells" if iso3 is not None else "cells_s"
-        ok = "num AND NOT proj AND NOT bad_unit"
+        ok = "num AND NOT noneq AND NOT bad_unit AND (NOT isproj OR allow)"
+        rule_sql = (
+            """,
+            m AS (SELECT c0.ci, c0.rank, c0.iso3, c0.year, min(r.ri) AS ri
+                    FROM c0 JOIN hr r ON r.ci = c0.ci AND r.rank = c0.rank
+                   WHERE (r.year_after IS NULL OR c0.year > r.year_after)
+                     AND (r.footnote IS NULL
+                          OR regexp_matches(coalesce(json_extract_string(c0.flags, '$.footnote'), ''), r.footnote))
+                     AND (r.unless_flag IS NULL OR json_extract_string(c0.flags, '$.' || r.unless_flag) IS NULL)
+                   GROUP BY ALL)"""
+            if hr
+            else ", m AS (SELECT ci, rank, iso3, year, CAST(NULL AS INTEGER) AS ri FROM c0 WHERE FALSE)"
+        )
         sql = f"""
-            WITH c AS (
-              SELECT h.ci, h.rank, x.iso3, x.year,
-                     ({PROJECTION_SQL} AND NOT h.allow) AS proj,
+            WITH c0 AS (
+              SELECT h.ci, h.rank, h.allow, x.iso3, x.year, x.flags,
+                     {PROJECTION_SQL} AS own_proj,
                      (h.unit IS NOT NULL AND x.unit <> h.unit) AS bad_unit,
                      (x.value IS NOT NULL) AS num,
                      {{'sid': x.sid, 'value': x.value, 'value_text': x.value_text, 'unit': x.unit,
@@ -722,44 +839,84 @@ class AtlasQuery:
                        'raw_sha256': x.raw_sha256, 'selector': x.selector, 'table_sha': x.table_sha,
                        'period_basis': x.period_basis}} AS cell
               FROM {table} x JOIN hs h ON x.sid = h.sid
-              WHERE {sidf} AND {" AND ".join(where)})
+              WHERE {sidf} AND {" AND ".join(where)}){rule_sql},
+            c AS (
+              SELECT c0.*, m.ri, (hx.iso3 IS NOT NULL) AS noneq, (c0.own_proj OR m.ri IS NOT NULL) AS isproj,
+                     c0.rank + CASE WHEN c0.own_proj OR m.ri IS NOT NULL THEN 1000 ELSE 0 END AS sortkey
+              FROM c0 LEFT JOIN m ON m.ci = c0.ci AND m.rank = c0.rank AND m.iso3 = c0.iso3 AND m.year = c0.year
+                      LEFT JOIN hx ON hx.ci = c0.ci AND hx.rank = c0.rank AND hx.iso3 = c0.iso3)
             SELECT ci, iso3, year,
                    list(rank ORDER BY rank) FILTER (WHERE {ok}) AS ok_ranks,
-                   list(rank ORDER BY rank) FILTER (WHERE proj) AS projected_ranks,
-                   list(rank ORDER BY rank) FILTER (WHERE bad_unit AND NOT proj) AS unit_ranks,
-                   arg_min(cell, rank) FILTER (WHERE {ok}) AS best,
-                   min(rank) FILTER (WHERE {ok}) AS best_rank
+                   list(rank ORDER BY rank) FILTER (WHERE own_proj AND NOT allow AND NOT noneq) AS projected_ranks,
+                   list({{'rank': rank, 'ri': ri}} ORDER BY rank)
+                     FILTER (WHERE ri IS NOT NULL AND NOT own_proj AND NOT allow AND NOT noneq) AS rule_ranks,
+                   list(rank ORDER BY rank) FILTER (WHERE bad_unit AND NOT (isproj AND NOT allow) AND NOT noneq)
+                     AS unit_ranks,
+                   list(rank ORDER BY rank) FILTER (WHERE noneq) AS noneq_ranks,
+                   list({{'rank': rank, 'value': cell.value, 'proj': isproj}} ORDER BY rank) FILTER (WHERE {ok})
+                     AS ok_values,
+                   arg_min(cell, sortkey) FILTER (WHERE {ok}) AS best,
+                   arg_min(rank, sortkey) FILTER (WHERE {ok}) AS best_rank,
+                   arg_min(ri, sortkey) FILTER (WHERE {ok}) AS best_rule,
+                   arg_min(isproj, sortkey) FILTER (WHERE {ok}) AS best_proj
             FROM c GROUP BY ci, iso3, year"""
-        for r in self._rows(sql, params, extra={"hs": tbl}):
+        for r in self._rows(sql, params, extra={"hs": tbl, "hr": rules, "hx": excl}):
             out[specs[r.pop("ci")].key][(r["iso3"], int(r["year"]))] = r
         return out
 
-    def _consulted(self, sp: _Spec, row: dict[str, Any] | None) -> list[dict[str, Any]]:
+    def _consulted(self, sp: _Spec, row: dict[str, Any] | None, iso3: str | None = None) -> list[dict[str, Any]]:
         ok = set((row or {}).get("ok_ranks") or [])
         proj = set((row or {}).get("projected_ranks") or [])
+        ruled = {int(x["rank"]): int(x["ri"]) for x in (row or {}).get("rule_ranks") or []}
         unit = set((row or {}).get("unit_ranks") or [])
+        noneq = set((row or {}).get("noneq_ranks") or [])
         best = (row or {}).get("best_rank")
         out = []
         for rank, (ser, _s, _u, _j) in enumerate(sp.series):
-            if (ser.source, ser.dataset, ser.indicator) not in self.sid_of:
+            extra: dict[str, Any] = {}
+            excluded = sp.excluded[rank] if sp.excluded else {}
+            if iso3 is not None and iso3 in excluded:
+                st = "not_equivalent_for_country"
+                extra["reason"] = excluded[iso3]
+            elif (ser.source, ser.dataset, ser.indicator) not in self.sid_of:
                 st = "series_not_in_snapshot"
             elif best is not None and rank == best:
                 st = "answered"
             elif rank in ok:
                 st = "also_reported"
+            elif rank in noneq:
+                st = "not_equivalent_for_country"
             elif rank in proj:
                 st = "projection_only"
+            elif rank in ruled:
+                rule = sp.rules[rank][ruled[rank]]
+                st = rule.estimate_kind  # projection_upstream | nowcast | extrapolated
+                extra["rule"] = rule.label.get("en")
             elif rank in unit:
                 st = "unit_mismatch"
             else:
                 st = "no_value"
-            out.append({"series": ser.key, "source_rank": rank, "status": st})
+            out.append({"series": ser.key, "source_rank": rank, "status": st, **extra})
         return out
 
     def _reported_cell(self, sp: _Spec, unit: str | None, key: tuple[str, int], row: dict[str, Any]) -> dict[str, Any]:
         rank = int(row["best_rank"])
         ser, scale, _u, just = sp.series[rank]
         c = self._cell({**row["best"], "year": key[1]})
+        flags = c["flags"]
+        if row.get("best_rule") is not None and sp.rules:
+            rule = sp.rules[rank][int(row["best_rule"])]
+            # never mutate the shared parsed flags: a copy with the rule that marks the cell (HL-2 / LAB-1)
+            flags = {
+                **(flags if isinstance(flags, dict) else {}),
+                "estimate_kind": rule.estimate_kind,
+                "estimate_rule": {
+                    "label": dict(rule.label),
+                    "upstream": rule.upstream,
+                    "basis": rule.basis,
+                    "registry": "registry/atlas/source_order",
+                },
+            }
         return {
             "concept_id": sp.key,
             "iso3": key[0],
@@ -768,6 +925,7 @@ class AtlasQuery:
             # the concept unit only when it is one fixed unit; "named per cell" units stay the cell's own
             "unit": c["unit"] if (unit is None or "per cell" in unit) else unit,
             "method": "reported",
+            "projection": bool(row.get("best_proj")),
             "answered_by": {
                 "series": ser.key,
                 "source": ser.source,
@@ -781,16 +939,26 @@ class AtlasQuery:
             "period_start": c["period_start"],
             "period_end": c["period_end"],
             "period_basis": c.get("period_basis"),
-            "flags": c["flags"],
+            "flags": flags,
             "provenance": c["provenance"],
-            "consulted": self._consulted(sp, row),
+            "rights": c["rights"],
+            "consulted": self._consulted(sp, row, key[0]),
             "derived": None,
         }
 
     def _headline(
-        self, reg: HeadlineRegistry, concept_ids: Iterable[str], *, iso3: str | None = None, year: int | None = None
+        self,
+        reg: HeadlineRegistry,
+        concept_ids: Iterable[str],
+        *,
+        iso3: str | None = None,
+        year: int | None = None,
+        include_projections: bool = False,
     ) -> dict[str, dict[str, Any]]:
-        """Best-available headline cells (reported, else derived) per concept and (iso3, year)."""
+        """Best-available headline cells (reported, else derived) per concept and (iso3, year).
+
+        Without a year filter every change of answering series inside one country's series is flagged on the
+        cell where it happens (``source_break``; review V3b HL-1)."""
         concepts = [reg.concepts[c] for c in concept_ids]
         specs: dict[str, _Spec] = {c.id: _spec_of(c) for c in concepts}
         alts = {c.id: _alternatives(c, reg) for c in concepts}
@@ -799,7 +967,7 @@ class AtlasQuery:
                 for o in (a, b):
                     sp = _operand_spec(o, reg)
                     specs.setdefault(sp.key, sp)
-        res = self._resolve(list(specs.values()), iso3=iso3, year=year)
+        res = self._resolve(list(specs.values()), iso3=iso3, year=year, include=include_projections)
         out: dict[str, dict[str, Any]] = {}
         for c in concepts:
             sp = specs[c.id]
@@ -815,6 +983,8 @@ class AtlasQuery:
                         d = self._derived_cell(reg, c, i, (a, sa), (b, sb), k, ra[k], rb[k], rows.get(k))
                         if d is not None:
                             cells[k] = d
+            if year is None:
+                _mark_source_breaks(cells, rows, sp)
             out[c.id] = {"concept": c, "spec": sp, "cells": cells, "rows": rows}
         return out
 
@@ -846,7 +1016,7 @@ class AtlasQuery:
         else:
             v, formula, precision = va - vb, f"{a[0].label} - {b[0].label}", "exact"
         v = v * c.derived.scale
-        consulted = self._consulted(_spec_of(c), own)
+        consulted = self._consulted(_spec_of(c), own, key[0])
         consulted.append({"series": f"derived: {formula}", "source_rank": len(c.series), "status": "answered"})
         return {
             "concept_id": c.id,
@@ -855,6 +1025,7 @@ class AtlasQuery:
             "value": _dec_text(v),
             "unit": c.unit,
             "method": "derived",
+            "projection": bool(ca.get("projection") or cb.get("projection")),
             "answered_by": None,
             "reported": None,
             "provider_geo": None,
@@ -863,6 +1034,7 @@ class AtlasQuery:
             "period_basis": ca.get("period_basis"),
             "flags": _derived_flags(ca["flags"], cb["flags"]),
             "provenance": None,
+            "rights": next((x for x in (ca["rights"], cb["rights"]) if x and x.get("restricted")), ca["rights"]),
             "consulted": consulted,
             "derived": {
                 "formula": c.derived.formula,
@@ -878,9 +1050,13 @@ class AtlasQuery:
     def _answer_key(cell: dict[str, Any]) -> str:
         return "derived" if cell["method"] == "derived" else cell["answered_by"]["series"]
 
-    def headline_map(self, reg: HeadlineRegistry, concept_id: str, year: int) -> dict[str, Any]:
+    def headline_map(
+        self, reg: HeadlineRegistry, concept_id: str, year: int, *, projections: str = "exclude"
+    ) -> dict[str, Any]:
+        """``projections="include"``: cells that are projections (own flags or a registry cell rule) may answer
+        where no actual value exists, flagged (``projection: true``, ``flags.estimate_kind``)."""
         _need_headline(reg, concept_id)
-        h = self._headline(reg, [concept_id], year=year)[concept_id]
+        h = self._headline(reg, [concept_id], year=year, include_projections=_include(projections))[concept_id]
         cells = sorted(h["cells"].values(), key=lambda x: x["iso3"])
         have = {x["iso3"] for x in cells}
         sids = [
@@ -890,22 +1066,27 @@ class AtlasQuery:
         ]
         other = self._other_period_countries(sids, year) - have
         without = [
-            {"iso3": k, "consulted": self._consulted(h["spec"], h["rows"].get((k, year)))}
+            {"iso3": k, "consulted": self._consulted(h["spec"], h["rows"].get((k, year)), k)}
             for k in sorted(known_country_keys() - have - other)
         ]
         return {
             "concept": reg.concepts[concept_id].as_dict(),
             "year": year,
+            "projections": projections,
             "values": cells,
             "countries_with_value": len(have),
             "countries_without_value": without,
             "countries_with_other_period_cells": sorted(other),
             "by_source": _count(self._answer_key(x) for x in cells),
+            "projection_values": sum(1 for x in cells if x.get("projection")),
+            "licences": licence_summary(_answer_sources(cells)),
         }
 
-    def headline_series(self, reg: HeadlineRegistry, concept_id: str, iso3: str) -> dict[str, Any]:
+    def headline_series(
+        self, reg: HeadlineRegistry, concept_id: str, iso3: str, *, projections: str = "exclude"
+    ) -> dict[str, Any]:
         _need_headline(reg, concept_id)
-        h = self._headline(reg, [concept_id], iso3=iso3)[concept_id]
+        h = self._headline(reg, [concept_id], iso3=iso3, include_projections=_include(projections))[concept_id]
         cells = sorted(h["cells"].values(), key=lambda x: x["year"])
         per: dict[int, list[int]] = {}
         for (_, y), r in h["rows"].items():
@@ -930,25 +1111,41 @@ class AtlasQuery:
         return {
             "concept": reg.concepts[concept_id].as_dict(),
             "iso3": iso3,
+            "projections": projections,
             "best": cells,
             "by_series": by_series,
             "derived_years": sum(1 for x in cells if x["method"] == "derived"),
             "sources_without_data": [b["series"] for b in by_series if b["years"] == 0],
+            "source_breaks": [x["source_break"] for x in cells if x.get("source_break")],
+            "projection_years": [x["year"] for x in cells if x.get("projection")],
+            "licences": licence_summary(_answer_sources(cells)),
         }
 
     def headline_dossier(
-        self, reg: HeadlineRegistry, iso3: str, *, theme: str | None = None, include_series: bool = True
+        self,
+        reg: HeadlineRegistry,
+        iso3: str,
+        *,
+        theme: str | None = None,
+        include_series: bool = True,
+        projections: str = "exclude",
     ) -> dict[str, Any]:
         """Every headline concept for one country: latest best value (who answered, who was
-        consulted and had nothing) + the best annual series."""
+        consulted and had nothing) + the best annual series (source breaks flagged)."""
         concepts = sorted(reg.by_theme(theme), key=lambda c: (c.theme, c.id))
-        hs = self._headline(reg, [c.id for c in concepts], iso3=iso3) if concepts else {}
+        hs = (
+            self._headline(reg, [c.id for c in concepts], iso3=iso3, include_projections=_include(projections))
+            if concepts
+            else {}
+        )
         items, without = [], []
         for c in concepts:
             h = hs[c.id]
             pts = sorted(h["cells"].values(), key=lambda x: x["year"])
             if not pts:
-                without.append({"concept_id": c.id, "theme": c.theme, "consulted": self._consulted(h["spec"], None)})
+                without.append(
+                    {"concept_id": c.id, "theme": c.theme, "consulted": self._consulted(h["spec"], None, iso3)}
+                )
                 continue
             item: dict[str, Any] = {
                 "concept_id": c.id,
@@ -960,6 +1157,8 @@ class AtlasQuery:
                 "year_min": pts[0]["year"],
                 "year_max": pts[-1]["year"],
                 "sources_used": sorted({self._answer_key(x) for x in pts}),
+                "source_breaks": [x["source_break"] for x in pts if x.get("source_break")],
+                "licences": licence_summary(_answer_sources(pts)),
             }
             if include_series:
                 item["series"] = [
@@ -971,11 +1170,18 @@ class AtlasQuery:
                         "period_end": x["period_end"],
                         "method": x["method"],
                         "series": self._answer_key(x),
+                        **({"projection": True} if x.get("projection") else {}),
+                        **({"source_break": x["source_break"]} if x.get("source_break") else {}),
                     }
                     for x in pts
                 ]
             items.append(item)
-        return {"concepts": items, "without_data": without}
+        return {
+            "concepts": items,
+            "without_data": without,
+            "projections": projections,
+            "licences": _merge_licences(i["licences"] for i in items),
+        }
 
     def headline_coverage(self, reg: HeadlineRegistry, theme: str | None = None) -> list[dict[str, Any]]:
         concepts = sorted(reg.by_theme(theme), key=lambda c: (c.theme, c.id))
@@ -1048,11 +1254,14 @@ def _scaled(value: str, scale: Decimal) -> str:
 
 @dataclass(frozen=True)
 class _Spec:
-    """One concept (or derived operand) to resolve: ordered (series, scale, reported unit)."""
+    """One concept (or derived operand) to resolve: ordered (series, scale, reported unit), with each
+    series' registry cell rules and the countries it is not equivalent for (review V3b HL-1/HL-2)."""
 
     key: str
     series: tuple[tuple[Series, Decimal, str | None, str | None], ...]  # (series, scale, unit, justification)
     allow_projections: bool = False
+    rules: tuple[tuple[CellRule, ...], ...] = ()  # per rank
+    excluded: tuple[dict[str, str], ...] = ()  # per rank: iso3 -> reason
 
 
 def _spec_of(c: HeadlineConcept) -> _Spec:
@@ -1060,7 +1269,71 @@ def _spec_of(c: HeadlineConcept) -> _Spec:
         c.id,
         tuple((s.series, s.scale, s.reported_unit, s.justification) for s in c.series),
         c.projections == "allow",
+        tuple(s.cell_rules for s in c.series),
+        tuple(s.excluded_countries() for s in c.series),
     )
+
+
+def _include(projections: str) -> bool:
+    if projections not in ("exclude", "include"):
+        raise ValidationProblem("projections must be exclude or include", projections=str(projections)[:20])
+    return projections == "include"
+
+
+def _answer_sources(cells: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    """(source, rights) of headline cells, derived cells through their two inputs."""
+    out: list[dict[str, Any]] = []
+    for x in cells:
+        if x.get("method") == "derived" and x.get("derived"):
+            out.extend(
+                {"source": i["answered_by"]["source"], "rights": i.get("rights")} for i in x["derived"]["inputs"]
+            )
+        elif x.get("answered_by"):
+            out.append({"source": x["answered_by"]["source"], "rights": x.get("rights")})
+    return out
+
+
+def _mark_source_breaks(cells: dict[tuple[str, int], dict[str, Any]], rows: dict[Any, Any], sp: _Spec) -> None:
+    """HL-1: where the answering series of a country's headline series changes from one answered year to the
+    next, the later cell gets ``source_break`` (from, to, years) with both series' values in the last year
+    both report (``overlap``), so a level shift between definitions is visible and never read as a change."""
+    by_iso: dict[str, list[dict[str, Any]]] = {}
+    for (iso3, _y), cell in cells.items():
+        by_iso.setdefault(iso3, []).append(cell)
+    years_of: dict[str, list[int]] = {}
+    for iso3, y in rows:
+        years_of.setdefault(iso3, []).append(int(y))
+    rank_of = {ser.key: r for r, (ser, _sc, _u, _j) in enumerate(sp.series)}
+    for iso3, pts in by_iso.items():
+        pts.sort(key=lambda x: x["year"])
+        for prev, cur in itertools.pairwise(pts):
+            fa, fb = AtlasQuery._answer_key(prev), AtlasQuery._answer_key(cur)
+            if fa == fb:
+                continue
+            brk: dict[str, Any] = {
+                "from": fa,
+                "to": fb,
+                "from_year": prev["year"],
+                "year": cur["year"],
+                "overlap": None,
+                "note": "the answering series changes here: values on either side come from different sources "
+                "(and possibly definitions); compare them only through the overlap year",
+            }
+            ra, rb = rank_of.get(fa), rank_of.get(fb)
+            if ra is not None and rb is not None:
+                for y in sorted((y for y in years_of.get(iso3, ()) if y <= prev["year"]), reverse=True):
+                    vals = {int(v["rank"]): v for v in rows[(iso3, y)].get("ok_values") or []}
+                    if ra in vals and rb in vals:
+                        va = Decimal(_scaled(vals[ra]["value"], sp.series[ra][1]))
+                        vb = Decimal(_scaled(vals[rb]["value"], sp.series[rb][1]))
+                        brk["overlap"] = {
+                            "year": y,
+                            "from_value": _dec_text(va),
+                            "to_value": _dec_text(vb),
+                            "ratio": _dec_text(Context(prec=6).divide(vb, va)) if va != 0 else None,
+                        }
+                        break
+            cur["source_break"] = brk
 
 
 def _alternatives(c: HeadlineConcept, reg: HeadlineRegistry) -> list[tuple[Operand, Operand]]:
@@ -1107,7 +1380,16 @@ def _operand_spec(o: Operand, reg: HeadlineRegistry) -> _Spec:
     if o.concept is not None:
         return _spec_of(reg.concepts[o.concept])
     assert o.series is not None
-    return _Spec(f"series:{o.series.key}", ((o.series, o.scale, o.reported_unit, None),))
+    # a series operand keeps the cell rules / country exceptions its headline listings declare (a derived
+    # density never turns a WDI population projection into an actual)
+    rules: tuple[CellRule, ...] = ()
+    excluded: dict[str, str] = {}
+    for c in reg.concepts.values():
+        for s in c.series:
+            if s.key == o.series.key:
+                rules = rules or s.cell_rules
+                excluded.update(s.excluded_countries())
+    return _Spec(f"series:{o.series.key}", ((o.series, o.scale, o.reported_unit, None),), False, (rules,), (excluded,))
 
 
 def _series_table(series: list[tuple[Any, ...]]) -> tuple[pa.Table, list[str]]:
@@ -1156,20 +1438,73 @@ def _count_by(cells: list[dict[str, Any]], key: str) -> dict[str, int]:
     return dict(sorted(out.items()))
 
 
+# --------------------------------------------------------------------------- rights (review V3b LIC-1)
+_SPEC_RIGHTS: dict[str, dict[str, Any] | None] = {}
+_SPEC_LOCK = threading.Lock()
+
+
+def source_spec_rights(source: str) -> dict[str, Any] | None:
+    """Rights from the atlas source spec(s) declaring ``source`` (the licence every connector run records
+    by default); the most restrictive when several specs share the table key. Cached per process."""
+    with _SPEC_LOCK:
+        if source in _SPEC_RIGHTS:
+            return _SPEC_RIGHTS[source]
+    try:
+        from reva.atlas.sources import atlas_sources
+
+        specs = [e.spec for e in atlas_sources().values() if e.spec.atlas_source == source]
+    except Exception:  # pragma: no cover - a broken connector module never breaks a read
+        specs = []
+    cands = [
+        x
+        for sp in sorted(specs, key=lambda sp: sp.name)
+        if (x := normalise_rights({"licence": sp.licence, "provider": sp.provider}, basis="atlas_source_spec"))
+    ]
+    out = next((x for x in cands if x["restricted"]), cands[0] if cands else None)
+    with _SPEC_LOCK:
+        _SPEC_RIGHTS[source] = out
+    return out
+
+
+def licence_summary(cells: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Distinct rights of the sources behind ``cells`` (one entry per source and licence), restricted first:
+    what an answer must show next to its values (non-commercial, share-alike, no-derivatives, not open)."""
+    seen: dict[tuple[str, str], dict[str, Any]] = {}
+    for c in cells:
+        r = c.get("rights")
+        if not r:
+            continue
+        k = (str(c.get("source")), str(r.get("licence")))
+        if k not in seen:
+            seen[k] = {"source": c.get("source"), **r}
+    return sorted(seen.values(), key=lambda x: (not x.get("restricted"), str(x["source"]), str(x["licence"])))
+
+
+def _merge_licences(groups: Iterable[list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    seen: dict[tuple[str, str], dict[str, Any]] = {}
+    for g in groups:
+        for x in g:
+            seen.setdefault((str(x.get("source")), str(x.get("licence"))), x)
+    return sorted(seen.values(), key=lambda x: (not x.get("restricted"), str(x["source"]), str(x["licence"])))
+
+
 # --------------------------------------------------------------------------- process cache
 _QUERIES: OrderedDict[str, AtlasQuery] = OrderedDict()
 _QLOCK = threading.Lock()
 
 
-def query_for(snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None) -> AtlasQuery:
-    """Process-wide cached :class:`AtlasQuery` per snapshot (at most 2 open)."""
+def query_for(
+    snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None, *, build: bool = True
+) -> AtlasQuery:
+    """Process-wide cached :class:`AtlasQuery` per snapshot (at most 2 open). ``build=False``: never build a
+    missing query file (:class:`SnapshotNotMaterialised`; review V3b SEC-3)."""
     key = f"{directory or ''}|{snapshot.sha256}"
     with _QLOCK:
         q = _QUERIES.get(key)
         if q is not None:
             _QUERIES.move_to_end(key)
             return q
-    q = AtlasQuery(snapshot, store, directory)
+    q = AtlasQuery(snapshot, store, directory, build=build)
     with _QLOCK:
         if key in _QUERIES:
             q.close()
@@ -1179,3 +1514,26 @@ def query_for(snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | N
             _, old = _QUERIES.popitem(last=False)
             old.close()
     return q
+
+
+def query_for_request(
+    conn: Any, store: ArtifactStore, *, origin: str | None = None, sha256: str | None = None
+) -> AtlasQuery:
+    """The :class:`AtlasQuery` an API request may use (review V3b SEC-3): the latest snapshot (of ``origin``)
+    is built when its query file is missing and its file is pinned against eviction; any other recorded
+    snapshot is served only if its query file already exists (else :class:`SnapshotNotMaterialised`, 409)."""
+    from reva.atlas.snapshot import latest_snapshot_ref, resolve_snapshot
+
+    snap = resolve_snapshot(conn, store, origin=origin, sha256=sha256)
+    latest = snap if sha256 is None else None
+    if latest is None:
+        ref = latest_snapshot_ref(conn, origin)
+        is_latest = ref is not None and ref["sha"] == snap.sha256
+    else:
+        is_latest = True
+    if is_latest and snap.origin == "live":
+        try:
+            pin_snapshot(snap.sha256)
+        except OSError:  # pragma: no cover - a read-only cache dir never fails a read
+            pass
+    return query_for(snap, store, build=is_latest)

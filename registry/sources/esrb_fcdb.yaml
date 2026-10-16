@@ -1,0 +1,30 @@
+# V3 (agent A-ECRISES): ESRB European financial crises database (ESRB/ECB; Lo Duca et al. 2017, updated).
+# Connector: src/reva/adapters/connectors/atlas_ecrises.py (atlas.ecrises.esrb) -> atlas table esrb.fcdb, crisis
+# events (KG + dataset ecrises.esrb.events) and coded "accelerator" claims (dataset ecrises.esrb.coded_relations).
+source_key: esrb.fcdb
+title: ESRB European financial crises database (systemic crises and residual events, EU/EEA, 1970s-2021)
+provider_url: https://www.esrb.europa.eu/pub/financial-crises/html/index.en.html
+lineage_family: esrb_fcdb
+rights:
+  licence: "ESRB website copyright terms: free use with accurate reproduction and citation of the ESRB as the source"
+  licence_url: https://www.esrb.europa.eu/services/disclaimer/html/index.en.html
+  attribution: >-
+    European Systemic Risk Board, European financial crises database (file esrb.fcdb20220120.en.xlsx); Lo Duca, M.,
+    Koban, A., Basten, M., Bengtsson, E., Klaus, B., Kusmierczyk, P., Lang, J. H., Detken, C. and Peltonen, T. (2017),
+    "A new database for financial crises in European countries", ESRB Occasional Paper No 13.
+  licence_evidence: >-
+    ESRB Disclaimer & copyright (read 2026-10-16): "users of the ESRB's website may make free use of the information
+    obtained directly from it subject to the following conditions: When such information is distributed or
+    reproduced, it must appear accurately and the ESRB must be cited as the source." Sold documents must say the
+    information is free on the ESRB site; transformations must be stated.
+  open_licence: false
+metadata:
+  allowed_hosts: [www.esrb.europa.eu]
+  files:
+    - https://www.esrb.europa.eu/pub/fcdb/esrb.fcdb20220120.en.xlsx
+  codebook: https://www.esrb.europa.eu/pub/pdf/occasional/esrb.op13.en.pdf (Annex A, fields of the crises database)
+  bis_note: >-
+    No open BIS banking-crisis list exists (BIS SDMX dataflows listed 2026-10-16: no crisis dataflow); this ESRB/ECB
+    database is the official-sector crisis chronology used instead.
+  authentication: none
+  cadence: "updated irregularly (page: last update December 2023); quarterly check"

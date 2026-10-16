@@ -1,0 +1,106 @@
+[
+  {
+    "request_fingerprint": "080a399361c8ec0f966be93a401c7c26494b30451c7c176c695cb924625ea773",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/2.0?persistentId=doi:10.7910/DVN/0UZOTX",
+    "file": "080a399361c8ec0f.json",
+    "sha256": "e20d0a0120f5556b2996649efb25d74e2e6776390b942123a1586ec287af8361",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 2.0 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "099249f4785daa2046bea82ff952be6de3cec2398345c9322c316c72d7966bfc",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3657601",
+    "file": "099249f4785daa20.tab",
+    "sha256": "1eaa507e3dafef53bd0925716db6e79c9c50d075bb3ad7d8c9ff168722626da5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of NAVCO 1.2 Updated.tab: header + 45 of the real rows (selected countries, a few blank rows kept), lines byte-identical; real file sha256 81199a030aea3fa5904f7e4ad065592386abc7632f9246ff22bd9e18f5b8acdb"
+  },
+  {
+    "request_fingerprint": "a8a08ffe8a6e22d2e53088c72d6a23bbf3e57bcadb44b6036f60a762ba737d27",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/1.0?persistentId=doi:10.7910/DVN/ON9XND",
+    "file": "a8a08ffe8a6e22d2.json",
+    "sha256": "e2af74dd159c5d4cd476260500c3103687bd8281bafe8a49aff03d681f8a0189",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 1.0 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "f656ad070c028e8b792386ab304cbc4b57b3a2488ab6db4ea0718ce159bb5bac",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3769104",
+    "file": "f656ad070c028e8b.tab",
+    "sha256": "6ea2e7bfe992db3d8cf3bba36b64ae3acb06e65b76e2ba9b3e616b9e7b9b80e5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of NAVCO 1.3 List.tab: header + 68 of the real rows (selected countries, a few blank rows kept), lines byte-identical; real file sha256 c59ab854ad36c3dd624c95e21bb8d6201ed79623279de51788ad66c38863259b"
+  },
+  {
+    "request_fingerprint": "7a0af3dacb2383a9b38142c5b1c6bed345510c014bbacd1932d9d0ca3b12cbf9",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/2.1?persistentId=doi:10.7910/DVN/MHOXDV",
+    "file": "7a0af3dacb2383a9.json",
+    "sha256": "1d5ba178e2825b1f5237b15b191f644da75308fffb29c0ce2d90e85380fb1f3e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 2.1 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "e57fbff9cb14a8953ec9e6017248747091c67a41b7c86caf6f0978728de14ed4",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3620879",
+    "file": "e57fbff9cb14a895.tab",
+    "sha256": "43e9cd045e5a2412fc1f6220eaeeecf4c1825670238eb3828351c7ec373de10a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of NAVCO2-1_ForPublication.tab: header + 249 of the real rows (selected countries, a few blank rows kept), lines byte-identical; real file sha256 a0e41f37955f78c11bf0ce24e1c6027fa6515de18139bf052c1b92fcf86b1ecb"
+  },
+  {
+    "request_fingerprint": "bc2d3c3c3ad90d4cb54182a75e6097db4552d1912c7c175c78287b44e5025ba7",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/1.0?persistentId=doi:10.7910/DVN/INNYEO",
+    "file": "bc2d3c3c3ad90d4c.json",
+    "sha256": "0eff449e133a74a57797c7fa33b8a981bb64c1b28d0d67bb2afacf47473fefea",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse version 1.0 record, trimmed to the data file and the quoted codebook; data filesize (and the workbook md5) replaced by the slice's"
+  },
+  {
+    "request_fingerprint": "0f5d0d8effa1cde0847e2e8a79b2c52f6e2186c4e0aa84e643c75f8e7114c143",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3612128",
+    "file": "0f5d0d8effa1cde0.xlsx",
+    "sha256": "0165f29520a4d3f8041f5595aefa11fdb87916269f29ab1aaf53c2eab1887fd2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of navco3-0full.xlsx: header + 358 of the real 112,381 rows (estonia, egypt 2011 first 150, us first 40), original row numbers and coded cells kept, free-text columns (news leads, source titles, localities, actor names, notes) removed; real file sha256 5a3886ab4d00212700352f5a79e7cdd102ac41960ca3600f292e7f932134d4e7 md5 8d90fc7433bd9765bbd3b94258042e4e"
+  }
+]

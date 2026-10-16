@@ -422,6 +422,11 @@ def _rank_in_python(
     return out
 
 
+#: bounded atlas reads of the on-demand country view (rows per kind); a capped read is reported (TRUNC-1)
+ON_DEMAND_ROW_CAP = 50_000
+ON_DEMAND_VOTE_CAP = 20_000
+
+
 def _country_on_demand(
     conn: Any,
     ref: str,
@@ -440,6 +445,7 @@ def _country_on_demand(
     qid_iso3 = {q: c for c, q in iso_map.items()}
     iso3 = ref if ISO3_RE.match(ref) else qid_iso3.get(qid)
     links: list[Link] = []
+    truncated: list[str] = []
     from reva.links.store import link_from_row
 
     for d in base["links"]:
@@ -462,7 +468,12 @@ def _country_on_demand(
                 if kinds is not None and lt.id not in kinds:
                     continue
                 yr = f" AND year = {int(year)}" if year is not None else ""
-                d = reader.dyadic(lt, where=f"(row_iso3 = '{iso3}' OR partner = '{iso3}'){yr}", cap=50_000)
+                # TRUNC-1: latest year and largest values first, so a capped read keeps what is ranked
+                d = reader.dyadic(
+                    lt, where=f"(row_iso3 = '{iso3}' OR partner = '{iso3}'){yr}", cap=ON_DEMAND_ROW_CAP, order="weight"
+                )
+                if d.skipped.get("row_cap_reached"):
+                    truncated.append(lt.id)
                 links.extend(d.links)
             if kinds is None or "unga_vote_agreement" in kinds:
                 v = reader.votes(
@@ -470,8 +481,11 @@ def _country_on_demand(
                     node=iso3,
                     year_lo=None if year is None else year - year % 10,
                     year_hi=None if year is None else year - year % 10 + 9,
-                    cap=20_000,
+                    cap=ON_DEMAND_VOTE_CAP,
+                    order="weight",
                 )
+                if v.skipped.get("row_cap_reached"):
+                    truncated.append("unga_vote_agreement")
                 links.extend(v.links)
     node = iso_map.get(iso3 or "", qid) if iso3 else qid
     ranked = _rank_in_python(links, node, year, _facets(facet), limit, _period_kinds(tax))
@@ -515,6 +529,8 @@ def _country_on_demand(
         links=flat,
         labels={**base.get("labels", {}), **labels},
         notes=NOT_CAUSAL,
+        truncated=bool(truncated),
+        truncated_kinds=sorted(set(truncated)),
     )
     return base
 

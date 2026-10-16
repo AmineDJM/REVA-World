@@ -1,0 +1,29 @@
+# V3 (agent A-SANCTIONS): EU Sanctions Map, regime level (EU autonomous and UN regimes in force in the EU).
+# Connector: src/reva/adapters/connectors/atlas_sanctions.py (atlas.eu_sanctionsmap) -> atlas table
+# eusanctionsmap.regimes + KG statements (source_key eu.sanctionsmap).
+source_key: eu.sanctionsmap
+title: EU Sanctions Map - restrictive measures regimes in force (regime level)
+provider_url: https://www.sanctionsmap.eu/
+lineage_family: eu_sanctionsmap
+rights:
+  licence: "no licence stated (site disclaimer only); regime-level facts referencing EU/UN official acts"
+  attribution: >-
+    EU Sanctions Map (www.sanctionsmap.eu). Authentic texts: Official Journal of the European Union (EUR-Lex)
+    and UN Security Council resolutions.
+  licence_evidence: >-
+    www.sanctionsmap.eu/api/v1/data, article "disclaimer" (read 2026-10-16): no licence or reuse terms; "Only
+    the legal acts published in the Official Journal of the European Union are authentic and produce legal
+    effects."
+metadata:
+  allowed_hosts: [www.sanctionsmap.eu]
+  open_licence: false
+  endpoints:
+    - https://www.sanctionsmap.eu/api/v1/regime
+  never_requested: >-
+    /api/v1/fsd, /api/v1/travelbans/*, /api/v1/autocomplete/search (designated persons and entities: personal
+    data, out of scope by policy).
+  semantics: >-
+    A regime is listed under a country on the map; it may target persons or entities linked to that country
+    rather than the State itself (e.g. the EU blocking statute is listed under the United States).
+  authentication: none
+  cadence: weekly

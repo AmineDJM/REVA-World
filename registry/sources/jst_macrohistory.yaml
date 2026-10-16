@@ -1,0 +1,34 @@
+# V3 (agent A-ECRISES): Jordà-Schularick-Taylor Macrohistory Database, release R6.
+# Connector: src/reva/adapters/connectors/atlas_ecrises.py (atlas.ecrises.jst) -> atlas table jst.macrohistory
+# (every R6 variable incl. crisisJST) and crisis events (KG + dataset ecrises.jst.events).
+source_key: jst.macrohistory
+title: Jordà-Schularick-Taylor Macrohistory Database R6 (18 advanced economies, 1870-2020)
+provider_url: https://www.macrohistory.net/database/
+lineage_family: jst_macrohistory
+rights:
+  licence: CC BY-NC-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  attribution: >-
+    Òscar Jordà, Moritz Schularick, and Alan M. Taylor. 2017. "Macrofinancial History and the New Business Cycle
+    Facts." in NBER Macroeconomics Annual 2016, volume 31, edited by Martin Eichenbaum and Jonathan A. Parker.
+    Chicago: University of Chicago Press.
+  licence_evidence: >-
+    macrohistory.net/database (read 2026-10-16): "All users of this work agree to the terms of a Creative Commons
+    Attribution-NonCommercial-ShareAlike 4.0 International License ... expressly forbidding commercial data
+    providers from integrating ... all or parts of the dataset into their services, or to sell the data."
+    The licence page (macrohistory.net/database/licence-terms/) is fetched and checked on every run.
+  non_commercial: true
+  share_alike: derived tables, events and relations from JST are shared under CC BY-NC-SA 4.0
+  restriction: >-
+    NON-COMMERCIAL. Atlas tables, events and datasets from source 'jst' must not be used or served commercially; a
+    commercial deployment must exclude them. Rates-of-return series also require the Jordà, Knoll, Kuvshinov,
+    Schularick and Taylor (2019, QJE) citation (provider's citation policy).
+metadata:
+  allowed_hosts: [www.macrohistory.net, sfff5b3ac9317c4be.jimcontent.com]
+  files:
+    - https://www.macrohistory.net/app/download/9834512569/JSTdatasetR6.xlsx?t=1763503850
+    - https://www.macrohistory.net/database/licence-terms/
+  access_note: the download link redirects (HTTP 302) to the site's file host sfff5b3ac9317c4be.jimcontent.com
+  review_flag: non-commercial licence -- exclude from any commercial deployment
+  authentication: none
+  cadence: releases every one to two years; quarterly check

@@ -1,0 +1,578 @@
+# Contention: protests, resistance campaigns, episodes of contention (agent A-CONTENTION). Provider-declared concepts
+# (not human-reviewed). Atlas tables (all COMPUTED exact counts per country-year from expert-coded datasets, CC0):
+# mmp.protests_cy (Mass Mobilization v5.1), navco.n13_cy (NAVCO 1.3), navco.n21_cy (NAVCO 2.1), mec.episodes_cy (MEC v3.0).
+# Domain `contention` has no theme rule yet: every concept carries theme: politics. See docs/dev/v3_a_contention.md.
+domain: contention
+labels:
+  fr: Contestation (manifestations, campagnes de résistance, répression)
+  en: Contention (protests, resistance campaigns, repression)
+maintainer: A-CONTENTION
+concepts:
+- id: contention.protests
+  labels:
+    fr: Manifestations contre le gouvernement (nombre, MMP)
+    en: Protests against the government (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests
+  provider_declared: true
+- id: contention.protests_protester_violence
+  labels:
+    fr: Manifestations avec violence des manifestants (nombre, MMP)
+    en: Protests with protester violence (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests coded protesterviolence = 1.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|protester_violence=1
+  provider_declared: true
+- id: contention.protests_response_killings
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : meurtres (nombre, MMP)'
+    en: Protests met with killings by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''killings'' among stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=killings
+  provider_declared: true
+  notes: 'MMP manual: government intent to kill is not part of the coding.'
+- id: contention.protests_response_shootings
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : tirs (nombre, MMP)'
+    en: Protests met with shootings by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''shootings'' among stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=shootings
+  provider_declared: true
+  notes: 'MMP manual: government intent to kill is not part of the coding.'
+- id: contention.protests_response_beatings
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : passages à tabac (nombre, MMP)'
+    en: Protests met with beatings by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''beatings'' among stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=beatings
+  provider_declared: true
+- id: contention.protests_response_arrests
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : arrestations (nombre, MMP)'
+    en: Protests met with arrests by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''arrests'' among stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=arrests
+  provider_declared: true
+- id: contention.protests_response_crowd_dispersal
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : dispersion de la foule (nombre, MMP)'
+    en: Protests met with crowd dispersal by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''crowd_dispersal'' among
+    stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=crowd_dispersal
+  provider_declared: true
+- id: contention.protests_response_accommodation
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : satisfaction des revendications (nombre, MMP)'
+    en: Protests met with accommodation of demands by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''accomodation'' among
+    stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=accommodation
+  provider_declared: true
+- id: contention.protests_response_ignore
+  labels:
+    fr: 'Manifestations ayant reçu une réponse de l''État : « ignorer » (aucune réponse rapportée) (nombre, MMP)'
+    en: Protests met with 'ignore' (no response reported) by the state (MMP count)
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with the state response ''ignore'' among stateresponse1-7.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|response=ignore
+  provider_declared: true
+  notes: 'MMP manual: ''ignore'' may be the press ignoring the state''s response rather than the state not responding.'
+- id: contention.protests_demand_labour_wage_dispute
+  labels:
+    fr: 'Manifestations revendiquant : conflit du travail ou salarial (nombre, MMP)'
+    en: 'Protests demanding: labour or wage dispute (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=labour_wage_dispute
+  provider_declared: true
+- id: contention.protests_demand_land_farm_issue
+  labels:
+    fr: 'Manifestations revendiquant : foncier ou questions agricoles (nombre, MMP)'
+    en: 'Protests demanding: land tenure or farm issues (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=land_farm_issue
+  provider_declared: true
+- id: contention.protests_demand_police_brutality
+  labels:
+    fr: 'Manifestations revendiquant : brutalités policières ou actes arbitraires (nombre, MMP)'
+    en: 'Protests demanding: police brutality or arbitrary actions (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=police_brutality
+  provider_declared: true
+- id: contention.protests_demand_political_behaviour_process
+  labels:
+    fr: 'Manifestations revendiquant : comportement ou processus politique (nombre, MMP)'
+    en: 'Protests demanding: political behaviour or process (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=political_behaviour_process
+  provider_declared: true
+- id: contention.protests_demand_price_increases_tax_policy
+  labels:
+    fr: 'Manifestations revendiquant : hausses de prix ou fiscalité (nombre, MMP)'
+    en: 'Protests demanding: price increases or tax policy (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=price_increases_tax_policy
+  provider_declared: true
+- id: contention.protests_demand_removal_of_politician
+  labels:
+    fr: 'Manifestations revendiquant : départ d''un responsable politique (nombre, MMP)'
+    en: 'Protests demanding: removal of a corrupt or reviled politician (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=removal_of_politician
+  provider_declared: true
+- id: contention.protests_demand_social_restrictions
+  labels:
+    fr: 'Manifestations revendiquant : restrictions sociales (nombre, MMP)'
+    en: 'Protests demanding: social restrictions (MMP count)'
+  definition: 'Mass Mobilization Project v5.1 (Clark & Regan): protests are gatherings of 50 or more people making a demand
+    of the government, coded from major newspapers; COMPUTED count per country-year (year = start year). Country-years MMP
+    codes protest = 0 are provider-reported zeros; 1990-2020. Only protests with this demand among protesterdemand1-4.'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mmp.protests_cy.protests|demand=social_restrictions
+  provider_declared: true
+- id: contention.campaigns_active
+  labels:
+    fr: Campagnes de résistance maximalistes actives (nombre, NAVCO 1.3)
+    en: Maximalist resistance campaigns active (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in every year
+    from BYEAR to EYEAR (EYEAR = peak year, or end year when the peak is unknown). Only country-years with >= 1 campaign are
+    listed; location = contemporary sovereign country named by the provider.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_active
+  provider_declared: true
+- id: contention.campaigns_active_nonviolent
+  labels:
+    fr: Campagnes maximalistes principalement non violentes actives (nombre, NAVCO 1.3)
+    en: Primarily nonviolent maximalist campaigns active (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in every year
+    from BYEAR to EYEAR (EYEAR = peak year, or end year when the peak is unknown). Only country-years with >= 1 campaign are
+    listed; location = contemporary sovereign country named by the provider. Only campaigns coded NONVIOL = 1.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_active|method=nonviolent
+  provider_declared: true
+- id: contention.campaigns_active_violent
+  labels:
+    fr: Campagnes maximalistes principalement violentes actives (nombre, NAVCO 1.3)
+    en: Primarily violent maximalist campaigns active (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in every year
+    from BYEAR to EYEAR (EYEAR = peak year, or end year when the peak is unknown). Only country-years with >= 1 campaign are
+    listed; location = contemporary sovereign country named by the provider. Only campaigns coded VIOL = 1.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_active|method=violent
+  provider_declared: true
+- id: contention.campaign_onsets
+  labels:
+    fr: Débuts de campagnes de résistance maximalistes (nombre, NAVCO 1.3)
+    en: Onsets of maximalist resistance campaigns (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in its BYEAR.
+    Only country-years with >= 1 campaign are listed; location = contemporary sovereign country named by the provider.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaign_onsets
+  provider_declared: true
+- id: contention.campaign_outcome_success
+  labels:
+    fr: 'Campagnes maximalistes culminant ou s''achevant par : succès (nombre, NAVCO 1.3)'
+    en: Maximalist campaigns peaking or ending with success (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in its EYEAR
+    (peak or end year). Only country-years with >= 1 campaign are listed; location = contemporary sovereign country named
+    by the provider. Outcome as coded (SUCCESS = 1, as of 2019-12-31): the provider''s coding, not REVA''s judgement.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_eyear|outcome=success
+  provider_declared: true
+- id: contention.campaign_outcome_limited
+  labels:
+    fr: 'Campagnes maximalistes culminant ou s''achevant par : succès limité (nombre, NAVCO 1.3)'
+    en: Maximalist campaigns peaking or ending with limited success (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in its EYEAR
+    (peak or end year). Only country-years with >= 1 campaign are listed; location = contemporary sovereign country named
+    by the provider. Outcome as coded (LIMITED = 1, as of 2019-12-31): the provider''s coding, not REVA''s judgement.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_eyear|outcome=limited
+  provider_declared: true
+- id: contention.campaign_outcome_failure
+  labels:
+    fr: 'Campagnes maximalistes culminant ou s''achevant par : échec (y compris en cours) (nombre, NAVCO 1.3)'
+    en: Maximalist campaigns peaking or ending with failure (incl. ongoing) (NAVCO 1.3 count)
+  definition: 'NAVCO 1.3 (Chenoweth & Shay): consensus list of 622 maximalist resistance campaigns (regime change, anti-occupation,
+    secession; >= 1,000 observed participants) 1900-2019; COMPUTED count per country-year; a campaign counts in its EYEAR
+    (peak or end year). Only country-years with >= 1 campaign are listed; location = contemporary sovereign country named
+    by the provider. Outcome as coded (FAILURE = 1, as of 2019-12-31): the provider''s coding, not REVA''s judgement.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n13_cy.campaigns_eyear|outcome=failure
+  provider_declared: true
+- id: contention.campaign_years
+  labels:
+    fr: Campagnes maximalistes actives dans l'année (nombre, NAVCO 2.1)
+    en: Campaign-years of maximalist campaigns (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years
+  provider_declared: true
+- id: contention.campaign_years_repression_extreme
+  labels:
+    fr: Campagnes-années avec répression étatique extrême (nombre, NAVCO 2.1)
+    en: Campaign-years with extreme state repression (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed. Only campaign-years coded repression = extreme
+    (''the most repressive episode or activity perpetrated by the state in response to campaign activity'').'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years|repression=extreme
+  provider_declared: true
+- id: contention.campaign_years_repression_moderate
+  labels:
+    fr: Campagnes-années avec répression étatique modérée (nombre, NAVCO 2.1)
+    en: Campaign-years with moderate state repression (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed. Only campaign-years coded repression = moderate
+    (''the most repressive episode or activity perpetrated by the state in response to campaign activity'').'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years|repression=moderate
+  provider_declared: true
+- id: contention.campaign_years_repression_mild
+  labels:
+    fr: Campagnes-années avec répression étatique légère (nombre, NAVCO 2.1)
+    en: Campaign-years with mild state repression (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed. Only campaign-years coded repression = mild (''the
+    most repressive episode or activity perpetrated by the state in response to campaign activity'').'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years|repression=mild
+  provider_declared: true
+- id: contention.campaign_years_repression_none
+  labels:
+    fr: Campagnes-années avec répression étatique aucune (nombre, NAVCO 2.1)
+    en: Campaign-years with no state repression (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed. Only campaign-years coded repression = none (''the
+    most repressive episode or activity perpetrated by the state in response to campaign activity'').'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years|repression=none
+  provider_declared: true
+- id: contention.campaign_years_security_defection
+  labels:
+    fr: Campagnes-années avec défection majeure des forces de sécurité (nombre, NAVCO 2.1)
+    en: Campaign-years with a major security-force defection (NAVCO 2.1 count)
+  definition: 'NAVCO 2.1 (Chenoweth & Shay): 384 maximalist campaigns, 2,717 campaign-years 1945-2013; COMPUTED count of campaign-year
+    rows per country-year. Only country-years with >= 1 campaign are listed. Only campaign-years coded sec_defect = 1.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n21_cy.campaign_years|sec_defect=1
+  provider_declared: true
+- id: contention.episodes_active
+  labels:
+    fr: Épisodes majeurs de contestation actifs (nombre, MEC)
+    en: Major episodes of contention active (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose [bdate, edate] overlaps the
+    year. Only country-years with >= 1 episode are listed.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_active
+  provider_declared: true
+- id: contention.episodes_active_reformist
+  labels:
+    fr: Épisodes de contestation réformistes actifs (nombre, MEC)
+    en: Reformist episodes of contention active (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose [bdate, edate] overlaps the
+    year. Only country-years with >= 1 episode are listed. Only category 2 (reformist) episodes.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_active|category=reformist
+  provider_declared: true
+- id: contention.episodes_active_maximalist
+  labels:
+    fr: Épisodes de contestation maximalistes actifs (nombre, MEC)
+    en: Maximalist episodes of contention active (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose [bdate, edate] overlaps the
+    year. Only country-years with >= 1 episode are listed. Only category 4 (maximalist) episodes.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_active|category=maximalist
+  provider_declared: true
+- id: contention.episodes_active_regime_violence
+  labels:
+    fr: Épisodes de contestation réprimés violemment par le régime (nombre, MEC)
+    en: Episodes of contention met with regime violence (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose [bdate, edate] overlaps the
+    year. Only country-years with >= 1 episode are listed. Only episodes coded regviol = 1 (''whether the regime used violence
+    to crack down on campaign'').'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_active|regviol=1
+  provider_declared: true
+- id: contention.episode_onsets
+  labels:
+    fr: Débuts d'épisodes majeurs de contestation (nombre, MEC)
+    en: Onsets of major episodes of contention (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose bdate falls in the year.
+    Only country-years with >= 1 episode are listed.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episode_onsets
+  provider_declared: true
+- id: contention.episodes_ending_success
+  labels:
+    fr: 'Épisodes de contestation s''achevant par : succès (nombre, MEC)'
+    en: Episodes of contention ending with success as coded (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose edate falls in the year.
+    Only country-years with >= 1 episode are listed. Outcome as coded (SUCCESS = 1; ongoing episodes are coded failure with
+    edate 2018-12-31): the provider''s coding.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_ending|outcome=success
+  provider_declared: true
+- id: contention.episodes_ending_limited
+  labels:
+    fr: 'Épisodes de contestation s''achevant par : succès limité (nombre, MEC)'
+    en: Episodes of contention ending with limited as coded (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose edate falls in the year.
+    Only country-years with >= 1 episode are listed. Outcome as coded (LIMITED = 1; ongoing episodes are coded failure with
+    edate 2018-12-31): the provider''s coding.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_ending|outcome=limited
+  provider_declared: true
+- id: contention.episodes_ending_failure
+  labels:
+    fr: 'Épisodes de contestation s''achevant par : échec (nombre, MEC)'
+    en: Episodes of contention ending with failure as coded (MEC count)
+  definition: 'Major Episodes of Contention v3.0 (Chenoweth & Kang): 2,734 episodes 1955-2018 of coordinated mass contention
+    (> 1,000 observed participants, > 1 week); COMPUTED count per country-year of episodes whose edate falls in the year.
+    Only country-years with >= 1 episode are listed. Outcome as coded (FAILURE = 1; ongoing episodes are coded failure with
+    edate 2018-12-31): the provider''s coding.'
+  unit: count
+  domain: contention
+  subdomain: campaigns
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - mec.episodes_cy.episodes_ending|outcome=failure
+  provider_declared: true

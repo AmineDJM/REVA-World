@@ -35,6 +35,117 @@ MAX_SENTENCE_STATEMENTS = 12
 MAX_RANK_LIST = 50
 MAX_SERIES_LIST = 30
 MAX_LINKS = 15
+#: Causal claims worded one by one in a ``why`` answer (the rest are cited in one note).
+MAX_CAUSAL_SENTENCES = 12
+
+# --------------------------------------------------------------------------- causal wording (v3_causality.md)
+#: Every causal sentence names its asserting source and tier ("selon <source> (T3, …)"); REVA asserts nothing.
+TIER_TEXT = {
+    "fr": {
+        "T1": "jeu de données codé par des experts",
+        "T2": "référence savante citée",
+        "T3": "déclaration Wikidata avec références",
+        "T4": "déclaration Wikidata sans référence",
+    },
+    "en": {
+        "T1": "expert-coded dataset",
+        "T2": "cited scholarly reference",
+        "T3": "Wikidata statement with references",
+        "T4": "Wikidata statement without references",
+    },
+}
+#: relation read effect → cause ("<effect> a pour cause immédiate <cause>")
+EFFECT_SIDE = {
+    "fr": {
+        "has_cause": "a pour cause",
+        "has_effect": "a pour cause",
+        "immediate_cause": "a pour cause immédiate",
+        "underlying_cause": "a pour cause profonde",
+        "contributing_factor": "a pour facteur contributif",
+        "enabled": "a été rendu(e) possible par",
+        "precipitated": "a été précipité(e) par",
+        "prevented_or_delayed": "a été empêché(e) ou retardé(e) par",
+        "reaction_to": "est une réaction à",
+        "coded_trigger": "a pour déclencheur codé",
+        "coded_outcome": "est l'issue codée de",
+    },
+    "en": {
+        "has_cause": "has cause",
+        "has_effect": "has cause",
+        "immediate_cause": "has immediate cause",
+        "underlying_cause": "has underlying cause",
+        "contributing_factor": "has contributing factor",
+        "enabled": "was enabled by",
+        "precipitated": "was precipitated by",
+        "prevented_or_delayed": "was prevented or delayed by",
+        "reaction_to": "is a reaction to",
+        "coded_trigger": "has coded trigger",
+        "coded_outcome": "is the coded outcome of",
+    },
+}
+#: relation read cause → effect ("<cause> a pour effet <effect>")
+CAUSE_SIDE = {
+    "fr": {
+        "has_cause": "a pour effet",
+        "has_effect": "a pour effet",
+        "immediate_cause": "est une cause immédiate de",
+        "underlying_cause": "est une cause profonde de",
+        "contributing_factor": "est un facteur contributif de",
+        "enabled": "a rendu possible",
+        "precipitated": "a précipité",
+        "prevented_or_delayed": "a empêché ou retardé",
+        "reaction_to": "a suscité en réaction",
+        "coded_trigger": "est le déclencheur codé de",
+        "coded_outcome": "a pour issue codée",
+    },
+    "en": {
+        "has_cause": "has effect",
+        "has_effect": "has effect",
+        "immediate_cause": "is an immediate cause of",
+        "underlying_cause": "is an underlying cause of",
+        "contributing_factor": "is a contributing factor of",
+        "enabled": "enabled",
+        "precipitated": "precipitated",
+        "prevented_or_delayed": "prevented or delayed",
+        "reaction_to": "prompted in reaction",
+        "coded_trigger": "is the coded trigger of",
+        "coded_outcome": "has coded outcome",
+    },
+}
+TEMPORAL_TEXT = {
+    "fr": {
+        "consistent": "la cause précède l'effet, à la précision des dates",
+        "overlapping": "périodes qui se chevauchent, antériorité non établie",
+        "inconsistent": "incohérence temporelle signalée : la cause commence après l'effet",
+        "undetermined": "dates manquantes, antériorité non vérifiable",
+    },
+    "en": {
+        "consistent": "the cause precedes the effect, at date precision",
+        "overlapping": "overlapping periods, precedence not established",
+        "inconsistent": "temporal inconsistency flagged: the cause starts after the effect",
+        "undetermined": "dates missing, precedence not checkable",
+    },
+}
+LANE_ORDER = ("immediate", "underlying", "contributing", "coded", "general", "reaction", "prevention")
+_RELATION_LANE = {
+    "immediate_cause": "immediate",
+    "precipitated": "immediate",
+    "underlying_cause": "underlying",
+    "contributing_factor": "contributing",
+    "enabled": "contributing",
+    "coded_trigger": "coded",
+    "coded_outcome": "coded",
+    "reaction_to": "reaction",
+    "prevented_or_delayed": "prevention",
+}
+
+
+def _grade_rank(g: str | None) -> int:
+    return "ABCDE".index(g) if g and g in "ABCDE" else 5
+
+
+def claim_lane(c: Any) -> str:
+    return c.lane if c.lane in LANE_ORDER else _RELATION_LANE.get(c.relation, "general")
 
 
 @dataclass
@@ -42,7 +153,7 @@ class Sentence:
     id: str
     text: str
     citations: list[str]
-    kind: str  # fact | path | missing | unavailable | unsupported | ambiguous | note | identification
+    kind: str  # fact | path | causal | missing | unavailable | unsupported | ambiguous | note | identification
     op_id: str | None = None
 
     def as_json(self, evidence: Mapping[str, Mapping[str, Any]] | None = None) -> dict[str, Any]:
@@ -84,6 +195,12 @@ def short_ref(item: Mapping[str, Any]) -> str:
         return f"{item['id']}: {c.get('source')} {item.get('qid')} {c.get('url')}"
     if k == "link":
         return f"{item['id']}: link {item.get('link_kind')} {item.get('a')}-{item.get('b')} ({c.get('source')})"
+    if k == "causal_claim":
+        where = c.get("statement_id") or (c.get("selector") and str(c.get("selector"))) or c.get("dataset") or ""
+        rev = f" rev {c['revision']}" if c.get("revision") else ""
+        return (
+            f"{item['id']}: claim by {c.get('source')} ({c.get('tier')}) {where}{rev} grade {item.get('grade') or 'ungraded'}"
+        ).strip()
     if k == "absence":
         return f"{item['id']}: consulted {', '.join(item.get('sources_consulted') or [])}"
     return str(item.get("id"))
@@ -304,7 +421,8 @@ class Composer:
                 "unsupported",
                 "rejected",
             )
-        if not any(s.kind in ("fact", "path") for s in self.out.sentences):
+        self.licences()
+        if not any(s.kind in ("fact", "path", "causal") for s in self.out.sentences):
             eid = self.x.evidence.absence(
                 "answer", sorted({c for r in self.x.results for c in r.consulted}) or ["no source"]
             )
@@ -317,6 +435,42 @@ class Composer:
                 "summary",
             )
         return self.out
+
+    # -- licences (review V3b LIC-1): restricted terms of the atlas sources cited, once per licence
+    def licences(self) -> None:
+        fr = self.fr()
+        by: dict[tuple[str, str], tuple[Mapping[str, Any], list[str]]] = {}
+        for item in self.x.evidence.items:
+            if item.get("kind") != "atlas_cell":
+                continue
+            c = item.get("citation") or {}
+            r = c.get("rights")
+            if not isinstance(r, Mapping) or not r.get("restricted"):
+                continue
+            by.setdefault((str(c.get("source")), str(r.get("licence"))), (r, []))[1].append(str(item["id"]))
+        for (src, lic), (r, eids) in sorted(by.items()):
+            terms = [
+                t
+                for t, on in (
+                    (("usage non commercial" if fr else "non-commercial use"), r.get("non_commercial")),
+                    (("partage dans les mêmes conditions" if fr else "share-alike"), r.get("share_alike")),
+                    (("pas de modification" if fr else "no derivatives"), r.get("no_derivatives")),
+                    (
+                        ("accès non payant" if fr else "no charging for access"),
+                        r.get("commercial_use") == "restricted",
+                    ),
+                    (("licence non ouverte" if fr else "not an open licence"), r.get("open_licence") is False),
+                )
+                if on
+            ]
+            self.add(
+                f"Licence de {src} : {lic} ({', '.join(terms)}) ; toute réutilisation doit respecter ces conditions."
+                if fr
+                else f"Licence of {src}: {lic} ({', '.join(terms)}); any reuse must respect these terms.",
+                eids,
+                "note",
+                "licence",
+            )
 
     # -- concept ambiguity (keyword planner)
     def ambiguity(self, a: Mapping[str, Any]) -> None:
@@ -415,6 +569,7 @@ class Composer:
                 "kg": "le graphe de connaissances" if fr else "the knowledge graph",
                 "atlas": "l'atlas" if fr else "the atlas",
                 "links": "la couche d'interconnexions" if fr else "the interconnection layer",
+                "causal": "le service des affirmations causales" if fr else "the causal claims service",
             }.get(str(res.data.get("backend")), str(res.data.get("backend")))
             eid = self.x.evidence.absence("capability_unavailable", [str(res.data.get("backend"))], operation=op.op)
             self.add(
@@ -532,6 +687,38 @@ class Composer:
                 if fr
                 else f"No link between {self.country(d['a'])} and {self.country(d['b'])} in the data consulted "
                 f"({consulted}): no link, not a zero value.",
+                [d["absence"]],
+                "missing",
+                op.id,
+            )
+        elif op.op == "why":
+            e = d["entity"]
+            what = (
+                ("les conséquences" if d["direction"] == "effects" else "les causes")
+                if fr
+                else ("the consequences" if d["direction"] == "effects" else "the causes")
+            )
+            self.add(
+                f"Aucune affirmation causale sourcée sur {what} de {self.entity(e)} ({e.qid}) dans les sources "
+                f"consultées ({consulted}) ; REVA ne déduit aucune cause de la chronologie, d'une succession ou "
+                f"d'une participation."
+                if fr
+                else f"No sourced causal claim about {what} of {self.entity(e)} ({e.qid}) in the sources consulted "
+                f"({consulted}); REVA infers no cause from chronology, sequence or participation.",
+                [d["absence"]],
+                "missing",
+                op.id,
+            )
+        elif op.op == "causal_chain":
+            a, b = d["from"], d["to"]
+            self.add(
+                f"Aucune chaîne d'affirmations causales sourcées d'au plus {d['max_hops']} maillons de "
+                f"{self.entity(a)} ({a.qid}) à {self.entity(b)} ({b.qid}) dans les sources consultées ({consulted}) ; "
+                f"cela ne prouve ni l'absence ni l'existence d'un lien causal."
+                if fr
+                else f"No chain of sourced causal claims of at most {d['max_hops']} hops from {self.entity(a)} "
+                f"({a.qid}) to {self.entity(b)} ({b.qid}) in the sources consulted ({consulted}); this proves "
+                f"neither the absence nor the existence of a causal link.",
                 [d["absence"]],
                 "missing",
                 op.id,
@@ -851,6 +1038,171 @@ class Composer:
                 res.op.id,
             )
 
+    # -- causality: every causal sentence names its asserting source and tier; chains are REVA's compositions
+    def selon(self, c: Any) -> str:
+        """``selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire)``."""
+        fr = self.fr()
+        name = "Wikidata" if c.community_edited else (f"{c.source_key}/{c.dataset}" if c.dataset else c.source_key)
+        tier = TIER_TEXT[self.lang if self.lang in TIER_TEXT else "en"].get(c.tier, c.tier)
+        community = (" ; donnée communautaire" if fr else "; community-edited") if c.community_edited else ""
+        return (
+            f"selon {name} ({c.tier}, {tier}{community})"
+            if fr
+            else f"according to {name} ({c.tier}, {tier}{community})"
+        )
+
+    def grade_text(self, c: Any) -> str:
+        fr = self.fr()
+        if c.grade is None:
+            return "pas encore gradée" if fr else "not graded yet"
+        rules = f" ; règles {', '.join(c.grade_rules)}" if fr and c.grade_rules else ""
+        if not fr and c.grade_rules:
+            rules = f"; rules {', '.join(c.grade_rules)}"
+        return f"preuve {c.grade}{rules}" if fr else f"evidence grade {c.grade}{rules}"
+
+    def claim_sentence(self, c: Any, *, direction: str) -> str:
+        fr = self.fr()
+        lang = "fr" if fr else "en"
+        cause, effect = c.cause_label(self.lang), c.effect_label(self.lang)
+        if direction == "effects":
+            core = f"{cause} {CAUSE_SIDE[lang].get(c.relation, c.relation)} {effect}"
+        else:
+            core = f"{effect} {EFFECT_SIDE[lang].get(c.relation, c.relation)} {cause}"
+        selon = self.selon(c)
+        if c.stance == "denies":
+            head = (
+                f"{selon[0].upper()}{selon[1:]}, il est faux que « {core} » (la source conteste ce lien)"
+                if fr
+                else f"{selon[0].upper()}{selon[1:]}, it is not the case that “{core}” (the source denies this link)"
+            )
+        else:
+            head = f"{selon[0].upper()}{selon[1:]}, {core}"
+        mech = ""
+        if c.mechanism:
+            mech = (
+                f" ; mécanisme cité par la source : « {c.mechanism} »"
+                if fr
+                else f"; mechanism quoted from the source: “{c.mechanism}”"
+            )
+        tt = TEMPORAL_TEXT[lang].get(
+            c.temporal_check or "", "vérification temporelle non calculée" if fr else "temporal check not computed"
+        )
+        corr = ""
+        if c.corroboration is not None:
+            corr = (
+                f" ; {c.corroboration} groupe(s) de sources indépendant(s) affirment ce lien"
+                if fr
+                else f"; {c.corroboration} independent source group(s) assert this link"
+            )
+        contested = ""
+        if c.contested_by:
+            contested = (
+                f" ; contestée par {len(c.contested_by)} autre(s) affirmation(s)"
+                if fr
+                else f"; contested by {len(c.contested_by)} other claim(s)"
+            )
+        return (
+            f"{head}{mech} ({tt}{corr}{contested} ; {self.grade_text(c)})."
+            if fr
+            else (f"{head}{mech} ({tt}{corr}{contested}; {self.grade_text(c)}).")
+        )
+
+    def op_why(self, res: OpResult) -> None:
+        fr = self.fr()
+        d = res.data
+        e = d["entity"]
+        rows = sorted(
+            d["claims"],
+            key=lambda r: (LANE_ORDER.index(claim_lane(r[0])), _grade_rank(r[0].grade), int(r[1][1:])),
+        )
+        effects = d["direction"] == "effects"
+        n = len(rows)
+        what = ("conséquences" if effects else "causes") if fr else ("consequences" if effects else "causes")
+        self.add(
+            f"{n} affirmation(s) de sources sur les {what} de {self.entity(e)} ({e.qid}) ; REVA n'établit aucune "
+            f"causalité : chaque lien ci-dessous est attribué à la source qui l'affirme, avec son niveau de source et "
+            f"son grade de preuve (ordinal, pas une probabilité)."
+            if fr
+            else f"{n} claim(s) by sources about the {what} of {self.entity(e)} ({e.qid}); REVA establishes no "
+            f"causation: each link below is attributed to the source asserting it, with its source tier and evidence "
+            f"grade (ordinal, not a probability).",
+            [eid for _, eid in rows],
+            "note",
+            res.op.id,
+        )
+        for c, eid in rows[:MAX_CAUSAL_SENTENCES]:
+            self.add(self.claim_sentence(c, direction=d["direction"]), [eid], "causal", res.op.id)
+        rest = rows[MAX_CAUSAL_SENTENCES:]
+        if rest:
+            self.add(
+                f"{len(rest)} autre(s) affirmation(s) causale(s), chacune attribuée à sa source, figurent dans les preuves."
+                if fr
+                else f"{len(rest)} more causal claim(s), each attributed to its source, are listed in the evidence.",
+                [eid for _, eid in rest],
+                "note",
+                res.op.id,
+            )
+        for c, eid in d.get("dissent") or []:
+            self.add(self.claim_sentence(c, direction=d["direction"]), [eid], "causal", res.op.id)
+        if d.get("truncated"):
+            self.add(
+                "Liste bornée par le service : d'autres affirmations existent."
+                if fr
+                else "List bounded by the service: more claims exist.",
+                [eid for _, eid in rows],
+                "note",
+                res.op.id,
+            )
+
+    def op_causal_chain(self, res: OpResult) -> None:
+        from reva.nlqa.ports import chain_grade, hop_grade
+
+        fr = self.fr()
+        d = res.data
+        a, b = d["from"], d["to"]
+        for i, (ch, hops) in enumerate(d["chains"]):
+            cites = [e for _, eids in hops for e in eids]
+            g = chain_grade(ch)
+            gtxt = (
+                (f"preuve {g}" if g else "non calculable (maillon non gradé)")
+                if fr
+                else (f"evidence grade {g}" if g else "not computable (ungraded hop)")
+            )
+            n = len(hops)
+            lead = "" if i == 0 else ("Autre chaîne : " if fr else "Another chain: ")
+            self.add(
+                f"{lead}Chaîne composée par REVA à partir de {n} affirmation(s) distincte(s), de {self.entity(a)} à "
+                f"{self.entity(b)} : aucune source n'affirme la chaîne entière ; force = maillon le plus faible ({gtxt})."
+                if fr
+                else f"{lead}Chain composed by REVA from {n} separately asserted claim(s), from {self.entity(a)} to "
+                f"{self.entity(b)}: no source asserts the whole chain; strength = weakest link ({gtxt}).",
+                cites,
+                "path",
+                res.op.id,
+            )
+            for j, (h, eids) in enumerate(hops, 1):
+                asserting = [c for c in h.claims if c.stance == "asserts"]
+                frm = pick_label(h.from_labels, self.lang, h.from_id)
+                to = pick_label(h.to_labels, self.lang, h.to_id)
+                lang = "fr" if fr else "en"
+                parts = [
+                    f"{self.selon(c)}, « {CAUSE_SIDE[lang].get(c.relation, c.relation)} » ({self.grade_text(c)})"
+                    if fr
+                    else f"{self.selon(c)}, “{CAUSE_SIDE[lang].get(c.relation, c.relation)}” ({self.grade_text(c)})"
+                    for c in asserting
+                ]
+                hg = hop_grade(h)
+                self.add(
+                    f"Maillon {j} : {frm} → {to}, lien affirmé {' ; et '.join(parts)} ; grade du maillon (meilleure "
+                    f"affirmation) : {hg or 'non gradé'}."
+                    if fr
+                    else f"Hop {j}: {frm} → {to}, link asserted {'; and '.join(parts)}; hop grade (best claim): "
+                    f"{hg or 'ungraded'}.",
+                    eids,
+                    "causal",
+                    res.op.id,
+                )
+
     # -- links
     def op_links(self, res: OpResult) -> None:
         fr = self.fr()
@@ -997,17 +1349,23 @@ class Composer:
                 )
                 # the share exactly as computed (4 decimals), never rounded further
                 share = str(lk.weight).replace(".", ",") if fr else str(lk.weight)
+                if lk.basis.get("partial_period"):  # VOTE-1/2: the years used are not the whole decade
+                    span += " (décennie partielle)" if fr else " (partial decade)"
                 parts.append(f"{span} : {share}{counts}" if fr else f"{span}: {share}{counts}")
             self.add(
                 f"Part de votes identiques à l'AG de l'ONU entre {a} et {b} ({issue_fr.get(issue, issue)} ; indice "
                 f"calculé par REVA = votes identiques / votes où les deux ont voté oui, non ou abstention) : "
                 + " ; ".join(parts)
-                + ". C'est une part de votes identiques : elle ne mesure ni une amitié ni une convergence d'intérêts."
+                + ". C'est une part stricte de votes identiques (une abstention face à un oui ou un non compte 0 ; ce "
+                "n'est pas l'indice « agree » de Voeten, qui compte une abstention pour moitié) : elle ne mesure ni "
+                "une amitié ni une convergence d'intérêts."
                 if fr
                 else f"Share of identical UN General Assembly votes between {a} and {b} ({issue_en.get(issue, issue)}; "
                 f"index computed by REVA = identical votes / votes where both voted yes, no or abstain): "
                 + "; ".join(parts)
-                + ". It is a share of identical votes: it measures neither friendship nor a convergence of interests.",
+                + ". It is a strict share of identical votes (an abstention against yes or no counts 0; not Voeten's "
+                "'agree' index, which counts an abstention as half): it measures neither friendship nor a "
+                "convergence of interests.",
                 [c for _, eid, cited in items for c in (eid, *cited)],
                 "fact",
                 op_id,

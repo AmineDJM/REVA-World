@@ -1,0 +1,39 @@
+# Geography aliases of agent A-SANCTIONS (src/reva/adapters/connectors/atlas_sanctions.py).
+#
+# ofac_program: US OFAC sanctions program (slug of its page under
+#   https://ofac.treasury.gov/sanctions-programs-and-country-information/<slug>) -> the one country its title
+#   names. A program is tied to a country ONLY when its official title names exactly one country; thematic
+#   programs (counter terrorism, cyber, Magnitsky, non-proliferation...), regional ones (Balkans), two-country
+#   ones ("Ukraine-/Russia-related Sanctions"), programs aimed at companies ("Chinese Military Companies
+#   Sanctions") and programs whose title names no country ("Promoting Accountability for Assad and Regional
+#   Stabilization Sanctions (PAARSS)") stay unmapped (kept, iso3 null). Evidence: the program title as listed
+#   in the "Active Sanctions Programs" table of the OFAC page (raw sha256
+#   38e8a756347b35ebee0621a1bb05d834b5808aa786dab68a9468dcbe26ef1e12, retrieved 2026-10-16), quoted per alias.
+#   No base scheme: only these slugs are codes of this scheme.
+schemes:
+  ofac_program:
+    aliases:
+      - {code: afghanistan-related-sanctions, iso3: AFG, source: "title 'Afghanistan-Related Sanctions'"}
+      - {code: belarus-sanctions, iso3: BLR, source: "title 'Belarus Sanctions'"}
+      - {code: burma, iso3: MMR, source: "title 'Burma-Related Sanctions' (Burma = Myanmar, ISO 3166 MMR)"}
+      - {code: central-african-republic-sanctions, iso3: CAF, source: "title 'Central African Republic Sanctions'"}
+      - {code: cuba-sanctions, iso3: CUB, source: "title 'Cuba Sanctions'"}
+      - {code: democratic-republic-of-the-congo-related-sanctions, iso3: COD, source: "title 'Democratic Republic of the Congo-Related Sanctions'"}
+      - {code: hong-kong-related-sanctions, iso3: HKG, source: "title 'Hong Kong-Related Sanctions' (crosswalk entity HKG)"}
+      - {code: iran-sanctions, iso3: IRN, source: "title 'Iran Sanctions'"}
+      - {code: iraq-related-sanctions, iso3: IRQ, source: "title 'Iraq-Related Sanctions'"}
+      - {code: lebanon-related-sanctions, iso3: LBN, source: "title 'Lebanon-Related Sanctions'"}
+      - {code: libya-sanctions, iso3: LBY, source: "title 'Libya Sanctions'"}
+      - {code: mali-related-sanctions, iso3: MLI, source: "title 'Mali-Related Sanctions'"}
+      - {code: nicaragua-related-sanctions, iso3: NIC, source: "title 'Nicaragua-related Sanctions'"}
+      - {code: north-korea-sanctions, iso3: PRK, source: "title 'North Korea Sanctions' (DPRK, ISO 3166 PRK)"}
+      - {code: russian-harmful-foreign-activities-sanctions, iso3: RUS, source: "title 'Russian Harmful Foreign Activities Sanctions'"}
+      - {code: somalia-sanctions, iso3: SOM, source: "title 'Somalia Sanctions'"}
+      - {code: south-sudan-related-sanctions, iso3: SSD, source: "title 'South Sudan-Related Sanctions'"}
+      - {code: sudan-and-darfur-sanctions, iso3: SDN, source: "title 'Sudan and Darfur Sanctions' (Darfur is a region of Sudan)"}
+      - {code: venezuela-related-sanctions, iso3: VEN, source: "title 'Venezuela-Related Sanctions'"}
+      - {code: yemen-related-sanctions, iso3: YEM, source: "title 'Yemen-related Sanctions'"}
+    source:
+      kind: provider_data
+      url: https://ofac.treasury.gov/sanctions-programs-and-country-information
+      retrieved_at: "2026-10-16T20:19:00Z"

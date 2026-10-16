@@ -308,6 +308,35 @@ def test_05_new_version_needs_a_new_snapshot_old_one_stays_pinned(env: Env) -> N
     assert fra(pinned) == "7.9" and pinned["snapshot"]["snapshot_sha256"] == old.sha256
 
 
+def test_05b_old_snapshot_without_query_file_is_409_and_rights_are_pinned(env: Env) -> None:
+    """Review V3b SEC-3: an older snapshot whose query file is gone is never rebuilt in the request (typed 409);
+    the latest one still is. LIC-1: the manifest pins each table's rights, and every cell carries them."""
+    import os
+
+    from reva.atlas.query import _QUERIES, DB_SUFFIX
+
+    with env.api.connect() as c:
+        new = resolve_snapshot(c, env.store, origin="test_fixture")
+        old_sha = c.execute(
+            text("""SELECT parameters->>'snapshot_sha256' FROM meta.activity WHERE kind = 'atlas.snapshot'
+                    AND parameters->>'snapshot_sha256' <> :s ORDER BY recorded_at LIMIT 1"""),
+            {"s": new.sha256},
+        ).scalar_one()
+    cache = Path(os.environ["REVA_ATLAS_CACHE_DIR"])
+    for k in [k for k in _QUERIES if k.endswith(old_sha)]:
+        _QUERIES.pop(k).close()
+    (cache / f"atlas-{old_sha}{DB_SUFFIX}").unlink()
+    r = get(env, "/v1/atlas/map", concept="labour.unemployment_rate", year=2021, snapshot=old_sha)
+    assert r.status_code == 409 and r.json()["code"] == "snapshot_not_materialised", r.text
+    assert not (cache / f"atlas-{old_sha}{DB_SUFFIX}").exists()
+    r = get(env, "/v1/atlas/map", concept="labour.unemployment_rate", year=2021, snapshot=new.sha256)
+    assert r.status_code == 200, r.text
+    assert all(t.get("rights") for t in new.tables)  # manifest rows written after LIC-1 carry rights
+    cell = r.json()["data"]["values"][0]
+    assert cell["rights"]["licence"] and cell["rights"]["basis"] == "table_artifact"
+    assert r.json()["data"]["licences"]
+
+
 def test_06_tampered_table_bytes_are_refused(env: Env, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from reva.atlas.query import AtlasQuery
     from reva.kernel.errors import IntegrityFailure

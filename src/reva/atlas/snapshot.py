@@ -5,7 +5,9 @@ An **atlas snapshot** pins, per atlas table (``evidence.dataset`` rows with
 the snapshot's origin. It is recorded (worker role) as
 
 * a canonical JSON manifest artifact (namespace ``normalised``, schema version
-  ``atlas-snapshot/1``) listing every pinned table by dataset id and artifact/manifest sha256;
+  ``atlas-snapshot/1``) listing every pinned table by dataset id and artifact/manifest sha256, with the
+  rights recorded with the table artifact (``rights``: licence, attribution, terms; review V3b LIC-1 —
+  for manifests written before, :func:`resolve_snapshot` reads them from ``meta.artifact``);
 * a ``meta.activity`` (kind ``atlas.snapshot``) whose inputs are the pinned table artifacts and
   whose output is the manifest (parameters: origin, cutoff, manifest sha256, table count).
 
@@ -22,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -37,13 +40,95 @@ SNAPSHOT_SCHEMA_VERSION = "atlas-snapshot/1"
 ACTIVITY_KIND = "atlas.snapshot"
 
 TABLES_AS_OF_SQL = """
-SELECT DISTINCT ON (dataset_key)
-       id::text AS dataset_id, dataset_key, subject_key, artifact_sha256, manifest_sha256, parser_version,
-       row_count, recorded_at
-FROM evidence.dataset
-WHERE concept_id = :c AND origin = :o AND recorded_at <= :cut
-ORDER BY dataset_key, recorded_at DESC, id DESC
+SELECT DISTINCT ON (d.dataset_key)
+       d.id::text AS dataset_id, d.dataset_key, d.subject_key, d.artifact_sha256, d.manifest_sha256,
+       d.parser_version, d.row_count, d.recorded_at, a.rights
+FROM evidence.dataset d LEFT JOIN meta.artifact a ON a.sha256 = d.artifact_sha256
+WHERE d.concept_id = :c AND d.origin = :o AND d.recorded_at <= :cut
+ORDER BY d.dataset_key, d.recorded_at DESC, d.id DESC
 """
+#: Rights recorded with each pinned table artifact (``meta.artifact.rights``), for manifests written before
+#: review V3b LIC-1 (they pin the same immutable artifacts; their rights are read, never assumed).
+RIGHTS_OF_SQL = "SELECT sha256, rights FROM meta.artifact WHERE sha256 = ANY(:s)"
+
+#: Licence ids / phrases that make a source *open* (attribution only).
+_OPEN_RE = re.compile(
+    r"\b(cc[- ]?by(?:[- ](?:3\.0|4\.0|2\.0|2\.5))?(?:[- ]igo)?|cc0|odbl|odc[- ]by|pddl|public domain|"
+    r"open government licen[cs]e|etalab|licence ouverte)\b",
+    re.I,
+)
+_NC_RE = re.compile(
+    r"(\bby[- ]nc\b|non[- ]?commercial|commercial use (?:is )?prohibited|prohibits? commercial|"
+    r"no commercial|commercial use not permitted)",
+    re.I,
+)
+_SA_RE = re.compile(r"(\bby(?:[- ]nc)?[- ]sa\b|share[- ]?alike)", re.I)
+_ND_RE = re.compile(r"(\bby(?:[- ]nc)?[- ]nd\b|no[- ]?deriv)", re.I)
+_NOT_OPEN_RE = re.compile(
+    r"(not an open licen[cs]e|no explicit data licen[cs]e|no open data licen[cs]e|"
+    r"terms of use|cannot charge|no charging)",
+    re.I,
+)
+
+
+def normalise_rights(raw: Any, *, basis: str) -> dict[str, Any] | None:
+    """Rights of a source table as served with every atlas cell (review V3b LIC-1).
+
+    ``raw`` is what the connector recorded with the table artifact (``meta.artifact.rights``: free-form,
+    ``licence`` always) or the atlas source spec's licence. Flags are read from explicit keys first
+    (``non_commercial``, ``commercial_use``, ``share_alike``, ``no_derivatives``, ``open_licence``), then from
+    the licence text (CC licence ids). ``restricted`` is true for any non-commercial, share-alike, no-derivatives
+    or not-open term: such a source must be named next to the answer."""
+    if isinstance(raw, str):
+        raw = {"licence": raw}
+    if not isinstance(raw, dict) or not raw.get("licence"):
+        return None
+    text_parts = [str(raw.get(k) or "") for k in ("licence", "restriction", "commercial_use", "terms", "share_alike")]
+    text = " ".join(text_parts)
+    licence = str(raw["licence"])[:300]
+    cu = str(raw.get("commercial_use") or "").lower()
+    nc = bool(raw.get("non_commercial")) or "prohibit" in cu or "not_permitted" in cu or bool(_NC_RE.search(text))
+    restricted_charge = bool(re.search(r"cannot charge|no charging|charge for access", text, re.I))
+    sa = bool(raw.get("share_alike")) or bool(_SA_RE.search(licence))
+    nd = bool(raw.get("no_derivatives")) or bool(_ND_RE.search(licence))
+    if isinstance(raw.get("open_licence"), bool):
+        open_l: bool | None = bool(raw["open_licence"]) and not nc
+    elif nc or _NOT_OPEN_RE.search(text):
+        open_l = False
+    elif _OPEN_RE.search(licence):
+        open_l = True
+    else:
+        open_l = None
+    commercial = (
+        "not_permitted" if nc else ("restricted" if restricted_charge else ("permitted" if open_l else "unknown"))
+    )
+    out: dict[str, Any] = {
+        "licence": licence,
+        "licence_url": raw.get("licence_url") or raw.get("terms_url"),
+        "attribution": (str(raw["attribution"])[:500] if raw.get("attribution") else None),
+        "commercial_use": commercial,
+        "non_commercial": nc,
+        "share_alike": sa,
+        "no_derivatives": nd,
+        "open_licence": open_l,
+        "restricted": nc or sa or nd or restricted_charge or open_l is False,
+        "basis": basis,
+    }
+    if raw.get("restriction"):
+        out["restriction"] = str(raw["restriction"])[:300]
+    return out
+
+
+def tables_with_rights(conn: Connection, tables: Any) -> tuple[dict[str, Any], ...]:
+    """Pinned tables with ``rights`` read from ``meta.artifact`` where the manifest has none (old manifests)."""
+    ts = [dict(t) for t in tables]
+    need = sorted({str(t["artifact_sha256"]) for t in ts if not t.get("rights")})
+    if need:
+        got = {r["sha256"]: r["rights"] for r in conn.execute(text(RIGHTS_OF_SQL), {"s": need}).mappings()}
+        for t in ts:
+            if not t.get("rights") and got.get(t["artifact_sha256"]):
+                t["rights"] = got[t["artifact_sha256"]]
+    return tuple(ts)
 
 
 class SnapshotUnavailable(RevaError):
@@ -198,7 +283,7 @@ def resolve_snapshot(
         ref["sha"],
         doc["origin"],
         datetime.fromisoformat(doc["knowledge_cutoff"]),
-        tuple(doc["tables"]),
+        tables_with_rights(conn, doc["tables"]),
         ref["activity_id"],
     )
 

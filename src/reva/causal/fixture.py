@@ -28,9 +28,9 @@ FIXTURE_FILE = REPO_ROOT / "tests" / "unit" / "causal" / "fixtures" / "wikidata_
 CAUSAL = ("P828", "P1542", "P1478", "P1479", "P1536", "P1537")
 DATES = ("P580", "P582", "P585", "P571", "P576")
 KEEP = frozenset((*CAUSAL, *DATES, "P31"))
-#: Great Depression, 1918 influenza pandemic, First World War (the Wall Street crash is found as a cause /
-#: effect of the Great Depression in the captured claims, never guessed).
-SEEDS = ("Q8698", "Q160649", "Q361")
+#: Great Depression, Wall Street crash of 1929, 1918 influenza pandemic ("Spanish flu"), First World War
+#: (ids checked against their captured labels).
+SEEDS = ("Q8698", "Q201684", "Q178275", "Q361")
 LANGS = ("fr", "en")
 MAX_NEIGHBOURS = 30
 
@@ -49,7 +49,9 @@ async def _entitydata(client: Any, qids: Iterable[str]) -> tuple[dict[str, Any],
     return ents, sha_by_id, retrieved
 
 
-async def capture(seeds: Iterable[str] = SEEDS, *, max_neighbours: int = MAX_NEIGHBOURS) -> dict[str, Any]:  # pragma: no cover - network
+async def capture(
+    seeds: Iterable[str] = SEEDS, *, max_neighbours: int = MAX_NEIGHBOURS
+) -> dict[str, Any]:  # pragma: no cover - network
     from reva.adapters.connectors.wikidata import (
         Archive,
         WikidataClient,

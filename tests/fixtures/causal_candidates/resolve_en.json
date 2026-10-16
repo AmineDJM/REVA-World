@@ -1,0 +1,154 @@
+{
+ "batchcomplete": true,
+ "query": {
+  "normalized": [
+   {
+    "fromencoded": false,
+    "from": "winston Churchill",
+    "to": "Winston Churchill"
+   }
+  ],
+  "redirects": [
+   {
+    "from": "Winston Churchill",
+    "to": "Winston Churchill (redirect test)"
+   }
+  ],
+  "pages": [
+   {
+    "pageid": 1000,
+    "ns": 0,
+    "title": "Appeasement",
+    "pageprops": {
+     "wikibase_item": "Q620737"
+    }
+   },
+   {
+    "pageid": 1001,
+    "ns": 0,
+    "title": "Battle of Madagascar",
+    "pageprops": {
+     "wikibase_item": "Q1052651"
+    }
+   },
+   {
+    "pageid": 1002,
+    "ns": 0,
+    "title": "Denazification",
+    "pageprops": {
+     "wikibase_item": "Q27617"
+    }
+   },
+   {
+    "pageid": 1003,
+    "ns": 0,
+    "title": "Export Control Act",
+    "pageprops": {
+     "wikibase_item": "Q5421545"
+    }
+   },
+   {
+    "pageid": 1004,
+    "ns": 0,
+    "title": "French Madagascar",
+    "pageprops": {
+     "wikibase_item": "Q5501842"
+    }
+   },
+   {
+    "pageid": 1005,
+    "ns": 0,
+    "title": "Japanese militarism",
+    "pageprops": {
+     "wikibase_item": "Q702868"
+    }
+   },
+   {
+    "pageid": 1006,
+    "ns": 0,
+    "title": "Locarno Treaties",
+    "pageprops": {
+     "wikibase_item": "Q152925"
+    }
+   },
+   {
+    "pageid": 1007,
+    "ns": 0,
+    "title": "Neville Chamberlain",
+    "pageprops": {
+     "wikibase_item": "Q10664"
+    }
+   },
+   {
+    "pageid": 1008,
+    "ns": 0,
+    "title": "Northern Transylvania",
+    "pageprops": {
+     "wikibase_item": "Q917134"
+    }
+   },
+   {
+    "pageid": 1009,
+    "ns": 0,
+    "title": "Norway Debate",
+    "pageprops": {
+     "wikibase_item": "Q128535"
+    }
+   },
+   {
+    "pageid": 1010,
+    "ns": 0,
+    "title": "Nuremberg trials",
+    "pageprops": {
+     "wikibase_item": "Q80130"
+    }
+   },
+   {
+    "pageid": 1011,
+    "ns": 0,
+    "title": "Second Vienna Award",
+    "pageprops": {
+     "wikibase_item": "Q243618"
+    }
+   },
+   {
+    "pageid": 1012,
+    "ns": 0,
+    "title": "Southern Dobruja",
+    "pageprops": {
+     "wikibase_item": "Q912868"
+    }
+   },
+   {
+    "pageid": 1013,
+    "ns": 0,
+    "title": "Treaty of Craiova",
+    "pageprops": {
+     "wikibase_item": "Q2292449"
+    }
+   },
+   {
+    "pageid": 1,
+    "ns": 0,
+    "title": "Winston Churchill (redirect test)",
+    "pageprops": {
+     "wikibase_item": "Q8016"
+    }
+   },
+   {
+    "ns": 0,
+    "title": "Red link page",
+    "missing": true
+   },
+   {
+    "pageid": 2,
+    "ns": 0,
+    "title": "Mercury",
+    "pageprops": {
+     "wikibase_item": "Q1",
+     "disambiguation": ""
+    }
+   }
+  ]
+ }
+}

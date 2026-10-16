@@ -1,0 +1,231 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 179688,
+  "datasetId": 3612156,
+  "datasetPersistentId": "doi:10.7910/DVN/0UZOTX",
+  "datasetType": "dataset",
+  "storageIdentifier": "s3://10.7910/DVN/0UZOTX",
+  "versionNumber": 2,
+  "internalVersionNumber": 5,
+  "versionMinorNumber": 0,
+  "versionState": "RELEASED",
+  "latestVersionPublishingState": "RELEASED",
+  "deaccessionLink": "",
+  "UNF": "UNF:6:zx7thIQfpp5M64v0kOiIqg==",
+  "lastUpdateTime": "2020-01-12T18:23:41Z",
+  "releaseTime": "2020-01-12T18:23:41Z",
+  "createTime": "2020-01-12T18:21:58Z",
+  "publicationDate": "2019-11-06",
+  "citationDate": "2019-11-06",
+  "effectiveDatasetFileCountLimit": 1000,
+  "datasetFileUploadsAvailable": 997,
+  "license": {
+   "name": "CC0 1.0",
+   "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+   "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+   "rightsIdentifier": "CC0-1.0",
+   "rightsIdentifierScheme": "SPDX",
+   "schemeUri": "https://spdx.org/licenses/",
+   "languageCode": "en"
+  },
+  "fileAccessRequest": false,
+  "metadataBlocks": {
+   "citation": {
+    "displayName": "Citation Metadata",
+    "name": "citation",
+    "fields": [
+     {
+      "typeName": "title",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "NAVCO 1.2 Dataset"
+     },
+     {
+      "typeName": "author",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Christopher Wiley Shay"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "datasetContact",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "datasetContactName": {
+         "typeName": "datasetContactName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Chenoweth, Erica"
+        },
+        "datasetContactAffiliation": {
+         "typeName": "datasetContactAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        },
+        "datasetContactEmail": {
+         "typeName": "datasetContactEmail",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "erica_chenoweth@hks.harvard.edu"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "dsDescription",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "dsDescriptionValue": {
+         "typeName": "dsDescriptionValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Includes 389 maximalist campaigns that set on from 1945-2013, correcting known coding errors and adding cases that were discovered through further research. Includes outcomes through 2014."
+        },
+        "dsDescriptionDate": {
+         "typeName": "dsDescriptionDate",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2019-10-31"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "subject",
+      "multiple": true,
+      "typeClass": "controlledVocabulary",
+      "value": [
+       "Social Sciences"
+      ]
+     },
+     {
+      "typeName": "keyword",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "protest, nonviolence, resistance, repression, civil conflict"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "depositor",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "Chenoweth, Erica"
+     },
+     {
+      "typeName": "dateOfDeposit",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2019-10-31"
+     }
+    ]
+   }
+  },
+  "files": [
+   {
+    "description": "NAVCO 1.2 Codebook and Variable Descriptions",
+    "label": "NAVCO 1.2 Codebook.pdf",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 179688,
+    "dataFile": {
+     "id": 3621197,
+     "persistentId": "doi:10.7910/DVN/0UZOTX/B4RH7S",
+     "pidURL": "https://doi.org/10.7910/DVN/0UZOTX/B4RH7S",
+     "filename": "NAVCO 1.2 Codebook.pdf",
+     "contentType": "application/pdf",
+     "friendlyType": "Adobe PDF",
+     "filesize": 182872,
+     "description": "NAVCO 1.2 Codebook and Variable Descriptions",
+     "storageIdentifier": "s3://dvn-cloud:16e42c6ccaf-7be71283e79f",
+     "rootDataFileId": -1,
+     "md5": "c7b56af6082e09abf6b250bd1e154678",
+     "checksum": {
+      "type": "MD5",
+      "value": "c7b56af6082e09abf6b250bd1e154678"
+     },
+     "tabularData": false,
+     "creationDate": "2019-11-06",
+     "publicationDate": "2019-11-06",
+     "lastUpdateTime": "2020-01-12T18:23:41Z",
+     "fileAccessRequest": false
+    }
+   },
+   {
+    "description": "NAVCO 1.2 data file, with known errors corrected as of 11 Jan 2020.",
+    "label": "NAVCO 1.2 Updated.tab",
+    "restricted": false,
+    "version": 2,
+    "datasetVersionId": 179688,
+    "dataFile": {
+     "id": 3657601,
+     "persistentId": "doi:10.7910/DVN/0UZOTX/N2DA8B",
+     "pidURL": "https://doi.org/10.7910/DVN/0UZOTX/N2DA8B",
+     "filename": "NAVCO 1.2 Updated.tab",
+     "contentType": "text/tab-separated-values",
+     "friendlyType": "Tab-Delimited",
+     "filesize": 7468,
+     "description": "NAVCO 1.2 data file, with known errors corrected as of 11 Jan 2020.",
+     "storageIdentifier": "s3://dvn-cloud:16f9afd22c4-4cfc89c62626",
+     "originalFileFormat": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+     "originalFormatLabel": "MS Excel Spreadsheet",
+     "originalFileSize": 72088,
+     "originalFileName": "NAVCO 1.2 Updated.xlsx",
+     "UNF": "UNF:6:zx7thIQfpp5M64v0kOiIqg==",
+     "rootDataFileId": -1,
+     "md5": "a8334eaf9ab5a25a458418f8ad42d906",
+     "checksum": {
+      "type": "MD5",
+      "value": "a8334eaf9ab5a25a458418f8ad42d906"
+     },
+     "tabularData": true,
+     "creationDate": "2020-01-12",
+     "publicationDate": "2020-01-12",
+     "lastUpdateTime": "2020-01-12T18:23:41Z",
+     "fileAccessRequest": false
+    }
+   }
+  ]
+ }
+}

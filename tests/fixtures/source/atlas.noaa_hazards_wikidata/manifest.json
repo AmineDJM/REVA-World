@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "5d6daae19b5679f2be2190bdbfe16ee42786ad7296b26dc9a9be5d1bdaf4b423",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+WHERE+%7B%0A++%3Fitem+p%3AP1886+%3Fstatement+.%0A++%3Fstatement+ps%3AP1886+%3Fcode+%3B%0A+++++++++++++wikibase%3Arank+%3Frank+.%0A++FILTER%28%3Frank+%21%3D+wikibase%3ADeprecatedRank%29%0A%7D&format=json",
+    "file": "results.json",
+    "sha256": "c8191913b127de5c427b824b0dfc66bb036cb039887809948686619ea8b08c34",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-16T20:40:38.162688+00:00",
+    "licence": "CC0-1.0 (Wikidata)",
+    "fixture_note": "trimmed: the live WDQS P1886 response (raw sha256 0b7bd7aa6ac35aeebeba4e18606a925739d0e997bd3156566e5035a009a81d7d, 1853 rows) restricted to the 22 rows whose GVP number is a volcano of the atlas.noaa_hazards fixture"
+  }
+]

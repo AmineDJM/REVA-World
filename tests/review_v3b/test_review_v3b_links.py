@@ -68,11 +68,7 @@ class VoteSnap:
         return AtlasLinkReader(rows, snapshot_sha256="c" * 64, origin="test_fixture")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="VOTE-1: atlas_links.py _vote_groups/_vote_link — a decade link computed over 1965-1969 only "
-    "is labelled 1960–1969 and its evidence selector says years [1960, 1969]",
-)
+# Fixed (agent REVFIX2).
 def test_decade_vote_agreement_with_a_year_window_states_the_years_it_was_computed_on() -> None:
     s = VoteSnap()
     # 1961: 10 identical votes; 1966: 10 roll calls, 5 identical  -> decade 15/20, 1965-1969 only 5/10
@@ -90,6 +86,11 @@ def test_decade_vote_agreement_with_a_year_window_states_the_years_it_was_comput
     sel = json.loads(part.evidence[0].selector or "{}")
     # the value is not the 1960s agreement: the link or at least its citation must say 1965-1969
     assert part.temporal.first_year >= 1965 or sel["years"][0] >= 1965
+    # the label, the temporal and the citation all state the years used (1965-1966: window and data coverage)
+    assert (part.temporal.first_year, part.temporal.last_year) == (1965, 1966) and sel["years"] == [1965, 1966]
+    assert part.basis["decade"] == [1960, 1969] and part.basis["partial_period"] is True
+    # VOTE-2: the data stop in 1966 here, so even the whole-decade link is labelled with the real end year
+    assert (full.temporal.first_year, full.temporal.last_year) == (1961, 1966)
 
 
 def _d(y: int, m: int = 1, day: int = 1) -> PartialDate:
@@ -108,11 +109,7 @@ def _corr(node: str, iso3: str, a: int, b: int) -> Stmt:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="CSH-1: dataset_kg.derive_cshapes_colonial copies the CShapes period; a period starting at the "
-    "dataset's first day (1886-01-01) is not marked left-censored (Algeria: French rule from 1830)",
-)
+# Fixed (agent REVFIX2).
 def test_cshapes_colonial_period_starting_at_coverage_start_is_marked_left_censored() -> None:
     sts = [
         Stmt(
@@ -132,13 +129,11 @@ def test_cshapes_colonial_period_starting_at_coverage_start_is_marked_left_censo
     assert lk.temporal.first_year == 1886
     text = json.dumps(lk.basis).lower()
     assert "censor" in text or "coverage_start" in text or "not before" in text
+    assert lk.temporal.start is not None and lk.temporal.start.iso() == "1886"  # never served as 1886-01-01
+    assert lk.basis["left_censored"] is True and lk.temporal.end is not None and lk.temporal.end.iso() == "1962-07-04"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="LIC-2: derive.derive_co_party builds the basis without the UN Treaty Collection terms "
-    "(open_licence: false, personal non-commercial use) that the A-TREATIES rows carry",
-)
+# Fixed (agent REVFIX2).
 def test_co_party_links_carry_the_untc_licence_restriction() -> None:
     t = "untc:treaty:XVIII-10"
     sts = [
@@ -148,6 +143,7 @@ def test_co_party_links_carry_the_untc_licence_restriction() -> None:
     (lk,) = derive_co_party(KgIndex(sts)).links
     text = json.dumps(lk.basis).lower()
     assert "licence" in text or "license" in text or "terms" in text
+    assert lk.basis["open_licence"] is False and lk.basis["non_commercial"] is True
 
 
 class _FakeSnapshot:
@@ -180,12 +176,7 @@ class _NoKg:
         return {}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="TRUNC-1: service._country_on_demand reads each atlas kind with cap=50,000 rows ordered by "
-    "(subject, object, year) and ignores d.skipped['row_cap_reached']: the top-N is ranked over an "
-    "alphabetically cut set and the response does not say it was truncated",
-)
+# Fixed (agent REVFIX2).
 def test_on_demand_country_view_reports_a_capped_atlas_read(monkeypatch: pytest.MonkeyPatch) -> None:
     from reva.links import geo_hops, service
 
@@ -221,3 +212,5 @@ def test_on_demand_country_view_reports_a_capped_atlas_read(monkeypatch: pytest.
     top = data["by_kind"]["bilateral_trade"]["groups"][0]["links"][0]
     # either the read is reported as truncated, or the ranking is right (ZWE: 999,999,999 USD in 2000)
     assert data.get("truncated") or top["object"] == "iso3:ZWE"
+    assert data["truncated"] is True and data["truncated_kinds"] == ["bilateral_trade"]
+    assert top["object"] == "iso3:ZWE"  # ranked over the latest year, read first under the cap

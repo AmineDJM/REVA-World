@@ -1,0 +1,18 @@
+agent: A-ECRISES
+requests:
+  - source_key: laeven_valencia.sbcd
+    daily_requests: 3
+    expected_bytes_per_day: 500000
+    reason: "one XLSX data file (121 kB) per run; retries"
+  - source_key: reinhart_rogoff.bffs
+    daily_requests: 3
+    expected_bytes_per_day: 5000000
+    reason: "one XLSX file (1.6 MB) per run; retries"
+  - source_key: jst.macrohistory
+    daily_requests: 6
+    expected_bytes_per_day: 5000000
+    reason: "licence page (100 kB) + one XLSX file (1.4 MB, one redirect) per run; retries"
+  - source_key: esrb.fcdb
+    daily_requests: 3
+    expected_bytes_per_day: 500000
+    reason: "one XLSX file (92 kB) per run; retries"

@@ -264,7 +264,7 @@ export const CausalCandidate = JsonRecord.transform((o, ctx) => {
     extractorVersion: optStr(ex.version) ?? optStr(o.extractor_version),
     sentence: optStr(o.source_sentence) ?? optStr(o.sentence) ?? optStr(o.text),
     sourceRevision: optStr(o.source_revision) ?? base.source?.revision ?? null,
-    selector: flat(o.selector),
+    selector: flat(o.selector) ?? (isRec(o.source) ? flat(o.source.selector) : null),
     promotionStatus: optStr(o.promotion_status) ?? 'not_promoted',
   };
 });
@@ -299,33 +299,61 @@ function claimsIn(data: unknown, keys: string[]): unknown {
 
 export interface ContextEdge {
   relation: string;
+  property: string | null;
   other: NodeRef;
+  /** the event is the statement's subject (event —relation→ other) or its object (other —relation→ event) */
+  eventIsSubject: boolean;
 }
 
+const sumCounts = (v: unknown): number | null => {
+  if (typeof v === 'number') return v;
+  if (!isRec(v)) return null;
+  let n = 0;
+  for (const x of Object.values(v)) n += typeof x === 'number' ? x : (sumCounts(x) ?? 0);
+  return n;
+};
+
+/** Context (non-causal) relations giving the event's places and participants (KG statements). */
+const PLACE_PIDS = new Set(['P276', 'P17', 'P30', 'P131']);
+const PARTICIPANT_PIDS = new Set(['P710', 'P1344']);
+
 export const CausalEvent = JsonRecord.transform((o0, ctx) => {
-  const o = isRec(o0.event) ? { ...o0, ...o0.event } : o0;
+  const o: Rec = isRec(o0.event) ? { ...o0, ...o0.event, id: o0.id ?? o0.event.id } : o0;
   const id = String(o.id ?? o.qid ?? o.event_id ?? '');
   if (!id) ctx.addIssue({ code: 'custom', message: 'identifiant d’événement manquant' });
   const refs = (v: unknown) => (Array.isArray(v) ? v.map(nodeRefOf).filter((r) => r.id) : []);
-  const has = (...ks: string[]) => ks.some((k) => Array.isArray(o[k]));
+  const ctxRaw = [o.context, o.context_edges, o.context_relations].find(Array.isArray) as unknown[] | undefined;
+  const context: ContextEdge[] = (ctxRaw ?? []).filter(isRec).map((c) => {
+    const subj = c.subject !== undefined ? nodeRefOf(c.subject) : null;
+    const obj = c.object !== undefined ? nodeRefOf(c.object) : null;
+    const eventIsSubject = !!subj && subj.id === id;
+    const other = subj && obj ? (eventIsSubject ? obj : subj) : nodeRefOf(c.other ?? c.entity ?? c.target ?? c.to ?? c);
+    const lab = c.label ?? c.relation_label;
+    return {
+      relation: optStr(c.relation_label_fr) ?? (isRec(lab) ? (optStr(lab.fr) ?? optStr(lab.en)) : optStr(lab)) ?? optStr(c.relation) ?? optStr(c.property) ?? 'contexte',
+      property: optStr(c.property),
+      other,
+      eventIsSubject,
+    };
+  });
   const participants = Array.isArray(o.participants)
     ? o.participants.map((p) => {
         const pr: Rec = isRec(p) ? p : { id: p };
         const ent = nodeRefOf(isRec(pr.entity) ? pr.entity : pr);
         const role = pr.role ?? pr.roles;
-        return { ...ent, role: Array.isArray(role) ? role.map(String).join(', ') : optStr(role), side: optStr(pr.side) };
+        return { ...ent, role: Array.isArray(role) ? role.map(String).join(', ') : optStr(role), side: optStr(pr.side), fromContext: false };
       })
-    : [];
+    : context
+        .filter((c) => c.property && PARTICIPANT_PIDS.has(c.property))
+        .map((c) => ({ ...c.other, role: c.relation, side: null as string | null, fromContext: true }));
+  const placesGiven = Array.isArray(o.places) || Array.isArray(o.locations);
+  const places = placesGiven ? refs(o.places ?? o.locations) : context.filter((c) => c.property && PLACE_PIDS.has(c.property)).map((c) => c.other);
   const type = o.type ?? o.event_type;
   const typeObj = isRec(type) ? type : null;
-  const ctxRaw = [o.context, o.context_edges, o.context_relations].find(Array.isArray) as unknown[] | undefined;
-  const context: ContextEdge[] = (ctxRaw ?? []).filter(isRec).map((c) => ({
-    relation: optStr(c.relation_label_fr) ?? (isRec(c.relation_label) ? (optStr(c.relation_label.fr) ?? optStr(c.relation_label.en)) : null) ?? optStr(c.relation) ?? optStr(c.property) ?? optStr(c.kind) ?? 'contexte',
-    other: nodeRefOf(c.other ?? c.entity ?? c.object ?? c.target ?? c.to ?? c),
-  }));
-  const counts = isRec(o.counts) ? o.counts : null;
+  const counts = isRec(o.counts) ? o.counts : o;
   const descs = isRec(o.descriptions) ? o.descriptions : {};
   const prov = isRec(o.provenance) ? o.provenance : {};
+  const cand = o.candidate_count ?? (isRec(o.counts) ? o.counts.candidates : o.candidates);
   return {
     id,
     label: labelOf(o, id),
@@ -333,17 +361,18 @@ export const CausalEvent = JsonRecord.transform((o0, ctx) => {
     type: typeObj ? String(typeObj.id ?? typeObj.key ?? '') : (optStr(type) ?? optStr(o.kind)),
     typeLabel: typeObj ? labelOf(typeObj, String(typeObj.id ?? '')) : (optStr(o.type_label_fr) ?? optStr(o.type_label)),
     ...intervalOf(o),
-    places: refs(o.places ?? o.locations),
-    placesGiven: has('places', 'locations'),
+    places,
+    placesGiven: placesGiven || context.length > 0,
     participants,
-    participantsGiven: has('participants'),
+    participantsGiven: Array.isArray(o.participants) || context.length > 0,
     partOf: refs(o.part_of),
     context,
-    nCauses: counts && typeof counts.causes === 'number' ? counts.causes : null,
-    nEffects: counts && typeof counts.effects === 'number' ? counts.effects : null,
-    nCandidates: typeof o.candidate_count === 'number' ? o.candidate_count : counts && typeof counts.candidates === 'number' ? counts.candidates : null,
+    contextTruncated: o.context_truncated === true,
+    nCauses: sumCounts(counts.causes),
+    nEffects: sumCounts(counts.effects),
+    nCandidates: typeof cand === 'number' ? cand : null,
     source: optStr(o.source_key) ?? optStr(prov.source_key),
-    origin: optStr(o.origin) ?? optStr(prov.origin),
+    origin: optStr(o.origin) ?? optStr(prov.origin) ?? (Array.isArray(o.origins) && o.origins.length === 1 ? optStr(o.origins[0]) : null),
   };
 });
 export type CausalEvent = z.output<typeof CausalEvent>;
@@ -396,7 +425,12 @@ export async function getCausalWhy(id: string, signal?: AbortSignal): Promise<Wh
   const path = `/v1/causal/events/${enc(id)}/why`;
   const { data, warnings } = await get(path, undefined, signal);
   const d: Rec = isRec(data) ? data : {};
-  const src: Rec = isRec(d.lanes) ? d.lanes : isRec(d.groups) ? d.groups : d;
+  // lanes as a list [{lane, label, claims}] (CAUSCORE) or an object {immediate: [...], ...}
+  let src: Rec = isRec(d.lanes) ? d.lanes : isRec(d.groups) ? d.groups : d;
+  if (Array.isArray(d.lanes)) {
+    src = {};
+    for (const l of d.lanes.filter(isRec)) if (typeof l.lane === 'string') src[l.lane] = l.claims;
+  }
   const groups = {} as Record<WhyGroup, CausalClaim[]>;
   for (const g of WHY_GROUPS) {
     const k = WHY_KEYS[g].find((key) => Array.isArray(src[key]) || (isRec(src[key]) && Array.isArray((src[key] as Rec).claims)));
@@ -405,7 +439,7 @@ export async function getCausalWhy(id: string, signal?: AbortSignal): Promise<Wh
   }
   const dis = isRec(d.dissent) ? (d.dissent.claims ?? []) : (d.dissent ?? []);
   const dissent = Array.isArray(dis) ? parseWith(ClaimList, dis, `${path} (dissent)`) : [];
-  return { groups, dissent, note: optStr(d.note) ?? optStr(d.wording_fr), warnings };
+  return { groups, dissent, note: optStr(d.summary_fr) ?? optStr(d.note), warnings };
 }
 
 // ------------------------------------------------------------------ chain
@@ -431,6 +465,7 @@ export interface ChainResult {
   chains: ChainView[];
   maxHops: number | null;
   note: string | null;
+  notFoundReason: string | null;
   truncated: boolean;
   warnings: string[];
 }
@@ -465,6 +500,7 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
     chains,
     maxHops: typeof d.max_hops === 'number' ? d.max_hops : null,
     note: optStr(d.note_fr) ?? optStr(d.note),
+    notFoundReason: optStr(d.not_found_reason),
     truncated: d.truncated === true || search.truncated === true,
     warnings,
   };

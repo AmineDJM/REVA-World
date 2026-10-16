@@ -2,7 +2,7 @@
  "fixture_kind": "synthetic_plan",
  "label": "fr_minimum_wage_senegal",
  "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
- "prompt_version": "nlqa-plan-1.1.0",
+ "prompt_version": "nlqa-plan-1.2.0",
  "text": "Quel est le salaire minimum au Sénégal ?",
  "text_sha256": "f80f5e182e22a7aac9a5d472f79ebb7dc6178186a986b12ace748cbc682dd3ff",
  "output": {
@@ -28,7 +28,8 @@
     "properties": [],
     "link_kinds": [],
     "id": "s1",
-    "op": "atlas_value"
+    "op": "atlas_value",
+    "causal_direction": null
    }
   ],
   "unsupported": []

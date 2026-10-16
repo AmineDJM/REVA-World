@@ -1,0 +1,34 @@
+# V3 (agent A-COUPS): Powell & Thyne, Global Instances of Coups 1950-present (coup list CSV + the page that links it).
+# Connector: src/reva/adapters/connectors/atlas_coups.py (atlas.coups) -> atlas tables powell_thyne.coup_events,
+# powell_thyne.coups_cy (COMPUTED counts) + KG coup events ptcoup:<ccode>:<day>. See docs/dev/v3_a_coups.md.
+source_key: powell_thyne.coups
+title: Powell & Thyne, Global Instances of Coups from 1950 to present (coup list, updated regularly)
+provider_url: https://jonathanmpowell.com/coups/
+lineage_family: powell_thyne_coups
+rights:
+  licence: "No licence stated (checked 2026-10-16): free public download without registration; the authors ask users to cite Powell & Thyne (2011)."
+  licence_url: https://jonathanmpowell.com/coups/
+  attribution: >-
+    Powell, Jonathan M. and Clayton L. Thyne (2011). Global instances of coups from 1950 to 2010: A new dataset.
+    Journal of Peace Research 48(2): 249-259. Data updated regularly at jonathanmpowell.com/coups.
+  licence_evidence: >-
+    jonathanmpowell.com/coups/ (read 2026-10-16) states no licence or terms; "If citing the data as a link, please
+    use the original Journal of Peace Research page." The former host (www.uky.edu/~clthyn2/coup_data/) answers 403.
+  open_licence: false
+  commercial_use: not_granted
+  redistribution: not stated by the provider; derived records carry the citation; flagged for maintainer review
+metadata:
+  allowed_hosts: [jonathanmpowell.com, cran.r-project.org]
+  files:
+    - https://jonathanmpowell.com/coups/                                            # page: newest pt_YYYYMMDD.csv link, definitions, note
+    - https://jonathanmpowell.com/wp-content/uploads/2026/08/pt_20260829.csv       # V2026.08.29, 497 events, 20 KB
+  definitions: >-
+    Coups are "illegal and overt attempts by the military or other elites within the state apparatus to unseat the
+    sitting executive." Successes are "episodes in which the perpetrators (or their agents) control power for at
+    least 7 days." coup = 2 successful, 1 failed (quoted from the page; the connector fails closed if they change).
+  code_crosswalk: >-
+    Correlates of War ccode (ccode_gw is empty in the 2026 file; ccode_polity is given in 8 rows and kept verbatim in flags) -> crosswalk entities through
+    KGGEOPOL's StateCodeCrosswalk (cow system, date-aware; countrycode 1.9.0 panel archived with every run).
+  authentication: none
+  cadence: irregular updates after each coup attempt; monthly check
+  review_flag: no open licence stated (cite-only) -- maintainer to confirm redistribution in REVA

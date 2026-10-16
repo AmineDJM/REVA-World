@@ -193,6 +193,7 @@ async def causal_session(
     cap_wbapi: int | None = None,
     cap_wdqs: int = 0,
     wbapi_retries: int = 3,
+    mode: str = "auto",
 ) -> AsyncIterator[Session]:
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
     from reva.adapters.postgres.engine import make_engine
@@ -248,7 +249,9 @@ async def causal_session(
                 }
         archive = Archive(store, ARCHIVE_INDEX)
         refusing = CappedHttp(inner, 0, SOURCE_WDQS)
-        client = WikidataClient(wdqs or refusing, wbapi, archive=archive, mode="api", max_retries=wbapi_retries)
+        client = WikidataClient(
+            wdqs or refusing, wbapi, archive=archive, mode=mode, max_retries=wbapi_retries, reuse_seconds=24 * 3600.0
+        )
         wdqs_client = (
             WikidataClient(wdqs, wbapi, archive=archive, mode="api", max_retries=0) if wdqs is not None else None
         )
@@ -336,7 +339,7 @@ def initial_seeds(state: State, *, kg_engine: Any | None) -> dict[str, int]:
     counts: dict[str, int] = {}
     rec = sorted(REPO_ROOT.glob("registry/kg/queries/*/_recorded/snapshot_claims_*.json"))
     for q, why in core.seeds_from_recorded(rec).items():
-        state.add(q, tier=TIER_RECORDED, reason=why)
+        state.add(q, tier=_recorded_tier(why), reason=why)
         counts["recorded"] = counts.get("recorded", 0) + 1
     specs = [p for p in REPO_ROOT.glob("registry/kg/queries/**/*.yaml") if "causal" not in p.parts]
     for q, why in core.seeds_from_specs(specs).items():
@@ -348,6 +351,18 @@ def initial_seeds(state: State, *, kg_engine: Any | None) -> dict[str, int]:
             counts["kg"] = counts.get("kg", 0) + 1
     state.data["seed_counts"] = counts
     return counts
+
+
+def _recorded_tier(reason: str) -> int:
+    """Recorded seeds tied to a causal claim come first; event-context objects (P793/P1344/P607) later."""
+    tail = reason.rsplit(":", 1)[-1]
+    return TIER_RECORDED if tail == "causal_subject" or tail in core.CAUSAL_PIDS else TIER_KG_EVENTS
+
+
+def retier_recorded(state: State) -> None:
+    for f in state.frontier.values():
+        if str(f.get("reason", "")).startswith("recorded:") and int(f.get("hop", 0)) == 0:
+            f["tier"] = _recorded_tier(str(f["reason"]))
 
 
 # --------------------------------------------------------------------------- harvest
@@ -458,6 +473,7 @@ class CausalHarvest:
                 "rev": e.lastrevid,
                 "sitelinks": e.sitelinks_count,
                 "causal": ncausal,
+                "dated": core.is_dated(e),
                 "hop": hop,
                 "tier": tier,
                 "reason": f.get("reason", ""),
@@ -466,9 +482,15 @@ class CausalHarvest:
             self._bump("entities")
             self._bump("causal_statements", ncausal)
             if hop < self.max_hops:
+                # neighbours of dated items (events have start/end/point-in-time) before those of concepts
+                step = 1 if core.is_dated(e) else 3
                 for o in core.causal_objects(e):
                     st.add(
-                        o, tier=tier + 1, reason=f"hop{hop + 1}:{e.qid}", hop=hop + 1, via_sitelinks=e.sitelinks_count
+                        o,
+                        tier=tier + step,
+                        reason=f"hop{hop + 1}:{e.qid}",
+                        hop=hop + 1,
+                        via_sitelinks=e.sitelinks_count,
                     )
                     if o in st.frontier:
                         st.frontier[o]["indegree"] = int(st.frontier[o].get("indegree", 0)) + 1
@@ -601,6 +623,11 @@ class CausalHarvest:
             and any(v.get("status") != "done" for v in self._wdqs_specs_state().values())
         )
 
+    def wdqs_pending(self) -> bool:
+        return self.sess.wdqs_client is not None and any(
+            v.get("status") != "done" for v in self._wdqs_specs_state().values()
+        )
+
     def _wdqs_specs_state(self) -> dict[str, Any]:
         out = {}
         for s in discover_specs([SPEC_DIR]):
@@ -636,7 +663,11 @@ class CausalHarvest:
                     return {"status": "stopped", "spec": spec.id, "error": ss["last_error"]}
                 stmts, skipped = h.rows_to_statements(spec, res)
                 kept = [s for s in stmts if s is not None]
-                todo = [s for s in kept if s.subject not in self.state.fetched]
+                # Scope and disk: only rows touching an item already reached from the event seeds (fetched or
+                # queued) are loaded; the full listing stays in the raw archive (counts in the state).
+                known = set(self.state.fetched) | set(self.state.frontier)
+                touching = [s for s in kept if s.subject in known or (s.object_qid or "") in known]
+                todo = [s for s in touching if s.subject not in self.state.fetched]
                 for i in range(0, len(todo), 50_000):
                     self.sess.sink.load(
                         Batch(
@@ -654,13 +685,15 @@ class CausalHarvest:
                             },
                         )
                     )
-                for s in kept:
-                    edge = core.causal_edge(s.subject, s.property, s.object_qid, s.statement_id)
-                    for q in (edge.cause, edge.effect) if edge else (s.subject,):
-                        self.state.add(q, tier=TIER_WDQS, reason=f"wdqs:{spec.id}")
+                for s in touching:
+                    for q in (s.subject, s.object_qid):
+                        if q and q.startswith("Q") and q not in known:
+                            self.state.add(q, tier=TIER_WDQS, reason=f"wdqs:{spec.id}", hop=1)
                 ss["chunks"][ch.key] = {
                     "rows": len(res.bindings),
                     "statements": len(kept),
+                    "distinct_subjects": len({s.subject for s in kept}),
+                    "touching_seed_reach": len(touching),
                     "loaded_as_wdqs_rows": len(todo),
                     "skipped": skipped,
                     "raw_sha256": res.raw_sha256,
@@ -694,12 +727,15 @@ async def run(
     until: float | None = None,
     max_entities: int = MAX_ENTITIES,
     max_hops: int = 1,
+    mode: str = "auto",
+    batch_size: int = 10,
+    linger: bool = False,
 ) -> dict[str, Any]:
     """One budget session (ends at the UTC day boundary, the cap, ``until`` or an empty frontier)."""
     state = State()
     out: dict[str, Any] = {"started_at": datetime.now(UTC).isoformat(), "db": db}
     day = datetime.now(UTC).date()
-    async with causal_session(db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs) as sess:
+    async with causal_session(db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs, mode=mode) as sess:
         out["run_id"], out["caps"] = sess.run_id, sess.caps
         log.info("CAUSWD session %s caps %s", sess.run_id, sess.caps)
         sess.sink.register_properties(load_allowlist())
@@ -707,6 +743,7 @@ async def run(
             out["seeds"] = initial_seeds(state, kg_engine=sess.ledger_engine)
             state.data["seeded"] = datetime.now(UTC).isoformat()
             state.save()
+        retier_recorded(state)
         hv = CausalHarvest(sess, state, db=db, max_entities=max_entities, max_hops=max_hops)
         stop = "frontier_empty"
         pending_discovery = [
@@ -734,7 +771,7 @@ async def run(
                     break
                 if hv.wdqs_due():
                     out.setdefault("wdqs", []).append(await hv.wdqs_listings())
-                batch = hv.next_batch()
+                batch = hv.next_batch(batch_size)
                 if not batch and pending_discovery:
                     await wait_for_wbapi(sess.client)
                     pid = pending_discovery[0]
@@ -744,10 +781,14 @@ async def run(
                     except RateLimited:
                         continue
                     continue
+                if not batch and linger and until is not None and hv.wdqs_pending():
+                    await asyncio.sleep(60)  # keep the session for the hourly WDQS attempt
+                    continue
                 if not batch:
                     stop = "frontier_empty" if len(state.fetched) < max_entities else "max_entities"
                     break
-                await wait_for_wbapi(sess.client)
+                if mode == "api":  # auto/linked_data: the client falls back to Special:EntityData itself
+                    await wait_for_wbapi(sess.client)
                 try:
                     r = await hv.fetch(batch)
                     log.info(

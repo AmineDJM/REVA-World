@@ -1,0 +1,22 @@
+# V3 (agent A-SANCTIONS): US OFAC "Sanctions Programs and Country Information" (active programs, program level).
+# Connector: src/reva/adapters/connectors/atlas_sanctions.py (atlas.ofac_programs) -> atlas table ofac.programs
+# + KG statements (source_key ofac.programs).
+source_key: ofac.programs
+title: US Treasury OFAC - active sanctions programs (program level)
+provider_url: https://ofac.treasury.gov/sanctions-programs-and-country-information
+lineage_family: ofac_programs
+rights:
+  licence: public domain (US Government work, 17 U.S.C. 105)
+  attribution: U.S. Department of the Treasury, Office of Foreign Assets Control.
+metadata:
+  allowed_hosts: [ofac.treasury.gov]
+  pages:
+    - https://ofac.treasury.gov/sanctions-programs-and-country-information
+  never_requested: >-
+    SDN list, consolidated (non-SDN) lists and sanctions list service (individuals and entities: personal data,
+    out of scope by policy).
+  country_mapping: >-
+    program slug -> ISO3 only when the program title names exactly one country (registry/atlas/geo_aliases/
+    a_sanctions.yaml, scheme ofac_program); every other program is kept unmapped.
+  authentication: none
+  cadence: weekly

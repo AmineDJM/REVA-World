@@ -57,6 +57,13 @@ VOTE_CAVEAT = (
     "friendship or alignment of interests. Issue codes are Voeten's keyword-based classification; roll-call "
     "selection (amendments, paragraph votes) and absences shape the share."
 )
+#: VOTE-3 (review V3b): what the index is *not* — numbers are not comparable with the literature's agreement index.
+VOTE_INDEX_NOTE = (
+    "Strict share of identical positions: yes/yes, no/no and abstain/abstain count 1, any other pair of "
+    "positions (including abstain against yes or no) counts 0. This is not Voeten/Bailey's 'agree' index, which "
+    "gives half credit when one state abstains (1 identical, 0.5 one abstains, 0 opposite); REVA's values are "
+    "therefore lower and not comparable with published 'agree' values."
+)
 #: link types stored in full (small tables; a top-k would drop real neighbours: China has 14+ land borders);
 #: atlas specs may also say ``stored_in_full: true`` (LINKS3: cables, 2014 air routes, launch services)
 STORED_IN_FULL = frozenset({"land_border"})
@@ -122,6 +129,7 @@ def explain_basis(link_type: str, basis: Mapping[str, Any], taxonomy: Taxonomy |
     out = dict(basis)
     if link_type == "unga_vote_agreement":
         out.setdefault("index", "share of identical votes")
+        out.setdefault("index_note", VOTE_INDEX_NOTE)
         out.setdefault("formula", VOTE_FORMULA)
         out.setdefault("issue_label", VOTE_ISSUE_LABELS.get(str(basis.get("issue")), basis.get("issue")))
         out.setdefault("caveat", VOTE_CAVEAT)
@@ -178,6 +186,7 @@ class AtlasLinkReader:
         #: provider code -> evidence (KG statement) of its mapping hop; a hop without evidence is never applied
         self.hop_evidence: Mapping[str, Evidence] = dict(hop_evidence or {})
         self._present: set[tuple[str, str]] | None = None
+        self._vote_span: tuple[int, int] | None = None
 
     @classmethod
     def of_query(cls, q: Any, **kw: Any) -> AtlasLinkReader:
@@ -296,7 +305,7 @@ class AtlasLinkReader:
                      {facet} AS facet, TRY_CAST(c.value AS DOUBLE) AS v{comp_cols}
                 FROM cells_s c JOIN s USING (sid){comp_join})"""
 
-    def _dyadic_sql(self, lt: LinkType, where: str, top_k: int | None, cap: int) -> str:
+    def _dyadic_sql(self, lt: LinkType, where: str, top_k: int | None, cap: int, order: str = "pair") -> str:
         spec = lt.atlas
         assert spec is not None
         subj, obj = ("row_iso3", "partner") if spec["row_role"] == "subject" else ("partner", "row_iso3")
@@ -312,7 +321,7 @@ class AtlasLinkReader:
                  AND length(partner) = 3 AND partner <> row_iso3 AND v IS NOT NULL AND v <> 0 AND ({where})),
         k AS (SELECT *, {subj} AS subj, {obj} AS obj {rank} FROM f)
         SELECT * FROM k {keep}
-        ORDER BY subj, obj, year, facet
+        ORDER BY {"year DESC, v DESC, subj, obj, facet" if order == "weight" else "subj, obj, year, facet"}
         LIMIT {int(cap) + 1}"""
 
     def _dyadic_counts(self, lt: LinkType, where: str) -> Counter[str]:
@@ -488,13 +497,22 @@ class AtlasLinkReader:
             )
 
     def dyadic(
-        self, lt: LinkType, *, where: str = "TRUE", top_k: int | None = None, cap: int = 2_000_000
+        self,
+        lt: LinkType,
+        *,
+        where: str = "TRUE",
+        top_k: int | None = None,
+        cap: int = 2_000_000,
+        order: str = "pair",
     ) -> AtlasDerivation:
+        """``order="weight"`` (bounded country reads, TRUNC-1): rows are read latest year first and largest value
+        first, so a row cap cuts the oldest and smallest rows, never the largest partners of the latest year;
+        ``skipped["row_cap_reached"]`` says the read was capped."""
         d = AtlasDerivation(lt.id)
         if not self.available(lt):
             d.skipped["source_not_in_snapshot"] += 1
             return d
-        rows = self._rows(self._dyadic_sql(lt, where, None if stored_in_full(lt) else top_k, cap), ())
+        rows = self._rows(self._dyadic_sql(lt, where, None if stored_in_full(lt) else top_k, cap, order), ())
         if len(rows) > cap:
             d.skipped["row_cap_reached"] += 1
             rows = rows[:cap]
@@ -590,14 +608,37 @@ class AtlasLinkReader:
                WHERE TRUE{cond.replace("a.y", "y")}
                GROUP BY na, nb, period, i.issue)"""
 
+    def rollcall_span(self) -> tuple[int, int] | None:
+        """(first, last) calendar year of the roll calls in the snapshot (the data's real coverage, VOTE-2)."""
+        if self._vote_span is None:
+            r = self._rows(
+                """SELECT min(CAST(year(c.period_start) AS INTEGER)) AS lo, max(CAST(year(c.period_start) AS INTEGER)) AS hi
+                     FROM cells c JOIN series s USING (sid)
+                    WHERE s.source = 'unga' AND s.dataset = 'rollcalls' AND starts_with(s.indicator, 'rollcall|rcid=')""",
+                (),
+            )
+            if not r or r[0]["lo"] is None:
+                return None
+            self._vote_span = (int(r[0]["lo"]), int(r[0]["hi"]))
+        return self._vote_span
+
     def _vote_node(self, node: str, iso3: str | None) -> str:
         if iso3:
             return self.node_of(iso3)
         return node
 
-    def _vote_link(self, r: Mapping[str, Any], grain: str) -> Link:
-        lo = int(r["period"])
-        hi = lo + 9 if grain == "decade" else lo
+    def _vote_link(
+        self, r: Mapping[str, Any], grain: str, year_lo: int | None = None, year_hi: int | None = None
+    ) -> Link:
+        decade_lo = int(r["period"])
+        decade_hi = decade_lo + 9 if grain == "decade" else decade_lo
+        # VOTE-1/VOTE-2: the years the value was computed on = the decade cut by the requested window and by the
+        # data's real coverage (roll calls 1946-2024): the label, the temporal and the cited selector all say them
+        span = self.rollcall_span() or (decade_lo, decade_hi)
+        lo = max(decade_lo, year_lo if year_lo is not None else decade_lo, span[0])
+        hi = min(decade_hi, year_hi if year_hi is not None else decade_hi, span[1])
+        if hi < lo:  # cannot happen for a group with votes (its years are inside both); keep the decade
+            lo, hi = decade_lo, decade_hi
         n, k = int(r["n_common"]), int(r["n_identical"])
         share = (Decimal(k) / Decimal(n)).quantize(Decimal("0.0001"), rounding=ROUND_HALF_EVEN)
         selector = json.dumps(
@@ -643,6 +684,17 @@ class AtlasLinkReader:
             "voters": {r["na"]: r["iso3_a"], r["nb"]: r["iso3_b"]},
             "table_artifact_sha256": r["table_sha"],
         }
+        if grain == "decade":
+            basis["decade"] = [decade_lo, decade_lo + 9]
+            basis["years_used"] = [lo, hi]
+            if (lo, hi) != (decade_lo, decade_hi):
+                basis["partial_period"] = True
+                basis["partial_reason"] = (
+                    "requested year window"
+                    if (year_lo is not None and year_lo > max(decade_lo, span[0]))
+                    or (year_hi is not None and year_hi < min(decade_hi, span[1]))
+                    else "roll-call data coverage"
+                )
         return Link(
             a,
             b,
@@ -668,9 +720,11 @@ class AtlasLinkReader:
         year_lo: int | None = None,
         year_hi: int | None = None,
         cap: int = 2_000_000,
+        order: str = "pair",
     ) -> AtlasDerivation:
         """Vote-agreement links: every pair (``top_k`` per node, period and issue), one ``pair`` of voter keys
-        (ISO3 / QID / provider code) or every partner of one ``node``."""
+        (ISO3 / QID / provider code) or every partner of one ``node``. ``order="weight"``: latest period and
+        highest share first (a row cap then cuts the oldest, lowest rows; TRUNC-1)."""
         d = AtlasDerivation("unga_vote_agreement")
         lt = self.taxonomy.link("unga_vote_agreement")
         if not self.available(lt):
@@ -687,7 +741,9 @@ class AtlasLinkReader:
         sql = f"""WITH {self._vote_groups(**kw).strip()},
             h AS (SELECT *, n_identical / n_common AS share {rank_sel} FROM g WHERE n_common >= {MIN_COMMON_ROLLCALLS})
             SELECT *, (SELECT count(*) FROM g WHERE n_common < {MIN_COMMON_ROLLCALLS}) AS too_few
-              FROM h {rank_where} ORDER BY na, nb, period, issue LIMIT {int(cap) + 1}"""
+              FROM h {rank_where}
+             ORDER BY {"period DESC, share DESC, n_common DESC, na, nb, issue" if order == "weight" else "na, nb, period, issue"}
+             LIMIT {int(cap) + 1}"""
         rows = self._rows(sql, ())
         if len(rows) > cap:
             d.skipped["row_cap_reached"] += 1
@@ -708,7 +764,7 @@ class AtlasLinkReader:
             if int(r["n_raw"]) != 1:
                 d.skipped["several_raw_artifacts"] += 1
                 continue
-            d.links.append(self._vote_link(r, grain))
+            d.links.append(self._vote_link(r, grain, year_lo, year_hi))
         return d
 
     def vote_detail(

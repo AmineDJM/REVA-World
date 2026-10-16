@@ -389,6 +389,120 @@ class PairLinks:
     type_labels: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
 
 
+#: Tiers of the *claim* space (v3_causality.md): T1 expert-coded dataset, T2 cited scholarly reference, T3/T4
+#: Wikidata statement with/without references. T5/T6 are candidates: never used by NLQA.
+CLAIM_TIERS = frozenset({"T1", "T2", "T3", "T4"})
+GRADES = ("A", "B", "C", "D", "E")
+
+
+@dataclass(frozen=True)
+class CausalClaim:
+    """One causal claim made by a named source (``kg.causal_claim`` + its current grade): REVA asserts nothing.
+
+    ``cause_id``/``effect_id`` are normalised (cause → effect) whatever side the source wrote it on; ``grade`` is
+    ``None`` until the grader has run; ``stance`` is ``denies`` for a source denying the link."""
+
+    claim_key: str
+    cause_id: str
+    effect_id: str
+    relation: str
+    source_key: str
+    tier: str
+    cause_labels: Mapping[str, str] = field(default_factory=dict)
+    effect_labels: Mapping[str, str] = field(default_factory=dict)
+    lane: str | None = None
+    stance: str = "asserts"
+    polarity: str | None = None
+    dataset: str | None = None
+    source_revision: str | None = None
+    statement_id: str | None = None
+    selector: Mapping[str, Any] | None = None
+    raw_sha256: str | None = None
+    citation: Mapping[str, Any] | None = None
+    codebook: Mapping[str, Any] | None = None
+    references: Sequence[Mapping[str, Any]] = ()
+    mechanism: str | None = None
+    grade: str | None = None
+    grade_rules: tuple[str, ...] = ()
+    rules_version: str | None = None
+    temporal_check: str | None = None
+    corroboration: int | None = None
+    contested_by: tuple[str, ...] = ()
+    review_status: str | None = None
+    origin: str | None = None
+
+    def cause_label(self, lang: str) -> str:
+        return pick_label(self.cause_labels, lang, self.cause_id)
+
+    def effect_label(self, lang: str) -> str:
+        return pick_label(self.effect_labels, lang, self.effect_id)
+
+    @property
+    def community_edited(self) -> bool:
+        return self.source_key.startswith("wikidata")
+
+
+@dataclass(frozen=True)
+class CausalExplanation:
+    """Causes (``direction="causes"``) or effects (``"effects"``) of an event, as sourced claims, plus dissent."""
+
+    event_id: str
+    direction: str
+    claims: tuple[CausalClaim, ...]
+    dissent: tuple[CausalClaim, ...] = ()
+    event_labels: Mapping[str, str] = field(default_factory=dict)
+    truncated: bool = False
+
+
+@dataclass(frozen=True)
+class CausalChainHop:
+    """One hop of a causal chain, asserted by one or more claims (each with its own source and grade)."""
+
+    from_id: str
+    to_id: str
+    claims: tuple[CausalClaim, ...]
+    from_labels: Mapping[str, str] = field(default_factory=dict)
+    to_labels: Mapping[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class CausalChain:
+    """REVA's *composition* of separately asserted claims (no source asserts the chain); grade = weakest hop."""
+
+    hops: tuple[CausalChainHop, ...]
+    engine: str = "reva.causal"
+
+
+def best_grade(grades: Sequence[str | None]) -> str | None:
+    gs = [g for g in grades if g in GRADES]
+    return min(gs, key=GRADES.index) if gs else None
+
+
+def hop_grade(h: CausalChainHop) -> str | None:
+    """Best grade among the claims asserting the hop (CAUSCORE's rule); ``None`` if none is graded."""
+    return best_grade([c.grade for c in h.claims if c.stance == "asserts"])
+
+
+def chain_grade(ch: CausalChain) -> str | None:
+    """Weakest hop; ``None`` (not gradable) when a hop has no graded claim."""
+    gs = [hop_grade(h) for h in ch.hops]
+    graded = [g for g in gs if g is not None]
+    if not gs or len(graded) != len(gs):
+        return None
+    return max(graded, key=GRADES.index)
+
+
+@runtime_checkable
+class CausalPort(Protocol):
+    """Causal claims service (CAUSCORE, ``reva.causal``). Candidates (T5/T6) are never returned through it."""
+
+    name: str
+
+    def explain(self, event_id: str, *, direction: str, limit: int) -> CausalExplanation: ...
+
+    def chains(self, from_id: str, to_id: str, *, max_hops: int, limit: int) -> list[CausalChain]: ...
+
+
 @runtime_checkable
 class KgPort(Protocol):
     name: str
@@ -461,4 +575,5 @@ class Backends:
     atlas: AtlasPort | None = None
     links: LinksPort | None = None
     search: EntitySearchPort | None = None
+    causal: CausalPort | None = None
     notes: list[str] = field(default_factory=list)

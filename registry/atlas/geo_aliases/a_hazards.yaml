@@ -1,0 +1,657 @@
+# Geography aliases of agent A-HAZARDS: NCEI Global Historical Hazard Database country names -> crosswalk entities.
+# NCEI publishes a free-text country name per record (earthquakes and tsunamis upper case, volcanoes title case); the
+# connector upper-cases and space-normalises it (atlas_noaa_hazards.country_key) and looks it up in scheme
+# `ncei_hazards` (base iso3, so aggregated rows can use the crosswalk key itself as provider_geo).
+# Names were collected from the full NCEI record lists and the descriptor lists earthquake/countries, tsunami/countries,
+# tsunami/runup/countries, volcano/countries and volcano/event-countries (hazard-service v1, read 2026-10-16).
+# Two kinds of evidence: "exact normalised name match" (the NCEI name equals, after upper-casing, a crosswalk label /
+# ISO / World Bank / UN / Comtrade name of exactly one entity) and "manual" (agent decision, reason given, maintainer
+# review pending). NCEI names the PRESENT-DAY country of a location, also for ancient events.
+# Deliberately absent (unmapped, kept with iso3 null): AFRICA, NORTH COAST (region, not a country); ARCTIC OCEAN (ocean); ATLANTIC OCEAN (ocean); BALTIC SEA (sea); BERING SEA (sea); DEAD SEA (lake/sea spanning several countries); EAST CHINA SEA (sea); INDIAN OCEAN (ocean); IRISH SEA (sea); KOREA (ambiguous (before or without the division into PRK/KOR; NCEI tsunami record)); NORTH SEA (sea); NORTHWEST PACIFIC OCEAN (ocean); PACIFIC OCEAN (ocean); SAINT MARTIN (FRENCH AND DUTCH TERRITORIES) (spans two crosswalk entities (MAF, SXM)); SOLOMON SEA (sea); TASMAN SEA (sea); UK TERRITORY (unspecified UK territory (records include Diego Garcia, Chagos, South Atlantic): no single entity); USA TERRITORY (unspecified US territory (records include Puerto Rico, Guam, Northern Mariana Islands, Virgin Islands): no single entity)
+scheme: ncei_hazards
+base: iso3
+aliases:
+  - code: "AFGHANISTAN"
+    iso3: AFG
+    source: "exact normalised name match: NCEI 'AFGHANISTAN' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Afghanistan'"
+  - code: "ALBANIA"
+    iso3: ALB
+    source: "exact normalised name match: NCEI 'ALBANIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Albania'"
+  - code: "ALGERIA"
+    iso3: DZA
+    source: "exact normalised name match: NCEI 'ALGERIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Algeria'"
+  - code: "AMERICAN SAMOA"
+    iso3: ASM
+    source: "exact normalised name match: NCEI 'AMERICAN SAMOA' (descriptor volcano/countries) = crosswalk iso_name 'American Samoa'"
+  - code: "ANGOLA"
+    iso3: AGO
+    source: "exact normalised name match: NCEI 'ANGOLA' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Angola'"
+  - code: "ANTARCTICA"
+    iso3: ATA
+    source: "exact normalised name match: NCEI 'ANTARCTICA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk iso_name 'Antarctica'"
+  - code: "ANTIGUA AND BARBUDA"
+    iso3: ATG
+    source: "exact normalised name match: NCEI 'ANTIGUA AND BARBUDA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Antigua and Barbuda'"
+  - code: "ARGENTINA"
+    iso3: ARG
+    source: "exact normalised name match: NCEI 'ARGENTINA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'Argentina'"
+  - code: "ARMENIA"
+    iso3: ARM
+    source: "exact normalised name match: NCEI 'ARMENIA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Armenia'"
+  - code: "AUSTRALIA"
+    iso3: AUS
+    source: "exact normalised name match: NCEI 'AUSTRALIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Australia'"
+  - code: "AUSTRIA"
+    iso3: AUT
+    source: "exact normalised name match: NCEI 'AUSTRIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Austria'"
+  - code: "AZERBAIJAN"
+    iso3: AZE
+    source: "exact normalised name match: NCEI 'AZERBAIJAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Azerbaijan'"
+  - code: "BANGLADESH"
+    iso3: BGD
+    source: "exact normalised name match: NCEI 'BANGLADESH' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Bangladesh'"
+  - code: "BARBADOS"
+    iso3: BRB
+    source: "exact normalised name match: NCEI 'BARBADOS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Barbados'"
+  - code: "BELGIUM"
+    iso3: BEL
+    source: "exact normalised name match: NCEI 'BELGIUM' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Belgium'"
+  - code: "BELIZE"
+    iso3: BLZ
+    source: "exact normalised name match: NCEI 'BELIZE' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Belize'"
+  - code: "BENIN"
+    iso3: BEN
+    source: "exact normalised name match: NCEI 'BENIN' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Benin'"
+  - code: "BHUTAN"
+    iso3: BTN
+    source: "exact normalised name match: NCEI 'BHUTAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Bhutan'"
+  - code: "BOLIVIA"
+    iso3: BOL
+    source: "exact normalised name match: NCEI 'BOLIVIA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk worldbank_name 'Bolivia'"
+  - code: "BRAZIL"
+    iso3: BRA
+    source: "exact normalised name match: NCEI 'BRAZIL' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Brazil'"
+  - code: "BRITISH VIRGIN ISLANDS"
+    iso3: VGB
+    source: "exact normalised name match: NCEI 'BRITISH VIRGIN ISLANDS' (descriptor earthquake/countries, earthquake records) = crosswalk label 'British Virgin Islands'"
+  - code: "BULGARIA"
+    iso3: BGR
+    source: "exact normalised name match: NCEI 'BULGARIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Bulgaria'"
+  - code: "BURUNDI"
+    iso3: BDI
+    source: "exact normalised name match: NCEI 'BURUNDI' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Burundi'"
+  - code: "CAMEROON"
+    iso3: CMR
+    source: "exact normalised name match: NCEI 'CAMEROON' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Cameroon'"
+  - code: "CANADA"
+    iso3: CAN
+    source: "exact normalised name match: NCEI 'CANADA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Canada'"
+  - code: "CENTRAL AFRICAN REPUBLIC"
+    iso3: CAF
+    source: "exact normalised name match: NCEI 'CENTRAL AFRICAN REPUBLIC' (descriptor earthquake/countries, earthquake records) = crosswalk iso_name 'Central African Republic'"
+  - code: "CHAD"
+    iso3: TCD
+    source: "exact normalised name match: NCEI 'CHAD' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Chad'"
+  - code: "CHILE"
+    iso3: CHL
+    source: "exact normalised name match: NCEI 'CHILE' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Chile'"
+  - code: "CHINA"
+    iso3: CHN
+    source: "exact normalised name match: NCEI 'CHINA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'China'"
+  - code: "COLOMBIA"
+    iso3: COL
+    source: "exact normalised name match: NCEI 'COLOMBIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Colombia'"
+  - code: "COMOROS"
+    iso3: COM
+    source: "exact normalised name match: NCEI 'COMOROS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Comoros'"
+  - code: "CONGO"
+    iso3: COG
+    source: "exact normalised name match: NCEI 'CONGO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Congo'"
+  - code: "COOK ISLANDS"
+    iso3: COK
+    source: "exact normalised name match: NCEI 'COOK ISLANDS' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk iso_name 'Cook Islands'"
+  - code: "COSTA RICA"
+    iso3: CRI
+    source: "exact normalised name match: NCEI 'COSTA RICA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Costa Rica'"
+  - code: "COTE D'IVOIRE"
+    iso3: CIV
+    source: "exact normalised name match: NCEI \"COTE D'IVOIRE\" (descriptor earthquake/countries, earthquake records) = crosswalk worldbank_name \"Cote d'Ivoire\""
+  - code: "CROATIA"
+    iso3: HRV
+    source: "exact normalised name match: NCEI 'CROATIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Croatia'"
+  - code: "CUBA"
+    iso3: CUB
+    source: "exact normalised name match: NCEI 'CUBA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Cuba'"
+  - code: "CYPRUS"
+    iso3: CYP
+    source: "exact normalised name match: NCEI 'CYPRUS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Cyprus'"
+  - code: "DENMARK"
+    iso3: DNK
+    source: "exact normalised name match: NCEI 'DENMARK' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Denmark'"
+  - code: "DJIBOUTI"
+    iso3: DJI
+    source: "exact normalised name match: NCEI 'DJIBOUTI' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Djibouti'"
+  - code: "DOMINICA"
+    iso3: DMA
+    source: "exact normalised name match: NCEI 'DOMINICA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'Dominica'"
+  - code: "DOMINICAN REPUBLIC"
+    iso3: DOM
+    source: "exact normalised name match: NCEI 'DOMINICAN REPUBLIC' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk iso_name 'Dominican Republic'"
+  - code: "ECUADOR"
+    iso3: ECU
+    source: "exact normalised name match: NCEI 'ECUADOR' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Ecuador'"
+  - code: "EGYPT"
+    iso3: EGY
+    source: "exact normalised name match: NCEI 'EGYPT' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Egypt'"
+  - code: "EL SALVADOR"
+    iso3: SLV
+    source: "exact normalised name match: NCEI 'EL SALVADOR' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'El Salvador'"
+  - code: "EQUATORIAL GUINEA"
+    iso3: GNQ
+    source: "exact normalised name match: NCEI 'EQUATORIAL GUINEA' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Equatorial Guinea'"
+  - code: "ERITREA"
+    iso3: ERI
+    source: "exact normalised name match: NCEI 'ERITREA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Eritrea'"
+  - code: "ESTONIA"
+    iso3: EST
+    source: "exact normalised name match: NCEI 'ESTONIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Estonia'"
+  - code: "ETHIOPIA"
+    iso3: ETH
+    source: "exact normalised name match: NCEI 'ETHIOPIA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Ethiopia'"
+  - code: "FIJI"
+    iso3: FJI
+    source: "exact normalised name match: NCEI 'FIJI' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Fiji'"
+  - code: "FINLAND"
+    iso3: FIN
+    source: "exact normalised name match: NCEI 'FINLAND' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Finland'"
+  - code: "FRANCE"
+    iso3: FRA
+    source: "exact normalised name match: NCEI 'FRANCE' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'France'"
+  - code: "FRENCH GUIANA"
+    iso3: GUF
+    source: "exact normalised name match: NCEI 'FRENCH GUIANA' (descriptor earthquake/countries, earthquake records) = crosswalk iso_name 'French Guiana'"
+  - code: "FRENCH POLYNESIA"
+    iso3: PYF
+    source: "exact normalised name match: NCEI 'FRENCH POLYNESIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'French Polynesia'"
+  - code: "GABON"
+    iso3: GAB
+    source: "exact normalised name match: NCEI 'GABON' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Gabon'"
+  - code: "GEORGIA"
+    iso3: GEO
+    source: "exact normalised name match: NCEI 'GEORGIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Georgia'"
+  - code: "GERMANY"
+    iso3: DEU
+    source: "exact normalised name match: NCEI 'GERMANY' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Germany'"
+  - code: "GHANA"
+    iso3: GHA
+    source: "exact normalised name match: NCEI 'GHANA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Ghana'"
+  - code: "GREECE"
+    iso3: GRC
+    source: "exact normalised name match: NCEI 'GREECE' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Greece'"
+  - code: "GREENLAND"
+    iso3: GRL
+    source: "exact normalised name match: NCEI 'GREENLAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Greenland'"
+  - code: "GRENADA"
+    iso3: GRD
+    source: "exact normalised name match: NCEI 'GRENADA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Grenada'"
+  - code: "GUADELOUPE"
+    iso3: GLP
+    source: "exact normalised name match: NCEI 'GUADELOUPE' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk iso_name 'Guadeloupe'"
+  - code: "GUATEMALA"
+    iso3: GTM
+    source: "exact normalised name match: NCEI 'GUATEMALA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Guatemala'"
+  - code: "GUINEA"
+    iso3: GIN
+    source: "exact normalised name match: NCEI 'GUINEA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Guinea'"
+  - code: "GUYANA"
+    iso3: GUY
+    source: "exact normalised name match: NCEI 'GUYANA' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Guyana'"
+  - code: "HAITI"
+    iso3: HTI
+    source: "exact normalised name match: NCEI 'HAITI' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Haiti'"
+  - code: "HONDURAS"
+    iso3: HND
+    source: "exact normalised name match: NCEI 'HONDURAS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Honduras'"
+  - code: "HUNGARY"
+    iso3: HUN
+    source: "exact normalised name match: NCEI 'HUNGARY' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Hungary'"
+  - code: "ICELAND"
+    iso3: ISL
+    source: "exact normalised name match: NCEI 'ICELAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Iceland'"
+  - code: "INDIA"
+    iso3: IND
+    source: "exact normalised name match: NCEI 'INDIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'India'"
+  - code: "INDONESIA"
+    iso3: IDN
+    source: "exact normalised name match: NCEI 'INDONESIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Indonesia'"
+  - code: "IRAN"
+    iso3: IRN
+    source: "exact normalised name match: NCEI 'IRAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Iran'"
+  - code: "IRAQ"
+    iso3: IRQ
+    source: "exact normalised name match: NCEI 'IRAQ' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Iraq'"
+  - code: "IRELAND"
+    iso3: IRL
+    source: "exact normalised name match: NCEI 'IRELAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Ireland'"
+  - code: "ISRAEL"
+    iso3: ISR
+    source: "exact normalised name match: NCEI 'ISRAEL' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Israel'"
+  - code: "ITALY"
+    iso3: ITA
+    source: "exact normalised name match: NCEI 'ITALY' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Italy'"
+  - code: "JAMAICA"
+    iso3: JAM
+    source: "exact normalised name match: NCEI 'JAMAICA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Jamaica'"
+  - code: "JAPAN"
+    iso3: JPN
+    source: "exact normalised name match: NCEI 'JAPAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Japan'"
+  - code: "JORDAN"
+    iso3: JOR
+    source: "exact normalised name match: NCEI 'JORDAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Jordan'"
+  - code: "KAZAKHSTAN"
+    iso3: KAZ
+    source: "exact normalised name match: NCEI 'KAZAKHSTAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Kazakhstan'"
+  - code: "KENYA"
+    iso3: KEN
+    source: "exact normalised name match: NCEI 'KENYA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Kenya'"
+  - code: "KIRIBATI"
+    iso3: KIR
+    source: "exact normalised name match: NCEI 'KIRIBATI' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Kiribati'"
+  - code: "KYRGYZSTAN"
+    iso3: KGZ
+    source: "exact normalised name match: NCEI 'KYRGYZSTAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Kyrgyzstan'"
+  - code: "LEBANON"
+    iso3: LBN
+    source: "exact normalised name match: NCEI 'LEBANON' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Lebanon'"
+  - code: "LIBYA"
+    iso3: LBY
+    source: "exact normalised name match: NCEI 'LIBYA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Libya'"
+  - code: "MADAGASCAR"
+    iso3: MDG
+    source: "exact normalised name match: NCEI 'MADAGASCAR' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Madagascar'"
+  - code: "MALAWI"
+    iso3: MWI
+    source: "exact normalised name match: NCEI 'MALAWI' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Malawi'"
+  - code: "MALAYSIA"
+    iso3: MYS
+    source: "exact normalised name match: NCEI 'MALAYSIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Malaysia'"
+  - code: "MALDIVES"
+    iso3: MDV
+    source: "exact normalised name match: NCEI 'MALDIVES' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Maldives'"
+  - code: "MALI"
+    iso3: MLI
+    source: "exact normalised name match: NCEI 'MALI' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Mali'"
+  - code: "MALTA"
+    iso3: MLT
+    source: "exact normalised name match: NCEI 'MALTA' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Malta'"
+  - code: "MARTINIQUE"
+    iso3: MTQ
+    source: "exact normalised name match: NCEI 'MARTINIQUE' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk iso_name 'Martinique'"
+  - code: "MAURITIUS"
+    iso3: MUS
+    source: "exact normalised name match: NCEI 'MAURITIUS' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Mauritius'"
+  - code: "MEXICO"
+    iso3: MEX
+    source: "exact normalised name match: NCEI 'MEXICO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Mexico'"
+  - code: "MONGOLIA"
+    iso3: MNG
+    source: "exact normalised name match: NCEI 'MONGOLIA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Mongolia'"
+  - code: "MONTENEGRO"
+    iso3: MNE
+    source: "exact normalised name match: NCEI 'MONTENEGRO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Montenegro'"
+  - code: "MONTSERRAT"
+    iso3: MSR
+    source: "exact normalised name match: NCEI 'MONTSERRAT' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Montserrat'"
+  - code: "MOROCCO"
+    iso3: MAR
+    source: "exact normalised name match: NCEI 'MOROCCO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Morocco'"
+  - code: "MOZAMBIQUE"
+    iso3: MOZ
+    source: "exact normalised name match: NCEI 'MOZAMBIQUE' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Mozambique'"
+  - code: "MYANMAR"
+    iso3: MMR
+    source: "exact normalised name match: NCEI 'MYANMAR' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Myanmar'"
+  - code: "NAMIBIA"
+    iso3: NAM
+    source: "exact normalised name match: NCEI 'NAMIBIA' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Namibia'"
+  - code: "NAOERO"
+    iso3: NRU
+    source: "exact normalised name match: NCEI 'NAOERO' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Naoero'"
+  - code: "NEPAL"
+    iso3: NPL
+    source: "exact normalised name match: NCEI 'NEPAL' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Nepal'"
+  - code: "NETHERLANDS"
+    iso3: NLD
+    source: "exact normalised name match: NCEI 'NETHERLANDS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Netherlands'"
+  - code: "NEW CALEDONIA"
+    iso3: NCL
+    source: "exact normalised name match: NCEI 'NEW CALEDONIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'New Caledonia'"
+  - code: "NEW ZEALAND"
+    iso3: NZL
+    source: "exact normalised name match: NCEI 'NEW ZEALAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'New Zealand'"
+  - code: "NICARAGUA"
+    iso3: NIC
+    source: "exact normalised name match: NCEI 'NICARAGUA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Nicaragua'"
+  - code: "NIGERIA"
+    iso3: NGA
+    source: "exact normalised name match: NCEI 'NIGERIA' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Nigeria'"
+  - code: "NIUE"
+    iso3: NIU
+    source: "exact normalised name match: NCEI 'NIUE' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Niue'"
+  - code: "NORTH MACEDONIA"
+    iso3: MKD
+    source: "exact normalised name match: NCEI 'NORTH MACEDONIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'North Macedonia'"
+  - code: "NORWAY"
+    iso3: NOR
+    source: "exact normalised name match: NCEI 'NORWAY' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Norway'"
+  - code: "OMAN"
+    iso3: OMN
+    source: "exact normalised name match: NCEI 'OMAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Oman'"
+  - code: "PAKISTAN"
+    iso3: PAK
+    source: "exact normalised name match: NCEI 'PAKISTAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Pakistan'"
+  - code: "PALAU"
+    iso3: PLW
+    source: "exact normalised name match: NCEI 'PALAU' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Palau'"
+  - code: "PANAMA"
+    iso3: PAN
+    source: "exact normalised name match: NCEI 'PANAMA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Panama'"
+  - code: "PAPUA NEW GUINEA"
+    iso3: PNG
+    source: "exact normalised name match: NCEI 'PAPUA NEW GUINEA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Papua New Guinea'"
+  - code: "PERU"
+    iso3: PER
+    source: "exact normalised name match: NCEI 'PERU' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Peru'"
+  - code: "PHILIPPINES"
+    iso3: PHL
+    source: "exact normalised name match: NCEI 'PHILIPPINES' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Philippines'"
+  - code: "POLAND"
+    iso3: POL
+    source: "exact normalised name match: NCEI 'POLAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Poland'"
+  - code: "PORTUGAL"
+    iso3: PRT
+    source: "exact normalised name match: NCEI 'PORTUGAL' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Portugal'"
+  - code: "QATAR"
+    iso3: QAT
+    source: "exact normalised name match: NCEI 'QATAR' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Qatar'"
+  - code: "ROMANIA"
+    iso3: ROU
+    source: "exact normalised name match: NCEI 'ROMANIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Romania'"
+  - code: "RWANDA"
+    iso3: RWA
+    source: "exact normalised name match: NCEI 'RWANDA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'Rwanda'"
+  - code: "SAINT KITTS AND NEVIS"
+    iso3: KNA
+    source: "exact normalised name match: NCEI 'SAINT KITTS AND NEVIS' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Saint Kitts and Nevis'"
+  - code: "SAINT LUCIA"
+    iso3: LCA
+    source: "exact normalised name match: NCEI 'SAINT LUCIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Saint Lucia'"
+  - code: "SAINT PIERRE AND MIQUELON"
+    iso3: SPM
+    source: "exact normalised name match: NCEI 'SAINT PIERRE AND MIQUELON' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Saint Pierre and Miquelon'"
+  - code: "SAINT VINCENT AND THE GRENADINES"
+    iso3: VCT
+    source: "exact normalised name match: NCEI 'SAINT VINCENT AND THE GRENADINES' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Saint Vincent and the Grenadines'"
+  - code: "SAMOA"
+    iso3: WSM
+    source: "exact normalised name match: NCEI 'SAMOA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Samoa'"
+  - code: "SAUDI ARABIA"
+    iso3: SAU
+    source: "exact normalised name match: NCEI 'SAUDI ARABIA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Saudi Arabia'"
+  - code: "SENEGAL"
+    iso3: SEN
+    source: "exact normalised name match: NCEI 'SENEGAL' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Senegal'"
+  - code: "SERBIA"
+    iso3: SRB
+    source: "exact normalised name match: NCEI 'SERBIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Serbia'"
+  - code: "SEYCHELLES"
+    iso3: SYC
+    source: "exact normalised name match: NCEI 'SEYCHELLES' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Seychelles'"
+  - code: "SIERRA LEONE"
+    iso3: SLE
+    source: "exact normalised name match: NCEI 'SIERRA LEONE' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Sierra Leone'"
+  - code: "SINGAPORE"
+    iso3: SGP
+    source: "exact normalised name match: NCEI 'SINGAPORE' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Singapore'"
+  - code: "SLOVAKIA"
+    iso3: SVK
+    source: "exact normalised name match: NCEI 'SLOVAKIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Slovakia'"
+  - code: "SLOVENIA"
+    iso3: SVN
+    source: "exact normalised name match: NCEI 'SLOVENIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Slovenia'"
+  - code: "SOLOMON ISLANDS"
+    iso3: SLB
+    source: "exact normalised name match: NCEI 'SOLOMON ISLANDS' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk iso_name 'Solomon Islands'"
+  - code: "SOMALIA"
+    iso3: SOM
+    source: "exact normalised name match: NCEI 'SOMALIA' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Somalia'"
+  - code: "SOUTH AFRICA"
+    iso3: ZAF
+    source: "exact normalised name match: NCEI 'SOUTH AFRICA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries) = crosswalk comtrade_reporter_label 'South Africa'"
+  - code: "SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS"
+    iso3: SGS
+    source: "exact normalised name match: NCEI 'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS' (descriptor earthquake/countries, earthquake records) = crosswalk iso_name 'South Georgia and the South Sandwich Islands'"
+  - code: "SOUTH SUDAN"
+    iso3: SSD
+    source: "exact normalised name match: NCEI 'SOUTH SUDAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'South Sudan'"
+  - code: "SPAIN"
+    iso3: ESP
+    source: "exact normalised name match: NCEI 'SPAIN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Spain'"
+  - code: "SRI LANKA"
+    iso3: LKA
+    source: "exact normalised name match: NCEI 'SRI LANKA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Sri Lanka'"
+  - code: "ST. LUCIA"
+    iso3: LCA
+    source: "exact normalised name match: NCEI 'ST. LUCIA' (descriptor volcano/countries) = crosswalk worldbank_name 'St. Lucia'"
+  - code: "SUDAN"
+    iso3: SDN
+    source: "exact normalised name match: NCEI 'SUDAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Sudan'"
+  - code: "SWEDEN"
+    iso3: SWE
+    source: "exact normalised name match: NCEI 'SWEDEN' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Sweden'"
+  - code: "SWITZERLAND"
+    iso3: CHE
+    source: "exact normalised name match: NCEI 'SWITZERLAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Switzerland'"
+  - code: "SYRIA"
+    iso3: SYR
+    source: "exact normalised name match: NCEI 'SYRIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Syria'"
+  - code: "TAIWAN"
+    iso3: TWN
+    source: "exact normalised name match: NCEI 'TAIWAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk label 'Taiwan'"
+  - code: "TAJIKISTAN"
+    iso3: TJK
+    source: "exact normalised name match: NCEI 'TAJIKISTAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Tajikistan'"
+  - code: "TANZANIA"
+    iso3: TZA
+    source: "exact normalised name match: NCEI 'TANZANIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk worldbank_name 'Tanzania'"
+  - code: "THAILAND"
+    iso3: THA
+    source: "exact normalised name match: NCEI 'THAILAND' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Thailand'"
+  - code: "TOGO"
+    iso3: TGO
+    source: "exact normalised name match: NCEI 'TOGO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Togo'"
+  - code: "TONGA"
+    iso3: TON
+    source: "exact normalised name match: NCEI 'TONGA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Tonga'"
+  - code: "TRINIDAD AND TOBAGO"
+    iso3: TTO
+    source: "exact normalised name match: NCEI 'TRINIDAD AND TOBAGO' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Trinidad and Tobago'"
+  - code: "TUNISIA"
+    iso3: TUN
+    source: "exact normalised name match: NCEI 'TUNISIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Tunisia'"
+  - code: "TURKMENISTAN"
+    iso3: TKM
+    source: "exact normalised name match: NCEI 'TURKMENISTAN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Turkmenistan'"
+  - code: "TUVALU"
+    iso3: TUV
+    source: "exact normalised name match: NCEI 'TUVALU' (descriptor tsunami/runup/countries) = crosswalk comtrade_reporter_label 'Tuvalu'"
+  - code: "UGANDA"
+    iso3: UGA
+    source: "exact normalised name match: NCEI 'UGANDA' (descriptor earthquake/countries, earthquake records, descriptor volcano/countries) = crosswalk comtrade_reporter_label 'Uganda'"
+  - code: "UKRAINE"
+    iso3: UKR
+    source: "exact normalised name match: NCEI 'UKRAINE' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Ukraine'"
+  - code: "UNITED KINGDOM"
+    iso3: GBR
+    source: "exact normalised name match: NCEI 'UNITED KINGDOM' (descriptor volcano/countries) = crosswalk comtrade_reporter_label 'United Kingdom'"
+  - code: "UNITED STATES"
+    iso3: USA
+    source: "exact normalised name match: NCEI 'UNITED STATES' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk iso_name 'United States'"
+  - code: "URUGUAY"
+    iso3: URY
+    source: "exact normalised name match: NCEI 'URUGUAY' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Uruguay'"
+  - code: "USA"
+    iso3: USA
+    source: "exact normalised name match: NCEI 'USA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'USA'"
+  - code: "UZBEKISTAN"
+    iso3: UZB
+    source: "exact normalised name match: NCEI 'UZBEKISTAN' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Uzbekistan'"
+  - code: "VANUATU"
+    iso3: VUT
+    source: "exact normalised name match: NCEI 'VANUATU' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Vanuatu'"
+  - code: "VENEZUELA"
+    iso3: VEN
+    source: "exact normalised name match: NCEI 'VENEZUELA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records) = crosswalk comtrade_reporter_label 'Venezuela'"
+  - code: "YEMEN"
+    iso3: YEM
+    source: "exact normalised name match: NCEI 'YEMEN' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries, descriptor volcano/countries, descriptor volcano/event-countries, eruption records) = crosswalk comtrade_reporter_label 'Yemen'"
+  - code: "ZAMBIA"
+    iso3: ZMB
+    source: "exact normalised name match: NCEI 'ZAMBIA' (descriptor earthquake/countries, earthquake records) = crosswalk comtrade_reporter_label 'Zambia'"
+  - code: "AZORES (PORTUGAL)"
+    iso3: PRT
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'AZORES (PORTUGAL)' (descriptor earthquake/countries, earthquake records, descriptor tsunami/runup/countries): NCEI names the sovereign in the name itself ('(PORTUGAL)'); the Azores are no separate crosswalk entity"
+  - code: "BERMUDA (UK TERRITORY)"
+    iso3: BMU
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'BERMUDA (UK TERRITORY)' (descriptor tsunami/runup/countries): name before the parenthesis = crosswalk label 'Bermuda' (ISO 3166-1 entity)"
+  - code: "BOSNIA-HERZEGOVINA"
+    iso3: BIH
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'BOSNIA-HERZEGOVINA' (descriptor earthquake/countries, earthquake records): hyphenated short form of crosswalk label 'Bosnia and Herzegovina'"
+  - code: "BOUVET I."
+    iso3: BVT
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'BOUVET I.' (descriptor volcano/countries, descriptor volcano/event-countries): abbreviation of crosswalk label 'Bouvet Island'"
+  - code: "BRITISH VIRGIN ISLANDS (UK TERRITORY)"
+    iso3: VGB
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'BRITISH VIRGIN ISLANDS (UK TERRITORY)' (descriptor tsunami/runup/countries): name before the parenthesis = crosswalk label 'British Virgin Islands'"
+  - code: "CANARY ISLANDS"
+    iso3: ESP
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'CANARY ISLANDS' (descriptor earthquake/countries, earthquake records): the Canary Islands are no separate crosswalk entity (part of Spain; ISO 3166-2:ES-CN)"
+  - code: "CAPE VERDE"
+    iso3: CPV
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'CAPE VERDE' (descriptor tsunami/runup/countries, descriptor volcano/countries, descriptor volcano/event-countries, eruption records): former English short name of crosswalk entity 'Cabo Verde' (ISO 3166-1 renamed 2013)"
+  - code: "CAYMAN ISLANDS (UK TERRITORY)"
+    iso3: CYM
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'CAYMAN ISLANDS (UK TERRITORY)' (descriptor tsunami/runup/countries): name before the parenthesis = crosswalk label 'Cayman Islands'"
+  - code: "CONGO, DRC"
+    iso3: COD
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'CONGO, DRC' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): 'DRC' = Democratic Republic of the Congo (crosswalk label); NCEI lists 'CONGO' separately (-> COG)"
+  - code: "CZECH REPUBLIC"
+    iso3: CZE
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'CZECH REPUBLIC' (descriptor earthquake/countries, earthquake records): former English short name of crosswalk entity 'Czechia'"
+  - code: "EAST TIMOR"
+    iso3: TLS
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'EAST TIMOR' (descriptor tsunami/runup/countries): English name of crosswalk entity 'Timor-Leste'"
+  - code: "FRENCH SOUTHERN & ANTARCTIC LANDS"
+    iso3: ATF
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'FRENCH SOUTHERN & ANTARCTIC LANDS' (descriptor volcano/countries): crosswalk entity 'French Southern Territories' (ISO 3166-1 ATF, 'Terres australes et antarctiques françaises')"
+  - code: "FRENCH SOUTHERN AND ANTARCTIC TERRITORIES"
+    iso3: ATF
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'FRENCH SOUTHERN AND ANTARCTIC TERRITORIES' (descriptor tsunami/runup/countries): crosswalk entity 'French Southern Territories' (ISO 3166-1 ATF)"
+  - code: "GUADELOUPE (FRENCH TERRITORY)"
+    iso3: GLP
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'GUADELOUPE (FRENCH TERRITORY)' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): name before the parenthesis = crosswalk label 'Guadeloupe'"
+  - code: "HEARD I. & MCDONALD IS."
+    iso3: HMD
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'HEARD I. & MCDONALD IS.' (descriptor volcano/countries, descriptor volcano/event-countries): abbreviation of crosswalk label 'Heard Island and McDonald Islands'"
+  - code: "HOLLAND"
+    iso3: NLD
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'HOLLAND' (descriptor tsunami/countries, tsunami source records): NCEI tsunami records 'HOLLAND' (1571, 1830): colloquial name of the Netherlands (crosswalk NLD)"
+  - code: "JAN MAYEN"
+    iso3: SJM
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'JAN MAYEN' (descriptor volcano/countries, descriptor volcano/event-countries): Jan Mayen is part of crosswalk entity 'Svalbard and Jan Mayen Islands' (ISO 3166-1 SJM)"
+  - code: "KERMADEC ISLANDS"
+    iso3: NZL
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'KERMADEC ISLANDS' (descriptor tsunami/countries, tsunami source records): NCEI's own earthquake table names the same islands 'KERMADEC ISLANDS (NEW ZEALAND)'"
+  - code: "KERMADEC ISLANDS (NEW ZEALAND)"
+    iso3: NZL
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'KERMADEC ISLANDS (NEW ZEALAND)' (descriptor earthquake/countries, earthquake records): NCEI names the sovereign in the name itself ('(NEW ZEALAND)'); no separate crosswalk entity"
+  - code: "LAOS"
+    iso3: LAO
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'LAOS' (descriptor earthquake/countries, earthquake records): English short name of crosswalk entity \"Lao People's Democratic Republic\" (World Bank: 'Lao PDR')"
+  - code: "MARSHALL ISLANDS, REP. OF"
+    iso3: MHL
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'MARSHALL ISLANDS, REP. OF' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): inverted form of crosswalk label 'Marshall Islands'"
+  - code: "MARTINIQUE (FRENCH TERRITORY)"
+    iso3: MTQ
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'MARTINIQUE (FRENCH TERRITORY)' (descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): name before the parenthesis = crosswalk label 'Martinique'"
+  - code: "MICRONESIA, FED. STATES OF"
+    iso3: FSM
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'MICRONESIA, FED. STATES OF' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): abbreviation of crosswalk ISO name 'Micronesia, Federated States of'"
+  - code: "MYANMAR (BURMA)"
+    iso3: MMR
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'MYANMAR (BURMA)' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): name before the parenthesis = crosswalk label 'Myanmar'"
+  - code: "NORTH KOREA"
+    iso3: PRK
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'NORTH KOREA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records): English short name of crosswalk entity \"Democratic People's Republic of Korea\""
+  - code: "REUNION"
+    iso3: REU
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'REUNION' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): crosswalk label 'Réunion' without the accent"
+  - code: "REUNION (FRENCH TERRITORY)"
+    iso3: REU
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'REUNION (FRENCH TERRITORY)' (descriptor tsunami/runup/countries): crosswalk label 'Réunion' without the accent; parenthesis names the sovereign"
+  - code: "RUSSIA"
+    iso3: RUS
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'RUSSIA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records): English short name of crosswalk entity 'Russian Federation'"
+  - code: "SABA (DUTCH TERRITORY)"
+    iso3: BES
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SABA (DUTCH TERRITORY)' (descriptor tsunami/runup/countries): Saba is part of crosswalk entity 'Bonaire, Sint Eustatius and Saba' (ISO 3166-1 BES)"
+  - code: "SAINT BARTHELEMY (FRENCH TERRITORY)"
+    iso3: BLM
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SAINT BARTHELEMY (FRENCH TERRITORY)' (descriptor tsunami/runup/countries): crosswalk label 'Saint Barthélemy' without the accent"
+  - code: "SAO TOME & PRINCIPE"
+    iso3: STP
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SAO TOME & PRINCIPE' (descriptor volcano/countries): '&' form of crosswalk label 'Sao Tome and Principe'"
+  - code: "SCOTLAND"
+    iso3: GBR
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SCOTLAND' (descriptor tsunami/countries, tsunami source records): constituent country of the United Kingdom (crosswalk GBR); NCEI tsunami record"
+  - code: "SINT EUSTATIUS (DUTCH TERRITORY)"
+    iso3: BES
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SINT EUSTATIUS (DUTCH TERRITORY)' (descriptor tsunami/runup/countries): Sint Eustatius is part of crosswalk entity 'Bonaire, Sint Eustatius and Saba' (BES)"
+  - code: "SOLOMON IS."
+    iso3: SLB
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SOLOMON IS.' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): abbreviation of crosswalk label 'Solomon Islands'"
+  - code: "SOUTH KOREA"
+    iso3: KOR
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'SOUTH KOREA' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries): English short name of crosswalk entity 'Republic of Korea'"
+  - code: "ST. KITTS & NEVIS"
+    iso3: KNA
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'ST. KITTS & NEVIS' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): abbreviated form of crosswalk label 'Saint Kitts and Nevis' (World Bank 'St. Kitts and Nevis')"
+  - code: "ST. VINCENT & THE GRENADINES"
+    iso3: VCT
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'ST. VINCENT & THE GRENADINES' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): abbreviated form of crosswalk label 'Saint Vincent and the Grenadines'"
+  - code: "TRINIDAD"
+    iso3: TTO
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'TRINIDAD' (descriptor volcano/countries, descriptor volcano/event-countries, eruption records): NCEI eruption record: the island of Trinidad, part of crosswalk entity 'Trinidad and Tobago'"
+  - code: "TURKEY"
+    iso3: TUR
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'TURKEY' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records): former English short name of crosswalk entity 'Türkiye' (ISO 3166-1 renamed 2022)"
+  - code: "UAE"
+    iso3: ARE
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'UAE' (descriptor tsunami/runup/countries): abbreviation of crosswalk label 'United Arab Emirates'"
+  - code: "UK"
+    iso3: GBR
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'UK' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): abbreviation of crosswalk label 'United Kingdom'"
+  - code: "VIETNAM"
+    iso3: VNM
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'VIETNAM' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records, descriptor volcano/countries, descriptor volcano/event-countries, eruption records): English short name of crosswalk entity 'Viet Nam'"
+  - code: "WALLIS & FUTUNA"
+    iso3: WLF
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'WALLIS & FUTUNA' (descriptor volcano/countries): '&' form of crosswalk ISO name 'Wallis and Futuna'"
+  - code: "WALLIS AND FUTUNA (FRENCH TERRITORY)"
+    iso3: WLF
+    source: "manual (agent A-HAZARDS, maintainer review pending): NCEI 'WALLIS AND FUTUNA (FRENCH TERRITORY)' (descriptor earthquake/countries, earthquake records, descriptor tsunami/countries, descriptor tsunami/runup/countries, tsunami source records): name before the parenthesis = crosswalk ISO name 'Wallis and Futuna'"
+source:
+  kind: provider_data
+  url: https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/earthquake/countries
+  retrieved_at: "2026-10-16T20:30:00Z"
+  note: "NCEI hazard-service v1 record lists and country descriptor lists; see docs/dev/v3_a_hazards.md"

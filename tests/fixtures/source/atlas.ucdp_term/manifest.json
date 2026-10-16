@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "GPL-3 (countrycode R package; code lists are facts)",
+    "note": "same slice as tests/fixtures/source/atlas.ucdp (only data/codelist_panel.rda, byte-identical member); real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "e843a10dbe38b72497709cc63f7593d432e6505314023d700bf2c89cf13562ac",
+    "url": "https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Conflict.csv",
+    "file": "e843a10dbe38b724.csv",
+    "sha256": "3882e49ed089b2d22b0cd6ecdf79a2ca334b0cc58e9584d91b3bc553079c654a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of the UCDP Conflict Termination Dataset v4-2024 (conflict level): conflicts ['200', '209', '287', '332', '333', '416'], original header and row text; real file sha256 6f3a739fa5c6e23ab3dde169d0d06f139677b7a9cf5ce5b2dcb3bf3ab39f9b7d"
+  },
+  {
+    "request_fingerprint": "e9119c02192a2acd1cfa4b81d7d96cd23ccbae0ca3a658108bb364459a26ed4e",
+    "url": "https://ucdp.uu.se/downloads/peace/ucdp-peace-agreements-222.xlsx",
+    "file": "e9119c02192a2acd.xlsx",
+    "sha256": "9a5666173defffe4c2937d96c5201b8e8891f289b1c32e0e24f45f517abc161a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "UCDP Peace Agreement Dataset 22.2, full file"
+  },
+  {
+    "request_fingerprint": "709c8f43724025e5228d62a73575ccdbcd3031abe9fbffbe77f52d1d6f520ece",
+    "url": "https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf",
+    "file": "709c8f43724025e5.pdf",
+    "sha256": "648c1601f41796f1b565ab91616b4e8968ec7e84aca5434ddad8945b2079908d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "termination codebook, full file"
+  },
+  {
+    "request_fingerprint": "d98ddae1da5403e9dbdfdfc89aa1fb8a3e5c09bc369be66a69847eee442815f6",
+    "url": "https://ucdp.uu.se/downloads/peace/ucdp-codebook-peace-agreements-221.pdf",
+    "file": "d98ddae1da5403e9.pdf",
+    "sha256": "d46ca9768cc123f1054ffbbe7ddb12d14b8bfe86cfa86e6a74614b5bab5c9bd5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "peace agreement codebook 22.1, full file"
+  }
+]

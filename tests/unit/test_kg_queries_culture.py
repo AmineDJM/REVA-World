@@ -28,7 +28,14 @@ ENTITY_BUDGET = 150_000  # KGCULT target: <= 150k entities across the culture sp
 
 # Anchor QIDs (Wikidata)
 PORTUGUESE, SPANISH, ENGLISH, FRENCH, ARABIC, SWAHILI, LATIN = (
-    "Q5146", "Q1321", "Q1860", "Q150", "Q13955", "Q7838", "Q397")
+    "Q5146",
+    "Q1321",
+    "Q1860",
+    "Q150",
+    "Q13955",
+    "Q7838",
+    "Q397",
+)
 ANCHOR_LANGUAGES = (PORTUGUESE, SPANISH, ENGLISH, FRENCH, ARABIC, SWAHILI, LATIN)
 BRAZIL, PORTUGAL = "Q155", "Q45"
 CATHOLICISM, CATHOLIC_CHURCH, ISLAM = "Q1841", "Q9592", "Q432"
@@ -38,11 +45,16 @@ WORLD_HERITAGE_SITE = "Q9259"
 ANCHORS: dict[str, tuple[str, str, str]] = {
     "languages": ("languages.yaml", "VALUES ?item { " + " ".join(f"wd:{q}" for q in ANCHOR_LANGUAGES) + " }", ""),
     # one anchor per language: the spec returns only ?item (the ancestors), not which language led there
-    **{f"language_ancestors_{q}": ("language_ancestors.yaml", f"VALUES ?lang {{ wd:{q} }}", "")
-       for q in ANCHOR_LANGUAGES},
+    **{
+        f"language_ancestors_{q}": ("language_ancestors.yaml", f"VALUES ?lang {{ wd:{q} }}", "")
+        for q in ANCHOR_LANGUAGES
+    },
     "brazil_official_languages": ("country_official_languages.yaml", "", f"wd:{BRAZIL} wd:{PORTUGAL}"),
-    "religions": ("religions.yaml", f"VALUES ?item {{ wd:{CATHOLICISM} wd:{CATHOLIC_CHURCH} wd:{ISLAM} }}",
-                  f"wd:{BRAZIL}"),
+    "religions": (
+        "religions.yaml",
+        f"VALUES ?item {{ wd:{CATHOLICISM} wd:{CATHOLIC_CHURCH} wd:{ISLAM} }}",
+        f"wd:{BRAZIL}",
+    ),
     "brazil_world_heritage_sites": ("world_heritage_sites.yaml", f"?item wdt:P17 wd:{BRAZIL} .", ""),
     "brazil_world_heritage_designations": ("world_heritage_designations.yaml", f"?site wdt:P17 wd:{BRAZIL} .", ""),
 }
@@ -129,8 +141,9 @@ def test_specs_pass_the_harvester_validator_when_available():
     other = {k: v for k, v in problems.items() if v and k not in not_allowed}
     assert not other, other
     if not_allowed:  # waiting for WDHARVEST to merge registry/kg/property_requests/kgcult.yaml
-        requested = {r["property"] for r in yaml.safe_load(
-            (REPO / "registry/kg/property_requests/kgcult.yaml").read_text())}
+        requested = {
+            r["property"] for r in yaml.safe_load((REPO / "registry/kg/property_requests/kgcult.yaml").read_text())
+        }
         for msgs in not_allowed.values():
             for m in msgs:
                 pid = next(t for t in m.replace(":", " ").split() if t.startswith("P") and t[1:].isdigit())
@@ -145,8 +158,10 @@ def test_entity_budget():
     # country specs are the 250 crosswalk countries, objects are mostly entities seeded above, so
     # count only the unbounded-subject statement specs fully.
     open_subjects = sum(
-        s["max_rows"] for s in specs.values()
-        if s["purpose"] == "statements" and (s.get("split") or {}).get("source") != "countries"
+        s["max_rows"]
+        for s in specs.values()
+        if s["purpose"] == "statements"
+        and (s.get("split") or {}).get("source") != "countries"
         # subjects restricted to items with a WH Site ID = the culture.world_heritage_sites seeds
         and s["id"] != "culture.world_heritage_designations"
     )
@@ -162,7 +177,13 @@ def test_anchor_languages_are_seeded():
 def test_anchor_language_genealogy():
     anc = {q: {r["item"] for r in rows(load_anchor(f"language_ancestors_{q}"))} for q in ANCHOR_LANGUAGES}
     ROMANCE, INDO_EUROPEAN, SEMITIC, AFROASIATIC, BANTU, GERMANIC = (
-        "Q19814", "Q19860", "Q34049", "Q25268", "Q33146", "Q21200")
+        "Q19814",
+        "Q19860",
+        "Q34049",
+        "Q25268",
+        "Q33146",
+        "Q21200",
+    )
     for lang in (PORTUGUESE, SPANISH, FRENCH):
         assert {ROMANCE, INDO_EUROPEAN} <= anc[lang], lang
     assert {GERMANIC, INDO_EUROPEAN} <= anc[ENGLISH]
@@ -216,8 +237,9 @@ def ent():
     allow = load_allowlist()
     out = {}
     for qid, raw in doc["entities"].items():
-        out[qid] = extract_entity(raw, allow, raw_sha256=raw["raw_sha256"],
-                                  retrieved_at=datetime.fromisoformat(raw["retrieved_at"]))
+        out[qid] = extract_entity(
+            raw, allow, raw_sha256=raw["raw_sha256"], retrieved_at=datetime.fromisoformat(raw["retrieved_at"])
+        )
     return out
 
 
@@ -242,8 +264,15 @@ def ancestors(ent, qid: str, pid: str = "P279") -> set[str]:
 
 
 def test_entity_anchor_language_codes(ent):
-    expected_639_3 = {PORTUGUESE: "por", SPANISH: "spa", ENGLISH: "eng", FRENCH: "fra", ARABIC: "ara",
-                      SWAHILI: "swa", LATIN: "lat"}
+    expected_639_3 = {
+        PORTUGUESE: "por",
+        SPANISH: "spa",
+        ENGLISH: "eng",
+        FRENCH: "fra",
+        ARABIC: "ara",
+        SWAHILI: "swa",
+        LATIN: "lat",
+    }
     for qid, code in expected_639_3.items():
         e = ent[qid]
         assert e.statements, qid
@@ -336,8 +365,29 @@ async def _capture(names: list[str]) -> None:  # pragma: no cover - live, run by
 
 
 ENTITY_FIXTURE = FIXTURES / "anchor_entities.json"
-ENTITY_KEEP = ("P31", "P279", "P361", "P17", "P220", "P218", "P219", "P1394", "P1098", "P282", "P37", "P2936",
-               "P140", "P38", "P112", "P571", "P576", "P1365", "P155", "P1366", "P156")
+ENTITY_KEEP = (
+    "P31",
+    "P279",
+    "P361",
+    "P17",
+    "P220",
+    "P218",
+    "P219",
+    "P1394",
+    "P1098",
+    "P282",
+    "P37",
+    "P2936",
+    "P140",
+    "P38",
+    "P112",
+    "P571",
+    "P576",
+    "P1365",
+    "P155",
+    "P1366",
+    "P156",
+)
 
 
 async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
@@ -353,15 +403,23 @@ async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
         todo = sorted(i for i in ids if i not in out)
         if not todo:
             return
-        res = await client.get_entities(todo, props=("info", "claims", "labels", "sitelinks"), languages=("en", "fr"),
-                                        meta={"agent": "KGCULT", "purpose": "anchor entities"})
+        res = await client.get_entities(
+            todo,
+            props=("info", "claims", "labels", "sitelinks"),
+            languages=("en", "fr"),
+            meta={"agent": "KGCULT", "purpose": "anchor entities"},
+        )
         for qid, ent in res.entities.items():
             out[qid] = {
-                "id": ent["id"], "type": ent.get("type"), "lastrevid": ent.get("lastrevid"),
-                "modified": ent.get("modified"), "labels": ent.get("labels", {}),
+                "id": ent["id"],
+                "type": ent.get("type"),
+                "lastrevid": ent.get("lastrevid"),
+                "modified": ent.get("modified"),
+                "labels": ent.get("labels", {}),
                 "sitelinks": ent.get("sitelinks") or {},
                 "claims": {k: v for k, v in (ent.get("claims") or {}).items() if k in ENTITY_KEEP},
-                "raw_sha256": res.raw_sha_by_id.get(qid), "retrieved_at": res.retrieved_at.isoformat(),
+                "raw_sha256": res.raw_sha_by_id.get(qid),
+                "retrieved_at": res.retrieved_at.isoformat(),
             }
 
     def objects(qid: str, pid: str) -> set[str]:
@@ -400,11 +458,18 @@ async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
     finally:
         await http.aclose()
     FIXTURES.mkdir(parents=True, exist_ok=True)
-    ENTITY_FIXTURE.write_text(json.dumps({
-        "source": "Wikidata wbgetentities (CC0) via reva.adapters.connectors.wikidata.WikidataClient; claims trimmed "
-                  "to ENTITY_KEEP, raw response sha256 per entity",
-        "entities": dict(sorted(out.items(), key=lambda kv: int(kv[0][1:]))),
-    }, indent=1, ensure_ascii=False, sort_keys=True))
+    ENTITY_FIXTURE.write_text(
+        json.dumps(
+            {
+                "source": "Wikidata wbgetentities (CC0) via reva.adapters.connectors.wikidata.WikidataClient; claims trimmed "
+                "to ENTITY_KEEP, raw response sha256 per entity",
+                "entities": dict(sorted(out.items(), key=lambda kv: int(kv[0][1:]))),
+            },
+            indent=1,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
     print("entities", len(out), file=sys.stderr)
 
 

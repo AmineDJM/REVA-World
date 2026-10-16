@@ -2,7 +2,7 @@
  "fixture_kind": "synthetic_plan",
  "label": "fr_us_decolonisation",
  "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
- "prompt_version": "nlqa-plan-1.1.0",
+ "prompt_version": "nlqa-plan-1.2.0",
  "text": "Position des États-Unis sur la décolonisation dans les années 1950-60 ?",
  "text_sha256": "989aa1979cb3a2c8e359afb3a1f1c2b352dc2d265e6382ab216724eb2c937c3e",
  "output": {
@@ -28,7 +28,8 @@
     "properties": [],
     "link_kinds": [],
     "id": "s1",
-    "op": "entity_lookup"
+    "op": "entity_lookup",
+    "causal_direction": null
    },
    {
     "text": "décolonisation",
@@ -49,7 +50,8 @@
     "properties": [],
     "link_kinds": [],
     "id": "s2",
-    "op": "entity_lookup"
+    "op": "entity_lookup",
+    "causal_direction": null
    },
    {
     "text": null,
@@ -70,7 +72,8 @@
     "properties": [],
     "link_kinds": [],
     "id": "s3",
-    "op": "kg_timeline"
+    "op": "kg_timeline",
+    "causal_direction": null
    },
    {
     "text": null,
@@ -91,7 +94,8 @@
     "properties": [],
     "link_kinds": [],
     "id": "s4",
-    "op": "kg_path"
+    "op": "kg_path",
+    "causal_direction": null
    }
   ],
   "unsupported": [

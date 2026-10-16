@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "GPL-3 (countrycode R package; code lists are facts)",
+    "note": "same slice as tests/fixtures/source/atlas.ucdp (only data/codelist_panel.rda, byte-identical member); real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "93ff2afc56923c00cb6b8ebc890701db45c68e4abbbb6e77270b0149da09ff96",
+    "url": "https://duke.box.com/shared/static/h6fodyhoq2deul0v5ekuqgb4zblx557c.csv",
+    "file": "93ff2afc56923c00.csv",
+    "sha256": "a8cdf908102a79b44cdf6fed5c532243688efa369cdf5d8e817f3b5723d4b46f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "ICB terms: citation requested, no open licence stated",
+    "note": "slice of icb1v16.csv (ICB v16): crises ['1', '123', '143', '196', '393', '510', '512'], original header and row text; real file sha256 69757d1315c3d25a352fbe4ef22e0ea4bb5c230b91a809a7304ff1896dbb1ba5"
+  },
+  {
+    "request_fingerprint": "9aa25747809f933720f5e13eb3f28c559bc4c5ba037b82e368987f6a2020ddc0",
+    "url": "https://duke.box.com/shared/static/oc99j12bgywnkzrpbhypkicwjcdglh8l.csv",
+    "file": "9aa25747809f9337.csv",
+    "sha256": "c50183b15e42a8b68fa1385b47b09d08ab197bd7b763d845140ea094ae25db83",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "ICB terms: citation requested, no open licence stated",
+    "note": "slice of icb2v16.csv (ICB v16): actors of the same crises, original header and row text; real file sha256 33e0a3deeed93a2d54a9c77b2f338b8025d779446fc410c7d704a45f83a3a21b"
+  },
+  {
+    "request_fingerprint": "04a6dec726f773ead527689050abab6034955b560688eaebf9f3fd266e2214c0",
+    "url": "https://duke.box.com/shared/static/ravjtawv20aszptx3xhn43p7gd2q02dq.pdf",
+    "file": "04a6dec726f773ea.pdf",
+    "sha256": "fd2f41be46aa61b77e9490515294e959112ecb91c5e5a3d2a59aa68fb0a81910",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "ICB terms: citation requested, no open licence stated",
+    "note": "ICB1 codebook v16, full file"
+  },
+  {
+    "request_fingerprint": "a4273480cb459a0e7e4cf2409d562d105f770b65e5ac69373eafc43d47d21681",
+    "url": "https://duke.box.com/shared/static/d7zxijj57ukexpc08j1039vvw4cvrpzy.pdf",
+    "file": "a4273480cb459a0e.pdf",
+    "sha256": "88063b614f10ad8c9d202a5b5e86ac1f0b68bee67f165d1490fae707ce094dac",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T19:30:00+00:00",
+    "licence": "ICB terms: citation requested, no open licence stated",
+    "note": "ICB2 codebook v16, full file"
+  }
+]

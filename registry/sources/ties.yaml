@@ -1,0 +1,32 @@
+# V3 (agent A-SANCTIONS): Threat and Imposition of Economic Sanctions (TIES) 4.1, case level, 1945-2005.
+# Connector: src/reva/adapters/connectors/atlas_sanctions.py (atlas.ties) -> atlas tables ties.dyad_year,
+# ties.country_year + KG statements (sanction episodes, coded outcomes; source_key ties.unc).
+source_key: ties.unc
+title: Threat and Imposition of Economic Sanctions (TIES) dataset, version 4.1 (case level, 1945-2005)
+provider_url: https://sanctions.web.unc.edu/
+lineage_family: ties
+rights:
+  licence: "no licence stated (public academic download, no registration; citation requested)"
+  attribution: >-
+    Morgan, T. Clifton, Navin Bapat, and Yoshiharu Kobayashi. 2014. "The Threat and Imposition of Sanctions:
+    Updating the TIES dataset." Conflict Management and Peace Science 31(5): 541-558.
+  licence_evidence: >-
+    sanctions.web.unc.edu (read 2026-10-16): "Please use the following citation when using TIES: Morgan, T.
+    Clifton, Navin Bapat, and Yoshi Kobayashi. 2014 ..."; no licence, terms of use or registration published.
+metadata:
+  allowed_hosts: [sanctions.web.unc.edu, cran.r-project.org]
+  open_licence: false
+  redistribution: not stated; flagged for maintainer review (cited on every row)
+  files:
+    - https://sanctions.web.unc.edu/wp-content/uploads/sites/18834/2021/04/TIESv4-1.xls
+  codebook: https://sanctions.web.unc.edu/wp-content/uploads/sites/18834/2021/04/tiesusersmanualv4.pdf
+  corrections_note: >-
+    The five corrections of TIESCorrection.txt (bapat.web.unc.edu) are already present in TIESv4-1.xls
+    (checked 2026-10-16: caseids 1990999901, 1983011301, 1973070501, 2002041106, 2002041103).
+  code_crosswalk: >-
+    COW state numbers -> crosswalk entities through KGGEOPOL's StateCodeCrosswalk (countrycode 1.9.0 panel,
+    CRAN, archived with every run); TIES code 1000 = EEC/EU acting collectively (kept unmapped).
+  personal_data: >-
+    none ingested: the threat-identity free-text columns (threatid*) and other free-text notes are not parsed.
+  authentication: none
+  cadence: static release (v4.1, 2021); quarterly check
