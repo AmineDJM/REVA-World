@@ -49,7 +49,6 @@ import io
 import json
 import re
 import zipfile
-from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -379,14 +378,19 @@ class DvFile:
 
 
 COLDAT_FILES = (
-    DvFile("dyads", 7416947, "COLDAT_dyads.tab", ("text/tab-separated-values", "text/plain", "application/octet-stream")),
     DvFile(
-        "colonies", 7416946, "COLDAT_colonies.tab", ("text/tab-separated-values", "text/plain", "application/octet-stream")
+        "dyads", 7416947, "COLDAT_dyads.tab", ("text/tab-separated-values", "text/plain", "application/octet-stream")
+    ),
+    DvFile(
+        "colonies",
+        7416946,
+        "COLDAT_colonies.tab",
+        ("text/tab-separated-values", "text/plain", "application/octet-stream"),
     ),
     DvFile("readme", 7416948, "read_me.txt", ("text/plain", "application/octet-stream")),
 )
 #: The paper whose Appendix I is quoted (not fetched: its md5 must still be listed in the pinned version record).
-COLDAT_CODEBOOK = {
+COLDAT_CODEBOOK: dict[str, Any] = {
     "file_id": 3476840,
     "file_name": "Introducing COLDAT.pdf",
     "md5": "31f7a831f4125d70497d6d0922094615",
@@ -515,7 +519,9 @@ def parse_coldat_wide(body: bytes) -> dict[str, tuple[int, dict[str, str]]]:
     return {r["country"]: (line, r) for line, r in t}
 
 
-def coldat_cross_check(dyads: Sequence[ColdatDyad], wide: Mapping[str, tuple[int, dict[str, str]]]) -> list[dict[str, Any]]:
+def coldat_cross_check(
+    dyads: Sequence[ColdatDyad], wide: Mapping[str, tuple[int, dict[str, str]]]
+) -> list[dict[str, Any]]:
     """Cell-by-cell comparison of the long and the wide file (the provider says they hold the same information).
     Differences are returned (and flagged on the atlas cells), never resolved."""
     out = []
@@ -566,7 +572,8 @@ def coldat_atlas(
             base["wide_file_differs"] = True
 
         def add(indicator: str, start: date, end: date, *, value: str | None, value_text: str | None, unit: str,
-                flags: Mapping[str, Any], columns: Sequence[str]) -> None:  # fmt: skip
+                flags: Mapping[str, Any], columns: Sequence[str], d: ColdatDyad = d,
+                base: Mapping[str, Any] = base) -> None:  # fmt: skip
             rows.add(
                 {
                     "source": "coldat",
@@ -951,7 +958,7 @@ def icow_colhist_atlas(states: Sequence[IcowState], *, raw_sha256: str, crosswal
     for s in states:
 
         def add(indicator: str, t: CodedTime, *, value: str | None = None, value_text: str | None = None,
-                unit: str, flags: Mapping[str, Any], columns: Sequence[str]) -> None:  # fmt: skip
+                unit: str, flags: Mapping[str, Any], columns: Sequence[str], s: IcowState = s) -> None:  # fmt: skip
             res = _resolve_cells(crosswalk, s.code, t.last_day)
             fl = {k: v for k, v in res.items() if not k.startswith("_")}
             fl |= {"state_name": s.name, "date_as_coded": t.text, "date_precision": "month" if t.month else "year"}
@@ -1064,7 +1071,9 @@ def icow_claims_atlas(claims: Sequence[IcowClaim], *, raw_sha256: str, crosswalk
                     "flags": json_obj(fl),
                     "raw_sha256": raw_sha256,
                     "selector": json_obj(
-                        file=ICOW_CLAIMS_MEMBER, line=c.line, columns=["claimdy", "name", "chal", "tgt", "begclaim", "endclaim"]
+                        file=ICOW_CLAIMS_MEMBER,
+                        line=c.line,
+                        columns=["claimdy", "name", "chal", "tgt", "begclaim", "endclaim"],
                     ),
                 }
             )
@@ -1151,7 +1160,9 @@ def icow_claims_kg(
         kg.time(f"{k}:begin", ev, "P580", c.begin, sel={**sel, "column": "begclaim"},
                 qualifiers={"as_coded": c.begin.text, **({"left_censored": "data begin 1816-01"} if c.begin.text == "1816-01" else {})})  # fmt: skip
         if c.end is not None:
-            kg.time(f"{k}:end", ev, "P582", c.end, sel={**sel, "column": "endclaim"}, qualifiers={"as_coded": c.end.text})
+            kg.time(
+                f"{k}:end", ev, "P582", c.end, sel={**sel, "column": "endclaim"}, qualifiers={"as_coded": c.end.text}
+            )
         kg.item(f"{k}:challenger", ev, "icowclaim:challenger", resolver.entity("cow", c.chal, c.begin.last_day, a),
                 sel={**sel, "column": "chal"}, qualifiers={"code": c.chal})  # fmt: skip
         kg.item(f"{k}:target", ev, "icowclaim:target", resolver.entity("cow", c.tgt, c.begin.last_day, b),
@@ -1293,9 +1304,7 @@ async def _ingest_coldat(run: Any) -> dict[str, Any]:
         raws[f.key] = await run.get(
             DV_FILE_URL.format(f.file_id), key=f"coldat:{f.file_name}", media_types=f.media, max_bytes=2_000_000
         )
-    check = check_dataverse_version(
-        meta.body, {f.file_id: raws[f.key].body for f in COLDAT_FILES}, title="COLDAT v3.0"
-    )
+    check = check_dataverse_version(meta.body, {f.file_id: raws[f.key].body for f in COLDAT_FILES}, title="COLDAT v3.0")
     dyads = parse_coldat_dyads(raws["dyads"].body)
     wide = parse_coldat_wide(raws["colonies"].body)
     disagreements = coldat_cross_check(dyads, wide)

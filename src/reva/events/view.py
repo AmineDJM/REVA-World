@@ -404,10 +404,10 @@ def _interval(
     dissolved = pick("dissolved", latest=True)
     episode_end = pick("episode_end", latest=True)
     basis = "source_dates"
-    lo_src = start or inception or pit
-    hi_src = end or dissolved or episode_end or (pit if not (start or inception) else None)
-    if lo_src is None and hi_src is None and pit is not None:
-        lo_src = hi_src = pit
+    # Same order as CAUSCORE's temporal check: start = P580, else P585, else P571; end = P582, else P585, else
+    # P576 (then a dataset's last episode end).
+    lo_src = start or pit or inception
+    hi_src = end or pit or dissolved or episode_end
     lo = lo_src["_lo"] if lo_src else None
     hi = hi_src["_hi"] if hi_src else None
     if lo is None and hi is None and incoming_spells:
@@ -998,11 +998,18 @@ def list_events(
         **{f"ms{i}": d.source_key for i, d in enumerate(markers)},
         **{f"mx{i}": sorted(k for k, v in d.coded_type_map.items() if v is None) for i, d in enumerate(markers)},
     }
+    for i, d in enumerate(markers):
+        # coded values that land in the requested types (all non-excluded values when the default type does)
+        params[f"mv{i}"] = sorted(k for k, v in d.coded_type_map.items() if v is not None and v in type_ids)
     marker_sql = (
         " OR ".join(
             f"(x.property_pid = :mp{i} AND (CAST(:ms{i} AS text) IS NULL OR x.source_key = :ms{i})"
             + (
-                f" AND NOT coalesce(x.value->>'value', '') = ANY(:mx{i}))"
+                (
+                    f" AND NOT coalesce(x.value->>'value', '') = ANY(:mx{i}))"
+                    if d.type in type_ids
+                    else f" AND coalesce(x.value->>'value', '') = ANY(:mv{i}))"
+                )
                 if d.coded_type_property == d.marker_property
                 else ")"
             )
@@ -1072,7 +1079,7 @@ def list_events(
                 continue
             if cursor is not None and cursor[0] is not None and (_key(lo), ev["id"]) <= (_key(cursor[0]), cursor[1]):
                 continue
-            rows.append({"qid": ev["id"], "lo": lo, "hi": lo})
+            rows.append({"qid": ev["id"], "lo": lo, "hi": lo, "name": ev["name"]})
         rows.sort(key=lambda r: (r["lo"] is None, _key(r["lo"]) if r["lo"] else (0, 0, 0), r["qid"]))
     more = len(rows) > limit
     rows = rows[:limit]
@@ -1092,7 +1099,7 @@ def list_events(
             items.append(
                 {
                     "id": r["qid"],
-                    "label": r["qid"],
+                    "label": f"{r.get('name') or r['qid']}: independence (CShapes status change)",
                     "types": [tax.type_ref("independence")],
                     "earliest": kq.astro_iso(r["lo"]),
                     "latest": kq.astro_iso(r["hi"]),
@@ -1101,8 +1108,10 @@ def list_events(
             )
             continue
         cls = classify(conn, r["qid"], origin=origin, tax=tax, recorded=recorded)
-        if not cls["is_event"]:
-            continue  # e.g. a dataset record coded as an outcome, not an event (a page may then hold fewer items)
+        if not cls["is_event"] or (types and not ({m["type"] for m in cls["matches"]} & type_ids)):
+            # a dataset record coded as an outcome (not an event), or coded with a type outside the request;
+            # a page may then hold fewer items than ``limit`` (the cursor still advances)
+            continue
         origins.update(m["statement"]["origin"] for m in cls["matches"] if m.get("statement"))
         if not any(m.get("statement") for m in cls["matches"]):
             origins.update(

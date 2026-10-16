@@ -48,7 +48,6 @@ from typing import Any
 from reva.adapters.connectors.atlas_colonial import (
     CodedTime,
     Kg,
-    StateEntityResolver,
     check_document,
     code_entities_and_links,
     drift,
@@ -59,7 +58,13 @@ from reva.adapters.connectors.atlas_colonial import (
     read_delimited,
     zip_members,
 )
-from reva.adapters.connectors.atlas_geopol_common import AtlasRows, KgEntity, KgStatement, StateCodeCrosswalk
+from reva.adapters.connectors.atlas_geopol_common import (
+    AtlasRows,
+    KgEntity,
+    KgStatement,
+    StateCodeCrosswalk,
+    StateEntityResolver,
+)
 
 CONNECTOR_VERSION = "1.0.0"
 PARSER_VERSION = "atlas_terrchange/1"
@@ -98,7 +103,7 @@ INDEPENDENCE_DEF = (
 )
 CONFLICT_DEF = (
     "This is coded if there was military conflict between organized forces of both sides. Unorganized violence, such "
-    "as riots, is not so classified. This variable is coded \"1\" for military conflict and \"0\" for no military "
+    'as riots, is not so classified. This variable is coded "1" for military conflict and "0" for no military '
     "conflict."
 )
 PORTION = {0: "part of the unit", 1: "entire unit", -9: "could not be determined"}
@@ -425,7 +430,9 @@ def parse_entities(pdf: bytes) -> tuple[list[EntitySpell], dict[str, Any]]:
         else:
             report["unparsed_status"].append({"page": r["page"], "row": r["row"], "status": status})
         if (r["begin"] and _year_or_none(r["begin"]) is None) or (r["end"] and _year_or_none(r["end"]) is None):
-            report["unreadable_years"].append({"page": r["page"], "row": r["row"], "begin": r["begin"], "end": r["end"]})
+            report["unreadable_years"].append(
+                {"page": r["page"], "row": r["row"], "begin": r["begin"], "end": r["end"]}
+            )
         spells.append(
             EntitySpell(
                 page=r["page"],
@@ -587,7 +594,9 @@ def tc_kg(rows: Sequence[TcRow], *, raw_sha256: str, resolver: StateEntityResolv
         k = str(r.number)
         when = r.when.start
         terr = names.get(r.entity, f"entity {r.entity}") if r.entity is not None else "unknown entity"
-        kg.entity(ev, "event", f"Territorial change {r.number}: {terr} ({r.when.text})", "COW Territorial Change v6 case")
+        kg.entity(
+            ev, "event", f"Territorial change {r.number}: {terr} ({r.when.text})", "COW Territorial Change v6 case"
+        )
         etype = "independence" if r.indep == 1 else "territorial_change"
         kg.string(f"{k}:type_of_event", ev, "colonial:event_type", etype, sel={**sel, "column": "indep"})
         kg.point_in_time(f"{k}:date", ev, r.when, sel={**sel, "column": ["year", "month"]},
@@ -601,7 +610,7 @@ def tc_kg(rows: Sequence[TcRow], *, raw_sha256: str, resolver: StateEntityResolv
         if r.entity is not None:
             kg.item(f"{k}:territory", ev, "cowtc:territory", er.territory(r.entity), sel={**sel, "column": "entity"},
                     qualifiers={"code": r.entity})  # fmt: skip
-        slug_, label, definition = PROCEDURES[r.procedure]
+        _, label, definition = PROCEDURES[r.procedure]
         kg.string(f"{k}:procedure", ev, "cowtc:procedure", label, sel={**sel, "column": "procedur"},
                   qualifiers={"code": r.procedure, "definition": definition})  # fmt: skip
         kg.string(f"{k}:independence", ev, "cowtc:independence", "independence" if r.indep else "not an independence",
@@ -655,9 +664,15 @@ def entities_kg(
         if s.end is not None and (s.begin is None or s.end >= s.begin):
             kw |= {"end": f"{s.end:04d}-01-01", "end_precision": 9}
         when = date(s.begin or s.end or 1900, 7, 1)
-        qual: dict[str, Any] = {"status_as_printed": s.status_text, "begin_as_printed": s.raw_begin, "end_as_printed": s.raw_end}
+        qual: dict[str, Any] = {
+            "status_as_printed": s.status_text,
+            "begin_as_printed": s.raw_begin,
+            "end_as_printed": s.raw_end,
+        }
         if s.end == ENTITY_LIST_LAST_YEAR:
-            qual["end_note"] = "1993 is the latest End Year in the list; the list does not say whether it marks its coverage end"
+            qual["end_note"] = (
+                "1993 is the latest End Year in the list; the list does not say whether it marks its coverage end"
+            )
         if s.begin is not None and s.end is not None and s.end < s.begin:
             qual["inconsistent"] = "End Year before Begin Year (end not stated)"
         if s.counterpart is None:
@@ -832,7 +847,9 @@ def entity_status_atlas(
         if s.end is None:
             fl["period_meaning"] = "End Year not printed: period = Begin Year only"
         if s.end == ENTITY_LIST_LAST_YEAR:
-            fl["end_note"] = "1993 is the latest End Year in the list; the list does not say whether it marks its coverage end"
+            fl["end_note"] = (
+                "1993 is the latest End Year in the list; the list does not say whether it marks its coverage end"
+            )
         out.add(
             {
                 "source": "cowtc",
@@ -939,7 +956,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "atlas": {},
         "claims": {"delivered": 0, "reason": "no COW TC variable identifies a cause event (relations_colonial.yaml)"},
     }
-    rights = {"licence": LICENCE, "provider": "Correlates of War Project", "citation": CITATION, "source_key": SOURCE_KEY}
+    rights = {
+        "licence": LICENCE,
+        "provider": "Correlates of War Project",
+        "citation": CITATION,
+        "source_key": SOURCE_KEY,
+    }
     if want_cy:
         cy, cleared = dedupe_iso3(changes_cy_atlas(rows, raw_sha256=sha, crosswalk=cw))
         reg = run.register(

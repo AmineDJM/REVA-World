@@ -350,3 +350,48 @@ def test_marker_kinds_and_coded_exclusions(graph) -> None:  # type: ignore[no-un
     assert not outcome["is_event"]
     ids = {i["id"] for i in listed["items"]}
     assert "evsyn:icb1" in ids and "evsyn:icb1:outcome" not in ids
+
+
+def test_listing_by_coded_type_only_returns_that_type(graph) -> None:  # type: ignore[no-untyped-def]
+    db = graph
+    raw = db.store.put_bytes(b"events marker kinds synthetic v2", "raw", "application/json").sha256
+    sts = [
+        KgStatement(
+            "evsyn:mid1",
+            "causdata:event_type",
+            value={"type": "string", "value": "militarized_interstate_dispute"},
+            statement_id="d1",
+        ),
+        KgStatement("evsyn:mid1", "P580", value=t("1962-10-20", 11), statement_id="d2"),
+    ]
+    rep = load_batch(
+        db.worker,
+        db.store,
+        statements=sts,
+        source_key="eventstest.causdata2",
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
+    assert rep.rejected_total == 0, rep.rejected
+    with db.api.connect() as c:
+        crises = ev.list_events(
+            c,
+            types=["international_crisis"],
+            start="1962",
+            end="1962",
+            recorded=EMPTY,
+            origin="test_fixture",
+            limit=200,
+        )
+        mids = ev.list_events(
+            c,
+            types=["militarized_interstate_dispute"],
+            start="1962",
+            end="1962",
+            recorded=EMPTY,
+            origin="test_fixture",
+            limit=200,
+        )
+    assert "evsyn:mid1" not in {i["id"] for i in crises["items"]} and "evsyn:icb1" in {i["id"] for i in crises["items"]}
+    assert [i["id"] for i in mids["items"]] == ["evsyn:mid1"]

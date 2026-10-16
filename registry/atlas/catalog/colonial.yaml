@@ -1,0 +1,1741 @@
+# Colonial history and decolonisation (agent A-COLONIAL). Provider-declared concepts (not human-reviewed), generated
+# from the connectors' definitions. Atlas tables: coldat.dyads_v3 (COLDAT v3.0, CC0), icow.colhist_v11 (ICOW Colonial
+# History 1.1), cowtc.changes_cy (COMPUTED counts, COW Territorial Change v6), cowtc.entity_status (COW entities list).
+# icow.claims_prov101 (one indicator per dyadic claim) has no catalog concept. See docs/dev/v3_a_colonial.md.
+domain: colonial
+labels:
+  fr: Histoire coloniale et décolonisation
+  en: Colonial history and decolonisation
+maintainer: A-COLONIAL
+concepts:
+- id: colonial.colonized_by.belgium
+  labels:
+    fr: 'Colonisé un jour par : Belgique (indicatrice COLDAT)'
+    en: Ever colonized by Belgium (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=belgium
+  provider_declared: true
+- id: colonial.rule.belgium.max
+  labels:
+    fr: 'Domination coloniale : Belgique, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Belgium, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=belgium|agg=max
+  provider_declared: true
+- id: colonial.rule_start.belgium.max
+  labels:
+    fr: 'Première année de domination coloniale : Belgique (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Belgium (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=belgium|agg=max
+  provider_declared: true
+- id: colonial.rule_end.belgium.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Belgique (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Belgium (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=belgium|agg=max
+  provider_declared: true
+- id: colonial.rule.belgium.mean
+  labels:
+    fr: 'Domination coloniale : Belgique, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Belgium, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=belgium|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.belgium.mean
+  labels:
+    fr: 'Première année de domination coloniale : Belgique (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Belgium (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=belgium|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.belgium.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Belgique (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Belgium (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=belgium|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.britain
+  labels:
+    fr: 'Colonisé un jour par : Grande-Bretagne (indicatrice COLDAT)'
+    en: Ever colonized by Britain (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=britain
+  provider_declared: true
+- id: colonial.rule.britain.max
+  labels:
+    fr: 'Domination coloniale : Grande-Bretagne, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Britain, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=britain|agg=max
+  provider_declared: true
+- id: colonial.rule_start.britain.max
+  labels:
+    fr: 'Première année de domination coloniale : Grande-Bretagne (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Britain (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=britain|agg=max
+  provider_declared: true
+- id: colonial.rule_end.britain.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Grande-Bretagne (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Britain (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=britain|agg=max
+  provider_declared: true
+- id: colonial.rule.britain.mean
+  labels:
+    fr: 'Domination coloniale : Grande-Bretagne, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Britain, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=britain|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.britain.mean
+  labels:
+    fr: 'Première année de domination coloniale : Grande-Bretagne (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Britain (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=britain|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.britain.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Grande-Bretagne (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Britain (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=britain|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.france
+  labels:
+    fr: 'Colonisé un jour par : France (indicatrice COLDAT)'
+    en: Ever colonized by France (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=france
+  provider_declared: true
+- id: colonial.rule.france.max
+  labels:
+    fr: 'Domination coloniale : France, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by France, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=france|agg=max
+  provider_declared: true
+- id: colonial.rule_start.france.max
+  labels:
+    fr: 'Première année de domination coloniale : France (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by France (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=france|agg=max
+  provider_declared: true
+- id: colonial.rule_end.france.max
+  labels:
+    fr: 'Dernière année de domination coloniale : France (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by France (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=france|agg=max
+  provider_declared: true
+- id: colonial.rule.france.mean
+  labels:
+    fr: 'Domination coloniale : France, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by France, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=france|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.france.mean
+  labels:
+    fr: 'Première année de domination coloniale : France (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by France (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=france|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.france.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : France (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by France (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=france|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.germany
+  labels:
+    fr: 'Colonisé un jour par : Allemagne (indicatrice COLDAT)'
+    en: Ever colonized by Germany (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=germany
+  provider_declared: true
+- id: colonial.rule.germany.max
+  labels:
+    fr: 'Domination coloniale : Allemagne, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Germany, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=germany|agg=max
+  provider_declared: true
+- id: colonial.rule_start.germany.max
+  labels:
+    fr: 'Première année de domination coloniale : Allemagne (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Germany (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=germany|agg=max
+  provider_declared: true
+- id: colonial.rule_end.germany.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Allemagne (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Germany (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=germany|agg=max
+  provider_declared: true
+- id: colonial.rule.germany.mean
+  labels:
+    fr: 'Domination coloniale : Allemagne, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Germany, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=germany|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.germany.mean
+  labels:
+    fr: 'Première année de domination coloniale : Allemagne (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Germany (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=germany|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.germany.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Allemagne (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Germany (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=germany|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.italy
+  labels:
+    fr: 'Colonisé un jour par : Italie (indicatrice COLDAT)'
+    en: Ever colonized by Italy (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=italy
+  provider_declared: true
+- id: colonial.rule.italy.max
+  labels:
+    fr: 'Domination coloniale : Italie, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Italy, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=italy|agg=max
+  provider_declared: true
+- id: colonial.rule_start.italy.max
+  labels:
+    fr: 'Première année de domination coloniale : Italie (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Italy (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=italy|agg=max
+  provider_declared: true
+- id: colonial.rule_end.italy.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Italie (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Italy (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=italy|agg=max
+  provider_declared: true
+- id: colonial.rule.italy.mean
+  labels:
+    fr: 'Domination coloniale : Italie, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Italy, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=italy|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.italy.mean
+  labels:
+    fr: 'Première année de domination coloniale : Italie (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Italy (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=italy|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.italy.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Italie (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Italy (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=italy|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.netherlands
+  labels:
+    fr: 'Colonisé un jour par : Pays-Bas (indicatrice COLDAT)'
+    en: Ever colonized by Netherlands (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=netherlands
+  provider_declared: true
+- id: colonial.rule.netherlands.max
+  labels:
+    fr: 'Domination coloniale : Pays-Bas, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Netherlands, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=netherlands|agg=max
+  provider_declared: true
+- id: colonial.rule_start.netherlands.max
+  labels:
+    fr: 'Première année de domination coloniale : Pays-Bas (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Netherlands (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=netherlands|agg=max
+  provider_declared: true
+- id: colonial.rule_end.netherlands.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Pays-Bas (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Netherlands (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=netherlands|agg=max
+  provider_declared: true
+- id: colonial.rule.netherlands.mean
+  labels:
+    fr: 'Domination coloniale : Pays-Bas, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Netherlands, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=netherlands|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.netherlands.mean
+  labels:
+    fr: 'Première année de domination coloniale : Pays-Bas (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Netherlands (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=netherlands|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.netherlands.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Pays-Bas (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Netherlands (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=netherlands|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.portugal
+  labels:
+    fr: 'Colonisé un jour par : Portugal (indicatrice COLDAT)'
+    en: Ever colonized by Portugal (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=portugal
+  provider_declared: true
+- id: colonial.rule.portugal.max
+  labels:
+    fr: 'Domination coloniale : Portugal, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Portugal, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=portugal|agg=max
+  provider_declared: true
+- id: colonial.rule_start.portugal.max
+  labels:
+    fr: 'Première année de domination coloniale : Portugal (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Portugal (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=portugal|agg=max
+  provider_declared: true
+- id: colonial.rule_end.portugal.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Portugal (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Portugal (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=portugal|agg=max
+  provider_declared: true
+- id: colonial.rule.portugal.mean
+  labels:
+    fr: 'Domination coloniale : Portugal, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Portugal, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=portugal|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.portugal.mean
+  labels:
+    fr: 'Première année de domination coloniale : Portugal (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Portugal (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=portugal|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.portugal.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Portugal (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Portugal (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=portugal|agg=mean
+  provider_declared: true
+- id: colonial.colonized_by.spain
+  labels:
+    fr: 'Colonisé un jour par : Espagne (indicatrice COLDAT)'
+    en: Ever colonized by Spain (COLDAT dummy)
+  definition: 'COLDAT v3.0 (Becker 2019): ''Dummy indicating whether country was ever colonized by colonizer.'' Colony: ''A
+    colony is a territory whose domestic and/or foreign affairs are dominated by a European nation state, and whose population
+    is constructed as inferior to the colonizer.'' Period = dataset coverage (1462 .. 2016-12-31).'
+  unit: '1'
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonized|colonizer=spain
+  provider_declared: true
+- id: colonial.rule.spain.max
+  labels:
+    fr: 'Domination coloniale : Espagne, période (agrégation par la dernière date, COLDAT)'
+    en: Colonial rule by Spain, spell (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on last date aggregation.'' / ''Last year during which country
+    was colonized by colonizer. Based on last date aggregation.'' Instead of imposing a choice on researchers, I include mean
+    aggregates, which aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=spain|agg=max
+  provider_declared: true
+- id: colonial.rule_start.spain.max
+  labels:
+    fr: 'Première année de domination coloniale : Espagne (agrégation par la dernière date, COLDAT)'
+    en: First year of colonial rule by Spain (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=spain|agg=max
+  provider_declared: true
+- id: colonial.rule_end.spain.max
+  labels:
+    fr: 'Dernière année de domination coloniale : Espagne (agrégation par la dernière date, COLDAT)'
+    en: Last year of colonial rule by Spain (last date aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on last date aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=spain|agg=max
+  provider_declared: true
+- id: colonial.rule.spain.mean
+  labels:
+    fr: 'Domination coloniale : Espagne, période (agrégation par la moyenne, COLDAT)'
+    en: Colonial rule by Spain, spell (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: the colonial spell first year .. last year (period = [first year, last year + 1)). ''First year
+    during which country was colonized by colonizer. Based on mean aggregation.'' / ''Last year during which country was colonized
+    by colonizer. Based on mean aggregation.'' Instead of imposing a choice on researchers, I include mean aggregates, which
+    aim at measurement accuracy, as well as last date aggregates, which aim at event consensuality, in COLDAT.'
+  unit: category
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: text
+  source_order:
+  - coldat.dyads_v3.colonial_rule|colonizer=spain|agg=mean
+  provider_declared: true
+- id: colonial.rule_start.spain.mean
+  labels:
+    fr: 'Première année de domination coloniale : Espagne (agrégation par la moyenne, COLDAT)'
+    en: First year of colonial rule by Spain (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''First year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_start|colonizer=spain|agg=mean
+  provider_declared: true
+- id: colonial.rule_end.spain.mean
+  labels:
+    fr: 'Dernière année de domination coloniale : Espagne (agrégation par la moyenne, COLDAT)'
+    en: Last year of colonial rule by Spain (mean aggregation, COLDAT)
+  definition: 'COLDAT v3.0: ''Last year during which country was colonized by colonizer. Based on mean aggregation.'''
+  unit: year
+  domain: colonial
+  subdomain: coldat
+  theme: history
+  value_kind: numeric
+  source_order:
+  - coldat.dyads_v3.colonial_rule_end|colonizer=spain|agg=mean
+  provider_declared: true
+- id: colonial.icow.independence_year
+  labels:
+    fr: Année de l'indépendance (ICOW)
+    en: Year of independence (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): The date on which this state became independent -- i.e., acquired
+    control of its own foreign policy, without being ruled by a foreign power. This takes the form YYYYMM, where the month
+    is coded as 00 if ICOW does not currently have an estimated month when the state took its current form.'
+  unit: year
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.independence_year
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.independence_from
+  labels:
+    fr: Indépendance obtenue de (ICOW)
+    en: Independence gained from (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): The COW country code for the state, empire, or other entity from which
+    this state gained independence. This variable is coded as missing where the state did not gain independence from a COW
+    system member (e.g., by unifying local units into a new state).'
+  unit: category
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: text
+  source_order:
+  - icow.colhist_v11.independence_from
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.independence_violent
+  labels:
+    fr: Indépendance violente (ICOW, 0/1)
+    en: Violent independence (ICOW, 0/1)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): An independence process is considered violent if it occurred through
+    armed revolt by the entity, or if it occurred through armed conflict between the former ruler and another state (as when
+    the entity in question is conquered or freed by a foreign power, or when it changed hands as part of a treaty ending a
+    war). Coded attribute, not a causal claim: the violent episode is not identified.'
+  unit: '1'
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.independence_violent
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.independence_type
+  labels:
+    fr: Type d'indépendance (ICOW)
+    en: Type of independence (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): ICOW IndType: Formation / Decolonization / Secession / Partition (codebook
+    definitions in the cell flags).'
+  unit: category
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: text
+  source_order:
+  - icow.colhist_v11.independence_type
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.primary_colonial_ruler
+  labels:
+    fr: Principal souverain colonial (ICOW)
+    en: Primary colonial ruler (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): The colonial or imperial power that was most responsible for shaping
+    the development of the entity (or entities) that became this modern state. Attached to the independence date (ICOW 1.1
+    codes no years of rule).'
+  unit: category
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: text
+  source_order:
+  - icow.colhist_v11.primary_colonial_ruler
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.secession_year
+  labels:
+    fr: Année de sécession (ICOW)
+    en: Year of secession (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): ICOW SecDate: the date on which this state seceded (YYYYMM, month
+    00 = unknown).'
+  unit: year
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.secession_year
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.seceded_from
+  labels:
+    fr: A fait sécession de (ICOW)
+    en: Seceded from (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): The COW country code for the state from which this state seceded after
+    independence.'
+  unit: category
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: text
+  source_order:
+  - icow.colhist_v11.seceded_from
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.secession_violent
+  labels:
+    fr: Sécession violente (ICOW, 0/1)
+    en: Violent secession (ICOW, 0/1)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): ICOW SecViol: 1 = The secession occurred through organized violence;
+    0 = it did not.'
+  unit: '1'
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.secession_violent
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.merged_into
+  labels:
+    fr: A fusionné dans (ICOW)
+    en: Merged into (ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): The COW country code for a state that absorbed this state after independence.'
+  unit: category
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: text
+  source_order:
+  - icow.colhist_v11.merged_into
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.cow_system_entry
+  labels:
+    fr: Entrée dans le système interétatique COW (selon ICOW)
+    en: COW interstate system entry year (as listed by ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): ICOW COWsys: the date on which this state entered the COW interstate
+    system (system list 2004.1).'
+  unit: year
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.cow_system_entry
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.icow.gw_system_entry
+  labels:
+    fr: Entrée dans le système Gleditsch-Ward (selon ICOW)
+    en: Gleditsch-Ward system entry year (as listed by ICOW)
+  definition: 'ICOW Colonial History 1.1 (Hensel 2018): ICOW GWsys: entry in the Gleditsch & Ward system (updated through
+    the end of 2002).'
+  unit: year
+  domain: colonial
+  subdomain: icow_colonial_history
+  theme: history
+  value_kind: numeric
+  source_order:
+  - icow.colhist_v11.gw_system_entry
+  provider_declared: true
+  notes: Cells are provider-coded per COW state (provider_geo cow:<code>); historical states keep iso3 null with their QID.
+- id: colonial.tc.gained
+  labels:
+    fr: Changements territoriaux gagnés (COW TC, nombre)
+    en: Territorial changes gained (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6: distinct changes with this state as gainer, dated in the year (treaty
+    date rule of the manual).'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained
+  provider_declared: true
+- id: colonial.tc.gained.independence
+  labels:
+    fr: Indépendances (obtenues) (COW TC, nombre)
+    en: Independences (gained) (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, cases coded indep = 1: Independence refers to the termination of colonial
+    rule over a dependency. This termination must involve the former dependency''s attaining effective control over its own
+    foreign affairs and armed forces as wed as achieving some measure of diplomatic recognition.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|independence=1
+  provider_declared: true
+- id: colonial.tc.gained.military_conflict
+  labels:
+    fr: Changements territoriaux gagnés avec conflit militaire (COW TC, nombre)
+    en: Territorial changes gained with military conflict (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, cases coded conflict = 1: This is coded if there was military conflict
+    between organized forces of both sides. Unorganized violence, such as riots, is not so classified. This variable is coded
+    "1" for military conflict and "0" for no military conflict.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|military_conflict=1
+  provider_declared: true
+- id: colonial.tc.gained.conquest
+  labels:
+    fr: 'Changements territoriaux gagnés : conquest (COW TC, nombre)'
+    en: Territorial changes gained by conquest (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Conquest'': Conquest occurs when armed force is the primary
+    agent of the territorial change.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=conquest
+  provider_declared: true
+- id: colonial.tc.gained.annexation
+  labels:
+    fr: 'Changements territoriaux gagnés : annexation (COW TC, nombre)'
+    en: Territorial changes gained by annexation (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Annexation'': Annexation occurs when one political entity
+    unilaterally extends its sovereignty over another political entity when the primary agent of change is diplomacy, although
+    the implied threat of force may be involved.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=annexation
+  provider_declared: true
+- id: colonial.tc.gained.cession
+  labels:
+    fr: 'Changements territoriaux gagnés : cession (COW TC, nombre)'
+    en: Territorial changes gained by cession (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Cession'': Cession occurs when part of a political entity
+    is yielded to another entity through plebiscite, purchase, compensating agreement, or as a consequence of hostilities.
+    If the cession was total, then the change is coded as a "conquest."'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=cession
+  provider_declared: true
+- id: colonial.tc.gained.secession
+  labels:
+    fr: 'Changements territoriaux gagnés : secession (COW TC, nombre)'
+    en: Territorial changes gained by secession (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Secession'': Secession refers to the dissolution of an
+    existing end as a result of one or more parts of the entity leaving it in order to establish themselves as new independent
+    entities.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=secession
+  provider_declared: true
+- id: colonial.tc.gained.unification
+  labels:
+    fr: 'Changements territoriaux gagnés : unification (COW TC, nombre)'
+    en: Territorial changes gained by unification (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Unification'': Unification refers to the formation of
+    a new political entity out of two or more pre-existing entities.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=unification
+  provider_declared: true
+- id: colonial.tc.gained.mandated_territory
+  labels:
+    fr: 'Changements territoriaux gagnés : mandated territory (COW TC, nombre)'
+    en: Territorial changes gained by mandated territory (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Mandated territory'': A Mandated Territory is a territorial
+    unit that is placed under the control of another political entity by the League of Nations or the United Nations.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=mandated_territory
+  provider_declared: true
+- id: colonial.tc.gained.not_applicable
+  labels:
+    fr: 'Changements territoriaux gagnés : not applicable (COW TC, nombre)'
+    en: Territorial changes gained by not applicable (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Not applicable'': This variable may not always be applicable,
+    most frequently for independences, in which case it is coded "-9".'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.gained|procedure=not_applicable
+  provider_declared: true
+- id: colonial.tc.lost
+  labels:
+    fr: Changements territoriaux perdus (COW TC, nombre)
+    en: Territorial changes lost (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6: distinct changes with this state as loser, dated in the year (treaty
+    date rule of the manual).'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost
+  provider_declared: true
+- id: colonial.tc.lost.independence
+  labels:
+    fr: Indépendances (de dépendances, perdues) (COW TC, nombre)
+    en: Independences (of dependencies, lost) (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, cases coded indep = 1: Independence refers to the termination of colonial
+    rule over a dependency. This termination must involve the former dependency''s attaining effective control over its own
+    foreign affairs and armed forces as wed as achieving some measure of diplomatic recognition.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|independence=1
+  provider_declared: true
+- id: colonial.tc.lost.military_conflict
+  labels:
+    fr: Changements territoriaux perdus avec conflit militaire (COW TC, nombre)
+    en: Territorial changes lost with military conflict (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, cases coded conflict = 1: This is coded if there was military conflict
+    between organized forces of both sides. Unorganized violence, such as riots, is not so classified. This variable is coded
+    "1" for military conflict and "0" for no military conflict.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|military_conflict=1
+  provider_declared: true
+- id: colonial.tc.lost.conquest
+  labels:
+    fr: 'Changements territoriaux perdus : conquest (COW TC, nombre)'
+    en: Territorial changes lost by conquest (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Conquest'': Conquest occurs when armed force is the primary
+    agent of the territorial change.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=conquest
+  provider_declared: true
+- id: colonial.tc.lost.annexation
+  labels:
+    fr: 'Changements territoriaux perdus : annexation (COW TC, nombre)'
+    en: Territorial changes lost by annexation (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Annexation'': Annexation occurs when one political entity
+    unilaterally extends its sovereignty over another political entity when the primary agent of change is diplomacy, although
+    the implied threat of force may be involved.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=annexation
+  provider_declared: true
+- id: colonial.tc.lost.cession
+  labels:
+    fr: 'Changements territoriaux perdus : cession (COW TC, nombre)'
+    en: Territorial changes lost by cession (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Cession'': Cession occurs when part of a political entity
+    is yielded to another entity through plebiscite, purchase, compensating agreement, or as a consequence of hostilities.
+    If the cession was total, then the change is coded as a "conquest."'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=cession
+  provider_declared: true
+- id: colonial.tc.lost.secession
+  labels:
+    fr: 'Changements territoriaux perdus : secession (COW TC, nombre)'
+    en: Territorial changes lost by secession (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Secession'': Secession refers to the dissolution of an
+    existing end as a result of one or more parts of the entity leaving it in order to establish themselves as new independent
+    entities.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=secession
+  provider_declared: true
+- id: colonial.tc.lost.unification
+  labels:
+    fr: 'Changements territoriaux perdus : unification (COW TC, nombre)'
+    en: Territorial changes lost by unification (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Unification'': Unification refers to the formation of
+    a new political entity out of two or more pre-existing entities.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=unification
+  provider_declared: true
+- id: colonial.tc.lost.mandated_territory
+  labels:
+    fr: 'Changements territoriaux perdus : mandated territory (COW TC, nombre)'
+    en: Territorial changes lost by mandated territory (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Mandated territory'': A Mandated Territory is a territorial
+    unit that is placed under the control of another political entity by the League of Nations or the United Nations.'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=mandated_territory
+  provider_declared: true
+- id: colonial.tc.lost.not_applicable
+  labels:
+    fr: 'Changements territoriaux perdus : not applicable (COW TC, nombre)'
+    en: Territorial changes lost by not applicable (COW TC, count)
+  definition: 'COMPUTED from COW Territorial Change v6, procedure ''Not applicable'': This variable may not always be applicable,
+    most frequently for independences, in which case it is coded "-9".'
+  unit: count
+  domain: colonial
+  subdomain: territorial_change
+  theme: history
+  value_kind: numeric
+  source_order:
+  - cowtc.changes_cy.lost|procedure=not_applicable
+  provider_declared: true
+- id: colonial.cow_entity.colony_of.2
+  labels:
+    fr: 'Territoire : colonie de États-Unis (liste des entités COW)'
+    en: Territory colony of United States (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 2'' (COW 2 = United States); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=2
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.200
+  labels:
+    fr: 'Territoire : colonie de Royaume-Uni (liste des entités COW)'
+    en: Territory colony of United Kingdom (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 200'' (COW 200 = United Kingdom); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=200
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.210
+  labels:
+    fr: 'Territoire : colonie de Pays-Bas (liste des entités COW)'
+    en: Territory colony of Netherlands (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 210'' (COW 210 = Netherlands); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=210
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.211
+  labels:
+    fr: 'Territoire : colonie de Belgique (liste des entités COW)'
+    en: Territory colony of Belgium (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 211'' (COW 211 = Belgium); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=211
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.220
+  labels:
+    fr: 'Territoire : colonie de France (liste des entités COW)'
+    en: Territory colony of France (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 220'' (COW 220 = France); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=220
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.230
+  labels:
+    fr: 'Territoire : colonie de Espagne (liste des entités COW)'
+    en: Territory colony of Spain (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 230'' (COW 230 = Spain); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=230
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.235
+  labels:
+    fr: 'Territoire : colonie de Portugal (liste des entités COW)'
+    en: Territory colony of Portugal (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 235'' (COW 235 = Portugal); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=235
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.255
+  labels:
+    fr: 'Territoire : colonie de Allemagne (liste des entités COW)'
+    en: Territory colony of Germany (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 255'' (COW 255 = Germany); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=255
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.325
+  labels:
+    fr: 'Territoire : colonie de Italie (liste des entités COW)'
+    en: Territory colony of Italy (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 325'' (COW 325 = Italy); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=325
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.colony_of.740
+  labels:
+    fr: 'Territoire : colonie de Japon (liste des entités COW)'
+    en: Territory colony of Japan (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    colony of 740'' (COW 740 = Japan); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=colony_of|counterpart=740
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.2
+  labels:
+    fr: 'Territoire : protectorat de États-Unis (liste des entités COW)'
+    en: Territory protectorate of United States (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 2'' (COW 2 = United States); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=2
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.200
+  labels:
+    fr: 'Territoire : protectorat de Royaume-Uni (liste des entités COW)'
+    en: Territory protectorate of United Kingdom (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 200'' (COW 200 = United Kingdom); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=200
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.220
+  labels:
+    fr: 'Territoire : protectorat de France (liste des entités COW)'
+    en: Territory protectorate of France (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 220'' (COW 220 = France); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=220
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.230
+  labels:
+    fr: 'Territoire : protectorat de Espagne (liste des entités COW)'
+    en: Territory protectorate of Spain (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 230'' (COW 230 = Spain); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=230
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.255
+  labels:
+    fr: 'Territoire : protectorat de Allemagne (liste des entités COW)'
+    en: Territory protectorate of Germany (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 255'' (COW 255 = Germany); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=255
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.325
+  labels:
+    fr: 'Territoire : protectorat de Italie (liste des entités COW)'
+    en: Territory protectorate of Italy (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 325'' (COW 325 = Italy); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=325
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.protectorate_of.740
+  labels:
+    fr: 'Territoire : protectorat de Japon (liste des entités COW)'
+    en: Territory protectorate of Japan (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    protectorate of 740'' (COW 740 = Japan); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=protectorate_of|counterpart=740
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.2
+  labels:
+    fr: 'Territoire : territoire sous mandat de États-Unis (liste des entités COW)'
+    en: Territory mandated territory of United States (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 2'' (COW 2 = United States); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=2
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.200
+  labels:
+    fr: 'Territoire : territoire sous mandat de Royaume-Uni (liste des entités COW)'
+    en: Territory mandated territory of United Kingdom (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 200'' (COW 200 = United Kingdom); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=200
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.211
+  labels:
+    fr: 'Territoire : territoire sous mandat de Belgique (liste des entités COW)'
+    en: Territory mandated territory of Belgium (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 211'' (COW 211 = Belgium); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=211
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.220
+  labels:
+    fr: 'Territoire : territoire sous mandat de France (liste des entités COW)'
+    en: Territory mandated territory of France (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 220'' (COW 220 = France); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=220
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.325
+  labels:
+    fr: 'Territoire : territoire sous mandat de Italie (liste des entités COW)'
+    en: Territory mandated territory of Italy (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 325'' (COW 325 = Italy); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=325
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.mandated_to.740
+  labels:
+    fr: 'Territoire : territoire sous mandat de Japon (liste des entités COW)'
+    en: Territory mandated territory of Japan (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Mandated
+    to 740'' (COW 740 = Japan); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=mandated_to|counterpart=740
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.2
+  labels:
+    fr: 'Territoire : possession de États-Unis (liste des entités COW)'
+    en: Territory possession of United States (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 2'' (COW 2 = United States); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=2
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.200
+  labels:
+    fr: 'Territoire : possession de Royaume-Uni (liste des entités COW)'
+    en: Territory possession of United Kingdom (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 200'' (COW 200 = United Kingdom); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=200
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.210
+  labels:
+    fr: 'Territoire : possession de Pays-Bas (liste des entités COW)'
+    en: Territory possession of Netherlands (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 210'' (COW 210 = Netherlands); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=210
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.220
+  labels:
+    fr: 'Territoire : possession de France (liste des entités COW)'
+    en: Territory possession of France (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 220'' (COW 220 = France); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=220
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.230
+  labels:
+    fr: 'Territoire : possession de Espagne (liste des entités COW)'
+    en: Territory possession of Spain (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 230'' (COW 230 = Spain); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=230
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.235
+  labels:
+    fr: 'Territoire : possession de Portugal (liste des entités COW)'
+    en: Territory possession of Portugal (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 235'' (COW 235 = Portugal); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=235
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.
+- id: colonial.cow_entity.possession_of.325
+  labels:
+    fr: 'Territoire : possession de Italie (liste des entités COW)'
+    en: Territory possession of Italy (COW entities list)
+  definition: 'COW political entities list (Entities.pdf, Territorial Change v6): spells printed ''Begin Year End Year Became
+    possession of 325'' (COW 325 = Italy); period = [Begin Year, End Year + 1).'
+  unit: category
+  domain: colonial
+  subdomain: cow_entities
+  theme: history
+  value_kind: text
+  source_order:
+  - cowtc.entity_status.status|relation=possession_of|counterpart=325
+  provider_declared: true
+  notes: iso3 = the present-day entity the COW entity code denotes (state codes through the crosswalk, a few exact-name aliases);
+    borders may differ.

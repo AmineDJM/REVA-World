@@ -201,7 +201,11 @@ def render_text(card: Mapping[str, Any]) -> str:
     iv = card["interval"]
 
     def tv(x: Any) -> str:
-        return "-" if not x else f"{x['time']} (precision {x['precision']})"
+        if not x:
+            return "-"
+        span = x["lo"] if x["lo"] == x["hi"] else f"{x['lo']}..{x['hi']}"
+        cal = f", {x['calendar']} calendar" if x.get("calendar") == "julian" else ""
+        return f"{span} (source {x['time']}, precision {x['precision']}{cal})"
 
     lines.append(
         f"time: start {tv(iv['start'])}, end {tv(iv['end'])}, point {tv(iv['point_in_time'])} -> "

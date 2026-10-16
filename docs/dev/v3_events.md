@@ -20,7 +20,7 @@ sequence are **context**; causal statements are only listed as *asserted by* the
 | HTTP routes (`read` scope) + 1 router line in `src/reva/api/app.py` | `src/reva/api/routes/events.py` |
 | Harvester specs (11, API-mode capable) | `registry/kg/queries/events/{political,society,violence,diplomacy}/*.yaml` |
 | Property requests to WDHARVEST | `registry/kg/property_requests/events.yaml` |
-| Tests | `tests/unit/events/test_events_{taxonomy,specs}.py` (17, offline), `tests/integration/test_events_view.py` (8, db), `tests/integration/test_events_datasets.py` (6, db, fixture ingests) |
+| Tests | `tests/unit/events/test_events_{taxonomy,specs}.py` (14 + 4, offline), `tests/integration/test_events_view.py` (9, db), `tests/integration/test_events_datasets.py` (6, db, fixture ingests) |
 | Contract | `contracts/openapi.json` regenerated (`/v1/events/{event_id}`, `/v1/events/search`, `/v1/events/types`) |
 
 No migration: the view reads `kg.statement_current` / `kg.entity_current`; `same_as` links are ordinary KG
@@ -65,7 +65,8 @@ pacing, archive and User-Agent as `budgeted_client`, but it reserves only the AP
 spent, 2,374/1,500, and reserving it blocked API-only work). The action API answered 429 for minutes at a time
 (13 attempts exhausted twice), so snapshots came from `Special:EntityData` (one entity per request, archive reuse
 72 h) and title lookups from `Special:ItemByTitle`. Records are compact (labels, non-deprecated P31/P279 with rank and
-statement id, datatype, `lastrevid`); raw bodies stay in `var/kg/objects`. Findings:
+statement id, datatype, `lastrevid`); raw bodies stay in `var/kg/objects`. (One verification run was started twice by
+mistake; the duplicate was stopped and its ledger reservation settled from the archive index: 97 requests.) Findings:
 
 * guesses rejected by the record: Q1752346 is *assembly* (not self-coup), Q3318733 *independentism* (an ideology),
   Q59858687 *civic holiday*, Q37055 *independence* is a concept (P279 sovereignty-like), so `independence` has no
@@ -184,7 +185,7 @@ Reused, not duplicated: `history.revolutions`, `history.wars`, `history.treaties
 `geography.nature.{epidemics,famines,earthquakes,...}` (they keep every allow-listed property, causal ones
 included). Every EVENTS spec is rank-aware (`p:P31/ps:P31`, deprecated excluded), lists its snapshot `properties`
 with **P828/P1542/P1478/P1479/P1536/P1537**, and carries an `api_search` block (`run --via api`).
-`python -m reva.kg.harvest validate`: 116/116 specs valid. Probes: WDQS `try` impossible (budget spent, 429
+`python -m reva.kg.harvest validate`: 116/116 specs valid. Wikidata traffic of this work: 261 `wikidata.wbapi` requests in the ledger (429 answers included), 0 WDQS. Probes: WDQS `try` impossible (budget spent, 429
 cool-downs); the API-mode probe (`python -m reva.events.verify --probe-specs`, REST search) was refused 13 times
 (429) and stopped — no retry. Instead an **offline probe** re-applies each spec's api_search classes to KGHIST's
 recorded claims: coups select Coup of 18 Brumaire and the Carnation Revolution; transfers select the Louisiana
@@ -197,7 +198,121 @@ P1339 number of injured. Until WDHARVEST merges them the specs cannot keep these
 
 ## 7. Demonstration (throwaway DB)
 
-See §7 results below (filled from `python -m reva.events.demo`).
+`uv run python -m reva.events.demo --out <dir> --store <dir>` (database `reva_events_demo`, created, migrated and
+dropped; `reva` untouched). Inputs: the fixture-mode ingests of UCDP (275 statements), COW (1,116), CShapes (72),
+UN peace operations (406) and UNTC (1,093); Wikidata `Special:EntityData` snapshots of the four events plus label
+snapshots of 35 entities they cite (39 entities, 65 allow-listed statements, 0 rejected; 27 snapshots fetched
+budget-metered, the others reused from the archive). `same_as`: 0 links (no evidence among these records; the
+inactive rules are reported). Listing `from=1954&to=1962&country=DZA&involving=true` returns the Algerian War
+(Q200790), UCDP conflict 246 and the CShapes independence of Algeria (1962-07-05) as three separate records — no
+link between Q200790 and `ucdp:conflict:246` because no shared identifier exists (§5).
+
+Cards as rendered by `reva.events.demo.render_text` (the JSON cards carry full provenance per item):
+
+```
+== Suez Crisis (Q49101)
+types: military_expedition (expédition militaire) | basis: wikidata_p31
+  via Q1384277 [normal, direct]
+  via Q2001676 > Q350604 [normal, recorded]
+  via Q2001676 > Q645883 [normal, recorded]
+time: start 1956-10-29 (source +1956-10-29T00:00:00Z, precision 11), end 1956-11-07 (source +1956-11-07T00:00:00Z, precision 11), point 1957-03-01..1957-03-31 (source +1957-03-00T00:00:00Z, precision 10) -> 1956-10-29 .. 1956-11-07 [source_dates, consistent]
+  note: point in time lies outside the start..end interval (kept as stated by the source)
+places: location: Sinai Peninsula
+participant: Egypt — participant [P710 out, wikidata.wbapi]
+participant: France — participant [P710 out, wikidata.wbapi]
+participant: Israel — participant [P710 out, wikidata.wbapi]
+participant: United Kingdom — participant [P710 out, wikidata.wbapi]
+structure: part_of Arab–Israeli conflict [P361 stated on Q49101]
+structure: part_of Cold War [P361 stated on Q49101]
+sources: wikidata.wbapi
+
+== Treaty of Tordesillas (Q180897)
+types: treaty (traité) | basis: wikidata_p31
+  via Q131569 [normal, direct]
+time: start -, end -, point 1494-06-16 (source +1494-06-07T00:00:00Z, precision 11, julian calendar) -> 1494-06-16 .. 1494-06-16 [source_dates, consistent]
+places: country: Kingdom of Portugal; country: Spanish Empire; location: Tordesillas; location: General Archive of the Indies; location: Torre do Tombo National Archive
+participant: Ferdinand II of Aragon — signatory, 1494-07-11..1494-07-11 [P1891 out, wikidata.wbapi]
+participant: Isabella I of Castile — signatory, 1494-07-11..1494-07-11 [P1891 out, wikidata.wbapi]
+participant: John II of Portugal — signatory, 1494-09-14..1494-09-14 [P1891 out, wikidata.wbapi]
+structure: has_part Demarcation line of Alexander VI [P527 stated on Q180897]
+structure: follows Inter caetera [P155 stated on Q180897]
+sources: wikidata.wbapi
+
+== Wall Street crash of 1929 (Q201684)
+types: stock_market_crash (krach boursier) | basis: wikidata_p31
+  via Q1020018 [normal, direct]
+time: start 1929-10-24 (source +1929-10-24T00:00:00Z, precision 11), end 1929-10-29 (source +1929-10-29T00:00:00Z, precision 11), point 1929-01-01..1929-12-31 (source +1929-00-00T00:00:00Z, precision 9) -> 1929-10-24 .. 1929-10-29 [source_dates, consistent]
+places: country: United States; location: United States
+participant: New York Stock Exchange — participant [P710 out, wikidata.wbapi]
+causal (asserted by wikidata.wbapi): Wall Street crash of 1929 —has effect→ Great Depression in the United States
+causal (asserted by wikidata.wbapi): Wall Street crash of 1929 —has effect→ Great Depression
+sources: wikidata.wbapi
+
+== Algerian War (Q200790)
+types: war_of_independence (guerre d'indépendance) | basis: wikidata_p31
+  via Q21994376 [normal, direct]
+  via Q1006311 > Q21994376 [normal, recorded]
+time: start 1954-11-01 (source +1954-11-01T00:00:00Z, precision 11), end 1962-09-09 (source +1962-09-09T00:00:00Z, precision 11), point - -> 1954-11-01 .. 1962-09-09 [source_dates, consistent]
+places: location: French Algeria; country: Algeria
+participant: Algerians — operator [P137 out, wikidata.wbapi]
+participant: Secret Army Organization — operator [P137 out, wikidata.wbapi]
+participant: pieds-noirs — operator [P137 out, wikidata.wbapi]
+structure: significant_event Congress of Soummam [P793 stated on Q200790]
+structure: significant_event Evian Accords [P793 stated on Q200790]
+structure: follows French conquest of Algeria [P155 stated on Q200790]
+structure: has_part Declaration of November 1, 1954 [P527 stated on Q200790]
+structure: has_part Congress of Soummam [P527 stated on Q200790]
+structure: has_part Battle of Algiers [P527 stated on Q200790]
+structure: has_part Evian Accords [P527 stated on Q200790]
+structure: has_part 1962 Algerian independence referendum [P527 stated on Q200790]
+structure: has_part 1962 Algerian provisional executive [P527 stated on Q200790]
+structure: has_part Café Wars [P527 stated on Q200790]
+sources: wikidata.wbapi
+
+== Algeria: Algeria (UCDP conflict 246) (ucdp:conflict:246)
+types: extrasystemic_armed_conflict (conflit armé extrasystémique (codage UCDP)) | basis: dataset_kind
+  via ucdp:conflict: [normal, direct]
+time: start 1954-11-01 (source 1954-11-01, precision 11), end -, point - -> 1954-11-01 .. 1962-03-19 [source_dates, consistent]
+  note: end = last episode end coded by the dataset (definition in the statement qualifiers)
+places: country: Algeria
+participant: France — belligerent, side a, 1954-01-01..1962-12-31 [ucdp:primary_party out, ucdp.downloads]
+participant: FLN — belligerent, side b, 1954-01-01..1962-12-31 [ucdp:nonstate_side out, ucdp.downloads]
+participant: MNA — belligerent, side b, 1955-01-01..1957-12-31 [ucdp:nonstate_side out, ucdp.downloads]
+sources: ucdp.downloads
+
+== United Nations Emergency Force I (UNEF I) (unpk:mission:UNEF_I)
+types: peacekeeping_mission (opération de paix (ONU)) | basis: dataset_kind
+  via unpk:mission: [normal, direct]
+time: start 1956-11-01 (source 1956-11-01, precision 11), end 1967-06-17 (source 1967-06-17, precision 11), point - -> 1956-11-01 .. 1967-06-17 [source_dates, consistent]
+places: location: Gaza
+sources: un.psdata
+
+== Franco-Spanish War (cow:war:1)
+types: war (guerre) | basis: wikidata_p31+dataset_kind
+  via Q198 [normal, direct]
+  via cow:war: [normal, direct]
+time: start -, end -, point - -> 1823-04-07 .. 1823-11-13 [derived_from_participation_spells, consistent]
+  note: interval derived by REVA from the participation spells the dataset codes (earliest start, latest end); the dataset gives no event-level dates
+participant: France (COW 220) — belligerent, side 1, 1823-04-07..1823-11-13 [P1344 in, cow.data]
+participant: Spain (COW 230) — belligerent, side 2, 1823-04-07..1823-11-13 [P1344 in, cow.data]
+sources: cow.data
+
+== Algeria: independence (CShapes status change) (cshapes:independence:615:1962-07-05)
+types: independence (indépendance) | basis: derived_status_change
+time: start -, end -, point 1962-07-05 (source 1962-07-05, precision 11) -> 1962-07-05 .. 1962-07-05 [derived_status_change, consistent]
+  note: Derived by REVA: CShapes 2.0 codes polity periods with a status (colony, protectorate, mandate, occupied, independent). A period coded 'independent' that follows a period with another status is shown as an independence event dated at the start of that period. It is not a source-reported event record, and it is not a claim about why the status changed.
+places: location: Algeria (CShapes GW 615); country: DZA
+participant: France — former ruling state, 1919-09-12..1962-07-04 [cshapes:ruled_by out, cshapes.cran]
+derived: reva.events.cshapes_status_change/1 from cshapes.cran:gw615:period:455, cshapes.cran:gw615:period:456
+sources: cshapes.cran
+```
+
+Readings: Wikidata classes the Suez Crisis as a *military expedition* and an *offensive*, not as a crisis — the card
+says so with the chains (`recorded` = P279 from the verification lookups, since the demo KG holds no class items).
+The Treaty of Tordesillas' Julian dates are converted to proleptic Gregorian for bounds (source string kept). The
+Wall Street crash's two *has effect* statements are shown as asserted by Wikidata; CAUSCORE grades them. The
+Algerian War's belligerents appear only as Wikidata's *operator* (P137) claims; UCDP's own record names France (side
+a) and the FLN/MNA (side b).
 
 ## 8. Limitations and requests
 
@@ -206,8 +321,9 @@ See §7 results below (filled from `python -m reva.events.demo`).
   check; EVENTS' tools read its ledger without re-bootstrapping it.
 * **Lead**: the bare `/v1/events` path is the V1 occurrence listing; the KG listing is `/v1/events/search`. Commit
   `contracts/openapi.json` with these routes (regenerate `ui/src/api/openapi.gen.ts` if the UI uses them).
-* **CAUSCORE**: its temporal check reads start = P580 → P585 → P571; the view also reads dataset dates and COW spells
-  (labelled derived). `reva.events.view.event_card(...)["interval"]` can be reused for event dates.
+* **CAUSCORE**: the view's interval uses the same order as the temporal check (start = P580 → P585 → P571; end =
+  P582 → P585 → P576) and adds dataset dates and COW spells (labelled derived); `event_card(...)["interval"]` can be
+  reused. `/v1/events/{id}` cards point to `/v1/causal/events/{id}` for graded claims.
 * **A-CONTENTION / A-ECRISES**: cross-dataset `same_as` needs a mapping table with evidence (e.g. the JST chronology
   PDF table): add it under `mapping_tables` in `registry/events/same_as_rules.yaml`.
 * Dataset kinds for CAUSDATA / A-COUPS / A-HAZARDS / A-SANCTIONS / A-CONTENTION follow their documented ids and coded

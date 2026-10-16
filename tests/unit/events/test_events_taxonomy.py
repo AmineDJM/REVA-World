@@ -216,3 +216,17 @@ def test_check_id() -> None:
     assert ev._check_id("Q49101") == "Q49101" and ev._check_id("ucdp:conflict:246")
     with pytest.raises(Exception):
         ev._check_id("FRA")
+
+
+def test_interval_point_in_time_before_inception() -> None:
+    tax = load_taxonomy()
+    iv = ev._interval(
+        tax,
+        [
+            _row("P585", "1494-06-07", 11, "1494-06-07", "1494-06-07", key="p"),
+            _row("P571", "1494", 9, "1494-01-01", "1494-12-31", key="i"),
+        ],
+        [],
+    )
+    assert (iv["earliest"], iv["latest"], iv["consistency"]) == ("1494-06-07", "1494-06-07", "consistent")
+    assert iv["inception"]["provenance"]["statement_key"] == "i"
