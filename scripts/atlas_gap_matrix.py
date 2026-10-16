@@ -289,7 +289,7 @@ SEARCHED: list[dict[str, Any]] = [
         "targets": "ASM COK FJI PYF GUM KIR MHL FSM NRU NCL NIU MNP PLW PNG PCN WSM SLB TKL TON TUV VUT WLF".split(),
         "result": "used",
         "connector": "atlas.gap_spc",
-        "note": "DF_POCKET, DF_KEYFACTS, DF_EMPRATES, DF_DIGITAL_DEVELOPMENT; live run pending budget key spc.pdh_stat",
+        "note": "DF_POCKET, DF_KEYFACTS, DF_EMPRATES, DF_DIGITAL_DEVELOPMENT; ingested live 2026-10-16 (budget spc.pdh_stat)",
     },
     {
         "id": "eurostat.nuts2",
@@ -309,7 +309,7 @@ SEARCHED: list[dict[str, Any]] = [
         "targets": "GLP MTQ GUF REU MYT".split(),
         "result": "used",
         "connector": "atlas.gap_insee",
-        "note": "CPI (annual average change) and Smic of the overseas departments; live run pending budget key insee.bdm",
+        "note": "CPI (annual average change) and Smic of the overseas departments; ingested live 2026-10-16 (budget insee.bdm)",
     },
     {
         "id": "cbs.opendata",
@@ -319,7 +319,7 @@ SEARCHED: list[dict[str, Any]] = [
         "targets": ["BES"],
         "result": "used",
         "connector": "atlas.gap_cbs_bes",
-        "note": "population, GDP (USD), labour survey; CPI only quarterly per island (not taken); live run pending budget key cbs.opendata",
+        "note": "population, GDP (USD), labour survey; CPI only quarterly per island (not taken); ingested live 2026-10-16 (budget cbs.opendata)",
     },
     {
         "id": "statistics_jersey.opendata",
@@ -329,7 +329,7 @@ SEARCHED: list[dict[str, Any]] = [
         "targets": ["JEY"],
         "result": "used",
         "connector": "atlas.gap_jersey",
-        "note": "monthly FTE earnings (second source after ILOSTAT); RPI is not a CPI (not taken); registered unemployment is not ILO (not taken)",
+        "note": "monthly FTE earnings (second source after ILOSTAT); RPI is not a CPI (not taken); registered unemployment is not ILO (not taken); ingested live 2026-10-16",
     },
     {
         "id": "insee.local",

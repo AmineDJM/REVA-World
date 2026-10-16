@@ -8165,7 +8165,7 @@
    ],
    "result": "used",
    "connector": "atlas.gap_spc",
-   "note": "DF_POCKET, DF_KEYFACTS, DF_EMPRATES, DF_DIGITAL_DEVELOPMENT; live run pending budget key spc.pdh_stat"
+   "note": "DF_POCKET, DF_KEYFACTS, DF_EMPRATES, DF_DIGITAL_DEVELOPMENT; ingested live 2026-10-16 (budget spc.pdh_stat)"
   },
   {
    "id": "eurostat.nuts2",
@@ -8199,7 +8199,7 @@
    ],
    "result": "used",
    "connector": "atlas.gap_insee",
-   "note": "CPI (annual average change) and Smic of the overseas departments; live run pending budget key insee.bdm"
+   "note": "CPI (annual average change) and Smic of the overseas departments; ingested live 2026-10-16 (budget insee.bdm)"
   },
   {
    "id": "cbs.opendata",
@@ -8211,7 +8211,7 @@
    ],
    "result": "used",
    "connector": "atlas.gap_cbs_bes",
-   "note": "population, GDP (USD), labour survey; CPI only quarterly per island (not taken); live run pending budget key cbs.opendata"
+   "note": "population, GDP (USD), labour survey; CPI only quarterly per island (not taken); ingested live 2026-10-16 (budget cbs.opendata)"
   },
   {
    "id": "statistics_jersey.opendata",
@@ -8223,7 +8223,7 @@
    ],
    "result": "used",
    "connector": "atlas.gap_jersey",
-   "note": "monthly FTE earnings (second source after ILOSTAT); RPI is not a CPI (not taken); registered unemployment is not ILO (not taken)"
+   "note": "monthly FTE earnings (second source after ILOSTAT); RPI is not a CPI (not taken); registered unemployment is not ILO (not taken); ingested live 2026-10-16"
   },
   {
    "id": "insee.local",
@@ -8629,10 +8629,11 @@
   }
  ],
  "inputs": [
-  "parsed: full atlas.gap_cbs_bes live response 2026-10-16 (not ingested: budget key pending)",
-  "parsed: full atlas.gap_insee live response 2026-10-16 (not ingested: budget key pending)",
-  "parsed: full atlas.gap_jersey live response 2026-10-16 (not ingested: budget key pending)",
-  "parsed: full atlas.gap_spc live response 2026-10-16 (not ingested: budget key pending)",
+  "live ingest 2026-10-16: atlas.gap_cbs_bes (throwaway reva_gaphunt_live_643be9e0, dropped",
+  "live ingest 2026-10-16: atlas.gap_insee (throwaway reva_gaphunt_live_643be9e0, dropped",
+  "live ingest 2026-10-16: atlas.gap_jersey (throwaway reva_gaphunt_live_643be9e0, dropped",
+  "live ingest 2026-10-16: atlas.gap_spc (throwaway reva_gaphunt_live_643be9e0, dropped",
+  "same cells as the parsed full responses)",
   "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks, other SSPTW economies not listed)",
   "static: docs/dev/v3_a_wb.md (live ingest 2026-10-15)",
   "tables: db reva, atlas.ccp.characteristics_v5 recorded 2026-10-16",
