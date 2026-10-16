@@ -1,6 +1,6 @@
 {
  "anchor": "religions",
- "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?item { wd:Q1841 wd:Q9592 wd:Q432 }\n  {\n    VALUES ?class { wd:Q9174 wd:Q13414953 wd:Q71966963 }\n    ?item wdt:P31/wdt:P279? ?class ; wikibase:sitelinks ?links .\n    FILTER(?links >= 5)\n  }\n  UNION\n  { VALUES ?country { wd:Q155 } ?country wdt:P140 ?item . }\n}",
+ "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?item { wd:Q1841 wd:Q9592 wd:Q432 }\n  {\n    VALUES ?class { wd:Q9174 wd:Q13414953 wd:Q71966963 }\n    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279? ?class ; wikibase:rank ?item_p31r .\n    FILTER(?item_p31r != wikibase:DeprecatedRank)\n    ?item wikibase:sitelinks ?links .\n    FILTER(?links >= 5)\n  }\n  UNION\n  { VALUES ?country { wd:Q155 } ?country p:P140 ?c_st . ?c_st ps:P140 ?item ; wikibase:rank ?c_r .\n    FILTER(?c_r != wikibase:DeprecatedRank) }\n}",
  "raw_sha256": "9e69891228f5467e0f5fa399ef1acec32159cab4c343df47df89a7fc4b4fb6d1",
  "response": {
   "head": {
@@ -32,7 +32,7 @@
   }
  },
  "response_sha256": "91649b9e8d070683e720b58b0b474003b1ae3a8d6711eed0be7292374c67538f",
- "retrieved_at": "2026-10-16T20:08:57.040580+00:00",
+ "retrieved_at": "2026-10-16T20:28:57.610780+00:00",
  "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
  "spec": "religions.yaml"
 }

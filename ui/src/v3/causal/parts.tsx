@@ -18,6 +18,7 @@ import {
   sourceName,
   TEMPORAL_FR,
   TIER_FR,
+  UNGRADED_STYLE,
   WHY_FR,
   type DissentPair,
 } from './model';
@@ -29,7 +30,14 @@ export const CHAIN_BANNER = 'chaîne composée par REVA à partir d’affirmatio
 
 // ------------------------------------------------------------------ badges
 
-export function GradeBadge({ grade, rules }: { grade: Grade; rules?: string[] }) {
+export function GradeBadge({ grade, rules }: { grade: Grade | null; rules?: string[] }) {
+  if (grade === null) {
+    return (
+      <span className="v3-grade v3-grade-none" title={UNGRADED_STYLE.rule} data-testid="grade-badge" data-grade="none">
+        non gradée
+      </span>
+    );
+  }
   const title = `Grade de preuve ${grade} : ${GRADE_STYLE[grade].rule}${rules && rules.length ? ` — règles : ${rules.join(', ')}` : ''}`;
   return (
     <span className={`v3-grade v3-grade-${grade}`} title={title} data-testid="grade-badge" data-grade={grade}>
@@ -115,7 +123,7 @@ export function ClaimLine({ c, onOpen, show = 'both' }: { c: CausalClaim; onOpen
       {show !== 'effect' && <NodeLink id={c.cause.id} label={c.cause.label} />}
       {show === 'both' && <span className="v3-claim-arrow"> → </span>}
       {show !== 'cause' && <NodeLink id={c.effect.id} label={c.effect.label} />}
-      <span className="muted"> · {relationFr(c)}</span>{' '}
+      {c.stance === 'denies' ? <span className="v3-denies"> · lien nié ({relationFr(c)})</span> : <span className="muted"> · {relationFr(c)}</span>}{' '}
       <span className="v3-selon" data-testid="selon">
         {selon(c)}
       </span>{' '}
@@ -147,7 +155,12 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         )}
       </header>
       <p className="v3-claim-assert" data-testid="claim-attribution">
-        <strong>Affirmé {selon(c)}</strong> : {relationFr(c)} <span className="muted">({FAMILY_STYLE[fam].label})</span>
+        {c.stance === 'denies' ? (
+          <strong>Lien nié {selon(c)}</strong>
+        ) : (
+          <strong>Affirmé {selon(c)}</strong>
+        )}{' '}
+        : {relationFr(c)} <span className="muted">({FAMILY_STYLE[fam].label})</span>
         {c.polarity && <span className="muted"> · polarité : {c.polarity === 'inhibits' ? 'inhibe' : c.polarity === 'promotes' ? 'favorise' : c.polarity}</span>}. REVA n’affirme
         aucune causalité : il rapporte cette affirmation.
       </p>
@@ -173,6 +186,12 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
             <span className="muted"> · révision non fournie</span>
           )}
         </dd>
+        {c.source.codebook && (
+          <>
+            <dt>Codebook</dt>
+            <dd>{c.source.codebook}</dd>
+          </>
+        )}
         {c.source.citation && (
           <>
             <dt>Référence citée</dt>
@@ -214,11 +233,12 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         <dt>Corroboration</dt>
         <dd data-testid="claim-corroboration">
           {c.corroboration.count === null ? (
-            <span className="muted">non fournie</span>
+            <span className="muted">non fournie{c.grade === null ? ' (affirmation pas encore gradée)' : ''}</span>
           ) : (
             <>
-              {c.corroboration.count} source{c.corroboration.count > 1 ? 's' : ''} indépendante{c.corroboration.count > 1 ? 's' : ''} affirme{c.corroboration.count > 1 ? 'nt' : ''} le même lien (même famille)
-              {c.corroboration.sources.length > 0 && <span className="muted"> : {c.corroboration.sources.join(', ')}</span>}
+              {c.corroboration.count} groupe{c.corroboration.count > 1 ? 's' : ''} de sources indépendant{c.corroboration.count > 1 ? 's' : ''} affirme{c.corroboration.count > 1 ? 'nt' : ''} ce lien
+              <span className="muted"> (des sources partageant une même origine comptent une fois)</span>
+              {c.corroboration.claims.length > 0 && <span className="muted"> · affirmations concordantes : {c.corroboration.claims.join(', ')}</span>}
             </>
           )}
         </dd>
@@ -251,14 +271,29 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
           )}
         </dd>
         <dt>Grade de preuve</dt>
-        <dd>
-          <GradeBadge grade={c.grade} rules={c.gradeRules} /> {GRADE_STYLE[c.grade].rule}
+        <dd data-testid="claim-grade">
+          <GradeBadge grade={c.grade} rules={c.gradeRules} /> {c.grade ? GRADE_STYLE[c.grade].rule : UNGRADED_STYLE.rule}
           <span className="muted"> · règles appliquées : {c.gradeRules.length ? c.gradeRules.join(', ') : 'non fournies'}</span>
-          {c.gradeVersion && <span className="muted"> · grille {c.gradeVersion}</span>}
+          {c.gradeVersion && <span className="muted"> · grille version {c.gradeVersion}</span>}
+          {c.gradeReasons.length > 0 && (
+            <ul className="v3-grade-reasons">
+              {c.gradeReasons.map((r) => (
+                <li key={r.rule}>
+                  <code>{r.rule}</code> {r.text}
+                </li>
+              ))}
+            </ul>
+          )}
         </dd>
         <dt>Relecture</dt>
         <dd>{c.reviewStatus ? (REVIEW_FR[c.reviewStatus] ?? c.reviewStatus) : 'non indiquée'}</dd>
       </dl>
+      {c.serverWording && (
+        <details className="v3-hop-server">
+          <summary>Formulation du serveur</summary>
+          <p>{c.serverWording}</p>
+        </details>
+      )}
     </article>
   );
 }
@@ -301,7 +336,7 @@ export function EventCard({ e }: { e: CausalEvent }) {
           )}
         </dd>
         <dt>Lieux</dt>
-        <dd>{e.places.length ? e.places.map((p) => p.label).join(' · ') : <span className="muted">aucun lieu déclaré</span>}</dd>
+        <dd>{e.places.length ? e.places.map((p) => p.label).join(' · ') : <span className="muted">{e.placesGiven ? 'aucun lieu déclaré dans la source' : 'non fournis par ce service'}</span>}</dd>
         <dt>Participants</dt>
         <dd>
           {e.participants.length ? (
@@ -314,13 +349,36 @@ export function EventCard({ e }: { e: CausalEvent }) {
               ))}
             </ul>
           ) : (
-            <span className="muted">aucun participant déclaré</span>
+            <span className="muted">{e.participantsGiven ? 'aucun participant déclaré dans la source' : 'non fournis par ce service'}</span>
           )}
         </dd>
         {e.partOf.length > 0 && (
           <>
             <dt>Partie de</dt>
             <dd>{e.partOf.map((p) => p.label).join(' · ')}</dd>
+          </>
+        )}
+        {(e.nCauses !== null || e.nEffects !== null) && (
+          <>
+            <dt>Affirmations</dt>
+            <dd>
+              {e.nCauses ?? '?'} cause(s) · {e.nEffects ?? '?'} conséquence(s) affirmées
+              {e.nCandidates !== null ? ` · ${e.nCandidates} candidat(s) en quarantaine` : ''}
+            </dd>
+          </>
+        )}
+        {e.context.length > 0 && (
+          <>
+            <dt>Contexte (non causal)</dt>
+            <dd data-testid="event-context">
+              <ul className="v3-plain">
+                {e.context.slice(0, 12).map((c, i) => (
+                  <li key={`${c.other.id}-${i}`}>
+                    {c.relation} : {c.other.label} <span className="muted">— relation de contexte, pas une cause</span>
+                  </li>
+                ))}
+              </ul>
+            </dd>
           </>
         )}
         {e.source && (
@@ -337,7 +395,7 @@ export function EventCard({ e }: { e: CausalEvent }) {
 // ------------------------------------------------------------------ why
 
 export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup, CausalClaim[]>; derived: boolean; onOpen: (id: string) => void }) {
-  const order: WhyGroup[] = ['immediate', 'underlying', 'contributing', 'coded', 'other'];
+  const order: WhyGroup[] = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention'];
   const total = order.reduce((n, g) => n + groups[g].length, 0);
   return (
     <section className="v3-why" aria-labelledby="why-title" data-testid="why-panel">

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import cytoscape from 'cytoscape';
 import { prefersReducedMotion } from '../../lib/useApi';
-import { FAMILIES, FAMILY_STYLE, GRADE_STYLE, type CausalGraphModel } from './model';
+import { FAMILIES, FAMILY_STYLE, GRADE_STYLE, UNGRADED_STYLE, type CausalGraphModel } from './model';
 import { GRADES } from './api';
 
 const familyStyles: cytoscape.StylesheetJson = FAMILIES.map((f) => ({
@@ -17,6 +17,7 @@ const gradeStyles: cytoscape.StylesheetJson = GRADES.map((g) => ({
   selector: `edge.grade-${g}`,
   style: { width: GRADE_STYLE[g].width, opacity: GRADE_STYLE[g].opacity },
 }));
+gradeStyles.push({ selector: 'edge.grade-none', style: { width: UNGRADED_STYLE.width, opacity: UNGRADED_STYLE.opacity, 'line-style': 'dotted' } });
 
 const STYLE: cytoscape.StylesheetJson = [
   {
@@ -117,8 +118,8 @@ export default function CausalGraph({
       cy.add(
         model.edges.map((e) => ({
           group: 'edges' as const,
-          data: { id: e.id, source: e.source, target: e.target, label: e.grade },
-          classes: `fam-${e.family} grade-${e.grade}`,
+          data: { id: e.id, source: e.source, target: e.target, label: e.grade ?? '?' },
+          classes: `fam-${e.family} grade-${e.grade ?? 'none'}`,
         })),
       );
     });

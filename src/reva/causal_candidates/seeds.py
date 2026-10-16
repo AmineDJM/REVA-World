@@ -25,12 +25,14 @@ from pathlib import Path
 from typing import Any
 
 #: Event classes (Wikidata items; direct ``P31`` only, no subclass closure: cheap and predictable).
-#: The labels are verified against the live query result (``class_labels`` in the snapshot).
+#: The labels are the classes' English Wikidata labels as returned by the 2026-10-16 query (``class_labels`` in
+#: the snapshot). Q3002150 was queried by mistake (it is "aircraft crash", not a political crisis): it is not
+#: in this table, so :func:`top_seeds` drops items matched only through it.
 EVENT_CLASSES: dict[str, str] = {
     "Q198": "war",
     "Q8465": "civil war",
     "Q103495": "world war",
-    "Q1006311": "war of independence",
+    "Q1006311": "war of national liberation",
     "Q350604": "armed conflict",
     "Q10931": "revolution",
     "Q45382": "coup d'état",
@@ -38,8 +40,7 @@ EVENT_CLASSES: dict[str, str] = {
     "Q124757": "riot",
     "Q114380": "financial crisis",
     "Q290178": "economic crisis",
-    "Q176494": "economic depression",
-    "Q3002150": "crisis (political/international)",
+    "Q176494": "recession",
     "Q168247": "famine",
     "Q44512": "epidemic",
     "Q12184": "pandemic",
@@ -104,9 +105,10 @@ def parse_seed_bindings(bindings: Sequence[Mapping[str, Mapping[str, str]]]) -> 
     return seeds, labels
 
 
-def top_seeds(seeds: Sequence[Seed], limit: int) -> list[Seed]:
-    """The ``limit`` seeds with most sitelinks that have at least one EN or FR article."""
-    return [s for s in seeds if s.enwiki or s.frwiki][:limit]
+def top_seeds(seeds: Sequence[Seed], limit: int, classes: Mapping[str, str] = EVENT_CLASSES) -> list[Seed]:
+    """The ``limit`` seeds with most sitelinks that are an instance of a declared class and have at least one
+    EN or FR article (input order kept: sitelinks desc, then QID)."""
+    return [s for s in seeds if (s.enwiki or s.frwiki) and any(c in classes for c in s.classes)][:limit]
 
 
 def load_seeds(path: Path) -> dict[str, Any]:
