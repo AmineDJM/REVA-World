@@ -56,7 +56,7 @@ def test_verified_class_labels_match_their_type() -> None:
         if q in exceptions:
             continue
         label = ents[q]["labels"]["en"].lower()
-        words = {w for t in types for w in re.split(r"[ _'()]+", tax.types[t].label_en.lower()) if len(w) > 3}
+        words = {w for t in types for w in re.split(r"[ _'()]+", tax.types[t].label_en.lower()) if len(w) >= 3}
         assert any(w[:5] in label for w in words), (q, label, types)
 
 

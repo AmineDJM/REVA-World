@@ -194,7 +194,7 @@ async def lookup_entities(client: Any, ids: Sequence[str]) -> list[dict[str, Any
     )
     ret = res.retrieved_at.isoformat()
     out = [
-        compact(ent, raw_sha256=res.sha_by_id.get(eid, ""), retrieved_at=ret, lookup="id")
+        compact(ent, raw_sha256=res.raw_sha_by_id.get(eid, ""), retrieved_at=ret, lookup="id")
         for eid, ent in res.entities.items()
     ]
     out += [{"id": m, "missing": True, "lookup": "id", "retrieved_at": ret} for m in res.missing]

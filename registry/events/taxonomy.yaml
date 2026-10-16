@@ -91,6 +91,12 @@ types:
     parent: armed_conflict
     wikidata_classes: [Q645883]
     roles: [belligerent, operator, target]
+  - id: military_expedition
+    label_en: military expedition
+    label_fr: expédition militaire
+    parent: military_operation
+    wikidata_classes: [Q1384277]
+    roles: [belligerent, operator, target]
   - id: invasion
     label_en: invasion
     label_fr: invasion
@@ -208,9 +214,8 @@ types:
     label_en: reform
     label_fr: réforme
     parent: event
-    wikidata_classes: []
+    wikidata_classes: [Q900406]
     roles: [actor, organizer]
-    description: No Wikidata class confirmed yet (see docs/dev/v3_events.md); populated by future datasets.
   - id: independence
     label_en: independence
     label_fr: indépendance
@@ -230,6 +235,19 @@ types:
     parent: event
     wikidata_classes: [Q518554]
     roles: [actor, target]
+  - id: transfer_of_sovereignty
+    label_en: transfer of sovereignty
+    label_fr: transfert de souveraineté
+    parent: event
+    wikidata_classes: [Q25929224]
+    roles: [former_ruler, actor, target]
+  - id: decolonization
+    label_en: decolonization
+    label_fr: décolonisation
+    parent: event
+    wikidata_classes: [Q230533]
+    roles: [actor, former_ruler]
+    description: A historical process rather than a dated event (e.g. Decolonisation of Africa); intervals are long.
   - id: crisis
     label_en: crisis
     label_fr: crise
@@ -247,9 +265,11 @@ types:
     label_en: migration wave
     label_fr: vague migratoire
     parent: event
-    wikidata_classes: []
+    wikidata_classes: [Q177626]
     roles: [participant, victim]
-    description: No Wikidata class confirmed yet (see docs/dev/v3_events.md).
+    description: >-
+      Wikidata's class is 'human migration' (Q177626), a general process class; its instances include named
+      migration waves (Great Migration, ...) but also generic concepts, so the type is shown with its class chain.
   - id: sanction_episode
     label_en: sanction episode
     label_fr: épisode de sanctions
@@ -271,6 +291,13 @@ types:
     parent: treaty
     wikidata_classes: [Q625298]
     roles: [signatory, party]
+
+  - id: conference
+    label_en: international conference
+    label_fr: conférence internationale
+    parent: event
+    wikidata_classes: [Q18564543]
+    roles: [participant, organizer, signatory]
 
   # -------------------------------------------------------------- economy
   - id: economic_crisis
@@ -302,6 +329,18 @@ types:
     label_fr: dépression économique
     parent: economic_crisis
     wikidata_classes: [Q1814941]
+    roles: [participant]
+  - id: oil_crisis
+    label_en: oil crisis
+    label_fr: choc pétrolier
+    parent: economic_crisis
+    wikidata_classes: [Q123193388]
+    roles: [participant]
+  - id: economic_bubble
+    label_en: economic bubble
+    label_fr: bulle spéculative
+    parent: event
+    wikidata_classes: [Q207781]
     roles: [participant]
   - id: hyperinflation
     label_en: hyperinflation

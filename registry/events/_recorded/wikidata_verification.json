@@ -1,0 +1,3386 @@
+{
+ "schema": "reva-events-wikidata-verification/1",
+ "built_by": "reva.events.verify/1",
+ "note": "Compact records of Wikidata entity snapshots (Special:EntityData through WDHARVEST's locked, budget-metered client): labels en/fr, non-deprecated P31/P279 claims with rank and statement id, property datatype, lastrevid. Raw bodies are archived content-addressed in var/kg/objects (raw_sha256, gzip; var/kg/archive_index.jsonl). Wikidata is community-edited (CC0).",
+ "updated_at": "2026-10-16T21:13:00.645151+00:00",
+ "titles": {},
+ "entities": {
+  "P17": {
+   "id": "P17",
+   "labels": {
+    "fr": "pays",
+    "en": "country"
+   },
+   "lastrevid": 2554410992,
+   "lookup": "id",
+   "raw_sha256": "0f34bbb2a19b2520a769c472da204cc9ccc0cc79e47507a677b161f3156b9251",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q19829914",
+     "rank": "normal",
+     "statement": "P17$79baa14a-45b3-b902-57c7-12f5514966a8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q26935994",
+     "rank": "normal",
+     "statement": "P17$1218b58a-4df7-f86b-4d43-5dfe2fb767ef",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P17$2307A6A7-3E03-4972-8762-0146ACA14F28",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P131": {
+   "id": "P131",
+   "labels": {
+    "fr": "localisation administrative",
+    "en": "located in the administrative territorial entity"
+   },
+   "lastrevid": 2555801353,
+   "lookup": "id",
+   "raw_sha256": "8298c2606fee973a60026f3ed224b9b5d36a8ed8dd1b6c62c1fd506b2b9c27fa",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18615777",
+     "rank": "normal",
+     "statement": "P131$bbea2c26-4fbe-11ba-abba-08baf0ace03a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647519",
+     "rank": "normal",
+     "statement": "P131$c358903c-4732-e431-da41-666cb5abd315",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647515",
+     "rank": "normal",
+     "statement": "P131$87056cb2-4d82-757c-fb18-484c1d181ac8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P131$57B682F9-5CA1-44B5-9CD3-9FA8377885A9",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P137": {
+   "id": "P137",
+   "labels": {
+    "en": "operator",
+    "fr": "opérateur"
+   },
+   "lastrevid": 2551547335,
+   "lookup": "id",
+   "raw_sha256": "a53d88aab6a3a8820578209e8f849742cce513fa4a309254fd779d47be80d1c5",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q30025373",
+     "rank": "normal",
+     "statement": "P137$04ce2556-44d4-d8d2-3004-1b83021f524a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P137$EDB957F8-638D-469E-86CD-E6F70D17D5A8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q115203080",
+     "rank": "normal",
+     "statement": "P137$251ad7ef-42e5-68d5-d159-caf0b717915e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P155": {
+   "id": "P155",
+   "labels": {
+    "en": "follows",
+    "fr": "précédé par"
+   },
+   "lastrevid": 2556220785,
+   "lookup": "id",
+   "raw_sha256": "71697f4945b0062e6698e38a82226e72fed3591c698a523b52b379b4e9e5700d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18616576",
+     "rank": "normal",
+     "statement": "P155$0b809d9d-480d-5052-9159-04d6399d4d49",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q61719274",
+     "rank": "normal",
+     "statement": "P155$74a8c7f7-4efb-01c9-b538-4cbd6c63d800",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P156": {
+   "id": "P156",
+   "labels": {
+    "en": "followed by",
+    "fr": "suivi par"
+   },
+   "lastrevid": 2557710345,
+   "lookup": "id",
+   "raw_sha256": "2732fff1bc246bfe50503e22ce7aa5f682a2e8b037b019f96ab994c16c4eb1ee",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18616576",
+     "rank": "normal",
+     "statement": "P156$fe19e02c-4aa5-62e7-5ab1-52e5196be544",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q61719274",
+     "rank": "normal",
+     "statement": "P156$76b5895e-4076-5e01-8c40-14b12d04f754",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P276": {
+   "id": "P276",
+   "labels": {
+    "fr": "lieu",
+    "en": "location"
+   },
+   "lastrevid": 2557293154,
+   "lookup": "id",
+   "raw_sha256": "99a553370b8572f2526c2543e3ea7edc4c65b2e08b35d4570866da937ba7f700",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18647515",
+     "rank": "normal",
+     "statement": "P276$9f40800c-4c0b-658b-bcef-f13bc5f84497",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18615777",
+     "rank": "normal",
+     "statement": "P276$1a7024d2-4f19-c1d7-7951-3560d784f34c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P276$421a50f2-40e9-0ef4-0f04-6882be28a73d",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P276$6594686A-F757-4930-AFAF-71977D393096",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P361": {
+   "id": "P361",
+   "labels": {
+    "en": "part of",
+    "fr": "partie de"
+   },
+   "lastrevid": 2557710852,
+   "lookup": "id",
+   "raw_sha256": "00772aa7b577a6a057592f000315378fa43356bce166a1ea90aa639830ee4be3",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18647515",
+     "rank": "normal",
+     "statement": "P361$57de4e02-4c58-7a02-102a-7f25bf6c35b4",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647519",
+     "rank": "normal",
+     "statement": "P361$265e83a0-4bd4-05da-abcf-ec5d3a8356e9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P361$AA9EC46B-52B9-4784-8C1D-253EAC4A2207",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608871",
+     "rank": "normal",
+     "statement": "P361$27b33dd2-488b-1523-4017-3ea09c0e8ddf",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P527": {
+   "id": "P527",
+   "labels": {
+    "en": "has part(s)",
+    "fr": "comprend"
+   },
+   "lastrevid": 2556002492,
+   "lookup": "id",
+   "raw_sha256": "9fbbdaa0d21fcf6699261c5233077e8003e3db34161e1ba79fbf31804320fb51",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18616576",
+     "rank": "normal",
+     "statement": "P527$cb333f9d-49d3-d6c3-394b-63a994a04fff",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P527$A61624DD-00BA-44C0-9FA6-77B6D6E1BD57",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647515",
+     "rank": "normal",
+     "statement": "P527$adbe3f7f-4c34-01ba-7598-1d2c082a806f",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P571": {
+   "id": "P571",
+   "labels": {
+    "en": "inception",
+    "fr": "date de fondation ou de création"
+   },
+   "lastrevid": 2554751823,
+   "lookup": "id",
+   "raw_sha256": "1cb995dcbd80e6d76badf7338d75b9b4e6cd4661169de88f8c5843bcfb1028ca",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "time",
+   "P31": [
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P571$339d42c5-4660-159a-4113-6016022aebd0",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18636219",
+     "rank": "normal",
+     "statement": "P571$533708f3-4e04-ae65-55cd-8e4d5e19be26",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P571$CF6BE332-D12E-43FE-9140-B677C422EAE9",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P576": {
+   "id": "P576",
+   "labels": {
+    "en": "dissolved, abolished or demolished",
+    "fr": "date de dissolution, d'abolition ou de démolition"
+   },
+   "lastrevid": 2550922993,
+   "lookup": "id",
+   "raw_sha256": "5e49d4287abbf923d146205344ed65a0a54428655d201d42a964094bbdf9e3eb",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "time",
+   "P31": [
+    {
+     "o": "Q18636219",
+     "rank": "normal",
+     "statement": "P576$fcf8da7b-42c2-ab2e-aabc-04f64ad15193",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P576$f032f6f1-4ab4-6a83-e065-26f78328d505",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q24239898",
+     "rank": "normal",
+     "statement": "P576$43f6f685-447a-a503-ebea-be08c25a5768",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P580": {
+   "id": "P580",
+   "labels": {
+    "fr": "date de début",
+    "en": "start time"
+   },
+   "lastrevid": 2556003306,
+   "lookup": "id",
+   "raw_sha256": "c636e523c39cef6daba3e4b086b48a6db13872887057589a3534a7544fe7bb07",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "time",
+   "P31": [
+    {
+     "o": "Q18636219",
+     "rank": "normal",
+     "statement": "P580$2e15550a-40ba-b579-5517-d1509709f3c5",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q115429021",
+     "rank": "normal",
+     "statement": "P580$809bf503-43b5-0eb2-ccef-36e35793112f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P580$1d1e68b0-42aa-9c59-8b7e-3d3a3d818ee0",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P582": {
+   "id": "P582",
+   "labels": {
+    "fr": "date de fin",
+    "en": "end time"
+   },
+   "lastrevid": 2556003224,
+   "lookup": "id",
+   "raw_sha256": "a9d8827dbd976268de975aaa6b6c954d1f281404433c3303f5bd820a08fc1c6c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "time",
+   "P31": [
+    {
+     "o": "Q18636219",
+     "rank": "normal",
+     "statement": "P582$2df028e1-4f11-d275-748b-f059e137d9da",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q115429021",
+     "rank": "normal",
+     "statement": "P582$13729e21-4283-6850-f609-377fcf3fd5ed",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P585": {
+   "id": "P585",
+   "labels": {
+    "fr": "date",
+    "en": "point in time"
+   },
+   "lastrevid": 2550484915,
+   "lookup": "id",
+   "raw_sha256": "3107a0814af9027bf14d6c60c769a40a436ac1f33c0997f53a09b32a554390fb",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "time",
+   "P31": [
+    {
+     "o": "Q18636219",
+     "rank": "normal",
+     "statement": "P585$c50d67d8-477c-3f1d-1663-021c96da9f30",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P585$DC245329-CE14-493C-B07D-6A1BD715D57A",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q122233685",
+     "rank": "normal",
+     "statement": "P585$3c1a494a-4fcb-25a2-0bea-f4e67bf7d3e1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q115429021",
+     "rank": "normal",
+     "statement": "P585$cf32da8f-4c73-b311-8a51-93705e5ebaad",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P607": {
+   "id": "P607",
+   "labels": {
+    "fr": "a participé au conflit",
+    "en": "participated in conflict"
+   },
+   "lastrevid": 2552047133,
+   "lookup": "id",
+   "raw_sha256": "725648054f26b8e104a51a62358d102c9da52ddb358b086aae948ed8390d5ecf",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18608871",
+     "rank": "normal",
+     "statement": "P607$860e76bd-4d81-448c-f79b-d975b2643acb",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q22964288",
+     "rank": "normal",
+     "statement": "P607$09a635ab-4555-74b5-2f55-822faf6eb424",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P664": {
+   "id": "P664",
+   "labels": {
+    "fr": "organisateur ou organisatrice",
+    "en": "organizer"
+   },
+   "lastrevid": 2555175076,
+   "lookup": "id",
+   "raw_sha256": "de8421cdc7194cc49609e19113c55b7d2e37cfd1bbdf5760ac843ee150e8678c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P664$fadcca67-48f8-2009-10cc-c2e64415c305",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q21818626",
+     "rank": "normal",
+     "statement": "P664$113812c1-4af3-267a-ccc2-2873beddafe2",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P710": {
+   "id": "P710",
+   "labels": {
+    "en": "participant",
+    "fr": "participant ou participante"
+   },
+   "lastrevid": 2540013605,
+   "lookup": "id",
+   "raw_sha256": "5b88ecf9063cf75ad3e3b24f15e8e44f7b2785e395506a6541ba10bfc2fdb72d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P710$80090684-4b7d-037a-5957-f1ba6bcc2ac9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P710$0b50c03f-4006-2ab5-daa9-32f0384418cd",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P710$D9E22B1C-7755-4377-9D12-A7541747FA37",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q64830420",
+     "rank": "normal",
+     "statement": "P710$718941c0-4ee4-55f0-cd10-519653d97133",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P726": {
+   "id": "P726",
+   "labels": {
+    "en": "candidate",
+    "fr": "candidat ou candidate"
+   },
+   "lastrevid": 2517012022,
+   "lookup": "id",
+   "raw_sha256": "814d725ccb1c2322047c0f82be216b36cfdbfd633087cca1f0b433a8cb53bab5",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964818",
+     "rank": "normal",
+     "statement": "P726$6b91c525-4813-be5b-570c-e3cd8e979f34",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P793": {
+   "id": "P793",
+   "labels": {
+    "en": "significant event",
+    "fr": "événement clé"
+   },
+   "lastrevid": 2536829907,
+   "lookup": "id",
+   "raw_sha256": "4382e9588ef399f963d09eb3474a11029598c6959599f64ab6d7cf4838b74100",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P793$f7dcb3bd-42d6-9747-76ff-05307b5d7163",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q70564278",
+     "rank": "normal",
+     "statement": "P793$3E4CF3A5-F339-410F-832D-80641713E1BB",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P828": {
+   "id": "P828",
+   "labels": {
+    "en": "has cause",
+    "fr": "a pour cause"
+   },
+   "lastrevid": 2557296919,
+   "lookup": "id",
+   "raw_sha256": "ada9f1767f2d9a16d9d4c32b675410f017ff5b45da6279d12b5c3a95be300833",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P828$2255001b-42e5-8c68-66f8-5cdab795b345",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647519",
+     "rank": "normal",
+     "statement": "P828$dd4f8cb9-4efd-fa96-9eb3-c5d6c0d59d40",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P991": {
+   "id": "P991",
+   "labels": {
+    "en": "successful candidate",
+    "fr": "élu ou élue"
+   },
+   "lastrevid": 2527502322,
+   "lookup": "id",
+   "raw_sha256": "710aecb7ce95eb49e1d8cfcdda699e2f93fb3a2941c9bf672d4a32935d9c4203",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964818",
+     "rank": "normal",
+     "statement": "P991$614961cd-4dd2-9dd6-d2e9-7ea9a111e0ab",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1120": {
+   "id": "P1120",
+   "labels": {
+    "en": "number of deaths",
+    "fr": "nombre de morts"
+   },
+   "lastrevid": 2557621846,
+   "lookup": "id",
+   "raw_sha256": "9f63a1ef6eb51e02d3bd7f3ce254098ac20ab7e0170f73a66b8ea0cf4d2f6734",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "quantity",
+   "P31": [
+    {
+     "o": "Q18608756",
+     "rank": "normal",
+     "statement": "P1120$d7c02d1c-4132-4e3a-ce45-36c3db063f00",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1120$f1c3b833-49ad-6b9d-354a-dc86fb08f385",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28100241",
+     "rank": "normal",
+     "statement": "P1120$2e7883f6-45f5-28d4-2dd7-7d1cd18f12ef",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q102046040",
+     "rank": "normal",
+     "statement": "P1120$2a75977e-4ca3-7954-3d75-fab5647d0037",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q111974592",
+     "rank": "normal",
+     "statement": "P1120$56960258-40dd-ef0b-4f83-dd93ca610db1",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1339": {
+   "id": "P1339",
+   "labels": {
+    "en": "number of injured",
+    "fr": "nombre de blessés"
+   },
+   "lastrevid": 2555739617,
+   "lookup": "id",
+   "raw_sha256": "aaf90819bb4cb3488c83bf955e902c511be6cccb105781b6ff2baf351486f24f",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "quantity",
+   "P31": [
+    {
+     "o": "Q28100241",
+     "rank": "normal",
+     "statement": "P1339$f6e25fec-4f0c-b08a-433e-58b00f25bfaa",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q102046040",
+     "rank": "normal",
+     "statement": "P1339$913d1fe6-4e39-974f-8672-c35cb93a31a1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q111974592",
+     "rank": "normal",
+     "statement": "P1339$6837bba5-452e-9c8b-9dba-43e1fca0ce9c",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1344": {
+   "id": "P1344",
+   "labels": {
+    "en": "participant in",
+    "fr": "participant ou participante à"
+   },
+   "lastrevid": 2547115713,
+   "lookup": "id",
+   "raw_sha256": "a95649bf6e6df01ba3f259ac5f13af98eba80a5752e0e27fdf43f3e20365246d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q18608871",
+     "rank": "normal",
+     "statement": "P1344$76dd9543-4323-7cbf-01ef-d3f2bb558100",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P1344$5e75b4f2-405f-9258-f374-7c1ab2261278",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28464773",
+     "rank": "normal",
+     "statement": "P1344$9fa0ac84-4ff4-35ec-c01b-2c3317a27f8e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1346": {
+   "id": "P1346",
+   "labels": {
+    "en": "winner",
+    "fr": "vainqueur"
+   },
+   "lastrevid": 2549622544,
+   "lookup": "id",
+   "raw_sha256": "3ec79002f3b10216097cf876981d1921b449526c6fbf2441ef405cadcd085580",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q28106586",
+     "rank": "normal",
+     "statement": "P1346$2331dec5-45e5-3eac-2412-8be04c96d3f6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1346$976f430a-4bd2-a3ee-af04-662f27e9971a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q15720608",
+     "rank": "normal",
+     "statement": "P1346$9c35da75-436b-4cd4-84a9-2f5b9c1c2ea9",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1478": {
+   "id": "P1478",
+   "labels": {
+    "en": "has immediate cause",
+    "fr": "a pour cause immédiate"
+   },
+   "lastrevid": 2556265491,
+   "lookup": "id",
+   "raw_sha256": "9e0c5a163ea6fb43465794f662629a63e0fbd6346061732026b2ed5e54e5a36e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1478$3942cd9e-4af7-5766-5e1d-b96a23dff500",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28100241",
+     "rank": "normal",
+     "statement": "P1478$a9a2bc73-4ad6-10e4-e226-baf82dad44b7",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P1478$d65daad8-443d-73d4-1ddc-9327e0e5aa3e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1479": {
+   "id": "P1479",
+   "labels": {
+    "en": "has contributing factor",
+    "fr": "a comme facteur contributif"
+   },
+   "lastrevid": 2551032766,
+   "lookup": "id",
+   "raw_sha256": "e4d48efe265f03052ee4fb70602de11f15245a9df45e718232dfba0519ae3be4",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1479$bb4882eb-4840-bc3b-d91d-d7d0c6884945",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28100241",
+     "rank": "normal",
+     "statement": "P1479$632d0796-4870-176c-49ed-55cf010e5cfc",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P1479$0ef01680-4c99-1271-20c9-ee61abe3b601",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1536": {
+   "id": "P1536",
+   "labels": {
+    "en": "immediate cause of",
+    "fr": "cause immédiate de"
+   },
+   "lastrevid": 2557296793,
+   "lookup": "id",
+   "raw_sha256": "68c1a4a6d3935dc72aa188f750b92ac13828bced801a853648db6b128d9f2a0d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1536$b17a69ad-4860-5c26-a0f1-ae15741067cb",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P1536$e24dcbfe-43cd-ff0a-6f2f-68b11ed3d963",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1537": {
+   "id": "P1537",
+   "labels": {
+    "en": "contributing factor of",
+    "fr": "facteur contributif de"
+   },
+   "lastrevid": 2544802114,
+   "lookup": "id",
+   "raw_sha256": "62991a3613b6ee2abd3183ea73833a18606f0eac38a2ae3fe4969ca1ea0631c7",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P1537$b62eeb86-4c93-a5ee-7ccc-c187d5dfaca5",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P1537$ea302056-4019-86a8-731f-d02ec442d740",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1542": {
+   "id": "P1542",
+   "labels": {
+    "en": "has effect",
+    "fr": "a pour effet"
+   },
+   "lastrevid": 2557296738,
+   "lookup": "id",
+   "raw_sha256": "2217b18017b90b1c10860672257e49522920f21dc6e5fe4d5c65cb8df9374c05",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q28746712",
+     "rank": "normal",
+     "statement": "P1542$260543BB-60FF-442F-B5E6-EEC9A38377B3",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18647519",
+     "rank": "normal",
+     "statement": "P1542$558adece-4077-8c81-8d99-e03a1ace0947",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1590": {
+   "id": "P1590",
+   "labels": {
+    "en": "number of casualties",
+    "fr": "nombre de victimes"
+   },
+   "lastrevid": 2484097434,
+   "lookup": "id",
+   "raw_sha256": "19bb801239729d673cb5ac99067c4c9709a16ebef23611bbd8193bc14e8893cf",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "quantity",
+   "P31": [
+    {
+     "o": "Q18608756",
+     "rank": "normal",
+     "statement": "P1590$363011b6-4253-3094-b239-dae9b5ea9316",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q28100241",
+     "rank": "normal",
+     "statement": "P1590$8f526ecb-426f-7250-9f97-40aef4b96d38",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q102046040",
+     "rank": "normal",
+     "statement": "P1590$02e90101-4874-270c-c7dc-ad161e38c69f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q111974592",
+     "rank": "normal",
+     "statement": "P1590$8565fd69-441b-6081-47d5-7cd561e132d6",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1891": {
+   "id": "P1891",
+   "labels": {
+    "en": "signatory",
+    "fr": "signataire"
+   },
+   "lastrevid": 2529582075,
+   "lookup": "id",
+   "raw_sha256": "417822669521b60bdf7d4c53b9d7f824eef5a3782826d709a15998821601acc8",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22984026",
+     "rank": "normal",
+     "statement": "P1891$abc54016-4e83-55d2-e723-ac4dcb70aa96",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P1923": {
+   "id": "P1923",
+   "labels": {
+    "en": "participating team",
+    "fr": "équipes participantes"
+   },
+   "lastrevid": 2515842123,
+   "lookup": "id",
+   "raw_sha256": "6234b5eb86ee2024cbbccf5bec6e20520c23991b07420fa96f552dbf654c64fe",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q28106586",
+     "rank": "normal",
+     "statement": "P1923$88ee86b4-45c9-5e9c-e043-32ccc9bb2ca2",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18608993",
+     "rank": "normal",
+     "statement": "P1923$b882c2b5-4e86-8e20-b25a-10eef8d1d9e7",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q15720608",
+     "rank": "normal",
+     "statement": "P1923$0a363d7d-410e-56f7-4135-d0526304f8e0",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P2868": {
+   "id": "P2868",
+   "labels": {
+    "en": "subject has role",
+    "fr": "rôle du sujet"
+   },
+   "lastrevid": 2557294214,
+   "lookup": "id",
+   "raw_sha256": "a631df8b4a501c7431fa40537dc41a68faf2c89a340ca60e34897a0649125e8b",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q15720608",
+     "rank": "normal",
+     "statement": "P2868$71b70564-460c-830a-957c-fb2f4a95a568",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q26935994",
+     "rank": "normal",
+     "statement": "P2868$adaa5f6e-4229-7084-83da-ad2e37380fe9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q61719274",
+     "rank": "normal",
+     "statement": "P2868$ff5371ba-45ee-2dac-7bad-7fe3895c0cd9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q18616576",
+     "rank": "normal",
+     "statement": "P2868$39e30944-4c6c-3a93-0079-bf72b213fc40",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P3831": {
+   "id": "P3831",
+   "labels": {
+    "en": "object of statement has role",
+    "fr": "rôle de l'objet de la déclaration"
+   },
+   "lastrevid": 2555747906,
+   "lookup": "id",
+   "raw_sha256": "59225f1ab3601fb4cb9da08c5e9ae6de8e3de900b43480a331141ec505de5be5",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q115396176",
+     "rank": "normal",
+     "statement": "P3831$3161544b-45f5-2ade-749e-19fa1cb1f4b2",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q61719274",
+     "rank": "normal",
+     "statement": "P3831$15aa29d2-44ac-195e-ccae-e0988de91f00",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P7166": {
+   "id": "P7166",
+   "labels": {
+    "en": "Acharts.co song ID",
+    "fr": "identifiant Acharts.co d'une chanson"
+   },
+   "lastrevid": 2341110696,
+   "lookup": "id",
+   "raw_sha256": "cfe492c38c8d1c4844de890272fac1fd48a86d60cd38e3bf348994584e82a691",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "external-id",
+   "P31": [
+    {
+     "o": "Q66116613",
+     "rank": "normal",
+     "statement": "P7166$19AE0CE2-3ABA-453E-BCDF-842AB6D3EC92",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P7695": {
+   "id": "P7695",
+   "labels": {
+    "fr": "identifiant The West Virginia Encyclopedia",
+    "en": "e-WV: The West Virginia Encyclopedia ID"
+   },
+   "lastrevid": 2384526613,
+   "lookup": "id",
+   "raw_sha256": "e29a64305906c0404e03da6a0d3c5a0fc7a8f1f03a81ca20a07d45019ff46aa0",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "external-id",
+   "P31": [
+    {
+     "o": "Q19847637",
+     "rank": "normal",
+     "statement": "P7695$2B6364EA-0280-4832-844B-E18F69A53ABB",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q55452870",
+     "rank": "normal",
+     "statement": "P7695$65eced08-42ff-65db-8fc4-9e1ef2350c49",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P8031": {
+   "id": "P8031",
+   "labels": {
+    "en": "perpetrator",
+    "fr": "perpétrateur ou perpétratrice"
+   },
+   "lastrevid": 2553931444,
+   "lookup": "id",
+   "raw_sha256": "45839c56e0f0ae686c92acdb7747d6e80975371d11d8e1f553f111c68b712777",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q112118353",
+     "rank": "normal",
+     "statement": "P8031$b0f7afc0-4001-363f-badc-7853fa964db8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q102046040",
+     "rank": "normal",
+     "statement": "P8031$c0da3b50-4504-965e-8fc9-486c89c7f2ca",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P8032": {
+   "id": "P8032",
+   "labels": {
+    "en": "victim(s)",
+    "fr": "victime"
+   },
+   "lastrevid": 2555746335,
+   "lookup": "id",
+   "raw_sha256": "a03d57e6bec59cc368423949350395b9478b7f40177b9a9cceb31d752667eb5c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "wikibase-item",
+   "P31": [
+    {
+     "o": "Q22964785",
+     "rank": "normal",
+     "statement": "P8032$98a1eb89-43fe-b8e8-6829-147f97231fa7",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q102046040",
+     "rank": "normal",
+     "statement": "P8032$1fe4e45f-4403-51a5-72c0-d8a8fe014a56",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P8472": {
+   "id": "P8472",
+   "labels": {
+    "fr": "identifiant Encyclopédie berbère d'un mot clé",
+    "en": "Encyclopedie berbere keyword ID"
+   },
+   "lastrevid": 2285127232,
+   "lookup": "id",
+   "raw_sha256": "29dc0b89df484efb3957bb8cb8fb214e1fd9c8a0a0138eb8fa048ba4ebc7cf6d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "external-id",
+   "P31": [
+    {
+     "o": "Q55452870",
+     "rank": "normal",
+     "statement": "P8472$0b5f44e7-46fb-7576-5ba4-6886d662345b",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "P13956": {
+   "id": "P13956",
+   "labels": {
+    "en": "Encyclopedia of African American History 1896 to the Present entry ID"
+   },
+   "lastrevid": 2477954647,
+   "lookup": "id",
+   "raw_sha256": "8064b0f372763ca6f858049c73c1de9b83b184a1257c53725ff66d085f0e02a6",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "datatype": "external-id",
+   "P31": [
+    {
+     "o": "Q19847637",
+     "rank": "normal",
+     "statement": "P13956$946BBB20-C820-4AF3-A616-C460822C4C77",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q106646822",
+     "rank": "normal",
+     "statement": "P13956$e972b14f-41a8-3b95-fce2-c06269ca9727",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q55452870",
+     "rank": "normal",
+     "statement": "P13956$a409e2bc-4619-3fb6-e03a-4f615a6002ab",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q198": {
+   "id": "Q198",
+   "labels": {
+    "en": "war",
+    "fr": "guerre"
+   },
+   "lastrevid": 2557410737,
+   "lookup": "id",
+   "raw_sha256": "da9642d978c4e119f68002a087dda45985136aa0390b14e420de9b1d8ea7f823",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q198$ee14c54d-424f-294e-0c37-b468c1249a34",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q17524420",
+     "rank": "normal",
+     "statement": "Q198$94635ca5-401e-e836-542d-4279393b55c9",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q350604",
+     "rank": "normal",
+     "statement": "q198$465c06f2-4c17-9107-533a-9f7293bc1841",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1920219",
+     "rank": "normal",
+     "statement": "Q198$2ec185a2-400e-e86e-8904-b3e28c1c4f85",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q198$c85bb6fa-458f-f18c-e8cf-8edf649d8137",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q15835236",
+     "rank": "normal",
+     "statement": "Q198$9e72fd7d-4ff4-00fc-2f9e-5831c608a739",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q17091170",
+     "rank": "normal",
+     "statement": "Q198$a7f4b493-4609-4001-e572-797b5eb71b27",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q7944": {
+   "id": "Q7944",
+   "labels": {
+    "en": "earthquake",
+    "fr": "séisme"
+   },
+   "lastrevid": 2557667249,
+   "lookup": "id",
+   "raw_sha256": "70db5f27a20451fd1806448083f5733413a2ddd35cd1425765fb8a4be6c7bb6e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q108156638",
+     "rank": "normal",
+     "statement": "Q7944$8e28dc30-4026-1da7-d456-762c8cd410ba",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q123349687",
+     "rank": "normal",
+     "statement": "Q7944$c7cd058e-47de-f214-93c9-635342511be6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q136927433",
+     "rank": "normal",
+     "statement": "Q7944$e30ef5c7-41bf-beda-944a-732733277d7f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q141222852",
+     "rank": "normal",
+     "statement": "Q7944$08663eb4-4586-79bb-d776-9bf6be2f0139",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q8065": {
+   "id": "Q8065",
+   "labels": {
+    "en": "natural disaster",
+    "fr": "catastrophe naturelle"
+   },
+   "lastrevid": 2542186636,
+   "lookup": "id",
+   "raw_sha256": "c09836b9540f5d719a9e1638e1a903a45685b8287ba6fcd72b8dec79bb46fa33",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q100151658",
+     "rank": "normal",
+     "statement": "Q8065$fa7e970e-4a91-006f-17e3-da5b766b5ee6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q140640277",
+     "rank": "normal",
+     "statement": "Q8065$7bbe6988-4c4e-68fc-fd75-132fcd8a0667",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q3839081",
+     "rank": "normal",
+     "statement": "Q8065$0d427167-4b33-5ebb-c33f-f19edcf4cc08",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1322005",
+     "rank": "normal",
+     "statement": "Q8065$c429977f-4088-4a8c-5281-cdf033d2e8e4",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3433179",
+     "rank": "normal",
+     "statement": "Q8065$a237707a-478e-803e-1252-fc1c063606b8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q86923152",
+     "rank": "normal",
+     "statement": "Q8065$b28a2861-4578-ca83-122f-a3983f124640",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q122355536",
+     "rank": "normal",
+     "statement": "Q8065$9fc0bbf0-4e20-0b6f-ea46-1d24ee4d1e40",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q8068": {
+   "id": "Q8068",
+   "labels": {
+    "en": "flood",
+    "fr": "inondation"
+   },
+   "lastrevid": 2557031419,
+   "lookup": "id",
+   "raw_sha256": "2f3d17af60bb84f121eb271ae02bac0f7fc3261efe979096d270316f082256de",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q108586636",
+     "rank": "normal",
+     "statement": "Q8068$d6377862-43f9-ba62-ebf2-5856f9b7bd6b",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q141736490",
+     "rank": "normal",
+     "statement": "Q8068$77d26562-4b5a-27b6-1deb-bbd42a716740",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q8070": {
+   "id": "Q8070",
+   "labels": {
+    "en": "tsunami",
+    "fr": "tsunami"
+   },
+   "lastrevid": 2557328299,
+   "lookup": "id",
+   "raw_sha256": "01be0fefdfb3b6d3751628098324cd7b21849f93ff236e289d8d13caf91ab4d1",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q141738025",
+     "rank": "normal",
+     "statement": "Q8070$5f337e31-4553-2879-e77f-b0bcb74ac8c3",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q8065",
+     "rank": "normal",
+     "statement": "Q8070$eefb1404-41e3-fcd0-b86c-cc028b29cebc",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q582695",
+     "rank": "normal",
+     "statement": "Q8070$12680f2d-4f33-35d3-3aaf-4b450408c037",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q8092": {
+   "id": "Q8092",
+   "labels": {
+    "en": "tropical cyclone",
+    "fr": "cyclone tropical"
+   },
+   "lastrevid": 2538774502,
+   "lookup": "id",
+   "raw_sha256": "f7b7ac954ce72260d3c2ee9e29aa352d1746b22c56c114520568e3a2e5181aa1",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q118733512",
+     "rank": "normal",
+     "statement": "Q8092$1f87437a-4bdb-8931-126c-0d712c3b8b92",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q79602",
+     "rank": "normal",
+     "statement": "Q8092$2b48449a-4ddc-5799-0efe-333ff43c3960",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1277161",
+     "rank": "normal",
+     "statement": "Q8092$d7c7166a-46e4-4914-962e-f7673af93ada",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q8465": {
+   "id": "Q8465",
+   "labels": {
+    "en": "civil war",
+    "fr": "guerre civile"
+   },
+   "lastrevid": 2548154832,
+   "lookup": "id",
+   "raw_sha256": "dcc7fcea4dd2f98c846b52b489f5a84ebfacba49b6239afc93cff0f6a6497bae",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q124867660",
+     "rank": "normal",
+     "statement": "Q8465$4f9e7442-4adc-838e-30b7-273224daead7",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q198",
+     "rank": "normal",
+     "statement": "q8465$44256105-4349-9bb6-f6c9-535b5a60b59e",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q5153967",
+     "rank": "normal",
+     "statement": "Q8465$9f44c00a-4513-fe68-898e-72535a8e49dd",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q10931": {
+   "id": "Q10931",
+   "labels": {
+    "en": "revolution",
+    "fr": "révolution"
+   },
+   "lastrevid": 2556243380,
+   "lookup": "id",
+   "raw_sha256": "17365eb0f3b2c1ef7ebb3ad26367d60109006b9911a91cf475e1747369a62a50",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q116505632",
+     "rank": "normal",
+     "statement": "Q10931$c2c00aa2-484c-be81-178b-bb15bb6e817a",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1510761",
+     "rank": "normal",
+     "statement": "Q10931$56324863-4d05-d29e-f36f-6a9e4f944e51",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1673271",
+     "rank": "normal",
+     "statement": "Q10931$cefed58c-429d-11ee-4c11-12746a170ba6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q180684",
+     "rank": "normal",
+     "statement": "Q10931$9cdd5583-4aa2-220c-f594-2636ab66fb4f",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q12184": {
+   "id": "Q12184",
+   "labels": {
+    "fr": "pandémie",
+    "en": "pandemic"
+   },
+   "lastrevid": 2551010553,
+   "lookup": "id",
+   "raw_sha256": "c3219a740a2b603b6c9af85c5ed04a4ae9a49109a45831fde27da3becd64ca98",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q44512",
+     "rank": "normal",
+     "statement": "Q12184$42e15000-4ebf-7ff0-fef5-8cbcfa5cf179",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1369234",
+     "rank": "normal",
+     "statement": "Q12184$ae9a9cdb-424a-209b-025c-7fb98b607824",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q5422048",
+     "rank": "normal",
+     "statement": "Q12184$9d6fa26f-4bff-c40f-926f-44f6237b5440",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q40231": {
+   "id": "Q40231",
+   "labels": {
+    "fr": "élection",
+    "en": "public election"
+   },
+   "lastrevid": 2555881115,
+   "lookup": "id",
+   "raw_sha256": "2f312504d9d87d6ecc01e6fc12931257b0cb1f3c742d03524e155b4b62c6a5c6",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q3249551",
+     "rank": "normal",
+     "statement": "Q40231$065f77b1-46f8-8f41-ac9a-764ebcc8646a",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q189760",
+     "rank": "normal",
+     "statement": "Q40231$59425ce5-4ffe-e485-4e4f-88fcd291a1d9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q841654",
+     "rank": "normal",
+     "statement": "Q40231$0492d463-4613-3c75-f7dd-1be3eb8cec21",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q41397": {
+   "id": "Q41397",
+   "labels": {
+    "en": "genocide",
+    "fr": "génocide"
+   },
+   "lastrevid": 2548188308,
+   "lookup": "id",
+   "raw_sha256": "7dab3607734e907172ec726312e77a3d6250ccebbf1b1c32a258454fc3c471b1",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q17781833",
+     "rank": "normal",
+     "statement": "Q41397$395ef140-40dc-81c7-b0d7-da14de4f5a2f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2438541",
+     "rank": "normal",
+     "statement": "Q41397$b9709652-48fb-c175-5c65-9efdaa2fbeff",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q130583773",
+     "rank": "normal",
+     "statement": "Q41397$c07bd000-4143-94b6-7ffa-eeb32afe0b78",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q20820018",
+     "rank": "normal",
+     "statement": "Q41397$f496ce47-489a-3629-05b0-23bead5b7b43",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q116250089",
+     "rank": "normal",
+     "statement": "Q41397$551150D3-0047-4A3F-A2E2-583036E3CC99",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q173462",
+     "rank": "normal",
+     "statement": "Q41397$459eaec7-475f-1b5c-ef7d-ab6081d4e362",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q4817637",
+     "rank": "normal",
+     "statement": "Q41397$6f6a0829-4898-37c0-6ad1-298d85fc9e1c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q750215",
+     "rank": "normal",
+     "statement": "Q41397$a9f5d48c-451a-0351-79a9-35a7e930b81c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q5153967",
+     "rank": "normal",
+     "statement": "Q41397$15159699-4e16-a8df-8dc6-57bcebb200c1",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q43109": {
+   "id": "Q43109",
+   "labels": {
+    "fr": "référendum",
+    "en": "referendum"
+   },
+   "lastrevid": 2549809273,
+   "lookup": "id",
+   "raw_sha256": "99ff7d827d8a6dde319df4211f0dc9f8391fd3fe64c8ed56f2f10e177c6e0d55",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q189760",
+     "rank": "normal",
+     "statement": "Q43109$4255558e-4343-2d5e-09cf-9e53852fe493",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q171174",
+     "rank": "normal",
+     "statement": "Q43109$EF1F931B-8593-4599-BC45-0404842C1D7B",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q44512": {
+   "id": "Q44512",
+   "labels": {
+    "fr": "épidémie",
+    "en": "epidemic"
+   },
+   "lastrevid": 2538278954,
+   "lookup": "id",
+   "raw_sha256": "12a4d04834ef47cd91bb2edaab3f72267a3b8bc7885884c75e501a02a2f844bf",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q3241045",
+     "rank": "normal",
+     "statement": "Q44512$1fd14ac8-4f61-b8cf-a405-66d0224241df",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3839081",
+     "rank": "normal",
+     "statement": "Q44512$a46bac40-4d7b-9d8d-9491-b967e92a68e0",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q50156634",
+     "rank": "normal",
+     "statement": "Q44512$c5fe8c3f-45ed-2d72-9878-d7a8067d93d9",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q45382": {
+   "id": "Q45382",
+   "labels": {
+    "fr": "coup d'État",
+    "en": "coup d'état"
+   },
+   "lastrevid": 2540463642,
+   "lookup": "id",
+   "raw_sha256": "7080410cc688846593061f918a2f6ac55591578b21f5810bd95d757950d332cd",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1673271",
+     "rank": "normal",
+     "statement": "Q45382$6dfd888a-471a-61fb-3644-9ddc85ac9fc8",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q180684",
+     "rank": "normal",
+     "statement": "Q45382$caf29478-47b6-5abf-301f-120f895f711e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q49776": {
+   "id": "Q49776",
+   "labels": {
+    "en": "strike",
+    "fr": "grève"
+   },
+   "lastrevid": 2556712599,
+   "lookup": "id",
+   "raw_sha256": "f725bdaf1517918e713cbbab9f9e3cd3133c0083e4ca0ffbbba4a6bf66171cf3",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q113644093",
+     "rank": "normal",
+     "statement": "Q49776$bd8bee16-441a-fa30-6ba3-8d3ad352220f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q32602941",
+     "rank": "normal",
+     "statement": "Q49776$1f9c4372-44ca-d5c8-8815-b5bce78d6e7a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q141277394",
+     "rank": "normal",
+     "statement": "Q49776$2d112cdd-444a-374b-d1d6-c5c6252dc48c",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q5782934",
+     "rank": "normal",
+     "statement": "Q49776$de450f49-4e1a-888d-d193-6a09baf6cbd3",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q273120",
+     "rank": "normal",
+     "statement": "Q49776$41ae4c56-4887-9bb7-7e79-62285e3cf13e",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q628191",
+     "rank": "normal",
+     "statement": "Q49776$0f00e1cd-4d00-9514-d334-99040a74acdd",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q17562059",
+     "rank": "normal",
+     "statement": "Q49776$db3d4ba7-406f-5918-a1ca-d8e1ed112bd3",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q103495": {
+   "id": "Q103495",
+   "labels": {
+    "fr": "guerre mondiale",
+    "en": "world war"
+   },
+   "lastrevid": 2554058331,
+   "lookup": "id",
+   "raw_sha256": "279dc7d84bae051f5ff6de2c2366ddee2b0aed9f832b5b4eb218875cc4067a95",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q124867660",
+     "rank": "normal",
+     "statement": "Q103495$7556b003-4622-c001-fc78-a9f5dc317ccc",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q198",
+     "rank": "normal",
+     "statement": "q103495$5d8dd6aa-4123-69de-3eab-850537b014f6",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q114380": {
+   "id": "Q114380",
+   "labels": {
+    "fr": "crise financière",
+    "en": "financial crisis"
+   },
+   "lastrevid": 2557663085,
+   "lookup": "id",
+   "raw_sha256": "633112ea5f143d05c3c3574eac984b6e63076f16e0d8c692848dbfd0f4cd7c3c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q127606978",
+     "rank": "normal",
+     "statement": "Q114380$2e84748f-49bb-9ed9-b3d9-5a2dac7e0b60",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q290178",
+     "rank": "normal",
+     "statement": "Q114380$fa2767bd-41c9-8ce2-df2a-7f2dfd8e7f1a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1337875",
+     "rank": "normal",
+     "statement": "Q114380$c65d6459-4c9a-7b5b-705e-5437fdc507aa",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q112683179",
+     "rank": "normal",
+     "statement": "Q114380$12051ecc-4a0f-cb9c-e1f8-315b6859798b",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q124734": {
+   "id": "Q124734",
+   "labels": {
+    "fr": "rébellion",
+    "en": "rebellion"
+   },
+   "lastrevid": 2550686696,
+   "lookup": "id",
+   "raw_sha256": "88d313b9b21990057f1c22087af44d5687cc9bb008b057f7b782cc925b8d9d02",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q130583773",
+     "rank": "normal",
+     "statement": "Q124734$7ecd42ba-48d1-bf0f-cb30-baf8d991dc08",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q2672648",
+     "rank": "normal",
+     "statement": "Q124734$ae4946f6-411d-5997-5d13-9aeacafbac5a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q13418847",
+     "rank": "normal",
+     "statement": "Q124734$0c7949ba-456d-f6bd-9496-a3cf8d454866",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q350604",
+     "rank": "normal",
+     "statement": "Q124734$f03f151e-42e0-ffed-1969-602fd532ab8e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q124757": {
+   "id": "Q124757",
+   "labels": {
+    "fr": "émeute",
+    "en": "riot"
+   },
+   "lastrevid": 2519850995,
+   "lookup": "id",
+   "raw_sha256": "297884588fe96bd7d6c274680cdbdb4b1b6b953e1446d33752776bd91031aac8",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q686984",
+     "rank": "normal",
+     "statement": "q124757$ba3979ce-4194-f5a0-8327-3b9799cb29b7",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q273120",
+     "rank": "normal",
+     "statement": "Q124757$cf87376a-4e05-34e5-59c8-7d1d36d57805",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q49773",
+     "rank": "normal",
+     "statement": "Q124757$d6c128be-4195-2ff4-6df9-198898b3a950",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q131569": {
+   "id": "Q131569",
+   "labels": {
+    "fr": "traité",
+    "en": "treaty"
+   },
+   "lastrevid": 2557702822,
+   "lookup": "id",
+   "raw_sha256": "7095420a9a7aec3a92237e0bf0966ee999212f49d5977054732de1c5ef2f9dfa",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q2635077",
+     "rank": "normal",
+     "statement": "Q131569$97d3cf6d-40e4-d6d4-e790-0bf58c09ee0e",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q321839",
+     "rank": "normal",
+     "statement": "Q131569$3143a56d-4eb0-8e20-2262-607c73120846",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q49848",
+     "rank": "normal",
+     "statement": "Q131569$e48bcc3b-499f-bcc8-5468-38a2bb6756bb",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1151067",
+     "rank": "normal",
+     "statement": "Q131569$5905f1cb-4089-b213-4240-73f235720ff4",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q820655",
+     "rank": "normal",
+     "statement": "Q131569$bf8fb3cd-492b-4202-9789-131e12b3c7d5",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q68619446",
+     "rank": "normal",
+     "statement": "Q131569$33d1bfdf-46cc-58b5-d2ff-5ac26b6af0e3",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q168247": {
+   "id": "Q168247",
+   "labels": {
+    "fr": "famine",
+    "en": "famine"
+   },
+   "lastrevid": 2557662141,
+   "lookup": "id",
+   "raw_sha256": "bf6c27eb9f0c0ae143d82e1a4f7b3a6c62e96cba82e88df3631c478704c2d5fc",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q3839081",
+     "rank": "normal",
+     "statement": "Q168247$21d9ea46-4c7f-bf22-f5e3-aff0dd931452",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2964234",
+     "rank": "normal",
+     "statement": "Q168247$bfff751e-4bbb-8c6c-120c-2fcac9c310ef",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2184645",
+     "rank": "normal",
+     "statement": "Q168247$9871547e-483d-95d0-134c-f34506a660d0",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q175331": {
+   "id": "Q175331",
+   "labels": {
+    "en": "demonstration",
+    "fr": "manifestation"
+   },
+   "lastrevid": 2547137287,
+   "lookup": "id",
+   "raw_sha256": "9f02dba9c1c8d4a845a33c24c2806bbe8a70108efa6100df1d885cedea72ddd9",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q108586636",
+     "rank": "normal",
+     "statement": "Q175331$1b9695f0-43ba-1cf8-084f-7fa33d74f6cc",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1656682",
+     "rank": "normal",
+     "statement": "Q175331$eee11d3b-4b2f-115c-49c2-c5598a49dbaf",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q130260549",
+     "rank": "normal",
+     "statement": "Q175331$3d200c9b-4eb8-1d25-75c9-5de4d831e5a1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3533467",
+     "rank": "normal",
+     "statement": "Q175331$8df855c9-4249-a31c-de00-b585747d993d",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q176494": {
+   "id": "Q176494",
+   "labels": {
+    "fr": "récession",
+    "en": "recession"
+   },
+   "lastrevid": 2556122774,
+   "lookup": "id",
+   "raw_sha256": "000e5448dc5aac54fae1ade55a40e84de6dc991afb47183bed3b08b9352a8a78",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1920219",
+     "rank": "normal",
+     "statement": "Q176494$5552686c-494d-dcee-0100-185d669e3011",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q177626": {
+   "id": "Q177626",
+   "labels": {
+    "fr": "migration humaine",
+    "en": "human migration"
+   },
+   "lastrevid": 2555821576,
+   "lookup": "id",
+   "raw_sha256": "e1b03ede94b1aebe58303e0bbcb7b95abf252a2f6fb58cf80d61fb3e02a3c037",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q193145",
+     "rank": "normal",
+     "statement": "Q177626$31c1a257-4b1d-e959-4b4e-6b9eaddd49be",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q178561": {
+   "id": "Q178561",
+   "labels": {
+    "fr": "bataille",
+    "en": "battle"
+   },
+   "lastrevid": 2545342398,
+   "lookup": "id",
+   "raw_sha256": "fbb204473af4babc962a5085a57076e1ff419b9fde56564787e05188f029489b",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q178561$e492b7e0-4847-99e1-0412-2e3d8062d3e4",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q650711",
+     "rank": "normal",
+     "statement": "Q178561$e5ffddb5-425f-f20d-3171-eb3e255fff4c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q13418847",
+     "rank": "normal",
+     "statement": "Q178561$23a9c10e-4ed7-b5cb-2ada-339f6d990a22",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q645883",
+     "rank": "normal",
+     "statement": "Q178561$049fd577-4a45-b4e5-ab09-953752528ef9",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q123349687",
+     "rank": "normal",
+     "statement": "Q178561$ad7bcd7d-45cf-f43f-ddeb-f354fe3844fd",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q350604",
+     "rank": "normal",
+     "statement": "Q178561$8c2c4a0e-46ad-e8e5-6898-a0a44c202106",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q180684": {
+   "id": "Q180684",
+   "labels": {
+    "fr": "conflit",
+    "en": "conflict"
+   },
+   "lastrevid": 2555585214,
+   "lookup": "id",
+   "raw_sha256": "6d7738651a00d572f54a44d5617e8e49c71d698c58a7167087ba4538fa202066",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q116505632",
+     "rank": "normal",
+     "statement": "Q180684$79275550-4bc1-9043-b498-d6d1a4d86d96",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q123345464",
+     "rank": "normal",
+     "statement": "Q180684$E1D128AF-7D60-4192-B276-7D0721BD51E3",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q839578",
+     "rank": "normal",
+     "statement": "Q180684$5bc5f20d-4cc2-ff81-ae79-bf0698ee5a55",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q86923152",
+     "rank": "normal",
+     "statement": "Q180684$2d4abb91-4410-50e0-2459-9a9ab46e4c71",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q185565": {
+   "id": "Q185565",
+   "labels": {
+    "fr": "hyperinflation",
+    "en": "hyperinflation"
+   },
+   "lastrevid": 2555487510,
+   "lookup": "id",
+   "raw_sha256": "3f75f16aed3a2dec2791a9514b276fc9c1bc14f2a77e5fd0263c9786c2e49ce1",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q35865",
+     "rank": "normal",
+     "statement": "Q185565$17f573bc-45df-b430-11ff-bcfcc281959b",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1920219",
+     "rank": "normal",
+     "statement": "Q185565$7da863cd-407f-0ce9-ecf6-349accf86ed2",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q188055": {
+   "id": "Q188055",
+   "labels": {
+    "fr": "siège militaire",
+    "en": "siege"
+   },
+   "lastrevid": 2551291194,
+   "lookup": "id",
+   "raw_sha256": "cc043cd8aa3dfcdca3d33067ca8f20b486b9b894c6fd007f0b3f3f43cfeb799f",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q207645",
+     "rank": "normal",
+     "statement": "Q188055$2d16ff4e-47df-59ba-6be7-4583699fdfa6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q188055$73dde72d-49cd-ca82-6e51-86276392520e",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q273976",
+     "rank": "normal",
+     "statement": "q188055$312708a3-483a-0cb2-b57b-460a384fd333",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q645883",
+     "rank": "normal",
+     "statement": "Q188055$0c1fd49a-430b-37fe-5613-d4148c1787c5",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q350604",
+     "rank": "normal",
+     "statement": "Q188055$aa820afa-4ad3-1466-8301-a92e84575e34",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q188686": {
+   "id": "Q188686",
+   "labels": {
+    "fr": "occupation",
+    "en": "military occupation"
+   },
+   "lastrevid": 2529076565,
+   "lookup": "id",
+   "raw_sha256": "102167373d702bd77551370acaa5907a6525d8bec566b8febd76625e12ca9df5",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q645883",
+     "rank": "normal",
+     "statement": "Q188686$392d1de4-450c-4589-448b-2cd2d73358da",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q12720126",
+     "rank": "normal",
+     "statement": "Q188686$5395ec85-4efd-89b9-a9ee-99090c65fd29",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q114046",
+     "rank": "normal",
+     "statement": "Q188686$9f2b0143-4cb5-52cf-413c-5788da5652b4",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q194465": {
+   "id": "Q194465",
+   "labels": {
+    "en": "annexation",
+    "fr": "annexion"
+   },
+   "lastrevid": 2513261031,
+   "lookup": "id",
+   "raw_sha256": "0b024d2ba7d848aa311494dade4430bc04f13107b84ad1571cfdb43590c04965",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q194465$2298b210-4726-0f09-beee-4de4c5142303",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q85249348",
+     "rank": "normal",
+     "statement": "Q194465$52db972f-42cd-0081-e82c-943f008ac8b6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q180684",
+     "rank": "normal",
+     "statement": "Q194465$091e794d-4051-063c-3857-32e39d41dbf0",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q207781": {
+   "id": "Q207781",
+   "labels": {
+    "fr": "bulle",
+    "en": "economic bubble"
+   },
+   "lastrevid": 2515852355,
+   "lookup": "id",
+   "raw_sha256": "13f7442a30559f9d2bb7b5846f304098be5dd3170e91d0011505c6714c2ca231",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q3539169",
+     "rank": "normal",
+     "statement": "Q207781$ccd3cc82-4c47-6ed5-cea5-143620bba7d1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q405372",
+     "rank": "normal",
+     "statement": "Q207781$094399cf-46d7-b777-f67f-f39d4890f708",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q877707",
+     "rank": "normal",
+     "statement": "Q207781$8E80FFBA-D923-4E39-A570-E55E675BAF31",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q230533": {
+   "id": "Q230533",
+   "labels": {
+    "fr": "décolonisation",
+    "en": "decolonization"
+   },
+   "lastrevid": 2531589610,
+   "lookup": "id",
+   "raw_sha256": "4a96e7e0030f467a3592c1afda457b133a1728c0ab22aa7dcbef37173c6e9f5d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q3249551",
+     "rank": "normal",
+     "statement": "Q230533$ce334d79-4b57-bf76-fa57-40e764322295",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q273120": {
+   "id": "Q273120",
+   "labels": {
+    "en": "protest",
+    "fr": "protestation"
+   },
+   "lastrevid": 2546719385,
+   "lookup": "id",
+   "raw_sha256": "708703ee1af152957da48e9af53811306d098f393853ed423c4d8fb1453115fc",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q108586636",
+     "rank": "normal",
+     "statement": "Q273120$4940c2fb-41ad-9080-695c-8a2e1afa0425",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q140451665",
+     "rank": "normal",
+     "statement": "Q273120$0a5a19fa-4309-fdbb-0e68-9427f7cb5a39",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1914636",
+     "rank": "normal",
+     "statement": "Q273120$81338109-4f9c-8acc-b061-deab2e64cd08",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q180684",
+     "rank": "normal",
+     "statement": "Q273120$26C18A79-1C52-402D-9B57-425B3DD1452C",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q628523",
+     "rank": "normal",
+     "statement": "Q273120$36C93211-CDB8-4B6E-BD8B-177286D77269",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q130260549",
+     "rank": "normal",
+     "statement": "Q273120$4eeae877-48db-49c8-dc70-d74ddcc368ad",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q290178": {
+   "id": "Q290178",
+   "labels": {
+    "fr": "crise économique",
+    "en": "economic crisis"
+   },
+   "lastrevid": 2557662186,
+   "lookup": "id",
+   "raw_sha256": "68e2a1fa8924856342f3034b62f3c54dc59463859193e1250468e5c158c5ab3c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q127606978",
+     "rank": "normal",
+     "statement": "Q290178$eb13d164-4e7a-48d0-ce4d-db64ff4b8479",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q381072",
+     "rank": "normal",
+     "statement": "Q290178$9c012e72-4519-b967-ee29-13a2e570e033",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1920219",
+     "rank": "normal",
+     "statement": "Q290178$0a7965b1-4eca-8d9b-2095-b64ab8647253",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3539169",
+     "rank": "normal",
+     "statement": "Q290178$db8bf6f1-48f8-d52d-df6c-1ad5290f6064",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q350604": {
+   "id": "Q350604",
+   "labels": {
+    "en": "armed conflict",
+    "fr": "conflit armé"
+   },
+   "lastrevid": 2549691631,
+   "lookup": "id",
+   "raw_sha256": "1268adb9f732934cdd3308bf0c861c061ff08080cd7b8a6955a0404e5b1c5f9d",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q350604$0d59fa2a-418b-476e-c728-73b7d8ffb5e3",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q71266556",
+     "rank": "normal",
+     "statement": "Q350604$451DF796-237E-44DB-8491-32E77D268F33",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q381072": {
+   "id": "Q381072",
+   "labels": {
+    "fr": "crise",
+    "en": "crisis"
+   },
+   "lastrevid": 2550946956,
+   "lookup": "id",
+   "raw_sha256": "fced030f68a01ddeae8a0f22f3b846bccc45f63629ccde0473979d267b87d2a0",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q130286945",
+     "rank": "normal",
+     "statement": "Q381072$b8b6fc20-45d8-497e-199f-ad04914246fa",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q381072$5df91f43-48ca-7cb8-22ff-b452d57abec0",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q104493",
+     "rank": "normal",
+     "statement": "Q381072$ed8dd232-40c4-db12-ceae-c93e2a035d7c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2141565",
+     "rank": "normal",
+     "statement": "Q381072$417d7b0d-4a4c-ca4b-52a6-28e1e5cfcfd4",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q467011": {
+   "id": "Q467011",
+   "labels": {
+    "fr": "invasion",
+    "en": "invasion"
+   },
+   "lastrevid": 2535059921,
+   "lookup": "id",
+   "raw_sha256": "cc6e5a63df6b252e31bf62e449115810aebe7fc9c55373aad6bf85329ba3a154",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q2001676",
+     "rank": "normal",
+     "statement": "Q467011$46a8661b-440e-b8a6-1300-667c3e48addb",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q5919191",
+     "rank": "normal",
+     "statement": "Q467011$70d03675-4a1d-e36d-efc0-63d76edfc3d8",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q518554": {
+   "id": "Q518554",
+   "labels": {
+    "en": "partition",
+    "fr": "partition"
+   },
+   "lastrevid": 2543585812,
+   "lookup": "id",
+   "raw_sha256": "32deba3b0ecd2b7fc227a817366dc099270b378f5130cbe17981a302f82b4e11",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q116505632",
+     "rank": "normal",
+     "statement": "Q518554$8910319c-4315-3fcb-8bfa-194ceb4653f7",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1150070",
+     "rank": "normal",
+     "statement": "Q518554$4d7c6c4c-4d5a-56d6-f0a3-3a6be7a2e425",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3182649",
+     "rank": "normal",
+     "statement": "Q518554$02ed6d04-4925-376e-b401-30f2dfb026a6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q139831852",
+     "rank": "normal",
+     "statement": "Q518554$8dc59238-4d8d-0d8d-3e26-c1c331c07ab0",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q518554$ec4bfb77-4086-5003-d33f-60e0d46cf66c",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q625298": {
+   "id": "Q625298",
+   "labels": {
+    "fr": "traité de paix",
+    "en": "peace treaty"
+   },
+   "lastrevid": 2548151016,
+   "lookup": "id",
+   "raw_sha256": "d1ad6691628b07e15ffbc127f4561bb9de9635703d02b59a25dc62867e366f5e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q131569",
+     "rank": "normal",
+     "statement": "q625298$284188e2-4e15-4eb7-63d0-a55215eb61c4",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q645883": {
+   "id": "Q645883",
+   "labels": {
+    "fr": "opération militaire",
+    "en": "military operation"
+   },
+   "lastrevid": 2542918510,
+   "lookup": "id",
+   "raw_sha256": "c9a1897d9f9e0bde2f1bbfc4914fdf288056bf0920fb147a6d6576f30196bb26",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q15835236",
+     "rank": "normal",
+     "statement": "Q645883$a81eb3d0-4490-4c97-eb7e-941d7d6567fb",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q645883$2c4cd908-472b-f115-f8ce-011afe3984df",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q858439": {
+   "id": "Q858439",
+   "labels": {
+    "en": "presidential election",
+    "fr": "élection présidentielle"
+   },
+   "lastrevid": 2541290143,
+   "lookup": "id",
+   "raw_sha256": "07ef6198128b7c8888d219b96ae81fc5a18c3635224b87b6b18cd4db5bf6838e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q40231",
+     "rank": "normal",
+     "statement": "q858439$d972bac4-4ae3-1ea1-9377-b48796dd4137",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q864113": {
+   "id": "Q864113",
+   "labels": {
+    "fr": "guerre par procuration",
+    "en": "proxy war"
+   },
+   "lastrevid": 2556321182,
+   "lookup": "id",
+   "raw_sha256": "843d8a64d11f646fbffceb8d5a7b31f388a876e355cab4b6c316e03116453e47",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q124867660",
+     "rank": "normal",
+     "statement": "Q864113$605e768e-4f2c-1f2c-bc47-85a22398077e",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q198",
+     "rank": "normal",
+     "statement": "q864113$8937c935-45c8-135d-9a6e-8b14a2454c19",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q900406": {
+   "id": "Q900406",
+   "labels": {
+    "en": "reform",
+    "fr": "réforme"
+   },
+   "lastrevid": 2551884082,
+   "lookup": "id",
+   "raw_sha256": "ae7e353169f721ea388f0d464befc8aa38b7c5c29aef4910f2536a0328e430d9",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q33104069",
+     "rank": "normal",
+     "statement": "Q900406$5eba6967-473f-a1df-759b-aa8deb585946",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q116505632",
+     "rank": "normal",
+     "statement": "Q900406$6e4c417c-4534-fce6-8b08-1d6bfb6f998f",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q2305441",
+     "rank": "normal",
+     "statement": "Q900406$c01ab135-4f50-b9da-0d29-b57bf6a3da8c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1408286",
+     "rank": "normal",
+     "statement": "Q900406$087382a5-40d0-698e-4d37-df843100fdf8",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1006311": {
+   "id": "Q1006311",
+   "labels": {
+    "en": "war of national liberation",
+    "fr": "guerre de libération nationale"
+   },
+   "lastrevid": 2497961493,
+   "lookup": "id",
+   "raw_sha256": "910cccaa81b069509d8133b258b0ec1c4ade68f78c61ef7bbaa58eba7881471b",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q21994376",
+     "rank": "normal",
+     "statement": "q1006311$1c4d01f9-4715-81f4-a520-1ab808efa630",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1020018": {
+   "id": "Q1020018",
+   "labels": {
+    "fr": "krach",
+    "en": "stock market crash"
+   },
+   "lastrevid": 2554816521,
+   "lookup": "id",
+   "raw_sha256": "187dba93e1ce40e9d2adec4f84841661ad1b0a8d823278053614095d5355fce7",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q1020018$c75fade0-4286-56dd-42f9-46dd637bc9bd",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q24900252",
+     "rank": "normal",
+     "statement": "Q1020018$1010177b-476d-a7b5-5065-fd17bbfa81f2",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1076105": {
+   "id": "Q1076105",
+   "labels": {
+    "fr": "élection générale",
+    "en": "general election"
+   },
+   "lastrevid": 2518154318,
+   "lookup": "id",
+   "raw_sha256": "30a01486ccee9dfc2ec5115d670b37a8dfe32fa19fb49150d6849623e028afb2",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q40231",
+     "rank": "normal",
+     "statement": "Q1076105$af9f128f-488e-33d3-d13a-c372cd50bf5c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q15275719",
+     "rank": "normal",
+     "statement": "Q1076105$a29420fe-4de2-3f98-1add-b75cfae637cd",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q30111082",
+     "rank": "normal",
+     "statement": "Q1076105$65e668b1-4556-8771-4593-c89eb5cd7298",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1155622": {
+   "id": "Q1155622",
+   "labels": {
+    "en": "slave rebellion",
+    "fr": "révolte d'esclaves"
+   },
+   "lastrevid": 2535120053,
+   "lookup": "id",
+   "raw_sha256": "9aca2770168c3f310c3e09eca9a9a892e88e9da75eca473cc5e2eb12d6f031b8",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q124734",
+     "rank": "normal",
+     "statement": "Q1155622$0e21c9da-48fe-f13a-ca39-8e14204d546b",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1190554": {
+   "id": "Q1190554",
+   "labels": {
+    "fr": "occurrence",
+    "en": "occurrence"
+   },
+   "lastrevid": 2554972772,
+   "lookup": "id",
+   "raw_sha256": "95b012005b65d7c40628d994f0f0184b9376a3791a355ab6481d5bd087355ca3",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q108586636",
+     "rank": "normal",
+     "statement": "Q1190554$562fb2cb-4b54-489d-8121-f9b42ff4a458",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q67518978",
+     "rank": "normal",
+     "statement": "Q1190554$a62dbba3-4693-65b6-b88b-69c1f64453f4",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q140451665",
+     "rank": "normal",
+     "statement": "Q1190554$46703972-47ee-8438-a2cd-0d62eddfb6cb",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1384277": {
+   "id": "Q1384277",
+   "labels": {
+    "en": "military expedition",
+    "fr": "expédition militaire"
+   },
+   "lastrevid": 2552189558,
+   "lookup": "id",
+   "raw_sha256": "772150a7f2efb96207878d7d392d4626620074255f65c80577dd08a06269af4e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q645883",
+     "rank": "normal",
+     "statement": "Q1384277$8c055ed0-40d2-5f25-fa08-6ebc28185293",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2401485",
+     "rank": "normal",
+     "statement": "Q1384277$A29500EC-551F-49CE-A574-373E0C637670",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q831663",
+     "rank": "normal",
+     "statement": "Q1384277$972C92DB-D105-41A7-BFCD-322169F14886",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1752346": {
+   "id": "Q1752346",
+   "labels": {
+    "fr": "assemblée délibérante",
+    "en": "assembly"
+   },
+   "lastrevid": 2548057258,
+   "lookup": "id",
+   "raw_sha256": "2d43944ff0827613787018f71c117fdeccf17fc63798a087f58cff82e3d0c6b3",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q43229",
+     "rank": "normal",
+     "statement": "q1752346$a5ef720b-4c41-c4a4-aff9-51f05dfbb678",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q1814941": {
+   "id": "Q1814941",
+   "labels": {
+    "fr": "dépression",
+    "en": "depression"
+   },
+   "lastrevid": 2506241584,
+   "lookup": "id",
+   "raw_sha256": "58e557c537ee5744f2dd9111c7773d40221dc50010ac94a4b07228943c8e2b18",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q1401304",
+     "rank": "normal",
+     "statement": "Q1814941$2ef88f8e-4555-8da5-a94d-f08556194f36",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1920219",
+     "rank": "normal",
+     "statement": "Q1814941$1898f002-4fd8-4607-eb90-b9fcff15fde8",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q2001676": {
+   "id": "Q2001676",
+   "labels": {
+    "en": "offensive",
+    "fr": "offensive militaire"
+   },
+   "lastrevid": 2556468351,
+   "lookup": "id",
+   "raw_sha256": "95b0337e24ac4d3d5199eccd107cf24b7e60b4a116a0dac3cca3407302818595",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q2001676$020b30ce-473f-be16-7c74-8b7af6c3337f",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q645883",
+     "rank": "normal",
+     "statement": "q2001676$80d0dce1-48b5-fe5c-6bfd-bfea874695f1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1174599",
+     "rank": "normal",
+     "statement": "Q2001676$31b4ca0f-43eb-2c1d-cded-c7761159da2f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q350604",
+     "rank": "normal",
+     "statement": "Q2001676$5f216b7f-40a6-90df-f3e0-7ba57357b78e",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q2223653": {
+   "id": "Q2223653",
+   "labels": {
+    "en": "terrorist attack",
+    "fr": "attaque terroriste"
+   },
+   "lastrevid": 2531930029,
+   "lookup": "id",
+   "raw_sha256": "15e8bb9c84946bd00f3aa79ba7065e4cbc5040393b4edf94c99a38dfb42ca37c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q130583773",
+     "rank": "normal",
+     "statement": "Q2223653$84f8e04f-412b-1ad8-d038-5369f962d205",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1520311",
+     "rank": "normal",
+     "statement": "Q2223653$E0B37956-C80A-4CF6-ABF3-C326290EE0C1",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q81672",
+     "rank": "normal",
+     "statement": "Q2223653$4AA4BE0D-0FCE-4CCA-BD89-755D9E93B472",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1174599",
+     "rank": "normal",
+     "statement": "Q2223653$1534fb6a-4b6b-1fc8-9eaa-a5cc56410611",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q2401485": {
+   "id": "Q2401485",
+   "labels": {
+    "en": "expedition",
+    "fr": "expédition"
+   },
+   "lastrevid": 2553139561,
+   "lookup": "id",
+   "raw_sha256": "63a409d8fc515a334acba686631ac852d4bd37ec00766d898a09f829b8d35af2",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q6502154",
+     "rank": "normal",
+     "statement": "Q2401485$aad34063-489a-3efe-4a84-99d7f92f9d1f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q2401485$d4b044a6-4c6f-5bd3-862d-add5e04e9795",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q3199915": {
+   "id": "Q3199915",
+   "labels": {
+    "en": "massacre",
+    "fr": "massacre"
+   },
+   "lastrevid": 2556136627,
+   "lookup": "id",
+   "raw_sha256": "051b19a9bcebe7d0768ed51ac202adbf5bf41dd65cfdcf0b08a57f23ba26edc1",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q130583773",
+     "rank": "normal",
+     "statement": "Q3199915$ee97de11-4839-63b0-2098-9efb4c74abb2",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q750215",
+     "rank": "normal",
+     "statement": "Q3199915$cd011080-4dbd-947a-c0e3-100126cbf5ea",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q3199915$24cee5f2-4a34-b32f-7307-04c352add89b",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q4676786",
+     "rank": "normal",
+     "statement": "Q3199915$17ae4f86-46e5-027a-e52b-3bd4b7e21f10",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q123349687",
+     "rank": "normal",
+     "statement": "Q3199915$1bea1ea4-43f1-ce82-c4ac-5005b0e90c27",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q4817637",
+     "rank": "normal",
+     "statement": "Q3199915$97c25930-47dc-4a38-238c-cb6e781cfe2f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q844482",
+     "rank": "normal",
+     "statement": "Q3199915$7CDF5CEF-89C6-4649-BDC0-5B5910858A97",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q3241045": {
+   "id": "Q3241045",
+   "labels": {
+    "en": "disease outbreak",
+    "fr": "poussée épidémique"
+   },
+   "lastrevid": 2553452941,
+   "lookup": "id",
+   "raw_sha256": "626952555e9f69260ccd85894d351cdf123cc9aefdbe5bfcf85ccf65a3a3addb",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q3241045$2bbbb34e-4303-9db2-d0d1-7de807fb0c36",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q5422048",
+     "rank": "normal",
+     "statement": "Q3241045$4fdded48-4254-97d3-f354-356bbb3f3335",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q87075524",
+     "rank": "normal",
+     "statement": "Q3241045$a81a8b07-4efd-3cad-d353-e503f79b3820",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q3318733": {
+   "id": "Q3318733",
+   "labels": {
+    "fr": "indépendantisme",
+    "en": "independentism"
+   },
+   "lastrevid": 2544005556,
+   "lookup": "id",
+   "raw_sha256": "e56fa1d8873785289f026de5599c02c148774c2e5db1f7773048c6145f1981e6",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q12909644",
+     "rank": "normal",
+     "statement": "Q3318733$af6c60de-4569-d6d1-ccb5-cbd85699783d",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q2738074",
+     "rank": "normal",
+     "statement": "Q3318733$F13C0A56-D517-425E-803C-46EFE4316562",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3533467",
+     "rank": "normal",
+     "statement": "Q3318733$3764ACCA-C93B-4A8E-916A-8939B0008067",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q3882219": {
+   "id": "Q3882219",
+   "labels": {
+    "fr": "magnicide",
+    "en": "assassination"
+   },
+   "lastrevid": 2548481001,
+   "lookup": "id",
+   "raw_sha256": "a37791831f455d796c304d4b5d1bb603fcf8f3cc6dd7a6f2c4293f059bd8fe8e",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q130583773",
+     "rank": "normal",
+     "statement": "Q3882219$1c3fe79d-45ef-05ad-d79f-1cf0d8165a63",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q4676786",
+     "rank": "normal",
+     "statement": "Q3882219$4fb143db-40ca-efce-d917-51118ff2f83b",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q6944158": {
+   "id": "Q6944158",
+   "labels": {
+    "en": "defense pact",
+    "fr": "pacte de défense"
+   },
+   "lastrevid": 2550325227,
+   "lookup": "id",
+   "raw_sha256": "35fee7c8b6cd3cefa0579f41e7437a1093ef5f6e00ce3e8913ac5f55235fcd0b",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q131569",
+     "rank": "normal",
+     "statement": "Q6944158$c80d0ad5-447c-a63c-65b9-85a00fbdd05a",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q878249",
+     "rank": "normal",
+     "statement": "Q6944158$0BF172B6-6B0C-4EEA-993A-11AFE47BD230",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q7692360": {
+   "id": "Q7692360",
+   "labels": {
+    "fr": "éruption volcanique",
+    "en": "volcanic eruption"
+   },
+   "lastrevid": 2557151346,
+   "lookup": "id",
+   "raw_sha256": "c87a4b3a151a5412e34ee4051287b332dabf52ff73b0cade35d0bc86e2ea201c",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q29436423",
+     "rank": "normal",
+     "statement": "Q7692360$a760f0dc-419a-9f65-bc00-51fe396081e5",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q123349687",
+     "rank": "normal",
+     "statement": "Q7692360$3f648e49-4af6-d076-b335-80d6f3d3f27c",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q23581666",
+     "rank": "normal",
+     "statement": "Q7692360$53c79bcb-44d9-ed51-8bbc-f06987d536ae",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q12772819": {
+   "id": "Q12772819",
+   "labels": {
+    "fr": "découverte",
+    "en": "discovery"
+   },
+   "lastrevid": 2528440191,
+   "lookup": "id",
+   "raw_sha256": "3e03f6801052576f92fcdba9a20ff7e12fbde6ccb79dac8bd35a3ded7e65033a",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q116505632",
+     "rank": "normal",
+     "statement": "Q12772819$60ab7ef9-4a12-ec18-abb2-22b1f5dfa88f",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q41172303",
+     "rank": "normal",
+     "statement": "Q12772819$C9B2309E-BE58-433C-9966-87DA7E828377",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q37112258",
+     "rank": "normal",
+     "statement": "Q12772819$17901121-B52B-49CE-B035-32FB072590DF",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q18564543": {
+   "id": "Q18564543",
+   "labels": {
+    "en": "international conference",
+    "fr": "conférence internationale"
+   },
+   "lastrevid": 2517800253,
+   "lookup": "id",
+   "raw_sha256": "9612a89889f8f5fa5ba6bd00b6f4c1b627861cd7e4e029c50da9cac9a32b96a2",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q625994",
+     "rank": "normal",
+     "statement": "Q18564543$8e89f018-4636-c21d-a41e-df9a277de5a6",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q13418847",
+     "rank": "normal",
+     "statement": "Q18564543$b7a3d8a0-402b-fab4-68f9-5a2b948a4828",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q17195514",
+     "rank": "normal",
+     "statement": "Q18564543$4acdc694-4572-e357-be96-986ca3968949",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q21994376": {
+   "id": "Q21994376",
+   "labels": {
+    "en": "war of independence",
+    "fr": "guerre d'indépendance"
+   },
+   "lastrevid": 2544534170,
+   "lookup": "id",
+   "raw_sha256": "be200d3a9f651d3ea1a2b7ab477984eed2801ca79bf4b2ee996c556379681cf5",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q124867660",
+     "rank": "normal",
+     "statement": "Q21994376$9504e54a-427b-ddf2-3b16-4c6e889a7e1b",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q125092269",
+     "rank": "normal",
+     "statement": "Q21994376$3d6aae06-45d8-dd2c-50f9-62ed93d188b1",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q198",
+     "rank": "normal",
+     "statement": "Q21994376$6bb059b0-4ff8-9e27-c37e-f9c1502533d6",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q25929224": {
+   "id": "Q25929224",
+   "labels": {
+    "en": "transfer of sovereignty",
+    "fr": "transfert de souveraineté"
+   },
+   "lastrevid": 2527779414,
+   "lookup": "id",
+   "raw_sha256": "54a5e00eacc22875cf4620701b56ce87d8a3ea09d629aa2e682148e2aa098a8f",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1190554",
+     "rank": "normal",
+     "statement": "Q25929224$a6c8e9c0-4340-3806-92d4-e9a2cb38e694",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q3534219",
+     "rank": "normal",
+     "statement": "Q25929224$43790b4f-43e9-b39d-1dbb-5b797566b375",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q22087155",
+     "rank": "normal",
+     "statement": "Q25929224$ac73c7f3-4d60-f18d-2a68-eeab9802f49c",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q59858687": {
+   "id": "Q59858687",
+   "labels": {
+    "en": "civic holiday"
+   },
+   "lastrevid": 2349439526,
+   "lookup": "id",
+   "raw_sha256": "e091c5cabd34471676df502055292043858da4d7ef88103638a2e296b1d81bf3",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P31": [
+    {
+     "o": "Q134485872",
+     "rank": "normal",
+     "statement": "Q59858687$8f2ab864-4f1b-4166-92cf-e5580aa5f89d",
+     "snaktype": "value"
+    }
+   ],
+   "P279": [
+    {
+     "o": "Q1197685",
+     "rank": "normal",
+     "statement": "Q59858687$F2A3A0B0-516E-4ADE-94F5-670AD283911B",
+     "snaktype": "value"
+    }
+   ]
+  },
+  "Q123193388": {
+   "id": "Q123193388",
+   "labels": {
+    "en": "oil crisis"
+   },
+   "lastrevid": 2498009422,
+   "lookup": "id",
+   "raw_sha256": "b886a2e15381ae840fa9633944fcccf126b92c0f74efd892005fa7b877d11343",
+   "retrieved_at": "2026-10-16T20:43:09.071459+00:00",
+   "P279": [
+    {
+     "o": "Q1341376",
+     "rank": "normal",
+     "statement": "Q123193388$7ef480e5-49bc-4cde-d776-054d410f92a3",
+     "snaktype": "value"
+    }
+   ]
+  }
+ }
+}

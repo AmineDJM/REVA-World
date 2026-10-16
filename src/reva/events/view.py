@@ -336,6 +336,7 @@ def descendant_classes(
     tax = tax or load_taxonomy()
     rec = recorded if recorded is not None else recorded_classes()
     rec_children = rec.children()
+    type_ids = list(type_ids)
     allowed = set(type_ids)
     seeds = {q for t in type_ids for q in tax.types[t].wikidata_classes}
     seen = set(seeds)

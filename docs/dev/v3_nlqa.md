@@ -71,6 +71,35 @@ hand-written plan fixtures were updated; the recorded provider refusals (HTTP 40
 version (a quota refusal does not depend on the prompt), recorded or synthetic *plans* must match theirs. Tests:
 `tests/unit/nlqa/test_nlqa_links_pair.py`, `tests/integration/test_nlqa_api.py::test_links_between_two_countries_keyword_planner`.
 
+### `why` / `causal_chain` (agent CAUSUI; prompt `nlqa-plan-1.2.0`)
+
+| op | arguments | backend |
+|---|---|---|
+| `why` | `entity` (lookup ref of an event), `causal_direction` (`causes` default, `effects`) | `reva.causal.graph.why` (causes by lane + dissent) / `reva.causal.graph.effects` |
+| `causal_chain` | `from_entity`, `to_entity` (lookup refs), `max_hops ≤ 6` (default 4) | `reva.causal.graph.chain` (asserting claims of the `cause` family, graded ≥ D) |
+
+Answers come **only from causal claims made by named sources** (CAUSCORE, `docs/dev/v3_causal_interface.md`); the
+adapter (`src/reva/nlqa/causal_adapter.py`) keeps only claims with a source and a tier T1–T4 — candidates (T5/T6)
+and source-less rows never reach an answer. Every causal sentence (kind `causal`) names its asserting source and
+tier: "Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale
+a pour cause immédiate attentat de Sarajevo (la cause précède l'effet, à la précision des dates ; 1 groupe(s) de
+sources indépendant(s) affirment ce lien ; preuve D ; règles …)"; a mechanism is quoted verbatim; a source denying
+a link is worded "Selon X (T2, …), il est faux que « … » (la source conteste ce lien)". A chain answer starts with
+"Chaîne composée par REVA à partir de n affirmation(s) distincte(s) … : aucune source n'affirme la chaîne entière ;
+force = maillon le plus faible (preuve C)" and names the sources of every hop (hop grade = best claim, chain grade
+= weakest hop). No claim → "Aucune affirmation causale sourcée … ; REVA ne déduit aucune cause de la chronologie,
+d'une succession ou d'une participation" (and for chains "cela ne prouve ni l'absence ni l'existence d'un lien
+causal"). Evidence items of kind `causal_claim` carry source, tier, dataset, statement id or row selector,
+revision, raw sha256, grade + rule ids, temporal check, corroboration and contesting claims. The rephrase check
+also requires each "selon <source> (Tn" attribution and "composée par REVA" to be kept verbatim.
+Keyword planner: "pourquoi <Événement> …" / "why did <Event> …" (a capitalised name or a year is required:
+"pourquoi le ciel est-il bleu" stays unsupported), "quelles sont les causes de …", "causes of …", "what caused …",
+"conséquences / effets / répercussions de …", "consequences of …", "chaîne causale / lien de causalité entre X et
+Y", "comment X a-t-il conduit à Y", "how did X lead to Y". Tests: `tests/unit/nlqa/test_nlqa_causal.py` (23, incl.
+the UI fixture `ui/src/v3/causal/ask_causal.fixture.json` kept equal to this pipeline's output),
+`tests/integration/test_nlqa_api.py::test_why_* / test_causal_chain_* / test_no_claim_*` (real
+`reva.causal.refresh` + graph services on the throwaway database).
+
 An id outside a list (concept `economy.secret_gdp`, a QID in place of a lookup ref, an unknown property or
 operation, a year outside −3000…2100) **rejects that operation and every operation depending on it**; the
 answer says how many operations were refused. Server limits (hops ≤ 4, limit ≤ 50, ≤ 12 operations) are
@@ -114,9 +143,9 @@ Body ≤ 8 KiB, `extra="forbid"`: `question` (≤ 2048 bytes), `lang` (`fr`|`en`
 Response: `question_sha256, language, plan {planner, language, operations, rejected}, restatement,
 llm_restatement, answer_text, sentences [{id, text, kind, citations, citation_refs}], evidence [...],
 unsupported [{text, reason, source, in_question}], planner (llm | keyword_fallback), provider, model (as
-reported), model_requested, prompt_version (nlqa-plan-1.1.0), prompt_sha256, catalog_digest, usage
+reported), model_requested, prompt_version (nlqa-plan-1.2.0), prompt_sha256, catalog_digest, usage
 {input_tokens, output_tokens, total_tokens, requests}, rephrase {requested, status, check, template_text},
-warnings, latency_ms`. Sentence kinds: fact, path, identification, missing, unavailable, unsupported, note.
+warnings, latency_ms`. Sentence kinds: fact, path, causal, identification, missing, unavailable, unsupported, note.
 
 Errors: 403 scope, 413 body/question size, 422 contract, 429 `rate_limited` (per actor, sliding minute,
 `REVA_NLQA_RATE_PER_MINUTE`, default 10). Audit rows `ask.answered` / `ask.refused` hold the question's
