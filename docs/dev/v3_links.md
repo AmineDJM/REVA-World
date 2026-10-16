@@ -318,8 +318,8 @@ BCE: `AtlasRowRef.year` / `period_year()` parse the signed astronomical year (`-
   kinds (truncation listed and warned), vote detail ≤ 11 years and ≤ 200 roll calls; country store read ≤ 20,000 rows;
   path: ≤ 20,000 stored links per query, constrained search ≤ 2,000,000 DFS steps + the 20 s request budget,
   `max_hops` ≤ 8, ≤ 8 ordered steps.
-* `/v1/links/path`: hop kinds may be namespaced predicates (`kind=geo:covered_territory_of`); the service accepts
-  `steps`, `via_any`, `via_all`, `non_transit_props` (Python API; route parameters not added — see L2.8).
+* `/v1/links/path`: hop kinds may be namespaced predicates (`kind=geo:covered_territory_of`); the route now takes
+  `steps`, `via_any`, `via_all`, `non_transit` (LINKWIRE, §LW.2).
 
 ## L2.5 Path engine and KGHIST's anchor chains
 
@@ -450,3 +450,57 @@ former colony of the Portuguese Empire (via Colonial Brazil, 1500–1822). Respo
 4. **Route parameters for constrained paths**: `steps`/`via_any`/`via_all`/`non_transit` are in `PathQuery` and the service;
    exposing them on `/v1/links/path` (and on KGCORE's `/v1/kg/path`) is a small follow-up.
 5. **A-TREATIES / A-LAW**: no data delivered; `co_signatory` remains Wikidata P1891 only, `shared_legal_family` awaiting.
+
+
+# LINKWIRE — the links layer wired into ops, the path route, NLQA and the UI (agent LINKWIRE, 2026-10-16)
+
+## LW.1 Operations
+
+* Job kind `links_materialise` → `reva.links.jobs:handle_links_materialise` (payload `atlas_origin`, `atlas_snapshot`,
+  `kg_origin`, `top_k`, `with_atlas`, `skip_unchanged`; unknown keys refused). With `skip_unchanged` (default) the
+  handler resolves (snapshot sha, KG watermark, taxonomy sha, method version, top-k) first and reuses an identical
+  materialisation (`reused: true`, nothing written). Allowed by `ops.submit_job` from migration `0013_links_ops`
+  (chained after `0012_links_store`; `migrations/schema_contract.json` regenerated, head `0013_links_ops`), schedulable
+  (`SCHEDULE_JOB_TYPES`), seeded daily as `links_materialise:live` two hours after `atlas_snapshot:live` (live atlas +
+  live KG: the only materialisations production serves). CLI: `reva links materialise` (alias of
+  `python -m reva.links.store materialise`). Tests: `tests/integration/test_links_ops.py`.
+* `scripts/e2e_stack.py --v3-fixtures` also replays UN DESA IMS, UNGA votes, CShapes, UCDP, BACI and UNTC and
+  materialises the store after the snapshot (`v3.links` in the stack file).
+
+## LW.2 Constrained paths on `/v1/links/path`
+
+`steps` (repeatable, one per ordered step; each a comma-separated set of hop kinds, `steps=P1891,P710&steps=P37`;
+≤ 8 steps, ≤ 16 kinds per step, never more steps than `max_hops`), `via_any` / `via_all` (≤ 8 QIDs or ISO3 codes;
+ISO3 resolved like the ends), `non_transit` (≤ 16 properties: `P37`, `P2936`, `P30`, `P2348` or namespaced
+predicates), `max_hops` ≤ 8. Ordered `via` cannot be combined with these (422). Malformed values → 422; the SEC-1
+bounds of the engine (2,000,000 DFS steps, 20 s request budget, ≤ 20,000 stored links per read) apply.
+`contracts/openapi.json` re-exported. Test: `tests/integration/test_links_db.py::test_links_path_route_constrained_parameters`.
+
+## LW.3 `co_party` (A-TREATIES)
+
+New link type `co_party` (country_country, undirected, interval): two states objects of `untc:party` statements of the
+same treaty (UN Treaty Collection, source key `untc.mtdsg`) over overlapping periods (consent instrument .. withdrawal
+effect), `via` = the treaty (`untc:treaty:<MTDSG>` for most, a QID for the few mapped in
+`registry/entities/treaty_qids.json`). Not linked, and counted in the derivation report: participants outside the
+crosswalk (`untc:participant:*`, e.g. the European Union → `non_state_participant`), `untc:former_party` rows (no
+stated date of effect → `former_party_end_not_stated`), disjoint periods, and treaties with more than 150 parties
+(`near_universal_treaty_not_expanded`, with the party count — near-universal treaties say little about a pair and
+would dominate the store); ≤ 200,000 pairs. `untc:party` / `untc:former_party` are statement edges (path hops,
+"partie à (Collection des traités de l'ONU)"); `kg_allowlist()` reads A-TREATIES' `KG_PROPERTIES`. The materialiser
+and the on-demand country view read `untc:party`. e2e fixture store: 14,876 `co_party` links (2 treaties skipped as
+near-universal); BRA–PRT co-parties of the Rome Statute (since 2002-06-20) and MTDSG IV-5. Tests:
+`tests/unit/links/test_links_co_party.py`.
+
+## LW.4 NLQA and UI
+
+* NLQA: `LINK_GROUPS` covers every taxonomy type (test-enforced): trade + `bilateral_trade_imports` /
+  `bilateral_trade_baci`, border + `land_border_cshapes`, colonial + `colonial_rule_cshapes`, shared_language +
+  `shared_language_glottolog`, treaty + `co_party`, new groups `peacekeeping` and `historical_polity`. New closed-set
+  operation `links_pair` (see `docs/dev/v3_nlqa.md`).
+* UI: "Pays ↔ Pays" screen `/v3/relation?a=BRA&b=PRT` (`ui/src/v3/pages/RelationPage.tsx`, view model
+  `ui/src/v3/lib/relation.ts`): overview lanes per link kind, themes (trade and migrant stocks per direction as exact
+  series, vote agreement by decade with `n_identical / n_common` and the caveat, colonial rule, borders, languages,
+  treaties, conflicts, peacekeeping), each link cited; predecessor-state links with their succession chain; kinds
+  without links listed as "aucun lien (≠ zéro)". Dossier pays links use `by_kind` groups (direction, period, top-N of
+  total) and link each partner to the pair screen. Chemin has advanced options (ordered steps, via any/all,
+  non-transit presets).

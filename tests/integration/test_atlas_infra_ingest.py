@@ -81,11 +81,16 @@ async def test_infra_sources_fixture_ingest(db: Any) -> None:
     assert cf.filter(pl.col("indicator") == "CABLES_SHARED|partner=CAN").height > 0
 
 
-async def test_live_run_refused_without_budget(db: Any) -> None:
+async def test_live_run_refused_without_budget(db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
     """A live run fetches nothing when its budget key is not pinned (fail closed, invariant 30)."""
-    from reva.operations.budgets import BudgetExhausted, load_budget
+    import dataclasses
+
+    from reva.operations import budgets as B
 
     ensure_registered(db.owner, db.store, _spec(po.NAME))
+    real = B.load_budget()
+    without = {k: v for k, v in real.per_source_requests.items() if k != po.SOURCE_KEY}
+    monkeypatch.setattr(B, "load_budget", lambda *a, **k: dataclasses.replace(real, per_source_requests=without))
     calls: list[str] = []
 
     class Boom:
@@ -96,9 +101,7 @@ async def test_live_run_refused_without_budget(db: Any) -> None:
         async def aclose(self) -> None:
             return None
 
-    if po.SOURCE_KEY in load_budget().per_source_requests:
-        pytest.skip("nga.wpi budget merged: the refusal path is covered by invariant 30")
-    with pytest.raises(BudgetExhausted):
+    with pytest.raises(B.BudgetExhausted):
         await run_atlas_ingest(
             db.settings, db.worker, db.store, po.NAME, mode="live", http_factory=lambda s, st: Boom()
         )

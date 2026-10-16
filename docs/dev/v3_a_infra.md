@@ -24,7 +24,7 @@ means "no such record in the source", never zero.
 
 | File | Purpose |
 |---|---|
-| `src/reva/adapters/connectors/atlas_cables.py` | `atlas.wikidata_cables` (source_key `wikidata.wbapi`, shares WDHARVEST's budget) |
+| `src/reva/adapters/connectors/atlas_cables.py` | `atlas.wikidata_cables` v1.2.0 (source_key `wikidata.wbapi`, shares WDHARVEST's budget; run option `reuse_archived_hours`) |
 | `src/reva/adapters/connectors/atlas_flights.py` | `atlas.openflights`, `atlas.ourairports` (one module, dispatch on `run.spec.name`) |
 | `src/reva/adapters/connectors/atlas_space.py` | `atlas.gcat` |
 | `src/reva/adapters/connectors/atlas_ports.py` | `atlas.nga_wpi` |
@@ -33,7 +33,7 @@ means "no such record in the source", never zero.
 | `registry/atlas/catalog/infrastructure.yaml` | 17 provider-declared country concepts (air 7, maritime 2, space 6, telecom 2), per-concept `theme` (economy / science) |
 | `registry/atlas/geo_aliases/a_infra.yaml` | schemes `gcat` (110 GCAT state codes, each with its `orgs.tsv` row as evidence), `openflights_name` (19 airport-country spellings), `ourairports` (ISO2 + XK), `nga_wpi` (ISO2) |
 | `registry/atlas/budget_requests/a_infra.yaml` | `openflights.data` 10/day, `ourairports.data` 6, `gcat.planet4589` 10, `nga.wpi` 3 (+29 requests, +108 MB/day) |
-| `tests/unit/test_atlas_infra.py` (12), `tests/integration/test_atlas_infra_ingest.py` (2, `db`) | offline tests; fixtures `tests/fixtures/source/atlas.{openflights,ourairports,gcat,nga_wpi,wikidata_cables}` (1 MB total, trimmed excerpts of real bytes, each manifest says how) |
+| `tests/unit/test_atlas_infra.py` (14), `tests/integration/test_atlas_infra_ingest.py` (2, `db`) | offline tests; fixtures `tests/fixtures/source/atlas.{openflights,ourairports,gcat,nga_wpi,wikidata_cables}` (1 MB total, trimmed excerpts of real bytes, each manifest says how) |
 
 Protocol: `atlas_source()` + `async atlas_ingest(run)`; every byte fetched with `run.get` and archived with
 `run.archive` before parsing; no HTTP client is built in these modules (invariant 30's client check passes; its
@@ -98,7 +98,7 @@ Definitions worth knowing:
 | `gcat.launches` | 1,719 | 22 launching states | SU, TTPI, I-ESA, I-ELDO, ESCN, multi-agency (5), unknown site/agency (2) | 1957–2026 |
 | `gcat.payloads` | 2,811 (1,413 dyadic) | 107 owner states | SU, CSSR, CSFR, HKUK, ESIB, 10 IGOs | 1957–2026 + snapshot |
 | `nga.wpi` | 548 | 167 | QM, QW, XU | 2026-10-16 |
-| `wikidata.submarine_cables` | see §6 | see §6 | see §6 | snapshot + service years |
+| `wikidata.submarine_cables` (live) | 5,600 (5,002 dyadic) | 127 | 8 P17 QIDs (§6) | snapshot + service years |
 
 Source totals: OpenFlights 67,663 route records (571 with an airport not in `airports.dat`, counted in the report,
 never assigned), 4,558 directed country pairs; GCAT 7,406 orbital launch attempts (1 with an unknown site code
@@ -116,11 +116,47 @@ Svalbard airports under NO).
   USA→GUF 238, GBR→USA 238, USA→IND 223, USA→NZL 136 (Rocket Lab), FRA→GUF 89. Algeria: RUS 2002 (1), IND 2010 (1),
   IND 2016 (3), CHN 2017 (1), CHN 2026 (2).
 * Launch states 2025 (attempts by site state): USA 181, CHN 92, NZL 17, RUS 17, GUF 7, IND 5, JPN 4, AUS 1.
-* Cables: see §6.
+* Cables: GBR–USA 6 since 1963, FRA–DZA 2 since 1994, CAN–GBR since 1956 (TAT-1) — §6.
 
 ## 6. Live ingest
 
-LIVE_RESULTS_PLACEHOLDER
+One throwaway database `reva_ainfra_live_dfc4d0d5` (bootstrapped + seeded like the test fixture; the dev database
+`reva` was never touched; dropped afterwards), objects under the scratch folder (44 MB, deleted). Budget policy
+`budgets-1.3.6` (ATLASOPS merged `a_infra.yaml` during the session).
+
+| Source | Requests (budget ledger) | Raw bytes | Seconds | Tables (rows) | Status |
+|---|---|---|---|---|---|
+| `atlas.nga_wpi` | 1 / 1 reserved | 1.3 MB | 2.8 | `nga.wpi` (548) | completed |
+| `atlas.openflights` | 5 / 5 | 3.9 MB | 7.2 | `openflights.routes_2014` (14,392) | completed |
+| `atlas.gcat` | 5 / 5 | 34.0 MB | 12.6 | `gcat.launches` (1,719), `gcat.payloads` (2,811) | completed |
+| `atlas.wikidata_cables` | ~400 over three runs (see below) | ~9 MB | — / 12.5 (final) | `wikidata.submarine_cables` (5,600) | completed (v1.2.0) |
+| `atlas.ourairports` | 0 | — | — | — | **not run live**: `ourairports.com` (terms page, checked on every run) answered HTTP 503 from 18:50 UTC until the end of the session; the connector refuses to run without its licence check. Fixture-tested and dry-built on the full 2026-10-16 dump (§5). |
+
+Live row counts equal the dry builds of §5 (same bytes, same builders). Tables registered as `origin: live`; every
+raw is an `evidence.acquisition` of its connector version.
+
+**Wikidata cables, three runs.** v1.0.0 fetched 240 snapshots and stopped on an HTTP 404: MediaWiki answers 404 for an
+*empty* `Special:WhatLinksHere` page (subclass `Q5008719`). v1.1.0 (404 = empty page; `wbgetentities` batches of
+50 first, `Special:EntityData` fallback when the API answers 429) fetched everything and was refused at registration:
+one country's `flags` exceeded the atlas 4,000-character limit (cable list). v1.2.0 caps the listed cables
+(`cables_total`/`cables_listed`; the selector lists every QID), checks the limit at build time
+(`RowBuilder.frame`), and adds the run option `reuse_archived_hours=N`, which serves responses this source archived
+less than N hours ago (same request fingerprint, origin live; original sha256 and retrieval time cited, nothing
+re-archived). The final run reused 159 archived responses and sent 2 requests (two throttled API batch attempts).
+
+Final cable run: 237 candidates, **190 cable items** (classes `Q506572`, `Q361047` transatlantic, `Q2395922`
+transatlantic telegraph, `Q5008719`, `Q137354303`; two subclass pages empty), 115 with at least one P17, 128 with a
+service year; 135 P17 values, 127 crosswalk countries; **1,263 undirected country pairs**. Unmapped P17 values (kept,
+`iso3` null): islands entered as "country" by editors (`Q128323` Trinidad, `Q316390` Antigua, `Q379656` Saint
+Vincent, `Q25596` Saint Martin, `Q34497` Saint Helena, `Q644636` Cyprus (island), `Q5813` Canary Islands) and
+`Q55` Netherlands (the constituent country; Wikidata's ISO codes on Q55 are **deprecated** in favour of `Q29999`
+Kingdom of the Netherlands, so it is not mapped to NLD — 10 cables).
+
+Sample cable links (live): most cables listed: GBR 28, USA 24, FRA 23, ITA 18, ESP 13, PRT 13, BRA 12, CYP 12; most
+partner countries: FRA 76, PRT 63, GBR 59, DJI 47. Pairs: FRA–GBR 7, BEL–GBR 7, FRA–IND 7, ESP–PRT 7, IND–SAU 7;
+GBR–USA 6 (Apollo, Atlantic Crossing 1, TAT-14, TAT-3, TGN Atlantic, Arctic Fibre; first service 1963); FRA–USA 6
+(since 1965); FRA–DZA 2 (SEA-ME-WE 2 and 4, since 1994); PRT–BRA 2 (Atlantis-2, EllaLink, since 2000); EGY–IND 6.
+Earliest pair: CAN–GBR 1956 (TAT-1, service entry 1956-09-25).
 
 ## 7. Honesty notes and limits
 
@@ -128,8 +164,10 @@ LIVE_RESULTS_PLACEHOLDER
   current, global route dataset was found (OurAirports has no routes; commercial schedules are proprietary).
 * OurAirports and Wikidata are community-edited; GCAT is one researcher's compilation; none is verified by REVA.
 * WPI is a navigation list, not a census of ports (USA 657 ports, India 7).
-* Wikidata cable coverage is partial (only part of the world's ~600 systems have items; some, e.g. TAT-8, lack
-  P17). A missing cable pair is "no Wikidata item lists both", not "no cable".
+* Wikidata cable coverage is partial: 190 cable items (the world has ~600 systems), 75 of them without P17 (e.g.
+  TAT-8, which gives terminus locations P559 instead); P17 sometimes names an island item instead of a country. A
+  missing cable pair is "no Wikidata item lists both", not "no cable". `CABLES_SHARED` counts cables ever listed:
+  retired cables (P730/P576) are not filtered.
 * GCAT `PAYLOADS_STATUS_IN_ORBIT` counts objects still in orbit, including dead satellites.
 
 ## 8. Requests
@@ -142,5 +180,8 @@ LIVE_RESULTS_PLACEHOLDER
    emitted — dedupe as one undirected link; air and space are directed). Suggested link types: `submarine_cable`
    (undirected, weight = cables, since = `CABLE_FIRST_SERVICE_YEAR`), `air_routes_2014` (directed, weight = operated
    routes, stale), `launch_service` (owner → site state, weight = payloads, per year).
-4. **WDHARVEST**: optional — P559 (terminus) / P609 (terminus location) on cable items could recover landing
+4. **WDHARVEST / LINKS**: 10 cable items list `Q55` (Netherlands, constituent country) whose ISO codes Wikidata
+   deprecated in favour of `Q29999` (Kingdom of the Netherlands, the crosswalk QID of NLD); they stay unmapped here.
+   If the KG records Q55 —part of→ Q29999, LINKS can attach those cable links to NLD with that hop cited.
+5. **WDHARVEST**: optional — P559 (terminus) / P609 (terminus location) on cable items could recover landing
    countries for items without P17 (TAT-8) through the location's P17.

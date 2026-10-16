@@ -287,6 +287,25 @@ role attributes). It is generated from a fresh bootstrap of a throwaway database
 * Startup guard mode `REVA_SCHEMA_CONTRACT=enforce|warn|off`: the default is
   `enforce`; `warn` applies under `REVA_ENV=test`; production always enforces.
 
+## V3 link store (`links_materialise`)
+
+The materialised link store (`kg.link_materialisation` / `kg.link_row`, migration 0012) is rebuilt by the
+worker job kind `links_materialise` (`reva.links.jobs.handle_links_materialise` →
+`reva.links.store.materialise`; allowed through `ops.submit_job` since migration 0013_links_ops). The seeded
+schedule `links_materialise:live` runs daily, its first slot two hours after `atlas_snapshot:live`, with
+payload `{"atlas_origin": "live", "kg_origin": "live", "top_k": 10, "skip_unchanged": true}` — production
+serves only materialisations built from a live snapshot and the live KG. With `skip_unchanged` (default) the
+job resolves its inputs first (latest atlas snapshot, KG watermark = highest `kg.load` id, taxonomy sha256,
+method version, top-k) and records nothing when a materialisation of exactly those inputs exists
+(`{"reused": true, ...}`); the store is append-only (~1.1 KB per link, ~400 MB for a full planet run), so
+old materialisations are kept until a retention policy is decided. Manual run (worker credentials):
+
+```bash
+uv run reva links materialise --atlas-origin live --kg-origin live [--top-k 10] [--atlas-snapshot SHA] [--no-atlas]
+```
+
+(alias of `uv run python -m reva.links.store materialise …`).
+
 ## V3 end-to-end stack (`--v3-fixtures`)
 
 The V3 screens (Neurones, Chemin, Frise, Atlas, Dossier pays, Demander) are checked against the
@@ -311,7 +330,14 @@ base fixtures and the `test_fixture` belief release, `--v3-fixtures`:
   Saint-Martin; rows flagged `ne_excerpt`), GeoNames country info, World Bank, FAO.
   `--v3-atlas-source NAME` (repeatable) picks others. A failing source is recorded with its error under
   `v3.atlas` in the stack file and the stack still starts; the spec requires at least 8 completed sources;
+  The link-bearing sources of `V3_LINK_ATLAS_SOURCES` are replayed too (UN DESA migrant stock, UNGA votes,
+  CShapes, UCDP, BACI, UN Treaty Collection);
 * records a `test_fixture` atlas snapshot (`reva.atlas.snapshot.take_snapshot`);
+* materialises the link store of that snapshot + the fixture KG (`reva.links.store.materialise`, top-k 10;
+  ~18k links: KG kinds, IMTS/BACI trade, migrant stock, CShapes, treaty co-parties) — reported under
+  `v3.links` in the stack file (a failure is recorded, never hidden), so `/v1/links/pair` and the
+  "Pays ↔ Pays" screen have pair links (Brésil–Portugal: KG kinds, treaty co-parties, predecessor states;
+  Algérie–France: trade both ways, migrant stocks, CShapes colonial rule);
 * (all modes) bootstraps as the owner, then confirms the seed as `reva_worker` in the same process: both
   use one registry snapshot (`reva.cli.seed.registry_snapshot`), so concurrent edits under `registry/` no
   longer make the confirmation fail; a failed bootstrap attempt is logged, and a refusal names both

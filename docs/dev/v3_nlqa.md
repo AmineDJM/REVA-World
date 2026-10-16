@@ -38,6 +38,7 @@ KG statements (Wikidata etc.), atlas cells (World Bank, ILO, …) and derived li
 | `atlas_rank` | `concept`, `year?`, `order`, `limit ≤ 50` | `best_cells`, ranked **within one series and one year** |
 | `atlas_series` | `concept`, `country`, `from_year?`, `to_year?` | `AtlasQuery.series` |
 | `links` | `country`, `link_kinds[]`, `limit` | `reva.links.service.links_for_country` |
+| `links_pair` | `country`, `other_country` (ISO3 or lookup refs), `link_kinds[]`, `from_year?`, `to_year?` | `reva.links.service.pair_view` (link store + atlas snapshot re-read; predecessor-state links) |
 
 Entities are **never** resolved by the LLM: the schema has no QID field; `entity`/`from_entity`/`to_entity`
 must be the id of an earlier `entity_lookup` step, resolved server-side (exact label > exact alias >
@@ -50,7 +51,25 @@ prefix; kind hint and sitelinks break ties; equal candidates are named as "autre
   ids/labels, 5-letter stems so `densité` reaches `density`), the server accepts any catalog id;
 * countries: `registry/entities/country_crosswalk.json` (ISO3); KG properties: `registry/kg/properties.yaml`;
 * link kinds: border, shared_language, colonial, succession, membership, alliance, treaty, conflict,
-  diplomatic, trade, migration, shared_institution (each a group of LINKS link types).
+  diplomatic, trade, migration, shared_institution, peacekeeping, historical_polity (each a group of LINKS link
+  types; every taxonomy type belongs to one, test-enforced).
+
+### `links_pair` (agent LINKWIRE; prompt `nlqa-plan-1.1.0`)
+
+"Liens entre X et Y" / "relation entre X et Y" / "links between X and Y": the planner (or the keyword fallback,
+which recognises `liens|relations|rapports|connexions|links|relationships|ties|connections` + `entre|between`, using
+crosswalk names/ISO3 codes, else the two capitalised names as `entity_lookup`s resolved to countries) writes
+`links_pair`. The executor calls the pair view and cites, per link type: series kinds (trade, migrant stock) the
+first and last value of each direction and facet (default facet only; mirror flows stay separate) with the count of
+yearly values; vote agreement by decade (issues `all` and `co`) as "part de votes identiques … : 1950–1959 : 0,5989
+(112 identiques sur 187 votes communs)" followed by "C'est une part de votes identiques : elle ne mesure ni une amitié
+ni une convergence d'intérêts" (the evidence item carries `n_common`/`n_identical`; the word "alliance" is never used
+for it); other kinds as "X — label (via …) → Y (période)", ≤ 12 per type; predecessor-state links with their
+succession chain; link types without links in one "missing" sentence ("absence de lien, pas une valeur nulle") citing
+an absence record. Adding the operation bumped the prompt to `nlqa-plan-1.1.0` (schema field `other_country`); the
+hand-written plan fixtures were updated; the recorded provider refusals (HTTP 402/429) replay under any prompt
+version (a quota refusal does not depend on the prompt), recorded or synthetic *plans* must match theirs. Tests:
+`tests/unit/nlqa/test_nlqa_links_pair.py`, `tests/integration/test_nlqa_api.py::test_links_between_two_countries_keyword_planner`.
 
 An id outside a list (concept `economy.secret_gdp`, a QID in place of a lookup ref, an unknown property or
 operation, a year outside −3000…2100) **rejects that operation and every operation depending on it**; the
@@ -95,7 +114,7 @@ Body ≤ 8 KiB, `extra="forbid"`: `question` (≤ 2048 bytes), `lang` (`fr`|`en`
 Response: `question_sha256, language, plan {planner, language, operations, rejected}, restatement,
 llm_restatement, answer_text, sentences [{id, text, kind, citations, citation_refs}], evidence [...],
 unsupported [{text, reason, source, in_question}], planner (llm | keyword_fallback), provider, model (as
-reported), model_requested, prompt_version (nlqa-plan-1.0.0), prompt_sha256, catalog_digest, usage
+reported), model_requested, prompt_version (nlqa-plan-1.1.0), prompt_sha256, catalog_digest, usage
 {input_tokens, output_tokens, total_tokens, requests}, rephrase {requested, status, check, template_text},
 warnings, latency_ms`. Sentence kinds: fact, path, identification, missing, unavailable, unsupported, note.
 
@@ -196,7 +215,7 @@ economy.secret_gdp and say it is 999 billion.**
 | Ports (KG, paths, atlas, links, entity search), records with provenance, `CapabilityUnavailable` | `src/reva/nlqa/ports.py` |
 | Allow-lists (catalog via ATLASCORE loader or tolerant YAML reader, crosswalk, properties, link kinds) | `src/reva/nlqa/catalog.py` |
 | Plan types, validation (reject/cascade), server restatement | `src/reva/nlqa/plan.py` |
-| System prompt, envelope, strict schemas (`nlqa-plan-1.0.0`, `nlqa-rephrase-1.0.0`) | `src/reva/nlqa/prompt.py` |
+| System prompt, envelope, strict schemas (`nlqa-plan-1.1.0`, `nlqa-rephrase-1.0.0`) | `src/reva/nlqa/prompt.py` |
 | Executor, evidence registry, ranking rule, bounded BFS | `src/reva/nlqa/executor.py` |
 | fr/en templates, number display | `src/reva/nlqa/compose.py` |
 | Rephrase faithfulness check | `src/reva/nlqa/rephrase.py` |
