@@ -28,6 +28,18 @@ Platform additions in `src/reva/atlas/ingest.py`:
   `"kind": "byte_range_archive"` (WID).
 * `run.options`: CLI `--option KEY=VALUE`, job payload `options`.
 * `AtlasRun.offline(spec, http)`: a fetch-only run for parser tests.
+* `run.post(url, key=, json_body= | content=, ...)` (GAPHUNT request: PxWeb of Greenland, Faroe, Kosovo ASK,
+  Åland and Andorra; IRENA; UNECE are POST-only).
+  * Transport: `reva.atlas.http_post.safe_post` sends the POST through the run's SafeHttpClient. That gives
+    the same allow-list, DNS pinning, politeness, bounded decoding and retries as GET. Redirects are not
+    followed, and no new client is created.
+  * Metering: the POST is charged to the run's MeteredHttp reservation exactly like a GET (one request;
+    request and response bytes count). It is refused before the transport when the budget is spent.
+  * Provenance: the request body (≤ 64 KiB) is archived in `response_metadata.request`, and the
+    fingerprint covers it.
+  * Fixture mode replays a FixtureHttp entry keyed by that fingerprint.
+  * A live run never POSTs outside the metered client.
+  * `safe_client.py` and `operations/budgets.py` were not modified: they are pinned/T3 files.
 * **Code-identity check.** A run is refused before any request if its connector version is not
   registered, or is registered with a different `code_digest` ("bump the version"). Acquisitions therefore
   always name the code that produced them.
@@ -35,7 +47,13 @@ Platform additions in `src/reva/atlas/ingest.py`:
   is skipped and logged, never fatal. The seed fingerprint includes the atlas sources (name, version), so
   a new source or version is registered by the next `reva seed` / `reva db bootstrap`.
 
-Versions bumped because the code changed: IMF 1.2.0, QOL 1.1.0, ILO 1.0.1 (docstring only), HYDE 1.1.0.
+Versions bumped because the code changed:
+
+* IMF 1.2.0, QOL 1.1.0, ILO 1.0.1 (docstring only), HYDE 1.1.0.
+* After TWNMAP and other agents' late edits, patch bumps to 1.0.1 so the dev-DB registration matches the
+  code: WHR 1.1.1, constitute, regimes (LIED/BMR), vdem, fao, unctad, oecd.batis, RCS/WRP, worldbank,
+  geonames, cckp, baci, oecd.fiscal, oecd.skills.
+* A-UN had already bumped to 1.1.0.
 
 ## 2. CLI, jobs, schedules, migration
 
@@ -48,14 +66,17 @@ Versions bumped because the code changed: IMF 1.2.0, QOL 1.1.0, ILO 1.0.1 (docst
   allow-list. The body is otherwise identical to 0006; downgrade restores 0006. The schema contract was
   regenerated (head `0010_atlas_ops`).
 * Seed schedules (`src/reva/cli/seed.py`):
-  * Every finished atlas source runs monthly, 34 sources in total (`ATLAS_SCHEDULE_SLOTS`).
+  * Every finished atlas source runs monthly, 39 sources in total (`ATLAS_SCHEDULE_SLOTS`), including
+    the 5 GAPHUNT gap-fill sources on day 12.
   * First slots are staggered over 12 days (`ATLAS_FIRST_SLOT_HOURS`). World Bank, WID and IMF each get a
     day of their own.
   * `atlas_snapshot:live` runs daily with `skip_unchanged` (no new table versions → nothing recorded) and
     `warm` (builds the query file).
   * A test checks that every scheduled source is discovered and that its planned requests fit its
     per-source budget.
-* Budgets: `budget_merge --write` → `budgets-1.3.4`, re-pinned in `src/reva/autonomy/policy.py`:
+* Budgets: `budget_merge --write`, re-pinned in `src/reva/autonomy/policy.py` with history notes. The
+  current version is `budgets-1.3.6`, which adds the late requests of A-SOCIETY, A-RESOURCES, A-MILITARY,
+  A-FISCAL, KGLANG, A-CULTURE and GAPHUNT. The earlier merge to `budgets-1.3.4` added:
   * `factbook.json`, `fao.faostat`, `unsd.ama`, `worldbank.atlas`
   * `ssa.ssptw` 220/day
   * `cshapes.cran`, `harvard.dataverse.unvotes`, `ucdp.downloads`
@@ -93,6 +114,20 @@ multiplied by 1000 in `Decimal`. A cell with another unit is skipped and reporte
 | society | `hdi` (UNDP), `gini_income` (WDI/PIP) |
 | science | `internet_users` (SDG/ITU → WDI) |
 | law | `homicide_rate` (SDG/UNODC → WDI) |
+
+GAPHUNT proposals (`_proposals_gaphunt.yaml`) were reviewed and all merged:
+
+* 10 gap-fill series were added after the multilateral ones:
+  * INSEE overseas-departments CPI
+  * CBS Caribbean Netherlands GDP, GDP per capita and real growth
+  * SPC GDP and GDP per capita in USD
+  * SPC and Eurostat internet use
+  * Eurostat NUTS land and total area
+* 8 `not_equivalent` exclusions were added.
+* 2 new concepts were added: `reva.population.total_1_january` and
+  `reva.health.life_expectancy_national_tables`.
+
+Each entry keeps GAPHUNT's justification. The registry now has 27 headline concepts.
 
 ### How a value is chosen
 
@@ -175,13 +210,16 @@ dates natively, so the schema did not change. Only Python `date` cannot hold the
 
 * **ATLAS-2: the year view now includes non-calendar cells.**
   * Cells spanning 150-1097 days are attached to a year: semesters, fiscal years, survey windows and WHR
-    3-year windows. The year is the provider's `flags.label_year` when given, else the year of the cell's
-    last day. One cell per series, country and year, with calendar cells preferred, then the latest one.
-  * Every answer shows its true period and `period_basis` (`calendar_year`, `sub_annual`,
-    `twelve_month_window`, `multi_year`).
+    3-year windows.
+  * Point-in-time cells (1-day "as of" periods: GeoNames, Natural Earth, Factbook, WBL, Constitute) are
+    attached too. The dev-DB load showed these concepts were otherwise invisible.
+  * The year is the provider's `flags.label_year` when given, else the year of the cell's last day. One
+    cell per series, country and year, with calendar cells preferred, then the latest one.
+  * Every answer shows its true period and `period_basis` (`calendar_year`, `point_in_time`,
+    `sub_annual`, `twelve_month_window`, `multi_year`).
   * Maps list countries whose cells overlap the year but are not attached (monthly, quarterly, long
     windows) under `countries_with_other_period_cells`, never as absent.
-  * DuckDB format is now `atlas-duckdb/4`.
+  * DuckDB format is now `atlas-duckdb/6`.
 * **ATLAS-1: the query cache is private and verified.**
   * The cache directory is per user and 0700 (`reva-atlas-cache-<uid>`). Group- or other-writable, or
     foreign-owned, directories are refused.
@@ -204,7 +242,22 @@ dates natively, so the schema did not change. Only Python `date` cannot hold the
   * The IMF and ILO docstrings no longer claim TWN is unmapped.
 * The `xfail` markers of `tests/review_v3/test_review_v3_atlas.py` were removed (4 tests pass).
 
-## 7. Live load of the dev database `reva` (2026-10-15)
+### Query-file build (dev-DB lesson)
+
+The first build over the full dev snapshot (159 tables, 87.5 M rows, 530 MB Parquet) used global sorts
+across all rows and filled the disk with ~15 GB of DuckDB spill; it failed cleanly and the work directory
+was removed. `_build_db` now works table by table:
+
+* Each Parquet file is fetched (hash- and schema-verified) and its cells are computed into a temporary
+  table.
+* The rows are appended to `cells` (sorted by country within the table) and `cells_s` (globally sorted by
+  series, since tables are loaded in (source, dataset) order).
+* The Parquet copy is deleted after loading.
+* Limits: memory `REVA_ATLAS_BUILD_MEMORY` (default 3GB), threads `REVA_ATLAS_BUILD_THREADS` (default 2).
+
+Dev result: 16 min, a 6.4 GB query file, and the disk never below ~10 GB free.
+
+## 7. Live load of the dev database `reva` (2026-10-15/16)
 
 LIVE_SECTION
 
