@@ -352,7 +352,7 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
     ambiguous = [] if concept else ambiguous
     # countries: crosswalk names (English and French, ASK-8) / ISO3 codes, in order of appearance; a name inside a
     # longer matched name of another country ("Guinée" in "Guinée-Bissau") is not a mention
-    spans: list[tuple[int, int, str]] = []
+    name_spans: list[tuple[int, int, str]] = []
     for c in catalog.countries.values():
         best: tuple[int, int, str] | None = None
         for n in c.names:
@@ -364,11 +364,11 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
             if m:
                 best = (m.start(), m.end(), c.iso3)  # question offsets; ISO3 codes never overlap names
         if best is not None:
-            spans.append(best)
+            name_spans.append(best)
     found = [
         (a, iso)
-        for a, z, iso in spans
-        if not any(a2 <= a and z <= z2 and (z2 - a2) > (z - a) and iso2 != iso for a2, z2, iso2 in spans)
+        for a, z, iso in name_spans
+        if not any(a2 <= a and z <= z2 and (z2 - a2) > (z - a) and iso2 != iso for a2, z2, iso2 in name_spans)
     ]
     countries = [iso for _, iso in sorted(set(found))]
     if _PAIR.search(question):

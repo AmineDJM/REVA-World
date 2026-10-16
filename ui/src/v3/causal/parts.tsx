@@ -3,7 +3,7 @@ import { CitationChip } from '../components/CitationChip';
 import { FixtureBadge } from '../components/Honesty';
 import { wikidataItemUrl } from '../lib/citations';
 import { kindLabel } from '../lib/kinds';
-import type { CausalCandidate, CausalClaim, CausalEvent, Grade, Tier, WhyGroup } from './api';
+import type { CausalCandidate, CausalClaim, CausalEvent, EventsCard, Grade, Tier, WhyGroup } from './api';
 import { GRADES } from './api';
 import {
   citeClaim,
@@ -301,65 +301,87 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
 
 // ------------------------------------------------------------------ event card
 
-export function EventCard({ e }: { e: CausalEvent }) {
-  const wd = wikidataItemUrl(e.id);
-  const when = intervalText(e);
+/**
+ * Event card: identity, type, dates at their precision, places and participants — from the EVENTS card
+ * (/v1/events/{id}, each fact from a cited statement) when deployed, else from the causal event view — plus the
+ * counts of claims and the non-causal context of /v1/causal/events/{id}.
+ */
+export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard | null }) {
+  const id = card?.id ?? e?.id ?? '';
+  const wd = wikidataItemUrl(id);
+  const dated = card?.start || card?.end ? card : e;
+  const when = dated ? intervalText(dated) : '';
+  const typeText = card?.types.length ? card.types.join(' · ') : e ? (e.typeLabel ?? (e.type ? kindLabel(e.type) : null)) : null;
+  const places = card ? card.places.map((p) => ({ label: p.ref.label, note: p.role })) : (e?.places ?? []).map((p) => ({ label: p.label, note: null as string | null }));
+  const people = card
+    ? card.participants.map((p) => ({ key: p.ref.id, label: p.ref.label, note: [p.role, p.side && `camp ${p.side}`].filter(Boolean).join(', ') }))
+    : (e?.participants ?? []).map((p) => ({ key: p.id, label: p.label, note: [p.role, p.side].filter(Boolean).join(', ') }));
+  const given = card ? true : !!e?.placesGiven;
+  const peopleGiven = card ? true : !!e?.participantsGiven;
   return (
     <div className="v3-entity-card v3-event-card" data-testid="event-card">
-      <h2 className="v3-entity-title">{e.label}</h2>
+      <h2 className="v3-entity-title">{card?.label ?? e?.label ?? id}</h2>
       <p className="v3-entity-sub">
         <span className="v3-chip" data-testid="event-type">
-          {e.typeLabel ?? (e.type ? kindLabel(e.type) : 'type non indiqué')}
+          {typeText ?? 'type non indiqué'}
         </span>{' '}
         {wd ? (
           <a href={wd} target="_blank" rel="noreferrer noopener">
-            {e.id}
+            {id}
           </a>
         ) : (
-          <code>{e.id}</code>
+          <code>{id}</code>
         )}
-        {e.origin === 'test_fixture' && <FixtureBadge />}
+        {e?.origin === 'test_fixture' && <FixtureBadge />}
       </p>
-      {e.description && <p className="v3-entity-desc">{e.description}</p>}
+      {(card?.description ?? e?.description) && <p className="v3-entity-desc">{card?.description ?? e?.description}</p>}
       <dl className="v3-dl">
         <dt>Dates</dt>
         <dd data-testid="event-dates">
-          {when ? (
+          {when && dated ? (
             <>
               {when}{' '}
               <span className="muted">
-                ({e.start ? `début ${precisionFr(e.start.precision)}` : 'début non daté'}
-                {e.end ? ` · fin ${precisionFr(e.end.precision)}` : ''})
+                ({dated.start ? `début ${precisionFr(dated.start.precision)}` : 'début non daté'}
+                {dated.end ? ` · fin ${precisionFr(dated.end.precision)}` : ''})
               </span>
+              {card?.dateConsistency === 'inconsistent' && <span className="v3-tcheck v3-tcheck-bad v3-tcheck-mini">dates contradictoires dans les sources</span>}
             </>
           ) : (
             <span className="v3-undated">non daté dans la source</span>
           )}
         </dd>
         <dt>Lieux</dt>
-        <dd>{e.places.length ? e.places.map((p) => p.label).join(' · ') : <span className="muted">{e.placesGiven ? 'aucun lieu déclaré dans la source' : 'non fournis par ce service'}</span>}</dd>
-        <dt>Participants</dt>
-        <dd>
-          {e.participants.length ? (
-            <ul className="v3-plain">
-              {e.participants.map((p) => (
-                <li key={`${p.id}-${p.role ?? ''}`}>
-                  {p.label}
-                  {(p.role || p.side) && <span className="muted"> — {[p.role, p.side].filter(Boolean).join(', ')}</span>}
-                </li>
-              ))}
-            </ul>
+        <dd data-testid="event-places">
+          {places.length ? (
+            places.map((p) => p.label + (p.note ? ` (${p.note})` : '')).join(' · ')
           ) : (
-            <span className="muted">{e.participantsGiven ? 'aucun participant déclaré dans la source' : 'non fournis par ce service'}</span>
+            <span className="muted">{given ? 'aucun lieu déclaré dans la source' : 'non fournis par ce service'}</span>
           )}
         </dd>
-        {e.partOf.length > 0 && (
+        <dt>Participants</dt>
+        <dd data-testid="event-participants">
+          {people.length ? (
+            <ul className="v3-plain">
+              {people.slice(0, 16).map((p) => (
+                <li key={`${p.key}-${p.note}`}>
+                  {p.label}
+                  {p.note && <span className="muted"> — {p.note}</span>}
+                </li>
+              ))}
+              {people.length > 16 && <li className="muted">… {people.length - 16} autre(s)</li>}
+            </ul>
+          ) : (
+            <span className="muted">{peopleGiven ? 'aucun participant déclaré dans la source' : 'non fournis par ce service'}</span>
+          )}
+        </dd>
+        {card && (
           <>
-            <dt>Partie de</dt>
-            <dd>{e.partOf.map((p) => p.label).join(' · ')}</dd>
+            <dt>Sources</dt>
+            <dd className="muted">fiche d’événement : chaque date, lieu et participant provient d’une déclaration citée (contexte, jamais une cause)</dd>
           </>
         )}
-        {(e.nCauses !== null || e.nEffects !== null) && (
+        {e && (e.nCauses !== null || e.nEffects !== null) && (
           <>
             <dt>Affirmations</dt>
             <dd>
@@ -368,7 +390,7 @@ export function EventCard({ e }: { e: CausalEvent }) {
             </dd>
           </>
         )}
-        {e.context.length > 0 && (
+        {e && e.context.length > 0 && (
           <>
             <dt>Contexte (non causal)</dt>
             <dd data-testid="event-context">
@@ -382,12 +404,6 @@ export function EventCard({ e }: { e: CausalEvent }) {
               </ul>
               {(e.context.length > 12 || e.contextTruncated) && <span className="muted">liste bornée</span>}
             </dd>
-          </>
-        )}
-        {e.source && (
-          <>
-            <dt>Source de l’événement</dt>
-            <dd>{e.source}</dd>
           </>
         )}
       </dl>

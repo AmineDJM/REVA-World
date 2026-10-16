@@ -20,7 +20,7 @@ from reva.api.auth import require_scope
 from reva.api.deps import origin_warnings, read_conn
 from reva.api.errors import NotFound
 from reva.atlas.catalog import Catalog, cached_catalog
-from reva.atlas.query import AtlasQuery, query_for_request
+from reva.atlas.query import AtlasQuery, query_for, request_snapshot
 from reva.atlas.source_order import HeadlineRegistry, cached_headlines
 from reva.atlas.tables import geo_index
 
@@ -482,7 +482,8 @@ def _query(request: Request, origin: str | None, snapshot: str | None) -> AtlasQ
         origin = "live"
     # SEC-3: only the latest snapshot's query file may be built here; another snapshot must already exist
     with read_conn(request) as conn:
-        return query_for_request(conn, _store(request), origin=origin, sha256=snapshot)
+        snap, build = request_snapshot(conn, _store(request), origin=origin, sha256=snapshot)
+    return query_for(snap, _store(request), build=build)
 
 
 def _licence_warnings(licences: list[dict[str, Any]]) -> list[s.ApiWarning]:

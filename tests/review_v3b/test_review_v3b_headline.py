@@ -13,7 +13,6 @@ from __future__ import annotations
 import json
 from typing import Any
 
-import pytest
 from v3b_helpers import SynthAtlas, rows
 
 from reva.atlas.source_order import load_headlines

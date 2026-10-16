@@ -75,12 +75,16 @@ class Rules:
     rules: tuple[Rule, ...]
     facts: Mapping[str, Mapping[str, str]]
 
+    index: Mapping[str, Mapping[str, str]] = field(default_factory=dict, compare=False, repr=False)
+
     def reason(self, rule_id: str) -> dict[str, str]:
-        for r in self.rules:
-            if r.id == rule_id:
-                return {"rule_id": rule_id, "en": r.reason_en, "fr": r.reason_fr}
-        f = self.facts.get(rule_id) or {}
-        return {"rule_id": rule_id, "en": f.get("en", rule_id), "fr": f.get("fr", rule_id)}
+        return dict(self.index.get(rule_id) or {"rule_id": rule_id, "en": rule_id, "fr": rule_id})
+
+
+def _reason_index(rules: Sequence[Rule], facts: Mapping[str, Mapping[str, str]]) -> dict[str, dict[str, str]]:
+    out = {k: {"rule_id": k, "en": v.get("en", k), "fr": v.get("fr", k)} for k, v in facts.items()}
+    out.update({r.id: {"rule_id": r.id, "en": r.reason_en, "fr": r.reason_fr} for r in rules})
+    return out
 
 
 def parse_rules(doc: Mapping[str, Any], sha256: str) -> Rules:
@@ -102,7 +106,14 @@ def parse_rules(doc: Mapping[str, Any], sha256: str) -> Rules:
             raise ValueError(f"rule {rid}: invalid temporal_check")
         rules.append(Rule(rid, r["grade"], when, r["reason"]["en"], r["reason"]["fr"]))
     facts = {str(k): dict(v) for k, v in (doc.get("facts") or {}).items()}
-    out = Rules(str(doc["version"]), sha256, int(doc.get("corroborated_min", 2)), tuple(rules), facts)
+    out = Rules(
+        str(doc["version"]),
+        sha256,
+        int(doc.get("corroborated_min", 2)),
+        tuple(rules),
+        facts,
+        _reason_index(rules, facts),
+    )
     for rid in _fact_ids():
         if rid not in facts:
             raise ValueError(f"grading.yaml lacks the fact rule {rid}")
@@ -307,6 +318,8 @@ class Corroboration:
 
 def corroboration(claims: Sequence[ClaimRef]) -> Corroboration:
     """Independent source groups among claims asserting the same (cause, effect, family)."""
+    if len(claims) == 1:  # the common case: one claim is one group
+        return Corroboration(1, [sorted(set(claims[0].upstream))], [[claims[0].key]])
     parent = list(range(len(claims)))
 
     def find(i: int) -> int:

@@ -918,8 +918,7 @@ def _atlas_snapshot_factory(engine: Engine, settings: Any, store: Any) -> Callab
 
     def make(sha: str | None) -> Any:
         try:
-            from reva.atlas.query import query_for
-            from reva.atlas.snapshot import resolve_snapshot
+            from reva.atlas.query import query_for, request_snapshot
         except ImportError:
             return None
         if holder["store"] is None:
@@ -928,9 +927,9 @@ def _atlas_snapshot_factory(engine: Engine, settings: Any, store: Any) -> Callab
             holder["store"] = build_store(settings)
         origin = "live" if sha is None and getattr(settings, "reva_env", "") == "production" else None
         try:
-            with engine.connect() as conn:
-                snap = resolve_snapshot(conn, holder["store"], origin=origin, sha256=sha)
-            return query_for(snap, holder["store"])
+            with engine.connect() as conn:  # SEC-3: only the latest snapshot's query file is built here
+                snap, build = request_snapshot(conn, holder["store"], origin=origin, sha256=sha)
+            return query_for(snap, holder["store"], build=build)
         except (RevaError, SQLAlchemyError, OSError):
             return None
 

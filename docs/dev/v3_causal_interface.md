@@ -186,65 +186,94 @@ bounds.
 
 ### Claim JSON (every list above)
 
+Real example (fixture `tests/unit/causal/fixtures/wikidata_causal_fixture.json`, abbreviated):
+
 ```json
 {
-  "claim_key": "kg:wikidata:Q8698$…",
+  "claim_key": "kg:wikidata.causal_fixture:Q8698$2d3e4107-4d1b-b343-6f93-a76055caa805",
   "row_id": 41,
-  "cause": {"id": "Q131074", "label": "Wall Street Crash of 1929", "kind": "event"},
-  "effect": {"id": "Q8698", "label": "Great Depression", "kind": "event"},
+  "cause": {"id": "Q201684", "label": "Wall Street crash of 1929", "label_fr": "krach de 1929", "kind": "event"},
+  "effect": {"id": "Q8698", "label": "Great Depression", "label_fr": "Grande Dépression", "kind": "event"},
   "relation": "has_cause",
-  "relation_label": {"en": "has cause", "fr": "a pour cause"},
+  "relation_label": {"en": "caused", "fr": "a causé"},
+  "relation_inverse_label": {"en": "has cause", "fr": "a pour cause"},
   "family": "cause",
   "lane": "general",
   "polarity": null,
   "stance": "asserts",
   "asserted_on": "effect",
   "source": {
-    "source_key": "wikidata", "tier": "T3", "dataset": null, "source_revision": "2551267717",
-    "statement_key": "wikidata:Q8698$…", "statement_id": "Q8698$…", "statement_row_id": 9,
-    "selector": {"entity": "Q8698", "property": "P828", "statement_id": "Q8698$…"},
-    "raw_sha256": "…", "references": [{"P854": ["https://…"]}], "citation": null, "codebook": null,
-    "verification": "community_edited_not_verified"
+    "source_key": "wikidata.causal_fixture", "tier": "T4", "dataset": null, "source_revision": "2553658571",
+    "statement_key": "wikidata.causal_fixture:Q8698$2d3e…", "statement_id": "Q8698$2d3e…", "statement_row_id": 9,
+    "selector": {"entity": "Q8698", "property": "P828", "statement_id": "Q8698$2d3e…", "rank": "normal"},
+    "raw_sha256": "…", "references": [], "citation": null, "codebook": null,
+    "verification": "community_edited_not_verified", "retrieved_at": "2026-10-16T20:37:40Z"
   },
   "mechanism": null,
   "scope": {},
-  "qualifiers": {},
+  "qualifiers": {"P3831": ["Q20204892"]},
+  "contests": [],
+  "disputed_by": [],
   "grade": {
-    "grade": "C", "rules_version": "1", "rules_sha256": "…",
-    "rule_ids": ["tier.T3", "temporal.overlapping", "corroboration.single", "contest.none", "grade.C.t3_single"],
-    "reasons": [{"rule_id": "grade.C.t3_single", "en": "…", "fr": "…"}],
-    "temporal_check": "overlapping",
-    "temporal": {"cause_start": {"from": "1929-10-24", "to": "1929-10-24", "basis": "P585", "precision": 11},
-                 "effect_start": {"from": "1929-01-01", "to": "1929-12-31", "basis": "P580", "precision": 9}},
-    "corroboration": 1, "corroborating_claim_keys": [], "upstream_groups": [["url:https://…"]],
-    "contested_by": [], "graded_at": "2026-10-16T…"
+    "grade": "D", "rules_version": "1", "rules_sha256": "…", "rules_current": true,
+    "rule_ids": ["tier.T4", "temporal.consistent", "corroboration.single", "contest.none", "grade.D.t4"],
+    "reasons": [{"rule_id": "grade.D.t4", "en": "Wikidata statement without references (community-edited, unsourced).",
+                 "fr": "Déclaration Wikidata sans référence (édition communautaire, non sourcée)."}, "…"],
+    "temporal_check": "consistent",
+    "temporal": {"check": "consistent", "rule": "cause start window vs effect start window, at date precision",
+                 "cause_start": {"from": "1929-10-24", "to": "1929-10-24", "basis": "P580", "precision": 11,
+                                 "times": ["+1929-10-24T00:00:00Z"]},
+                 "effect_start": {"from": "1929-10-29", "to": "1929-10-29", "basis": "P580", "precision": 11,
+                                  "times": ["+1929-10-29T00:00:00Z"]}},
+    "corroboration": 1, "corroborating_claim_keys": ["kg:wikidata.causal_fixture:Q201684$3507…"],
+    "upstream_groups": [["community:wikidata"]], "contested_by": [], "graded_at": "2026-10-16T…"
   },
   "review_status": "unreviewed",
-  "wording": "According to Wikidata (statement Q8698$…, community-edited), Great Depression has cause Wall Street Crash of 1929; REVA does not establish causation.",
-  "wording_fr": "Selon Wikidata (…), Grande Dépression a pour cause Krach de 1929 ; REVA n'établit pas de causalité.",
+  "wording": "According to Wikidata (statement Q8698$2d3e…, revision 2553658571, community-edited), Great Depression has cause Wall Street crash of 1929; REVA does not establish causation.",
+  "wording_fr": "Selon Wikidata (déclaration Q8698$2d3e…, révision 2553658571, édition communautaire), Grande Dépression a pour cause krach de 1929 ; REVA n'établit pas de causalité.",
   "origin": "test_fixture",
-  "recorded_at": "2026-10-16T…"
+  "recorded_at": "2026-10-16T…",
+  "load_id": 1
 }
 ```
 
-`grade` is `null` until the grader has run on that claim row.
+`relation_label` reads cause → effect, `relation_inverse_label` effect → cause; the wording uses the side the
+source wrote it on (`asserted_on`). `grade` is `null` until the grader has run on that claim row. Dates are
+ISO 8601 with astronomical years (`-0043-03-15` = 15 March 44 BCE); `times` are the source's raw strings.
 
 ### Chain JSON
 
 ```json
 {
-  "from": "Q361", "to": "Q…", "found": true, "max_hops": 6, "min_grade": "D",
+  "from": {"id": "Q192050", "label": "assassination of Archduke Franz Ferdinand", …},
+  "to": {"id": "Q178275", "label": "1918–1920 flu pandemic", …},
+  "found": true,
   "paths": [{
-    "length": 2, "chain_grade": "C", "weakest_hop": 1,
-    "hops": [{"from": {…}, "to": {…}, "hop_grade": "C", "claims": [<claim JSON>, …]}, …],
-    "wording": "Composition by REVA of 2 separately asserted claims; chain grade = weakest hop (C). Each hop is asserted by its own source; REVA does not assert the chain."
+    "length": 2, "chain_grade": "D", "weakest_hop": 0,
+    "hops": [{"from": {…}, "to": {…}, "hop_grade": "D", "claims": [<claim JSON>, …]}, …],
+    "wording": "Composition by REVA of 2 separately asserted claim(s); chain grade = weakest hop (D). Each hop is asserted by its own source; REVA does not assert the chain.",
+    "wording_fr": "Composition par REVA de 2 affirmation(s) énoncée(s) séparément ; …"
   }],
-  "note": "composition by REVA of separately asserted claims; chain grade = weakest hop",
-  "search": {"levels_expanded": 2, "edges_scanned": 14, "truncated": false, "truncation_reasons": [],
-             "elapsed_ms": 12, "time_budget_ms": 5000}
+  "paths_found": 1,
+  "note": "composition by REVA of separately asserted claims; chain grade = weakest hop. …",
+  "note_fr": "composition par REVA d'affirmations causales énoncées séparément ; …",
+  "not_found_reason": null,
+  "search": {"max_hops": 6, "min_grade": "D", "levels_expanded": 2, "edges_scanned": 16, "ungraded_skipped": 0,
+             "below_min_grade_skipped": 4, "truncated": false, "truncation_reasons": [], "elapsed_ms": 7,
+             "time_budget_ms": 5000}
 }
 ```
 
 Hop grade = best grade among the claims for that hop (each listed with its own source and grade); chain
 grade = weakest hop. Only minimal-length chains are returned (≤ `max_paths`, best chain grade first).
-Ungraded claims are not traversed (`search.ungraded_skipped`).
+Ungraded claims are not traversed (`search.ungraded_skipped`). Only `asserts` claims of the `cause` family are
+traversed (prevention and denials never compose into a chain); self-loops are skipped. Bounds: `max_hops` ≤ 6,
+`max_paths` ≤ 10, 5 s time budget, 5,000 frontier nodes and 20,000 edges per level, 2,000 enumerated paths;
+hitting one sets `search.truncated` with the reason and an envelope `truncated` warning.
+
+### NLQA
+
+`reva.causal.graph.why(conn, id, origin=, min_grade=)`, `effects(conn, id, origin=, limit=)` and
+`chain(conn, a, b, max_hops=, min_grade=, max_paths=, origin=)` return the JSON above as plain dicts (the API
+wraps them in the envelope). Answers must say "selon <source>" per hop (use `wording_fr`) and, for a chain,
+the `note_fr`.

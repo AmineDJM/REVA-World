@@ -331,3 +331,57 @@ def test_wdqs_listing_loads_only_rows_touching_the_seed_reach(tmp_path: Path) ->
     assert first["status"] == "done"
     chunk = next(iter(first["chunks"].values()))
     assert chunk["statements"] == 3 and chunk["touching_seed_reach"] == 2 and chunk["loaded_as_wdqs_rows"] == 1
+
+
+def test_report_analyse_directions_temporal_cycles_and_causcore_override() -> None:
+    from reva.causal_harvest.report import analyse, chain_exhibits
+
+    def st(s: str, p: str, o: str, sid: str, refs: list[Any] | None = None, sk: str = "wikidata.wbapi") -> dict:
+        return {
+            "subject_qid": s,
+            "property_pid": p,
+            "object_qid": o,
+            "value": None,
+            "statement_id": sid,
+            "rank": "normal",
+            "refs": refs or [],
+            "qualifiers": {},
+            "source_key": sk,
+            "source_revision": "1",
+        }
+
+    rows = [
+        st("Q8698", "P828", "Q131074", "a", [{"P854": ["https://x"]}]),  # crash -> depression (referenced)
+        st("Q131074", "P1542", "Q8698", "b"),  # same pair asserted on the other item
+        st("Q8698", "P1542", "Q362", "c"),  # depression -> WWII
+        st("Q362", "P1542", "Q8698", "d"),  # WWII -> depression: time-inconsistent, closes a cycle
+        st("Q1", "P828", "Q1", "e", sk="wikidata.wdqs"),  # self-loop, WDQS row
+    ]
+    start = {
+        "Q131074": ((1929, 10, 24), (1929, 10, 24), "P585"),
+        "Q8698": ((1929, 1, 1), (1929, 12, 31), "P580"),
+        "Q362": ((1939, 9, 1), (1939, 9, 1), "P580"),
+    }
+    g = {
+        "rows": rows,
+        "start": start,
+        "labels": {"Q8698": "Great Depression"},
+        "entities": {},
+        "causcore": {
+            "_by_statement": {
+                "c": {"grade": "C", "source_tier": "T3", "temporal_check": "consistent", "rule_ids": ["x"]}
+            }
+        },
+    }
+    a = analyse(g)
+    assert a["by_property"] == {"P828": 2, "P1542": 3}
+    assert a["reference_classes"] == {"referenced": 1, "none": 3, "unknown": 1}
+    assert a["temporal"]["inconsistent"] == 1 and a["temporal"]["overlapping"] == 2
+    assert a["self_loops"] == ["? (Q1)"]
+    assert [c["size"] for c in a["cycles"]] == [2]
+    grades = {e["statement_id"]: (e["provisional_grade"], e["grade_source"]) for e in a["_edges"]}
+    assert grades["c"] == ("C", "causcore") and grades["d"] == ("E", "causwd_provisional")
+    assert grades["a"][0] == "C" and grades["b"][0] == "D" and grades["e"][0] == "C/D?"
+    chains = chain_exhibits(a, g, starts=["Q131074"], limit=5)
+    assert chains and chains[0]["path"][0].endswith("(Q131074)") and chains[0]["hops"] == 2
+    assert chains[0]["chain_grade_weakest_hop"] == "C"  # best claim per hop, weakest hop

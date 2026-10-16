@@ -60,7 +60,44 @@ def load_graph(engine: Any) -> dict[str, Any]:
         cur = start.get(q)
         if cur is None or (START_PIDS.index(p), b[0]) < (START_PIDS.index(cur[2]), cur[0]):
             start[q] = (b[0], b[1], p)
-    return {"rows": rows, "start": start, "labels": labels, "entities": ents}
+    return {"rows": rows, "start": start, "labels": labels, "entities": ents, "causcore": load_causcore(engine)}
+
+
+def load_causcore(engine: Any) -> dict[str, Any] | None:
+    """CAUSCORE's claims and grades (``kg.causal_claim_current`` / ``kg.causal_grade_current``) when the
+    loader/grader has run on this database; ``None`` otherwise."""
+    from sqlalchemy import text
+    from sqlalchemy.exc import ProgrammingError
+
+    try:
+        with engine.connect() as c:
+            rows = (
+                c.execute(
+                    text(
+                        "SELECT c.claim_key, c.statement_id, c.cause_id, c.effect_id, c.relation, c.source_tier,"
+                        " c.mechanism, c.disputed_by, g.grade, g.rule_ids, g.temporal_check, g.temporal,"
+                        " g.corroboration, g.contested_by FROM kg.causal_claim_current c"
+                        " LEFT JOIN kg.causal_grade_current g ON g.claim_row_id = c.id"
+                    )
+                )
+                .mappings()
+                .all()
+            )
+    except ProgrammingError:
+        return None
+    by_sid = {r["statement_id"]: dict(r) for r in rows if r["statement_id"]}
+    tier_grade: Counter[str] = Counter(f"{r['source_tier']}/{r['grade']}" for r in rows)
+    return {
+        "claims": len(rows),
+        "by_tier": dict(Counter(r["source_tier"] for r in rows)),
+        "by_grade": dict(Counter(r["grade"] for r in rows)),
+        "by_tier_grade": dict(sorted(tier_grade.items())),
+        "by_temporal_check": dict(Counter(r["temporal_check"] for r in rows)),
+        "corroborated": sum(1 for r in rows if (r["corroboration"] or 0) > 1),
+        "contested": sum(1 for r in rows if r["contested_by"] or r["disputed_by"]),
+        "with_mechanism": sum(1 for r in rows if r["mechanism"]),
+        "_by_statement": by_sid,
+    }
 
 
 def analyse(g: dict[str, Any], *, top: int = 25) -> dict[str, Any]:
@@ -123,6 +160,16 @@ def analyse(g: dict[str, Any], *, top: int = 25) -> dict[str, Any]:
             g_ = "D"
         else:
             g_ = "C/D?"
+        cc = ((g.get("causcore") or {}).get("_by_statement") or {}).get(edge["statement_id"])
+        if cc and cc.get("grade"):  # CAUSCORE's grader is authoritative when it has run
+            edge.update(
+                causcore_tier=cc["source_tier"],
+                causcore_grade=cc["grade"],
+                causcore_temporal=cc["temporal_check"],
+                causcore_rules=cc["rule_ids"],
+            )
+            g_ = cc["grade"]
+        edge["grade_source"] = "causcore" if cc and cc.get("grade") else "causwd_provisional"
         edge["provisional_grade"] = g_
         grades[g_] += 1
     succ: dict[str, list[str]] = defaultdict(list)
@@ -174,6 +221,10 @@ def analyse(g: dict[str, Any], *, top: int = 25) -> dict[str, Any]:
         "temporal": dict(temporal),
         "provisional_grades": dict(grades),
         "inconsistent": inconsistent,
+        # an effect dated only by its inception (P571) is usually an entity (a state, an organisation), and
+        # "X has effect <state>" often means the state's creation *or end*: precedence on inception misleads
+        "inconsistent_effect_dated_by_inception": sum(1 for x in inconsistent if x["effect_start"][2] == "P571"),
+        "causcore": {k: v for k, v in (g.get("causcore") or {}).items() if not k.startswith("_")} or None,
         "self_loops": self_loops,
         "cycles": cycles,
         "top_connected": [
@@ -224,7 +275,9 @@ def chain_exhibits(
                                 "on": x["asserted_on"],
                                 "revision": x["revision"],
                                 "ref_class": x["ref_class"],
-                                "temporal": x["temporal"],
+                                "temporal": x.get("causcore_temporal") or x["temporal"],
+                                "tier": x.get("causcore_tier") or x["tier"],
+                                "grade": x["provisional_grade"],
                                 "references": x["references"][:3],
                             }
                             for x in by_pair[(c_, e_)]
@@ -235,6 +288,7 @@ def chain_exhibits(
                 {
                     "hops": len(hops),
                     "path": [f"{labels.get(q, '?')} ({q})" for q in path],
+                    "grade_source": sorted({x["grade_source"] for x in a["_edges"] if x["cause"] in path}),
                     "chain_grade_weakest_hop": max(
                         min(x["provisional_grade"] for x in by_pair[(c_, e_)]) for c_, e_ in itertools.pairwise(path)
                     ),

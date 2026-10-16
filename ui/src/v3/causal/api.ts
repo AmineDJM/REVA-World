@@ -387,6 +387,77 @@ export async function getCausalEvent(id: string, signal?: AbortSignal) {
   return { event: parseWith(CausalEvent, data, path), warnings };
 }
 
+// ------------------------------------------------------------------ event card (agent EVENTS, /v1/events/{id})
+
+export interface CardFact {
+  ref: NodeRef;
+  role: string | null;
+  side: string | null;
+  /** statement keys the fact rests on (each a cited KG statement) */
+  statements: string[];
+  source: string | null;
+}
+
+/**
+ * The EVENTS event card (src/reva/api/routes/events.py): types (taxonomy, fr labels), interval with precision,
+ * places and participants with roles/sides, each from cited statements. Tolerant: absent members stay absent.
+ */
+export const EventsCard = JsonRecord.transform((o, ctx) => {
+  const id = optStr(o.id) ?? '';
+  if (!id) ctx.addIssue({ code: 'custom', message: 'identifiant d’événement manquant' });
+  const types = isRec(o.types) ? o.types : {};
+  const primary = (Array.isArray(types.primary) ? types.primary : []).filter(isRec);
+  const iv = isRec(o.interval) ? o.interval : {};
+  const tv = (v: unknown): TimePoint => (isRec(v) ? timeOf(v.time, typeof v.precision === 'number' ? v.precision : null) : null);
+  const start = tv(iv.start) ?? tv(iv.point_in_time) ?? tv(iv.inception);
+  const end = tv(iv.end) ?? tv(iv.dissolved) ?? tv(iv.episode_end);
+  const prov = (x: Rec): { key: string | null; source: string | null } => {
+    const p = isRec(x.provenance) ? x.provenance : {};
+    return { key: optStr(p.statement_key), source: optStr(p.source_key) };
+  };
+  const places: CardFact[] = (Array.isArray(o.places) ? o.places : []).filter(isRec).flatMap((pl) => {
+    if (!isRec(pl.place)) return [];
+    const pv = prov(pl);
+    return [{ ref: nodeRefOf(pl.place), role: optStr(pl.relation), side: null, statements: pv.key ? [pv.key] : [], source: pv.source }];
+  });
+  const participants: CardFact[] = (Array.isArray(o.participants) ? o.participants : []).filter(isRec).flatMap((pa) => {
+    if (!isRec(pa.participant)) return [];
+    const role = isRec(pa.role) ? (optStr(pa.role.label_fr) ?? optStr(pa.role.label_en) ?? optStr(pa.role.id)) : optStr(pa.role);
+    const sts = (Array.isArray(pa.statements) ? pa.statements : []).filter(isRec);
+    return [
+      {
+        ref: nodeRefOf(pa.participant),
+        role,
+        side: optStr(pa.side),
+        statements: sts.map((x) => optStr(x.statement_key)).filter((x): x is string => !!x),
+        source: optStr(sts[0]?.source_key),
+      },
+    ];
+  });
+  const labels = isRec(o.labels) ? o.labels : {};
+  const descs = isRec(o.descriptions) ? o.descriptions : {};
+  return {
+    id,
+    label: optStr(labels.fr) ?? optStr(o.label) ?? id,
+    description: optStr(descs.fr) ?? optStr(descs.en),
+    types: primary.map((t) => optStr(t.label_fr) ?? optStr(t.label_en) ?? optStr(t.id) ?? '').filter(Boolean),
+    start,
+    end,
+    dateBasis: optStr(iv.basis),
+    dateConsistency: optStr(iv.consistency),
+    places,
+    participants,
+    truncated: o.truncated === true,
+  };
+});
+export type EventsCard = z.output<typeof EventsCard>;
+
+export async function getEventsCard(id: string, signal?: AbortSignal) {
+  const path = `/v1/events/${enc(id)}`;
+  const { data, warnings } = await get(path, undefined, signal);
+  return { card: parseWith(EventsCard, data, path), warnings };
+}
+
 // ------------------------------------------------------------------ causes / effects
 
 export interface ClaimsResult {

@@ -413,3 +413,77 @@ export const CANDIDATES_WW1 = envelope({
 
 export const NOT_FOUND_ROUTE = { detail: 'Not Found' };
 export const UNKNOWN_EVENT = { title: 'Not Found', status: 404, detail: 'unknown event', code: 'not_found' };
+
+const prov = (key: string, property: string) => ({
+  statement_key: key,
+  property,
+  source_key: 'wikidata',
+  source_revision: '2250000000',
+  raw_sha256: SHA,
+  rank: 'normal',
+  origin: 'test_fixture',
+  verification: 'community_edited_not_verified',
+  derivation: null,
+});
+const tv = (time: string, precision: number, key: string, property: string) => ({ time, precision, lo: time.slice(1, 11), hi: time.slice(1, 11), provenance: prov(key, property) });
+
+/** GET /v1/events/Q361 (agent EVENTS, src/reva/api/routes/events.py EventCard), trimmed to what the screen reads. */
+export const EVENTS_CARD_WW1 = envelope({
+  id: 'Q361',
+  label: 'World War I',
+  labels: { en: 'World War I', fr: 'Première Guerre mondiale' },
+  descriptions: { fr: 'conflit mondial (donnée de test)' },
+  kind: 'event',
+  dataset_kind: null,
+  types: {
+    is_event: true,
+    basis: 'wikidata_p31',
+    primary: [{ id: 'world_war', label_en: 'world war', label_fr: 'guerre mondiale', parent: 'war' }],
+    secondary: [],
+    rank_rule: 'fixture',
+    matches: [],
+    p31_unmatched: [],
+    class_search_truncated: false,
+  },
+  interval: {
+    start: tv('+1914-07-28T00:00:00Z', 11, 'wikidata:Q361$FIXTURE-P580', 'P580'),
+    end: tv('+1918-11-11T00:00:00Z', 11, 'wikidata:Q361$FIXTURE-P582', 'P582'),
+    point_in_time: null,
+    inception: null,
+    dissolved: null,
+    episode_end: null,
+    earliest: '1914-07-28',
+    latest: '1918-11-11',
+    basis: 'source_dates',
+    consistency: 'consistent',
+    alternatives: [],
+    conflicting_values: false,
+    notes: [],
+  },
+  places: [{ relation: 'location', place: { id: 'fixture:europe', label: 'Europe', label_fr: 'Europe', kind: 'place' }, value: null, valid_from: null, valid_to: null, provenance: prov('wikidata:Q361$FIXTURE-P276', 'P276') }],
+  participants: [
+    {
+      participant: { id: 'fixture:france', label: 'France', label_fr: 'France', kind: 'country' },
+      value: null,
+      role: { id: 'belligerent', label_en: 'belligerent', label_fr: 'belligérant' },
+      side: 'Alliés',
+      property: 'P710',
+      direction: 'out',
+      role_qualifiers: [],
+      valid_from: null,
+      valid_to: null,
+      statement_count: 1,
+      statements: [{ ...prov('wikidata:Q361$FIXTURE-P710-1', 'P710'), point_in_time: null, coded: null }],
+    },
+  ],
+  structure: [],
+  causal_statements: [],
+  same_as: [],
+  coded: [],
+  sources: ['wikidata'],
+  entity_provenance: null,
+  truncated: false,
+  notes: [],
+  view_version: 'fixture',
+  taxonomy_sha256: SHA,
+});

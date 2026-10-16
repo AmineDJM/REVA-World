@@ -144,6 +144,8 @@ Each entry keeps GAPHUNT's justification. The registry now has 27 headline conce
     * `also_reported`
     * `no_value`
     * `projection_only`
+    * `projection_upstream` / `nowcast` / `extrapolated` (a registry cell rule marks the cell, see below)
+    * `not_equivalent_for_country` (with the `reason`)
     * `unit_mismatch`
     * `series_not_in_snapshot`
 
@@ -159,6 +161,34 @@ Each entry keeps GAPHUNT's justification. The registry now has 27 headline conce
 * **Units and status.** The headline unit is the concept unit, except for "named per cell" concepts such
   as currencies, which keep the cell's own unit. The equivalences are labelled
   `agent_declared_equivalence_not_human_reviewed`.
+
+* **Upstream projections and country exceptions (review V3b HL-2, HL-1, LAB-1).** A listed series may carry
+  documented `cell_rules`: `{estimate_kind: projection_upstream | nowcast | extrapolated, year_after,
+  footnote_matches, unless_flag, upstream, label, basis}`. Rules in force:
+  * WDI `SP.POP.TOTL`, `SP.DYN.LE00.IN`, `EN.POP.DNST`: years after 2023 are `projection_upstream` (WDI source
+    note: UN WPP 2024, whose estimates end in 2023; the WDI does not say per economy which source it used, so
+    every later value is treated as the WPP medium-variant projection — it equals it to the person for 129 of
+    216 countries in 2024). WDI population cells footnoted "Extrapolated…" are `extrapolated`.
+  * ILOSTAT modelled unemployment: the vintage year (2025 for the November 2025 vintage; `year_after: 2024`,
+    `unless_flag: obs_status`) is a `nowcast`; WDI `SL.UEM.TOTL.ZS` after 2024 is `projection_upstream`.
+    `year_after` must be moved with each new ILO vintage.
+
+  Such cells never answer by default (`projections=exclude`); with `projections=include` (query parameter
+  of `/headline/map`, `/headline/series`, `/countries/{iso3}`) they answer only where no actual value exists,
+  with `projection: true`, `flags.estimate_kind` and `flags.estimate_rule` (label, upstream, basis).
+  `not_equivalent_for` lists countries for which a series is not the concept (territorial scope): the WDI
+  never answers FRA (WDI France includes the overseas departments, WPP France is metropolitan) or MDA (WPP
+  includes Transnistria, the WDI does not) for population and life expectancy.
+* **Source breaks (review V3b HL-1).** In a country's series (`/headline/series`, dossier), the first cell
+  answered by another series than the previous answered year carries `source_break: {from, to, from_year,
+  year, overlap: {year, from_value, to_value, ratio}}` — the last year both series report, so the level
+  shift between sources is visible; `/headline/series` lists them in `source_breaks` and warns
+  `source_break`. The UI sparkline interrupts the line at each source change.
+* **Licences (review V3b LIC-1).** Every atlas cell and headline answer carries `rights` (licence,
+  `commercial_use`, `non_commercial`, `share_alike`, `no_derivatives`, `open_licence`, `restricted`,
+  attribution, `basis`: `table_artifact` = recorded with the table artifact and pinned in the snapshot
+  manifest; `atlas_source_spec` = the source spec's licence, for cells whose table rights are unknown).
+  Answers list `licences` (restricted first) and the API warns `licence_restricted`.
 
 API (read scope): `GET /v1/atlas/headline/concepts`, `/headline/map?concept&year`,
 `/headline/series?concept&iso3`, `/headline/coverage?theme`. The country dossier

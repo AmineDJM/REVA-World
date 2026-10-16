@@ -8,10 +8,12 @@ import {
   getCausalClaims,
   getCausalEvent,
   getCausalWhy,
+  getEventsCard,
   type CausalCandidate,
   type CausalClaim,
   type CausalEvent,
   type ClaimsResult,
+  type EventsCard,
   type WhyResult,
 } from './api';
 import { CausalTimeline } from './CausalTimeline';
@@ -82,6 +84,8 @@ export default function CausesPage() {
   }, [selected]);
 
   const ev = useLoad<{ event: CausalEvent; warnings: string[] }>(event, (s) => getCausalEvent(event!, s));
+  // the EVENTS card (types, dates, places, participants from cited statements); optional: absent → causal view only
+  const evCard = useLoad<{ card: EventsCard; warnings: string[] }>(event, (s) => getEventsCard(event!, s));
   const causes = useLoad<ClaimsResult>(event, (s) => getCausalClaims(event!, 'causes', s));
   const effects = useLoad<ClaimsResult>(event, (s) => getCausalClaims(event!, 'effects', s));
   const why = useLoad<WhyResult>(event, (s) => getCausalWhy(event!, s));
@@ -89,7 +93,8 @@ export default function CausesPage() {
 
   useEffect(() => {
     if (ev?.status === 'ok' && event) setLabels((l) => ({ ...l, [event]: ev.data.event.label }));
-  }, [ev, event]);
+    if (evCard?.status === 'ok' && event) setLabels((l) => ({ ...l, [event]: evCard.data.card.label }));
+  }, [ev, evCard, event]);
 
   const causeClaims = useMemo(() => (causes?.status === 'ok' ? causes.data.claims : []), [causes]);
   const effectClaims = useMemo(() => (effects?.status === 'ok' ? effects.data.claims : []), [effects]);
@@ -101,7 +106,9 @@ export default function CausesPage() {
   }, [causeClaims, effectClaims, why, extra]);
 
   const focal = ev?.status === 'ok' ? ev.data.event : null;
-  const focalLabel = focal?.label ?? (event ? (labels[event] ?? event) : '');
+  const card = evCard?.status === 'ok' ? evCard.data.card : null;
+  const focalLabel = card?.label ?? focal?.label ?? (event ? (labels[event] ?? event) : '');
+  const focalDates = card && (card.start || card.end) ? card : focal;
   const graph = useMemo(() => (event ? buildGraph({ id: event, label: focalLabel }, causeClaims, effectClaims) : null), [event, focalLabel, causeClaims, effectClaims]);
   const pairs = useMemo(() => dissentPairs([...all.values()]), [all]);
 
@@ -179,8 +186,8 @@ export default function CausesPage() {
           <div className="v3-causes-top">
             <div className="v3-causes-event">
               {ev?.status === 'loading' && <V3Loading what="de l’événement" />}
-              {ev?.status === 'error' && <V3Error error={ev.error} what="La fiche de l’événement" />}
-              {focal && <EventCard e={focal} />}
+              {ev?.status === 'error' && !card && <V3Error error={ev.error} what="La fiche de l’événement" />}
+              {(focal || card) && <EventCard e={focal} card={card} />}
             </div>
             <div className="v3-causes-graph">
               <h2>Graphe causal gradué</h2>
@@ -219,7 +226,9 @@ export default function CausesPage() {
           {why?.status === 'loading' && <V3Loading what="de l’explication" />}
           {why?.status === 'error' && !unavailable(why) && <V3Error error={why.error} what="Le panneau « Pourquoi ? »" />}
           {whyGroups && <WhyPanel groups={whyGroups} derived={why?.status !== 'ok'} onOpen={setSelected} />}
-          {focal && (causeClaims.length > 0 || effectClaims.length > 0) && <CausalTimeline focal={focal} causes={causeClaims} effects={effectClaims} />}
+          {focalDates && (causeClaims.length > 0 || effectClaims.length > 0) && (
+            <CausalTimeline focal={{ id: event, label: focalLabel, start: focalDates.start, end: focalDates.end }} causes={causeClaims} effects={effectClaims} />
+          )}
           <DissentPanel pairs={pairs} onOpen={setSelected} />
           <ChainFinder
             from={chainFrom}

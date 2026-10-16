@@ -45,6 +45,7 @@ test('Première Guerre mondiale (Q361): real claims on the graph, every line att
   expect(edges.size).toBeGreaterThan(5);
   await page.goto('/v3/causes?event=Q361');
   await expect(page.getByTestId('event-card').getByRole('heading', { name: 'Première Guerre mondiale' })).toBeVisible(SLOW);
+  await expect(page.getByTestId('event-dates')).toContainText('1914');
   const canvas = page.getByTestId('causal-canvas');
   await expect(canvas).toHaveAttribute('data-edges', String(edges.size), SLOW);
   for (const tag of await page.getByTestId('causes-list').getByTestId('selon').allTextContents()) expect(tag).toMatch(/^selon Wikidata \(T[34]\)$/);

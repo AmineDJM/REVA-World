@@ -187,7 +187,9 @@ def test_not_an_object_is_refused() -> None:
 def test_server_restatement_uses_catalog_labels() -> None:
     p = validate_plan(plan(op("s1", "atlas_value", concept="labour.minimum_wage_monthly", country="SEN")), CAT, Q)
     r = restate(p, CAT)
-    assert r.startswith("Question interprétée comme") and "Salaire minimum mensuel" in r and "Senegal" in r
+    assert (
+        r.startswith("Question interprétée comme") and "Salaire minimum mensuel" in r and "Sénégal" in r
+    )  # French label (review V3b ASK-8)
 
 
 def test_in_question_is_accent_and_case_insensitive() -> None:

@@ -1516,24 +1516,24 @@ def query_for(
     return q
 
 
-def query_for_request(
+def request_snapshot(
     conn: Any, store: ArtifactStore, *, origin: str | None = None, sha256: str | None = None
-) -> AtlasQuery:
-    """The :class:`AtlasQuery` an API request may use (review V3b SEC-3): the latest snapshot (of ``origin``)
-    is built when its query file is missing and its file is pinned against eviction; any other recorded
-    snapshot is served only if its query file already exists (else :class:`SnapshotNotMaterialised`, 409)."""
+) -> tuple[AtlasSnapshot, bool]:
+    """The snapshot an API request asks for and whether its query file may be built in the request (review V3b
+    SEC-3): only the latest snapshot (of ``origin``) may be built, and the latest live one is pinned against
+    eviction; any other recorded snapshot is served only if its query file already exists. Call
+    ``query_for(snap, store, build=...)`` *after* releasing ``conn`` (a build can take minutes)."""
     from reva.atlas.snapshot import latest_snapshot_ref, resolve_snapshot
 
     snap = resolve_snapshot(conn, store, origin=origin, sha256=sha256)
-    latest = snap if sha256 is None else None
-    if latest is None:
+    if sha256 is None:
+        is_latest = True
+    else:
         ref = latest_snapshot_ref(conn, origin)
         is_latest = ref is not None and ref["sha"] == snap.sha256
-    else:
-        is_latest = True
     if is_latest and snap.origin == "live":
         try:
             pin_snapshot(snap.sha256)
         except OSError:  # pragma: no cover - a read-only cache dir never fails a read
             pass
-    return query_for(snap, store, build=is_latest)
+    return snap, is_latest

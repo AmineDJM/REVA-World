@@ -94,8 +94,8 @@ def _atlas_factory(request: Request) -> Any:
     """snapshot sha (None = latest; live only in production) -> AtlasQuery, or None when no snapshot exists."""
 
     def make(sha: str | None) -> Any:
-        from reva.atlas.query import query_for
-        from reva.atlas.snapshot import SnapshotUnavailable, resolve_snapshot
+        from reva.atlas.query import SnapshotNotMaterialised, query_for, request_snapshot
+        from reva.atlas.snapshot import SnapshotUnavailable
 
         st = getattr(request.app.state, "atlas_store", None)
         if st is None:
@@ -106,10 +106,11 @@ def _atlas_factory(request: Request) -> Any:
         origin = "live" if sha is None and _production(request) else None
         try:
             with read_conn(request) as conn:
-                snap = resolve_snapshot(conn, st, origin=origin, sha256=sha)
-        except SnapshotUnavailable:
+                # review V3b SEC-3: only the latest snapshot's query file is built in a request
+                snap, build = request_snapshot(conn, st, origin=origin, sha256=sha)
+            return query_for(snap, st, build=build)
+        except (SnapshotUnavailable, SnapshotNotMaterialised):
             return None
-        return query_for(snap, st)
 
     return make
 

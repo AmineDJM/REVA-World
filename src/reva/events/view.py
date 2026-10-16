@@ -188,7 +188,9 @@ def class_graph(
 
 
 def _chains(graph: ClassGraph, start: str, targets: Mapping[str, Sequence[str]]) -> dict[str, list[dict[str, Any]]]:
-    """Shortest P279 chain from ``start`` to every reachable taxonomy class (BFS)."""
+    """Shortest P279 chain from ``start`` to the nearest taxonomy classes (BFS). A path stops at the first class
+    the taxonomy maps: the most specific mapping on each path decides (a military expedition is not also typed
+    as an expedition because Wikidata makes it a subclass of both)."""
     out: dict[str, list[dict[str, Any]]] = {}
     prev: dict[str, tuple[str, dict[str, Any]] | None] = {start: None}
     q: deque[str] = deque([start])
@@ -202,6 +204,7 @@ def _chains(graph: ClassGraph, start: str, targets: Mapping[str, Sequence[str]])
                 chain.append({"class": p, "subclass_of": cur, **{k: v for k, v in edge.items() if k != "parent"}})
                 cur = p
             out[c] = list(reversed(chain))
+            continue
         for e in graph.parents.get(c, []):
             if e["parent"] not in prev:
                 prev[e["parent"]] = (c, e)
@@ -333,6 +336,7 @@ def descendant_classes(
     tax = tax or load_taxonomy()
     rec = recorded if recorded is not None else recorded_classes()
     rec_children = rec.children()
+    allowed = set(type_ids)
     seeds = {q for t in type_ids for q in tax.types[t].wikidata_classes}
     seen = set(seeds)
     frontier = sorted(seeds)
@@ -350,7 +354,8 @@ def descendant_classes(
         }
         for c in frontier:
             kids.update(rec_children.get(c, ()))
-        nxt = sorted(kids - seen)
+        # consistent with classification: do not descend into a class the taxonomy maps to another type
+        nxt = sorted(k for k in kids - seen if not (set(tax.class_index.get(k, ())) - allowed))
         seen.update(nxt)
         if len(seen) > MAX_DESCENDANT_CLASSES:
             truncated = True

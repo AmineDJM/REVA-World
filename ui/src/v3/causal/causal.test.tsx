@@ -69,6 +69,17 @@ describe('Causes & conséquences', () => {
     expect(within(causes).getAllByTestId('grade-badge').map((b) => b.getAttribute('data-grade'))).toContain('none');
   });
 
+  it('the event card prefers the EVENTS card (type, dated interval, places and participants with roles) when deployed', async () => {
+    mockFetch({ ...ROUTES, 'GET /v1/events/Q361': { body: F.EVENTS_CARD_WW1 } });
+    at('/v3/causes?event=Q361');
+    const card = await screen.findByTestId('event-card');
+    await waitFor(() => expect(within(card).getByTestId('event-type')).toHaveTextContent('guerre mondiale'));
+    expect(within(card).getByTestId('event-dates')).toHaveTextContent('28 juil. 1914 – 11 nov. 1918');
+    expect(within(card).getByTestId('event-places')).toHaveTextContent('Europe (location)');
+    expect(within(card).getByTestId('event-participants')).toHaveTextContent('France — belligérant, camp Alliés');
+    expect(card).toHaveTextContent('8 cause(s) · 3 conséquence(s) affirmées');
+  });
+
   it('a clicked edge opens its claim: tier, source, statement + revision, verbatim mechanism, temporal check, corroboration, contested-by', async () => {
     mockFetch(ROUTES);
     at('/v3/causes?event=Q361');

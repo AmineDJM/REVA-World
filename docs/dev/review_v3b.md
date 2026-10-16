@@ -223,3 +223,28 @@ V3 checked SEN/NOR/FRA).
   predecessors unmapped; SPC keeps only cells whose `DATA_YEAR` is the cell year and spells the unit multiplier out;
   USGS keeps "W" as `missing: confidential`; OpenFlights and Wikidata cables carry their staleness/licence or
   community-edited caveats; no "alliance" or causal wording in the vote and pair texts (test-enforced in the UI).
+
+
+## Fix status (agent REVFIX2, 2026-10-16)
+
+Every reproduction now passes without its `xfail` marker (regression tests); tests rewritten where the honest
+fix answers differently from what the reproduction assumed are noted. Extra regression tests:
+`tests/review_v3b/test_review_v3b_fixes.py`, `tests/integration/test_atlas_api.py::test_05b_*`,
+`tests/unit/nlqa/test_nlqa_review_fixes.py::test_restricted_licence_*`, UI `relation.test.ts`,
+`Sparkline.test.tsx`, `pages.test.tsx` (atlas legend licence).
+
+| ID | Status | Fix |
+|---|---|---|
+| HL-2 | fixed | `cell_rules` in `registry/atlas/source_order` (schema + `source_order.py`): WDI population, life expectancy and density after 2023 = `projection_upstream` (UN WPP via World Bank), WDI "Extrapolated…" footnotes = `extrapolated`; `query._resolve` applies them in SQL. Excluded by default; `projections=include` serves them flagged (`projection: true`, `flags.estimate_kind`, `flags.estimate_rule`). Series operands of derived concepts keep the rules (a derived density never turns a projected population into an actual). Tests: the reproductions now assert the default exclusion (`consulted` status `projection_upstream`) and the flagged answer with `projections=include`. |
+| HL-1 | fixed | `not_equivalent_for` (FRA: overseas departments; MDA: Transnistria) on WDI population and life expectancy; the "same definition" claims rewritten (national usually-resident figures, 2023 gaps listed). Every remaining change of answering series in a country's series carries `source_break` (from, to, years, overlap-year values and ratio); `/headline/series` lists `source_breaks` and warns; the UI sparkline interrupts the line at source changes. The FRA reproduction now asserts that the WDI never answers France; a USA case asserts the flagged break. |
+| LIC-1 | fixed | Snapshot manifests pin `rights` per table (from `meta.artifact`; older manifests are completed at `resolve_snapshot`); `normalise_rights` derives NC/SA/ND/open flags; every cell and headline answer carries `rights` (fallback: the atlas source spec licence), answers list `licences`, the API warns `licence_restricted`, `/v1/ask` adds a "Licence de … (usage non commercial…)" note citing the cells, the atlas legend and the dossier show "licence non commerciale" badges. |
+| LIC-2 | fixed | `co_party` basis carries the UN Terms of Use (`licence`, `licence_url`, `open_licence: false`, `non_commercial: true`); `/v1/links/*` warn `licence_restricted` for any returned link with non-open terms. Path hops (`untc:party` statements) are not annotated. |
+| VOTE-1 | fixed | `_vote_link` writes the years used (decade ∩ requested window ∩ roll-call coverage) in the temporal, the evidence selector and `basis.years_used`, with `basis.decade` and `partial_period`; NLQA says "(décennie partielle)". |
+| VOTE-2 | fixed | Same mechanism: the last decade is labelled with the data's real end year (2020–2024); UI and NLQA show the years used. |
+| VOTE-3 | fixed | `basis.index_note`, the API `derived_index` warning, the NLQA sentence and the UI caveat say the index is the strict identical-vote share, not Voeten/Bailey's `agree`. |
+| TRUNC-1 | fixed | On-demand country reads order by latest year then weight (`order="weight"`) before the cap, report `truncated` / `truncated_kinds`, and the route warns which kinds were capped. |
+| ASK-7 | fixed (partly) | `headline_tiebreak` never covers a candidate whose series the headline lists under `not_equivalent`. Not done: answering with the headline concept itself (needs a headline operation in NLQA). |
+| ASK-8 | fixed | The planner's country table adds the iso-codes French translation (`registry/reference/iso-codes_4.20.1_iso_3166-1_fr.po`) of ISO names / common names, unique short forms ("Russie"), a few curated aliases; a name inside a longer country name is not a mention ("Guinée" in "Guinée-Bissau"); restatements use French labels. |
+| SEC-3 | fixed | `query.request_snapshot` (atlas routes, links and NLQA atlas factories): only the latest snapshot's query file may be built in a request; any other snapshot is served only if its file exists, else 409 `snapshot_not_materialised`; the latest live snapshot is pinned (`live-snapshot.pin`) and `_evict` never removes it. The links factory degrades to "atlas unavailable" for a stale materialisation snapshot without a query file. |
+| CSH-1 | fixed | CShapes periods starting on 1886-01-01 (borders and colonial rule) start at year precision with `left_censored`, `coverage_start`, `start_basis`; the relation page shows "≤ 1886 – …" with the coverage note. |
+| LAB-1 | fixed | ILOSTAT modelled vintage year (2025) = `nowcast` (cell rule, `unless_flag: obs_status`), WDI ILO-modelled after 2024 = `projection_upstream`; excluded by default. |

@@ -37,6 +37,7 @@ async function installFixtures(page: Page, calls: string[] = []) {
       if (STANDALONE) return json(route, { username: 'e2e', principal: 'user:e2e', auth_method: 'session', scopes: ['read'] });
       return route.fallback();
     }
+    if (p === '/v1/events/Q361') return json(route, F.EVENTS_CARD_WW1);
     if (p === '/v1/causal/events/Q361') return json(route, F.EVENT_WW1);
     if (p === '/v1/causal/events/Q361/causes') return json(route, F.CAUSES_WW1);
     if (p === '/v1/causal/events/Q361/effects') return json(route, F.EFFECTS_WW1);
@@ -73,6 +74,8 @@ test('graded causal graph: event card, legend, edges on the canvas; a clicked ed
   const card = page.getByTestId('event-card');
   await expect(card.getByRole('heading', { name: 'Première Guerre mondiale' })).toBeVisible();
   await expect(card.getByTestId('event-dates')).toContainText('28 juil. 1914 – 11 nov. 1918');
+  await expect(card.getByTestId('event-type')).toHaveText('guerre mondiale');
+  await expect(card.getByTestId('event-participants')).toContainText('France — belligérant, camp Alliés');
   await expect(page.getByTestId('causal-legend')).toContainText('Grade de preuve');
   const canvas = page.getByTestId('causal-canvas');
   await expect(canvas.locator('canvas').first()).toBeAttached();
