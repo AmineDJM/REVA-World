@@ -273,33 +273,75 @@ def build_openflights(files: dict[str, ic.Fetched]) -> tuple[ic.RowBuilder, dict
             flags=ic.derived(formula, inputs=lookups, **base, **extra),
         )
 
-    for (ca, cb) in sorted(set(operated) | set(pairs)):
+    for ca, cb in sorted(set(operated) | set(pairs)):
         if ca == cb:
             continue
         p = ic.Partner(iso.get(cb), cb)
         w = {"origin_country": ca, "destination_country": cb}
         f = p.flags()
-        emit(f"ROUTES_OPERATED|{p.dim()}", ca, operated.get((ca, cb), 0), "routes",
-             "count of routes.dat records (airline x origin airport x destination airport) with codeshare != 'Y', "
-             "origin airport in origin country, destination airport in destination country", w, **f)
-        emit(f"ROUTE_AIRPORT_PAIRS|{p.dim()}", ca, len(pairs[(ca, cb)]), "airport pairs",
-             "count of distinct directed (origin airport, destination airport) in routes.dat records, incl. codeshares",
-             w, **f)
-        emit(f"ROUTE_AIRLINES|{p.dim()}", ca, len(airlines[(ca, cb)]), "airlines",
-             "count of distinct airlines (airline id, else code) in routes.dat records, incl. codeshares", w, **f)
+        emit(
+            f"ROUTES_OPERATED|{p.dim()}",
+            ca,
+            operated.get((ca, cb), 0),
+            "routes",
+            "count of routes.dat records (airline x origin airport x destination airport) with codeshare != 'Y', "
+            "origin airport in origin country, destination airport in destination country",
+            w,
+            **f,
+        )
+        emit(
+            f"ROUTE_AIRPORT_PAIRS|{p.dim()}",
+            ca,
+            len(pairs[(ca, cb)]),
+            "airport pairs",
+            "count of distinct directed (origin airport, destination airport) in routes.dat records, incl. codeshares",
+            w,
+            **f,
+        )
+        emit(
+            f"ROUTE_AIRLINES|{p.dim()}",
+            ca,
+            len(airlines[(ca, cb)]),
+            "airlines",
+            "count of distinct airlines (airline id, else code) in routes.dat records, incl. codeshares",
+            w,
+            **f,
+        )
     for c in sorted(ap_in):
         intl = sum(v for (x, y), v in operated.items() if x == c and y != c)
-        emit("ROUTES_OPERATED_INTL_OUT", c, intl, "routes",
-             "count of routes.dat records with codeshare != 'Y' from an airport in the country to an airport in "
-             "another country", {"origin_country": c})
-        emit("ROUTES_OPERATED_DOMESTIC", c, operated.get((c, c), 0), "routes",
-             "count of routes.dat records with codeshare != 'Y' with both airports in the country", {"country": c})
-        emit("ROUTE_DEST_COUNTRIES", c, len(dests[c]), "countries",
-             "count of distinct other countries reached by routes.dat records (incl. codeshares) from the country",
-             {"origin_country": c})
-        emit("ROUTE_AIRPORTS", c, len(ap_in[c]), "airports",
-             "count of distinct airports of the country appearing as origin or destination in routes.dat records",
-             {"country": c})
+        emit(
+            "ROUTES_OPERATED_INTL_OUT",
+            c,
+            intl,
+            "routes",
+            "count of routes.dat records with codeshare != 'Y' from an airport in the country to an airport in "
+            "another country",
+            {"origin_country": c},
+        )
+        emit(
+            "ROUTES_OPERATED_DOMESTIC",
+            c,
+            operated.get((c, c), 0),
+            "routes",
+            "count of routes.dat records with codeshare != 'Y' with both airports in the country",
+            {"country": c},
+        )
+        emit(
+            "ROUTE_DEST_COUNTRIES",
+            c,
+            len(dests[c]),
+            "countries",
+            "count of distinct other countries reached by routes.dat records (incl. codeshares) from the country",
+            {"origin_country": c},
+        )
+        emit(
+            "ROUTE_AIRPORTS",
+            c,
+            len(ap_in[c]),
+            "airports",
+            "count of distinct airports of the country appearing as origin or destination in routes.dat records",
+            {"country": c},
+        )
     report = {
         "routes_records": len(routes),
         "routes_unresolved_airport": unresolved,
@@ -386,13 +428,25 @@ def build_ourairports(airports: ic.Fetched, countries: ic.Fetched, day: Any) -> 
                      flags=ic.derived(formula, inputs=[countries], **extra))  # fmt: skip
 
         for t in OA_TYPES:
-            emit(f"AIRPORTS|type={t}", by[c][t], f"count of airports.csv rows with type = {t}",
-                 {"iso_country": c, "type": t})
+            emit(
+                f"AIRPORTS|type={t}",
+                by[c][t],
+                f"count of airports.csv rows with type = {t}",
+                {"iso_country": c, "type": t},
+            )
         emit("AIRPORTS_OPEN", by[c]["open"], "count of airports.csv rows with type != closed", {"iso_country": c})
-        emit("AIRPORTS_SCHEDULED_SERVICE", by[c]["scheduled"],
-             "count of airports.csv rows with type != closed and scheduled_service = yes", {"iso_country": c})
-        emit("AIRPORTS_CLOSED", by[c]["closed"], "count of airports.csv rows with type = closed",
-             {"iso_country": c, "type": "closed"})
+        emit(
+            "AIRPORTS_SCHEDULED_SERVICE",
+            by[c]["scheduled"],
+            "count of airports.csv rows with type != closed and scheduled_service = yes",
+            {"iso_country": c},
+        )
+        emit(
+            "AIRPORTS_CLOSED",
+            by[c]["closed"],
+            "count of airports.csv rows with type = closed",
+            {"iso_country": c, "type": "closed"},
+        )
     report = {
         "airport_records": len(rows),
         "countries": len(by),

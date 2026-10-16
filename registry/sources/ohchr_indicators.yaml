@@ -1,0 +1,26 @@
+# V3 (agent A-TREATIES): OHCHR Status of Ratification Interactive Dashboard (18 core human rights instruments).
+# Connector: src/reva/adapters/connectors/atlas_ohchr.py (atlas.ohchr) -> atlas table ohchr.hr_ratification.
+source_key: ohchr.indicators
+title: OHCHR Status of Ratification Interactive Dashboard (indicators.ohchr.org), dashboard JSON web API
+provider_url: https://indicators.ohchr.org/
+lineage_family: ohchr
+rights:
+  licence: "UN Terms of Use (OHCHR is part of the UN Secretariat; not an open licence): personal, non-commercial use; no redistribution or derivative compilations without permission"
+  licence_url: https://www.un.org/en/about-us/terms-of-use
+  licence_evidence: >-
+    The dashboard links OHCHR's copyright page (www.ohchr.org/EN/AboutUs/Pages/Copyright.aspx), which answered
+    a Cloudflare bot challenge (HTTP 403) on 2026-10-16 and could not be read; the UN Terms of Use (archived by
+    atlas.untc) are applied conservatively. OHCHR metadata sheet: data "obtained from and regularly updated by
+    the United Nations Office of Legal Affairs".
+  attribution: "OHCHR, Status of Ratification Interactive Dashboard (https://indicators.ohchr.org), data from UN OLA."
+  open_licence: false
+  review_flag: not an open licence -- internal research use only; maintainer review before any publication
+metadata:
+  allowed_hosts: [indicators.ohchr.org]
+  endpoints:
+    - https://indicators.ohchr.org/webapi/dashboarddata/GetRatifications
+    - https://indicators.ohchr.org/webapi/dashboarddata/GetCountries
+    - https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=<1..18>
+  access_note: the dashboard's own JSON calls (GET, no key); 20 requests (~4.5 MB) per run
+  authentication: none
+  cadence: monthly check (OHCHR updates every six months or after a new ratification)

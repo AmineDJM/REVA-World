@@ -47,6 +47,21 @@ predicates:
       so that language -> family is one hop even when the classification path is ten levels deep. Absent for
       isolates and for top-level families themselves. Some top-level units are Glottolog pseudo-families
       (Pidgin, Mixed Language, Sign Language, Unclassifiable, Bookkeeping, ...): the family entity's category says so.
+  - pid: "glottolog:in_group"
+    value_kind: item
+    reva_predicate: glottolog_in_group
+    label_en: "belongs to the language group (Glottolog classification)"
+    label_fr: "appartient au groupe de langues (classification Glottolog)"
+    inverse_name: glottolog_group_member
+    inverse_label_en: "language group of (Glottolog classification)"
+    inverse_label_fr: "groupe de langues de (classification Glottolog)"
+    derived: false
+    description: >-
+      For language-level languoids only: one statement per intermediate group of the `classification` path, i.e.
+      every ancestor except the immediate parent (glottolog:parent) and the top-level family (glottolog:family), with
+      qualifier `steps_up` (2 = grandparent). Same Glottolog row as glottolog:parent; it lets the path engine (max
+      5 hops) reach a branch such as Romance or Italic in one hop: Brazil -> Portuguese -> Romance <- French ->
+      France. Read the full ordered chain from glottolog:parent.
   - pid: "glottolog:spoken_in"
     value_kind: item
     reva_predicate: glottolog_spoken_in

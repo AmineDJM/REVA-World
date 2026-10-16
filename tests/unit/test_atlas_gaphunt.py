@@ -52,7 +52,11 @@ def _tables(mod: Any) -> dict[str, Any]:
     out = {}
     for t in mod.build(got):
         frame, _unmapped = validate_atlas_frame(
-            t.frame, source=spec.atlas_source, dataset=t.dataset, raw_sha256s=list(t.raw_sha256s), geo_scheme=t.geo_scheme
+            t.frame,
+            source=spec.atlas_source,
+            dataset=t.dataset,
+            raw_sha256s=list(t.raw_sha256s),
+            geo_scheme=t.geo_scheme,
         )
         out[t.dataset] = frame
     return out
@@ -121,14 +125,17 @@ def test_spc_counts_omitted_rows_in_the_note() -> None:
     got = _fetch(atlas_gap_spc)
     rows, stats = atlas_gap_spc.parse("pocket", got["data:pocket"])
     assert stats["carried_forward_omitted"] > 0
-    assert stats["rows_read"] == len(rows) + stats["carried_forward_omitted"] + stats["missing_status_omitted"] + stats["empty_omitted"]
+    assert (
+        stats["rows_read"]
+        == len(rows) + stats["carried_forward_omitted"] + stats["missing_status_omitted"] + stats["empty_omitted"]
+    )
 
 
 def test_spc_refuses_a_coded_cell_without_code() -> None:
     body = (
-        "DATAFLOW,FREQ: Frequency,GEO_PICT: Geo,INDICATOR: Indicator,TIME_PERIOD: Time,OBS_VALUE\n"
-        "SPC:DF_X(1.0),A: Annual,Niue,POP: Population,2020,1600\n"
-    ).encode()
+        b"DATAFLOW,FREQ: Frequency,GEO_PICT: Geo,INDICATOR: Indicator,TIME_PERIOD: Time,OBS_VALUE\n"
+        b"SPC:DF_X(1.0),A: Annual,Niue,POP: Population,2020,1600\n"
+    )
     with pytest.raises(SourceResponseError):
         atlas_gap_spc.parse("pocket", Fetched(body, "0" * 64, "u", "t"))
 
@@ -147,7 +154,7 @@ def test_eurostat_nuts_regions_fill_the_seven_entities() -> None:
 def test_eurostat_label_change_fails_closed() -> None:
     got = _fetch(atlas_gap_eurostat_nuts)
     f = got["data:demo_r_d2jan"]
-    body = f.body.replace("Svalbard og Jan Mayen".encode(), b"Somewhere else")
+    body = f.body.replace(b"Svalbard og Jan Mayen", b"Somewhere else")
     with pytest.raises(SourceResponseError):
         atlas_gap_eurostat_nuts.parse_jsonstat("demo_r_d2jan", Fetched(body, f.sha256, f.url, f.retrieved_at))
 
@@ -172,7 +179,7 @@ def test_insee_refuses_dtd_and_scope_change() -> None:
         atlas_gap_insee.read_series(b'<?xml version="1.0"?><!DOCTYPE x [<!ENTITY a "b">]><x/>', "t")
     got = _fetch(atlas_gap_insee)
     f = got["data:SMIC"]
-    body = f.body.replace("hors Mayotte".encode(), b"y compris Mayotte")
+    body = f.body.replace(b"hors Mayotte", b"y compris Mayotte")
     with pytest.raises(SourceResponseError):
         atlas_gap_insee.parse_smic(Fetched(body, f.sha256, f.url, f.retrieved_at))
 
@@ -199,7 +206,9 @@ def test_jersey_monthly_fte_earnings() -> None:
     assert set(f["iso3"].unique()) == {"JEY"}
     mean = f.filter(f["indicator"] == "mean_monthly_earnings_fte|sector=Overall")
     assert mean.height >= 12 and set(mean["unit"]) == {"GBP per month (full-time equivalent)"}
-    assert all((r["period_end"] - r["period_start"]).days <= 31 for r in mean.iter_rows(named=True))  # monthly, never annualised
+    assert all(
+        (r["period_end"] - r["period_start"]).days <= 31 for r in mean.iter_rows(named=True)
+    )  # monthly, never annualised
 
 
 def test_jersey_refuses_changed_columns() -> None:
@@ -232,3 +241,36 @@ def test_proposals_follow_the_source_order_schema() -> None:
         jsonschema.validate(c["concept"], concept_schema)
     for ne in doc.get("not_equivalent", []):
         jsonschema.validate(ne["entry"], {"$defs": schema["$defs"], **schema["$defs"]["not_equivalent"]})
+
+
+# ---------------------------------------------------------------------------------------- gap matrix
+def _gap_script() -> Any:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("atlas_gap_matrix", REPO / "scripts" / "atlas_gap_matrix.py")
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_gap_matrix_from_static_and_coverage_files(tmp_path: Path) -> None:
+    gm = _gap_script()
+    assert len(gm.entities()) == 251
+    cov = tmp_path / "cov.json"
+    cov.write_text(json.dumps({"spc.pocket.MIDYEARPOPEST": {"iso3": ["NIU", "TKL"], "origin": "test"}}))
+    out_json, out_md = tmp_path / "g.json", tmp_path / "g.md"
+    gm.main(["--static", "--coverage", str(cov), "--out-json", str(out_json), "--out-md", str(out_md)])
+    res = json.loads(out_json.read_text())
+    pop = res["concepts"]["population"]
+    # WDI SP.POP.TOTL (static, 217 WB economies) is a headline series; SPC is an 'any source' series
+    assert pop["headline_covered"] == 217 and pop["any_covered"] == 219
+    assert "NIU" not in pop["any_missing"] and "NIU" in pop["headline_missing"] and "ATA" in pop["any_missing"]
+    assert "spc.pocket.MIDYEARPOPEST" in pop["series_consulted"]
+    assert set(res["entities"]["ATA"]["missing_any"]) >= {"population", "gdp"}
+    assert out_md.read_text().startswith("| concept |")
+    # every headline concept named by the matrix exists in ATLASOPS's source-order files
+    from reva.atlas.source_order import load_headlines
+
+    reg = load_headlines()
+    assert all(c in reg.concepts for spec in gm.CONCEPTS.values() for c in spec["headline"])

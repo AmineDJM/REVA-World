@@ -256,7 +256,7 @@
       "properties": {
         "property": {
           "type": "string",
-          "pattern": "^P[1-9][0-9]*$"
+          "pattern": "^(P[1-9][0-9]*|[a-z][a-z0-9_]*:[a-z][a-z0-9_]*)$"
         },
         "labels": {
           "$ref": "#/$defs/labels"

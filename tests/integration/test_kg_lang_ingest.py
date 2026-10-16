@@ -96,6 +96,9 @@ async def test_language_layer_fixture_ingest_paths_and_idempotence(db: Any) -> N
             [h["property"]["pid"] for h in p["hops"]] == ["glottolog:spoken_in", "glottolog:spoken_in"]
             for p in res["paths"]
         ), res
+        # Brazil -> Portuguese -> Romance <- French -> France (in_group hops)
+        res = kq.paths(c, brazil, "glottolog:roma1334", max_hops=2)
+        assert [h["property"]["pid"] for h in res["paths"][0]["hops"]] == ["glottolog:spoken_in", "glottolog:in_group"]
         res = kq.paths(c, brazil, "Q5146", max_hops=2)
         assert res["paths"] and res["paths"][0]["hops"][1]["property"]["pid"] == "glottolog:wikidata_item"
         # typology is literal: no path through a shared word order

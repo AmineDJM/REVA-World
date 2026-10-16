@@ -55,7 +55,7 @@ DOM_EXCEPT_MAYOTTE = ("D971", "D972", "D973", "D974")
 IPC_NATURES = {"INDICE": ("CPI", "index (2025 = 100)"), "VARIATIONS_A": ("CPI_ANNUAL_CHANGE", "% change")}
 
 
-def items(*, fixture: bool = False) -> list[GapItem]:  # noqa: ARG001 - fixtures are full captures
+def items(*, fixture: bool = False) -> list[GapItem]:
     mt = ("application/xml", "application/vnd.sdmx.structurespecificdata+xml", "text/xml")
     return [
         GapItem("data:IPC-2025", IPC_URL, ("ipc_dom",), mt, max_bytes=10_000_000),
@@ -106,7 +106,9 @@ def parse_ipc(f: Fetched) -> list[dict[str, Any]]:
             continue
         title = attrs.get("TITLE_FR", "")
         if DEPARTMENTS[area].lower() not in title.lower():
-            raise SourceResponseError("INSEE IPC: series title does not name its department", area=area, retryable=False)
+            raise SourceResponseError(
+                "INSEE IPC: series title does not name its department", area=area, retryable=False
+            )
         code, unit = IPC_NATURES[nature]
         for o in obs:
             value = _obs_value(o)
@@ -137,7 +139,9 @@ def parse_ipc(f: Fetched) -> list[dict[str, Any]]:
                     "unit": unit,
                     "flags": canon(flags),
                     "raw_sha256": f.sha256,
-                    "selector": canon({"dataflow": "IPC-2025", "idbank": attrs.get("IDBANK", ""), "time": o.get("TIME_PERIOD")}),
+                    "selector": canon(
+                        {"dataflow": "IPC-2025", "idbank": attrs.get("IDBANK", ""), "time": o.get("TIME_PERIOD")}
+                    ),
                 }
             )
     common.dedupe_check(rows, "INSEE IPC")

@@ -192,7 +192,9 @@ def parse(dataset: str, f: Fetched) -> tuple[list[dict[str, Any]], dict[str, int
         if data_year:
             flags["data_year"] = data_year
         if dataset == "pocket":
-            flags["provider_note"] = "PDH.Stat pocket summary: latest known value per year; only cells whose DATA_YEAR is the cell year are kept"
+            flags["provider_note"] = (
+                "PDH.Stat pocket summary: latest known value per year; only cells whose DATA_YEAR is the cell year are kept"
+            )
         start, end = common.year_period(int(tp))
         rows.append(
             {

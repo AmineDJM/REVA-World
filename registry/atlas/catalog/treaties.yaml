@@ -1,0 +1,3891 @@
+# Atlas catalog of agent A-TREATIES: treaty participation per State (UNTC status pages, OHCHR dashboard).
+# Generated from the connector treaty list (atlas_treaties.TREATIES / atlas_ohchr.ACRONYM_MTDSG). Not an open licence.
+domain: treaties
+labels:
+  en: International treaty participation
+  fr: Participation aux traités internationaux
+maintainer: A-TREATIES
+concepts:
+- id: treaties.genocide.status
+  labels:
+    en: 'Genocide Convention (1948): participation status (UNTC)'
+    fr: 'Convention pour la prévention et la répression du crime de génocide (1948) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-1 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-1|status
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: &id001
+  - treaty
+  - IV-1
+- id: treaties.genocide.consent
+  labels:
+    en: 'Genocide Convention (1948): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention pour la prévention et la répression du crime de génocide (1948) : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-1 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-1|action=consent
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: *id001
+- id: treaties.genocide.signature
+  labels:
+    en: 'Genocide Convention (1948): signature (date, UNTC)'
+    fr: 'Convention pour la prévention et la répression du crime de génocide (1948) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-1 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-1|action=signature
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: *id001
+- id: treaties.icerd.status
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: participation status (UNTC)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-2 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-2|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id002
+  - treaty
+  - IV-2
+- id: treaties.icerd.consent
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: consent to be bound (date and
+      instrument, UNTC)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : consentement à être
+      lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-2 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-2|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id002
+- id: treaties.icerd.signature
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: signature (date, UNTC)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-2 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-2|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id002
+- id: treaties.icerd.ohchr_status
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: ratification status (OHCHR dashboard)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : statut de ratification
+      (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICERD|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id003
+  - treaty
+  - IV-2
+  - ICERD
+- id: treaties.icerd.individual_complaints
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: individual complaints procedure
+      accepted (OHCHR)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : procédure de plaintes
+      individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICERD|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id003
+- id: treaties.icerd.reservations
+  labels:
+    en: 'International Convention on the Elimination of All Forms of Racial Discrimination: reservations text (OHCHR)'
+    fr: 'Convention internationale sur l''élimination de toutes les formes de discrimination raciale : texte des réserves
+      (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICERD|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id003
+- id: treaties.icescr.status
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: participation status (UNTC)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-3 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id004
+  - treaty
+  - IV-3
+- id: treaties.icescr.consent
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: consent to be bound (date and instrument, UNTC)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-3 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id004
+- id: treaties.icescr.signature
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: signature (date, UNTC)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-3 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id004
+- id: treaties.icescr.ohchr_status
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: ratification status (OHCHR dashboard)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : statut de ratification (tableau de bord
+      HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICESCR|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id005
+  - treaty
+  - IV-3
+  - ICESCR
+- id: treaties.icescr.individual_complaints
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: individual complaints procedure accepted (OHCHR)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : procédure de plaintes individuelles acceptée
+      (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICESCR|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id005
+- id: treaties.icescr.reservations
+  labels:
+    en: 'International Covenant on Economic, Social and Cultural Rights: reservations text (OHCHR)'
+    fr: 'Pacte international relatif aux droits économiques, sociaux et culturels : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICESCR|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id005
+- id: treaties.icescr_op.status
+  labels:
+    en: 'Optional Protocol to the ICESCR: participation status (UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-3-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3-a|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id006
+  - treaty
+  - IV-3-a
+- id: treaties.icescr_op.consent
+  labels:
+    en: 'Optional Protocol to the ICESCR: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-3-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3-a|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id006
+- id: treaties.icescr_op.signature
+  labels:
+    en: 'Optional Protocol to the ICESCR: signature (date, UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-3-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-3-a|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id006
+- id: treaties.icescr_op.ohchr_status
+  labels:
+    en: 'Optional Protocol to the ICESCR: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CESCR-OP|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id007
+  - treaty
+  - IV-3-a
+  - CESCR-OP
+- id: treaties.icescr_op.individual_complaints
+  labels:
+    en: 'Optional Protocol to the ICESCR: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CESCR-OP|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id007
+- id: treaties.icescr_op.reservations
+  labels:
+    en: 'Optional Protocol to the ICESCR: reservations text (OHCHR)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits économiques, sociaux et culturels :
+      texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CESCR-OP|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id007
+- id: treaties.iccpr.status
+  labels:
+    en: 'International Covenant on Civil and Political Rights: participation status (UNTC)'
+    fr: 'Pacte international relatif aux droits civils et politiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-4 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-4|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id008
+  - treaty
+  - IV-4
+- id: treaties.iccpr.consent
+  labels:
+    en: 'International Covenant on Civil and Political Rights: consent to be bound (date and instrument, UNTC)'
+    fr: 'Pacte international relatif aux droits civils et politiques : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-4 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-4|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id008
+- id: treaties.iccpr.signature
+  labels:
+    en: 'International Covenant on Civil and Political Rights: signature (date, UNTC)'
+    fr: 'Pacte international relatif aux droits civils et politiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-4 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-4|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id008
+- id: treaties.iccpr.ohchr_status
+  labels:
+    en: 'International Covenant on Civil and Political Rights: ratification status (OHCHR dashboard)'
+    fr: 'Pacte international relatif aux droits civils et politiques : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id009
+  - treaty
+  - IV-4
+  - ICCPR
+- id: treaties.iccpr.individual_complaints
+  labels:
+    en: 'International Covenant on Civil and Political Rights: individual complaints procedure accepted (OHCHR)'
+    fr: 'Pacte international relatif aux droits civils et politiques : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id009
+- id: treaties.iccpr.reservations
+  labels:
+    en: 'International Covenant on Civil and Political Rights: reservations text (OHCHR)'
+    fr: 'Pacte international relatif aux droits civils et politiques : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id009
+- id: treaties.iccpr_op1.status
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): participation status (UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-5 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-5|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id010
+  - treaty
+  - IV-5
+- id: treaties.iccpr_op1.consent
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : consentement
+      à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-5 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-5|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id010
+- id: treaties.iccpr_op1.signature
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): signature (date, UNTC)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : signature (date,
+      UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-5 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-5|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id010
+- id: treaties.iccpr_op1.ohchr_status
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : statut de ratification
+      (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP1|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id011
+  - treaty
+  - IV-5
+  - ICCPR-OP1
+- id: treaties.iccpr_op1.individual_complaints
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : procédure de
+      plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP1|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id011
+- id: treaties.iccpr_op1.reservations
+  labels:
+    en: 'Optional Protocol to the ICCPR (individual communications): reservations text (OHCHR)'
+    fr: 'Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques : texte des réserves
+      (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP1|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id011
+- id: treaties.iccpr_op2.status
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): participation status (UNTC)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-12 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-12|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id012
+  - treaty
+  - IV-12
+- id: treaties.iccpr_op2.consent
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): consent to be bound (date and instrument,
+      UNTC)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-12 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-12|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id012
+- id: treaties.iccpr_op2.signature
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): signature (date, UNTC)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-12 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-12|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id012
+- id: treaties.iccpr_op2.ohchr_status
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): ratification status (OHCHR dashboard)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP2|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id013
+  - treaty
+  - IV-12
+  - ICCPR-OP2
+- id: treaties.iccpr_op2.individual_complaints
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): individual complaints procedure accepted
+      (OHCHR)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP2|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id013
+- id: treaties.iccpr_op2.reservations
+  labels:
+    en: 'Second Optional Protocol to the ICCPR (abolition of the death penalty): reservations text (OHCHR)'
+    fr: 'Deuxième Protocole facultatif se rapportant au Pacte international relatif aux droits civils et politiques, visant
+      à abolir la peine de mort : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICCPR-OP2|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id013
+- id: treaties.apartheid.status
+  labels:
+    en: 'International Convention on the Suppression and Punishment of the Crime of Apartheid: participation status (UNTC)'
+    fr: 'Convention internationale sur l''élimination et la répression du crime d''apartheid : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-7 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-7|status
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: &id014
+  - treaty
+  - IV-7
+- id: treaties.apartheid.consent
+  labels:
+    en: 'International Convention on the Suppression and Punishment of the Crime of Apartheid: consent to be bound (date and
+      instrument, UNTC)'
+    fr: 'Convention internationale sur l''élimination et la répression du crime d''apartheid : consentement à être lié (date
+      et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-7 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-7|action=consent
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: *id014
+- id: treaties.apartheid.signature
+  labels:
+    en: 'International Convention on the Suppression and Punishment of the Crime of Apartheid: signature (date, UNTC)'
+    fr: 'Convention internationale sur l''élimination et la répression du crime d''apartheid : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-7 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-7|action=signature
+  domain: treaties
+  subdomain: human_rights
+  theme: law
+  provider_declared: true
+  tags: *id014
+- id: treaties.cedaw.status
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: participation status (UNTC)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-8 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id015
+  - treaty
+  - IV-8
+- id: treaties.cedaw.consent
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: consent to be bound (date and instrument,
+      UNTC)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : consentement à être
+      lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-8 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id015
+- id: treaties.cedaw.signature
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: signature (date, UNTC)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-8 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id015
+- id: treaties.cedaw.ohchr_status
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: ratification status (OHCHR dashboard)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : statut de ratification
+      (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CEDAW|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id016
+  - treaty
+  - IV-8
+  - CEDAW
+- id: treaties.cedaw.individual_complaints
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: individual complaints procedure accepted
+      (OHCHR)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : procédure de plaintes
+      individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CEDAW|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id016
+- id: treaties.cedaw.reservations
+  labels:
+    en: 'Convention on the Elimination of All Forms of Discrimination against Women: reservations text (OHCHR)'
+    fr: 'Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CEDAW|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id016
+- id: treaties.cedaw_op.status
+  labels:
+    en: 'Optional Protocol to CEDAW: participation status (UNTC)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-8-b on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8-b|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id017
+  - treaty
+  - IV-8-b
+- id: treaties.cedaw_op.consent
+  labels:
+    en: 'Optional Protocol to CEDAW: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-8-b as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8-b|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id017
+- id: treaties.cedaw_op.signature
+  labels:
+    en: 'Optional Protocol to CEDAW: signature (date, UNTC)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-8-b as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-8-b|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id017
+- id: treaties.cedaw_op.ohchr_status
+  labels:
+    en: 'Optional Protocol to CEDAW: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CEDAW|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id018
+  - treaty
+  - IV-8-b
+  - OP-CEDAW
+- id: treaties.cedaw_op.individual_complaints
+  labels:
+    en: 'Optional Protocol to CEDAW: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CEDAW|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id018
+- id: treaties.cedaw_op.reservations
+  labels:
+    en: 'Optional Protocol to CEDAW: reservations text (OHCHR)'
+    fr: 'Protocole facultatif à la Convention sur l''élimination de toutes les formes de discrimination à l''égard des femmes
+      : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CEDAW|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id018
+- id: treaties.cat.status
+  labels:
+    en: 'Convention against Torture: participation status (UNTC)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-9 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id019
+  - treaty
+  - IV-9
+- id: treaties.cat.consent
+  labels:
+    en: 'Convention against Torture: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : consentement à être
+      lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-9 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id019
+- id: treaties.cat.signature
+  labels:
+    en: 'Convention against Torture: signature (date, UNTC)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-9 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id019
+- id: treaties.cat.ohchr_status
+  labels:
+    en: 'Convention against Torture: ratification status (OHCHR dashboard)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : statut de ratification
+      (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CAT|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id020
+  - treaty
+  - IV-9
+  - CAT
+- id: treaties.cat.individual_complaints
+  labels:
+    en: 'Convention against Torture: individual complaints procedure accepted (OHCHR)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : procédure de plaintes
+      individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CAT|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id020
+- id: treaties.cat.reservations
+  labels:
+    en: 'Convention against Torture: reservations text (OHCHR)'
+    fr: 'Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants : texte des réserves
+      (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CAT|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id020
+- id: treaties.cat_op.status
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: participation status (UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-9-b on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9-b|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id021
+  - treaty
+  - IV-9-b
+- id: treaties.cat_op.consent
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-9-b as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9-b|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id021
+- id: treaties.cat_op.signature
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: signature (date, UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-9-b as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-9-b|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id021
+- id: treaties.cat_op.ohchr_status
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CAT|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id022
+  - treaty
+  - IV-9-b
+  - OP-CAT
+- id: treaties.cat_op.individual_complaints
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : procédure de plaintes individuelles acceptée
+      (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CAT|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id022
+- id: treaties.cat_op.reservations
+  labels:
+    en: 'Optional Protocol to the Convention against Torture: reservations text (OHCHR)'
+    fr: 'Protocole facultatif se rapportant à la Convention contre la torture : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CAT|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id022
+- id: treaties.crc.status
+  labels:
+    en: 'Convention on the Rights of the Child: participation status (UNTC)'
+    fr: 'Convention relative aux droits de l''enfant : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-11 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id023
+  - treaty
+  - IV-11
+- id: treaties.crc.consent
+  labels:
+    en: 'Convention on the Rights of the Child: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention relative aux droits de l''enfant : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-11 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id023
+- id: treaties.crc.signature
+  labels:
+    en: 'Convention on the Rights of the Child: signature (date, UNTC)'
+    fr: 'Convention relative aux droits de l''enfant : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-11 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id023
+- id: treaties.crc.ohchr_status
+  labels:
+    en: 'Convention on the Rights of the Child: ratification status (OHCHR dashboard)'
+    fr: 'Convention relative aux droits de l''enfant : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id024
+  - treaty
+  - IV-11
+  - CRC
+- id: treaties.crc.individual_complaints
+  labels:
+    en: 'Convention on the Rights of the Child: individual complaints procedure accepted (OHCHR)'
+    fr: 'Convention relative aux droits de l''enfant : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id024
+- id: treaties.crc.reservations
+  labels:
+    en: 'Convention on the Rights of the Child: reservations text (OHCHR)'
+    fr: 'Convention relative aux droits de l''enfant : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id024
+- id: treaties.crc_opac.status
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: participation status (UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-11-b on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-b|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id025
+  - treaty
+  - IV-11-b
+- id: treaties.crc_opac.consent
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-11-b as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-b|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id025
+- id: treaties.crc_opac.signature
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: signature (date, UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-11-b as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-b|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id025
+- id: treaties.crc_opac.ohchr_status
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-AC|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id026
+  - treaty
+  - IV-11-b
+  - OP-CRC-AC
+- id: treaties.crc_opac.individual_complaints
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-AC|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id026
+- id: treaties.crc_opac.reservations
+  labels:
+    en: 'Optional Protocol to the CRC on children in armed conflict: reservations text (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant l''implication d''enfants dans
+      les conflits armés : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-AC|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id026
+- id: treaties.crc_opsc.status
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: participation status
+      (UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-11-c on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-c|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id027
+  - treaty
+  - IV-11-c
+- id: treaties.crc_opsc.consent
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: consent to be bound
+      (date and instrument, UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-11-c as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-c|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id027
+- id: treaties.crc_opsc.signature
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: signature (date,
+      UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-11-c as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-c|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id027
+- id: treaties.crc_opsc.ohchr_status
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: ratification status
+      (OHCHR dashboard)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-SC|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id028
+  - treaty
+  - IV-11-c
+  - OP-CRC-SC
+- id: treaties.crc_opsc.individual_complaints
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: individual complaints
+      procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-SC|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id028
+- id: treaties.crc_opsc.reservations
+  labels:
+    en: 'Optional Protocol to the CRC on the sale of children, child prostitution and child pornography: reservations text
+      (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant, concernant la vente d''enfants, la prostitution
+      des enfants et la pornographie mettant en scène des enfants : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.OP-CRC-SC|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id028
+- id: treaties.crc_opic.status
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: participation status (UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-11-d on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-d|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id029
+  - treaty
+  - IV-11-d
+- id: treaties.crc_opic.consent
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-11-d as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-d|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id029
+- id: treaties.crc_opic.signature
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: signature (date, UNTC)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-11-d as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-11-d|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id029
+- id: treaties.crc_opic.ohchr_status
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC-OP-IC|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id030
+  - treaty
+  - IV-11-d
+  - CRC-OP-IC
+- id: treaties.crc_opic.individual_complaints
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC-OP-IC|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id030
+- id: treaties.crc_opic.reservations
+  labels:
+    en: 'Optional Protocol to the CRC on a communications procedure: reservations text (OHCHR)'
+    fr: 'Protocole facultatif à la Convention relative aux droits de l''enfant établissant une procédure de présentation de
+      communications : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRC-OP-IC|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id030
+- id: treaties.icrmw.status
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: participation
+      status (UNTC)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-13 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-13|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id031
+  - treaty
+  - IV-13
+- id: treaties.icrmw.consent
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: consent
+      to be bound (date and instrument, UNTC)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-13 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-13|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id031
+- id: treaties.icrmw.signature
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: signature
+      (date, UNTC)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-13 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-13|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id031
+- id: treaties.icrmw.ohchr_status
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: ratification
+      status (OHCHR dashboard)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICRMW|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id032
+  - treaty
+  - IV-13
+  - ICRMW
+- id: treaties.icrmw.individual_complaints
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: individual
+      complaints procedure accepted (OHCHR)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICRMW|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id032
+- id: treaties.icrmw.reservations
+  labels:
+    en: 'International Convention on the Protection of the Rights of All Migrant Workers and Members of Their Families: reservations
+      text (OHCHR)'
+    fr: 'Convention internationale sur la protection des droits de tous les travailleurs migrants et des membres de leur famille
+      : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.ICRMW|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id032
+- id: treaties.crpd.status
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: participation status (UNTC)'
+    fr: 'Convention relative aux droits des personnes handicapées : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-15 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id033
+  - treaty
+  - IV-15
+- id: treaties.crpd.consent
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention relative aux droits des personnes handicapées : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-15 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id033
+- id: treaties.crpd.signature
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: signature (date, UNTC)'
+    fr: 'Convention relative aux droits des personnes handicapées : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-15 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id033
+- id: treaties.crpd.ohchr_status
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: ratification status (OHCHR dashboard)'
+    fr: 'Convention relative aux droits des personnes handicapées : statut de ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id034
+  - treaty
+  - IV-15
+  - CRPD
+- id: treaties.crpd.individual_complaints
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: individual complaints procedure accepted (OHCHR)'
+    fr: 'Convention relative aux droits des personnes handicapées : procédure de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id034
+- id: treaties.crpd.reservations
+  labels:
+    en: 'Convention on the Rights of Persons with Disabilities: reservations text (OHCHR)'
+    fr: 'Convention relative aux droits des personnes handicapées : texte des réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id034
+- id: treaties.crpd_op.status
+  labels:
+    en: 'Optional Protocol to the CRPD: participation status (UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-15-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15-a|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id035
+  - treaty
+  - IV-15-a
+- id: treaties.crpd_op.consent
+  labels:
+    en: 'Optional Protocol to the CRPD: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : consentement à
+      être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-15-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15-a|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id035
+- id: treaties.crpd_op.signature
+  labels:
+    en: 'Optional Protocol to the CRPD: signature (date, UNTC)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : signature (date,
+      UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-15-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-15-a|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id035
+- id: treaties.crpd_op.ohchr_status
+  labels:
+    en: 'Optional Protocol to the CRPD: ratification status (OHCHR dashboard)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : statut de ratification
+      (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD-OP|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id036
+  - treaty
+  - IV-15-a
+  - CRPD-OP
+- id: treaties.crpd_op.individual_complaints
+  labels:
+    en: 'Optional Protocol to the CRPD: individual complaints procedure accepted (OHCHR)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : procédure de plaintes
+      individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD-OP|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id036
+- id: treaties.crpd_op.reservations
+  labels:
+    en: 'Optional Protocol to the CRPD: reservations text (OHCHR)'
+    fr: 'Protocole facultatif se rapportant à la Convention relative aux droits des personnes handicapées : texte des réserves
+      (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CRPD-OP|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id036
+- id: treaties.cped.status
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: participation status (UNTC)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : statut de
+      participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IV-16 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-16|status
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: &id037
+  - treaty
+  - IV-16
+- id: treaties.cped.consent
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: consent to be bound (date
+      and instrument, UNTC)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : consentement
+      à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IV-16 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-16|action=consent
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id037
+- id: treaties.cped.signature
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: signature (date, UNTC)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : signature
+      (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IV-16 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IV-16|action=signature
+  domain: treaties
+  subdomain: human_rights_core
+  theme: law
+  provider_declared: true
+  tags: *id037
+- id: treaties.cped.ohchr_status
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: ratification status (OHCHR
+      dashboard)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : statut de
+      ratification (tableau de bord HCDH)'
+  definition: 'OHCHR indicator ''Status of ratification of a core international human rights treaty'': state_party (consent
+    expressed by ratification, accession or succession and the treaty in force, or about to be), signatory, no_action; as
+    of the instrument''s LastSynced date (row period). Source: OHCHR from UN OLA data.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CPED|field=status
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: &id038
+  - treaty
+  - IV-16
+  - CPED
+- id: treaties.cped.individual_complaints
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: individual complaints procedure
+      accepted (OHCHR)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : procédure
+      de plaintes individuelles acceptée (HCDH)'
+  definition: 'OHCHR dashboard: the State accepts the competence of the treaty body to receive individual communications (value_text
+    ''accepted''; row period = acceptance date when OHCHR reports one, else the LastSynced date, flagged). No row = not reported
+    as accepted.'
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CPED|field=individual_complaints
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id038
+- id: treaties.cped.reservations
+  labels:
+    en: 'International Convention for the Protection of All Persons from Enforced Disappearance: reservations text (OHCHR)'
+    fr: 'Convention internationale pour la protection de toutes les personnes contre les disparitions forcées : texte des
+      réserves (HCDH)'
+  definition: Text of the State's reservations as published on the OHCHR dashboard (HTML stripped, <= 4000 characters, truncation
+    flagged); as of the LastSynced date. Declarations are under |field=declarations.
+  unit: status
+  value_kind: text
+  source_order:
+  - ohchr.hr_ratification.CPED|field=reservations
+  domain: treaties
+  subdomain: human_rights_ohchr
+  theme: law
+  provider_declared: true
+  tags: *id038
+- id: treaties.refugees_1951.status
+  labels:
+    en: 'Convention relating to the Status of Refugees (1951): participation status (UNTC)'
+    fr: 'Convention relative au statut des réfugiés (1951) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG V-2 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-2|status
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: &id039
+  - treaty
+  - V-2
+- id: treaties.refugees_1951.consent
+  labels:
+    en: 'Convention relating to the Status of Refugees (1951): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention relative au statut des réfugiés (1951) : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG V-2 as listed by
+    UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-2|action=consent
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id039
+- id: treaties.refugees_1951.signature
+  labels:
+    en: 'Convention relating to the Status of Refugees (1951): signature (date, UNTC)'
+    fr: 'Convention relative au statut des réfugiés (1951) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG V-2 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-2|action=signature
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id039
+- id: treaties.refugees_1967.status
+  labels:
+    en: 'Protocol relating to the Status of Refugees (1967): participation status (UNTC)'
+    fr: 'Protocole relatif au statut des réfugiés (1967) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG V-5 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-5|status
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: &id040
+  - treaty
+  - V-5
+- id: treaties.refugees_1967.consent
+  labels:
+    en: 'Protocol relating to the Status of Refugees (1967): consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole relatif au statut des réfugiés (1967) : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG V-5 as listed by
+    UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-5|action=consent
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id040
+- id: treaties.refugees_1967.signature
+  labels:
+    en: 'Protocol relating to the Status of Refugees (1967): signature (date, UNTC)'
+    fr: 'Protocole relatif au statut des réfugiés (1967) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG V-5 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-5|action=signature
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id040
+- id: treaties.stateless_1954.status
+  labels:
+    en: 'Convention relating to the Status of Stateless Persons (1954): participation status (UNTC)'
+    fr: 'Convention relative au statut des apatrides (1954) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG V-3 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-3|status
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: &id041
+  - treaty
+  - V-3
+- id: treaties.stateless_1954.consent
+  labels:
+    en: 'Convention relating to the Status of Stateless Persons (1954): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention relative au statut des apatrides (1954) : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG V-3 as listed by
+    UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-3|action=consent
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id041
+- id: treaties.stateless_1954.signature
+  labels:
+    en: 'Convention relating to the Status of Stateless Persons (1954): signature (date, UNTC)'
+    fr: 'Convention relative au statut des apatrides (1954) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG V-3 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-3|action=signature
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id041
+- id: treaties.stateless_1961.status
+  labels:
+    en: 'Convention on the Reduction of Statelessness (1961): participation status (UNTC)'
+    fr: 'Convention sur la réduction des cas d''apatridie (1961) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG V-4 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-4|status
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: &id042
+  - treaty
+  - V-4
+- id: treaties.stateless_1961.consent
+  labels:
+    en: 'Convention on the Reduction of Statelessness (1961): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur la réduction des cas d''apatridie (1961) : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG V-4 as listed by
+    UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-4|action=consent
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id042
+- id: treaties.stateless_1961.signature
+  labels:
+    en: 'Convention on the Reduction of Statelessness (1961): signature (date, UNTC)'
+    fr: 'Convention sur la réduction des cas d''apatridie (1961) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG V-4 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.V-4|action=signature
+  domain: treaties
+  subdomain: refugees
+  theme: law
+  provider_declared: true
+  tags: *id042
+- id: treaties.vcdr.status
+  labels:
+    en: 'Vienna Convention on Diplomatic Relations: participation status (UNTC)'
+    fr: 'Convention de Vienne sur les relations diplomatiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG III-3 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-3|status
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: &id043
+  - treaty
+  - III-3
+- id: treaties.vcdr.consent
+  labels:
+    en: 'Vienna Convention on Diplomatic Relations: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Vienne sur les relations diplomatiques : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG III-3 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-3|action=consent
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: *id043
+- id: treaties.vcdr.signature
+  labels:
+    en: 'Vienna Convention on Diplomatic Relations: signature (date, UNTC)'
+    fr: 'Convention de Vienne sur les relations diplomatiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG III-3 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-3|action=signature
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: *id043
+- id: treaties.vccr.status
+  labels:
+    en: 'Vienna Convention on Consular Relations: participation status (UNTC)'
+    fr: 'Convention de Vienne sur les relations consulaires : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG III-6 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-6|status
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: &id044
+  - treaty
+  - III-6
+- id: treaties.vccr.consent
+  labels:
+    en: 'Vienna Convention on Consular Relations: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Vienne sur les relations consulaires : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG III-6 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-6|action=consent
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: *id044
+- id: treaties.vccr.signature
+  labels:
+    en: 'Vienna Convention on Consular Relations: signature (date, UNTC)'
+    fr: 'Convention de Vienne sur les relations consulaires : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG III-6 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.III-6|action=signature
+  domain: treaties
+  subdomain: diplomacy
+  theme: law
+  provider_declared: true
+  tags: *id044
+- id: treaties.vclt.status
+  labels:
+    en: 'Vienna Convention on the Law of Treaties: participation status (UNTC)'
+    fr: 'Convention de Vienne sur le droit des traités : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXIII-1 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXIII-1|status
+  domain: treaties
+  subdomain: law_of_treaties
+  theme: law
+  provider_declared: true
+  tags: &id045
+  - treaty
+  - XXIII-1
+- id: treaties.vclt.consent
+  labels:
+    en: 'Vienna Convention on the Law of Treaties: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Vienne sur le droit des traités : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXIII-1 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXIII-1|action=consent
+  domain: treaties
+  subdomain: law_of_treaties
+  theme: law
+  provider_declared: true
+  tags: *id045
+- id: treaties.vclt.signature
+  labels:
+    en: 'Vienna Convention on the Law of Treaties: signature (date, UNTC)'
+    fr: 'Convention de Vienne sur le droit des traités : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXIII-1 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXIII-1|action=signature
+  domain: treaties
+  subdomain: law_of_treaties
+  theme: law
+  provider_declared: true
+  tags: *id045
+- id: treaties.unclos.status
+  labels:
+    en: 'United Nations Convention on the Law of the Sea: participation status (UNTC)'
+    fr: 'Convention des Nations Unies sur le droit de la mer : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXI-6 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-6|status
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: &id046
+  - treaty
+  - XXI-6
+- id: treaties.unclos.consent
+  labels:
+    en: 'United Nations Convention on the Law of the Sea: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention des Nations Unies sur le droit de la mer : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXI-6 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-6|action=consent
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: *id046
+- id: treaties.unclos.signature
+  labels:
+    en: 'United Nations Convention on the Law of the Sea: signature (date, UNTC)'
+    fr: 'Convention des Nations Unies sur le droit de la mer : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXI-6 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-6|action=signature
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: *id046
+- id: treaties.bbnj.status
+  labels:
+    en: 'Agreement on Marine Biological Diversity of Areas beyond National Jurisdiction (BBNJ): participation status (UNTC)'
+    fr: 'Accord sur la biodiversité marine des zones ne relevant pas de la juridiction nationale (BBNJ) : statut de participation
+      (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXI-10 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-10|status
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: &id047
+  - treaty
+  - XXI-10
+- id: treaties.bbnj.consent
+  labels:
+    en: 'Agreement on Marine Biological Diversity of Areas beyond National Jurisdiction (BBNJ): consent to be bound (date
+      and instrument, UNTC)'
+    fr: 'Accord sur la biodiversité marine des zones ne relevant pas de la juridiction nationale (BBNJ) : consentement à être
+      lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXI-10 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-10|action=consent
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: *id047
+- id: treaties.bbnj.signature
+  labels:
+    en: 'Agreement on Marine Biological Diversity of Areas beyond National Jurisdiction (BBNJ): signature (date, UNTC)'
+    fr: 'Accord sur la biodiversité marine des zones ne relevant pas de la juridiction nationale (BBNJ) : signature (date,
+      UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXI-10 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXI-10|action=signature
+  domain: treaties
+  subdomain: law_of_the_sea
+  theme: law
+  provider_declared: true
+  tags: *id047
+- id: treaties.rome_statute.status
+  labels:
+    en: 'Rome Statute of the International Criminal Court: participation status (UNTC)'
+    fr: 'Statut de Rome de la Cour pénale internationale : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XVIII-10 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-10|status
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: &id048
+  - treaty
+  - XVIII-10
+- id: treaties.rome_statute.consent
+  labels:
+    en: 'Rome Statute of the International Criminal Court: consent to be bound (date and instrument, UNTC)'
+    fr: 'Statut de Rome de la Cour pénale internationale : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XVIII-10 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-10|action=consent
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id048
+- id: treaties.rome_statute.signature
+  labels:
+    en: 'Rome Statute of the International Criminal Court: signature (date, UNTC)'
+    fr: 'Statut de Rome de la Cour pénale internationale : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XVIII-10 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-10|action=signature
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id048
+- id: treaties.terrorism_financing.status
+  labels:
+    en: 'International Convention for the Suppression of the Financing of Terrorism: participation status (UNTC)'
+    fr: 'Convention internationale pour la répression du financement du terrorisme : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XVIII-11 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-11|status
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: &id049
+  - treaty
+  - XVIII-11
+- id: treaties.terrorism_financing.consent
+  labels:
+    en: 'International Convention for the Suppression of the Financing of Terrorism: consent to be bound (date and instrument,
+      UNTC)'
+    fr: 'Convention internationale pour la répression du financement du terrorisme : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XVIII-11 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-11|action=consent
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id049
+- id: treaties.terrorism_financing.signature
+  labels:
+    en: 'International Convention for the Suppression of the Financing of Terrorism: signature (date, UNTC)'
+    fr: 'Convention internationale pour la répression du financement du terrorisme : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XVIII-11 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-11|action=signature
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id049
+- id: treaties.untoc.status
+  labels:
+    en: 'UN Convention against Transnational Organized Crime: participation status (UNTC)'
+    fr: 'Convention des Nations Unies contre la criminalité transnationale organisée : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XVIII-12 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12|status
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: &id050
+  - treaty
+  - XVIII-12
+- id: treaties.untoc.consent
+  labels:
+    en: 'UN Convention against Transnational Organized Crime: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention des Nations Unies contre la criminalité transnationale organisée : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XVIII-12 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12|action=consent
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id050
+- id: treaties.untoc.signature
+  labels:
+    en: 'UN Convention against Transnational Organized Crime: signature (date, UNTC)'
+    fr: 'Convention des Nations Unies contre la criminalité transnationale organisée : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XVIII-12 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12|action=signature
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id050
+- id: treaties.trafficking_protocol.status
+  labels:
+    en: 'Protocol to Prevent, Suppress and Punish Trafficking in Persons: participation status (UNTC)'
+    fr: 'Protocole visant à prévenir, réprimer et punir la traite des personnes, en particulier des femmes et des enfants
+      : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XVIII-12-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12-a|status
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: &id051
+  - treaty
+  - XVIII-12-a
+- id: treaties.trafficking_protocol.consent
+  labels:
+    en: 'Protocol to Prevent, Suppress and Punish Trafficking in Persons: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole visant à prévenir, réprimer et punir la traite des personnes, en particulier des femmes et des enfants
+      : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XVIII-12-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12-a|action=consent
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id051
+- id: treaties.trafficking_protocol.signature
+  labels:
+    en: 'Protocol to Prevent, Suppress and Punish Trafficking in Persons: signature (date, UNTC)'
+    fr: 'Protocole visant à prévenir, réprimer et punir la traite des personnes, en particulier des femmes et des enfants
+      : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XVIII-12-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-12-a|action=signature
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id051
+- id: treaties.uncac.status
+  labels:
+    en: 'UN Convention against Corruption: participation status (UNTC)'
+    fr: 'Convention des Nations Unies contre la corruption : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XVIII-14 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-14|status
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: &id052
+  - treaty
+  - XVIII-14
+- id: treaties.uncac.consent
+  labels:
+    en: 'UN Convention against Corruption: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention des Nations Unies contre la corruption : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XVIII-14 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-14|action=consent
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id052
+- id: treaties.uncac.signature
+  labels:
+    en: 'UN Convention against Corruption: signature (date, UNTC)'
+    fr: 'Convention des Nations Unies contre la corruption : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XVIII-14 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XVIII-14|action=signature
+  domain: treaties
+  subdomain: penal
+  theme: law
+  provider_declared: true
+  tags: *id052
+- id: treaties.drug_trafficking_1988.status
+  labels:
+    en: 'UN Convention against Illicit Traffic in Narcotic Drugs and Psychotropic Substances (1988): participation status
+      (UNTC)'
+    fr: 'Convention des Nations Unies contre le trafic illicite de stupéfiants et de substances psychotropes (1988) : statut
+      de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG VI-19 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.VI-19|status
+  domain: treaties
+  subdomain: drugs
+  theme: law
+  provider_declared: true
+  tags: &id053
+  - treaty
+  - VI-19
+- id: treaties.drug_trafficking_1988.consent
+  labels:
+    en: 'UN Convention against Illicit Traffic in Narcotic Drugs and Psychotropic Substances (1988): consent to be bound (date
+      and instrument, UNTC)'
+    fr: 'Convention des Nations Unies contre le trafic illicite de stupéfiants et de substances psychotropes (1988) : consentement
+      à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG VI-19 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.VI-19|action=consent
+  domain: treaties
+  subdomain: drugs
+  theme: law
+  provider_declared: true
+  tags: *id053
+- id: treaties.drug_trafficking_1988.signature
+  labels:
+    en: 'UN Convention against Illicit Traffic in Narcotic Drugs and Psychotropic Substances (1988): signature (date, UNTC)'
+    fr: 'Convention des Nations Unies contre le trafic illicite de stupéfiants et de substances psychotropes (1988) : signature
+      (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG VI-19 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.VI-19|action=signature
+  domain: treaties
+  subdomain: drugs
+  theme: law
+  provider_declared: true
+  tags: *id053
+- id: treaties.who_fctc.status
+  labels:
+    en: 'WHO Framework Convention on Tobacco Control: participation status (UNTC)'
+    fr: 'Convention-cadre de l''OMS pour la lutte antitabac : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG IX-4 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IX-4|status
+  domain: treaties
+  subdomain: health
+  theme: law
+  provider_declared: true
+  tags: &id054
+  - treaty
+  - IX-4
+- id: treaties.who_fctc.consent
+  labels:
+    en: 'WHO Framework Convention on Tobacco Control: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention-cadre de l''OMS pour la lutte antitabac : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG IX-4 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IX-4|action=consent
+  domain: treaties
+  subdomain: health
+  theme: law
+  provider_declared: true
+  tags: *id054
+- id: treaties.who_fctc.signature
+  labels:
+    en: 'WHO Framework Convention on Tobacco Control: signature (date, UNTC)'
+    fr: 'Convention-cadre de l''OMS pour la lutte antitabac : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG IX-4 as listed by UNTC (value_text signature or
+    succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.IX-4|action=signature
+  domain: treaties
+  subdomain: health
+  theme: law
+  provider_declared: true
+  tags: *id054
+- id: treaties.ccw.status
+  labels:
+    en: 'Convention on Certain Conventional Weapons: participation status (UNTC)'
+    fr: 'Convention sur certaines armes classiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-2 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-2|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id055
+  - treaty
+  - XXVI-2
+- id: treaties.ccw.consent
+  labels:
+    en: 'Convention on Certain Conventional Weapons: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur certaines armes classiques : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-2 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-2|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id055
+- id: treaties.ccw.signature
+  labels:
+    en: 'Convention on Certain Conventional Weapons: signature (date, UNTC)'
+    fr: 'Convention sur certaines armes classiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-2 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-2|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id055
+- id: treaties.cwc.status
+  labels:
+    en: 'Chemical Weapons Convention: participation status (UNTC)'
+    fr: 'Convention sur l''interdiction des armes chimiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-3 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-3|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id056
+  - treaty
+  - XXVI-3
+- id: treaties.cwc.consent
+  labels:
+    en: 'Chemical Weapons Convention: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur l''interdiction des armes chimiques : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-3 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-3|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id056
+- id: treaties.cwc.signature
+  labels:
+    en: 'Chemical Weapons Convention: signature (date, UNTC)'
+    fr: 'Convention sur l''interdiction des armes chimiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-3 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-3|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id056
+- id: treaties.ctbt.status
+  labels:
+    en: 'Comprehensive Nuclear-Test-Ban Treaty: participation status (UNTC)'
+    fr: 'Traité d''interdiction complète des essais nucléaires : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-4 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-4|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id057
+  - treaty
+  - XXVI-4
+- id: treaties.ctbt.consent
+  labels:
+    en: 'Comprehensive Nuclear-Test-Ban Treaty: consent to be bound (date and instrument, UNTC)'
+    fr: 'Traité d''interdiction complète des essais nucléaires : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-4 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-4|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id057
+- id: treaties.ctbt.signature
+  labels:
+    en: 'Comprehensive Nuclear-Test-Ban Treaty: signature (date, UNTC)'
+    fr: 'Traité d''interdiction complète des essais nucléaires : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-4 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-4|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id057
+- id: treaties.mine_ban.status
+  labels:
+    en: 'Anti-Personnel Mine Ban Convention (Ottawa): participation status (UNTC)'
+    fr: 'Convention sur l''interdiction des mines antipersonnel (Ottawa) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-5 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-5|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id058
+  - treaty
+  - XXVI-5
+- id: treaties.mine_ban.consent
+  labels:
+    en: 'Anti-Personnel Mine Ban Convention (Ottawa): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur l''interdiction des mines antipersonnel (Ottawa) : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-5 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-5|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id058
+- id: treaties.mine_ban.signature
+  labels:
+    en: 'Anti-Personnel Mine Ban Convention (Ottawa): signature (date, UNTC)'
+    fr: 'Convention sur l''interdiction des mines antipersonnel (Ottawa) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-5 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-5|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id058
+- id: treaties.cluster_munitions.status
+  labels:
+    en: 'Convention on Cluster Munitions: participation status (UNTC)'
+    fr: 'Convention sur les armes à sous-munitions : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-6 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-6|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id059
+  - treaty
+  - XXVI-6
+- id: treaties.cluster_munitions.consent
+  labels:
+    en: 'Convention on Cluster Munitions: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur les armes à sous-munitions : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-6 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-6|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id059
+- id: treaties.cluster_munitions.signature
+  labels:
+    en: 'Convention on Cluster Munitions: signature (date, UNTC)'
+    fr: 'Convention sur les armes à sous-munitions : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-6 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-6|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id059
+- id: treaties.att.status
+  labels:
+    en: 'Arms Trade Treaty: participation status (UNTC)'
+    fr: 'Traité sur le commerce des armes : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-8 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-8|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id060
+  - treaty
+  - XXVI-8
+- id: treaties.att.consent
+  labels:
+    en: 'Arms Trade Treaty: consent to be bound (date and instrument, UNTC)'
+    fr: 'Traité sur le commerce des armes : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-8 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-8|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id060
+- id: treaties.att.signature
+  labels:
+    en: 'Arms Trade Treaty: signature (date, UNTC)'
+    fr: 'Traité sur le commerce des armes : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-8 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-8|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id060
+- id: treaties.tpnw.status
+  labels:
+    en: 'Treaty on the Prohibition of Nuclear Weapons: participation status (UNTC)'
+    fr: 'Traité sur l''interdiction des armes nucléaires : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVI-9 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-9|status
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: &id061
+  - treaty
+  - XXVI-9
+- id: treaties.tpnw.consent
+  labels:
+    en: 'Treaty on the Prohibition of Nuclear Weapons: consent to be bound (date and instrument, UNTC)'
+    fr: 'Traité sur l''interdiction des armes nucléaires : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVI-9 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-9|action=consent
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id061
+- id: treaties.tpnw.signature
+  labels:
+    en: 'Treaty on the Prohibition of Nuclear Weapons: signature (date, UNTC)'
+    fr: 'Traité sur l''interdiction des armes nucléaires : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVI-9 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVI-9|action=signature
+  domain: treaties
+  subdomain: disarmament
+  theme: law
+  provider_declared: true
+  tags: *id061
+- id: treaties.vienna_ozone.status
+  labels:
+    en: 'Vienna Convention for the Protection of the Ozone Layer: participation status (UNTC)'
+    fr: 'Convention de Vienne pour la protection de la couche d''ozone : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-2 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id062
+  - treaty
+  - XXVII-2
+- id: treaties.vienna_ozone.consent
+  labels:
+    en: 'Vienna Convention for the Protection of the Ozone Layer: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Vienne pour la protection de la couche d''ozone : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-2 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id062
+- id: treaties.vienna_ozone.signature
+  labels:
+    en: 'Vienna Convention for the Protection of the Ozone Layer: signature (date, UNTC)'
+    fr: 'Convention de Vienne pour la protection de la couche d''ozone : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-2 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id062
+- id: treaties.montreal_protocol.status
+  labels:
+    en: 'Montreal Protocol on Substances that Deplete the Ozone Layer: participation status (UNTC)'
+    fr: 'Protocole de Montréal relatif à des substances qui appauvrissent la couche d''ozone : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-2-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2-a|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id063
+  - treaty
+  - XXVII-2-a
+- id: treaties.montreal_protocol.consent
+  labels:
+    en: 'Montreal Protocol on Substances that Deplete the Ozone Layer: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole de Montréal relatif à des substances qui appauvrissent la couche d''ozone : consentement à être lié (date
+      et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-2-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2-a|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id063
+- id: treaties.montreal_protocol.signature
+  labels:
+    en: 'Montreal Protocol on Substances that Deplete the Ozone Layer: signature (date, UNTC)'
+    fr: 'Protocole de Montréal relatif à des substances qui appauvrissent la couche d''ozone : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-2-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-2-a|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id063
+- id: treaties.basel.status
+  labels:
+    en: 'Basel Convention on Hazardous Wastes: participation status (UNTC)'
+    fr: 'Convention de Bâle sur les déchets dangereux : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-3 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-3|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id064
+  - treaty
+  - XXVII-3
+- id: treaties.basel.consent
+  labels:
+    en: 'Basel Convention on Hazardous Wastes: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Bâle sur les déchets dangereux : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-3 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-3|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id064
+- id: treaties.basel.signature
+  labels:
+    en: 'Basel Convention on Hazardous Wastes: signature (date, UNTC)'
+    fr: 'Convention de Bâle sur les déchets dangereux : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-3 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-3|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id064
+- id: treaties.unfccc.status
+  labels:
+    en: 'UN Framework Convention on Climate Change: participation status (UNTC)'
+    fr: 'Convention-cadre des Nations Unies sur les changements climatiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-7 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id065
+  - treaty
+  - XXVII-7
+- id: treaties.unfccc.consent
+  labels:
+    en: 'UN Framework Convention on Climate Change: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention-cadre des Nations Unies sur les changements climatiques : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-7 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id065
+- id: treaties.unfccc.signature
+  labels:
+    en: 'UN Framework Convention on Climate Change: signature (date, UNTC)'
+    fr: 'Convention-cadre des Nations Unies sur les changements climatiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-7 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id065
+- id: treaties.kyoto_protocol.status
+  labels:
+    en: 'Kyoto Protocol: participation status (UNTC)'
+    fr: 'Protocole de Kyoto : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-7-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-a|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id066
+  - treaty
+  - XXVII-7-a
+- id: treaties.kyoto_protocol.consent
+  labels:
+    en: 'Kyoto Protocol: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole de Kyoto : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-7-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-a|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id066
+- id: treaties.kyoto_protocol.signature
+  labels:
+    en: 'Kyoto Protocol: signature (date, UNTC)'
+    fr: 'Protocole de Kyoto : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-7-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-a|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id066
+- id: treaties.paris_agreement.status
+  labels:
+    en: 'Paris Agreement: participation status (UNTC)'
+    fr: 'Accord de Paris : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-7-d on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-d|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id067
+  - treaty
+  - XXVII-7-d
+- id: treaties.paris_agreement.consent
+  labels:
+    en: 'Paris Agreement: consent to be bound (date and instrument, UNTC)'
+    fr: 'Accord de Paris : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-7-d as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-d|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id067
+- id: treaties.paris_agreement.signature
+  labels:
+    en: 'Paris Agreement: signature (date, UNTC)'
+    fr: 'Accord de Paris : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-7-d as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-7-d|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id067
+- id: treaties.cbd.status
+  labels:
+    en: 'Convention on Biological Diversity: participation status (UNTC)'
+    fr: 'Convention sur la diversité biologique : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-8 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id068
+  - treaty
+  - XXVII-8
+- id: treaties.cbd.consent
+  labels:
+    en: 'Convention on Biological Diversity: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention sur la diversité biologique : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-8 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id068
+- id: treaties.cbd.signature
+  labels:
+    en: 'Convention on Biological Diversity: signature (date, UNTC)'
+    fr: 'Convention sur la diversité biologique : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-8 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id068
+- id: treaties.cartagena_protocol.status
+  labels:
+    en: 'Cartagena Protocol on Biosafety: participation status (UNTC)'
+    fr: 'Protocole de Cartagena sur la prévention des risques biotechnologiques : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-8-a on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8-a|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id069
+  - treaty
+  - XXVII-8-a
+- id: treaties.cartagena_protocol.consent
+  labels:
+    en: 'Cartagena Protocol on Biosafety: consent to be bound (date and instrument, UNTC)'
+    fr: 'Protocole de Cartagena sur la prévention des risques biotechnologiques : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-8-a as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8-a|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id069
+- id: treaties.cartagena_protocol.signature
+  labels:
+    en: 'Cartagena Protocol on Biosafety: signature (date, UNTC)'
+    fr: 'Protocole de Cartagena sur la prévention des risques biotechnologiques : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-8-a as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-8-a|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id069
+- id: treaties.unccd.status
+  labels:
+    en: 'UN Convention to Combat Desertification: participation status (UNTC)'
+    fr: 'Convention des Nations Unies sur la lutte contre la désertification : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-10 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-10|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id070
+  - treaty
+  - XXVII-10
+- id: treaties.unccd.consent
+  labels:
+    en: 'UN Convention to Combat Desertification: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention des Nations Unies sur la lutte contre la désertification : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-10 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-10|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id070
+- id: treaties.unccd.signature
+  labels:
+    en: 'UN Convention to Combat Desertification: signature (date, UNTC)'
+    fr: 'Convention des Nations Unies sur la lutte contre la désertification : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-10 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-10|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id070
+- id: treaties.rotterdam.status
+  labels:
+    en: 'Rotterdam Convention (prior informed consent): participation status (UNTC)'
+    fr: 'Convention de Rotterdam (consentement préalable en connaissance de cause) : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-14 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-14|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id071
+  - treaty
+  - XXVII-14
+- id: treaties.rotterdam.consent
+  labels:
+    en: 'Rotterdam Convention (prior informed consent): consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Rotterdam (consentement préalable en connaissance de cause) : consentement à être lié (date et instrument,
+      UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-14 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-14|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id071
+- id: treaties.rotterdam.signature
+  labels:
+    en: 'Rotterdam Convention (prior informed consent): signature (date, UNTC)'
+    fr: 'Convention de Rotterdam (consentement préalable en connaissance de cause) : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-14 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-14|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id071
+- id: treaties.stockholm.status
+  labels:
+    en: 'Stockholm Convention on Persistent Organic Pollutants: participation status (UNTC)'
+    fr: 'Convention de Stockholm sur les polluants organiques persistants : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-15 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-15|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id072
+  - treaty
+  - XXVII-15
+- id: treaties.stockholm.consent
+  labels:
+    en: 'Stockholm Convention on Persistent Organic Pollutants: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Stockholm sur les polluants organiques persistants : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-15 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-15|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id072
+- id: treaties.stockholm.signature
+  labels:
+    en: 'Stockholm Convention on Persistent Organic Pollutants: signature (date, UNTC)'
+    fr: 'Convention de Stockholm sur les polluants organiques persistants : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-15 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-15|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id072
+- id: treaties.minamata.status
+  labels:
+    en: 'Minamata Convention on Mercury: participation status (UNTC)'
+    fr: 'Convention de Minamata sur le mercure : statut de participation (UNTC)'
+  definition: 'Status of the State in the UN Treaty Collection list for MTDSG XXVII-17 on the retrieval day, as the depositary
+    lists it: party (an instrument of ratification/accession/succession/acceptance/approval is listed; entry into force for
+    the State may be later), signatory (signature only), withdrawn (UNTC brackets the dates after a withdrawal/denunciation),
+    signature_bracketed, listed_without_dates. Flags carry footnote numbers, a scheduled withdrawal date and whether declarations/reservations
+    exist. States absent from the list have taken no action recorded by UNTC (no row is stored for them).'
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-17|status
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: &id073
+  - treaty
+  - XXVII-17
+- id: treaties.minamata.consent
+  labels:
+    en: 'Minamata Convention on Mercury: consent to be bound (date and instrument, UNTC)'
+    fr: 'Convention de Minamata sur le mercure : consentement à être lié (date et instrument, UNTC)'
+  definition: Date (row period, one day) of the State's instrument expressing consent to be bound by MTDSG XXVII-17 as listed
+    by UNTC; value_text = the instrument type from the table legend (ratification, accession, succession, acceptance, approval,
+    formal_confirmation...). Bracketed (withdrawn) entries are kept and flagged. Withdrawal notification/effect dates are
+    separate indicators (|action=withdrawal_notification, |action=withdrawal_effect).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-17|action=consent
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id073
+- id: treaties.minamata.signature
+  labels:
+    en: 'Minamata Convention on Mercury: signature (date, UNTC)'
+    fr: 'Convention de Minamata sur le mercure : signature (date, UNTC)'
+  definition: Date (row period, one day) of the State's signature of MTDSG XXVII-17 as listed by UNTC (value_text signature
+    or succession_to_signature).
+  unit: status
+  value_kind: text
+  source_order:
+  - untc.treaty_status.XXVII-17|action=signature
+  domain: treaties
+  subdomain: environment
+  theme: law
+  provider_declared: true
+  tags: *id073

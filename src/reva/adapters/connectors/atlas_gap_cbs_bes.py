@@ -48,7 +48,9 @@ RIGHTS = {
     "licence_url": "https://www.cbs.nl/en-gb/about-us/website/copyright",
     "attribution": "Source: CBS (Statistics Netherlands), StatLine",
 }
-LABOUR_FILTER = "$filter=Sex%20eq%20%27T001038%27%20and%20Age%20eq%20%2752052%27%20and%20LevelOfEducation%20eq%20%27T001143%27"
+LABOUR_FILTER = (
+    "$filter=Sex%20eq%20%27T001038%27%20and%20Age%20eq%20%2752052%27%20and%20LevelOfEducation%20eq%20%27T001143%27"
+)
 #: table -> (atlas dataset, query suffix, {topic key: (indicator, unit)})
 TABLES: dict[str, tuple[str, str, dict[str, tuple[str, str]]]] = {
     "83774ENG": (
@@ -93,9 +95,10 @@ def url(table: str) -> str:
     return f"{BASE}/{table}/TypedDataSet?{TABLES[table][1]}"
 
 
-def items(*, fixture: bool = False) -> list[GapItem]:  # noqa: ARG001 - fixtures are full captures
+def items(*, fixture: bool = False) -> list[GapItem]:
     return [
-        GapItem(f"data:{t}", url(t), (ds,), ("application/json",), max_bytes=20_000_000) for t, (ds, _q, _m) in TABLES.items()
+        GapItem(f"data:{t}", url(t), (ds,), ("application/json",), max_bytes=20_000_000)
+        for t, (ds, _q, _m) in TABLES.items()
     ]
 
 
@@ -110,7 +113,9 @@ def parse_table(table: str, f: Fetched) -> list[dict[str, Any]]:
         raise SourceResponseError(f"CBS {table}: no rows", retryable=False)
     geo_key = next((k for k in recs[0] if k.lower().replace("carribean", "caribbean") == "caribbeannetherlands"), None)
     if geo_key is None or "Periods" not in recs[0]:
-        raise SourceResponseError(f"CBS {table}: region/period column missing", columns=list(recs[0])[:10], retryable=False)
+        raise SourceResponseError(
+            f"CBS {table}: region/period column missing", columns=list(recs[0])[:10], retryable=False
+        )
     missing = [t for t in topics if t not in recs[0]]
     if missing:
         raise SourceResponseError(f"CBS {table}: topic columns missing", missing=missing, retryable=False)
@@ -129,7 +134,11 @@ def parse_table(table: str, f: Fetched) -> list[dict[str, Any]]:
             value = strict_decimal(r.get(topic))
             if value is None:
                 continue
-            flags: dict[str, Any] = {"cbs_table": table, "region_label": REGIONS[geo], "cbs_region_code_raw": str(r[geo_key])}
+            flags: dict[str, Any] = {
+                "cbs_table": table,
+                "region_label": REGIONS[geo],
+                "cbs_region_code_raw": str(r[geo_key]),
+            }
             if geo != "CN01":
                 flags["partial_of_iso3"] = "BES"
             if table == "83165ENG":

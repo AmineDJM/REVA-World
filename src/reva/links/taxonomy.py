@@ -138,8 +138,19 @@ def validate_taxonomy(doc: Mapping[str, Any], kg_properties: set[str] | None = N
 
 
 def kg_allowlist() -> set[str]:
+    """Wikidata properties (registry/kg/properties.yaml) plus the namespaced dataset predicates registered by the
+    KG layers (registry/kg/predicates_*.yaml; KGGEOPOL's GEOPOL_PROPERTIES)."""
     doc = _load_yaml(KG_PROPERTIES_FILE)
-    return {str(p["property"]) for p in doc.get("properties", [])}
+    out = {str(p["property"]) for p in doc.get("properties", [])}
+    for f in sorted(KG_PROPERTIES_FILE.parent.glob("predicates_*.yaml")):
+        out |= {str(p["pid"]) for p in (_load_yaml(f) or {}).get("predicates", [])}
+    try:
+        from reva.adapters.connectors.atlas_geopol_common import GEOPOL_PROPERTIES
+
+        out |= set(GEOPOL_PROPERTIES)
+    except ImportError:  # pragma: no cover
+        pass
+    return out
 
 
 @lru_cache(maxsize=4)

@@ -31,7 +31,11 @@ EXPECTED = {
         {"atlas.spc.pocket", "atlas.spc.keyfacts", "atlas.spc.emprates", "atlas.spc.digital"},
         {"NIU", "TKL", "WLF", "PCN", "COK", "TON"},  # pocket NU+TK+WF, keyfacts +PN+CK, emprates/digital +TO
     ),
-    atlas_gap_eurostat_nuts.NAME: (7, {"atlas.eurostat.nuts2_gapfill"}, {"GLP", "MTQ", "GUF", "REU", "MYT", "ALA", "SJM"}),
+    atlas_gap_eurostat_nuts.NAME: (
+        7,
+        {"atlas.eurostat.nuts2_gapfill"},
+        {"GLP", "MTQ", "GUF", "REU", "MYT", "ALA", "SJM"},
+    ),
     atlas_gap_insee.NAME: (2, {"atlas.insee.ipc_dom", "atlas.insee.smic_dom"}, {"GLP", "MTQ", "GUF", "REU", "MYT"}),
     atlas_gap_cbs_bes.NAME: (4, {"atlas.cbs.bes_population", "atlas.cbs.bes_gdp", "atlas.cbs.bes_labour"}, {"BES"}),
     atlas_gap_jersey.NAME: (1, {"atlas.statsjersey.earnings"}, {"JEY"}),

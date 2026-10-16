@@ -21,6 +21,7 @@ import polars as pl
 import pytest
 import yaml
 
+from reva.adapters.connectors import atlas_cables as cb
 from reva.adapters.connectors import atlas_flights as fl
 from reva.adapters.connectors import atlas_infra_common as ic
 from reva.adapters.connectors import atlas_ports as po
@@ -55,7 +56,8 @@ def _trimmed(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _flags(row: dict[str, Any]) -> dict[str, Any]:
-    return json.loads(row["flags"])
+    out: dict[str, Any] = json.loads(row["flags"])
+    return out
 
 
 def _one(frame: pl.DataFrame, geo: str, indicator: str) -> dict[str, Any] | None:
@@ -82,7 +84,7 @@ def test_openflights_counts_are_exact(of_files: dict[str, ic.Fetched]) -> None:
     )
     # independent recount: airports by id -> country; routes France -> Algeria
     ap = {r[0]: r[3] for r in csv.reader(io.StringIO(of_files["airports.dat"].body.decode()))}
-    code = {}
+    code: dict[str, str] = {}
     for r in csv.reader(io.StringIO(of_files["airports.dat"].body.decode())):
         code.setdefault(r[4], r[0])
         code.setdefault(r[5], r[0])
@@ -110,7 +112,9 @@ def test_openflights_counts_are_exact(of_files: dict[str, ic.Fetched]) -> None:
     assert any("partner_code=Netherlands Antilles" in i for i in frame["indicator"].to_list())
     assert rep["routes_unresolved_airport"] == 1  # the synthetic route, never assigned
     assert frame.filter(pl.col("value") == "0").height == 0  # no zero for missing
-    assert not frame.filter(pl.col("indicator").str.contains("partner=FRA") & (pl.col("provider_geo") == "France")).height
+    assert not frame.filter(
+        pl.col("indicator").str.contains("partner=FRA") & (pl.col("provider_geo") == "France")
+    ).height
 
 
 def test_openflights_licence_change_is_refused(of_files: dict[str, ic.Fetched]) -> None:
@@ -121,12 +125,10 @@ def test_openflights_licence_change_is_refused(of_files: dict[str, ic.Fetched]) 
             return True
 
         async def get(self, url: str, **kw: Any) -> Any:
-            class R:
-                body = b"<html>All rights reserved</html>"
-                retrieved_at = datetime.now(UTC)
-                response_metadata: dict[str, Any] = {}
+            from types import SimpleNamespace
 
-            return R()
+            return SimpleNamespace(body=b"<html>All rights reserved</html>", retrieved_at=datetime.now(UTC),
+                                   response_metadata={})  # fmt: skip
 
         def archive(self, raw: Any) -> str:
             return "0" * 64
@@ -179,7 +181,7 @@ def test_gcat_index_licence_and_release() -> None:
     idx = _fixture(sp.NAME, sp.INDEX_URL, "index.html")
     meta = sp.parse_index(idx.body)
     assert meta["release"] == "1.8.8" and meta["data_update"] == "2026-10-15"
-    with pytest.raises(SourceResponseError, match="CC-BY-4.0"):
+    with pytest.raises(SourceResponseError, match=r"CC-BY-4\.0"):
         sp.parse_index(idx.body.replace(b"CC-BY-4.0", b"All rights reserved"))
 
 
@@ -256,10 +258,91 @@ def test_wpi_counts() -> None:
     assert _flags(_one(frame, "FR", "PORTS_LISTED"))["coverage"].startswith("WPI lists ports")  # type: ignore[arg-type]
 
 
+# --------------------------------------------------------------------------- Wikidata cables
+class _OfflineRun:
+    """The connector's own fetch path over recorded responses; archive = sha256, register = capture."""
+
+    def __init__(self, spec: Any) -> None:
+        from reva.atlas.ingest import AtlasRun
+        from reva.evidence.runner import FixtureHttp
+
+        self._run = AtlasRun.offline(spec, FixtureHttp(spec.name))
+        self.spec, self.origin = spec, "test_fixture"
+        self.registered: list[dict[str, Any]] = []
+
+    def wants(self, d: str) -> bool:
+        return True
+
+    async def get(self, url: str, **kw: Any) -> Any:
+        return await self._run.get(url, **kw)
+
+    def archive(self, raw: Any) -> str:
+        return hashlib.sha256(raw.body).hexdigest()
+
+    def register(self, **kw: Any) -> dict[str, Any]:
+        self.registered.append(kw)
+        return {"dataset_key": f"atlas.{cb.ATLAS_SOURCE}.{kw['dataset']}", "row_count": kw["frame"].height,
+                "created": True, "artifact_sha256": "0" * 64}  # fmt: skip
+
+
+_CABLES: dict[str, Any] = {}
+
+
+def cables_run() -> tuple[pl.DataFrame, dict[str, Any], dict[str, Any]]:
+    if not _CABLES:
+        import asyncio
+
+        run = _OfflineRun(cb.atlas_source())
+        out = asyncio.run(cb.atlas_ingest(run))
+        (kw,) = run.registered
+        frame, _unmapped = validate_atlas_frame(kw["frame"], source="wikidata", dataset=cb.DATASET,
+                                               raw_sha256s=kw["raw_sha256s"])  # fmt: skip
+        _CABLES.update(frame=frame, out=out, kw=kw)
+    return _CABLES["frame"], _CABLES["out"], _CABLES["kw"]
+
+
+def test_wikidata_cables_pairs_and_subclasses() -> None:
+    frame, out, kw = cables_run()
+    rep = out["report"]
+    assert rep["classes"] == ["Q2395922", "Q361047", "Q506572"]  # subclasses found via P279 and expanded
+    # TAT-1 (instance of the transatlantic subclass) is a cable; TAT-8 too but lists no P17
+    assert rep["cables"] == 20 and rep["cables_without_country"] == 2
+    gbr_usa = _one(frame, "Q145", "CABLES_SHARED|partner=USA")
+    assert gbr_usa is not None and gbr_usa["iso3"] == "GBR"
+    f = _flags(gbr_usa)
+    assert [c["label"] for c in f["cables"]] == ["Apollo"] and gbr_usa["value"] == "1"
+    assert (
+        f["partner_iso3"] == "USA" and f["undirected"] is True and f["verification"] == "community_edited_not_verified"
+    )
+    assert _one(frame, "Q30", "CABLES_SHARED|partner=GBR")["value"] == "1"  # type: ignore[index]  # both directions
+    assert _one(frame, "Q145", "CABLE_FIRST_SERVICE_YEAR|partner=USA")["value"] == "2003"  # type: ignore[index]
+    # TAT-1 (instance of the transatlantic subclass): P17 = United Kingdom, Canada; P729 1956-09-25
+    first = _one(frame, "Q145", "CABLE_FIRST_SERVICE_YEAR|partner=CAN")
+    assert first is not None and first["value"] == "1956" and first["unit"] == "year"
+    assert _flags(first)["cables"][0]["year_property"] == "P729"
+    assert _flags(first)["derived"] == "min"
+    # every cable raw (EntityData snapshot) cited is registered with the table
+    assert {c["raw_sha256"] for r in frame.to_dicts() for c in _flags(r).get("cables", [])} <= set(kw["raw_sha256s"])
+    assert frame.filter(pl.col("value") == "0").height == 0
+    # FARICE-1: inception 2004-01 (month precision) -> service year 2004 via P571
+    fo = frame.filter((pl.col("provider_geo") == "Q189") & (pl.col("indicator") == "CABLES_ENTERING_SERVICE"))
+    assert date(2004, 1, 1) in fo["period_start"].to_list()
+
+
+def test_wikidata_cables_skip_telegeography_and_parse_guards() -> None:
+    assert "non-commercial" in cb.SKIPPED["telegeography"]
+    with pytest.raises(SourceResponseError):
+        cb.parse_links(b"<html>nothing</html>", "Q1")
+    e = {"id": "Q1", "claims": {"P31": [{"rank": "deprecated", "mainsnak": {"datavalue": {"value": {"id": "Q506572"}}}}],
+         "P571": [{"rank": "normal", "mainsnak": {"datavalue": {"value": {"time": "+1900-00-00T00:00:00Z", "precision": 7}}}}]}}  # fmt: skip
+    d = cb.describe(e)
+    assert d["p31"] == [] and d["year"] is None  # deprecated rank ignored; century precision is no year
+
+
 # --------------------------------------------------------------------------- platform contract
 def test_sources_discovered_and_no_http_client_in_modules() -> None:
     names = set(atlas_sources())
-    assert {fl.OF_NAME, fl.OA_NAME, sp.NAME, po.NAME} <= names
+    assert {fl.OF_NAME, fl.OA_NAME, sp.NAME, po.NAME, cb.NAME} <= names
     banned = ("make_live_client(", "SafeHttpClient(", "httpx.", "urlopen(", "requests.get(")
     for m in MODULES:
         p = REPO / "src/reva/adapters/connectors" / f"{m}.py"
@@ -292,12 +375,7 @@ def test_catalog_series_exist_in_fixture_tables(
         ("gcat", "launches"): set(gcat[0]["launches"]["indicator"]),
         ("gcat", "payloads"): set(gcat[0]["payloads"]["indicator"]),
     }
-    try:
-        from reva.adapters.connectors import atlas_cables as cb
-
-        indicators[(cb.ATLAS_SOURCE, cb.DATASET)] = set(cb.INDICATORS)
-    except ImportError:  # pragma: no cover
-        pass
+    indicators[(cb.ATLAS_SOURCE, cb.DATASET)] = set(cables_run()[0]["indicator"])
     for c in concepts:
         for s in c.source_order:
             assert s.indicator in indicators[(s.source, s.dataset)], (c.id, s.key)

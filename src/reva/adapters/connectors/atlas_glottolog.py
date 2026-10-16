@@ -30,7 +30,9 @@ re-stored by a new release; a fact a new release drops is retracted):
 
 * ``glottolog:parent`` (immediate parent from ``classification``) and ``glottolog:family`` (``Family_ID``):
   e.g. Portuguese -> Galician-Portuguese ... -> Romance -> ... -> Italic -> Classical Indo-European ->
-  Indo-European, and Portuguese -> Indo-European in one hop. Creoles are wherever Glottolog classifies them
+  Indo-European, and Portuguese -> Indo-European in one hop. ``glottolog:in_group`` (language-level languoids only)
+  links each language to every intermediate group of its classification (Portuguese -> Romance, -> Italic, ...),
+  so that a branch is one hop away for the path engine (max 5 hops); the ordered chain is ``glottolog:parent``. Creoles are wherever Glottolog classifies them
   (e.g. Haitian Creole under Gallo-Romance): REVA adds no lexifier link of its own.
 * ``glottolog:spoken_in`` per country code of ``Countries`` -> the country QID when known
   (``country_qids.json`` / unambiguous P298 statements in the KG, as KGPOLITY resolves it) else ``iso3:<KEY>``.
@@ -79,7 +81,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.glottolog"
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 PARSER_VERSION = "atlas_glottolog/1"
 SOURCE_KEY = "glottolog.cldf"
 ATLAS_SOURCE = "glottolog"
@@ -105,6 +107,7 @@ DECIMAL_TEXT_RE = re.compile(r"^-?[0-9]{1,3}(\.[0-9]{1,20})?$")
 
 P_PARENT = "glottolog:parent"
 P_FAMILY = "glottolog:family"
+P_IN_GROUP = "glottolog:in_group"
 P_SPOKEN_IN = "glottolog:spoken_in"
 P_AES = "glottolog:endangerment"
 P_ISO = "glottolog:iso639_3"
@@ -674,6 +677,19 @@ def glottolog_kg(
                 obj=f"glottolog:{lg.parent}",
                 quals={"depth": len(lg.classification), "level": lg.level},
             )
+        if lg.level == "language":
+            ups = lg.classification[::-1]  # immediate parent first
+            for k, anc in enumerate(ups[1:], start=2):
+                if anc == lg.family_id:
+                    continue
+                st(
+                    node,
+                    P_IN_GROUP,
+                    f"in_group:{gc}:{anc}",
+                    ref("values.csv", f"{gc}-classification", "classification"),
+                    obj=f"glottolog:{anc}",
+                    quals={"steps_up": k},
+                )
         if lg.family_id and lg.family_id != gc:
             st(node, P_FAMILY, f"family:{gc}", ref("languages.csv", gc, "Family_ID"), obj=f"glottolog:{lg.family_id}")
         for c in lg.countries:

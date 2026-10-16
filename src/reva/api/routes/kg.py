@@ -34,6 +34,11 @@ PID_PATTERN = r"^(P[1-9][0-9]{0,9}|[a-z][a-z0-9_]{1,31}:[a-z][a-z0-9_]{0,63})$"
 TIME_PATTERN = r"^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$"
 
 COMMUNITY_WARNING = s.ApiWarning(code="community_edited", message=kq.COMMUNITY_NOTE)
+DERIVED_WARNING = s.ApiWarning(
+    code="derived_statements",
+    message="Some statements are derived (computed by REVA from sourced inputs, e.g. a spatial overlay), not "
+    "reported by a source; their qualifiers give the method, inputs and caveats.",
+)
 PATH_WARNING = s.ApiWarning(code="path_not_causal", message=kq.PATH_NOTE)
 
 
@@ -69,7 +74,13 @@ class KgProvenance(s.ApiModel):
     origin: Literal["live", "test_fixture"]
     rank: Literal["preferred", "normal"]
     references: list[dict[str, Any]]
-    verification: Literal["community_edited_not_verified", "source_reported_not_verified"]
+    verification: Literal["community_edited_not_verified", "source_reported_not_verified", "derived"] = Field(
+        description="community_edited_not_verified: Wikidata; derived: computed from sourced inputs (the "
+        "qualifiers declare the derivation, its inputs and caveats), not reported by a source; else "
+        "source_reported_not_verified. Nothing is verified by REVA"
+    )
+    derivation: str | None = Field(None, description="For derived statements: the declared derivation")
+    derivation_method: str | None = Field(None, description="For derived statements: the method id and version")
 
 
 class KgStatementOut(s.ApiModel):
@@ -82,8 +93,13 @@ class KgStatementOut(s.ApiModel):
     end: KgTimeOut | None
     point_in_time: KgTimeOut | None
     time_calendars: dict[str, str] | None
-    valid_from: str | None = Field(description="Derived inclusive start date used for filtering (null: open)")
-    valid_to: str | None = Field(description="Derived inclusive end date used for filtering (null: open)")
+    valid_from: str | None = Field(
+        description="Derived inclusive start date used for filtering, ISO 8601 with astronomical years "
+        "(-0043-03-15 = 15 March 44 BCE; null: open)"
+    )
+    valid_to: str | None = Field(
+        description="Derived inclusive end date used for filtering, astronomical years (null: open)"
+    )
     qualifiers: dict[str, Any]
     provenance: KgProvenance
     direction: Literal["out", "in"] | None = None
@@ -130,7 +146,7 @@ class KgNeighboursResponse(s.Envelope):
 
 
 class KgTimelineEvent(KgStatementOut):
-    sort_date: str | None
+    sort_date: str | None = Field(description="Date the event is sorted by, ISO 8601 with astronomical years")
     dated_by: Literal["validity_qualifiers", "time_value"]
 
 
@@ -258,19 +274,27 @@ def _window(valid_from: str | None, valid_to: str | None, include_undated: bool)
     return kq.window(valid_from, valid_to, include_undated=include_undated)
 
 
-def _envelope_kwargs(origins: list[str], community: bool, t: Timer, rows: int, **detail: Any) -> dict[str, Any]:
+def _envelope_kwargs(
+    origins: list[str], community: bool, t: Timer, rows: int, *, derived: bool = False, **detail: Any
+) -> dict[str, Any]:
     origin = origin_of(origins)
     return {
         "context_mode": "evidence",
         "origin": origin,
         "modality": "reported_observation",
-        "warnings": ([COMMUNITY_WARNING] if community else []) + origin_warnings(origin),
+        "warnings": ([COMMUNITY_WARNING] if community else [])
+        + ([DERIVED_WARNING] if derived else [])
+        + origin_warnings(origin),
         "cost": t.cost(rows, **detail),
     }
 
 
 def _community(statements: list[dict[str, Any]]) -> bool:
     return any(x["provenance"]["verification"] == "community_edited_not_verified" for x in statements)
+
+
+def _derived(statements: list[dict[str, Any]]) -> bool:
+    return any(x["provenance"]["verification"] == "derived" for x in statements)
 
 
 def _known_qid(conn: Any, qid: str) -> None:
@@ -336,7 +360,9 @@ def get_neighbours(
     return KgNeighboursResponse(
         data=KgNeighbours(qid=res["qid"], label=res["label"], edges=res["edges"]),
         next_cursor=nxt,
-        **_envelope_kwargs(res["origins"], _community(res["edges"]), t, len(res["edges"])),
+        **_envelope_kwargs(
+            res["origins"], _community(res["edges"]), t, len(res["edges"]), derived=_derived(res["edges"])
+        ),
     )
 
 
@@ -361,7 +387,9 @@ def get_timeline(
         res = kq.timeline(
             conn, qid, include_incoming=include_incoming, time_window=w, limit=limit, origin=_origin(request, origin)
         )
-    env = _envelope_kwargs(res["origins"], _community(res["events"]), t, len(res["events"]))
+    env = _envelope_kwargs(
+        res["origins"], _community(res["events"]), t, len(res["events"]), derived=_derived(res["events"])
+    )
     if res["truncated"]:
         env["warnings"].append(s.ApiWarning(code="truncated", message=f"timeline limited to {limit} events"))
     return KgTimelineResponse(
@@ -460,6 +488,7 @@ def get_path(
         _community(hops),
         t,
         len(hops),
+        derived=_derived(hops),
         edges_scanned=res["search"]["edges_scanned"],
         levels_expanded=res["search"]["levels_expanded"],
     )

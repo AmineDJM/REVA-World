@@ -1,0 +1,29 @@
+# V3 (agent A-TREATIES): UN Treaty Collection — status of multilateral treaties deposited with the Secretary-General.
+# Connector: src/reva/adapters/connectors/atlas_treaties.py (atlas.untc) -> atlas table untc.treaty_status
+# + KG statements (source_key untc.mtdsg): P1891 signatory, untc:party, untc:former_party, untc:mtdsg_number.
+source_key: untc.mtdsg
+title: Multilateral Treaties Deposited with the Secretary-General (MTDSG), UN Treaty Collection status pages
+provider_url: https://treaties.un.org/Pages/ParticipationStatus.aspx
+lineage_family: untc
+rights:
+  licence: "UN Terms of Use (not an open licence): personal, non-commercial use; no redistribution or derivative compilations without permission"
+  licence_url: https://www.un.org/en/about-us/terms-of-use
+  licence_evidence: >-
+    www.un.org/en/about-us/terms-of-use (read 2026-10-16, archived by every run): "The United Nations grants
+    permission to Users to visit the Site and to download and copy the information, documents and materials
+    (collectively, "Materials") from the Site for the User's personal, non-commercial use, without any right to
+    resell or redistribute them or to compile or create derivative works therefrom". Copyright page: "All rights
+    reserved ... except as provided for in the Terms and Conditions of Use".
+  attribution: "United Nations, Office of Legal Affairs, Treaty Section: Multilateral Treaties Deposited with the Secretary-General, status as at the retrieval date (https://treaties.un.org)."
+  open_licence: false
+  review_flag: >-
+    not an open licence: internal research use; do not redistribute the derived tables/statements without UN
+    permission (UN Publications, Rights and Permissions). Maintainer review required before any publication.
+metadata:
+  allowed_hosts: [treaties.un.org, www.un.org]
+  access_note: >-
+    No bulk/machine-readable export: one HTML page per treaty (ViewDetails / ViewDetailsII Temp=mtdsg2 /
+    ViewDetailsIII Temp=mtdsg3; the connector stores the template each page answers with, so no redirect is
+    followed). 53 treaties = 53 pages (0.13-3.3 MB, ~26 MB total) + the terms page per run; sequential, >= 3 s apart.
+  authentication: none
+  cadence: monthly check

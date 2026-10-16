@@ -96,9 +96,11 @@ def url(dataset: str) -> str:
     return f"{BASE}/{dataset}?{QUERIES[dataset]}&{geo}&format=JSON&lang=EN"
 
 
-def items(*, fixture: bool = False) -> list[GapItem]:  # noqa: ARG001 - fixtures are full captures of the same URLs
+def items(*, fixture: bool = False) -> list[GapItem]:
     return [
-        GapItem(key=f"data:{ds}", url=url(ds), datasets=(DATASET,), media_types=("application/json",), max_bytes=5_000_000)
+        GapItem(
+            key=f"data:{ds}", url=url(ds), datasets=(DATASET,), media_types=("application/json",), max_bytes=5_000_000
+        )
         for ds in QUERIES
     ]
 
@@ -126,7 +128,9 @@ def parse_jsonstat(dataset: str, f: Fetched) -> list[dict[str, Any]]:
     for g, want in GEOS.items():
         got = labels["geo"].get(g)
         if got is not None and got != want:
-            raise SourceResponseError(f"Eurostat {dataset}: NUTS label changed", geo=g, label=str(got)[:60], retryable=False)
+            raise SourceResponseError(
+                f"Eurostat {dataset}: NUTS label changed", geo=g, label=str(got)[:60], retryable=False
+            )
     status_labels = ((d.get("extension") or {}).get("status") or {}).get("label") or {}
     status = d.get("status") or {}
     stride = [1] * len(size)
@@ -239,4 +243,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     return await common.ingest_items(run, items(fixture=run.origin == "test_fixture"), build)
 
 
-__all__ = ["DATASET", "GEOS", "NAME", "QUERIES", "atlas_ingest", "atlas_source", "build", "items", "parse_jsonstat", "url"]
+__all__ = [
+    "DATASET",
+    "GEOS",
+    "NAME",
+    "QUERIES",
+    "atlas_ingest",
+    "atlas_source",
+    "build",
+    "items",
+    "parse_jsonstat",
+    "url",
+]

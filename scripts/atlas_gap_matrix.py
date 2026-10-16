@@ -31,7 +31,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from collections.abc import Iterable
 from pathlib import Path
@@ -158,7 +157,12 @@ CONCEPTS: dict[str, dict[str, Any]] = {
             "undp.hdr25.mys",
         ],
     },
-    "hdi": {"en": "HDI-like index", "fr": "Indice de type IDH", "headline": ["reva.society.hdi"], "other": ["undp.hdr25.phdi"]},
+    "hdi": {
+        "en": "HDI-like index",
+        "fr": "Indice de type IDH",
+        "headline": ["reva.society.hdi"],
+        "other": ["undp.hdr25.phdi"],
+    },
     "inflation": {
         "en": "Inflation",
         "fr": "Inflation",
@@ -298,7 +302,10 @@ def static_coverage() -> dict[str, dict[str, Any]]:
     wb = sorted(k for k, e in ents.items() if e.get("worldbank"))
     out: dict[str, dict[str, Any]] = {}
     for key, minus in WB_MINUS.items():
-        out[key] = {"iso3": sorted(set(wb) - set(minus)), "origin": "static: docs/dev/v3_a_wb.md (live ingest 2026-10-15)"}
+        out[key] = {
+            "iso3": sorted(set(wb) - set(minus)),
+            "origin": "static: docs/dev/v3_a_wb.md (live ingest 2026-10-15)",
+        }
     out["ssa.ssptw_2018_2019.old_age.pension_age.men"] = {
         "iso3": SSPTW_FILLS,
         "origin": "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks; other SSPTW economies not listed)",
@@ -370,11 +377,16 @@ def tables_coverage(db: str, objects: Path) -> dict[str, dict[str, Any]]:
             continue
         g = f.filter(pl.col("indicator").is_in(want)).group_by("indicator").agg(pl.col("iso3").unique())
         for i, isos in g.iter_rows():
-            out[f"{sd}.{i}"] = {"iso3": sorted(isos), "origin": f"tables: db {db}, {r.dataset_key} recorded {r.recorded_at:%Y-%m-%d}"}
+            out[f"{sd}.{i}"] = {
+                "iso3": sorted(isos),
+                "origin": f"tables: db {db}, {r.dataset_key} recorded {r.recorded_at:%Y-%m-%d}",
+            }
     return out
 
 
-def snapshot_coverage(db: str, objects: Path, origin: str | None) -> tuple[dict[str, dict[str, Any]], dict[str, list[str]]]:
+def snapshot_coverage(
+    db: str, objects: Path, origin: str | None
+) -> tuple[dict[str, dict[str, Any]], dict[str, list[str]]]:
     """Series coverage + headline coverage (incl. derived cells) of the latest recorded atlas snapshot."""
     from sqlalchemy import create_engine
 
@@ -426,6 +438,7 @@ def matrix(cov: dict[str, dict[str, Any]], head_snapshot: dict[str, list[str]] |
         head_series: list[str] = []
         for cid in spec["headline"]:
             head_series += [s.series.key for s in reg.concepts[cid].series]
+
         def covered(pats: Iterable[str]) -> tuple[set[str], dict[str, int]]:
             got: set[str] = set()
             per: dict[str, int] = {}
@@ -434,6 +447,7 @@ def matrix(cov: dict[str, dict[str, Any]], head_snapshot: dict[str, list[str]] |
                     got |= set(v["iso3"])
                     per[sk] = len(v["iso3"])
             return got & allk, per
+
         h, h_per = covered(head_series)
         if head_snapshot:
             for cid in spec["headline"]:
@@ -464,7 +478,7 @@ def to_markdown(res: dict[str, Any]) -> str:
         "| concept | headline: entities with a value | any source: with a value | no value from any source (ISO3) |",
         "|---|---:|---:|---|",
     ]
-    for key, v in res["concepts"].items():
+    for v in res["concepts"].values():
         miss = " ".join(v["any_missing"]) or "—"
         lines.append(f"| {v['labels']['en']} | {v['headline_covered']} | {v['any_covered']} | {miss} |")
     return "\n".join(lines) + "\n"
@@ -489,7 +503,10 @@ def main(argv: list[str] | None = None) -> None:
     def merge(more: dict[str, dict[str, Any]]) -> None:
         for k, v in more.items():
             if k in cov:
-                cov[k] = {"iso3": sorted(set(cov[k]["iso3"]) | set(v["iso3"])), "origin": f"{cov[k]['origin']}; {v['origin']}"}
+                cov[k] = {
+                    "iso3": sorted(set(cov[k]["iso3"]) | set(v["iso3"])),
+                    "origin": f"{cov[k]['origin']}; {v['origin']}",
+                }
             else:
                 cov[k] = v
 

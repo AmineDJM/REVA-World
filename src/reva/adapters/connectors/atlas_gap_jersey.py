@@ -1,7 +1,8 @@
 """Statistics Jersey open data — monthly earnings of Jersey (V3, GAPHUNT).
 
-Jersey (ISO 3166-1 ``JEY``) is in no ILOSTAT or OECD earnings table: the average wage was an absolute gap.
-Statistics Jersey publishes payroll-based monthly earnings on the Government of Jersey open-data portal
+Jersey (ISO 3166-1 ``JEY``) has ILOSTAT mean earnings of employees (annual, local currency) and nothing in
+the OECD tables. This source adds the office's own, more recent and more detailed figures: Statistics Jersey
+publishes payroll-based monthly earnings on the Government of Jersey open-data portal
 (CKAN, ``https://opendata.gov.je``), licence **Open Government Licence – Jersey v1.0** (CKAN ``license_id``
 ``OGL-J-1.0`` of the dataset "earnings-in-jersey"). One request (GET CSV):
 
@@ -44,8 +45,16 @@ HEADER = ["Year", "Month", "Sector", "Median earnings", "Mean earnings"]
 UNIT = "GBP per month (full-time equivalent)"
 
 
-def items(*, fixture: bool = False) -> list[GapItem]:  # noqa: ARG001 - the fixture is the full file
-    return [GapItem("data:earnings_by_sector", EARNINGS_URL, ("earnings",), ("text/csv", "application/octet-stream"), max_bytes=5_000_000)]
+def items(*, fixture: bool = False) -> list[GapItem]:
+    return [
+        GapItem(
+            "data:earnings_by_sector",
+            EARNINGS_URL,
+            ("earnings",),
+            ("text/csv", "application/octet-stream"),
+            max_bytes=5_000_000,
+        )
+    ]
 
 
 def parse_earnings(f: Fetched) -> list[dict[str, Any]]:
@@ -55,7 +64,9 @@ def parse_earnings(f: Fetched) -> list[dict[str, Any]]:
         raise SourceResponseError("Jersey earnings: not UTF-8", retryable=False) from e
     rows = list(csv.reader(io.StringIO(text)))
     if not rows or [h.strip() for h in rows[0]] != HEADER:
-        raise SourceResponseError("Jersey earnings: unexpected columns", columns=rows[0][:8] if rows else [], retryable=False)
+        raise SourceResponseError(
+            "Jersey earnings: unexpected columns", columns=rows[0][:8] if rows else [], retryable=False
+        )
     out = []
     for n, r in enumerate(rows[1:], start=2):
         if not r or not any(x.strip() for x in r):

@@ -171,3 +171,30 @@ concepts:
   theme: science
   source_order: ["gcat.payloads.PAYLOADS_STATUS_IN_ORBIT|by=owner_state"]
   provider_declared: true
+- id: infrastructure.submarine_cables_listed.wikidata
+  labels: {fr: "Câbles sous-marins de communication (Wikidata)", en: "Submarine communications cables (Wikidata)"}
+  definition: >-
+    Number of Wikidata items that are instances of 'submarine communications cable' (Q506572) or of a subclass and
+    list the country in P17 (country), at the retrieval day.
+  unit: cables
+  domain: infrastructure
+  subdomain: telecom
+  theme: economy
+  source_order: ["wikidata.submarine_cables.CABLES_LISTED"]
+  provider_declared: true
+  notes: >-
+    Community-edited (CC0), not verified; only part of the world's cable systems have a Wikidata item and some items
+    lack P17 (e.g. TAT-8). TeleGeography's Submarine Cable Map is not used (non-commercial licence).
+  tags: ["bilateral_detail:wikidata.submarine_cables"]
+- id: infrastructure.submarine_cable_partner_countries.wikidata
+  labels: {fr: "Pays reliés par câble sous-marin (Wikidata)", en: "Countries linked by submarine cable (Wikidata)"}
+  definition: >-
+    Number of distinct other countries listed (P17) on at least one Wikidata submarine communications cable item that
+    also lists the country, at the retrieval day.
+  unit: countries
+  domain: infrastructure
+  subdomain: telecom
+  theme: economy
+  source_order: ["wikidata.submarine_cables.CABLE_PARTNER_COUNTRIES"]
+  provider_declared: true
+  notes: Community-edited (CC0), not verified; absent row = no Wikidata cable item, not "no cable".

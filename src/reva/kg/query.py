@@ -12,6 +12,9 @@ Honesty rules (docs/roadmap/v3_world_graph.md)
   P1542 and their immediate/contributing variants), and then as "asserted by <source>", never as REVA's
   conclusion.
 * Results are bounded and say so (``truncated`` flags, skipped hubs, limits), never silently cut.
+* Verification labels (:func:`verification_of`): ``community_edited_not_verified`` (Wikidata),
+  ``derived`` (the statement's qualifiers declare a ``derivation``: computed from sourced inputs, e.g. the
+  Cliopatria territorial overlay, not reported by a source), else ``source_reported_not_verified``.
 * ``origin``: every query takes an optional origin filter (``live`` / ``test_fixture``; ``None`` = both, the
   caller then says when fixture rows are mixed in — the API defaults to ``live`` in production).
 """
@@ -103,7 +106,8 @@ def country_qid_registry(path: Path = COUNTRY_QIDS) -> dict[str, str]:
 
 @dataclass(frozen=True)
 class TimeWindow:
-    """Inclusive window as PostgreSQL date literals (``None`` = open side)."""
+    """Inclusive window as PostgreSQL date literals (``0044-01-01 BC``; ``None`` = open side). They are SQL
+    parameters only; outputs render them with :func:`astro_iso`."""
 
     lo: str | None = None
     hi: str | None = None
@@ -262,7 +266,37 @@ def _time_out(iso: str | None, prec: int | None) -> dict[str, Any] | None:
     return None if iso is None else {"time": iso, "precision": prec}
 
 
+def derivation_of(qualifiers: Any) -> tuple[str, str | None] | None:
+    """``(derivation, method)`` when a statement's qualifiers declare that REVA (or a source pipeline) computed
+    it rather than a source reporting it, e.g. the Cliopatria territorial overlay
+    (``derivation: computed_spatial_overlay``, ``method: reva.kg.overlay/1``); ``None`` otherwise."""
+    if not isinstance(qualifiers, Mapping):
+        return None
+    d = qualifiers.get("derivation")
+    if isinstance(d, Mapping):  # {"method": ..., ...}
+        name, method = d.get("kind") or d.get("method") or "derived", d.get("method") or d.get("version")
+    elif d is None or d is False or d == "":
+        return None
+    else:
+        name, method = d, qualifiers.get("method")
+    return str(name)[:200], (None if method is None else str(method)[:200])
+
+
+def verification_of(source_key: str | None, qualifiers: Any = None) -> tuple[str, str | None, str | None]:
+    """``(verification, derivation, derivation_method)`` of a statement: Wikidata (``wikidata``/``wikidata.*``
+    keys) is ``community_edited_not_verified`` whatever its qualifiers say; a statement whose qualifiers declare a
+    derivation is ``derived`` (computed, not reported: see the qualifiers for method, inputs and caveats); any
+    other is ``source_reported_not_verified``."""
+    if is_community_edited(source_key):
+        return "community_edited_not_verified", None, None
+    der = derivation_of(qualifiers)
+    if der is not None:
+        return "derived", der[0], der[1]
+    return "source_reported_not_verified", None, None
+
+
 def _provenance(r: Mapping[str, Any]) -> dict[str, Any]:
+    verification, derivation, method = verification_of(r["source_key"], r.get("qualifiers"))
     return {
         "source_key": r["source_key"],
         "statement_id": r["statement_id"],
@@ -275,9 +309,9 @@ def _provenance(r: Mapping[str, Any]) -> dict[str, Any]:
         "origin": r["origin"],
         "rank": r["rank"],
         "references": r["refs"],
-        "verification": "community_edited_not_verified"
-        if is_community_edited(r["source_key"])
-        else "source_reported_not_verified",
+        "verification": verification,
+        "derivation": derivation,
+        "derivation_method": method,
     }
 
 
@@ -983,9 +1017,7 @@ def _finish(
     d = dict(diag.__dict__)
     tw = diag.time_window
     d["time_window"] = (
-        None
-        if tw is None
-        else {"lo": astro_iso(tw.lo), "hi": astro_iso(tw.hi), "include_undated": tw.include_undated}
+        None if tw is None else {"lo": astro_iso(tw.lo), "hi": astro_iso(tw.hi), "include_undated": tw.include_undated}
     )
     d["hubs_skipped"] = [
         {"qid": q, "label": _display(q, labels), "degree_at_least": n} for q, n in list(diag.hubs_skipped.items())[:50]

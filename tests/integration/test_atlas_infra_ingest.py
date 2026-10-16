@@ -13,6 +13,7 @@ import polars as pl
 import pytest
 from sqlalchemy import text
 
+from reva.adapters.connectors import atlas_cables as cb
 from reva.adapters.connectors import atlas_flights as fl
 from reva.adapters.connectors import atlas_ports as po
 from reva.adapters.connectors import atlas_space as sp
@@ -73,6 +74,11 @@ async def test_infra_sources_fixture_ingest(db: Any) -> None:
 
     w = await _run(db, _spec(po.NAME), po.NAME)
     assert w["tables"][0]["table"] == "nga.wpi" and sorted(w["tables"][0]["unmapped_provider_geo"]) == ["QM", "XU"]
+
+    c = await _run(db, _spec(cb.NAME), cb.NAME)
+    assert c["tables"][0]["table"] == "wikidata.submarine_cables" and c["report"]["cables"] == 20
+    cf = read_atlas_table(db.store, c["tables"][0]["artifact_sha256"])
+    assert cf.filter(pl.col("indicator") == "CABLES_SHARED|partner=CAN").height > 0
 
 
 async def test_live_run_refused_without_budget(db: Any) -> None:

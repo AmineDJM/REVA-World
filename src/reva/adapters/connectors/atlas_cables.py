@@ -182,10 +182,10 @@ def _amount(claims: dict[str, Any], pid: str) -> dict[str, str] | None:
 def entity_of(body: bytes, qid: str) -> dict[str, Any]:
     try:
         ents = json.loads(body)["entities"]
-    except (ValueError, KeyError, TypeError) as e:
-        raise SourceResponseError(f"EntityData {qid}: not Wikibase JSON", retryable=False, kind="schema_drift") from e
-    e = ents.get(qid) or next(iter(ents.values()))  # a redirect answers with the target id
-    return e  # type: ignore[no-any-return]
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SourceResponseError(f"EntityData {qid}: not Wikibase JSON", retryable=False, kind="schema_drift") from exc
+    ent: dict[str, Any] = ents.get(qid) or next(iter(ents.values()))  # a redirect answers with the target id
+    return ent
 
 
 def describe(e: dict[str, Any]) -> dict[str, Any]:
@@ -225,7 +225,7 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
         for q in c["countries"]:
             by_country[q].append(c)
     rb = ic.RowBuilder(ATLAS_SOURCE, DATASET)
-    base = {"verification": "community_edited_not_verified", "licence": "CC0-1.0", "class": ROOT_CLASS,
+    base: dict[str, Any] = {"verification": "community_edited_not_verified", "licence": "CC0-1.0", "class": ROOT_CLASS,
             "coverage": "Wikidata cable items only (not every cable system has one); countries = P17 as edited"}  # fmt: skip
 
     def ref(cs: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:

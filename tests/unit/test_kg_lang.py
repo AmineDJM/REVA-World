@@ -118,6 +118,11 @@ def test_glottolog_kg_records(glotto: gl.GlottologData, release: gl.Release) -> 
     by = {(s.subject_qid, s.property_pid, s.statement_id): s for s in parts.statements}
     fam = by[("glottolog:port1283", gl.P_FAMILY, "family:port1283")]
     assert fam.object_qid == "glottolog:indo1319"
+    rom = by[("glottolog:port1283", gl.P_IN_GROUP, "in_group:port1283:roma1334")]
+    assert rom.object_qid == "glottolog:roma1334" and rom.qualifiers["steps_up"] > 2
+    ups = [s for s in parts.statements if s.subject_qid == "glottolog:port1283" and s.property_pid == gl.P_IN_GROUP]
+    assert len(ups) == len(glotto.languoids["port1283"].classification) - 2  # minus parent and top family
+    assert not any(s.subject_qid == "glottolog:braz1246" and s.property_pid == gl.P_IN_GROUP for s in parts.statements)
     par = by[("glottolog:port1283", gl.P_PARENT, "parent:port1283")]
     assert par.object_qid == f"glottolog:{glotto.languoids['port1283'].parent}"
     br = by[("glottolog:port1283", gl.P_SPOKEN_IN, "spoken_in:port1283:BR")]

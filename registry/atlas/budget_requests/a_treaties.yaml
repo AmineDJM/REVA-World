@@ -1,0 +1,20 @@
+# Budget request from agent A-TREATIES (treaty participation). ATLASCORE merges into registry/policies/budgets.yaml.
+# Both keys have a registry/sources/*.yaml entry (untc.yaml, ohchr_indicators.yaml); invariant 30 requires the pinned
+# budget keys to equal the registered source keys, so they must be merged for it to pass.
+# NORMLEX (ILO), UNODA treaty database, CITES and Ramsar are NOT requested: their hosts answer bot challenges
+# (Cloudflare / AWS WAF) to non-browser clients (2026-10-16); see docs/dev/v3_a_treaties.md.
+agent: A-TREATIES
+requests:
+  - source_key: untc.mtdsg
+    daily_requests: 120
+    expected_bytes_per_day: 60000000
+    reason: >-
+      atlas.untc: 53 treaty status pages (HTML, 0.13-3.3 MB, ~26 MB) + 1 UN Terms of Use page per run
+      (planned_requests 57); one full run per month, 120/day allows one retry run.
+  - source_key: ohchr.indicators
+    daily_requests: 50
+    expected_bytes_per_day: 10000000
+    reason: "atlas.ohchr: 2 list calls + 18 per-instrument JSON calls (~4.5 MB) per run (planned_requests 22); monthly"
+daily_totals_increase:
+  http_requests_total: "+170"
+  http_bytes_total: "+70_000_000"

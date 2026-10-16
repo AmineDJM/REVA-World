@@ -207,7 +207,9 @@ async def ingest_items(
                 rights=dict(p.rights),
             )
         except Exception as e:
-            errors.append({"stage": "register", "dataset": p.dataset, "error": type(e).__name__, "message": str(e)[:500]})
+            errors.append(
+                {"stage": "register", "dataset": p.dataset, "error": type(e).__name__, "message": str(e)[:500]}
+            )
             continue
         cov = out.get("coverage") or {}
         tables.append(
