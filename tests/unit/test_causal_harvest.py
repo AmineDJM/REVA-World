@@ -116,7 +116,8 @@ def test_causal_statements_keep_full_references_and_qualifiers_others_unchanged(
     e = extract_entity(raw, allow, raw_sha256="a" * 64, retrieved_at=datetime.now(UTC), properties=core.HARVEST_PIDS)
     assert {s.property for s in e.statements} == {"P828", "P1542", "P580"}  # P1082 not harvested, deprecated out
     before = {s.statement_id: s for s in e.statements}
-    assert before["Q8698$A"].references == [{"P248": ["Q999"]}]  # compact global allow-list
+    # compact global allow-list (DOI P356 / ISBN P212, P957 kept globally since CAUSOPS; quote P1683 only here)
+    assert before["Q8698$A"].references == [{"P248": ["Q999"], "P356": ["10.1/x"]}]
     e2 = core.enrich_causal_statements(e, raw, allow)
     after = {s.statement_id: s for s in e2.statements}
     ref = after["Q8698$A"].references[0]

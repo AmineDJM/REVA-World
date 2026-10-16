@@ -1830,3 +1830,8 @@ references:
   - {property: P854, expected_en: "reference URL", label_en: "reference URL", label_fr: "URL de la référence"}
   - {property: P813, expected_en: "retrieved", label_en: "retrieved", label_fr: "date de consultation"}
   - {property: P143, expected_en: "imported from Wikimedia project", label_en: "imported from Wikimedia project", label_fr: "importé du projet Wikimedia"}
+  # CAUSOPS (V3, CAUSCORE request 2): scholarly identifiers in references, so a Wikidata causal claim citing a
+  # publication by DOI/ISBN can reach tier T2 (reva.causal.grading reads P356 / P212 / P957 verbatim).
+  - {property: P356, expected_en: "DOI", label_en: "DOI", label_fr: "DOI", requested_by: CAUSCORE}
+  - {property: P212, expected_en: "ISBN-13", label_en: "ISBN-13", label_fr: "ISBN-13", requested_by: CAUSCORE}
+  - {property: P957, expected_en: "ISBN-10", label_en: "ISBN-10", label_fr: "ISBN-10", requested_by: CAUSCORE}
