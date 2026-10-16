@@ -443,8 +443,10 @@ maintainer licence review (`docs/dev/HANDOFF_V3.md` and the agents' reports):
   circumvented. Someone has to ask the providers or allow-list REVA.
 * **Wikidata capacity:** WDQS was throttled all session, and the budgets are `wikidata.wdqs` 1,500/day and
   `wikidata.wbapi` 4,000/day. The full domain harvest needs several budget days. A ledger defect booked all
-  Wikibase traffic to the WDQS account (found by CAUSWD). WDRUN has an uncommitted fix in the working tree
-  (`src/reva/kg/harvest.py`: one ledger operation per source key).
+  Wikibase traffic to the WDQS account (found by CAUSWD). WDRUN's fix (one ledger operation per source key,
+  `src/reva/kg/harvest.py`) was committed in the WIP snapshot `e411fe1` while this report was written. The same
+  snapshot also added `reva.kg.import_harvest`, an import of the harvest database into a target database, which
+  this report does not cover.
 * **Deployment** is still blocked on the V1/V2 credentials (Render, S3 bucket and scoped keys, admin password):
   see `docs/final_report.md` §5.
 * **Human reviews nobody has done yet:**
@@ -515,7 +517,7 @@ maintainer licence review (`docs/dev/HANDOFF_V3.md` and the agents' reports):
 ## 9. Open items
 
 1. **Wikidata harvest** (the biggest gap): about 110 domain specs remain. Merge the pending property requests
-   (P1923, P8031, P8032, P726, P991, P1590, P1339), commit the ledger fix (§6), and recreate
+   (P1923, P8031, P8032, P726, P991, P1590, P1339), and recreate
    `reva_kg_wdharvest`, which was migrated to an earlier 0015 revision (HANDOFF).
 2. **Dev-database loads to finish and record:**
    * the sources refused on 2026-10-16 (§4.1);

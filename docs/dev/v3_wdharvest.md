@@ -173,3 +173,68 @@ WDQS-only specs are reported `skipped`). Progress: `uv run python -m reva.kg.har
   full snapshots; objects are present as QIDs and can be labelled later (`run` without `--no-expand`).
 * QLever not adopted (no published usage policy).
 * Live test `tests/integration/test_wikidata_live.py` (marked live) not run at the end (WDQS throttled).
+
+## Governed import into the dev database (agent LOADALL, 2026-10-16/17)
+
+Owner decision (2026-10-16 23:05 UTC): the Wikidata statements harvested into the throwaway databases may enter
+the dev database `reva` through one governed path. That path is `reva kg import-harvest` (module
+`src/reva/kg/import_harvest.py`, also `python -m reva.kg.import_harvest`):
+
+```bash
+uv run reva kg import-harvest --from-db reva_kg_wdharvest            # then
+uv run reva kg import-harvest --from-db reva_kg_causwd               # [--sources 'wikidata*'] [--dry-run] [--no-verify]
+```
+
+* **No row copies.** The source database is read only as an index: its `kg.load` rows give the archived raw
+  responses (`raw_sha256s`), the retrieval time and the harvester parameters. Each entity and statement is
+  re-derived from the archived raw Wikidata response in `var/kg/objects` with the harvester's own extraction
+  (`extract_entity`, plus `enrich_causal_statements` for CAUSWD loads). The result is written with
+  `reva.kg.model.load_batch` through `KgDbSink`, under the target's integrity triggers.
+* **Provenance kept.** Statement GUIDs, `lastrevid`, ranks, qualifiers, references, `raw_sha256`, retrieval time
+  and origin are those of the archived response. Each `kg.load` carries the original parameters plus
+  `import: {importer: kg-import-harvest/1, import_key, from_db, from_load_id, profile, allowlist_sha256}`.
+* **Raw bytes verified, then copied.** Each archived gzip object must hash to its address. Its body must match
+  `body_sha256` in `archive_index.jsonl`, or the load is refused (`raw_unusable`). Verified objects are copied,
+  under the same sha256, into the target's own object store (`var/objects`), and `load_batch` registers them
+  as verified `meta.artifact` rows of the target.
+* **Extraction profiles** (from `parameters.harvester`):
+  * `wdharvest/1.0.0`: the spec's `entity_kind`/`properties`. EntityData bodies are pruned to the requested
+    props and languages, as the client does. `whatlinkshere` seed specs keep only items whose own P31
+    contains the class.
+  * `causwd/1.0.0`: `unclassified`, `HARVEST_PIDS`, extended causal references. `entitydata_archived` bodies
+    are left unpruned, as CAUSWD read them.
+  * Any other harvester or source key (e.g. `wikidata.wdqs` row loads) is skipped with a reason, never
+    guessed.
+* **Allow-list.** The current `registry/kg/properties.yaml` applies and is registered in the target first.
+  Loads harvested under an older allow-list are counted `allowlist_changed`. The re-derivation then keeps
+  what the newer list allows: P212/P356/P957 references are now allow-listed.
+* **Idempotent.** `import_key` = sha256(importer, source key, origin, raw sha256s, retrieval time, profile).
+  A load already imported is skipped without writing anything, not even a `kg.load` row, and `load_batch` is
+  idempotent per (statement key, origin, revision).
+* **Verification** (default on, read only): for every current statement key of the source, the source and
+  target `content_sha256` are compared (`identical` / `differing` / `missing_in_target`).
+* **Two profiles, one statement.** CAUSWD keeps more reference properties on causal statements than WDHARVEST.
+  The same GUID and revision therefore derives differently, and the second import is reported `conflicting`
+  and not stored. The same applies to entities: `country` vs `unclassified`, same revision.
+* **Tests.**
+  * `tests/unit/test_kg_import_harvest.py` (5): profiles, pruning, P31 filter, import key, raw verification.
+  * `tests/integration/test_kg_import_harvest_db.py` (3, two throwaway DBs): a real harvester run (scripted
+    HTTP, real archive) re-imported. Statement rows (key, GUID, content, revision, raw sha, refs, rank,
+    retrieval time, origin) and entities are identical, raws are in the target store and verified, and a
+    re-run writes nothing. A tampered archive writes nothing. The dev DB is refused as a source.
+
+### Dev-DB import results (2026-10-16 23:20 UTC)
+
+Before touching `reva`, the CAUSWD archive was imported into a throwaway DB (`reva_loadall_ihcheck`, dropped
+afterwards): 3,185 of 3,187 statements were identical, and the 2 differing ones gained ISBN references under
+the newer allow-list. Then the dev DB, WDHARVEST first so the 17 entities both harvests hold keep their
+`country`/`historical_state` kinds:
+
+| from | loads | raw objects copied (+ already present) | entities inserted / conflicting | statements inserted / unchanged / conflicting | rejected | verification (identical / differing / missing) |
+|---|---:|---:|---:|---:|---:|---|
+| `reva_kg_wdharvest` (WDRUN's archive replay of `core.*`) | 113 | 4,836 (+442) | 4,167 / 242 | 104,654 / 64,485 / 0 | 4 `end_before_start` | 104,654 / 0 / 0 |
+| `reva_kg_causwd` | 39 | 207 (+17) | 224 / 17 | 2,988 / 198 / 1 | 0 | 3,184 / 3 / 0 (1 conflict: WDHARVEST's version kept; 2: newer allow-list adds ISBN refs) |
+
+The 242 entity conflicts of the WDHARVEST import are the same as in the source: countries reloaded by
+`core.sovereign_states` with another kind at the same revision. 995 `whatlinkshere` candidates were rejected
+on P31, as in the harvest. A re-run of both imports skipped all 152 loads.
