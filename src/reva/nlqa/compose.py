@@ -248,10 +248,10 @@ class Composer:
         for op in self.x.plan.operations:
             if op.op == "entity_lookup":
                 self.identification(op.id, self.x.lookups[op.id])
-        for amb in self.x.plan.ambiguities:
-            self.ambiguity(amb)
         for res in self.x.results:
             getattr(self, f"op_{res.op.op}")(res) if res.status == "ok" else self.not_ok(res)
+        for amb in self.x.plan.ambiguities:
+            self.ambiguity(amb)
         instruction_said = False
         for u in self.x.plan.unsupported:
             if u.get("source") == "server":

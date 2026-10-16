@@ -276,4 +276,4 @@ def cached_headlines(directory: Path = SOURCE_ORDER_DIR) -> HeadlineRegistry:
     if hit is None or hit[0] != fp:
         hit = (fp, load_headlines(directory, strict=False))
         _CACHE[str(directory)] = hit
-    return hit[1]  # type: ignore[no-any-return]
+    return hit[1]

@@ -36,7 +36,7 @@ from reva.atlas.tables import DATASET_RE, SOURCE_RE
 
 CONNECTOR_PACKAGE = "reva.adapters.connectors"
 MODULE_PREFIX = "atlas_"
-ATLAS_TEMPLATE = "atlas_bulk"
+ATLAS_TEMPLATE: Literal["atlas_bulk"] = "atlas_bulk"
 MAX_ATLAS_RESPONSE_BYTES = 1024**3  # 1 GiB per response (bulk files); daily byte budget still applies
 NAME_RE = r"^atlas\.[a-z0-9][a-z0-9_.-]{0,99}$"
 HOST_RE = re.compile(r"^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$")

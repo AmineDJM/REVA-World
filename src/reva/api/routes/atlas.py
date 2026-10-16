@@ -516,7 +516,7 @@ def country_dossier(
     d = q.dossier(cat, key, domain=domain, include_series=series, theme=theme)
     h = q.headline_dossier(_headlines(), key, theme=theme, include_series=series) if headline else None
     return AtlasDossierResponse(
-        data=AtlasDossier(label=label, headline=h, **d),
+        data=AtlasDossier(label=label, headline=AtlasHeadlineDossier(**h) if h is not None else None, **d),
         snapshot=_snap(q),
         notes=[CELL_NOTE, HEADLINE_NOTE] if headline else [CELL_NOTE],
         catalog_errors=cat.errors,

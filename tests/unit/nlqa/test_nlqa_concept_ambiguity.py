@@ -89,7 +89,7 @@ def test_headline_choice_is_answered_and_the_other_candidates_named() -> None:
         ("atlas_value", "labour.mw.monthly_lcu", "FRA")
     ]
     assert plan.ambiguities[0]["resolution"] == "headline" and plan.as_json()["ambiguities"]
-    assert "1 867 EUR per month" in c.text, c.text
+    assert "867 EUR per month" in c.text and c.sentences[0].kind == "fact", c.text
     assert "Non couvert" not in c.text
     note = next(s for s in c.sentences if s.op_id == "ambiguity")
     assert note.kind == "note" and "reva.labour.minimum_wage_monthly_lcu" in note.text

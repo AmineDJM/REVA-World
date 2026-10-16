@@ -355,7 +355,7 @@ def cached_catalog(directory: Path = CATALOG_DIR) -> Catalog:
     if hit is None or hit[0] != fp:
         hit = (fp, load_catalog(directory, strict=False))
         _CACHE[key] = hit
-    return hit[1]  # type: ignore[no-any-return]
+    return hit[1]
 
 
 SERIES_KEY_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,23}\.[a-z0-9][a-z0-9_-]{0,38}\..+$")

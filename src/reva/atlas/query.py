@@ -294,7 +294,7 @@ class AtlasQuery:
         params: Sequence[Any] = (),
         series: list[tuple[Any, ...]] | None = None,
         extra: dict[str, pa.Table] | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         with self._lock:
             cur = self._con.cursor()
         try:
@@ -388,7 +388,7 @@ class AtlasQuery:
         series = self._concept_series(catalog, concept_ids)
         if not series:
             return []
-        where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], []
+        where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], list[Any]()
         if iso3 is not None:
             where.append("x.iso3 = ?")
             params.append(iso3)
@@ -670,7 +670,7 @@ class AtlasQuery:
                 "allow": pa.array([h[4] for h in hs], pa.bool_()),
             }
         )
-        where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], []
+        where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], list[Any]()
         if iso3 is not None:
             where.append("x.iso3 = ?")
             params.append(iso3)
@@ -803,8 +803,8 @@ class AtlasQuery:
     ) -> dict[str, Any] | None:
         assert c.derived is not None
         unit_of = {o.concept: reg.concepts[o.concept].unit for o, _ in (a, b) if o.concept}
-        ca = self._reported_cell(a[1], unit_of.get(a[0].concept), key, ra)
-        cb = self._reported_cell(b[1], unit_of.get(b[0].concept), key, rb)
+        ca = self._reported_cell(a[1], unit_of.get(a[0].concept or ""), key, ra)
+        cb = self._reported_cell(b[1], unit_of.get(b[0].concept or ""), key, rb)
         try:
             va, vb = Decimal(ca["value"]), Decimal(cb["value"])
         except InvalidOperation:  # pragma: no cover - registered values are strict decimals
