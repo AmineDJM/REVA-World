@@ -1177,10 +1177,17 @@ def icow_claims_kg(
     return kg
 
 
-def code_entities_and_links(resolver: StateEntityResolver, *, raw_sha256: str) -> tuple[list[KgEntity], list[KgStatement]]:
+def code_entities_and_links(
+    resolver: StateEntityResolver, *, raw_sha256: str, prefix: str
+) -> tuple[list[KgEntity], list[KgStatement]]:
+    """State-code entities (``cow:<code>``) the resolver had to create, and their dated
+    ``geopol:corresponds_to_iso3`` statements (keys prefixed per dataset: each load owns its own)."""
+    from dataclasses import replace
+
     from reva.adapters.connectors.atlas_geopol_common import code_correspondence
 
-    return resolver.code_entities(), code_correspondence(resolver, raw_sha256=raw_sha256)
+    links = [replace(s, key=f"{prefix}:{s.key}") for s in code_correspondence(resolver, raw_sha256=raw_sha256)]
+    return resolver.code_entities(), links
 
 
 # =============================================================================== atlas source specs
@@ -1205,15 +1212,15 @@ def atlas_source() -> list[Any]:
             atlas_source="coldat",
             provider="Bastian Becker (University of Bremen, SOCIUM) via Harvard Dataverse",
             licence=LICENCE_COLDAT,
-            allowed_hosts=DV_HOSTS,
+            allowed_hosts=(*DV_HOSTS, "cran.r-project.org"),
             datasets=("dyads_v3",),
             dataset_ids=(f"{COLDAT_DOI}@{COLDAT_VERSION}",),
             cadence_seconds=180 * 86400,
-            planned_requests=6,
+            planned_requests=7,
             max_response_bytes=5_000_000,
             min_interval_seconds=1.0,
             parser_version=PARSER_VERSION_COLDAT,
-            notes="COLDAT v3.0: version record + dyads/colonies .tab + read_me (4 requests)",
+            notes="COLDAT v3.0: version record + dyads/colonies .tab + read_me + countrycode tarball (5 requests)",
         ),
         AtlasSourceSpec(
             name="atlas.icow",
@@ -1325,7 +1332,7 @@ async def _ingest_coldat(run: Any) -> dict[str, Any]:
         qids = load_qid_for_iso3()
         resolver = StateEntityResolver(cw, qids)
         kg = coldat_kg(dyads, raw_sha256=shas["dyads"], resolver=resolver, qid_for_iso3=qids)
-        code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha)
+        code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha, prefix="coldat")
         ents = [*kg.entities.values(), *code_ents]
         out["kg"] = load_colonial_kg(
             run.engine,
@@ -1405,7 +1412,7 @@ async def _ingest_icow(run: Any) -> dict[str, Any]:
                 kg = icow_colhist_kg(parsed[key][1], raw_sha256=shas[key], resolver=resolver)
             else:
                 kg = icow_claims_kg(parsed[key][1], raw_sha256=shas[key], resolver=resolver, names=names)
-            code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha)
+            code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha, prefix=key)
             ents = [*kg.entities.values(), *code_ents]
             out["kg"][key] = load_colonial_kg(
                 run.engine,
