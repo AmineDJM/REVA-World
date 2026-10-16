@@ -5,7 +5,7 @@ Sources (both read from their Harvard Dataverse release, licence + file MD5 chec
 ------------------------------------------------------------------------------------------------
 * **HIEF** -- Drazanova, Lenka (2019), *Historical Index of Ethnic Fractionalization Dataset (HIEF)*,
   Harvard Dataverse doi:10.7910/DVN/4JQRCL, V2, file ``HIEF_data.tab`` (original ``HIEF_data.csv``):
-  ``Country, Year, EFindex`` for 165 country units, 1945-2013, annual. Licence **CC0 1.0** (Dataverse
+  ``Country, Year, EFindex`` for 162 country units, 1945-2013, annual (no row for France). Licence **CC0 1.0** (Dataverse
   record). Built from Cline Center CREG group shares (Drazanova 2020, Journal of Open Humanities Data).
 * **SSCP fractionalisation** -- Gordon, E. R. (2026), *Small State Coverage Project (SSCP):
   Fractionalisation* v1.0, Harvard Dataverse doi:10.7910/DVN/EVCQXC, file
@@ -126,17 +126,27 @@ def parse_hief(body: bytes, *, raw_sha256: str, min_rows: int = HIEF_MIN_ROWS) -
         raise err(f"{HIEF_FILE}: only {len(rows)} rows (expected >= {min_rows}): truncated file?")
     hints = concept_hints(CATALOG_FILE, "hief", "hief")
     buf = RowBuffer("hief", "hief")
-    seen: set[tuple[str, int]] = set()
     rep: Counter[str] = Counter()
     unmapped: dict[str, list[int]] = {}
+    # HIEF V2 repeats some country-years on several identical lines (e.g. Rwanda 1991, Argentina 2000 x3):
+    # identical repeats are kept once (first line) and listed in flags.provider_duplicate_lines; repeats
+    # with a different value would be ambiguous and block registration.
+    first: dict[tuple[str, int], tuple[int, str]] = {}
+    dups: dict[tuple[str, int], list[int]] = {}
     for i, r in enumerate(rows, start=2):
         name, ytxt, vtxt = r["Country"].strip(), r["Year"].strip(), r["EFindex"].strip()
         if not ytxt.isdigit():
             raise err(f"{HIEF_FILE} line {i}: Year {ytxt!r} is not a year")
-        year = int(ytxt)
-        if (name, year) in seen:
-            raise err(f"{HIEF_FILE} line {i}: duplicate country-year {name}/{year}")
-        seen.add((name, year))
+        key = (name, int(ytxt))
+        if key in first:
+            if first[key][1] != vtxt:
+                raise err(f"{HIEF_FILE} line {i}: {name}/{ytxt} repeated with a different value ({vtxt!r})")
+            dups.setdefault(key, []).append(i)
+            rep["identical_duplicate_lines"] += 1
+            continue
+        first[key] = (i, vtxt)
+    seen = set(first)
+    for (name, year), (i, vtxt) in first.items():
         if vtxt in ("", "NA"):
             rep["missing_values"] += 1
             continue
@@ -144,16 +154,19 @@ def parse_hief(body: bytes, *, raw_sha256: str, min_rows: int = HIEF_MIN_ROWS) -
         if v is None:
             raise err(f"{HIEF_FILE} line {i}: EFindex {vtxt!r} is not a number")
         iso3, how = hief_iso3(name, year)
-        rep[how] += 1
+        rep[f"cells_{how}"] += 1
         if iso3 is None:
             unmapped.setdefault(name, []).append(year)
+        flags: dict[str, Any] = {"iso3_resolution": how}
+        if (name, year) in dups:
+            flags["provider_duplicate_lines"] = dups[(name, year)]
         buf.add(
             indicator="EFindex",
             provider_geo=name,
             period=year_period(year),
             value=v,
             unit="index (0-1)",
-            flags=canon(iso3_resolution=how),
+            flags=canon(flags),
             raw_sha256=raw_sha256,
             selector=canon(file=HIEF_FILE, row=i, column="EFindex"),
             iso3=iso3,
@@ -166,6 +179,7 @@ def parse_hief(body: bytes, *, raw_sha256: str, min_rows: int = HIEF_MIN_ROWS) -
         "units": len({n for n, _ in seen}),
         "years": [min(y for _, y in seen), max(y for _, y in seen)] if seen else None,
         "unmapped": {k: [min(v), max(v)] for k, v in sorted(unmapped.items())},
+        "duplicate_country_years": [f"{n}/{y}" for n, y in sorted(dups)],
     }
     return buf.frame(), rep_out
 

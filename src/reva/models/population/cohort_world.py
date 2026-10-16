@@ -147,7 +147,9 @@ class CohortComponentWorldModel(CC.CohortComponentModel):
         if source == "eurostat_demography":
             compiled = super().compile(inputs, {**base_spec(spec), "countries": list(ms.countries)})
         else:
-            compiled = CC.CompiledProjection(ms, dict(inputs.release), [self._wpp_plan(inputs, ms, iso3) for iso3 in ms.countries])
+            compiled = CC.CompiledProjection(
+                ms, dict(inputs.release), [self._wpp_plan(inputs, ms, iso3) for iso3 in ms.countries]
+            )
         compiled.data_source = source  # type: ignore[attr-defined]
         return compiled
 

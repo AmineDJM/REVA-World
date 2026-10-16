@@ -340,6 +340,8 @@ def iter_geojson_features(stream: IO[bytes], *, max_feature_bytes: int = MAX_FEA
                     raise OverlayError("GeoJSON feature larger than the bound") from e
                 if not fill():
                     raise OverlayError(f"GeoJSON: malformed feature ({e.msg})") from e
+        if end > max_feature_bytes:
+            raise OverlayError("GeoJSON feature larger than the bound")
         if not isinstance(obj, dict) or obj.get("type") != "Feature":
             raise OverlayError("GeoJSON: features array holds a non-Feature")
         yield obj

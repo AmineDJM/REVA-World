@@ -251,9 +251,7 @@ def _other_versions(models: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
     out: dict[str, dict[str, Any]] = {}
     for k, default in models.items():
-        others = {
-            v: m for v, m in VERSIONS.get(k, {}).items() if m is not default and v != default.model_version
-        }
+        others = {v: m for v, m in VERSIONS.get(k, {}).items() if m is not default and v != default.model_version}
         if others:
             out[k] = dict(sorted(others.items()))
     return out

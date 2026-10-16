@@ -85,6 +85,52 @@ models:
     output_ports: [{name: weighted_records}]
     applicability: {attributes: [age, sex], max_records: 100000}
     assumptions: [no attributes beyond age and recorded sex; no household structure]
+  # V3 SIMWORLD: version 1.1.0 of the same model (every WPP country). Listed BEFORE 1.0.0 on purpose: the
+  # plugin registry keeps 1.0.0 as the default version of the key, and consumers that index this file by
+  # model_key alone (later entry wins) keep resolving the 1.0.0 entry.
+  - model_key: demography.cohort_component
+    version: "1.1.0"
+    kind: scenario
+    approval_status: candidate
+    review_status: maintainer_review_pending
+    description: >-
+      Version 1.1.0 of the annual cohort-component projection: identical numerics; a required
+      assumptions.data_source selects the inputs: "eurostat_demography" (the 1.0.0 path for the 31 EU/EFTA
+      countries, values identical to 1.0.0) or "un_wpp2024" (UN World Population Prospects 2024 estimates,
+      237 countries/areas; countries ["ALL"] accepted; migration zero or average residual, constant
+      fertility by five-year mother's age groups; jump-off at most 1 January 2023). WPP estimates are
+      model-based: the published back-test checks consistency with WPP, not truth. A conditional
+      projection under stated assumptions, not a forecast.
+    input_ports:
+      - {name: population, kind: dataset, concept: demography.wpp.population.jan1_age_sex}
+      - {name: deaths, kind: dataset, concept: demography.wpp.deaths.age_sex}
+      - {name: births, kind: dataset, concept: demography.wpp.live_births.mother_age5_newborn_sex}
+      - {name: wpp_indicators, kind: dataset, concept: demography.wpp.indicators_summary, optional: true}
+      - {name: population_eurostat, kind: dataset, concept: demography.population.jan1_age_sex, optional: true}
+      - {name: deaths_eurostat, kind: dataset, concept: demography.deaths.age_sex, optional: true}
+      - {name: births_eurostat, kind: dataset, concept: demography.live_births.mother_age_newborn_sex, optional: true}
+    output_ports:
+      - {name: population_by_sex_and_broad_age_group, unit: unit.persons, temporal: "point:01-01"}
+      - {name: births_deaths_net_migration, unit: unit.persons, temporal: calendar_year}
+      - {name: old_age_dependency_ratio_65plus_per_15_64, unit: unit.percent}
+      - {name: old_age_dependency_ratio_67plus_per_20_66, unit: unit.percent}
+      - {name: population_by_single_age, unit: unit.persons, optional: true}
+    applicability:
+      data_sources: [eurostat_demography, un_wpp2024]
+      countries_un_wpp2024: 237 WPP 2024 countries/areas (reva.models.population.wpp.COUNTRIES); small territories refused when the open age would fall below 85
+      horizon: {max_periods: 50, unit: calendar_year}
+      open_age: {max: 100, min: 85}
+      base_period_must_end_before_jump_off: true
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [forecast, probability_levels, mortality_improvement, economic_effects]
+    assumptions:
+      - mortality held at base-period rates (no improvement)
+      - migrants added at the end of the year
+      - residual net migration against WPP estimates = migration implied by WPP's own reconstruction plus survival differences
+      - fertility rates by five-year mother's age group applied uniformly within the group (WPP path)
+      - births by newborn sex derived from WPP total births and the WPP sex ratio at birth (WPP path)
+      - open age groups never split
   - model_key: demography.cohort_component
     version: "1.0.0"
     kind: scenario
@@ -160,6 +206,48 @@ models:
         products (FIGARO DOM x D21X31 x P3_S14) fixed in money per unit; ad valorem taxes would keep the
         basic-price figure, so the two readings bracket the tax treatment; neither is a CPI
       - a shocked industry is a whole table industry (NACE B is broader than crude petroleum)
+  # V3 SIMWORLD: version 1.1.0 (countries outside the Eurostat LFS); listed before 1.0.0 (see above).
+  - model_key: social.retirement_age
+    version: "1.1.0"
+    kind: scenario
+    approval_status: candidate
+    review_status: maintainer_review_pending
+    description: >-
+      Version 1.1.0 of the retirement-age module for countries with a rule table (law-text tables for
+      FRA DEU ESP NLD; World Bank WBL 2026 tables for 163 more economies, registry/rules/retirement_age_wbl2026,
+      age as of 1 October 2025 held constant as a labelled counterfactual reference path, one track per sex),
+      UN WPP 2024 population (cohort-component projection) and ILOSTAT employment and participation rates by
+      sex and five-year band. Single ages 55-64 only (ILOSTAT has no 65-69 band); employment change, persons
+      kept out of / brought into pension receipt (rho proxy), employed persons 55-64, employment rates by band
+      and the old-age dependency ratio. Pension recipient levels and expenditure are not computed (refused).
+      The employment response is a cited European estimate, transferred and labelled outside its country.
+    input_ports:
+      - {name: employment_rate, kind: dataset, concept: labour.ilostat.employment_to_population_ratio.age5_sex}
+      - {name: activity_rate, kind: dataset, concept: labour.ilostat.labour_force_participation_rate.age5_sex}
+      - {name: population, kind: dataset, concept: demography.wpp.population.jan1_age_sex}
+      - {name: deaths, kind: dataset, concept: demography.wpp.deaths.age_sex}
+      - {name: births, kind: dataset, concept: demography.wpp.live_births.mother_age5_newborn_sex}
+    output_ports:
+      - {name: employed_persons_55_64, unit: unit.persons}
+      - {name: employment_change_55_64, unit: unit.persons}
+      - {name: pension_recipients_change_55_64, unit: unit.persons}
+      - {name: old_age_dependency_ratio, unit: unit.ratio}
+      - {name: employment_rate_by_sex_and_group, unit: unit.percent}
+    applicability:
+      rule_tables: registry/rules/retirement_age (law text) + registry/rules/retirement_age_wbl2026 (WBL 2026)
+      countries_refused_capability_gap: registry/rules/retirement_age_wbl2026/wbl2026_gaps.yaml
+      horizon: {max_end_year: 2040, unit: calendar_year}
+      reference_year_max: 2022
+      ages: [55, 64]
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [pension_recipients, pension_expenditure_change_approx_eur, employed_persons_55_69, gdp_loss, unemployment, wages, household_welfare]
+    assumptions:
+      - ILOSTAT rates of the latest complete year (at most 10 years before the reference year) held constant
+      - pension-receipt drop = share outside the labour force of the age band (proxy of unknown direction; L2 bounding variants 55-59 / 60-64)
+      - employment response = cited European literature value (transferred outside its country, labelled)
+      - WBL 2026 age held constant for every claim year (counterfactual reference path; reforms not captured)
+      - exceptions to the general eligibility age and pension coverage (informality) not represented
   - model_key: social.retirement_age
     version: "1.0.0"
     kind: scenario

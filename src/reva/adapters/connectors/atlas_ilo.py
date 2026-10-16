@@ -34,7 +34,7 @@ One table per indicator: ``source = "ilostat"``, ``dataset = <indicator id lower
 (``ilostat.ear_inee_cur_nb_a``). ``indicator`` = the ILOSTAT indicator code with every classification
 folded in verbatim: ``UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15``. Geography: ILOSTAT
 ``ref_area`` through the ``ilo`` scheme (``registry/atlas/geo_aliases/ilo.yaml``: ISO3 + ``KOS``→XKX,
-``CHA``→CHI); aggregates (``X..``), ``TWN`` and ``ANT`` stay unmapped and are listed in the manifest.
+``CHA``→CHI); aggregates (``X..``) and ``ANT`` stay unmapped and are listed in the manifest (``TWN`` maps since the crosswalk lists Taiwan).
 
 Estimate types are never mixed: the ``*_2*`` indicators and ``SDG_0111`` (working poverty; every row
 sourced "ILO - Modelled Estimates") are **ILO modelled estimates** (harmonised, cover every country incl.
@@ -72,7 +72,7 @@ SOURCE_KEY = "ilostat.rplumber"
 HOST = "rplumber.ilo.org"
 BASE = f"https://{HOST}"
 CONNECTOR_NAME = "atlas.ilostat"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.1 (ATLASOPS): docstring update only (TWN maps)
 PARSER_VERSION = "atlas-ilostat-parse-1"
 GEO_SCHEME = "ilo"
 GZIP_MEDIA = ("application/octet-stream", "application/gzip", "application/x-gzip")

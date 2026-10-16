@@ -86,10 +86,12 @@ class Derived:
     alternatives: tuple[tuple[Operand, Operand], ...]
     justification: str
     scale: Decimal = Decimal(1)
+    same_source: bool = True  # both inputs from one provider (default; review ATLAS-6)
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "formula": self.formula,
+            "same_source": self.same_source,
             "scale": str(self.scale),
             "alternatives": [[a.as_dict(), b.as_dict()] for a, b in self.alternatives],
             "justification": self.justification,
@@ -176,7 +178,11 @@ def _check_doc(doc: dict[str, Any], name: str, themes: set[str]) -> list[str]:
         for s in c.get("series") or []:
             if _dec(s.get("scale")) != 1 and not s.get("reported_unit"):
                 out.append(f"{c['id']}: {s['series']} has a scale but no reported_unit")
-        for alt in (c.get("derived") or {}).get("alternatives") or []:
+        d = c.get("derived") or {}
+        for alt in d.get("alternatives") or []:
+            if d.get("same_source", True) and all("series" in o for o in alt):
+                if len({Series.parse(o["series"]).source for o in alt}) != 1:
+                    out.append(f"{c['id']}: same_source derived pair mixes providers: {[o['series'] for o in alt]}")
             for o in alt:
                 if "series" in o and _dec(o.get("scale")) != 1 and not o.get("reported_unit"):
                     out.append(f"{c['id']}: derived operand {o['series']} has a scale but no reported_unit")
@@ -227,6 +233,7 @@ def load_headlines(directory: Path = SOURCE_ORDER_DIR, *, strict: bool = True) -
                     alternatives=tuple((_operand(a), _operand(b)) for a, b in d["alternatives"]),
                     justification=d["justification"],
                     scale=_dec(d.get("scale")),
+                    same_source=bool(d.get("same_source", True)),
                 )
                 if d
                 else None,

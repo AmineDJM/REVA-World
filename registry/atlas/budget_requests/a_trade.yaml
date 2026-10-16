@@ -6,8 +6,9 @@ requests:
   - source_key: cepii.baci
     # Byte ranges of BACI_HS92_V202601.zip (2.42 GB): tail (64 KB) + country codes + Readme + 13 year
     # members (45-99 MB each) = 16 requests, 1.14 GB per full run. BACI releases once a year (January):
-    # a full run is needed once a year; allow one retry of a few members.
-    daily_requests: 30
+    # a full run is needed once a year; allow one full retry (2 x 16 = 32 requests; the live run of
+    # 2026-10-15 needed it: the first attempt was OOM-killed while building tables, after all fetches).
+    daily_requests: 40
     expected_bytes_per_day: 1250000000
     reason: "BACI HS92 V202601: 13 selected year members by byte range (1.14 GB) + central directory"
   - source_key: unctad.bulk
@@ -23,7 +24,7 @@ requests:
     expected_bytes_per_day: 80000000
     reason: "OECD-WTO BaTIS bilateral services matrix (21 requests per run) + A-ILO earnings (2)"
 daily_totals_increase:
-  http_requests_total: "+95"
+  http_requests_total: "+105"
   http_bytes_total: "+1_365_000_000"
 notes: >-
   BACI is the only large item (1.14 GB per yearly refresh) and is archived content-addressed (raw

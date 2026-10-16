@@ -113,6 +113,14 @@ consistently modelled sanctions class/property (candidate class QIDs did not ver
 `ImmutableRecordViolation: connector atlas.bmr@1.0.0 is registered with different content` (A-POL's connector
 changed without a version bump) — not in my files; Wikidata was also throttling (429/maxlag) most of the session.
 
+### 4.3 Live ingest (budget-metered, `pytest -m "live and db" tests/integration/test_atlas_geopol_live.py`, 2026-10-15)
+
+3 passed in 718 s on a per-session throwaway database: UCDP 5 requests / 0.87 MB, CShapes 2 / 4.72 MB, UNGA 4 /
+9.27 MB (budget policy `budgets-1.3.4`, no refusal). Registered: `atlas.ucdp.orgvio_cy` 185,432,
+`atlas.ucdp.acd_cy` 6,835, `atlas.cshapes.polities_gw` 2,475, `polities_cow` 2,813, `geo.cshapes.polygons` 1,515,
+`atlas.unga.votes` 1,027,498, `atlas.unga.rollcalls` 6,551, `atlas.unga.vote_shares` 431,489 rows; KG 10,159 +
+1,957 + 950,213 statements inserted, **0 rejected**. The live bytes equal the bytes analysed in §4 (identical counts).
+
 ### 4.4 Full-scale load (real 2026-10-15 bytes, throwaway DB `reva_kggeopol_*`, dropped afterwards)
 
 | Source | Time | Peak RSS | KG statements (rejected) | `kg.statement` size after |

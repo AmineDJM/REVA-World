@@ -45,6 +45,7 @@ from reva.nlqa.ports import (
     KgStatement,
     PathHop,
     TimeValue,
+    is_projection,
 )
 
 log = logging.getLogger("reva.nlqa.adapters")
@@ -202,20 +203,26 @@ class KgDbAdapter:
         return {q: v for q, v in rows if isinstance(v, str) and re.fullmatch(r"[A-Z]{3}", v)}
 
     def labels_for_iso3(self, iso3s: Sequence[str]) -> dict[str, dict[str, str]]:
+        """KG labels per ISO3: the reviewed registry's QID for the code, else the only KG item holding the
+        code (P298). A code held by several items gets no KG label (the crosswalk label is used): the
+        answer never names one of them silently (review V3, LINKS-2)."""
         kq = self._kq()
+        registry = kq.country_qid_registry() if hasattr(kq, "country_qid_registry") else {}
         with self._conn() as conn:
             rows = conn.execute(
-                text("""SELECT value->>'value' AS iso3, subject_qid FROM kg.statement_current
+                text("""SELECT DISTINCT value->>'value' AS iso3, subject_qid FROM kg.statement_current
                          WHERE property_pid = 'P298' AND value->>'value' = ANY(:i)"""),
                 {"i": list(iso3s)},
             ).all()
-            by_qid = {q: i for i, q in rows}
-            labels = kq.labels_for(conn, by_qid.keys())
-        out: dict[str, dict[str, str]] = {}
-        for qid, iso3 in by_qid.items():
-            if labels.get(qid) and iso3 not in out:
-                out[iso3] = dict(labels[qid])
-        return out
+            holders: dict[str, set[str]] = {}
+            for i, q in rows:
+                holders.setdefault(i, set()).add(q)
+            qid_of = {i: registry[i] for i in iso3s if i in registry}
+            for i, qs in holders.items():
+                if i not in qid_of and len(qs) == 1:
+                    qid_of[i] = next(iter(qs))
+            labels = kq.labels_for(conn, set(qid_of.values()))
+        return {iso3: dict(labels[qid]) for iso3, qid in qid_of.items() if labels.get(qid)}
 
     def entity(self, qid: str) -> Entity | None:
         kq = self._kq()
@@ -323,6 +330,11 @@ def _atlas_cell(c: Mapping[str, Any], concept_id: str, snapshot: str | None) -> 
     )
 
 
+def _latest_key(c: AtlasCell) -> tuple[bool, int]:
+    """Order for "the latest value": any actual cell before any projection, then by year."""
+    return (not is_projection(c.flags), c.year if c.year is not None else -(10**6))
+
+
 class AtlasQueryAdapter:
     """:class:`~reva.nlqa.ports.AtlasPort` on :class:`reva.atlas.query.AtlasQuery` + the atlas catalog."""
 
@@ -343,6 +355,7 @@ class AtlasQueryAdapter:
                 definition=c.definition[:300],
                 source_order=tuple(s.key for s in c.source_order),
                 review_status="provider_declared_not_human_reviewed",
+                rankable=getattr(c, "rankable", None) if isinstance(getattr(c, "rankable", None), bool) else None,
             )
             for c in self.catalog.concepts.values()
         ]
@@ -377,11 +390,11 @@ class AtlasQueryAdapter:
             cells = self._per_source(concept_id, iso3)
             if year is not None:
                 out.extend(c for c in cells if c.year == year)
-            else:  # latest cell per series
+            else:  # latest cell per series — the latest actual one; a projection only when nothing else exists
                 latest: dict[str, AtlasCell] = {}
                 for c in cells:
                     k = f"{c.source}.{c.dataset}.{c.indicator}"
-                    if k not in latest or (c.year or 0) > (latest[k].year or 0):
+                    if k not in latest or _latest_key(c) > _latest_key(latest[k]):
                         latest[k] = c
                 out.extend(latest.values())
         return AtlasResult(tuple(out), declared)
@@ -568,7 +581,7 @@ class LinksAdapter:
         try:
             from reva.kg import query as kq
             from reva.links.paths import KgNeighbourhood
-            from reva.links.service import UnknownCountry, links_for_country
+            from reva.links.service import AmbiguousCountry, UnknownCountry, links_for_country
         except ImportError:
             raise CapabilityUnavailable("reva.links is not installed", backend="links") from None
         types = sorted({t for k in kinds for t in LINK_GROUPS.get(k, (k,))}) if kinds else None
@@ -578,6 +591,11 @@ class LinksAdapter:
                     res = links_for_country(conn, iso3, link_types=types)
                 except UnknownCountry:
                     return []
+                except AmbiguousCountry as e:
+                    raise CapabilityUnavailable(
+                        f"ISO3 {iso3} is held by several KG items ({', '.join(e.candidates[:5])}); none is chosen",
+                        backend="links",
+                    ) from None
                 iso_by_qid = {q: i for i, q in KgNeighbourhood(conn).iso3_to_qid().items()}
                 pids = {
                     str(ev.get("pid") or ev.get("property")) for lk in res["links"] for ev in lk.get("evidence", [])

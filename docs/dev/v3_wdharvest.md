@@ -21,8 +21,8 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
 ## Policy compliance
 
 * **User-Agent** (Wikimedia User-Agent policy, WDQS usage policy): `REVA-World/0.3 (research world knowledge
-  graph; <contact>) reva-kg-harvest/0.3`, contact = `REVA_CONTACT_EMAIL`/`REVA_HTTP_CONTACT_EMAIL` when set,
-  else the project URL. **Set `REVA_CONTACT_EMAIL` for production runs.**
+  graph; https://github.com/AmineDJM/REVA-World) reva-kg-harvest/0.3` — generic project UA with the project
+  URL as contact; never a personal e-mail address or other personal data.
 * **One request at a time, machine-wide.** Every request takes an exclusive `fcntl` lock on
   `var/locks/wikidata.lock`; the shared state `var/locks/wikidata.state.json` enforces ≥ 2 s between the end
   of one request and the start of the next (any process, any agent) — 2 s, not 1 s, because the API answered

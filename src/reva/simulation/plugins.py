@@ -66,6 +66,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 __all__ = [
     "KNOWN_MODEL_MODULES",
     "REGISTRY",
+    "VERSIONS",
     "DatasetInput",
     "InputRequirement",
     "ResolvedInputs",
@@ -73,7 +74,6 @@ __all__ = [
     "ScalarInput",
     "SimulationModel",
     "SubjectRef",
-    "VERSIONS",
     "get",
     "load_all",
     "register",

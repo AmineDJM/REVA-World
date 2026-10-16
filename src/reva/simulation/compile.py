@@ -17,7 +17,6 @@ names are re-exported here for compatibility).
 from __future__ import annotations
 
 import re
-
 from collections.abc import Iterable
 from datetime import datetime
 from typing import Any

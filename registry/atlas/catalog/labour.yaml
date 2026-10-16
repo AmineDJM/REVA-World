@@ -380,24 +380,41 @@ concepts:
     breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
 - id: labour.minimum_wage.monthly.local_currency
   labels:
-    fr: Salaire minimum mensuel (monnaie nationale)
-    en: Monthly minimum wage (national currency)
-  definition: Statutory nominal gross monthly minimum wage in national currency (the currency of each cell is named in its
-    unit).
+    fr: Salaire minimum mensuel (monnaie nationale, à une date de référence)
+    en: Monthly minimum wage (national currency, at a reference date)
+  definition: Statutory nominal gross monthly minimum wage in force at the provider's reference date (ILOSTAT reference
+    month, e.g. July for France; Eurostat 1 January / 1 July semesters), in the currency the provider reports (named in the
+    cell unit or flags; ILOSTAT's "local currency" can be EUR for a non-euro country, e.g. Norway, as its notes state).
   unit: national currency per month (named per cell)
   domain: labour
   subdomain: wages
   source_order:
   - ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU
   - eurostat.earn_mw_cur.earn_mw_cur|currency=NAC
-  - oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V
   provider_declared: true
   notes: Statutory minimum wage as published by ILOSTAT (best source per country-year; mostly labour legislation). flags.notes
     gives the minimum-wage type (national floor, sectoral, lowest occupational, regional mean...), the reference month and
     ILO calculations (e.g. 'Hourly figure multiplied by 40 hours and 4.33 weeks'). Countries without a statutory national
     minimum wage have no ILOSTAT row; Eurostat earn_mw_cur states it explicitly for European countries (flag 'm', data cannot
-    exist). Eurostat cells are semi-annual (January / July); OECD monthly cells are only published for countries whose minimum
-    wage is set monthly.
+    exist). Eurostat cells are semesters (the year view shows the July semester, with its true period); Eurostat NAC does not
+    name the currency. OECD monthly minimum wages are annual averages of the monthly values (a different reference period)
+    and are a separate concept (labour.minimum_wage.monthly.national_currency.annual_average; review V3 DATA-1, ATLASOPS).
+  tags:
+  - owner_request
+- id: labour.minimum_wage.monthly.national_currency.annual_average
+  labels:
+    fr: Salaire minimum mensuel, moyenne annuelle (monnaie nationale, OCDE)
+    en: Monthly minimum wage, annual average (national currency, OECD)
+  definition: Statutory gross monthly minimum wage averaged over the year (OECD earnings database, current prices, national
+    currency).
+  unit: national currency per month (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V
+  provider_declared: true
+  notes: OECD averages the monthly minimum wage over the calendar year (e.g. France 2023 = mean of 1,709.28 x 4 months and
+    1,747.20 x 8 months), so it differs from the value in force at a reference date (labour.minimum_wage.monthly.local_currency).
   tags:
   - owner_request
 - id: labour.minimum_wage.monthly.usd

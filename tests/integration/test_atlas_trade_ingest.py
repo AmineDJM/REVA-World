@@ -50,7 +50,11 @@ def _one(frame: pl.DataFrame, geo: str, indicator: str, year: int) -> dict[str, 
 async def test_baci_byte_range_ingest(db: Any) -> None:
     rep = await _run(db, atlas_baci)
     tabs = _tables(rep)
-    assert set(tabs) == {f"baci.{d}" for d in atlas_baci.DATASETS if d != "hs92_pair_section_1995_2015"}
+    assert set(tabs) == {
+        f"baci.{d}"
+        for d in atlas_baci.DATASETS
+        if d not in ("hs92_pair_section_1995_2010", "hs92_pair_section_2011_2019")
+    }
     assert rep["years"] == [2023, 2024]
     assert all(t["unmapped_provider_geo"] == ["490"] for t in tabs.values())
     country = read_atlas_table(db.store, tabs["baci.hs92_country"]["artifact_sha256"])

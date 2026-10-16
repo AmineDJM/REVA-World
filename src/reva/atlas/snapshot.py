@@ -212,7 +212,13 @@ def take_snapshot(
     warm: bool = False,
     skip_unchanged: bool = False,
 ) -> dict[str, Any]:
-    """Record (or reuse) a snapshot; ``warm`` also builds the local DuckDB query file."""
+    """Record (or reuse) a snapshot; ``warm`` also builds the local DuckDB query file.
+
+    A fixture-origin snapshot is refused in production (review ATLAS-5)."""
+    if origin == "test_fixture" and getattr(settings, "reva_env", "") == "production":
+        from reva.kernel.errors import PolicyDenied
+
+        raise PolicyDenied("fixture atlas snapshots are not allowed in production")
     snap = create_atlas_snapshot(engine, store, origin=origin, skip_unchanged=skip_unchanged)
     out: dict[str, Any] = {**snap.ref(), "reused": snap.reused, "activity_id": snap.activity_id}
     if warm:

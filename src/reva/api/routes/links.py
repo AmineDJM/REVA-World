@@ -39,12 +39,23 @@ class CountryLinksResponse(s.Envelope):
 
 
 def _origins(evidence: list[dict[str, Any]]) -> list[str]:
-    return sorted({e.get("origin") or "live" for e in evidence})
+    """Origins of the evidence; an item without a recorded origin is ``unknown`` (never assumed live)."""
+    return sorted({e.get("origin") or "unknown" for e in evidence})
 
 
 def _envelope(origins: list[str], community: bool, t: Timer, rows: int, **detail: Any) -> dict[str, Any]:
-    origin = origin_of(origins)
+    known = [o for o in origins if o != "unknown"]
+    origin = origin_of(known)
     warnings = ([COMMUNITY_WARNING] if community else []) + origin_warnings(origin)
+    if "unknown" in origins:
+        # LINKS-3: evidence without a recorded origin is not labelled live
+        origin = "mixed" if known else "none"
+        warnings.append(
+            s.ApiWarning(
+                code="origin_unknown",
+                message="Some evidence has no recorded origin (live or test fixture); it is not asserted to be live.",
+            )
+        )
     return {
         "context_mode": "evidence",
         "origin": origin,
@@ -110,6 +121,8 @@ def get_links_path(
             )
     except service.UnknownCountry as e:
         raise NotFound("country not found in the knowledge graph (no ISO 3166 alpha-3 statement)", iso3=str(e)) from e
+    except service.AmbiguousCountry as e:
+        raise _ambiguous(e) from e
     except PathQueryError as e:
         raise ValidationProblem(str(e)) from e
     if res.reason == "unknown_node":
@@ -125,8 +138,23 @@ def get_links_path(
     )
     env["warnings"].insert(0, PATH_WARNING)
     if res.truncated:
-        env["warnings"].append(s.ApiWarning(code="truncated", message="search bounded: a connection may exist beyond"))
+        reasons = "; ".join(res.truncation_reasons)
+        env["warnings"].append(
+            s.ApiWarning(
+                code="truncated",
+                message=("search bounded: a connection may exist beyond" + (f" ({reasons})" if reasons else ""))[:500],
+            )
+        )
     return LinksPathResponse(data=data, **env)
+
+
+def _ambiguous(e: service.AmbiguousCountry) -> ValidationProblem:
+    return ValidationProblem(
+        "ambiguous ISO 3166 alpha-3 code: several knowledge-graph items hold it and the reviewed registry "
+        "(registry/entities/country_qids.json) does not decide; give a QID",
+        iso3=e.iso3,
+        candidates=e.candidates[:10],
+    )
 
 
 @router.get(
@@ -146,6 +174,8 @@ def get_country_links(
             data = service.links_for_country(conn, ref, link_types=link_type, year=year)
     except service.UnknownCountry as e:
         raise NotFound("country not found in the knowledge graph (no ISO 3166 alpha-3 statement)", iso3=str(e)) from e
+    except service.AmbiguousCountry as e:
+        raise _ambiguous(e) from e
     evidence = [e for lk in data["links"] for e in lk["evidence"]]
     env = _envelope(
         _origins(evidence),
@@ -153,4 +183,12 @@ def get_country_links(
         t,
         len(data["links"]),
     )
+    if data.get("truncated"):
+        env["warnings"].append(
+            s.ApiWarning(
+                code="truncated",
+                message=f"neighbourhood read bounded at {len(data.get('truncated_nodes') or [])} node(s): "
+                "links beyond the read caps are not listed",
+            )
+        )
     return CountryLinksResponse(data=data, **env)

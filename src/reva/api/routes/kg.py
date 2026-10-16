@@ -5,6 +5,11 @@ Read-only (``read`` scope) over ``kg.*`` via ``reva.kg.query``. Every statement 
 references). Wikidata statements are labelled community-edited and not verified. A path says "connected
 via"; causal wording appears only for has cause / has effect statements, attributed to their source.
 All results are bounded; limits and truncation are reported.
+
+Origin (review V3, KG-3): ``kg.statement_current`` holds ``live`` and ``test_fixture`` rows side by side.
+Every route takes ``origin`` (``live`` | ``test_fixture`` | ``any``); the default is ``live`` when
+``REVA_ENV=production`` and ``any`` elsewhere, and a response that serves fixture rows (alone or mixed with
+live ones) carries the ``fixture_data`` warning.
 """
 
 from __future__ import annotations
@@ -17,7 +22,7 @@ from pydantic import Field
 
 from reva.api import schemas as s
 from reva.api.auth import require_scope
-from reva.api.deps import Timer, decode_cursor, encode_cursor, origin_of, read_conn
+from reva.api.deps import Timer, decode_cursor, encode_cursor, origin_of, origin_warnings, read_conn
 from reva.api.errors import NotFound
 from reva.kernel.errors import ValidationProblem
 from reva.kg import query as kq
@@ -36,6 +41,7 @@ PATH_WARNING = s.ApiWarning(code="path_not_causal", message=kq.PATH_NOTE)
 class KgRef(s.ApiModel):
     qid: str
     label: str = Field(description="English label, else French, else the id itself")
+    kind: str | None = Field(None, description="Entity kind of the current snapshot (null: no snapshot loaded)")
 
 
 class KgTimeOut(s.ApiModel):
@@ -147,18 +153,26 @@ class KgSearchMatch(s.ApiModel):
 
 class KgSearchHit(s.ApiModel):
     qid: str
-    kind: str
+    kind: str | None
     sitelinks: int | None
     origin: Literal["live", "test_fixture"]
-    match: Literal["exact", "prefix", "substring"]
+    match: Literal["exact", "prefix", "substring", "iso3_registry", "iso3_statement"]
     matched: list[KgSearchMatch]
     labels: dict[str, str]
+    rank: Literal["preferred", "normal"] | None = Field(
+        None, description="iso3 mode, from KG statements: rank of the ISO alpha-3 statement"
+    )
 
 
 class KgSearch(s.ApiModel):
     query: str
-    mode: Literal["prefix", "substring"]
+    mode: Literal["prefix", "substring", "iso3"]
     results: list[KgSearchHit]
+    truncated: bool = Field(False, description="More entities match than the limit")
+    ambiguous: bool = Field(False, description="iso3 mode: several entities hold this code (none is chosen)")
+    iso3_source: str | None = Field(
+        None, description="iso3 mode: the reviewed registry file, or the KG's ISO alpha-3 (P298) statements"
+    )
 
 
 class KgSearchResponse(s.Envelope):
@@ -225,16 +239,32 @@ class KgPathResponse(s.Envelope):
 
 
 # ---------------------------------------------------------------------------------------------- helpers
+OriginParam = Literal["live", "test_fixture", "any"]
+ORIGIN_QUERY = Query(
+    None,
+    description="Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+)
+
+
+def _origin(request: Request, origin: str | None) -> str | None:
+    """The origin filter for kg.query (None = both origins)."""
+    if origin is None:
+        prod = getattr(getattr(request.app.state, "settings", None), "reva_env", "") == "production"
+        origin = "live" if prod else "any"
+    return None if origin == "any" else origin
+
+
 def _window(valid_from: str | None, valid_to: str | None, include_undated: bool) -> kq.TimeWindow | None:
     return kq.window(valid_from, valid_to, include_undated=include_undated)
 
 
 def _envelope_kwargs(origins: list[str], community: bool, t: Timer, rows: int, **detail: Any) -> dict[str, Any]:
+    origin = origin_of(origins)
     return {
         "context_mode": "evidence",
-        "origin": origin_of(origins),
+        "origin": origin,
         "modality": "reported_observation",
-        "warnings": [COMMUNITY_WARNING] if community else [],
+        "warnings": ([COMMUNITY_WARNING] if community else []) + origin_warnings(origin),
         "cost": t.cost(rows, **detail),
     }
 
@@ -253,10 +283,10 @@ QidPath = Path(..., pattern=QID_PATTERN, max_length=161, description="Wikidata Q
 
 
 @router.get("/entities/{qid}", response_model=KgEntityResponse, responses={404: {"model": s.Problem}})
-def get_entity(request: Request, qid: str = QidPath) -> KgEntityResponse:
+def get_entity(request: Request, qid: str = QidPath, origin: OriginParam | None = ORIGIN_QUERY) -> KgEntityResponse:
     t = Timer()
     with read_conn(request) as conn:
-        ent = kq.entity(conn, qid)
+        ent = kq.entity(conn, qid, origin=_origin(request, origin))
     if ent is None:
         raise NotFound("entity not found in the knowledge graph", qid=qid)
     prov = ent["provenance"]
@@ -282,6 +312,7 @@ def get_neighbours(
     include_literals: bool = Query(False, description="Also return literal-valued outgoing statements"),
     limit: int = Query(100, ge=1, le=kq.MAX_NEIGHBOURS),
     cursor: str | None = None,
+    origin: OriginParam | None = ORIGIN_QUERY,
 ) -> KgNeighboursResponse:
     t = Timer()
     _pids(property)
@@ -299,6 +330,7 @@ def get_neighbours(
             include_literals=include_literals,
             limit=limit,
             after_id=cur[0] if cur else None,
+            origin=_origin(request, origin),
         )
     nxt = encode_cursor([res["next_after_id"]]) if res["next_after_id"] is not None else None
     return KgNeighboursResponse(
@@ -320,12 +352,15 @@ def get_timeline(
     valid_from: str | None = Query(None, pattern=TIME_PATTERN),
     valid_to: str | None = Query(None, pattern=TIME_PATTERN),
     limit: int = Query(500, ge=1, le=kq.MAX_TIMELINE),
+    origin: OriginParam | None = ORIGIN_QUERY,
 ) -> KgTimelineResponse:
     t = Timer()
     w = _window(valid_from, valid_to, False)
     with read_conn(request) as conn:
         _known_qid(conn, qid)
-        res = kq.timeline(conn, qid, include_incoming=include_incoming, time_window=w, limit=limit)
+        res = kq.timeline(
+            conn, qid, include_incoming=include_incoming, time_window=w, limit=limit, origin=_origin(request, origin)
+        )
     env = _envelope_kwargs(res["origins"], _community(res["events"]), t, len(res["events"]))
     if res["truncated"]:
         env["warnings"].append(s.ApiWarning(code="truncated", message=f"timeline limited to {limit} events"))
@@ -337,19 +372,44 @@ def get_timeline(
 @router.get("/search", response_model=KgSearchResponse, responses={422: {"model": s.Problem}})
 def search(
     request: Request,
-    q: str = Query(..., min_length=1, max_length=200, description="Label or alias text (case-insensitive)"),
+    q: str | None = Query(None, min_length=1, max_length=200, description="Label or alias text (case-insensitive)"),
+    iso3: str | None = Query(
+        None,
+        pattern=r"^[A-Z]{3}$",
+        description="ISO 3166-1 alpha-3 code → entity (registry/entities/country_qids.json, else the KG's P298 "
+        "statements; several holders are all returned with ambiguous=true). Exclusive with q",
+    ),
     lang: list[str] = Query(["fr", "en"], max_length=10),
     kind: str | None = Query(None, pattern=r"^[a-z][a-z0-9_]{0,63}$"),
     limit: int = Query(20, ge=1, le=kq.MAX_SEARCH),
+    origin: OriginParam | None = ORIGIN_QUERY,
 ) -> KgSearchResponse:
     t = Timer()
+    if (q is None) == (iso3 is None):
+        raise ValidationProblem("give exactly one of q or iso3")
+    org = _origin(request, origin)
     with read_conn(request) as conn:
-        res = kq.search(conn, q, langs=lang, kind=kind, limit=limit)
+        if iso3 is not None:
+            res = kq.iso3_lookup(conn, iso3, origin=org, limit=limit)
+        else:
+            res = kq.search(conn, q or "", langs=lang, kind=kind, limit=limit, origin=org)
+    found = origin_of(h["origin"] for h in res["results"])
+    warnings = origin_warnings(found)
+    if res.get("truncated"):
+        warnings.append(s.ApiWarning(code="truncated", message=f"more entities match; first {limit} returned"))
+    if res.get("ambiguous"):
+        warnings.append(
+            s.ApiWarning(
+                code="ambiguous",
+                message=f"{len(res['results'])} entities hold ISO code {iso3}; none is chosen by REVA",
+            )
+        )
     return KgSearchResponse(
         data=KgSearch(**res),
         context_mode="registry",
-        origin=origin_of(h["origin"] for h in res["results"]),
+        origin=found,
         modality="metadata",
+        warnings=warnings,
         cost=t.cost(len(res["results"])),
     )
 
@@ -372,6 +432,7 @@ def get_path(
     hub_limit: int = Query(kq.DEFAULT_HUB_LIMIT, ge=1, le=kq.MAX_HUB_LIMIT),
     allow_hub: list[str] | None = Query(None, max_length=20, description="Hub entities that may be traversed"),
     max_paths: int = Query(5, ge=1, le=kq.MAX_PATHS),
+    origin: OriginParam | None = ORIGIN_QUERY,
 ) -> KgPathResponse:
     t = Timer()
     _pids(property)
@@ -391,6 +452,7 @@ def get_path(
             hub_limit=hub_limit,
             allow_hubs=allow_hub or (),
             max_paths=max_paths,
+            origin=_origin(request, origin),
         )
     hops = [h for p in res["paths"] for h in p["hops"]]
     env = _envelope_kwargs(

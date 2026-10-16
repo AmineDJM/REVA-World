@@ -46,6 +46,20 @@ which now just calls this script with ``--recorded-drafter --v2-fixtures``):
     only the captured requests; dropped items are reported in ``stack.json``. Live behaviour is
     unchanged. With ``--no-fixture-plan`` those connectors are skipped (reason recorded).
 
+Option for the V3 suite (``ui/e2e/v3_live_stack.spec.ts``):
+
+``--v3-fixtures``
+    after the release is published (so the release is the same as without it), loads on the
+    disposable database: the real-Wikidata links fixture
+    (``tests/unit/links/fixtures/wikidata_links_fixture.json``) into ``kg.*`` through
+    ``reva.kg.model.load_batch`` (origin ``test_fixture``, source key ``wikidata.links_fixture``,
+    the allow-listed properties registered first); then the atlas sources of ``V3_ATLAS_SOURCES``
+    (``--v3-atlas-source`` repeatable to choose others) through ``reva.atlas.ingest.run_atlas_ingest``
+    in fixture mode (recorded responses, never the network, never charged); then a ``test_fixture``
+    atlas snapshot (``reva.atlas.snapshot.take_snapshot``). A source whose fixture run fails is
+    recorded with its error in ``stack.json`` (``v3.atlas``), never hidden; the stack still starts.
+    ``POST /v1/ask`` stays on the deterministic keyword planner (no LLM planner is wired).
+
 The release cutoff is taken after every ingest has finished, so the release pins all ingested
 datasets.
 
@@ -55,6 +69,7 @@ Usage::
     uv run python scripts/e2e_stack.py --run           # serve, run `npm --prefix ui run e2e`, tear down
     uv run python scripts/e2e_stack.py --run -- --grep provenance   # extra Playwright args
     uv run python scripts/e2e_stack.py --recorded-drafter --v2-fixtures --run   # V2 suites
+    uv run python scripts/e2e_stack.py --v3-fixtures --run -- e2e/v3_live_stack.spec.ts   # V3 suite
 
 The default stack file is ``var/e2e/stack.json`` (gitignored); the specs in
 ui/e2e read it (or ``REVA_E2E_STACK_FILE``) when ``REVA_E2E_BASE_URL`` is unset.
@@ -101,6 +116,28 @@ V2_FIXTURE_PLAN_CONNECTORS = ("worldbank.wdi.all_economies", "un.comtrade.public
 SOCIAL_FIXTURES = ROOT / "tests" / "fixtures" / "social"
 NL_RECORDED_FIXTURES = ROOT / "tests" / "fixtures" / "nl" / "recorded"
 DEFAULT_STACK_FILE = ROOT / "var" / "e2e" / "stack.json"
+#: atlas sources replayed in fixture mode with --v3-fixtures (order matters little; each is independent)
+V3_ATLAS_SOURCES = (
+    "atlas.imf",
+    "atlas.ilostat",
+    "atlas.eurostat.earn_mw_cur",
+    "atlas.oecd.earnings",
+    "atlas.who_gho",
+    "atlas.unesco_uis",
+    "atlas.undp_hdr",
+    "atlas.whr",
+    "atlas.owid",
+    # atlas.naturalearth_10m is not replayable: its capture holds 2 of the 6 layers one run fetches
+    # (its ingest test serves a synthetic world instead)
+    "atlas.geonames_countryinfo",
+    "atlas.worldbank",
+    "atlas.fao",
+)
+#: source key of the links fixture in kg.*: the live harvest's key, so the KG treats these real Wikidata
+#: statements exactly as harvested ones (community-edited label); only the origin (test_fixture) differs.
+#: (tests/integration/test_links_db.py loads the same file under "wikidata.links_fixture", which
+#: reva.kg.query does not count as community-edited.)
+V3_KG_SOURCE_KEY = "wikidata"
 ADMIN_USERNAME = "admin"
 
 
@@ -238,6 +275,9 @@ class Stack:
             )
             if self.args.v2_fixtures and self.args.backtests:
                 v2["backtest_jobs"] = self.enqueue_backtests(worker, release.release_id)
+            v3: dict[str, Any] = {}
+            if self.args.v3_fixtures:
+                v3 = self.load_v3(settings, store, worker)
         finally:
             worker.dispose()
         llm: dict[str, Any] = {}
@@ -253,7 +293,115 @@ class Stack:
             "origin": "test_fixture",
         }
         log.info("published test_fixture release: %s", rel)
-        return {"ingest": ingest, "release": rel, **({"v2": v2} if self.args.v2_fixtures else {}), **llm}
+        return {
+            "ingest": ingest,
+            "release": rel,
+            **({"v2": v2} if self.args.v2_fixtures else {}),
+            **({"v3": v3} if self.args.v3_fixtures else {}),
+            **llm,
+        }
+
+    # ------------------------------------------------------------------ V3 fixtures
+    def load_v3(self, settings: Any, store: Any, worker: Any) -> dict[str, Any]:
+        """KG + links fixture, atlas sources in fixture mode, a test_fixture atlas snapshot."""
+        out: dict[str, Any] = {"kg": with_connection_retry("kg fixture", lambda: self.load_kg_fixture(store, worker))}
+        atlas: dict[str, Any] = {}
+        for name in self.args.v3_atlas_sources or V3_ATLAS_SOURCES:
+            atlas[name] = self.ingest_atlas_fixture(settings, store, worker, name)
+        out["atlas"] = atlas
+        from reva.atlas.snapshot import take_snapshot
+
+        out["atlas_snapshot"] = with_connection_retry(
+            "atlas snapshot", lambda: take_snapshot(settings, worker, store, origin="test_fixture")
+        )
+        log.info("V3 atlas snapshot: %s", out["atlas_snapshot"])
+        return out
+
+    @staticmethod
+    def load_kg_fixture(store: Any, worker: Any) -> dict[str, Any]:
+        """The real-Wikidata links fixture into kg.* through load_batch (origin test_fixture)."""
+        from reva.adapters.connectors.wikidata import load_allowlist
+        from reva.kg.harvest import kg_properties
+        from reva.kg.model import KgEntity, KgStatement, KgTime, load_batch, register_properties
+        from reva.links.fixture import FIXTURE_FILE, load_fixture
+
+        register_properties(worker, kg_properties(load_allowlist()))
+        body = FIXTURE_FILE.read_bytes()
+        raw = store.put_bytes(body, "raw", "application/json").sha256
+        fx = load_fixture()
+
+        def t(d: Any) -> Any:
+            return None if d is None else KgTime(d["time"], d["precision"], d.get("calendar", "gregorian"))
+
+        sts = [
+            KgStatement(
+                subject_qid=r["subject_qid"],
+                property_pid=r["property_pid"],
+                object_qid=r["object_qid"],
+                value=r["value"],
+                start=t(r["start"]),
+                end=t(r["end"]),
+                point_in_time=t(r["point_in_time"]),
+                qualifiers=r["qualifiers"],
+                rank=r["rank"],
+                references=r["references"],
+                source_key=V3_KG_SOURCE_KEY,
+                source_revision=r["source_revision"],
+                statement_id=r["statement_id"],
+                raw_sha256=raw,
+            )
+            for r in fx.raw_statements
+        ]
+        ents = [
+            KgEntity(q, "fixture_entity", e["labels"], e.get("descriptions") or {}, source_revision=str(e["lastrevid"]))
+            for q, e in fx.entities.items()
+        ]
+        rep = load_batch(
+            worker,
+            store,
+            entities=ents,
+            statements=sts,
+            source_key=V3_KG_SOURCE_KEY,
+            raw_sha256s=[raw],
+            retrieved_at=datetime.now(UTC),
+            origin="test_fixture",
+        )
+        if rep.rejected_total:
+            log.warning("KG fixture load rejected %d rows: %s", rep.rejected_total, rep.rejected[:5])
+        log.info("loaded KG fixture: %d entities, %d statements", len(ents), len(sts))
+        return {
+            "source_key": V3_KG_SOURCE_KEY,
+            "entities": len(ents),
+            "statements": len(sts),
+            "rejected": rep.rejected_total,
+            "raw_sha256": raw,
+        }
+
+    @staticmethod
+    def ingest_atlas_fixture(settings: Any, store: Any, worker: Any, name: str) -> dict[str, Any]:
+        """One atlas source in fixture mode; failures are recorded per source, never fatal."""
+        from reva.atlas.ingest import run_atlas_ingest
+
+        t0 = time.monotonic()
+        try:
+            res = with_connection_retry(
+                f"atlas {name}",
+                lambda: asyncio.run(run_atlas_ingest(settings, worker, store, name, mode="fixture")),
+            )
+        except Exception as e:
+            log.warning("V3 atlas fixture %s failed: %s", name, e)
+            return {"status": "failed", "error": f"{type(e).__name__}: {str(e)[:500]}"}
+        tables = res.get("registered") or []
+        rows = sum(int(t.get("row_count", 0) or 0) for t in tables if isinstance(t, dict))
+        log.info(
+            "V3 atlas fixture %s: %s, %d tables, %d rows (%.1fs)",
+            name,
+            res["status"],
+            len(tables),
+            rows,
+            time.monotonic() - t0,
+        )
+        return {"status": res["status"], "error": res.get("error"), "tables": len(tables), "rows": rows}
 
     # ------------------------------------------------------------------ V2 fixtures
     @staticmethod
@@ -470,6 +618,9 @@ class Stack:
             }
         )
         app = create_app(api_settings, static_dir=static_dir, login_rate_limit_per_minute=self.args.login_rate_limit)
+        if self.args.v3_fixtures:
+            # /v1/ask stays on the deterministic keyword planner, whatever .env says about LLMs.
+            app.state.nlqa_planner_factory = lambda _settings: []
         if self.args.recorded_drafter:
             from reva.nl.recorded import RecordedDrafter
 
@@ -605,6 +756,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_false",
         help="with --v2-fixtures, do not enqueue back-test jobs after publication",
     )
+    ap.add_argument(
+        "--v3-fixtures",
+        action="store_true",
+        help="also load the V3 KG/links fixture and atlas sources (fixture mode) and take a test_fixture snapshot",
+    )
+    ap.add_argument(
+        "--v3-atlas-source",
+        dest="v3_atlas_sources",
+        action="append",
+        default=None,
+        metavar="NAME",
+        help="with --v3-fixtures: atlas source to replay (repeatable; default: V3_ATLAS_SOURCES)",
+    )
     ap.add_argument("playwright_args", nargs="*", help="extra Playwright arguments (after --)")
     args = ap.parse_args(argv)
     if args.fixture_plan is None:
@@ -653,7 +817,7 @@ def main(argv: list[str] | None = None) -> int:
             "database": stack.db_name,
             "release": data["release"],
             "ingest": data["ingest"],
-            **{k: data[k] for k in ("v2", "llm_drafter", "llm_ledger") if k in data},
+            **{k: data[k] for k in ("v2", "v3", "llm_drafter", "llm_ledger") if k in data},
             "started_at": datetime.now(UTC).isoformat(),
             "pid": os.getpid(),
             "login_rate_limit_per_minute": args.login_rate_limit,

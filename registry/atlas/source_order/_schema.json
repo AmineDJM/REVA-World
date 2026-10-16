@@ -52,6 +52,7 @@
       "required": ["formula", "alternatives", "justification"],
       "properties": {
         "formula": {"enum": ["ratio", "difference"], "description": "ratio = a / b (b > 0); difference = a - b"},
+        "same_source": {"type": "boolean", "description": "Default true: both inputs come from one provider (concept operands are expanded into same-provider series pairs). false would combine providers and needs an explicit, documented exception."},
         "scale": {"$ref": "#/$defs/decimal", "description": "Exact factor applied to the result (default 1)"},
         "alternatives": {
           "type": "array", "minItems": 1, "maxItems": 10,

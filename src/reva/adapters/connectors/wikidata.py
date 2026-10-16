@@ -59,6 +59,8 @@ log = logging.getLogger("reva.wikidata")
 REPO_ROOT = Path(__file__).resolve().parents[4]
 WDQS_URL = "https://query.wikidata.org/sparql"
 WBAPI_URL = "https://www.wikidata.org/w/api.php"
+ENTITYDATA_URL = "https://www.wikidata.org/wiki/Special:EntityData/{id}.json"
+REST_SEARCH_URL = "https://www.wikidata.org/w/rest.php/v1/search/page"
 ALLOWED_HOSTS: tuple[str, ...] = ("query.wikidata.org", "www.wikidata.org")
 SOURCE_WDQS = "wikidata.wdqs"
 SOURCE_WBAPI = "wikidata.wbapi"
@@ -97,6 +99,11 @@ class QueryTimeout(WikidataError):
 class SparqlSyntaxError(WikidataError):
     code = "wdqs_bad_query"
     http_status = 400
+
+
+class EntityMissing(WikidataError):
+    code = "wikidata_entity_missing"
+    http_status = 404
 
 
 class RateLimited(WikidataError):
@@ -334,6 +341,7 @@ class WikidataClient:
         archive: Archive | None = None,
         lock: MachineLock | None = None,
         max_retries: int = 12,
+        mode: str = "api",
         sleep: Any = asyncio.sleep,
     ) -> None:
         self.wdqs_http = wdqs_http
@@ -342,6 +350,13 @@ class WikidataClient:
         self.lock = lock or MachineLock()
         self.ua = user_agent()
         self.max_retries = max_retries
+        if mode not in ("api", "linked_data", "hybrid"):
+            raise ValueError("mode must be 'api', 'linked_data' or 'hybrid'")
+        #: ``api``: action API (wbgetentities 50 ids/call, list=search with paging). ``linked_data``: used when the
+        #: action API is saturated for our shared egress — Special:EntityData/<id>.json (one entity per request,
+        #: CDN-cacheable, same JSON + lastrevid) and the MediaWiki REST search (<= 100 hits, no paging).
+        #: ``hybrid``: action-API search (paging, few requests) + Special:EntityData snapshots (the bulk).
+        self.mode = mode
         self._sleep = sleep
         self.stats = ClientStats()
 
@@ -356,7 +371,8 @@ class WikidataClient:
         qs_lag = 0  # consecutive maxlag errors caused by query-service (WDQS updater) lag
         while True:
             attempt += 1
-            kw: dict[str, Any] = {"headers": headers, "accept_status": (200, 400, 403, 429, 500, 502, 503, 504)}
+            kw: dict[str, Any] = {"headers": headers,
+                                  "accept_status": (200, 400, 403, 404, 429, 500, 502, 503, 504)}
             if max_bytes:
                 kw["max_bytes"] = max_bytes
             async with self.lock.slot(endpoint) as slot:
@@ -399,6 +415,8 @@ class WikidataClient:
             if endpoint == "wdqs" and timed_out:
                 self.stats.timeouts += 1
                 raise QueryTimeout("WDQS query exceeded its time limit; split the spec", status=status)
+            if status == 404:
+                raise EntityMissing(f"{endpoint}: HTTP 404", status=status)
             if status == 400:
                 raise SparqlSyntaxError(f"{endpoint}: HTTP 400: {_first_line(body_head)}", status=status)
             if status == 403:
@@ -442,6 +460,17 @@ class WikidataClient:
                           meta: Mapping[str, Any] | None = None) -> tuple[list[str], int, str]:
         """One page of a CirrusSearch query: (QIDs, total hits, raw sha256). CirrusSearch serves at most
         10,000 results per query (offset + limit <= 10,000)."""
+        if self.mode == "linked_data":
+            if offset > 0:  # the REST search has no paging
+                return [], 0, ""
+            url = f"{REST_SEARCH_URL}?{urlencode({'q': query, 'limit': '100'})}"
+            result, sha = await self._request(self.wbapi_http, url, endpoint="rest", accept="application/json",
+                                              meta={"kind": "rest_search", "query": query[:2000], **(meta or {})})
+            pages = (_json(result.body).get("pages") or [])
+            hits = [str(p.get("key", "")) for p in pages]
+            hits = [h for h in hits if h[:1] == "Q" and h[1:].isdigit()]
+            # no total is reported: a full page may be truncated -> report "at least one more"
+            return hits, (len(hits) + 1 if len(pages) >= 100 else len(hits)), sha
         params = {"action": "query", "list": "search", "srsearch": query, "srnamespace": "0",
                   "srlimit": str(min(max(1, limit), 500)), "sroffset": str(max(0, offset)), "srprop": "",
                   "srinfo": "totalhits", "format": "json", "maxlag": "5"}
@@ -495,8 +524,31 @@ class WikidataClient:
         nbytes = 0
         requests = 0
         retrieved = datetime.now(UTC)
+        if self.mode in ("linked_data", "hybrid"):
+            batch_size = 1
         queue: list[list[str]] = [todo[i:i + batch_size] for i in range(0, len(todo), batch_size)]
         while queue:
+            if self.mode in ("linked_data", "hybrid"):
+                eid0 = queue.pop(0)[0]
+                try:
+                    result, sha = await self._request(
+                        self.wbapi_http, ENTITYDATA_URL.format(id=eid0), endpoint="entitydata",
+                        accept="application/json", meta={"kind": "entitydata", "ids": [eid0], **(meta or {})})
+                except EntityMissing:
+                    missing.append(eid0)
+                    continue
+                requests += 1
+                nbytes += len(result.body)
+                shas.append(sha)
+                retrieved = result.retrieved_at
+                for key, ent in (_json(result.body).get("entities") or {}).items():
+                    ent = _prune(ent, props, languages)
+                    eid = ent.get("id", key)
+                    if eid != eid0:
+                        redirects[eid0] = eid
+                    entities[eid] = ent
+                    sha_by_id[eid] = sha
+                continue
             chunk = queue.pop(0)
             url = self.entities_url(chunk, props, languages)
             try:
@@ -530,6 +582,20 @@ class WikidataClient:
             for key, eid in (doc.get("redirects") or {}).items() if isinstance(doc.get("redirects"), dict) else []:
                 redirects.setdefault(key, eid)
         return EntitiesResult(entities, tuple(missing), redirects, tuple(shas), sha_by_id, nbytes, requests, retrieved)
+
+
+def _prune(ent: dict[str, Any], props: Sequence[str], languages: Sequence[str]) -> dict[str, Any]:
+    """Special:EntityData returns every language and prop: keep what wbgetentities would have returned."""
+    keep_lang = set(languages)
+    out = {k: v for k, v in ent.items()
+           if k not in ("labels", "descriptions", "aliases", "claims", "sitelinks") or k in props}
+    for k in ("labels", "descriptions", "aliases"):
+        if k in out and isinstance(out[k], dict):
+            out[k] = {lang: v for lang, v in out[k].items() if lang in keep_lang}
+    if "info" not in props:
+        for k in ("lastrevid", "modified", "pageid", "ns", "title"):
+            out.pop(k, None)
+    return out
 
 
 def _id_sort_key(i: str) -> tuple[str, int]:

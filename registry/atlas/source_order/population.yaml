@@ -54,12 +54,11 @@ concepts:
       alternatives:
         - [{concept: reva.population.total}, {concept: reva.geography.land_area}]
       justification: >-
-        Exact by definition: the headline mid-year population (de facto) divided by the headline land area
-        of the same country and the same calendar year; both inputs are cited with their own sources.
-        Used only when the WDI does not report the cell.
-    caveats: >-
-      A derived value may combine a WPP population with an FAO land area (WDI's own density uses the WDI
-      population); both are cited.
+        Exact by definition: mid-year population divided by land area of the same country and calendar
+        year, both from ONE provider (same_source, the default: the pair expands to the listed series of the
+        same source, i.e. WDI SP.POP.TOTL / WDI AG.LND.TOTL.K2); both inputs are cited. Used only when the WDI
+        does not report EN.POP.DNST for the cell.
+    caveats: "A derived density uses the WDI population, never a WPP population divided by an FAO area."
     not_equivalent:
       - series: "un_wpp.wpp2024_demo.PopDensity"
         reason: >-

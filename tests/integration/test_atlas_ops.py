@@ -145,3 +145,12 @@ def test_every_catalog_concept_has_a_theme() -> None:
     assert cat.concepts["un.wpp.population"].theme == "population"
     assert cat.concepts["un.unsd.surface_area"].theme == "geography"
     assert themes.theme_of("imf", "fiscal", "imf.x", own="society") == "society"  # a concept's own theme wins
+
+
+def test_fixture_snapshots_are_refused_in_production() -> None:
+    from reva.atlas.snapshot import take_snapshot
+    from reva.kernel.errors import PolicyDenied
+
+    prod = SimpleNamespace(reva_env="production")
+    with pytest.raises(PolicyDenied):  # refused before any database access (review V3 ATLAS-5)
+        take_snapshot(prod, None, None, origin="test_fixture")  # type: ignore[arg-type]

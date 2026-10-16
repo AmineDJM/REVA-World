@@ -69,12 +69,17 @@ The query returns explicit rows. `columns` maps them:
 | `statement` | strongly recommended: variable bound to the `wds:` statement node (`?s p:P39 ?statement`) — gives the stable statement id and lets the harvester de-duplicate against wbgetentities snapshots |
 | `rank` | variable bound to `wikibase:rank` (deprecated rows are dropped anyway; filter them in SPARQL too) |
 | `start`, `end`, `point_in_time` | P580 / P582 / P585 qualifier variables |
+| `start_precision`, `end_precision`, `point_in_time_precision`, `object_precision` | `wikibase:timePrecision` of those times, selected through the full value node (`pqv:P580`, `psv:Pxxx`). **Without them a WDQS date is stored with `precision_unknown` and asserts no time bounds** — the harvester never guesses precision from a date's shape (`-0400-01-01` may be a century) |
 | `qualifiers` | `{Pnnn: variable}` other qualifiers to keep |
 
 The property must be in the allow-list; unknown properties fail validation (ask WDHARVEST — see
 "Requesting properties"). Subjects get a label snapshot (no claims); objects too when `expand_hops: 1`.
-SPARQL rows have no entity revision id: their provenance is the WDQS query (sha256 of the final query
-text), the raw response sha256 and the retrieval time.
+Rows that carry a statement id are **re-read from the subject's wbgetentities snapshot** (fetched anyway for
+labels): the loaded statement is the snapshot's claim, with the entity `lastrevid`, its references and exact
+precision/calendar. Rows without a statement id (or whose claim changed since the WDQS replica) are loaded as
+WDQS rows: revision recorded as explicitly unknown (`qualifiers._revision`), no references; their provenance
+is the WDQS query (sha256 of the final query text), the raw response sha256 and the retrieval time. So: always
+bind `?statement`.
 
 ```yaml
 id: people.heads_of_state_positions
@@ -84,17 +89,17 @@ description: Holders of head-of-state positions of current countries, with start
 purpose: statements
 entity_kind: person
 sparql: |
-  SELECT ?person ?statement ?position ?start ?end ?rank WHERE {
+  SELECT ?person ?statement ?position ?start ?start_p ?end ?end_p ?rank WHERE {
     VALUES ?country { {{values}} }
     ?country wdt:P1906 ?position .
     ?person p:P39 ?statement .
     ?statement ps:P39 ?position ; wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)
-    OPTIONAL { ?statement pq:P580 ?start }
-    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?start_p ] }
+    OPTIONAL { ?statement pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?end_p ] }
   }
 columns: {subject: person, property: P39, object: position, statement: statement, rank: rank,
-          start: start, end: end}
+          start: start, start_precision: start_p, end: end, end_precision: end_p}
 split: {by: values, source: countries, chunk_size: 25}
 max_rows: 60000
 expand_hops: 1

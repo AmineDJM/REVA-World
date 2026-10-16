@@ -19,8 +19,10 @@ Views (catalog concepts from :mod:`reva.atlas.catalog`):
 * **country dossier**: every concept of every domain — latest best value + annual series.
 * **map**: best values of one concept for one year, all countries.
 
-"Year" means a calendar-year cell (``period_start`` = Jan 1, ``period_end`` = Jan 1 of the next
-year), in astronomical year numbering (year 0 = 1 BCE, -9999 = 10000 BCE; same as the KG). Periods
+"Year" view: a calendar-year cell (``[Jan 1, Jan 1 next year)``), or a non-calendar cell spanning
+150..1097 days (semester, fiscal year, survey or 3-year window) attached to its provider's
+``flags.label_year`` or to the year of its last day; every answer shows its true period and
+``period_basis``. Years use astronomical numbering (year 0 = 1 BCE, -9999 = 10000 BCE; same as the KG). Periods
 are returned as ISO 8601 text (``-9999-01-01``). Sub-annual or multi-year cells appear in per-source
 views only.
 """
@@ -53,8 +55,14 @@ from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
 from reva.ports.storage import ArtifactStore
 
-DB_FORMAT = "atlas-duckdb/3"
-DB_SUFFIX = "-v3.duckdb"
+DB_FORMAT = "atlas-duckdb/4"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
+DB_SUFFIX = "-v4.duckdb"
+#: Non-calendar cells attach to a year view when they span 150..1097 days (semesters, 12-month fiscal
+#: years, survey and 3-year windows): to ``flags.label_year`` when the provider labels the cell with a
+#: year inside the period, else to the year containing the period's last day. Shorter (monthly,
+#: quarterly) and longer windows stay in per-source views only and are never reported "absent".
+ATTACH_MIN_DAYS = 150
+ATTACH_MAX_DAYS = 1097
 KEEP_SNAPSHOT_DBS = 2
 
 DDL = """
@@ -64,7 +72,7 @@ CREATE TABLE cells (sid INTEGER NOT NULL, iso3 VARCHAR, year INTEGER, has_value 
                     concept_hint VARCHAR, provider_geo VARCHAR NOT NULL, entity_qid VARCHAR,
                     period_start DATE NOT NULL, period_end DATE NOT NULL, value VARCHAR, value_text VARCHAR,
                     unit VARCHAR NOT NULL, flags VARCHAR NOT NULL, raw_sha256 VARCHAR NOT NULL,
-                    selector VARCHAR NOT NULL, table_sha VARCHAR NOT NULL);
+                    selector VARCHAR NOT NULL, table_sha VARCHAR NOT NULL, period_basis VARCHAR NOT NULL);
 """
 
 
@@ -82,14 +90,81 @@ def iso_date_sql(col: str) -> str:
 CELL_SELECT = (
     "x.sid, x.iso3, x.year, x.concept_hint, x.provider_geo, x.entity_qid, "
     f"{iso_date_sql('x.period_start')} AS period_start, {iso_date_sql('x.period_end')} AS period_end, x.value, "
-    "x.value_text, x.unit, x.flags, x.raw_sha256, x.selector, x.table_sha"
+    "x.value_text, x.unit, x.flags, x.raw_sha256, x.selector, x.table_sha, x.period_basis"
 )
+
+#: Year attachment of every cell (see ATTACH_*): calendar years; else label_year or the last day's year.
+CELLS_INSERT = f"""
+INSERT INTO cells
+WITH pre AS (
+  SELECT s.sid, r.*,
+         (month(r.period_start) = 1 AND day(r.period_start) = 1
+          AND r.period_end = CAST(r.period_start + INTERVAL 1 YEAR AS DATE)) AS cal,
+         datediff('day', r.period_start, r.period_end) AS span,
+         TRY_CAST(json_extract_string(r.flags, '$.label_year') AS INTEGER) AS label_year,
+         CAST(year(CAST(r.period_end - INTERVAL 1 DAY AS DATE)) AS INTEGER) AS last_year
+  FROM raw r JOIN series s USING (source, dataset, indicator)),
+att AS (
+  SELECT *,
+         CASE WHEN cal THEN CAST(year(period_start) AS INTEGER)
+              WHEN span BETWEEN {ATTACH_MIN_DAYS} AND {ATTACH_MAX_DAYS} THEN
+                CASE WHEN label_year BETWEEN year(period_start) AND last_year THEN label_year ELSE last_year END
+         END AS attach,
+         CASE WHEN cal THEN 'calendar_year' WHEN span < 365 THEN 'sub_annual'
+              WHEN span <= 366 THEN 'twelve_month_window' ELSE 'multi_year' END AS basis
+  FROM pre),
+ranked AS (
+  SELECT *, row_number() OVER (PARTITION BY sid, coalesce(iso3, '#' || provider_geo), attach
+                               ORDER BY cal DESC, (value IS NOT NULL OR value_text IS NOT NULL) DESC,
+                                        period_end DESC, period_start DESC) AS rn
+  FROM att)
+SELECT sid, iso3, CASE WHEN attach IS NOT NULL AND rn = 1 THEN attach END,
+       (value IS NOT NULL OR value_text IS NOT NULL), concept_id, provider_geo, entity_qid, period_start,
+       period_end, value, value_text, unit, flags, raw_sha256, selector, table_sha, basis
+FROM ranked
+ORDER BY iso3 NULLS LAST, sid, period_start
+"""
 
 
 def cache_dir() -> Path:
-    d = Path(os.environ.get("REVA_ATLAS_CACHE_DIR") or Path(tempfile.gettempdir()) / "reva-atlas-cache")
-    d.mkdir(parents=True, exist_ok=True)
-    return d
+    from reva.atlas.cachedir import cache_dir as _private
+
+    return _private()
+
+
+def _file_sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _verify_db(final: Path, snapshot: AtlasSnapshot) -> None:
+    """ATLAS-1: a cached query file is used only if its bytes match the digest recorded when it was
+    built and its meta names this snapshot and format; otherwise both files are removed and the read
+    is refused (the next read rebuilds from the verified Parquet artifacts)."""
+    side = final.with_name(final.name + ".sha256")
+    try:
+        want = json.loads(side.read_text())
+        ok = (
+            want.get("format") == DB_FORMAT
+            and want.get("snapshot_sha256") == snapshot.sha256
+            and want.get("sha256") == _file_sha256(final)
+        )
+        if ok:
+            con = duckdb.connect(str(final), read_only=True)
+            try:
+                meta = con.execute("SELECT format, snapshot_sha256 FROM meta").fetchone()
+            finally:
+                con.close()
+            ok = meta == (DB_FORMAT, snapshot.sha256)
+    except (OSError, ValueError, duckdb.Error):
+        ok = False
+    if not ok:
+        final.unlink(missing_ok=True)
+        side.unlink(missing_ok=True)
+        raise IntegrityFailure("cached atlas query file failed verification; removed", path=final.name)
 
 
 def _fetch_verified(store: ArtifactStore, sha: str, dest: Path) -> None:
@@ -108,14 +183,18 @@ def _fetch_verified(store: ArtifactStore, sha: str, dest: Path) -> None:
 
 def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: Path | None = None) -> Path:
     """Materialise (once, under a file lock) the DuckDB file of a snapshot; returns its path."""
-    d = directory or cache_dir()
-    d.mkdir(parents=True, exist_ok=True)
+    from reva.atlas.cachedir import private_dir
+
+    d = private_dir(directory) if directory is not None else cache_dir()
     final = d / f"atlas-{snapshot.sha256}{DB_SUFFIX}"
     if final.exists():
+        _verify_db(final, snapshot)
         return final
-    with open(d / f"atlas-{snapshot.sha256}.lock", "w") as lockf:
+    lock_fd = os.open(d / f"atlas-{snapshot.sha256}.lock", os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(lock_fd, "w") as lockf:
         fcntl.flock(lockf, fcntl.LOCK_EX)
         if final.exists():
+            _verify_db(final, snapshot)
             return final
         work = Path(tempfile.mkdtemp(prefix=f"build-{snapshot.sha256[:12]}-", dir=d))
         try:
@@ -142,18 +221,7 @@ def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: 
                                   source, dataset, indicator
                            FROM (SELECT DISTINCT source, dataset, indicator FROM raw)"""
                     )
-                    con.execute(
-                        """INSERT INTO cells
-                           SELECT s.sid, r.iso3,
-                                  CASE WHEN month(r.period_start) = 1 AND day(r.period_start) = 1
-                                        AND r.period_end = CAST(r.period_start + INTERVAL 1 YEAR AS DATE)
-                                       THEN CAST(year(r.period_start) AS INTEGER) END,
-                                  (r.value IS NOT NULL OR r.value_text IS NOT NULL),
-                                  r.concept_id, r.provider_geo, r.entity_qid, r.period_start, r.period_end, r.value,
-                                  r.value_text, r.unit, r.flags, r.raw_sha256, r.selector, r.table_sha
-                           FROM raw r JOIN series s USING (source, dataset, indicator)
-                           ORDER BY r.iso3 NULLS LAST, s.sid, r.period_start"""
-                    )
+                    con.execute(CELLS_INSERT)
                 # the same cells ordered by series first: series/year filters (maps, coverage) prune row groups
                 con.execute("CREATE TABLE cells_s AS SELECT * FROM cells ORDER BY sid, year, iso3")
                 n = con.execute("SELECT count(*) FROM cells").fetchone()[0]  # type: ignore[index]
@@ -167,6 +235,10 @@ def build_snapshot_db(snapshot: AtlasSnapshot, store: ArtifactStore, directory: 
                 con.execute("CHECKPOINT")
             finally:
                 con.close()
+            digest = {"format": DB_FORMAT, "snapshot_sha256": snapshot.sha256, "sha256": _file_sha256(tmp_db)}
+            side_tmp = work / "atlas.duckdb.sha256"
+            side_tmp.write_text(json.dumps(digest))
+            os.replace(side_tmp, final.with_name(final.name + ".sha256"))
             os.replace(tmp_db, final)
         finally:
             shutil.rmtree(work, ignore_errors=True)
@@ -179,6 +251,7 @@ def _evict(d: Path, keep: Path) -> None:
     for p in dbs[KEEP_SNAPSHOT_DBS:]:
         if p != keep:
             p.unlink(missing_ok=True)
+            p.with_name(p.name + ".sha256").unlink(missing_ok=True)
 
 
 @lru_cache(maxsize=65536)
@@ -278,6 +351,7 @@ class AtlasQuery:
             "entity_qid": r["entity_qid"],
             "period_start": r["period_start"],  # ISO text, astronomical years (BCE-safe)
             "period_end": r["period_end"],
+            "period_basis": r.get("period_basis"),
             "flags": _json(r["flags"]),
             "provenance": {
                 "raw_sha256": r["raw_sha256"],
@@ -326,16 +400,33 @@ class AtlasQuery:
         rows.sort(key=lambda r: (r["concept_id"], r["iso3"], r["year"]))
         return [{"concept_id": r["concept_id"], "iso3": r["iso3"], **self._cell(r)} for r in rows]
 
+    def _other_period_countries(self, sids: Iterable[int], year: int) -> set[str]:
+        """Countries with a value-bearing cell overlapping calendar ``year`` that the year view does not
+        attach to it (monthly/quarterly cells, long windows): reported apart, never "absent" (ATLAS-2)."""
+        ids = sorted({int(x) for x in sids})
+        if not ids:
+            return set()
+        rows = self._rows(
+            f"""SELECT DISTINCT x.iso3 FROM cells_s x
+                WHERE x.sid IN ({",".join(str(i) for i in ids)}) AND x.iso3 IS NOT NULL AND x.has_value
+                  AND (x.year IS NULL OR x.year <> ?)
+                  AND x.period_start < make_date(?, 1, 1) AND x.period_end > make_date(?, 1, 1)""",
+            [year, year + 1, year],
+        )
+        return {r["iso3"] for r in rows}
+
     def map_values(self, catalog: Catalog, concept_id: str, year: int) -> dict[str, Any]:
         _need(catalog, concept_id)
         cells = self.best_cells(catalog, [concept_id], year=year)
         have = {c["iso3"] for c in cells}
+        other = self._other_period_countries((s[2] for s in self._concept_series(catalog, [concept_id])), year) - have
         return {
             "concept": catalog.concepts[concept_id].as_dict(),
             "year": year,
             "values": cells,
             "countries_with_value": len(have),
-            "countries_without_value": sorted(known_country_keys() - have),
+            "countries_without_value": sorted(known_country_keys() - have - other),
+            "countries_with_other_period_cells": sorted(other),
             "by_source": _count_by(cells, "series"),
         }
 
@@ -486,7 +577,10 @@ class AtlasQuery:
         latest: dict[str, dict[str, Any]] = {}
         points: dict[str, list[dict[str, Any]]] = {}
         if series:
-            light = "x.sid, x.iso3, x.year, x.value, x.value_text, x.flags"
+            light = (
+                "x.sid, x.iso3, x.year, x.value, x.value_text, x.flags, x.unit, x.period_basis, "
+                f"{iso_date_sql('x.period_start')} AS period_start, {iso_date_sql('x.period_end')} AS period_end"
+            )
             for r in self._rows(self._best_sql(series, where, light, "cells"), [iso3], series):
                 points.setdefault(r["concept_id"], []).append(r)
             if points:  # full cells (provenance) only for each concept's latest year
@@ -533,6 +627,10 @@ class AtlasQuery:
                         "year": r["year"],
                         "value": r["value"],
                         "value_text": r["value_text"],
+                        "unit": r["unit"],  # ATLAS-3: a series may switch currency or unit across years
+                        "period_start": r["period_start"],
+                        "period_end": r["period_end"],
+                        "period_basis": r["period_basis"],
                         "series": self._series_key(r["sid"])[3],
                         "flags": _json(r["flags"]),
                     }
@@ -592,7 +690,8 @@ class AtlasQuery:
                      {{'sid': x.sid, 'value': x.value, 'value_text': x.value_text, 'unit': x.unit,
                        'flags': x.flags, 'provider_geo': x.provider_geo, 'entity_qid': x.entity_qid,
                        'period_start': {iso_date_sql("x.period_start")}, 'period_end': {iso_date_sql("x.period_end")},
-                       'raw_sha256': x.raw_sha256, 'selector': x.selector, 'table_sha': x.table_sha}} AS cell
+                       'raw_sha256': x.raw_sha256, 'selector': x.selector, 'table_sha': x.table_sha,
+                       'period_basis': x.period_basis}} AS cell
               FROM {table} x JOIN hs h ON x.sid = h.sid
               WHERE {sidf} AND {" AND ".join(where)})
             SELECT ci, iso3, year,
@@ -637,7 +736,8 @@ class AtlasQuery:
             "iso3": key[0],
             "year": key[1],
             "value": _scaled(c["value"], scale),
-            "unit": unit or c["unit"],
+            # the concept unit only when it is one fixed unit; "named per cell" units stay the cell's own
+            "unit": c["unit"] if (unit is None or "per cell" in unit) else unit,
             "method": "reported",
             "answered_by": {
                 "series": ser.key,
@@ -651,6 +751,7 @@ class AtlasQuery:
             "provider_geo": c["provider_geo"],
             "period_start": c["period_start"],
             "period_end": c["period_end"],
+            "period_basis": c.get("period_basis"),
             "flags": c["flags"],
             "provenance": c["provenance"],
             "consulted": self._consulted(sp, row),
@@ -663,8 +764,9 @@ class AtlasQuery:
         """Best-available headline cells (reported, else derived) per concept and (iso3, year)."""
         concepts = [reg.concepts[c] for c in concept_ids]
         specs: dict[str, _Spec] = {c.id: _spec_of(c) for c in concepts}
+        alts = {c.id: _alternatives(c, reg) for c in concepts}
         for c in concepts:
-            for a, b in c.derived.alternatives if c.derived else ():
+            for a, b in alts[c.id]:
                 for o in (a, b):
                     sp = _operand_spec(o, reg)
                     specs.setdefault(sp.key, sp)
@@ -675,7 +777,7 @@ class AtlasQuery:
             rows = res[c.id]
             cells = {k: self._reported_cell(sp, c.unit, k, r) for k, r in rows.items() if r["best_rank"] is not None}
             if c.derived:
-                for i, (a, b) in enumerate(c.derived.alternatives):
+                for i, (a, b) in enumerate(alts[c.id]):
                     sa, sb = specs[_operand_spec(a, reg).key], specs[_operand_spec(b, reg).key]
                     ra, rb = res[sa.key], res[sb.key]
                     for k in sorted(set(ra) & set(rb)):
@@ -729,7 +831,8 @@ class AtlasQuery:
             "provider_geo": None,
             "period_start": ca["period_start"],
             "period_end": ca["period_end"],
-            "flags": {},
+            "period_basis": ca.get("period_basis"),
+            "flags": _derived_flags(ca["flags"], cb["flags"]),
             "provenance": None,
             "consulted": consulted,
             "derived": {
@@ -751,9 +854,15 @@ class AtlasQuery:
         h = self._headline(reg, [concept_id], year=year)[concept_id]
         cells = sorted(h["cells"].values(), key=lambda x: x["iso3"])
         have = {x["iso3"] for x in cells}
+        sids = [
+            self.sid_of[k]
+            for ser, _sc, _u, _j in h["spec"].series
+            if (k := (ser.source, ser.dataset, ser.indicator)) in self.sid_of
+        ]
+        other = self._other_period_countries(sids, year) - have
         without = [
             {"iso3": k, "consulted": self._consulted(h["spec"], h["rows"].get((k, year)))}
-            for k in sorted(known_country_keys() - have)
+            for k in sorted(known_country_keys() - have - other)
         ]
         return {
             "concept": reg.concepts[concept_id].as_dict(),
@@ -761,6 +870,7 @@ class AtlasQuery:
             "values": cells,
             "countries_with_value": len(have),
             "countries_without_value": without,
+            "countries_with_other_period_cells": sorted(other),
             "by_source": _count(self._answer_key(x) for x in cells),
         }
 
@@ -824,7 +934,15 @@ class AtlasQuery:
             }
             if include_series:
                 item["series"] = [
-                    {"year": x["year"], "value": x["value"], "method": x["method"], "series": self._answer_key(x)}
+                    {
+                        "year": x["year"],
+                        "value": x["value"],
+                        "unit": x["unit"],
+                        "period_start": x["period_start"],
+                        "period_end": x["period_end"],
+                        "method": x["method"],
+                        "series": self._answer_key(x),
+                    }
                     for x in pts
                 ]
             items.append(item)
@@ -914,6 +1032,46 @@ def _spec_of(c: HeadlineConcept) -> _Spec:
         tuple((s.series, s.scale, s.reported_unit, s.justification) for s in c.series),
         c.projections == "allow",
     )
+
+
+def _alternatives(c: HeadlineConcept, reg: HeadlineRegistry) -> list[tuple[Operand, Operand]]:
+    """Operand pairs of a derived concept. With ``same_source`` (the default; review ATLAS-6: no value
+    combines two providers) a pair naming headline concepts is expanded into the pairs of their listed
+    series that come from the same provider (``source``), in the first operand's order."""
+    if c.derived is None:
+        return []
+    out: list[tuple[Operand, Operand]] = []
+    for a, b in c.derived.alternatives:
+        if not c.derived.same_source or (a.concept is None and b.concept is None):
+            if c.derived.same_source and a.series is not None and b.series is not None:
+                if a.series.source != b.series.source:
+                    continue  # refused at load time as well
+            out.append((a, b))
+            continue
+
+        def series_of(o: Operand) -> list[Operand]:
+            if o.concept is None:
+                return [o]
+            return [
+                Operand(series=s.series, scale=s.scale, reported_unit=s.reported_unit)
+                for s in reg.concepts[o.concept].series
+            ]
+
+        for x in series_of(a):
+            for y in series_of(b):
+                if x.series is not None and y.series is not None and x.series.source == y.series.source:
+                    out.append((x, y))
+    return out
+
+
+def _derived_flags(fa: Any, fb: Any) -> dict[str, Any]:
+    """Flags of a derived cell: both inputs' flags, and any honesty-relevant flag lifted to the top."""
+    out: dict[str, Any] = {"inputs_flags": [fa or {}, fb or {}]}
+    for k in ("estimate_kind", "projection", "estimate", "provider_flag", "estimate_type", "period_basis"):
+        vals = [f.get(k) for f in (fa or {}, fb or {}) if isinstance(f, dict) and f.get(k) not in (None, False, "")]
+        if vals:
+            out[k] = vals[0] if len(vals) == 1 or vals[0] == vals[1] else vals
+    return out
 
 
 def _operand_spec(o: Operand, reg: HeadlineRegistry) -> _Spec:

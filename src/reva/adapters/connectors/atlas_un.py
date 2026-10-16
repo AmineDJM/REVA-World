@@ -75,8 +75,8 @@ import polars as pl
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
-CONNECTOR_VERSION = "1.0.0"
-PARSER_VERSION = "atlas-un-1"
+CONNECTOR_VERSION = "1.1.0"
+PARSER_VERSION = "atlas-un-2"  # 2: compact WPP flags (revision/label/sex/age moved to manifest, catalog, indicator)
 GEO_SCHEME = "un_m49x"  # registry/atlas/geo_aliases/a_un.yaml: crosswalk M49 + evidence-backed aliases
 STRICT_DECIMAL = re.compile(r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$")
 _PLAIN_NUMBER = re.compile(r"^[+-]?(\d{1,3}(,\d{3})+|\d+)?(\.\d*)?([eE][-+]?\d{1,3})?$")
@@ -473,20 +473,35 @@ def wpp_projection_suffix(variant: str = "Medium") -> str:
     return f"|proj={variant.lower()}"
 
 
-def read_wpp_csv(body: bytes, *, file: str, limit: int = WPP_MAX_DECOMPRESSED) -> tuple[pl.DataFrame, str]:
-    """A WPP CSV(.gz) as an all-string frame with a 0-based ``record`` index, plus its encoding."""
+def read_wpp_csv(
+    body: bytes, *, file: str, columns: Sequence[str] | None = None, limit: int = WPP_MAX_DECOMPRESSED
+) -> tuple[pl.DataFrame, str, list[str]]:
+    """A WPP CSV(.gz) as an all-string frame with a 0-based ``record`` index, its encoding and its
+    full header. ``columns`` restricts the frame to those columns (memory: the 5-year age file is
+    ~200 MB of text); every identifier column must exist."""
     _reject_html(body)
     data = gunzip_bounded(body, limit) if body[:2] == b"\x1f\x8b" else body
-    text, enc = decode_text(data)
-    del data
+    if data.startswith(b"\xef\xbb\xbf"):
+        data = data[3:]
     try:
-        frame = pl.read_csv(io.StringIO(text), infer_schema=False, has_header=True)
+        data.decode("utf-8")  # validation only (WPP CSVs are UTF-8); the parser reads the bytes
+    except UnicodeDecodeError as e:
+        raise _err(f"{file}: not UTF-8 text", kind="decoding_error") from e
+    first = data[: data.find(b"\n")] if b"\n" in data else data
+    header = next(csv.reader([first.decode("utf-8").rstrip("\r")]))
+    missing = [c for c in WPP_ID_COLUMNS if c not in header]
+    if missing:
+        raise _err(f"{file}: missing identifier columns {missing}", columns=header[:30])
+    want = [c for c in header if columns is None or c in set(columns)]
+    try:
+        frame = pl.read_csv(io.BytesIO(data), columns=want, infer_schema=False, has_header=True)
     except pl.exceptions.PolarsError as e:  # malformed CSV
         raise _err(f"{file}: not a readable CSV ({type(e).__name__})") from e
-    missing = [c for c in WPP_ID_COLUMNS if c not in frame.columns and c not in ("MidPeriod",)]
-    if missing:
-        raise _err(f"{file}: missing identifier columns {missing}", columns=frame.columns[:30])
-    return frame.with_row_index("record"), enc
+    del data
+    return frame.with_row_index("record"), "utf-8", header
+
+
+_WPP_KEEP = ("LocID", "LocTypeName", "Location", "VarID", "Variant", "Time")
 
 
 def _normalise_value_column(frame: pl.DataFrame, file: str) -> pl.DataFrame:
@@ -583,11 +598,11 @@ def _wpp_frame(
 
 
 def _wpp_base_flags(r: Mapping[str, Any], projection: bool, variant: str) -> dict[str, Any]:
+    # Compact on purpose (one JSON string per cell, millions of cells): the revision, units and
+    # definitions are in the table manifest / catalog, sex and age group in the indicator code.
     return {
-        "wpp_revision": WPP_REVISION,
         "variant": variant,
         "projection": projection,
-        "estimate": not projection,
         "loc_type": r.get("LocTypeName") or None,
         "geo_label": r.get("Location"),
     }
@@ -605,13 +620,13 @@ def _check_wpp_identity(frame: pl.DataFrame, file: str) -> None:
 def build_wpp_demo(body: bytes, raw_sha256: str) -> TablePlan:
     """Demographic indicators (medium file): estimates 1950-2023 and medium projections 2024-2100."""
     f = WPP_DI
-    frame, enc = read_wpp_csv(body, file=f.file)
+    frame, enc, header = read_wpp_csv(body, file=f.file, columns=(*_WPP_KEEP, *WPP_DI_COLUMNS))
     _check_wpp_identity(frame, f.file)
     cols = [c for c in WPP_DI_COLUMNS if c in frame.columns]
     missing = sorted(set(WPP_DI_COLUMNS) - set(cols))
     if missing:
         raise _err(f"{f.file}: expected indicator columns are missing: {missing}")
-    extra = sorted(set(frame.columns) - set(WPP_DI_COLUMNS) - set(WPP_ID_COLUMNS) - {"record"})
+    extra = sorted(set(header) - set(WPP_DI_COLUMNS) - set(WPP_ID_COLUMNS))
     variants = frame["Variant"].unique().to_list()
     if variants != ["Medium"]:
         raise _err(f"{f.file}: expected only the Medium variant, found {variants}")
@@ -621,8 +636,8 @@ def build_wpp_demo(body: bytes, raw_sha256: str) -> TablePlan:
     long = long.with_columns((pl.col("Time").cast(pl.Int32) >= WPP_FIRST_PROJECTION_YEAR).alias("proj"))
 
     def make(r: dict[str, Any]) -> str:
-        _unit, tref, label = WPP_DI_COLUMNS[r["column"]]
-        return canon({**_wpp_base_flags(r, r["proj"], "Medium"), "time_reference": tref, "label": label})
+        _unit, tref, _label = WPP_DI_COLUMNS[r["column"]]
+        return canon({**_wpp_base_flags(r, r["proj"], "Medium"), "time_reference": tref})
 
     long = _flags_join(long, ["column", "proj", "LocTypeName", "Location"], make)
     concept_map = {(c, p): wpp_concept_id(c, p) for c in cols for p in (False, True)}
@@ -666,7 +681,7 @@ def build_wpp_demo(body: bytes, raw_sha256: str) -> TablePlan:
 def build_wpp_variants(body: bytes, raw_sha256: str) -> TablePlan:
     """Total population of every projection variant except Medium (Medium is in wpp2024_demo)."""
     f = WPP_VARIANTS
-    frame, enc = read_wpp_csv(body, file=f.file)
+    frame, enc, _h = read_wpp_csv(body, file=f.file, columns=(*_WPP_KEEP, *WPP_VARIANT_VALUE_COLUMNS))
     _check_wpp_identity(frame, f.file)
     for c in (*WPP_VARIANT_VALUE_COLUMNS, "VarID", "Variant"):
         if c not in frame.columns:
@@ -689,7 +704,6 @@ def build_wpp_variants(body: bytes, raw_sha256: str) -> TablePlan:
                 "variant_id": r["VarID"],
                 "probabilistic_interval": v.endswith(" PI"),
                 "time_reference": _STOCK_JUL,
-                "label": "Total population, as of 1 July",
             }
         )
 
@@ -728,7 +742,9 @@ def build_wpp_age5(body: bytes, raw_sha256: str) -> Iterator[TablePlan]:
     1950-2023 (``wpp2024_age5``) and medium projections 2024-2100 (``wpp2024_age5_proj``, indicator
     suffix ``|proj=medium``); one table would exceed the ~5 M row guidance (556 locations)."""
     f = WPP_AGE5
-    frame, enc = read_wpp_csv(body, file=f.file)
+    frame, enc, _h = read_wpp_csv(
+        body, file=f.file, columns=(*_WPP_KEEP, *WPP_AGE5_VALUE_COLUMNS, "AgeGrp", "AgeGrpStart", "AgeGrpSpan")
+    )
     _check_wpp_identity(frame, f.file)
     for c in (*WPP_AGE5_VALUE_COLUMNS, "AgeGrp", "AgeGrpStart", "AgeGrpSpan"):
         if c not in frame.columns:
@@ -747,14 +763,11 @@ def build_wpp_age5(body: bytes, raw_sha256: str) -> Iterator[TablePlan]:
             return canon(
                 {
                     **_wpp_base_flags(r, r["proj"], "Medium"),
-                    "age_group": r["AgeGrp"],
-                    "age_span": r["AgeGrpSpan"],
-                    "sex": WPP_AGE5_VALUE_COLUMNS[r["column"]],
                     "time_reference": _STOCK_JUL,
                 }
             )
 
-        long = _flags_join(long, ["column", "proj", "AgeGrp", "AgeGrpSpan", "LocTypeName", "Location"], make)
+        long = _flags_join(long, ["proj", "LocTypeName", "Location"], make)
         indicator = pl.concat_str(
             [
                 pl.col("column"),
@@ -1718,6 +1731,7 @@ class UnConnector:
             name=self.name,
             version=CONNECTOR_VERSION,
             source_key=self.source_key,
+            budget_key=self.source_key,
             atlas_source=self.atlas_source_key,
             provider=self.provider,
             licence=self.licence,

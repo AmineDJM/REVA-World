@@ -9,7 +9,9 @@ sentence by sentence, against the template sentence and the evidence it cites:
   template sentence or its cited evidence;
 * no causal wording ("because", "à cause de", "led to", …) unless the template sentence has it;
 * the honesty markers of the template sentence ("selon", "Wikidata", "pas une cause", "aucune
-  source", "community-edited", …) are kept;
+  source", "community-edited", "projection", "estimate", …) are kept;
+* every value keeps its entity: a value of a cited atlas cell stays in the same clause as the names
+  and unit codes that accompany it in the template (no value swapped between countries or units);
 * the length stays bounded and the ids match one to one.
 
 If any sentence fails, the whole rephrase is discarded and the template text is returned with
@@ -26,7 +28,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from reva.nlqa.catalog import fold
-from reva.nlqa.compose import Sentence
+from reva.nlqa.compose import Sentence, format_number
 
 _NUM = re.compile(r"\d+(?:[   ]\d{3})*(?:[.,]\d+)*")
 _WORD = re.compile(r"[^\W\d_][\w'’-]*", re.UNICODE)
@@ -67,6 +69,11 @@ KEEP_MARKERS = (
     "indisponible",
     "unavailable",
 )
+#: Status markers kept by stem (any inflection): a projection or an estimate must stay labelled as such.
+STEM_MARKERS = {
+    "projection": re.compile(r"projec|projet|prevision|forecast", re.IGNORECASE),
+    "estimate": re.compile(r"estimat|modell|modelis|modeled|imput", re.IGNORECASE),
+}
 _STOP_CAPS = {
     "selon",
     "according",
@@ -125,6 +132,11 @@ def _numbers_strict(text: str) -> set[str]:
     return {re.sub(r"[   ]", "", m.group(0)) for m in _NUM.finditer(text)}
 
 
+def _name(w: str) -> str:
+    """Folded word without an English possessive ("Senegal's" → "senegal")."""
+    return re.sub(r"'s$", "", fold(w))
+
+
 def capitalised(text: str) -> set[str]:
     out = set()
     for sent in re.split(r"(?<=[.:;!?])\s+", text):
@@ -132,9 +144,9 @@ def capitalised(text: str) -> set[str]:
         for i, w in enumerate(words):
             if i == 0 or not w[:1].isupper():
                 continue
-            if fold(w) in _STOP_CAPS:
+            if _name(w) in _STOP_CAPS:
                 continue
-            out.add(fold(w))
+            out.add(_name(w))
     return out
 
 
@@ -148,7 +160,75 @@ class FaithReport:
     problems: list[dict[str, Any]] = field(default_factory=list)
 
 
-def check_sentence(original: str, rephrased: str, evidence: str) -> list[str]:
+#: Clause boundaries for the entity–value pairing check (never a grouping comma "1,747" nor a decimal one).
+_CLAUSE = re.compile(r";|,\s+|\s+(?:and|et|while|whereas|but|mais|alors que|tandis que)\s+", re.IGNORECASE)
+
+
+def _norm_num(tok: str) -> str:
+    t = re.sub(r"[   ]", "", tok)
+    if re.fullmatch(r"\d{1,3}(,\d{3})+(\.\d+)?", t):
+        return t.replace(",", "")
+    if re.fullmatch(r"\d+,\d+", t):
+        return t.replace(",", ".")
+    return t
+
+
+def _clause_parts(text: str) -> list[tuple[set[str], set[str]]]:
+    """(normalised numbers, folded capitalised words) of each clause."""
+    out = []
+    for part in _CLAUSE.split(text):
+        nums = {_norm_num(m.group(0)) for m in _NUM.finditer(part)}
+        caps = {_name(w) for w in _WORD.findall(part) if w[:1].isupper() and _name(w) not in _STOP_CAPS}
+        out.append((nums, caps))
+    return out
+
+
+def value_numbers(items: Sequence[Mapping[str, Any]]) -> set[str]:
+    """Normalised display forms of the values of cited atlas cells (exact, en and fr display)."""
+    out: set[str] = set()
+    for it in items:
+        v = it.get("value") if isinstance(it, Mapping) else None
+        if v is None:
+            continue
+        for form in (str(v), format_number(str(v), "en"), format_number(str(v), "fr")):
+            form = form.replace("≈", "").strip().lstrip("-")
+            for m in _NUM.finditer(form):
+                out.add(_norm_num(m.group(0)))
+    return out
+
+
+def pairing_problems(original: str, rephrased: str, values: set[str]) -> list[str]:
+    """A value of a cited cell must stay with the names/codes of its own template clause: in the rephrased
+    clause holding the value, no capitalised word may be one that the template uses only in the clause of
+    *another* value (e.g. France's value moved next to "Senegal" or "XOF")."""
+    if not values:
+        return []
+    tmpl = _clause_parts(original)
+    owner: dict[str, set[int]] = {}
+    for i, (nums, _) in enumerate(tmpl):
+        for n in nums & values:
+            owner.setdefault(n, set()).add(i)
+    if len(owner) < 1:
+        return []
+    value_clauses = {i for idx in owner.values() for i in idx}
+    where: dict[str, set[int]] = {}
+    for i, (_, caps) in enumerate(tmpl):
+        for w in caps:
+            where.setdefault(w, set()).add(i)
+    distinctive = {w: next(iter(ix)) for w, ix in where.items() if len(ix) == 1 and next(iter(ix)) in value_clauses}
+    problems: list[str] = []
+    for nums, caps in _clause_parts(rephrased):
+        for n in nums & set(owner):
+            for w in caps:
+                home = distinctive.get(w)
+                if home is not None and home not in owner[n]:
+                    problems.append(f"value_moved_between_entities:{n}:{w}")
+    return sorted(set(problems))
+
+
+def check_sentence(
+    original: str, rephrased: str, evidence: str, *, values: set[str] | frozenset[str] = frozenset()
+) -> list[str]:
     problems: list[str] = []
     allowed_nums = numbers(original) | numbers(evidence)
     for n in _numbers_strict(rephrased):
@@ -169,6 +249,10 @@ def check_sentence(original: str, rephrased: str, evidence: str) -> list[str]:
         rx = re.compile(r"(?<!\w)" + re.escape(fold(marker).strip()) + r"(?!\w)")
         if rx.search(fo) and not rx.search(fr_):
             problems.append(f"marker_dropped:{marker.strip()}")
+    for name, stem in STEM_MARKERS.items():
+        if stem.search(fo) and not stem.search(fr_):
+            problems.append(f"marker_dropped:{name}")
+    problems.extend(pairing_problems(original, rephrased, set(values)))
     if len(rephrased) > 2 * len(original) + 60:
         problems.append("too_long")
     if not rephrased.strip():
@@ -190,8 +274,9 @@ def check_faithful(
     if sorted(by_id) != sorted(expected) or len(items) != len(expected):
         return FaithReport(False, [{"id": None, "problems": ["ids_do_not_match"]}]), {}
     for s in sentences:
-        ev = evidence_text([evidence[c] for c in s.citations if c in evidence])
-        problems = check_sentence(s.text, by_id[s.id], ev)
+        cited = [evidence[c] for c in s.citations if c in evidence]
+        ev = evidence_text(cited)
+        problems = check_sentence(s.text, by_id[s.id], ev, values=value_numbers(cited))
         if problems:
             report.ok = False
             report.problems.append({"id": s.id, "problems": problems[:10]})

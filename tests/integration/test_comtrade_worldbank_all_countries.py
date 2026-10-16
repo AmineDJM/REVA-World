@@ -63,7 +63,7 @@ def test_seed_creates_crosswalk_entities_with_provider_declared_aliases(db) -> N
         n = conn.execute(
             text("SELECT count(DISTINCT entity_id) FROM world.alias WHERE provider='iso3166_alpha3'")
         ).scalar_one()
-    assert n == 248
+    assert n == 249  # every ISO 3166-1 code (crosswalk 1.1.0 adds TWN, which has no WB/Comtrade data)
 
 
 async def test_all_country_fixture_ingest_keeps_gaps_typed(db) -> None:

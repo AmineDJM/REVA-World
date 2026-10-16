@@ -73,12 +73,18 @@ SOURCE_KINDS = (
     "official_information_page",
     "secondary_consolidated_mirror",
     "secondary_statutory_fund_table",
+    # V3 SIMWORLD: a legal-indicator dataset compiled by an international organisation that cites the
+    # law per cell (World Bank Women, Business and the Law); the legal text itself is not archived
+    "secondary_legal_dataset",
 )
 PATH_STATUSES = ("in_force", "enacted_superseded", "enacted_as_amended", "counterfactual")
 CLAIM_YEAR_SEMANTICS = ("attained_once",)
 CLAIM_YEAR_DERIVATIONS = ("verbatim", "model_assumption")
 REVIEW_STATUS = "maintainer_review_pending"
 TRANSCRIPTION_NOTE = "transcribed from law text by an agent; maintainer review pending"
+#: V3 SIMWORLD: tables transcribed from the World Bank WBL 2026 dataset (cell values + WBL's legal basis)
+WBL_TRANSCRIPTION_NOTE = "transcribed by agent SIMWORLD from WBL 2026, maintainer review pending"
+TRANSCRIPTION_NOTES = (TRANSCRIPTION_NOTE, WBL_TRANSCRIPTION_NOTE)
 
 
 class RuleCoverageGap(CapabilityGap):
@@ -267,8 +273,8 @@ def parse_rule_table(doc: Mapping[str, Any], *, check_locators: bool = True) -> 
         raise ValidationProblem("country must be an ISO3 code")
     if doc.get("review_status") != REVIEW_STATUS:
         raise ValidationProblem(f"{country}: review_status must be {REVIEW_STATUS!r} (no agent records a review)")
-    if doc.get("transcription") != TRANSCRIPTION_NOTE:
-        raise ValidationProblem(f"{country}: transcription note must read {TRANSCRIPTION_NOTE!r}")
+    if doc.get("transcription") not in TRANSCRIPTION_NOTES:
+        raise ValidationProblem(f"{country}: transcription note must read one of {TRANSCRIPTION_NOTES!r}")
     sources: dict[str, Mapping[str, Any]] = {}
     for s in doc.get("sources") or []:
         sid = s.get("source_id")
@@ -452,6 +458,51 @@ def _gaps() -> Mapping[str, Any]:
 def gap_reason(iso3: str) -> str:
     g = _gaps().get(iso3)
     return str(g["reason"]) if g else "no rule table has been transcribed from an archived legal source"
+
+
+# --------------------------------------------------------------------------- WBL 2026 tables (V3 SIMWORLD)
+#: Tables transcribed by agent SIMWORLD from World Bank WBL 2026 (src/reva/cli/build_wbl_rule_tables.py).
+#: Kept apart from the law-text tables of RULE_DIR (a lower provenance tier: a cited legal dataset, the law
+#: text itself is not archived) and read only by social.retirement_age@1.1.0; the 1.0.0 model never sees them.
+WBL_RULE_DIR = RULES_ROOT / "retirement_age_wbl2026"
+WBL_GAPS_FILE = WBL_RULE_DIR / "wbl2026_gaps.yaml"
+
+
+def wbl_countries() -> tuple[str, ...]:
+    return tuple(sorted(p.stem for p in WBL_RULE_DIR.glob("*.yaml") if re.fullmatch(r"[A-Z]{3}", p.stem)))
+
+
+@lru_cache(maxsize=1)
+def _wbl_gaps() -> Mapping[str, Any]:
+    if not WBL_GAPS_FILE.exists():
+        return {}
+    with open(WBL_GAPS_FILE, encoding="utf-8") as f:
+        return {g["country"]: g for g in (yaml.safe_load(f) or {}).get("gaps", [])}
+
+
+@lru_cache(maxsize=512)
+def load_wbl_rule_table(iso3: str) -> RuleTable:
+    p = WBL_RULE_DIR / f"{iso3}.yaml"
+    if not p.exists():
+        g = _wbl_gaps().get(iso3)
+        raise CapabilityGap(
+            f"no sourced retirement-age rule table for {iso3}",
+            capability="social.retirement_age",
+            country=iso3,
+            reason=str(g["reason"]) if g else gap_reason(iso3),
+        )
+    with open(p, encoding="utf-8") as f:
+        table = parse_rule_table(yaml.safe_load(f))
+    if table.transcription != WBL_TRANSCRIPTION_NOTE or table.country != iso3:
+        raise ValidationProblem(f"{iso3}: a table in {WBL_RULE_DIR.name} must be a WBL 2026 transcription of {iso3}")
+    return table
+
+
+def load_any_rule_table(iso3: str) -> RuleTable:
+    """The law-text table when one exists (RULE_DIR), else the WBL 2026 table, else ``CapabilityGap``."""
+    if (RULE_DIR / f"{iso3}.yaml").exists():
+        return load_rule_table(iso3)
+    return load_wbl_rule_table(iso3)
 
 
 # --------------------------------------------------------------------------- eligibility paths

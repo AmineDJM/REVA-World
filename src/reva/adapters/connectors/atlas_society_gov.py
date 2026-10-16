@@ -37,7 +37,7 @@ permission, and "Toute extraction et toute réutilisation ... de la totalité ou
 of its databases prohibited); International IDEA Voter Turnout Database (idea.int/terms-and-conditions:
 non-commercial use of the text only, "you are not permitted to benefit commercially from their use";
 A-POL reached the same conclusion; turnout is covered by IPU Parline and V-Dem); Constituency-Level
-Elections Archive (registration and non-redistribution terms).
+Elections Archive (download behind registration; no open licence found).
 
 What a cell is
 --------------

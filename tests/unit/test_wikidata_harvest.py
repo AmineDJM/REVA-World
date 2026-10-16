@@ -150,13 +150,11 @@ async def test_lock_paces_requests_and_shares_cooldowns_per_endpoint(tmp_path: P
     assert max(clock.sleeps) <= 60.0
 
 
-async def test_user_agent_is_descriptive(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("REVA_CONTACT_EMAIL", raising=False)
-    monkeypatch.delenv("REVA_HTTP_CONTACT_EMAIL", raising=False)
+async def test_user_agent_is_generic_and_carries_no_personal_data(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("REVA_CONTACT_EMAIL", "someone@example.org")
+    monkeypatch.setenv("REVA_HTTP_CONTACT_EMAIL", "someone@example.org")
     ua = wd.user_agent()
-    assert ua.startswith("REVA-World/") and "github.com" in ua
-    monkeypatch.setenv("REVA_CONTACT_EMAIL", "ops@example.org")
-    assert "mailto:ops@example.org" in wd.user_agent()
+    assert ua.startswith("REVA-World/") and "github.com" in ua and "@" not in ua
 
 
 # --------------------------------------------------------------------------- client protocol
@@ -278,11 +276,14 @@ def test_kg_conversion_handles_bce_julian_and_inferred_precision() -> None:
     labels_only = wd.extract_entity({k: v for k, v in entity_json().items() if k != "claims"}, allow,
                                     raw_sha256="a" * 64, retrieved_at=NOW)
     assert not labels_only.claims_fetched and hv.to_kg_entity(labels_only).source_revision == "2000000001:labels"
-    # WDQS dates carry no precision: the coarsest consistent precision is used and flagged
-    assert hv.coarse_precision({"time": "+1492-01-01T00:00:00Z", "precision": None})["precision"] == 9
-    assert hv.coarse_precision({"time": "+1492-10-01T00:00:00Z", "precision": None})["precision"] == 10
-    t = hv.coarse_precision({"time": "+1492-10-12T00:00:00Z", "precision": None, "astronomical": True})
-    assert t["precision"] == 11 and t["precision_inferred"] is True
+    # WDQS dates carry no precision and their shape says nothing about it (review KG-2): a century written
+    # -0400-01-01 must not become a year. Unknown unless the spec selects wikibase:timePrecision.
+    aksum = {"time": "-0400-01-01T00:00:00Z", "precision": None, "astronomical": True}
+    t = hv.with_precision(dict(aksum), None)
+    assert t["precision"] is None and t["precision_unknown"] is True
+    assert hv.kg_value("time", t) == {"type": "time_unknown_precision", "time": "-0400-01-01T00:00:00Z"}
+    t7 = hv.with_precision(dict(aksum), {"type": "literal", "value": "7"})
+    assert t7["precision"] == 7 and hv.kg_value("time", t7)["precision"] == 7
 
 
 def test_recorded_fixture_extracts() -> None:
@@ -422,6 +423,7 @@ async def test_statement_rows(tmp_path: Path) -> None:
         {"person": uri("Q1"), "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q1-ABC"},
          "position": uri("Q30461"), "start": {"type": "literal", "datatype": wd.XSD + "dateTime",
                                               "value": "1789-04-30T00:00:00Z"},
+         "sp": {"type": "literal", "datatype": wd.XSD + "integer", "value": "11"},
          "rank": {"type": "uri", "value": "http://wikiba.se/ontology#NormalRank"}},
         {"person": uri("Q2"), "position": uri("Q30461"),
          "rank": {"type": "uri", "value": "http://wikiba.se/ontology#DeprecatedRank"}},
@@ -429,10 +431,11 @@ async def test_statement_rows(tmp_path: Path) -> None:
     ]
     spec = _spec(tmp_path, {
         "id": "people.potus", "domain": "people", "description": "Holders of a position.", "purpose": "statements",
-        "sparql": "SELECT ?person ?st ?position ?start ?rank WHERE { ?person p:P39 ?st . ?st ps:P39 ?position ; "
-                  "wikibase:rank ?rank . OPTIONAL { ?st pq:P580 ?start } }",
+        "sparql": "SELECT ?person ?st ?position ?start ?sp ?rank WHERE { ?person p:P39 ?st . ?st ps:P39 ?position ; "
+                  "wikibase:rank ?rank . OPTIONAL { ?st pqv:P580 [ wikibase:timeValue ?start ; "
+                  "wikibase:timePrecision ?sp ] } }",
         "columns": {"subject": "person", "property": "P39", "object": "position", "statement": "st",
-                    "start": "start", "rank": "rank"},
+                    "start": "start", "start_precision": "sp", "rank": "rank"},
         "max_rows": 10}, domain="people")
     http = ScriptedHttp(router=lambda url: (200, sparql_body(["person", "st", "position", "start", "rank"], rows), {})
                         if url.startswith(wd.WDQS_URL) else
@@ -444,7 +447,7 @@ async def test_statement_rows(tmp_path: Path) -> None:
     s = stmts[0]
     assert s is not None and s.statement_id == "Q1$ABC" and s.source_key == wd.SOURCE_WDQS
     assert s.start == {"time": "+1789-04-30T00:00:00Z", "precision": 11, "calendar": None, "astronomical": True,
-                       "precision_inferred": True}
+                       "precision_unknown": False}  # selected through pqv:P580/wikibase:timePrecision
     kg = hv.to_kg_statement(s)
     assert kg.start.iso.startswith("+1789-04-30") and kg.start.precision == 11 and kg.object_qid == "Q30461"
     # WDQS gives no entity revision: explicitly unknown, versioned by retrieval time
@@ -549,3 +552,68 @@ async def test_requests_are_spaced_out_while_recovering_from_a_429(tmp_path: Pat
     async with lock.slot("wdqs"):  # other endpoint: normal pacing only
         pass
     assert sum(clock.sleeps) <= 2.0 + 1e-6
+
+
+async def test_wdqs_rows_with_statement_ids_are_replaced_by_snapshot_claims(tmp_path: Path) -> None:
+    """Review PROV-1/KG-2: a WDQS row whose statement id is found in the subject's wbgetentities snapshot is
+    loaded from the snapshot (revision, references, exact precision); the others stay WDQS rows with an
+    explicitly unknown revision."""
+    ent = entity_json()
+    rows = [
+        {"s": uri("Q17167"), "st": {"type": "uri", "value": wd.ENTITY_PREFIX + "statement/Q17167-D"},
+         "o": uri("Q220")},  # matches claim Q17167$D (capital, start precision 9 in the snapshot)
+        {"s": uri("Q17167"), "o": uri("Q999")},  # no statement id: stays a WDQS row
+    ]
+    spec = _spec(tmp_path, {
+        "id": "history.capitals", "domain": "history", "description": "Capitals of states.", "purpose": "statements",
+        "sparql": "SELECT ?s ?st ?o WHERE { ?s p:P36 ?st . ?st ps:P36 ?o }",
+        "columns": {"subject": "s", "property": "P36", "object": "o", "statement": "st"}, "max_rows": 10})
+
+    def route(url: str) -> tuple[int, bytes, dict[str, str]]:
+        if url.startswith(wd.WDQS_URL):
+            return 200, sparql_body(["s", "st", "o"], rows), {}
+        ent["id"] = "Q17167"
+        ent["claims"]["P36"][0]["id"] = "Q17167$D"
+        return 200, json.dumps({"entities": {"Q17167": ent}}).encode(), {}
+
+    class Capture(hv.NullSink):
+        def __init__(self) -> None:
+            super().__init__()
+            self.got: list[hv.Batch] = []
+
+        def load(self, batch: hv.Batch) -> dict[str, Any]:
+            self.got.append(batch)
+            return super().load(batch)
+
+    sink = Capture()
+    h = hv.Harvester(client_for(ScriptedHttp(router=route), tmp_path), sink, state_dir=tmp_path / "state")
+    rep = await h.run_spec(spec)
+    assert rep.status == "done" and rep.statements_enriched == 1 and rep.statements_unenriched == 1
+    snap = [s for b in sink.got if b.source_key == wd.SOURCE_WBAPI for s in b.statements]
+    assert len(snap) == 1 and snap[0].statement_id == "Q17167$D" and snap[0].source_revision == 2_000_000_001
+    assert snap[0].start and snap[0].start["precision"] == 9
+    wdqs = [s for b in sink.got if b.source_key == wd.SOURCE_WDQS for s in b.statements]
+    assert len(wdqs) == 1 and wdqs[0].object_qid == "Q999"
+    kg = hv.to_kg_statement(wdqs[0])
+    assert kg.qualifiers["_revision"]["wikidata_revision"] == "unknown" and kg.references == []
+
+
+async def test_linked_data_mode_uses_entitydata_and_rest_search(tmp_path: Path) -> None:
+    def route(url: str) -> tuple[int, bytes, dict[str, str]]:
+        if url.startswith(wd.REST_SEARCH_URL):
+            return 200, json.dumps({"pages": [{"key": "Q17167"}, {"key": "Q404"}]}).encode(), {}
+        if "Special:EntityData/Q404.json" in url:
+            return 404, b"not found", {}
+        ent = entity_json()
+        ent["labels"]["la"] = {"language": "la", "value": "Res publica Romana"}
+        return 200, json.dumps({"entities": {"Q17167": ent}}).encode(), {}
+
+    http = ScriptedHttp(router=route)
+    c = client_for(http, tmp_path)
+    c.mode = "linked_data"
+    hits, total, _ = await c.search_page("haswbstatement:P31=Q3024240")
+    assert hits == ["Q17167", "Q404"] and total == 2
+    res = await c.get_entities(["Q17167", "Q404"])
+    assert res.missing == ("Q404",) and res.entities["Q17167"]["lastrevid"] == 2_000_000_001
+    assert "la" not in res.entities["Q17167"]["labels"]  # pruned to the requested languages
+    assert all("Special:EntityData/" in u or u.startswith(wd.REST_SEARCH_URL) for u, _ in http.calls)

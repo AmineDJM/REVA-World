@@ -34,8 +34,8 @@ was awarded) and flagged per row.
 Countries: the Nobel API names present-day countries in English (``"USA"``, ``"the Netherlands"``,
 ``"Scotland"``) with a Wikidata QID when it has one. Names are mapped to crosswalk keys by the
 reviewed table :data:`COUNTRY_NOW_ISO3` (constituent countries of the United Kingdom -> ``GBR``,
-flagged ``subnational_mapped``); a name not in the table, or Taiwan (not a crosswalk entity), keeps
-``iso3 = null`` and is listed as unmapped. Counts are aggregated per crosswalk key; the Nobel names
+flagged ``subnational_mapped``; Taiwan -> ``TWN``, a crosswalk entity whose flags note that some
+providers include it in China); a name not in the table keeps ``iso3 = null`` and is listed as unmapped. Counts are aggregated per crosswalk key; the Nobel names
 merged into a cell are listed in its flags.
 
 *KG* (:func:`kg_statements`): per laureate-prize, ``<laureate QID> award_received (P166) <prize QID>``
@@ -169,6 +169,7 @@ COUNTRY_NOW_ISO3: dict[str, str] = {
     "Spain": "ESP",
     "Sweden": "SWE",
     "Switzerland": "CHE",
+    "Taiwan": "TWN",
     "Trinidad and Tobago": "TTO",
     "Tunisia": "TUN",
     "Turkey": "TUR",
@@ -269,7 +270,7 @@ async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
         geo_scheme="iso3",
         coverage_note=(
             "Counts of laureate-prize records per present-day birth country and per affiliation country at "
-            "award, computed by REVA from the complete Nobel API laureate list; Taiwan unmapped."
+            "award, computed by REVA from the complete Nobel API laureate list."
         ),
         rights=RIGHTS,
     )
@@ -430,8 +431,6 @@ def parse_laureates(
 
 # ----------------------------------------------------------------------------- atlas rows
 def _iso3(name: str) -> str | None:
-    if name == "Taiwan":  # not a crosswalk entity (kept unmapped, never merged into CHN)
-        return None
     return COUNTRY_NOW_ISO3.get(name)
 
 

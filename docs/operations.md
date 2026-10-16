@@ -286,3 +286,36 @@ role attributes). It is generated from a fresh bootstrap of a throwaway database
   the migrations) is not repaired: recreate it from the migrations.
 * Startup guard mode `REVA_SCHEMA_CONTRACT=enforce|warn|off`: the default is
   `enforce`; `warn` applies under `REVA_ENV=test`; production always enforces.
+
+## V3 end-to-end stack (`--v3-fixtures`)
+
+The V3 screens (Neurones, Chemin, Frise, Atlas, Dossier pays, Demander) are checked against the
+real `/v1/kg`, `/v1/links`, `/v1/atlas`, `/v1/ask` and `/v1/locations` routes by
+`ui/e2e/v3_live_stack.spec.ts` (no route interception):
+
+```bash
+uv run python scripts/e2e_stack.py --v3-fixtures --run -- e2e/v3_live_stack.spec.ts
+uv run python scripts/e2e_stack.py --v3-fixtures            # serve only (Ctrl-C tears down)
+```
+
+On the disposable `reva_e2e_<random>` database (never the dev database `reva`), after the usual
+base fixtures and the `test_fixture` belief release, `--v3-fixtures`:
+
+* loads the real-Wikidata links fixture (`tests/unit/links/fixtures/wikidata_links_fixture.json`,
+  76 entities / 544 statements) into `kg.*` through `reva.kg.model.load_batch`, source key
+  `wikidata`, origin `test_fixture` (the allow-listed properties are registered first);
+* replays the atlas sources of `V3_ATLAS_SOURCES` in fixture mode
+  (`reva.atlas.ingest.run_atlas_ingest(..., mode="fixture")`, recorded responses, never the network,
+  never charged): IMF, ILOSTAT, Eurostat minimum wages, OECD earnings, WHO GHO, UNESCO UIS, UNDP HDR,
+  WHR, OWID, GeoNames country info, World Bank, FAO. `--v3-atlas-source NAME` (repeatable) picks
+  others. A failing source is recorded with its error under `v3.atlas` in the stack file and the
+  stack still starts; the spec requires at least 8 completed sources. Natural Earth 10m is not in
+  the list: its capture holds only 2 of the 6 layers a run fetches;
+* records a `test_fixture` atlas snapshot (`reva.atlas.snapshot.take_snapshot`);
+* keeps `POST /v1/ask` on the deterministic keyword planner (no LLM planner is wired, whatever
+  `.env` says).
+
+`v3_live_stack.spec.ts` skips itself unless the stack file has the `v3` section; UI3's
+`v3_planet.spec.ts` (fixtures served by route interception) still runs standalone or on any stack.
+The modes combine (`--v2-fixtures --recorded-drafter --v3-fixtures`); without `--v3-fixtures` the
+stack is unchanged.

@@ -9,7 +9,15 @@ import pytest
 
 from reva.nl.budget import load_llm_budget
 from reva.nl.providers import OpenAIDrafter
-from reva.nlqa.plan import MAX_OPERATIONS, OPS, in_question, restate, validate_plan
+from reva.nlqa.plan import (
+    MAX_OPERATIONS,
+    MAX_PATH_OPERATIONS,
+    OPS,
+    in_question,
+    lookup_from_question,
+    restate,
+    validate_plan,
+)
 from reva.nlqa.prompt import output_schema, prompt_digest, system_prompt, user_envelope
 from reva.nlqa.service import plan_request
 
@@ -69,7 +77,7 @@ def test_valid_plan_is_kept() -> None:
             op("s5", "atlas_rank", concept="population.density", year=2022, order="desc", limit=5),
         ),
         CAT,
-        Q,
+        "Comment Christophe Colomb est-il lié au portugais ? Et le salaire minimum au Sénégal ?",
     )
     assert [o.op for o in p.operations] == ["entity_lookup", "entity_lookup", "kg_path", "atlas_value", "atlas_rank"]
     assert p.rejected == [] and p.planner == "llm"
@@ -101,7 +109,7 @@ def test_unknown_property_is_rejected_not_dropped() -> None:
             op("s2", "kg_neighbours", entity="s1", properties=["P37", "P9999999"]),
         ),
         CAT,
-        Q,
+        "Quelles langues parlent les Brésiliens ?",
     )
     assert [o.op for o in p.operations] == ["entity_lookup"]
     assert p.rejected[0]["reason"] == "property_not_in_list"
@@ -125,7 +133,7 @@ def test_server_limits_are_capped_with_a_warning_and_stated_years_never_changed(
             op("d", "atlas_rank", concept="population.density", year=1961, limit=500),
         ),
         CAT,
-        Q,
+        "Lien entre A et B ? Densité en 1961",
     )
     assert p.op("c").args["max_hops"] == 4 and p.op("d").args["limit"] == 50
     assert p.op("d").args["year"] == 1961
@@ -134,8 +142,41 @@ def test_server_limits_are_capped_with_a_warning_and_stated_years_never_changed(
 
 def test_too_many_operations_are_truncated_and_reported() -> None:
     ops = [op(f"s{i}", "entity_lookup", text=f"x{i}") for i in range(MAX_OPERATIONS + 3)]
-    p = validate_plan(plan(*ops), CAT, Q)
+    p = validate_plan(plan(*ops), CAT, " ".join(f"x{i}" for i in range(MAX_OPERATIONS + 3)))
     assert len(p.operations) == MAX_OPERATIONS and len(p.rejected) == 3
+
+
+def test_lookup_text_must_come_from_the_question() -> None:
+    """ASK-6 (review V3): a lookup the planner adds on its own (an injected question can make it look up
+    entities the user never named) is rejected with the operations using it; dictionary forms pass."""
+    q = "Comment les Brésiliens parlent-ils portugais ?"
+    assert lookup_from_question("Brésil", q) and lookup_from_question("portugais", q)
+    assert lookup_from_question("Portuguese language", "the Portuguese language of Brazilians")
+    assert not lookup_from_question("Adolf Hitler", q) and not lookup_from_question("a", "la"), "word, not substring"
+    p = validate_plan(
+        plan(
+            op("s1", "entity_lookup", text="Brésil"),
+            op("s2", "entity_lookup", text="Union soviétique"),
+            op("s3", "kg_path", from_entity="s1", to_entity="s2"),
+        ),
+        CAT,
+        q,
+    )
+    assert [o.id for o in p.operations] == ["s1"]
+    assert {r["id"]: r["reason"] for r in p.rejected} == {
+        "s2": "lookup_not_in_question",
+        "s3": "unknown_entity_ref",
+    }
+
+
+def test_path_searches_per_question_are_capped() -> None:
+    """SEC-1 (review V3): path searches are the expensive operation; at most MAX_PATH_OPERATIONS per question."""
+    q = "aaa bbb ccc ddd eee"
+    looks = [op(f"l{i}", "entity_lookup", text=w) for i, w in enumerate(q.split())]
+    paths = [op(f"p{i}", "kg_path", from_entity="l0", to_entity=f"l{i}") for i in range(1, 5)]
+    p = validate_plan(plan(*looks, *paths), CAT, q)
+    assert sum(o.op == "kg_path" for o in p.operations) == MAX_PATH_OPERATIONS
+    assert [r["reason"] for r in p.rejected] == ["too_many_path_operations"] * (4 - MAX_PATH_OPERATIONS)
 
 
 def test_not_an_object_is_refused() -> None:

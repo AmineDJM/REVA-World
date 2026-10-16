@@ -10,7 +10,11 @@ untrusted JSON into a :class:`QueryPlan` and enforces:
   :class:`~reva.nlqa.catalog.QaCatalog`; anything else **rejects that operation** (and every
   operation depending on it) with a typed reason — never a substitution;
 * bounded numbers (years, hops, limits); a server limit (hops ≤ 4, limit ≤ 50) is applied
-  with a warning, a user-stated year is never changed (out of range → rejected).
+  with a warning, a user-stated year is never changed (out of range → rejected);
+* an ``entity_lookup`` text must come from the question (:func:`lookup_from_question`: the words
+  as written or their dictionary form, e.g. "Brésil" for "Brésiliens"); a lookup the planner
+  added on its own is rejected (``lookup_not_in_question``), with the operations that use it;
+* at most :data:`MAX_PATH_OPERATIONS` path searches per question (``too_many_path_operations``).
 """
 
 from __future__ import annotations
@@ -33,6 +37,8 @@ OPS: tuple[str, ...] = (
     "links",
 )
 MAX_OPERATIONS = 12
+#: Path searches are the expensive operations: at most this many per question (SEC-1).
+MAX_PATH_OPERATIONS = 3
 MAX_HOPS = 4
 MAX_LIMIT = 50
 DEFAULT_LIMIT = 10
@@ -89,6 +95,28 @@ def in_question(fragment: str, question: str) -> bool:
     return bool(f) and f in fold(question)
 
 
+def _words(text: str) -> list[str]:
+    return re.findall(r"[^\W_]+", fold(text))
+
+
+def lookup_from_question(text: str, question: str) -> bool:
+    """True when a lookup text comes from the question: it occurs in it, or each of its words of 3+
+    characters shares its first 5 characters (the whole word when shorter) with a word of the question
+    (inflections and dictionary forms: "Brésil"/"Brésiliens", "portugais"/"portugaise")."""
+    t = fold(text)
+    if t and re.search(r"(?<!\w)" + re.escape(t) + r"(?!\w)", fold(question)):
+        return True
+    qwords = _words(question)
+    words = [w for w in _words(text) if len(w) >= 3]
+    if not words:
+        return False
+    for w in words:
+        stem = w[:5]
+        if not any(q.startswith(stem) or (len(q) >= 5 and w.startswith(q[:5])) for q in qwords):
+            return False
+    return True
+
+
 def _year(v: Any) -> int | None:
     if v is None:
         return None
@@ -142,6 +170,7 @@ def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str =
         ops = ops[:MAX_OPERATIONS]
     lookups: dict[str, str | None] = {}  # id -> kind
     seen: set[str] = set()
+    n_paths = 0
     for i, o in enumerate(ops):
         if not isinstance(o, Mapping):
             plan.rejected.append({"id": f"#{i}", "op": "", "reason": "not_an_object"})
@@ -154,6 +183,12 @@ def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str =
             if name not in OPS:
                 raise _Reject("unknown_operation", op=_clean(name, 40))
             args = _validate_args(name, o, catalog, lookups, plan)
+            if name == "entity_lookup" and not lookup_from_question(args["text"], question):
+                raise _Reject("lookup_not_in_question")
+            if name == "kg_path":
+                if n_paths >= MAX_PATH_OPERATIONS:
+                    raise _Reject("too_many_path_operations")
+                n_paths += 1
         except _Reject as r:
             plan.rejected.append({"id": _clean(op_id, 16), "op": _clean(name, 32), "reason": r.reason, **r.details})
             continue

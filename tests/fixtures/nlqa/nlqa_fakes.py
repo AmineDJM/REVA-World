@@ -23,6 +23,7 @@ from reva.nlqa.ports import (
     EntityMatch,
     KgStatement,
     TimeValue,
+    is_projection,
 )
 
 HERE = Path(__file__).resolve().parent
@@ -313,7 +314,11 @@ class FakeAtlas:
             latest = {}
             for c in cells:
                 k = (c.source, c.dataset, c.indicator, c.iso3)
-                if k not in latest or c.year > latest[k].year:
+                # the latest actual cell; a projection only when the series has nothing else (as the adapter)
+                if k not in latest or (not is_projection(c.flags), c.year) > (
+                    not is_projection(latest[k].flags),
+                    latest[k].year,
+                ):
                     latest[k] = c
             cells = list(latest.values())
         return AtlasResult(tuple(cells), tuple(self.order.get(concept_id, ())))

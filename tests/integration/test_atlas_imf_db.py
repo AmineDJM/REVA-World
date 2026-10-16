@@ -72,7 +72,7 @@ def test_registered_weo_table_reads_back_with_projection_flags(db, first):
     fra = df.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "BCA_NGDPD"))
     flags = {r["period_start"].year: json.loads(r["flags"]) for r in fra.to_dicts()}
     assert flags[2026]["estimate_kind"] == "projection" and "estimate_kind" not in flags[2025]
-    assert t["coverage"]["unmapped_provider_geo_count"] == 2  # G001, TWN kept
+    assert t["coverage"]["unmapped_provider_geo_count"] == 1  # G001 kept (TWN: crosswalk entity since 1.1.0)
     assert "WEO October 2026" in t["coverage"]["coverage_note"]
 
 

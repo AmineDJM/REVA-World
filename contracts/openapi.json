@@ -414,6 +414,18 @@
             ],
             "title": "Iso3"
           },
+          "period_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "calendar_year | sub_annual | twelve_month_window | multi_year (the cell's true period)",
+            "title": "Period Basis"
+          },
           "period_end": {
             "description": "Exclusive end (half-open period), same convention as period_start",
             "title": "Period End",
@@ -517,6 +529,7 @@
           "entity_qid",
           "period_start",
           "period_end",
+          "period_basis",
           "flags",
           "provenance",
           "source_rank",
@@ -1196,6 +1209,17 @@
             "title": "Method",
             "type": "string"
           },
+          "period_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Basis"
+          },
           "period_end": {
             "title": "Period End",
             "type": "string"
@@ -1264,6 +1288,7 @@
           "provider_geo",
           "period_start",
           "period_end",
+          "period_basis",
           "flags",
           "provenance",
           "consulted",
@@ -1683,6 +1708,14 @@
           "concept": {
             "$ref": "#/components/schemas/AtlasHeadlineConcept"
           },
+          "countries_with_other_period_cells": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Countries With Other Period Cells",
+            "type": "array"
+          },
           "countries_with_value": {
             "title": "Countries With Value",
             "type": "integer"
@@ -1712,6 +1745,7 @@
           "values",
           "countries_with_value",
           "countries_without_value",
+          "countries_with_other_period_cells",
           "by_source"
         ],
         "title": "AtlasHeadlineMap",
@@ -1895,6 +1929,15 @@
           "concept": {
             "$ref": "#/components/schemas/AtlasConcept"
           },
+          "countries_with_other_period_cells": {
+            "default": [],
+            "description": "Countries with cells overlapping the year that the year view does not attach (never absent)",
+            "items": {
+              "type": "string"
+            },
+            "title": "Countries With Other Period Cells",
+            "type": "array"
+          },
           "countries_with_value": {
             "title": "Countries With Value",
             "type": "integer"
@@ -1924,6 +1967,7 @@
           "values",
           "countries_with_value",
           "countries_without_value",
+          "countries_with_other_period_cells",
           "by_source"
         ],
         "title": "AtlasMap",
@@ -2064,9 +2108,54 @@
             "title": "Flags",
             "type": "object"
           },
+          "period_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Basis"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
           "series": {
             "title": "Series",
             "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The cell's own unit (a series can switch currency or unit)",
+            "title": "Unit"
           },
           "value": {
             "anyOf": [
@@ -2099,6 +2188,10 @@
           "year",
           "value",
           "value_text",
+          "unit",
+          "period_start",
+          "period_end",
+          "period_basis",
           "series",
           "flags"
         ],
@@ -10003,6 +10096,18 @@
       "KgRef": {
         "additionalProperties": false,
         "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Entity kind of the current snapshot (null: no snapshot loaded)",
+            "title": "Kind"
+          },
           "label": {
             "description": "English label, else French, else the id itself",
             "title": "Label",
@@ -10015,7 +10120,8 @@
         },
         "required": [
           "qid",
-          "label"
+          "label",
+          "kind"
         ],
         "title": "KgRef",
         "type": "object"
@@ -10023,10 +10129,29 @@
       "KgSearch": {
         "additionalProperties": false,
         "properties": {
+          "ambiguous": {
+            "default": false,
+            "description": "iso3 mode: several entities hold this code (none is chosen)",
+            "title": "Ambiguous",
+            "type": "boolean"
+          },
+          "iso3_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "iso3 mode: the reviewed registry file, or the KG's ISO alpha-3 (P298) statements",
+            "title": "Iso3 Source"
+          },
           "mode": {
             "enum": [
               "prefix",
-              "substring"
+              "substring",
+              "iso3"
             ],
             "title": "Mode",
             "type": "string"
@@ -10041,12 +10166,21 @@
             },
             "title": "Results",
             "type": "array"
+          },
+          "truncated": {
+            "default": false,
+            "description": "More entities match than the limit",
+            "title": "Truncated",
+            "type": "boolean"
           }
         },
         "required": [
           "query",
           "mode",
-          "results"
+          "results",
+          "truncated",
+          "ambiguous",
+          "iso3_source"
         ],
         "title": "KgSearch",
         "type": "object"
@@ -10055,8 +10189,15 @@
         "additionalProperties": false,
         "properties": {
           "kind": {
-            "title": "Kind",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
           },
           "labels": {
             "additionalProperties": {
@@ -10069,7 +10210,9 @@
             "enum": [
               "exact",
               "prefix",
-              "substring"
+              "substring",
+              "iso3_registry",
+              "iso3_statement"
             ],
             "title": "Match",
             "type": "string"
@@ -10093,6 +10236,22 @@
             "title": "Qid",
             "type": "string"
           },
+          "rank": {
+            "anyOf": [
+              {
+                "enum": [
+                  "preferred",
+                  "normal"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "iso3 mode, from KG statements: rank of the ISO alpha-3 statement",
+            "title": "Rank"
+          },
           "sitelinks": {
             "anyOf": [
               {
@@ -10112,7 +10271,8 @@
           "origin",
           "match",
           "matched",
-          "labels"
+          "labels",
+          "rank"
         ],
         "title": "KgSearchHit",
         "type": "object"
@@ -18655,7 +18815,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -18669,7 +18829,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -18794,7 +18954,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -18808,7 +18968,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -18957,7 +19117,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -18971,7 +19131,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -19051,7 +19211,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -19065,7 +19225,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -19144,7 +19304,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -19158,7 +19318,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -19237,7 +19397,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -19251,7 +19411,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -19329,7 +19489,7 @@
             }
           },
           {
-            "description": "Snapshot origin (default: latest of any)",
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
             "in": "query",
             "name": "origin",
             "required": false,
@@ -19343,7 +19503,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Snapshot origin (default: latest of any)",
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
               "title": "Origin"
             }
           },
@@ -20821,6 +20981,29 @@
               "title": "Qid",
               "type": "string"
             }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
           }
         ],
         "responses": {
@@ -21019,6 +21202,29 @@
               ],
               "title": "Cursor"
             }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
           }
         ],
         "responses": {
@@ -21130,6 +21336,29 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
             }
           }
         ],
@@ -21281,7 +21510,7 @@
             "required": false,
             "schema": {
               "default": 2000,
-              "maximum": 100000,
+              "maximum": 5000,
               "minimum": 1,
               "title": "Hub Limit",
               "type": "integer"
@@ -21319,6 +21548,29 @@
               "minimum": 1,
               "title": "Max Paths",
               "type": "integer"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
             }
           }
         ],
@@ -21368,13 +21620,39 @@
             "description": "Label or alias text (case-insensitive)",
             "in": "query",
             "name": "q",
-            "required": true,
+            "required": false,
             "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "description": "Label or alias text (case-insensitive)",
-              "maxLength": 200,
-              "minLength": 1,
-              "title": "Q",
-              "type": "string"
+              "title": "Q"
+            }
+          },
+          {
+            "description": "ISO 3166-1 alpha-3 code → entity (registry/entities/country_qids.json, else the KG's P298 statements; several holders are all returned with ambiguous=true). Exclusive with q",
+            "in": "query",
+            "name": "iso3",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-1 alpha-3 code → entity (registry/entities/country_qids.json, else the KG's P298 statements; several holders are all returned with ambiguous=true). Exclusive with q",
+              "title": "Iso3"
             }
           },
           {
@@ -21421,6 +21699,29 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
             }
           }
         ],

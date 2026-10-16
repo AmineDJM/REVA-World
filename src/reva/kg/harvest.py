@@ -196,7 +196,8 @@ def validate_spec(spec: Spec, allow: AllowList, *, known_ids: Iterable[str] = ()
         if cols.get("property") and cols["property"] not in allow:
             errors.append(f"property {cols['property']} is not allow-listed (registry/kg/properties.yaml)")
         variables = set(re.findall(r"\?([A-Za-z_][A-Za-z0-9_]*)", sparql))
-        for key in ("subject", "object", "property_var", "statement", "rank", "start", "end", "point_in_time"):
+        for key in ("subject", "object", "property_var", "statement", "rank", "start", "end", "point_in_time",
+                    "start_precision", "end_precision", "point_in_time_precision", "object_precision"):
             if cols.get(key) and cols[key] not in variables:
                 errors.append(f"columns.{key}: ?{cols[key]} does not occur in the query")
         for pid, var in (cols.get("qualifiers") or {}).items():
@@ -1106,7 +1107,7 @@ class BudgetedSession:
 
 @contextlib.asynccontextmanager
 async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wdqs: int = 1,
-                          planned_wbapi: int = 1) -> AsyncIterator[BudgetedSession]:
+                          planned_wbapi: int = 1, mode: str = "api") -> AsyncIterator[BudgetedSession]:
     """The only live Wikidata entry point (invariant 30): reserve -> meter every request -> settle.
 
     The ledger lives in the throwaway harvest database. ``reserve_ingest`` refuses a run that does not fit the
@@ -1135,7 +1136,8 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
                                planned_requests=planned_wbapi, budget=budget)
         wdqs = metered(inner, engine, res_q, budget=budget)
         wbapi = metered(inner, engine, res_a, budget=budget)
-        client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"))
+        client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"),
+                                mode=mode)
         session = BudgetedSession(client, engine, store, run_id)
         yield session
     finally:
@@ -1148,7 +1150,7 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
 
 async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
                       planned_wdqs: int = 50, planned_wbapi: int = 100, via: str = "wdqs",
-                      expand: bool = True) -> dict[str, Any]:
+                      expand: bool = True, mode: str = "api") -> dict[str, Any]:
     """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
     specs = discover_specs(paths or None)
@@ -1159,7 +1161,7 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
                            "allowlist_sha256": allow.sha256, "specs": []}
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     async with budgeted_client(purpose="harvest", db_name=db_name, planned_wdqs=planned_wdqs,
-                               planned_wbapi=planned_wbapi) as sess:
+                               planned_wbapi=planned_wbapi, mode=mode) as sess:
         out["run_id"] = sess.run_id
         report_path = REPORT_DIR / f"{sess.run_id}.json"
         sink = KgDbSink(sess.engine, sess.store)
@@ -1176,7 +1178,7 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
 
         try:
             out["properties"] = sink.register_properties(allow)
-            out["via"], out["expand"] = via, expand
+            out["via"], out["expand"], out["mode"] = via, expand, mode
             await run_specs(Harvester(client, sink, allow=allow, via=via, expand=expand), specs, force=force,
                             on_report=save)
         finally:
@@ -1326,7 +1328,8 @@ def or_groups(prefix: str, terms: Sequence[str], suffix: str = "") -> list[str]:
 
 async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS,
                                manual_titles: Mapping[str, str] | None = None,
-                               extra_codes: Sequence[str] = ("TWN",)) -> dict[str, Any]:
+                               extra_codes: Sequence[str] = ("TWN",),
+                               candidates_via: str = "search") -> dict[str, Any]:
     """Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).
 
     Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character
@@ -1342,10 +1345,21 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
     codes = sorted({k for k, e in ents.items() if e.get("iso3")} | set(extra_codes))
     raws: list[str] = []
     cands: list[str] = []
-    for q in or_groups("haswbstatement:", [f"P298={c}" for c in codes]):
-        hits, _total, shas = await client.search_all(q, meta={"purpose": "country_qids"})
-        raws.extend(shas)
-        cands.extend(hits)
+    if candidates_via == "whatlinkshere":
+        # Every item with a P298 statement links to Property:P298; the page view is served outside the action
+        # API limiter. It only supplies candidates: codes come from the items' own P298 claims below.
+        result, sha = await client._request(client.wbapi_http, WHATLINKSHERE_P298, endpoint="pages",
+                                            accept="text/html", meta={"kind": "whatlinkshere", "target": "P298"})
+        raws.append(sha)
+        found = re.findall(r'href="/wiki/(Q[0-9]+)"', result.body.decode("utf-8", "replace"))
+        cands = list(dict.fromkeys(found))
+        if len(cands) >= 500:
+            raise SpecError("WhatLinksHere/Property:P298 has more than one page: use --candidates search")
+    else:
+        for q in or_groups("haswbstatement:", [f"P298={c}" for c in codes]):
+            hits, _total, shas = await client.search_all(q, meta={"purpose": "country_qids"})
+            raws.extend(shas)
+            cands.extend(hits)
     cands = sorted(set(cands), key=lambda q: int(q[1:]))
     res = await client.get_entities(cands, props=("info", "claims", "labels"), languages=("en", "fr"),
                                     meta={"purpose": "country_qids"})
@@ -1397,11 +1411,21 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
     for code, title in (manual_titles or {}).items():
         if code not in unmapped:
             continue
-        url = WBAPI_SITELINK.format(title=title.replace(" ", "_"))
-        result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                            meta={"kind": "wbgetentities_sitelink", "title": title})
+        if client.mode == "api":
+            url = WBAPI_SITELINK.format(title=title.replace(" ", "_"))
+            result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
+                                                meta={"kind": "wbgetentities_sitelink", "title": title})
+            doc = json.loads(result.body)
+        else:  # Special:ItemByTitle redirects to the item; its snapshot then comes from Special:EntityData
+            url = ITEM_BY_TITLE.format(title=title.replace(" ", "_"))
+            result, sha = await client._request(client.wbapi_http, url, endpoint="pages", accept="text/html",
+                                                meta={"kind": "item_by_title", "title": title})
+            target = qid_from_uri("http://www.wikidata.org/entity/" + result.final_url.rstrip("/").rsplit("/", 1)[-1])
+            snap = await client.get_entities([target] if target else [], props=("info", "labels"),
+                                             languages=("en", "fr"))
+            raws.extend(snap.raw_sha256s)
+            doc = {"entities": snap.entities}
         raws.append(sha)
-        doc = json.loads(result.body)
         found = [(q, e) for q, e in (doc.get("entities") or {}).items() if q.startswith("Q") and "missing" not in e]
         if len(found) == 1:
             q, e = found[0]
@@ -1437,6 +1461,9 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
     return stats
 
 
+ITEM_BY_TITLE = "https://www.wikidata.org/wiki/Special:ItemByTitle/enwiki/{title}"
+WHATLINKSHERE_P298 = ("https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/Property:P298"
+                      "&limit=500&namespace=0")
 WBAPI_SITELINK = ("https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={title}"
                   "&props=info&format=json&maxlag=5")
 MANUAL_TITLES = {"CHI": "Channel Islands", "XKX": "Kosovo"}
@@ -1570,7 +1597,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     st.add_argument("paths", nargs="*", type=Path)
     sub.add_parser("merge-property-requests", help="merge registry/kg/property_requests into the allow-list")
     mc = sub.add_parser("map-countries", help="write registry/entities/country_qids.json (crosswalk -> QID)")
-    mc.add_argument("--via-wdqs", action="store_true", help="one SPARQL query instead of per-code API searches")
+    mc.add_argument("--via-wdqs", action="store_true", help="one SPARQL query instead of API searches")
+    mc.add_argument("--candidates", choices=("search", "whatlinkshere"), default="search",
+                    help="where candidate items come from (whatlinkshere: page view, outside the API limiter)")
     r = sub.add_parser("run", help="run specs into a throwaway database (never 'reva'), budget-metered")
     r.add_argument("paths", nargs="*", type=Path)
     r.add_argument("--db", default=DEFAULT_DB)
@@ -1580,6 +1609,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     r.add_argument("--via", choices=("wdqs", "api"), default="wdqs",
                    help="api: select seeds with the specs' api_search blocks (CirrusSearch) instead of WDQS")
     r.add_argument("--no-expand", action="store_true", help="skip label snapshots of object entities")
+    for sp in (r, mc):
+        sp.add_argument("--api-mode", choices=("api", "linked_data", "hybrid"), default="api",
+                        help="api: action API; linked_data: Special:EntityData + REST search; hybrid: action-API "
+                             "search + Special:EntityData (use when the action API is saturated)")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     allow = load_allowlist()
@@ -1637,7 +1670,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
                                               planned_wdqs=args.planned_wdqs,
                                               planned_wbapi=args.planned_wbapi, via=args.via,
-                                              expand=not args.no_expand))
+                                              expand=not args.no_expand, mode=args.api_mode))
         except BudgetExhausted as e:
             _print({"status": "budget_exhausted", "message": e.message, **e.details})
             return 3
@@ -1649,11 +1682,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if all(r["status"] in ("done", "skipped") for r in spec_reports) else 1
     if args.cmd == "map-countries":
         async def mapc() -> int:
-            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=30) as sess:
+            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=30,
+                                       mode=args.api_mode) as sess:
                 if args.via_wdqs:
                     _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
                 else:
-                    _print(await map_countries_search(sess.client, manual_titles=MANUAL_TITLES))
+                    _print(await map_countries_search(sess.client, manual_titles=MANUAL_TITLES,
+                                                      candidates_via=args.candidates))
             _print({"budget": sess.usage.get("budget")})
             return 0
 

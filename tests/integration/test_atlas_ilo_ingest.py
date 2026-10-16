@@ -36,7 +36,7 @@ async def test_ilostat_fixture_ingest_registers_every_table(db: Any) -> None:
     assert out["status"] == "completed" and out["summary"]["ok"], out["summary"]["errors"]
     assert {t["table"] for t in out["summary"]["tables"]} == {f"ilostat.{i.dataset}" for i in ilo.INDICATORS}
     mw = _table(out, "ilostat.ear_inee_cur_nb_a")
-    assert mw["created"] is True and mw["unmapped_provider_geo"] == ["TWN"]
+    assert mw["created"] is True and mw["unmapped_provider_geo"] == []  # TWN: crosswalk entity since 1.1.0
     frame = read_atlas_table(db.store, mw["artifact_sha256"])
     fra = frame.filter(
         (pl.col("iso3") == "FRA")

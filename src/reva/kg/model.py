@@ -40,6 +40,12 @@ not stored. Deprecated-rank statements are rejected; if an earlier version of th
 a retraction (``deprecated_at_source``) removes it from the current view. ``retract_keys`` records
 statements the source removed (``removed_at_source``). Nothing is ever updated or deleted.
 
+Reinstatement (review V3, KG-1; migration ``0011_kg_fixes``): a source without revision ids
+(``source_revision`` NULL) that re-asserts a statement whose latest stored row is retracted — by a
+retraction recorded from a delivery retrieved *before* this one — stores a new row with
+``reinstates_row_id`` = that retracted row (report: ``statements_reinstated``); the statement is current
+again. A revisioned source re-asserting it under a new revision is an ordinary ``revision``.
+
 Raw artifacts: every ``raw_sha256s`` entry must be archived. If it is not yet a verified ``meta.artifact``
 but the bytes are in ``store`` (namespace ``raw``), the loader registers it; otherwise the batch is refused.
 """
@@ -188,6 +194,7 @@ class LoadReport:
     statements_inserted: int = 0
     statements_new_revision: int = 0
     statements_unchanged: int = 0
+    statements_reinstated: int = 0
     statements_stale: int = 0
     statements_conflicting: int = 0
     retractions_inserted: int = 0
@@ -951,18 +958,22 @@ def _load_statements(conn: Connection, rows: list[_StRow], bind: dict[str, Any],
         res = conn.execute(
             text(f"""WITH st AS (SELECT {_ST_SELECT} FROM jsonb_array_elements(CAST(:rows AS jsonb)) x),
         cls AS (
-          SELECT st.*, CASE
+          SELECT st.*, lt.id AS lt_id, CASE
               WHEN lt.id IS NULL THEN 'new'
+              WHEN lt.retracted AND st.source_revision IS NULL AND lt.retraction_retrieved_at < :ret
+                   AND lt.retrieved_at <= :ret THEN 'reinstated'
               WHEN ex.content_sha256 IS NOT NULL AND ex.content_sha256 = st.content_sha256 THEN 'unchanged'
               WHEN ex.content_sha256 IS NOT NULL THEN 'conflicting'
               WHEN lt.retrieved_at > :ret THEN 'stale'
               WHEN lt.content_sha256 = st.content_sha256 AND NOT lt.retracted THEN 'unchanged'
               ELSE 'revision' END AS cls
           FROM st
-          LEFT JOIN LATERAL (SELECT s.id, s.content_sha256, s.retrieved_at,
-                                    EXISTS (SELECT 1 FROM kg.statement_retraction r
-                                             WHERE r.statement_row_id = s.id) AS retracted
-                               FROM kg.statement s WHERE s.statement_key = st.statement_key AND s.origin = :o
+          LEFT JOIN LATERAL (SELECT s.id, s.content_sha256, s.retrieved_at, rl.retrieved_at IS NOT NULL AS retracted,
+                                    rl.retrieved_at AS retraction_retrieved_at
+                               FROM kg.statement s
+                               LEFT JOIN kg.statement_retraction r ON r.statement_row_id = s.id
+                               LEFT JOIN kg.load rl ON rl.id = r.load_id
+                              WHERE s.statement_key = st.statement_key AND s.origin = :o
                               ORDER BY s.id DESC LIMIT 1) lt ON true
           LEFT JOIN LATERAL (SELECT s.content_sha256 FROM kg.statement s
                               WHERE lt.id IS NOT NULL AND s.statement_key = st.statement_key AND s.origin = :o
@@ -971,12 +982,13 @@ def _load_statements(conn: Connection, rows: list[_StRow], bind: dict[str, Any],
           INSERT INTO kg.statement(load_id, statement_key, statement_id, origin, content_sha256, subject_qid,
                 property_pid, object_qid, value, start_time, start_precision, end_time, end_precision, pit_time,
                 pit_precision, time_calendars, valid_lo, valid_hi, value_time_lo, value_time_hi, qualifiers, rank,
-                refs, source_key, source_revision, raw_sha256, retrieved_at)
+                refs, source_key, source_revision, raw_sha256, retrieved_at, reinstates_row_id)
           SELECT :load, c.statement_key, c.statement_id, :o, c.content_sha256, c.subject_qid, c.property_pid,
                  c.object_qid, c.value, c.start_time, c.start_precision, c.end_time, c.end_precision, c.pit_time,
                  c.pit_precision, c.time_calendars, c.valid_lo, c.valid_hi, c.value_time_lo, c.value_time_hi,
-                 c.qualifiers, c.rank, c.refs, :sk, c.source_revision, c.raw_sha256, :ret
-            FROM cls c WHERE c.cls IN ('new','revision') ORDER BY c.idx
+                 c.qualifiers, c.rank, c.refs, :sk, c.source_revision, c.raw_sha256, :ret,
+                 CASE WHEN c.cls = 'reinstated' THEN c.lt_id END
+            FROM cls c WHERE c.cls IN ('new','revision','reinstated') ORDER BY c.idx
           RETURNING 1)
         SELECT cls, count(*) FROM cls GROUP BY cls UNION ALL SELECT '_inserted', count(*) FROM ins"""),
             {**bind, "rows": _rows_json(_st_tuple(r) for r in chunk)},
@@ -987,6 +999,8 @@ def _load_statements(conn: Connection, rows: list[_StRow], bind: dict[str, Any],
                 rep.statements_inserted += n
             elif cls == "revision":
                 rep.statements_new_revision += n
+            elif cls == "reinstated":
+                rep.statements_reinstated += n
             elif cls == "unchanged":
                 rep.statements_unchanged += n
             elif cls == "stale":

@@ -132,7 +132,9 @@ def test_exact_decimal_helpers() -> None:
 
 # --------------------------------------------------------------------------- BACI
 def test_baci_tables_are_exact_sums(baci_tables: dict[str, pl.DataFrame]) -> None:
-    assert set(baci_tables) == {d for d in baci.DATASETS if d != "hs92_pair_section_1995_2015"}
+    assert set(baci_tables) == {
+        d for d in baci.DATASETS if d not in ("hs92_pair_section_1995_2010", "hs92_pair_section_2011_2019")
+    }
     rows = _raw_baci_rows(2024)
     pair: dict[tuple[str, str], Decimal] = defaultdict(Decimal)
     sec: dict[tuple[str, str, str], Decimal] = defaultdict(Decimal)
@@ -146,7 +148,7 @@ def test_baci_tables_are_exact_sums(baci_tables: dict[str, pl.DataFrame]) -> Non
     pt = baci_tables["hs92_pair_total"]
     for (i, j), v in list(pair.items())[:40]:
         assert Decimal(_cell(pt, i, f"X|partner={j}|section=TOTAL", 2024)["value"]) == v
-    ps = baci_tables["hs92_pair_section_2016_2024"]
+    ps = baci_tables["hs92_pair_section_2020_2024"]
     for (i, j, s), v in list(sec.items())[:40]:
         assert Decimal(_cell(ps, i, f"X|partner={j}|section={s}", 2024)["value"]) == v
     c = baci_tables["hs92_country"]

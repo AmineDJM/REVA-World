@@ -47,8 +47,8 @@ also mapped in ``flags.partner_iso3`` or ``flags.partner_unmapped``):
   (``flags.derived``, both input indicators cited);
 * ``hs92_pair_total``: ``X|partner=<j>|section=TOTAL`` (exports of i to j, all products) and
   derived ``BAL|partner=<j>|section=TOTAL`` = X(i->j) - X(j->i) when both directions exist;
-* ``hs92_pair_section_1995_2015`` / ``hs92_pair_section_2016_2024``:
-  ``X|partner=<j>|section=<S>`` (split in two so one table stays below ~5 M rows);
+* ``hs92_pair_section_1995_2010`` / ``_2011_2019`` / ``_2020_2024``: ``X|partner=<j>|section=<S>``
+  (split by year range so one table stays below ~2 M rows and registers in bounded memory);
 * ``hs92_pair_hs2``: ``X|partner=<j>|hs2=<CC>`` for the chapters of :data:`HS2_CHAPTERS`
   (cereals, ores, mineral fuels, pharmaceuticals, gold/precious stones, iron and steel,
   machinery, electrical equipment, vehicles, aircraft, arms...).
@@ -62,6 +62,7 @@ nes", 530, 697, 711, 736 Sudan (...2011), 810, 849, 891.
 
 from __future__ import annotations
 
+import gc
 import io
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
@@ -161,10 +162,11 @@ HS2_CHAPTERS: dict[str, str] = {
 DS_COUNTRY = "hs92_country"
 DS_PAIR_TOTAL = "hs92_pair_total"
 DS_PAIR_HS2 = "hs92_pair_hs2"
-#: pair x section tables by year range (one table stays below ~5 M rows)
+#: pair x section tables by year range (one table stays below ~2 M rows: bounded memory when registering)
 PAIR_SECTION_TABLES: dict[str, tuple[int, int]] = {
-    "hs92_pair_section_1995_2015": (1995, 2015),
-    "hs92_pair_section_2016_2024": (2016, 2024),
+    "hs92_pair_section_1995_2010": (1995, 2010),
+    "hs92_pair_section_2011_2019": (2011, 2019),
+    "hs92_pair_section_2020_2024": (2020, 2024),
 }
 DATASETS: tuple[str, ...] = (DS_COUNTRY, DS_PAIR_TOTAL, *PAIR_SECTION_TABLES, DS_PAIR_HS2)
 
@@ -491,25 +493,44 @@ def country_rows(agg: YearAgg) -> pl.DataFrame:
     return _frame(out, dataset=DS_COUNTRY, year=agg.year)
 
 
-def build_frames(aggs: Sequence[YearAgg], wanted: Iterable[str]) -> dict[str, pl.DataFrame]:
-    """Atlas frames (not yet validated) of every wanted dataset from the year aggregates."""
-    wanted = set(wanted)
+def dataset_years(dataset: str, years: Iterable[int]) -> list[int]:
+    """The years whose aggregates feed ``dataset``."""
+    if dataset in PAIR_SECTION_TABLES:
+        lo, hi = PAIR_SECTION_TABLES[dataset]
+        return [y for y in years if lo <= y <= hi]
+    return list(years)
+
+
+def partner_map(aggs: Sequence[YearAgg]) -> dict[str, str | None]:
     codes: set[str] = set()
     for a in aggs:
         codes |= set(a.by_section["j"].unique().to_list())
-    pmap = _partner_map(sorted(codes))
-    out: dict[str, list[pl.DataFrame]] = {d: [] for d in DATASETS if d in wanted}
+    return _partner_map(sorted(codes))
+
+
+def build_frame(aggs: Sequence[YearAgg], dataset: str, pmap: dict[str, str | None]) -> pl.DataFrame | None:
+    """The atlas frame (not yet validated) of one dataset from the year aggregates (``None``: no year)."""
+    years = set(dataset_years(dataset, [a.year for a in aggs]))
+    parts = []
     for a in aggs:
-        if DS_COUNTRY in out:
-            out[DS_COUNTRY].append(country_rows(a))
-        if DS_PAIR_TOTAL in out:
-            out[DS_PAIR_TOTAL].append(pair_total_rows(a, pmap))
-        if DS_PAIR_HS2 in out:
-            out[DS_PAIR_HS2].append(pair_hs2_rows(a, pmap))
-        for ds, (lo, hi) in PAIR_SECTION_TABLES.items():
-            if ds in out and lo <= a.year <= hi:
-                out[ds].append(pair_section_rows(a, ds, pmap))
-    return {d: pl.concat(parts) for d, parts in out.items() if parts}
+        if a.year not in years:
+            continue
+        if dataset == DS_COUNTRY:
+            parts.append(country_rows(a))
+        elif dataset == DS_PAIR_TOTAL:
+            parts.append(pair_total_rows(a, pmap))
+        elif dataset == DS_PAIR_HS2:
+            parts.append(pair_hs2_rows(a, pmap))
+        else:
+            parts.append(pair_section_rows(a, dataset, pmap))
+    return pl.concat(parts) if parts else None
+
+
+def build_frames(aggs: Sequence[YearAgg], wanted: Iterable[str]) -> dict[str, pl.DataFrame]:
+    """Atlas frames of every wanted dataset (tests; the ingest builds one table at a time)."""
+    pmap = partner_map(aggs)
+    out = {d: build_frame(aggs, d, pmap) for d in DATASETS if d in set(wanted)}
+    return {d: f for d, f in out.items() if f is not None}
 
 
 def parse_country_codes(body: bytes) -> list[dict[str, str]]:
@@ -621,12 +642,17 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             {"item": name, "bytes": members[name].end - members[name].offset + 1, "sha256": sha, **agg.stats}
         )
     tables: list[dict[str, Any]] = []
-    frames = build_frames(aggs, wanted)
     years_done = sorted(a.year for a in aggs)
-    for ds, frame in frames.items():
+    pmap = partner_map(aggs)
+    ref_shas = shas[:3]  # tail, country codes, Readme
+    for ds in wanted:
+        frame = build_frame(aggs, ds, pmap)
+        if frame is None:
+            continue
+        used = [a for a in aggs if a.year in set(dataset_years(ds, years_done))]
         note = (
             f"CEPII BACI {HS} V{RELEASE} ({ARCHIVE}, ETag {etag}, {total} bytes) read by byte ranges; years "
-            f"{', '.join(map(str, years_done))}. Values: exact sums of BACI HS6 values (thousand USD, FOB, CEPII "
+            f"{', '.join(str(a.year) for a in used)}. Values: exact sums of BACI HS6 values (thousand USD, FOB, CEPII "
             "reconciled estimates). BAL rows are derived (exports - imports, same year and file). Codes follow UN "
             "Comtrade reporters: 251 France incl. Monaco, 842 USA incl. Puerto Rico and US Virgin Islands, 757 "
             "Switzerland incl. Liechtenstein, 579 Norway incl. Svalbard and Jan Mayen (crosswalk notes)."
@@ -635,7 +661,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             out = run.register(
                 dataset=ds,
                 frame=frame,
-                raw_sha256s=shas,
+                raw_sha256s=[*ref_shas, *(a.raw_sha256 for a in used)],
                 coverage_note=note,
                 geo_scheme=GEO_SCHEME,
                 rights=dict(RIGHTS),
@@ -645,6 +671,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 {"stage": "register", "table": f"{SOURCE}.{ds}", "error": type(e).__name__, "message": str(e)[:500]}
             )
             continue
+        finally:
+            del frame
+            gc.collect()
         cov = out.get("coverage") or {}
         tables.append(
             {

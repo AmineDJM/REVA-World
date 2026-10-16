@@ -262,6 +262,12 @@ def test_read_only_roles_cannot_write(kg, role: str) -> None:  # type: ignore[no
     if engine is None:
         pytest.skip(f"{role} login not configured")
     load_id, raw = _one_statement_load(kg, _source())
+    if role == "gate":
+        # SEC-2 (review V3, migration 0011): the promotion gate reads only its decision inputs, not the KG
+        with engine.connect() as c, pytest.raises(DBAPIError) as e:
+            c.execute(text("SELECT count(*) FROM kg.statement_current"))
+        assert "permission denied" in str(e.value.orig)
+        return
     with engine.connect() as c:
         assert (
             c.execute(text("SELECT count(*) FROM kg.statement_current WHERE load_id = :l"), {"l": load_id}).scalar_one()

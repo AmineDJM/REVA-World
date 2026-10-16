@@ -39,12 +39,18 @@ Honesty rules implemented here:
   value may be flagged projection that is not, never the reverse). Series without a declared
   boundary (the PPP series PPPGDP/PPPPC/PPPEX carry none) are flagged ``projection`` after the same
   country's NGDP boundary or from the publication year on, and ``unknown_boundary`` before.
+* WEO fiscal-year economies (``START_END_MONTHS_OF_REPORTING_YEAR`` not January/December): when the
+  series states its mapping (``FY(t/t+1) = CY(t)`` or ``FY(t-1/t) = CY(t)``) the cell keeps its true
+  12-month window (e.g. India 2024 = ``[2024-04-01, 2025-04-01)``) with ``flags.period_basis =
+  "fiscal_year"`` and ``flags.label_year`` = the WEO label (the atlas year view uses it); otherwise the
+  calendar label is kept and flagged ``fiscal_year_labelled_as_calendar`` (parser ``atlas_imf/2``).
 * Non-WEO datasets: ``DERIVATION_TYPE`` (SP = staff projection, SE* = staff estimate…) and ``STATUS``
   (F forecast, E/e estimate, P provisional, B break…) are carried in flags; SP/F become
   ``estimate_kind = "projection"``, staff estimates/E ``"estimate"``.
 * Provider geographies map through ``registry/atlas/geo_aliases/a_imf.yaml`` (scheme ``imf`` = ISO3
-  plus IMF ``KOS`` -> XKX and ``WBG`` -> PSE). Aggregates (G001 World, regions…), Taiwan Province of
-  China (TWN), Curaçao and Sint Maarten (CWX) and historical areas (SUN, YUG, CSK…) stay unmapped
+  plus IMF ``KOS`` -> XKX and ``WBG`` -> PSE). Aggregates (G001 World, regions…), Curaçao and
+  Sint Maarten (CWX) and historical areas (SUN, YUG, CSK…) stay unmapped; TWN maps since the
+  crosswalk lists Taiwan (it did not when A-IMF wrote this connector)
   (kept, listed). IMTS partners are folded into the indicator (``XG_FOB_USD|partner=DEU``) and mapped
   into ``flags.partner_iso3`` (null when unmapped; the IMF code is always kept).
 
@@ -67,7 +73,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
-from typing import Any
+from typing import Any, ClassVar
 from urllib.parse import urlencode
 
 import polars as pl
@@ -76,8 +82,8 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.imf"
-CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parsers
-PARSER_VERSION = "atlas_imf/1"
+CONNECTOR_VERSION = "1.2.0"  # 1.1.0: atlas source platform (metered run.get); 1.2.0: WEO fiscal-year windows
+PARSER_VERSION = "atlas_imf/2"  # /2: WEO fiscal-year cells keep their true window (ATLAS-4)
 SOURCE = "imf"
 SOURCE_KEY = "imf.sdmx"
 HOST = "api.imf.org"
@@ -486,6 +492,33 @@ def weo_boundary(latest_actual: str | None, methodology_notes: str | None) -> tu
     return None, "unparsed"
 
 
+_MONTHS = {
+    m: i + 1
+    for i, m in enumerate(
+        ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+         "November", "December")
+    )
+}  # fmt: skip
+
+
+def weo_fiscal_window(months: str | None, methodology_notes: str | None) -> tuple[int, int, str | None]:
+    """(start month, start-year offset, period_basis) of a WEO year label ``t``.
+
+    Calendar reporting years (``January/December`` or none) -> ``(1, 0, None)``. A fiscal year whose
+    mapping the series states (``FY(t/t+1) = CY(t)``: starts in ``t``; ``FY(t-1/t) = CY(t)``: starts in
+    ``t-1``) -> its true window, ``period_basis = "fiscal_year"``. Without a stated mapping the window
+    is unknown: the cell keeps the WEO calendar label, flagged ``fiscal_year_labelled_as_calendar``."""
+    if not months or months == "January/December":
+        return 1, 0, None
+    start = _MONTHS.get(months.split("/")[0].strip())
+    notes = methodology_notes or ""
+    if start is not None and _FY_MAP_T_T1.search(notes):
+        return start, 0, "fiscal_year"
+    if start is not None and _FY_MAP_T1_T.search(notes):
+        return start, -1, "fiscal_year"
+    return 1, 0, "fiscal_year_labelled_as_calendar"
+
+
 def _year(tp: str | None) -> int | None:
     if tp and re.fullmatch(r"\d{4}", tp):
         return int(tp)
@@ -505,7 +538,11 @@ def _obs_kind(obs: Mapping[str, str]) -> str | None:
 class _Columns:
     """Column-wise accumulator (memory-light for millions of rows)."""
 
-    COLS = ("indicator", "concept_id", "provider_geo", "year", "value", "unit", "flags", "selector")
+    COLS = ("indicator", "concept_id", "provider_geo", "year", "value", "unit", "flags", "selector", "month", "offset")
+    DEFAULTS: ClassVar[dict[str, Any]] = {
+        "month": 1,
+        "offset": 0,
+    }  # period start month / start-year offset (fiscal years)
 
     def __init__(self) -> None:
         self.data: dict[str, list[Any]] = {c: [] for c in self.COLS}
@@ -518,7 +555,7 @@ class _Columns:
 
     def add(self, **kw: Any) -> None:
         for c in self.COLS:
-            v = kw[c]
+            v = kw[c] if c in kw else self.DEFAULTS[c]
             self.data[c].append(self._i(v) if isinstance(v, str) and c not in ("value",) else v)
 
     def __len__(self) -> int:
@@ -537,6 +574,8 @@ class _Columns:
                 "unit": pl.Series(self.data["unit"], dtype=pl.String),
                 "flags": pl.Series(self.data["flags"], dtype=pl.String),
                 "selector": pl.Series(self.data["selector"], dtype=pl.String),
+                "month": pl.Series(self.data["month"], dtype=pl.Int8),
+                "offset": pl.Series(self.data["offset"], dtype=pl.Int32),
             }
         )
         f = f.with_columns(
@@ -544,8 +583,9 @@ class _Columns:
             pl.lit(dataset).alias("dataset"),
             pl.lit(None, dtype=pl.String).alias("iso3"),
             pl.lit(None, dtype=pl.String).alias("entity_qid"),
-            pl.date(pl.col("year"), 1, 1).alias("period_start"),
-            pl.date(pl.col("year") + 1, 1, 1).alias("period_end"),
+            # calendar years [Y-01-01, Y+1-01-01); WEO fiscal years their true 12-month window (ATLAS-4)
+            pl.date(pl.col("year") + pl.col("offset"), pl.col("month"), 1).alias("period_start"),
+            pl.date(pl.col("year") + pl.col("offset") + 1, pl.col("month"), 1).alias("period_end"),
             pl.lit(None, dtype=pl.String).alias("value_text"),
             pl.lit(raw_sha256).alias("raw_sha256"),
         )
@@ -624,6 +664,7 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
             rule = f"{rule}_ngdp_inherited" if fallback is not None else f"{rule}_publication_year"
         boundary_rules[rule] = boundary_rules.get(rule, 0) + 1
         months = g.get("START_END_MONTHS_OF_REPORTING_YEAR")
+        fy_month, fy_offset, basis = weo_fiscal_window(months, g.get("METHODOLOGY_NOTES"))
         skey = f"{geo}.{code}.A"
         for o in obs:
             st.obs += 1
@@ -655,6 +696,8 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
                     "estimate_kind": kind,
                     "display_scale": sattrs.get("SCALE"),
                     "reporting_year": months if months and months != "January/December" else None,
+                    "period_basis": basis,
+                    "label_year": y if basis else None,  # the WEO's own year label (the atlas year view)
                 }
             )
             cols.add(
@@ -666,6 +709,8 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
                 unit=unit,
                 flags=flags,
                 selector=_selector(msg, skey, tp or "", item_key),
+                month=fy_month,
+                offset=fy_offset,
             )
     st.rows = len(cols)
     st.notes = {"vintage": vint, "boundary_rules": boundary_rules}

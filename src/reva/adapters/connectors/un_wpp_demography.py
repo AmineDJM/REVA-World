@@ -65,7 +65,7 @@ import json
 import re
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
-from decimal import Context, Decimal, InvalidOperation
+from decimal import Context, Decimal
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -456,7 +456,10 @@ def _keep(rec: Mapping[str, str], rep: ParseReport, countries: Iterable[str] | N
         rep.unmapped_locations = {**(rep.unmapped_locations or {}), iso3: rec["Location"]}
         return None
     if xw[iso3] is not None and str(int(rec["LocID"])) != str(int(xw[iso3] or 0)):
-        rep.m49_mismatches = {**(rep.m49_mismatches or {}), iso3: {"wpp_loc_id": rec["LocID"], "crosswalk_m49": xw[iso3]}}
+        rep.m49_mismatches = {
+            **(rep.m49_mismatches or {}),
+            iso3: {"wpp_loc_id": rec["LocID"], "crosswalk_m49": xw[iso3]},
+        }
     if countries is not None and iso3 not in countries:
         return None
     rep.rows_kept += 1
@@ -552,7 +555,22 @@ def parse_single_age(
         rows = out.setdefault(iso3, [])
         for sex, v in (("F", f), ("M", m)):
             rows.append(
-                _row(dataset, iso3, loc, year, sex, code, kind, a, b, "leaf", thousands_to_persons(v), v, "persons", rec["Notes"])
+                _row(
+                    dataset,
+                    iso3,
+                    loc,
+                    year,
+                    sex,
+                    code,
+                    kind,
+                    a,
+                    b,
+                    "leaf",
+                    thousands_to_persons(v),
+                    v,
+                    "persons",
+                    rec["Notes"],
+                )
             )
     rep.max_additivity_diff_thousands = dec_text(max_diff)
     return out, rep
@@ -630,7 +648,24 @@ def parse_indicators(
         for col, unit, scale in SUMMARY_INDICATORS:
             v = rec[col]
             if v == "":
-                rows.append(_row("wpp2024_indicators", iso3, loc, year, "T", col, "indicator", None, None, "total", None, None, unit, rec["Notes"]))
+                rows.append(
+                    _row(
+                        "wpp2024_indicators",
+                        iso3,
+                        loc,
+                        year,
+                        "T",
+                        col,
+                        "indicator",
+                        None,
+                        None,
+                        "total",
+                        None,
+                        None,
+                        unit,
+                        rec["Notes"],
+                    )
+                )
                 continue
             if not _DEC.match(v):
                 raise _fail(f"indicator {col} {iso3} {year}: {v[:30]!r} is not a decimal")
@@ -660,9 +695,45 @@ def parse_indicators(
         male = male.quantize(Decimal("1e-6"))
         female = b - male
         rows_s = by_sex.setdefault(iso3, [])
-        rows_s.append(_row("wpp2024_births", iso3, loc, year, "T", "TOTAL", "total", None, None, "total", dec_text(b), births, "persons", rec["Notes"], "verbatim: WPP Demographic Indicators Births"))
+        rows_s.append(
+            _row(
+                "wpp2024_births",
+                iso3,
+                loc,
+                year,
+                "T",
+                "TOTAL",
+                "total",
+                None,
+                None,
+                "total",
+                dec_text(b),
+                births,
+                "persons",
+                rec["Notes"],
+                "verbatim: WPP Demographic Indicators Births",
+            )
+        )
         for sex, v in (("M", male), ("F", female)):
-            rows_s.append(_row("wpp2024_births", iso3, loc, year, sex, "TOTAL", "total", None, None, "total", dec_text(v), None, "persons", rec["Notes"], BIRTHS_BY_SEX_DERIVATION))
+            rows_s.append(
+                _row(
+                    "wpp2024_births",
+                    iso3,
+                    loc,
+                    year,
+                    sex,
+                    "TOTAL",
+                    "total",
+                    None,
+                    None,
+                    "total",
+                    dec_text(v),
+                    None,
+                    "persons",
+                    rec["Notes"],
+                    BIRTHS_BY_SEX_DERIVATION,
+                )
+            )
     return summary, by_sex, rep
 
 
@@ -673,7 +744,14 @@ def rows_to_table(rows: Sequence[Mapping[str, Any]]) -> Any:
     schema = pa.schema([(name, getattr(pa, typ)()) for name, typ in DATASET_COLUMNS])
     ordered = sorted(
         rows,
-        key=lambda r: (r["dataset"], r["iso3"], r["year"], r["sex"], r["age_start"] if r["age_start"] is not None else -1, r["age"]),
+        key=lambda r: (
+            r["dataset"],
+            r["iso3"],
+            r["year"],
+            r["sex"],
+            r["age_start"] if r["age_start"] is not None else -1,
+            r["age"],
+        ),
     )
     return pa.table({name: [r.get(name) for r in ordered] for name, _ in DATASET_COLUMNS}, schema=schema)
 
@@ -709,7 +787,9 @@ def check_complete(dataset: str, rows: Sequence[Mapping[str, Any]], first_year: 
     return problems
 
 
-def dataset_coverage(dataset: str, rows: Sequence[Mapping[str, Any]], report: ParseReport | None = None) -> dict[str, Any]:
+def dataset_coverage(
+    dataset: str, rows: Sequence[Mapping[str, Any]], report: ParseReport | None = None
+) -> dict[str, Any]:
     years = sorted({r["year"] for r in rows})
     return {
         "dataset": dataset,
@@ -939,7 +1019,11 @@ class UnWppDemographyConnector:
                 )
             )
         if md.get("byte_size") != b - a + 1:
-            f.append(Finding(code="size_mismatch", severity="blocker", message=f"{md.get('byte_size')} bytes for range {a}-{b}"))
+            f.append(
+                Finding(
+                    code="size_mismatch", severity="blocker", message=f"{md.get('byte_size')} bytes for range {a}-{b}"
+                )
+            )
         if md.get("pinned_etag") and md.get("etag") and md["etag"] != md["pinned_etag"]:
             f.append(
                 Finding(
@@ -959,7 +1043,9 @@ class UnWppDemographyConnector:
 
 
 # --------------------------------------------------------------------------- dataset registration
-def _latest_parts(conn: Any, connector: UnWppDemographyConnector, file_key: str, origin: str) -> list[dict[str, Any]] | None:
+def _latest_parts(
+    conn: Any, connector: UnWppDemographyConnector, file_key: str, origin: str
+) -> list[dict[str, Any]] | None:
     """Latest passing acquisition of every part of one file, or None while any is missing/blocked."""
     from sqlalchemy import text
 
@@ -1065,7 +1151,11 @@ def post_publish_datasets(
         return  # a fixture/test file: registered by the caller with its own connector instance
     fk = str(p["file_key"])
     assemble_datasets(
-        conn, store, origin=raw.origin, connector=connector, datasets=[d for d, dd in DATASETS.items() if fk in dd.files]
+        conn,
+        store,
+        origin=raw.origin,
+        connector=connector,
+        datasets=[d for d, dd in DATASETS.items() if fk in dd.files],
     )
 
 
@@ -1088,6 +1178,8 @@ def post_publish_for_connector(connector: UnWppDemographyConnector) -> Any:
     return hook
 
 
-def backfill_datasets(conn: Any, store: Any, *, origin: str = "live", connector: UnWppDemographyConnector | None = None) -> list[Any]:
+def backfill_datasets(
+    conn: Any, store: Any, *, origin: str = "live", connector: UnWppDemographyConnector | None = None
+) -> list[Any]:
     """Assemble and register every complete dataset input from archived acquisitions."""
     return assemble_datasets(conn, store, origin=origin, connector=connector)

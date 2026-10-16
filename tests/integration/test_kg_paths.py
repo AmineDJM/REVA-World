@@ -204,3 +204,13 @@ def test_entity_snapshot(g) -> None:  # type: ignore[no-untyped-def]
     assert e["labels"] == {"en": "Node HUB", "fr": "Nœud HUB"} and e["statements_in"] == 32
     assert e["provenance"]["source_key"] == SRC and len(e["provenance"]["raw_sha256s"]) == 1
     assert kq.entity(g, "pth:nothing") is None
+
+
+def test_time_budget_ends_the_search_with_a_reason(g) -> None:  # type: ignore[no-untyped-def]
+    """SEC-1 (review V3): a path search has a wall-clock budget, checked between levels; when it is spent the
+    search stops and says it was truncated."""
+    r = kq.paths(g, "pth:a", "pth:d", hub_limit=10, time_budget_s=0.0)
+    assert r["search"]["truncated"] and r["search"]["levels_expanded"] == 1
+    assert any("time budget" in x for x in r["search"]["truncation_reasons"])
+    assert not r["found"] and "truncated" in r["not_found_reason"]
+    assert kq.paths(g, "pth:a", "pth:d", hub_limit=10, time_budget_s=60)["found"]

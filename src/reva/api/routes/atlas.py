@@ -27,7 +27,11 @@ from reva.atlas.tables import geo_index
 
 router = APIRouter(prefix="/v1/atlas", tags=["atlas"], dependencies=[Depends(require_scope("read"))])
 
-ORIGIN_Q = Query(None, pattern="^(live|test_fixture)$", description="Snapshot origin (default: latest of any)")
+ORIGIN_Q = Query(
+    None,
+    pattern="^(live|test_fixture)$",
+    description="Snapshot origin (default: live in production, else the latest snapshot of any origin)",
+)
 SNAPSHOT_Q = Query(None, pattern="^[0-9a-f]{64}$", description="A recorded atlas snapshot (manifest sha256)")
 CELL_NOTE = (
     "Atlas cells are what each source reports. The best-available value is the first source in the concept's "
@@ -72,6 +76,9 @@ class AtlasCell(_M):
         description="ISO 8601 date, proleptic Gregorian, astronomical years (year 0 = 1 BCE; -9999-01-01 = 10000 BCE)"
     )
     period_end: str = Field(description="Exclusive end (half-open period), same convention as period_start")
+    period_basis: str | None = Field(
+        None, description="calendar_year | sub_annual | twelve_month_window | multi_year (the cell's true period)"
+    )
     flags: dict[str, Any]
     provenance: AtlasProvenance
     source_rank: int | None = Field(None, description="Position of the series in the concept's source order")
@@ -109,6 +116,10 @@ class AtlasSeriesPoint(_M):
     year: int
     value: str | None
     value_text: str | None
+    unit: str | None = Field(None, description="The cell's own unit (a series can switch currency or unit)")
+    period_start: str | None = None
+    period_end: str | None = None
+    period_basis: str | None = None
     series: str
     flags: dict[str, Any]
 
@@ -162,6 +173,7 @@ class AtlasHeadlineCell(_M):
     provider_geo: str | None
     period_start: str
     period_end: str
+    period_basis: str | None = None
     flags: dict[str, Any]
     provenance: AtlasProvenance | None
     consulted: list[AtlasConsulted] = Field(description="Every listed series in order, with what it had for this cell")
@@ -243,6 +255,9 @@ class AtlasMap(_M):
     values: list[AtlasCell]
     countries_with_value: int
     countries_without_value: list[str]
+    countries_with_other_period_cells: list[str] = Field(
+        [], description="Countries with cells overlapping the year that the year view does not attach (never absent)"
+    )
     by_source: dict[str, int]
 
 
@@ -325,6 +340,7 @@ class AtlasHeadlineMap(_M):
     values: list[AtlasHeadlineCell]
     countries_with_value: int
     countries_without_value: list[AtlasHeadlineMapMissing]
+    countries_with_other_period_cells: list[str] = []
     by_source: dict[str, int]
 
 
@@ -396,6 +412,9 @@ def _store(request: Request) -> Any:
 
 
 def _query(request: Request, origin: str | None, snapshot: str | None) -> AtlasQuery:
+    # ATLAS-5: in production an unspecified origin means live (a fixture snapshot never shadows it)
+    if origin is None and snapshot is None and getattr(request.app.state.settings, "reva_env", "") == "production":
+        origin = "live"
     with read_conn(request) as conn:
         snap = resolve_snapshot(conn, _store(request), origin=origin, sha256=snapshot)
     return query_for(snap, _store(request))

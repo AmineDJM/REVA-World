@@ -12,13 +12,19 @@ Honesty rules (docs/roadmap/v3_world_graph.md)
   P1542 and their immediate/contributing variants), and then as "asserted by <source>", never as REVA's
   conclusion.
 * Results are bounded and say so (``truncated`` flags, skipped hubs, limits), never silently cut.
+* ``origin``: every query takes an optional origin filter (``live`` / ``test_fixture``; ``None`` = both, the
+  caller then says when fixture rows are mixed in — the API defaults to ``live`` in production).
 """
 
 from __future__ import annotations
 
+import json
 import re
+import time
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Literal
 
 from sqlalchemy import Connection, text
@@ -30,7 +36,13 @@ Direction = Literal["out", "in", "both"]
 
 MAX_HOPS = 5
 DEFAULT_HUB_LIMIT = 2_000
-MAX_HUB_LIMIT = 100_000
+#: Upper bound of a caller-chosen hub limit (review V3, SEC-1): the hub test counts up to ``hub_limit + 1``
+#: rows per candidate node, so the bound caps the cost of one level.
+MAX_HUB_LIMIT = 5_000
+#: Wall-clock budget of one path search (checked between levels and hub-test batches); exceeding it ends the
+#: search with ``truncated`` and the reason.
+PATH_TIME_BUDGET_S = 20.0
+DEGREE_BATCH = 2_000
 MAX_PATHS = 20
 MAX_FRONTIER = 5_000
 MAX_EDGES_PER_LEVEL = 50_000
@@ -47,6 +59,39 @@ PATH_NOTE = (
     "effect (has cause / has effect), and is then attributed to that source."
 )
 COMMUNITY_NOTE = "Wikidata statements are community-edited and are not verified by REVA."
+ORIGINS = ("live", "test_fixture")
+REPO_ROOT = Path(__file__).resolve().parents[3]
+COUNTRY_QIDS = REPO_ROOT / "registry" / "entities" / "country_qids.json"
+
+
+def _check_origin(origin: str | None) -> str | None:
+    if origin is not None and origin not in ORIGINS:
+        raise ValidationProblem("origin must be live or test_fixture", origin=str(origin)[:32])
+    return origin
+
+
+def _origin_sql(origin: str | None, alias: str = "s") -> str:
+    return "" if origin is None else f" AND {alias}.origin = :origin"
+
+
+@lru_cache(maxsize=4)
+def _country_qids_cached(path: str, mtime: float) -> dict[str, str]:
+    doc = json.loads(Path(path).read_text())
+    out: dict[str, str] = {}
+    for code, e in (doc.get("countries") or {}).items():
+        q = e.get("qid") if isinstance(e, Mapping) else e
+        if isinstance(code, str) and isinstance(q, str) and QID_RE.match(q) and q.startswith("Q"):
+            out[code] = q
+    return out
+
+
+def country_qid_registry(path: Path = COUNTRY_QIDS) -> dict[str, str]:
+    """ISO3 → Wikidata QID from WDHARVEST's reviewed ``registry/entities/country_qids.json`` (crosswalk
+    entity → QID); empty when the file is absent or unreadable."""
+    try:
+        return _country_qids_cached(str(path), path.stat().st_mtime)
+    except (OSError, ValueError):
+        return {}
 
 
 @dataclass(frozen=True)
@@ -143,6 +188,21 @@ def labels_for(conn: Connection, qids: Iterable[str], langs: Sequence[str] = ("e
     return out
 
 
+def kinds_for(conn: Connection, qids: Iterable[str]) -> dict[str, str]:
+    """Entity kind per QID from the current snapshots (live preferred); absent when no snapshot has one."""
+    qs = sorted(set(qids))
+    if not qs:
+        return {}
+    out: dict[str, str] = {}
+    for qid, kind in conn.execute(
+        text("""SELECT e.qid, e.kind FROM kg.entity_current e
+                 WHERE e.qid = ANY(:q) AND e.kind IS NOT NULL ORDER BY e.qid, (e.origin = 'live') DESC"""),
+        {"q": qs},
+    ).all():
+        out.setdefault(qid, kind)
+    return out
+
+
 def property_info(conn: Connection, pids: Iterable[str]) -> dict[str, dict[str, Any]]:
     ps = sorted(set(pids))
     if not ps:
@@ -185,13 +245,20 @@ def _provenance(r: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _ref(qid: str, labels: Mapping[str, Mapping[str, str]], kinds: Mapping[str, str] | None) -> dict[str, Any]:
+    return {"qid": qid, "label": _display(qid, labels), "kind": (kinds or {}).get(qid)}
+
+
 def _statement_out(
-    r: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]], props: Mapping[str, Any]
+    r: Mapping[str, Any],
+    labels: Mapping[str, Mapping[str, str]],
+    props: Mapping[str, Any],
+    kinds: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     p = props.get(r["property_pid"], {})
     return {
         "row_id": r["id"],
-        "subject": {"qid": r["subject_qid"], "label": _display(r["subject_qid"], labels)},
+        "subject": _ref(r["subject_qid"], labels, kinds),
         "property": {
             "pid": r["property_pid"],
             "label_en": p.get("label_en"),
@@ -199,9 +266,7 @@ def _statement_out(
             "reva_predicate": p.get("reva_predicate"),
             "causal_assertion": r["property_pid"] in CAUSAL_PIDS,
         },
-        "object": None
-        if r["object_qid"] is None
-        else {"qid": r["object_qid"], "label": _display(r["object_qid"], labels)},
+        "object": None if r["object_qid"] is None else _ref(r["object_qid"], labels, kinds),
         "value": r["value"],
         "start": _time_out(r["start_time"], r["start_precision"]),
         "end": _time_out(r["end_time"], r["end_precision"]),
@@ -234,14 +299,15 @@ def exists(conn: Connection, qid: str) -> bool:
     )
 
 
-def entity(conn: Connection, qid: str) -> dict[str, Any] | None:
+def entity(conn: Connection, qid: str, *, origin: str | None = None) -> dict[str, Any] | None:
     """The current snapshot of an entity (live preferred over fixture), with its provenance and degree."""
     _check_qid(qid)
+    _check_origin(origin)
     row = (
         conn.execute(
-            text("""SELECT e.*, l.raw_sha256s FROM kg.entity_current e JOIN kg.load l ON l.id = e.load_id
-                     WHERE e.qid = :q ORDER BY (e.origin = 'live') DESC LIMIT 1"""),
-            {"q": qid},
+            text(f"""SELECT e.*, l.raw_sha256s FROM kg.entity_current e JOIN kg.load l ON l.id = e.load_id
+                     WHERE e.qid = :q{_origin_sql(origin, "e")} ORDER BY (e.origin = 'live') DESC LIMIT 1"""),
+            {"q": qid, "origin": origin},
         )
         .mappings()
         .one_or_none()
@@ -320,10 +386,12 @@ def neighbours(
     include_literals: bool = False,
     limit: int = 100,
     after_id: int | None = None,
+    origin: str | None = None,
 ) -> dict[str, Any]:
     """Statements touching ``qid`` (outgoing: ``qid`` is the subject; incoming: it is the object), keyset
     paginated by statement row id."""
     _check_qid(qid)
+    _check_origin(origin)
     pids = _check_pids(properties)
     if direction not in ("out", "in", "both"):
         raise ValidationProblem("direction must be out, in or both")
@@ -345,19 +413,20 @@ def neighbours(
                      WHERE (({") OR (".join(conds)}))
                        AND (CAST(:pids AS text[]) IS NULL OR s.property_pid = ANY(:pids))
                        AND (CAST(:after AS bigint) IS NULL OR s.id > :after)
-                       {tsql}{kind_sql}
+                       {tsql}{kind_sql}{_origin_sql(origin)}
                      ORDER BY s.id LIMIT :lim"""),
-            {"q": qid, "pids": pids, "after": after_id, "lim": limit + 1, "kind": kind, **tparams},
+            {"q": qid, "pids": pids, "after": after_id, "lim": limit + 1, "kind": kind, "origin": origin, **tparams},
         ).mappings()
     ]
     more = len(rows) > limit
     rows = rows[:limit]
     qids = {qid} | {r["subject_qid"] for r in rows} | {r["object_qid"] for r in rows if r["object_qid"]}
     labels = labels_for(conn, qids)
+    kinds = kinds_for(conn, qids)
     props = property_info(conn, {r["property_pid"] for r in rows})
     edges = []
     for r in rows:
-        e = _statement_out(r, labels, props)
+        e = _statement_out(r, labels, props, kinds)
         e["direction"] = "out" if r["subject_qid"] == qid else "in"
         edges.append(e)
     return {
@@ -377,10 +446,12 @@ def timeline(
     include_incoming: bool = True,
     time_window: TimeWindow | None = None,
     limit: int = 500,
+    origin: str | None = None,
 ) -> dict[str, Any]:
     """Dated statements about ``qid`` sorted by date: statements with start/end/point-in-time qualifiers and
     time-valued statements (e.g. inception). Undated statements are not part of a timeline."""
     _check_qid(qid)
+    _check_origin(origin)
     limit = max(1, min(int(limit), MAX_TIMELINE))
     tsql, tparams = "", {}
     if time_window is not None:
@@ -400,19 +471,20 @@ def timeline(
                        FROM kg.statement_current s
                       WHERE {who}
                         AND (s.valid_lo IS NOT NULL OR s.valid_hi IS NOT NULL OR s.value_time_lo IS NOT NULL)
-                        {tsql}
+                        {tsql}{_origin_sql(origin)}
                       ORDER BY sort_date, s.id LIMIT :lim"""),
-            {"q": qid, "lim": limit + 1, **tparams},
+            {"q": qid, "lim": limit + 1, "origin": origin, **tparams},
         ).mappings()
     ]
     truncated = len(rows) > limit
     rows = rows[:limit]
     qids = {qid} | {r["subject_qid"] for r in rows} | {r["object_qid"] for r in rows if r["object_qid"]}
     labels = labels_for(conn, qids)
+    kinds = kinds_for(conn, qids)
     props = property_info(conn, {r["property_pid"] for r in rows})
     events = []
     for r in rows:
-        e = _statement_out(r, labels, props)
+        e = _statement_out(r, labels, props, kinds)
         e["direction"] = "out" if r["subject_qid"] == qid else "in"
         e["sort_date"] = r["sort_date"].isoformat() if r["sort_date"] else None
         e["dated_by"] = "validity_qualifiers" if (r["valid_lo"] or r["valid_hi"]) else "time_value"
@@ -427,11 +499,24 @@ def timeline(
 
 
 # ---------------------------------------------------------------------------------------------- search
+#: Matched labels returned per hit (the entity's best matching label first).
+MAX_MATCHED_PER_HIT = 10
+
+
 def search(
-    conn: Connection, q: str, *, langs: Sequence[str] = ("fr", "en"), kind: str | None = None, limit: int = 20
+    conn: Connection,
+    q: str,
+    *,
+    langs: Sequence[str] = ("fr", "en"),
+    kind: str | None = None,
+    limit: int = 20,
+    origin: str | None = None,
 ) -> dict[str, Any]:
     """Label/alias search (case-insensitive): exact, then prefix, then substring (substring needs >= 3
-    characters and uses the trigram index when pg_trgm is installed)."""
+    characters and uses the trigram index when pg_trgm is installed).
+
+    Ranking is per *entity* (``DISTINCT ON`` its best-matching label), so an entity with many matching
+    labels or aliases never pushes others out; ``truncated`` says when more entities match than ``limit``."""
     q = (q or "").strip()
     if not 1 <= len(q) <= 200:
         raise ValidationProblem("search text must have 1..200 characters")
@@ -441,43 +526,133 @@ def search(
         or not all(isinstance(lang, str) and re.match(r"^[a-z]{2,3}(-[a-z0-9]{1,8}){0,3}$", lang) for lang in langs)
     ):
         raise ValidationProblem("invalid language list")
+    _check_origin(origin)
     limit = max(1, min(int(limit), MAX_SEARCH))
     ql = q.lower()
     esc = ql.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     pattern = ("%" + esc + "%") if len(ql) >= 3 else (esc + "%")
     rows = conn.execute(
-        text(r"""SELECT e.qid, e.kind, e.sitelinks, e.origin, l.lang, l.label, l.is_alias,
-                        CASE WHEN lower(l.label) = :ql THEN 0 WHEN lower(l.label) LIKE :prefix ESCAPE '\' THEN 1
-                             ELSE 2 END AS match_rank
-                   FROM kg.entity_label l
-                   JOIN kg.entity e ON e.id = l.entity_id
-                  WHERE lower(l.label) LIKE :pat ESCAPE '\' AND l.lang = ANY(:langs)
-                    AND (CAST(:kind AS text) IS NULL OR e.kind = :kind)
-                    AND NOT EXISTS (SELECT 1 FROM kg.entity n WHERE n.qid = e.qid AND n.origin = e.origin
-                                       AND n.id > e.id)
-                  ORDER BY match_rank, l.is_alias, e.sitelinks DESC NULLS LAST, e.qid
+        text(rf"""WITH m AS (
+                   SELECT e.id AS entity_id, e.qid, e.kind, e.sitelinks, e.origin, l.lang, l.label, l.is_alias,
+                          CASE WHEN lower(l.label) = :ql THEN 0 WHEN lower(l.label) LIKE :prefix ESCAPE '\' THEN 1
+                               ELSE 2 END AS match_rank
+                     FROM kg.entity_label l
+                     JOIN kg.entity e ON e.id = l.entity_id
+                    WHERE lower(l.label) LIKE :pat ESCAPE '\' AND l.lang = ANY(:langs)
+                      AND (CAST(:kind AS text) IS NULL OR e.kind = :kind){_origin_sql(origin, "e")}
+                      AND NOT EXISTS (SELECT 1 FROM kg.entity n WHERE n.qid = e.qid AND n.origin = e.origin
+                                         AND n.id > e.id)),
+                 best AS (
+                   SELECT DISTINCT ON (qid) qid, entity_id, kind, sitelinks, origin, match_rank, is_alias
+                     FROM m ORDER BY qid, (origin = 'live') DESC, match_rank, is_alias)
+                 SELECT b.qid, b.kind, b.sitelinks, b.origin, b.match_rank,
+                        (SELECT jsonb_agg(jsonb_build_object('lang', x.lang, 'label', x.label, 'alias', x.is_alias)
+                                          ORDER BY x.match_rank, x.is_alias, x.lang, x.label)
+                           FROM (SELECT * FROM m WHERE m.entity_id = b.entity_id
+                                  ORDER BY m.match_rank, m.is_alias, m.lang, m.label LIMIT {MAX_MATCHED_PER_HIT}) x)
+                          AS matched
+                   FROM best b
+                  ORDER BY b.match_rank, b.is_alias, b.sitelinks DESC NULLS LAST, b.qid
                   LIMIT :lim"""),
-        {"ql": ql, "prefix": esc + "%", "pat": pattern, "langs": list(langs), "kind": kind, "lim": limit * 5},
+        {
+            "ql": ql,
+            "prefix": esc + "%",
+            "pat": pattern,
+            "langs": list(langs),
+            "kind": kind,
+            "lim": limit + 1,
+            "origin": origin,
+        },
     ).mappings()
     hits: dict[str, dict[str, Any]] = {}
+    truncated = False
     for r in rows:
-        h = hits.get(r["qid"])
-        if h is None:
-            if len(hits) >= limit:
-                continue
-            h = hits[r["qid"]] = {
-                "qid": r["qid"],
-                "kind": r["kind"],
-                "sitelinks": r["sitelinks"],
-                "origin": r["origin"],
-                "match": ("exact", "prefix", "substring")[r["match_rank"]],
-                "matched": [],
-            }
-        h["matched"].append({"lang": r["lang"], "label": r["label"], "alias": r["is_alias"]})
+        if len(hits) >= limit:
+            truncated = True
+            break
+        hits[r["qid"]] = {
+            "qid": r["qid"],
+            "kind": r["kind"],
+            "sitelinks": r["sitelinks"],
+            "origin": r["origin"],
+            "match": ("exact", "prefix", "substring")[r["match_rank"]],
+            "matched": list(r["matched"] or []),
+        }
     labels = labels_for(conn, hits.keys())
     for qid, h in hits.items():
         h["labels"] = labels.get(qid, {})
-    return {"query": q, "results": list(hits.values()), "mode": "substring" if len(ql) >= 3 else "prefix"}
+    return {
+        "query": q,
+        "results": list(hits.values()),
+        "mode": "substring" if len(ql) >= 3 else "prefix",
+        "truncated": truncated,
+    }
+
+
+ISO3_RE = re.compile(r"^[A-Z]{3}$")
+
+
+def iso3_lookup(conn: Connection, iso3: str, *, origin: str | None = None, limit: int = 20) -> dict[str, Any]:
+    """ISO 3166-1 alpha-3 → entity. The reviewed ``registry/entities/country_qids.json`` decides when it lists
+    the code (``match = "iso3_registry"``); otherwise the KG's ISO alpha-3 statements (Wikidata P298,
+    ``match = "iso3_statement"``) — several items may hold one code (PSE, YUG, ATA on Wikidata): they are
+    all returned and ``ambiguous`` is set, never silently resolved."""
+    if not isinstance(iso3, str) or not ISO3_RE.match(iso3):
+        raise ValidationProblem("iso3 must be three upper-case letters", iso3=str(iso3)[:8])
+    _check_origin(origin)
+    reg = country_qid_registry().get(iso3)
+    rows: list[dict[str, Any]] = []
+    if reg is not None:
+        rows = [{"qid": reg, "rank": None, "statement_origin": None, "source": "registry/entities/country_qids.json"}]
+    else:
+        rows = [
+            {**dict(r), "source": "kg:P298"}
+            for r in conn.execute(
+                text(f"""SELECT s.subject_qid AS qid,
+                                CASE WHEN bool_or(s.rank = 'preferred') THEN 'preferred' ELSE 'normal' END AS rank,
+                                min(s.origin) AS statement_origin
+                           FROM kg.statement_current s
+                          WHERE s.property_pid = 'P298' AND s.value->>'value' = :iso3{_origin_sql(origin)}
+                          GROUP BY s.subject_qid ORDER BY bool_or(s.rank = 'preferred') DESC, s.subject_qid
+                          LIMIT :lim"""),
+                {"iso3": iso3, "origin": origin, "lim": limit + 1},
+            ).mappings()
+        ]
+    truncated = len(rows) > limit
+    rows = rows[:limit]
+    qids = [r["qid"] for r in rows]
+    labels = labels_for(conn, qids)
+    ents = {
+        r["qid"]: dict(r)
+        for r in conn.execute(
+            text(f"""SELECT DISTINCT ON (e.qid) e.qid, e.kind, e.sitelinks, e.origin FROM kg.entity_current e
+                      WHERE e.qid = ANY(:q){_origin_sql(origin, "e")} ORDER BY e.qid, (e.origin = 'live') DESC"""),
+            {"q": qids, "origin": origin},
+        ).mappings()
+    }
+    results = []
+    for r in rows:
+        e = ents.get(r["qid"], {})
+        results.append(
+            {
+                "qid": r["qid"],
+                "kind": e.get("kind"),
+                "sitelinks": e.get("sitelinks"),
+                "origin": e.get("origin") or r.get("statement_origin") or "live",
+                "match": "iso3_registry" if r["source"].startswith("registry") else "iso3_statement",
+                "matched": [{"lang": "iso3", "label": iso3, "alias": False}],
+                "labels": labels.get(r["qid"], {}),
+                "rank": r.get("rank"),
+            }
+        )
+    return {
+        "query": iso3,
+        "results": results,
+        "mode": "iso3",
+        "truncated": truncated,
+        "ambiguous": len(results) > 1,
+        "iso3_source": "registry/entities/country_qids.json" if reg is not None else "kg P298 statements",
+    }
 
 
 # ---------------------------------------------------------------------------------------------- paths
@@ -512,6 +687,7 @@ def _edges_for(
     excluded: list[str],
     w: TimeWindow | None,
     cap: int,
+    origin: str | None = None,
 ) -> list[dict[str, Any]]:
     tsql, tparams = _time_sql(w)
     return [
@@ -522,16 +698,26 @@ def _edges_for(
                         AND s.subject_qid <> s.object_qid
                         AND (CAST(:pids AS text[]) IS NULL OR s.property_pid = ANY(:pids))
                         AND NOT (s.property_pid = ANY(:excl))
-                        {tsql}
+                        {tsql}{_origin_sql(origin)}
                       LIMIT :cap"""),
-            {"f": list(frontier), "pids": pids, "excl": excluded, "cap": cap, **tparams},
+            {"f": list(frontier), "pids": pids, "excl": excluded, "cap": cap, "origin": origin, **tparams},
         ).mappings()
     ]
 
 
-def _degrees(conn: Connection, qids: Sequence[str], cap: int) -> dict[str, int]:
+def _degrees(conn: Connection, qids: Sequence[str], cap: int, deadline: float | None = None) -> dict[str, int]:
     """Entity-valued statement count per node, counted on stored rows and capped at ``cap + 1`` (a hub test,
-    not an exact degree)."""
+    not an exact degree). Counted in batches of :data:`DEGREE_BATCH`; once ``deadline`` (``time.monotonic``)
+    has passed, the remaining nodes are left out (the caller treats untested nodes as not traversable)."""
+    out: dict[str, int] = {}
+    for i in range(0, len(qids), DEGREE_BATCH):
+        if deadline is not None and i and time.monotonic() > deadline:
+            break
+        out.update(_degree_batch(conn, qids[i : i + DEGREE_BATCH], cap))
+    return out
+
+
+def _degree_batch(conn: Connection, qids: Sequence[str], cap: int) -> dict[str, int]:
     if not qids:
         return {}
     return {
@@ -561,6 +747,8 @@ def paths(
     max_paths: int = 5,
     max_frontier: int = MAX_FRONTIER,
     max_edges_per_level: int = MAX_EDGES_PER_LEVEL,
+    origin: str | None = None,
+    time_budget_s: float | None = PATH_TIME_BUDGET_S,
 ) -> dict[str, Any]:
     """Shortest connections between two entities (bidirectional breadth-first search over entity-valued
     statements, either direction), bounded:
@@ -571,7 +759,8 @@ def paths(
       excluded (``DEFAULT_PATH_EXCLUDED``);
     * ``time_window``: every hop's statement must overlap the window (undated statements are allowed and
       flagged unless ``include_undated`` is false);
-    * per-level frontier/edge caps; hitting one sets ``truncated`` with the reason.
+    * per-level frontier/edge caps and a wall-clock budget (``time_budget_s``, checked between levels and
+      hub-test batches); hitting one sets ``truncated`` with the reason.
 
     Returns up to ``max_paths`` shortest paths (all of the same, minimal length), each hop with its property
     labels, direction, dates and its statement's provenance.
@@ -583,6 +772,8 @@ def paths(
     if not 1 <= int(hub_limit) <= MAX_HUB_LIMIT:
         raise ValidationProblem(f"hub_limit must be between 1 and {MAX_HUB_LIMIT}")
     max_paths = max(1, min(int(max_paths), MAX_PATHS))
+    _check_origin(origin)
+    deadline = None if time_budget_s is None else time.monotonic() + float(time_budget_s)
     pids = _check_pids(allowed_properties)
     excluded = [p for p in DEFAULT_PATH_EXCLUDED if pids is None or p not in pids]
     allowed_hubs = {_check_qid(h) for h in allow_hubs}
@@ -597,13 +788,19 @@ def paths(
     endpoints = {from_qid, to_qid}
     meetings: list[str] = []
     while fwd.depth + bwd.depth < diag.max_hops and fwd.frontier and bwd.frontier:
+        if deadline is not None and diag.levels_expanded and time.monotonic() > deadline:
+            diag.truncated = True
+            diag.truncation_reasons.append(
+                f"time budget of {time_budget_s:g} s exhausted after {diag.levels_expanded} level(s)"
+            )
+            break
         side, other = (fwd, bwd) if len(fwd.frontier) <= len(bwd.frontier) else (bwd, fwd)
         frontier = sorted(side.frontier)
         if len(frontier) > max_frontier:
             diag.truncated = True
             diag.truncation_reasons.append(f"frontier of {len(frontier)} nodes cut to {max_frontier}")
             frontier = frontier[:max_frontier]
-        edges = _edges_for(conn, frontier, pids, excluded, time_window, max_edges_per_level + 1)
+        edges = _edges_for(conn, frontier, pids, excluded, time_window, max_edges_per_level + 1, origin)
         if len(edges) > max_edges_per_level:
             diag.truncated = True
             diag.truncation_reasons.append(f"more than {max_edges_per_level} edges at level {diag.levels_expanded + 1}")
@@ -618,9 +815,17 @@ def paths(
                     candidates.setdefault(there, []).append((here, e))
         # hub test on newly reached nodes (endpoints and explicitly allowed hubs are always traversable)
         test = [q for q in candidates if q not in endpoints and q not in allowed_hubs]
-        deg = _degrees(conn, test, diag.hub_limit)
+        deg = _degrees(conn, test, diag.hub_limit, deadline)
+        untested = {q for q in test if q not in deg}
+        if untested:
+            diag.truncated = True
+            diag.truncation_reasons.append(
+                f"time budget exhausted during the hub test: {len(untested)} reached node(s) not traversed"
+            )
         nxt: set[str] = set()
         for there, via in sorted(candidates.items()):
+            if there in untested:
+                continue
             if deg.get(there, 0) > diag.hub_limit:
                 diag.hubs_skipped[there] = deg[there]
                 continue
@@ -680,6 +885,7 @@ def _finish(
     qids = {result["from"], result["to"]} | {q for p in found for h in p for q in (h[0], h[1])}
     qids |= set(list(diag.hubs_skipped)[:50])
     labels = labels_for(conn, qids)
+    kinds = kinds_for(conn, qids)
     props = property_info(conn, {h[2]["property_pid"] for p in found for h in p})
     out_paths = []
     for p in found:
@@ -688,9 +894,9 @@ def _finish(
             forward = e["subject_qid"] == a
             info = props.get(e["property_pid"], {})
             label_en = info.get("label_en") or e["property_pid"]
-            hop = _statement_out(e, labels, props)
-            hop["from"] = {"qid": a, "label": _display(a, labels)}
-            hop["to"] = {"qid": b, "label": _display(b, labels)}
+            hop = _statement_out(e, labels, props, kinds)
+            hop["from"] = _ref(a, labels, kinds)
+            hop["to"] = _ref(b, labels, kinds)
             hop["direction"] = "forward" if forward else "inverse"
             if forward:
                 hop["relation_label_en"] = label_en

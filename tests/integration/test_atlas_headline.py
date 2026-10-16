@@ -276,7 +276,9 @@ def test_derived_ratio_only_fills_missing_cells_and_cites_both_inputs(env: Env) 
     d = by["DZA"]
     assert d["method"] == "derived" and d["answered_by"] is None
     assert d["value"] == "18.2436570559"  # 43451666 / 2381741, 12 significant digits
-    assert d["derived"]["expression"] == "reva.population.total / reva.population.land"
+    # same_source (default): the concept pair expands to series pairs of one provider
+    assert d["derived"]["expression"] == "tpop.wdi.SP.POP.TOTL / tpop.wdi.AG.LND.TOTL.K2"
+    assert "inputs_flags" in d["flags"]
     a, b = d["derived"]["inputs"]
     assert (
         a["answered_by"]["series"] == "tpop.wdi.SP.POP.TOTL" and b["answered_by"]["series"] == "tpop.wdi.AG.LND.TOTL.K2"

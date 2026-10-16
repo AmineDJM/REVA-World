@@ -153,6 +153,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=SOURCE,
         provider="U.S. Geological Survey, National Minerals Information Center (ScienceBase data releases)",
         licence=LICENCE,
@@ -279,7 +280,9 @@ def bounded_indicator(full: str) -> str:
 
 
 def _flags(obj: dict[str, Any]) -> str:
-    return json.dumps({k: v for k, v in obj.items() if v not in (None, "")}, sort_keys=True, ensure_ascii=False)
+    return json.dumps(
+        {k: v for k, v in obj.items() if v not in (None, "")}, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    )
 
 
 def disambiguate(inds: list[str], geos: list[str], periods: list[str]) -> set[int]:
@@ -535,7 +538,14 @@ def parse_myb_wide(release: Release, body: bytes, raw_sha: str, codes: dict[str,
     years = sorted(int(m.group(1)) for h in head if (m := re.match(r"^([0-9]{4}) Production$", h)))
     if not years:
         raise UsgsParseError(f"{release.data_file}: no '<year> Production' columns")
-    for c in ("Country", "Commodity", "Commodity Product", "Commodity Type", "Units", *(f"{y} Footnotes" for y in years)):
+    for c in (
+        "Country",
+        "Commodity",
+        "Commodity Product",
+        "Commodity Type",
+        "Units",
+        *(f"{y} Footnotes" for y in years),
+    ):
         if c not in head:
             raise UsgsParseError(f"{release.data_file}: missing column {c!r}")
     rep = Report(release.dataset, encoding=enc, records=len(recs))
@@ -598,9 +608,7 @@ def _finish(rows: list[dict[str, Any]], release: Release, raw_sha: str, rep: Rep
 PARSERS = {"mcs": parse_mcs, "myb_long": parse_myb_long, "myb_wide": parse_myb_wide}
 
 
-def parse_release(
-    release: Release, body: bytes, raw_sha: str, meta: dict[str, Any]
-) -> tuple[pl.DataFrame, Report]:
+def parse_release(release: Release, body: bytes, raw_sha: str, meta: dict[str, Any]) -> tuple[pl.DataFrame, Report]:
     return PARSERS[release.kind](release, body, raw_sha, dict(meta.get("value_codes") or {}))
 
 

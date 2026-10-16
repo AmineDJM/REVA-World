@@ -54,11 +54,6 @@ def _catalog(cid: str, series: Series) -> Catalog:
     return Catalog(concepts={cid: Concept(cid, {"fr": cid, "en": cid}, "d", "u", "t", None, (series,))})
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ATLAS-1: a cached per-snapshot DuckDB file is trusted on existence; its content is never re-verified "
-    "against the snapshot (meta.snapshot_sha256 / file digest), so a tampered or stale cache file is served",
-)
 def test_tampered_duckdb_cache_is_refused(tmp_path: Path) -> None:
     rows = [_row("src", "ds", "IND", "FRA", date(2020, 1, 1), date(2021, 1, 1), "10")]
     snap, store = _snapshot(tmp_path, rows, "atlas.src.ds")
@@ -84,12 +79,6 @@ def test_tampered_duckdb_cache_is_refused(tmp_path: Path) -> None:
         ("eurostat_semester", date(2025, 7, 1), date(2026, 1, 1)),
     ],
 )
-@pytest.mark.xfail(
-    strict=True,
-    reason="ATLAS-2: best-available/map/coverage only consider calendar-year cells; concepts whose only source "
-    "reports multi-year windows (all 11 WHR concepts) or semesters (labour.minimum_wage.monthly.eur/.pps) are "
-    "invisible, and the map lists the reporting country under countries_without_value ('absent')",
-)
 def test_non_calendar_cells_are_not_reported_as_absent(tmp_path: Path, label: str, start: date, end: date) -> None:
     rows = [_row("src", "ds", "IND", "FIN", start, end, "7.7")]
     snap, store = _snapshot(tmp_path, rows, "atlas.src.ds")
@@ -103,12 +92,6 @@ def test_non_calendar_cells_are_not_reported_as_absent(tmp_path: Path, label: st
     assert cov["countries"] == cov["by_source"][0]["countries"] == 1, label
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ATLAS-3: dossier series points (and the API's AtlasSeriesPoint) carry no unit; one concept's series can "
-    "switch currency (ILOSTAT AUT earnings: ATS 1969-1970, EUR 2000-) or source/unit across years, so the points "
-    "read as one homogeneous series",
-)
 def test_dossier_series_points_carry_their_unit(tmp_path: Path) -> None:
     rows = [
         {**_row("src", "ds", "IND", "AUT", date(1970, 1, 1), date(1971, 1, 1), "4590"), "unit": "ATS per month"},

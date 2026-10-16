@@ -55,7 +55,11 @@ def weo(raws):
 
 def _cells(df: pl.DataFrame, geo: str, indicator: str) -> dict[int, dict]:
     rows = df.filter((pl.col("provider_geo") == geo) & (pl.col("indicator") == indicator)).to_dicts()
-    return {r["period_start"].year: {**r, "flags": json.loads(r["flags"])} for r in rows}
+    out = {}
+    for r in rows:  # keyed by the WEO year label (fiscal-year cells keep their true window, ATLAS-4)
+        f = json.loads(r["flags"])
+        out[f.get("label_year", r["period_start"].year)] = {**r, "flags": f}
+    return out
 
 
 # --------------------------------------------------------------------------- WEO

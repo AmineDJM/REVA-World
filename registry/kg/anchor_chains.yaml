@@ -35,6 +35,10 @@ retrieved: "2026-10-15"
 
 excluded_properties: [P31, P279, P1343, P910, P1269, P2184, P921, P1889, P460, P5008, P373]
 
+# Objects of these properties (languages, continents, eras) may end a path but are never passed through:
+# "France -official language-> French <-official language- French Algeria" is not a historical explanation.
+non_transit_object_properties: [P37, P2936, P30, P2348]
+
 hop_classes:
   territorial:
     label_en: "territorial or sovereignty tie (country, part of, has part, contains, located in, owned by, claimed by)"
@@ -171,4 +175,288 @@ entities:
   catholic_monarchs: {qid: Q186851, label_en: "Catholic Monarchs of Spain", verified: enwiki_title_lookup}
   third_treaty_of_san_ildefonso: {qid: Q1259275, label_en: "Third Treaty of San Ildefonso", verified: enwiki_title_lookup}
 
-chains: []
+chains:
+  - id: columbus_portuguese_brazil
+    from: christopher_columbus
+    to: portuguese_language
+    question: "How is Christopher Columbus connected to Portuguese being spoken in Brazil?"
+    steps: [["leadership", "participation", "significant_event"], ["treaty_signatory", "territorial", "location"], ["territorial", "state_succession"], ["official_language"]]
+    via_all: ["treaty_of_tordesillas"]
+    via_any: ["colonial_brazil", "state_of_brazil", "uk_portugal_brazil_algarves", "empire_of_brazil", "brazil"]
+    exclude: ["modern_relations"]
+    max_hops: 8
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "christopher_columbus", "property": "P945", "object": "crown_of_castile"}
+      - {"subject": "portuguese_empire", "property": "P793", "object": "treaty_of_tordesillas"}
+      - {"subject": "portuguese_empire", "property": "P527", "object": "colonial_brazil"}
+      - {"subject": "empire_of_brazil", "property": "P37", "object": "portuguese_language"}
+      - {"subject": "brazil", "property": "P571", "year": 1822}
+      - {"subject": "treaty_of_tordesillas", "property": "P585", "year": 1494}
+  - id: tordesillas_brazil
+    from: treaty_of_tordesillas
+    to: brazil
+    question: "How is the Treaty of Tordesillas connected to Brazil?"
+    steps: [["treaty_signatory", "territorial", "location"], ["territorial", "state_succession"]]
+    via_any: ["colonial_brazil", "state_of_brazil", "portuguese_empire", "uk_portugal_brazil_algarves", "empire_of_brazil"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "treaty_of_tordesillas", "property": "P17", "object": "kingdom_of_portugal"}
+      - {"subject": "treaty_of_tordesillas", "property": "P17", "object": "spanish_empire"}
+      - {"subject": "colonial_brazil", "property": "P361", "object": "portuguese_empire"}
+      - {"subject": "brazil", "property": "P1365", "object": "colonial_brazil"}
+  - id: cabral_brazil
+    from: pedro_alvares_cabral
+    to: brazil
+    question: "How is Pedro Álvares Cabral connected to Brazil?"
+    steps: [["voyage_geography", "participation", "significant_event", "leadership"]]
+    exclude: ["modern_relations"]
+    max_hops: 4
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "brazil", "property": "P61", "object": "pedro_alvares_cabral"}
+      - {"subject": "pedro_alvares_cabral", "property": "P27", "object": "kingdom_of_portugal"}
+      - {"subject": "discovery_of_brazil", "property": "P585", "year": 1500}
+  - id: napoleon_louisiana_usa
+    from: napoleon
+    to: united_states
+    question: "How is Napoleon connected to the United States via the Louisiana Purchase?"
+    steps: [["leadership", "participation", "treaty_signatory"], ["state_succession", "territorial", "participation", "treaty_signatory"]]
+    via_all: ["louisiana_purchase"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "louisiana_purchase", "property": "P1365", "object": "louisiana_new_france"}
+      - {"subject": "louisiana_purchase", "property": "P17", "object": "united_states"}
+      - {"subject": "louisiana_purchase", "property": "P585", "year": 1803}
+      - {"subject": "louisiana_new_france", "property": "P17", "object": "kingdom_of_france"}
+      - {"subject": "napoleon", "property": "P27", "object": "france"}
+  - id: berlin_conference_congo
+    from: berlin_conference
+    to: dr_congo
+    question: "How is the Berlin Conference (1884-85) connected to the Democratic Republic of the Congo?"
+    steps: [["participation", "significant_event", "asserted_causation"], ["state_succession"]]
+    via_any: ["congo_free_state", "belgian_congo", "leopold_ii"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "berlin_conference", "property": "P580", "year": 1884}
+      - {"subject": "berlin_conference", "property": "P361", "object": "scramble_for_africa"}
+      - {"subject": "congo_free_state", "property": "P1366", "object": "belgian_congo"}
+      - {"subject": "congo_free_state", "property": "P35", "object": "leopold_ii"}
+      - {"subject": "dr_congo", "property": "P571", "year": 1960}
+  - id: suez_crisis_usa_decolonisation
+    from: suez_crisis
+    to: decolonisation_of_africa
+    question: "How is the 1956 Suez Crisis connected, through the United States, to the decolonisation of Africa?"
+    steps: [["participation", "significant_event", "asserted_causation"]]
+    via_all: ["united_states"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_may_be_absent
+    note: "Recorded Wikidata lists Israel, the United Kingdom, France and Egypt as Suez Crisis participants (not the United States) and states no US link to decolonisation; the US position needs UN General Assembly votes (KGGEOPOL) or another sourced dataset. The engine must say 'no sourced path' rather than invent one."
+    expected_facts:
+      - {"subject": "suez_crisis", "property": "P361", "object": "cold_war"}
+      - {"subject": "suez_crisis", "property": "P580", "year": 1956}
+      - {"subject": "suez_crisis", "property": "P710", "object": "united_kingdom"}
+      - {"subject": "suez_crisis", "property": "P710", "object": "france"}
+      - {"subject": "algerian_war", "property": "P361", "object": "decolonisation_of_africa"}
+  - id: spanish_empire_mexico_spanish
+    from: spanish_empire
+    to: spanish_language
+    question: "How is the Spanish Empire connected to Spanish being the language of Mexico?"
+    steps: [["territorial"], ["state_succession", "territorial"], ["official_language"]]
+    via_all: ["mexico"]
+    via_any: ["new_spain"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "new_spain", "property": "P361", "object": "spanish_empire"}
+      - {"subject": "mexico", "property": "P1365", "object": "new_spain"}
+      - {"subject": "mexico", "property": "P37", "object": "spanish_language"}
+      - {"subject": "new_spain", "property": "P576", "year": 1821}
+  - id: british_empire_pakistan
+    from: british_empire
+    to: pakistan
+    question: "How is the British Empire connected to Pakistan?"
+    steps: [["territorial"], ["state_succession"]]
+    via_any: ["british_raj", "dominion_of_pakistan"]
+    exclude: ["modern_relations"]
+    max_hops: 4
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "british_raj", "property": "P17", "object": "british_empire"}
+      - {"subject": "british_raj", "property": "P1366", "object": "dominion_of_pakistan"}
+      - {"subject": "dominion_of_pakistan", "property": "P1366", "object": "pakistan"}
+      - {"subject": "pakistan", "property": "P571", "year": 1947}
+  - id: france_algeria
+    from: france
+    to: algeria
+    question: "How are France and Algeria historically connected (colony, war, independence)?"
+    steps: [["territorial", "participation", "location", "significant_event", "treaty_signatory", "state_succession"]]
+    via_any: ["french_algeria", "algerian_war", "evian_accords"]
+    exclude: ["modern_relations"]
+    max_hops: 3
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "french_algeria", "property": "P17", "object": "france"}
+      - {"subject": "algerian_war", "property": "P276", "object": "french_algeria"}
+      - {"subject": "algeria", "property": "P571", "year": 1962}
+      - {"subject": "algeria", "property": "P793", "object": "evian_accords"}
+  - id: dutch_empire_indonesia
+    from: dutch_empire
+    to: indonesia
+    question: "How is the Dutch colonial empire connected to Indonesia?"
+    steps: [["territorial"], ["state_succession", "participation"]]
+    via_any: ["dutch_east_indies", "indonesian_national_revolution"]
+    exclude: ["modern_relations"]
+    max_hops: 4
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "dutch_empire", "property": "P527", "object": "dutch_east_indies"}
+      - {"subject": "indonesia", "property": "P1365", "object": "dutch_east_indies"}
+      - {"subject": "indonesia", "property": "P571", "year": 1945}
+  - id: carnation_revolution_angola
+    from: carnation_revolution
+    to: angola
+    question: "How is Portugal's Carnation Revolution (1974) connected to Angola's independence (1975)?"
+    steps: [["asserted_causation", "participation", "significant_event", "location", "territorial"]]
+    via_any: ["portuguese_colonial_war", "portuguese_angola", "angolan_war_of_independence"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "carnation_revolution", "property": "P17", "object": "portugal"}
+      - {"subject": "portuguese_colonial_war", "property": "P276", "object": "portuguese_angola"}
+      - {"subject": "portuguese_angola", "property": "P17", "object": "portuguese_empire"}
+      - {"subject": "angola", "property": "P571", "year": 1975}
+  - id: vasco_da_gama_india
+    from: vasco_da_gama
+    to: india
+    question: "How is Vasco da Gama connected to India (Portuguese India, Goa)?"
+    steps: [["participation", "voyage_geography", "leadership", "significant_event"], ["territorial", "state_succession", "location", "voyage_geography"]]
+    via_any: ["portuguese_india", "goa", "annexation_of_goa", "sea_route_to_india"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "vasco_da_gama", "property": "P27", "object": "kingdom_of_portugal"}
+      - {"subject": "portuguese_empire", "property": "P527", "object": "portuguese_india"}
+      - {"subject": "portuguese_empire", "property": "P793", "object": "sea_route_to_india"}
+      - {"subject": "sea_route_to_india", "property": "P585", "year": 1498}
+  - id: magellan_philippines
+    from: ferdinand_magellan
+    to: philippines
+    question: "How is Ferdinand Magellan connected to the Philippines?"
+    steps: [["participation", "voyage_geography", "leadership", "significant_event"], ["territorial", "state_succession", "location", "voyage_geography"]]
+    via_any: ["magellan_expedition", "spanish_east_indies", "captaincy_general_philippines"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "ferdinand_magellan", "property": "P1344", "object": "magellan_expedition"}
+      - {"subject": "ferdinand_magellan", "property": "P945", "object": "spanish_empire"}
+      - {"subject": "captaincy_general_philippines", "property": "P17", "object": "spanish_empire"}
+      - {"subject": "magellan_expedition", "property": "P580", "year": 1519}
+  - id: france_american_revolution_usa
+    from: france
+    to: united_states
+    question: "How was France connected to the independence of the United States?"
+    steps: [["participation", "treaty_signatory"]]
+    via_any: ["american_revolutionary_war", "treaty_of_paris_1783", "treaty_of_alliance_1778"]
+    exclude: ["modern_relations"]
+    max_hops: 4
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "treaty_of_paris_1783", "property": "P710", "object": "kingdom_of_france"}
+      - {"subject": "treaty_of_paris_1783", "property": "P710", "object": "united_states"}
+      - {"subject": "american_revolutionary_war", "property": "P710", "object": "kingdom_of_france"}
+      - {"subject": "united_states", "property": "P571", "year": 1776}
+  - id: haitian_revolution_france
+    from: haitian_revolution
+    to: france
+    question: "How is the Haitian Revolution connected to France?"
+    steps: [["participation", "territorial", "location"]]
+    via_any: ["saint_domingue", "french_first_republic", "kingdom_of_france", "french_colonial_empire", "first_french_empire"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "haitian_revolution", "property": "P17", "object": "saint_domingue"}
+      - {"subject": "saint_domingue", "property": "P17", "object": "france"}
+      - {"subject": "saint_domingue", "property": "P156", "object": "haiti"}
+      - {"subject": "haiti", "property": "P571", "year": 1804}
+  - id: ottoman_empire_turkey
+    from: ottoman_empire
+    to: turkey
+    question: "How is the Ottoman Empire connected to the Republic of Turkey?"
+    steps: [["state_succession", "treaty_signatory", "participation"]]
+    allowed_classes: ["state_succession", "treaty_signatory", "participation", "location", "significant_event"]
+    exclude: ["modern_relations"]
+    max_hops: 4
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "turkey", "property": "P1365", "object": "ottoman_empire"}
+      - {"subject": "treaty_of_lausanne", "property": "P1891", "object": "turkey"}
+      - {"subject": "ottoman_empire", "property": "P576", "year": 1922}
+      - {"subject": "turkey", "property": "P571", "year": 1923}
+  - id: russian_empire_russia
+    from: russian_empire
+    to: russia
+    question: "How is the Russian Empire connected to today's Russia?"
+    steps: [["state_succession"]]
+    via_any: ["soviet_union", "russian_sfsr", "russian_revolution"]
+    allowed_classes: ["state_succession", "significant_event", "asserted_causation"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "soviet_union", "property": "P1366", "object": "russia"}
+      - {"subject": "russia", "property": "P1365", "object": "soviet_union"}
+      - {"subject": "soviet_union", "property": "P155", "object": "russian_sfsr"}
+      - {"subject": "russia", "property": "P571", "year": 1991}
+  - id: bolivar_venezuela
+    from: simon_bolivar
+    to: venezuela
+    question: "How is Simón Bolívar connected to Venezuela's independence?"
+    steps: [["leadership", "participation"]]
+    via_any: ["gran_colombia", "venezuelan_war_of_independence"]
+    exclude: ["modern_relations"]
+    max_hops: 5
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "gran_colombia", "property": "P35", "object": "simon_bolivar"}
+      - {"subject": "gran_colombia", "property": "P1366", "object": "venezuela"}
+      - {"subject": "venezuela", "property": "P571", "year": 1811}
+  - id: cortes_mexico
+    from: hernan_cortes
+    to: mexico
+    question: "How is Hernán Cortés connected to Mexico?"
+    steps: [["participation", "leadership", "significant_event"], ["territorial", "state_succession"]]
+    via_any: ["spanish_conquest_of_aztec_empire", "aztec_empire", "new_spain"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "hernan_cortes", "property": "P607", "object": "spanish_conquest_of_aztec_empire"}
+      - {"subject": "spanish_conquest_of_aztec_empire", "property": "P276", "object": "aztec_empire"}
+      - {"subject": "mexico", "property": "P1365", "object": "new_spain"}
+      - {"subject": "new_spain", "property": "P571", "year": 1521}
+  - id: united_kingdom_nigeria_english
+    from: united_kingdom
+    to: english_language
+    question: "How is the United Kingdom connected to English being an official language of Nigeria?"
+    steps: [["territorial", "state_succession"], ["official_language"]]
+    via_all: ["nigeria"]
+    via_any: ["colonial_nigeria", "british_empire"]
+    exclude: ["modern_relations"]
+    max_hops: 6
+    expectation: path_expected
+    expected_facts:
+      - {"subject": "nigeria", "property": "P37", "object": "english_language"}
+      - {"subject": "nigeria", "property": "P571", "year": 1963}

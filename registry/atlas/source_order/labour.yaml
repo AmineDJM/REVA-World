@@ -43,25 +43,30 @@ concepts:
     related_catalog_concepts: [labour.unemployment_rate.national]
 
   - id: reva.labour.minimum_wage_monthly_lcu
-    labels: {fr: "Salaire minimum mensuel (monnaie nationale)", en: "Monthly minimum wage (national currency)"}
-    definition: "Statutory nominal gross monthly minimum wage in national currency (currency named in each cell's unit)."
+    labels: {fr: "Salaire minimum mensuel (monnaie nationale, à une date de référence)", en: "Monthly minimum wage (national currency, at a reference date)"}
+    definition: >-
+      Statutory nominal gross monthly minimum wage in force at the provider's reference date, in the currency the
+      provider reports (the answer keeps the cell's own unit; never converted).
     unit: national currency per month (named per cell)
     series:
       - series: "ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU"
-        justification: "ILOSTAT statutory nominal gross monthly minimum wage, local currency (A-ILO catalog, rank 1)."
+        justification: "ILOSTAT statutory nominal gross monthly minimum wage, local currency, at the ILO reference month."
+        caveats: "ILOSTAT's local currency can be EUR for a non-euro country (Norway; see flags.notes)."
       - series: "eurostat.earn_mw_cur.earn_mw_cur|currency=NAC"
         justification: >-
-          Eurostat monthly national minimum wages, national currency: same statutory gross monthly minimum. Its
-          cells are semi-annual (January/July), so they answer only where a calendar-year cell exists.
-      - series: "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V"
-        justification: "OECD real/nominal minimum wages, monthly, national currency, current prices: same quantity."
+          Eurostat monthly national minimum wages in national currency, value in force on 1 January / 1 July
+          (semesters; the year view shows the July semester with its true period) — the same quantity at a
+          reference date.
+        caveats: "Eurostat NAC does not name the currency in the cell."
     caveats: >-
       Countries without a statutory national minimum wage have no value (never zero). The ILO notes give the
       type (national, sectoral, lowest occupational) per cell.
     not_equivalent:
+      - series: "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V"
+        reason: "OECD averages the monthly minimum wage over the year: a different reference period (review V3 DATA-1)."
       - series: "oecd ... pay_period=A / pay_period=H"
         reason: "Annual or hourly minimum wages are different units; never converted with assumed hours."
-    related_catalog_concepts: [labour.minimum_wage.monthly.local_currency]
+    related_catalog_concepts: [labour.minimum_wage.monthly.local_currency, labour.minimum_wage.monthly.national_currency.annual_average]
 
   - id: reva.labour.average_monthly_earnings_lcu
     labels: {fr: "Salaire mensuel moyen des salariés (monnaie nationale)", en: "Average monthly earnings of employees (national currency)"}

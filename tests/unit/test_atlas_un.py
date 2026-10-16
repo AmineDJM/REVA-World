@@ -134,7 +134,7 @@ def test_wpp_demo_estimates_and_projections_are_separate_series(wpp_demo):
     proj = fra.filter(pl.col("indicator") == "TFR|proj=medium")
     assert est["period_start"].min() == date(1950, 1, 1) and est["period_start"].max() == date(2023, 1, 1)
     assert proj["period_start"].min() == date(2024, 1, 1) and proj["period_start"].max() == date(2100, 1, 1)
-    assert all(_flags(r)["projection"] is False and _flags(r)["estimate"] is True for r in est.to_dicts())
+    assert all(_flags(r)["projection"] is False for r in est.to_dicts())
     assert all(_flags(r)["projection"] is True and _flags(r)["variant"] == "Medium" for r in proj.to_dicts())
     # concept hints: estimates and projections never share a concept
     assert set(est["concept_id"]) == {"un.wpp.total_fertility_rate"}
@@ -188,7 +188,7 @@ def test_wpp_age5_split_in_estimate_and_projection_tables(wpp_raws):
     assert fp["indicator"].str.ends_with("|proj=medium").all()
     assert not fe["indicator"].str.contains("proj=").any()
     row = fe.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "PopTotal|age=100+")).to_dicts()[0]
-    assert row["concept_id"] == "un.wpp.population_age_100" and _flags(row)["sex"] == "both sexes"
+    assert row["concept_id"] == "un.wpp.population_age_100" and _flags(row)["projection"] is False
     # 21 age groups x 3 sexes for each location-year
     n = fe.filter((pl.col("iso3") == "FRA") & (pl.col("period_start") == date(1950, 1, 1))).height
     assert n == 63

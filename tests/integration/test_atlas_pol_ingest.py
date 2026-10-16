@@ -41,7 +41,8 @@ async def test_vdem_ingest_registers_three_tables(db):
     for ds in ("indices", "institutions", "liberties"):
         t = s["tables"][ds]
         assert t["dataset_key"] == f"atlas.vdem.{ds}" and t["created"] is True
-        assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} == {"PSE", "BVR", "TWN"}
+        # TWN maps to the crosswalk entity TWN since crosswalk 1.1.0 (ISO 3166-1)
+        assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} == {"PSE", "BVR"}
     frame = read_atlas_table(db.store, s["tables"]["indices"]["artifact_sha256"])
     fr = frame.filter(
         (pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2x_libdem") & (pl.col("period_start").dt.year() == 2025)

@@ -5,7 +5,10 @@ Rules the templates follow (tested):
 * every sentence carries citation ids of evidence items (sourced statements, atlas cells,
   derived links, entity identifications, or *absence* records naming what was consulted);
 * a number appears only as an atlas cell reports it (rounded for display with ``≈`` when the
-  display differs; the exact decimal string stays in the evidence);
+  display differs; the exact decimal string stays in the evidence), with its own unit: values in
+  different units (a currency per country) are never ranked or labelled with one unit;
+* a projection or estimate says so next to the value, in every sentence (value, series point,
+  ranking item); the honesty-relevant source flags are never truncated;
 * missing data is said as missing, naming the sources consulted ("aucune source consultée ne
   fournit…"), never filled;
 * a path says "relié via" / "connected via" and "connexion, pas une cause" — causal wording only
@@ -18,6 +21,7 @@ Rules the templates follow (tested):
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -25,7 +29,7 @@ from typing import Any
 
 from reva.nlqa.executor import Execution, OpResult, Resolved, _dec
 from reva.nlqa.plan import in_question
-from reva.nlqa.ports import AtlasCell, Entity, KgStatement, pick_label
+from reva.nlqa.ports import AtlasCell, Entity, KgStatement, estimate_status, pick_label
 
 MAX_SENTENCE_STATEMENTS = 12
 MAX_RANK_LIST = 50
@@ -116,14 +120,24 @@ def format_number(value: str | None, lang: str) -> str:
     return ("≈ " if approx else "") + ("-" if neg else "") + out
 
 
+_ISO_DAY = re.compile(r"^([+-]?\d+)-(\d{2})-(\d{2})")
+
+
+def _year_text(y: int) -> str:
+    return f"-{abs(y)}" if y < 0 else str(y)
+
+
 def period_label(cell: AtlasCell) -> str:
-    """``2019`` for a calendar-year cell (half-open [2019-01-01, 2020-01-01)), else ``start–end``."""
+    """``2019`` for a calendar-year cell (half-open [2019-01-01, 2020-01-01)), else ``start–end``.
+    Years are astronomical ISO years (``-0043-01-01`` → ``-43``)."""
     s, e = str(cell.period_start), str(cell.period_end)
-    if s[4:10] == "-01-01" and e[4:10] == "-01-01" and s[:4].lstrip("-").isdigit() and e[:4].isdigit():
-        if int(e[:4]) == int(s[:4]) + 1:
-            return s[:4]
-    if s[:4] == e[:4] or not e:
-        return s[:4] if not e else f"{s}–{e}"
+    ms, me = _ISO_DAY.match(s), _ISO_DAY.match(e)
+    if ms and me and ms.group(2, 3) == ("01", "01") and me.group(2, 3) == ("01", "01"):
+        ys, ye = int(ms.group(1)), int(me.group(1))
+        if ye == ys + 1:
+            return _year_text(ys)
+    if not e:
+        return _year_text(int(ms.group(1))) if ms else s
     return f"{s}–{e}"
 
 
@@ -152,11 +166,45 @@ def _value(c: AtlasCell, lang: str) -> str:
     return f"{format_number(c.value, lang)}{unit}"
 
 
+#: Flags that change what a value *is* (projection, estimate, missing, period basis): rendered first and
+#: never truncated. The others are shown after them, truncated to :data:`MAX_OTHER_FLAGS_CHARS`.
+HONESTY_FLAGS = (
+    "estimate_kind",
+    "projection",
+    "period_after_vintage",
+    "estimate_type",
+    "missing",
+    "provider_flag",
+    "period_basis",
+    "reference_period",
+    "reporting_year",
+)
+MAX_OTHER_FLAGS_CHARS = 160
+
+
+def _flag_text(k: str, v: Any) -> str:
+    return k if isinstance(v, bool) and v else f"{k}={v}"
+
+
 def _flags(c: AtlasCell, lang: str) -> str:
     if not c.flags:
         return ""
-    flags = ", ".join(f"{k}={v}" if not isinstance(v, bool) else k for k, v in sorted(c.flags.items()))[:160]
+    key = [k for k in HONESTY_FLAGS if k in c.flags and c.flags[k] not in (None, "")]
+    rest = ", ".join(_flag_text(k, v) for k, v in sorted(c.flags.items()) if k not in key)
+    if len(rest) > MAX_OTHER_FLAGS_CHARS:
+        rest = rest[:MAX_OTHER_FLAGS_CHARS].rstrip() + "…"
+    flags = ", ".join([*(_flag_text(k, c.flags[k]) for k in key), *([rest] if rest else [])])
     return f" ; signalements de la source : {flags}" if lang == "fr" else f"; source flags: {flags}"
+
+
+def _status(c: AtlasCell, lang: str) -> str:
+    """`` (projection)`` / `` (estimate)`` next to a value the source projects or estimates."""
+    st = estimate_status(c.flags)
+    if st == "projection":
+        return " (projection de la source)" if lang == "fr" else " (source projection)"
+    if st == "estimate":
+        return " (estimation de la source)" if lang == "fr" else " (source estimate)"
+    return ""
 
 
 class Composer:
@@ -343,6 +391,9 @@ class Composer:
                 op.id,
             )
             return
+        if res.status == "refused":
+            self.refused(res)
+            return
         if res.status == "error":
             eid = self.x.evidence.absence("backend_error", res.consulted or [op.op], error=res.message)
             self.add(
@@ -357,6 +408,18 @@ class Composer:
         # empty
         consulted = ", ".join(res.consulted)
         d = res.data
+        if d.get("only_projections"):
+            self.add(
+                f"{self.concept(d['concept'])} : la source ne fournit que des projections pour les années récentes ; "
+                f"aucune année n'est choisie par défaut parmi des projections (préciser une année)."
+                if fr
+                else f"{self.concept(d['concept'])}: the source only has projections for recent years; no projection "
+                f"year is chosen by default (ask for a specific year).",
+                [d["absence"]],
+                "missing",
+                op.id,
+            )
+            return
         if op.op in ("kg_neighbours", "kg_timeline"):
             e = d["entity"]
             self.add(
@@ -403,11 +466,11 @@ class Composer:
                 for cell, eid in cells[:1]:
                     self.add(
                         f"Dernière valeur disponible (autre année) : {self.concept(c)} — {self.country(cell.iso3)}, "
-                        f"{period_label(cell)} : {_value(cell, self.lang)} (source : {cell.source}/{cell.dataset}, indicateur "
+                        f"{period_label(cell)}{_status(cell, self.lang)} : {_value(cell, self.lang)} (source : {cell.source}/{cell.dataset}, indicateur "
                         f"{cell.indicator}{_flags(cell, self.lang)})."
                         if fr
                         else f"Latest available value (another year): {self.concept(c)} — {self.country(cell.iso3)}, "
-                        f"{period_label(cell)}: {_value(cell, self.lang)} (source: {cell.source}/{cell.dataset}, indicator "
+                        f"{period_label(cell)}{_status(cell, self.lang)}: {_value(cell, self.lang)} (source: {cell.source}/{cell.dataset}, indicator "
                         f"{cell.indicator}{_flags(cell, self.lang)}).",
                         [eid],
                         "fact",
@@ -422,6 +485,33 @@ class Composer:
                 "missing",
                 op.id,
             )
+
+    def refused(self, res: OpResult) -> None:
+        fr = self.fr()
+        d = res.data
+        c = self.concept(d["concept"])
+        units = [u for u in d.get("units") or [] if u]
+        shown = ", ".join(units[:6]) + (" …" if len(units) > 6 else "")
+        reason = d.get("reason")
+        if reason == "only_projections":
+            text = (
+                f"Pas de classement de {c} : la source ne fournit que des projections pour les années récentes, et "
+                f"aucune année de projection n'est choisie par défaut (préciser une année)."
+                if fr
+                else f"No ranking of {c}: the source only has projections for recent years, and no projection year "
+                f"is chosen by default (ask for a specific year)."
+            )
+        else:
+            text = (
+                f"Pas de classement de {c} : les valeurs sont exprimées dans une unité (monnaie) propre à chaque pays"
+                + (f" ({shown})" if shown else "")
+                + " ; REVA ne les compare pas et ne convertit pas les monnaies (demander la valeur d'un pays)."
+                if fr
+                else f"No ranking of {c}: the values are in a unit (currency) specific to each country"
+                + (f" ({shown})" if shown else "")
+                + "; REVA does not compare them and does not convert currencies (ask for one country's value)."
+            )
+        self.add(text, [d["absence"]], "unsupported", res.op.id)
 
     # -- KG
     def statement_text(self, s: KgStatement) -> str:
@@ -530,7 +620,7 @@ class Composer:
     # -- atlas
     def _cell_sentence(self, concept: Any, cell: AtlasCell, src: str, *, first: bool) -> str:
         fr = self.fr()
-        year = period_label(cell)
+        year = period_label(cell) + _status(cell, self.lang)
         lead = "" if first else ("Autre source : " if fr else "Other source: ")
         return (
             f"{lead}{self.concept(concept)} — {self.country(cell.iso3)}, {year} : {_value(cell, self.lang)} "
@@ -546,14 +636,47 @@ class Composer:
         c = d["concept"]
         if d.get("all_countries"):
             cites = [eid for _, eid in d["cells"]]
-            years = sorted({cell.period_start[:4] for cell, _ in d["cells"]})
-            span = years[0] if len(years) == 1 else f"{years[0]}–{years[-1]}"
+            span = _year_text(d["year"])
+            units = [u for u in d.get("units") or [] if u]
+            if len(units) == 1:
+                unit = f" ({units[0]})"
+            elif units:
+                unit = (
+                    f" (unités différentes selon le pays : {len(units)} ; non comparables entre elles)"
+                    if fr
+                    else f" (units differ by country: {len(units)}; not comparable with each other)"
+                )
+            else:
+                unit = ""
+            np_, n = d.get("n_projection") or 0, d["n"]
+            proj = ""
+            if np_:
+                proj = (
+                    f" ; {np_} de ces valeurs sont des projections de la source"
+                    if fr
+                    else f"; {np_} of these values are projections of the source"
+                )
+            if not d.get("year_asked"):
+                span += (
+                    " (dernière année bien couverte hors projections)"
+                    if fr
+                    else " (latest well-covered year, projections excluded)"
+                )
+            listed = (
+                (
+                    f"les {len(cites)} premières valeurs (sur {n}) figurent dans les preuves (liste tronquée)"
+                    if fr
+                    else f"the first {len(cites)} values (of {n}) are listed in the evidence (list truncated)"
+                )
+                if d.get("truncated")
+                else ("chaque valeur figure dans les preuves" if fr else "each value is listed in the evidence")
+            )
             self.add(
-                f"{self.concept(c)} : valeurs disponibles pour {d['n']} pays ({span}) selon {d['source']} ; "
-                f"chaque valeur figure dans les preuves."
+                f"{self.concept(c)}{unit} : valeurs disponibles pour {n} pays en {span} selon {d['source']}{proj} ; "
+                f"{listed}."
                 if fr
-                else f"{self.concept(c)}: values available for {d['n']} countries ({span}) according to {d['source']}; "
-                f"each value is listed in the evidence.",
+                else f"{self.concept(c)}{unit}: values available for {n} countries in {span} according to "
+                f"{d['source']}{proj}; {listed}.",
                 cites,
                 "fact",
                 res.op.id,
@@ -579,11 +702,13 @@ class Composer:
         d = res.data
         c = d["concept"]
         rows = d["rows"][:MAX_RANK_LIST]
-        unit = rows[0][0].unit if rows and rows[0][0].unit else ""
+        units = {cell.unit or "" for cell, _ in rows}
+        assert len(units) <= 1, "rank_cells ranks one unit only"
+        unit = next(iter(units), "")
         items = (" ; " if fr else "; ").join(
-            f"{i}. {self.country(cell.iso3)} : {format_number(cell.value, self.lang)}"
+            f"{i}. {self.country(cell.iso3)} : {format_number(cell.value, self.lang)}{_status(cell, self.lang)}"
             if fr
-            else f"{i}. {self.country(cell.iso3)}: {format_number(cell.value, self.lang)}"
+            else f"{i}. {self.country(cell.iso3)}: {format_number(cell.value, self.lang)}{_status(cell, self.lang)}"
             for i, (cell, _) in enumerate(rows, 1)
         )
         order = (
@@ -592,10 +717,22 @@ class Composer:
             else ("highest" if res.op.args["order"] == "desc" else "lowest")
         )
         u = f" ({unit})" if unit else ""
+        year = _year_text(d["year"])
+        n_proj = d.get("n_projection") or 0
+        if n_proj and n_proj == len(rows):
+            year += " (projections de la source)" if fr else " (source projections)"
+        elif n_proj:
+            year += (
+                f" ({n_proj} valeur(s) projetée(s) par la source)"
+                if fr
+                else f" ({n_proj} value(s) projected by the source)"
+            )
+        elif not d.get("year_asked"):
+            year += " (dernière année bien couverte hors projections)" if fr else " (latest well-covered actual year)"
         self.add(
-            f"{self.concept(c)}{u}, {d['year']}, valeurs {order} selon {d['source']} : {items}."
+            f"{self.concept(c)}{u}, {year}, valeurs {order} selon {d['source']} : {items}."
             if fr
-            else f"{self.concept(c)}{u}, {d['year']}, {order} values according to {d['source']}: {items}.",
+            else f"{self.concept(c)}{u}, {year}, {order} values according to {d['source']}: {items}.",
             [eid for _, eid in rows],
             "fact",
             res.op.id,
@@ -621,15 +758,23 @@ class Composer:
         c = d["concept"]
         for src, cells, total in d["groups"][:2]:
             shown = cells[-MAX_SERIES_LIST:]
-            unit = shown[0][0].unit if shown and shown[0][0].unit else ""
-            pts = (" ; " if fr else "; ").join(
-                f"{cell.period_start[:4]} : {format_number(cell.value, self.lang)}"
-                if fr
-                else f"{cell.period_start[:4]}: {format_number(cell.value, self.lang)}"
-                for cell, _ in shown
-                if cell.value is not None
-            )
+            units = {cell.unit or "" for cell, _ in shown if cell.value is not None}
+            one_unit = len(units) == 1
+            unit = next(iter(units)) if one_unit else ""
+
+            def point(cell: AtlasCell, one_unit: bool = one_unit) -> str:
+                v = format_number(cell.value, self.lang) + ("" if one_unit or not cell.unit else f" {cell.unit}")
+                sep = " : " if fr else ": "
+                return f"{period_label(cell)}{_status(cell, self.lang)}{sep}{v}"
+
+            pts = (" ; " if fr else "; ").join(point(cell) for cell, _ in shown if cell.value is not None)
             u = f" ({unit})" if unit else ""
+            if not one_unit and units:
+                u = (
+                    " (l'unité change dans la série : chaque valeur porte la sienne)"
+                    if fr
+                    else " (the unit changes within the series: each value carries its own)"
+                )
             more = ""
             if total > len(shown):
                 more = (

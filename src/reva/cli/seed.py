@@ -438,6 +438,45 @@ def _seed_models(conn: Connection, store: ArtifactStore, reg: Registry, act: UUI
     return n
 
 
+#: ATLASOPS: finished atlas sources (agent reports in docs/dev/v3_a_*.md) and their first-slot offset
+#: in hours from seeding; every source runs monthly after that.
+ATLAS_SCHEDULE_SLOTS: tuple[tuple[str, int], ...] = (
+    ("atlas.imf", 2),  # day 0: ~170 MB
+    ("atlas.undp_hdr", 26),  # day 1: small sources
+    ("atlas.whr", 27),
+    ("atlas.ilostat", 28),
+    ("atlas.eurostat.earn_mw_cur", 29),
+    ("atlas.oecd.earnings", 30),
+    ("atlas.owid", 50),  # day 2
+    ("atlas.un_wpp", 51),
+    ("atlas.un_ims", 52),
+    ("atlas.unsd_syb", 53),
+    ("atlas.wid", 74),  # day 3: ~660 MB
+    ("atlas.who_gho", 98),  # day 4
+    ("atlas.unesco_uis", 99),
+    ("atlas.un_sdg", 122),  # day 5
+    ("atlas.unhcr", 123),
+    ("atlas.worldbank", 146),  # day 6: ~790 MB
+    ("atlas.maddison.mpd2023", 170),  # day 7: history
+    ("atlas.clio_infra", 171),
+    ("atlas.gapminder.fasttrack", 172),
+    ("atlas.hyde.hyde321", 173),
+    ("atlas.cow", 174),
+    ("atlas.vdem", 194),  # day 8: politics
+    ("atlas.lied", 195),
+    ("atlas.bmr", 196),
+    ("atlas.ipu", 197),
+    ("atlas.wbl", 218),  # day 9: law
+    ("atlas.constitute", 219),
+    ("atlas.ccp", 220),
+    ("atlas.ssa_ssptw", 221),
+    ("atlas.naturalearth_10m", 242),  # day 10: geography
+    ("atlas.geonames_countryinfo", 243),
+    ("atlas.cckp_climatology", 244),
+    ("atlas.inform_risk_hazards", 245),
+    ("atlas.fao", 266),  # day 11
+)
+
 DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     ("ingest:worldbank.wdi.indicators", "ingest", {"connector": "worldbank.wdi.indicators"}, 30 * 86400),
     ("ingest:un.comtrade.public_exact", "ingest", {"connector": "un.comtrade.public_exact"}, 30 * 86400),
@@ -460,38 +499,19 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     # --- GATE2: late gate decisions (discovery reported gate_pending) are promoted from the stored proposal
     ("gate_followup:promotion", "gate_followup", {}, 300),
     # --- end GATE2
-    # --- ATLASOPS (V3): monthly atlas source runs through the single metered entry point
-    # (reva.atlas.ingest: reserve the spec's planned requests on its budget key, meter, settle), first
-    # slots staggered over a week (ATLAS_FIRST_SLOT_HOURS) so no day carries more than one large run;
-    # then a daily snapshot that is reused (nothing recorded) when no atlas table changed.
-    ("atlas_ingest:atlas.imf", "atlas_ingest", {"source": "atlas.imf"}, 30 * 86400),
-    ("atlas_ingest:atlas.undp_hdr", "atlas_ingest", {"source": "atlas.undp_hdr"}, 30 * 86400),
-    ("atlas_ingest:atlas.whr", "atlas_ingest", {"source": "atlas.whr"}, 30 * 86400),
-    ("atlas_ingest:atlas.owid", "atlas_ingest", {"source": "atlas.owid"}, 30 * 86400),
-    ("atlas_ingest:atlas.wid", "atlas_ingest", {"source": "atlas.wid"}, 30 * 86400),
-    ("atlas_ingest:atlas.who_gho", "atlas_ingest", {"source": "atlas.who_gho"}, 30 * 86400),
-    ("atlas_ingest:atlas.unesco_uis", "atlas_ingest", {"source": "atlas.unesco_uis"}, 30 * 86400),
-    ("atlas_ingest:atlas.ilostat", "atlas_ingest", {"source": "atlas.ilostat"}, 30 * 86400),
-    ("atlas_ingest:atlas.un_wpp", "atlas_ingest", {"source": "atlas.un_wpp"}, 30 * 86400),
-    ("atlas_ingest:atlas.un_sdg", "atlas_ingest", {"source": "atlas.un_sdg"}, 30 * 86400),
+    # --- ATLASOPS (V3): monthly runs of every finished atlas source through the single metered entry
+    # point (reva.atlas.ingest: reserve the spec's planned requests on its budget key, meter, settle),
+    # first slots staggered over the month (ATLAS_FIRST_SLOT_HOURS) so large downloads never share a
+    # day's byte budget; then a daily snapshot, reused (nothing recorded) when no atlas table changed.
+    *((f"atlas_ingest:{name}", "atlas_ingest", {"source": name}, 30 * 86400) for name, _hours in ATLAS_SCHEDULE_SLOTS),
     ("atlas_snapshot:live", "atlas_snapshot", {"origin": "live", "warm": True, "skip_unchanged": True}, 86400),
     # --- end ATLASOPS
 )
 
-#: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Atlas runs are spread over
-#: a week so heavy downloads (WID ~660 MB, IMF ~170 MB, OWID ~25 MB) never share a day's byte budget;
-#: the daily snapshot follows the day's runs.
+#: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Heavy downloads get a day of
+#: their own (World Bank ~790 MB, WID ~660 MB, IMF ~170 MB); small sources share days.
 ATLAS_FIRST_SLOT_HOURS: dict[str, int] = {
-    "atlas_ingest:atlas.imf": 2,
-    "atlas_ingest:atlas.undp_hdr": 26,
-    "atlas_ingest:atlas.whr": 27,
-    "atlas_ingest:atlas.ilostat": 28,
-    "atlas_ingest:atlas.owid": 50,
-    "atlas_ingest:atlas.un_wpp": 51,
-    "atlas_ingest:atlas.wid": 74,
-    "atlas_ingest:atlas.who_gho": 98,
-    "atlas_ingest:atlas.unesco_uis": 99,
-    "atlas_ingest:atlas.un_sdg": 122,
+    **{f"atlas_ingest:{name}": hours for name, hours in ATLAS_SCHEDULE_SLOTS},
     "atlas_snapshot:live": 8,
 }
 

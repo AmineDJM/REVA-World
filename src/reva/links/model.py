@@ -334,6 +334,8 @@ class AtlasRowRef:
     concept_id: str | None = None
     flags: Mapping[str, Any] = field(default_factory=dict)
     iso3_is_subject: bool = True
+    #: origin of the atlas table the row comes from (``live`` / ``test_fixture``); ``None`` = not recorded
+    origin: str | None = None
 
     @classmethod
     def from_mapping(cls, row: Mapping[str, Any]) -> AtlasRowRef:
@@ -370,6 +372,7 @@ class AtlasRowRef:
             concept_id=row.get("concept_id"),
             flags=dict(flags),
             iso3_is_subject=subject_first,
+            origin=str(row["origin"]) if row.get("origin") else None,
         )
 
     @property
@@ -451,6 +454,7 @@ class Evidence:
             subject=r.iso3,
             object=r.counterpart_iso3,
             pid=r.indicator,
+            origin=r.origin,
         )
 
     @property
@@ -465,7 +469,8 @@ class Evidence:
             rev = f" rev {self.source_revision}" if self.source_revision else ""
             tag = " [fixture]" if self.origin == "test_fixture" else ""
             return f"{self.source}:{self.statement_id}{rev}{tag}"
-        return f"{self.source}:{(self.raw_sha256 or '')[:12]}#{self.selector}"
+        tag = " [fixture]" if self.origin == "test_fixture" else ""
+        return f"{self.source}:{(self.raw_sha256 or '')[:12]}#{self.selector}{tag}"
 
     def to_json(self) -> dict[str, Any]:
         return {k: v for k, v in self.__dict__.items() if v is not None}

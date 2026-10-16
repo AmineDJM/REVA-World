@@ -4,12 +4,21 @@
 from __future__ import annotations
 
 import re
+import time
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
 from reva.links.derive import DerivedSet, assert_all_evidenced, derive_all
 from reva.links.model import AtlasRowRef
-from reva.links.paths import KgNeighbourhood, PathQuery, PathResult, find_chain, find_paths, graph_from_db
+from reva.links.paths import (
+    TIME_BUDGET_S,
+    KgNeighbourhood,
+    PathQuery,
+    PathResult,
+    find_chain,
+    find_paths,
+    graph_from_db,
+)
 from reva.links.taxonomy import load_taxonomy
 
 ISO3_RE = re.compile(r"^[A-Z]{3}$")
@@ -26,12 +35,24 @@ class UnknownCountry(LookupError):
     pass
 
 
+class AmbiguousCountry(LookupError):
+    """An ISO alpha-3 code held by several KG items and not decided by the reviewed registry (LINKS-2)."""
+
+    def __init__(self, iso3: str, candidates: list[str]) -> None:
+        super().__init__(iso3)
+        self.iso3 = iso3
+        self.candidates = candidates
+
+
 def resolve_node(nb: KgNeighbourhood, ref: str) -> str:
-    """A QID / provider key is returned as is; an ISO 3166 alpha-3 code is resolved through the KG's P298
-    statements."""
+    """A QID / provider key is returned as is; an ISO 3166 alpha-3 code is resolved through the reviewed
+    registry (``registry/entities/country_qids.json``), else the KG's P298 statements when exactly one item
+    holds it (several holders: :class:`AmbiguousCountry`, never a silent pick)."""
     if ISO3_RE.match(ref):
         q = nb.iso3_to_qid([ref]).get(ref)
         if q is None:
+            if ref in nb.ambiguous_iso3:
+                raise AmbiguousCountry(ref, nb.ambiguous_iso3[ref])
             raise UnknownCountry(ref)
         return q
     return ref
@@ -44,17 +65,22 @@ def path_between(
     *,
     origin: str | None = None,
     via: Iterable[str] = (),
+    time_budget_s: float | None = TIME_BUDGET_S,
     **query: Any,
 ) -> PathResult:
     """Paths ``source`` → ``target`` (QIDs or ISO3 codes); with ``via`` waypoints, one path forced through
-    them (each segment read and searched on its own bounded neighbourhood)."""
+    them (each segment read and searched on its own bounded neighbourhood). ``time_budget_s`` bounds the
+    whole request (reads, segments, candidate ranking); a spent budget is reported as truncation."""
+    deadline = None if time_budget_s is None else time.monotonic() + time_budget_s
     nb = KgNeighbourhood(conn, origin=origin)
     ends = [resolve_node(nb, x) for x in (source, *via, target)]
     if len(ends) > 2:
-        return find_chain(lambda sq: graph_from_db(conn, sq, origin=origin), ends, **query)
+        return find_chain(
+            lambda sq: graph_from_db(conn, sq, origin=origin, deadline=deadline), ends, deadline=deadline, **query
+        )
     q = PathQuery(ends[0], ends[1], **query)
-    g = graph_from_db(conn, q, origin=origin)
-    return find_paths(g, q)
+    g = graph_from_db(conn, q, origin=origin, deadline=deadline)
+    return find_paths(g, q, deadline=deadline)
 
 
 def links_for_country(
@@ -75,7 +101,7 @@ def links_for_country(
     s1, reached, trunc1 = nb.expand([qid], 2, COUNTRY_LINK_PROPERTIES)
     s2, reached2, trunc2 = nb.expand([qid], 4, SUCCESSION_PROPERTIES)
     langs = {s.object for s in s1 if s.pid in ("P37", "P2936") and s.object}
-    s3, reached3, _ = nb.expand(sorted(langs), 6, LANGUAGE_GENEALOGY)
+    s3, reached3, trunc3 = nb.expand(sorted(langs), 6, LANGUAGE_GENEALOGY)
     nodes = reached | reached2 | reached3
     stmts = {s.statement_id: s for s in (*s1, *s2, *s3, *nb.context(nodes))}
     iso_map: dict[str, str] = {}
@@ -107,5 +133,6 @@ def links_for_country(
         "labels": labels,
         "link_types": status,
         "derivation": derived.report(),
-        "truncated": bool(trunc1 or trunc2),
+        "truncated": bool(trunc1 or trunc2 or trunc3),
+        "truncated_nodes": sorted(trunc1 | trunc2 | trunc3)[:50],
     }

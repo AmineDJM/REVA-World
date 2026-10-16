@@ -1,5 +1,7 @@
 # V3 (agent A-UN): UN World Population Prospects 2024, official CSV bulk files.
 # Connector: src/reva/adapters/connectors/atlas_un.py (atlas.un_wpp) -> atlas tables un_wpp.*
+# V3 SIMWORLD: also the reviewed built-in connector un.wpp (src/reva/adapters/connectors/un_wpp_demography.py)
+# -> dataset inputs of demography.cohort_component@1.1.0 (files listed under metadata.simulation_files).
 source_key: un.wpp
 title: "UN DESA Population Division - World Population Prospects 2024 (CSV bulk files)"
 provider_url: https://population.un.org/wpp/downloads
@@ -18,6 +20,11 @@ metadata:
     - WPP2024_Demographic_Indicators_Medium.csv.gz      # 16.6 MB; estimates 1950-2023 + medium variant 2024-2100
     - WPP2024_TotalPopulationBySex.csv.gz              # 17.0 MB; all projection variants 2024-2100
     - WPP2024_PopulationByAge5GroupSex_Medium.csv.gz   # 29.9 MB; 5-year age groups x sex, 1950-2100
+  simulation_files:  # connector un.wpp (SIMWORLD): byte-range parts of <= 48 MiB, size and ETag pinned
+    - WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz   # 62.1 MB, 2 parts
+    - WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz               # 45.2 MB, 1 part
+    - WPP2024_Fertility_by_Age5.csv.gz                                   # 82.9 MB, 2 parts (all variants; Medium <= 2023 kept)
+    - WPP2024_Demographic_Indicators_Medium.csv.gz                       # 16.6 MB, 1 part (shared with atlas.un_wpp)
   not_ingested:
     - "WPP2024_PopulationBySingleAgeSex_Medium_{1950-2023,2024-2100}.csv.gz (62 + 67 MB; ~14 M atlas rows): over the per-table row guidance and the shared container's memory; 5-year groups used"
     - "WPP2024_Demographic_Indicators_OtherVariants.csv.gz (75 MB): only total population of the variants is ingested (TotalPopulationBySex)"

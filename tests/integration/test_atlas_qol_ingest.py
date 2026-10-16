@@ -92,7 +92,9 @@ async def test_owid_and_wid_ingest(db: Any) -> None:
                     WHERE v.name = :n"""),
             {"n": atlas_wid.CONNECTOR_NAME},
         ).scalar_one()
-    assert n == 2 + 3 * 2  # tail + WID_countries.csv + data/metadata of FR, KS, DZ (one raw per byte range)
+    # tail + WID_countries.csv + data/metadata of FR, KS, DZ (one raw per byte range) + WID_data_TW.csv
+    # (TW maps to TWN since crosswalk 1.1.0; the excerpt has no TW metadata member and no selected series)
+    assert n == 2 + 3 * 2 + 1
     sub = await _ingest(db, atlas_wid, options={"countries": "FR"})  # run option: a country subset
     (t2,) = sub["tables"]
     assert t2["coverage"]["countries"] == 1 and t2["created"] is True

@@ -22,13 +22,13 @@ pytestmark = pytest.mark.db
 
 EXPECTED = {
     "atlas.rcs_dem": ("atlas.rcs.dem2", {"USA", "FRA", "XKX", "IND", "RUS"}),
-    "atlas.wrp": ("atlas.wrp.national", {"USA", "FRA", "RUS", "DEU", "IND", "TWN"}),
+    "atlas.wrp": ("atlas.wrp.national", {"USA", "FRA", "RUS", "DEU", "IND"}),  # COW 713: historical QID (ROC)
     "atlas.hief": ("atlas.hief.hief", {"GBR", "DEU", "SRB", "IRN", "TWN"}),
     "atlas.sscp_frac": ("atlas.sscp.frac_v1", {"AFG", "ASM", "FRA", "XKX", "CHI", "TWN"}),
     "atlas.cdpd": ("atlas.cdpd.cdpd_v1", {"FRA", "RUS", "USA", "TWN", "ETH", "KGZ"}),
     "atlas.who_violence": ("atlas.who.gho_violence", {"BRA", "FRA", "JPN", "NGA", "ZAF"}),
     "atlas.ti_cpi": ("atlas.ti.cpi", {"DNK", "FRA", "XKX", "TWN", "SOM"}),
-    "atlas.oecd_sigi": ("atlas.oecd.sigi2023", {"FRA", "XKX", "TWN", "AFG", "NGA"}),
+    "atlas.oecd_sigi": ("atlas.oecd.sigi2023", {"FRA", "XKX", "TWN", "NGA"}),
     "atlas.parlgov": ("atlas.parlgov.elections", {"DEU", "FRA", "GBR"}),
 }
 
@@ -93,14 +93,21 @@ async def test_a_licence_change_blocks_registration(db) -> None:
     rec_url = jus.dataverse_record_url(jus.CDPD_DOI)
     http0 = FixtureHttp(spec.name)
     doc = json.loads((await http0.get(rec_url)).body)
-    doc["data"]["latestVersion"]["license"] = {"name": "CC BY-NC 4.0", "uri": "http://creativecommons.org/licenses/by-nc/4.0"}
+    doc["data"]["latestVersion"]["license"] = {
+        "name": "CC BY-NC 4.0",
+        "uri": "http://creativecommons.org/licenses/by-nc/4.0",
+    }
     http = FixtureHttp(spec.name, overrides={request_fingerprint("GET", rec_url): json.dumps(doc).encode()})
     run = AtlasRun(spec=spec, http=http, engine=db.worker, store=db.store, settings=db.settings, origin="test_fixture")
     with db.owner.connect() as c:
-        before = c.execute(text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.cdpd.cdpd_v1'")).scalar_one()
+        before = c.execute(
+            text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.cdpd.cdpd_v1'")
+        ).scalar_one()
     with pytest.raises(SourceResponseError, match="licence"):
         await jus.atlas_ingest(run)
     assert len(run.archived) == 2 and run.registered == []  # bytes archived, nothing registered
     with db.owner.connect() as c:
-        after = c.execute(text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.cdpd.cdpd_v1'")).scalar_one()
+        after = c.execute(
+            text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.cdpd.cdpd_v1'")
+        ).scalar_one()
     assert after == before

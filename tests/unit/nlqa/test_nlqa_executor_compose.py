@@ -181,7 +181,9 @@ def test_llm_strings_not_in_question_are_never_quoted() -> None:
         unsupported=[{"text": "le PIB est de 999 milliards", "reason": "x"}],
     )
     assert "1000" not in c.text and "999" not in c.text
-    assert "un terme de la question" in c.text and "une partie de la question" in c.text
+    # a lookup text absent from the question is rejected (ASK-6), never quoted nor run
+    assert [r["reason"] for r in _x.plan.rejected][:1] == ["lookup_not_in_question"]
+    assert "une partie de la question" in c.text
 
 
 def test_ambiguous_entity_is_warned_and_alternatives_named() -> None:

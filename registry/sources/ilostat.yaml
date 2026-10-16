@@ -1,5 +1,8 @@
 # V3 (agent A-ILO): ILOSTAT bulk/API service. Connector: src/reva/adapters/connectors/atlas_ilo.py
 # (one gzip CSV per indicator + code dictionaries; atlas tables ilostat.<indicator id>).
+# V3 SIMWORLD: also the reviewed built-in connector ilostat.labour_age5 (src/reva/adapters/connectors/
+# ilostat_labour.py): EMP_DWAP_SEX_AGE_RT_A and EAP_DWAP_SEX_AGE_RT_A -> dataset inputs of
+# social.retirement_age@1.1.0.
 source_key: ilostat.rplumber
 title: ILOSTAT (International Labour Organization) bulk download / API service
 provider_url: https://rplumber.ilo.org/

@@ -136,7 +136,7 @@ def test_streaming_reader_is_layout_independent_and_bounded() -> None:
     z = zipfile.ZipFile(io.BytesIO(_zip(feats)))
     with z.open(z.namelist()[0]) as fh, pytest.raises(ov.OverlayError, match="larger"):
         list(ov.iter_geojson_features(fh, max_feature_bytes=50))
-    with pytest.raises(ov.OverlayError, match="truncated|malformed"):
+    with pytest.raises(ov.OverlayError, match=r"truncated|malformed"):
         list(ov.iter_geojson_features(io.BytesIO(b'{"features": [{"type": "Feature", "prop')))
 
 
@@ -199,7 +199,9 @@ def test_scan_and_records_on_synthetic_file() -> None:
     assert a.qualifiers["ne_raw_sha256"] == "b" * 64 and len(a.qualifiers["rows"]) == 3
     assert all(r["geometry_sha256"] for r in a.qualifiers["rows"])
     bb = ovs[("cliopatria:polity:alpha", "iso3:BBB")]  # no QID for BBB -> REVA node, entity created
-    assert bb.qualifiers["share_of_country_area"]["max"] == "0.5000" and bb.qualifiers["country_node"].startswith("iso3")
+    assert bb.qualifiers["share_of_country_area"]["max"] == "0.5000" and bb.qualifiers["country_node"].startswith(
+        "iso3"
+    )
     assert any(e.qid == "iso3:BBB" for e in b.entities)
     # every statement passes KGCORE's own normalisation (allow-list of the five predicates)
     kinds = {p.pid: p.value_kind for p in ac.load_predicates()}
@@ -217,7 +219,7 @@ def test_release_and_licence_checks() -> None:
         ac.scan(_zip([], member="cliopatria_polities_only_v030.geojson"), None)
     with pytest.raises(ac.CliopatriaError, match="member"):
         ac.scan(_zip([], member="other.geojson"), None)
-    with pytest.raises(ac.CliopatriaError, match="CC BY 4.0"):
+    with pytest.raises(ac.CliopatriaError, match=r"CC BY 4\.0"):
         ac.check_licence(b"All rights reserved")
     assert ac.check_licence(_fixture(ac.URL_LICENCE)) == "CC BY 4.0"
 
@@ -245,9 +247,15 @@ def real() -> tuple[ac.Scan, ov.CountryLayer, ac.KgBuild]:
 
 def _runs(b: ac.KgBuild, polity: str, iso3: str) -> list[tuple[int, int, str]]:
     return sorted(
-        (s.qualifiers["provider_years"][0], s.qualifiers["provider_years"][1], s.qualifiers["share_of_country_area"]["max"])
+        (
+            s.qualifiers["provider_years"][0],
+            s.qualifiers["provider_years"][1],
+            s.qualifiers["share_of_country_area"]["max"],
+        )
         for s in b.statements
-        if s.property_pid == ac.P_OVERLAY and s.subject_qid == ac.entity_ids([polity])[polity] and s.object_qid == f"iso3:{iso3}"
+        if s.property_pid == ac.P_OVERLAY
+        and s.subject_qid == ac.entity_ids([polity])[polity]
+        and s.object_qid == f"iso3:{iso3}"
     )
 
 
@@ -271,5 +279,9 @@ def test_real_fixture_example_chains(real) -> None:
     ):
         runs = _runs(b, polity, iso3)
         assert runs, (polity, iso3)
-    (d,) = {s.object_qid for s in b.statements if s.property_pid == ac.P_DENOTES and s.subject_qid.endswith(":portuguese_empire")}
+    (d,) = {
+        s.object_qid
+        for s in b.statements
+        if s.property_pid == ac.P_DENOTES and s.subject_qid.endswith(":portuguese_empire")
+    }
     assert d == "Q200464"  # the provider's own Wikidata id

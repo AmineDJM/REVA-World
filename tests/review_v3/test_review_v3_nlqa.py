@@ -10,7 +10,6 @@ import json
 from typing import Any
 
 import nlqa_fakes as F
-import pytest
 
 from reva.nlqa.compose import Sentence, compose
 from reva.nlqa.executor import Executor
@@ -35,12 +34,6 @@ def _facts(c: Any) -> list[str]:
     return [s.text for s in c.sentences if s.kind == "fact"]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-1: atlas_rank ranks one series' cells across countries even when every cell has a different "
-    "currency (ILOSTAT CUR_TYPE_LCU names the currency per cell) and labels the whole ranking with the FIRST "
-    "row's unit (compose.op_atlas_rank: unit = rows[0][0].unit)",
-)
 def test_rank_never_compares_or_mislabels_different_units() -> None:
     cells = [
         F.cell("ilo", "ilostat_mw", "EAR_INEE_NOC_NB|cur=LCU", "KOR", 2019, "1745150", "KRW per month", F.RAW_ILO, MW),
@@ -65,11 +58,6 @@ def _weo_une(iso3: str, year: int, value: str, projection: bool) -> Any:
     return F.cell(*UNE_SRC, iso3, year, value, "% of labour force", F.RAW_WDI, UNE, flags)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-2: atlas_series and atlas_rank sentences never render cell flags, so IMF WEO / ILO modelled "
-    "projections are stated as plain facts (compose.op_atlas_series / op_atlas_rank)",
-)
 def test_series_sentence_marks_projections() -> None:
     cells = [_weo_une("USA", y, v, y > 2025) for y, v in ((2024, "4.025"), (2025, "4.279167"), (2030, "3.896672"))]
     _, c = _run(
@@ -83,11 +71,6 @@ def test_series_sentence_marks_projections() -> None:
     assert "2030" in text and "projection" in text.lower(), text
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-2: with no year, atlas_rank picks the most recent well-covered year — a WEO projection year when "
-    "the source projects every country — and the ranking sentence does not say it is a projection",
-)
 def test_rank_latest_year_is_not_silently_a_projection() -> None:
     cells = [
         _weo_une(iso, y, v, y > 2025)
@@ -103,11 +86,6 @@ def test_rank_latest_year_is_not_silently_a_projection() -> None:
     assert "2031" not in text or "projection" in text.lower(), text
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-3: compose._flags truncates the rendered flags to 160 characters after sorting keys; an ILOSTAT "
-    "modelled-estimate cell's 'projection' flag sorts after its long 'notes' and is cut from the sentence",
-)
 def test_value_sentence_keeps_the_projection_flag() -> None:
     flags = {
         "estimate_type": "ilo_modelled",
@@ -132,11 +110,6 @@ EV = {
 }
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-4: the rephrase faithfulness check is set-based (numbers/names present somewhere in the sentence "
-    "or its evidence), so an LLM rephrase that swaps two countries' values is accepted as faithful",
-)
 def test_rephrase_that_swaps_values_between_countries_is_rejected() -> None:
     s = Sentence(
         "S1",
@@ -154,10 +127,6 @@ def test_rephrase_that_swaps_values_between_countries_is_rejected() -> None:
     assert not report.ok, json.dumps(report.problems)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-4: 'projection'/'estimate' are not KEEP_MARKERS, so a rephrase may drop the projection label",
-)
 def test_rephrase_that_drops_the_projection_label_is_rejected() -> None:
     s = Sentence(
         "S1",
@@ -173,23 +142,12 @@ def test_rephrase_that_drops_the_projection_label_is_rejected() -> None:
     assert not report.ok
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-5: nlqa.ports.AtlasCell.year is int(period_start[:4]); atlas periods are now astronomical ISO text "
-    "('-0043-01-01' = 44 BCE, reva.atlas.query.iso_date_sql), so a BCE cell gets year -4 (and compose prints "
-    "'-004' via period_start[:4])",
-)
 def test_bce_atlas_cell_year() -> None:
     c = F.cell(*UNE_SRC, "ITA", 2000, "1", "%", F.RAW_ILO, UNE)
     bce = type(c)(**{**c.__dict__, "period_start": "-0043-01-01", "period_end": "-0042-01-01"})
     assert bce.year == -43
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ASK-1: op_atlas_series labels a whole series with its first point's unit; ILOSTAT's Austrian mean "
-    "earnings switch from ATS (1969-1970) to EUR (2000-) inside one series, so EUR values are printed as ATS",
-)
 def test_series_sentence_never_labels_mixed_currencies_with_one_unit() -> None:
     ind = "EAR_INEE_NOC_NB|cur=LCU"
     cells = [

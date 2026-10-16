@@ -23,6 +23,12 @@ Search
    hubs ("human", "country", "Earth"...) are never intermediate nodes unless ``include_blocked_hubs``.
 3. filters: ``as_of`` year or ``window`` (years), link kinds, ``max_hops`` ≤ 6, ``include_undated``.
 
+Bounds (review V3, SEC-1 / LINKS-1): rows read per neighbourhood (``MAX_ROWS_PER_NEIGHBOURHOOD``), Yen
+candidates (``MAX_YEN_CANDIDATES``) and an optional wall-clock ``deadline`` (``time.monotonic``) checked
+between hops, segments and candidates. Any cut — including a neighbourhood truncated when read from the
+database (``PathGraph.truncated_nodes``) — sets ``truncated`` with its reasons: a "no path" over a cut graph
+never reads as a definitive absence (invariant 17).
+
 Temporal filter semantics (per edge):
 * interval [start, end] (open bounds = not stated): kept if it contains ``as_of`` / overlaps ``window``;
 * point (a dated event): kept if it happened by ``as_of`` (≤) / within ``window``;
@@ -41,6 +47,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import time
 from collections import Counter, defaultdict, deque
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -54,7 +61,11 @@ from reva.links.taxonomy import Hubs, Taxonomy, load_hubs, load_taxonomy
 MAX_HOPS_LIMIT = 6
 MAX_K = 10
 DEFAULT_MAX_EXPANSIONS = 200_000
-MAX_YEN_CANDIDATES = 400
+MAX_YEN_CANDIDATES = 200
+#: Statement rows read from the database for one neighbourhood (all hops of one side together).
+MAX_ROWS_PER_NEIGHBOURHOOD = 100_000
+#: Default wall-clock budget of one /v1/links/path request (all segments).
+TIME_BUDGET_S = 20.0
 LANGS = ("fr", "en")
 
 DISCLAIMER = {
@@ -298,6 +309,8 @@ class Hop:
     edge: Edge
     alternatives: int
     text: dict[str, str]
+    #: the relation's own label in the traversal direction ({fr, en}), e.g. "langue officielle"
+    label: dict[str, str] = field(default_factory=dict)
 
     def to_json(self) -> dict[str, Any]:
         e = self.edge
@@ -313,6 +326,7 @@ class Hop:
             "sources": sorted({ev.source_label for ev in e.evidence}),
             "alternatives": self.alternatives,
             "text": self.text,
+            "label": self.label,
         }
         if e.link is not None:
             d["via"] = list(e.link.via)
@@ -350,6 +364,13 @@ class PathResult:
     truncated: bool = False
     explored_nodes: int = 0
     labels: dict[str, dict[str, str]] = field(default_factory=dict)
+    truncation_reasons: list[str] = field(default_factory=list)
+    truncated_nodes: set[str] = field(default_factory=set)
+
+    def cut(self, reason: str) -> None:
+        self.truncated = True
+        if reason not in self.truncation_reasons:
+            self.truncation_reasons.append(reason)
 
     @property
     def found(self) -> bool:
@@ -362,6 +383,8 @@ class PathResult:
             "found": self.found,
             "reason": self.reason,
             "truncated": self.truncated,
+            "truncation_reasons": self.truncation_reasons,
+            "truncated_nodes": sorted(self.truncated_nodes)[:50],
             "explored_nodes": self.explored_nodes,
             "paths": [p.to_json() for p in self.paths],
             "labels": {n: self.labels.get(n, {}) for n in sorted(nodes)},
@@ -392,6 +415,19 @@ def _cite(evidence: Sequence[Evidence], limit: int = 4) -> str:
     cites = [e.cite() for e in evidence]
     more = f"; +{len(cites) - limit}" if len(cites) > limit else ""
     return " [" + "; ".join(cites[:limit]) + more + "]"
+
+
+def hop_label(edge: Edge, graph: PathGraph) -> dict[str, str]:
+    """The relation label of a hop in its traversal direction, per language (no node names)."""
+    if edge.kind == "statement":
+        et = graph.taxonomy.edge_types[edge.type_id]
+        if et.causal and et.causal_phrase is not None:
+            return {lang: et.causal_phrase[lang] for lang in LANGS if lang in et.causal_phrase}
+        src = et.labels if edge.forward else et.inverse_labels
+    else:
+        lt = graph.taxonomy.link(edge.type_id)
+        src = lt.labels if edge.forward else lt.inverse_labels
+    return {lang: src[lang] for lang in LANGS if lang in src}
 
 
 def render_hop(edge: Edge, graph: PathGraph, lang: str, *, cite: bool = True) -> str:
@@ -465,8 +501,20 @@ def _best_edge(graph: PathGraph, edges: Sequence[Edge]) -> Edge:
     return min(edges, key=rank)
 
 
-def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
+def _late(deadline: float | None) -> bool:
+    return deadline is not None and time.monotonic() > deadline
+
+
+def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None) -> PathResult:
     res = PathResult(q, labels={})
+    if graph.truncated_nodes:
+        # LINKS-1: the neighbourhood read from the database was cut at these nodes; whatever the outcome,
+        # the search did not see the whole graph
+        res.truncated_nodes = set(graph.truncated_nodes)
+        res.cut(
+            f"neighbourhood truncated at {len(graph.truncated_nodes)} node(s) (statement rows beyond the "
+            "per-node / per-hop read caps were not loaded)"
+        )
     for n in (q.source, q.target):
         if n not in graph:
             # known entity (labelled) without any traversable statement vs an id the graph has never seen
@@ -476,7 +524,8 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
     budget = [q.max_expansions]
     dt, trunc_t = _bfs(graph, q.target, q, q.max_hops, budget, None)
     ds, trunc_s = _bfs(graph, q.source, q, q.max_hops, budget, dt)
-    res.truncated = trunc_t or trunc_s
+    if trunc_t or trunc_s:
+        res.cut(f"breadth-first expansion budget of {q.max_expansions} edges exhausted")
     res.explored_nodes = len(set(dt) | set(ds))
     if q.target not in ds:
         res.reason = "no_path_within_max_hops"
@@ -505,7 +554,10 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
         for nodes in nx.shortest_simple_paths(g, q.source, q.target, weight="weight"):
             seen_candidates += 1
             if seen_candidates > MAX_YEN_CANDIDATES:
-                res.truncated = True
+                res.cut(f"more than {MAX_YEN_CANDIDATES} candidate paths examined")
+                break
+            if _late(deadline):
+                res.cut("time budget exhausted while ranking candidate paths")
                 break
             if len(nodes) - 1 > q.max_hops:
                 continue
@@ -515,7 +567,9 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
                 es = parallel[(u, v)]
                 e = _best_edge(graph, es)
                 cost += g[u][v]["weight"]
-                hops.append(Hop(e, len(es) - 1, {lang: render_hop(e, graph, lang) for lang in LANGS}))
+                hops.append(
+                    Hop(e, len(es) - 1, {lang: render_hop(e, graph, lang) for lang in LANGS}, hop_label(e, graph))
+                )
             res.paths.append(Path(list(nodes), hops, cost))
             if len(res.paths) >= q.k:
                 break
@@ -538,7 +592,11 @@ MAX_WAYPOINTS = 4
 
 
 def find_chain(
-    graph: PathGraph | Callable[[PathQuery], PathGraph], waypoints: Sequence[str], **query: Any
+    graph: PathGraph | Callable[[PathQuery], PathGraph],
+    waypoints: Sequence[str],
+    *,
+    deadline: float | None = None,
+    **query: Any,
 ) -> PathResult:
     """A path forced through ``waypoints`` (``[Columbus, Treaty of Tordesillas, Brazil, Portuguese]``): the
     best path of each consecutive segment, concatenated. Each segment obeys the same filters and
@@ -553,9 +611,16 @@ def find_chain(
     hops: list[Hop] = []
     cost = 0.0
     for a, b in itertools.pairwise(waypoints):
+        if _late(deadline):
+            out.cut("time budget exhausted before segment " + f"{a}->{b}")
+            out.reason = f"no_path_segment:{a}->{b} (time_budget_exhausted)"
+            return out
         sq = PathQuery(a, b, **query)
-        seg = find_paths(graph if isinstance(graph, PathGraph) else graph(sq), sq)
+        seg = find_paths(graph if isinstance(graph, PathGraph) else graph(sq), sq, deadline=deadline)
+        for r in seg.truncation_reasons:
+            out.cut(r)
         out.truncated |= seg.truncated
+        out.truncated_nodes |= seg.truncated_nodes
         out.explored_nodes += seg.explored_nodes
         out.labels.update(seg.labels)
         if not seg.paths:
@@ -619,6 +684,12 @@ class KgNeighbourhood:
     origin: str | None = None  # None: live and test_fixture rows (each hop says which)
     max_rows_per_hop: int = 50_000
     per_node_limit: int = 2_000
+    #: rows read by one ``expand`` call over all its hops (SEC-1)
+    max_total_rows: int = MAX_ROWS_PER_NEIGHBOURHOOD
+    #: ``time.monotonic()`` deadline checked before each hop (``None``: no wall-clock bound)
+    deadline: float | None = None
+    #: ISO3 codes held by several KG items and absent from the reviewed registry (LINKS-2)
+    ambiguous_iso3: dict[str, list[str]] = field(default_factory=dict)
 
     def _rows(self, sql: str, params: Mapping[str, Any]) -> list[Mapping[str, Any]]:
         from sqlalchemy import text
@@ -633,8 +704,12 @@ class KgNeighbourhood:
         frontier = [s for s in seeds]
         stmts: dict[str, Stmt] = {}
         truncated: set[str] = set()
+        total = 0
         for _ in range(depth):
             if not frontier:
+                break
+            if total >= self.max_total_rows or _late(self.deadline):
+                truncated |= set(frontier)  # not expanded: the bound or the time budget is spent
                 break
             rows = self._rows(
                 _ST_SELECT
@@ -646,6 +721,7 @@ class KgNeighbourhood:
             if len(rows) > self.max_rows_per_hop:
                 truncated |= set(frontier)
                 rows = rows[: self.max_rows_per_hop]
+            total += len(rows)
             per_node: Counter[str] = Counter()
             nxt: set[str] = set()
             fset = set(frontier)
@@ -711,17 +787,32 @@ class KgNeighbourhood:
         return out
 
     def iso3_to_qid(self, iso3s: Iterable[str] | None = None) -> dict[str, str]:
+        """ISO 3166 alpha-3 → QID. The reviewed ``registry/entities/country_qids.json`` decides for the codes
+        it lists; otherwise the KG's P298 statements, and only when exactly one item holds the code. A code
+        held by several items (PSE, YUG, ATA on Wikidata) is left out and recorded in ``ambiguous_iso3``
+        (never resolved by rank or identifier order)."""
+        from reva.kg.query import country_qid_registry
+
         sql = (
             _ST_SELECT
             + " WHERE (CAST(:origin AS text) IS NULL OR origin = CAST(:origin AS text)) AND property_pid = 'P298'"
         )
         rows = self._rows(sql, {"origin": self.origin})
-        out: dict[str, str] = {}
         want = None if iso3s is None else {x.upper() for x in iso3s}
-        for r in sorted(rows, key=lambda r: (r.get("rank") != "preferred", str(r.get("subject_qid")))):
+        holders: dict[str, set[str]] = defaultdict(set)
+        for r in rows:
             s = row_to_stmt(r)
             if s.value and (want is None or s.value.upper() in want):
-                out.setdefault(s.value.upper(), s.subject)
+                holders[s.value.upper()].add(s.subject)
+        registry = country_qid_registry()
+        out: dict[str, str] = {}
+        for code in sorted(set(holders) | ({c for c in registry if want is None or c in want})):
+            if code in registry:
+                out[code] = registry[code]
+            elif len(holders[code]) == 1:
+                out[code] = next(iter(holders[code]))
+            else:
+                self.ambiguous_iso3[code] = sorted(holders[code])
         return out
 
 
@@ -733,6 +824,7 @@ def graph_from_db(
     with_derived: bool = True,
     taxonomy: Taxonomy | None = None,
     hubs: Hubs | None = None,
+    deadline: float | None = None,
 ) -> PathGraph:
     """Read the neighbourhoods of ``q.source`` (⌈max_hops/2⌉ hops) and ``q.target`` (⌊max_hops/2⌋ hops):
     every path of length ≤ max_hops has each of its edges incident to a node expanded on one side.
@@ -741,7 +833,7 @@ def graph_from_db(
 
     tax = taxonomy or load_taxonomy()
     hb = hubs or load_hubs()
-    nb = KgNeighbourhood(conn, origin=origin)
+    nb = KgNeighbourhood(conn, origin=origin, deadline=deadline)
     props = sorted(tax.edge_types)
     a = math.ceil(q.max_hops / 2)
     b = q.max_hops - a

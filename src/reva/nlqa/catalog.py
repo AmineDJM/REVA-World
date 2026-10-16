@@ -147,6 +147,7 @@ def concepts_from_docs(docs: Iterable[Mapping[str, Any]]) -> list[Concept]:
                 definition=str(definition)[:300] if definition else None,
                 source_order=_source_order(c),
                 review_status=str(c.get("review_status") or doc.get("review_status") or "provider_declared"),
+                rankable=c["rankable"] if isinstance(c.get("rankable"), bool) else None,
             )
     return [out[k] for k in sorted(out)]
 
@@ -287,6 +288,12 @@ class QaCatalog:
         }
 
 
+def _rankable(c: Any) -> bool | None:
+    """An explicit ``rankable`` declaration of an atlas catalog concept, when its loader keeps one."""
+    v = getattr(c, "rankable", None)
+    return v if isinstance(v, bool) else None
+
+
 def atlas_catalog_concepts() -> list[Concept] | None:
     """Concepts through ATLASCORE's validating loader (:mod:`reva.atlas.catalog`, invalid files skipped),
     or ``None`` when that module is absent."""
@@ -304,6 +311,7 @@ def atlas_catalog_concepts() -> list[Concept] | None:
             definition=(c.definition or "")[:300] or None,
             source_order=tuple(s.key for s in c.source_order),
             review_status="provider_declared_not_human_reviewed",
+            rankable=_rankable(c),
         )
         for c in sorted(cat.concepts.values(), key=lambda c: c.id)
     ]

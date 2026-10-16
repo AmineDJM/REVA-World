@@ -33,7 +33,7 @@ Mapping rules (deterministic, conservative; nothing is guessed):
 
 1. A Comtrade *reporter* code maps to an entity only when it is not a group, is
    valid at some point in the coverage window, its label is not a "nes" area,
-   its provider ISO3 field is an ISO 3166 alpha-3 code listed by M49, and it is
+   its provider ISO3 field is an ISO 3166-1 alpha-3 code (1.0.0: one listed by M49), and it is
    the only such reporter for that ISO3. Anything else is listed under
    ``unmapped_provider_codes`` with flags (``group``, ``nes_area``,
    ``historical``, ``provider_iso3_not_iso3166``, ``ambiguous_iso3``) and is
@@ -50,12 +50,12 @@ Mapping rules (deterministic, conservative; nothing is guessed):
    492 "Europe EU, nes" carries "MCO"). They are not seeded as aliases: bilateral
    rows keep the provider partner code and resolve to provider-declared partner
    entities (``reva.cli.seed``), so no partner territory is merged into a country.
-
 4. Taiwan: the UNSD M49 FAQ says that within M49 Taiwan Province of China is considered part
    of China (156) and that 158 can be used for strictly statistical purposes (likewise Kosovo /
    Serbia 688 / 412). TWN and CHN (XKX and SRB) carry the flag ``aggregation_overlap`` and that
-   note verbatim in ``aggregation_notes``: a provider's "China" may or may not include Taiwan. REVA never sums TWN into CHN nor splits CHN; each provider row keeps its own
-   territorial definition. Comtrade 490 "Other Asia, nes" is a "nes" area and is never mapped
+   note verbatim in ``aggregation_notes``: a provider's "China" may or may not include Taiwan.
+   REVA never sums TWN into CHN nor splits CHN; each provider row keeps its own territorial
+   definition. Comtrade 490 "Other Asia, nes" is a "nes" area and is never mapped
    to TWN; partner 158 maps only because the provider labels it "Taiwan, Province of China".
 
 Entities defined in ``registry/entities/countries.yaml`` (human-reviewed) keep

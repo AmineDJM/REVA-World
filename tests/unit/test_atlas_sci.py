@@ -264,7 +264,7 @@ def test_openalex_query_urls():
     assert "SECRET" not in redact_url(url) and "mailto" not in url
     qs = oa.queries()
     assert len([x for x in qs if x.dataset == "works_country_year"]) == 36
-    assert len([x for x in qs if x.dataset == "works_country_domain"]) == 26 * 4
+    assert len([x for x in qs if x.dataset == "works_country_domain"]) == 11 * 4
 
 
 def test_openalex_rows_keep_world_and_unknown():
@@ -278,9 +278,11 @@ def test_openalex_rows_keep_world_and_unknown():
             ]
         )
     )
-    rows = oa.atlas_rows(q, [(page, SHA, 1)], retrieved_at=T0)
+    rows = oa.atlas_rows(q, [oa.Fetched(page, SHA, 1, q.filter)], retrieved_at=T0)
     f = atlas_frame(rows)
-    v, unmapped = validate_atlas_frame(f, source="openalex", dataset=q.dataset, raw_sha256s=[SHA], geo_scheme="iso2")
+    v, unmapped = validate_atlas_frame(
+        f, source="openalex", dataset=q.dataset, raw_sha256s=[SHA], geo_scheme=oa.GEO_SCHEME
+    )
     assert {u["provider_geo"] for u in unmapped} == {"_all_works", "unknown"}
     assert dict(zip(v["provider_geo"], v["value"], strict=True)) == {
         "US": "500",
@@ -303,7 +305,7 @@ def test_openalex_bad_pages():
     q = oa.Query("works_country_year", 2020)
     p1 = oa.parse_group_page(_group_doc([("https://openalex.org/countries/FR", "France", 3)]))
     with pytest.raises(SourceResponseError):  # a group repeated across cursor pages
-        oa.atlas_rows(q, [(p1, SHA, 1), (p1, SHA, 2)], retrieved_at=T0)
+        oa.atlas_rows(q, [oa.Fetched(p1, SHA, 1, q.filter), oa.Fetched(p1, SHA, 2, q.filter)], retrieved_at=T0)
 
 
 # ----------------------------------------------------------------------------- catalog
@@ -329,3 +331,43 @@ def test_science_catalog_series_match_parsers(nobel_records, gii):
                 assert s.key in produced or (s.source == "nobel" and "|category=" in s.indicator), s.key
             else:
                 assert s.dataset == "patent_pub_tech" and s.indicator.startswith("patent_publications|office=")
+
+
+async def test_openalex_complement_queries_without_key():
+    """Without an API key OpenAlex refuses cursor paging: the countries beyond the first 200 groups come from
+    complement queries; co-author countries in those responses are ignored (counted from page 1)."""
+    from types import SimpleNamespace
+    from urllib.parse import parse_qs, urlsplit
+
+    from reva.atlas.tables import geo_index
+
+    codes = sorted(geo_index().maps[oa.GEO_SCHEME])
+    first = [c for c in codes if c != "US"][:199] + ["US"]
+    calls: list[str] = []
+
+    class Run:
+        origin = "live"
+
+        async def get(self, url: str, **kw: object) -> SimpleNamespace:
+            calls.append(url)
+            flt = parse_qs(urlsplit(url).query)["filter"][0]
+            if "authorships.countries:" not in flt:
+                groups = [(f"https://openalex.org/countries/{c}", c, 1000) for c in first]
+                return SimpleNamespace(body=_group_doc(groups, count=5000, next_cursor="abc"))
+            chunk = flt.split("authorships.countries:")[1].split("|")
+            groups = [(f"https://openalex.org/countries/{c}", c, 7) for c in chunk] + [
+                ("https://openalex.org/countries/US", "United States", 3)
+            ]
+            return SimpleNamespace(body=_group_doc(groups, count=99))
+
+        def archive(self, raw: object) -> str:
+            return SHA
+
+    q = oa.Query("works_country_year", 2020)
+    fetched = await oa.fetch_query(Run(), q, api_key=None, limit=100, state={"requests": 0})
+    rows = oa.atlas_rows(q, fetched, retrieved_at=T0)
+    vals = {r["provider_geo"]: r["value"] for r in rows}
+    assert set(codes) <= set(vals) and vals["US"] == "1000" and vals["_all_works"] == "5000"
+    rest = sorted(set(codes) - set(first))
+    assert all(vals[c] == "7" for c in rest)
+    assert len(calls) == 1 + -(-len(rest) // oa.CHUNK) and not any("cursor=abc" in u for u in calls)

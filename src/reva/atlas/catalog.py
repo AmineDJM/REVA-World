@@ -228,14 +228,17 @@ def _disk_path(name: str, sha: str) -> Path | None:
     the 9 MB World Bank catalog take ~15 s). Keyed by the file's and the schema's sha256 and the cache
     format; JSON only (never pickle), written atomically; any read problem means a fresh parse."""
     import hashlib
-    import os
-    import tempfile
+
+    from reva.atlas.cachedir import cache_dir, private_dir
 
     if len(sha) != 64:
         return None
-    base = Path(os.environ.get("REVA_ATLAS_CACHE_DIR") or Path(tempfile.gettempdir()) / "reva-atlas-cache")
+    try:
+        base = private_dir(cache_dir() / "catalog")  # private (0700, owned by this user): ATLAS-1
+    except Exception:  # a cache problem never blocks loading the catalog
+        return None
     schema = hashlib.sha256(SCHEMA_PATH.read_bytes() + _PARSE_FORMAT.encode()).hexdigest()[:16]
-    return base / "catalog" / f"{Path(name).stem}-{sha}-{schema}.json"
+    return base / f"{Path(name).stem}-{sha}-{schema}.json"
 
 
 def _disk_cached(name: str, sha: str) -> tuple[Any, list[str]] | None:
@@ -262,12 +265,11 @@ def _disk_store(name: str, sha: str, hit: tuple[Any, list[str]]) -> None:
         blob = json.dumps({"format": _PARSE_FORMAT, "file": name, "sha256": sha, "doc": hit[0], "errors": hit[1]})
         if len(blob) < 1_000_000:
             return
-        p.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=p.parent, suffix=".tmp")
         with os.fdopen(fd, "w") as f:
             f.write(blob)
         os.replace(tmp, p)
-    except (OSError, TypeError, ValueError):  # a cache, never fatal
+    except Exception:  # a cache, never fatal
         return
 
 

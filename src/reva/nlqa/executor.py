@@ -4,8 +4,9 @@ Every record the executor reads becomes an *evidence item* with a stable id (``E
 and full provenance; the composer may only cite these. Nothing is computed that a source does
 not report, except:
 
-* **ranking** within one source and one year (never across sources or years, never with
-  missing values, which are excluded and counted);
+* **ranking** within one source, one year and one unit (never across sources, years or units —
+  a concept whose currency is named per country is never ranked —, never with missing values,
+  which are excluded and counted; with no year asked, never over a projection year);
 * a bounded **breadth-first path search** over KG neighbours (``nlqa.bfs``) when the LINKS path
   engine is absent — each hop is still a sourced statement.
 
@@ -18,6 +19,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
@@ -36,6 +38,8 @@ from reva.nlqa.ports import (
     KgPath,
     KgStatement,
     PathHop,
+    is_projection,
+    per_country_unit,
 )
 
 log = logging.getLogger("reva.nlqa.executor")
@@ -44,6 +48,10 @@ MAX_STATEMENTS = 25
 MAX_TIMELINE = 30
 MAX_PATHS = 3
 MAX_SERIES_POINTS = 60
+#: ``atlas_value`` with ``country=ALL``: one year only, at most this many cells as evidence (SEC-1).
+MAX_ALL_CELLS = 300
+#: Wall-clock budget of one question's execution; operations started after it are not run (SEC-1).
+TIME_BUDGET_S = 45.0
 #: Bounded BFS (fallback path search): neighbour calls and nodes per frontier.
 BFS_MAX_CALLS = 60
 BFS_MAX_FRONTIER = 150
@@ -255,10 +263,20 @@ def _dec(v: str | None) -> Decimal | None:
     return d if d.is_finite() else None
 
 
+class RankRefused(Exception):
+    """A ranking REVA refuses to compute (values not comparable, or only projections without a year)."""
+
+    def __init__(self, reason: str, **details: Any) -> None:
+        super().__init__(reason)
+        self.reason = reason
+        self.details = details
+
+
 class Executor:
-    def __init__(self, backends: Backends, catalog: QaCatalog) -> None:
+    def __init__(self, backends: Backends, catalog: QaCatalog, *, time_budget_s: float | None = TIME_BUDGET_S) -> None:
         self.b = backends
         self.catalog = catalog
+        self.time_budget_s = time_budget_s
 
     # ------------------------------------------------------------------ entry point
     def run(self, plan: QueryPlan) -> Execution:
@@ -266,7 +284,19 @@ class Executor:
         lookups: dict[str, Resolved] = {}
         results: list[OpResult] = []
         warnings: list[str] = []
+        deadline = None if self.time_budget_s is None else time.monotonic() + self.time_budget_s
         for op in plan.operations:
+            if deadline is not None and time.monotonic() > deadline:
+                if op.op == "entity_lookup":
+                    lookups[op.id] = Resolved(text=op.args["text"], kind=op.args.get("kind"), status="unavailable")
+                    lookups[op.id].evidence_id = ev.absence(
+                        "entity", ["time budget exceeded"], query=op.args["text"], kind=op.args.get("kind") or "any"
+                    )
+                else:
+                    results.append(OpResult(op, "error", message="time_budget_exceeded"))
+                if "time_budget_exceeded" not in warnings:
+                    warnings.append("time_budget_exceeded")
+                continue
             if op.op == "entity_lookup":
                 lookups[op.id] = self._lookup(op, plan.language, ev, warnings)
                 continue
@@ -433,7 +463,23 @@ class Executor:
         if op.op == "atlas_rank":
             res = atlas.values(concept.id, None, a["year"])
             consulted = _consulted(res, order, atlas.name)
-            ranked = rank_cells(res.cells, order, a["year"], a["order"], a["limit"])
+            try:
+                ranked = rank_cells(
+                    res.cells,
+                    order,
+                    a["year"],
+                    a["order"],
+                    a["limit"],
+                    comparable=concept.comparable_across_countries,
+                )
+            except RankRefused as r:
+                data.update(reason=r.reason, **r.details)
+                details: dict[str, Any] = {"concept": concept.id, "year": a["year"] or "latest"}
+                details.update(
+                    {k: ",".join(map(str, v)) if isinstance(v, list | tuple) else v for k, v in r.details.items()}
+                )
+                data["absence"] = ev.absence(f"atlas_rank_refused:{r.reason}", consulted, **details)
+                return OpResult(op, "refused", data=data, consulted=consulted)
             if ranked is None:
                 data["absence"] = ev.absence("atlas_rank", consulted, concept=concept.id, year=a["year"] or "latest")
                 return OpResult(op, "empty", data=data, consulted=consulted)
@@ -445,6 +491,8 @@ class Executor:
                 n_non_numeric=n_non_numeric,
                 rows=[(c, ev.cell(c)) for c in rows],
                 other_sources=sorted({_src(c) for c in res.cells} - {source}),
+                n_projection=sum(1 for c in rows if is_projection(c.flags)),
+                year_asked=a["year"] is not None,
             )
             return OpResult(op, "ok", data=data, consulted=consulted)
         country = a["country"]
@@ -486,11 +534,24 @@ class Executor:
                 )
                 return OpResult(op, "empty", data=data, consulted=consulted)
             src, cells = groups[0]
+            year = a["year"] if a["year"] is not None else latest_actual_year(cells)
+            if year is None:  # only projections and no year asked: the latest year is never a projection
+                data["absence"] = ev.absence(
+                    "atlas_value", consulted, concept=concept.id, iso3="ALL", year="latest", only_projections=True
+                )
+                data["only_projections"] = True
+                return OpResult(op, "empty", data=data, consulted=consulted)
+            chosen = sorted((c for c in cells if c.year == year), key=lambda c: c.iso3)
             data.update(
                 all_countries=True,
                 source=src,
-                n=len({c.iso3 for c in cells}),
-                cells=[(c, ev.cell(c)) for c in sorted(cells, key=lambda c: c.iso3)],
+                year=year,
+                year_asked=a["year"] is not None,
+                n=len({c.iso3 for c in chosen}),
+                units=sorted({c.unit or "" for c in chosen}),
+                n_projection=sum(1 for c in chosen if is_projection(c.flags)),
+                truncated=len(chosen) > MAX_ALL_CELLS,
+                cells=[(c, ev.cell(c)) for c in chosen[:MAX_ALL_CELLS]],
                 other_sources=[s for s, _ in groups[1:]],
             )
             return OpResult(op, "ok", data=data, consulted=consulted)
@@ -573,34 +634,69 @@ def _consulted(res: AtlasResult, order: Sequence[str], backend: str) -> list[str
 
 #: "Latest" year for a ranking: the most recent year whose coverage in the chosen source is at least this
 #: share of that source's best-covered year (a ranking over a handful of early reporters is not shown).
+#: Only actual (non-projection) cells count: a default year is never a projection year.
 RANK_LATEST_COVERAGE = 0.8
 
 
+def latest_actual_year(cells: Sequence[AtlasCell]) -> int | None:
+    """The most recent year whose count of numeric, non-projection cells is at least
+    :data:`RANK_LATEST_COVERAGE` of the best-covered year's; ``None`` when there is no actual cell."""
+    by_year: dict[int, int] = {}
+    for c in cells:
+        if c.year is not None and _dec(c.value) is not None and not is_projection(c.flags):
+            by_year[c.year] = by_year.get(c.year, 0) + 1
+    if not by_year:
+        return None
+    best = max(by_year.values())
+    return max(y for y, n in by_year.items() if n >= RANK_LATEST_COVERAGE * best)
+
+
 def rank_cells(
-    cells: Sequence[AtlasCell], order: Sequence[str], year: int | None, direction: str, limit: int
+    cells: Sequence[AtlasCell],
+    order: Sequence[str],
+    year: int | None,
+    direction: str,
+    limit: int,
+    *,
+    comparable: bool = True,
 ) -> tuple[str, int, list[AtlasCell], int, int] | None:
-    """Rank within ONE series and ONE year: the first series (declared order) that has numeric values;
-    the requested year, else that series' most recent year covering at least
-    :data:`RANK_LATEST_COVERAGE` of its best-covered year. Missing values are never ranked."""
+    """Rank within ONE series, ONE year and ONE unit: the first series (declared order) that has numeric
+    values; the requested year, else that series' latest *actual* year (:func:`latest_actual_year`).
+    Missing values are never ranked.
+
+    Raises :class:`RankRefused` when the values are not comparable — the concept's unit names a currency
+    per country (``comparable=False``), or the cells of the year carry different units (``units_differ``)
+    or a per-country unit such as "current LCU" — and when, with no year asked, the source has only
+    projections (``only_projections``)."""
+    if not comparable:
+        units = sorted({c.unit for c in cells if c.unit and _dec(c.value) is not None})
+        raise RankRefused("unit_named_per_country", units=units)
+    only_projections = False
     for src, group in _by_source(cells, order):
-        numeric_by_year: dict[int, int] = {}
-        for c in group:
-            if c.year is not None and _dec(c.value) is not None:
-                numeric_by_year[c.year] = numeric_by_year.get(c.year, 0) + 1
-        if not numeric_by_year:
-            continue
         if year is not None:
-            y = year
+            y: int | None = year
         else:
-            best = max(numeric_by_year.values())
-            y = max(yy for yy, n in numeric_by_year.items() if n >= RANK_LATEST_COVERAGE * best)
+            y = latest_actual_year(group)
+            if y is None:
+                only_projections = only_projections or any(
+                    _dec(c.value) is not None and is_projection(c.flags) for c in group
+                )
+                continue
         same_year = [c for c in group if c.year == y]
         numeric = [(c, _dec(c.value)) for c in same_year]
         ok = [(c, d) for c, d in numeric if d is not None]
         if not ok:
             continue
+        units = sorted({c.unit or "" for c, _ in ok})
+        if len(units) > 1:
+            raise RankRefused("units_differ", units=units, series=src, year=y)
+        if per_country_unit(units[0]):
+            raise RankRefused("unit_named_per_country", units=units, series=src, year=y)
         ok.sort(key=lambda cd: (cd[1], cd[0].iso3), reverse=direction == "desc")
+        assert y is not None
         return src, y, [c for c, _ in ok[:limit]], len(ok), len(numeric) - len(ok)
+    if only_projections:
+        raise RankRefused("only_projections")
     return None
 
 

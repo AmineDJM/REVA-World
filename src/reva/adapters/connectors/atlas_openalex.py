@@ -56,7 +56,7 @@ MAX_BYTES = 2_000_000
 PER_PAGE = 200
 WORK_TYPES = "article|review"
 YEARS = (1990, 2025)
-DOMAIN_YEARS = (2000, 2025)
+DOMAIN_YEARS = (2015, 2025)
 FIELD_YEARS = (2000, 2010, 2020, 2024)
 DOMAINS: dict[str, str] = {
     "1": "Life Sciences",
@@ -154,9 +154,16 @@ def queries(
     return out
 
 
-def query_url(q: Query, *, cursor: str = "*", api_key: str | None = None) -> str:
+def query_filter(q: Query, countries: Sequence[str] | None = None) -> str:
+    """The query's filter, optionally restricted to works with an author in ``countries`` (ISO alpha-2)."""
+    return q.filter + (f",authorships.countries:{'|'.join(countries)}" if countries else "")
+
+
+def query_url(
+    q: Query, *, cursor: str = "*", api_key: str | None = None, countries: Sequence[str] | None = None
+) -> str:
     params: dict[str, str] = {
-        "filter": q.filter,
+        "filter": query_filter(q, countries),
         "group_by": "authorships.countries",
         "per_page": str(PER_PAGE),
         "cursor": cursor,
@@ -166,7 +173,7 @@ def query_url(q: Query, *, cursor: str = "*", api_key: str | None = None) -> str
     return f"https://{HOST}/works?" + urlencode(params, safe=":,|*", quote_via=quote)
 
 
-#: Planned requests for one default run (36 + 104 queries, <= 2 cursor pages each).
+#: Planned requests for one default run (36 + 44 queries, ~3 requests each without an API key).
 PLANNED_REQUESTS = 300
 #: Fixture runs replay a small recorded plan (real captures of these queries).
 FIXTURE_YEARS = (2020, 2020)
@@ -237,37 +244,25 @@ async def atlas_ingest(
         if stopped:
             incomplete.append({"query": q.key, "status": "not_attempted", "reason": stopped})
             continue
-        pages: list[tuple[GroupPage, str, int]] = []
-        cursor, pno = "*", 1
+        state = {"requests": requests}
         try:
-            while True:
-                if requests >= limit:
-                    stopped = "request limit for this run reached"
-                    raise _StopRun
-                requests += 1
-                raw = await run.get(
-                    query_url(q, cursor=cursor, api_key=api_key), key=f"{q.key}:p{pno}", max_bytes=MAX_BYTES
-                )
-                page = parse_group_page(raw.body)
-                pages.append((page, run.archive(raw), pno))
-                if page.next_cursor and len(page.groups) >= PER_PAGE:
-                    if pno >= MAX_PAGES:
-                        raise _err(f"{q.key}: more group pages than {MAX_PAGES}", kind="too_many_pages")
-                    cursor, pno = page.next_cursor, pno + 1
-                    continue
-                break
+            fetched = await fetch_query(run, q, api_key=api_key, limit=limit, state=state)
         except _StopRun:
+            requests = state["requests"]
+            stopped = "request limit for this run reached"
             incomplete.append({"query": q.key, "status": "not_attempted", "reason": stopped})
             continue
         except RevaError as e:
+            requests = state["requests"]
             status = e.details.get("status")
             incomplete.append({"query": q.key, "status": "failed", "http_status": status, "error": e.message[:300]})
             if status in (429, 401, 403):
                 stopped = f"provider refused (HTTP {status}); no further requests this run"
             continue
+        requests = state["requests"]
         retrieved_at = datetime.now(UTC)
-        rows.setdefault(q.dataset, []).extend(atlas_rows(q, pages, retrieved_at=retrieved_at))
-        shas.setdefault(q.dataset, []).extend(s for _, s, _ in pages)
+        rows.setdefault(q.dataset, []).extend(atlas_rows(q, fetched, retrieved_at=retrieved_at))
+        shas.setdefault(q.dataset, []).extend(f.sha for f in fetched)
     tables = {}
     for ds, rs in rows.items():
         reg = run.register(
@@ -290,6 +285,67 @@ class _StopRun(Exception):
 
 
 MAX_PAGES = 5
+#: Country codes per complement query (keeps the response under 200 groups; halved when it is not).
+CHUNK = 25
+
+
+@dataclass(frozen=True)
+class Fetched:
+    page: GroupPage
+    sha: str
+    pno: int
+    filter: str
+    keep: frozenset[str] | None = None  # complement queries: only these groups are taken from the page
+
+
+def _complete(page: GroupPage) -> bool:
+    return not (page.next_cursor and len(page.groups) >= PER_PAGE)
+
+
+async def fetch_query(run: Any, q: Query, *, api_key: str | None, limit: int, state: dict[str, int]) -> list[Fetched]:
+    """All groups of one query. The first page holds the 200 largest groups; the rest comes from cursor
+    pages when an API key is set (OpenAlex refuses cursor paging without one: HTTP 401), else from
+    *complement* queries restricted to works with an author in a chunk of the crosswalk countries absent
+    from the first page — a country's count is the same under that restriction (every work counted for
+    it has an author there), and only groups of the chunk are taken from a response that is complete
+    (fewer than 200 groups); an incomplete one is split in halves."""
+    from reva.atlas.tables import geo_index
+
+    async def get(url: str, key: str) -> GroupPage | Any:
+        if state["requests"] >= limit:
+            raise _StopRun
+        state["requests"] += 1
+        raw = await run.get(url, key=key, max_bytes=MAX_BYTES)
+        return parse_group_page(raw.body), run.archive(raw)
+
+    page, sha = await get(query_url(q, api_key=api_key), f"{q.key}:p1")
+    out = [Fetched(page, sha, 1, q.filter)]
+    if _complete(page):
+        return out
+    if api_key:
+        pno = 1
+        while not _complete(page):
+            if pno >= MAX_PAGES:
+                raise _err(f"{q.key}: more group pages than {MAX_PAGES}", kind="too_many_pages")
+            pno += 1
+            page, sha = await get(query_url(q, cursor=str(page.next_cursor), api_key=api_key), f"{q.key}:p{pno}")
+            out.append(Fetched(page, sha, pno, q.filter))
+        return out
+    seen = {c for c, *_ in page.groups}
+    todo = sorted(set(geo_index().maps[GEO_SCHEME]) - seen)
+    queue = [todo[i : i + CHUNK] for i in range(0, len(todo), CHUNK)]
+    n = 0
+    while queue:
+        chunk = queue.pop(0)
+        n += 1
+        page, sha = await get(query_url(q, countries=chunk), f"{q.key}:c{n}")
+        if not _complete(page):
+            if len(chunk) == 1:
+                raise _err(f"{q.key}: complement query for {chunk[0]} is not complete", kind="incomplete")
+            queue[:0] = [chunk[: len(chunk) // 2], chunk[len(chunk) // 2 :]]
+            continue
+        out.append(Fetched(page, sha, n, query_filter(q, chunk), frozenset(chunk)))
+    return out
 
 
 # ----------------------------------------------------------------------------- parsing
@@ -333,11 +389,9 @@ def parse_group_page(body: bytes) -> GroupPage:
     return GroupPage(total, tuple(out), nc if isinstance(nc, str) and nc else None, gc if isinstance(gc, int) else None)
 
 
-def atlas_rows(
-    q: Query, pages: Sequence[tuple[GroupPage, str, int]], *, retrieved_at: datetime
-) -> list[dict[str, Any]]:
-    """Rows for one query from its pages ``(page, raw_sha256, page_number)``; ``iso3`` is left
-    null and filled by ``register_atlas_table(..., geo_scheme=GEO_SCHEME)``."""
+def atlas_rows(q: Query, pages: Sequence[Fetched], *, retrieved_at: datetime) -> list[dict[str, Any]]:
+    """Rows for one query from its fetched pages (first page, cursor pages or complement queries);
+    ``iso3`` is left null and filled by ``register_atlas_table(..., geo_scheme=GEO_SCHEME)``."""
     if not pages:
         return []
     period = (date(q.year, 1, 1), date(q.year + 1, 1, 1))
@@ -356,7 +410,7 @@ def atlas_rows(
         flags["field"] = FIELDS.get(q.dim_id or "", str(q.dim_id))
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
-    first, first_sha, _ = pages[0]
+    first, first_sha = pages[0].page, pages[0].sha
     rows.append(
         _row(
             q,
@@ -369,8 +423,10 @@ def atlas_rows(
             {**flags, "meaning": "all works matching the filter (any country or none)"},
         )
     )
-    for page, sha, pno in pages:
-        for code, name, count, pos in page.groups:
+    for fp in pages:
+        for code, name, count, pos in fp.page.groups:
+            if fp.keep is not None and code not in fp.keep:
+                continue  # a co-author country of a complement query: counted from its own response
             if code in seen:
                 raise _err(f"{q.key}: group {code} repeated across pages")
             seen.add(code)
@@ -386,9 +442,9 @@ def atlas_rows(
                     None,
                     period,
                     count,
-                    sha,
-                    {"filter": q.filter, "page": pno, "path": f"group_by[{pos}]", "key": code},
-                    f,
+                    fp.sha,
+                    {"filter": fp.filter, "page": fp.pno, "path": f"group_by[{pos}]", "key": code},
+                    f if fp.keep is None else {**f, "via": "complement query (works with an author in the chunk)"},
                 )
             )
     return rows
@@ -424,7 +480,7 @@ def _row(
 
 
 #: geo scheme for OpenAlex country codes (ISO 3166 alpha-2).
-GEO_SCHEME = "iso2"
+GEO_SCHEME = "openalex"  # ISO alpha-2 + XK (Kosovo), registry/atlas/geo_aliases/a_sci.yaml
 
 
 def frame(rows: Sequence[Mapping[str, Any]]) -> Any:
@@ -436,11 +492,13 @@ __all__ = [
     "DOMAINS",
     "FIELDS",
     "GEO_SCHEME",
+    "Fetched",
     "GroupPage",
     "Query",
     "atlas_ingest",
     "atlas_rows",
     "atlas_source",
+    "fetch_query",
     "frame",
     "parse_group_page",
     "queries",

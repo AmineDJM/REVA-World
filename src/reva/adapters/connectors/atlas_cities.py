@@ -43,6 +43,7 @@ and reports every disagreement (several or disputed capitals included) without c
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import logging
@@ -521,15 +522,32 @@ def country_rows(places: Sequence[Place], *, raw_sha256: str, retrieved_at: date
     period = snapshot_period(retrieved_at)
     out: list[dict[str, Any]] = []
     sel_all = {"file": CITIES_MEMBER, "derivation": "all rows of the country"}
+    base = {**BASE_FLAGS, "derived_from": "cities15000.txt (exact count/selection, no estimate)"}
     for cc, a in country_aggregates(places).items():
-        base = {**BASE_FLAGS, "derived_from": "cities15000.txt (exact count/selection, no estimate)"}
 
-        def add(ind: str, value: str | None, text: str | None, unit: str, flags: Mapping[str, Any],
-                lines: Sequence[int] | None = None, cc: str = cc) -> None:
+        def add(
+            ind: str,
+            value: str | None,
+            text: str | None,
+            unit: str,
+            flags: Mapping[str, Any],
+            lines: Sequence[int] | None = None,
+            cc: str = cc,
+        ) -> None:
             sel = dict(sel_all) if lines is None else {"file": CITIES_MEMBER, "lines": list(lines)[:50]}
             out.append(
-                _row(dataset=DS_COUNTRY, indicator=ind, geo=cc, period=period, value=value, text=text, unit=unit,
-                     flags={**base, **flags}, raw_sha256=raw_sha256, selector=sel)
+                _row(
+                    dataset=DS_COUNTRY,
+                    indicator=ind,
+                    geo=cc,
+                    period=period,
+                    value=value,
+                    text=text,
+                    unit=unit,
+                    flags={**base, **flags},
+                    raw_sha256=raw_sha256,
+                    selector=sel,
+                )
             )
 
         add(
@@ -537,31 +555,56 @@ def country_rows(places: Sequence[Place], *, raw_sha256: str, retrieved_at: date
             str(len(a["over_threshold"])),
             None,
             "places",
-            {"definition": "places in cities15000 with GeoNames population > 15000 (any P feature code, incl. "
-             "PPLX sections of a larger place)", "feature_codes": a["feature_codes"]},
+            {
+                "definition": "places in cities15000 with GeoNames population > 15000 (any P feature code, incl. "
+                "PPLX sections of a larger place)",
+                "feature_codes": a["feature_codes"],
+            },
         )
         add(
             "places_pop_gt_15000|scope=excl_sections_historical",
             str(len(a["over_threshold_current"])),
             None,
             "places",
-            {"definition": "same, without PPLX (section of a place), PPLH, PPLQ, PPLW, PPLCH",
-             "excluded_feature_codes": sorted(NOT_A_CURRENT_PLACE)},
+            {
+                "definition": "same, without PPLX (section of a place), PPLH, PPLQ, PPLW, PPLCH",
+                "excluded_feature_codes": sorted(NOT_A_CURRENT_PLACE),
+            },
         )
         if a["largest"]:
             names = [p.cells["name"] for p in a["largest"]]
-            info = {"geonameids": [p.geonameid for p in a["largest"]], "feature_codes": [p.feature_code for p in
-                    a["largest"]], "scope": "excl_sections_historical"}
+            info = {
+                "geonameids": [p.geonameid for p in a["largest"]],
+                "feature_codes": [p.feature_code for p in a["largest"]],
+                "scope": "excl_sections_historical",
+            }
             if len(names) > 1:
                 info["tie"] = True
             lines = [p.line for p in a["largest"]]
-            add("largest_place", None, " | ".join(names), "1", {**info, "population": str(a["largest_population"])},
-                lines)
-            add("largest_place_population", str(a["largest_population"]), None, "persons",
-                {**info, "names": names}, lines)
+            add(
+                "largest_place",
+                None,
+                " | ".join(names),
+                "1",
+                {**info, "population": str(a["largest_population"])},
+                lines,
+            )
+            add(
+                "largest_place_population",
+                str(a["largest_population"]),
+                None,
+                "persons",
+                {**info, "names": names},
+                lines,
+            )
         pplc = a["pplc"]
-        add("capital_pplc_count", str(len(pplc)), None, "places",
-            {"definition": "places with GeoNames feature code PPLC (capital of a political entity)"})
+        add(
+            "capital_pplc_count",
+            str(len(pplc)),
+            None,
+            "places",
+            {"definition": "places with GeoNames feature code PPLC (capital of a political entity)"},
+        )
         if pplc:
             info = {"geonameids": [p.geonameid for p in pplc]}
             if len(pplc) > 1:
@@ -569,9 +612,18 @@ def country_rows(places: Sequence[Place], *, raw_sha256: str, retrieved_at: date
                 info["note"] = "GeoNames marks several places PPLC for this country; all listed, none chosen"
             add("capital_pplc", None, " | ".join(p.cells["name"] for p in pplc), "1", info, [p.line for p in pplc])
             if len(pplc) == 1 and pplc[0].population > 0:
-                add("capital_pplc_population", str(pplc[0].population), None, "persons",
-                    {**info, "name": pplc[0].cells["name"],
-                     "geonames_modification_date": pplc[0].cells["modification date"]}, [pplc[0].line])
+                add(
+                    "capital_pplc_population",
+                    str(pplc[0].population),
+                    None,
+                    "persons",
+                    {
+                        **info,
+                        "name": pplc[0].cells["name"],
+                        "geonames_modification_date": pplc[0].cells["modification date"],
+                    },
+                    [pplc[0].line],
+                )
     return out
 
 
@@ -581,37 +633,69 @@ def admin1_rows(rows: Sequence[Admin1], *, raw_sha256: str, retrieved_at: dateti
     counts: Counter[str] = Counter()
     for a in rows:
         counts[a.country] += 1
-        for col, ind, txt in (("name", "admin1_name", a.name), ("asciiname", "admin1_asciiname", a.asciiname),
-                              ("geonameid", "admin1_geonameid", a.geonameid)):
+        for col, ind, txt in (
+            ("name", "admin1_name", a.name),
+            ("asciiname", "admin1_asciiname", a.asciiname),
+            ("geonameid", "admin1_geonameid", a.geonameid),
+        ):
             if not txt.strip():
                 continue
             out.append(
-                _row(dataset=DS_ADMIN1, indicator=f"{ind}|code={a.code}", geo=a.country, period=period, value=None,
-                     text=txt.strip(), unit="1", flags={**BASE_FLAGS, "admin1_code": a.code},
-                     raw_sha256=raw_sha256,
-                     selector={"file": "admin1CodesASCII.txt", "line": a.line, "column": col})
+                _row(
+                    dataset=DS_ADMIN1,
+                    indicator=f"{ind}|code={a.code}",
+                    geo=a.country,
+                    period=period,
+                    value=None,
+                    text=txt.strip(),
+                    unit="1",
+                    flags={**BASE_FLAGS, "admin1_code": a.code},
+                    raw_sha256=raw_sha256,
+                    selector={"file": "admin1CodesASCII.txt", "line": a.line, "column": col},
+                )
             )
     for cc, n in sorted(counts.items()):
         out.append(
-            _row(dataset=DS_ADMIN1, indicator="admin1_count", geo=cc, period=period, value=str(n), text=None,
-                 unit="divisions", flags={**BASE_FLAGS, "derived_from": "admin1CodesASCII.txt (exact count)"},
-                 raw_sha256=raw_sha256, selector={"file": "admin1CodesASCII.txt", "derivation": "rows of country"})
+            _row(
+                dataset=DS_ADMIN1,
+                indicator="admin1_count",
+                geo=cc,
+                period=period,
+                value=str(n),
+                text=None,
+                unit="divisions",
+                flags={**BASE_FLAGS, "derived_from": "admin1CodesASCII.txt (exact count)"},
+                raw_sha256=raw_sha256,
+                selector={"file": "admin1CodesASCII.txt", "derivation": "rows of country"},
+            )
         )
     return out
 
 
 def name_rows(
-    names: Sequence[AltName], country_of: Mapping[str, str], *, raw_sha256: str, retrieved_at: datetime,
+    names: Sequence[AltName],
+    country_of: Mapping[str, str],
+    *,
+    raw_sha256: str,
+    retrieved_at: datetime,
     totals: Mapping[tuple[str, str], int],
 ) -> list[dict[str, Any]]:
     period = snapshot_period(retrieved_at)
     out = []
     for a in names:
-        flags = {**BASE_FLAGS, "geonameid": a.geonameid, "lang": a.lang,
-                 "names_in_language": totals.get((a.geonameid, a.lang), 1),
-                 "kept_at_most": MAX_NAMES_PER_LANG}
-        for k, v in (("preferred", a.preferred), ("short", a.short), ("colloquial", a.colloquial),
-                     ("historic", a.historic)):
+        flags = {
+            **BASE_FLAGS,
+            "geonameid": a.geonameid,
+            "lang": a.lang,
+            "names_in_language": totals.get((a.geonameid, a.lang), 1),
+            "kept_at_most": MAX_NAMES_PER_LANG,
+        }
+        for k, v in (
+            ("preferred", a.preferred),
+            ("short", a.short),
+            ("colloquial", a.colloquial),
+            ("historic", a.historic),
+        ):
             if v:
                 flags[k] = True
         if a.from_:
@@ -619,9 +703,18 @@ def name_rows(
         if a.to:
             flags["to"] = a.to
         out.append(
-            _row(dataset=DS_NAMES, indicator=f"altname|geonameid={a.geonameid}|lang={a.lang}|id={a.alternate_name_id}",
-                 geo=country_of[a.geonameid], period=period, value=None, text=a.name[:4000], unit="1", flags=flags,
-                 raw_sha256=raw_sha256, selector={"file": ALTNAMES_MEMBER, "line": a.line, "column": "alternate name"})
+            _row(
+                dataset=DS_NAMES,
+                indicator=f"altname|geonameid={a.geonameid}|lang={a.lang}|id={a.alternate_name_id}",
+                geo=country_of[a.geonameid],
+                period=period,
+                value=None,
+                text=a.name[:4000],
+                unit="1",
+                flags=flags,
+                raw_sha256=raw_sha256,
+                selector={"file": ALTNAMES_MEMBER, "line": a.line, "column": "alternate name"},
+            )
         )
     return out
 
@@ -674,21 +767,28 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         admin_raw = await run.get(URL_ADMIN1, key="admin1", media_types=("text/plain",), max_bytes=MAX_ADMIN1_BYTES)
         admin_sha = run.archive(admin_raw)
         admin = parse_admin1(admin_raw.body)
-        if len(admin) < MIN_ADMIN1:
+        live = run.origin == "live"  # recorded fixtures are excerpts: the completeness bounds apply to live bytes
+        if live and len(admin) < MIN_ADMIN1:
             raise _err(f"admin1CodesASCII.txt has only {len(admin)} rows (expected >= {MIN_ADMIN1})")
         summary["admin1_raw_sha256"] = admin_sha
         if run.wants(DS_ADMIN1):
-            t = run.register(dataset=DS_ADMIN1, frame=_frame(admin1_rows(admin, raw_sha256=admin_sha,
-                             retrieved_at=admin_raw.retrieved_at)), raw_sha256s=[admin_sha], geo_scheme=GEO_SCHEME,
-                             rights=RIGHTS, coverage_note=f"GeoNames admin1CodesASCII.txt: {len(admin)} first-order "
-                             "divisions (undated; retrieval snapshot)")
+            t = run.register(
+                dataset=DS_ADMIN1,
+                frame=_frame(admin1_rows(admin, raw_sha256=admin_sha, retrieved_at=admin_raw.retrieved_at)),
+                raw_sha256s=[admin_sha],
+                geo_scheme=GEO_SCHEME,
+                rights=RIGHTS,
+                coverage_note=f"GeoNames admin1CodesASCII.txt: {len(admin)} first-order "
+                "divisions (undated; retrieval snapshot)",
+            )
             summary["tables"][DS_ADMIN1] = _table_summary(t)
     if need_cities:
-        cities_raw = await run.get(URL_CITIES, key="cities15000", media_types=("application/zip",),
-                                   max_bytes=MAX_CITIES_BYTES)
+        cities_raw = await run.get(
+            URL_CITIES, key="cities15000", media_types=("application/zip",), max_bytes=MAX_CITIES_BYTES
+        )
         sha = run.archive(cities_raw)
         places = parse_cities(cities_raw.body)
-        problems = validate_cities(places)
+        problems = validate_cities(places, min_rows=MIN_CITIES if run.origin == "live" else 1)
         if problems:
             raise _err("; ".join(problems[:10]))
         summary["cities_raw_sha256"] = sha
@@ -696,40 +796,68 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         a1 = {a.code: a for a in admin}
         if run.wants(DS_CITIES):
             rows, omitted = city_rows(places, a1, raw_sha256=sha, retrieved_at=cities_raw.retrieved_at)
-            t = run.register(dataset=DS_CITIES, frame=_frame(rows), raw_sha256s=[sha], geo_scheme=GEO_SCHEME,
-                             rights=RIGHTS, coverage_note=f"GeoNames cities15000: {len(places)} populated places "
-                             "('population > 15000 or capitals'), values as declared, undated (retrieval snapshot); "
-                             f"omitted cells: {json.dumps(omitted, sort_keys=True)}")
+            t = run.register(
+                dataset=DS_CITIES,
+                frame=_frame(rows),
+                raw_sha256s=[sha],
+                geo_scheme=GEO_SCHEME,
+                rights=RIGHTS,
+                coverage_note=f"GeoNames cities15000: {len(places)} populated places "
+                "('population > 15000 or capitals'), values as declared, undated (retrieval snapshot); "
+                f"omitted cells: {json.dumps(omitted, sort_keys=True)}",
+            )
             summary["tables"][DS_CITIES] = _table_summary(t)
             summary["omitted_cells"] = omitted
         if run.wants(DS_COUNTRY):
-            t = run.register(dataset=DS_COUNTRY, frame=_frame(country_rows(places, raw_sha256=sha,
-                             retrieved_at=cities_raw.retrieved_at)), raw_sha256s=[sha], geo_scheme=GEO_SCHEME,
-                             rights=RIGHTS, coverage_note="exact per-country counts/selections from cities15000 "
-                             "(places > 15000, largest place, PPLC places; several PPLC all listed)")
+            t = run.register(
+                dataset=DS_COUNTRY,
+                frame=_frame(country_rows(places, raw_sha256=sha, retrieved_at=cities_raw.retrieved_at)),
+                raw_sha256s=[sha],
+                geo_scheme=GEO_SCHEME,
+                rights=RIGHTS,
+                coverage_note="exact per-country counts/selections from cities15000 "
+                "(places > 15000, largest place, PPLC places; several PPLC all listed)",
+            )
             summary["tables"][DS_COUNTRY] = _table_summary(t)
         if _wants_names(run):
-            alt = await run.get(URL_ALTNAMES, key="alternateNamesV2", media_types=("application/zip",),
-                                max_bytes=MAX_ALTNAMES_BYTES)
+            alt = await run.get(
+                URL_ALTNAMES, key="alternateNamesV2", media_types=("application/zip",), max_bytes=MAX_ALTNAMES_BYTES
+            )
             alt_sha = run.archive(alt)
             country_of = {p.geonameid: p.country for p in places}
             found = list(iter_altnames(alt.body, set(country_of)))
             totals = Counter((a.geonameid, a.lang) for a in found)
             kept, dropped = bounded_names(found)
             del alt
-            t = run.register(dataset=DS_NAMES, frame=_frame(name_rows(kept, country_of, raw_sha256=alt_sha,
-                             retrieved_at=cities_raw.retrieved_at, totals=totals)), raw_sha256s=[alt_sha],
-                             geo_scheme=GEO_SCHEME, rights=RIGHTS,
-                             coverage_note=f"fr/en alternate names of the cities15000 places, at most "
-                             f"{MAX_NAMES_PER_LANG} per place and language ({dropped} further names not kept)")
+            t = run.register(
+                dataset=DS_NAMES,
+                frame=_frame(
+                    name_rows(kept, country_of, raw_sha256=alt_sha, retrieved_at=cities_raw.retrieved_at, totals=totals)
+                ),
+                raw_sha256s=[alt_sha],
+                geo_scheme=GEO_SCHEME,
+                rights=RIGHTS,
+                coverage_note=f"fr/en alternate names of the cities15000 places, at most "
+                f"{MAX_NAMES_PER_LANG} per place and language ({dropped} further names not kept)",
+            )
             summary["tables"][DS_NAMES] = _table_summary(t)
-            summary["names"] = {"found": len(found), "kept": len(kept), "dropped_over_bound": dropped,
-                                "places_with_fr": len({a.geonameid for a in kept if a.lang == "fr"}),
-                                "places_with_en": len({a.geonameid for a in kept if a.lang == "en"})}
+            summary["names"] = {
+                "found": len(found),
+                "kept": len(kept),
+                "dropped_over_bound": dropped,
+                "places_with_fr": len({a.geonameid for a in kept if a.lang == "fr"}),
+                "places_with_en": len({a.geonameid for a in kept if a.lang == "en"}),
+            }
     if places and cities_raw is not None and admin_raw is not None:
         summary["kg"] = load_geonames_kg(
-            run.engine, run.store, places, admin, retrieved_at=cities_raw.retrieved_at, origin=run.origin,
-            cities_sha=summary["cities_raw_sha256"], admin_sha=summary["admin1_raw_sha256"],
+            run.engine,
+            run.store,
+            places,
+            admin,
+            retrieved_at=cities_raw.retrieved_at,
+            origin=run.origin,
+            cities_sha=summary["cities_raw_sha256"],
+            admin_sha=summary["admin1_raw_sha256"],
         )
     return summary
 
@@ -795,8 +923,14 @@ def geonames_statements(
     rev = cities_sha[:16]
 
     def ref(p: Place, extra: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
-        r = {"source": "GeoNames cities15000.txt", "url": URL_CITIES, "line": p.line, "raw_sha256": cities_sha,
-             "retrieved_at": retrieved_at.isoformat(), "licence": RIGHTS["licence"]}
+        r = {
+            "source": "GeoNames cities15000.txt",
+            "url": URL_CITIES,
+            "line": p.line,
+            "raw_sha256": cities_sha,
+            "retrieved_at": retrieved_at.isoformat(),
+            "licence": RIGHTS["licence"],
+        }
         return [{**r, **(extra or {})}]
 
     for p in places:
@@ -806,40 +940,86 @@ def geonames_statements(
             continue
         qid, wd_sid = m
         info["places_mapped"] += 1
-        quals = {"geonameid": p.geonameid, "feature_code": p.feature_code,
-                 "subject_mapped_via": {"property": "P1566", "wikidata_statement_id": wd_sid}}
+        quals = {
+            "geonameid": p.geonameid,
+            "feature_code": p.feature_code,
+            "subject_mapped_via": {"property": "P1566", "wikidata_statement_id": wd_sid},
+        }
         iso3 = _geo_iso3(p.country)
         cq = country_qids.get(iso3 or "")
 
-        def st(pid: str, *, obj: str | None = None, value: Mapping[str, Any] | None = None,
-               q: Mapping[str, Any] | None = None, refs: list[dict[str, Any]] | None = None,
-               p: Place = p, qid: str = qid, quals: Mapping[str, Any] = quals) -> None:
-            sts.append(KgStatement(subject_qid=qid, property_pid=pid, object_qid=obj, value=value,
-                                   qualifiers={**quals, **(q or {})}, references=refs or ref(p),
-                                   source_key=SOURCE_KEY, source_revision=rev,
-                                   statement_id=f"geonames:{p.geonameid}:{pid}", raw_sha256=cities_sha))
+        def st(
+            pid: str,
+            *,
+            obj: str | None = None,
+            value: Mapping[str, Any] | None = None,
+            q: Mapping[str, Any] | None = None,
+            refs: list[dict[str, Any]] | None = None,
+            p: Place = p,
+            qid: str = qid,
+            quals: Mapping[str, Any] = quals,
+        ) -> None:
+            sts.append(
+                KgStatement(
+                    subject_qid=qid,
+                    property_pid=pid,
+                    object_qid=obj,
+                    value=value,
+                    qualifiers={**quals, **(q or {})},
+                    references=refs or ref(p),
+                    source_key=SOURCE_KEY,
+                    source_revision=rev,
+                    statement_id=f"geonames:{p.geonameid}:{pid}",
+                    raw_sha256=cities_sha,
+                )
+            )
             info[f"statements_{pid}"] += 1
 
         if cq:
             st("P17", obj=cq, q={"country_code": p.country, "country_iso3": iso3})
             if p.feature_code == "PPLC":
-                st("P1376", obj=cq, q={"country_code": p.country, "country_iso3": iso3,
-                                       "basis": "GeoNames feature code PPLC (capital of a political entity)"})
+                st(
+                    "P1376",
+                    obj=cq,
+                    q={
+                        "country_code": p.country,
+                        "country_iso3": iso3,
+                        "basis": "GeoNames feature code PPLC (capital of a political entity)",
+                    },
+                )
         else:
             info["country_qid_missing"] += 1
         if p.population > 0:
-            st("P1082", value={"type": "quantity", "amount": str(p.population), "unit": None},
-               q={"geonames_modification_date": p.cells["modification date"],
-                  "date_note": "GeoNames states no date for its population figure"})
+            st(
+                "P1082",
+                value={"type": "quantity", "amount": str(p.population), "unit": None},
+                q={
+                    "geonames_modification_date": p.cells["modification date"],
+                    "date_note": "GeoNames states no date for its population figure",
+                },
+            )
         key = p.admin1_key
         div = a1.get(key) if key else None
         if div is not None:
             dm = gn_qids.get(div.geonameid)
             if dm is not None:
-                st("P131", obj=dm[0], q={"admin1_code": div.code, "admin1_geonameid": div.geonameid,
-                                         "object_mapped_via": {"property": "P1566", "wikidata_statement_id": dm[1]}},
-                   refs=ref(p, {"admin1_file": "admin1CodesASCII.txt", "admin1_line": div.line,
-                                "admin1_raw_sha256": admin_sha}))
+                st(
+                    "P131",
+                    obj=dm[0],
+                    q={
+                        "admin1_code": div.code,
+                        "admin1_geonameid": div.geonameid,
+                        "object_mapped_via": {"property": "P1566", "wikidata_statement_id": dm[1]},
+                    },
+                    refs=ref(
+                        p,
+                        {
+                            "admin1_file": "admin1CodesASCII.txt",
+                            "admin1_line": div.line,
+                            "admin1_raw_sha256": admin_sha,
+                        },
+                    ),
+                )
             else:
                 info["admin1_unmapped"] += 1
     return sts, dict(info)
@@ -864,25 +1044,41 @@ def load_geonames_kg(
 
     try:
         gn_qids, ambiguous = geonames_qid_map(engine, origin)
-    except Exception as e:  # noqa: BLE001 - a database without the kg schema: report, never fail the atlas run
+    except Exception as e:  # a database without the kg schema: report, never fail the atlas run
         return {"loaded": False, "blocked": f"KG not readable ({type(e).__name__})"}
     if not gn_qids:
-        return {"loaded": False, "blocked": "no Wikidata P1566 (GeoNames ID) statements in the KG yet: run "
-                "'python -m reva.adapters.connectors.atlas_cities wikidata --db <db>'"}
+        return {
+            "loaded": False,
+            "blocked": "no Wikidata P1566 (GeoNames ID) statements in the KG yet: run "
+            "'python -m reva.adapters.connectors.atlas_cities wikidata --db <db>'",
+        }
     cq = dict(country_qids) if country_qids is not None else load_country_qids()
     for pid in ("P17", "P1376", "P131", "P1082"):
         ensure_kg_property(engine, pid)
-    sts, info = geonames_statements(places, admin1, gn_qids, cq, cities_sha=cities_sha, admin_sha=admin_sha,
-                                    retrieved_at=retrieved_at)
+    sts, info = geonames_statements(
+        places, admin1, gn_qids, cq, cities_sha=cities_sha, admin_sha=admin_sha, retrieved_at=retrieved_at
+    )
     reports = []
     for i in range(0, len(sts), MAX_STATEMENTS_PER_BATCH):
-        rep = load_batch(engine, store, statements=sts[i:i + MAX_STATEMENTS_PER_BATCH], source_key=SOURCE_KEY,
-                         raw_sha256s=[cities_sha, admin_sha], retrieved_at=retrieved_at, origin=origin,
-                         parameters={"connector": CONNECTOR_NAME, "mapping": "Wikidata P1566 (unique holder)"})
+        rep = load_batch(
+            engine,
+            store,
+            statements=sts[i : i + MAX_STATEMENTS_PER_BATCH],
+            source_key=SOURCE_KEY,
+            raw_sha256s=[cities_sha, admin_sha],
+            retrieved_at=retrieved_at,
+            origin=origin,
+            parameters={"connector": CONNECTOR_NAME, "mapping": "Wikidata P1566 (unique holder)"},
+        )
         reports.append(rep.as_dict())
-    out: dict[str, Any] = {"loaded": True, **info, "ambiguous_geonameids": len(ambiguous),
-                           "ambiguous_sample": dict(list(sorted(ambiguous.items()))[:20]),
-                           "statements": len(sts), "reports": [_short_report(r) for r in reports]}
+    out: dict[str, Any] = {
+        "loaded": True,
+        **info,
+        "ambiguous_geonameids": len(ambiguous),
+        "ambiguous_sample": dict(list(sorted(ambiguous.items()))[:20]),
+        "statements": len(sts),
+        "reports": [_short_report(r) for r in reports],
+    }
     if not cq:
         out["blocked_country_statements"] = "registry/entities/country_qids.json (ISO3 -> QID) not available"
     return out
@@ -897,6 +1093,20 @@ def _load_spec(path: Path) -> Any:
     from reva.kg.harvest import load_spec
 
     return load_spec(path)
+
+
+def priority_ids(places: Sequence[Place], admin1: Sequence[Admin1]) -> list[str]:
+    """GeoNames ids in mapping priority: capitals and seats of government, admin-1 divisions, seats of
+    first-order divisions, then every other place by declared population (largest first)."""
+    rank = {"PPLC": 0, "PPLG": 0, "PPLA": 2}
+    first = [p.geonameid for p in places if rank.get(p.feature_code) == 0]
+    seats = [p.geonameid for p in places if rank.get(p.feature_code) == 2]
+    rest = [
+        p.geonameid
+        for p in sorted(places, key=lambda p: (-p.population, int(p.geonameid)))
+        if p.feature_code not in rank
+    ]
+    return list(dict.fromkeys([*first, *(a.geonameid for a in admin1), *seats, *rest]))
 
 
 def ids_query(spec: Any, ids: Sequence[str]) -> str:
@@ -926,15 +1136,15 @@ async def harvest_p1566(
     spec = _load_spec(SPEC_GEONAMES_IDS)
     h = Harvester(client, sink)
     await h.probe_wdqs_as_of()
-    ids = sorted(set(geonameids), key=int)
+    ids = list(dict.fromkeys(geonameids))  # caller's priority order (a partial run maps the first ones)
     state = HarvestState(state_dir or STATE_DIR, spec.id)
     state.reset_for(spec.sha256)
     stats: Counter[str] = Counter()
     per_chunk_bound = ROWS_PER_ID_BOUND
     done = 0
     for i in range(0, len(ids), chunk_size):
-        part = ids[i:i + chunk_size]
-        key = f"ids:{part[0]}..{part[-1]}:{len(part)}"
+        part = ids[i : i + chunk_size]
+        key = f"ids:{len(part)}:{hashlib.sha256(' '.join(part).encode()).hexdigest()[:16]}"
         if key in state.data["chunks"]:
             stats["chunks_skipped_done"] += 1
             continue
@@ -942,24 +1152,39 @@ async def harvest_p1566(
             stats["chunks_left"] += 1
             continue
         bound = len(part) * per_chunk_bound
-        res = await client.sparql(with_limit(ids_query(spec, part), bound + 1),
-                                  meta={"spec": spec.id, "chunk": key, "spec_sha256": spec.sha256})
+        res = await client.sparql(
+            with_limit(ids_query(spec, part), bound + 1),
+            meta={"spec": spec.id, "chunk": key, "spec_sha256": spec.sha256},
+        )
         if len(res.bindings) > bound:
-            raise RowBoundExceeded(f"{spec.id}: chunk {key} returned more than {bound} rows", rows=len(res.bindings),
-                                   max_rows=bound)
+            raise RowBoundExceeded(
+                f"{spec.id}: chunk {key} returned more than {bound} rows", rows=len(res.bindings), max_rows=bound
+            )
         stmts, skipped = h.rows_to_statements(spec, res)
         kept = [s for s in stmts if s is not None]
         if kept:
-            sink.load(Batch(SOURCE_WDQS, [], kept, [res.raw_sha256], res.retrieved_at,
-                            {"spec": spec.id, "chunk": key, "query_sha256": res.query_sha256,
-                             "harvester": HARVEST_VERSION, "caller": CONNECTOR_NAME}))
+            sink.load(
+                Batch(
+                    SOURCE_WDQS,
+                    [],
+                    kept,
+                    [res.raw_sha256],
+                    res.retrieved_at,
+                    {
+                        "spec": spec.id,
+                        "chunk": key,
+                        "query_sha256": res.query_sha256,
+                        "harvester": HARVEST_VERSION,
+                        "caller": CONNECTOR_NAME,
+                    },
+                )
+            )
         stats["rows"] += len(res.bindings)
         stats["statements"] += len(kept)
         stats["rows_skipped"] += skipped
         stats["dropped_deprecated"] += sum(1 for s in stmts if s is None)
         done += 1
-        state.data["chunks"][key] = {"rows": len(res.bindings), "raw_sha256": res.raw_sha256,
-                                     "statements": len(kept)}
+        state.data["chunks"][key] = {"rows": len(res.bindings), "raw_sha256": res.raw_sha256, "statements": len(kept)}
         state.data["subjects"] = sorted(set(state.data.get("subjects") or []) | {s.subject for s in kept})
         state.save()
     stats["chunks_total"] = math.ceil(len(ids) / chunk_size)
@@ -973,8 +1198,10 @@ async def fetch_capitals(client: Any) -> tuple[list[dict[str, Any]], str]:
 
     spec = _load_spec(SPEC_CAPITALS)
     bound = int(spec.data["max_rows"])
-    res = await client.sparql(with_limit(str(spec.data["sparql"]), bound + 1),
-                              meta={"spec": spec.id, "chunk": "all", "spec_sha256": spec.sha256})
+    res = await client.sparql(
+        with_limit(str(spec.data["sparql"]), bound + 1),
+        meta={"spec": spec.id, "chunk": "all", "spec_sha256": spec.sha256},
+    )
     if len(res.bindings) > bound:
         raise RowBoundExceeded(f"{spec.id}: more than {bound} rows", rows=len(res.bindings), max_rows=bound)
     rows = [{k: v.get("value") for k, v in b.items()} for b in res.bindings]
@@ -1003,8 +1230,9 @@ def capital_crosscheck(places: Sequence[Place], wd_rows: Sequence[Mapping[str, A
         iso3, cap = r.get("iso3"), _q(r.get("capital"))
         if not iso3 or not cap or r.get("end"):
             continue
-        e = wd[iso3].setdefault(cap, {"qid": cap, "country_qid": _q(r.get("country")), "geonameids": set(),
-                                       "ranks": set(), "start": set()})
+        e = wd[iso3].setdefault(
+            cap, {"qid": cap, "country_qid": _q(r.get("country")), "geonameids": set(), "ranks": set(), "start": set()}
+        )
         if r.get("gn"):
             e["geonameids"].add(r["gn"])
         if r.get("rank"):
@@ -1033,11 +1261,19 @@ def capital_crosscheck(places: Sequence[Place], wd_rows: Sequence[Mapping[str, A
             out["summary"]["iso3_on_several_items"] += 1
         out["countries"][iso3] = {
             "status": status,
-            "geonames_pplc": [{"geonameid": p.geonameid, "name": p.cells["name"], "population": p.population}
-                              for p in g],
-            "wikidata_p36_current": [{"qid": c["qid"], "country_qid": c["country_qid"],
-                                      "geonameids": sorted(c["geonameids"]), "ranks": sorted(c["ranks"]),
-                                      "start": sorted(c["start"])} for c in w.values()],
+            "geonames_pplc": [
+                {"geonameid": p.geonameid, "name": p.cells["name"], "population": p.population} for p in g
+            ],
+            "wikidata_p36_current": [
+                {
+                    "qid": c["qid"],
+                    "country_qid": c["country_qid"],
+                    "geonameids": sorted(c["geonameids"]),
+                    "ranks": sorted(c["ranks"]),
+                    "start": sorted(c["start"]),
+                }
+                for c in w.values()
+            ],
         }
     out["summary"] = dict(out["summary"])
     return out
@@ -1093,22 +1329,27 @@ async def harvest_wikidata(
         allow = load_allowlist()
         sink = KgDbSink(engine, sess.store)
         sink.register_properties(allow)
-        ids = [p.geonameid for p in places] + [a.geonameid for a in admin1]
+        ids = priority_ids(places, admin1)
         out: dict[str, Any] = {"database": db_name, "run_id": sess.run_id}
-        out["p1566"] = await harvest_p1566(sess.client, sink, ids, chunk_size=chunk_size, state_dir=state_dir,
-                                           max_chunks=max_chunks)
+        out["p1566"] = await harvest_p1566(
+            sess.client, sink, ids, chunk_size=chunk_size, state_dir=state_dir, max_chunks=max_chunks
+        )
         rows, cap_sha = await fetch_capitals(sess.client)
         out["capitals"] = {"raw_sha256": cap_sha, "rows": len(rows), **capital_crosscheck(places, rows)}
         gn_qids, ambiguous = geonames_qid_map(engine, "live")
-        out["mapping"] = {"places": len(places), "places_mapped": sum(1 for p in places if p.geonameid in gn_qids),
-                          "admin1": len(admin1), "admin1_mapped": sum(1 for a in admin1 if a.geonameid in gn_qids),
-                          "ambiguous": len(ambiguous), "ambiguous_sample": dict(list(sorted(ambiguous.items()))[:30])}
+        out["mapping"] = {
+            "places": len(places),
+            "places_mapped": sum(1 for p in places if p.geonameid in gn_qids),
+            "admin1": len(admin1),
+            "admin1_mapped": sum(1 for a in admin1 if a.geonameid in gn_qids),
+            "ambiguous": len(ambiguous),
+            "ambiguous_sample": dict(list(sorted(ambiguous.items()))[:30]),
+        }
         if labels != "none":
             spec = _load_spec(SPEC_GEONAMES_IDS)
             if labels == "capitals":
                 todo = {gn_qids[p.geonameid][0] for p in places if p.feature_code == "PPLC" and p.geonameid in gn_qids}
-                todo |= {c["qid"] for v in out["capitals"]["countries"].values()
-                         for c in v["wikidata_p36_current"]}
+                todo |= {c["qid"] for v in out["capitals"]["countries"].values() for c in v["wikidata_p36_current"]}
             else:
                 todo = {q for q, _ in gn_qids.values()}
             known = sink.known_entities(sorted(todo))
@@ -1116,11 +1357,23 @@ async def harvest_wikidata(
             state.reset_for(spec.sha256)
             rep = SpecReport(spec.id, "statements")
             await Harvester(sess.client, sink, allow=allow).fetch_entities(
-                spec, sorted(q for q in todo if q not in known), state, rep, full=False, kind="city")
-            out["labels"] = {"requested": len(todo), "already_known": len(known), **{k: rep.as_dict()[k] for k in
-                             ("entities_labels", "statements", "failures")}}
-        out["kg"] = load_geonames_kg(engine, atlas_store, places, admin1, retrieved_at=got_c[2], origin="live",
-                                     cities_sha=got_c[1], admin_sha=got_a[1])
+                spec, sorted(q for q in todo if q not in known), state, rep, full=False, kind="city"
+            )
+            out["labels"] = {
+                "requested": len(todo),
+                "already_known": len(known),
+                **{k: rep.as_dict()[k] for k in ("entities_labels", "statements", "failures")},
+            }
+        out["kg"] = load_geonames_kg(
+            engine,
+            atlas_store,
+            places,
+            admin1,
+            retrieved_at=got_c[2],
+            origin="live",
+            cities_sha=got_c[1],
+            admin_sha=got_a[1],
+        )
         out["client"] = sess.client.stats.as_dict()
     out["budget"] = sess.usage.get("budget")
     if report_path is not None:
@@ -1152,15 +1405,29 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
     settings = harvest_settings(args.db)
     store = FilesystemArtifactStore(args.atlas_object_root, settings.reva_s3_prefix)
     try:
-        out = asyncio.run(harvest_wikidata(db_name=args.db, atlas_store=store, labels=args.labels,
-                                           max_chunks=args.max_chunks, chunk_size=args.chunk_size,
-                                           state_dir=args.state_dir, report_path=args.report))
+        out = asyncio.run(
+            harvest_wikidata(
+                db_name=args.db,
+                atlas_store=store,
+                labels=args.labels,
+                max_chunks=args.max_chunks,
+                chunk_size=args.chunk_size,
+                state_dir=args.state_dir,
+                report_path=args.report,
+            )
+        )
     except BudgetExhausted as e:
         print(json.dumps({"status": "budget_exhausted", "message": e.message, **e.details}, default=str))
         return 3
     caps = out.get("capitals", {})
-    print(json.dumps({k: v for k, v in out.items() if k != "capitals"} | {"capitals_summary": caps.get("summary")},
-                     indent=1, default=str, ensure_ascii=False))
+    print(
+        json.dumps(
+            {k: v for k, v in out.items() if k != "capitals"} | {"capitals_summary": caps.get("summary")},
+            indent=1,
+            default=str,
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 
