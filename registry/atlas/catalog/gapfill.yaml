@@ -642,3 +642,32 @@ concepts:
   - cbs.bes_labour.net_labour_participation_rate|sex=total|age=15-74
   provider_declared: true
   notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.statsjersey.mean_monthly_earnings_fte
+  labels:
+    fr: Salaire mensuel moyen, équivalent temps plein (Statistics Jersey)
+    en: Mean monthly earnings, full-time equivalent (Statistics Jersey)
+  definition: 'Statistics Jersey: mean monthly earnings on a full-time equivalency basis, all sectors (''Overall'').'
+  unit: GBP per month (full-time equivalent)
+  domain: gapfill
+  subdomain: statsjersey
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - statsjersey.earnings.mean_monthly_earnings_fte|sector=Overall
+  provider_declared: true
+  notes: Statistics Jersey 'Earnings by sector' (payroll data), monthly cells from January 2022. FTE basis (not the ILOSTAT
+    mean earnings of all employees).
+- id: gapfill.statsjersey.median_monthly_earnings_fte
+  labels:
+    fr: Salaire mensuel médian, équivalent temps plein (Statistics Jersey)
+    en: Median monthly earnings, full-time equivalent (Statistics Jersey)
+  definition: 'Statistics Jersey: median monthly earnings on a full-time equivalency basis, all sectors (''Overall'').'
+  unit: GBP per month (full-time equivalent)
+  domain: gapfill
+  subdomain: statsjersey
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - statsjersey.earnings.median_monthly_earnings_fte|sector=Overall
+  provider_declared: true
+  notes: Statistics Jersey 'Earnings by sector' (payroll data), monthly cells from January 2022.

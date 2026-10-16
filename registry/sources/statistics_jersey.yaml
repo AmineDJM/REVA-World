@@ -1,0 +1,19 @@
+# V3 (agent GAPHUNT): Statistics Jersey datasets on the Government of Jersey open-data portal (CKAN).
+# Atlas connector: src/reva/adapters/connectors/atlas_gap_jersey.py (atlas.gap_jersey -> statsjersey.earnings).
+source_key: statistics_jersey.opendata
+title: "Statistics Jersey - Government of Jersey open data portal"
+provider_url: https://opendata.gov.je/
+lineage_family: statistics_jersey
+rights:
+  licence: "Open Government Licence - Jersey v1.0 (OGL-J-1.0)"
+  licence_url: https://www.gov.je/ServiceManual/opendata/Pages/open-government-licence-jersey-ogl-j-v1-0.aspx
+  attribution: "Statistics Jersey"
+  provider_statement: "CKAN package 'earnings-in-jersey': license_id OGL-J-1.0, license_title 'Open Government Licence – Jersey v1.0' (read 2026-10-16)"
+metadata:
+  allowed_hosts: [opendata.gov.je]
+  endpoints:
+    earnings_by_sector: "https://opendata.gov.je/dataset/8a23152e-e04a-4d43-9081-06817e8d881d/resource/47246565-a300-4d7c-b273-4eb55be82615/download/earnings_by_sector.csv"
+    package_api: "https://opendata.gov.je/api/3/action/package_show?id=<name>"
+  authentication: none
+  cadence: annual release of monthly figures
+  coverage: "Jersey (JEY)"

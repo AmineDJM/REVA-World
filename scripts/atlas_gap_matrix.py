@@ -133,7 +133,7 @@ CONCEPTS: dict[str, dict[str, Any]] = {
         "en": "Average wage",
         "fr": "Salaire moyen",
         "headline": ["reva.labour.average_monthly_earnings_lcu"],
-        "other": ["oecd.earnings_av_an_wage.*", "ilostat.ear_emtm_sex_cur_nb_a.*"],
+        "other": ["oecd.earnings_av_an_wage.*", "ilostat.ear_emtm_sex_cur_nb_a.*", "statsjersey.earnings.*"],
     },
     "life_expectancy": {
         "en": "Life expectancy",

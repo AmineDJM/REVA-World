@@ -135,15 +135,44 @@ def window(start: str | None, end: str | None, *, include_undated: bool = True) 
             raise ValidationProblem("time bound outside the supported date range", value=v[:32])
         out.append(b[side])
     w = TimeWindow(out[0], out[1], include_undated)
-    if w.lo and w.hi and _date_key(w.lo) > _date_key(w.hi):
+    if w.lo and w.hi and date_key(w.lo) > date_key(w.hi):
         raise ValidationProblem("time window start is after its end")
     return w
 
 
-def _date_key(pg: str) -> tuple[int, int, int]:
-    bc = pg.endswith(" BC")
-    y, m, d = (int(x) for x in pg.removesuffix(" BC").split("-"))
-    return (1 - y if bc else y, m, d)
+# ---------------------------------------------------------------------------------------------- dates
+# ``kg.statement`` keeps its derived bounds as SQL ``date``s, which reach back to 4713 BCE. psycopg loads a
+# ``date`` into ``datetime.date`` and cannot represent years before 1 ("date too small"), so no query here
+# selects a ``date`` column: it renders it with :func:`_date_sql` (DateStyle-independent text with an era
+# marker) and Python turns that into an astronomical ISO string with :func:`astro_iso`. Range filtering and
+# ordering stay in SQL on the ``date`` values themselves, which handle BCE dates correctly.
+_PG_DATE_RE = re.compile(r"^([0-9]{4,7})-([0-9]{2})-([0-9]{2})(?: (AD|BC))?$")
+
+
+def _date_sql(expr: str, alias: str) -> str:
+    """``SELECT`` item rendering a SQL ``date`` as ``YYYY-MM-DD AD|BC`` (``to_char``: independent of DateStyle)."""
+    return f"to_char({expr}, 'YYYY-MM-DD BC') AS {alias}"
+
+
+def date_key(pg: str) -> tuple[int, int, int]:
+    """(astronomical year, month, day) of a PostgreSQL date literal (``0044-03-15 BC``, ``1975-01-01`` or
+    ``1975-01-01 AD``): the one sort key for dates read from or sent to SQL (year 0 = 1 BCE)."""
+    mt = _PG_DATE_RE.match(pg.strip())
+    if not mt:
+        raise ValueError(f"not a PostgreSQL date literal: {pg[:32]!r}")
+    y = int(mt.group(1))
+    return (1 - y if mt.group(4) == "BC" else y, int(mt.group(2)), int(mt.group(3)))
+
+
+def astro_iso(pg: str | None) -> str | None:
+    """ISO 8601 text of a PostgreSQL date literal in astronomical year numbering, rendered like the atlas
+    (``reva.atlas.tables.period_text``): ``0044-03-15 BC`` -> ``-0043-03-15``, ``0001-01-01 BC`` ->
+    ``0000-01-01``, years above 9999 with a ``+`` sign."""
+    if pg is None:
+        return None
+    y, m, d = date_key(pg)
+    year = f"-{-y:04d}" if y < 0 else (f"+{y}" if y > 9999 else f"{y:04d}")
+    return f"{year}-{m:02d}-{d:02d}"
 
 
 def _check_qid(q: str) -> str:
@@ -279,17 +308,19 @@ def _statement_out(
         "end": _time_out(r["end_time"], r["end_precision"]),
         "point_in_time": _time_out(r["pit_time"], r["pit_precision"]),
         "time_calendars": r["time_calendars"],
-        "valid_from": r["valid_lo"].isoformat() if r["valid_lo"] else None,
-        "valid_to": r["valid_hi"].isoformat() if r["valid_hi"] else None,
+        "valid_from": astro_iso(r["valid_lo"]),
+        "valid_to": astro_iso(r["valid_hi"]),
         "qualifiers": r["qualifiers"],
         "provenance": _provenance(r),
     }
 
 
-_ST_SELECT = """s.id, s.statement_key, s.statement_id, s.origin, s.subject_qid, s.property_pid, s.object_qid, s.value,
-  s.start_time, s.start_precision, s.end_time, s.end_precision, s.pit_time, s.pit_precision, s.time_calendars,
-  s.valid_lo, s.valid_hi, s.value_time_lo, s.value_time_hi, s.qualifiers, s.rank, s.refs, s.source_key,
-  s.source_revision, s.raw_sha256, s.retrieved_at, s.recorded_at, s.load_id"""
+#: Statement columns; the derived ``date`` bounds come back as ``YYYY-MM-DD AD|BC`` text (see :func:`_date_sql`).
+_ST_SELECT = f"""s.id, s.statement_key, s.statement_id, s.origin, s.subject_qid, s.property_pid, s.object_qid,
+  s.value, s.start_time, s.start_precision, s.end_time, s.end_precision, s.pit_time, s.pit_precision,
+  s.time_calendars, {_date_sql("s.valid_lo", "valid_lo")}, {_date_sql("s.valid_hi", "valid_hi")},
+  {_date_sql("s.value_time_lo", "value_time_lo")}, {_date_sql("s.value_time_hi", "value_time_hi")}, s.qualifiers,
+  s.rank, s.refs, s.source_key, s.source_revision, s.raw_sha256, s.retrieved_at, s.recorded_at, s.load_id"""
 
 
 # ---------------------------------------------------------------------------------------------- entity
@@ -471,15 +502,17 @@ def timeline(
         )
         tparams = {"w_lo": time_window.lo, "w_hi": time_window.hi}
     who = "(s.subject_qid = :q OR s.object_qid = :q)" if include_incoming else "s.subject_qid = :q"
+    # ordered in SQL on the date itself (correct across the era boundary); only rendered as text
+    sort_sql = "COALESCE(s.valid_lo, s.value_time_lo, s.valid_hi)"
     rows = [
         dict(r)
         for r in conn.execute(
-            text(f"""SELECT {_ST_SELECT}, COALESCE(s.valid_lo, s.value_time_lo, s.valid_hi) AS sort_date
+            text(f"""SELECT {_ST_SELECT}, {_date_sql(sort_sql, "sort_date")}
                        FROM kg.statement_current s
                       WHERE {who}
                         AND (s.valid_lo IS NOT NULL OR s.valid_hi IS NOT NULL OR s.value_time_lo IS NOT NULL)
                         {tsql}{_origin_sql(origin)}
-                      ORDER BY sort_date, s.id LIMIT :lim"""),
+                      ORDER BY {sort_sql}, s.id LIMIT :lim"""),
             {"q": qid, "lim": limit + 1, "origin": origin, **tparams},
         ).mappings()
     ]
@@ -493,7 +526,7 @@ def timeline(
     for r in rows:
         e = _statement_out(r, labels, props, kinds)
         e["direction"] = "out" if r["subject_qid"] == qid else "in"
-        e["sort_date"] = r["sort_date"].isoformat() if r["sort_date"] else None
+        e["sort_date"] = astro_iso(r["sort_date"])
         e["dated_by"] = "validity_qualifiers" if (r["valid_lo"] or r["valid_hi"]) else "time_value"
         events.append(e)
     return {
@@ -948,7 +981,12 @@ def _finish(
     result["from_label"] = _display(result["from"], labels)
     result["to_label"] = _display(result["to"], labels)
     d = dict(diag.__dict__)
-    d["time_window"] = None if diag.time_window is None else diag.time_window.__dict__
+    tw = diag.time_window
+    d["time_window"] = (
+        None
+        if tw is None
+        else {"lo": astro_iso(tw.lo), "hi": astro_iso(tw.hi), "include_undated": tw.include_undated}
+    )
     d["hubs_skipped"] = [
         {"qid": q, "label": _display(q, labels), "degree_at_least": n} for q, n in list(diag.hubs_skipped.items())[:50]
     ]

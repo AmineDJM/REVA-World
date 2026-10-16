@@ -19,6 +19,11 @@ requests:
     daily_requests: 12
     expected_bytes_per_day: 1000000
     reason: "CBS StatLine OData: 4 requests (~0.1 MB) per monthly run, two retries"
+  - source_key: statistics_jersey.opendata
+    # atlas.gap_jersey: 1 CSV (35 kB), measured 2026-10-16.
+    daily_requests: 3
+    expected_bytes_per_day: 200000
+    reason: "Statistics Jersey open data: 1 request (~35 kB) per monthly run, two retries"
 daily_totals_increase:
-  http_requests_total: "+30"
+  http_requests_total: "+33"
   http_bytes_total: "+12_000_000"

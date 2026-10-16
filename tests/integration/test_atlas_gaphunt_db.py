@@ -12,7 +12,13 @@ import polars as pl
 import pytest
 from sqlalchemy import text
 
-from reva.adapters.connectors import atlas_gap_cbs_bes, atlas_gap_eurostat_nuts, atlas_gap_insee, atlas_gap_spc
+from reva.adapters.connectors import (
+    atlas_gap_cbs_bes,
+    atlas_gap_eurostat_nuts,
+    atlas_gap_insee,
+    atlas_gap_jersey,
+    atlas_gap_spc,
+)
 from reva.atlas.ingest import run_atlas_ingest
 from reva.atlas.sources import ensure_registered, get_source
 from reva.atlas.tables import read_atlas_table
@@ -28,6 +34,7 @@ EXPECTED = {
     atlas_gap_eurostat_nuts.NAME: (7, {"atlas.eurostat.nuts2_gapfill"}, {"GLP", "MTQ", "GUF", "REU", "MYT", "ALA", "SJM"}),
     atlas_gap_insee.NAME: (2, {"atlas.insee.ipc_dom", "atlas.insee.smic_dom"}, {"GLP", "MTQ", "GUF", "REU", "MYT"}),
     atlas_gap_cbs_bes.NAME: (4, {"atlas.cbs.bes_population", "atlas.cbs.bes_gdp", "atlas.cbs.bes_labour"}, {"BES"}),
+    atlas_gap_jersey.NAME: (1, {"atlas.statsjersey.earnings"}, {"JEY"}),
 }
 
 

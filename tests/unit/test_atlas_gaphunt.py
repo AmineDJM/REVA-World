@@ -14,7 +14,13 @@ from typing import Any
 import pytest
 import yaml
 
-from reva.adapters.connectors import atlas_gap_cbs_bes, atlas_gap_eurostat_nuts, atlas_gap_insee, atlas_gap_spc
+from reva.adapters.connectors import (
+    atlas_gap_cbs_bes,
+    atlas_gap_eurostat_nuts,
+    atlas_gap_insee,
+    atlas_gap_jersey,
+    atlas_gap_spc,
+)
 from reva.adapters.connectors.atlas_gap_common import Fetched, strict_decimal
 from reva.atlas.ingest import AtlasRun
 from reva.atlas.sources import atlas_sources
@@ -23,7 +29,7 @@ from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError, ValidationProblem
 
 REPO = Path(__file__).resolve().parents[2]
-MODULES = (atlas_gap_spc, atlas_gap_eurostat_nuts, atlas_gap_insee, atlas_gap_cbs_bes)
+MODULES = (atlas_gap_spc, atlas_gap_eurostat_nuts, atlas_gap_insee, atlas_gap_cbs_bes, atlas_gap_jersey)
 
 
 def _fetch(mod: Any) -> dict[str, Fetched]:
@@ -71,7 +77,7 @@ def test_sources_and_budget_requests_are_declared() -> None:
         assert m.atlas_source().source_key in keys
     req = yaml.safe_load((REPO / "registry/atlas/budget_requests/gaphunt.yaml").read_text())
     asked = {r["source_key"] for r in req["requests"]}
-    assert asked == {"spc.pdh_stat", "insee.bdm", "cbs.opendata"}
+    assert asked == {"spc.pdh_stat", "insee.bdm", "cbs.opendata", "statistics_jersey.opendata"}
     for r in req["requests"]:
         mod = next(m for m in MODULES if m.atlas_source().source_key == r["source_key"])
         assert r["daily_requests"] >= 2 * mod.atlas_source().planned_requests
@@ -185,6 +191,20 @@ def test_cbs_caribbean_netherlands_maps_total_and_keeps_islands_unmapped() -> No
     assert set(gdp["unit"]) == {"million USD"}
     une = t["bes_labour"].filter(t["bes_labour"]["indicator"].str.starts_with("unemployment_rate"))
     assert une.height > 0 and "0" not in set(une["value"])  # empty survey cells are never zeros
+
+
+# ------------------------------------------------------------------------------------------- Jersey
+def test_jersey_monthly_fte_earnings() -> None:
+    f = _tables(atlas_gap_jersey)["earnings"]
+    assert set(f["iso3"].unique()) == {"JEY"}
+    mean = f.filter(f["indicator"] == "mean_monthly_earnings_fte|sector=Overall")
+    assert mean.height >= 12 and set(mean["unit"]) == {"GBP per month (full-time equivalent)"}
+    assert all((r["period_end"] - r["period_start"]).days <= 31 for r in mean.iter_rows(named=True))  # monthly, never annualised
+
+
+def test_jersey_refuses_changed_columns() -> None:
+    with pytest.raises(SourceResponseError):
+        atlas_gap_jersey.parse_earnings(Fetched(b"Year,Month,Sector,Mean\n2022,1,Overall,1\n", "0" * 64, "u", "t"))
 
 
 # ------------------------------------------------------------------------------------------- helpers
