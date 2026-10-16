@@ -11,9 +11,9 @@ client: first `build_client`, then `harvest.budgeted_client` once WDHARVEST made
 |---|---|
 | `registry/kg/queries/history/*.yaml` | 16 query specs (11 `seed_entities`, 5 `statements`). All pass `python -m reva.kg.harvest validate`. Total declared bound: 209,000 rows. |
 | `registry/kg/anchor_chains.yaml` | 20 anchor chains with typed hop constraints, waypoints and 80 expected facts. These are the acceptance tests for the path engine. Also holds 104 entities whose QIDs were looked up, never typed from memory. |
-| `registry/kg/queries/history/_recorded/` | Recorded Wikidata evidence: 1 WDQS label lookup (raw), 2 WDQS count queries (raw), 3 `wbgetentities` title lookups (raw), and 4 claim snapshots for 266 entities. The snapshots are reduced to history properties, keep their statement ids and revision ids, and their raw responses (23.7 MB) are archived in `var/kg/objects`. |
+| `registry/kg/queries/history/_recorded/` | Recorded Wikidata evidence: 1 WDQS label lookup (raw), 1 WDQS count query (raw), 3 `wbgetentities` title lookups (raw), and 4 claim snapshots for 266 entities. The snapshots are reduced to history properties, keep their statement ids and revision ids, and their raw responses (23.7 MB) are archived in `var/kg/objects`. |
 | `registry/kg/property_requests/KGHIST.yaml` | P945 (allegiance) and P137 (operator). WDHARVEST has merged both into the allow-list. |
-| `tests/unit/test_kg_queries_history.py` | 34 offline tests (see §5). |
+| `tests/unit/test_kg_queries_history.py` | 35 offline tests (see §5). |
 
 ## 2. How Wikidata models colonial history (findings, with evidence)
 
@@ -45,7 +45,13 @@ All examples below come from the recorded snapshots.
 
 ## 3. Query specs and expected sizes
 
-The WDQS sizes come from two recorded COUNT queries (`_recorded/wdqs_counts_1.*`, `wdqs_counts_2.*`). Count 1 used the truthy pattern, so its values are **lower bounds**; count 2 is rank-aware. If count 2 is missing, it did not complete in this session. "unmeasured" means WDQS was too throttled to measure (see §6). Bounds are set with margin. A spec that exceeds its bound fails with `row_bound_exceeded`; nothing is truncated.
+The WDQS sizes come from one recorded COUNT query (`_recorded/wdqs_counts_1.*`, 2026-10-16). It used the truthy
+`wdt:P31/wdt:P279*` pattern, so its values are **lower bounds** for the rank-aware specs. A second, rank-aware COUNT
+over nine classes in one request **timed out at 60 s** (`QueryTimeout`, not retried). Per-spec run times of the
+rank-aware class specs are therefore unmeasured. If one of them times out, WDHARVEST can split it by root class or run it
+`--via api`: CirrusSearch indexes every non-deprecated statement, which is exactly the rank-aware semantics. "unmeasured"
+means WDQS was too throttled to measure (see §6). Bounds are set with margin. A spec that exceeds its bound fails
+with `row_bound_exceeded`; nothing is truncated.
 
 | Spec | Purpose | Selection | Split | Measured | `max_rows` |
 |---|---|---|---|---|---|
@@ -125,7 +131,7 @@ How to read the witnesses:
 
 Without (3), the shortest Columbus ↔ Portuguese path is a trivial shared-language or `languages spoken` hop.
 
-## 5. Tests (`tests/unit/test_kg_queries_history.py`, offline, 34 tests)
+## 5. Tests (`tests/unit/test_kg_queries_history.py`, offline, 35 tests)
 
 * Every spec validates against WDHARVEST's schema and allow-list, is owned by KGHIST, and stays bounded (≤ 150k per spec, ≤ 400k total). Statement specs keep the statement id and filter deprecated rows. Class specs use rank-aware P31.
 * Recording integrity: the sha256 of every committed raw body, the query text against its sha256, and snapshot provenance (archive sha256, `lastrevid`, statement-id prefix, rank).
@@ -149,7 +155,7 @@ QID corrections found by lookup:
 
 ## 6. Limits and honest notes
 
-* **WDQS was heavily throttled** (machine-wide 429s with 900–1,000 s Retry-After) throughout. KGHIST obtained 3 WDQS responses: the label lookup and two counts. A count query waited 34 minutes in the lock queue. Membership and hop evidence therefore comes from `wbgetentities` snapshots (Wikibase API) plus an offline re-application of each spec's selection rule, not from LIMITed runs of each spec. The specs' SPARQL has passed validation but has **not** been executed in full. Counts for the statement specs and the fan-out specs are unmeasured.
+* **WDQS was heavily throttled** (machine-wide 429s with 900–1,000 s Retry-After) throughout. KGHIST obtained 2 WDQS responses: the label lookup and one count. That count waited 34 minutes in the lock queue; a third request (the rank-aware count) timed out. Membership and hop evidence therefore comes from `wbgetentities` snapshots (Wikibase API) plus an offline re-application of each spec's selection rule, not from LIMITed runs of each spec. The specs' SPARQL has passed validation but has **not** been executed in full. Counts for the statement specs and the fan-out specs are unmeasured.
 * One exploratory label lookup (`label_lookup_1`) and one early probe went through the pre-budget `build_client`. The probe was cancelled before it ran, after WDHARVEST introduced `budgeted_client`. All later traffic was metered.
 * The snapshots keep all non-deprecated ranks, matching the rank-aware specs. Values are compacted: entity id, time string, amount or text.
 * The scratch helpers (recorder, path-search prototype, count script) live in the session scratchpad, not in the repo.

@@ -420,3 +420,26 @@ def test_altnames_real_excerpt(places) -> None:
     lis = [a for a in kept if a.geonameid == "2267057"]
     assert {a.lang for a in lis} == {"fr", "en"} and len([a for a in lis if a.lang == "fr"]) <= C.MAX_NAMES_PER_LANG
     assert "Lisbonne" in {a.name for a in lis if a.lang == "fr"}
+
+
+def test_capital_rows_from_entity_snapshots(places) -> None:
+    def claim(v: Any, rank: str = "normal", q: dict | None = None) -> dict:
+        return {"rank": rank, "mainsnak": {"datavalue": {"value": v}}, "qualifiers": q or {}}
+
+    ents = {
+        "Q45": {"claims": {"P36": [claim({"id": "Q597"}, "preferred")]}},
+        "Q750": {
+            "claims": {"P36": [claim({"id": "Q2971"}), claim({"id": "Q1491"}), claim({"id": "Q1"}, "deprecated")]}
+        },
+        "Q597": {"claims": {"P1566": [claim("2267057")]}},
+        "Q2971": {"claims": {"P1566": [claim("3903987")]}},
+        "Q1491": {"claims": {"P1566": [claim("3911925")]}},
+    }
+    rows = C.capital_rows_from_entities({"PRT": "Q45", "BOL": "Q750", "FRA": "Q142"}, ents)
+    assert {(r["iso3"], r["capital"].rsplit("/", 1)[1], r["gn"]) for r in rows} == {
+        ("PRT", "Q597", "2267057"),
+        ("BOL", "Q2971", "3903987"),
+        ("BOL", "Q1491", "3911925"),
+    }
+    st = C.capital_crosscheck(places, rows)["countries"]
+    assert st["PRT"]["status"] == "agree" and st["BOL"]["status"] == "agree_partial_multiple"

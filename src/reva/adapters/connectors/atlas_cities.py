@@ -1389,6 +1389,171 @@ async def harvest_wikidata(
     return out
 
 
+# ------------------------------------------------- Wikibase API path (when WDQS refuses our egress)
+CITY_PROPERTIES = ("P31", "P17", "P131", "P1376", "P1566", "P625", "P1082")
+
+
+def _claim_values(claims: Mapping[str, Any], pid: str) -> list[tuple[Any, Mapping[str, Any]]]:
+    """(value, claim) for the non-deprecated claims of ``pid`` in a wbgetentities snapshot."""
+    out = []
+    for c in claims.get(pid) or []:
+        if c.get("rank") == "deprecated":
+            continue
+        dv = ((c.get("mainsnak") or {}).get("datavalue") or {}).get("value")
+        if isinstance(dv, Mapping) and "id" in dv:
+            dv = dv["id"]
+        if dv is not None:
+            out.append((dv, c))
+    return out
+
+
+def capital_rows_from_entities(
+    countries: Mapping[str, str], entities: Mapping[str, Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    """Rows shaped like the ``places.country_capitals`` SPARQL result, built from wbgetentities snapshots of
+    the countries (P36 claims, rank, P580/P582 qualifiers) and of their capitals (P1566)."""
+    rows: list[dict[str, Any]] = []
+    ent = "http://www.wikidata.org/entity/"
+    for iso3, cq in sorted(countries.items()):
+        e = entities.get(cq)
+        if not e:
+            continue
+        for cap, claim in _claim_values(e.get("claims") or {}, "P36"):
+            q = claim.get("qualifiers") or {}
+
+            def qtime(pid: str, q: Mapping[str, Any] = q) -> str | None:
+                for snak in q.get(pid) or []:
+                    t = ((snak.get("datavalue") or {}).get("value") or {}).get("time")
+                    if t:
+                        return str(t).lstrip("+")
+                    if snak.get("snaktype") == "somevalue":
+                        return "somevalue"
+                return None
+
+            rank = "http://wikiba.se/ontology#" + str(claim.get("rank", "normal")).capitalize() + "Rank"
+            base = {
+                "country": ent + cq,
+                "iso3": iso3,
+                "capital": ent + str(cap),
+                "rank": rank,
+                "start": qtime("P580"),
+                "end": qtime("P582"),
+            }
+            gns = [str(v) for v, _ in _claim_values((entities.get(str(cap)) or {}).get("claims") or {}, "P1566")]
+            rows.extend([{**base, "gn": g} for g in gns] or [{**base, "gn": None}])
+    return rows
+
+
+async def map_via_search(
+    sess: Any, sink: Any, allow: Any, ids: Sequence[str], *, state_dir: Path | None = None
+) -> dict[str, Any]:
+    """Candidates by CirrusSearch ``haswbstatement:P1566=<id>|...`` (Wikibase API host, not WDQS), then full
+    wbgetentities snapshots of the candidates loaded through WDHARVEST's harvester (claims filtered to
+    :data:`CITY_PROPERTIES`). The link itself is only ever read from those snapshots' own P1566 claims."""
+    from reva.kg.harvest import STATE_DIR, Harvester, HarvestState, SpecReport, or_groups
+
+    spec = _load_spec(SPEC_GEONAMES_IDS)
+    cands: list[str] = []
+    truncated: list[str] = []
+    for q in or_groups("haswbstatement:", [f"P1566={i}" for i in ids]):
+        hits, total, _shas = await sess.client.search_all(
+            q, meta={"purpose": "geonames_p1566", "caller": CONNECTOR_NAME}
+        )
+        cands.extend(hits)
+        if total > len(hits):
+            truncated.append(q[:120])
+    cands = sorted(set(cands), key=lambda x: int(x[1:]))
+    state = HarvestState(state_dir or STATE_DIR, spec.id + ".api")
+    state.reset_for(spec.sha256)
+    rep = SpecReport(spec.id, "seed_entities")
+    await Harvester(sess.client, sink, allow=allow).fetch_entities(
+        spec, cands, state, rep, full=True, kind="city", properties=CITY_PROPERTIES
+    )
+    return {
+        "ids": len(ids),
+        "candidates": len(cands),
+        "search_window_exceeded": truncated,
+        **{k: rep.as_dict()[k] for k in ("entities_full", "statements", "failures")},
+    }
+
+
+async def harvest_wikidata_api(
+    *,
+    db_name: str,
+    atlas_store: Any,
+    max_ids: int = 600,
+    state_dir: Path | None = None,
+    report_path: Path | None = None,
+) -> dict[str, Any]:
+    """The WDQS-free variant of :func:`harvest_wikidata` for a bounded priority subset of geonameids
+    (capitals and seats of government first): P1566 links from entity snapshots, the P36 cross-check from
+    the countries' own snapshots (``registry/entities/country_qids.json``), then the GeoNames KG statements."""
+    from reva.adapters.connectors.atlas_geo_common import load_country_qids
+    from reva.adapters.connectors.wikidata import load_allowlist
+    from reva.kg.harvest import KgDbSink, budgeted_client
+
+    async with budgeted_client(purpose="citiesapi", db_name=db_name, planned_wdqs=0, planned_wbapi=40) as sess:
+        engine = sess.engine
+        got_c = latest_raw(engine, atlas_store, URL_CITIES)
+        got_a = latest_raw(engine, atlas_store, URL_ADMIN1)
+        if got_c is None or got_a is None:
+            raise _err("no archived cities15000/admin1 acquisition in this database: run the atlas ingest first")
+        places, admin1 = parse_cities(got_c[0]), parse_admin1(got_a[0])
+        allow = load_allowlist()
+        sink = KgDbSink(engine, sess.store)
+        sink.register_properties(allow)
+        ids = priority_ids(places, admin1)[:max_ids]
+        out: dict[str, Any] = {"database": db_name, "run_id": sess.run_id, "via": "wikibase_api"}
+        out["p1566"] = await map_via_search(sess, sink, allow, ids, state_dir=state_dir)
+        countries = load_country_qids()
+        res = await sess.client.get_entities(
+            sorted(set(countries.values()), key=lambda q: int(q[1:])),
+            props=("info", "claims"),
+            languages=("en",),
+            meta={"purpose": "country_capitals", "caller": CONNECTOR_NAME},
+        )
+        ents = dict(res.entities)
+        caps = {str(v) for e in ents.values() for v, _ in _claim_values(e.get("claims") or {}, "P36")}
+        missing = sorted((c for c in caps if c not in ents and c.startswith("Q")), key=lambda q: int(q[1:]))
+        if missing:
+            res2 = await sess.client.get_entities(
+                missing,
+                props=("info", "claims"),
+                languages=("en",),
+                meta={"purpose": "capital_geonames_ids", "caller": CONNECTOR_NAME},
+            )
+            ents.update(res2.entities)
+        rows = capital_rows_from_entities(countries, ents)
+        out["capitals"] = {"raw_sha256": list(res.raw_sha256s), "rows": len(rows), **capital_crosscheck(places, rows)}
+        gn_qids, ambiguous = geonames_qid_map(engine, "live")
+        out["mapping"] = {
+            "places": len(places),
+            "ids_asked": len(ids),
+            "places_mapped": sum(1 for p in places if p.geonameid in gn_qids),
+            "admin1": len(admin1),
+            "admin1_mapped": sum(1 for a in admin1 if a.geonameid in gn_qids),
+            "pplc": sum(1 for p in places if p.feature_code == "PPLC"),
+            "pplc_mapped": sum(1 for p in places if p.feature_code == "PPLC" and p.geonameid in gn_qids),
+            "ambiguous": len(ambiguous),
+            "ambiguous_sample": dict(list(sorted(ambiguous.items()))[:30]),
+        }
+        out["kg"] = load_geonames_kg(
+            engine,
+            atlas_store,
+            places,
+            admin1,
+            retrieved_at=got_c[2],
+            origin="live",
+            cities_sha=got_c[1],
+            admin_sha=got_a[1],
+        )
+        out["client"] = sess.client.stats.as_dict()
+    out["budget"] = sess.usage.get("budget")
+    if report_path is not None:
+        report_path.write_text(json.dumps(out, indent=1, default=str, ensure_ascii=False))
+    return out
+
+
 def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operator entry point
     import argparse
     import asyncio
@@ -1402,6 +1567,13 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
     w.add_argument("--db", required=True, help="throwaway reva_* database holding the atlas ingest")
     w.add_argument("--atlas-object-root", required=True, type=Path, help="object root of the atlas ingest")
     w.add_argument("--labels", choices=("none", "capitals", "all"), default="capitals")
+    w.add_argument(
+        "--via",
+        choices=("wdqs", "api"),
+        default="wdqs",
+        help="api: CirrusSearch + wbgetentities for a priority subset (WDQS refusing our egress)",
+    )
+    w.add_argument("--max-ids", type=int, default=600, help="--via api: how many priority geonameids")
     w.add_argument("--max-chunks", type=int, default=None)
     w.add_argument("--chunk-size", type=int, default=300)
     w.add_argument("--state-dir", type=Path, default=None)
@@ -1421,18 +1593,29 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
     settings = harvest_settings(args.db)
     store = FilesystemArtifactStore(args.atlas_object_root, settings.reva_s3_prefix)
     try:
-        out = asyncio.run(
-            harvest_wikidata(
-                db_name=args.db,
-                atlas_store=store,
-                labels=args.labels,
-                ids_from=(args.ids_from[0], args.ids_from[1]) if args.ids_from else None,
-                max_chunks=args.max_chunks,
-                chunk_size=args.chunk_size,
-                state_dir=args.state_dir,
-                report_path=args.report,
+        if args.via == "api":
+            out = asyncio.run(
+                harvest_wikidata_api(
+                    db_name=args.db,
+                    atlas_store=store,
+                    max_ids=args.max_ids,
+                    state_dir=args.state_dir,
+                    report_path=args.report,
+                )
             )
-        )
+        else:
+            out = asyncio.run(
+                harvest_wikidata(
+                    db_name=args.db,
+                    atlas_store=store,
+                    labels=args.labels,
+                    ids_from=(args.ids_from[0], args.ids_from[1]) if args.ids_from else None,
+                    max_chunks=args.max_chunks,
+                    chunk_size=args.chunk_size,
+                    state_dir=args.state_dir,
+                    report_path=args.report,
+                )
+            )
     except BudgetExhausted as e:
         print(json.dumps({"status": "budget_exhausted", "message": e.message, **e.details}, default=str))
         return 3
