@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import re
 import time
 from collections import Counter, defaultdict, deque
 from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -67,6 +68,7 @@ MAX_ROWS_PER_NEIGHBOURHOOD = 100_000
 #: Default wall-clock budget of one /v1/links/path request (all segments).
 TIME_BUDGET_S = 20.0
 LANGS = ("fr", "en")
+NS_PID_RE = re.compile(r"^[a-z][a-z0-9_]{0,31}:[a-z][a-z0-9_]{0,63}$")
 
 DISCLAIMER = {
     "fr": "Chemin de connexions (« relié via »), pas une explication causale. Chaque étape cite sa source.",
@@ -141,8 +143,8 @@ class PathQuery:
         for k in kinds:
             if ":" in k and k.split(":", 1)[0] in ("statement", "link"):
                 out.add(k)
-            elif k.startswith("P") and k[1:].isdigit():
-                out.add(f"statement:{k}")
+            elif (k.startswith("P") and k[1:].isdigit()) or NS_PID_RE.match(k):
+                out.add(f"statement:{k}")  # Wikidata property or namespaced dataset predicate (geo:covered_territory_of)
             else:
                 out.add(f"link:{k}")
         return out

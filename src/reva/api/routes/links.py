@@ -24,7 +24,7 @@ from reva.links.paths import DISCLAIMER, MAX_HOPS_LIMIT, MAX_K, MAX_WAYPOINTS, P
 router = APIRouter(prefix="/v1/links", tags=["links"], dependencies=[Depends(require_scope("read"))])
 
 NODE_PATTERN = r"^(Q[1-9][0-9]{0,11}|[A-Z]{3}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$"
-KIND_PATTERN = r"^((statement|link):)?([A-Za-z][A-Za-z0-9_]{0,63})$"
+KIND_PATTERN = r"^((statement|link):)?([A-Za-z][A-Za-z0-9_]{0,63}|[a-z][a-z0-9_]{0,31}:[a-z][a-z0-9_]{0,63})$"
 PATH_WARNING = s.ApiWarning(code="path_not_causal", message=DISCLAIMER["en"])
 COMMUNITY_WARNING = s.ApiWarning(
     code="community_edited", message="Wikidata statements are community-edited and are not verified by REVA."
