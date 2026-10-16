@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { PairLinksData } from '../api/links';
 import * as F from '../test/fixtures';
 import { NODE_RE, parseList, parseSteps, PROP_RE } from './pathOptions';
-import { buildRelation, laneMarks, physicalDetail, themeOf } from './relation';
+import { licenceTermsFr, restrictedLicences } from './licence';
+import { buildRelation, censoredDates, laneMarks, physicalDetail, themeOf } from './relation';
 
 describe('relation view model', () => {
   const d = PairLinksData.parse(F.PAIR_BRA_PRT.data);
@@ -136,5 +137,37 @@ describe('Chemin advanced options', () => {
     expect(parseList('Q155, PRT', NODE_RE)).toEqual(['Q155', 'PRT']);
     expect(parseList('brazil', NODE_RE)).toBeNull();
     expect(parseList('P37 P2936', PROP_RE)).toEqual(['P37', 'P2936']);
+  });
+});
+
+describe('review V3b: partial decades, left-censored periods, licences', () => {
+  const base = PairLinksData.parse(F.PAIR_BRA_PRT.data);
+  const voteKind = base.kinds.unga_vote_agreement!;
+  const vote = voteKind.links[0]!;
+
+  it('labels a decade vote value with the years it was computed on and says it is partial (VOTE-1/2)', () => {
+    const lk = { ...vote, temporal: { kind: 'interval', start: '2020', end: '2024' }, basis: { ...(vote.basis ?? {}), decade: [2020, 2029], years_used: [2020, 2024], partial_period: true } };
+    const d = PairLinksData.parse({ ...F.PAIR_BRA_PRT.data, kinds: { unga_vote_agreement: { ...voteKind, links: [lk], count: 1 } } });
+    const rows = buildRelation(d).themes.find((t) => t.id === 'votes')!.kinds[0]!.votes;
+    expect(rows.map((r) => r.period)).toEqual(['2020–2024 (décennie partielle)']);
+  });
+
+  it('shows a period starting at the dataset coverage start as "≤ year", never as a day (CSH-1)', () => {
+    const lk = { ...vote, link_type: 'colonial_rule_cshapes', temporal: { kind: 'interval', start: '1886', end: '1962-07-04' }, basis: { left_censored: true, coverage_start: '1886-01-01' } };
+    const out = censoredDates(PairLinksData.parse({ ...F.PAIR_BRA_PRT.data, kinds: { x: { ...voteKind, links: [lk] } } }).kinds.x!.links[0]!, { text: '1886 – 1962', undated: false });
+    expect(out.text.startsWith('≤ 1886 – 1962')).toBe(true);
+    expect(out.text).toContain('1886-01-01');
+  });
+
+  it('names restrictive licence terms (LIC-1)', () => {
+    expect(licenceTermsFr({ licence: 'CC-BY-NC-SA-4.0', non_commercial: true, share_alike: true })).toEqual(['licence non commerciale', 'partage dans les mêmes conditions']);
+    expect(licenceTermsFr({ licence: 'CC-BY-4.0', open_licence: true })).toEqual([]);
+    expect(licenceTermsFr({ licence: 'UN Terms of Use', open_licence: false })).toEqual(['licence non ouverte']);
+    const ls = [
+      { source: 'ipu', licence: 'CC-BY-NC-SA-4.0', restricted: true },
+      { source: 'wb', licence: 'CC-BY-4.0', restricted: false },
+      { source: 'ipu', licence: 'CC-BY-NC-SA-4.0', restricted: true },
+    ];
+    expect(restrictedLicences(ls).map((l) => l.source)).toEqual(['ipu']);
   });
 });
