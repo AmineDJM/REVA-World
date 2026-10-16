@@ -68,7 +68,7 @@ API_URL = (
     "&languages=en&format=json&maxlag=5"
 )
 API_BATCH = 50
-CABLE_LIST_CHARS = 2200  # flags must stay <= 4,000 characters (atlas schema); the selector lists every QID
+CABLE_LIST_CHARS = 1500  # flags must stay <= 4,000 characters (atlas schema); the selector lists every QID
 #: tests replace the machine-wide Wikidata lock (``wikidata.MachineLock``) with a no-op one
 LOCK_FACTORY: Any = None
 MAX_SUBCLASS_DEPTH = 2
@@ -306,7 +306,8 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
         partners = sorted({b for (a, b) in pairs if a == q})
         if partners:
             put("CABLE_PARTNER_COUNTRIES", q, snap, len(partners), "countries", cs,
-                "count of distinct other P17 values on the cables listing the country", partners=partners)  # fmt: skip
+                "count of distinct other P17 values on the cables listing the country",
+                partners=partners[:100], partners_total=len(partners))  # fmt: skip
         years: dict[int, list[dict[str, Any]]] = defaultdict(list)
         for c in cs:
             if c["year"] is not None:

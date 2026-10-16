@@ -321,12 +321,31 @@ def test_wikidata_cables_pairs_and_subclasses() -> None:
     assert first is not None and first["value"] == "1956" and first["unit"] == "year"
     assert _flags(first)["cables"][0]["year_property"] == "P729"
     assert _flags(first)["derived"] == "min"
-    # every cable raw (EntityData snapshot) cited is registered with the table
-    assert {c["raw_sha256"] for r in frame.to_dicts() for c in _flags(r).get("cables", [])} <= set(kw["raw_sha256s"])
+    # every raw cited is registered with the table; the selector lists the cable items
+    assert set(frame["raw_sha256"].to_list()) <= set(kw["raw_sha256s"])
+    assert json.loads(gbr_usa["selector"])["wikidata_entities"] == ["Q618973"]
     assert frame.filter(pl.col("value") == "0").height == 0
     # FARICE-1: inception 2004-01 (month precision) -> service year 2004 via P571
     fo = frame.filter((pl.col("provider_geo") == "Q189") & (pl.col("indicator") == "CABLES_ENTERING_SERVICE"))
     assert date(2004, 1, 1) in fo["period_start"].to_list()
+
+
+def test_wikidata_cables_flags_fit_the_atlas_limit_for_large_hubs() -> None:
+    """300 cables between the same countries (a hub such as the USA): flags stay within 4,000 characters."""
+    qids = sorted(cb.country_index())[:120]
+    cables = [{"qid": f"Q{9000 + i}", "label": f"Very long cable system name number {i} " * 2, "revision": 123456789 + i,
+               "p31": [cb.ROOT_CLASS], "p279": [], "countries": qids if i == 0 else qids[:2], "year": 1990 + i % 30,
+               "year_property": "P571", "retired": None, "length": None, "owners": []} for i in range(300)]  # fmt: skip
+    rb, rep = cb.build(cables, {c["qid"]: "a" * 64 for c in cables}, date(2026, 10, 16))
+    frame = rb.frame()  # raises if any flags/selector exceeds the atlas limit
+    assert max(frame["flags"].str.len_chars()) <= 4000 and max(frame["selector"].str.len_chars()) <= 4000
+    row = (
+        frame.filter(pl.col("indicator").str.starts_with("CABLES_SHARED"))
+        .sort("value", descending=True)
+        .row(0, named=True)
+    )
+    f = _flags(row)
+    assert f["cables_total"] == 300 and 0 < f["cables_listed"] < 300
 
 
 def test_wikidata_cables_skip_telegeography_and_parse_guards() -> None:
