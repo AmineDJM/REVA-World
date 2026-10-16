@@ -11,7 +11,12 @@ Everything written by the lead and the agents is committed and pushed on `claude
 * **Archived raw provider bytes** `var/objects` (~3.8 GB) and the Wikidata archive `var/kg/objects`.
 * **Throwaway DBs** (`reva_test_*`, `reva_kg_wdharvest`, `reva_kg_causwd`, `reva_causcand`, …).
 
-All of it is **reproducible from the committed code** (connectors archive raw bytes and rebuild tables
+**Saved on GitHub (2026-10-16):** branches `reva-data-20261016-b1` … `-b4` hold pg_dumps of `reva`,
+`reva_kg_wdharvest`, `reva_kg_causwd`, `reva_causcand`, a tar of `var/objects` + `var/kg` (95 MB parts) and the
+agents' scratch scripts; restore steps in `RESTORE.md` and checksums in `MANIFEST.sha256` on branch `-b1`.
+Clone the code with `--single-branch` to avoid downloading the 4.3 GB of data.
+
+All of it is also **reproducible from the committed code** (connectors archive raw bytes and rebuild tables
 deterministically). Rebuilding costs provider requests within the daily budgets (3 GiB/day cap): roughly
 2–3 budget days for the full atlas, longer for Wikidata (see below).
 
