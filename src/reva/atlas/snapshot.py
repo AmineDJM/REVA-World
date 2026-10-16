@@ -307,8 +307,10 @@ def take_snapshot(
     snap = create_atlas_snapshot(engine, store, origin=origin, skip_unchanged=skip_unchanged)
     out: dict[str, Any] = {**snap.ref(), "reused": snap.reused, "activity_id": snap.activity_id}
     if warm:
-        from reva.atlas.query import build_snapshot_db
+        from reva.atlas.query import build_snapshot_db, pin_snapshot
 
+        if origin == "live":  # pinned before the build: concurrent small builds never evict it
+            pin_snapshot(snap.sha256)
         out["query_file"] = str(build_snapshot_db(snap, store))
     return out
 
