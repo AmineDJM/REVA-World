@@ -64,7 +64,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.gcat"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 SOURCE_KEY = "gcat.planet4589"
 ATLAS_SOURCE = "gcat"
 DATASETS = ("launches", "payloads")

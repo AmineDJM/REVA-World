@@ -33,7 +33,7 @@ from reva.adapters.connectors import atlas_glottolog as gl
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.wals"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_wals/1"
 SOURCE_KEY = "wals.cldf"
 ATLAS_SOURCE = "wals"

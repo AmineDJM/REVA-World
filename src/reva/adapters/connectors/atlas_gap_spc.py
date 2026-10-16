@@ -242,7 +242,7 @@ def _module() -> Any:
 def atlas_source() -> AtlasSourceSpec:
     return AtlasSourceSpec(
         name=NAME,
-        version="1.0.0",
+        version="1.0.1",
         source_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="Pacific Community (SPC) — Pacific Data Hub .Stat",

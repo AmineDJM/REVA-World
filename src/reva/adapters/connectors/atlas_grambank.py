@@ -32,7 +32,7 @@ from reva.adapters.connectors import atlas_glottolog as gl
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.grambank"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_grambank/1"
 SOURCE_KEY = "grambank.cldf"
 ATLAS_SOURCE = "grambank"

@@ -81,7 +81,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.glottolog"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 PARSER_VERSION = "atlas_glottolog/1"
 SOURCE_KEY = "glottolog.cldf"
 ATLAS_SOURCE = "glottolog"

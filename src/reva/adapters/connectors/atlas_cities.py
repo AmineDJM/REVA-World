@@ -65,7 +65,7 @@ from reva.kernel.errors import SourceResponseError
 log = logging.getLogger("reva.atlas.cities")
 
 CONNECTOR_NAME = "atlas.geonames_cities"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 SOURCE_KEY = "geonames.cities"
 PARSER_VERSION = "atlas-geonames-cities/1"
 ATLAS_SOURCE = "geonames"

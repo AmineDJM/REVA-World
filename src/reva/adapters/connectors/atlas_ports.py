@@ -39,7 +39,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.nga_wpi"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 SOURCE_KEY = "nga.wpi"
 ATLAS_SOURCE = "nga"
 DATASET = "wpi"

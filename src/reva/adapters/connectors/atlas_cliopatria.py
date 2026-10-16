@@ -73,7 +73,7 @@ from reva.kernel.errors import SourceResponseError
 from reva.kg import overlay as ov
 
 NAME = "atlas.cliopatria"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 SOURCE_KEY = "cliopatria.github"
 ATLAS_SOURCE = "cliopatria"
 DATASET = "polities"
