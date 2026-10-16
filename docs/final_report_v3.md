@@ -219,15 +219,86 @@ Resume details, disk needs and the data snapshot branches are in `docs/dev/HANDO
 | `0015_causal` | CAUSCORE | causal claims, grades, retractions, candidates, owner-only reviews |
 | `0016_causal_ops` | CAUSOPS | `causal_refresh` job kind |
 
-  Schema contract: head `0016_causal_ops` (`migrations/schema_contract.json`). The pre-release policy of editing
-  migrations in place (V1) does not apply to 0009–0016: every V3 fix shipped as a new migration.
+  Schema contract: head `0016_causal_ops` (`migrations/schema_contract.json`). The V3 schema fixes from the reviews
+  and from operations shipped as new migrations (0011, 0014). This report did not check whether 0009–0016 were
+  edited in place before 0016.
 * **Data is not in the main branch.** The dev database, `var/objects` (~3.8 GB) and the Wikidata archive are
   container-local. pg_dumps and archives were pushed to branches `reva-data-20261016-b1` … `-b4`
   (`docs/dev/HANDOFF_V3.md`).
 
 ## 3. Actual test results (this run)
 
-FILL_TESTS
+**Run conditions.** Agent V3FINAL ran these checks on 2026-10-16 between 23:05 and 23:58 UTC, on the shared 4-vCPU
+session container. Two things affected the run:
+
+* **The tree changed under the run.** It started on `e1ccf03` plus WDRUN's uncommitted `harvest.py` edit. During the
+  run the lead committed the WIP snapshots `8ff853d` (version bumps of 12 atlas connectors), `e411fe1` (Wikidata
+  harvest import, new tests, these docs) and `5af8df2`.
+* **Other work ran at the same time.** LOADALL and WDRUN were working, and the e2e stack ran in parallel with the
+  last 40 minutes of the pytest run.
+
+DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwards). The dev database was not used.
+
+| Check | Command | Result |
+|---|---|---|
+| pytest offline | `uv run pytest -m "not live and not perf" -q -x --maxfail=50` | **4,074 passed, 12 failed**, 31 skipped, 66 deselected, of 4,117 collected (50 min 38 s). Each failure is diagnosed below |
+| failing files re-run alone (current tree) | `uv run pytest tests/integration/<file>.py` for the 7 files with failures | **all pass alone**: events_datasets 6, kg_lang_ingest 3, kg_polity_ingest 3, links_db 4, links_ops 4, events_dataset_kinds 7, wikidata_kg_load 1. Run together, 6 of these files still give 7 failures (same causes) |
+| `ruff check .` | | **2 errors → 0**: `ui/src/v3/test/dumpresp.py` (E401, I001; a UI capture helper), fixed by `ruff check --fix` |
+| `ruff format --check .` | | **20 → 17 files would be reformatted** after formatting 3 non-product files (`dumpresp.py`, `tests/integration/test_wikidata_{kg_load,live}.py`). The remaining 17 are left to their owners (see below) |
+| `lint-imports` | | **5 contracts kept, 0 broken** |
+| `mypy -p reva.kernel -p reva.ports` | | **pass** (13 source files) |
+| UI typecheck | `npm run typecheck` | **pass** |
+| UI unit tests | `npx vitest run` | **221 passed, 1 skipped** (29 files passed, 1 skipped: `contract.dump.test.ts` needs a response dump) |
+| UI build | `npm run build` | **pass**. The maplibre chunk is 1.03 MB (278 kB gzip) |
+| UI e2e (V3 stack) | `uv run python scripts/e2e_stack.py --run --v3-fixtures` | **81 passed, 1 failed, 8 skipped** (Playwright 2.1 min; stack 3 min 41 s in total). The stack replayed 18 atlas fixture sources (all `completed`), the 76-entity Wikidata links fixture, the 37 causal fixture statements, a fixture snapshot and one link materialisation. V3 specs: `v3_live_stack` 13/13, `v3_planet` 10/10, `v3_causal` 7/7, `v3_causal_live` 6/6. The 8 skipped are V2 composer/runs specs that need `--recorded-drafter --v2-fixtures` |
+| live-marked tests, Docker build, performance | — | **not run** for V3 |
+
+**The 12 pytest failures.** None of them is a stale version or count in a test, so no test was edited.
+
+* **Test isolation: the session-scoped test database is shared by every test file (4 failures).** Each test passes
+  alone. They fail after other files load KG or link data into the same database:
+  * `test_events_datasets.py::test_same_as_from_evidence_only`: other loads add `same_as` pairs beyond the
+    expected Paris Agreement pair.
+  * `test_events_dataset_kinds.py::test_causal_claims_attach_to_typed_events`: the `czapi` claims do not attach
+    to typed events after earlier loads.
+  * `test_links_ops.py::test_handler_materialises_then_reuses_unchanged_inputs`: the KG watermark moved, so the
+    test got a new materialisation (`4 == 3`) instead of a reuse.
+  * `test_wikidata_kg_load.py::test_seed_spec_loads_into_kg_tables`: properties already registered by other files
+    give `163 == 186`.
+  Fix (owners EVENTS, LINKWIRE, WDHARVEST): make the assertions relative to the test's own loads, or give these
+  files a private database.
+* **Tree changed during the run (5 failures).** `test_kg_lang_ingest.py` (2) and `test_kg_polity_ingest.py` (3)
+  failed with `ImmutableRecordViolation: connector atlas.glottolog@1.1.0 / atlas.cliopatria@1.0.0 is registered
+  with different content`. Commit `8ff853d` bumped these connectors on disk while the pytest process held the old
+  module. All 6 tests pass on the current tree.
+* **Product defect, not fixed (owner LINKS2/EVMAP), 3 failures:** `test_links_db.py::test_path_columbus_to_portuguese_from_db`,
+  `::test_links_http_api` and `::test_links_path_route_constrained_parameters` fail with `LinkError: not a date:
+  '1998-08'` (and `'1993-01'`).
+  * Cause: the link store serialises a month-precision temporal as `YYYY-MM` (`PartialDate.iso()`), and
+    `reva.links.store.temporal_from_json` → `PartialDate.parse` accepts only `YYYY-MM-DD` (`_TIME_RE` in
+    `src/reva/links/model.py`). Reproduced directly: `temporal_from_json({"kind": "interval", "start": "1998-08"})`
+    raises `LinkError`.
+  * Impact: any materialisation that holds a month-precision link (here from the dataset fixtures loaded by other
+    tests, e.g. the sanctions and hazard kinds) makes stored-link reads fail. `/v1/links/path` answers **500**.
+  * The tests pass alone only because no such link is materialised then.
+  * Fix: parse `YYYY` and `YYYY-MM` in `PartialDate.parse` (or serialise with an explicit precision), plus a
+    round-trip test.
+
+**Also found.**
+
+* **UI e2e failure (product defect, owner UI3):** `v2_runs.spec.ts` "⌘K palette: deterministic search over
+  countries and runs, keyboard only".
+  * What happens: typing "algeria" shows a stale first option "Pays ↔ Pays — Brésil et Portugal" (the list has 6
+    options while the status says "5 results"), so Algeria is not first.
+  * Cause: `ui/src/v3/screens.ts` puts `/v3/relation?a=BRA&b=PRT` in `V3_PALETTE` twice: once as the screen entry
+    and once as the example entry. The palette keys its options by `${kind}:${id}` (`CommandPalette.tsx`), so two
+    items share one React key and React leaves a stale node behind.
+  * Fix: a distinct `to` for the example, or de-duplicated ids.
+* **`ruff format` leftovers (owners):**
+  * 14 atlas connector modules and `src/reva/adapters/connectors/wikidata.py` / `src/reva/kg/harvest.py`. These were
+    *not* reformatted: a reformat changes the connector code digest, and the code-identity check would then refuse
+    the registered version until it is bumped. WDRUN is also editing the two Wikidata files.
+  * Code blocks in three `docs/dev` reports (`v3_a_imf.md`, `v3_atlas_interface.md`, `v3_causal_interface.md`).
 
 ## 4. Live source coverage
 
@@ -535,7 +606,11 @@ maintainer licence review (`docs/dev/HANDOFF_V3.md` and the agents' reports):
 6. **Licence decisions** (§5) before any non-private or commercial use.
 7. **Cleanup** of leftover throwaway databases (`reva_test_*` and the agents' `reva_*` databases on the local
    server).
-8. **Lint debt** found by this sweep (§3).
+8. **Defects and debt found by this sweep (§3):**
+   * link-store month-precision temporals crash stored-link reads (`/v1/links/path` 500);
+   * duplicate ⌘K palette key (`v2_runs` e2e failure);
+   * four integration tests depend on test order (shared session database);
+   * 17 files are not `ruff format`-clean.
 
 ## 10. What this report did not verify
 

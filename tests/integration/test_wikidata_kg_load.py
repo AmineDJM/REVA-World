@@ -46,8 +46,10 @@ async def test_seed_spec_loads_into_kg_tables(db: Any, tmp_path: Path) -> None:
     with db.owner.connect() as c:
         kinds = dict(c.execute(text("SELECT qid, kind FROM kg.entity_current WHERE origin='test_fixture'")).all())
         assert kinds["Q17167"] == "empire" and kinds["Q220"] == hv.LABEL_KIND
-        row = c.execute(text("""SELECT value, rank, refs, source_key, source_revision, raw_sha256
-                                 FROM kg.statement_current WHERE statement_id = 'Q17167$C'""")).one()
+        row = c.execute(
+            text("""SELECT value, rank, refs, source_key, source_revision, raw_sha256
+                                 FROM kg.statement_current WHERE statement_id = 'Q17167$C'""")
+        ).one()
         assert row.value["time"].startswith("-0043-03-15") and row.value["calendar"] == "julian"
         assert row.rank == "preferred" and row.source_key == wd.SOURCE_WBAPI and row.source_revision
         assert row.refs == [{"P248": ["Q123"], "P854": ["https://example.org/x"]}]

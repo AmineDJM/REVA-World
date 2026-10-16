@@ -1,9 +1,14 @@
 """pytest plugin: dump JSON bodies of V3 API responses made through TestClient (read-only capture)."""
-import json, os, re
+
+import json
+import os
+import re
+
 import starlette.testclient as tc
 
 OUT = os.environ["UI3_DUMP"]
 _orig = tc.TestClient.request
+
 
 def request(self, method, url, *a, **kw):
     r = _orig(self, method, url, *a, **kw)
@@ -14,7 +19,10 @@ def request(self, method, url, *a, **kw):
         except Exception:
             return r
         with open(OUT, "a") as f:
-            f.write(json.dumps({"method": method, "url": path, "status": r.status_code, "body": body}, default=str) + "\n")
+            f.write(
+                json.dumps({"method": method, "url": path, "status": r.status_code, "body": body}, default=str) + "\n"
+            )
     return r
+
 
 tc.TestClient.request = request
