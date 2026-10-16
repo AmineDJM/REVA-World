@@ -4,7 +4,7 @@
 # Bank name, or a decision with the provider's own evidence (its numeric ISO / COW / Polity code on the same
 # rows). Historical states and names spanning several entities are listed under `unmapped` (comments only:
 # the loader reads `aliases`); atlas rows for them keep iso3 = null and the provider name.
-# Connectors: src/reva/adapters/connectors/atlas_navco.py (navco_loc, mec_loc), atlas_massmob.py (mmp_loc).
+# Connectors: src/reva/adapters/connectors/atlas_navco.py (navco_loc, navco3_loc, mec_loc), atlas_massmob.py (mmp_loc).
 schemes:
   navco_loc:
     aliases:

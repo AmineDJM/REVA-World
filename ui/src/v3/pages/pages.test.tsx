@@ -211,6 +211,24 @@ describe('Atlas', () => {
     }
     expect(await screen.findByTestId('atlas-map')).toHaveAttribute('aria-label', expect.stringContaining('3 sans valeur (hachurés)'));
   });
+
+  it('names a restrictive licence of the map sources in the legend (review V3b LIC-1)', async () => {
+    const lic = { source: 'ipu', licence: 'CC-BY-NC-SA-4.0', commercial_use: 'not_permitted', non_commercial: true, share_alike: true, no_derivatives: false, open_licence: false, restricted: true, basis: 'table_artifact', attribution: 'IPU Parline' };
+    mockFetch({
+      'GET /v1/atlas/concepts': { body: F.CONCEPTS },
+      'GET /v1/atlas/coverage': { body: F.COVERAGE_UNEMP },
+      'GET /v1/atlas/map': (c) => {
+        const body = F.mapResponse(Number(new URL(c.url, 'http://x').searchParams.get('year')));
+        return { body: { ...body, data: { ...body.data, licences: [lic] } } };
+      },
+      'GET /v1/locations': { body: F.LOCATIONS },
+    });
+    at('/v3/atlas?concept=labour.unemployment_rate');
+    const legend = await screen.findByTestId('atlas-legend');
+    const list = within(legend).getByTestId('licence-list');
+    expect(list).toHaveTextContent('CC-BY-NC-SA-4.0');
+    expect(within(list).getByTestId('licence-badge')).toHaveTextContent('licence non commerciale');
+  });
 });
 
 describe('Dossier pays', () => {

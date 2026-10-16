@@ -12,10 +12,10 @@ graded by CAUSCORE's `load_dataset_claims` / `grade_claims` (§7); budgets reque
 | NAVCO 1.2 / 1.3 / 2.1 / 3.0 + MEC connector (`atlas.navco`, `atlas.mec`) and the shared helpers (Dataverse version checks, tab reader, places, counting, KG predicates, claims) | `src/reva/adapters/connectors/atlas_navco.py` |
 | Mass Mobilization connector (`atlas.massmob`) | `src/reva/adapters/connectors/atlas_massmob.py` |
 | Sources | `registry/sources/{navco,mec,massmob}.yaml` |
-| Location-name schemes `navco_loc`, `mec_loc`, `mmp_loc` (every provider name, with evidence) | `registry/atlas/geo_aliases/a_contention.yaml` |
+| Location-name schemes `navco_loc`, `navco3_loc`, `mec_loc`, `mmp_loc` (every provider name, with evidence) | `registry/atlas/geo_aliases/a_contention.yaml` |
 | Atlas catalog (40 concepts, domain `contention`, theme `politics`) | `registry/atlas/catalog/contention.yaml` |
 | Budget request | `registry/atlas/budget_requests/a_contention.yaml` |
-| Fixtures (slices of the real downloads, hash-pinned) | `tests/fixtures/source/atlas.{navco,mec,massmob}/` (186 KB, 54 KB, 63 KB) |
+| Fixtures (slices of the real downloads, hash-pinned) | `tests/fixtures/source/atlas.{navco,mec,massmob}/` (220 KB, 54 KB, 63 KB) |
 | Tests | `tests/unit/test_atlas_contention.py` (offline), `tests/integration/test_atlas_contention_ingest.py` (throwaway DB, fixture mode) |
 
 Run: `uv run python -m reva.atlas.ingest atlas.navco|atlas.mec|atlas.massmob [--fixture] [--option claims_staging=/abs/dir]`
@@ -39,7 +39,7 @@ listed in the version with the pinned md5.
 | Mass Mobilization v5.1 (Clark & Regan) | `doi:10.7910/DVN/HTTWYL` v5.1, file 4291456 (15,625,472 B; 15,239 protests + 1,906 `protest = 0` country-years, 1990-2020) | protests of >= 50 people against the government: dates, location text, protester violence, participants, identity, 4 demands, 7 state responses | atlas `mmp.protests_cy`, KG, claims |
 
 **Not stored**: MMP `sources` (newspaper citations with journalists' names) and `notes` (news excerpts, third-party
-copyright); they are emptied in the fixture slice as well. Free-text fields that are kept are short coder fields:
+copyright); they are emptied in the fixture slice as well. NAVCO 3.0 text columns are not used (see below). Free-text fields that are kept are short coder fields:
 NAVCO/MEC campaign names, targets and actors, MEC goal descriptions, MMP location and protester identity.
 
 **Not ingested (decisions)**
@@ -54,7 +54,7 @@ NAVCO/MEC campaign names, targets and actors, MEC goal descriptions, MMP locatio
   own query services, flagged as machine-coded — not done.
 * **ACLED**: skipped. Access requires a registered (personal) account and an access key, and the terms of use
   restrict redistribution of the data; both are outside what an agent may do here (no personal accounts).
-* **Major Episodes / NAVCO 1.1, 2.0**: superseded by the versions above (kept out to avoid duplicate events).
+* **NAVCO 1.1, NAVCO 2.0**: superseded by NAVCO 1.2/1.3 and 2.1 (kept out to avoid duplicate events).
 
 ## 3. Geography
 
@@ -148,8 +148,8 @@ Total 14,993 T1 claims (`coded_outcome` 3,676, `reaction_to` 11,317).
 Decisions: MMP `ignore` makes no claim (manual: it may be the press ignoring the response rather than the state
 not responding). Demands and goals are what protesters seek, not causes (context statements only). Defection,
 external support, violent flank are attributes (no codebook wording of cause/response). No claim joins two
-datasets. Expected temporal checks: `coded_outcome` consistent/overlapping (BYEAR vs EYEAR), `reaction_to`
-overlapping (responses dated by their campaign/protest) — never invented as "consistent".
+datasets. Repression / response events carry their campaign's or protest's dates, so their temporal check is
+`overlapping` (or `consistent` for a later NAVCO 2.1 campaign-year), never made "consistent" by REVA (§7).
 
 ## 7. Full-scale load (real 2026-10-16 bytes, throwaway DB, dropped afterwards)
 

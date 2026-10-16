@@ -3,12 +3,12 @@ from datetime import UTC, datetime
 import pytest
 from reva.kg.model import KgProperty, KgStatement, load_batch, register_properties
 pytestmark = pytest.mark.db
-OUT = "/tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/perf.json"
+OUT = "/tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/causcore/perf.json"
 
 def test_perf(db):
     from reva.causal import load_kg_claims, grade_claims
     from reva.causal import graph as cg
-    register_properties(db.worker, [KgProperty(p, "item", n, n) for p, n in [("P828","has_cause"),("P1542","has_effect"),("P1478","x1"),("P1536","x2"),("P1479","x3"),("P1537","x4")]] + [KgProperty(p, "time", n, n) for p, n in [("P580","s"),("P582","e"),("P585","p"),("P571","i")]])
+    register_properties(db.worker, [KgProperty(p, "item", n, n) for p, n in [("P828","has_cause"),("P1542","has_effect"),("P1478","has_immediate_cause"),("P1536","immediate_cause_of"),("P1479","has_contributing_factor"),("P1537","contributing_factor_of")]] + [KgProperty(p, "time", n, n) for p, n in [("P580","start_time"),("P582","end_time"),("P585","point_in_time"),("P571","inception")]])
     rnd = random.Random(7)
     N_NODES, N_EDGES = 20000, 50000
     sts = []
@@ -16,6 +16,7 @@ def test_perf(db):
         y = rnd.randint(-500, 2000)
         if rnd.random() < 0.8:
             sts.append(KgStatement(f"pf:n{i}", "P580", value={"type": "time", "time": f"{y:+05d}-00-00T00:00:00Z", "precision": 9}, statement_id=f"d{i}"))
+    seen = set()
     for j in range(N_EDGES):
         a, b = rnd.randrange(N_NODES), rnd.randrange(N_NODES)
         if j % 50 == 0: b = rnd.randrange(20)  # hubs
@@ -25,8 +26,8 @@ def test_perf(db):
     raw = db.store.put_bytes(f"perf {uuid.uuid4()}".encode(), "raw", "application/json").sha256
     out = {}
     t = time.perf_counter()
-    load_batch(db.worker, db.store, statements=sts, source_key="wikidata.perf", raw_sha256s=[raw], retrieved_at=datetime.now(UTC), origin="live")
-    out["kg_load_s"] = time.perf_counter() - t
+    rep = load_batch(db.worker, db.store, statements=sts, source_key="wikidata.perf", raw_sha256s=[raw], retrieved_at=datetime.now(UTC), origin="live")
+    out["kg_load_s"] = time.perf_counter() - t; out["kg_rejected"] = rep.rejected_counts
     t = time.perf_counter(); r = load_kg_claims(db.worker, origin="live"); out["claims_load_s"] = time.perf_counter() - t; out["claims"] = r.inserted
     t = time.perf_counter(); r = load_kg_claims(db.worker, origin="live"); out["claims_reload_unchanged_s"] = time.perf_counter() - t
     t = time.perf_counter(); g = grade_claims(db.worker, origin="live"); out["grade_s"] = time.perf_counter() - t; out["by_grade"] = g.by_grade

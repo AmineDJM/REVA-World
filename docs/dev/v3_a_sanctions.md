@@ -173,9 +173,9 @@ proposed here.
 4. **CAUSCORE**: the grader reads only `P580`/`P585`/`P571` dates, so this connector writes `P580`/`P582` on cases
    and `P585` on outcome records; the undated sender-goals records (`eusanct:policy_result:*`) leave 133 HSE claims
    `undetermined`. `reva.causal.model` is used as a fallback import if the package stops re-exporting the loader.
-5. **A-ECRISES**: `registry/sources/esrb_fcdb.yaml` (untracked, in progress) is invalid YAML (line 30: an
-   unquoted `:` in `cadence`) and makes `load_registry` — hence the seed and every `db` test session — fail;
-   the integration tests here were run in an isolated copy without that file.
+5. **A-ECRISES** (resolved during this work): `registry/sources/esrb_fcdb.yaml` was briefly invalid YAML, which
+   made `load_registry` (seed, every `db` test session) fail; any unparsable `registry/sources/*.yaml` blocks all DB
+   tests, so a registry YAML lint in CI would help (lead).
 
 ## 7. Run
 
