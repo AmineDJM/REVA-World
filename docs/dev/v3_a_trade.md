@@ -29,7 +29,7 @@ dev database `reva` was never touched. Nothing committed by this agent.
 | `src/reva/adapters/connectors/atlas_trade_batis.py` | atlas source `atlas.oecd.batis` (`oecd.sdmx`, shared with A-ILO): dataflow (edition) + 20 yearly files → `oecd.batis_services` |
 | `registry/sources/cepii_baci.yaml`, `registry/sources/unctad.yaml` | new source keys (rights, lineage, notes) |
 | `registry/atlas/geo_aliases/a_trade.yaml` | schemes `baci` (Comtrade reporter codes + 10 territory aliases quoted from BACI's `country_codes_V202601.csv`), `unctad` (238 zero-padded M49 codes observed with labels + 412 Kosovo → XKX), `batis` (ISO3 + XKV → XKX) |
-| `registry/atlas/catalog/trade.yaml` | 109 provider-declared country concepts, domain `trade` |
+| `registry/atlas/catalog/trade.yaml` | 106 provider-declared country concepts, domain `trade` |
 | `registry/atlas/budget_requests/a_trade.yaml` | `cepii.baci` 40/day 1.25 GB, `unctad.bulk` 15/day 35 MB, `oecd.sdmx` 50/day 80 MB |
 | `tests/unit/test_atlas_trade.py` (11), `tests/integration/test_atlas_trade_ingest.py` (3, `db`) | offline; fixtures `tests/fixtures/source/atlas.baci/` (rebuilt excerpt zip served by byte range, 227 KB), `atlas.unctad/` (LSCI whole real file + rebuilt 7z excerpts of original lines, 330 KB), `atlas.oecd.batis/` (real responses restricted to FRA+USA+DZA+CHN+XKV+W, 2023–2024, + dataflow, 200 KB) |
 

@@ -11,6 +11,8 @@
 # number of official languages (derivable from KG statements P37, but that is a REVA count over
 # community-edited data with regional/temporal qualifiers: kept as KG statements, not an atlas cell).
 domain: culture
+labels: {fr: "Culture (patrimoine mondial)", en: "Culture (World Heritage)"}
+maintainer: KGCULT
 concepts:
   - id: culture.whc_properties_total
     labels: {fr: "Biens du patrimoine mondial (UNESCO)", en: "World Heritage properties (UNESCO)"}

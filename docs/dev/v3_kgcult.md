@@ -51,11 +51,13 @@ Design choices (honesty):
   the unfiltered closure of the 7 anchor languages reached 139 items, climbing from "language" into
   BFO/DOLCE upper-ontology classes ("continuant", "entity") and contested macro-families without a
   Glottocode (Eurasiatic, Italo-Celtic). `language_ancestors` therefore seeds only ancestors with a
-  Glottocode (P1394) — Glottolog's classification as mirrored on Wikidata. The anchor chains are
-  complete with Wikidata alone (e.g. Portuguese → Galician–Portuguese → West Iberian → Iberian
-  Romance → Gallo-Iberian(?)/Italo-Western → Romance → Latino-Faliscan → Italic → Indo-European;
-  Swahili → Sabaki → … → Bantu → … → Niger–Congo; Arabic → Semitic → Afroasiatic), so a Glottolog
-  connector (CC BY 4.0, `glottolog_languoid.csv.zip`) was not needed; it remains the fallback.
+  Glottocode (P1394) — Glottolog's classification as mirrored on Wikidata. With the filter the
+  live anchor query for Portuguese returns exactly 10 genealogical ancestors (Galician–Portuguese,
+  West Iberian, Iberian Romance, Gallo-Iberian, Western Romance, Italo-Western, Romance,
+  Latino-Faliscan, Italic, Indo-European; captured 2026-10-15 23:31 UTC) and none of the ontology
+  classes. Swahili reaches Bantu and Niger–Congo, Arabic Semitic and Afroasiatic through Wikidata
+  alone, so a Glottolog connector (CC BY 4.0, `glottolog_languoid.csv.zip`) was not needed; it
+  remains the fallback.
 
 ### Colonial diffusion paths (no invented links)
 

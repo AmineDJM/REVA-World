@@ -1308,13 +1308,16 @@ async def harvest_wikidata(
     chunk_size: int = 300,
     state_dir: Path | None = None,
     report_path: Path | None = None,
+    ids_from: tuple[Path, Path] | None = None,
 ) -> dict[str, Any]:
     """Live: P1566 links of every cities15000 place and admin-1 division, Wikidata P36 cross-check, label
     snapshots (``labels``: none | capitals | all mapped places), then the GeoNames KG statements.
 
     Every Wikidata request goes through WDHARVEST's ``budgeted_client`` (machine-wide lock, Retry-After,
     budget ledger in ``db_name``, raw responses archived). The GeoNames raws are read from the atlas store
-    where ``atlas.geonames_cities`` archived them (run the atlas ingest first)."""
+    where ``atlas.geonames_cities`` archived them. ``ids_from`` (cities15000.zip, admin1CodesASCII.txt copies) only
+    supplies the geonameids to ask Wikidata about before the atlas ingest has run; the GeoNames KG statements
+    are then left to the atlas ingest (they always cite the archived acquisition)."""
     from reva.adapters.connectors.wikidata import load_allowlist
     from reva.kg.harvest import STATE_DIR, Harvester, HarvestState, KgDbSink, SpecReport, budgeted_client
 
@@ -1322,10 +1325,12 @@ async def harvest_wikidata(
         engine = sess.engine
         got_c = latest_raw(engine, atlas_store, URL_CITIES)
         got_a = latest_raw(engine, atlas_store, URL_ADMIN1)
-        if got_c is None or got_a is None:
+        if got_c is not None and got_a is not None:
+            places, admin1 = parse_cities(got_c[0]), parse_admin1(got_a[0])
+        elif ids_from is not None:
+            places, admin1 = parse_cities(ids_from[0].read_bytes()), parse_admin1(ids_from[1].read_bytes())
+        else:
             raise _err("no archived cities15000/admin1 acquisition in this database: run the atlas ingest first")
-        places = parse_cities(got_c[0])
-        admin1 = parse_admin1(got_a[0])
         allow = load_allowlist()
         sink = KgDbSink(engine, sess.store)
         sink.register_properties(allow)
@@ -1364,16 +1369,19 @@ async def harvest_wikidata(
                 "already_known": len(known),
                 **{k: rep.as_dict()[k] for k in ("entities_labels", "statements", "failures")},
             }
-        out["kg"] = load_geonames_kg(
-            engine,
-            atlas_store,
-            places,
-            admin1,
-            retrieved_at=got_c[2],
-            origin="live",
-            cities_sha=got_c[1],
-            admin_sha=got_a[1],
-        )
+        if got_c is not None and got_a is not None:
+            out["kg"] = load_geonames_kg(
+                engine,
+                atlas_store,
+                places,
+                admin1,
+                retrieved_at=got_c[2],
+                origin="live",
+                cities_sha=got_c[1],
+                admin_sha=got_a[1],
+            )
+        else:
+            out["kg"] = {"loaded": False, "pending": "the GeoNames statements load with the atlas ingest"}
         out["client"] = sess.client.stats.as_dict()
     out["budget"] = sess.usage.get("budget")
     if report_path is not None:
@@ -1398,6 +1406,14 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
     w.add_argument("--chunk-size", type=int, default=300)
     w.add_argument("--state-dir", type=Path, default=None)
     w.add_argument("--report", type=Path, default=None)
+    w.add_argument(
+        "--ids-from",
+        type=Path,
+        nargs=2,
+        default=None,
+        metavar=("CITIES_ZIP", "ADMIN1_TXT"),
+        help="local copies giving the geonameids when the atlas ingest has not run yet",
+    )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     from reva.kg.harvest import harvest_settings
@@ -1410,6 +1426,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
                 db_name=args.db,
                 atlas_store=store,
                 labels=args.labels,
+                ids_from=(args.ids_from[0], args.ids_from[1]) if args.ids_from else None,
                 max_chunks=args.max_chunks,
                 chunk_size=args.chunk_size,
                 state_dir=args.state_dir,

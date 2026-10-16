@@ -109,9 +109,10 @@ P580/P582, P2868 role, P1534 end cause; values split over the seeded organisatio
 `territory_claims` (P1336 with dates), `military_alliances` (Q1127126 subclasses), `conflict_participation` (P607).
 All properties used are already allow-listed. **Structured sanctions are not specified**: Wikidata has no
 consistently modelled sanctions class/property (candidate class QIDs did not verify); a gap, not a guess.
-`harvest try` could not be run: it currently fails in WDHARVEST's harvest DB setup with
-`ImmutableRecordViolation: connector atlas.bmr@1.0.0 is registered with different content` (A-POL's connector
-changed without a version bump) — not in my files; Wikidata was also throttling (429/maxlag) most of the session.
+`harvest try` was not completed: first it failed in WDHARVEST's harvest-DB setup (`atlas.bmr@1.0.0 registered
+with different content`, since fixed by its owner), then WDQS answered 429 with `Retry-After: 1000` machine-wide
+for most of the session; I stopped my try requests rather than add load. The specs are schema-valid but their
+row bounds and run times have not been tried against WDQS.
 
 ### 4.3 Live ingest (budget-metered, `pytest -m "live and db" tests/integration/test_atlas_geopol_live.py`, 2026-10-15)
 
@@ -166,6 +167,5 @@ statements to `load_batch` in 100k batches. KG cross-check: US votes on CO-coded
 * **ATLASCORE**: budgets merged (`cshapes.cran` 8, `harvard.dataverse.unvotes` 12, `ucdp.downloads`); invariant 30
   no longer lists my keys.
 * **WDHARVEST**: run `registry/kg/queries/geopolitics/**`; write `registry/entities/country_qids.json`.
-* **A-POL**: `atlas.bmr@1.0.0` changed content without a version bump (breaks `harvest try`).
 * Shared code: A-HISTECON's `atlas_cow.py` imports my `StateCodeCrosswalk` (API kept stable); my modules import
   A-POL's `atlas_rdata.read_rdata_frame`.

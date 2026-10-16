@@ -177,6 +177,23 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
     with create_engine(base.migration_url().set(database="postgres")).connect() as c:
         c.execute(text("SELECT 1"))
     stats: dict[str, Any] = {"started": utc_now().isoformat()}
+
+    def dump() -> None:  # partial results survive a failure later in the run
+        if out_dir is not None:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            (out_dir / "live_stats.json").write_text(json.dumps(stats, indent=1, default=str))
+
+    def job(key: str, doc: dict[str, Any], fidelity: str) -> dict[str, Any] | None:
+        try:
+            ref = _job(engines, settings, store, _create(engines, doc), fidelity)
+        except Exception as e:  # recorded, the remaining runs still go ahead
+            stats[key] = {"status": "error", "error": f"{type(e).__name__}: {str(e)[:500]}"}
+            dump()
+            return None
+        stats[key] = _summary(engines, ref)
+        dump()
+        return ref
+
     with throwaway_database(base, prefix="reva_live_simworld") as s0:
         settings = Settings.model_validate({**s0.model_dump(), "reva_object_root": root})
         stats["database"] = settings.migration_url().database
@@ -205,6 +222,7 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
             t0 = time.perf_counter()
             rel = publish_release(engines["worker"], store, cutoff=utc_now(), origin=Origin.live, environment="test")
             stats["release"] = {"id": str(rel.release_id), "seconds": round(time.perf_counter() - t0, 1)}
+            dump()
 
             common = {
                 "schema_version": "2.0.0",
@@ -230,14 +248,11 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
                     "base_period": {"first_year": 2018, "last_year": 2022},
                 },
                 "fidelity": "L1",
-                "outputs": [
-                    "population.total.all_ages",
-                    "population.total.age_65_plus",
-                    "old_age_dependency_ratio_65plus_per_15_64",
-                ],
+                # two outputs: every country x 28 years x 2 rows stays under the 32 MiB result manifest
+                "outputs": ["population.total.all_ages", "old_age_dependency_ratio_65plus_per_15_64"],
             }
-            ref = _job(engines, settings, store, _create(engines, cohort), "L1")
-            stats["cohort_all"] = _summary(engines, ref)
+            ref = job("cohort_all", cohort, "L1")
+            assert ref is not None, stats["cohort_all"]
             with engines["migration"].connect() as c:
                 rows = c.execute(
                     text("""SELECT applicability->>'country' AS c, output_key, period_start, value->>'value' AS v
@@ -263,16 +278,30 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
                     "first_birth_year": 1965,
                 },
                 "assumptions": {"employment_response": {"central": "rabate_rochut_2020_fra"}},
-                "fidelity": "L2",
-                "outputs": [
-                    "employed_persons_55_64",
-                    "employment_change_55_64",
-                    "pension_recipients_change_55_64",
-                    "old_age_dependency_ratio",
-                ],
+                "fidelity": "L1",  # every country at L1 (L2 x every country exceeds the 32 MiB result manifest)
+                "outputs": ["employment_change_55_64", "pension_recipients_change_55_64"],
             }
-            ref = _job(engines, settings, store, _create(engines, retire), "L2")
-            stats["retirement_shift_plus_24m"] = _summary(engines, ref)
+            job("retirement_shift_plus_24m", retire, "L1")
+            l2 = {
+                **retire,
+                "title": "Live SIMWORLD: retirement age +2 years, L2 grid, five countries",
+                "countries": ["SEN", "BRA", "JPN", "IND", "MEX"],
+                "fidelity": "L2",
+                "outputs": ["employed_persons_55_64", "employment_change_55_64", "pension_recipients_change_55_64"],
+            }
+            ref = job("retirement_shift_l2_five", l2, "L2")
+            if ref is not None:
+                with engines["migration"].connect() as c:
+                    rows = c.execute(
+                        text("""SELECT applicability->>'country' AS c, variant, value FROM sim.result
+                                WHERE run_id=:r AND period_start = '2032-01-01'
+                                  AND output_key = 'employment_change_55_64'"""),
+                        {"r": ref["run_id"]},
+                    ).all()
+                stats["retirement_shift_l2_five"]["employment_change_2032"] = {
+                    f"{iso}|{var}": (v.get("value") or [v.get("lower"), v.get("upper")]) for iso, var, v in rows
+                }
+                dump()
             target = {**retire, "title": "Live SIMWORLD: retirement age 62 from the 1965 cohort", "fidelity": "L1"}
             target["intervention"] = {
                 "kind": "retirement_age_target",
@@ -280,8 +309,7 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
                 "target_age_months": 744,
                 "first_birth_year": 1965,
             }
-            ref = _job(engines, settings, store, _create(engines, target), "L1")
-            stats["retirement_target_62"] = _summary(engines, ref)
+            ref = job("retirement_target_62", target, "L1")
             with engines["migration"].connect() as c:
                 rows = c.execute(
                     text("""SELECT applicability->>'country' AS c, output_key, value->>'value' AS v FROM sim.result
@@ -344,6 +372,8 @@ def test_live_world_ingest_projections_backtest_and_retirement(tmp_path: Path) -
             assert stats["cohort_all"]["status"] == "succeeded", stats["cohort_all"]
             assert len(stats["cohort_all"]["ready"]) > 200
             assert stats["retirement_shift_plus_24m"]["status"] == "succeeded"
+            assert stats["retirement_shift_l2_five"]["status"] == "succeeded"
+            assert stats["retirement_target_62"]["status"] == "succeeded"
             ok = [v for v in backtest.values() if "total_ape" in v]
             assert len(ok) > 200 and all(Decimal(v["naive_no_change_total_ape"]) >= 0 for v in ok)
         finally:

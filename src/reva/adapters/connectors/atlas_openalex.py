@@ -7,17 +7,22 @@ OpenAlex (OurResearch), ``https://api.openalex.org`` — data **CC0** (https://o
 downloads: one request returns the number of works per country for one filter.
 
 * ``/works?filter=publication_year:<Y>,type:article|review&group_by=authorships.countries``
-  -> dataset ``works_country_year``: works (articles and reviews) published in year ``Y`` with at
+  (years 1990-2025) -> dataset ``works_country_year``: works (articles and reviews) published in year ``Y`` with at
   least one authorship affiliated to an institution in the country (**full counting**: a work with
   authors in France and Japan counts once for each; country counts do not sum to the world total).
 * the same with ``primary_topic.domain.id:<D>`` for OpenAlex's four domains (1 Life Sciences,
-  2 Social Sciences, 3 Physical Sciences, 4 Health Sciences) -> dataset ``works_country_domain``.
-* Optionally (``fields=True``) the 26 OpenAlex fields (``primary_topic.field.id``) for a few years
+  2 Social Sciences, 3 Physical Sciences, 4 Health Sciences), years 2015-2025 -> dataset
+  ``works_country_domain``.
+* Optionally (``field_years=...``) the 26 OpenAlex fields (``primary_topic.field.id``) for a few years
   -> dataset ``works_country_field`` (request-hungry; off by default).
 
 Every response's ``meta.count`` (all works matching the filter, any country or none) is kept as
-an unmapped ``provider_geo = "_all_works"`` row, and the ``unknown`` group (works with no country
-attributed) as ``provider_geo = "unknown"``, so country shares and the coverage gap stay visible.
+an unmapped ``provider_geo = "_all_works"`` row (the denominator for shares); an ``unknown`` group,
+if OpenAlex returns one, is kept unmapped as ``provider_geo = "unknown"``.
+
+A group_by page holds at most 200 groups and OpenAlex refuses cursor paging without an API key
+(HTTP 401, observed 2026-10-16), so the countries beyond the 200 largest come from *complement*
+queries (see :func:`fetch_query`); about 3 requests per query, 230 for the default plan.
 
 Caveats carried in flags: OpenAlex is a live index (counts change as records are added, merged or
 re-attributed: the retrieval date is recorded on every row); affiliation-country coverage is weak

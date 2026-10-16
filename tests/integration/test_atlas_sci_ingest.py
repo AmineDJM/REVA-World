@@ -136,3 +136,23 @@ async def test_openalex_rate_limit_stops_run(db):
     assert http.calls == 1 and rep["tables"] == {}
     assert rep["incomplete"][0]["status"] == "failed"
     assert {i["status"] for i in rep["incomplete"][1:]} == {"not_attempted"}
+
+
+async def test_openalex_fixture_run(db):
+    """Recorded live responses of the 2020 queries (first page + complement queries) -> two atlas tables."""
+    _reg(db, "atlas.openalex")
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.openalex", mode="fixture")
+    rep = out["summary"]
+    assert out["status"] == "completed" and rep["incomplete"] == [] and rep["stopped"] is None
+    year = read_atlas_table(db.store, rep["tables"]["works_country_year"]["artifact_sha256"])
+    assert year.filter(pl.col("iso3").is_not_null())["iso3"].n_unique() > 200
+    assert {u["provider_geo"] for u in rep["tables"]["works_country_year"]["unmapped_provider_geo"]} <= {
+        "_all_works",
+        "unknown",
+    }
+    fra = year.filter(pl.col("iso3") == "FRA")["value"].to_list()
+    assert len(fra) == 1 and int(fra[0]) > 100_000
+    xkx = year.filter(pl.col("iso3") == "XKX")  # OpenAlex XK -> Kosovo via registry/atlas/geo_aliases/a_sci.yaml
+    assert xkx.height == 1
+    dom = read_atlas_table(db.store, rep["tables"]["works_country_domain"]["artifact_sha256"])
+    assert dom["indicator"].n_unique() == 4

@@ -106,11 +106,63 @@ section 1 are referenced in the file header, not duplicated.
 
 ## 5. Live ingest
 
-LIVE_SECTION
+`pytest -m "live and db" tests/integration/test_atlas_society_live.py` (2026-10-15/16 UTC), throwaway database
+created and dropped by the `db` fixture, object store in the agent's scratch folder (deleted afterwards). Every
+run went through `run_atlas_ingest(mode="live")` → `reserve_ingest` → metered SafeHttpClient → `settle_metered`;
+the six new keys were granted in memory from the budget request (section 7). No request was refused.
+`atlas.rcs_dem` was run a second time after adding the 984/2020 aliases (numbers below are from that run).
+
+| Source | Table | Requests | Bytes | Rows | Countries (crosswalk) | Years | Parquet sha256 |
+|---|---|---:|---:|---:|---:|---|---|
+| `atlas.rcs_dem` | `rcs.dem2` | 4 | 40.1 MB | 1,879,662 | 235 | 1700-2015 | `de017394…a9ef3` |
+| `atlas.wrp` | `wrp.national` | 2 | 1.4 MB | 145,630 | 193 | 1945-2010 (5-yearly) | `6b33ff3a…` |
+| `atlas.hief` | `hief.hief` | 2 | 0.2 MB | 8,784 | 156 | 1945-2013 | `30bd3362…` |
+| `atlas.sscp_frac` | `sscp.frac_v1` | 3 | 0.05 MB | 682 | 239 | 2003 / 2014 / 2015 / 2026 cross-sections | `3fae7cd2…` |
+| `atlas.cdpd` | `cdpd.cdpd_v1` | 2 | 0.9 MB | 19,204 | 194 | 1800-2022 | `ecec0deb…` |
+| `atlas.who_violence` | `who.gho_violence` | 3 | 10.1 MB | 23,190 | 185 | 2000-2021 | `58ca913b…` |
+| `atlas.ti_cpi` | `ti.cpi` | 2 | 3.4 MB | 14,964 | 183 | 2012-2025 | `727b3fda…` |
+| `atlas.oecd_sigi` | `oecd.sigi2023` | 2 | 4.3 MB | 3,635 | 178 | 2023 | `c9e39d0e…` |
+| `atlas.parlgov` | `parlgov.elections` | 2 | 1.2 MB | 18,436 | 37 | 1900-05-27 … 2023-06-25 (1,028 elections) | `6f261350…` |
+
+Total: 22 requests, ~61.6 MB of raw downloads, ~12 MB of Parquet (RCS 8.9 MB). Duration ≈ 3.3 min
+for all nine (RCS parse of the 266 MB sheet XML dominates). Disk per full refresh ≈ 75 MB.
 
 ## 6. Coverage and gaps
 
-COVERAGE_SECTION
+Latest-year coverage of the headline series (crosswalk entities; 251 in the crosswalk):
+
+| Series | Countries | Latest year (countries) | Not covered |
+|---|---:|---|---|
+| RCS `CHRPC` (Christians %) | 235 | 2015: 235 | 16: uninhabited / sub-national territories (ATA, BVT, HMD, SGS, UMI, IOT, ATF, CCK, CXR, NFK, SJM, ALA, BLM, MAF) and Guernsey/Jersey (RCS has the Channel Islands as one unit → CHI) |
+| RCS `MAJID` | 231 | 2015: 226 | as above + a few units without a (super)majority code |
+| WRP `chrstgenpct` | 193 | 2010: 193 | territories and microstates outside the COW system |
+| HIEF `EFindex` | 156 | 2013: 156 | 95 — HIEF covers 162 units with ≥ 500,000 inhabitants; **France has no row in HIEF V2** |
+| SSCP `ethnic_frac` / `language_frac` / `religion_frac` | 227 / 215 / 234 | cross-section | 24 / 36 / 17 (uninhabited territories; language missing for 25 polities "No value in any source") |
+| CDPD `Deathpenalty` | 194 | 2022: 194 (110 abolished, 7 ordinary crimes only, 43 abolished in practice, 34 retained) | territories (CDPD covers independent states) |
+| WHO `VIOLENCE_HOMICIDERATE` both sexes | 185 | 2021: 185 | WHO member states only |
+| TI `cpi_score` | 183 | 2025: 182 | territories, microstates |
+| OECD `SIGI` / legal variables | 140 / 178 | 2023 | SIGI not computed where data are insufficient (110 empty observations omitted) |
+| ParlGov | 37 | 2023 | by design (EU/OECD democracies) |
+
+All nine tables together cover **241 of 251** crosswalk entities; the ten without any A-SOCIETY data are
+uninhabited or have no population of their own (ATA, BVT, HMD, SGS, UMI, IOT, ATF) plus Åland, Saint-Barthélemy
+and Saint-Martin (FR).
+
+Gaps and where they are filled:
+
+* **Religion for territories not in RCS** (Guernsey and Jersey individually): CIA Factbook text
+  (`factbook.text.religions`, A-FACTBOOK) and SSCP `religion_frac` (Jersey).
+* **Religion after 2015**: no openly licensed source (Pew forbids republication in principal part; the World
+  Religion Database is proprietary). Factbook texts give current shares as text.
+* **Homicide**: UNODC series via WDI (`wb.vc.ihr.psrc.p5`) and the SDG table (A-UN) — a different concept
+  (recorded intentional homicides) from WHO's modelled estimates; both shown per source, never blended.
+* **Prisons**: no open source found (World Prison Brief and UNODC not redistributable); SDG 16.3.2 (unsentenced
+  detainees) could be added by A-UN from the SDG API.
+* **Press / political freedom**: Freedom House and RSF are not redistributable; V-Dem indices (A-POL, CC BY-SA)
+  cover freedom of expression, association, academic freedom and corruption.
+* **Digital and tourism**: WDI copies of ITU and UN Tourism series (A-WB); SDG internet/broadband (A-UN).
+* **Turnout**: IPU Parline and V-Dem (A-POL); ParlGov adds party-level results for 37 countries.
+* **HIEF France gap**: SSCP/Alesina `ethnic_frac` covers France (different method, separate concept).
 
 ## 7. Shared-file notes for the lead / ATLASCORE
 

@@ -1,0 +1,197 @@
+[
+  {
+    "request_fingerprint": "6d62780194e9dba4826d4c5d9231cbd06a787144700fd36604e4b130851d54f4",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review&group_by=authorships.countries&per_page=200",
+    "file": "6d62780194e9dba4.json",
+    "sha256": "17262ddb4b942303c93a86aad4aae872ba7fe32d9a75b3cc2829917c58060609",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:07:54.083248+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_year:2020:top) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "5455cc59d4ffc391bd9720c49a3ea4625a75b9bcf1270909dcec8bd565ab2228",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,authorships.countries:AD|AI|AQ|AS|AW|AX|BL|BQ|BV|CC|CK|CX|EH|FK|FM|GG|GQ|GS|HM|IM|IO|KI|KM|KY|LC&group_by=authorships.countries&per_page=200",
+    "file": "5455cc59d4ffc391.json",
+    "sha256": "d688cf8d37fcbaad83fea1b3f35816b2336521a3908a0455321a20c44df89a63",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:07:54.267176+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_year:2020:c1) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "85865ff753320313ae6342abc71423c902293447db88a933b45f4d229bf81e2b",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,authorships.countries:MF|MH|MP|MS|NF|NR|NU|PM|PN|PW|SB|SH|TC|TF|TK|TM|TO|TV|UM|VA|VC|VG|VU|WF|YT&group_by=authorships.countries&per_page=200",
+    "file": "85865ff753320313.json",
+    "sha256": "0821733efc2e61f93bb4b2f915b216ca34b9cac58f71f4ff1abd036809d1139d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:07:54.523038+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_year:2020:c2) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "b4f35808a6845bb9a7a1382da10e17d60c5fce255d5f9dc0ef442b2032597b57",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:1&group_by=authorships.countries&per_page=200",
+    "file": "b4f35808a6845bb9.json",
+    "sha256": "7e80671281f2f836056b33400f8cdb26c866c2daa96760d09f7c248f5fe2ae6c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:14.643417+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=1:top) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "d8ea3a151ab076d55ed713e7af225d32b2d1e65af40a50a07422ed79fe3a11ad",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:1,authorships.countries:AD|AI|AQ|AW|AX|BL|BM|BQ|BV|CC|CK|CX|EH|FK|GG|GQ|GS|HM|IM|IO|KM|KY|MF|MH|MS&group_by=authorships.countries&per_page=200",
+    "file": "d8ea3a151ab076d5.json",
+    "sha256": "be60d9e6fadcd40aab6e18cd98a5206aa9269d0238ef355963043b5e0667cf22",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:14.929007+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=1:c1) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "cbcb12fa494469604a52e8aa07d03a24e96edbc99c0d136134c3e8426af785ce",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:1,authorships.countries:MV|NF|NR|NU|PM|PN|PW|SB|SH|SM|SR|TC|TF|TK|TM|TO|TV|UM|VA|VC|VG|VI|VU|WF|YT&group_by=authorships.countries&per_page=200",
+    "file": "cbcb12fa49446960.json",
+    "sha256": "d690ee5be8e9de4e936e5479203f98d4a850ae9dee1f03a82b1b43e8bef89387",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:15.162584+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=1:c2) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "7c3fd678fd91cb75aba761fdefe02f6781c693ba758489b220148bc2c2632a5b",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:2&group_by=authorships.countries&per_page=200",
+    "file": "7c3fd678fd91cb75.json",
+    "sha256": "bb4f98b692aed659066480404a5b5e120b2f6159deddf9b9c1867ffcf5bfb360",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:15.447903+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=2:top) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "54bddb885eb2b111562f8609a7816e812fe0455f7bd344af748210444827b28a",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:2,authorships.countries:AI|AQ|AS|AW|AX|BL|BM|BQ|BV|CC|CK|CX|EH|FK|FM|GG|GQ|GS|HM|IM|IO|JE|KI|KM|LC&group_by=authorships.countries&per_page=200",
+    "file": "54bddb885eb2b111.json",
+    "sha256": "299a78b7886f2772b26b8b8c6588f51f854e2eca3480efca1b3f5cc66af2c00b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:15.624666+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=2:c1) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "babd2ac037acac1f046a34d267b1cbcd189bc53d5740b24f227582325ff8b184",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:2,authorships.countries:MH|MP|MS|NF|NR|NU|PM|PN|PW|SB|SH|SJ|TC|TF|TK|TM|TO|TV|UM|VA|VC|VG|VI|WF|YT&group_by=authorships.countries&per_page=200",
+    "file": "babd2ac037acac1f.json",
+    "sha256": "dc03f12c0c8a0ce556c1cd9d3ee050da464a962a6315850d761dc623c5762315",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:15.944239+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=2:c2) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "65bde98376cc4f26964175c540c93be86553f8f6cd8110b03d848b1eb5545175",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:3&group_by=authorships.countries&per_page=200",
+    "file": "65bde98376cc4f26.json",
+    "sha256": "cd844857a2703394c110282a2259a3269443175e696f82343d68c5c81ac11664",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:16.131766+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=3:top) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "71a5bb7279d9bd5a7720bbab4687168a2fc9c887739dc5200926b9ea1ff6d841",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:3,authorships.countries:AD|AG|AI|AQ|AW|AX|BL|BQ|BV|CC|CK|CW|CX|EH|GG|GQ|GS|GW|HM|IM|IO|KI|KM|KY|LC&group_by=authorships.countries&per_page=200",
+    "file": "71a5bb7279d9bd5a.json",
+    "sha256": "0359d2e296f7113c3106f6f31854a75e98dfabe715268a2f20282503d1e7b3e9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:16.381438+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=3:c1) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "129aff7ac789ae179613d8e4545c7026048c4a0ff5ae2bd1ed0e585c74446016",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:3,authorships.countries:LR|MF|MH|MP|MS|NF|NR|NU|PM|PN|SB|SH|SX|TC|TF|TK|TO|TV|UM|VA|VC|VG|VU|WF|YT&group_by=authorships.countries&per_page=200",
+    "file": "129aff7ac789ae17.json",
+    "sha256": "633c2a57233b7b24b30381b2870e3e1aa3543e5b71608af6ad247fa167ca72f0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:16.707590+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=3:c2) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "49a6dda7b22c6497ecb9b49d70c75f798f0d3c11a246ecf5802ec174e50d7440",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:4&group_by=authorships.countries&per_page=200",
+    "file": "49a6dda7b22c6497.json",
+    "sha256": "54b053d4512a7968734c91604cd737183390d38f1215dbcf9d60bbc6c5c3c57b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:16.983011+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=4:top) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "4915492ca440f0ebf3c8dbf7404bbdfd1844ada02f996ed8787e199d3178046c",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:4,authorships.countries:AD|AI|AQ|AS|AW|AX|BL|BM|BQ|BV|BZ|CC|CK|CX|DJ|DM|EH|FK|FM|GG|GQ|GS|HM|IO|KI&group_by=authorships.countries&per_page=200",
+    "file": "4915492ca440f0eb.json",
+    "sha256": "560adc0e74c2fce0a86f280c327986f8ec50603e9e6b5454f64b5c41df59904f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:17.146831+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=4:c1) archived by the throwaway live run"
+  },
+  {
+    "request_fingerprint": "6cebc4b6a048c44c7f7eef4fca1b8d8948f9d840fafe3710a1f842953e5b2e10",
+    "url": "https://api.openalex.org/works?filter=publication_year:2020,type:article|review,primary_topic.domain.id:4,authorships.countries:KM|MF|MH|MP|MS|NF|NR|NU|PM|PN|PW|SB|SH|SJ|TC|TF|TK|TM|UM|VA|VG|VI|VU|WF|YT&group_by=authorships.countries&per_page=200",
+    "file": "6cebc4b6a048c44c.json",
+    "sha256": "6cc5768226df5249e16e1e63f1b5e94b0c5e59d45350d78ae1c68632ed67decc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:08:17.389415+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (item works_country_domain:2020:domain=4:c2) archived by the throwaway live run"
+  }
+]

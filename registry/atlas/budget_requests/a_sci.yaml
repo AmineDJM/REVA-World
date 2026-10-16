@@ -2,9 +2,9 @@
 agent: A-SCI
 requests:
   - source_key: openalex.api
-    # group_by aggregates only (never per-work downloads): 1 request per (year) and per (year, domain), 1-2 cursor
-    # pages each. Default plan: 36 years (1990-2025) + 26 years x 4 domains (2000-2025) = 140 queries, <= 280 pages.
-    # Optional fields plan: 4 years x 26 fields = 104 queries. Each page <= ~60 KB.
+    # group_by aggregates only (never per-work downloads). Default plan: 36 years (1990-2025) + 11 years x 4 domains
+    # (2015-2025) = 80 queries; without an API key ~3 requests per query (first page + complement queries, OpenAlex
+    # refuses cursor paging without a key): 230 requests / 2.7 MB in the live run of 2026-10-16.
     daily_requests: 400
     expected_bytes_per_day: 25000000
     reason: "monthly re-query of works per country x year (x domain); OpenAlex itself also meters per IP/API key"
