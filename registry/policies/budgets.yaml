@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.6"
+policy_version: "budgets-1.3.7"
 daily:
-  http_requests_total: 11538
+  http_requests_total: 12875
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -15,6 +15,8 @@ per_source_daily_requests:
   # --- V3 atlas/KG sources ---
   # Merged by ATLASCORE (src/reva/atlas/budget_merge.py) from registry/atlas/budget_requests/*.yaml:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
+  # archigos.leaders: requested by A-COUPS (a_coups.yaml)
+  archigos.leaders: 18
   # bis.stats: requested by A-FISCAL (a_fiscal.yaml)
   bis.stats: 14
   # bmr.dataverse: requested by A-POL (a_pol.yaml)
@@ -33,12 +35,18 @@ per_source_daily_requests:
   cliopatria.github: 6
   # constitute.service: requested by A-LAW (a_law.yaml)
   constitute.service: 5
-  # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml)
-  cow.data: 26
+  # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml), CAUSDATA (causdata.yaml)
+  cow.data: 34
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
   cshapes.cran: 8
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml)
   eia.opendata_bulk: 8
+  # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml)
+  esrb.fcdb: 3
+  # eu.sanctionsmap: requested by A-SANCTIONS (a_sanctions.yaml)
+  eu.sanctionsmap: 4
+  # eusanct.kondata: requested by A-SANCTIONS (a_sanctions.yaml)
+  eusanct.kondata: 6
   # factbook.json: requested by A-FACTBOOK (a_factbook.yaml), A-LAW (a_law.yaml)
   factbook.json: 900
   # fao.faostat: requested by A-FAO (a_fao.yaml)
@@ -55,12 +63,20 @@ per_source_daily_requests:
   glottolog.cldf: 8
   # grambank.cldf: requested by KGLANG (kglang.yaml)
   grambank.cldf: 6
+  # harvard.dataverse.massmob: requested by A-CONTENTION (a_contention.yaml)
+  harvard.dataverse.massmob: 6
+  # harvard.dataverse.mec: requested by A-CONTENTION (a_contention.yaml)
+  harvard.dataverse.mec: 6
+  # harvard.dataverse.navco: requested by A-CONTENTION (a_contention.yaml)
+  harvard.dataverse.navco: 20
   # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
   harvard.dataverse.unvotes: 12
   # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
   hief.dataverse: 6
   # hyde.dans: requested by A-HISTECON (a_histecon.yaml)
   hyde.dans: 10
+  # icb.data: requested by CAUSDATA (causdata.yaml)
+  icb.data: 16
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml)
   ilostat.rplumber: 60
   # imf.sdmx: requested by A-IMF (a_imf.yaml)
@@ -71,6 +87,10 @@ per_source_daily_requests:
   ipu.parline: 12
   # jrc.inform_risk: requested by A-GEO (a_geo.yaml)
   jrc.inform_risk: 4
+  # jst.macrohistory: requested by A-ECRISES (a_ecrises.yaml)
+  jst.macrohistory: 6
+  # laeven_valencia.sbcd: requested by A-ECRISES (a_ecrises.yaml)
+  laeven_valencia.sbcd: 3
   # lied.dataverse: requested by A-POL (a_pol.yaml)
   lied.dataverse: 6
   # maddison.mpd: requested by A-HISTECON (a_histecon.yaml)
@@ -79,10 +99,14 @@ per_source_daily_requests:
   naturalearth.admin0_10m: 12
   # nga.wpi: requested by A-INFRA (a_infra.yaml)
   nga.wpi: 3
+  # noaa.ncei_hazards: requested by A-HAZARDS (a_hazards.yaml)
+  noaa.ncei_hazards: 600
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
   # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)
   oecd.sdmx: 76
+  # ofac.programs: requested by A-SANCTIONS (a_sanctions.yaml)
+  ofac.programs: 4
   # ohchr.indicators: requested by A-TREATIES (a_treaties.yaml)
   ohchr.indicators: 50
   # openalex.api: requested by A-SCI (a_sci.yaml)
@@ -95,8 +119,14 @@ per_source_daily_requests:
   owid.compilations: 50
   # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
   parlgov.dataverse: 6
+  # powell_thyne.coups: requested by A-COUPS (a_coups.yaml)
+  powell_thyne.coups: 6
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)
   rcs_dem.osf: 12
+  # reign.leaderlist: requested by A-COUPS (a_coups.yaml)
+  reign.leaderlist: 6
+  # reinhart_rogoff.bffs: requested by A-ECRISES (a_ecrises.yaml)
+  reinhart_rogoff.bffs: 3
   # spc.pdh_stat: requested by GAPHUNT (gaphunt.yaml)
   spc.pdh_stat: 12
   # ssa.ssptw: requested by A-LAW (a_law.yaml)
@@ -107,8 +137,10 @@ per_source_daily_requests:
   statistics_jersey.opendata: 3
   # ti.cpi: requested by A-SOCIETY (a_society.yaml)
   ti.cpi: 6
-  # ucdp.downloads: requested by KGGEOPOL (kggeopol.yaml)
-  ucdp.downloads: 16
+  # ties.unc: requested by A-SANCTIONS (a_sanctions.yaml)
+  ties.unc: 8
+  # ucdp.downloads: requested by CAUSDATA (causdata.yaml), KGGEOPOL (kggeopol.yaml)
+  ucdp.downloads: 30
   # un.desa_ims: requested by A-UN (a_un.yaml)
   un.desa_ims: 5
   # un.psdata: requested by A-MILITARY (a_military.yaml)
@@ -153,6 +185,8 @@ per_source_daily_requests:
   wikidata.wbapi: 4000
   # wikidata.wdqs: requested by WDHARVEST (wdharvest.yaml)
   wikidata.wdqs: 1500
+  # wikipedia.causal_text: requested by CAUSCAND (causcand.yaml)
+  wikipedia.causal_text: 600
   # wikipedia.olympic_medal_tables: requested by A-CULTURE (a_culture.yaml)
   wikipedia.olympic_medal_tables: 12
   # wipo.gii: requested by A-SCI (a_sci.yaml)

@@ -607,9 +607,9 @@ def chain(
     for c in rendered:
         by_pair[(c["cause"]["id"], c["effect"]["id"])].append(c)
     labels, kinds = labels_for(conn, {x for p in paths for x in p}), kinds_for(conn, {x for p in paths for x in p})
-    built = []
+    built: list[tuple[tuple[int, int, list[str]], dict[str, Any]]] = []
     for p in paths:
-        hops = []
+        hops: list[dict[str, Any]] = []
         for i in range(len(p) - 1):
             cl = by_pair.get((p[i], p[i + 1]), [])
             if not cl:
@@ -624,10 +624,12 @@ def chain(
             )
         if len(hops) != len(p) - 1:
             continue  # a claim changed between the search and the read
-        grades = [h["hop_grade"] for h in hops]
+        grades: list[str] = [h["hop_grade"] for h in hops]
         cg = gr.weakest(grades)
         built.append(
-            {
+            (
+                (gr.GRADES.index(cg), sum(gr.GRADES.index(g) for g in grades), p),
+                {
                 "length": len(hops),
                 "chain_grade": cg,
                 "weakest_hop": grades.index(cg),
@@ -636,18 +638,16 @@ def chain(
                 f"weakest hop ({cg}). Each hop is asserted by its own source; REVA does not assert the chain.",
                 "wording_fr": f"Composition par REVA de {len(hops)} affirmation(s) énoncée(s) séparément ; note de "
                 f"la chaîne = maillon le plus faible ({cg}). REVA n'affirme pas la chaîne.",
-                "_key": (gr.GRADES.index(cg), sum(gr.GRADES.index(g) for g in grades), p),
-            }
+                },
+            )
         )
-    built.sort(key=lambda x: x["_key"])
-    for b in built:
-        b.pop("_key")
+    built.sort(key=lambda x: x[0])
     lab = labels_for(conn, labels_ids)
     return {
         "from": _ref(frm, lab, kinds),
         "to": _ref(to, lab, kinds),
         "found": bool(built),
-        "paths": built[:max_paths],
+        "paths": [b for _, b in built[:max_paths]],
         "paths_found": len(built),
         "note": CHAIN_NOTE,
         "note_fr": CHAIN_NOTE_FR,

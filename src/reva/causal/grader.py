@@ -47,7 +47,9 @@ def fetch_event_dates(conn: Connection, ids: Iterable[str], origin: str | None) 
     qs = sorted(set(ids))
     rows: list[Mapping[str, Any]] = []
     for i in range(0, len(qs), ENTITY_CHUNK):
-        rows += (
+        rows += [
+            dict(r)
+            for r in
             conn.execute(
                 text(f"""SELECT s.subject_qid, s.property_pid, s.rank, s.value->>'time' AS time,
                                (s.value->>'precision')::int AS precision,
@@ -144,8 +146,8 @@ def grade_claims(engine: Engine, *, origin: str | None = None, rules: gr.Rules |
             if not claims:
                 continue
             dates = fetch_event_dates(conn, [c["cause_id"] for c in claims] + [c["effect_id"] for c in claims], o)
-            computed = compute(claims, dates, rules)
-            latest = dict(
+            computed = compute([dict(c) for c in claims], dates, rules)
+            latest: dict[int, str] = dict(
                 conn.execute(
                     text("""SELECT claim_row_id, inputs_sha256 FROM kg.causal_grade_current
                              WHERE origin = :o AND claim_row_id = ANY(:ids)"""),

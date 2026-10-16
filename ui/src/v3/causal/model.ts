@@ -47,17 +47,18 @@ export const FAMILY_STYLE: Record<Family, { label: string; short: string; color:
 
 /** French wording of a relation, read cause → effect, always attributed by the caller. */
 const RELATION_FR: Record<string, string> = {
-  has_cause: 'a pour cause',
+  // read cause → effect, as registry/causal/relations.yaml labels them (the server's relation_label wins)
+  has_cause: 'a causé',
   has_effect: 'a pour effet',
-  immediate_cause: 'cause immédiate',
-  underlying_cause: 'cause profonde',
-  contributing_factor: 'facteur contributif',
+  immediate_cause: 'cause immédiate de',
+  underlying_cause: 'cause profonde de',
+  contributing_factor: 'facteur contributif de',
   enabled: 'a rendu possible',
   precipitated: 'a précipité',
   prevented_or_delayed: 'a empêché ou retardé',
-  reaction_to: 'réaction à',
-  coded_trigger: 'déclencheur codé',
-  coded_outcome: 'issue codée',
+  reaction_to: 'a provoqué la réaction',
+  coded_trigger: 'est le déclencheur codé de',
+  coded_outcome: 'a pour issue codée',
 };
 export function relationFr(c: Pick<CausalClaim, 'relation' | 'relationLabel'>): string {
   return c.relationLabel ?? RELATION_FR[c.relation] ?? c.relation.replace(/_/g, ' ');

@@ -347,12 +347,12 @@ def _write(
         ).rowcount
         rep.inserted += int(n)
     for i in range(0, len(gone), INSERT_CHUNK):
-        chunk = gone[i : i + INSERT_CHUNK]
+        part = gone[i : i + INSERT_CHUNK]
         n = conn.execute(
             text("""INSERT INTO kg.causal_claim_retraction(load_id, claim_row_id, claim_key, origin, reason)
                     SELECT :load, (x->>0)::bigint, x->>1, :o, x->>2
                       FROM jsonb_array_elements(CAST(:rows AS jsonb)) x"""),
-            {"load": load_id, "o": origin, "rows": _json([list(g) for g in chunk])},
+            {"load": load_id, "o": origin, "rows": _json([list(g) for g in part])},
         ).rowcount
         rep.retracted += int(n)
 
@@ -493,7 +493,7 @@ def load_kg_claims(
             rows: list[dict[str, Any]] = []
             for i, st in enumerate(rows_db):
                 try:
-                    rows.append(claim_from_statement(st, vocab))
+                    rows.append(claim_from_statement(dict(st), vocab))
                 except ValueError as e:
                     rep.reject(i, str(e)[:100], st["statement_key"])
             current_stmt = {r["statement_key"] for r in rows_db}
