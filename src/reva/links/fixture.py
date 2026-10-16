@@ -32,6 +32,8 @@ from reva.links.taxonomy import LINKS_DIR, REPO_ROOT
 
 SEED_FILE = LINKS_DIR / "fixture_entities.yaml"
 FIXTURE_FILE = REPO_ROOT / "tests" / "unit" / "links" / "fixtures" / "wikidata_links_fixture.json"
+#: LINKS3: the one real Wikidata statement of the Q55 -> Q29999 mapping hop (registry/links/geo_mapping_hops.yaml)
+HOP_FIXTURE_FILE = REPO_ROOT / "tests" / "unit" / "links" / "fixtures" / "wikidata_q55_hop.json"
 #: literal-valued properties kept for every fixture entity (dates, ISO codes)
 LITERAL_KEEP = frozenset({"P298", "P297", "P571", "P576", "P580", "P582", "P585", "P569", "P570"})
 FIXTURE_LANGS = ("fr", "en")
@@ -257,9 +259,12 @@ def _t(t: Any) -> dict[str, Any] | None:
     return None if t is None else {"time": t.iso, "precision": t.precision, "calendar": t.calendar}
 
 
-def load_into_kg(engine: Any, store: Any, *, source_key: str = "wikidata.links_fixture") -> Any:
-    """Load the captured fixture into ``kg.*`` with KGCORE's ``load_batch`` (origin ``test_fixture``; the
-    fixture file archived as the raw artifact). Idempotent. Used by tests and the LINKS2 demo database."""
+def load_into_kg(
+    engine: Any, store: Any, *, source_key: str = "wikidata.links_fixture", path: Path = FIXTURE_FILE
+) -> Any:
+    """Load the captured fixture (``path``: the links fixture, or LINKS3's mapping-hop fixture) into ``kg.*``
+    with KGCORE's ``load_batch`` (origin ``test_fixture``; the fixture file archived as the raw artifact).
+    Idempotent. Used by tests and the LINKS2 demo database."""
     import hashlib
 
     from reva.adapters.connectors.wikidata import load_allowlist
@@ -267,10 +272,10 @@ def load_into_kg(engine: Any, store: Any, *, source_key: str = "wikidata.links_f
     from reva.kg.model import KgEntity, KgStatement, KgTime, load_batch, register_properties
 
     register_properties(engine, kg_properties(load_allowlist()))
-    body = FIXTURE_FILE.read_bytes()
+    body = path.read_bytes()
     raw = store.put_bytes(body, "raw", "application/json").sha256
     assert raw == hashlib.sha256(body).hexdigest()
-    fx = load_fixture()
+    fx = load_fixture(path)
 
     def t(d: Any) -> Any:
         return None if d is None else KgTime(d["time"], d["precision"], d.get("calendar", "gregorian"))
