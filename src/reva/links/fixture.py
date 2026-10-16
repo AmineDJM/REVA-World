@@ -257,7 +257,6 @@ def _t(t: Any) -> dict[str, Any] | None:
     return None if t is None else {"time": t.iso, "precision": t.precision, "calendar": t.calendar}
 
 
-
 def load_into_kg(engine: Any, store: Any, *, source_key: str = "wikidata.links_fixture") -> Any:
     """Load the captured fixture into ``kg.*`` with KGCORE's ``load_batch`` (origin ``test_fixture``; the
     fixture file archived as the raw artifact). Idempotent. Used by tests and the LINKS2 demo database."""
@@ -309,6 +308,7 @@ def load_into_kg(engine: Any, store: Any, *, source_key: str = "wikidata.links_f
         retrieved_at=datetime.now(UTC),
         origin="test_fixture",
     )
+
 
 def main(argv: list[str]) -> int:  # pragma: no cover - CLI
     if not argv or argv[0] != "capture":

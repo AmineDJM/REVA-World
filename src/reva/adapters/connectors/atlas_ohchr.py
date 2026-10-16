@@ -101,9 +101,8 @@ class OhchrParseError(ValueError):
 def text_of(fragment: str | None) -> str:
     if not fragment:
         return ""
-    t = re.sub(r"<br\s*/?>", "\n", fragment, flags=re.I)
-    t = html.unescape(re.sub(r"<[^>]+>", " ", t)).replace("\xa0", " ")
-    return re.sub(r"[ \t]+", " ", re.sub(r"\s*\n\s*", "\n", t)).strip()
+    t = html.unescape(re.sub(r"<[^>]+>", " ", fragment)).replace("\xa0", " ")
+    return re.sub(r"\s+", " ", t).strip()  # one line: atlas text cells refuse control characters
 
 
 def ddmmyyyy(s: str | None) -> date | None:

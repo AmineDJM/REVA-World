@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.5"
+policy_version: "budgets-1.3.6"
 daily:
-  http_requests_total: 11206
+  http_requests_total: 11538
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -15,8 +15,12 @@ per_source_daily_requests:
   # --- V3 atlas/KG sources ---
   # Merged by ATLASCORE (src/reva/atlas/budget_merge.py) from registry/atlas/budget_requests/*.yaml:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
+  # bis.stats: requested by A-FISCAL (a_fiscal.yaml)
+  bis.stats: 14
   # bmr.dataverse: requested by A-POL (a_pol.yaml)
   bmr.dataverse: 6
+  # cbs.opendata: requested by GAPHUNT (gaphunt.yaml)
+  cbs.opendata: 12
   # ccp.data: requested by A-LAW (a_law.yaml)
   ccp.data: 10
   # cdpd.dataverse: requested by A-SOCIETY (a_society.yaml)
@@ -41,10 +45,16 @@ per_source_daily_requests:
   fao.faostat: 45
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
+  # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
+  gcat.planet4589: 10
   # geonames.cities: requested by A-CITIES (a_cities.yaml)
   geonames.cities: 6
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
   geonames.countryinfo: 2
+  # glottolog.cldf: requested by KGLANG (kglang.yaml)
+  glottolog.cldf: 8
+  # grambank.cldf: requested by KGLANG (kglang.yaml)
+  grambank.cldf: 6
   # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
   harvard.dataverse.unvotes: 12
   # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
@@ -55,6 +65,8 @@ per_source_daily_requests:
   ilostat.rplumber: 60
   # imf.sdmx: requested by A-IMF (a_imf.yaml)
   imf.sdmx: 60
+  # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
+  insee.bdm: 6
   # ipu.parline: requested by A-POL (a_pol.yaml)
   ipu.parline: 12
   # jrc.inform_risk: requested by A-GEO (a_geo.yaml)
@@ -65,28 +77,42 @@ per_source_daily_requests:
   maddison.mpd: 10
   # naturalearth.admin0_10m: requested by A-GEO (a_geo.yaml)
   naturalearth.admin0_10m: 12
+  # nga.wpi: requested by A-INFRA (a_infra.yaml)
+  nga.wpi: 3
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
-  # oecd.sdmx: requested by A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)
-  oecd.sdmx: 56
+  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)
+  oecd.sdmx: 76
+  # ohchr.indicators: requested by A-TREATIES (a_treaties.yaml)
+  ohchr.indicators: 50
   # openalex.api: requested by A-SCI (a_sci.yaml)
   openalex.api: 400
+  # openflights.data: requested by A-INFRA (a_infra.yaml)
+  openflights.data: 10
+  # ourairports.data: requested by A-INFRA (a_infra.yaml)
+  ourairports.data: 6
   # owid.compilations: requested by A-QOL (a_qol.yaml)
   owid.compilations: 50
   # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
   parlgov.dataverse: 6
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)
   rcs_dem.osf: 12
+  # spc.pdh_stat: requested by GAPHUNT (gaphunt.yaml)
+  spc.pdh_stat: 12
   # ssa.ssptw: requested by A-LAW (a_law.yaml)
   ssa.ssptw: 220
   # sscp.dataverse: requested by A-SOCIETY (a_society.yaml)
   sscp.dataverse: 9
+  # statistics_jersey.opendata: requested by GAPHUNT (gaphunt.yaml)
+  statistics_jersey.opendata: 3
   # ti.cpi: requested by A-SOCIETY (a_society.yaml)
   ti.cpi: 6
   # ucdp.downloads: requested by KGGEOPOL (kggeopol.yaml)
   ucdp.downloads: 16
   # un.desa_ims: requested by A-UN (a_un.yaml)
   un.desa_ims: 5
+  # un.psdata: requested by A-MILITARY (a_military.yaml)
+  un.psdata: 30
   # un.sdg: requested by A-UN (a_un.yaml)
   un.sdg: 400
   # un.wpp: requested by A-UN (a_un.yaml), SIMWORLD (simworld.yaml)
@@ -97,9 +123,11 @@ per_source_daily_requests:
   unctad.bulk: 15
   # undp.hdr: requested by A-QOL (a_qol.yaml)
   undp.hdr: 10
-  # unesco.uis: requested by A-HEALTHEDU (a_healthedu.yaml)
+  # unesco.ich: requested by A-CULTURE (a_culture.yaml)
+  unesco.ich: 4
+  # unesco.uis: requested by A-CULTURE (a_culture.yaml), A-HEALTHEDU (a_healthedu.yaml)
   unesco.uis: 30
-  # unesco.whc: requested by KGCULT (kgcult.yaml)
+  # unesco.whc: requested by A-CULTURE (a_culture.yaml), KGCULT (kgcult.yaml)
   unesco.whc: 4
   # unhcr.population: requested by A-UN (a_un.yaml)
   unhcr.population: 150
@@ -107,10 +135,14 @@ per_source_daily_requests:
   unsd.ama: 20
   # unsd.syb: requested by A-UN (a_un.yaml)
   unsd.syb: 5
+  # untc.mtdsg: requested by A-TREATIES (a_treaties.yaml)
+  untc.mtdsg: 120
   # usgs.sciencebase: requested by A-RESOURCES (a_resources.yaml)
   usgs.sciencebase: 20
   # vdem.vdemdata: requested by A-POL (a_pol.yaml)
   vdem.vdemdata: 9
+  # wals.cldf: requested by KGLANG (kglang.yaml)
+  wals.cldf: 6
   # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml), A-SOCIETY (a_society.yaml)
   who.gho: 129
   # whr.figure21: requested by A-QOL (a_qol.yaml)
@@ -121,6 +153,8 @@ per_source_daily_requests:
   wikidata.wbapi: 4000
   # wikidata.wdqs: requested by WDHARVEST (wdharvest.yaml)
   wikidata.wdqs: 1500
+  # wikipedia.olympic_medal_tables: requested by A-CULTURE (a_culture.yaml)
+  wikipedia.olympic_medal_tables: 12
   # wipo.gii: requested by A-SCI (a_sci.yaml)
   wipo.gii: 3
   # wipo.ipstats_bulk: requested by A-SCI (a_sci.yaml)

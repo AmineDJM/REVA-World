@@ -25,7 +25,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
-from reva.links.derive import Derivation, KgIndex, _ev
+from reva.links.derive import Derivation, KgIndex, _ev, derive_shared_subject  # noqa: F401 (re-export)
 from reva.links.model import Link, Stmt, Temporal
 
 CORRESPONDS = "geopol:corresponds_to_iso3"
@@ -33,7 +33,13 @@ CSHAPES_BORDER = "cshapes:shares_border_with"
 CSHAPES_RULED_BY = "cshapes:ruled_by"
 UCDP_PARTIES = ("ucdp:primary_party", "ucdp:secondary_party")
 COVERED_TERRITORY = "geo:covered_territory_of"
-DATASET_PROPERTIES = (CORRESPONDS, CSHAPES_BORDER, CSHAPES_RULED_BY, *UCDP_PARTIES, COVERED_TERRITORY)
+UNPK_CONTRIB = "unpk:contributed_personnel_to"
+UNPK_MISSION_COUNTRY = "unpk:mission_country"
+DATASET_PROPERTIES = (
+    CORRESPONDS, CSHAPES_BORDER, CSHAPES_RULED_BY, *UCDP_PARTIES, COVERED_TERRITORY, UNPK_CONTRIB, UNPK_MISSION_COUNTRY,
+)  # fmt: skip
+#: bound on derived peacekeeping links (one per contribution statement x mission country; linear, not pairwise)
+MAX_PEACEKEEPING_LINKS = 200_000
 
 NodeOf = Callable[[str], str]
 
@@ -217,48 +223,55 @@ def derive_ucdp_sides(
     return same.finish(), opp.finish()
 
 
-def derive_shared_subject(
-    index: KgIndex,
-    prop: str,
-    link_type: str,
-    *,
-    focus: set[str] | None = None,
-    max_members: int = 60,
+def derive_peacekeeping(
+    index: KgIndex, *, focus: set[str] | None = None, cap: int = MAX_PEACEKEEPING_LINKS
 ) -> Derivation:
-    """Two objects of ``prop`` statements with the same subject over overlapping periods."""
-    d = Derivation(link_type)
-    groups: dict[str, list[Stmt]] = defaultdict(list)
-    for s in index.by_prop.get(prop, ()):
+    """``peacekeeping_contributor_to_host``: country A —unpk:contributed_personnel_to→ mission (one calendar year)
+    and mission —unpk:mission_country→ B over an overlapping period → A → B via the mission. Linear in the
+    contribution statements (bounded by ``cap``, truncation recorded)."""
+    d = Derivation("peacekeeping_contributor_to_host")
+    hosts: dict[str, list[Stmt]] = defaultdict(list)
+    for s in index.by_prop.get(UNPK_MISSION_COUNTRY, ()):
         if s.object is not None:
-            groups[s.subject].append(s)
-    for subj, stmts in sorted(groups.items()):
-        members = {s.object for s in stmts}
-        if len(members) < 2:
+            hosts[s.subject].append(s)
+    n = 0
+    for c in index.by_prop.get(UNPK_CONTRIB, ()):
+        if c.object is None:
             continue
-        if len(members) > max_members:
-            d.skip("hub_subject_not_expanded", via=subj, members=len(members))
+        hs = hosts.get(c.object)
+        if not hs:
+            d.skip("mission_without_reported_country", mission=c.object)
             continue
-        for sa, sb in itertools.combinations(sorted(stmts, key=lambda s: (str(s.object), s.statement_id)), 2):
-            if sa.object == sb.object or sa.object is None or sb.object is None:
+        for h in hs:
+            if h.object is None or h.object == c.subject:
                 continue
-            if focus is not None and sa.object not in focus and sb.object not in focus:
+            if focus is not None and c.subject not in focus and h.object not in focus:
                 continue
-            ov = sa.temporal.overlap(sb.temporal)
-            if ov is None:
-                d.skip("disjoint_periods", via=subj, pair=[sa.object, sb.object])
+            ov = c.temporal.overlap(h.temporal)
+            if ov is None or ov.kind == "undated":
+                d.skip("disjoint_periods", mission=c.object, contributor=c.subject)
                 continue
-            a, b = (sa, sb) if sa.object < sb.object else (sb, sa)
-            assert a.object is not None and b.object is not None
+            if n >= cap:
+                d.skip("cap_reached", cap=cap)
+                return d.finish()
+            n += 1
             d.add(
                 Link(
-                    a.object,
-                    b.object,
-                    link_type,
-                    False,
+                    c.subject,
+                    h.object,
+                    "peacekeeping_contributor_to_host",
+                    True,
                     ov,
-                    _ev(a, b),
-                    via=(subj,),
-                    basis={"property": prop, "temporal_basis": "undated" if ov.kind == "undated" else "intersection"},
+                    _ev(c, h),
+                    via=(c.object,),
+                    basis={
+                        "year": (c.qualifier("year") or (None,))[0],
+                        "max_uniformed_personnel_reported": (
+                            c.qualifier("max_uniformed_personnel_reported") or (None,)
+                        )[0],
+                        "note": "deployment under a UN mandate as reported by the UN Peace and Security Data Hub; "
+                        "says nothing about alliances or positions",
+                    },
                 )
             )
     return d.finish()
@@ -278,9 +291,7 @@ def derive_dataset_links(
     out["colonial_rule_cshapes"] = derive_cshapes_colonial(index, node_of, qid_iso3, focus=focus)
     same, opp = derive_ucdp_sides(index, node_of, qid_iso3, focus=focus)
     out["conflict_same_side"], out["conflict_opposing_sides"] = same, opp
-    out["shared_polity_territory"] = derive_shared_subject(
-        index, COVERED_TERRITORY, "shared_polity_territory", focus=focus, max_members=max_members
-    )
+    out["peacekeeping_contributor_to_host"] = derive_peacekeeping(index, focus=focus)
     return out
 
 

@@ -214,3 +214,108 @@ def test_time_budget_ends_the_search_with_a_reason(g) -> None:  # type: ignore[n
     assert any("time budget" in x for x in r["search"]["truncation_reasons"])
     assert not r["found"] and "truncated" in r["not_found_reason"]
     assert kq.paths(g, "pth:a", "pth:d", hub_limit=10, time_budget_s=60)["found"]
+
+
+# ------------------------------------------------------------------------- BCE dates and derived statements (KGBCE)
+#   bce:carthage --linked[-0263..-0145]--> bce:rome --linked[-0026..0395]--> bce:italy
+#   bce:rome --member[pit -0043-03-15, derivation declared]--> bce:italy     bce:rome founded -0752-04-21
+# Astronomical years (year 0 = 1 BCE): -0043 is 44 BCE. psycopg cannot load such SQL dates into
+# datetime.date, so these exercise the text rendering of every derived bound (neighbours, timeline, paths).
+BCE_SRC = "kgbcetest"
+DERIVED_Q = {"derivation": "computed_spatial_overlay", "method": "reva.test.overlay/1", "label": "derived"}
+
+
+@pytest.fixture(scope="module")
+def bce(db):  # type: ignore[no-untyped-def]
+    register_properties(
+        db.worker,
+        [
+            KgProperty(
+                "syn:linked", "item", "linked_to", "linked to", "lié à", "linked_from", "linked from", "lié depuis"
+            ),
+            KgProperty(
+                "syn:member", "item", "member_of", "member of", "membre de", "has_member", "has member", "a pour membre"
+            ),
+            KgProperty("syn:founded", "time", "founded", "founded", "fondé"),
+        ],
+    )
+    raw = db.store.put_bytes(b"kg bce test synthetic graph v1", "raw", "application/json").sha256
+    y = lambda v: KgTime(v, 9)  # noqa: E731
+    sts = [
+        KgStatement("bce:carthage", "syn:linked", "bce:rome", statement_id="cr", start=y("-0263"), end=y("-0145")),
+        KgStatement("bce:rome", "syn:linked", "bce:italy", statement_id="ri", start=y("-0026"), end=y("0395")),
+        KgStatement(
+            "bce:rome",
+            "syn:member",
+            "bce:italy",
+            statement_id="ri_derived",
+            point_in_time=KgTime("-0043-03-15", 11),
+            qualifiers=DERIVED_Q,
+        ),
+        KgStatement(
+            "bce:rome",
+            "syn:founded",
+            value={"type": "time", "time": "-0752-04-21T00:00:00Z", "precision": 11},
+            statement_id="founded",
+        ),
+    ]
+    rep = load_batch(
+        db.worker,
+        db.store,
+        entities=[KgEntity(f"bce:{n}", "test_thing", {"en": f"Old {n}"}) for n in ("carthage", "rome", "italy")],
+        statements=sts,
+        source_key=BCE_SRC,
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
+    assert rep.rejected_total == 0, rep.rejected
+    with db.api.connect() as conn:
+        yield conn
+
+
+def _by_key(rows: list[dict]) -> dict[str, dict]:
+    return {r["provenance"]["statement_key"].removeprefix(BCE_SRC + ":"): r for r in rows}
+
+
+def test_bce_neighbours_render_astronomical_years(bce) -> None:  # type: ignore[no-untyped-def]
+    n = _by_key(kq.neighbours(bce, "bce:rome", include_literals=True)["edges"])
+    assert set(n) == {"cr", "ri", "ri_derived", "founded"}
+    assert (n["cr"]["valid_from"], n["cr"]["valid_to"]) == ("-0263-01-01", "-0145-12-31")
+    assert (n["ri"]["valid_from"], n["ri"]["valid_to"]) == ("-0026-01-01", "0395-12-31")
+    assert n["ri_derived"]["valid_from"] == n["ri_derived"]["valid_to"] == "-0043-03-15"
+    assert n["ri_derived"]["point_in_time"] == {"time": "-0043-03-15", "precision": 11}
+    # filtering stays in SQL on the dates: 44 BCE overlaps the derived statement only (plus nothing undated)
+    w = kq.window("-0043", "-0043", include_undated=False)
+    assert set(_by_key(kq.neighbours(bce, "bce:rome", time_window=w)["edges"])) == {"ri_derived"}
+    w = kq.window("-0200", "-0100", include_undated=False)
+    assert set(_by_key(kq.neighbours(bce, "bce:rome", time_window=w)["edges"])) == {"cr"}
+
+
+def test_bce_timeline_is_sorted_across_the_era_boundary(bce) -> None:  # type: ignore[no-untyped-def]
+    tl = kq.timeline(bce, "bce:rome")
+    assert [(e["sort_date"], e["provenance"]["statement_key"]) for e in tl["events"]] == [
+        ("-0752-04-21", f"{BCE_SRC}:founded"),
+        ("-0263-01-01", f"{BCE_SRC}:cr"),
+        ("-0043-03-15", f"{BCE_SRC}:ri_derived"),
+        ("-0026-01-01", f"{BCE_SRC}:ri"),
+    ]
+    assert tl["events"][0]["dated_by"] == "time_value" and tl["events"][1]["dated_by"] == "validity_qualifiers"
+    tl = kq.timeline(bce, "bce:rome", time_window=kq.window("-0300", "-0030"))
+    assert [e["sort_date"] for e in tl["events"]] == ["-0263-01-01", "-0043-03-15"]
+
+
+def test_bce_paths_and_derived_provenance(bce) -> None:  # type: ignore[no-untyped-def]
+    r = kq.paths(bce, "bce:carthage", "bce:italy", time_window=kq.window("-0200", "0100", include_undated=False))
+    assert r["found"], r
+    hops = r["paths"][0]["hops"]
+    assert [h["valid_from"] for h in hops] == ["-0263-01-01", "-0026-01-01"]
+    assert r["search"]["time_window"] == {"lo": "-0200-01-01", "hi": "0100-12-31", "include_undated": False}
+    # the window of 44 BCE: carthage--rome ended in 145 BCE, so no connection
+    assert not kq.paths(bce, "bce:carthage", "bce:italy", time_window=kq.window("-0043", "-0043", include_undated=False))["found"]
+    (hop,) = kq.paths(bce, "bce:rome", "bce:italy", allowed_properties=["syn:member"])["paths"][0]["hops"]
+    prov = hop["provenance"]
+    assert prov["verification"] == "derived" and prov["derivation"] == "computed_spatial_overlay"
+    assert prov["derivation_method"] == "reva.test.overlay/1"
+    other = _by_key(kq.neighbours(bce, "bce:rome")["edges"])["ri"]["provenance"]
+    assert other["verification"] == "source_reported_not_verified" and other["derivation"] is None

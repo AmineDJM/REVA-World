@@ -175,14 +175,19 @@ CONCEPTS: dict[str, dict[str, Any]] = {
         ],
     },
     "government_balance": {
-        "en": "Government balance",
-        "fr": "Solde public",
+        "en": "Government balance / budget",
+        "fr": "Solde public / budget",
         "headline": ["reva.finance.government_net_lending_gdp"],
-        "other": ["imf.weo.GGXONLB_NGDP", "imf.gfs_soo.GNLB_T*", "factbook.figures_2026_01.budget.revenues"],
+        "other": [
+            "imf.weo.GGXONLB_NGDP",
+            "imf.gfs_soo.GNLB_T*",
+            "factbook.figures_2026_01.budget.revenues",
+            "spc.pocket.GOVREVGDPC",
+        ],
     },
     "trade_balance": {
-        "en": "Trade balance",
-        "fr": "Balance commerciale",
+        "en": "Trade balance / exports-imports",
+        "fr": "Balance commerciale / exportations-importations",
         "headline": [
             "reva.trade.goods_balance_usd",
             "reva.trade.goods_services_balance_usd",

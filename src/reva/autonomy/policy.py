@@ -61,9 +61,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   the KGGEOPOL sources cshapes.cran, harvard.dataverse.unvotes, ucdp.downloads (kggeopol.yaml).
 # * budgets.yaml -> budgets-1.3.5 (2026-10-16, ATLASOPS): merge of the requests filed by finished agents
 #   since 1.3.4 (A-SOCIETY, A-RESOURCES, KGGEOPOL, A-FACTBOOK, ...); same caps (<= 5000/source, 3 GiB/day).
+# * budgets.yaml -> budgets-1.3.6 (2026-10-16, ATLASOPS): merge of requests filed since 1.3.5 (A-MILITARY un.psdata,
+#   A-FISCAL bis.stats + oecd.sdmx raise, KGLANG glottolog/wals/grambank, ...); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "3b826baca1ba485db351e319d0ed31a3381b32db0ea3c81e559057baa72d9e29",
+    "budgets.yaml": "cff55dc95cb68caea932ed076adf3c4e46bc3763e243602742965a85117b6363",
 }
 
 

@@ -58,6 +58,8 @@ SUCCESSION_FORWARD = ("P1365", "P155")  # S replaces/follows P: subject is the s
 SUCCESSION_BACKWARD = ("P1366", "P156")  # P replaced by/followed by S: object is the successor
 CONFLICT_SIDE_QUALIFIERS = ("ucdp:side", "side")
 MAX_SKIP_SAMPLES = 200
+MAX_SHARED_SUBJECT_PAIRS = 200_000
+COVERED_TERRITORY = "geo:covered_territory_of"
 
 
 @dataclass
@@ -665,6 +667,65 @@ def derive_conflict_sides(index: KgIndex, *, focus: set[str] | None = None) -> t
     return same.finish(), opp.finish()
 
 
+def derive_shared_subject(
+    index: KgIndex,
+    prop: str,
+    link_type: str,
+    *,
+    focus: set[str] | None = None,
+    max_members: int = 60,
+    max_pairs: int = MAX_SHARED_SUBJECT_PAIRS,
+) -> Derivation:
+    """Two objects of ``prop`` statements with the same subject over overlapping periods (KGPOLITY's
+    ``geo:covered_territory_of``: two present-day countries partly covered by the same polity). Bounded: a subject
+    with more than ``max_members`` objects is not expanded pairwise (``hub_subject_not_expanded``) and at most
+    ``max_pairs`` links are produced (``pair_cap_reached``); both are recorded."""
+    d = Derivation(link_type)
+    produced = 0
+    groups: dict[str, list[Stmt]] = defaultdict(list)
+    for s in index.by_prop.get(prop, ()):
+        if s.object is not None:
+            groups[s.subject].append(s)
+    for subj, stmts in sorted(groups.items()):
+        members = {s.object for s in stmts}
+        if len(members) < 2:
+            continue
+        if len(members) > max_members:
+            d.skip("hub_subject_not_expanded", via=subj, members=len(members))
+            continue
+        for sa, sb in itertools.combinations(sorted(stmts, key=lambda s: (str(s.object), s.statement_id)), 2):
+            if sa.object == sb.object or sa.object is None or sb.object is None:
+                continue
+            if focus is not None and sa.object not in focus and sb.object not in focus:
+                continue
+            ov = sa.temporal.overlap(sb.temporal)
+            if ov is None:
+                d.skip("disjoint_periods", via=subj, pair=[sa.object, sb.object])
+                continue
+            if produced >= max_pairs:
+                d.skip("pair_cap_reached", cap=max_pairs)
+                return d.finish()
+            produced += 1
+            a, b = (sa, sb) if sa.object < sb.object else (sb, sa)
+            assert a.object is not None and b.object is not None
+            d.add(
+                Link(
+                    a.object,
+                    b.object,
+                    link_type,
+                    False,
+                    ov,
+                    _ev(a, b),
+                    via=(subj,),
+                    basis={
+                        "property": prop,
+                        "temporal_basis": "undated" if ov.kind == "undated" else "intersection",
+                    },
+                )
+            )
+    return d.finish()
+
+
 # ---------------------------------------------------------------------------------------------- atlas
 _ISO3 = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -840,6 +901,9 @@ def derive_all(
     out["co_signatory"] = derive_co_signatory(index, focus=fset)
     out["conflict_co_participant"] = derive_conflict_co_participants(index, None, focus=fset)
     out["conflict_same_side"], out["conflict_opposing_sides"] = derive_conflict_sides(index, focus=fset)
+    out["shared_polity_territory"] = derive_shared_subject(
+        index, COVERED_TERRITORY, "shared_polity_territory", focus=fset, max_members=max_members
+    )
     col = derive_colonial(index, pol)
     if fset is not None:
         col_all = col

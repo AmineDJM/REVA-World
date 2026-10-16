@@ -175,3 +175,53 @@ def test_wikidata_sub_keys_are_community_edited() -> None:
     assert not is_community_edited("wikidatafake")
     assert not is_community_edited("cow")
     assert not is_community_edited(None)
+
+
+@pytest.mark.parametrize(
+    ("pg", "iso"),
+    [
+        ("0044-03-15 BC", "-0043-03-15"),  # 15 March 44 BCE = astronomical -43
+        ("0001-12-31 BC", "0000-12-31"),  # 1 BCE = year 0
+        ("4713-11-24 BC", "-4712-11-24"),  # the start of PostgreSQL's date range
+        ("1975-01-01", "1975-01-01"),  # parse_time literal (no era marker)
+        ("0005-01-05 AD", "0005-01-05"),  # to_char(..., 'YYYY-MM-DD BC') output
+        ("12345-01-01 AD", "+12345-01-01"),
+    ],
+)
+def test_astro_iso_matches_the_atlas_rendering(pg: str, iso: str) -> None:
+    import polars as pl
+
+    from reva.atlas.tables import period_text
+    from reva.kg.query import astro_iso, date_key
+
+    assert astro_iso(pg) == iso
+    y, m, d = date_key(pg)
+    assert pl.select(period_text(pl.date(y, m, d))).item() == iso  # same text as atlas periods
+    assert astro_iso(None) is None
+    with pytest.raises(ValueError):
+        date_key("-0043-03-15")  # not a PostgreSQL literal: SQL params stay PostgreSQL literals
+
+
+def test_bce_window_bounds_are_ordered_astronomically() -> None:
+    from reva.kernel.errors import ValidationProblem
+    from reva.kg.query import astro_iso
+
+    w = window("-0043", "0014")
+    assert w is not None and (w.lo, w.hi) == ("0044-01-01 BC", "0014-12-31")
+    assert (astro_iso(w.lo), astro_iso(w.hi)) == ("-0043-01-01", "0014-12-31")
+    with pytest.raises(ValidationProblem):
+        window("-0043", "-0100")
+
+
+def test_verification_labels() -> None:
+    from reva.kg.query import verification_of
+
+    overlay = {"derivation": "computed_spatial_overlay", "method": "reva.kg.overlay/1", "label": "derived"}
+    assert verification_of("atlas.cliopatria", overlay) == ("derived", "computed_spatial_overlay", "reva.kg.overlay/1")
+    assert verification_of("x", {"derivation": "model_assumption"}) == ("derived", "model_assumption", None)
+    assert verification_of("x", {"derivation": {"kind": "k", "method": "m/2"}}) == ("derived", "k", "m/2")
+    assert verification_of("cow", {"label": "x"}) == ("source_reported_not_verified", None, None)
+    assert verification_of("cow", {"derivation": ""}) == ("source_reported_not_verified", None, None)
+    assert verification_of("cow", None) == ("source_reported_not_verified", None, None)
+    # Wikidata keeps its community-edited label whatever its qualifiers say
+    assert verification_of("wikidata.x", overlay) == ("community_edited_not_verified", None, None)
