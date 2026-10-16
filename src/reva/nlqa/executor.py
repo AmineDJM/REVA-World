@@ -754,7 +754,7 @@ class Executor:
             except CapabilityUnavailable:
                 pass
         for iso3 in wanted:
-            out.setdefault(iso3, {"en": self.catalog.country_label(iso3)})
+            out.setdefault(iso3, {"en": self.catalog.country_label(iso3), "fr": self.catalog.country_label(iso3, "fr")})
         return out
 
 

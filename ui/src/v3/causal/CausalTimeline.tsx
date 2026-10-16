@@ -91,6 +91,14 @@ export function CausalTimeline({ focal, causes, effects }: { focal: { id: string
         </svg>
       )}
       {!focalItem && <p className="v3-undated">L’événement lui-même n’est pas daté dans la source : l’alignement est indicatif.</p>}
+      {m.outside.length > 0 && (
+        <p className="v3-undated" data-testid="timeline-outside">
+          Hors de la fenêtre affichée :{' '}
+          {m.outside
+            .map((u) => `${u.label} (${u.dateText}, ${u.lane === 'cause' ? 'cause' : 'conséquence'}${tone(u.claims) === 'bad' ? ', incohérence temporelle signalée' : ''})`)
+            .join(' · ')}
+        </p>
+      )}
       {m.undated.filter((u) => u.lane !== 'focal').length > 0 && (
         <p className="v3-undated" data-testid="timeline-undated">
           Non datés dans la source :{' '}

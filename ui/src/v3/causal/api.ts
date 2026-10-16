@@ -272,11 +272,15 @@ export type CausalCandidate = z.output<typeof CausalCandidate>;
 
 // ------------------------------------------------------------------ envelopes
 
+/** Server warnings the screen already states in French (claim ≠ causation banner, chain banner, candidate label). */
+const SAID_ON_SCREEN = new Set(['claims_not_causation', 'chain_is_composition', 'unsourced_candidates']);
+
 /** Envelope-or-bare: `{data, warnings}` (src/reva/api/schemas.py Envelope) or the data itself. */
 function unwrap(body: unknown): { data: unknown; warnings: string[] } {
   if (isRec(body) && 'data' in body) {
     const ws = Array.isArray(body.warnings) ? body.warnings.filter(isRec).filter((w) => typeof w.code === 'string') : [];
-    return { data: body.data, warnings: warningsFr(ws.map((w) => ({ code: String(w.code), message: String(w.message ?? '') }))) };
+    const shown = ws.filter((w) => !SAID_ON_SCREEN.has(String(w.code)));
+    return { data: body.data, warnings: warningsFr(shown.map((w) => ({ code: String(w.code), message: String(w.message ?? '') }))) };
   }
   return { data: body, warnings: [] };
 }

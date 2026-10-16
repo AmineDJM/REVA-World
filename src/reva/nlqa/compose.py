@@ -341,7 +341,7 @@ class Composer:
         return self.lang == "fr"
 
     def country(self, iso3: str) -> str:
-        return pick_label(self.x.country_labels.get(iso3), self.lang, self.catalog.country_label(iso3))
+        return pick_label(self.x.country_labels.get(iso3), self.lang, self.catalog.country_label(iso3, self.lang))
 
     def concept(self, c: Any) -> str:
         return c.label(self.lang)

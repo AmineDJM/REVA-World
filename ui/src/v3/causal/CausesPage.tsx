@@ -46,6 +46,12 @@ function useLoad<T>(key: string | null, fn: (signal: AbortSignal) => Promise<T>)
 
 const unavailable = (l: Load<unknown> | null) => l?.status === 'error' && classifyV3Error(l.error).kind === 'unavailable';
 
+/** Canvas height that keeps labels readable: one row per node of the longest column. */
+function graphHeight(g: { nodes: { side: string }[] }): number {
+  const col = Math.max(...['cause', 'effect'].map((side) => g.nodes.filter((n) => n.side === side).length), 1);
+  return Math.min(1000, Math.max(420, 62 * col + 90));
+}
+
 export const CAUSES_EXAMPLES = [
   { id: 'Q361', label: 'Première Guerre mondiale' },
   { id: 'Q8698', label: 'Grande Dépression' },
@@ -189,6 +195,7 @@ export default function CausesPage() {
                     onSelectClaim={setSelected}
                     onOpenNode={openNode}
                     label={`Graphe causal de ${focalLabel} : ${causeClaims.length} cause(s) et ${effectClaims.length} conséquence(s) affirmées par des sources`}
+                    height={graphHeight(graph)}
                   />
                 </Suspense>
               )}

@@ -29,9 +29,15 @@ def test_perf(db):
     rep = load_batch(db.worker, db.store, statements=sts, source_key="wikidata.perf", raw_sha256s=[raw], retrieved_at=datetime.now(UTC), origin="live")
     out["kg_load_s"] = time.perf_counter() - t; out["kg_rejected"] = rep.rejected_counts
     t = time.perf_counter(); r = load_kg_claims(db.worker, origin="live"); out["claims_load_s"] = time.perf_counter() - t; out["claims"] = r.inserted
+    import cProfile, pstats, io
+    pr = cProfile.Profile(); pr.enable()
     t = time.perf_counter(); r = load_kg_claims(db.worker, origin="live"); out["claims_reload_unchanged_s"] = time.perf_counter() - t
+    pr.disable(); sio = io.StringIO(); pstats.Stats(pr, stream=sio).sort_stats("cumulative").print_stats(18); out["prof_reload"] = sio.getvalue()
     t = time.perf_counter(); g = grade_claims(db.worker, origin="live"); out["grade_s"] = time.perf_counter() - t; out["by_grade"] = g.by_grade
+    pr = cProfile.Profile(); pr.enable()
     t = time.perf_counter(); g = grade_claims(db.worker, origin="live"); out["regrade_unchanged_s"] = time.perf_counter() - t; out["regrade_written"] = g.written
+    pr.disable(); sio = io.StringIO(); pstats.Stats(pr, stream=sio).sort_stats("cumulative").print_stats(18); out["prof_regrade"] = sio.getvalue()
+    json.dump(out, open(OUT, "w"), indent=1, default=str); return
     times = []; found = 0
     with db.api.connect() as c:
         for k in range(30):
@@ -44,5 +50,5 @@ def test_perf(db):
         t = time.perf_counter(); cg.causes(c, "pf:n3", limit=500); out["causes_hub_ms"] = (time.perf_counter() - t)*1000
         t = time.perf_counter(); cg.why(c, "pf:n3"); out["why_hub_ms"] = (time.perf_counter() - t)*1000
         t = time.perf_counter(); cg.event(c, "pf:n3"); out["event_hub_ms"] = (time.perf_counter() - t)*1000
-        out["db_size_causal_mb"] = c.exec_driver_sql("SELECT sum(pg_total_relation_size(oid))/1e6 FROM pg_class WHERE relname LIKE 'causal_%' AND relkind IN ('r','i')").scalar()
+        out["db_size_causal_mb"] = c.exec_driver_sql("SELECT sum(pg_total_relation_size(oid))/1e6 FROM pg_class WHERE starts_with(relname::text, 'causal_') AND relkind IN ('r','i')").scalar()
     json.dump(out, open(OUT, "w"), indent=1, default=str)

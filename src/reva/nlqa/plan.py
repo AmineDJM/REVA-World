@@ -436,7 +436,7 @@ def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
             return ent(c)
         if c == "ALL":
             return "tous les pays" if fr else "all countries"
-        return catalog.country_label(c)
+        return catalog.country_label(c, plan.language)
 
     def concept(cid: str) -> str:
         c = catalog.concepts.get(cid)

@@ -194,6 +194,7 @@ class Country:
     iso3: str
     label: str
     names: tuple[str, ...] = ()
+    label_fr: str | None = None  # crosswalk label_fr, else the iso-codes French name (ASK-8)
 
 
 @lru_cache(maxsize=4)
@@ -214,44 +215,46 @@ def load_countries(path: Path = CROSSWALK) -> tuple[Country, ...]:
         for k in ("worldbank_name", "comtrade_reporter_label", "label_fr", "iso_name"):
             if e.get(k):
                 names.add(str(e[k]))
-        for n in iso_names.get(iso3, ()):
+        iso = iso_names.get(iso3, {})
+        for n in iso.values():
             names.add(n)
             if fr.get(n):
                 names.add(fr[n])
         names.update(FR_ALIASES.get(iso3, ()))
-        out.append(Country(iso3, str(e.get("label") or iso3), tuple(sorted(names))))
+        # French display name: the crosswalk's, else the translation of the ISO common name, else of the ISO name
+        cands = [fr[x] for k in ("common_name", "name") if (x := iso.get(k)) and fr.get(x)]
+        label_fr = e.get("label_fr") or (cands[0] if cands else None)
+        out.append(Country(iso3, str(e.get("label") or iso3), tuple(sorted(names)), label_fr))
     # "Russie, Fédération de" -> "Russie": the part before the comma, only when no other country shares it
     heads: dict[str, set[str]] = {}
     for c in out:
         for n in c.names:
             if "," in n:
                 heads.setdefault(fold(n.split(",", 1)[0]), set()).add(c.iso3)
+
+    def short(n: str | None, iso3: str) -> str | None:
+        if n and "," in n and heads.get(fold(n.split(",", 1)[0])) == {iso3}:
+            return n.split(",", 1)[0].strip()
+        return n
+
     return tuple(
         Country(
             c.iso3,
             c.label,
-            tuple(
-                sorted(
-                    set(c.names)
-                    | {
-                        n.split(",", 1)[0].strip()
-                        for n in c.names
-                        if "," in n and heads.get(fold(n.split(",", 1)[0])) == {c.iso3}
-                    }
-                )
-            ),
+            tuple(sorted(set(c.names) | {x for n in c.names if (x := short(n, c.iso3)) and x != n})),
+            short(c.label_fr, c.iso3),
         )
         for c in out
     )
 
 
-def _iso_names() -> dict[str, tuple[str, ...]]:
+def _iso_names() -> dict[str, dict[str, str]]:
     try:
         rows = json.loads(ISO_CODES.read_text())["3166-1"]
     except (OSError, ValueError, KeyError):
         return {}
     return {
-        r["alpha_3"]: tuple(r[k] for k in ("name", "common_name", "official_name") if r.get(k))
+        r["alpha_3"]: {k: r[k] for k in ("name", "common_name", "official_name") if r.get(k)}
         for r in rows
         if r.get("alpha_3")
     }
@@ -313,9 +316,11 @@ class QaCatalog:
         h.update(json.dumps(list(self.link_kinds)).encode())
         return h.hexdigest()
 
-    def country_label(self, iso3: str) -> str:
+    def country_label(self, iso3: str, lang: str = "en") -> str:
         c = self.countries.get(iso3)
-        return c.label if c else iso3
+        if c is None:
+            return iso3
+        return (c.label_fr or c.label) if lang == "fr" else c.label
 
     def relevant_concepts(self, question: str, limit: int = MAX_PROMPT_CONCEPTS) -> list[Concept]:
         """Concepts for the prompt: all when few, else the ``limit`` best lexical matches (deterministic).

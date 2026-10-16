@@ -350,6 +350,8 @@ export interface TimelineItem {
 
 export interface TimelineModel {
   items: TimelineItem[];
+  /** dated items far outside the window around the event (listed with their dates, not drawn) */
+  outside: TimelineItem[];
   undated: { key: string; label: string; lane: 'cause' | 'effect' | 'focal'; claims: CausalClaim[] }[];
   min: number;
   max: number;
@@ -389,9 +391,26 @@ export function buildTimeline(focal: { id: string; label: string; start: TimePoi
   group(causes, 'cause');
   group(effects, 'effect');
   const years = items.flatMap((i) => [i.from, i.to]);
-  const min = years.length ? Math.min(...years) : 0;
-  const max = years.length ? Math.max(...years) : 0;
-  return { items, undated, min, max };
+  let min = years.length ? Math.min(...years) : 0;
+  let max = years.length ? Math.max(...years) : 0;
+  // a far outlier (an empire's inception asserted as an "effect") would squeeze everything else: focus on a
+  // window around the event and list the items outside it, with their dates, instead of hiding them
+  const outside: TimelineItem[] = [];
+  const f = items.find((i) => i.lane === 'focal');
+  if (f) {
+    const span = Math.max(1, f.to - f.from);
+    const lo = f.from - Math.max(60, 3 * span);
+    const hi = f.to + Math.max(30, 2 * span);
+    if (max - min > 2.5 * (hi - lo)) {
+      for (const it of items) if (it.to < lo || it.from > hi) outside.push(it);
+      const kept = items.filter((it) => !outside.includes(it));
+      items.splice(0, items.length, ...kept);
+      const ys = items.flatMap((i) => [i.from, i.to]);
+      min = Math.min(...ys);
+      max = Math.max(...ys);
+    }
+  }
+  return { items, undated, outside, min, max };
 }
 
 /** Readable tick years for [min, max] (about `n` ticks). */

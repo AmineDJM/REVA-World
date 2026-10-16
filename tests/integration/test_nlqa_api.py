@@ -311,8 +311,9 @@ def test_links_between_two_countries_keyword_planner(env: Env) -> None:
     b = r.json()
     cited(b)
     ops = b["plan"]["operations"]
-    assert [o["op"] for o in ops] == ["entity_lookup", "entity_lookup", "links_pair"], ops
-    assert "les liens (tous types) entre « Brésil » et « Portugal »" in b["restatement"]
+    # review V3b ASK-8: French country names are in the keyword planner's country table (no lookup needed)
+    assert [(o["op"], o["country"], o["other_country"]) for o in ops] == [("links_pair", "BRA", "PRT")], ops
+    assert "les liens (tous types) entre Brésil et Portugal" in b["restatement"]
     text = b["answer_text"]
     assert "Brésil — langue officielle commune (via portugais) — Portugal" in text, text
     assert "pas une valeur nulle" in text

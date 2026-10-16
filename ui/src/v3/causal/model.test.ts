@@ -80,3 +80,14 @@ describe('views', () => {
     expect(g.edges.find((e) => e.id === F.C_UNGRADED.claim_key)!.grade).toBeNull();
   });
 });
+
+describe('timeline', () => {
+  it('a far outlier is listed outside the window, never dropped', async () => {
+    const { buildTimeline } = await import('./model');
+    const outlier = parse({ ...F.E_VERSAILLES, claim_key: 'x', effect: { id: 'fixture:ottoman', label: 'Empire ottoman' }, grade: { ...F.E_VERSAILLES.grade!, temporal: { cause_start: null, effect_start: { from: '1299-08-05', precision: 11 } }, temporal_check: 'inconsistent' } });
+    const m = buildTimeline({ id: 'Q361', label: 'WW1', start: { time: '1914-07-28', precision: 11 }, end: { time: '1918-11-11', precision: 11 } }, causes, [...effects, outlier]);
+    expect(m.outside.map((i) => i.label)).toEqual(['Empire ottoman']);
+    expect(m.items.some((i) => i.label === 'Empire ottoman')).toBe(false);
+    expect(m.min).toBeGreaterThan(1800);
+  });
+});
