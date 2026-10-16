@@ -1,0 +1,106 @@
+schema: reva-retirement-age-gaps/1
+note: 'WBL 2026 economies without a rule table (agent SIMWORLD): the model refuses them with capability_gap. Countries
+  with tables transcribed from archived law text (FRA, DEU, ESP, NLD) are listed in capability_gaps.yaml / their
+  own files.'
+gaps:
+- country: AFG
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: ALB
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 women: 61.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed)'
+- country: BGD
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: BTN
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: BGR
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 64.7 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 62.3 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: CHN
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 60.2 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 50.3 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: HRV
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 women: 63.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed)'
+- country: CZE
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 64.6 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 63.2 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: ERI
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: ISR
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 women: 63.3 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed)'
+- country: LBN
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: LTU
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 64.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 64.7 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: MMR
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: PRT
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 66.6 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 66.6 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: PRI
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 66.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 66.8 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: ROU
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 women: 61.4 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed)'
+- country: SRB
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 women: 63.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed)'
+- country: SVK
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 63.3 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 62.3 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: SOM
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: ZAF
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'
+- country: USA
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 66.8 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 66.8 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: VNM
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: 61.3 years is rounded to one decimal and is not a whole number of months; the month is
+    not in the source (never guessed); WBL 2026 women: 56.7 years is rounded to one decimal and is not a whole number
+    of months; the month is not in the source (never guessed)'
+- country: PSE
+  source: WBL 2026 (agent SIMWORLD)
+  reason: 'WBL 2026 men: ''NS'' (no full-benefit pension age stated: ''NS'' = no system); WBL 2026 women: ''NS''
+    (no full-benefit pension age stated: ''NS'' = no system)'

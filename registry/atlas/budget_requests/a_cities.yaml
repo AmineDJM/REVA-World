@@ -1,0 +1,23 @@
+# Budget request from agent A-CITIES (cities and urbanisation). ATLASCORE merges into
+# registry/policies/budgets.yaml. Every request is a whole-world bulk file.
+agent: A-CITIES
+requests:
+  - source_key: geonames.cities
+    # download.geonames.org/export/dump/: cities15000.zip (3.4 MB) + admin1CodesASCII.txt (0.15 MB) per run;
+    # alternateNamesV2.zip (205 MB) only when fr/en alternate names are requested. CC BY 4.0.
+    daily_requests: 6
+    expected_bytes_per_day: 230000000
+    reason: "one full run = 2 requests / 3.6 MB (3 requests / 209 MB with alternate names); allow one retry"
+  - source_key: un.wup
+    # population.un.org/wup/assets/Download: 3 CSV.gz (3.4 + 8.5 + 58.7 MB) + capital workbook (63 kB). CC BY 3.0 IGO.
+    daily_requests: 10
+    expected_bytes_per_day: 150000000
+    reason: "one full run = 4 requests / 70.7 MB; allow one retry"
+daily_totals_increase:
+  http_requests_total: "+16"
+  http_bytes_total: "+380_000_000"
+notes: >-
+  Wikidata traffic (P1566 GeoNames-ID links ~130 WDQS requests per full mapping, P36 cross-check 1 request,
+  optional label snapshots ~1 wbgetentities request per 50 places) goes through WDHARVEST's budgeted client
+  under the existing wikidata.wdqs / wikidata.wbapi keys. Disk: raw ~75 MB per run (+205 MB with alternate
+  names), Parquet < 100 MB.

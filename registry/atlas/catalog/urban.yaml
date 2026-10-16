@@ -1,0 +1,230 @@
+# Cities and urbanisation concepts (agent A-CITIES). Provider-declared, not human-reviewed: definitions are
+# the providers' own (UN DESA Population Division, World Urbanization Prospects 2025; GeoNames).
+# * WUP 2025 national definitions ("urban" as each country defines it) and the Degree of Urbanisation
+#   (harmonised cities / towns / rural areas, EC-JRC population grids) are different concepts and are never
+#   mixed. Years >= 2026 are projections: separate concepts (suffix _proj) and series (|proj=wup2025).
+# * World Bank WDI SP.URB.TOTL.IN.ZS (urban population %) is the WUP 2018 national-definitions series; it is
+#   not listed (WUP 2025 supersedes it and covers every country), see notes.
+# * GeoNames concepts are exact counts/selections over GeoNames' cities15000 file (as GeoNames declares
+#   population and feature codes), dated by the retrieval day (GeoNames does not date its figures).
+domain: urban
+labels:
+  fr: Villes et urbanisation
+  en: Cities and urbanisation
+maintainer: agent A-CITIES (provider-declared, not human-reviewed)
+concepts:
+- id: urban.wup.urban_share_natdef
+  labels: {fr: "Part de la population urbaine (définitions nationales)", en: "Urban population share (national definitions)"}
+  definition: Percentage of the total population living in urban areas as defined by each country, at mid-year (UN World Urbanization Prospects 2025 estimates, 1950-2025).
+  unit: "%"
+  domain: urban
+  subdomain: urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_urban_rural.percPop|cat=Urban
+  provider_declared: true
+  notes: National definitions of "urban" differ between countries (the WUP 2018 concept). WDI SP.URB.TOTL.IN.ZS reports the WUP 2018 revision of this series; WUP 2025 supersedes it.
+  tags: [wup2025, estimate, national_definitions]
+- id: urban.wup.urban_share_natdef_proj
+  labels: {fr: "Part de la population urbaine (définitions nationales) — projection", en: "Urban population share (national definitions) — projection"}
+  definition: Percentage of the total population living in urban areas as defined by each country, at mid-year; UN World Urbanization Prospects 2025 projection 2026-2050. A projection, not an observation.
+  unit: "%"
+  domain: urban
+  subdomain: urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_urban_rural.percPop|cat=Urban|proj=wup2025
+  provider_declared: true
+  tags: [wup2025, projection, national_definitions]
+- id: urban.wup.urban_population_natdef
+  labels: {fr: "Population urbaine (définitions nationales)", en: "Urban population (national definitions)"}
+  definition: Population living in urban areas as defined by each country, at mid-year, in thousands (WUP 2025 estimates, 1950-2025).
+  unit: thousands
+  domain: urban
+  subdomain: urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_urban_rural.Pop|cat=Urban
+  provider_declared: true
+  tags: [wup2025, estimate, national_definitions]
+- id: urban.wup.rural_population_natdef
+  labels: {fr: "Population rurale (définitions nationales)", en: "Rural population (national definitions)"}
+  definition: Population living in rural areas (total minus urban as defined by each country), at mid-year, in thousands (WUP 2025 estimates, 1950-2025).
+  unit: thousands
+  domain: urban
+  subdomain: urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_urban_rural.Pop|cat=Rural
+  provider_declared: true
+  tags: [wup2025, estimate, national_definitions]
+- id: urban.wup.urban_growth_rate_natdef
+  labels: {fr: "Taux de variation annuel de la population urbaine (définitions nationales)", en: "Annual rate of change of the urban population (national definitions)"}
+  definition: Annual rate of change of the urban population (national definitions), per cent, as published in WUP 2025 (estimates 1950-2025).
+  unit: "%"
+  domain: urban
+  subdomain: urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_urban_rural.Pop_rate|cat=Urban
+  provider_declared: true
+  tags: [wup2025, estimate, national_definitions]
+- id: urban.wup.degurba_share_cities
+  labels: {fr: "Part de la population vivant en villes (degré d'urbanisation)", en: "Share of population living in cities (Degree of Urbanisation)"}
+  definition: Percentage of the population living in cities as defined by the Degree of Urbanisation (contiguous 1 km2 grid cells with at least 1,500 inhabitants per km2 and at least 50,000 inhabitants), at mid-year (WUP 2025 estimates, 1950-2025).
+  unit: "%"
+  domain: urban
+  subdomain: degree_of_urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_degurba.percPop|cat=Cities
+  provider_declared: true
+  notes: Harmonised across countries; not comparable with the national-definitions urban share.
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.degurba_share_towns
+  labels: {fr: "Part de la population vivant en villes moyennes et zones semi-denses (degré d'urbanisation)", en: "Share of population living in towns and semi-dense areas (Degree of Urbanisation)"}
+  definition: Percentage of the population living in towns and semi-dense areas as defined by the Degree of Urbanisation, at mid-year (WUP 2025 estimates, 1950-2025).
+  unit: "%"
+  domain: urban
+  subdomain: degree_of_urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_degurba.percPop|cat=Towns
+  provider_declared: true
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.degurba_share_rural
+  labels: {fr: "Part de la population vivant en zones rurales (degré d'urbanisation)", en: "Share of population living in rural areas (Degree of Urbanisation)"}
+  definition: Percentage of the population living in rural areas as defined by the Degree of Urbanisation, at mid-year (WUP 2025 estimates, 1950-2025).
+  unit: "%"
+  domain: urban
+  subdomain: degree_of_urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_degurba.percPop|cat=Rural
+  provider_declared: true
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.degurba_population_cities
+  labels: {fr: "Population vivant en villes (degré d'urbanisation)", en: "Population living in cities (Degree of Urbanisation)"}
+  definition: Population living in cities as defined by the Degree of Urbanisation, at mid-year, in thousands (WUP 2025 estimates, 1950-2025).
+  unit: thousands
+  domain: urban
+  subdomain: degree_of_urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_degurba.Pop|cat=Cities
+  provider_declared: true
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.degurba_share_cities_proj
+  labels: {fr: "Part de la population vivant en villes (degré d'urbanisation) — projection", en: "Share of population living in cities (Degree of Urbanisation) — projection"}
+  definition: Percentage of the population living in cities as defined by the Degree of Urbanisation, at mid-year; WUP 2025 projection 2026-2050. A projection, not an observation.
+  unit: "%"
+  domain: urban
+  subdomain: degree_of_urbanisation
+  theme: population
+  source_order:
+  - un_wup.wup2025_degurba.percPop|cat=Cities|proj=wup2025
+  provider_declared: true
+  tags: [wup2025, projection, degurba]
+- id: urban.wup.builtup_area_total
+  labels: {fr: "Surface bâtie", en: "Built-up area"}
+  definition: Built-up area of the country (all Degree of Urbanisation classes), in square kilometres, at mid-year (WUP 2025 estimates, 1975-2025, from EC-JRC GHSL built-up grids).
+  unit: km2
+  domain: urban
+  subdomain: built_up
+  theme: geography
+  source_order:
+  - un_wup.wup2025_degurba.BU_km2|cat=Total
+  provider_declared: true
+  notes: The provider's indicator list gives 'thousands' as unit of the mid-year BU_km2 column; its values equal the 1 January km2 column (km2).
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.builtup_per_capita_cities
+  labels: {fr: "Surface bâtie par habitant dans les villes", en: "Built-up area per capita in cities"}
+  definition: Built-up area per inhabitant in cities (Degree of Urbanisation), square metres per person, at mid-year (WUP 2025 estimates, 1975-2025).
+  unit: m2 per person
+  domain: urban
+  subdomain: built_up
+  theme: geography
+  source_order:
+  - un_wup.wup2025_degurba.BU_m2_per_capita|cat=Cities
+  provider_declared: true
+  tags: [wup2025, estimate, degurba]
+- id: urban.wup.national_capital_population_2025
+  labels: {fr: "Population de la capitale nationale (mi-2025)", en: "Population of the national capital (mid-2025)"}
+  definition: Population in mid-2025 of the Degree-of-Urbanisation settlement (city, town or village) of the national capital, in thousands (WUP 2025 file 20). Only for locations with exactly one capital row typed 'National capital...'; countries with several (e.g. Malaysia) are listed per capital in un_wup.wup2025_capitals (Pop|capital=<code>), never reduced to one.
+  unit: thousands
+  domain: urban
+  subdomain: capitals
+  theme: population
+  source_order:
+  - un_wup.wup2025_capitals.national_capital_pop
+  provider_declared: true
+  tags: [wup2025, estimate, capitals]
+- id: urban.geonames.places_over_15000
+  labels: {fr: "Nombre de localités de plus de 15 000 habitants (GeoNames)", en: "Number of places with more than 15,000 inhabitants (GeoNames)"}
+  definition: Number of populated places in GeoNames cities15000 with a GeoNames-declared population above 15,000, excluding sections of populated places (PPLX) and historical, abandoned or destroyed places. Exact count over the GeoNames file; populations are GeoNames' own undated figures.
+  unit: places
+  domain: urban
+  subdomain: cities
+  theme: geography
+  source_order:
+  - geonames.cities15000_by_country.places_pop_gt_15000|scope=excl_sections_historical
+  provider_declared: true
+  notes: The count including PPLX sections is geonames.cities15000_by_country.places_pop_gt_15000|scope=all_ppl. GeoNames place boundaries are not urban agglomerations.
+  tags: [geonames, count]
+- id: urban.geonames.largest_place_population
+  labels: {fr: "Population de la plus grande localité (GeoNames)", en: "Population of the largest place (GeoNames)"}
+  definition: GeoNames-declared population of the most populous place of the country in cities15000 (sections and historical places excluded); the place is named in the flags (ties listed). A municipality/place figure, not an agglomeration.
+  unit: persons
+  domain: urban
+  subdomain: cities
+  theme: geography
+  source_order:
+  - geonames.cities15000_by_country.largest_place_population
+  provider_declared: true
+  tags: [geonames]
+- id: urban.geonames.largest_place
+  labels: {fr: "Plus grande localité (GeoNames)", en: "Largest place (GeoNames)"}
+  definition: Name of the most populous place of the country in GeoNames cities15000 by GeoNames-declared population (sections and historical places excluded; ties listed, separated by ' | ').
+  unit: "1"
+  value_kind: text
+  domain: urban
+  subdomain: cities
+  theme: geography
+  source_order:
+  - geonames.cities15000_by_country.largest_place
+  provider_declared: true
+  tags: [geonames]
+- id: urban.geonames.capital_pplc
+  labels: {fr: "Capitale (code PPLC de GeoNames)", en: "Capital (GeoNames feature code PPLC)"}
+  definition: Name of the place(s) GeoNames codes PPLC ("capital of a political entity") in the country; several PPLC places are all listed (' | '), none chosen. Compare with Wikidata P36 in the KG (cross-check in docs/dev/v3_a_cities.md).
+  unit: "1"
+  value_kind: text
+  domain: urban
+  subdomain: capitals
+  theme: geography
+  source_order:
+  - geonames.cities15000_by_country.capital_pplc
+  provider_declared: true
+  tags: [geonames, capitals]
+- id: urban.geonames.capital_pplc_population
+  labels: {fr: "Population de la capitale (GeoNames)", en: "Population of the capital (GeoNames)"}
+  definition: GeoNames-declared population of the country's PPLC place, only when GeoNames codes exactly one place PPLC in the country (undated figure; the record's modification date is in the flags).
+  unit: persons
+  domain: urban
+  subdomain: capitals
+  theme: geography
+  source_order:
+  - geonames.cities15000_by_country.capital_pplc_population
+  provider_declared: true
+  tags: [geonames, capitals]
+- id: urban.geonames.admin1_divisions
+  labels: {fr: "Nombre de divisions administratives de premier niveau (GeoNames)", en: "Number of first-order administrative divisions (GeoNames)"}
+  definition: Number of first-order administrative divisions of the country listed in GeoNames admin1CodesASCII.txt (exact count over the file).
+  unit: divisions
+  domain: urban
+  subdomain: regions
+  theme: geography
+  source_order:
+  - geonames.admin1.admin1_count
+  provider_declared: true
+  tags: [geonames]

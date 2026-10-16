@@ -1,0 +1,36 @@
+[
+  {
+    "request_fingerprint": "3d25af2190650885283d9f7ef72e30583429c02075d85ba8ba6f91bff32af837",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EMP_DWAP_SEX_AGE_RT_A&format=.csv.gz",
+    "file": "EMP_DWAP_SEX_AGE_RT_A.csv.gz",
+    "sha256": "852b75a704272a65c8bed4a626242d3dde0a3b6c9a2d9bc1efbd5e85d0ef328a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T23:19:00+00:00",
+    "licence": "CC-BY-4.0 (ILO, ILOSTAT)",
+    "excerpt_of": {
+      "full_sha256": "633c2ec93209ef53898d5e36dab14345308d84db9e8d2ca7e989df39c24f4916",
+      "kept": "rows of SEN, JPN, BRA, KOS, ANT, X01 (verbatim lines)",
+      "rows": 11142
+    }
+  },
+  {
+    "request_fingerprint": "8cd6215d194a4c6697c0bab3bf9838ee3fe48baaf5b0d7a5e7d360922abd4510",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAP_DWAP_SEX_AGE_RT_A&format=.csv.gz",
+    "file": "EAP_DWAP_SEX_AGE_RT_A.csv.gz",
+    "sha256": "0c0b1c5ceae9cca1a639e42f04fbd0cf64894042b4d1159db1179d89ae29ea0a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T23:19:00+00:00",
+    "licence": "CC-BY-4.0 (ILO, ILOSTAT)",
+    "excerpt_of": {
+      "full_sha256": "c4ce86e73efaa271150901311f5b7409129d59b3e6d0312fe26024002f2c435f",
+      "kept": "rows of SEN, JPN, BRA, KOS, ANT, X01 (verbatim lines)",
+      "rows": 12735
+    }
+  }
+]

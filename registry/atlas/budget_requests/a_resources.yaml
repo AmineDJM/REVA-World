@@ -1,0 +1,19 @@
+# Budget request from agent A-RESOURCES. ATLASCORE/ATLASOPS merges into registry/policies/budgets.yaml.
+# Measured on 2026-10-15.
+agent: A-RESOURCES
+requests:
+  - source_key: usgs.sciencebase
+    # One full run (connector atlas.usgs_minerals) = 3 releases x (item JSON ~30 kB + FGDC metadata 14-84 kB
+    # + CSV 3.2 / 4.3 / 3.3 MB) = 9 requests, ~11 MB. Releases change yearly; a monthly run is plenty.
+    daily_requests: 20
+    expected_bytes_per_day: 25000000
+    reason: "9 requests (~11 MB) per full run plus one retry; ScienceBase public items, no key"
+  - source_key: eia.opendata_bulk
+    # One full run (connector atlas.eia_intl) = manifest.txt (~0.05 MB) + footnotes page (~0.02 MB) + INTL.zip
+    # (24.2 MB) = 3 requests, ~24.3 MB.
+    daily_requests: 8
+    expected_bytes_per_day: 55000000
+    reason: "3 requests (~24 MB bulk zip) per full run plus one retry; no key"
+daily_totals_increase:
+  http_requests_total: "+28"
+  http_bytes_total: "+80_000_000"

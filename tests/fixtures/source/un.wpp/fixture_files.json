@@ -1,0 +1,34 @@
+[
+  {
+    "key": "pop",
+    "file": "WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz",
+    "size": 93972,
+    "chunk_bytes": 60000,
+    "first_year": 2005,
+    "last_year": 2023
+  },
+  {
+    "key": "deaths",
+    "file": "WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz",
+    "size": 68232,
+    "chunk_bytes": 60000,
+    "first_year": 2005,
+    "last_year": 2023
+  },
+  {
+    "key": "fert5",
+    "file": "WPP2024_Fertility_by_Age5.csv.gz",
+    "size": 7559,
+    "chunk_bytes": 60000,
+    "first_year": 2005,
+    "last_year": 2023
+  },
+  {
+    "key": "indicators",
+    "file": "WPP2024_Demographic_Indicators_Medium.csv.gz",
+    "size": 12990,
+    "chunk_bytes": 60000,
+    "first_year": 2005,
+    "last_year": 2023
+  }
+]

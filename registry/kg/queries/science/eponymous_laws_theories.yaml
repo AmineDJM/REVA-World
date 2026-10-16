@@ -1,0 +1,24 @@
+id: science.eponymous_laws_theories
+domain: science
+owner: KGSCIECO
+description: >-
+  Scientific laws, theories, theorems, effects, constants, units and equations -- direct instances of the
+  listed classes with at least 5 sitelinks. Most are named after a person (Ohm's law, Doppler effect,
+  Kepler's laws, Fermat's Last Theorem, Avogadro constant, kelvin): the "named after" (P138) hop to the
+  person arrives with the snapshot once P138 is allow-listed (requested); discoverer (P61), time of discovery
+  (P575), "studied by" (P2579) and part of (P361) are kept already.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { {{values}} }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 5)
+  }
+split:
+  by: values
+  source: list
+  qids: [Q214070, Q408891, Q379231, Q3239681, Q1293220, Q65943, Q173227, Q11345, Q47574, Q319141]
+  chunk_size: 5
+max_rows: 15000
+expand_hops: 1

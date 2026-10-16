@@ -1,0 +1,20 @@
+id: science.universities
+domain: science
+owner: KGSCIECO
+description: >-
+  Major universities: direct instances of university (Q3918), public university (Q875538), private
+  university (Q902104), research university (Q15936437), institute of technology (Q1371037) or collegiate
+  university (Q3354859) with at least 20 sitelinks (University of Bologna, al-Qarawiyyin, Oxford, MIT, ...).
+  Snapshots keep country (P17), location (P131), inception (P571), founders (P112), member of (P463, e.g.
+  university networks), headquarters (P159). People -> university edges come from the people snapshots
+  (P69 educated at, P108 employer).
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q3918 wd:Q875538 wd:Q902104 wd:Q15936437 wd:Q1371037 wd:Q3354859 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+  }
+max_rows: 8000
+expand_hops: 0

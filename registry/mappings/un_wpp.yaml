@@ -1,0 +1,78 @@
+# Exact mappings of the reviewed connector un.wpp (V3 agent SIMWORLD): WPP 2024 bulk CSV files ->
+# dataset-input concepts (registry/concepts/demography_wpp.yaml). The connector publishes no scalar
+# observations; the mappings record what each dataset input means and for which subjects (the 237 WPP
+# countries/areas, crosswalk keys) and years the dataset inputs are eligible for belief releases.
+connector: {name: un.wpp, version: 1.0.0}
+mappings:
+- mapping_key: un.wpp.wpp2024_pop_jan1
+  source_ref:
+    provider: un_wpp
+    dataset: wpp2024_pop_jan1
+    files: WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz
+    dimensions: {variant: Medium, estimates_only: true}
+  target: {concept_id: demography.wpp.population.jan1_age_sex, version: 1.0.0}
+  mapping_kind: exact
+  version: 1.0.0
+  applicability:
+    subjects: [ABW, AFG, AGO, AIA, ALB, AND, ARE, ARG, ARM, ASM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BES, BFA, BGD, BGR, BHR, BHS, BIH, BLM, BLR, BLZ, BMU, BOL, BRA, BRB, BRN, BTN, BWA, CAF, CAN, CHE, CHL,
+      CHN, CIV, CMR, COD, COG, COK, COL, COM, CPV, CRI, CUB, CUW, CYM, CYP, CZE, DEU, DJI, DMA, DNK, DOM, DZA, ECU, EGY, ERI, ESH, ESP, EST, ETH, FIN, FJI, FLK, FRA, FRO, FSM, GAB, GBR, GEO, GGY, GHA, GIB,
+      GIN, GLP, GMB, GNB, GNQ, GRC, GRD, GRL, GTM, GUF, GUM, GUY, HKG, HND, HRV, HTI, HUN, IDN, IMN, IND, IRL, IRN, IRQ, ISL, ISR, ITA, JAM, JEY, JOR, JPN, KAZ, KEN, KGZ, KHM, KIR, KNA, KOR, KWT, LAO, LBN,
+      LBR, LBY, LCA, LIE, LKA, LSO, LTU, LUX, LVA, MAC, MAF, MAR, MCO, MDA, MDG, MDV, MEX, MHL, MKD, MLI, MLT, MMR, MNE, MNG, MNP, MOZ, MRT, MSR, MTQ, MUS, MWI, MYS, MYT, NAM, NCL, NER, NGA, NIC, NIU, NLD,
+      NOR, NPL, NRU, NZL, OMN, PAK, PAN, PER, PHL, PLW, PNG, POL, PRI, PRK, PRT, PRY, PSE, PYF, QAT, REU, ROU, RUS, RWA, SAU, SDN, SEN, SGP, SHN, SLB, SLE, SLV, SMR, SOM, SPM, SRB, SSD, STP, SUR, SVK, SVN,
+      SWE, SWZ, SXM, SYC, SYR, TCA, TCD, TGO, THA, TJK, TKL, TKM, TLS, TON, TTO, TUN, TUR, TUV, TWN, TZA, UGA, UKR, URY, USA, UZB, VAT, VCT, VEN, VGB, VIR, VNM, VUT, WLF, WSM, XKX, YEM, ZAF, ZMB, ZWE]
+    years: {from: 1990, to: 2023}
+  eligibility: eligible
+- mapping_key: un.wpp.wpp2024_deaths
+  source_ref:
+    provider: un_wpp
+    dataset: wpp2024_deaths
+    files: WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz
+    dimensions: {variant: Medium, estimates_only: true}
+  target: {concept_id: demography.wpp.deaths.age_sex, version: 1.0.0}
+  mapping_kind: exact
+  version: 1.0.0
+  applicability:
+    subjects: [ABW, AFG, AGO, AIA, ALB, AND, ARE, ARG, ARM, ASM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BES, BFA, BGD, BGR, BHR, BHS, BIH, BLM, BLR, BLZ, BMU, BOL, BRA, BRB, BRN, BTN, BWA, CAF, CAN, CHE, CHL,
+      CHN, CIV, CMR, COD, COG, COK, COL, COM, CPV, CRI, CUB, CUW, CYM, CYP, CZE, DEU, DJI, DMA, DNK, DOM, DZA, ECU, EGY, ERI, ESH, ESP, EST, ETH, FIN, FJI, FLK, FRA, FRO, FSM, GAB, GBR, GEO, GGY, GHA, GIB,
+      GIN, GLP, GMB, GNB, GNQ, GRC, GRD, GRL, GTM, GUF, GUM, GUY, HKG, HND, HRV, HTI, HUN, IDN, IMN, IND, IRL, IRN, IRQ, ISL, ISR, ITA, JAM, JEY, JOR, JPN, KAZ, KEN, KGZ, KHM, KIR, KNA, KOR, KWT, LAO, LBN,
+      LBR, LBY, LCA, LIE, LKA, LSO, LTU, LUX, LVA, MAC, MAF, MAR, MCO, MDA, MDG, MDV, MEX, MHL, MKD, MLI, MLT, MMR, MNE, MNG, MNP, MOZ, MRT, MSR, MTQ, MUS, MWI, MYS, MYT, NAM, NCL, NER, NGA, NIC, NIU, NLD,
+      NOR, NPL, NRU, NZL, OMN, PAK, PAN, PER, PHL, PLW, PNG, POL, PRI, PRK, PRT, PRY, PSE, PYF, QAT, REU, ROU, RUS, RWA, SAU, SDN, SEN, SGP, SHN, SLB, SLE, SLV, SMR, SOM, SPM, SRB, SSD, STP, SUR, SVK, SVN,
+      SWE, SWZ, SXM, SYC, SYR, TCA, TCD, TGO, THA, TJK, TKL, TKM, TLS, TON, TTO, TUN, TUR, TUV, TWN, TZA, UGA, UKR, URY, USA, UZB, VAT, VCT, VEN, VGB, VIR, VNM, VUT, WLF, WSM, XKX, YEM, ZAF, ZMB, ZWE]
+    years: {from: 1990, to: 2023}
+  eligibility: eligible
+- mapping_key: un.wpp.wpp2024_births
+  source_ref:
+    provider: un_wpp
+    dataset: wpp2024_births
+    files: WPP2024_Fertility_by_Age5.csv.gz + WPP2024_Demographic_Indicators_Medium.csv.gz
+    dimensions: {variant: Medium, estimates_only: true}
+  target: {concept_id: demography.wpp.live_births.mother_age5_newborn_sex, version: 1.0.0}
+  mapping_kind: exact
+  version: 1.0.0
+  applicability:
+    subjects: [ABW, AFG, AGO, AIA, ALB, AND, ARE, ARG, ARM, ASM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BES, BFA, BGD, BGR, BHR, BHS, BIH, BLM, BLR, BLZ, BMU, BOL, BRA, BRB, BRN, BTN, BWA, CAF, CAN, CHE, CHL,
+      CHN, CIV, CMR, COD, COG, COK, COL, COM, CPV, CRI, CUB, CUW, CYM, CYP, CZE, DEU, DJI, DMA, DNK, DOM, DZA, ECU, EGY, ERI, ESH, ESP, EST, ETH, FIN, FJI, FLK, FRA, FRO, FSM, GAB, GBR, GEO, GGY, GHA, GIB,
+      GIN, GLP, GMB, GNB, GNQ, GRC, GRD, GRL, GTM, GUF, GUM, GUY, HKG, HND, HRV, HTI, HUN, IDN, IMN, IND, IRL, IRN, IRQ, ISL, ISR, ITA, JAM, JEY, JOR, JPN, KAZ, KEN, KGZ, KHM, KIR, KNA, KOR, KWT, LAO, LBN,
+      LBR, LBY, LCA, LIE, LKA, LSO, LTU, LUX, LVA, MAC, MAF, MAR, MCO, MDA, MDG, MDV, MEX, MHL, MKD, MLI, MLT, MMR, MNE, MNG, MNP, MOZ, MRT, MSR, MTQ, MUS, MWI, MYS, MYT, NAM, NCL, NER, NGA, NIC, NIU, NLD,
+      NOR, NPL, NRU, NZL, OMN, PAK, PAN, PER, PHL, PLW, PNG, POL, PRI, PRK, PRT, PRY, PSE, PYF, QAT, REU, ROU, RUS, RWA, SAU, SDN, SEN, SGP, SHN, SLB, SLE, SLV, SMR, SOM, SPM, SRB, SSD, STP, SUR, SVK, SVN,
+      SWE, SWZ, SXM, SYC, SYR, TCA, TCD, TGO, THA, TJK, TKL, TKM, TLS, TON, TTO, TUN, TUR, TUV, TWN, TZA, UGA, UKR, URY, USA, UZB, VAT, VCT, VEN, VGB, VIR, VNM, VUT, WLF, WSM, XKX, YEM, ZAF, ZMB, ZWE]
+    years: {from: 1990, to: 2023}
+  eligibility: eligible
+- mapping_key: un.wpp.wpp2024_indicators
+  source_ref:
+    provider: un_wpp
+    dataset: wpp2024_indicators
+    files: WPP2024_Demographic_Indicators_Medium.csv.gz
+    dimensions: {variant: Medium, estimates_only: true}
+  target: {concept_id: demography.wpp.indicators_summary, version: 1.0.0}
+  mapping_kind: exact
+  version: 1.0.0
+  applicability:
+    subjects: [ABW, AFG, AGO, AIA, ALB, AND, ARE, ARG, ARM, ASM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BES, BFA, BGD, BGR, BHR, BHS, BIH, BLM, BLR, BLZ, BMU, BOL, BRA, BRB, BRN, BTN, BWA, CAF, CAN, CHE, CHL,
+      CHN, CIV, CMR, COD, COG, COK, COL, COM, CPV, CRI, CUB, CUW, CYM, CYP, CZE, DEU, DJI, DMA, DNK, DOM, DZA, ECU, EGY, ERI, ESH, ESP, EST, ETH, FIN, FJI, FLK, FRA, FRO, FSM, GAB, GBR, GEO, GGY, GHA, GIB,
+      GIN, GLP, GMB, GNB, GNQ, GRC, GRD, GRL, GTM, GUF, GUM, GUY, HKG, HND, HRV, HTI, HUN, IDN, IMN, IND, IRL, IRN, IRQ, ISL, ISR, ITA, JAM, JEY, JOR, JPN, KAZ, KEN, KGZ, KHM, KIR, KNA, KOR, KWT, LAO, LBN,
+      LBR, LBY, LCA, LIE, LKA, LSO, LTU, LUX, LVA, MAC, MAF, MAR, MCO, MDA, MDG, MDV, MEX, MHL, MKD, MLI, MLT, MMR, MNE, MNG, MNP, MOZ, MRT, MSR, MTQ, MUS, MWI, MYS, MYT, NAM, NCL, NER, NGA, NIC, NIU, NLD,
+      NOR, NPL, NRU, NZL, OMN, PAK, PAN, PER, PHL, PLW, PNG, POL, PRI, PRK, PRT, PRY, PSE, PYF, QAT, REU, ROU, RUS, RWA, SAU, SDN, SEN, SGP, SHN, SLB, SLE, SLV, SMR, SOM, SPM, SRB, SSD, STP, SUR, SVK, SVN,
+      SWE, SWZ, SXM, SYC, SYR, TCA, TCD, TGO, THA, TJK, TKL, TKM, TLS, TON, TTO, TUN, TUR, TUV, TWN, TZA, UGA, UKR, URY, USA, UZB, VAT, VCT, VEN, VGB, VIR, VNM, VUT, WLF, WSM, XKX, YEM, ZAF, ZMB, ZWE]
+    years: {from: 1990, to: 2023}
+  eligibility: eligible

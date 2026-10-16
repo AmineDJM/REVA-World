@@ -1,0 +1,30 @@
+# V3 (agent A-CITIES): UN World Urbanization Prospects 2025 (bulk CSV + capital cities workbook).
+# Connector: src/reva/adapters/connectors/atlas_wup.py (atlas.un_wup) -> atlas tables un_wup.*
+source_key: un.wup
+title: "UN DESA Population Division - World Urbanization Prospects: The 2025 Revision"
+provider_url: https://population.un.org/wup/downloads
+lineage_family: un_wup
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: http://creativecommons.org/licenses/by/3.0/igo/
+  attribution: "United Nations, Department of Economic and Social Affairs, Population Division (2025). World Urbanization Prospects: The 2025 Revision, Online Edition."
+  provider_statement: "Copyright (c) 2025 by United Nations, made available under a Creative Commons license CC BY 3.0 IGO (WUP2025-F20-DEGURBA-Capital_Cities.xlsx, sheet 'info', row 13)"
+metadata:
+  allowed_hosts: [population.un.org]
+  files:
+    - WUP2025-DB-National-Definitions-Population-Data.csv.gz     # 3.4 MB; urban/rural by national definitions 1950-2050
+    - WUP2025-DB-DEGURBA-Level1-Population-Surface-Data.csv.gz   # 8.5 MB; Degree of Urbanisation level 1
+    - WUP2025-DB-DEGURBA-Cities-Population-Surface-Data.csv.gz   # 58.7 MB; 16,828 cities >= 50k, 1975-2050
+    - WUP2025-F20-DEGURBA-Capital_Cities.xlsx                    # 63 kB; capital cities mid-2025
+  not_ingested:
+    - "WUP2025-DB-DEGURBA-Level2-Population-Surface-Data.csv.gz (14 MB): level-2 classes (suburbs, villages ...); level 1 used"
+    - "WUP2018-Excel-files.zip (archive): WUP 2018 is superseded by WUP 2025; legacy .xls workbooks (no reader in the project)"
+  authentication: none
+  cadence: revision every few years (2018, 2025; WUP 2025 released 2025-11-18)
+  editorial_status: >-
+    Official UN estimates (1950-2025) and projections (2026-2050), consistent with WPP 2024 totals. Urban
+    population by national definitions is the WUP 2018 concept; the Degree of Urbanisation (cities, towns,
+    rural areas; EC-JRC grids) is new in WUP 2025 and not comparable with national definitions. Years >= 2026
+    are projections and are flagged.
+  upstream_lineages:
+    population: [national_censuses, ghsl_population_grids, un_wpp_model]

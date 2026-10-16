@@ -1,0 +1,58 @@
+[
+  {
+    "request_fingerprint": "764c56e6164413501c6c145e42bd68dbf57cf903e3d768ac49312a3abf4555f6",
+    "url": "https://population.un.org/wup/assets/Download/Countries%20and%20Aggregates/WUP2025-DB-National-Definitions-Population-Data.csv.gz",
+    "file": "764c56e616441350.csv.gz",
+    "sha256": "8b4b50f9e3124df382f89e0ded457e4578b0af193f11eea63aacc4f682fab515",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + rows of LocID ['158', '1837', '412', '458', '620', '900'] in years ['1950', '1975', '2025', '2026', '2050']",
+    "excerpt_of_raw_sha256": "6f7f9fdb2b2acccfd6d250e61ae058ace5b818fee6245f352505be655004ddac"
+  },
+  {
+    "request_fingerprint": "bb8d447e61411754ff5063479a99e4f474a5381c30f1a581ebc83546111e248d",
+    "url": "https://population.un.org/wup/assets/Download/Countries%20and%20Aggregates/WUP2025-DB-DEGURBA-Level1-Population-Surface-Data.csv.gz",
+    "file": "bb8d447e61411754.csv.gz",
+    "sha256": "203620b5ac73aea881ac31642eb21a4387d1707fa31a1cd0a4c652fb72d73878",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + rows of LocID ['158', '1837', '412', '458', '620', '900'] in years ['1950', '1975', '2025', '2026', '2050']",
+    "excerpt_of_raw_sha256": "851cb5c271334e4a566816d2ad313f3730034645b6b732629ac626746692d8e4"
+  },
+  {
+    "request_fingerprint": "540bbf51cee39e9ec394b9eb7b92cd9d7df8162262cef81fe360eb70b20d3490",
+    "url": "https://population.un.org/wup/assets/Download/Cities/WUP2025-DB-DEGURBA-Cities-Population-Surface-Data.csv.gz",
+    "file": "540bbf51cee39e9e.csv.gz",
+    "sha256": "5670405ba5b0c0fa00243d8e3b0b00b20436827d9577793f8e2f03eb535519b3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + rows of cities ['1629', '217', '698', '828'] in years ['1950', '1975', '2025', '2026', '2050']",
+    "excerpt_of_raw_sha256": "e9c9b41e374d776a9983e39bab54755405cecc263134db68ee706049294cd114"
+  },
+  {
+    "request_fingerprint": "166c94419b573d53c5d36f9a888ee3e2598468cd4c6f718799e38b6a789f2da5",
+    "url": "https://population.un.org/wup/assets/Download/Cities/WUP2025-F20-DEGURBA-Capital_Cities.xlsx",
+    "file": "166c94419b573d53.xlsx",
+    "sha256": "cf2f934b51412f12cb7c3ac58b211ceef4204b68460b4c691ca829c4caada3a5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "complete file (63 kB)",
+    "excerpt_of_raw_sha256": "cf2f934b51412f12cb7c3ac58b211ceef4204b68460b4c691ca829c4caada3a5"
+  }
+]

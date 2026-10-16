@@ -1,0 +1,27 @@
+id: history.explorer_voyages
+domain: history
+owner: KGHIST
+description: >-
+  Person -> voyage/expedition statements stated on the person: participant in (P1344) and significant
+  event (P793). Wikidata attaches explorers' voyages mostly through P793 on the person (e.g. Christopher
+  Columbus -> significant event -> his first..fourth voyages, which are parts of "Voyages of Christopher
+  Columbus"), and only sometimes through P1344 or the voyage's own participant (P710) list. Subjects are
+  people (label snapshots; biographies come from KGPEOPLE); voyages are seeded by history.expeditions.
+purpose: statements
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?person ?statement ?prop ?voyage ?rank ?start ?end ?pit WHERE {
+    VALUES (?p ?ps ?prop) { (p:P1344 ps:P1344 wd:P1344) (p:P793 ps:P793 wd:P793) }
+    ?voyage wdt:P31/wdt:P279* wd:Q2401485 .
+    ?person ?p ?statement .
+    ?statement ?ps ?voyage ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?person wdt:P31 wd:Q5 .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: person, property_var: prop, object: voyage, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+max_rows: 30000
+expand_hops: 1

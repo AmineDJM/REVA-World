@@ -1,0 +1,27 @@
+# V3 atlas (agent A-RESOURCES): USGS National Minerals Information Center data releases on ScienceBase.
+# Connector src/reva/adapters/connectors/atlas_usgs.py (atlas tables usgs.mcs2026, usgs.myb2024, usgs.myb2019).
+source_key: usgs.sciencebase
+title: USGS Mineral Commodity Summaries and Minerals Yearbook vol. III (world mine production, reserves, country production tables)
+provider_url: https://www.usgs.gov/centers/national-minerals-information-center
+lineage_family: usgs_nmic
+rights:
+  licence: "U.S. public domain; data releases marked CC0 1.0"
+  licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+  attribution: "U.S. Geological Survey, National Minerals Information Center, <year>, <data release title>: U.S. Geological Survey data release, <doi>."
+  terms_quote: >-
+    These data are marked with a Creative Commons CC0 1.0 Universal License. These data are in the public domain
+    and do not have any use constraints.
+metadata:
+  allowed_hosts: [www.sciencebase.gov]
+  items:
+    mcs2026: {item: 69837e43b66b01367d7ec7c7, doi: "10.5066/P1WKQ63T", file: MCS2026_Commodities_Data.csv}
+    myb2024: {item: 6a8490171ba49b3133cd8055, doi: "10.5066/P1KEQASH", file: 2024MYBv3_Production_table.csv}
+    myb2019: {item: 67febb3cd4be02350c2609bc, doi: "10.5066/P13HTKV3", file: 2019_MYBviii_Table1_08-21-2025.csv}
+  access: "ScienceBase item JSON (catalog/item/<id>?format=json) -> file URLs from the item's own file list; no key"
+  cadence: "MCS yearly (late January/February); Minerals Yearbook vol. III yearly; monthly check"
+  editorial_status: >-
+    USGS compilation from national statistical offices, company reports and USGS estimates; estimates, withheld
+    (W) and not-available values are flagged per cell exactly as published.
+  not_used: >-
+    Minerals Yearbook country-chapter spreadsheets per country (superseded by the compiled vol. III data releases);
+    MYB facilities table (2024MYBv3_Facilities_table.csv, plant-level capacities; not country-year cells).

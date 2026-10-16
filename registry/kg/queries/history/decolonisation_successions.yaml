@@ -1,0 +1,30 @@
+id: history.decolonisation_successions
+domain: history
+owner: KGHIST
+description: >-
+  Decolonisation table as explicit statements: countries (instances of country Q6256 or a subclass) whose
+  inception (P571) falls in 1940-1979 and that replace (P1365) a colony, protectorate, dependent territory or
+  historical country, e.g. Algeria (1962) replaces French Algeria; Indonesia (1945) replaces the Dutch East
+  Indies. The independence date is the country's P571 (core snapshot); the former colonial power is the
+  predecessor's dated P17/P361 (history.colonies / history.country_predecessors snapshots).
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT DISTINCT ?state ?statement ?colony ?rank ?start ?end ?pit WHERE {
+    ?state wdt:P31/wdt:P279* wd:Q6256 ; wdt:P571 ?inception .
+    FILTER(YEAR(?inception) >= 1940 && YEAR(?inception) <= 1979)
+    ?state p:P1365 ?statement .
+    ?statement ps:P1365 ?colony ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    FILTER EXISTS {
+      VALUES ?kind { wd:Q133156 wd:Q164142 wd:Q161243 wd:Q3024240 }
+      ?colony wdt:P31/wdt:P279* ?kind .
+    }
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: state, property: P1365, object: colony, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+max_rows: 3000
+expand_hops: 1

@@ -1,0 +1,122 @@
+[
+  {
+    "request_fingerprint": "7e24ee075e3f24c91f95f8eabb92c7c5bfd0857695c7b831e74e36316ec74706",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz?bytes=0-59999",
+    "file": "deaths_0.bin",
+    "sha256": "dde6150a91661694282370982d08542cfb1abab90a12432627fe9ae6d7c98ac6",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 0-59999/68232"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz",
+      "full_size": 45178348,
+      "full_etag": "\"0x8DD1BA9FE2AFD0C\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 5959
+    }
+  },
+  {
+    "request_fingerprint": "4b256c4bace9b057f04b8c1121d766f94f236c76f2008d39b41ae0543507cc7e",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz?bytes=60000-68231",
+    "file": "deaths_1.bin",
+    "sha256": "5684868fdc2f3b2e3153ae640bb882b6a8bd0d2c66b0345a0317fe75a1dd2ef8",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 60000-68231/68232"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz",
+      "full_size": 45178348,
+      "full_etag": "\"0x8DD1BA9FE2AFD0C\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 5959
+    }
+  },
+  {
+    "request_fingerprint": "b919ad02c3291b4b38d01475cea32297b80c7a4c2a52a5d8f119afa61b75624e",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz?bytes=0-12989",
+    "file": "indicators_0.bin",
+    "sha256": "f967df65c0d2da345f72b95c819f295af09c74a5e592606e6b2ad28fbe47fe9b",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 0-12989/12990"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_Demographic_Indicators_Medium.csv.gz",
+      "full_size": 16557272,
+      "full_etag": "\"0x8DD1BA9EBFD1565\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 59
+    }
+  },
+  {
+    "request_fingerprint": "cda591e94b49e5f3785ad258704afe55baa0d901b37b1f8d9ac8a94bb49a158b",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Fertility_by_Age5.csv.gz?bytes=0-7558",
+    "file": "fert5_0.bin",
+    "sha256": "26b2560c791484814d55e7be39390c96c513e16dd6203806e8526d02438b1f8e",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 0-7558/7559"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_Fertility_by_Age5.csv.gz",
+      "full_size": 82864610,
+      "full_etag": "\"0x8DD1BA9FE930DAD\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 540
+    }
+  },
+  {
+    "request_fingerprint": "ec9362109fe6daee538b0a0cd4949753c31a7e0bb52c1bb57479ede62f1139a8",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz?bytes=0-59999",
+    "file": "pop_0.bin",
+    "sha256": "c8b0908487b7d6635602da28b192f1d291626d8b50d452e3b54d379144bdb121",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 0-59999/93972"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz",
+      "full_size": 62107912,
+      "full_etag": "\"0x8DD1BA9F7BFACA3\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 5959
+    }
+  },
+  {
+    "request_fingerprint": "1c4032df71b96889d8e50997c61e6e2f54504a009e6ae129314e9d7423ea7d8c",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz?bytes=60000-93971",
+    "file": "pop_1.bin",
+    "sha256": "d8c09736533ddb83337c1976e069964117cb9b0f606e68d7a5728f1878769a07",
+    "status": 206,
+    "headers": {
+      "content-type": "application/x-gzip",
+      "content-range": "bytes 60000-93971/93972"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 3.0 IGO (UN DESA Population Division, World Population Prospects 2024)",
+    "excerpt_of": {
+      "file": "WPP2024_Population1JanuaryBySingleAgeSex_Medium_1950-2023.csv.gz",
+      "full_size": 62107912,
+      "full_etag": "\"0x8DD1BA9F7BFACA3\"",
+      "kept": "Country/Area rows of ['BRA', 'JPN', 'SEN'], Medium, 2005-2023; plus World 2020, SEN 2030 Low variant and SEN 2004 rows (filter checks)",
+      "rows": 5959
+    }
+  }
+]

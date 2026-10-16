@@ -1,0 +1,48 @@
+# ILOSTAT labour-market rates by sex and five-year age band (V3 agent SIMWORLD), read by
+# social.retirement_age@1.1.0. Fetched by the reviewed built-in connector ilostat.labour_age5
+# (src/reva/adapters/connectors/ilostat_labour.py) and stored as dataset inputs (Parquet).
+# Separate concepts from the Eurostat LFS ones (labour.employment_rate.lfs_age_sex, ...): ILOSTAT
+# harmonises national survey series with its own selection of one source per area and year.
+# Published versions are immutable: changing meaning requires a new version.
+concepts:
+  - concept_id: labour.ilostat.employment_to_population_ratio.age5_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Employment-to-population ratio by sex and five-year age band, annual (ILOSTAT EMP_DWAP_SEX_AGE_RT_A)"}
+    definition: >-
+      ILOSTAT EMP_DWAP_SEX_AGE_RT: employed persons as a percentage of the working-age population of the same
+      sex and age band, annual, from the national labour force survey or other source ILOSTAT selected for the
+      area and year (source column). Five-year bands 15-19 .. 60-64 and 65+ (ILOSTAT publishes no 65-69 band).
+      Observation status (break, unreliable, ...) and notes kept verbatim.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: working_age_population_national_lfs_ilostat
+      denominator: working-age population of the same sex and age band
+      temporal_support: calendar_year
+      spatial_support: ilostat_ref_area
+      aggregation: period_rate
+      scale_type: rate
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable]
+      measurement_method: labour_force_survey_compiled_by_ilo
+  - concept_id: labour.ilostat.labour_force_participation_rate.age5_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Labour force participation rate by sex and five-year age band, annual (ILOSTAT EAP_DWAP_SEX_AGE_RT_A)"}
+    definition: >-
+      ILOSTAT EAP_DWAP_SEX_AGE_RT: persons in the labour force (employed or unemployed) as a percentage of the
+      working-age population of the same sex and age band, annual; same sources, bands and flags as the
+      employment-to-population ratio.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: working_age_population_national_lfs_ilostat
+      denominator: working-age population of the same sex and age band
+      temporal_support: calendar_year
+      spatial_support: ilostat_ref_area
+      aggregation: period_rate
+      scale_type: rate
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable]
+      measurement_method: labour_force_survey_compiled_by_ilo

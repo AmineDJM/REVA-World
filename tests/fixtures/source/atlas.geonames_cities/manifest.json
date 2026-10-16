@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "b921b5af2c6c7c8deb6a7b30793ca837303ee33c1bc24e6319035f0028325403",
+    "url": "https://download.geonames.org/export/dump/cities15000.zip",
+    "file": "b921b5af2c6c7c8d.zip",
+    "sha256": "0ad5f7fbd654145086a6f58324c9788ea16c126567e354d2691152a917f76857",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real rows of geonameids ['1735161', '2267057', '2272187', '2461993', '2462881', '2463447', '2735943', '2742136', '281124', '281133', '281184', '3578069', '3903987', '3911925', '6697380', '6949382', '786712', '786714', '789225', '8063361'] (zip re-packed)",
+    "excerpt_of_raw_sha256": "d5cc2af747cdb2defd31f7baa815240fb9cc0145902469de01d059eaceb23011"
+  },
+  {
+    "request_fingerprint": "a4666ed781ce9cc644804e0f97696a4ad1dcc543cb95a0dfa468404c416c92eb",
+    "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+    "file": "a4666ed781ce9cc6.txt",
+    "sha256": "12bbaff3de7b4e72d6ebd00062e10017fb7ceca274df970718d1b777442a1329",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:35:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real rows of countries ['AU', 'BO', 'EH', 'IL', 'MS', 'MY', 'PS', 'PT', 'PW', 'XK']",
+    "excerpt_of_raw_sha256": "1da92a6323a5fec3176f3f743bf4cf4040fd56a876da55e46fbca23c863aa60a"
+  }
+]

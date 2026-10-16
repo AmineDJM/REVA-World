@@ -1,0 +1,50 @@
+[
+ {
+  "request_fingerprint": "4db18128761fde9c08ead00c9ff5594cd1f30de67d423f1ce01de1c4b4b57b49",
+  "url": "https://www.eia.gov/opendata/bulk/manifest.txt",
+  "file": "4db18128761fde9c.txt",
+  "sha256": "cf5b29f787888d9332e7d05a1f39c41f2202322def1afa61bf02320e465e9925",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain",
+   "etag": "\"01f0b5f95cdd1:0\""
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "cf5b29f787888d9332e7d05a1f39c41f2202322def1afa61bf02320e465e9925",
+  "live_bytes": 28398,
+  "excerpt": "whole bulk manifest"
+ },
+ {
+  "request_fingerprint": "34ad65cfb9e9b87a3ea9bfd2233615de27636538636c7844d9b7605f4a005f7b",
+  "url": "https://www.eia.gov/international/content/info/footnotes.html",
+  "file": "34ad65cfb9e9b87a.html",
+  "sha256": "016caafe3cf000b147a57aad4a85420a4c3e3faa632fb430cc73ef3066fe1f99",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "016caafe3cf000b147a57aad4a85420a4c3e3faa632fb430cc73ef3066fe1f99",
+  "live_bytes": 1151,
+  "excerpt": "whole footnotes page"
+ },
+ {
+  "request_fingerprint": "3309a5db3d625a136f548bc01cb878c6bcf21b9aa5c5f52d94c3356d955a3296",
+  "url": "https://www.eia.gov/opendata/bulk/INTL.zip",
+  "file": "3309a5db3d625a13.zip",
+  "sha256": "216a23c1748a8f6cd10e444878b37f3bdfef138b7f1cb1cb25b46d7a4d4a7d84",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed",
+   "etag": "\"80a6e6761c53dd1:0\"",
+   "last-modified": "Sat, 03 Oct 2026 09:49:21 GMT"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "9251a5920ebe70448fc7af522c4f938dc9e1f4728aca2928ecc814ca9f216ea9",
+  "live_bytes": 24153479,
+  "excerpt": "INTL.txt with 326 verbatim lines of the live member (3 category lines with child lists cut to 3; series of geographies ['CHN', 'FRA', 'MTQ', 'OECD', 'SAU', 'SUN', 'USA', 'USOH', 'WORL', 'XKS'] and products ['116', '2', '26', '4008', '44', '4701', '5', '57', '7', '79'], annual plus the USA product-5 monthly/quarterly series; TJ series only for WORL/USA)"
+ }
+]

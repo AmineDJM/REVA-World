@@ -1,0 +1,22 @@
+id: science.science_awards
+domain: science
+owner: KGSCIECO
+description: >-
+  Science, mathematics and medicine awards: instances of science award (Q11448906) or of a subclass with at
+  least 10 sitelinks (Fields Medal, Turing Award, Abel Prize, Wolf Prizes, Copley Medal, Lasker, Kyoto,
+  Crafoord, Breakthrough prizes ...) plus the six Nobel prizes by id (they are typed "Nobel Prize", not
+  "science award"). Snapshots keep conferred by (P1027 once allow-listed), country (P17), inception (P571),
+  founder (P112), named after (P138). The award -> recipient edges come from science.award_recipients.
+purpose: seed_entities
+entity_kind: award
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      ?item wdt:P31/wdt:P279* wd:Q11448906 ; wikibase:sitelinks ?links .
+      FILTER(?links >= 10)
+    }
+    UNION
+    { VALUES ?item { wd:Q38104 wd:Q44585 wd:Q80061 wd:Q37922 wd:Q35637 wd:Q47170 } }
+  }
+max_rows: 3000
+expand_hops: 1

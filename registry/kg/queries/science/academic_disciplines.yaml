@@ -1,0 +1,19 @@
+id: science.academic_disciplines
+domain: science
+owner: KGSCIECO
+description: >-
+  Scientific fields: direct instances of academic discipline (Q11862829) or branch of science (Q2465832)
+  with at least 10 sitelinks (physics, computer science, genetics, ...). Snapshots keep subclass of / part
+  of (field hierarchy), "is the study of" (P2578), "studied by" (P2579), founder (P112) or discoverer /
+  inventor (P61) when Wikidata records one (founders of fields), inception (P571), country of origin (P495).
+  Person -> field edges come from the people snapshots (P101 field of work).
+purpose: seed_entities
+entity_kind: field
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q11862829 wd:Q2465832 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 10)
+  }
+max_rows: 6000
+expand_hops: 1

@@ -1,0 +1,157 @@
+# HUN: retirement-age rule table transcribed by agent SIMWORLD from World Bank WBL 2026
+# (src/reva/cli/build_wbl_rule_tables.py); maintainer review pending.
+schema: reva-retirement-age-rules/1
+version: 1.0.0
+review_status: maintainer_review_pending
+transcription: transcribed by agent SIMWORLD from WBL 2026, maintainer review pending
+country: HUN
+notes: 'Hungary: full-benefit retirement age for women and men from World Bank WBL 2026 (law as of 1 October 2025),
+  legal basis as cited by WBL: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January
+  2011), Section "Retirement Age". The legal text itself was not archived by REVA. WBL states one age at one date:
+  the in-force path covers claim year 2025 only; the held-constant path is an explicitly labelled counterfactual.'
+model_lever:
+  age_kind: normal_pension_age
+  sex_tracks:
+    F: women
+    M: men
+  rationale: 'WBL 2026 question 10.1.1: the age at which a woman / a man can retire with full pension benefits (general
+    scheme, main business city); the only legal age REVA holds for this country.'
+  qualification: WBL 2026 full-benefit age as of 1 October 2025 held constant for every year (reforms before or
+    after that date are not captured); early, partial, occupation-specific and contribution-record routes are not
+    modelled; coverage of the pension system (informality) is not represented.
+sources:
+- source_id: wbl2026
+  title: World Bank, Women, Business and the Law 2026 - sheet '10. Pension' (full-benefit retirement ages, legal
+    basis)
+  url: https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026.02.19_WBL26_FINAL%20Data%20for%20Download.xlsx
+  kind: secondary_legal_dataset
+  retrieved_at: '2026-10-15T23:19:45Z'
+  response_sha256: c51f7210b4abe5b5daf2c74f1c1410a066fad7673a4c15be36524665e8de666c
+  archived_file: WBL2026_pension_full_benefit_ages_excerpt.txt
+  licence: CC BY 4.0 (World Bank)
+  note: 2.5 MB workbook not committed; verbatim cell excerpt committed (one line per economy and sex).
+paths:
+- path_id: wbl2026_in_force_2025
+  label: 'WBL 2026: full-benefit age in force on 1 October 2025 (claim year 2025 only)'
+  status: in_force
+  description: Verbatim WBL 2026 value; no other year is covered by the source.
+- path_id: wbl2026_held_constant
+  label: 'WBL 2026 age held constant for every claim year (counterfactual: reforms not captured)'
+  status: counterfactual
+  description: 'The reference path for scenarios: the stated age, as if it applied in every year.'
+rows:
+- row_id: HUN.wbl2026.women.2025
+  paths:
+  - wbl2026_in_force_2025
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: women
+  age:
+    years: 65
+    months: 0
+  year_from: 2025
+  year_to: 2025
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!O77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
+- row_id: HUN.wbl2026.women.before
+  paths:
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: women
+  age:
+    years: 65
+    months: 0
+  year_from: null
+  year_to: 2024
+  derivation: counterfactual_extension
+  note: 'Counterfactual: the WBL 2026 age (law as of 1 October 2025) applied to every earlier claim year; past and
+    scheduled reforms are not captured by this source.'
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!O77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
+- row_id: HUN.wbl2026.women.after
+  paths:
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: women
+  age:
+    years: 65
+    months: 0
+  year_from: 2026
+  year_to: null
+  derivation: counterfactual_extension
+  note: 'Counterfactual: the WBL 2026 age (law as of 1 October 2025) applied to every later claim year; past and
+    scheduled reforms are not captured by this source.'
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!O77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
+- row_id: HUN.wbl2026.men.2025
+  paths:
+  - wbl2026_in_force_2025
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: men
+  age:
+    years: 65
+    months: 0
+  year_from: 2025
+  year_to: 2025
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!N77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65'
+- row_id: HUN.wbl2026.men.before
+  paths:
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: men
+  age:
+    years: 65
+    months: 0
+  year_from: null
+  year_to: 2024
+  derivation: counterfactual_extension
+  note: 'Counterfactual: the WBL 2026 age (law as of 1 October 2025) applied to every earlier claim year; past and
+    scheduled reforms are not captured by this source.'
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!N77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65'
+- row_id: HUN.wbl2026.men.after
+  paths:
+  - wbl2026_held_constant
+  age_kind: normal_pension_age
+  basis: claim_year
+  track: men
+  age:
+    years: 65
+    months: 0
+  year_from: 2026
+  year_to: null
+  derivation: counterfactual_extension
+  note: 'Counterfactual: the WBL 2026 age (law as of 1 October 2025) applied to every later claim year; past and
+    scheduled reforms are not captured by this source.'
+  citation:
+    source_id: wbl2026
+    legal_reference: Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section
+      "Retirement Age" (legal basis cited by WBL 2026, question 10.1.1)
+    locator: '[10. Pension!N77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65'
+claim_year_semantics:
+  rule: attained_once
+  derivation: model_assumption
+  note: WBL gives one age at one date; a person who reached the age of a claim year stays eligible (stated model
+    assumption, as for ESP).

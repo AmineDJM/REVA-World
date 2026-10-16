@@ -1,0 +1,887 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>National Minerals Information Center (NMIC)</origin>
+        <pubdate>20250821</pubdate>
+        <title>Minerals Yearbook, volume III, Area Reports — International: 2019 country chapters, table 1, production of mineral commodities</title>
+        <geoform>tabular digital data</geoform>
+        <pubinfo>
+          <pubplace>12201 Sunrise Valley Drive, Reston, Virginia, 20192, US</pubplace>
+          <publish>National Minerals Information Center</publish>
+        </pubinfo>
+        <othercit>DOI link: https://doi.org/10.5066/P13HTKV3</othercit>
+        <onlink>https://doi.org/10.5066/P13HTKV3</onlink>
+        <lworkcit>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, volume III, Area Reports — International</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>US Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes 2019 Minerals Yearbook country chapters and tables that were published and available for download as of March 31, 2025. Individual Minerals Yearbook country chapters are published independently from the complete volume as "Advanced Release.”</othercit>
+            <onlink>https://doi.org/10.3133/mybvIII</onlink>
+          </citeinfo>
+        </lworkcit>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>This data release contains the compilation of country level mineral commodity production data extracted from Table 1 within all published 2019 international chapters in the U.S. Geological Survey's annual publication Minerals Yearbook Volume III: Area Reports — International. Individual Minerals Yearbook country chapters are published independently from the complete volume as "Advanced Release." Data reported in Table 1 of the individual country chapters include mineral commodity production data over a 5-year period (2015 through 2019). For this data release, these mineral commodity production data from all published 2019 international chapters were combined into a single table and reformatted into a machine-readable format .csv file. No content from the originally published tables were modified or revised in this process other than minor typographical errors.</abstract>
+      <purpose>Published on an annual basis, the U.S. Geological Survey's Minerals Yearbook Volume III: Area Reports — International is the Government's publication to furnish information covering mineral commodities in various countries. Individual Minerals Yearbook country chapters include sections on government policies and programs, trade and production data, industry structure and ownership, commodity sector developments, infrastructure, and a summary outlook. Data tables within these chapters contain mineral commodity information and statistics over a range of 5 years covering over 90 individual minerals and materials. The purpose of this data release is to provide mineral commodity production data from these tables into a machine-readable format.</purpose>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>2015</begdate>
+          <enddate>2019</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>Current as of the publication date of the 2019 individual advanced release country chapters and tables as listed in the “Source Publication Date” field.</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>None planned</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-180.0000</westbc>
+        <eastbc>180.0000</eastbc>
+        <northbc>90.0000</northbc>
+        <southbc>-90.0000</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>USGS Metadata Identifier</themekt>
+        <themekey>USGS:67febb3cd4be02350c2609bc</themekey>
+      </theme>
+      <theme>
+        <themekt>None</themekt>
+        <themekey>commodity</themekey>
+        <themekey>crude</themekey>
+        <themekey>industrial minerals</themekey>
+        <themekey>metals</themekey>
+        <themekey>mine</themekey>
+        <themekey>mineral commodity</themekey>
+        <themekey>mineral fuels and related materials</themekey>
+        <themekey>mineral production</themekey>
+        <themekey>mineral</themekey>
+        <themekey>minerals</themekey>
+        <themekey>mining</themekey>
+        <themekey>ore</themekey>
+        <themekey>refined</themekey>
+        <themekey>refinery</themekey>
+        <themekey>resources</themekey>
+        <themekey>smelting</themekey>
+        <themekey>abrasives</themekey>
+        <themekey>aggregates</themekey>
+        <themekey>alginite</themekey>
+        <themekey>alumina</themekey>
+        <themekey>aluminum</themekey>
+        <themekey>antimony</themekey>
+        <themekey>arsenic trioxide</themekey>
+        <themekey>asbestos</themekey>
+        <themekey>barite</themekey>
+        <themekey>bauxite</themekey>
+        <themekey>bentonite</themekey>
+        <themekey>beryl</themekey>
+        <themekey>beryllium</themekey>
+        <themekey>bismuth</themekey>
+        <themekey>boron</themekey>
+        <themekey>bromine</themekey>
+        <themekey>cadmium</themekey>
+        <themekey>carbon black</themekey>
+        <themekey>celestite</themekey>
+        <themekey>cement</themekey>
+        <themekey>chromium</themekey>
+        <themekey>clay</themekey>
+        <themekey>clinker</themekey>
+        <themekey>coal</themekey>
+        <themekey>cobalt</themekey>
+        <themekey>coke</themekey>
+        <themekey>copper</themekey>
+        <themekey>diamond</themekey>
+        <themekey>diatomite</themekey>
+        <themekey>dolomite</themekey>
+        <themekey>feldspar</themekey>
+        <themekey>ferroalloys</themekey>
+        <themekey>fertilizers</themekey>
+        <themekey>fluorspar</themekey>
+        <themekey>gallium</themekey>
+        <themekey>garnet</themekey>
+        <themekey>gas</themekey>
+        <themekey>gemstone</themekey>
+        <themekey>germanium</themekey>
+        <themekey>gold</themekey>
+        <themekey>graphite</themekey>
+        <themekey>gypsum</themekey>
+        <themekey>helium</themekey>
+        <themekey>indium</themekey>
+        <themekey>iodine</themekey>
+        <themekey>iron and steel</themekey>
+        <themekey>iron ore</themekey>
+        <themekey>iron oxide pigments</themekey>
+        <themekey>kyanite and related materials</themekey>
+        <themekey>laterite</themekey>
+        <themekey>lead</themekey>
+        <themekey>leonardite</themekey>
+        <themekey>lime</themekey>
+        <themekey>liquefied natural gas</themekey>
+        <themekey>lithium</themekey>
+        <themekey>magnesite</themekey>
+        <themekey>magnesium</themekey>
+        <themekey>manganese</themekey>
+        <themekey>mercury</themekey>
+        <themekey>methanol</themekey>
+        <themekey>mica</themekey>
+        <themekey>molybdenum</themekey>
+        <themekey>natural gas</themekey>
+        <themekey>natural gas liquids</themekey>
+        <themekey>nickel</themekey>
+        <themekey>niobium</themekey>
+        <themekey>nitrogen</themekey>
+        <themekey>oil shale</themekey>
+        <themekey>peat</themekey>
+        <themekey>perlite</themekey>
+        <themekey>petroleum</themekey>
+        <themekey>phosphate</themekey>
+        <themekey>phosphoric acid</themekey>
+        <themekey>platinum</themekey>
+        <themekey>platinum-group metals</themekey>
+        <themekey>potash</themekey>
+        <themekey>pozzolan</themekey>
+        <themekey>pumice</themekey>
+        <themekey>quartz</themekey>
+        <themekey>rare earths</themekey>
+        <themekey>raw steel</themekey>
+        <themekey>rhenium</themekey>
+        <themekey>salt</themekey>
+        <themekey>sand and gravel</themekey>
+        <themekey>selenium</themekey>
+        <themekey>shale oil</themekey>
+        <themekey>silicon</themekey>
+        <themekey>silver</themekey>
+        <themekey>soda ash</themekey>
+        <themekey>sodium</themekey>
+        <themekey>steel</themekey>
+        <themekey>stone</themekey>
+        <themekey>strontium</themekey>
+        <themekey>sulfur</themekey>
+        <themekey>talc</themekey>
+        <themekey>tantalum</themekey>
+        <themekey>tellurium</themekey>
+        <themekey>tin</themekey>
+        <themekey>titanium</themekey>
+        <themekey>tungsten</themekey>
+        <themekey>uranium</themekey>
+        <themekey>vanadium</themekey>
+        <themekey>vermiculite</themekey>
+        <themekey>wollastonite</themekey>
+        <themekey>zeolites</themekey>
+        <themekey>zinc</themekey>
+        <themekey>zirconium</themekey>
+      </theme>
+      <place>
+        <placekt>None</placekt>
+        <placekey>Africa</placekey>
+        <placekey>Asia</placekey>
+        <placekey>Central Eurasia</placekey>
+        <placekey>Europe</placekey>
+        <placekey>Latin America</placekey>
+        <placekey>Canada</placekey>
+        <placekey>Middle East</placekey>
+        <placekey>Pacific</placekey>
+        <placekey>Afghanistan</placekey>
+        <placekey>Albania</placekey>
+        <placekey>Algeria</placekey>
+        <placekey>Angola</placekey>
+        <placekey>Argentina</placekey>
+        <placekey>Armenia</placekey>
+        <placekey>Australia</placekey>
+        <placekey>Austria</placekey>
+        <placekey>Azerbaijan</placekey>
+        <placekey>Bahrain</placekey>
+        <placekey>Bangladesh</placekey>
+        <placekey>Belarus</placekey>
+        <placekey>Belgium</placekey>
+        <placekey>Belize</placekey>
+        <placekey>Benin</placekey>
+        <placekey>Bhutan</placekey>
+        <placekey>Bolivia</placekey>
+        <placekey>Bosnia and Herzegovina</placekey>
+        <placekey>Botswana</placekey>
+        <placekey>Brazil</placekey>
+        <placekey>Brunei</placekey>
+        <placekey>Bulgaria</placekey>
+        <placekey>Burkina Faso</placekey>
+        <placekey>Burma</placekey>
+        <placekey>Burundi</placekey>
+        <placekey>Cambodia</placekey>
+        <placekey>Cameroon</placekey>
+        <placekey>Canada</placekey>
+        <placekey>Central African Republic</placekey>
+        <placekey>Chad</placekey>
+        <placekey>Chile</placekey>
+        <placekey>China</placekey>
+        <placekey>Colombia</placekey>
+        <placekey>Congo (Brazzaville)</placekey>
+        <placekey>Congo (Kinshasa) (DRC)</placekey>
+        <placekey>Costa Rica</placekey>
+        <placekey>Cote d'Ivoire</placekey>
+        <placekey>Croatia</placekey>
+        <placekey>Cuba</placekey>
+        <placekey>Cyprus</placekey>
+        <placekey>Czechia</placekey>
+        <placekey>Denmark</placekey>
+        <placekey>Djibouti</placekey>
+        <placekey>Dominican Republic</placekey>
+        <placekey>Ecuador</placekey>
+        <placekey>Egypt</placekey>
+        <placekey>El Salvador</placekey>
+        <placekey>Equatorial Guinea</placekey>
+        <placekey>Eritrea</placekey>
+        <placekey>Estonia</placekey>
+        <placekey>Eswatini</placekey>
+        <placekey>Ethiopia</placekey>
+        <placekey>Fiji</placekey>
+        <placekey>Finland</placekey>
+        <placekey>France</placekey>
+        <placekey>French Guiana</placekey>
+        <placekey>Gabon</placekey>
+        <placekey>Georgia</placekey>
+        <placekey>Germany</placekey>
+        <placekey>Ghana</placekey>
+        <placekey>Greece</placekey>
+        <placekey>Greenland</placekey>
+        <placekey>Guatemala</placekey>
+        <placekey>Guinea</placekey>
+        <placekey>Guyana</placekey>
+        <placekey>Honduras</placekey>
+        <placekey>Hungary</placekey>
+        <placekey>Iceland</placekey>
+        <placekey>India</placekey>
+        <placekey>Indonesia</placekey>
+        <placekey>Iran</placekey>
+        <placekey>Iraq</placekey>
+        <placekey>Ireland</placekey>
+        <placekey>Israel</placekey>
+        <placekey>Italy</placekey>
+        <placekey>Jamaica</placekey>
+        <placekey>Japan</placekey>
+        <placekey>Jordan</placekey>
+        <placekey>Kazakhstan</placekey>
+        <placekey>Kenya</placekey>
+        <placekey>Kosovo</placekey>
+        <placekey>Kuwait</placekey>
+        <placekey>Kyrgyzstan</placekey>
+        <placekey>Laos</placekey>
+        <placekey>Latvia</placekey>
+        <placekey>Lebanon</placekey>
+        <placekey>Lesotho</placekey>
+        <placekey>Liberia</placekey>
+        <placekey>Libya</placekey>
+        <placekey>Lithuania</placekey>
+        <placekey>Luxembourg</placekey>
+        <placekey>Madagascar</placekey>
+        <placekey>Malawi</placekey>
+        <placekey>Malaysia</placekey>
+        <placekey>Mali</placekey>
+        <placekey>Malta</placekey>
+        <placekey>Mauritania</placekey>
+        <placekey>Mauritius</placekey>
+        <placekey>Mexico</placekey>
+        <placekey>Moldova</placekey>
+        <placekey>Mongolia</placekey>
+        <placekey>Montenegro</placekey>
+        <placekey>Morocco</placekey>
+        <placekey>Mozambique</placekey>
+        <placekey>Namibia</placekey>
+        <placekey>Nauru</placekey>
+        <placekey>Nepal</placekey>
+        <placekey>Netherlands</placekey>
+        <placekey>New Caledonia</placekey>
+        <placekey>New Zealand</placekey>
+        <placekey>Nicaragua</placekey>
+        <placekey>Niger</placekey>
+        <placekey>Nigeria</placekey>
+        <placekey>North Korea</placekey>
+        <placekey>North Macedonia</placekey>
+        <placekey>Norway</placekey>
+        <placekey>Oman</placekey>
+        <placekey>Pakistan</placekey>
+        <placekey>Panama</placekey>
+        <placekey>Papua New Guinea</placekey>
+        <placekey>Paraguay</placekey>
+        <placekey>Peru</placekey>
+        <placekey>Philippines</placekey>
+        <placekey>Poland</placekey>
+        <placekey>Portugal</placekey>
+        <placekey>Qatar</placekey>
+        <placekey>Republic of Korea</placekey>
+        <placekey>Reunion</placekey>
+        <placekey>Romania</placekey>
+        <placekey>Russia</placekey>
+        <placekey>Rwanda</placekey>
+        <placekey>Saudi Arabia</placekey>
+        <placekey>Senegal</placekey>
+        <placekey>Serbia</placekey>
+        <placekey>Seychelles</placekey>
+        <placekey>Sierra Leone</placekey>
+        <placekey>Singapore</placekey>
+        <placekey>Slovakia</placekey>
+        <placekey>Slovenia</placekey>
+        <placekey>Solomon Islands</placekey>
+        <placekey>South Africa</placekey>
+        <placekey>South Sudan</placekey>
+        <placekey>Spain</placekey>
+        <placekey>Sri Lanka</placekey>
+        <placekey>Sudan</placekey>
+        <placekey>Suriname</placekey>
+        <placekey>Sweden</placekey>
+        <placekey>Switzerland</placekey>
+        <placekey>Syria</placekey>
+        <placekey>Taiwan</placekey>
+        <placekey>Tajikistan</placekey>
+        <placekey>Tanzania</placekey>
+        <placekey>Thailand</placekey>
+        <placekey>Timor-Leste (East Timor)</placekey>
+        <placekey>Togo</placekey>
+        <placekey>Trinidad and Tobago</placekey>
+        <placekey>Tunisia</placekey>
+        <placekey>Turkey</placekey>
+        <placekey>Turkmenistan</placekey>
+        <placekey>Uganda</placekey>
+        <placekey>Ukraine</placekey>
+        <placekey>United Arab Emirates</placekey>
+        <placekey>United Kingdom</placekey>
+        <placekey>Uruguay</placekey>
+        <placekey>Uzbekistan</placekey>
+        <placekey>Venezuela</placekey>
+        <placekey>Vietnam</placekey>
+        <placekey>Yemen</placekey>
+        <placekey>Zambia</placekey>
+        <placekey>Zimbabwe</placekey>
+      </place>
+    </keywords>
+    <accconst>No access constraints. Please see 'Distribution Information' for details.</accconst>
+    <useconst>The U.S. Geological Survey (USGS) provides these data "as is." Unless otherwise stated, all data and metadata are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been processed successfully on USGS computer systems, reviewed for accuracy and completeness, and approved for release by the USGS, no warranty expressed or implied is made regarding the display or utility of the data on any other system or for general or scientific purposes, nor shall the act of distribution constitute any such warranty. The burden for determining fitness for use of these data lies entirely with the user. Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>National Minerals Information Center</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>12201 Sunrise Valley Drive</address>
+          <city>Reston</city>
+          <state>Virginia</state>
+          <postal>20192</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>703-648-4976</cntvoice>
+        <cntfax>703-648-4995</cntfax>
+        <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>All feature attribute values were peer reviewed for accuracy. Values were checked for correct data type and for presence / absence.</attraccr>
+    </attracc>
+    <logic>Data quality assurance and data quality control logic tests were performed for several feature classes. However, as many feature classes are directly from authoritative sources or from previously published governmental or scientific work, not all layers were subjected to a new logical accuracy test. Visual comparison of the feature classes supports the robustness of the overall data for feature classes not created by the National Minerals Information Center or from other programs within the U.S. Geological Survey.</logic>
+    <complete>Data set is considered complete for the information presented, as described in the abstract. Users are advised to read the rest of the metadata records, including data-level metadata records, carefully for additional details.</complete>
+    <posacc>
+      <horizpa>
+        <horizpar>No formal positional accuracy tests were conducted.</horizpar>
+      </horizpa>
+      <vertacc>
+        <vertaccr>No formal positional accuracy tests were conducted.</vertaccr>
+      </vertacc>
+    </posacc>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, volume III, Area Reports — International — Africa and the Middle East</title>
+            <geoform>tabular digital data</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes 2019 Mineral Yearbook country chapters and tables that were available for download as of March 31, 2025. Individual country Minerals Yearbook chapters are published independently from the complete volume as "Advanced Release."</othercit>
+            <onlink>https://doi.org/10.3133/70178240</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2015</begdate>
+              <enddate>2019</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Africa and the Middle East</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Asia and the Pacific</title>
+            <geoform>tabular digital data</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes 2019 Mineral Yearbook country chapters and tables that were available for download as of March 31, 2025. Individual country Minerals Yearbook chapters are published independently from the complete volume as "Advanced Release."</othercit>
+            <onlink>https://doi.org/10.3133/70178411</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2015</begdate>
+              <enddate>2019</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Asia and the Pacific</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Europe and Central Eurasia</title>
+            <geoform>tabular digital data</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes 2019 Mineral Yearbook country chapters and tables that were available for download as of March 31, 2025. Individual country Minerals Yearbook chapters are published independently from the complete volume as "Advanced Release."</othercit>
+            <onlink>https://doi.org/10.3133/70178412</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2015</begdate>
+              <enddate>2019</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Europe and Central Eurasia</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Latin America and Canada</title>
+            <geoform>tabular digital data</geoform>
+            <pubinfo>
+              <pubplace>Restion, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes 2019 Mineral Yearbook country chapters and tables that were available for download as of March 31, 2025. Individual country Minerals Yearbook chapters are published independently from the complete volume as "Advanced Release."</othercit>
+            <onlink>https://doi.org/10.3133/70178419</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2015</begdate>
+              <enddate>2019</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Latin America and Canada</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>Mineral commodity production data were compiled from Table 1 within all published 2019 individual country chapters from the U.S. Geological Survey’s Minerals Yearbook Volume III — International publication that were available for download as of March 31, 2025. These data were combined into a single table and reformatted into a machine-readable format .csv file for this data release. No content from the originally published data were modified or revised in this process other than minor typographical errors.</procdesc>
+        <procdate>20250407</procdate>
+        <proccont>
+          <cntinfo>
+            <cntorgp>
+              <cntorg>U.S. Geological Survey</cntorg>
+              <cntper>National Minerals Information Center</cntper>
+            </cntorgp>
+            <cntaddr>
+              <addrtype>physical</addrtype>
+              <address>12201 Sunrise Valley Drive</address>
+              <city>Reston</city>
+              <state>Virginia</state>
+              <postal>20192</postal>
+              <country>US</country>
+            </cntaddr>
+            <cntvoice>703-648-4976</cntvoice>
+            <cntfax>703-648-4995</cntfax>
+            <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+          </cntinfo>
+        </proccont>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>Minerals Yearbook, volume III, Area Reports — International: 2019 country chapters, table 1, production of mineral commodities</enttypl>
+        <enttypd>This dataset contains the mineral commodity production data available in advanced release 2019 Mineral Yearbook country chapters and tables that were available for download as of March 31, 2025.</enttypd>
+        <enttypds>U.S. Geological Survey</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>Chapter Title</attrlabl>
+        <attrdef>Title of individual advance release 2019 country chapters as written in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Minerals Yearbook, volume III, Area Reports — International</codesetn>
+            <codesets>https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Country</attrlabl>
+        <attrdef>Name of country as written in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Countries of interest: Afghanistan; Albania; Algeria; Angola; Argentina; Armenia; Australia; Austria; Azerbaijan; Bahrain; Bangladesh; Belarus; Belgium; Belize; Benin; Bhutan; Bolivia; Bosnia and Herzegovina; Botswana; Brazil; Brunei; Bulgaria; Burkina Faso; Burma; Burundi; Cambodia; Cameroon; Canada; Central African Republic; Chad; Chile; China; Colombia; Congo (Brazzaville); Congo (Kinshasa) (DRC); Costa Rica; Cote d'Ivoire; Croatia; Cuba; Cyprus; Czechia; Denmark; Djibouti; Dominican Republic; Ecuador; Egypt; El Salvador; Equatorial Guinea; Eritrea; Estonia; Eswatini; Ethiopia; Fiji; Finland; France; French Guiana; Gabon; Georgia; Germany; Ghana; Greece; Greenland; Guatemala; Guinea; Guyana; Honduras; Hungary; Iceland; India; Indonesia; Iran; Iraq; Ireland; Israel; Italy; Jamaica; Japan; Jordan; Kazakhstan; Kenya; Kosovo; Kuwait; Kyrgyzstan; Laos; Latvia; Lebanon; Lesotho; Liberia; Libya; Lithuania; Luxembourg; Madagascar; Malawi; Malaysia; Mali; Malta; Mauritania; Mauritius; Mexico; Moldova; Mongolia; Montenegro; Morocco; Mozambique; Namibia; Nauru; Nepal; Netherlands; New Caledonia; New Zealand; Nicaragua; Niger; Nigeria; North Korea; North Macedonia; Norway; Oman; Pakistan; Panama; Papua New Guinea; Paraguay; Peru; Philippines; Poland; Portugal; Qatar; Republic of Korea; Reunion; Romania; Russia; Rwanda; Saudi Arabia; Senegal; Serbia; Seychelles; Sierra Leone; Singapore; Slovakia; Slovenia; Solomon Islands; South Africa; South Sudan; Spain; Sri Lanka; Sudan; Suriname; Sweden; Switzerland; Syria; Taiwan; Tajikistan; Tanzania; Thailand; Timor-Leste (East Timor); Togo; Trinidad and Tobago; Tunisia; Turkey; Turkmenistan; Uganda; Ukraine; United Arab Emirates; United Kingdom; Uruguay; Uzbekistan; Venezuela; Vietnam; Yemen; Zambia; Zimbabwe</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Type</attrlabl>
+        <attrdef>Mineral commodity type using USGS mineral commodity categories listed in the source material in Volume III of the USGS Minerals Yearbook. Mineral commodity types include “Industrial minerals,” “Metals,” and “Mineral fuels and related materials.”</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Industrial minerals</edomv>
+            <edomvd>Industrial or non-metallic mineral resource or product, such as cement, clays, dimension stone, etc.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Metals</edomv>
+            <edomvd>Metallic mineral resource or product, such as gold, lead, silver, zinc, etc.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Mineral fuels and related materials</edomv>
+            <edomvd>Fuel mineral, such as crude petroleum, natural gas, petroleum products, etc.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity</attrlabl>
+        <attrdef>Mineral commodity using USGS mineral commodity names as listed in the source material in Volume III of the USGS Minerals Yearbook. Minor typographical errors in the original commodity list were revised for this data release.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Commodities of interest: Abrasives; Aggregates; Alginite; Alumina; Aluminum; Antimony; Arsenic trioxide; Asbestos; Barite; Bauxite; Bentonite; Beryl; Beryllium; Bismuth; Boron; Bromine; Cadmium; Carbon black; Celestite; Cement; Chromium; Clay; Clinker; Coal; Cobalt; Coke; Copper; Diamond; Diatomite; Dolomite; Feldspar; Ferroalloys; Fertilizers; Fluorspar; Gallium; Garnet; Gas; Gemstone; Germanium; Gold; Graphite; Gypsum; Helium; Indium; Iodine; Iron and steel; Iron ore; Iron oxide pigments; Kyanite and related materials; Laterite; Lead; Leonardite; Lime; Liquefied natural gas; Lithium; Magnesite; Magnesium; Manganese; Mercury; Methanol; Mica; Molybdenum; Natural gas; Natural gas liquids; Nickel; Niobium; Nitrogen; Oil shale; Peat; Perlite; Petroleum; Phosphate; Phosphoric acid; Platinum; Platinum-group metals; Potash; Pozzolan; Pumice; Quartz; Rare earths; Raw steel; Rhenium; Salt; Sand and gravel; Selenium; Shale oil; Silicon; Silver; Soda ash; Sodium; Steel; Stone; Strontium; Sulfur; Talc; Tantalum; Tellurium; Tin; Titanium; Tungsten; Uranium; Vanadium; Vermiculite; Wollastonite; Zeolites; Zinc; Zirconium</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Product</attrlabl>
+        <attrdef>Specific form and (or) description of a mineral commodity produced or processed for a given country. For example: Au content; Industrial, Sand; Metal (e.g. refinery); Ore; etc. Minor typographical errors in the original commodity list were revised for this data release.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries depending on the mineral commodity. For example: Au content; Industrial, Sand; Metal (e.g. refinery); Ore; etc.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the entire series of mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Units</attrlabl>
+        <attrdef>Units of measure for the reported mineral commodity production data. For example "Cubic meters," "Metric tons," and "Thousand carats."</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Various units of measure: 42-gallon barrels; Carats; Cubic meters; Kilograms; Metric tons; Million 42-gallon barrels; Million cubic meters; Million metric tons; Thousand 42-gallon barrels; Thousand carats; Thousand cubic meters; Thousand metric tons</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2015 Production</attrlabl>
+        <attrdef>Production in 2015 for the specified mineral commodity and country as listed in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Capacity is not known or not available.</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>576000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Units” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2015 Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the 2015 mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2016 Production</attrlabl>
+        <attrdef>Production in 2016 for the specified mineral commodity and country as listed in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Capacity is not known or not available.</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>567000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Units” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2016 Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the 2016 mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2017 Production</attrlabl>
+        <attrdef>Production in 2017 for the specified mineral commodity and country as listed in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Capacity is not known or not available.</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>627000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Units” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2017 Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the 2017 mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2018 Production</attrlabl>
+        <attrdef>Production in 2018 for the specified mineral commodity and country as listed in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Capacity is not known or not available.</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>657000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Units” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2018 Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the 2018 mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2019 Production</attrlabl>
+        <attrdef>Production in 2019 for the specified mineral commodity and country as listed in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Capacity is not known or not available.</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>658000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Units” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>2019 Footnotes</attrlabl>
+        <attrdef>Footnotes pertaining to the 2019 mineral commodity production data as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Other Footnotes</attrlabl>
+        <attrdef>Other footnotes pertaining to Table 1 in the individual country chapter as provided in the source material in Volume III of the USGS Minerals Yearbook.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Source</attrlabl>
+        <attrdef>Website sources of the materials used to create this data release from the Minerals Yearbook, volume III, Area Reports — International publication, which includes advanced release 2019 Minerals Yearbook country chapters and tables.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>https://www.usgs.gov/centers/national-minerals-information-center/africa-and-middle-east</edomv>
+            <edomvd>Website address containing download links for chapters from the Minerals Yearbook, volume III, Area Reports—International—Africa and the Middle East</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>https://www.usgs.gov/centers/national-minerals-information-center/asia-and-pacific</edomv>
+            <edomvd>Website address containing download links for chapters from the Minerals Yearbook, volume III, Area Reports—International—Asia and the Pacific</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>https://www.usgs.gov/centers/national-minerals-information-center/europe-and-central-eurasia</edomv>
+            <edomvd>Website address containing download links for chapters from the Minerals Yearbook, volume III, Area Reports—International—Europe and Central Eurasia</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>https://www.usgs.gov/centers/national-minerals-information-center/latin-america-and-canada-north-america-central-america</edomv>
+            <edomvd>Website address containing download links for chapters from the Minerals Yearbook, volume III, Area Reports—International—Latin America and Canada</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>https://www.usgs.gov/centers/national-minerals-information-center/south-america</edomv>
+            <edomvd>Website address containing download links for chapters from the Minerals Yearbook, volume III, Area Reports—International—South America</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Source Publication Date</attrlabl>
+        <attrdef>Date that source material was published and available for download on the source website as of March 31, 2025.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6/8/2022</rdommin>
+            <rdommax>7/1/2024</rdommax>
+            <attrunit>Date in M/D/YYYY format</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey - ScienceBase</cntorg>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>Denver Federal Center</address>
+          <address>Building 810</address>
+          <address>Mail Stop 302</address>
+          <city>Denver</city>
+          <state>CO</state>
+          <postal>80225</postal>
+        </cntaddr>
+        <cntvoice>1-888-275-8747</cntvoice>
+        <cntemail>sciencebase@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>https://doi.org/10.5066/P13HTKV3</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>None</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20250821</metd>
+    <metc>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>National Minerals Information Center</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>12201 Sunrise Valley Drive</address>
+          <city>Reston</city>
+          <state>Virginia</state>
+          <postal>20192</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>703-648-4976</cntvoice>
+        <cntfax>703-648-4995</cntfax>
+        <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>

@@ -1,0 +1,389 @@
+World Bank, Women, Business and the Law 2026 - data download (CC BY 4.0)
+URL: https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026.02.19_WBL26_FINAL%20Data%20for%20Download.xlsx
+Workbook sha256: c51f7210b4abe5b5daf2c74f1c1410a066fad7673a4c15be36524665e8de666c
+Retrieved: 2026-10-15T23:19:45Z (by agent SIMWORLD)
+Sheet: '10. Pension'; data current as of 1 October 2025 (WBL 2026 report).
+Verbatim cell values, one line per economy and sex: ISO Code (column C), Economy (A), Report Year (F),
+10.1.1.1 Ages men (full benefits) (N) or 10.1.1.2 Ages women (full benefits) (O), and the Legal basis of question 10.1.1 (M).
+Excerpt made by agent SIMWORLD; the full workbook is not committed (hash above).
+
+[10. Pension!N4] ISO Code=AFG | Economy=Afghanistan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M4)=No applicable provisions could be located
+[10. Pension!O4] ISO Code=AFG | Economy=Afghanistan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M4)=No applicable provisions could be located
+[10. Pension!N5] ISO Code=ALB | Economy=Albania | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M5)=Law No. 7703 on Social Insurance, Arts. 31 and 92
+[10. Pension!O5] ISO Code=ALB | Economy=Albania | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=61.8 | Legal basis (10. Pension!M5)=Law No. 7703 on Social Insurance, Arts. 31 and 92
+[10. Pension!N6] ISO Code=DZA | Economy=Algeria | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M6)=Loi No. 16-15, Art. 2
+[10. Pension!O6] ISO Code=DZA | Economy=Algeria | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M6)=Loi No. 16-15, Art. 2
+[10. Pension!N7] ISO Code=AGO | Economy=Angola | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M7)=Presidential Decree No. 299/20 of 23 November 2020, Art. 4
+[10. Pension!O7] ISO Code=AGO | Economy=Angola | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M7)=Presidential Decree No. 299/20 of 23 November 2020, Art. 4
+[10. Pension!N8] ISO Code=ATG | Economy=Antigua and Barbuda | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M8)=Social Security (Benefits) (Age Pensions and Grants) (Amendment) Regulations of 2016, H Schedule
+[10. Pension!O8] ISO Code=ATG | Economy=Antigua and Barbuda | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M8)=Social Security (Benefits) (Age Pensions and Grants) (Amendment) Regulations of 2016, H Schedule
+[10. Pension!N9] ISO Code=ARG | Economy=Argentina | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M9)=Ley No. 24.241, Art. 47
+[10. Pension!O9] ISO Code=ARG | Economy=Argentina | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M9)=Ley No. 24.241, Art. 47
+[10. Pension!N10] ISO Code=ARM | Economy=Armenia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M10)=Law on State Pensions, Art. 9
+[10. Pension!O10] ISO Code=ARM | Economy=Armenia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M10)=Law on State Pensions, Art. 9
+[10. Pension!N11] ISO Code=AUS | Economy=Australia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M11)=Social Security Act, Secs. 23(5A), (5B), (5C), (5D) and 43
+[10. Pension!O11] ISO Code=AUS | Economy=Australia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M11)=Social Security Act, Secs. 23(5A), (5B), (5C), (5D) and 43
+[10. Pension!N12] ISO Code=AUT | Economy=Austria | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M12)=General Social Insurance Act (ASVG), Arts. 253(1) and 617(11); Federal Law Gazette No. 832/1992, Art. 3
+[10. Pension!O12] ISO Code=AUT | Economy=Austria | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=61 | Legal basis (10. Pension!M12)=General Social Insurance Act (ASVG), Arts. 253(1) and 617(11); Federal Law Gazette No. 832/1992, Art. 3
+[10. Pension!N13] ISO Code=AZE | Economy=Azerbaijan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M13)=Law on Labor Pensions, Art. 7
+[10. Pension!O13] ISO Code=AZE | Economy=Azerbaijan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=64.5 | Legal basis (10. Pension!M13)=Law on Labor Pensions, Art. 7
+[10. Pension!N14] ISO Code=BHS | Economy=Bahamas, The | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M14)=National Insurance (Benefit and Assistance) Regulations, Sec. 18
+[10. Pension!O14] ISO Code=BHS | Economy=Bahamas, The | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M14)=National Insurance (Benefit and Assistance) Regulations, Sec. 18
+[10. Pension!N15] ISO Code=BHR | Economy=Bahrain | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M15)=Social Insurance Law, Art. 34; Law No. 14/2022, Art. 1
+[10. Pension!O15] ISO Code=BHR | Economy=Bahrain | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M15)=Social Insurance Law, Art. 34; Law No. 14/2022, Art. 1
+[10. Pension!N16] ISO Code=BGD | Economy=Bangladesh | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M16)=No applicable provisions could be located
+[10. Pension!O16] ISO Code=BGD | Economy=Bangladesh | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M16)=No applicable provisions could be located
+[10. Pension!N17] ISO Code=BRB | Economy=Barbados | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M17)=National Insurance and Social Security Act, Schedule II
+[10. Pension!O17] ISO Code=BRB | Economy=Barbados | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M17)=National Insurance and Social Security Act, Schedule II
+[10. Pension!N18] ISO Code=BLR | Economy=Belarus | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M18)=Law of the Republic of Belarus on Pension Provision, Art. 11
+[10. Pension!O18] ISO Code=BLR | Economy=Belarus | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M18)=Law of the Republic of Belarus on Pension Provision, Art. 11
+[10. Pension!N19] ISO Code=BEL | Economy=Belgium | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M19)=Arrêté Royal du 23 décembre 1996, Art. 2
+[10. Pension!O19] ISO Code=BEL | Economy=Belgium | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66 | Legal basis (10. Pension!M19)=Arrêté Royal du 23 décembre 1996, Art. 2
+[10. Pension!N20] ISO Code=BLZ | Economy=Belize | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M20)=Social Security (Benefit) Regulations, Reg. 25
+[10. Pension!O20] ISO Code=BLZ | Economy=Belize | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M20)=Social Security (Benefit) Regulations, Reg. 25
+[10. Pension!N21] ISO Code=BEN | Economy=Benin | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M21)=Loi No. 2010-10 du 22 mars 2010, Art. 1er
+[10. Pension!O21] ISO Code=BEN | Economy=Benin | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M21)=Loi No. 2010-10 du 22 mars 2010, Art. 1er
+[10. Pension!N22] ISO Code=BTN | Economy=Bhutan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M22)=No applicable provisions could be located
+[10. Pension!O22] ISO Code=BTN | Economy=Bhutan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M22)=No applicable provisions could be located
+[10. Pension!N23] ISO Code=BOL | Economy=Bolivia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=58 | Legal basis (10. Pension!M23)=Ley de Pensiones No. 65, Arts. 8(c) y 78, II
+[10. Pension!O23] ISO Code=BOL | Economy=Bolivia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=56 | Legal basis (10. Pension!M23)=Ley de Pensiones No. 65, Arts. 8(c) y 78, II
+[10. Pension!N24] ISO Code=BIH | Economy=Bosnia and Herzegovina | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M24)=Law on Pension and Disability Insurance, Art. 40
+[10. Pension!O24] ISO Code=BIH | Economy=Bosnia and Herzegovina | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M24)=Law on Pension and Disability Insurance, Art. 40
+[10. Pension!N25] ISO Code=BWA | Economy=Botswana | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M25)=Universal Pension and Orphan Care Act, 1996
+[10. Pension!O25] ISO Code=BWA | Economy=Botswana | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M25)=Universal Pension and Orphan Care Act, 1996
+[10. Pension!N26] ISO Code=BRA | Economy=Brazil | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M26)=Decree No. 3.048/1999, Arts. 51(a), 51(I) and 53
+[10. Pension!O26] ISO Code=BRA | Economy=Brazil | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62 | Legal basis (10. Pension!M26)=Decree No. 3.048/1999, Arts. 51(a), 51(I) and 53
+[10. Pension!N27] ISO Code=BRN | Economy=Brunei Darussalam | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M27)=Old Age and Disability Pensions Act and Regulations, Sec. 3; Retirement Age Order, 2010, Sec. 4
+[10. Pension!O27] ISO Code=BRN | Economy=Brunei Darussalam | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M27)=Old Age and Disability Pensions Act and Regulations, Sec. 3; Retirement Age Order, 2010, Sec. 4
+[10. Pension!N28] ISO Code=BGR | Economy=Bulgaria | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64.7 | Legal basis (10. Pension!M28)=Social Insurance Code, Art. 68
+[10. Pension!O28] ISO Code=BGR | Economy=Bulgaria | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62.3 | Legal basis (10. Pension!M28)=Social Insurance Code, Art. 68
+[10. Pension!N29] ISO Code=BFA | Economy=Burkina Faso | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=56 | Legal basis (10. Pension!M29)=Loi No. 004-2021/AN du 6 avril 2021, Art. 94; Décret n° 2005-024/PRES/PM/MTEJ/MFB, Arts. 1 et 2
+[10. Pension!O29] ISO Code=BFA | Economy=Burkina Faso | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=56 | Legal basis (10. Pension!M29)=Loi No. 004-2021/AN du 6 avril 2021, Art. 94; Décret n° 2005-024/PRES/PM/MTEJ/MFB, Arts. 1 et 2
+[10. Pension!N30] ISO Code=BDI | Economy=Burundi | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M30)=Code de la Sécurité Sociale, Art. 67; Loi No. 1/11 du 24 novembre 2020, Art. 164
+[10. Pension!O30] ISO Code=BDI | Economy=Burundi | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M30)=Code de la Sécurité Sociale, Art. 67; Loi No. 1/11 du 24 novembre 2020, Art. 164
+[10. Pension!N31] ISO Code=CPV | Economy=Cabo Verde | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M31)=Decree-Law No. 5 of 2004, Art. 81
+[10. Pension!O31] ISO Code=CPV | Economy=Cabo Verde | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M31)=Decree-Law No. 5 of 2004, Art. 81
+[10. Pension!N32] ISO Code=KHM | Economy=Cambodia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M32)=Sub-Decree 32 on Social Security Scheme of Pension for Persons Under Labour Law, Art. 13
+[10. Pension!O32] ISO Code=KHM | Economy=Cambodia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M32)=Sub-Decree 32 on Social Security Scheme of Pension for Persons Under Labour Law, Art. 13
+[10. Pension!N33] ISO Code=CMR | Economy=Cameroon | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M33)=Loi No. 69/LF/18 du 18 novembre 1969, Art. 8
+[10. Pension!O33] ISO Code=CMR | Economy=Cameroon | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M33)=Loi No. 69/LF/18 du 18 novembre 1969, Art. 8
+[10. Pension!N34] ISO Code=CAN | Economy=Canada | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M34)=Pension Benefits Act of 1990, Sec. 35(1)
+[10. Pension!O34] ISO Code=CAN | Economy=Canada | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M34)=Pension Benefits Act of 1990, Sec. 35(1)
+[10. Pension!N35] ISO Code=CAF | Economy=Central African Republic | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M35)=Code de la sécurite sociale, Art. 138
+[10. Pension!O35] ISO Code=CAF | Economy=Central African Republic | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M35)=Code de la sécurite sociale, Art. 138
+[10. Pension!N36] ISO Code=TCD | Economy=Chad | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M36)=Décret No. 1144/27 du 28 Décembre 2007, portant relèvement de l’âge d’admission à la retraite, Art. 1
+[10. Pension!O36] ISO Code=TCD | Economy=Chad | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M36)=Décret No. 1144/27 du 28 Décembre 2007, portant relèvement de l’âge d’admission à la retraite, Art. 1
+[10. Pension!N37] ISO Code=CHL | Economy=Chile | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M37)=Decreto Ley No. 3500, Art. 3
+[10. Pension!O37] ISO Code=CHL | Economy=Chile | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M37)=Decreto Ley No. 3500, Art. 3
+[10. Pension!N38] ISO Code=CHN | Economy=China | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60.2 | Legal basis (10. Pension!M38)=Decision of the Standing Committee of the National People's Congress on the Gradual Delay of the Statutory Retirement Age, Sec. 1, Art. 1 and Annex I
+[10. Pension!O38] ISO Code=CHN | Economy=China | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50.3 | Legal basis (10. Pension!M38)=Decision of the Standing Committee of the National People's Congress on the Gradual Delay of the Statutory Retirement Age, Sec. 1, Art. 1 and Annex I
+[10. Pension!N39] ISO Code=COL | Economy=Colombia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M39)=Ley 797/2003, Art. 9
+[10. Pension!O39] ISO Code=COL | Economy=Colombia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=57 | Legal basis (10. Pension!M39)=Ley 797/2003, Art. 9
+[10. Pension!N40] ISO Code=COM | Economy=Comoros | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=58 | Legal basis (10. Pension!M40)=Décret No. 07-108/PR du 05/ juillet 2007, Art. 3
+[10. Pension!O40] ISO Code=COM | Economy=Comoros | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M40)=Décret No. 07-108/PR du 05/ juillet 2007, Art. 3
+[10. Pension!N41] ISO Code=COD | Economy=Congo, Dem. Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M41)=Loi No. 16-009 fixant les règles relatives au régime général de sécurité sociale, Art. 82
+[10. Pension!O41] ISO Code=COD | Economy=Congo, Dem. Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M41)=Loi No. 16-009 fixant les règles relatives au régime général de sécurité sociale, Art. 82
+[10. Pension!N42] ISO Code=COG | Economy=Congo, Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M42)=Loi No. 48-2024 du 30 décembre 2024, Art. 1; Loi No. 18/2012 du 22 Août 2012, Arts. 99 et 101
+[10. Pension!O42] ISO Code=COG | Economy=Congo, Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M42)=Loi No. 48-2024 du 30 décembre 2024, Art. 1; Loi No. 18/2012 du 22 Août 2012, Arts. 99 et 101
+[10. Pension!N43] ISO Code=CRI | Economy=Costa Rica | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M43)=Reglamento del Seguro de Invalidez, Vejez y Muerte 6898/1995, Art. 5
+[10. Pension!O43] ISO Code=CRI | Economy=Costa Rica | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M43)=Reglamento del Seguro de Invalidez, Vejez y Muerte 6898/1995, Art. 5
+[10. Pension!N44] ISO Code=HRV | Economy=Croatia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M44)=Pension Insurance Act, Arts. 38 and 170
+[10. Pension!O44] ISO Code=HRV | Economy=Croatia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63.8 | Legal basis (10. Pension!M44)=Pension Insurance Act, Arts. 38 and 170
+[10. Pension!N45] ISO Code=CYP | Economy=Cyprus | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M45)=Social Insurance Law, Arts. 2 and 35
+[10. Pension!O45] ISO Code=CYP | Economy=Cyprus | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M45)=Social Insurance Law, Arts. 2 and 35
+[10. Pension!N46] ISO Code=CZE | Economy=Czechia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64.6 | Legal basis (10. Pension!M46)=Act No. 155/1995, Secs. 29, 31, 32 and Appendix
+[10. Pension!O46] ISO Code=CZE | Economy=Czechia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63.2 | Legal basis (10. Pension!M46)=Act No. 155/1995, Secs. 29, 31, 32 and Appendix
+[10. Pension!N47] ISO Code=CIV | Economy=Côte d'Ivoire | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M47)=Code de Prévoyance Sociale, modifié par Ordonnance No. 212-3 du 11 janvier 2012, Art. 150
+[10. Pension!O47] ISO Code=CIV | Economy=Côte d'Ivoire | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M47)=Code de Prévoyance Sociale, modifié par Ordonnance No. 212-3 du 11 janvier 2012, Art. 150
+[10. Pension!N48] ISO Code=DNK | Economy=Denmark | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M48)=Social Pensions Act, Sec. 1a
+[10. Pension!O48] ISO Code=DNK | Economy=Denmark | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M48)=Social Pensions Act, Sec. 1a
+[10. Pension!N49] ISO Code=DJI | Economy=Djibouti | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M49)=Loi No. 17/AN/8/6ème L portant modification de l'âge de départ à la retraite, Art. 1
+[10. Pension!O49] ISO Code=DJI | Economy=Djibouti | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M49)=Loi No. 17/AN/8/6ème L portant modification de l'âge de départ à la retraite, Art. 1
+[10. Pension!N50] ISO Code=DMA | Economy=Dominica | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M50)=Social Security (Amendment) Act, Act 2 of 2012, Schedule 4
+[10. Pension!O50] ISO Code=DMA | Economy=Dominica | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M50)=Social Security (Amendment) Act, Act 2 of 2012, Schedule 4
+[10. Pension!N51] ISO Code=DOM | Economy=Dominican Republic | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M51)=Ley No. 87-01, Art. 45
+[10. Pension!O51] ISO Code=DOM | Economy=Dominican Republic | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M51)=Ley No. 87-01, Art. 45
+[10. Pension!N52] ISO Code=ECU | Economy=Ecuador | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M52)=Ley de Seguridad Social, Arts. 185 y 201
+[10. Pension!O52] ISO Code=ECU | Economy=Ecuador | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M52)=Ley de Seguridad Social, Arts. 185 y 201
+[10. Pension!N53] ISO Code=EGY | Economy=Egypt, Arab Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M53)=Labor Law No. 14 of 2025, Art. 171; Social Insurance and Pension Law No. 148 of 2019, Art. 21(1)
+[10. Pension!O53] ISO Code=EGY | Economy=Egypt, Arab Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M53)=Labor Law No. 14 of 2025, Art. 171; Social Insurance and Pension Law No. 148 of 2019, Art. 21(1)
+[10. Pension!N54] ISO Code=SLV | Economy=El Salvador | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M54)=Ley del Sistema de Ahorro para Pensiones, Art. 104
+[10. Pension!O54] ISO Code=SLV | Economy=El Salvador | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M54)=Ley del Sistema de Ahorro para Pensiones, Art. 104
+[10. Pension!N55] ISO Code=GNQ | Economy=Equatorial Guinea | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M55)=Decreto No. 100/1990, Art. 47
+[10. Pension!O55] ISO Code=GNQ | Economy=Equatorial Guinea | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M55)=Decreto No. 100/1990, Art. 47
+[10. Pension!N56] ISO Code=ERI | Economy=Eritrea | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M56)=No applicable provisions could be located
+[10. Pension!O56] ISO Code=ERI | Economy=Eritrea | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M56)=No applicable provisions could be located
+[10. Pension!N57] ISO Code=EST | Economy=Estonia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M57)=State Pension Insurance Act, Sec. 7
+[10. Pension!O57] ISO Code=EST | Economy=Estonia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M57)=State Pension Insurance Act, Sec. 7
+[10. Pension!N58] ISO Code=SWZ | Economy=Eswatini | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=50 | Legal basis (10. Pension!M58)=National Provident Fund Order, Sec. 25
+[10. Pension!O58] ISO Code=SWZ | Economy=Eswatini | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M58)=National Provident Fund Order, Sec. 25
+[10. Pension!N59] ISO Code=ETH | Economy=Ethiopia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M59)=Private Organization Employees Pension Proclamation No. 1268/2022, Art. 18
+[10. Pension!O59] ISO Code=ETH | Economy=Ethiopia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M59)=Private Organization Employees Pension Proclamation No. 1268/2022, Art. 18
+[10. Pension!N60] ISO Code=FJI | Economy=Fiji | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M60)=Fiji National Provident Fund Regulations 2014, Reg. 3; Fiji National Provident Fund Act 2011 (Decree 52), Sec. 4(1)
+[10. Pension!O60] ISO Code=FJI | Economy=Fiji | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M60)=Fiji National Provident Fund Regulations 2014, Reg. 3; Fiji National Provident Fund Act 2011 (Decree 52), Sec. 4(1)
+[10. Pension!N61] ISO Code=FIN | Economy=Finland | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M61)=Employee Pensions Act 395/2006, Sec. 11
+[10. Pension!O61] ISO Code=FIN | Economy=Finland | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M61)=Employee Pensions Act 395/2006, Sec. 11
+[10. Pension!N62] ISO Code=FRA | Economy=France | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M62)=Code de la Sécurité Sociale, Arts. L351-8 et L161-17-2
+[10. Pension!O62] ISO Code=FRA | Economy=France | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M62)=Code de la Sécurité Sociale, Arts. L351-8 et L161-17-2
+[10. Pension!N63] ISO Code=GAB | Economy=Gabon | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=57 | Legal basis (10. Pension!M63)=Code de la Sécurité Sociale, Art. 75; Décret No. 1498/PR/MTEPS du 29 décembre 2011, Art. 2
+[10. Pension!O63] ISO Code=GAB | Economy=Gabon | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=57 | Legal basis (10. Pension!M63)=Code de la Sécurité Sociale, Art. 75; Décret No. 1498/PR/MTEPS du 29 décembre 2011, Art. 2
+[10. Pension!N64] ISO Code=GMB | Economy=Gambia, The | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M64)=Social Security Corporation Act, Definitions and Rule 4
+[10. Pension!O64] ISO Code=GMB | Economy=Gambia, The | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M64)=Social Security Corporation Act, Definitions and Rule 4
+[10. Pension!N65] ISO Code=GEO | Economy=Georgia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M65)=Law on State Pension, Art. 5(1)
+[10. Pension!O65] ISO Code=GEO | Economy=Georgia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M65)=Law on State Pension, Art. 5(1)
+[10. Pension!N66] ISO Code=DEU | Economy=Germany | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M66)=Pension Reform Act 1992, Secs. 35 and 235
+[10. Pension!O66] ISO Code=DEU | Economy=Germany | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66 | Legal basis (10. Pension!M66)=Pension Reform Act 1992, Secs. 35 and 235
+[10. Pension!N67] ISO Code=GHA | Economy=Ghana | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M67)=National Pensions Act, 2008, Sec. 76
+[10. Pension!O67] ISO Code=GHA | Economy=Ghana | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M67)=National Pensions Act, 2008, Sec. 76
+[10. Pension!N68] ISO Code=GRC | Economy=Greece | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M68)=Law 4336/2015, Art. 1
+[10. Pension!O68] ISO Code=GRC | Economy=Greece | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M68)=Law 4336/2015, Art. 1
+[10. Pension!N69] ISO Code=GRD | Economy=Grenada | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M69)=National Insurance (Amendement) (No.2) Act 2023,Third Schedule Pensionable Age Sec. 2
+[10. Pension!O69] ISO Code=GRD | Economy=Grenada | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62 | Legal basis (10. Pension!M69)=National Insurance (Amendement) (No.2) Act 2023,Third Schedule Pensionable Age Sec. 2
+[10. Pension!N70] ISO Code=GTM | Economy=Guatemala | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M70)=Reglamento sobre Protección Relativa a Invalidez, Vejez y Sobrevivencia, Art. 15(a)
+[10. Pension!O70] ISO Code=GTM | Economy=Guatemala | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M70)=Reglamento sobre Protección Relativa a Invalidez, Vejez y Sobrevivencia, Art. 15(a)
+[10. Pension!N71] ISO Code=GIN | Economy=Guinea | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M71)=Code de la Sécurité Sociale, Art. 49
+[10. Pension!O71] ISO Code=GIN | Economy=Guinea | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M71)=Code de la Sécurité Sociale, Art. 49
+[10. Pension!N72] ISO Code=GNB | Economy=Guinea-Bissau | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M72)=Decree-Law No. 5/86, Art. 66
+[10. Pension!O72] ISO Code=GNB | Economy=Guinea-Bissau | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M72)=Decree-Law No. 5/86, Art. 66
+[10. Pension!N73] ISO Code=GUY | Economy=Guyana | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M73)=National Insurance and Social Security (Benefit) Regulations, Sec. 3
+[10. Pension!O73] ISO Code=GUY | Economy=Guyana | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M73)=National Insurance and Social Security (Benefit) Regulations, Sec. 3
+[10. Pension!N74] ISO Code=HTI | Economy=Haiti | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M74)=Loi du 28 août 1967, Art. 183
+[10. Pension!O74] ISO Code=HTI | Economy=Haiti | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M74)=Loi du 28 août 1967, Art. 183
+[10. Pension!N75] ISO Code=HND | Economy=Honduras | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M75)=Reglamento General de la Ley del Seguro Social, Art. 116
+[10. Pension!O75] ISO Code=HND | Economy=Honduras | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M75)=Reglamento General de la Ley del Seguro Social, Art. 116
+[10. Pension!N76] ISO Code=HKG | Economy=Hong Kong SAR, China | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M76)=Mandatory Provident Fund Schemes Ordinance (Cap. 485), Secs. 2 and 15 and Sch. 7
+[10. Pension!O76] ISO Code=HKG | Economy=Hong Kong SAR, China | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M76)=Mandatory Provident Fund Schemes Ordinance (Cap. 485), Secs. 2 and 15 and Sch. 7
+[10. Pension!N77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M77)=Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section "Retirement Age"
+[10. Pension!O77] ISO Code=HUN | Economy=Hungary | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M77)=Law on Social Security Pensions, Sec. 18(1); Regulation on Pension Law (1 January 2011), Section "Retirement Age"
+[10. Pension!N78] ISO Code=ISL | Economy=Iceland | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M78)=Social Security Act 2007, Arts. 16 and 17
+[10. Pension!O78] ISO Code=ISL | Economy=Iceland | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M78)=Social Security Act 2007, Arts. 16 and 17
+[10. Pension!N79] ISO Code=IND | Economy=India | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=58 | Legal basis (10. Pension!M79)=Employee's Pension Scheme 1995, Sec. 12(7)
+[10. Pension!O79] ISO Code=IND | Economy=India | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M79)=Employee's Pension Scheme 1995, Sec. 12(7)
+[10. Pension!N80] ISO Code=IDN | Economy=Indonesia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=59 | Legal basis (10. Pension!M80)=Government Regulation (PP) Number 45 of 2015 concerning the Implementation of the Pension Guarantee Program, Arts. 15 and 19
+[10. Pension!O80] ISO Code=IDN | Economy=Indonesia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=59 | Legal basis (10. Pension!M80)=Government Regulation (PP) Number 45 of 2015 concerning the Implementation of the Pension Guarantee Program, Arts. 15 and 19
+[10. Pension!N81] ISO Code=IRN | Economy=Iran, Islamic Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M81)=Social Security Law 1975, Art. 76
+[10. Pension!O81] ISO Code=IRN | Economy=Iran, Islamic Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M81)=Social Security Law 1975, Art. 76
+[10. Pension!N82] ISO Code=IRQ | Economy=Iraq | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M82)=Worker Retirement and Social Security Law No. 18 of 2023, Art. 29
+[10. Pension!O82] ISO Code=IRQ | Economy=Iraq | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M82)=Worker Retirement and Social Security Law No. 18 of 2023, Art. 29
+[10. Pension!N83] ISO Code=IRL | Economy=Ireland | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M83)=Social Welfare Consolidation Act 2005, Sec. 2 and 108
+[10. Pension!O83] ISO Code=IRL | Economy=Ireland | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66 | Legal basis (10. Pension!M83)=Social Welfare Consolidation Act 2005, Sec. 2 and 108
+[10. Pension!N84] ISO Code=ISR | Economy=Israel | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M84)=Retirement Age Law (5764-2004), Secs. 3 and 6 and Extension Part II
+[10. Pension!O84] ISO Code=ISR | Economy=Israel | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63.3 | Legal basis (10. Pension!M84)=Retirement Age Law (5764-2004), Secs. 3 and 6 and Extension Part II
+[10. Pension!N85] ISO Code=ITA | Economy=Italy | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M85)=Legislative Decree No. 201/2011, Art. 24 Para. 6 and 9; Law No. 214/2011, Art. 24 Para. 9
+[10. Pension!O85] ISO Code=ITA | Economy=Italy | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M85)=Legislative Decree No. 201/2011, Art. 24 Para. 6 and 9; Law No. 214/2011, Art. 24 Para. 9
+[10. Pension!N86] ISO Code=JAM | Economy=Jamaica | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M86)=National Insurance Act, Sec. 10
+[10. Pension!O86] ISO Code=JAM | Economy=Jamaica | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M86)=National Insurance Act, Sec. 10
+[10. Pension!N87] ISO Code=JPN | Economy=Japan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M87)=National Pension Act, Art. 26; Employees Pension Insurance Act, Art. 42
+[10. Pension!O87] ISO Code=JPN | Economy=Japan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M87)=National Pension Act, Art. 26; Employees Pension Insurance Act, Art. 42
+[10. Pension!N88] ISO Code=JOR | Economy=Jordan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M88)=Social Security Law, Art. 62
+[10. Pension!O88] ISO Code=JOR | Economy=Jordan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M88)=Social Security Law, Art. 62
+[10. Pension!N89] ISO Code=KAZ | Economy=Kazakhstan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M89)=Social Security Code, Art. 207
+[10. Pension!O89] ISO Code=KAZ | Economy=Kazakhstan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=61 | Legal basis (10. Pension!M89)=Social Security Code, Art. 207
+[10. Pension!N90] ISO Code=KEN | Economy=Kenya | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M90)=National Social Security Fund Act, Secs. 2 and 36
+[10. Pension!O90] ISO Code=KEN | Economy=Kenya | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M90)=National Social Security Fund Act, Secs. 2 and 36
+[10. Pension!N91] ISO Code=KIR | Economy=Kiribati | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=50 | Legal basis (10. Pension!M91)=Provident Fund Ordinance, Sec. 20; Provident Fund (Amendment) Act 2005, Sec. 8
+[10. Pension!O91] ISO Code=KIR | Economy=Kiribati | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M91)=Provident Fund Ordinance, Sec. 20; Provident Fund (Amendment) Act 2005, Sec. 8
+[10. Pension!N92] ISO Code=KOR | Economy=Korea, Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M92)=National Pension Act of 31 December 2011, Art. 61
+[10. Pension!O92] ISO Code=KOR | Economy=Korea, Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M92)=National Pension Act of 31 December 2011, Art. 61
+[10. Pension!N93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M93)=Law No. 04/L-101 on Pension Funds, Art. 1
+[10. Pension!O93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M93)=Law No. 04/L-101 on Pension Funds, Art. 1
+[10. Pension!N94] ISO Code=KWT | Economy=Kuwait | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M94)=Social Insurance Law 1976, Art. 17(6); Law No. 10 of 2019
+[10. Pension!O94] ISO Code=KWT | Economy=Kuwait | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M94)=Social Insurance Law 1976, Art. 17(6); Law No. 10 of 2019
+[10. Pension!N95] ISO Code=KGZ | Economy=Kyrgyz Republic | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M95)=Law No. 57 of 1997, Art. 9
+[10. Pension!O95] ISO Code=KGZ | Economy=Kyrgyz Republic | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M95)=Law No. 57 of 1997, Art. 9
+[10. Pension!N96] ISO Code=LAO | Economy=Lao PDR | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M96)=Law on Social Security 2018, Art. 58
+[10. Pension!O96] ISO Code=LAO | Economy=Lao PDR | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M96)=Law on Social Security 2018, Art. 58
+[10. Pension!N97] ISO Code=LVA | Economy=Latvia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M97)=Law on State Pensions, Sec. 11; Transitional provisions to the Law (8)
+[10. Pension!O97] ISO Code=LVA | Economy=Latvia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M97)=Law on State Pensions, Sec. 11; Transitional provisions to the Law (8)
+[10. Pension!N98] ISO Code=LBN | Economy=Lebanon | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M98)=No applicable provisions could be located
+[10. Pension!O98] ISO Code=LBN | Economy=Lebanon | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M98)=No applicable provisions could be located
+[10. Pension!N99] ISO Code=LSO | Economy=Lesotho | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=70 | Legal basis (10. Pension!M99)=Old Age Pension (Pensions) Regulations, Sec. 3
+[10. Pension!O99] ISO Code=LSO | Economy=Lesotho | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=70 | Legal basis (10. Pension!M99)=Old Age Pension (Pensions) Regulations, Sec. 3
+[10. Pension!N100] ISO Code=LBR | Economy=Liberia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M100)=Code of Laws, Sec.2501; Act to Repeal Decree No.14 and to create Chapter 89 of Law establishing Social Security and Welfare Corporation, Sec. 89
+[10. Pension!O100] ISO Code=LBR | Economy=Liberia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M100)=Code of Laws, Sec.2501; Act to Repeal Decree No.14 and to create Chapter 89 of Law establishing Social Security and Welfare Corporation, Sec. 89
+[10. Pension!N101] ISO Code=LBY | Economy=Libya | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M101)=Law on Social Security, Art. 13
+[10. Pension!O101] ISO Code=LBY | Economy=Libya | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M101)=Law on Social Security, Art. 13
+[10. Pension!N102] ISO Code=LTU | Economy=Lithuania | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64.8 | Legal basis (10. Pension!M102)=Law on State Social Insurance Pensions, Arts. 15 and 57 and Annex 7
+[10. Pension!O102] ISO Code=LTU | Economy=Lithuania | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=64.7 | Legal basis (10. Pension!M102)=Law on State Social Insurance Pensions, Arts. 15 and 57 and Annex 7
+[10. Pension!N103] ISO Code=LUX | Economy=Luxembourg | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M103)=Code de la Sécurité Sociale, Art. 183
+[10. Pension!O103] ISO Code=LUX | Economy=Luxembourg | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M103)=Code de la Sécurité Sociale, Art. 183
+[10. Pension!N104] ISO Code=MDG | Economy=Madagascar | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M104)=Code de Prévoyance Sociale, Art. 268; Décret No. 2013-337 du 02 juillet 2013, Art. 1
+[10. Pension!O104] ISO Code=MDG | Economy=Madagascar | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M104)=Code de Prévoyance Sociale, Art. 268; Décret No. 2013-337 du 02 juillet 2013, Art. 1
+[10. Pension!N105] ISO Code=MWI | Economy=Malawi | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=50 | Legal basis (10. Pension!M105)=Pension Act 2023, Sec. 2
+[10. Pension!O105] ISO Code=MWI | Economy=Malawi | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M105)=Pension Act 2023, Sec. 2
+[10. Pension!N106] ISO Code=MYS | Economy=Malaysia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M106)=Minimum Retirement Age Act 2012, Sec. 4(1)
+[10. Pension!O106] ISO Code=MYS | Economy=Malaysia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M106)=Minimum Retirement Age Act 2012, Sec. 4(1)
+[10. Pension!N107] ISO Code=MDV | Economy=Maldives | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M107)=Pension Act, Sec. 19
+[10. Pension!O107] ISO Code=MDV | Economy=Maldives | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M107)=Pension Act, Sec. 19
+[10. Pension!N108] ISO Code=MLI | Economy=Mali | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M108)=Loi No. 2019-025 du 05 juillet 2019 Portant Modification du Code du Travail, Art. 60 Nouveau
+[10. Pension!O108] ISO Code=MLI | Economy=Mali | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M108)=Loi No. 2019-025 du 05 juillet 2019 Portant Modification du Code du Travail, Art. 60 Nouveau
+[10. Pension!N109] ISO Code=MLT | Economy=Malta | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64 | Legal basis (10. Pension!M109)=Social Security Act, Sec. 2
+[10. Pension!O109] ISO Code=MLT | Economy=Malta | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=64 | Legal basis (10. Pension!M109)=Social Security Act, Sec. 2
+[10. Pension!N110] ISO Code=MHL | Economy=Marshall Islands | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M110)=Social Security Act of 1990, Sec. 136(1)(b); Social Security (Amendment) Act 2021, Sec. 102
+[10. Pension!O110] ISO Code=MHL | Economy=Marshall Islands | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M110)=Social Security Act of 1990, Sec. 136(1)(b); Social Security (Amendment) Act 2021, Sec. 102
+[10. Pension!N111] ISO Code=MRT | Economy=Mauritania | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M111)=Loi No. 2021-007 du 22 février 2021 modifiant certaines dispositions de la loi No. 67-039 instituant un régime de sécurité sociale, Art. 1
+[10. Pension!O111] ISO Code=MRT | Economy=Mauritania | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M111)=Loi No. 2021-007 du 22 février 2021 modifiant certaines dispositions de la loi No. 67-039 instituant un régime de sécurité sociale, Art. 1
+[10. Pension!N112] ISO Code=MUS | Economy=Mauritius | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M112)=National Pensions Act, Secs. 2, 20 and Ninth Schedule
+[10. Pension!O112] ISO Code=MUS | Economy=Mauritius | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M112)=National Pensions Act, Secs. 2, 20 and Ninth Schedule
+[10. Pension!N113] ISO Code=MEX | Economy=Mexico | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M113)=Ley del Seguro Social, Art. 162
+[10. Pension!O113] ISO Code=MEX | Economy=Mexico | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M113)=Ley del Seguro Social, Art. 162
+[10. Pension!N114] ISO Code=FSM | Economy=Micronesia, Fed. Sts. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M114)=Social Security and Prior-Service Benefits, Secs. 801 and 804(c)(i); Regulation No. 3 of 1 May 2012, Secs. 100.2
+[10. Pension!O114] ISO Code=FSM | Economy=Micronesia, Fed. Sts. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M114)=Social Security and Prior-Service Benefits, Secs. 801 and 804(c)(i); Regulation No. 3 of 1 May 2012, Secs. 100.2
+[10. Pension!N115] ISO Code=MDA | Economy=Moldova | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M115)=Law on State Pension System, Art. 41
+[10. Pension!O115] ISO Code=MDA | Economy=Moldova | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=61.5 | Legal basis (10. Pension!M115)=Law on State Pension System, Art. 41
+[10. Pension!N116] ISO Code=MNG | Economy=Mongolia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M116)=Law on Pensions Payable from the Social Insurance Fund, Art. 5
+[10. Pension!O116] ISO Code=MNG | Economy=Mongolia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=57 | Legal basis (10. Pension!M116)=Law on Pensions Payable from the Social Insurance Fund, Art. 5
+[10. Pension!N117] ISO Code=MNE | Economy=Montenegro | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M117)=Law on Pension and Disability Insurance, Arts. 17 and 197d
+[10. Pension!O117] ISO Code=MNE | Economy=Montenegro | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M117)=Law on Pension and Disability Insurance, Arts. 17 and 197d
+[10. Pension!N118] ISO Code=MAR | Economy=Morocco | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M118)=Code du Travail, Art. 526; Loi No. 1-72-184, 1972, Art. 53
+[10. Pension!O118] ISO Code=MAR | Economy=Morocco | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M118)=Code du Travail, Art. 526; Loi No. 1-72-184, 1972, Art. 53
+[10. Pension!N119] ISO Code=MOZ | Economy=Mozambique | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M119)=Decree No. 51/2017, Art. 29
+[10. Pension!O119] ISO Code=MOZ | Economy=Mozambique | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M119)=Decree No. 51/2017, Art. 29
+[10. Pension!N120] ISO Code=MMR | Economy=Myanmar | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M120)=No applicable provisions could be located
+[10. Pension!O120] ISO Code=MMR | Economy=Myanmar | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M120)=No applicable provisions could be located
+[10. Pension!N121] ISO Code=NAM | Economy=Namibia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M121)=National Pensions Act, Secs. 1 and 2
+[10. Pension!O121] ISO Code=NAM | Economy=Namibia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M121)=National Pensions Act, Secs. 1 and 2
+[10. Pension!N122] ISO Code=NPL | Economy=Nepal | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M122)=Social Security Scheme Operating Procedure, 2075 (2018), Sec. 22(2)
+[10. Pension!O122] ISO Code=NPL | Economy=Nepal | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M122)=Social Security Scheme Operating Procedure, 2075 (2018), Sec. 22(2)
+[10. Pension!N123] ISO Code=NLD | Economy=Netherlands | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M123)=General Old Age Law, Arts. 7 and 7a(1)
+[10. Pension!O123] ISO Code=NLD | Economy=Netherlands | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M123)=General Old Age Law, Arts. 7 and 7a(1)
+[10. Pension!N124] ISO Code=NZL | Economy=New Zealand | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M124)=New Zealand Superannuation and Retirement Income Act 2001, Sec. 7(1)
+[10. Pension!O124] ISO Code=NZL | Economy=New Zealand | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M124)=New Zealand Superannuation and Retirement Income Act 2001, Sec. 7(1)
+[10. Pension!N125] ISO Code=NIC | Economy=Nicaragua | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M125)=Ley de Seguridad Social, Arts. 48 y 49
+[10. Pension!O125] ISO Code=NIC | Economy=Nicaragua | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M125)=Ley de Seguridad Social, Arts. 48 y 49
+[10. Pension!N126] ISO Code=NER | Economy=Niger | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M126)=Décret No. 67-25 du 2 février 1967, Art. 13
+[10. Pension!O126] ISO Code=NER | Economy=Niger | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M126)=Décret No. 67-25 du 2 février 1967, Art. 13
+[10. Pension!N127] ISO Code=NGA | Economy=Nigeria | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=50 | Legal basis (10. Pension!M127)=Pension Reform Act 2014, Sec. 7
+[10. Pension!O127] ISO Code=NGA | Economy=Nigeria | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M127)=Pension Reform Act 2014, Sec. 7
+[10. Pension!N128] ISO Code=MKD | Economy=North Macedonia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64 | Legal basis (10. Pension!M128)=Law on Pension and Disability Insurance, Art. 18
+[10. Pension!O128] ISO Code=MKD | Economy=North Macedonia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62 | Legal basis (10. Pension!M128)=Law on Pension and Disability Insurance, Art. 18
+[10. Pension!N129] ISO Code=NOR | Economy=Norway | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M129)=National Insurance Act, Chapter 3, Secs. 19 and 20
+[10. Pension!O129] ISO Code=NOR | Economy=Norway | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M129)=National Insurance Act, Chapter 3, Secs. 19 and 20
+[10. Pension!N130] ISO Code=OMN | Economy=Oman | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M130)=Sultanate Decree No. 52 of 2023 issuing the Social Protection Law, Arts. 1(23), 6 and 75
+[10. Pension!O130] ISO Code=OMN | Economy=Oman | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M130)=Sultanate Decree No. 52 of 2023 issuing the Social Protection Law, Arts. 1(23), 6 and 75
+[10. Pension!N131] ISO Code=PAK | Economy=Pakistan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M131)=Sindh Employees Old Age Benefits Act 2014, Secs. 26 and 55
+[10. Pension!O131] ISO Code=PAK | Economy=Pakistan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M131)=Sindh Employees Old Age Benefits Act 2014, Secs. 26 and 55
+[10. Pension!N132] ISO Code=PLW | Economy=Palau | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M132)=Palau National Code, Title 41, Sec. 753; Palau Social Security System Amendments, RPPL No. 9-12 2013, Sec. 5
+[10. Pension!O132] ISO Code=PLW | Economy=Palau | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M132)=Palau National Code, Title 41, Sec. 753; Palau Social Security System Amendments, RPPL No. 9-12 2013, Sec. 5
+[10. Pension!N133] ISO Code=PAN | Economy=Panama | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M133)=Ley No. 51, Art. 170
+[10. Pension!O133] ISO Code=PAN | Economy=Panama | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=57 | Legal basis (10. Pension!M133)=Ley No. 51, Art. 170
+[10. Pension!N134] ISO Code=PNG | Economy=Papua New Guinea | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M134)=Superannuation Regulation 2002, Art. 2
+[10. Pension!O134] ISO Code=PNG | Economy=Papua New Guinea | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M134)=Superannuation Regulation 2002, Art. 2
+[10. Pension!N135] ISO Code=PRY | Economy=Paraguay | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M135)=Ley No. 98/92, Art. 60
+[10. Pension!O135] ISO Code=PRY | Economy=Paraguay | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M135)=Ley No. 98/92, Art. 60
+[10. Pension!N136] ISO Code=PER | Economy=Peru | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M136)=Ley No. 32123/2024. Art. 12; Ley No. 26504/1995, Art. 9; Decreto Supremo No. 054-97-EF de 1997, Art. 41
+[10. Pension!O136] ISO Code=PER | Economy=Peru | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M136)=Ley No. 32123/2024. Art. 12; Ley No. 26504/1995, Art. 9; Decreto Supremo No. 054-97-EF de 1997, Art. 41
+[10. Pension!N137] ISO Code=PHL | Economy=Philippines | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M137)=Social Security Act of 2018, Sec. 12-B; Labor Code, Art. 302
+[10. Pension!O137] ISO Code=PHL | Economy=Philippines | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M137)=Social Security Act of 2018, Sec. 12-B; Labor Code, Art. 302
+[10. Pension!N138] ISO Code=POL | Economy=Poland | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M138)=Act of 17 December 1998 on Old-Age and Disability Pensions from Social Insurance, Art. 24(1)
+[10. Pension!O138] ISO Code=POL | Economy=Poland | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M138)=Act of 17 December 1998 on Old-Age and Disability Pensions from Social Insurance, Art. 24(1)
+[10. Pension!N139] ISO Code=PRT | Economy=Portugal | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66.6 | Legal basis (10. Pension!M139)=Ordinance No. 414/2023, Art. 1
+[10. Pension!O139] ISO Code=PRT | Economy=Portugal | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66.6 | Legal basis (10. Pension!M139)=Ordinance No. 414/2023, Art. 1
+[10. Pension!N140] ISO Code=PRI | Economy=Puerto Rico (US) | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66.8 | Legal basis (10. Pension!M140)=U.S. Code Title 42 The Public Health and Welfare, Sec. 416(L)
+[10. Pension!O140] ISO Code=PRI | Economy=Puerto Rico (US) | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66.8 | Legal basis (10. Pension!M140)=U.S. Code Title 42 The Public Health and Welfare, Sec. 416(L)
+[10. Pension!N141] ISO Code=QAT | Economy=Qatar | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M141)=Law No. 1 of 2022, Art. 24
+[10. Pension!O141] ISO Code=QAT | Economy=Qatar | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M141)=Law No. 1 of 2022, Art. 24
+[10. Pension!N142] ISO Code=ROU | Economy=Romania | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M142)=Law No. 360/2023, Arts. 47, 51(1) and Annex No. 5
+[10. Pension!O142] ISO Code=ROU | Economy=Romania | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=61.4 | Legal basis (10. Pension!M142)=Law No. 360/2023, Arts. 47, 51(1) and Annex No. 5
+[10. Pension!N143] ISO Code=RUS | Economy=Russian Federation | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M143)=Federal Law No. 400-03 of 28 December 2013 on Insurance Pensions, Arts. 8(1) and 81.2 and Appendix 6; Federal Law No. 350-03 of 3 October 2018, Art. 10
+[10. Pension!O143] ISO Code=RUS | Economy=Russian Federation | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M143)=Federal Law No. 400-03 of 28 December 2013 on Insurance Pensions, Arts. 8(1) and 81.2 and Appendix 6; Federal Law No. 350-03 of 3 October 2018, Art. 10
+[10. Pension!N144] ISO Code=RWA | Economy=Rwanda | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M144)=Law No. 05/2015 of 30/03/2015 Governing the Organization of Pension Schemes, Art. 18
+[10. Pension!O144] ISO Code=RWA | Economy=Rwanda | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M144)=Law No. 05/2015 of 30/03/2015 Governing the Organization of Pension Schemes, Art. 18
+[10. Pension!N145] ISO Code=WSM | Economy=Samoa | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M145)=National Provident Fund Act, Sec. 2
+[10. Pension!O145] ISO Code=WSM | Economy=Samoa | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M145)=National Provident Fund Act, Sec. 2
+[10. Pension!N146] ISO Code=SMR | Economy=San Marino | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M146)=Law No. 158, Art. 12; Law No. 157, Art. 10
+[10. Pension!O146] ISO Code=SMR | Economy=San Marino | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66 | Legal basis (10. Pension!M146)=Law No. 158, Art. 12; Law No. 157, Art. 10
+[10. Pension!N147] ISO Code=SAU | Economy=Saudi Arabia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M147)=Social Insurance Law, Art. 38(1)
+[10. Pension!O147] ISO Code=SAU | Economy=Saudi Arabia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M147)=Social Insurance Law, Art. 38(1)
+[10. Pension!N148] ISO Code=SEN | Economy=Senegal | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M148)=Code du Travail, Art. 69; Accord interprofessionnel national sur la retraite à soixante (60) ans dans le secteur privé, Arts. 1, 3
+[10. Pension!O148] ISO Code=SEN | Economy=Senegal | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M148)=Code du Travail, Art. 69; Accord interprofessionnel national sur la retraite à soixante (60) ans dans le secteur privé, Arts. 1, 3
+[10. Pension!N149] ISO Code=SRB | Economy=Serbia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M149)=Law on Pension and Disability Insurance, Arts. 19 and 19a
+[10. Pension!O149] ISO Code=SRB | Economy=Serbia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63.8 | Legal basis (10. Pension!M149)=Law on Pension and Disability Insurance, Arts. 19 and 19a
+[10. Pension!N150] ISO Code=SYC | Economy=Seychelles | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M150)=Pension Fund Act, Art. 2; Social Security (Retirement Age) Regulations 2022, Art. 2
+[10. Pension!O150] ISO Code=SYC | Economy=Seychelles | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M150)=Pension Fund Act, Art. 2; Social Security (Retirement Age) Regulations 2022, Art. 2
+[10. Pension!N151] ISO Code=SLE | Economy=Sierra Leone | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M151)=National Social Security and Insurance Trust Act, Sec. 39
+[10. Pension!O151] ISO Code=SLE | Economy=Sierra Leone | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M151)=National Social Security and Insurance Trust Act, Sec. 39
+[10. Pension!N152] ISO Code=SGP | Economy=Singapore | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M152)=Retirement and Re-employment Act 1993, Sec. 4(1); Retirement and Re-employment (Prescribed Minimum Retirement Age) Notification 2022, Art. 2
+[10. Pension!O152] ISO Code=SGP | Economy=Singapore | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M152)=Retirement and Re-employment Act 1993, Sec. 4(1); Retirement and Re-employment (Prescribed Minimum Retirement Age) Notification 2022, Art. 2
+[10. Pension!N153] ISO Code=SVK | Economy=Slovak Republic | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63.3 | Legal basis (10. Pension!M153)=Law 275/2020 Coll. of 24 September 2020 amending Social Insurance Act and Certain Laws; Social Insurance Act, Secs. 65 and Annex 3a
+[10. Pension!O153] ISO Code=SVK | Economy=Slovak Republic | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62.3 | Legal basis (10. Pension!M153)=Law 275/2020 Coll. of 24 September 2020 amending Social Insurance Act and Certain Laws; Social Insurance Act, Secs. 65 and Annex 3a
+[10. Pension!N154] ISO Code=SVN | Economy=Slovenia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M154)=Pension and Disability Insurance Act, Art. 27
+[10. Pension!O154] ISO Code=SVN | Economy=Slovenia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M154)=Pension and Disability Insurance Act, Art. 27
+[10. Pension!N155] ISO Code=SLB | Economy=Solomon Islands | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=50 | Legal basis (10. Pension!M155)=National Provident Fund Act, Secs. 25 and 29
+[10. Pension!O155] ISO Code=SLB | Economy=Solomon Islands | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M155)=National Provident Fund Act, Secs. 25 and 29
+[10. Pension!N156] ISO Code=SOM | Economy=Somalia, Fed. Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M156)=No applicable provisions could be located
+[10. Pension!O156] ISO Code=SOM | Economy=Somalia, Fed. Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M156)=No applicable provisions could be located
+[10. Pension!N157] ISO Code=ZAF | Economy=South Africa | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M157)=No applicable provisions could be located
+[10. Pension!O157] ISO Code=ZAF | Economy=South Africa | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M157)=No applicable provisions could be located
+[10. Pension!N158] ISO Code=SSD | Economy=South Sudan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M158)=National Social Insurance Fund Act 2023, Secs. 5 and 42; Labor Regulations 2023, Reg. 37
+[10. Pension!O158] ISO Code=SSD | Economy=South Sudan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M158)=National Social Insurance Fund Act 2023, Secs. 5 and 42; Labor Regulations 2023, Reg. 37
+[10. Pension!N159] ISO Code=ESP | Economy=Spain | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=67 | Legal basis (10. Pension!M159)=Real Decreto Legislativo No. 8/2015, Art. 205
+[10. Pension!O159] ISO Code=ESP | Economy=Spain | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=67 | Legal basis (10. Pension!M159)=Real Decreto Legislativo No. 8/2015, Art. 205
+[10. Pension!N160] ISO Code=LKA | Economy=Sri Lanka | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M160)=Employees' Provident Fund Act, Sec. 23
+[10. Pension!O160] ISO Code=LKA | Economy=Sri Lanka | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=50 | Legal basis (10. Pension!M160)=Employees' Provident Fund Act, Sec. 23
+[10. Pension!N161] ISO Code=KNA | Economy=St. Kitts and Nevis | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M161)=Social Security (Benefits) Regulations, Sec. 28(1)
+[10. Pension!O161] ISO Code=KNA | Economy=St. Kitts and Nevis | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=62 | Legal basis (10. Pension!M161)=Social Security (Benefits) Regulations, Sec. 28(1)
+[10. Pension!N162] ISO Code=LCA | Economy=St. Lucia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M162)=National Insurance Regulations, Sec. 53
+[10. Pension!O162] ISO Code=LCA | Economy=St. Lucia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M162)=National Insurance Regulations, Sec. 53
+[10. Pension!N163] ISO Code=VCT | Economy=St. Vincent and the Grenadines | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64 | Legal basis (10. Pension!M163)=National Insurance (Benefits) Regulations, Sec. 33; Act No. 28 of 2013
+[10. Pension!O163] ISO Code=VCT | Economy=St. Vincent and the Grenadines | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=64 | Legal basis (10. Pension!M163)=National Insurance (Benefits) Regulations, Sec. 33; Act No. 28 of 2013
+[10. Pension!N164] ISO Code=SDN | Economy=Sudan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M164)=Pensions and Social Insurance Act, Sec. 73
+[10. Pension!O164] ISO Code=SDN | Economy=Sudan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M164)=Pensions and Social Insurance Act, Sec. 73
+[10. Pension!N165] ISO Code=SUR | Economy=Suriname | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M165)=General Pensions Act, Arts. 1 and 4
+[10. Pension!O165] ISO Code=SUR | Economy=Suriname | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M165)=General Pensions Act, Arts. 1 and 4
+[10. Pension!N166] ISO Code=SWE | Economy=Sweden | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M166)=Social Insurance Act, Ch. 56, Sec. 3
+[10. Pension!O166] ISO Code=SWE | Economy=Sweden | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=63 | Legal basis (10. Pension!M166)=Social Insurance Act, Ch. 56, Sec. 3
+[10. Pension!N167] ISO Code=CHE | Economy=Switzerland | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M167)=Federal Act on Old Age and Survivors' Insurance, Art. 21
+[10. Pension!O167] ISO Code=CHE | Economy=Switzerland | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M167)=Federal Act on Old Age and Survivors' Insurance, Art. 21
+[10. Pension!N168] ISO Code=SYR | Economy=Syrian Arab Republic | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M168)=Law No. 92 of 1959, Art. 57; Law No. 78 of 2001, Art. 9
+[10. Pension!O168] ISO Code=SYR | Economy=Syrian Arab Republic | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M168)=Law No. 92 of 1959, Art. 57; Law No. 78 of 2001, Art. 9
+[10. Pension!N169] ISO Code=STP | Economy=São Tomé and Príncipe | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=62 | Legal basis (10. Pension!M169)=Decree-Law No. 19/2022, Arts. 78(1)(b) and 78(2)
+[10. Pension!O169] ISO Code=STP | Economy=São Tomé and Príncipe | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=57 | Legal basis (10. Pension!M169)=Decree-Law No. 19/2022, Arts. 78(1)(b) and 78(2)
+[10. Pension!N170] ISO Code=TWN | Economy=Taiwan, China | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=64 | Legal basis (10. Pension!M170)=Labor Insurance Act, Art. 58
+[10. Pension!O170] ISO Code=TWN | Economy=Taiwan, China | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=64 | Legal basis (10. Pension!M170)=Labor Insurance Act, Art. 58
+[10. Pension!N171] ISO Code=TJK | Economy=Tajikistan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=63 | Legal basis (10. Pension!M171)=Law of the Republic of Tajikistan On Insurance and State Pensions, Art. 13; Law on Pensions Provisions, Art. 11
+[10. Pension!O171] ISO Code=TJK | Economy=Tajikistan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M171)=Law of the Republic of Tajikistan On Insurance and State Pensions, Art. 13; Law on Pensions Provisions, Art. 11
+[10. Pension!N172] ISO Code=TZA | Economy=Tanzania | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M172)=National Social Security Fund Act, Secs. 2 and 23
+[10. Pension!O172] ISO Code=TZA | Economy=Tanzania | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M172)=National Social Security Fund Act, Secs. 2 and 23
+[10. Pension!N173] ISO Code=THA | Economy=Thailand | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M173)=Social Security Act, Sec. 77 bis
+[10. Pension!O173] ISO Code=THA | Economy=Thailand | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M173)=Social Security Act, Sec. 77 bis
+[10. Pension!N174] ISO Code=TLS | Economy=Timor-Leste | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M174)=Decree-Law No. 17/2017, Arts. 17 and 18
+[10. Pension!O174] ISO Code=TLS | Economy=Timor-Leste | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M174)=Decree-Law No. 17/2017, Arts. 17 and 18
+[10. Pension!N175] ISO Code=TGO | Economy=Togo | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M175)=Loi No. 211-6 du 21 février 2011 portant Code de Sécurité Sociale, Art. 42
+[10. Pension!O175] ISO Code=TGO | Economy=Togo | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M175)=Loi No. 211-6 du 21 février 2011 portant Code de Sécurité Sociale, Art. 42
+[10. Pension!N176] ISO Code=TON | Economy=Tonga | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M176)=National Retirement Benefits Act, Sec. 43(1)
+[10. Pension!O176] ISO Code=TON | Economy=Tonga | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M176)=National Retirement Benefits Act, Sec. 43(1)
+[10. Pension!N177] ISO Code=TTO | Economy=Trinidad and Tobago | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M177)=National Insurance Act, Secs. 2 and 46
+[10. Pension!O177] ISO Code=TTO | Economy=Trinidad and Tobago | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M177)=National Insurance Act, Secs. 2 and 46
+[10. Pension!N178] ISO Code=TUN | Economy=Tunisia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M178)=Décret No. 74-499 du 27 Avril 1974, Art. 15
+[10. Pension!O178] ISO Code=TUN | Economy=Tunisia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M178)=Décret No. 74-499 du 27 Avril 1974, Art. 15
+[10. Pension!N179] ISO Code=TUR | Economy=Türkiye | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M179)=Law No. 5510 of 2006, Art. 28
+[10. Pension!O179] ISO Code=TUR | Economy=Türkiye | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=58 | Legal basis (10. Pension!M179)=Law No. 5510 of 2006, Art. 28
+[10. Pension!N180] ISO Code=UGA | Economy=Uganda | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=55 | Legal basis (10. Pension!M180)=National Social Security Fund Act, Sec. 20
+[10. Pension!O180] ISO Code=UGA | Economy=Uganda | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M180)=National Social Security Fund Act, Sec. 20
+[10. Pension!N181] ISO Code=UKR | Economy=Ukraine | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M181)=Law on Compulsory State Pension Insurance, Art. 26
+[10. Pension!O181] ISO Code=UKR | Economy=Ukraine | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M181)=Law on Compulsory State Pension Insurance, Art. 26
+[10. Pension!N182] ISO Code=ARE | Economy=United Arab Emirates | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M182)=Federal Law No. 7 of 1999, Arts. 1 and 16
+[10. Pension!O182] ISO Code=ARE | Economy=United Arab Emirates | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M182)=Federal Law No. 7 of 1999, Arts. 1 and 16
+[10. Pension!N183] ISO Code=GBR | Economy=United Kingdom | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66 | Legal basis (10. Pension!M183)=Pensions Act 2007, Part 3, Schedule 3
+[10. Pension!O183] ISO Code=GBR | Economy=United Kingdom | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66 | Legal basis (10. Pension!M183)=Pensions Act 2007, Part 3, Schedule 3
+[10. Pension!N184] ISO Code=USA | Economy=United States | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=66.8 | Legal basis (10. Pension!M184)=42 United States Code, Sec. 416
+[10. Pension!O184] ISO Code=USA | Economy=United States | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=66.8 | Legal basis (10. Pension!M184)=42 United States Code, Sec. 416
+[10. Pension!N185] ISO Code=URY | Economy=Uruguay | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65 | Legal basis (10. Pension!M185)=Ley No. 20.130, Art. 35
+[10. Pension!O185] ISO Code=URY | Economy=Uruguay | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65 | Legal basis (10. Pension!M185)=Ley No. 20.130, Art. 35
+[10. Pension!N186] ISO Code=UZB | Economy=Uzbekistan | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M186)=Law on State Pensions 1993, Art. 7
+[10. Pension!O186] ISO Code=UZB | Economy=Uzbekistan | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M186)=Law on State Pensions 1993, Art. 7
+[10. Pension!N187] ISO Code=VUT | Economy=Vanuatu | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M187)=Employment Act, Sec. 54; Statute Law (Miscellaneous Provisions) Act No. 1 of 2020, Schedule Minor Amendments, 2B
+[10. Pension!O187] ISO Code=VUT | Economy=Vanuatu | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M187)=Employment Act, Sec. 54; Statute Law (Miscellaneous Provisions) Act No. 1 of 2020, Schedule Minor Amendments, 2B
+[10. Pension!N188] ISO Code=VEN | Economy=Venezuela, RB | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M188)=Ley del Seguro Social, Art. 27
+[10. Pension!O188] ISO Code=VEN | Economy=Venezuela, RB | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M188)=Ley del Seguro Social, Art. 27
+[10. Pension!N189] ISO Code=VNM | Economy=Viet Nam | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=61.3 | Legal basis (10. Pension!M189)=Decree No. 135/2020/ND-CP, Art. 4; Labor Code, Art. 169
+[10. Pension!O189] ISO Code=VNM | Economy=Viet Nam | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=56.7 | Legal basis (10. Pension!M189)=Decree No. 135/2020/ND-CP, Art. 4; Labor Code, Art. 169
+[10. Pension!N190] ISO Code=PSE | Economy=West Bank and Gaza | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=NS | Legal basis (10. Pension!M190)=No applicable provisions could be located
+[10. Pension!O190] ISO Code=PSE | Economy=West Bank and Gaza | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=NS | Legal basis (10. Pension!M190)=No applicable provisions could be located
+[10. Pension!N191] ISO Code=YEM | Economy=Yemen, Rep. | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M191)=Republican Decree Law No. 26 of 1991, Arts. 2 and 51(1)
+[10. Pension!O191] ISO Code=YEM | Economy=Yemen, Rep. | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=55 | Legal basis (10. Pension!M191)=Republican Decree Law No. 26 of 1991, Arts. 2 and 51(1)
+[10. Pension!N192] ISO Code=ZMB | Economy=Zambia | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M192)=Pension Scheme Regulation (Amendment) Act, 2022, Sec. 2(d); National Pension Scheme (Amendment) Act 2015, Sec. 2
+[10. Pension!O192] ISO Code=ZMB | Economy=Zambia | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M192)=Pension Scheme Regulation (Amendment) Act, 2022, Sec. 2(d); National Pension Scheme (Amendment) Act 2015, Sec. 2
+[10. Pension!N193] ISO Code=ZWE | Economy=Zimbabwe | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=60 | Legal basis (10. Pension!M193)=Pension and Other Benefits Scheme Statutory Instrument No. 393 of 1993, Sec. 26(2)
+[10. Pension!O193] ISO Code=ZWE | Economy=Zimbabwe | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=60 | Legal basis (10. Pension!M193)=Pension and Other Benefits Scheme Statutory Instrument No. 393 of 1993, Sec. 26(2)

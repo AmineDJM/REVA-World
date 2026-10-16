@@ -1,0 +1,28 @@
+# V3 atlas (agent A-RESOURCES): U.S. EIA open-data bulk file International Energy Data (INTL.zip).
+# Connector src/reva/adapters/connectors/atlas_eia.py (atlas tables eia.intl_petroleum, eia.intl_gas,
+# eia.intl_coal, eia.intl_electricity, eia.intl_energy).
+source_key: eia.opendata_bulk
+title: U.S. EIA International Energy Data (production, consumption, trade, coal reserves, capacity, generation, CO2 by country)
+provider_url: https://www.eia.gov/opendata/bulkfiles.php
+lineage_family: eia_ies
+rights:
+  licence: "U.S. public domain"
+  licence_url: https://www.eia.gov/about/copyrights_reuse.php
+  attribution: "Source: U.S. Energy Information Administration (EIA), International Energy Data."
+  terms_quote: >-
+    U.S. government publications are in the public domain and are not subject to copyright protection. You may
+    use and/or distribute any of our data, files, databases, reports, graphs, charts, and other information
+    products that are on our website
+metadata:
+  allowed_hosts: [www.eia.gov]
+  files:
+    bulk: https://www.eia.gov/opendata/bulk/INTL.zip
+    manifest: https://www.eia.gov/opendata/bulk/manifest.txt
+    notation: https://www.eia.gov/international/content/info/footnotes.html
+  authentication: "none for bulk files (the EIA API v2 requires a registered api_key and is not used)"
+  cadence: "EIA revises series individually (per-series last_updated); monthly check"
+  notation: "-- not applicable; NA not available; W withheld to avoid disclosure; ie included elsewhere for this time period"
+  not_used: >-
+    API v2 (needs a key); monthly/quarterly OECD series; TJ and MTOE unit conversions; GDP PPP and population
+    inputs. EIA no longer publishes crude oil / natural gas proved reserves in the international data (only
+    coal reserves).

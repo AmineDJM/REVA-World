@@ -1,0 +1,137 @@
+[
+ {
+  "request_fingerprint": "2528c3e1db0917bfe348c4caf1200ce90ccc0643f1c4df70b32c3dfea1d2f2b5",
+  "url": "https://www.sciencebase.gov/catalog/item/69837e43b66b01367d7ec7c7?format=json",
+  "file": "2528c3e1db0917bf.json",
+  "sha256": "1acf6e89cb12007345289f59fc67819400158e68691619e1fd008f3445151d84",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "1acf6e89cb12007345289f59fc67819400158e68691619e1fd008f3445151d84",
+  "live_bytes": 7275,
+  "excerpt": "whole item JSON"
+ },
+ {
+  "request_fingerprint": "444aa6249d7a67a8e28c09587de0ee7e3140f87261edaeb51ab477c79ddeed7a",
+  "url": "https://www.sciencebase.gov/catalog/file/get/69837e43b66b01367d7ec7c7?f=__disk__59%2F9f%2F78%2F599f78dcdae6cfc820ec8410e8a0e684c28be9d2",
+  "file": "444aa6249d7a67a8.xml",
+  "sha256": "0588a74c5257484630cd41dbb60cbd9ef4862bd24b6660a762d1aecf3c73e15a",
+  "status": 200,
+  "headers": {
+   "content-type": "application/fgdc+xml"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "0588a74c5257484630cd41dbb60cbd9ef4862bd24b6660a762d1aecf3c73e15a",
+  "live_bytes": 13470,
+  "excerpt": "whole FGDC metadata"
+ },
+ {
+  "request_fingerprint": "d51a9b680b96d4825e56efdbdb53497a003b673fe7f19ab60a4d6c08781ea03a",
+  "url": "https://www.sciencebase.gov/catalog/file/get/69837e43b66b01367d7ec7c7?f=__disk__d3%2Fac%2F84%2Fd3ac8466552946c5e8caa2c2c6338d9e1aff655d",
+  "file": "d51a9b680b96d482.csv",
+  "sha256": "8865339d66f749a18feb62737c673d5291ac33672ddf58419bccc756d30eee49",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "582a0aa231aea53d8a97dc8d1cd3dfa5f885cf3760353e3d029d7f0ae4fbaaf5",
+  "live_bytes": 3189010,
+  "excerpt": "header + 387 data rows of the live file, verbatim lines (selected countries/commodities plus every special value code)"
+ },
+ {
+  "request_fingerprint": "18c2dc9046a6791555929bc7574e12fe54bb7ede506f146756335fa5d2d3ba91",
+  "url": "https://www.sciencebase.gov/catalog/item/6a8490171ba49b3133cd8055?format=json",
+  "file": "18c2dc9046a67915.json",
+  "sha256": "bb945220ac58d2471fad36fea36fe34a2f0ac44322a6ab2f3db852cb0d38048b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "bb945220ac58d2471fad36fea36fe34a2f0ac44322a6ab2f3db852cb0d38048b",
+  "live_bytes": 31018,
+  "excerpt": "whole item JSON"
+ },
+ {
+  "request_fingerprint": "4c5b90afca566f9a5c3f47c47a3e5470ffbcf9232f76d2d6614df0716e2f25d0",
+  "url": "https://www.sciencebase.gov/catalog/file/get/6a8490171ba49b3133cd8055?f=__disk__56%2F06%2Fce%2F5606ce0dbe32e2ae952385d93b5c634eca508a3a",
+  "file": "4c5b90afca566f9a.xml",
+  "sha256": "734ba58ac0450991553b1b9b942823009b7f22247c9dcf89e39461b6a130b46e",
+  "status": 200,
+  "headers": {
+   "content-type": "application/fgdc+xml"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "734ba58ac0450991553b1b9b942823009b7f22247c9dcf89e39461b6a130b46e",
+  "live_bytes": 83730,
+  "excerpt": "whole FGDC metadata"
+ },
+ {
+  "request_fingerprint": "a9940aacf8fb8749eafa9ccf0110a42de076899e79d05903a59a9dc7103eb9fb",
+  "url": "https://www.sciencebase.gov/catalog/file/get/6a8490171ba49b3133cd8055?f=__disk__dc%2Fde%2Fe2%2Fdcdee2cc3de8311e6245db9cb11b1d09459a8065",
+  "file": "a9940aacf8fb8749.csv",
+  "sha256": "18098333a8201d035a0c5883bb17e8af7c55c1951716d223ce631304b2b39e1e",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "a7e8e80bbac49c40182e03055495340f1478d488a251d203deafd481ddb7ee27",
+  "live_bytes": 4285468,
+  "excerpt": "header + 515 data rows of the live file, verbatim lines (selected countries/commodities plus every special value code)"
+ },
+ {
+  "request_fingerprint": "e12d26328454be3d017f4de789646746b37d9f77ffa9ec54807b1f0ca40439e8",
+  "url": "https://www.sciencebase.gov/catalog/item/67febb3cd4be02350c2609bc?format=json",
+  "file": "e12d26328454be3d.json",
+  "sha256": "933354ca503b581986a00a19fff2c1ae460cf75e4ecfd83746faf8a04bdd7978",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "933354ca503b581986a00a19fff2c1ae460cf75e4ecfd83746faf8a04bdd7978",
+  "live_bytes": 26926,
+  "excerpt": "whole item JSON"
+ },
+ {
+  "request_fingerprint": "64e31e469c2d4b839123f8d2d1589fd7f36c5ea294522107f51eea97a9339f8e",
+  "url": "https://www.sciencebase.gov/catalog/file/get/67febb3cd4be02350c2609bc?f=__disk__c1%2Fae%2F79%2Fc1ae79e7d156122e343ad329738d5d9c7c6bfe6c",
+  "file": "64e31e469c2d4b83.xml",
+  "sha256": "fd1ec66129523f9327e5fb79fc385c60874a2dd284298479c530bd190d577cb0",
+  "status": 200,
+  "headers": {
+   "content-type": "application/fgdc+xml"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "fd1ec66129523f9327e5fb79fc385c60874a2dd284298479c530bd190d577cb0",
+  "live_bytes": 44896,
+  "excerpt": "whole FGDC metadata"
+ },
+ {
+  "request_fingerprint": "7701c8dbb6b3faeae8d563f6baa71e5aa0e14f6f3ed79a5a73b6f60e94560818",
+  "url": "https://www.sciencebase.gov/catalog/file/get/67febb3cd4be02350c2609bc?f=__disk__9e%2Fa7%2F70%2F9ea77058d75843f8906a9c8d7c09b2cede2d6494",
+  "file": "7701c8dbb6b3faea.csv",
+  "sha256": "30b90d214a351eb75a70159a7afdfd5168abc7b8f21d48b79164b3fb589caa27",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-15T23:30:00+00:00",
+  "licence": "U.S. public domain (CC0 1.0)",
+  "live_sha256": "58ff0356973d6e7859d1ce13dbd8174cbb673a4cf72761cfbfcec41d7117d4b9",
+  "live_bytes": 3325364,
+  "excerpt": "header + 98 data rows of the live file, verbatim lines (selected countries/commodities plus every special value code)"
+ }
+]

@@ -1,0 +1,21 @@
+id: history.empire_event_items
+domain: history
+owner: KGHIST
+description: >-
+  Seeds the significant events (P793) of every empire seeded by history.empires, e.g. Portuguese Empire ->
+  Treaty of Tordesillas, discovery of the sea route to India, discovery of Brazil, independence of Brazil.
+  Their own claims (dates, participants, signatories, places) are then harvested even when the event is
+  not typed as a war, treaty, revolution or expedition.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?empire { {{values}} }
+    ?empire p:P793 ?statement .
+    ?statement ps:P793 ?item ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+split: {by: values, source: "spec:history.empires", chunk_size: 100}
+depends_on: [history.empires]
+max_rows: 5000
+expand_hops: 1

@@ -1,0 +1,25 @@
+id: science.award_recipients
+domain: science
+owner: KGSCIECO
+description: >-
+  "Award received" (P166) statements whose award is one of the awards seeded by science.science_awards, with
+  the year (P585 point in time) -- people AND organisations (e.g. Nobel Peace Prize to the ICRC or the IPCC,
+  which people.nobel_laureates does not seed). Person -> award -> year chains: Marie Curie -> Nobel Prize in
+  Physics (1903) / Chemistry (1911). Overlaps people.nobel_laureates snapshots for human Nobel laureates;
+  the harvester de-duplicates by Wikidata statement id. Subjects get a label snapshot.
+purpose: statements
+entity_kind: person
+sparql: |
+  SELECT ?recipient ?statement ?award ?rank ?pit WHERE {
+    VALUES ?award { {{values}} }
+    ?recipient p:P166 ?statement .
+    ?statement ps:P166 ?award ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: recipient, property: P166, object: award, statement: statement, rank: rank,
+          point_in_time: pit}
+split: {by: values, source: "spec:science.science_awards", chunk_size: 50}
+depends_on: [science.science_awards]
+max_rows: 80000
+expand_hops: 0

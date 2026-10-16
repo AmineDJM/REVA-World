@@ -1,0 +1,16 @@
+# Geography aliases of agent A-SCI (OpenAlex). OpenAlex identifies countries by ISO 3166-1 alpha-2 codes
+# (https://openalex.org/countries/<code>); the crosswalk holds every ISO alpha-2 code. OpenAlex uses one code
+# outside ISO 3166-1: XK for Kosovo (crosswalk key XKX). Nothing else is added; any other code stays unmapped.
+scheme: openalex
+base: iso2
+aliases:
+  - code: XK
+    iso3: XKX
+    source: >-
+      OpenAlex API response GET /works?filter=publication_year:1993,type:article|review,authorships.countries:TV|NR|XK|SM
+      &group_by=authorships.countries (retrieved 2026-10-16T00:05Z): group key "https://openalex.org/countries/XK"
+      with key_display_name "Kosovo". XKX is the World Bank / crosswalk key of Kosovo.
+source:
+  kind: provider_data
+  url: https://api.openalex.org/works?group_by=authorships.countries
+  retrieved_at: "2026-10-16T00:05:00Z"

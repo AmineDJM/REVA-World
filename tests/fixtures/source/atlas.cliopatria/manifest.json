@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "546b93fab847164475be6db9043200e64454eb1dcada2e5c0bf3fa884ddb0253",
+    "url": "https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/v0.2.1/LICENSE.md",
+    "file": "546b93fab8471644.md",
+    "sha256": "62ca7e92dee4ebe402372d5e64f87845de445a6c0e5d76fddb68b3e33739d1a6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "licence": "CC BY 4.0 (Cliopatria)",
+    "fixture_note": "live capture, unchanged"
+  },
+  {
+    "request_fingerprint": "a8e80463dc61140830c482815b53616b3709cc2851444eac1b62bbd7aabce0b6",
+    "url": "https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/v0.2.1/cliopatria.geojson.zip",
+    "file": "a8e80463dc611408.zip",
+    "sha256": "1ef8ab1ce74b8289b49266c23956d360493b7f3b5f4a76d5c53d78f01e9a93f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "licence": "CC BY 4.0 (Cliopatria)",
+    "fixture_note": "TRIMMED + SIMPLIFIED: 299 of 13,797 rows of Cliopatria v0.2.1 (polities ['(Portuguese Empire)', 'British Raj', 'Empire of Brazil', 'French Africa', 'French Algeria', 'Mughal Empire', 'Ottoman Empire', \"People's Democratic Republic of Algeria\", 'Portuguese Empire', 'Regency of Algiers', 'Republic of India', 'Roman Empire', 'Sumerian City-States']), polygons simplified (shapely simplify 0.05 deg, 1e-4 deg grid); attributes unchanged; original zip sha256 e10a4e429fca708788ff9e7572a95fce801fae55852d217cffabc1c59cd4eed4"
+  },
+  {
+    "request_fingerprint": "b7524bf7fe45f8c459b412868766f051997fc587037aedd9fa5e1efbbb79d62b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_map_units.zip",
+    "file": "b7524bf7fe45f8c4.zip",
+    "sha256": "da11f84833429eb722396f0479607e80418683ad3919820477975ea000b6412a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "licence": "Public domain (Natural Earth)",
+    "fixture_note": "TRIMMED + SIMPLIFIED: 15 Natural Earth 5.1.1 1:10m map units ['BGD', 'BRA', 'DZA', 'ESP', 'IND', 'IRQ', 'IRQ', 'ITA', 'MAR', 'PAK', 'PRT', 'PRT', 'PRT', 'TUN', 'TUR'], rewritten with pyshp (simplify 0.02 deg, 1e-4 deg grid; fields ADM0_A3, GU_A3, ISO_A3, ISO_A3_EH, TYPE, NAME, NAME_EN, ADMIN); original zip sha256 45bebe2aaf8bf42b9daf4428594925bcb11eabd32fe9dc6e0acf681438053eb5"
+  }
+]

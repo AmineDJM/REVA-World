@@ -1,0 +1,25 @@
+id: history.country_discoverers
+domain: history
+owner: KGHIST
+description: >-
+  Discoverer or inventor (P61) statements of the 250 crosswalk countries, e.g. Brazil -> discoverer ->
+  Pedro Álvares Cabral. Wikidata uses P61 on countries/islands for the European "discovery" narrative; the
+  hop is shown with its property label only ("discoverer (Wikidata P61)"), never as a claim that the land was
+  unknown to its inhabitants.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?person ?rank ?start ?end ?pit WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P61 ?statement .
+    ?statement ps:P61 ?person ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: country, property: P61, object: person, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 1000
+expand_hops: 1

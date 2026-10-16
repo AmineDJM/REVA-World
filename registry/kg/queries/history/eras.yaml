@@ -1,0 +1,20 @@
+id: history.eras
+domain: history
+owner: KGHIST
+description: >-
+  Eras and historical periods: instances of historical period (Q11514315) or of a subclass, with at least 5
+  Wikipedia sitelinks (keeps named periods such as the Age of Discovery or the Cold War and drops thousands of
+  local micro-periods). Snapshots keep start/end (P580/P582), follows/followed by (P155/P156), part of
+  (P361), country/location (P17/P276) and significant events; events point to them with P2348 (time period).
+purpose: seed_entities
+entity_kind: era
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q11514315 .
+    {{qid_filter}}
+    ?item wikibase:sitelinks ?n .
+    FILTER(?n >= 5)
+  }
+split: {by: qid_prefix}
+max_rows: 15000
+expand_hops: 1

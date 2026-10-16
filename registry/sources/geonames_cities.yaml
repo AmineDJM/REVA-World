@@ -1,0 +1,23 @@
+# V3 (agent A-CITIES): GeoNames populated places (cities15000), admin-1 codes and fr/en alternate names.
+# Connector: src/reva/adapters/connectors/atlas_cities.py (atlas.geonames_cities) -> atlas tables geonames.*
+source_key: geonames.cities
+title: GeoNames cities15000, admin1CodesASCII and alternateNamesV2 (fr/en)
+provider_url: https://download.geonames.org/export/dump/
+lineage_family: geonames
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "GeoNames (www.geonames.org)"
+  provider_statement: "GeoNames export/dump/readme.txt lines 6-7: 'This work is licensed under a Creative Commons Attribution 4.0 License, see https://creativecommons.org/licenses/by/4.0/'"
+metadata:
+  allowed_hosts: [download.geonames.org]
+  files:
+    - cities15000.zip        # ~3.4 MB; "all cities with a population > 15000 or capitals" (readme)
+    - admin1CodesASCII.txt   # ~150 kB; first-order administrative divisions
+    - alternateNamesV2.zip   # ~205 MB; only on request (--dataset cities15000_names / --option altnames=1)
+  authentication: none
+  cadence: daily dump; monthly ingest is plenty
+  editorial_status: >-
+    GeoNames-declared values (names, coordinates, feature codes, population, elevation, time zone); undated
+    and partly community-maintained. Population figures carry no reference date; the record's modification
+    date is kept. Feature code PPLC = "capital of a political entity" as GeoNames assigns it.

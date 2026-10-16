@@ -1,0 +1,23 @@
+id: science.research_institutes
+domain: science
+owner: KGSCIECO
+description: >-
+  Research institutes, academies of sciences and space agencies: direct instances of research institute
+  (Q31855), academy of sciences (Q414147) or space agency (Q11753232) with at least 10 sitelinks, plus
+  CERN, the Max Planck Society and the Pasteur Institute by id (typed as international organisation /
+  society). Snapshots keep country (P17), location, inception (P571), founders (P112), parent organisation
+  (P749), headquarters (P159).
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?class { wd:Q31855 wd:Q414147 wd:Q11753232 }
+      ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+      FILTER(?links >= 10)
+    }
+    UNION
+    { VALUES ?item { wd:Q42944 wd:Q158085 wd:Q629317 } }
+  }
+max_rows: 4000
+expand_hops: 0
