@@ -333,7 +333,7 @@ def test_wikidata_cables_pairs_and_subclasses() -> None:
 def test_wikidata_cables_flags_fit_the_atlas_limit_for_large_hubs() -> None:
     """300 cables between the same countries (a hub such as the USA): flags stay within 4,000 characters."""
     qids = sorted(cb.country_index())[:120]
-    cables = [{"qid": f"Q{9000 + i}", "label": f"Very long cable system name number {i} " * 2, "revision": 123456789 + i,
+    cables: list[dict[str, Any]] = [{"qid": f"Q{9000 + i}", "label": f"Very long cable system name number {i} " * 2, "revision": 123456789 + i,
                "p31": [cb.ROOT_CLASS], "p279": [], "countries": qids if i == 0 else qids[:2], "year": 1990 + i % 30,
                "year_property": "P571", "retired": None, "length": None, "owners": []} for i in range(300)]  # fmt: skip
     rb, _rep = cb.build(cables, {c["qid"]: "a" * 64 for c in cables}, date(2026, 10, 16))

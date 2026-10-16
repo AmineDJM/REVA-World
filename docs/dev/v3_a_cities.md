@@ -272,24 +272,25 @@ Peak RSS while building `wup2025_cities_area` (2.3 M rows) was about 3 GB.
   * CCK: West Island 7304591 vs Q48675 → 1547351;
   * CHE: Bern 2661552 vs Q70 → 7285212;
   * ESP: Madrid 3117735 vs Q2807 → 6359304;
-  * GNQ: Ciudad de la Paz 12226438 vs Q1140136 (Malabo) → 2306898;
+  * GNQ: Ciudad de la Paz 12226438 vs Q1140136 → 2306898;
   * GTM: Guatemala City 3598132 vs Q1555 → 3595529;
   * HTI: Port-au-Prince 3718426 vs Q34261 → 3718427;
   * KGZ: Bishkek 1528675 vs Q9361 → 1528334;
   * KIR: Tarawa 2110257 vs Q131233 (no P1566);
+  * NRU: Yaren 7626461 vs Q31026 → 2110418;
   * MCO: Monaco 2993458 vs Q235 → 2993457;
   * MLI: Bamako 2460596 vs Q3703 → 2460594;
   * MLT: Valletta 2562305 vs Q23800 → 8334638;
-  * NRU: Yaren 7626461 vs Q31026 → 2110418;
   * PRK: Pyongyang 1871859 vs Q18808 → 1871856;
   * SGP: Singapore 1880252 vs Q334 → 1880251;
   * TJK: Dushanbe 1221874 vs Q9365 → 1221873;
   * VAT: Vatican City 6691831 vs Q237 → 3164670.
 * **Reading the disagreements.** In most cases Wikidata's P1566 points to another GeoNames record of the same
-  place: an administrative-division or neighbouring-id record, judging from the names. Equatorial Guinea is a
-  real difference: GeoNames codes the new capital Ciudad de la Paz PPLC, while Wikidata keeps Malabo.
-  Kiribati's Wikidata capital has no GeoNames ID. Nothing is merged or corrected; the PPLC-based P1376
-  statements are loaded only for places that Wikidata links to that same geonameid.
+  place, judging from the items' Wikidata labels, which match the PPLC names: Q1140136 is "Ciudad de la Paz",
+  Q31026 "Yaren District", Q131233 "South Tarawa". In Equatorial Guinea both sides now name Ciudad de la Paz
+  (the P36 claim starts 2026-01-03), but through different GeoNames ids. Kiribati's capital item has no
+  GeoNames ID at all. Nothing is merged or corrected; the PPLC-based P1376 statements are loaded only for
+  places that Wikidata links to that same geonameid.
 
 
 ### Per country (GeoNames cities15000 live bytes; WUP 2025)
