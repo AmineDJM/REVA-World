@@ -259,12 +259,189 @@ Dev result: 16 min, a 6.4 GB query file, and the disk never below ~10 GB free.
 
 ## 7. Live load of the dev database `reva` (2026-10-15/16)
 
-LIVE_SECTION
+### How the load was run
+
+* **Database.** `reva db bootstrap` brought the database to the migration head. It is now at
+  `0013_links_ops`; 0011 and 0012 come from other agents and keep the atlas job kinds. `reva seed`
+  registered the atlas connector versions.
+* **Ingest.** Each source ran through `reva atlas ingest <source>`, one at a time, with a disk check
+  before each run (stop if < 6 GB free). WID used `--option countries=` with 40 countries.
+* **Restart.** The container restarted mid-load. Tables registered before the restart were kept; the
+  remaining sources were run afterwards. The TWNMAP-affected sources (WHR, Constitute, LIED, BMR, V-Dem)
+  were re-ingested after the version bumps.
+
+### What is in the dev DB
+
+* **Sources.** 59 atlas sources have at least one completed live run:
+  * A-IMF, A-QOL, A-UN, A-ILO (with the Eurostat and OECD wage sources), A-HEALTHEDU, A-HISTECON,
+    A-LAW, A-POL
+  * A-GEO (Natural Earth, GeoNames, CCKP, INFORM), FAO, A-WB, A-TRADE (BACI, UNCTAD, BaTIS)
+  * A-SOCIETY (except RCS), A-SCI (Nobel, WIPO), A-FACTBOOK, A-RESOURCES, KGGEOPOL (UCDP, UNGA)
+  * A-FISCAL (OECD fiscal, PISA skills, BIS)
+* **Tables.** 159 live atlas tables, 87,542,065 rows in their latest versions; Parquet artifacts total
+  530 MB.
+* **Raw acquisitions.** 1,594 archived live raw acquisitions, 3.5 GB in total (including the repeated IMF
+  and WPP runs). `var/objects` is 3.8 GB.
+* **Requests.** The metered runs used 1,533 requests and 3.17 GB over the two budget days, counting the
+  last run of each source.
+* **Biggest downloads.**
+  * World Bank: 19 requests, 672 MB, 10 tables, 21.9 M rows.
+  * FAO: 544 MB.
+  * BACI: 366 MB.
+  * WHO: 260 MB.
+  * UN SDG: 234 MB.
+  * WID: 176 MB.
+  * IMF: 167 MB.
+* **Budget.** The daily byte budget (3 GiB) was used up on 2026-10-16, so the ledger refused the tail of
+  the queue (typed refusal, nothing partial registered):
+  * `atlas.peacekeeping`: response capped at the remaining headroom.
+  * The GAPHUNT gap-fill sources were not reached.
+  * `atlas.openalex`: provider Retry-After above the politeness cap, 0 tables.
+  * `atlas.rcs_dem`: OSF answered 503.
+
+  These sources run on the next budget day, or from their monthly schedule.
+* **Not loaded.** CShapes (non-commercial licence) and the KG vote loads, per the lead.
+
+### Snapshot
+
+| item | value |
+|---|---|
+| snapshot | `b11f1c51bc14197497d167e2bbc7d5d6b4ee320fa79a9db6d1d6ca1444fa9768` |
+| origin | live |
+| knowledge cutoff | 2026-10-16T19:19:27Z |
+| tables / rows | 159 / 87,542,065 |
+| query file | `atlas-duckdb/6`: 6.4 GB, built in 886 s, disk never below 9.9 GB free |
+
+### API checks on the dev DB
+
+The checks used the API test client against the dev DB with a temporary read token (revoked afterwards).
+Script: `/tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/verify_api.py`.
+
+* **`/v1/atlas/countries/FRA`: 200.**
+  * 5,261 catalog concepts with data; 3,989 without.
+  * Headline section: 24 concepts answered. Two concepts have no series in the snapshot yet (the GAPHUNT
+    ones). Literacy has no data because UIS publishes no literacy rate for France, and its `consulted`
+    list shows that.
+  * Example: population 2025 = 68,720,337. WDI answered; `consulted` shows WPP 2024 `no_value` because
+    WPP estimates stop in 2023.
+  * Example: the IMTS merchandise balance is `derived` (exports FOB − imports CIF, same source).
+  * About 30 s on the first call: this includes the one-off sha256 verification of the 6.4 GB query file
+    on open (ATLAS-1) and 8.5 k catalog concepts. Later calls in the same process are fast. Use `?theme=`
+    or `?domain=` for light calls.
+* **Maps: 60-150 ms.**
+  * `/v1/atlas/map` for `imf.current_account_balance_gdp` 2025: 194 countries.
+  * `/v1/atlas/map` for `quality_of_life.hdi` 2023: 193 countries.
+  * `/v1/atlas/map` for `un.wpp.population` 2023: 237 countries.
+  * `/v1/atlas/headline/map` for `reva.population.total` 2023: 238 countries (WPP 237, WDI 1).
+* **`/v1/atlas/coverage`: 200** in 6.6 s on the first call, memoized afterwards. 9,250 catalog concepts,
+  8,730 of them with data in the year view.
+* **`/v1/atlas/headline/coverage`: 200** in 18 s on the first call, memoized afterwards.
+* **`/v1/atlas/series?concept=history.population_persons&iso3=FRA`.** It starts with HYDE
+  `-10000-01-01`..`-9999-01-01`, which is 10001 BCE in astronomical years. Each pre-CE cell is flagged
+  `year_numbering`.
+
+### Headline coverage (crosswalk: 251 entities)
+
+| headline concept | countries | years | derived cells | latest year answered by (countries) | declared series not in snapshot |
+|---|---:|---|---:|---|---|
+| `reva.economy.gdp_per_capita_ppp` | 205 | 1980-2025 | 0 | imf.weo 8; wb.wdi_econ 197 | 0 |
+| `reva.economy.gdp_per_capita_usd` | 215 | 1960-2026 | 0 | imf.weo 8; wb.wdi_econ 207 | 2 |
+| `reva.economy.gdp_real_growth` | 215 | 1961-2026 | 0 | imf.weo 9; wb.wdi_econ 206 | 1 |
+| `reva.economy.gdp_usd` | 215 | 1960-2026 | 0 | imf.weo 8; wb.wdi_econ 207 | 2 |
+| `reva.economy.inflation_cpi` | 201 | 1960-2026 | 0 | imf.weo 190; wb.wdi_econ 11 | 1 |
+| `reva.education.literacy_rate_adult` | 180 | 1970-2024 | 0 | uis.api 180 | 0 |
+| `reva.environment.co2_per_capita` | 214 | 1750-2024 | 0 | owid.co2 214 | 0 |
+| `reva.finance.government_net_lending_gdp` | 197 | 1972-2026 | 0 | imf.gfs_soo 12; imf.weo 185 | 0 |
+| `reva.geography.land_area` | 216 | 1961-2024 | 0 | wb.wdi_social 216 | 1 |
+| `reva.geography.surface_area` | 216 | 1961-2024 | 0 | wb.wdi_social 216 | 1 |
+| `reva.health.life_expectancy` | 238 | 1950-2024 | 0 | un_wpp.wpp2024_demo 21; wb.wdi_social 217 | 0 |
+| `reva.health.life_expectancy_national_tables` | 0 | None-None | 0 |  | 1 |
+| `reva.labour.average_monthly_earnings_lcu` | 192 | 1969-2025 | 0 | ilostat.ear_emta_sex_cur_nb_a 192 | 0 |
+| `reva.labour.minimum_wage_monthly_lcu` | 175 | 1980-2026 | 0 | ilostat.ear_inee_cur_nb_a 175 | 0 |
+| `reva.labour.unemployment_rate` | 189 | 1991-2025 | 0 | ilostat.une_2eap_sex_age_rt_a 189 | 0 |
+| `reva.labour.unemployment_rate_national` | 223 | 1947-2025 | 0 | ilostat.une_deap_sex_age_rt_a 223 | 0 |
+| `reva.law.homicide_rate` | 208 | 1990-2024 | 0 | un_sdg.sdg_headline 199; wb.wdi_econ 9 | 0 |
+| `reva.population.density` | 216 | 1961-2024 | 0 | wb.wdi_social 216 | 0 |
+| `reva.population.total` | 238 | 1950-2025 | 0 | un_wpp.wpp2024_demo 21; wb.wdi_social 217 | 0 |
+| `reva.population.total_1_january` | 0 | None-None | 0 |  | 2 |
+| `reva.science.internet_users` | 230 | 1990-2025 | 0 | un_sdg.sdg_headline 226; wb.wdi_econ 4 | 2 |
+| `reva.society.gini_income` | 171 | 1963-2025 | 0 | wb.wdi_social 171 | 0 |
+| `reva.society.hdi` | 193 | 1990-2023 | 0 | undp.hdr25 193 | 0 |
+| `reva.trade.current_account_gdp` | 204 | 1960-2026 | 0 | imf.weo 180; wb.wdi_econ 24 | 0 |
+| `reva.trade.goods_balance_usd` | 202 | 1948-2025 | 0 | imf.bop 202 | 0 |
+| `reva.trade.goods_services_balance_usd` | 202 | 1948-2025 | 0 | imf.bop 202 | 0 |
+| `reva.trade.merchandise_balance_imts` | 209 | 2000-2025 | 5376 | derived 209 | 0 |
+
+GAPHUNT gap matrix on this snapshot (`scripts/atlas_gap_matrix.py --snapshot`), saved in
+`docs/dev/v3_gap_matrix_snapshot.md` / `.json`:
+
+* With any source, population, area, languages and currency cover 249-251 entities.
+* With the headline series alone, population and life expectancy reach 238. The 13 entities missing
+  are uninhabited or depend on another state (ALA, ATA, ATF, BVT, CCK, CXR, HMD, IOT, NFK, PCN, SGS,
+  SJM, UMI).
+* The GAPHUNT gap-fill sources will close the French overseas departments, BES and the Pacific
+  territories once they are ingested (next budget day).
+
 
 ## 8. Tests
 
-TESTS_SECTION
+Commands run (2026-10-16, after the container restart): `uv run pytest -m "not live and not perf"`
+over `tests/unit/test_atlas_*.py`, `tests/integration/test_atlas_*.py`,
+`tests/review_v3/test_review_v3_atlas.py`, `test_gate_followup.py`, `test_scheduler_slots.py`,
+`test_worker_loop.py`, `tests/invariants/test_invariant_30_budgets.py` and `test_api_contract.py`.
+Result: **698 passed, 0 failed** in 311 s. That run also included two new test files, which then passed
+again on their own (6 passed):
+
+* `tests/unit/test_atlas_post.py` (metered POST)
+* `tests/unit/test_atlas_query_periods.py` (point-in-time and semester attachment, 5-digit BCE)
+
+Tests added or adapted by ATLASOPS:
+
+* New:
+  * `tests/integration/test_atlas_ops.py`: job kinds, schedules within the budgets, `submit_job`
+    allow-list, handlers, CLI, themes, fixture snapshots refused in production.
+  * `tests/integration/test_atlas_headline.py`: cross-source fallback, consulted statuses, exact
+    scaling, projections, same-source derived values, BCE, API, registry validity.
+  * `tests/unit/test_atlas_post.py`
+  * `tests/unit/test_atlas_query_periods.py`
+* Migrated to the platform:
+  * `tests/unit/test_atlas_imf.py`
+  * `tests/integration/test_atlas_imf_db.py`
+  * `tests/integration/test_atlas_imf_live.py`
+  * `tests/unit/test_atlas_qol_connectors.py`
+  * `tests/integration/test_atlas_qol_ingest.py`
+  * `tests/integration/test_atlas_qol_live.py`
+* Adapted to BCE:
+  * `tests/unit/test_atlas_histecon.py`
+  * `tests/integration/test_atlas_histecon_ingest.py`
+* Review markers: in `tests/review_v3/test_review_v3_atlas.py` the ATLAS-1/2/3 `xfail` markers were
+  removed.
+
+Known failing outside ATLASOPS's files: `tests/integration/test_schema_contract.py`.
+`migrations/schema_contract.json` is behind the migrations 0012/0013 added by other agents; it was
+regenerated for 0010 by ATLASOPS.
 
 ## 9. Open issues
 
-OPEN_SECTION
+1. **Daily byte budget.** The 3 GiB/day cap is the binding constraint for a full atlas refresh: WB 0.7
+   GB, WID 0.66 GB full, FAO 0.54 GB, BACI 0.37 GB. The monthly schedule spreads the runs over 12 days.
+   The sources refused on 2026-10-16 (peacekeeping, GAPHUNT ×5, rcs_dem, openalex) still need a live run.
+   OpenAlex needs a politeness and Retry-After window larger than the current cap.
+2. **WID is a 40-country subset in the dev DB.** The full run is about 470 requests and 660 MB, and fits
+   the budget on its own day.
+3. **Query-file cost on open.** Verifying the sha256 of a 6.4 GB file takes about 15 s per process open.
+   Opening the file read-only and verifying in the background is possible, but the current choice favours
+   integrity. All uid-0 processes share the default cache directory, and `_evict` keeps the 2 newest
+   files: tests that do not set `REVA_ATLAS_CACHE_DIR` could evict the dev query file. Tests should always
+   set it.
+4. **Same-version code changes.** Several in-flight agents still edit their atlas modules without bumping
+   versions; ATLASOPS bumped the finished ones. `run_atlas_ingest` refuses such sources until they are
+   bumped, and the seed logs and skips them.
+5. **WB series keys.** World Bank keys in the headline files (dataset split `wdi_econ`/`wdi_social`) were
+   checked against the live WB tables: they all resolve except where noted `series_not_in_snapshot`
+   (only GAPHUNT series at present).
+6. **Not my files.** `api/routes/system.py` `CANCEL_SCOPE` has no entry for `atlas_ingest`/`atlas_snapshot`,
+   so these jobs cannot be cancelled through the API (worker or owner only).
+   `tests/integration/test_schema_contract.py` is stale (see Tests).
+7. **Equivalence review.** The headline equivalences are agent-declared (`review_status`). A maintainer
+   should review them before any belief release uses them. The atlas never feeds releases directly.
