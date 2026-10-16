@@ -1,0 +1,3242 @@
+{
+ "countries": {
+  "AGO": {
+   "1.1.0": {
+    "employment_change_55_64": "48829.947",
+    "pension_recipients_change_55_64": "-111739.009"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "7470.982",
+    "pension_recipients_change_55_64": "-17096.068"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "15.3",
+     "M": "15.3"
+    },
+    "total_percent": "15.3",
+    "year": 2022
+   }
+  },
+  "ARE": {
+   "1.1.0": {
+    "employment_change_55_64": "22912.733",
+    "pension_recipients_change_55_64": "-52431.884"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "4513.808",
+    "pension_recipients_change_55_64": "-10329.081"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "19.7",
+     "M": "19.7"
+    },
+    "total_percent": "19.7",
+    "year": 2022
+   }
+  },
+  "ARG": {
+   "1.1.0": {
+    "employment_change_55_64": "61359.916",
+    "pension_recipients_change_55_64": "-140411.708"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "48546.291",
+    "pension_recipients_change_55_64": "-111089.91"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "87.8",
+     "M": "96.4"
+    },
+    "total_percent": "90.8",
+    "year": 2021
+   }
+  },
+  "ARM": {
+   "1.1.0": {
+    "employment_change_55_64": "-4944.036",
+    "pension_recipients_change_55_64": "11313.584"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-4035.116",
+    "pension_recipients_change_55_64": "9233.676"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "79.3",
+     "M": "86.6"
+    },
+    "total_percent": "81.9",
+    "year": 2021
+   }
+  },
+  "ATG": {
+   "1.1.0": {
+    "employment_change_55_64": "-838.008",
+    "pension_recipients_change_55_64": "1917.638"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-707.279",
+    "pension_recipients_change_55_64": "1618.486"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "84.4",
+     "M": "84.4"
+    },
+    "total_percent": "84.4",
+    "year": 2020
+   }
+  },
+  "AUS": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "76.5",
+     "M": "71.9"
+    },
+    "total_percent": "74.4",
+    "year": 2022
+   }
+  },
+  "AUT": {
+   "1.1.0": {
+    "employment_change_55_64": "-23216.037",
+    "pension_recipients_change_55_64": "53125.943"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-23216.037",
+    "pension_recipients_change_55_64": "53125.943"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "AZE": {
+   "1.1.0": {
+    "employment_change_55_64": "-94916.222",
+    "pension_recipients_change_55_64": "217199.593"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-94916.222",
+    "pension_recipients_change_55_64": "217199.593"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2015
+   }
+  },
+  "BDI": {
+   "1.1.0": {
+    "employment_change_55_64": "6168.92",
+    "pension_recipients_change_55_64": "-14116.521"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "783.245",
+    "pension_recipients_change_55_64": "-1792.323"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "8.9",
+     "M": "18.7"
+    },
+    "total_percent": "13.3",
+    "year": 2021
+   }
+  },
+  "BEL": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "BEN": {
+   "1.1.0": {
+    "employment_change_55_64": "11925.094",
+    "pension_recipients_change_55_64": "-27288.545"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1085.184",
+    "pension_recipients_change_55_64": "-2483.258"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "9.1",
+     "M": "9.1"
+    },
+    "total_percent": "9.1",
+    "year": 2020
+   }
+  },
+  "BFA": {
+   "1.1.0": {
+    "employment_change_55_64": "74321.561",
+    "pension_recipients_change_55_64": "-170072.221"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "4258.366",
+    "pension_recipients_change_55_64": "-9744.546"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "3.9",
+     "M": "10.3"
+    },
+    "total_percent": "6.7",
+    "year": 2021
+   }
+  },
+  "BHR": {
+   "1.1.0": {
+    "employment_change_55_64": "6250.311",
+    "pension_recipients_change_55_64": "-14302.771"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2907.361",
+    "pension_recipients_change_55_64": "-6653.001"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "39.2",
+     "M": "55.5"
+    },
+    "total_percent": "46.5",
+    "year": 2022
+   }
+  },
+  "BHS": {
+   "1.1.0": {
+    "employment_change_55_64": "-1941.448",
+    "pension_recipients_change_55_64": "4442.673"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-1446.031",
+    "pension_recipients_change_55_64": "3308.995"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "71.6",
+     "M": "79.2"
+    },
+    "total_percent": "74.8",
+    "year": 2019
+   }
+  },
+  "BIH": {
+   "1.1.0": {
+    "employment_change_55_64": "-34177.115",
+    "pension_recipients_change_55_64": "78208.502"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-22503.83",
+    "pension_recipients_change_55_64": "51496.179"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "43.8",
+     "M": "100"
+    },
+    "total_percent": "75.3",
+    "year": 2020
+   }
+  },
+  "BLR": {
+   "1.1.0": {
+    "employment_change_55_64": "46585.02",
+    "pension_recipients_change_55_64": "-106601.876"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "46585.02",
+    "pension_recipients_change_55_64": "-106601.876"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "BLZ": {
+   "1.1.0": {
+    "employment_change_55_64": "-1522.89",
+    "pension_recipients_change_55_64": "3484.873"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-509.478",
+    "pension_recipients_change_55_64": "1165.854"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "27.3",
+     "M": "47.9"
+    },
+    "total_percent": "37.5",
+    "year": 2021
+   }
+  },
+  "BOL": {
+   "1.1.0": {
+    "employment_change_55_64": "33180.779",
+    "pension_recipients_change_55_64": "-75928.557"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "33180.779",
+    "pension_recipients_change_55_64": "-75928.557"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "BRA": {
+   "1.1.0": {
+    "employment_change_55_64": "-593676.65",
+    "pension_recipients_change_55_64": "1358527.804"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-593676.65",
+    "pension_recipients_change_55_64": "1358527.804"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "67.4",
+     "M": "100"
+    },
+    "total_percent": "88.6",
+    "year": 2022
+   }
+  },
+  "BRB": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "93",
+     "M": "100"
+    },
+    "total_percent": "98.4",
+    "year": 2020
+   }
+  },
+  "BRN": {
+   "1.1.0": {
+    "employment_change_55_64": "3282.029",
+    "pension_recipients_change_55_64": "-7510.363"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3282.029",
+    "pension_recipients_change_55_64": "-7510.363"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "BWA": {
+   "1.1.0": {
+    "employment_change_55_64": "-7330.708",
+    "pension_recipients_change_55_64": "16775.076"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-7330.708",
+    "pension_recipients_change_55_64": "16775.076"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "CAF": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "4.7",
+     "M": "4.7"
+    },
+    "total_percent": "4.7",
+    "year": 2019
+   }
+  },
+  "CAN": {
+   "1.1.0": {
+    "employment_change_55_64": "-272899.204",
+    "pension_recipients_change_55_64": "624483.304"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-272899.204",
+    "pension_recipients_change_55_64": "624483.304"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "CHE": {
+   "1.1.0": {
+    "employment_change_55_64": "-57187.214",
+    "pension_recipients_change_55_64": "130863.191"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-56742.35",
+    "pension_recipients_change_55_64": "129845.195"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "98.7",
+     "M": "100"
+    },
+    "total_percent": "99.3",
+    "year": 2021
+   }
+  },
+  "CHL": {
+   "1.1.0": {
+    "employment_change_55_64": "30458.36",
+    "pension_recipients_change_55_64": "-69698.764"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "23188.098",
+    "pension_recipients_change_55_64": "-53062.01"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "72.7",
+     "M": "69.6"
+    },
+    "total_percent": "71.6",
+    "year": 2021
+   }
+  },
+  "CIV": {
+   "1.1.0": {
+    "employment_change_55_64": "40035.956",
+    "pension_recipients_change_55_64": "-91615.46"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "5808.038",
+    "pension_recipients_change_55_64": "-13290.705"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "11.5",
+     "M": "20.9"
+    },
+    "total_percent": "16.2",
+    "year": 2022
+   }
+  },
+  "CMR": {
+   "1.1.0": {
+    "employment_change_55_64": "32339.338",
+    "pension_recipients_change_55_64": "-74003.061"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "5155.671",
+    "pension_recipients_change_55_64": "-11797.875"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "9.6",
+     "M": "28.4"
+    },
+    "total_percent": "18.3",
+    "year": 2020
+   }
+  },
+  "COD": {
+   "1.1.0": {
+    "employment_change_55_64": "107324.803",
+    "pension_recipients_change_55_64": "-245594.515"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "778.374",
+    "pension_recipients_change_55_64": "-1781.176"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6331",
+      "label": "Social security coverage: National estimate"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "0",
+     "M": "2.2"
+    },
+    "total_percent": "1",
+    "year": 2022
+   }
+  },
+  "COL": {
+   "1.1.0": {
+    "employment_change_55_64": "387969.979",
+    "pension_recipients_change_55_64": "-887803.157"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "166051.151",
+    "pension_recipients_change_55_64": "-379979.751"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2025
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "42.8",
+     "M": "67.5"
+    },
+    "total_percent": "51.4",
+    "year": 2022
+   }
+  },
+  "COM": {
+   "1.1.0": {
+    "employment_change_55_64": "2829.329",
+    "pension_recipients_change_55_64": "-6474.437"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "196.859",
+    "pension_recipients_change_55_64": "-450.479"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "6.8",
+     "M": "7.4"
+    },
+    "total_percent": "7.1",
+    "year": 2022
+   }
+  },
+  "CPV": {
+   "1.1.0": {
+    "employment_change_55_64": "-87.091",
+    "pension_recipients_change_55_64": "199.292"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "5.527",
+    "pension_recipients_change_55_64": "-12.648"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [
+     {
+      "code": "C15:6331",
+      "label": "Social security coverage: National estimate"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "74",
+     "M": "68.4"
+    },
+    "total_percent": "71.7",
+    "year": 2022
+   }
+  },
+  "CRI": {
+   "1.1.0": {
+    "employment_change_55_64": "-35562.071",
+    "pension_recipients_change_55_64": "81377.738"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-18633.298",
+    "pension_recipients_change_55_64": "42639.126"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "46.6",
+     "M": "68.8"
+    },
+    "total_percent": "56.9",
+    "year": 2022
+   }
+  },
+  "CYP": {
+   "1.1.0": {
+    "employment_change_55_64": "-8328.292",
+    "pension_recipients_change_55_64": "19057.877"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-7387.234",
+    "pension_recipients_change_55_64": "16904.425"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "83.6",
+     "M": "100"
+    },
+    "total_percent": "92.7",
+    "year": 2022
+   }
+  },
+  "DJI": {
+   "1.1.0": {
+    "employment_change_55_64": "5742.846",
+    "pension_recipients_change_55_64": "-13141.525"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "815.484",
+    "pension_recipients_change_55_64": "-1866.096"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "14.2",
+     "M": "14.2"
+    },
+    "total_percent": "14.2",
+    "year": 2019
+   }
+  },
+  "DMA": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "85.3",
+     "M": "100"
+    },
+    "total_percent": "92.7",
+    "year": 2020
+   }
+  },
+  "DNK": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "DOM": {
+   "1.1.0": {
+    "employment_change_55_64": "38371.939",
+    "pension_recipients_change_55_64": "-87807.641"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2567.299",
+    "pension_recipients_change_55_64": "-5874.826"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "5.5",
+     "M": "9.9"
+    },
+    "total_percent": "7.6",
+    "year": 2021
+   }
+  },
+  "DZA": {
+   "1.1.0": {
+    "employment_change_55_64": "818860.65",
+    "pension_recipients_change_55_64": "-1873822.997"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "725510.536",
+    "pension_recipients_change_55_64": "-1660207.176"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "88.6",
+     "M": "88.6"
+    },
+    "total_percent": "88.6",
+    "year": 2021
+   }
+  },
+  "ECU": {
+   "1.1.0": {
+    "employment_change_55_64": "47781.809",
+    "pension_recipients_change_55_64": "-109340.524"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "29151.138",
+    "pension_recipients_change_55_64": "-66707.41"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "52.9",
+     "M": "82"
+    },
+    "total_percent": "66.1",
+    "year": 2021
+   }
+  },
+  "EGY": {
+   "1.1.0": {
+    "employment_change_55_64": "611217.565",
+    "pension_recipients_change_55_64": "-1398667.196"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "294343.695",
+    "pension_recipients_change_55_64": "-673555.365"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "23.4",
+     "M": "86.7"
+    },
+    "total_percent": "58.5",
+    "year": 2022
+   }
+  },
+  "EST": {
+   "1.1.0": {
+    "employment_change_55_64": "-6868.76",
+    "pension_recipients_change_55_64": "15717.986"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-6868.76",
+    "pension_recipients_change_55_64": "15717.986"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "ETH": {
+   "1.1.0": {
+    "employment_change_55_64": "225017.499",
+    "pension_recipients_change_55_64": "-514914.186"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "8944.411",
+    "pension_recipients_change_55_64": "-20467.759"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2024
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "3.8",
+     "M": "4.6"
+    },
+    "total_percent": "4.2",
+    "year": 2019
+   }
+  },
+  "FIN": {
+   "1.1.0": {
+    "employment_change_55_64": "-30733.214",
+    "pension_recipients_change_55_64": "70327.721"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-30733.214",
+    "pension_recipients_change_55_64": "70327.721"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "FJI": {
+   "1.1.0": {
+    "employment_change_55_64": "12355.245",
+    "pension_recipients_change_55_64": "-28272.872"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "12355.245",
+    "pension_recipients_change_55_64": "-28272.872"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "FSM": {
+   "1.1.0": {
+    "employment_change_55_64": "-489.381",
+    "pension_recipients_change_55_64": "1119.866"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-474.584",
+    "pension_recipients_change_55_64": "1086.005"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "97",
+     "M": "96.9"
+    },
+    "total_percent": "97",
+    "year": 2021
+   }
+  },
+  "GBR": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2019
+   }
+  },
+  "GEO": {
+   "1.1.0": {
+    "employment_change_55_64": "3298.448",
+    "pension_recipients_change_55_64": "-7547.936"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3298.448",
+    "pension_recipients_change_55_64": "-7547.936"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "GHA": {
+   "1.1.0": {
+    "employment_change_55_64": "61843.014",
+    "pension_recipients_change_55_64": "-141517.195"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "9095.342",
+    "pension_recipients_change_55_64": "-20813.139"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "7.8",
+     "M": "23.1"
+    },
+    "total_percent": "15.7",
+    "year": 2022
+   }
+  },
+  "GIN": {
+   "1.1.0": {
+    "employment_change_55_64": "87091.515",
+    "pension_recipients_change_55_64": "-199294.084"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2177.288",
+    "pension_recipients_change_55_64": "-4982.352"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "2.5",
+     "M": "2.5"
+    },
+    "total_percent": "2.5",
+    "year": 2021
+   }
+  },
+  "GMB": {
+   "1.1.0": {
+    "employment_change_55_64": "5120.568",
+    "pension_recipients_change_55_64": "-11717.548"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "870.497",
+    "pension_recipients_change_55_64": "-1991.983"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "17",
+     "M": "17"
+    },
+    "total_percent": "17",
+    "year": 2015
+   }
+  },
+  "GNB": {
+   "1.1.0": {
+    "employment_change_55_64": "2656.318",
+    "pension_recipients_change_55_64": "-6078.531"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "390.479",
+    "pension_recipients_change_55_64": "-893.544"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "14.7",
+     "M": "14.7"
+    },
+    "total_percent": "14.7",
+    "year": 2020
+   }
+  },
+  "GNQ": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "3.7",
+     "M": "3.7"
+    },
+    "total_percent": "3.7",
+    "year": 2021
+   }
+  },
+  "GRC": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "85.4",
+     "M": "100"
+    },
+    "total_percent": "99.2",
+    "year": 2020
+   }
+  },
+  "GRD": {
+   "1.1.0": {
+    "employment_change_55_64": "0",
+    "pension_recipients_change_55_64": "0"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "0",
+    "pension_recipients_change_55_64": "0"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "53.5",
+     "M": "53.5"
+    },
+    "total_percent": "53.5",
+    "year": 2020
+   }
+  },
+  "GTM": {
+   "1.1.0": {
+    "employment_change_55_64": "42463.101",
+    "pension_recipients_change_55_64": "-97169.568"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "6925.28",
+    "pension_recipients_change_55_64": "-15847.323"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "13.4",
+     "M": "27.5"
+    },
+    "total_percent": "23.3",
+    "year": 2022
+   }
+  },
+  "GUY": {
+   "1.1.0": {
+    "employment_change_55_64": "3947.084",
+    "pension_recipients_change_55_64": "-9032.229"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3947.084",
+    "pension_recipients_change_55_64": "-9032.229"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "HKG": {
+   "1.1.0": {
+    "employment_change_55_64": "-76177.252",
+    "pension_recipients_change_55_64": "174318.654"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-55761.748",
+    "pension_recipients_change_55_64": "127601.255"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "73.2",
+     "M": "73.2"
+    },
+    "total_percent": "73.2",
+    "year": 2019
+   }
+  },
+  "HND": {
+   "1.1.0": {
+    "employment_change_55_64": "9863.084",
+    "pension_recipients_change_55_64": "-22569.987"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1440.01",
+    "pension_recipients_change_55_64": "-3295.218"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "14.6",
+     "M": "14.6"
+    },
+    "total_percent": "14.6",
+    "year": 2022
+   }
+  },
+  "HTI": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "1",
+     "M": "1"
+    },
+    "total_percent": "1",
+    "year": 2022
+   }
+  },
+  "HUN": {
+   "1.1.0": {
+    "employment_change_55_64": "-70717.157",
+    "pension_recipients_change_55_64": "161824.158"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-70186.937",
+    "pension_recipients_change_55_64": "160610.839"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "97.3"
+    },
+    "total_percent": "99",
+    "year": 2021
+   }
+  },
+  "IDN": {
+   "1.1.0": {
+    "employment_change_55_64": "1235575.608",
+    "pension_recipients_change_55_64": "-2827404.138"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "385499.59",
+    "pension_recipients_change_55_64": "-882150.091"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "31.2",
+     "M": "31.2"
+    },
+    "total_percent": "31.2",
+    "year": 2021
+   }
+  },
+  "IND": {
+   "1.1.0": {
+    "employment_change_55_64": "10555363.87",
+    "pension_recipients_change_55_64": "-24154150.733"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "4491771.314",
+    "pension_recipients_change_55_64": "-10278652.892"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6330",
+      "label": "Social security coverage: Data not available for BOCW Fund"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "39.5",
+     "M": "52.6"
+    },
+    "total_percent": "45.9",
+    "year": 2022
+   }
+  },
+  "IRL": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "90.3",
+     "M": "100"
+    },
+    "total_percent": "95.8",
+    "year": 2022
+   }
+  },
+  "IRN": {
+   "1.1.0": {
+    "employment_change_55_64": "1728532.648",
+    "pension_recipients_change_55_64": "-3955452.284"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1507280.469",
+    "pension_recipients_change_55_64": "-3449154.391"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "87.2",
+     "M": "87.2"
+    },
+    "total_percent": "87.2",
+    "year": 2019
+   }
+  },
+  "IRQ": {
+   "1.1.0": {
+    "employment_change_55_64": "228413.085",
+    "pension_recipients_change_55_64": "-522684.405"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "43298.613",
+    "pension_recipients_change_55_64": "-99081.494"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "24.7",
+     "M": "73.3"
+    },
+    "total_percent": "48.9",
+    "year": 2022
+   }
+  },
+  "ISL": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "87",
+     "M": "77.3"
+    },
+    "total_percent": "82.4",
+    "year": 2021
+   }
+  },
+  "ITA": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "JAM": {
+   "1.1.0": {
+    "employment_change_55_64": "-11861.166",
+    "pension_recipients_change_55_64": "27142.256"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-10556.038",
+    "pension_recipients_change_55_64": "24155.694"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "90.5",
+     "M": "84.5"
+    },
+    "total_percent": "87.8",
+    "year": 2022
+   }
+  },
+  "JOR": {
+   "1.1.0": {
+    "employment_change_55_64": "183383.33",
+    "pension_recipients_change_55_64": "-419641.488"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "105445.415",
+    "pension_recipients_change_55_64": "-241293.856"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6331",
+      "label": "Social security coverage: National estimate"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "57.5",
+     "M": "57.5"
+    },
+    "total_percent": "57.5",
+    "year": 2022
+   }
+  },
+  "JPN": {
+   "1.1.0": {
+    "employment_change_55_64": "-517128.493",
+    "pension_recipients_change_55_64": "1183360.396"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-517128.493",
+    "pension_recipients_change_55_64": "1183360.396"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "KAZ": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "98.8",
+     "M": "100"
+    },
+    "total_percent": "99.6",
+    "year": 2019
+   }
+  },
+  "KEN": {
+   "1.1.0": {
+    "employment_change_55_64": "43539.694",
+    "pension_recipients_change_55_64": "-99633.167"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "8620.859",
+    "pension_recipients_change_55_64": "-19727.367"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "19.8",
+     "M": "19.8"
+    },
+    "total_percent": "19.8",
+    "year": 2021
+   }
+  },
+  "KGZ": {
+   "1.1.0": {
+    "employment_change_55_64": "26867.35",
+    "pension_recipients_change_55_64": "-61481.35"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "26867.35",
+    "pension_recipients_change_55_64": "-61481.35"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "KHM": {
+   "1.1.0": {
+    "employment_change_55_64": "36002.115",
+    "pension_recipients_change_55_64": "-82384.702"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2688.806",
+    "pension_recipients_change_55_64": "-6152.874"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "5.7",
+     "M": "11.5"
+    },
+    "total_percent": "8.1",
+    "year": 2020
+   }
+  },
+  "KIR": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "93.8",
+     "M": "93.8"
+    },
+    "total_percent": "93.8",
+    "year": 2020
+   }
+  },
+  "KNA": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "83.1",
+     "M": "86.7"
+    },
+    "total_percent": "84.7",
+    "year": 2020
+   }
+  },
+  "KOR": {
+   "1.1.0": {
+    "employment_change_55_64": "260568.053",
+    "pension_recipients_change_55_64": "-596265.567"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "260568.053",
+    "pension_recipients_change_55_64": "-596265.567"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "KWT": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6326",
+      "label": "Social security coverage: Estimated based on legal coverage"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "30.8",
+     "M": "21.3"
+    },
+    "total_percent": "25.4",
+    "year": 2022
+   }
+  },
+  "LAO": {
+   "1.1.0": {
+    "employment_change_55_64": "51054.622",
+    "pension_recipients_change_55_64": "-116829.799"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3573.824",
+    "pension_recipients_change_55_64": "-8178.086"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "7",
+     "M": "7"
+    },
+    "total_percent": "7",
+    "year": 2021
+   }
+  },
+  "LBR": {
+   "1.1.0": {
+    "employment_change_55_64": "10822.382",
+    "pension_recipients_change_55_64": "-24765.177"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "367.961",
+    "pension_recipients_change_55_64": "-842.016"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "3.4",
+     "M": "3.4"
+    },
+    "total_percent": "3.4",
+    "year": 2019
+   }
+  },
+  "LBY": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "40",
+     "M": "100"
+    },
+    "total_percent": "79.4",
+    "year": 2020
+   }
+  },
+  "LCA": {
+   "1.1.0": {
+    "employment_change_55_64": "-1102.802",
+    "pension_recipients_change_55_64": "2523.575"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-506.265",
+    "pension_recipients_change_55_64": "1158.501"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "40.6",
+     "M": "58.6"
+    },
+    "total_percent": "48.4",
+    "year": 2020
+   }
+  },
+  "LKA": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "31.1",
+     "M": "31.1"
+    },
+    "total_percent": "31.1",
+    "year": 2021
+   }
+  },
+  "LSO": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "LUX": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "LVA": {
+   "1.1.0": {
+    "employment_change_55_64": "-9761.075",
+    "pension_recipients_change_55_64": "22336.557"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-9761.075",
+    "pension_recipients_change_55_64": "22336.557"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "MAR": {
+   "1.1.0": {
+    "employment_change_55_64": "208470.453",
+    "pension_recipients_change_55_64": "-477049.092"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "48782.086",
+    "pension_recipients_change_55_64": "-111629.487"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "23.4",
+     "M": "23.4"
+    },
+    "total_percent": "23.4",
+    "year": 2019
+   }
+  },
+  "MDA": {
+   "1.1.0": {
+    "employment_change_55_64": "47.448",
+    "pension_recipients_change_55_64": "-108.577"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "57.36",
+    "pension_recipients_change_55_64": "-131.258"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "94.4",
+     "M": "93"
+    },
+    "total_percent": "94",
+    "year": 2022
+   }
+  },
+  "MDG": {
+   "1.1.0": {
+    "employment_change_55_64": "39376.622",
+    "pension_recipients_change_55_64": "-90106.688"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "7560.312",
+    "pension_recipients_change_55_64": "-17300.484"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "19.2",
+     "M": "19.2"
+    },
+    "total_percent": "19.2",
+    "year": 2022
+   }
+  },
+  "MDV": {
+   "1.1.0": {
+    "employment_change_55_64": "-1926.934",
+    "pension_recipients_change_55_64": "4409.461"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-1926.934",
+    "pension_recipients_change_55_64": "4409.461"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "MEX": {
+   "1.1.0": {
+    "employment_change_55_64": "-754924.006",
+    "pension_recipients_change_55_64": "1727514.889"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-754924.006",
+    "pension_recipients_change_55_64": "1727514.889"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "MHL": {
+   "1.1.0": {
+    "employment_change_55_64": "-46.052",
+    "pension_recipients_change_55_64": "105.383"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-28.875",
+    "pension_recipients_change_55_64": "66.075"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "62.7",
+     "M": "62.7"
+    },
+    "total_percent": "62.7",
+    "year": 2019
+   }
+  },
+  "MKD": {
+   "1.1.0": {
+    "employment_change_55_64": "-3717.869",
+    "pension_recipients_change_55_64": "8507.71"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-3580.308",
+    "pension_recipients_change_55_64": "8192.925"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "41",
+     "M": "96.3"
+    },
+    "total_percent": "65.8",
+    "year": 2021
+   }
+  },
+  "MLI": {
+   "1.1.0": {
+    "employment_change_55_64": "32020.044",
+    "pension_recipients_change_55_64": "-73272.412"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1021.618",
+    "pension_recipients_change_55_64": "-2337.798"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "1.9",
+     "M": "7.4"
+    },
+    "total_percent": "5.6",
+    "year": 2022
+   }
+  },
+  "MLT": {
+   "1.1.0": {
+    "employment_change_55_64": "-3090.006",
+    "pension_recipients_change_55_64": "7070.952"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-2224.758",
+    "pension_recipients_change_55_64": "5090.979"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "47.3",
+     "M": "100"
+    },
+    "total_percent": "82.9",
+    "year": 2021
+   }
+  },
+  "MNE": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "78",
+     "M": "78"
+    },
+    "total_percent": "78",
+    "year": 2020
+   }
+  },
+  "MNG": {
+   "1.1.0": {
+    "employment_change_55_64": "25266.628",
+    "pension_recipients_change_55_64": "-57818.371"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "25266.628",
+    "pension_recipients_change_55_64": "-57818.371"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "MOZ": {
+   "1.1.0": {
+    "employment_change_55_64": "56018.441",
+    "pension_recipients_change_55_64": "-128188.652"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "23695.8",
+    "pension_recipients_change_55_64": "-54223.8"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6331",
+      "label": "Social security coverage: National estimate"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "42.3",
+     "M": "42.3"
+    },
+    "total_percent": "42.3",
+    "year": 2022
+   }
+  },
+  "MRT": {
+   "1.1.0": {
+    "employment_change_55_64": "-4968.251",
+    "pension_recipients_change_55_64": "11368.996"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-548.171",
+    "pension_recipients_change_55_64": "1254.396"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2024
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "2.6",
+     "M": "34.6"
+    },
+    "total_percent": "17.6",
+    "year": 2020
+   }
+  },
+  "MUS": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "MWI": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "8.9",
+     "M": "8.9"
+    },
+    "total_percent": "8.9",
+    "year": 2022
+   }
+  },
+  "MYS": {
+   "1.1.0": {
+    "employment_change_55_64": "179599.416",
+    "pension_recipients_change_55_64": "-410982.645"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "33405.491",
+    "pension_recipients_change_55_64": "-76442.772"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "18.6",
+     "M": "18.6"
+    },
+    "total_percent": "18.6",
+    "year": 2019
+   }
+  },
+  "NAM": {
+   "1.1.0": {
+    "employment_change_55_64": "7771.911",
+    "pension_recipients_change_55_64": "-17784.694"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "7771.911",
+    "pension_recipients_change_55_64": "-17784.694"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "NER": {
+   "1.1.0": {
+    "employment_change_55_64": "19109.044",
+    "pension_recipients_change_55_64": "-43727.79"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1108.325",
+    "pension_recipients_change_55_64": "-2536.212"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "5.8",
+     "M": "5.8"
+    },
+    "total_percent": "5.8",
+    "year": 2015
+   }
+  },
+  "NGA": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6327",
+      "label": "Social security coverage: Based on available data mainly from central government schemes"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "5.2",
+     "M": "31.7"
+    },
+    "total_percent": "19.6",
+    "year": 2022
+   }
+  },
+  "NIC": {
+   "1.1.0": {
+    "employment_change_55_64": "19824.003",
+    "pension_recipients_change_55_64": "-45363.851"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "6183.762",
+    "pension_recipients_change_55_64": "-14150.485"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "25.8",
+     "M": "46.8"
+    },
+    "total_percent": "35",
+    "year": 2021
+   }
+  },
+  "NOR": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2019
+   }
+  },
+  "NPL": {
+   "1.1.0": {
+    "employment_change_55_64": "153171.313",
+    "pension_recipients_change_55_64": "-350506.438"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "119205.202",
+    "pension_recipients_change_55_64": "-272780.782"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6332",
+      "label": "Social security coverage: Estimated based on available data for Public Sector Pension and Social Security Allowance Programme (SSA) only"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "82.1",
+     "M": "71.7"
+    },
+    "total_percent": "77.2",
+    "year": 2021
+   }
+  },
+  "NZL": {
+   "1.1.0": {
+    "employment_change_55_64": "-19821.784",
+    "pension_recipients_change_55_64": "45358.773"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-19821.784",
+    "pension_recipients_change_55_64": "45358.773"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2019
+   }
+  },
+  "OMN": {
+   "1.1.0": {
+    "employment_change_55_64": "32102.84",
+    "pension_recipients_change_55_64": "-73461.876"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "12916.846",
+    "pension_recipients_change_55_64": "-29557.999"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "38.4",
+     "M": "57.7"
+    },
+    "total_percent": "46.6",
+    "year": 2022
+   }
+  },
+  "PAK": {
+   "1.1.0": {
+    "employment_change_55_64": "2323948.696",
+    "pension_recipients_change_55_64": "-5317960.403"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "404367.073",
+    "pension_recipients_change_55_64": "-925325.11"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "17.4",
+     "M": "17.4"
+    },
+    "total_percent": "17.4",
+    "year": 2022
+   }
+  },
+  "PAN": {
+   "1.1.0": {
+    "employment_change_55_64": "26992.605",
+    "pension_recipients_change_55_64": "-61767.974"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "11768.776",
+    "pension_recipients_change_55_64": "-26930.837"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "43.6",
+     "M": "86.4"
+    },
+    "total_percent": "61.5",
+    "year": 2022
+   }
+  },
+  "PER": {
+   "1.1.0": {
+    "employment_change_55_64": "-94443.862",
+    "pension_recipients_change_55_64": "216118.677"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-43672.927",
+    "pension_recipients_change_55_64": "99938.048"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2024
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "45.4",
+     "M": "48.5"
+    },
+    "total_percent": "46.9",
+    "year": 2021
+   }
+  },
+  "PHL": {
+   "1.1.0": {
+    "employment_change_55_64": "-438580.409",
+    "pension_recipients_change_55_64": "1003616.497"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-283083.49",
+    "pension_recipients_change_55_64": "647788.306"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "60.7",
+     "M": "71.4"
+    },
+    "total_percent": "65.6",
+    "year": 2021
+   }
+  },
+  "PLW": {
+   "1.1.0": {
+    "employment_change_55_64": "-57.663",
+    "pension_recipients_change_55_64": "131.951"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-57.663",
+    "pension_recipients_change_55_64": "131.951"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2019
+   }
+  },
+  "PNG": {
+   "1.1.0": {
+    "employment_change_55_64": "88503.241",
+    "pension_recipients_change_55_64": "-202524.579"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1681.562",
+    "pension_recipients_change_55_64": "-3847.967"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "1.9",
+     "M": "1.9"
+    },
+    "total_percent": "1.9",
+    "year": 2022
+   }
+  },
+  "POL": {
+   "1.1.0": {
+    "employment_change_55_64": "56376.674",
+    "pension_recipients_change_55_64": "-129008.407"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "14937.7",
+    "pension_recipients_change_55_64": "-34182.38"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "72.9",
+     "M": "100"
+    },
+    "total_percent": "82.9",
+    "year": 2022
+   }
+  },
+  "PRY": {
+   "1.1.0": {
+    "employment_change_55_64": "17377.97",
+    "pension_recipients_change_55_64": "-39766.522"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "14504.893",
+    "pension_recipients_change_55_64": "-33191.975"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "85",
+     "M": "79"
+    },
+    "total_percent": "82.2",
+    "year": 2021
+   }
+  },
+  "QAT": {
+   "1.1.0": {
+    "employment_change_55_64": "5677.305",
+    "pension_recipients_change_55_64": "-12991.545"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "627.911",
+    "pension_recipients_change_55_64": "-1436.868"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "13.4",
+     "M": "5.6"
+    },
+    "total_percent": "8",
+    "year": 2022
+   }
+  },
+  "RUS": {
+   "1.1.0": {
+    "employment_change_55_64": "678624.965",
+    "pension_recipients_change_55_64": "-1552917.54"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "678624.965",
+    "pension_recipients_change_55_64": "-1552917.54"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "RWA": {
+   "1.1.0": {
+    "employment_change_55_64": "30487.697",
+    "pension_recipients_change_55_64": "-69765.897"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "5128.499",
+    "pension_recipients_change_55_64": "-11735.696"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "17.9",
+     "M": "15"
+    },
+    "total_percent": "16.7",
+    "year": 2022
+   }
+  },
+  "SAU": {
+   "1.1.0": {
+    "employment_change_55_64": "115167.212",
+    "pension_recipients_change_55_64": "-263540.531"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "12101.37",
+    "pension_recipients_change_55_64": "-27691.923"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "1.8",
+     "M": "24.9"
+    },
+    "total_percent": "24.5",
+    "year": 2022
+   }
+  },
+  "SDN": {
+   "1.1.0": null,
+   "1.2.0": {
+    "employment_change_55_64": "-20797.958",
+    "pension_recipients_change_55_64": "47592.58"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "10.6",
+     "M": "10.6"
+    },
+    "total_percent": "10.6",
+    "year": 2021
+   }
+  },
+  "SEN": {
+   "1.1.0": {
+    "employment_change_55_64": "45452.785",
+    "pension_recipients_change_55_64": "-104010.95"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "11499.555",
+    "pension_recipients_change_55_64": "-26314.77"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "25.3",
+     "M": "25.3"
+    },
+    "total_percent": "25.3",
+    "year": 2022
+   }
+  },
+  "SGP": {
+   "1.1.0": {
+    "employment_change_55_64": "-8304.828",
+    "pension_recipients_change_55_64": "19004.184"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-3097.701",
+    "pension_recipients_change_55_64": "7088.56"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "37.3",
+     "M": "37.3"
+    },
+    "total_percent": "37.3",
+    "year": 2021
+   }
+  },
+  "SLB": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "0",
+     "M": "0"
+    },
+    "total_percent": "0",
+    "year": 2021
+   }
+  },
+  "SLE": {
+   "1.1.0": {
+    "employment_change_55_64": "13153.472",
+    "pension_recipients_change_55_64": "-30099.477"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "920.743",
+    "pension_recipients_change_55_64": "-2106.963"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "7",
+     "M": "7"
+    },
+    "total_percent": "7",
+    "year": 2019
+   }
+  },
+  "SLV": {
+   "1.1.0": {
+    "employment_change_55_64": "63361.5",
+    "pension_recipients_change_55_64": "-144991.99"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "11270.215",
+    "pension_recipients_change_55_64": "-25789.966"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "15.6",
+     "M": "47.4"
+    },
+    "total_percent": "24.5",
+    "year": 2021
+   }
+  },
+  "SSD": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "0",
+     "M": "0"
+    },
+    "total_percent": "0",
+    "year": 2019
+   }
+  },
+  "STP": {
+   "1.1.0": {
+    "employment_change_55_64": "722.168",
+    "pension_recipients_change_55_64": "-1652.559"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "310.532",
+    "pension_recipients_change_55_64": "-710.6"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [
+     {
+      "code": "C15:6331",
+      "label": "Social security coverage: National estimate"
+     }
+    ],
+    "percent_by_sex_used": {
+     "F": "43",
+     "M": "72.8"
+    },
+    "total_percent": "54.8",
+    "year": 2021
+   }
+  },
+  "SUR": {
+   "1.1.0": {
+    "employment_change_55_64": "3899.978",
+    "pension_recipients_change_55_64": "-8924.435"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3899.978",
+    "pension_recipients_change_55_64": "-8924.435"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "SVN": {
+   "1.1.0": {
+    "employment_change_55_64": "-24916.104",
+    "pension_recipients_change_55_64": "57016.256"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-24916.104",
+    "pension_recipients_change_55_64": "57016.256"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "SWE": {
+   "1.1.0": {
+    "employment_change_55_64": "-15789.719",
+    "pension_recipients_change_55_64": "36132.079"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-15789.719",
+    "pension_recipients_change_55_64": "36132.079"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "SWZ": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "SYC": {
+   "1.1.0": {
+    "employment_change_55_64": "-1065.492",
+    "pension_recipients_change_55_64": "2438.197"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-1065.492",
+    "pension_recipients_change_55_64": "2438.197"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "TCD": {
+   "1.1.0": {
+    "employment_change_55_64": "19449.748",
+    "pension_recipients_change_55_64": "-44507.432"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1128.085",
+    "pension_recipients_change_55_64": "-2581.431"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "5.8",
+     "M": "5.8"
+    },
+    "total_percent": "5.8",
+    "year": 2022
+   }
+  },
+  "TGO": {
+   "1.1.0": {
+    "employment_change_55_64": "9577.03",
+    "pension_recipients_change_55_64": "-21915.4"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "1522.748",
+    "pension_recipients_change_55_64": "-3484.549"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "15.9",
+     "M": "15.9"
+    },
+    "total_percent": "15.9",
+    "year": 2022
+   }
+  },
+  "THA": {
+   "1.1.0": {
+    "employment_change_55_64": "876201.756",
+    "pension_recipients_change_55_64": "-2005038.344"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "723742.651",
+    "pension_recipients_change_55_64": "-1656161.672"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "82.6",
+     "M": "82.6"
+    },
+    "total_percent": "82.6",
+    "year": 2020
+   }
+  },
+  "TJK": {
+   "1.1.0": {
+    "employment_change_55_64": "47311.788",
+    "pension_recipients_change_55_64": "-108264.962"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "47311.788",
+    "pension_recipients_change_55_64": "-108264.962"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "TLS": {
+   "1.1.0": {
+    "employment_change_55_64": "2926.127",
+    "pension_recipients_change_55_64": "-6695.944"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2926.127",
+    "pension_recipients_change_55_64": "-6695.944"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2020
+   }
+  },
+  "TON": {
+   "1.1.0": {
+    "employment_change_55_64": "289.615",
+    "pension_recipients_change_55_64": "-662.734"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "289.615",
+    "pension_recipients_change_55_64": "-662.734"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2022
+   }
+  },
+  "TTO": {
+   "1.1.0": null,
+   "1.2.0": {
+    "employment_change_55_64": "-12071.789",
+    "pension_recipients_change_55_64": "27624.231"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "63.3",
+     "M": "100"
+    },
+    "total_percent": "90.8",
+    "year": 2022
+   }
+  },
+  "TUN": {
+   "1.1.0": {
+    "employment_change_55_64": "93087.36",
+    "pension_recipients_change_55_64": "-213014.555"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "93087.36",
+    "pension_recipients_change_55_64": "-213014.555"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "TUR": {
+   "1.1.0": {
+    "employment_change_55_64": "889883.471",
+    "pension_recipients_change_55_64": "-2036346.617"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "683751.427",
+    "pension_recipients_change_55_64": "-1564648.574"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "69.4",
+     "M": "100"
+    },
+    "total_percent": "85.9",
+    "year": 2022
+   }
+  },
+  "TWN": {
+   "1.1.0": {
+    "employment_change_55_64": "-182353.774",
+    "pension_recipients_change_55_64": "417285.524"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-159932.23",
+    "pension_recipients_change_55_64": "365977.642"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "89.8",
+     "M": "84.2"
+    },
+    "total_percent": "87.6",
+    "year": 2019
+   }
+  },
+  "TZA": {
+   "1.1.0": {
+    "employment_change_55_64": "33866.11",
+    "pension_recipients_change_55_64": "-77496.82"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2031.967",
+    "pension_recipients_change_55_64": "-4649.809"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "6",
+     "M": "6"
+    },
+    "total_percent": "6",
+    "year": 2021
+   }
+  },
+  "UGA": {
+   "1.1.0": {
+    "employment_change_55_64": "92905.973",
+    "pension_recipients_change_55_64": "-212599.481"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "17001.793",
+    "pension_recipients_change_55_64": "-38905.705"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "18.3",
+     "M": "18.3"
+    },
+    "total_percent": "18.3",
+    "year": 2022
+   }
+  },
+  "UKR": {
+   "1.1.0": {
+    "employment_change_55_64": "278075.369",
+    "pension_recipients_change_55_64": "-636328.076"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "267508.505",
+    "pension_recipients_change_55_64": "-612147.61"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "96.2",
+     "M": "96.2"
+    },
+    "total_percent": "96.2",
+    "year": 2020
+   }
+  },
+  "URY": {
+   "1.1.0": {
+    "employment_change_55_64": "-24616.137",
+    "pension_recipients_change_55_64": "56329.833"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "-24616.137",
+    "pension_recipients_change_55_64": "56329.833"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "UZB": {
+   "1.1.0": {
+    "employment_change_55_64": "508658.242",
+    "pension_recipients_change_55_64": "-1163977.671"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "508658.242",
+    "pension_recipients_change_55_64": "-1163977.671"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2021
+   }
+  },
+  "VCT": {
+   "1.1.0": null,
+   "1.2.0": null,
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "53.8",
+     "M": "49.8"
+    },
+    "total_percent": "51.8",
+    "year": 2019
+   }
+  },
+  "VEN": {
+   "1.1.0": {
+    "employment_change_55_64": "313984.644",
+    "pension_recipients_change_55_64": "-718500.33"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "313984.644",
+    "pension_recipients_change_55_64": "-718500.33"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "100",
+     "M": "100"
+    },
+    "total_percent": "100",
+    "year": 2019
+   }
+  },
+  "VUT": {
+   "1.1.0": {
+    "employment_change_55_64": "1063.031",
+    "pension_recipients_change_55_64": "-2432.566"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "43.584",
+    "pension_recipients_change_55_64": "-99.735"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "4.1",
+     "M": "4.1"
+    },
+    "total_percent": "4.1",
+    "year": 2019
+   }
+  },
+  "WSM": {
+   "1.1.0": {
+    "employment_change_55_64": "3233.833",
+    "pension_recipients_change_55_64": "-7400.075"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "2955.723",
+    "pension_recipients_change_55_64": "-6763.668"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [
+     2023
+    ],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "91.4",
+     "M": "91.4"
+    },
+    "total_percent": "91.4",
+    "year": 2019
+   }
+  },
+  "YEM": {
+   "1.1.0": {
+    "employment_change_55_64": "349723.605",
+    "pension_recipients_change_55_64": "-800282.849"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "28112.831",
+    "pension_recipients_change_55_64": "-64331.421"
+   },
+   "coverage": {
+    "breakdown": "by_sex",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "3.9",
+     "M": "43.3"
+    },
+    "total_percent": "17.8",
+    "year": 2022
+   }
+  },
+  "ZMB": {
+   "1.1.0": {
+    "employment_change_55_64": "25257.687",
+    "pension_recipients_change_55_64": "-57797.91"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "6516.483",
+    "pension_recipients_change_55_64": "-14911.861"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "25.8",
+     "M": "25.8"
+    },
+    "total_percent": "25.8",
+    "year": 2022
+   }
+  },
+  "ZWE": {
+   "1.1.0": {
+    "employment_change_55_64": "17019.793",
+    "pension_recipients_change_55_64": "-38946.894"
+   },
+   "1.2.0": {
+    "employment_change_55_64": "3335.879",
+    "pension_recipients_change_55_64": "-7633.591"
+   },
+   "coverage": {
+    "breakdown": "total_applied_to_both_sexes",
+    "newer_years_not_used": [],
+    "notes": [],
+    "percent_by_sex_used": {
+     "F": "19.6",
+     "M": "19.6"
+    },
+    "total_percent": "19.6",
+    "year": 2021
+   }
+  }
+ },
+ "coverage_refusals": {
+  "COG": "no ILOSTAT SDG 1.3.1 old-age pension coverage value in [2012, 2022]; coverage is never assumed (not 100 %)",
+  "GAB": "no ILOSTAT SDG 1.3.1 old-age pension coverage value in [2012, 2022]; coverage is never assumed (not 100 %)",
+  "SMR": "no ILOSTAT SDG 1.3.1 old-age pension coverage value in [2012, 2022]; coverage is never assumed (not 100 %)",
+  "SYR": "no ILOSTAT SDG 1.3.1 old-age pension coverage value in [2012, 2022]; coverage is never assumed (not 100 %)"
+ },
+ "run": {
+  "database": "reva_live_simfix_b7381fced4",
+  "finished": "2026-10-16T19:00:02.605169+00:00",
+  "release": "1792cb75-2245-4961-9127-f1bcb2d20180",
+  "spec": "social.retirement_age, countries ALL, reference_year 2022, target_age_months 744 from birth year 1965, reference path wbl2026_held_constant, L1, central rabate_rochut_2020_fra; values for 2030 (persons)",
+  "started": "2026-10-16T18:52:37.255553+00:00",
+  "status": {
+   "1.1.0": {
+    "incompatible": 24,
+    "missing_input": 12,
+    "ready": 126,
+    "unsupported": 74
+   },
+   "1.2.0": {
+    "incompatible": 21,
+    "missing_input": 13,
+    "ready": 128,
+    "unsupported": 74
+   }
+  }
+ }
+}

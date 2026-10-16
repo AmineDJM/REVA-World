@@ -19,12 +19,17 @@ from reva.api.deps import Timer, origin_of, origin_warnings, read_conn
 from reva.api.errors import NotFound
 from reva.kernel.errors import ValidationProblem
 from reva.links import service
-from reva.links.paths import DISCLAIMER, MAX_HOPS_LIMIT, MAX_K, MAX_WAYPOINTS, PathQueryError
+from reva.links.paths import DISCLAIMER, MAX_HOPS_LIMIT, MAX_K, MAX_STEPS, MAX_WAYPOINTS, PathQueryError
 
 router = APIRouter(prefix="/v1/links", tags=["links"], dependencies=[Depends(require_scope("read"))])
 
 NODE_PATTERN = r"^(Q[1-9][0-9]{0,11}|[A-Z]{3}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$"
 KIND_PATTERN = r"^((statement|link):)?([A-Za-z][A-Za-z0-9_]{0,63}|[a-z][a-z0-9_]{0,31}:[a-z][a-z0-9_]{0,63})$"
+#: non-transit properties: Wikidata property or namespaced dataset predicate (objects never passed through)
+PROP_PATTERN = r"^(P[1-9][0-9]{0,8}|[a-z][a-z0-9_]{0,31}:[a-z][a-z0-9_]{0,63})$"
+MAX_UNORDERED_WAYPOINTS = 8
+MAX_KINDS_PER_STEP = 16
+MAX_NON_TRANSIT = 16
 PATH_WARNING = s.ApiWarning(code="path_not_causal", message=DISCLAIMER["en"])
 COMMUNITY_WARNING = s.ApiWarning(
     code="community_edited", message="Wikidata statements are community-edited and are not verified by REVA."
@@ -133,16 +138,57 @@ def get_links_path(
     exclude_kind: list[str] | None = Query(None, max_length=50),
     include_undated: bool = True,
     include_blocked_hubs: bool = False,
+    steps: list[str] | None = Query(
+        None,
+        max_length=MAX_STEPS,
+        description="Ordered hop-type steps, one parameter per step; each a comma-separated set of hop kinds "
+        "(P945,link:co_member). The path matches the steps in order, each by a distinct hop.",
+    ),
+    via_any: list[str] | None = Query(
+        None, max_length=MAX_UNORDERED_WAYPOINTS, description="The path passes through at least one of these nodes"
+    ),
+    via_all: list[str] | None = Query(
+        None, max_length=MAX_UNORDERED_WAYPOINTS, description="The path passes through all of these nodes (any order)"
+    ),
+    non_transit: list[str] | None = Query(
+        None,
+        max_length=MAX_NON_TRANSIT,
+        description="Properties whose objects may end a path but are never passed through (P37, P2936, P30, P2348)",
+    ),
 ) -> LinksPathResponse:
     t = Timer()
     for x in (*(kind or ()), *(exclude_kind or ())):
         if not re.match(KIND_PATTERN, x):
             raise ValidationProblem("invalid kind", kind=x[:64])
-    for x in via or ():
+    for x in (*(via or ()), *(via_any or ()), *(via_all or ())):
         if not re.match(NODE_PATTERN, x):
             raise ValidationProblem("invalid waypoint", via=x[:64])
     if via and len(via) > MAX_WAYPOINTS:
         raise ValidationProblem(f"at most {MAX_WAYPOINTS} waypoints")
+    for name, vals, cap in (
+        ("via_any", via_any, MAX_UNORDERED_WAYPOINTS),
+        ("via_all", via_all, MAX_UNORDERED_WAYPOINTS),
+        ("non_transit", non_transit, MAX_NON_TRANSIT),
+        ("steps", steps, MAX_STEPS),
+    ):
+        if vals and len(vals) > cap:
+            raise ValidationProblem(f"at most {cap} {name} values")
+    for x in non_transit or ():
+        if not re.match(PROP_PATTERN, x):
+            raise ValidationProblem("invalid non-transit property", non_transit=x[:64])
+    step_sets: list[frozenset[str]] = []
+    for st in steps or ():
+        kinds_of_step = [x.strip() for x in st.split(",")]
+        if not all(kinds_of_step) or len(kinds_of_step) > MAX_KINDS_PER_STEP:
+            raise ValidationProblem(f"each step names 1..{MAX_KINDS_PER_STEP} hop kinds", step=st[:64])
+        for x in kinds_of_step:
+            if not re.match(KIND_PATTERN, x):
+                raise ValidationProblem("invalid step kind", kind=x[:64])
+        step_sets.append(frozenset(kinds_of_step))
+    if len(step_sets) > max_hops:
+        raise ValidationProblem("no more ordered steps than max_hops", steps=len(step_sets), max_hops=max_hops)
+    if via and (step_sets or via_any or via_all):
+        raise ValidationProblem("ordered via waypoints cannot be combined with steps, via_any or via_all")
     window = None
     if from_year is not None or to_year is not None:
         if from_year is None or to_year is None:
@@ -163,6 +209,10 @@ def get_links_path(
                 exclude_kinds=frozenset(exclude_kind or ()),
                 include_undated=include_undated,
                 include_blocked_hubs=include_blocked_hubs,
+                steps=tuple(step_sets),
+                via_any=frozenset(via_any or ()),
+                via_all=frozenset(via_all or ()),
+                non_transit_props=frozenset(non_transit or ()),
             )
     except service.UnknownCountry as e:
         raise NotFound("country not found in the knowledge graph (no ISO 3166 alpha-3 statement)", iso3=str(e)) from e

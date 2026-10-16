@@ -71,6 +71,9 @@ HANDLERS: dict[str, str] = {
     # --- ATLASOPS: record (or reuse when unchanged) an atlas snapshot of the registered atlas tables
     "atlas_snapshot": "reva.atlas.snapshot:handle_atlas_snapshot",
     # --- end ATLASOPS
+    # --- LINKWIRE (V3): materialised link store of (atlas snapshot, KG watermark); reused when unchanged
+    "links_materialise": "reva.links.jobs:handle_links_materialise",
+    # --- end LINKWIRE
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation

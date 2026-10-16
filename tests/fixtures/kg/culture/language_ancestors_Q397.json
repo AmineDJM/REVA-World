@@ -1,0 +1,38 @@
+{
+ "anchor": "language_ancestors_Q397",
+ "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?lang { wd:Q397 }\n  ?lang wdt:P220 ?iso .\n  ?lang wdt:P279+ ?item .\n  ?item wdt:P1394 ?glottocode .\n}",
+ "raw_sha256": "06b2ac563e0a05d96ab0898d55833542f67996cf6aac7744b7426d2a36fc7ba0",
+ "response": {
+  "head": {
+   "vars": [
+    "item"
+   ]
+  },
+  "results": {
+   "bindings": [
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q131848"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q19860"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q33478"
+     }
+    }
+   ]
+  }
+ },
+ "response_sha256": "6ffa289cc384de181a600863598556768f57da335c4928d55afc88a2cf78a7bd",
+ "retrieved_at": "2026-10-16T19:02:51.902375+00:00",
+ "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
+ "spec": "language_ancestors.yaml"
+}

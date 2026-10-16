@@ -56,8 +56,10 @@ Option for the V3 suite (``ui/e2e/v3_live_stack.spec.ts``):
     the allow-listed properties registered first); then the atlas sources of ``V3_ATLAS_SOURCES``
     (``--v3-atlas-source`` repeatable to choose others) through ``reva.atlas.ingest.run_atlas_ingest``
     in fixture mode (recorded responses, never the network, never charged); then a ``test_fixture``
-    atlas snapshot (``reva.atlas.snapshot.take_snapshot``). A source whose fixture run fails is
-    recorded with its error in ``stack.json`` (``v3.atlas``), never hidden; the stack still starts.
+    atlas snapshot (``reva.atlas.snapshot.take_snapshot``) and one materialisation of the link store
+    (``reva.links.store.materialise``; the link-bearing sources of ``V3_LINK_ATLAS_SOURCES`` are replayed
+    too). A source whose fixture run fails is recorded with its error in ``stack.json`` (``v3.atlas``,
+    ``v3.links``), never hidden; the stack still starts.
     ``POST /v1/ask`` stays on the deterministic keyword planner (no LLM planner is wired).
 
 The release cutoff is taken after every ingest has finished, so the release pins all ingested
@@ -134,6 +136,9 @@ V3_ATLAS_SOURCES = (
     "atlas.worldbank",
     "atlas.fao",
 )
+#: LINKWIRE: link-bearing atlas sources replayed with --v3-fixtures as well (UN DESA migrant stock, UNGA votes,
+#: CShapes borders/colonial rule, UCDP conflict sides, BACI trade), so the materialised link store holds pair links
+V3_LINK_ATLAS_SOURCES = ("atlas.un_ims", "atlas.unga_votes", "atlas.cshapes", "atlas.ucdp", "atlas.baci")
 #: source key of the links fixture in kg.*: the live harvest's key, so the KG treats these real Wikidata
 #: statements exactly as harvested ones (community-edited label); only the origin (test_fixture) differs.
 #: (tests/integration/test_links_db.py loads the same file under "wikidata.links_fixture", which
@@ -322,7 +327,7 @@ class Stack:
         """KG + links fixture, atlas sources in fixture mode, a test_fixture atlas snapshot."""
         out: dict[str, Any] = {"kg": with_connection_retry("kg fixture", lambda: self.load_kg_fixture(store, worker))}
         atlas: dict[str, Any] = {}
-        for name in self.args.v3_atlas_sources or V3_ATLAS_SOURCES:
+        for name in self.args.v3_atlas_sources or (*V3_ATLAS_SOURCES, *V3_LINK_ATLAS_SOURCES):
             atlas[name] = self.ingest_atlas_fixture(settings, store, worker, name)
         out["atlas"] = atlas
         from reva.atlas.snapshot import take_snapshot
@@ -331,7 +336,38 @@ class Stack:
             "atlas snapshot", lambda: take_snapshot(settings, worker, store, origin="test_fixture")
         )
         log.info("V3 atlas snapshot: %s", out["atlas_snapshot"])
+        out["links"] = self.materialise_links(store, worker, out["atlas_snapshot"])
         return out
+
+    @staticmethod
+    def materialise_links(store: Any, worker: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
+        """LINKWIRE: the link store of (fixture snapshot, fixture KG), as the daily ``links_materialise`` job
+        would build it; a failure is recorded in ``stack.json`` (``v3.links``), never hidden."""
+        from reva.links.store import materialise
+
+        t0 = time.monotonic()
+        try:
+            res = with_connection_retry(
+                "links materialise",
+                lambda: materialise(
+                    worker,
+                    store,
+                    atlas_sha256=snapshot.get("snapshot_sha256"),
+                    top_k=10,
+                    duckdb_memory_limit="1GB",
+                    log_fn=log.info,
+                ),
+            )
+        except Exception as e:
+            log.warning("V3 links materialisation failed: %s", e)
+            return {"status": "failed", "error": f"{type(e).__name__}: {str(e)[:500]}"}
+        log.info("V3 link store: %d links (%.1fs)", res.link_count, time.monotonic() - t0)
+        return {
+            "status": "completed",
+            "materialisation_id": res.id,
+            "link_count": res.link_count,
+            "counts": res.report.get("counts"),
+        }
 
     @staticmethod
     def load_kg_fixture(store: Any, worker: Any) -> dict[str, Any]:

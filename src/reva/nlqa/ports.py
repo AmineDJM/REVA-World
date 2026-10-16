@@ -340,6 +340,49 @@ class CountryLink:
     source: str | None = None
     derived_by: str = "links"
     link_type: str | None = None
+    #: how the link was computed (vote agreement: ``n_common``, ``n_identical``, formula); empty for source facts
+    basis: Mapping[str, Any] = field(default_factory=dict)
+    facet: str | None = None  # ``issue=co`` (vote agreement), ``section=XVI`` (BACI)
+    a_node: str | None = None  # node ids when an end is not a crosswalk country (a predecessor state)
+    b_node: str | None = None
+
+
+@dataclass(frozen=True)
+class PairLinkGroup:
+    """Every link of one LINKS type between two countries (``links`` may be capped; ``count`` is the total)."""
+
+    link_type: str
+    kind: str  # user-level group (trade, migration, diplomatic…)
+    count: int
+    first_year: int | None
+    last_year: int | None
+    links: tuple[CountryLink, ...]
+    labels: Mapping[str, str] = field(default_factory=dict)  # type labels {fr, en}
+
+
+@dataclass(frozen=True)
+class PredecessorLink:
+    """A link of ``country`` with a predecessor state of ``predecessor_of``, shown with its succession chain."""
+
+    country: str
+    predecessor_of: str
+    link: CountryLink
+    succession: tuple[CountryLink, ...]
+
+
+@dataclass(frozen=True)
+class PairLinks:
+    """Every link between two countries over time (``reva.links.service.pair_view``)."""
+
+    a_iso3: str
+    b_iso3: str
+    groups: tuple[PairLinkGroup, ...]
+    #: link types with no link between the two (in the data consulted): "no link", never zero
+    kinds_without_links: tuple[str, ...] = ()
+    predecessor_links: tuple[PredecessorLink, ...] = ()
+    truncated: tuple[str, ...] = ()
+    node_labels: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
+    store: str | None = None  # "materialisation <id>" or "on demand"
 
 
 @runtime_checkable
@@ -383,6 +426,17 @@ class LinksPort(Protocol):
     name: str
 
     def links(self, iso3: str, kinds: Sequence[str] | None, limit: int) -> list[CountryLink]: ...
+
+
+@runtime_checkable
+class PairLinksPort(Protocol):
+    """Optional on a links backend: every link between two countries (``links_pair``)."""
+
+    name: str
+
+    def pair(
+        self, a: str, b: str, kinds: Sequence[str] | None, from_year: int | None, to_year: int | None
+    ) -> PairLinks: ...
 
 
 @runtime_checkable

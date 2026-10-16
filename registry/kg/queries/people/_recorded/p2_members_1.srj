@@ -1,0 +1,597 @@
+{
+  "head" : {
+    "vars" : [ "part", "m_s", "m_o" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36014"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.military_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36014"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.political_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45859"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.monarchs"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q174432"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.explorers_navigators"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.explorers_navigators"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7328"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.explorers_navigators"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q937"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7186"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7328"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36014"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.founders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7186"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.nobel_laureates"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q217637"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.monarchs"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.monarchs"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.monarchs"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45859"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.monarchs"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q937"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.nobel_laureates"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7328"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1775277"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.colonial_officials"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5555325"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q668"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q199821"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q170468"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q142"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q71084"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.country_heads"
+      },
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45859"
+      },
+      "m_o" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q21088788"
+      }
+    } ]
+  }
+}

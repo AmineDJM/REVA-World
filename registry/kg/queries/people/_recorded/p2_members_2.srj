@@ -1,0 +1,251 @@
+{
+  "head" : {
+    "vars" : [ "part", "m_s", "m_o" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q937"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.scientists_scholars"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7186"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.scientists_scholars"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.scientists_scholars"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.scientists_scholars"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q937"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.writers_artists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.revolutionaries_activists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.revolutionaries_activists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.revolutionaries_activists"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.religious_figures"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36014"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q217637"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    }, {
+      "m_s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45859"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "m:people.state_leaders"
+      }
+    } ]
+  }
+}

@@ -54,7 +54,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.wikidata_cables"
-VERSION = "1.0.0"
+VERSION = "1.1.0"  # 1.1.0: wbgetentities batches with EntityData fallback; 404 pages skipped
 SOURCE_KEY = "wikidata.wbapi"
 ATLAS_SOURCE = "wikidata"
 DATASET = "submarine_cables"
@@ -63,6 +63,13 @@ HOST = "www.wikidata.org"
 ROOT_CLASS = "Q506572"  # submarine communications cable
 WLH_URL = "https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/{qid}&namespace=0&limit=5000"
 ENTITY_URL = "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
+API_URL = (
+    "https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids}&props=info%7Cclaims%7Clabels"
+    "&languages=en&format=json&maxlag=5"
+)
+API_BATCH = 50
+#: tests replace the machine-wide Wikidata lock (``wikidata.MachineLock``) with a no-op one
+LOCK_FACTORY: Any = None
 MAX_SUBCLASS_DEPTH = 2
 MAX_CANDIDATES = 1500
 MAX_ATTEMPTS = 4
@@ -111,23 +118,26 @@ def atlas_source() -> AtlasSourceSpec:
 
 
 # ----------------------------------------------------------------------------- fetch (locked, paced)
-async def _locked_get(run: Any, url: str, *, key: str, endpoint: str, media: tuple[str, ...]) -> ic.Fetched:
+async def _locked_get(
+    run: Any, url: str, *, key: str, endpoint: str, media: tuple[str, ...], attempts: int = MAX_ATTEMPTS
+) -> ic.Fetched:
     from reva.adapters.connectors.wikidata import MachineLock, user_agent
 
     if run.origin != "live":  # recorded fixtures: no provider traffic, no machine-wide pacing
         raw = await run.get(url, key=key, media_types=media, max_bytes=run.spec.max_response_bytes,
                             headers={"User-Agent": user_agent(), "Accept": media[0]})  # fmt: skip
         return ic.Fetched(name=key, url=url, body=raw.body, sha256=run.archive(raw), retrieved_at=raw.retrieved_at)
-    lock = MachineLock()
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    lock = (LOCK_FACTORY or MachineLock)()
+    for attempt in range(1, attempts + 1):
         async with lock.slot(endpoint) as slot:
             try:
                 raw = await run.get(url, key=key, media_types=media, max_bytes=run.spec.max_response_bytes,
                                     headers={"User-Agent": user_agent(), "Accept": media[0]})  # fmt: skip
             except SourceResponseError as e:
                 status = e.details.get("status")
-                if status in (429, 503) and attempt < MAX_ATTEMPTS:
+                if status in (429, 503):
                     slot.cooldown(min(600.0, 30.0 * 2 ** (attempt - 1)))  # every process waits
+                if status in (429, 503) and attempt < attempts:
                     continue
                 raise
         sha = run.archive(raw)
@@ -301,6 +311,65 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
     return rb, report
 
 
+class _Gone(Exception):
+    """HTTP 404: an empty Special:WhatLinksHere page or a deleted item."""
+
+
+async def _get_or_gone(run: Any, url: str, *, key: str, endpoint: str, media: tuple[str, ...]) -> ic.Fetched:
+    try:
+        return await _locked_get(run, url, key=key, endpoint=endpoint, media=media)
+    except SourceResponseError as e:
+        if e.details.get("status") == 404:
+            raise _Gone(url) from e
+        raise
+
+
+async def _api_batch(run: Any, ids: list[str]) -> tuple[ic.Fetched, dict[str, Any]] | None:
+    """One wbgetentities call (<= 50 ids) when the action API answers; None -> use Special:EntityData."""
+    if run.origin != "live":  # recorded fixtures hold EntityData snapshots only
+        return None
+    try:
+        got = await _locked_get(run, API_URL.format(ids="|".join(ids)), key=f"wikidata:wbgetentities:{ids[0]}+{len(ids)}",
+                                endpoint="wbapi", media=("application/json",), attempts=1)  # fmt: skip
+    except SourceResponseError:
+        return None  # throttled / unavailable: fall back, never fail the run on the faster path
+    try:
+        doc = json.loads(got.body)
+    except ValueError:
+        return None
+    if "error" in doc or not isinstance(doc.get("entities"), dict):
+        return None  # e.g. maxlag
+    return got, doc["entities"]
+
+
+async def fetch_entities(run: Any, ids: list[str], report: dict[str, Any]) -> dict[str, tuple[dict[str, Any], str]]:
+    """QID -> (entity JSON, raw sha256): wbgetentities batches, else one Special:EntityData per item."""
+    out: dict[str, tuple[dict[str, Any], str]] = {}
+    for i in range(0, len(ids), API_BATCH):
+        chunk = ids[i : i + API_BATCH]
+        api = await _api_batch(run, chunk)
+        if api is not None:
+            got, ents = api
+            report["api_batches"] += 1
+            for q, e in ents.items():
+                if "missing" in e or "claims" not in e:
+                    report["missing_items"].append(q)
+                    continue
+                out[e.get("id", q)] = (e, got.sha256)
+            continue
+        for q in chunk:
+            try:
+                ent = await _get_or_gone(run, ENTITY_URL.format(qid=q), key=f"wikidata:entitydata:{q}",
+                                         endpoint="entitydata", media=("application/json",))  # fmt: skip
+            except _Gone:
+                report["missing_items"].append(q)
+                continue
+            report["entitydata_requests"] += 1
+            e = entity_of(ent.body, q)
+            out[e["id"]] = (e, ent.sha256)
+    return out
+
+
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     if not run.wants(DATASET):
         return {"ok": True, "tables": [], "skipped": DATASET}
@@ -311,26 +380,29 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     frontier = [(ROOT_CLASS, 0)]
     seen_class_pages: set[str] = set()
     first_day: date | None = None
+    fetch_report: dict[str, Any] = {"api_batches": 0, "entitydata_requests": 0, "missing_items": [],
+                                    "empty_class_pages": []}  # fmt: skip
     while frontier:
         cls, depth = frontier.pop(0)
         if cls in seen_class_pages:
             continue
         seen_class_pages.add(cls)
-        page = await _locked_get(run, WLH_URL.format(qid=cls), key=f"wikidata:whatlinkshere:{cls}", endpoint="pages",
-                                 media=("text/html",))  # fmt: skip
+        try:
+            page = await _get_or_gone(run, WLH_URL.format(qid=cls), key=f"wikidata:whatlinkshere:{cls}",
+                                      endpoint="pages", media=("text/html",))  # fmt: skip
+        except _Gone:
+            fetch_report["empty_class_pages"].append(cls)  # MediaWiki answers 404 when nothing links here
+            continue
         first_day = first_day or page.retrieved_at.date()
         pages.append(page.sha256)
-        for q in parse_links(page.body, cls):
-            if q in entities or len(entities) >= MAX_CANDIDATES:
-                continue
-            ent = await _locked_get(run, ENTITY_URL.format(qid=q), key=f"wikidata:entitydata:{q}",
-                                    endpoint="entitydata", media=("application/json",))  # fmt: skip
-            d = describe(entity_of(ent.body, q))
-            entities[d["qid"]] = d
-            raws[d["qid"]] = ent.sha256
+        todo = [q for q in parse_links(page.body, cls) if q not in entities][: max(0, MAX_CANDIDATES - len(entities))]
+        for q, (e, sha) in (await fetch_entities(run, todo, fetch_report)).items():
+            d = describe(e)
+            entities[q] = d
+            raws[q] = sha
             if set(d["p279"]) & classes and depth + 1 <= MAX_SUBCLASS_DEPTH:
-                classes.add(d["qid"])
-                frontier.append((d["qid"], depth + 1))
+                classes.add(q)
+                frontier.append((q, depth + 1))
     cables = [d for d in entities.values() if set(d["p31"]) & classes]
     rb, report = build(cables, raws, first_day or date.today())
     out = run.register(
@@ -352,4 +424,4 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "unmapped_provider_geo": [u["provider_geo"] for u in out.get("unmapped_provider_geo") or []],
     }
     return {"ok": True, "tables": [table], "report": {**report, "classes": sorted(classes),
-                                                       "candidates_fetched": len(entities)}}  # fmt: skip
+                                                       "candidates_fetched": len(entities), **fetch_report}}  # fmt: skip

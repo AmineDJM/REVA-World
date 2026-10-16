@@ -22410,6 +22410,94 @@
               "title": "Include Blocked Hubs",
               "type": "boolean"
             }
+          },
+          {
+            "description": "Ordered hop-type steps, one parameter per step; each a comma-separated set of hop kinds (P945,link:co_member). The path matches the steps in order, each by a distinct hop.",
+            "in": "query",
+            "name": "steps",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ordered hop-type steps, one parameter per step; each a comma-separated set of hop kinds (P945,link:co_member). The path matches the steps in order, each by a distinct hop.",
+              "title": "Steps"
+            }
+          },
+          {
+            "description": "The path passes through at least one of these nodes",
+            "in": "query",
+            "name": "via_any",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The path passes through at least one of these nodes",
+              "title": "Via Any"
+            }
+          },
+          {
+            "description": "The path passes through all of these nodes (any order)",
+            "in": "query",
+            "name": "via_all",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The path passes through all of these nodes (any order)",
+              "title": "Via All"
+            }
+          },
+          {
+            "description": "Properties whose objects may end a path but are never passed through (P37, P2936, P30, P2348)",
+            "in": "query",
+            "name": "non_transit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 16,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Properties whose objects may end a path but are never passed through (P37, P2936, P30, P2348)",
+              "title": "Non Transit"
+            }
           }
         ],
         "responses": {

@@ -339,6 +339,47 @@ def test_wikidata_cables_skip_telegeography_and_parse_guards() -> None:
     assert d["p31"] == [] and d["year"] is None  # deprecated rank ignored; century precision is no year
 
 
+def test_wikidata_cables_live_path_api_batch_fallback_and_404(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Live path (fake transport): API batch throttled -> Special:EntityData; empty class page (404) skipped."""
+    import asyncio
+    import contextlib
+    from types import SimpleNamespace
+
+    class Slot:
+        def cooldown(self, s: float) -> None:
+            cooldowns.append(s)
+
+    class Lock:
+        @contextlib.asynccontextmanager
+        async def slot(self, endpoint: str = "any") -> Any:
+            yield Slot()
+
+    cooldowns: list[float] = []
+    monkeypatch.setattr(cb, "LOCK_FACTORY", Lock)
+    fixtures = {e["url"]: (FIXTURE_ROOT / cb.NAME / e["file"]).read_bytes()
+                for e in json.loads((FIXTURE_ROOT / cb.NAME / "manifest.json").read_text())}  # fmt: skip
+    seen: list[str] = []
+
+    class Run(_OfflineRun):
+        origin = "live"
+
+        async def get(self, url: str, **kw: Any) -> Any:
+            seen.append(url)
+            if "action=wbgetentities" in url:
+                raise SourceResponseError("HTTP 429 from www.wikidata.org", retryable=True, status=429)
+            if url == cb.WLH_URL.format(qid="Q2395922"):
+                raise SourceResponseError("HTTP 404 from www.wikidata.org", retryable=False, status=404)
+            return SimpleNamespace(body=fixtures[url], retrieved_at=datetime(2026, 10, 16, tzinfo=UTC))
+
+    run = Run(cb.atlas_source())
+    run.origin = "live"
+    out = asyncio.run(cb.atlas_ingest(run))
+    rep = out["report"]
+    assert rep["empty_class_pages"] == ["Q2395922"] and rep["api_batches"] == 0
+    assert rep["entitydata_requests"] == 23 and rep["cables"] == 20 and cooldowns  # 429 -> shared cool-down
+    assert sum("action=wbgetentities" in u for u in seen) == 2  # one try per batch, then EntityData
+
+
 # --------------------------------------------------------------------------- platform contract
 def test_sources_discovered_and_no_http_client_in_modules() -> None:
     names = set(atlas_sources())

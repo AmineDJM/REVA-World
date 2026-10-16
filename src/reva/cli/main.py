@@ -22,6 +22,8 @@ app.add_typer(auth_app, name="auth")
 app.add_typer(beliefs_app, name="beliefs")
 atlas_app = typer.Typer(no_args_is_help=True, help="V3 atlas: budget-metered source runs, snapshots, listing")
 app.add_typer(atlas_app, name="atlas")
+links_app = typer.Typer(no_args_is_help=True, help="V3 links: materialised link store (country-country neurons)")
+app.add_typer(links_app, name="links")
 
 
 def _out(obj: Any) -> None:
@@ -524,6 +526,38 @@ def atlas_snapshot_cmd(
             skip_unchanged=skip_unchanged,
         )
     )
+
+
+# --------------------------------------------------------------------------- links (V3, LINKWIRE)
+@links_app.command("materialise")
+def links_materialise_cmd(
+    atlas_origin: str | None = typer.Option(None, help="live or test_fixture (default: latest snapshot of any origin)"),
+    atlas_snapshot: str | None = typer.Option(None, help="atlas snapshot sha256 (default: latest)"),
+    kg_origin: str | None = typer.Option(None, help="live or test_fixture (default: every origin)"),
+    top_k: int = typer.Option(10, help="atlas kinds: partners kept per country, period, facet and direction"),
+    no_atlas: bool = typer.Option(False, "--no-atlas", help="KG and dataset kinds only"),
+    duckdb_memory_limit: str = typer.Option("3GB", help="DuckDB memory limit for the snapshot read"),
+) -> None:
+    """Materialise the link store (worker credentials): every link of (atlas snapshot, KG watermark), one
+    transaction. Alias of `python -m reva.links.store materialise`."""
+    from reva.links.store import main as store_main
+
+    argv = ["materialise", "--top-k", str(top_k), "--duckdb-memory-limit", duckdb_memory_limit]
+    for flag, value in (
+        ("--atlas-origin", atlas_origin),
+        ("--atlas-snapshot", atlas_snapshot),
+        ("--kg-origin", kg_origin),
+    ):
+        if value is not None:
+            argv += [flag, value]
+    if no_atlas:
+        argv.append("--no-atlas")
+    try:
+        code = store_main(argv)
+    except SystemExit as e:  # argparse refusal (bad origin)
+        raise typer.Exit(2) from e
+    if code:
+        raise typer.Exit(code)
 
 
 def main() -> None:  # pragma: no cover

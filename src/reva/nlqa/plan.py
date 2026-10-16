@@ -35,6 +35,7 @@ OPS: tuple[str, ...] = (
     "atlas_rank",
     "atlas_series",
     "links",
+    "links_pair",
 )
 MAX_OPERATIONS = 12
 #: Path searches are the expensive operations: at most this many per question (SEC-1).
@@ -256,8 +257,10 @@ def _concept(o: Mapping[str, Any], catalog: QaCatalog) -> str:
     return c
 
 
-def _country(o: Mapping[str, Any], catalog: QaCatalog, lookups: Mapping[str, Any], *, allow_all: bool) -> str:
-    c = o.get("country")
+def _country(
+    o: Mapping[str, Any], catalog: QaCatalog, lookups: Mapping[str, Any], *, allow_all: bool, key: str = "country"
+) -> str:
+    c = o.get(key)
     if isinstance(c, str) and c in lookups:
         return c
     if isinstance(c, str) and c == "ALL" and allow_all:
@@ -336,13 +339,20 @@ def _validate_args(
             "from_year": f,
             "to_year": t,
         }
-    if name == "links":
+    if name in ("links", "links_pair"):
         kinds = o.get("link_kinds") or []
         if not isinstance(kinds, list):
             raise ValueError("link_kinds must be a list")
         bad = [k for k in kinds if k not in catalog.link_kinds]
         if bad:
             raise _Reject("link_kind_not_in_list", value=", ".join(_clean(b, 30) for b in bad[:5]))
+        if name == "links_pair":
+            a = _country(o, catalog, lookups, allow_all=False)
+            b = _country(o, catalog, lookups, allow_all=False, key="other_country")
+            if a == b:
+                raise _Reject("pair_with_itself")
+            f, t = _range(o)
+            return {"country": a, "other_country": b, "kinds": list(dict.fromkeys(kinds)), "from_year": f, "to_year": t}
         return {
             "country": _country(o, catalog, lookups, allow_all=False),
             "kinds": list(dict.fromkeys(kinds)),
@@ -453,6 +463,18 @@ def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
                 f"les liens ({kinds}) de {country(a['country'])}"
                 if fr
                 else f"the links ({kinds}) of {country(a['country'])}"
+            )
+        elif o.op == "links_pair":
+            kinds = ", ".join(a["kinds"]) or ("tous types" if fr else "all kinds")
+            span = (
+                f", {a['from_year'] or '…'}–{a['to_year'] or '…'}"
+                if a.get("from_year") is not None or a.get("to_year") is not None
+                else ""
+            )
+            parts.append(
+                f"les liens ({kinds}{span}) entre {country(a['country'])} et {country(a['other_country'])}"
+                if fr
+                else f"the links ({kinds}{span}) between {country(a['country'])} and {country(a['other_country'])}"
             )
     head = "Question interprétée comme : " if fr else "Question read as: "
     if not parts:

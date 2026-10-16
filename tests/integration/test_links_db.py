@@ -146,3 +146,72 @@ def test_links_http_api(kg, db) -> None:  # type: ignore[no-untyped-def]
             assert links and {lk["link_type"] for lk in links} == {"shared_official_language"}
     finally:
         app.state.engine.dispose()
+
+
+def test_links_path_route_constrained_parameters(kg, db) -> None:  # type: ignore[no-untyped-def]
+    """LINKWIRE: ``steps`` / ``via_any`` / ``via_all`` / ``non_transit`` on ``/v1/links/path`` (validated, bounded)."""
+    from fastapi.testclient import TestClient
+    from pydantic import SecretStr
+    from sqlalchemy import text
+
+    from reva.api.app import create_app
+    from reva.api.auth import new_api_token
+    from reva.settings import Settings
+
+    tok, sha = new_api_token()
+    with db.owner.begin() as c:
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'links-path')"),
+            {"h": sha, "s": ["read"]},
+        )
+    settings = Settings.model_validate(
+        {
+            **db.settings.model_dump(),
+            "reva_session_secret": SecretStr("s" * 48),
+            "reva_allowed_hosts": "testserver,localhost",
+            "reva_cors_origins": "",
+        }
+    )
+    app = create_app(settings)
+    auth = {"Authorization": f"Bearer {tok}"}
+
+    def path(**params):  # type: ignore[no-untyped-def]
+        return client.get("/v1/links/path", params={"from": "Q7322", "to": "Q5146", **params}, headers=auth)
+
+    try:
+        with TestClient(app) as client:
+            plain = path(max_hops=6)
+            assert plain.status_code == 200, plain.text
+            # Portuguese (object of P37/P2936) may end the path but never be passed through; Brazil via ISO3
+            r = path(max_hops=8, k=1, non_transit=["P37", "P2936"], via_all=["BRA"], steps=["P1891,P710"])
+            assert r.status_code == 200, r.text
+            d = r.json()["data"]
+            assert d["query"]["non_transit_props"] == ["P2936", "P37"]
+            assert d["query"]["via_all"] == ["Q155"]
+            assert d["query"]["steps"] == [["statement:P1891", "statement:P710"]]
+            assert r.json()["warnings"][0]["code"] == "path_not_causal"
+            if d["found"]:
+                p = d["paths"][0]
+                assert "Q155" in p["nodes"] and "Q5146" not in p["nodes"][:-1]
+                assert any(h["type"] in ("P1891", "P710") for h in p["hops"])
+            else:
+                assert d["reason"].startswith("no_path")
+            r = path(via_any=["Q155", "Q45"], max_hops=8, k=1)
+            assert r.status_code == 200, r.text
+            assert r.json()["data"]["query"]["via_any"] == ["Q155", "Q45"]
+            # validation and SEC-1 bounds
+            for bad in (
+                {"max_hops": 9},
+                {"non_transit": ["language"]},
+                {"steps": ["P37,,"]},
+                {"steps": ["bad kind!"]},
+                {"steps": ["P37"] * 5, "max_hops": 4},
+                {"steps": ["P37"] * 9, "max_hops": 8},
+                {"via_any": ["not a node"]},
+                {"via_all": [f"Q{i}" for i in range(1, 10)]},
+                {"non_transit": [f"P{i}" for i in range(1, 18)]},
+                {"via": ["Q155"], "steps": ["P37"]},
+            ):
+                assert path(**bad).status_code == 422, bad
+    finally:
+        app.state.engine.dispose()

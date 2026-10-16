@@ -21,7 +21,7 @@ from typing import Any
 from reva.nlqa.catalog import ENTITY_KINDS, QaCatalog
 from reva.nlqa.plan import OPS
 
-PROMPT_VERSION = "nlqa-plan-1.0.0"
+PROMPT_VERSION = "nlqa-plan-1.1.0"
 SCHEMA_NAME = "reva_query_plan"
 REPHRASE_PROMPT_VERSION = "nlqa-rephrase-1.0.0"
 REPHRASE_SCHEMA_NAME = "reva_answer_rephrase"
@@ -59,6 +59,10 @@ an entity_lookup step; year = the year the user states, else null (latest availa
  - atlas_series(concept, country, from_year, to_year): an indicator over a period.
  - links(country, link_kinds, limit): interconnections of a country (borders, shared language, \
 colonial ties, trade, migration, alliances, memberships, conflicts, diplomatic).
+ - links_pair(country, other_country, link_kinds, from_year, to_year): every link between two \
+countries over time (trade both ways, migrant stocks both ways, share of identical UN General Assembly \
+votes, colonial rule, borders, shared languages, conflicts, peacekeeping); country and other_country = \
+ISO3 codes or ids of entity_lookup steps; link_kinds [] = all. Use it for "links/relations between X and Y".
 5. Use the fewest operations that cover the question (at most 12). A historical or political question \
 (positions, relations, events) uses entity_lookup + kg_neighbours / kg_timeline / kg_path with \
 as_of or years from the question. A question about an indicator uses an atlas operation with a \
@@ -94,6 +98,7 @@ def output_schema() -> dict[str, Any]:
         "max_hops": ni,
         "concept": ns,
         "country": ns,
+        "other_country": ns,
         "year": ni,
         "order": {"type": ["string", "null"], "enum": ["desc", "asc", None]},
         "limit": ni,

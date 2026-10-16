@@ -48,6 +48,8 @@ LINK_KINDS: tuple[str, ...] = (
     "trade",
     "migration",
     "shared_institution",
+    "peacekeeping",  # LINKWIRE: UN peacekeeping personnel contributed to a mission in the other country
+    "historical_polity",  # LINKWIRE: present territories covered by the same historical polity (overlay)
 )
 #: Entity kinds a lookup may ask for (a hint for server-side resolution, never an id).
 ENTITY_KINDS: tuple[str, ...] = (

@@ -532,3 +532,123 @@ ILOSTAT: CC BY 4.0. World Bank WBL: CC BY 4.0. Attribution strings are stored wi
 | ZAF | 100 | 3.374 | 4.977 | 13.632 | 1.546 | 2.682 | 5.979 | 6.480 | 8.942 | 9.687 |
 | ZMB | 100 | 3.150 | 1.628 | 25.832 | 4.071 | 2.720 | 9.379 | 1.317 | 3.909 | 6.160 |
 | ZWE | 100 | 1.551 | 7.623 | 14.123 | 0.298 | 1.297 | 2.205 | 3.958 | 8.105 | 6.366 |
+
+---
+
+# V3 SIMFIX — pension coverage in the world retirement module (`social.retirement_age@1.2.0`)
+
+Agent SIMFIX, 2026-10-16. Problem: 1.1.0 treats every person of an affected age as bound by the legal pension
+age, so in informal economies it overstates the effects (India, age 62 from the 1965 cohort, 2030: +10.6 M
+employed, −24.2 M persons in pension receipt). Fix: a coverage dataset input and a new model version that
+applies the legal-age change only to the pension-covered share. **1.0.0 and 1.1.0 are unchanged** (their files
+were not edited; existing specs run the same code; the live 1.1.0 numbers below equal SIMWORLD's).
+
+## What was built
+
+| Piece | Where |
+|---|---|
+| Reviewed built-in connector `ilostat.social_protection@1.0.0` (new name, not a new version of `ilostat.labour_age5`: different file layout and concept; `ilostat.labour_age5@1.0.1` untouched) | `src/reva/adapters/connectors/ilostat_social_protection.py`, registered in `registry.builtin_connectors` |
+| Concept / mapping | `registry/concepts/social_protection_ilostat.yaml` (`social_protection.ilostat.old_age_pension_coverage.sex@1.0.0`), `registry/mappings/ilostat_social_protection.yaml`; `registry/sources/ilostat.yaml` annotated (no new source key, one request per refresh within `ilostat.rplumber` 60/day, so no budget request) |
+| Model `social.retirement_age@1.2.0` | `src/reva/models/social/retirement_coverage.py` (reuses the 1.1.0 functions; listed in `plugins.KNOWN_MODEL_MODULES`); `registry/models/methods.yaml` entry (candidate, review pending); `contracts/scenario.schema.json` regenerated (new `$defs["social.retirement_age@1.2.0"]`, same spec fields as 1.1.0) |
+| Capability | `social.retirement_age.pension_coverage` (implemented) in `src/reva/capabilities.py` |
+| Tests | `tests/unit/test_simfix_coverage.py` (9), `tests/integration/test_simfix_pipeline.py` (3, throwaway DB), `tests/integration/test_simfix_live.py` (`live`); fixture `tests/fixtures/source/ilostat.social_protection/` (verbatim lines of SEN JPN BRA IND MEX IDN JOR KOS X01), helper `tests/fixtures/simworld/simfix_fixtures.py`; `test_simworld_models.py` now accepts a third registered retirement version |
+
+## Source
+
+* ILOSTAT indicator `SDG_0131_SEX_SOC_RT_A`, "SDG indicator 1.3.1: Proportion of population covered by social
+  protection floors/systems by sex and function (%)" (ILOSTAT catalogue, last update 04/05/2026; CC BY 4.0;
+  source "ILO - Social Security Inquiry Database", `XA:<n>`). Only `classif1 = SOC_CONTIG_PENSION` is kept —
+  ILOSTAT label "Function: Persons above retirement age receiving a pension" — sexes F, M, T. Bulk file
+  `rplumber.ilo.org/data/indicator/?id=SDG_0131_SEX_SOC_RT_A&format=.csv.gz` (184 757 bytes on 2026-10-16,
+  sha256 `0c5c2567…57a9f`), archived as one acquisition, one Parquet dataset per country
+  (`reva-ilostat-sdg131-pension-table/1`), values verbatim (percent text, ILOSTAT caps at 100; >100 refused),
+  status flags and `note_classif` codes with their reviewed ILOSTAT labels (e.g. `C15:6330` "Data not
+  available for BOCW Fund" on India). ILO aggregates `X..` counted, never mapped; `KOS` → `XKX`.
+* **Contributors not used**: the ILOSTAT catalogue has no other social-protection indicator (checked
+  2026-10-16: no contributor series), and the ILO World Social Protection Database pages answer HTTP 403 to
+  this environment. No atlas table is used as an input.
+
+## Method (1.2.0)
+
+* Coverage `c` = the source's own value of the **latest year ≤ `reference_year`** (at most 10 years older) that
+  has F and M (then by sex) or T (then the total applied to both sexes, stated). Years after the reference
+  year are listed as not used; a year before it is stated in every row ("old" from 5 years).
+* Per (sex, single age 55-64, year): employment change `c·s·rho·A`, pension-receipt change `−c·rho·A`,
+  employment-rate levels `e_obs + c·s·rho·(I − I_obs)`; `A`, `s`, `rho`, rule tables, population and rates
+  exactly as 1.1.0. The uncovered share keeps the observed rates. `c = 1` reproduces 1.1.0 exactly (tested).
+* **No coverage sensitivity is invented**: the L2 range moves the response grid and the rho variants only; its
+  description says "Pension coverage fixed at the source's value (no coverage variant)".
+* A country without a usable value → `missing_input` (`input: pension_coverage`, reason "coverage is never
+  assumed (not 100 %)"); skipped and listed under `skip_missing_countries`.
+* Every row's applicability carries `pension_coverage` (series, year, breakdown, values used, total, notes,
+  status) and caveats; the qualification sentence names the coverage used.
+
+**Assumptions and their direction (stated in every row):** coverage is measured among persons *above*
+pensionable age today and applied unchanged to persons aged 55-64 in every projection year; it is applied
+uniformly across single ages (the source has no age breakdown); covered and uncovered persons share the band's
+employment rate, rho and response share. SDG 1.3.1 counts **non-contributory** (social) pensions: where such a
+pension with its own age drives coverage — Mexico (100 %; universal pension from 65), India (includes the
+national old-age social pension, age 60) and others — `c` overstates the share bound by the WBL contributory
+age, so results there remain **overstated**. Otherwise the direction is unknown.
+
+## Live demonstration (throwaway database, never `reva`)
+
+`REVA_SIMFIX_LIVE_OUT=… uv run pytest -m live tests/integration/test_simfix_live.py`, 2026-10-16 18:52–19:00
+UTC, database `reva_live_simfix_b7381fced4` (dropped by the fixture; object store in the agent scratch folder,
+deleted). Budget ledger (policy budgets-1.3.6): `un.wpp` 6 requests / 206 708 142 bytes (SIMWORLD's two runs
+today used 12 of 20), `ilostat.rplumber` 2 + 1 requests (4 894 525 + 184 757 bytes), `worldbank.wdi` 5.
+217 coverage datasets registered. Both runs: `countries ["ALL"]`, reference year 2022, target age 62 for
+cohorts born 1965+, reference path `wbl2026_held_constant`, L1, central Rabaté & Rochut 2020 (FRA,
+transferred), `skip_missing_countries`. The test's last assertion first failed on this run (it assumed coverage
+could only remove countries; SDN and TTO came back, see below); the assertion was corrected afterwards, the
+numbers are those of this run. Two formatting/typing-only edits (ruff format of the connector, a mypy cast in
+the model) were made after the run started; behaviour identical, code digests differ.
+
+| | 1.1.0 | 1.2.0 |
+|---|---:|---:|
+| countries computed | 126 | **128** |
+| no rule table / unsupported | 74 | 74 |
+| incompatible (age range, response out of bounds, KAZ input) | 24 | 21 |
+| missing input | 12 | 13 |
+| Σ employment change 2030, 126 common countries | +21.6 M | **+9.3 M** |
+| Σ pension-receipt change 2030, same countries | −49.5 M | **−21.3 M** |
+| Σ abs. employment change | 28.5 M | 15.6 M (54.7 %) |
+
+* Coverage refused (`missing_input`): **COG** (latest 2011), **GAB** (2010), **SYR** (2006) — older than 10
+  years — and **SMR** (only 2023, after the reference year); none of them ran in 1.1.0 either (other refusals).
+  Every country computed by 1.1.0 has a coverage value.
+* **SDN and TTO** now run: under full coverage the response pushed an employment rate out of [0, 100]
+  (1.1.0 refused them); scaled by coverage (SDN 10.6 %, TTO F 63.3 %) they stay within bounds.
+* 128 countries: coverage by sex for 87, total for both sexes for 41; 74 use a year before 2022 (mostly
+  2020/2021), AZE, GMB, NER use 2015 (stated "old"); median coverage 65.5 %, 56 below 50 %, 34 at 100 %.
+
+2030, persons (conditional projections under stated assumptions, not forecasts; full table:
+`docs/dev/v3_simfix_live.json`):
+
+| Country | coverage used (ILOSTAT SDG 1.3.1) | employment change 1.1.0 → 1.2.0 | pension-receipt change 1.1.0 → 1.2.0 |
+|---|---|---:|---:|
+| IND (WBL 58 → 62) | 2022: F 39.5 %, M 52.6 % (note C15:6330) | +10 555 364 → **+4 491 771** | −24 154 151 → **−10 278 653** |
+| SEN (60 → 62) | 2022: total 25.3 % (both sexes) | +45 453 → **+11 500** | −104 011 → **−26 315** |
+| IDN | 2021: total 31.2 % | +1 235 576 → **+385 500** | −2 827 404 → **−882 150** |
+| PAK | 2022: total 17.4 % | +2 323 949 → **+404 367** | −5 317 960 → **−925 325** |
+| EGY | 2022: F 23.4 %, M 86.7 % | +611 218 → **+294 344** | −1 398 667 → **−673 555** |
+| ETH | 2019: F 3.8 %, M 4.6 % | +225 017 → **+8 944** | −514 914 → **−20 468** |
+| BRA (men 65 → 62; women already 62) | 2022: F 67.4 %, M 100 % | −593 677 → −593 677 | +1 358 528 → +1 358 528 |
+| MEX (65 → 62) | 2022: F 100 %, M 100 % | −754 924 → −754 924 | +1 727 515 → +1 727 515 |
+| JPN / KOR | 100 % | unchanged | unchanged |
+
+Reading: India's effect falls by 57 % but is still likely overstated — the 2022 coverage includes the
+non-contributory national old-age pension (age 60), while the WBL age 58 is the EPS age of formal-sector
+members. Brazil is unchanged because only men are affected and men's coverage is published as 100 %. Mexico is
+unchanged at 100 % coverage, which comes largely from the universal non-contributory pension from age 65: the
+1.2.0 Mexican figure remains an overstatement of what a change in the contributory age would do. A contributor
+share (active contributors / labour force) would be the better denominator; it is not available as an open
+archivable series here (see Source).
+
+## Open issues
+
+* Contributor coverage (ILO WSPDB / national SSI tables) when an archivable source is reachable.
+* Using the source's coverage year after the reference year (e.g. SMR 2023) would need a decision on mixing
+  input years; refused for now.
+* NL drafting still targets default versions; drafting 1.2.0 is NLC's call. No `ingest:ilostat.social_protection`
+  schedule was added (same remark as SIMWORLD).

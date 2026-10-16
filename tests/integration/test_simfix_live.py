@@ -155,7 +155,10 @@ def test_live_retirement_target_62_with_and_without_coverage(tmp_path: Path) -> 
             assert stats["target_62_1.1.0"]["status"] == "succeeded"
             assert stats["target_62_1.2.0"]["status"] == "succeeded"
             ready12 = set(stats["target_62_1.2.0"]["ready"])
-            assert ready12 <= set(stats["target_62_1.1.0"]["ready"])  # coverage only ever removes countries
+            # coverage can only remove countries (missing coverage), or bring back one whose full-coverage
+            # response pushed an employment rate out of [0, 100] in 1.1.0 (live 2026-10-16: SDN, TTO)
+            back = ready12 - set(stats["target_62_1.1.0"]["ready"])
+            assert all(stats["target_62_1.1.0"]["not_ready"][iso]["code"] == "validation_error" for iso in back)
             assert all(iso in stats["coverage_used"] for iso in ready12)
         finally:
             for e in engines.values():

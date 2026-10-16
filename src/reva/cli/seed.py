@@ -512,6 +512,15 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     *((f"atlas_ingest:{name}", "atlas_ingest", {"source": name}, 30 * 86400) for name, _hours in ATLAS_SCHEDULE_SLOTS),
     ("atlas_snapshot:live", "atlas_snapshot", {"origin": "live", "warm": True, "skip_unchanged": True}, 86400),
     # --- end ATLASOPS
+    # --- LINKWIRE (V3): daily link store materialisation two hours after the atlas snapshot slot (live atlas
+    # snapshot + live KG, the only materialisations production serves); reused when the inputs are unchanged.
+    (
+        "links_materialise:live",
+        "links_materialise",
+        {"atlas_origin": "live", "kg_origin": "live", "top_k": 10, "skip_unchanged": True},
+        86400,
+    ),
+    # --- end LINKWIRE
 )
 
 #: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Heavy downloads get a day of
@@ -519,6 +528,7 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
 ATLAS_FIRST_SLOT_HOURS: dict[str, int] = {
     **{f"atlas_ingest:{name}": hours for name, hours in ATLAS_SCHEDULE_SLOTS},
     "atlas_snapshot:live": 8,
+    "links_materialise:live": 10,  # LINKWIRE: after the daily atlas snapshot slot
 }
 
 

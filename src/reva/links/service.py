@@ -82,6 +82,9 @@ def path_between(
     deadline = None if time_budget_s is None else time.monotonic() + time_budget_s
     nb = KgNeighbourhood(conn, origin=origin)
     ends = [resolve_node(nb, x) for x in (source, *via, target)]
+    for key in ("via_any", "via_all"):  # unordered waypoints may be ISO3 codes too (LINKWIRE)
+        if query.get(key):
+            query[key] = frozenset(resolve_node(nb, x) for x in query[key])
     if len(ends) > 2:
         return find_chain(
             lambda sq: graph_from_db(conn, sq, origin=origin, deadline=deadline), ends, deadline=deadline, **query

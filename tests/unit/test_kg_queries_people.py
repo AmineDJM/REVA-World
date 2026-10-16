@@ -160,9 +160,10 @@ def resolve_query(specs: dict[str, dict[str, Any]], labels: list[str],
         f"BIND(\"anchor\" AS ?part) }}",
         f"{{ VALUES ?c_item {{ {' '.join('wd:' + q for q in classes)} }} "
         f"OPTIONAL {{ ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = \"en\") }} BIND(\"class\" AS ?part) }}",
-        f"{{ VALUES ?lk_l {{ {_lits(lookup_labels)} }} ?lk_item rdfs:label ?lk_l ; wikibase:sitelinks ?lk_sl . "
-        f"FILTER(?lk_sl >= 10) BIND(\"lookup\" AS ?part) }}",
     ]
+    if lookup_labels:  # an empty VALUES would leave ?lk_l unbound: a scan of every label (WDQS timeout)
+        branches.append(f"{{ VALUES ?lk_l {{ {_lits(lookup_labels)} }} ?lk_item rdfs:label ?lk_l ; "
+                        f"wikibase:sitelinks ?lk_sl . FILTER(?lk_sl >= 10) BIND(\"lookup\" AS ?part) }}")
     return ("SELECT DISTINCT ?part ?a_l ?a_item ?a_sl ?c_item ?c_l ?lk_l ?lk_item ?lk_sl WHERE { "
             + " UNION ".join(branches) + " }")
 

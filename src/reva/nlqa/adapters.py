@@ -43,9 +43,13 @@ from reva.nlqa.ports import (
     EntityMatch,
     KgPath,
     KgStatement,
+    PairLinkGroup,
+    PairLinks,
     PathHop,
+    PredecessorLink,
     TimeValue,
     is_projection,
+    pick_label,
 )
 
 log = logging.getLogger("reva.nlqa.adapters")
@@ -411,18 +415,25 @@ class AtlasQueryAdapter:
 # --------------------------------------------------------------------------- links (LINKS layer)
 #: user-level link kinds (the plan's ``link_kinds``) → LINKS link type ids (registry/links/link_types.yaml)
 LINK_GROUPS: dict[str, tuple[str, ...]] = {
-    "border": ("border_wikidata", "land_border", "maritime_neighbour"),
-    "shared_language": ("shared_official_language", "shared_language_used", "shared_language_family"),
-    "colonial": ("colony_of", "former_colony_of"),
+    "border": ("border_wikidata", "land_border", "land_border_cshapes", "maritime_neighbour"),
+    "shared_language": (
+        "shared_official_language",
+        "shared_language_used",
+        "shared_language_family",
+        "shared_language_glottolog",
+    ),
+    "colonial": ("colony_of", "former_colony_of", "colonial_rule_cshapes"),
     "succession": ("successor_of",),
     "membership": ("co_member",),
     "alliance": ("alliance_co_member",),
     "treaty": ("co_signatory",),
     "conflict": ("conflict_co_participant", "conflict_same_side", "conflict_opposing_sides"),
     "diplomatic": ("diplomatic_relation", "unga_vote_agreement"),
-    "trade": ("bilateral_trade",),
+    "trade": ("bilateral_trade", "bilateral_trade_imports", "bilateral_trade_baci"),
     "migration": ("migrant_stock",),
     "shared_institution": ("shared_head_of_state", "shared_currency", "shared_legal_family"),
+    "peacekeeping": ("peacekeeping_contributor_to_host",),
+    "historical_polity": ("shared_polity_territory",),
 }
 
 
@@ -574,8 +585,98 @@ class LinksAdapter:
 
     name = "reva.links"
 
-    def __init__(self, kg: KgDbAdapter) -> None:
+    def __init__(
+        self,
+        kg: KgDbAdapter,
+        *,
+        atlas_factory: Callable[[str | None], Any] | None = None,
+        live_only: bool = False,
+    ) -> None:
         self.kg = kg
+        #: atlas snapshot sha (None = latest) -> AtlasQuery or None: the pair view re-reads full histories
+        self.atlas_factory = atlas_factory
+        self.live_only = live_only
+
+    def pair(
+        self, a: str, b: str, kinds: Sequence[str] | None, from_year: int | None, to_year: int | None
+    ) -> PairLinks:
+        """Every link between two countries (``reva.links.service.pair_view``): store + atlas snapshot re-read,
+        predecessor-state links with their succession chain. Records keep their evidence for citation."""
+        try:
+            from reva.kg import query as kq
+            from reva.links.service import UnknownCountry, UnknownLinkKind, pair_view
+        except ImportError:
+            raise CapabilityUnavailable("reva.links is not installed", backend="links") from None
+        types = sorted({t for k in kinds for t in LINK_GROUPS.get(k, (k,))}) if kinds else None
+        try:
+            with self.kg._conn() as conn:
+                try:
+                    d = pair_view(
+                        conn,
+                        a,
+                        b,
+                        kinds=types,
+                        from_year=from_year,
+                        to_year=to_year,
+                        atlas=self.atlas_factory,
+                        live_only=self.live_only,
+                    )
+                except UnknownCountry:
+                    return PairLinks(a, b, ())
+                except UnknownLinkKind as e:
+                    raise CapabilityUnavailable(
+                        f"link type {e} is not in the LINKS taxonomy", backend="links"
+                    ) from None
+                pids = {
+                    str(ev.get("pid") or "")
+                    for k in d["kinds"].values()
+                    for lk in k["links"]
+                    for ev in lk.get("evidence", [])
+                    if ev.get("kind") == "kg_statement"
+                }
+                props = kq.property_info(conn, {p for p in pids if p})
+        except CapabilityUnavailable:
+            raise
+        except Exception as e:
+            raise CapabilityUnavailable(f"pair links query failed: {type(e).__name__}", backend="links") from None
+        labels = d.get("labels") or {}
+        groups = []
+        for t, k in sorted(d["kinds"].items(), key=lambda kv: (link_kind(kv[0]), kv[0])):
+            groups.append(
+                PairLinkGroup(
+                    link_type=t,
+                    kind=link_kind(t),
+                    count=int(k.get("count") or 0),
+                    first_year=k.get("first_year"),
+                    last_year=k.get("last_year"),
+                    links=tuple(_pair_link(lk, labels, props) for lk in k["links"]),
+                    labels={x: str(v) for x, v in (k.get("labels") or {}).items()},
+                )
+            )
+        preds = tuple(
+            PredecessorLink(
+                country=str(p["country"]),
+                predecessor_of=str(p["predecessor_of"]),
+                link=_pair_link(p["link"], labels, props),
+                succession=tuple(_pair_link(c, labels, props) for c in p.get("succession") or []),
+            )
+            for p in d.get("predecessor_links") or []
+        )
+        store = d.get("store") or {}
+        return PairLinks(
+            a,
+            b,
+            tuple(groups),
+            kinds_without_links=tuple(d.get("kinds_without_links") or ()),
+            predecessor_links=preds,
+            truncated=tuple(d.get("truncated") or ()),
+            node_labels={n: dict(v) for n, v in labels.items()},
+            store=(
+                f"materialisation {store.get('materialisation_id') or store.get('id')}"
+                if store
+                else "on demand (no materialised link store)"
+            ),
+        )
 
     def links(self, iso3: str, kinds: Sequence[str] | None, limit: int) -> list[CountryLink]:
         try:
@@ -636,6 +737,42 @@ class LinksAdapter:
             if len(out) >= limit:
                 break
         return out
+
+
+def _period_of(t: Mapping[str, Any]) -> str | None:
+    return (
+        "–".join(str(x) for x in (t.get("start"), t.get("end")) if x)
+        or t.get("point")
+        or (str(t["year"]) if t.get("year") is not None else None)
+    )
+
+
+def _pair_link(lk: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]], props: Mapping[str, Any]) -> CountryLink:
+    """One link of the pair view (``_link_json``) → port record; ends without an ISO3 (a predecessor state, a
+    colony) keep their node id and label."""
+    st, cells = _evidence_records(lk.get("evidence") or [], labels, props)
+    iso = [*(lk.get("iso3") or ()), None, None]
+    subj, obj = str(lk.get("subject")), str(lk.get("object"))
+    basis = lk.get("basis") if isinstance(lk.get("basis"), Mapping) else {}
+    return CountryLink(
+        kind=link_kind(str(lk.get("link_type"))),
+        link_type=str(lk.get("link_type")),
+        a_iso3=iso[0] or subj,
+        b_iso3=iso[1] or obj,
+        a_label=pick_label(labels.get(subj), "en", subj),
+        b_label=pick_label(labels.get(obj), "en", obj),
+        period=_period_of(lk.get("temporal") or {}),
+        weight=lk.get("weight"),
+        unit=lk.get("unit"),
+        statements=st,
+        cells=cells,
+        source=", ".join(lk.get("sources") or []) or None,
+        derived_by="reva.links",
+        basis=dict(basis or {}),
+        facet=lk.get("facet") or None,
+        a_node=None if iso[0] else subj,
+        b_node=None if iso[1] else obj,
+    )
 
 
 # --------------------------------------------------------------------------- Wikidata search (optional)
@@ -735,7 +872,11 @@ def build_backends(
                 import reva.links.service  # noqa: F401
 
                 b.paths = LinksPathAdapter(b.kg)
-                b.links = LinksAdapter(b.kg)
+                b.links = LinksAdapter(
+                    b.kg,
+                    atlas_factory=_atlas_snapshot_factory(engine, settings, atlas_store),
+                    live_only=getattr(settings, "reva_env", "") == "production",
+                )
             except ImportError:
                 b.paths = KgPathAdapter(b.kg)
         try:
@@ -747,6 +888,31 @@ def build_backends(
     if search_get is not None:  # a budget-metered Wikidata GET (WDHARVEST) — not wired by default
         b.search = WikidataSearchAdapter(search_get)
     return b
+
+
+def _atlas_snapshot_factory(engine: Engine, settings: Any, store: Any) -> Callable[[str | None], Any]:
+    """snapshot sha (None = latest; live only in production) → AtlasQuery, or None when none is readable."""
+    holder: dict[str, Any] = {"store": store}
+
+    def make(sha: str | None) -> Any:
+        try:
+            from reva.atlas.query import query_for
+            from reva.atlas.snapshot import resolve_snapshot
+        except ImportError:
+            return None
+        if holder["store"] is None:
+            from reva.adapters.objects.factory import build_store
+
+            holder["store"] = build_store(settings)
+        origin = "live" if sha is None and getattr(settings, "reva_env", "") == "production" else None
+        try:
+            with engine.connect() as conn:
+                snap = resolve_snapshot(conn, holder["store"], origin=origin, sha256=sha)
+            return query_for(snap, holder["store"])
+        except (RevaError, SQLAlchemyError, OSError):
+            return None
+
+    return make
 
 
 def _atlas(engine: Engine, settings: Any, store: Any) -> AtlasQueryAdapter | None:

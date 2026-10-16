@@ -9,13 +9,15 @@ Offline. Checks that
   domain enum has no ``nature``; the harvester checks domain == directory only one level below the root);
 * every QID and PID written in a KGSCIECO spec (classes, anchor items, VALUES lists) or requested in
   ``registry/kg/property_requests/kgscieco.yaml`` was confirmed by the recorded label check
-  ``tests/fixtures/kg/scieco/qid_labels.json`` -- real wbgetentities responses (archived, sha256 kept),
-  captured through WDHARVEST's budgeted, locked client; the English label must equal the label expected here (no id typed from memory goes
+  ``tests/fixtures/kg/scieco/qid_labels.json`` -- labels read from real wbgetentities responses fetched through
+  WDHARVEST's budgeted, locked client (bodies archived content-addressed, sha256 kept and re-checked when the
+  archive is present); the English label must equal the label expected here (no id typed from memory goes
   unverified). Re-capture after adding ids: ``uv run python tests/unit/test_kg_queries_scieco.py capture``.
 """
 
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 import re
@@ -158,8 +160,26 @@ def load_fixture() -> dict[str, Any]:
     doc: dict[str, Any] = json.loads(FIXTURE.read_text())
     body = json.dumps(doc["labels"], sort_keys=True, ensure_ascii=False).encode()
     assert hashlib.sha256(body).hexdigest() == doc["labels_sha256"]
-    assert len(doc["raw_sha256"]) == (len(doc["ids"]) + 49) // 50  # one archived wbgetentities response per 50 ids
+    assert doc["raw_sha256"] and all(re.fullmatch(r"[0-9a-f]{64}", h) for h in doc["raw_sha256"])
     return doc
+
+
+def test_fixture_matches_archived_raw_responses() -> None:
+    """When the raw archive is present (var/kg/objects, not versioned), the labels are re-read from it."""
+    doc = load_fixture()
+    base = ROOT / "var" / "kg" / "objects" / "reva" / "raw" / "sha256"
+    paths = [base / h[:2] / h[2:4] / h for h in doc["raw_sha256"]]
+    if not all(p.exists() for p in paths):
+        pytest.skip("raw archive not present on this machine")
+    seen: dict[str, str | None] = {}
+    for h, p in zip(doc["raw_sha256"], paths, strict=True):
+        stored = p.read_bytes()
+        body = gzip.decompress(stored) if stored[:2] == b"\x1f\x8b" else stored  # archive may keep gzip bytes
+        assert h in {hashlib.sha256(stored).hexdigest(), hashlib.sha256(body).hexdigest()}
+        for q, e in json.loads(body)["entities"].items():
+            if "missing" not in e:
+                seen[q] = e.get("labels", {}).get("en", {}).get("value")
+    assert {i: seen.get(i) for i in doc["labels"]} == doc["labels"]
 
 
 def test_every_id_is_expected_and_recorded() -> None:

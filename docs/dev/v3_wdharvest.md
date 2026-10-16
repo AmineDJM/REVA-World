@@ -13,7 +13,10 @@ tests `tests/unit/test_wikidata_harvest.py`, `tests/integration/test_wikidata_kg
 |---|---|---|---|
 | WDQS SPARQL (GET, JSON results) | `https://query.wikidata.org/sparql` | `wikidata.wdqs` | selecting items / explicit statement rows (query specs) |
 | `wbgetentities` (≤ 50 ids/call, `props=info|claims|labels|descriptions|aliases|sitelinks`, languages fr/en/es/pt/ar/zh/ru/de, `maxlag=5`) | `https://www.wikidata.org/w/api.php` | `wikidata.wbapi` | versioned entity snapshots (`lastrevid`), statements with ids, ranks, qualifiers, references |
-| CirrusSearch `list=search` (`haswbstatement:`) | same API host | `wikidata.wbapi` | country → QID mapping without WDQS |
+| CirrusSearch `list=search` (`haswbstatement:`) | same API host | `wikidata.wbapi` | candidate discovery without WDQS (`api_search`) |
+| `Special:EntityData/<id>.json` (Linked Data interface, one entity, CDN-cacheable, same JSON + `lastrevid`) | `https://www.wikidata.org/wiki/` | `wikidata.wbapi` | snapshots when the action API is saturated (`--api-mode auto|hybrid|linked_data`) |
+| `Special:WhatLinksHere/<item>` (page view, 5,000 items/page) | `https://www.wikidata.org/w/index.php` | `wikidata.wbapi` | candidates only (`discover: whatlinkshere`); an item is kept only if its own P31 claim contains the class |
+| MediaWiki REST search `/w/rest.php/v1/search/page` (≤ 100 hits) | same host | `wikidata.wbapi` | `linked_data` mode; shares the action-API limiter (also 429 on 2026-10-15) |
 
 Both hosts are the only ones allow-listed (`registry/sources/wikidata_*.yaml`, `ALLOWED_HOSTS`); the HTTP
 client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
@@ -80,12 +83,17 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
   `source_revision=<lastrevid>` (props include `info`; a snapshot without `lastrevid` is reported as
   `missing_revision`), references kept compactly (P248 stated in, P854 reference URL, P813 retrieved, P143
   imported from), allow-listed qualifiers, rank preferred/normal (deprecated dropped).
-* WDQS statements (`purpose: statements`): `source_key=wikidata.wdqs`. WDQS exposes no entity revision: the
-  revision is recorded as **explicitly unknown** in `qualifiers._revision = {wikidata_revision: "unknown",
-  reason, wdqs_data_as_of, retrieved_at}` (`wdqs_data_as_of` = `schema:dateModified` of
-  `<http://www.wikidata.org>`, probed once per run) and the version label is `wdqs@<retrieval time>`. Dates
-  from WDQS carry no precision: the coarsest consistent precision is used (`-01-01` → year, day `01` → month,
-  else day) and flagged `precision_inferred`. Rows without a `?rank` column are flagged `_rank_not_selected`.
+* WDQS statements (`purpose: statements`, review findings PROV-1 / KG-2): every row carrying a statement id
+  is **re-read from its subject's snapshot** (fetched anyway for labels, so no extra request): the loaded
+  statement is the snapshot claim with `lastrevid`, references and exact precision/calendar. Only rows
+  without a statement id, or whose claim changed since the WDQS replica, stay `source_key=wikidata.wdqs`, with
+  the revision recorded as **explicitly unknown** (`qualifiers._revision = {wikidata_revision: "unknown",
+  reason, wdqs_data_as_of, retrieved_at}`; version label `wdqs@<retrieval time>`). WDQS dates carry no
+  precision and **precision is never inferred from a date's shape** (`-0400-01-01` may be a century): a spec
+  selects it via `pqv:`/`psv:` `wikibase:timePrecision` columns, otherwise the time is kept with
+  `precision_unknown` and asserts no time bounds. All 29 statements specs bind `?statement`; 28 select time
+  qualifiers without precision columns (their unmatched rows fall back to `precision_unknown`). Rows without a
+  `?rank` column are flagged `_rank_not_selected`.
 * Label-only snapshots (objects of statements, `expand_hops: 1`) are versioned `<lastrevid>:labels` with kind
   `unclassified`, so a later full snapshot of the same revision becomes current instead of conflicting.
 * Wikidata is community-edited (CC0): statements are never labelled verified; causal properties (P828, P1542,
@@ -96,8 +104,14 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
 Format: `registry/kg/queries/README.md` + `_schema.json` (published first; KGHIST, KGPEOPLE, KGCULT,
 KGGEOPOL and A-LAW write against it). `python -m reva.kg.harvest validate` checks schema, allow-list,
 placeholders vs `split`, columns vs query variables, no trailing LIMIT, no label service, dependencies.
-Commands: `validate`, `try <spec> --limit N` (≤ 50 rows, first chunk, metered, no KG writes), `run [paths]`,
-`status`, `map-countries`, `merge-property-requests`.
+Commands: `validate`, `try <spec> --limit N` (≤ 50 rows, first chunk, metered, no KG writes),
+`run [paths] [--via wdqs|api] [--api-mode api|auto|hybrid|linked_data] [--no-expand] [--reuse-hours N]`,
+`status`, `map-countries [--candidates search|whatlinkshere] [--api-mode …]`, `merge-property-requests`.
+`--reuse-hours` (default 24) reuses archived EntityData snapshots (their sha and original retrieval time are
+cited; a mixed batch reports its oldest retrieval time). `--via api` uses the specs' `api_search` blocks (99 specs
+validated; 11 carry one: 3 core, 6 KGHIST, 1 economy, 1 science). Truthy `wdt:P31` under-selects historical states (preferred rank
+often goes to "historical country"): selection uses `p:P31/ps:P31` with a rank filter (core) and the
+`--via api` path filters on every non-deprecated P31 claim.
 
 Resumability: `var/kg/harvest_state/<spec id>.json` (spec sha256, chunks done with raw sha, seeds, subjects,
 objects, entity batches loaded). A completed spec with an unchanged sha256 is skipped; a changed spec restarts.
@@ -105,9 +119,9 @@ Loads are idempotent (KGCORE identity: statement key + origin + revision).
 
 ## Property allow-list
 
-`registry/kg/properties.yaml`: 141 properties chosen by WDHARVEST + accepted requests (KGHIST, KGCULT,
-A-LAW), each with REVA predicate, inverse name, kind, group, and the property entity's **own en/fr labels**
+`registry/kg/properties.yaml`: 186 properties — 141 chosen by WDHARVEST + 45 accepted requests (KGHIST,
+KGCULT, KGPEOPLE, KGSCIECO, A-LAW) — each with REVA predicate, inverse name, kind, group, and the property entity's **own en/fr labels**
 fetched from Wikidata (every P-id was verified to exist and its datatype to match the declared kind; label
 drift vs. my expected labels was reviewed: e.g. P607 is "participated in conflict"). Rejected: P642 ("of",
-deleted from Wikidata). 26 qualifiers and 4 reference properties are kept. Requests:
+deleted from Wikidata). 30 qualifiers and 4 reference properties are kept. Every property has its fr label. Requests:
 `registry/kg/property_requests/<agent>.yaml` → `python -m reva.kg.harvest merge-property-requests`.

@@ -1,0 +1,40 @@
+{
+  "kind": "membership",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "query": "SELECT DISTINCT ?part ?m_s ?m_o WHERE { { VALUES ?item { wd:Q7322 wd:Q174432 wd:Q7328 wd:Q45859 wd:Q217637 wd:Q939 wd:Q9916 wd:Q9696 wd:Q2042 wd:Q8620 wd:Q161672 wd:Q36014 wd:Q39524 wd:Q1047 wd:Q8605 wd:Q517 wd:Q7186 wd:Q937 } { ?religion wdt:P31/wdt:P279* wd:Q9174 ; wdt:P112 ?item . } UNION { VALUES ?office { wd:Q19546 wd:Q65997 } ?item wdt:P39 ?office . } UNION { VALUES ?occupation { wd:Q15995642 wd:Q1234713 wd:Q42857 wd:Q219477 } ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links . FILTER(?links >= 20) } ?item wdt:P31 wd:Q5 . BIND(?item AS ?m_s) BIND(\"m:people.religious_figures\" AS ?part) } UNION { VALUES ?item { wd:Q7322 wd:Q174432 wd:Q7328 wd:Q45859 wd:Q217637 wd:Q939 wd:Q9916 wd:Q9696 wd:Q2042 wd:Q8620 wd:Q161672 wd:Q36014 wd:Q39524 wd:Q1047 wd:Q8605 wd:Q517 wd:Q7186 wd:Q937 } VALUES ?occupation { wd:Q3242115 wd:Q15253558 wd:Q15627169 } ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links . FILTER(?links >= 12) ?item wdt:P31 wd:Q5 . BIND(?item AS ?m_s) BIND(\"m:people.revolutionaries_activists\" AS ?part) } UNION { VALUES ?item { wd:Q7322 wd:Q174432 wd:Q7328 wd:Q45859 wd:Q217637 wd:Q939 wd:Q9916 wd:Q9696 wd:Q2042 wd:Q8620 wd:Q161672 wd:Q36014 wd:Q39524 wd:Q1047 wd:Q8605 wd:Q517 wd:Q7186 wd:Q937 } VALUES ?occupation { wd:Q901 wd:Q169470 wd:Q593644 wd:Q170790 wd:Q864503 wd:Q11063 wd:Q39631 wd:Q188094 wd:Q4964182 wd:Q205375 wd:Q81096 wd:Q201788 wd:Q82594 wd:Q2374149 wd:Q212980 wd:Q901402 wd:Q18805 wd:Q2306091 } ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links . FILTER(?links >= 25) ?item wdt:P31 wd:Q5 . BIND(?item AS ?m_s) BIND(\"m:people.scientists_scholars\" AS ?part) } UNION { VALUES ?item { wd:Q7322 wd:Q174432 wd:Q7328 wd:Q45859 wd:Q217637 wd:Q939 wd:Q9916 wd:Q9696 wd:Q2042 wd:Q8620 wd:Q161672 wd:Q36014 wd:Q39524 wd:Q1047 wd:Q8605 wd:Q517 wd:Q7186 wd:Q937 } VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q417175 wd:Q1763527 wd:Q133156 wd:Q161243 wd:Q164142 } { ?state wdt:P31 ?cls ; p:P35|p:P6 ?hs . ?hs ps:P35|ps:P6 ?item ; wikibase:rank ?hr . FILTER(?hr != wikibase:DeprecatedRank) } UNION { ?state wdt:P31 ?cls ; p:P1906|p:P1313 ?os . ?os ps:P1906|ps:P1313 ?position ; wikibase:rank ?or . FILTER(?or != wikibase:DeprecatedRank) ?item p:P39 ?ps . ?ps ps:P39 ?position ; wikibase:rank ?pr . FILTER(?pr != wikibase:DeprecatedRank) } ?item wdt:P31 wd:Q5 . BIND(?item AS ?m_s) BIND(\"m:people.state_leaders\" AS ?part) } UNION { VALUES ?item { wd:Q7322 wd:Q174432 wd:Q7328 wd:Q45859 wd:Q217637 wd:Q939 wd:Q9916 wd:Q9696 wd:Q2042 wd:Q8620 wd:Q161672 wd:Q36014 wd:Q39524 wd:Q1047 wd:Q8605 wd:Q517 wd:Q7186 wd:Q937 } VALUES ?occupation { wd:Q36180 wd:Q49757 wd:Q6625963 wd:Q214917 wd:Q11774202 wd:Q1028181 wd:Q1281618 wd:Q36834 wd:Q42973 wd:Q2526255 } ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links . FILTER(?links >= 40) ?item wdt:P31 wd:Q5 . BIND(?item AS ?m_s) BIND(\"m:people.writers_artists\" AS ?part) } }\nLIMIT 2000",
+  "query_sha256": "cc4be6a763731089721b3bb895cc106d065ff0ad96d90998401d6d8739d0a839",
+  "raw_file": "p2_members_2.srj",
+  "body_sha256": "b6e35175d4b60510f9dbfb53df93b89d52cee4ec9a357004b3b8a82f37b4e3b4",
+  "archive_sha256": "a5688bb77534b119e8f60e827374be85ad833d083408619f91f13344e7149b80",
+  "retrieved_at": "2026-10-16T19:04:42.641753+00:00",
+  "rows": 27,
+  "elapsed_seconds": 50.02,
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)",
+  "spec_ids": [
+    "people.religious_figures",
+    "people.revolutionaries_activists",
+    "people.scientists_scholars",
+    "people.state_leaders",
+    "people.writers_artists"
+  ],
+  "probe_qids": [
+    "Q7322",
+    "Q174432",
+    "Q7328",
+    "Q45859",
+    "Q217637",
+    "Q939",
+    "Q9916",
+    "Q9696",
+    "Q2042",
+    "Q8620",
+    "Q161672",
+    "Q36014",
+    "Q39524",
+    "Q1047",
+    "Q8605",
+    "Q517",
+    "Q7186",
+    "Q937"
+  ]
+}
