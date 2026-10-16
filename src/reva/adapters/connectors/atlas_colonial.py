@@ -1238,14 +1238,40 @@ def atlas_source() -> list[Any]:
 # =============================================================================== ingest
 
 
-def _pinned_documents() -> dict[str, Any]:
-    from reva.adapters.connectors.atlas_colonial_registry import documents
+RELATIONS_FILE = "causal/relations_colonial.yaml"
 
-    return documents()
+
+def relations() -> dict[str, Any]:
+    """``registry/causal/relations_colonial.yaml`` (owner A-COLONIAL): pinned codebook documents and the mapping of
+    every coded variable (all non-causal: attribute / context)."""
+    import yaml
+
+    from reva.ontology.registry import REGISTRY_ROOT
+
+    doc = yaml.safe_load((REGISTRY_ROOT / RELATIONS_FILE).read_text(encoding="utf-8"))
+    if not isinstance(doc, dict) or doc.get("owner") != "A-COLONIAL":
+        raise ValueError("registry/causal/relations_colonial.yaml: unexpected content")
+    return doc
+
+
+def check_document(key: str, body: bytes) -> dict[str, Any]:
+    """A codebook shipped inside a provider archive vs its pinned sha256. A changed codebook stops the dataset
+    (the quoted value labels may no longer be the provider's)."""
+    pinned = relations()["documents"][key]["sha256"]
+    got = sha256(body)
+    if got != pinned:
+        raise drift(f"codebook {key} changed (sha256 {got[:12]} != pinned {pinned[:12]}): re-check the quoted labels")
+    return {"document": key, "sha256": got}
+
+
+def _kg_ready(run: Any) -> bool:
+    from reva.adapters.connectors.atlas_geopol_common import kg_available
+
+    return getattr(run, "engine", None) is not None and kg_available(run.engine)
 
 
 async def _ingest_coldat(run: Any) -> dict[str, Any]:
-    from reva.adapters.connectors.atlas_geopol_common import load_qid_for_iso3
+    from reva.adapters.connectors.atlas_geopol_common import fetch_countrycode, load_qid_for_iso3
 
     if not run.wants("dyads_v3"):
         return {"skipped": "dataset not requested"}
@@ -1279,8 +1305,12 @@ async def _ingest_coldat(run: Any) -> dict[str, Any]:
             f"{sum(d.col for d in dyads)} colonized dyads; both aggregations (max = last date, mean); "
             f"long/wide file differences: {len(disagreements)}"
         ),
-        rights={"licence": LICENCE_COLDAT, "provider": "Bastian Becker / Harvard Dataverse", "citation": COLDAT_CITATION,
-                "source_key": SOURCE_KEY_COLDAT},  # fmt: skip
+        rights={
+            "licence": LICENCE_COLDAT,
+            "provider": "Bastian Becker / Harvard Dataverse",
+            "citation": COLDAT_CITATION,
+            "source_key": SOURCE_KEY_COLDAT,
+        },
     )
     out: dict[str, Any] = {
         "version_check": check,
@@ -1291,32 +1321,110 @@ async def _ingest_coldat(run: Any) -> dict[str, Any]:
         "claims": {"delivered": 0, "reason": "no COLDAT variable codes a causal relation (relations_colonial.yaml)"},
     }
     if _kg_ready(run):
-        from reva.adapters.connectors.atlas_geopol_common import crosswalk_from_countrycode_tarball, crosswalk_keys
-
-        cw = _countrycode_from_store(run) or crosswalk_from_countrycode_tarball(b"", crosswalk_keys())
-        resolver = StateEntityResolver(cw, load_qid_for_iso3())
-        kg = coldat_kg(dyads, raw_sha256=shas["dyads"], resolver=resolver, qid_for_iso3=load_qid_for_iso3())
-        ents = [*kg.entities.values(), *resolver.code_entities()]
+        cw, cc_sha = await fetch_countrycode(run)
+        qids = load_qid_for_iso3()
+        resolver = StateEntityResolver(cw, qids)
+        kg = coldat_kg(dyads, raw_sha256=shas["dyads"], resolver=resolver, qid_for_iso3=qids)
+        code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha)
+        ents = [*kg.entities.values(), *code_ents]
         out["kg"] = load_colonial_kg(
             run.engine,
             run.store,
             ents,
-            kg.statements,
+            [*kg.statements, *code_links],
             source_key=SOURCE_KEY_COLDAT,
             source_revision=COLDAT_REVISION,
-            raw_sha256s=[shas["dyads"]],
+            raw_sha256s=[shas["dyads"], cc_sha],
             retrieved_at=raws["dyads"].retrieved_at,
             origin=run.origin,
         )
-        out["kg_counts"] = {"entities": len(ents), "statements": len(kg.statements)}
+        out["kg_counts"] = {"entities": len(ents), "statements": len(kg.statements) + len(code_links)}
     return out
 
 
-def _kg_ready(run: Any) -> bool:
-    from reva.adapters.connectors.atlas_geopol_common import kg_available
+async def _ingest_icow(run: Any) -> dict[str, Any]:
+    from reva.adapters.connectors.atlas_geopol_common import fetch_countrycode, load_qid_for_iso3
 
-    return getattr(run, "engine", None) is not None and kg_available(run.engine)
+    want_col, want_claims = run.wants("colhist_v11"), run.wants("claims_prov101")
+    media = ("application/zip", "application/x-zip-compressed", "application/octet-stream")
+    out: dict[str, Any] = {"atlas": {}, "kg": {}, "kg_counts": {}, "documents": []}
+    parsed: dict[str, Any] = {}
+    if want_col:
+        raw = await run.get(ICOW_COLHIST_URL, key="icow:colhist:1.1", media_types=media, max_bytes=5_000_000)
+        mem = zip_members(raw.body, name="colhist.zip")
+        _, cb = member(mem, "/" + ICOW_COLHIST_CODEBOOK, name="colhist.zip")
+        out["documents"].append(check_document("icow_colcode", cb))
+        _, data = member(mem, "/" + ICOW_COLHIST_MEMBER, name="colhist.zip")
+        parsed["colhist"] = (raw, parse_icow_colhist(data))
+    if want_claims:
+        raw = await run.get(ICOW_CLAIMS_URL, key="icow:claims:prov1.01", media_types=media, max_bytes=8_000_000)
+        mem = zip_members(raw.body, name="ICOWprov.zip")
+        _, man = member(mem, "/" + ICOW_CLAIMS_MANUAL, name="ICOWprov.zip")
+        out["documents"].append(check_document("icow_claims_manual", man))
+        _, data = member(mem, "/" + ICOW_CLAIMS_MEMBER, name="ICOWprov.zip")
+        parsed["claims"] = (raw, parse_icow_claims(data))
+    if not parsed:
+        return {"skipped": "dataset not requested"}
+    cw, cc_sha = await fetch_countrycode(run)
+    shas = {k: run.archive(v[0]) for k, v in parsed.items()}
+    rights = {"licence": LICENCE_ICOW, "provider": "ICOW Project (Paul R. Hensel)", "source_key": SOURCE_KEY_ICOW}
+    names: dict[int, str] = {}
+    if "colhist" in parsed:
+        states = parsed["colhist"][1]
+        names = {s.code: s.name for s in states}
+        rows = icow_colhist_atlas(states, raw_sha256=shas["colhist"], crosswalk=cw)
+        reg = run.register(
+            dataset="colhist_v11",
+            frame=rows.frame(),
+            raw_sha256s=[shas["colhist"]],
+            coverage_note=f"ICOW Colonial History 1.1: {len(states)} COW states (1816-2018 members), as coded",
+            rights={**rights, "citation": ICOW_COLHIST_CITATION},
+        )
+        out["atlas"]["colhist_v11"] = {k: reg[k] for k in ("dataset_key", "row_count", "created")}
+        out["states"] = len(states)
+    if "claims" in parsed:
+        claims = parsed["claims"][1]
+        rows = icow_claims_atlas(claims, raw_sha256=shas["claims"], crosswalk=cw)
+        reg = run.register(
+            dataset="claims_prov101",
+            frame=rows.frame(),
+            raw_sha256s=[shas["claims"]],
+            coverage_note=f"ICOW Territorial Claims provisional 1.01: {len(claims)} dyadic claims 1816-2001, as coded",
+            rights={**rights, "citation": ICOW_CLAIMS_CITATION},
+        )
+        out["atlas"]["claims_prov101"] = {k: reg[k] for k in ("dataset_key", "row_count", "created")}
+        out["claims_dyads"] = len(claims)
+    out["claims"] = {"delivered": 0, "reason": "no ICOW variable identifies a cause event (relations_colonial.yaml)"}
+    if _kg_ready(run):
+        qids = load_qid_for_iso3()
+        for key, revision in (("colhist", ICOW_COLHIST_REVISION), ("claims", ICOW_CLAIMS_REVISION)):
+            if key not in parsed:
+                continue
+            resolver = StateEntityResolver(cw, qids)
+            if key == "colhist":
+                kg = icow_colhist_kg(parsed[key][1], raw_sha256=shas[key], resolver=resolver)
+            else:
+                kg = icow_claims_kg(parsed[key][1], raw_sha256=shas[key], resolver=resolver, names=names)
+            code_ents, code_links = code_entities_and_links(resolver, raw_sha256=cc_sha)
+            ents = [*kg.entities.values(), *code_ents]
+            out["kg"][key] = load_colonial_kg(
+                run.engine,
+                run.store,
+                ents,
+                [*kg.statements, *code_links],
+                source_key=SOURCE_KEY_ICOW,
+                source_revision=revision,
+                raw_sha256s=[shas[key], cc_sha],
+                retrieved_at=parsed[key][0].retrieved_at,
+                origin=run.origin,
+            )
+            out["kg_counts"][key] = {"entities": len(ents), "statements": len(kg.statements) + len(code_links)}
+    return out
 
 
-def _countrycode_from_store(run: Any) -> StateCodeCrosswalk | None:  # pragma: no cover - replaced below
-    return None
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    if run.spec.name == "atlas.coldat":
+        return await _ingest_coldat(run)
+    if run.spec.name == "atlas.icow":
+        return await _ingest_icow(run)
+    raise ValueError(f"atlas_colonial: unknown source {run.spec.name}")
