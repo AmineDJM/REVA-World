@@ -143,11 +143,11 @@ rescaled, annualised, imputed or blended; value-less cells are omitted.
 
 | connector (module) | source key / budget | tables (`atlas.<source>.<dataset>`) | entities | licence |
 |---|---|---|---|---|
-| `atlas.gap_spc` (`atlas_gap_spc.py`) | `spc.pdh_stat` (requested 12/day) | `spc.pocket` (DF_POCKET: mid-year population, land area, density, life expectancy M/F, GDP LCU/USD, GDP per capita USD, inflation, merchandise trade, government revenue/expenditure % GDP, EEZ), `spc.keyfacts` (capital, languages, currency, government — texts), `spc.emprates` (unemployment rate, national total), `spc.digital` (ITU internet users DD024) | 22 PICTs: ASM COK FJI FSM GUM KIR MHL MNP NCL NIU NRU PCN PLW PNG PYF SLB TKL TON TUV VUT WLF WSM (9,676 pocket cells kept) | PDH catalogue "Other (Open)"; terms page 403 → **pending maintainer review** |
+| `atlas.gap_spc` (`atlas_gap_spc.py`) | `spc.pdh_stat` (12/day, merged) | `spc.pocket` (DF_POCKET: mid-year population, land area, density, life expectancy M/F, GDP LCU/USD, GDP per capita USD, inflation, merchandise trade, government revenue/expenditure % GDP, EEZ), `spc.keyfacts` (capital, languages, currency, government — texts), `spc.emprates` (unemployment rate, national total), `spc.digital` (ITU internet users DD024) | 22 PICTs: ASM COK FJI FSM GUM KIR MHL MNP NCL NIU NRU PCN PLW PNG PYF SLB TKL TON TUV VUT WLF WSM (9,676 pocket cells kept) | PDH catalogue "Other (Open)"; terms page 403 → **pending maintainer review** |
 | `atlas.gap_eurostat_nuts` (`atlas_gap_eurostat_nuts.py`) | `eurostat.dissemination` (existing key, shared with A-ILO's Eurostat source) | `eurostat.nuts2_gapfill`: population 1 Jan, total/land area, density, GDP (MIO_EUR, EUR_HAB), unemployment 15-74 (LFS), life expectancy at birth, internet use (3 / 12 months) | GLP MTQ GUF REU MYT (FRY1-5), ALA (FI20), SJM (NO0B "Svalbard og Jan Mayen"); 1,040 cells | Eurostat reuse policy (CC BY 4.0) |
-| `atlas.gap_insee` (`atlas_gap_insee.py`) | `insee.bdm` (requested 6/day) | `insee.ipc_dom` (IPC-2025 annual all-items index + annual variation = change of the annual average), `insee.smic_dom` (gross hourly Smic, DOM hors Mayotte series written per department it names + Mayotte series; monthly) | GLP MTQ GUF REU MYT (73 + 1,330 cells) | Licence Ouverte 2.0 (Etalab) |
-| `atlas.gap_cbs_bes` (`atlas_gap_cbs_bes.py`) | `cbs.opendata` (requested 12/day) | `cbs.bes_population` (1 Jan / 31 Dec population, births, deaths), `cbs.bes_gdp` (GDP current and 2017 prices, million USD; changes; GDP per capita USD), `cbs.bes_labour` (unemployment, participation, 15-74, two-yearly survey; filtered server-side) | BES (CN01); islands GM9001-9003 kept unmapped with `partial_of_iso3: BES` | CC BY 4.0 (CBS copyright notice, quoted) |
-| `atlas.gap_jersey` (`atlas_gap_jersey.py`) | `statistics_jersey.opendata` (requested 3/day) | `statsjersey.earnings` (mean and median monthly earnings, FTE basis, by sector, monthly from 2022) | JEY (1,344 cells) | Open Government Licence – Jersey v1.0 |
+| `atlas.gap_insee` (`atlas_gap_insee.py`) | `insee.bdm` (6/day, merged) | `insee.ipc_dom` (IPC-2025 annual all-items index + annual variation = change of the annual average), `insee.smic_dom` (gross hourly Smic, DOM hors Mayotte series written per department it names + Mayotte series; monthly) | GLP MTQ GUF REU MYT (73 + 1,330 cells) | Licence Ouverte 2.0 (Etalab) |
+| `atlas.gap_cbs_bes` (`atlas_gap_cbs_bes.py`) | `cbs.opendata` (12/day, merged) | `cbs.bes_population` (1 Jan / 31 Dec population, births, deaths), `cbs.bes_gdp` (GDP current and 2017 prices, million USD; changes; GDP per capita USD), `cbs.bes_labour` (unemployment, participation, 15-74, two-yearly survey; filtered server-side) | BES (CN01); islands GM9001-9003 kept unmapped with `partial_of_iso3: BES` | CC BY 4.0 (CBS copyright notice, quoted) |
+| `atlas.gap_jersey` (`atlas_gap_jersey.py`) | `statistics_jersey.opendata` (3/day, merged) | `statsjersey.earnings` (mean and median monthly earnings, FTE basis, by sector, monthly from 2022) | JEY (1,344 cells) | Open Government Licence – Jersey v1.0 |
 
 Honesty choices worth knowing:
 
@@ -175,18 +175,22 @@ explicit `theme`, French labels written by GAPHUNT). Geo aliases: `registry/atla
 
 ## 4. Live runs
 
-* `atlas.gap_eurostat_nuts`: **live ingest completed** twice through `run_atlas_ingest(mode="live")` into
-  throwaway databases (`reva_gaphunt_live_197fdcd8`, `reva_gaphunt_live_06422d39`, both dropped): 7 requests
-  reserved/consumed, 39,339 bytes, 7 raw artifacts archived, table `atlas.eurostat.nuts2_gapfill` (1,040 rows,
-  10 indicators, 7 entities), ~10 s.
-* `atlas.gap_spc`, `atlas.gap_insee`, `atlas.gap_cbs_bes`, `atlas.gap_jersey`: the platform **refused** the live
-  run before any request (`budget_exhausted`, reason `unknown_source`: their keys are not in the pinned policy
-  budgets-1.3.5) — fail closed as designed. Their fixtures are complete real provider responses captured on
-  2026-10-16 (SPC: restricted SDMX keys, see `FLOWS`), and the "after" matrix used the full live responses
-  parsed by the same parsers. Once ATLASOPS merges `gaphunt.yaml`, run
-  `uv run python -m reva.atlas.ingest atlas.gap_spc` (and `atlas.gap_insee`, `atlas.gap_cbs_bes`, `atlas.gap_jersey`).
-* Seed: the four new sources are discovered by module name; `register_atlas_connector_versions` registers them
-  at the next `reva seed`.
+All five sources were ingested live through `run_atlas_ingest(mode="live")` (budget-metered: reserve → metered
+GET → settle) into throwaway databases, all dropped afterwards; the dev database `reva` was never written.
+
+| connector | requests reserved / consumed | bytes | raw archived | tables (rows) | time |
+|---|---|---:|---:|---|---:|
+| `atlas.gap_spc` | 4 / 4 | 2,610,941 | 4 | `spc.pocket` (9,676), `spc.keyfacts` (198), `spc.emprates` (18), `spc.digital` (275) | ~4 s |
+| `atlas.gap_eurostat_nuts` | 7 / 7 | 39,339 | 7 | `eurostat.nuts2_gapfill` (1,040; 10 indicators; 7 entities) | ~6 s |
+| `atlas.gap_insee` | 2 / 2 | 94,269 | 2 | `insee.ipc_dom` (73), `insee.smic_dom` (1,330) | ~3 s |
+| `atlas.gap_cbs_bes` | 4 / 4 | 76,074 | 4 | `cbs.bes_population` (240), `cbs.bes_gdp` (232), `cbs.bes_labour` (140) | ~3 s |
+| `atlas.gap_jersey` | 1 / 1 | 35,267 | 1 | `statsjersey.earnings` (1,344) | ~1 s |
+
+Policy budgets-1.3.6 (ATLASOPS merged `gaphunt.yaml` during this work; before the merge the platform refused
+the four new keys with `budget_exhausted` / `unknown_source` before any request — fail closed, observed). The
+Eurostat source uses the existing `eurostat.dissemination` key and was also run under budgets-1.3.5.
+Fixtures are complete real provider responses captured on 2026-10-16 (SPC: restricted SDMX keys, see
+`FLOWS`). The seed registers the five sources (discovered by module name) at the next `reva seed`.
 
 ## 5. Proposals to ATLASOPS (`registry/atlas/source_order/_proposals_gaphunt.yaml`, not loaded)
 
@@ -292,8 +296,8 @@ uv run python scripts/atlas_gap_matrix.py --static --tables --db reva --objects 
     --with-proposals --out-json /tmp/gaps.json --out-md /tmp/gaps.md
 # union of coverage files saved earlier with --save-coverage FILE
 uv run python scripts/atlas_gap_matrix.py --coverage a.json --coverage b.json --out-md /tmp/gaps.md
-# gap-fill sources (live needs the budget keys merged; --fixture replays the captured responses)
-uv run python -m reva.atlas.ingest atlas.gap_eurostat_nuts [--fixture]
+# gap-fill sources (point the settings at a THROWAWAY database; --fixture replays the captured responses)
+uv run python -m reva.atlas.ingest atlas.gap_spc [--fixture]   # also gap_eurostat_nuts, gap_insee, gap_cbs_bes, gap_jersey
 ```
 
 ## 9. Tests
@@ -307,14 +311,13 @@ uv run python -m reva.atlas.ingest atlas.gap_eurostat_nuts [--fixture]
 * `tests/integration/test_atlas_gaphunt_db.py` (5, `db`): each source through `run_atlas_ingest(mode="fixture")`
   — raw archived as `evidence.acquisition`, tables registered (`atlas.table`, `test_fixture`), expected entities,
   idempotent second run.
-* `tests/invariants/test_invariant_30_budgets.py`: no GAPHUNT module builds a client (static scan passes). The
-  "budget keys == registered sources" test now also lists the four new source keys until ATLASOPS merges
-  `gaphunt.yaml` (it already failed before on other agents' keys: `glottolog.cldf`, `grambank.cldf`, `wals.cldf`).
+* `tests/invariants/test_invariant_30_budgets.py`: 9/9 pass with budgets-1.3.6 (no GAPHUNT module builds a
+  client; the four new source keys are pinned).
 
 ## 10. Requests
 
-* **ATLASOPS**: merge `registry/atlas/budget_requests/gaphunt.yaml` (`budget_merge --write`, re-pin); review and
-  merge `_proposals_gaphunt.yaml`; when the deployment snapshot exists, re-run `--snapshot` to replace the
+* **ATLASOPS**: (budget request already merged, thanks) review and merge `_proposals_gaphunt.yaml`; add the five
+  sources to the monthly schedule (`ATLAS_SCHEDULE_SLOTS`); when the deployment snapshot exists, re-run `--snapshot` to replace the
   static World Bank lists by the real WDI coverage.
 * **Lead / maintainer**: confirm the SPC PDH licence ("Other (Open)" in the catalogue; terms page not readable by
   automated clients) before publishing SPC values beyond the atlas; review the INSEE DOM Smic expansion rule.
