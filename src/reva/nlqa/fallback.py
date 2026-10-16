@@ -104,13 +104,11 @@ def _default_headlines() -> Any:
         from reva.atlas.source_order import cached_headlines
 
         return cached_headlines()
-    except Exception:  # noqa: BLE001 - a broken registry must not break the keyword planner
+    except Exception:  # a broken registry must not break the keyword planner
         return None
 
 
-def headline_tiebreak(
-    question: str, tied: list[str], catalog: QaCatalog, headlines: Any
-) -> tuple[str, str] | None:
+def headline_tiebreak(question: str, tied: list[str], catalog: QaCatalog, headlines: Any) -> tuple[str, str] | None:
     """``(catalog concept, headline concept)`` chosen among equally matching catalog concepts by the
     headline layer, or ``None`` when it does not decide.
 
@@ -145,9 +143,7 @@ def headline_tiebreak(
     return min(cands)[2], hid
 
 
-def match_concept(
-    question: str, catalog: QaCatalog, headlines: Any = _UNSET
-) -> tuple[str | None, list[str]]:
+def match_concept(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> tuple[str | None, list[str]]:
     """Best concept by the share of its label words (parenthetical parts ignored) found in the question:
     at least half of the words and at least one word of 5+ letters. A tie is broken by the headline
     layer (:func:`headline_tiebreak`) when it decides; otherwise no concept and the tied candidates."""
@@ -177,9 +173,7 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
     concept = ambiguous[0] if len(ambiguous) == 1 else None
     ambiguity: dict[str, Any] | None = None
     if len(ambiguous) > 1:
-        hb = headline_tiebreak(
-            question, ambiguous, catalog, _default_headlines() if headlines is _UNSET else headlines
-        )
+        hb = headline_tiebreak(question, ambiguous, catalog, _default_headlines() if headlines is _UNSET else headlines)
         ambiguity = {"candidates": ambiguous[:12], "resolution": "unresolved"}
         if hb:
             concept = hb[0]

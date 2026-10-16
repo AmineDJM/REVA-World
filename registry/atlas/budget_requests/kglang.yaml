@@ -1,0 +1,27 @@
+# Budget request from agent KGLANG (languages: Glottolog, WALS, Grambank). ATLASOPS merges into
+# registry/policies/budgets.yaml. Each source is one Zenodo record (JSON, ~10 kB) + one release zip per run.
+# The Wikidata cross-reference (atlas.glottolog_wikidata) runs under WDHARVEST's existing wikidata.wdqs budget:
+# one WDQS request per run (~3 MB), plus retries after 429/503.
+agent: KGLANG
+requests:
+  - source_key: glottolog.cldf
+    # zenodo.org: /api/records/3260727/versions/latest + glottolog-cldf-v5.3.zip (49.6 MB). CC BY 4.0.
+    daily_requests: 8
+    expected_bytes_per_day: 110000000
+    reason: "Glottolog CLDF release: 2 requests per run (record + 50 MB zip); 8/day allows retries of a flaky Zenodo"
+  - source_key: wals.cldf
+    # zenodo.org: /api/records/3606197/versions/latest + wals-2020.6.zip (12.6 MB). CC BY 4.0.
+    daily_requests: 6
+    expected_bytes_per_day: 30000000
+    reason: "WALS Online CLDF release: 2 requests per run (record + 12.6 MB zip)"
+  - source_key: grambank.cldf
+    # zenodo.org: /api/records/7740139/versions/latest + grambank-v1.0.3.zip (9.1 MB). CC BY 4.0.
+    daily_requests: 6
+    expected_bytes_per_day: 25000000
+    reason: "Grambank CLDF release: 2 requests per run (record + 9.1 MB zip)"
+daily_totals_increase:
+  http_requests_total: "+20"
+  http_bytes_total: "+165_000_000"
+notes: >-
+  zenodo.org resets connections intermittently (seen 2026-10-15); SafeHttpClient retries transport failures, the
+  daily request numbers leave room for one retried run. No new Wikidata budget is requested.

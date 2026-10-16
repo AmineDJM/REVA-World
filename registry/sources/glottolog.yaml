@@ -1,0 +1,24 @@
+# V3 (agent KGLANG): Glottolog, CLDF release on Zenodo (glottolog/glottolog-cldf).
+# Connector: src/reva/adapters/connectors/atlas_glottolog.py -> KG languoids/classification/countries/endangerment
+# (source_key glottolog.cldf) + atlas table glottolog.languages (per-country counts of Glottolog records).
+source_key: glottolog.cldf
+title: Glottolog (CLDF dataset glottolog/glottolog-cldf, Zenodo)
+provider_url: https://glottolog.org
+lineage_family: glottolog
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Hammarström, Harald & Forkel, Robert & Haspelmath, Martin & Bank, Sebastian. Glottolog <version>. Leipzig: Max
+    Planck Institute for Evolutionary Anthropology. https://glottolog.org (CLDF release on Zenodo, concept DOI
+    10.5281/zenodo.3260727; the version DOI is recorded on every load).
+metadata:
+  allowed_hosts: [zenodo.org]
+  zenodo_concept_record: https://zenodo.org/records/3260727
+  record_api: https://zenodo.org/api/records/3260727/versions/latest
+  release_checked: v5.3 (2026-03-02, doi:10.5281/zenodo.18840967, glottolog-cldf-v5.3.zip 49,646,070 bytes, md5 a90ec97b56abb432dc02ca7b5a838272)
+  licence_check: the Zenodo record's license id must be cc-by-4.0 on every run, else the run is blocked
+  integrity: zip md5 and size checked against the record before archiving
+  tables_used: cldf/languages.csv, cldf/values.csv (classification, category, aes), cldf/codes.csv, cldf/names.csv (fr)
+  authentication: none
+  cadence: monthly check; Glottolog publishes about two releases a year

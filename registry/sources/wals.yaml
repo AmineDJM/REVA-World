@@ -1,0 +1,21 @@
+# V3 (agent KGLANG): WALS Online, CLDF release on Zenodo (cldf-datasets/wals).
+# Connector: src/reva/adapters/connectors/atlas_wals.py -> KG typological feature values (source_key wals.cldf).
+source_key: wals.cldf
+title: World Atlas of Language Structures Online (CLDF dataset cldf-datasets/wals, Zenodo)
+provider_url: https://wals.info
+lineage_family: wals
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Dryer, Matthew S. & Haspelmath, Martin (eds.). WALS Online (<version>). Zenodo (concept DOI
+    10.5281/zenodo.3606197; the version DOI is recorded on every load). https://wals.info
+metadata:
+  allowed_hosts: [zenodo.org]
+  zenodo_concept_record: https://zenodo.org/records/3606197
+  record_api: https://zenodo.org/api/records/3606197/versions/latest
+  release_checked: v2020.6 (2026-09-28, doi:10.5281/zenodo.23010827, wals-2020.6.zip 12,618,962 bytes, md5 65611a3d32cadfd8d1e4e0a064b0f7c7)
+  licence_check: the Zenodo record's license id must be cc-by-4.0 on every run, else the run is blocked
+  language_mapping: Glottocode column of the WALS LanguageTable (WALS-declared); 17 WALS languages have none
+  authentication: none
+  cadence: quarterly check

@@ -40,7 +40,8 @@ def test_ties_are_queried_when_few_and_reported_when_many() -> None:
 
     assert [o[1] for o in ops("salaire minimum au Senegal", cat_with(2))] == ["labour.mw.v0", "labour.mw.v1"]
     plan = keyword_plan("salaire minimum au Senegal", cat_with(6))
-    assert plan["unsupported"] and "several catalog concepts match" in plan["unsupported"][0]["reason"]
+    assert plan["operations"] == [] and plan["unsupported"] == []
+    assert plan["ambiguities"][0]["resolution"] == "unresolved" and len(plan["ambiguities"][0]["candidates"]) == 6
     assert match_concept("météo à Paris", CAT) == (None, [])
 
 

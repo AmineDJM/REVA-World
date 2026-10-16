@@ -1,0 +1,22 @@
+# V3 (agent KGLANG): Grambank, CLDF release on Zenodo (grambank/grambank).
+# Connector: src/reva/adapters/connectors/atlas_grambank.py -> KG grammatical feature values (source_key grambank.cldf).
+source_key: grambank.cldf
+title: Grambank (CLDF dataset grambank/grambank, Zenodo)
+provider_url: https://grambank.clld.org
+lineage_family: grambank
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Skirgård, Hedvig et al. 2023. Grambank reveals the importance of genealogical constraints on linguistic
+    diversity and highlights the impact of language loss. Science Advances 9(16), doi:10.1126/sciadv.adg6175.
+    Dataset: Grambank <version>, Zenodo (concept DOI 10.5281/zenodo.7740139; the version DOI is recorded on every load).
+metadata:
+  allowed_hosts: [zenodo.org]
+  zenodo_concept_record: https://zenodo.org/records/7740139
+  record_api: https://zenodo.org/api/records/7740139/versions/latest
+  release_checked: v1.0.3 (2023-04-19, doi:10.5281/zenodo.7844558, grambank-v1.0.3.zip 9,113,298 bytes, md5 baf806fa8647c062a7403fa9cd969a50)
+  licence_check: the Zenodo record's license id must be cc-by-4.0 on every run, else the run is blocked
+  language_mapping: Grambank language ids are Glottocodes
+  authentication: none
+  cadence: quarterly check
