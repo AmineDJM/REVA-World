@@ -9,7 +9,7 @@ sequence are **context**; causal statements are only listed as *asserted by* the
 
 | Piece | Path |
 |---|---|
-| Taxonomy (73 types fr/en, 16 roles, property roles, 13 dataset kinds, 1 derived kind) | `registry/events/taxonomy.yaml` |
+| Taxonomy (82 types fr/en, 19 roles, 56 property roles, 17 dataset kinds, 1 derived kind; EVMAP §9) | `registry/events/taxonomy.yaml` |
 | Recorded Wikidata verification (106 entities: labels en/fr, P31/P279 claims with rank and statement id, property datatypes, `lastrevid`, raw sha256) | `registry/events/_recorded/wikidata_verification.json` |
 | `same_as` evidence rules | `registry/events/same_as_rules.yaml` |
 | Taxonomy loader/validator | `src/reva/events/taxonomy.py` |
@@ -326,8 +326,62 @@ a) and the FLN/MNA (side b).
   reused. `/v1/events/{id}` cards point to `/v1/causal/events/{id}` for graded claims.
 * **A-CONTENTION / A-ECRISES**: cross-dataset `same_as` needs a mapping table with evidence (e.g. the JST chronology
   PDF table): add it under `mapping_tables` in `registry/events/same_as_rules.yaml`.
-* Dataset kinds for CAUSDATA / A-COUPS / A-HAZARDS / A-SANCTIONS / A-CONTENTION follow their documented ids and coded
-  values; they are tested with synthetic records (CAUSDATA-style marker + coded outcome exclusion), not with those
-  agents' fixtures.
+* Dataset kinds for CAUSDATA / A-COUPS / A-HAZARDS / A-SANCTIONS / A-CONTENTION / A-ECRISES / A-COLONIAL are now
+  verified on those agents' real fixtures (EVMAP, §9).
 * Wikidata is community-edited: a type is what Wikidata's P31/P279 claims say at the recorded revision, shown with
   its chain; COW intervals and CShapes independence events are REVA derivations and labelled so.
+
+## 9. EVMAP — dataset kinds verified on the agents' real fixtures (agent EVMAP, 2026-10-16)
+
+`tests/integration/test_events_dataset_kinds.py` (`db`, 7 tests) runs the fixture-mode ingests of **every**
+causality dataset into one throwaway database — KGGEOPOL UCDP, CAUSDATA (`atlas.icb`, `atlas.mid`,
+`atlas.ucdp_term`), A-COUPS (`atlas.coups`, `atlas.archigos`, `atlas.reign_leaders`), A-HAZARDS (`atlas.noaa_hazards`,
+2018 window), A-SANCTIONS (`atlas.ties`, `atlas.eusanct`, `atlas.eu_sanctionsmap`, `atlas.ofac_programs`),
+A-CONTENTION (`atlas.navco`, `atlas.mec`, `atlas.massmob`), A-ECRISES (the four `atlas.ecrises.*`), A-COLONIAL
+(`atlas.coldat`, `atlas.icow`, `atlas.cowtc`) — then classifies every record of their namespaces (≈ 7,000) with
+`reva.events.view.classify`. It asserts: every KG entity kind has an EVMAP decision (event or not an event); every
+event record is typed with a type more specific than the root `event`; coded outcomes, terminations, volcanoes,
+persons, regimes/programs, organisations, conditions and COW territories are never typed as events; each dataset
+reaches exactly its expected types; every loaded causal claim has a typed event at one end and, at the other, a
+typed event or a known non-event record (coded outcome, ESRB condition); the listing never mixes coded types.
+
+**What the real fixtures showed (before → after).** Typed already: UCDP conflicts / episodes / peace agreements,
+ICB crises, triggers and responses, MID disputes and incidents, Powell & Thyne coups, NCEI earthquakes / tsunamis /
+eruptions, TIES / EUSANCT cases, NAVCO / MEC / MMP records (synthetic-tested by EVENTS, confirmed). **Untyped**:
+`archigos:coup:*` (32 in the fixture) and `archigos:exit:*` (44), all Laeven-Valencia / Reinhart-Rogoff / JST crisis
+events and the ESRB residual events (829: their P31 classes Q806729 / Q1417912 / Q1092023 / Q1364290 have no recorded
+EVENTS verification, so they matched nothing), and every A-COLONIAL event. Also a listing bug: the contention
+marker's default type was `protest`, so `list_events(types=["protest"])` returned state repression and state responses
+too; the default is now `event` (only coded values mapped into the requested types are listed).
+
+| Records | Mapping added | Type(s) |
+|---|---|---|
+| `archigos:coup:*` | prefix (source `archigos.leaders`) | `coup` |
+| `archigos:exit:*` | prefix | new dataset type `leader_removal` (Archigos exit Irregular or Foreign) |
+| `ecrises:{lv,rr,jst,esrb}:*` | marker `ecrises:crisis_type` (coded values verbatim) | new dataset types `banking_crisis`, `currency_crisis`, `sovereign_debt_crisis` (under `financial_crisis`), `inflation_crisis` (under `economic_crisis`), `financial_stress_episode` (ESRB residual, under `event`: not coded as a crisis); ESRB systemic → `financial_crisis` |
+| `icowcol:{independence,secession,merger}:*`, `cowtc:*`, `icowclaim:*` | marker `colonial:event_type` | `independence`, new `secession` (under `independence`), new `state_merger`, `transfer_of_sovereignty` (COW TC non-independence changes; procedure kept as a coded property), new `territorial_claim` |
+| `ptcoup:*`, `ncei_hazards:*`, `ties:case:*`, `eusanct:case:*` | prefix kinds now name their source keys and coded properties | unchanged |
+
+Not events (by decision, asserted by the test): `ncei_hazards:volcano:*` (a place), `archigos:leader:*`,
+`reign:leader:*`, `*:outcome*`, `eusanct:policy_result:*`, ICB `crisis_outcome`, MID `dispute_outcome`, UCDP
+`conflict_termination`, `icb:pc:*`, `eusanctionsmap:regime:*`, `ofac:program:*`, `sanctions:org:*`,
+`ecrises:condition:*`, `cowent:*` (territories), provider place nodes.
+
+**Property roles added** (cards, `country=` filter of the listing): participants `ties:sender` / `eusanct:sender`
+(new role `sender`), `ties:target` / `eusanct:target`, `coup:leader_removed`, `archigos:removal_of` (target),
+`icowcol:independence_of` / `secession_of` / `merged_into`, `cowtc:gainer` (new role `gainer`),
+`icowcol:independence_from` / `seceded_from`, `cowtc:loser` (`former_ruler`), `icowcol:merger_of`,
+`icowclaim:challenger` (new role `challenger`) / `icowclaim:target`; places `ncei:country`, `ncei:runup_country`
+(location), `coup:against_state`, `archigos:removed_from`, `contention:location`, `cowtc:territory`.
+
+**`same_as`: `colonial_independence_key` (active).** A-COLONIAL's `colonial:independence_key`
+(`independence|cow:<state>|from|cow:<ruler>`) links an ICOW independence to the COW TC independence of the same state
+from the same ruler. New rule option `one_per_source: true` (`reva.events.same_as.shared_property_links`): a key held
+by two records of ONE source is two events of that source (Baltic / Caucasus states from Russia in 1918-21 and 1991,
+when ICOW's record is absent from a slice), so it is reported `ambiguous` with reason
+`several_records_of_one_source`, never linked. Fixture: 12 cross-dataset links (e.g. `cowtc:46` =
+`icowcol:independence:140`, Brazil from Portugal), 11 same-source keys reported. Without the option the fixture
+would have linked `cowtc:580` = `cowtc:862` (two COW TC independences of one state).
+
+Coups: `coup:same_state_and_day_as` (A-COUPS) stays context; it is not turned into `same_as` (same state and day
+is a coincidence test, not a shared identifier).

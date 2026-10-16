@@ -4,15 +4,16 @@ agents' REAL fixtures (fixture-mode ingests, no network) loaded together into th
 Sources: CAUSDATA (ICB, COW MID, UCDP termination + peace agreements, with KGGEOPOL's UCDP conflicts), A-COUPS
 (Powell & Thyne, Archigos, REIGN-format list), A-HAZARDS (NOAA NCEI 2018 window), A-SANCTIONS (TIES, EUSANCT, EU
 sanctions map, OFAC), A-CONTENTION (NAVCO, MEC, Mass Mobilization), A-ECRISES (Laeven-Valencia, Reinhart-Rogoff,
-JST, ESRB), A-COLONIAL (COLDAT, ICOW colonial history + claims, COW territorial change + entities). Asserts: no record of an event kind is left untyped, coded outcomes / places / regimes / persons are
-never typed as events, and every causal claim's cause or effect is a typed event (the other end being a typed
-event or a known non-event record such as a coded outcome).
+JST, ESRB), A-COLONIAL (COLDAT, ICOW colonial history + claims, COW territorial change + entities). Asserts: no
+record of an event kind is left untyped, coded outcomes / places / regimes / persons are never typed as events,
+and every causal claim's cause or effect is a typed event (the other end being a typed event or a known non-event
+record such as a coded outcome). The same loads then feed one link-store materialisation (EVMAP link kinds:
+sanctions episodes, OFAC programs, COLDAT / COW colonial rule, shared tsunami observations).
 """
 
 from __future__ import annotations
 
 from collections import Counter
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -191,9 +192,7 @@ def test_types_per_dataset(classified: dict[str, tuple[str, dict[str, Any]]]) ->
     assert m and m[0]["coded_type"] == "systemic banking crisis" and m[0]["statement"]["source_key"]
 
 
-def test_causal_claims_attach_to_typed_events(
-    loaded: Any, classified: dict[str, tuple[str, dict[str, Any]]]
-) -> None:
+def test_causal_claims_attach_to_typed_events(loaded: Any, classified: dict[str, tuple[str, dict[str, Any]]]) -> None:
     tax = load_taxonomy()
     with loaded.api.connect() as c:
         if not c.execute(text("SELECT to_regclass('kg.causal_claim_current')")).scalar():
@@ -267,3 +266,89 @@ def test_colonial_independence_same_as_is_cross_dataset_only(loaded: Any) -> Non
     amb = [a for a in report.ambiguous if a["rule"] == "colonial_independence_key"]
     assert amb and all(a.get("reason") == "several_records_of_one_source" for a in amb if len(a["holders"]) == 2)
     assert not any({x.left, x.right} == set(a["holders"]) for x in col for a in amb)
+
+
+# ------------------------------------------------------------------------------------------------ EVMAP links
+EVMAP_LINKS = (
+    "sanction_episode",
+    "us_sanctions_program",
+    "colonised_by_coldat",
+    "colonial_rule_cow",
+    "hazard_shared_event",
+)
+
+
+@pytest.fixture(scope="module")
+def materialised(loaded: Any, tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """One link-store materialisation over the same fixture loads (test_fixture atlas snapshot + KG)."""
+    from reva.atlas.snapshot import create_atlas_snapshot
+    from reva.links.store import materialise
+
+    mp = pytest.MonkeyPatch()
+    mp.setenv("REVA_ATLAS_CACHE_DIR", str(tmp_path_factory.mktemp("evmap_atlas_cache")))
+    snap = create_atlas_snapshot(loaded.worker, loaded.store, origin="test_fixture")
+    res = materialise(loaded.worker, loaded.store, atlas_sha256=snap.sha256, top_k=5, duckdb_memory_limit="1GB")
+    yield res, snap
+    mp.undo()
+
+
+def _atlas(db: Any) -> Any:
+    from reva.atlas.query import query_for
+    from reva.atlas.snapshot import resolve_snapshot
+
+    def make(sha: str | None) -> Any:
+        with db.api.connect() as c:
+            snap = resolve_snapshot(c, db.store, sha256=sha)
+        return query_for(snap, db.store)
+
+    return make
+
+
+def test_evmap_links_are_materialised_with_terms_and_evidence(loaded: Any, materialised: Any) -> None:
+    res, _snap = materialised
+    counts = res.report["counts"]
+    for kind in EVMAP_LINKS:
+        assert counts.get(kind, 0) > 0, (kind, counts)
+    assert counts["us_sanctions_program"] == 20
+    print("EVMAP counts", {k: counts[k] for k in EVMAP_LINKS})  # shown with -s (docs/dev/v3_links.md figures)
+    print("EVMAP skipped", {k: res.report["kg_dataset"][k]["skipped"] for k in EVMAP_LINKS[2:]})
+    print("EVMAP atlas", {k: res.report["atlas"][k]["skipped"] for k in EVMAP_LINKS[:2]})
+    with loaded.api.connect() as c:
+        rows = c.execute(
+            text(
+                """SELECT link_type, count(*) AS n,
+                          count(*) FILTER (WHERE jsonb_array_length(evidence) = 0 OR weight_num = 0) AS bad,
+                          count(*) FILTER (WHERE NOT basis ? 'licence') AS no_terms,
+                          count(DISTINCT facet) AS facets
+                     FROM kg.link_row WHERE materialisation_id = :m AND link_type = ANY(:k) GROUP BY link_type"""
+            ),
+            {"m": res.id, "k": list(EVMAP_LINKS)},
+        ).mappings()
+        by = {r["link_type"]: dict(r) for r in rows}
+        hz = c.execute(
+            text(
+                "SELECT via, temporal, basis FROM kg.link_row WHERE materialisation_id = :m "
+                "AND link_type = 'hazard_shared_event' ORDER BY subject, object LIMIT 1"
+            ),
+            {"m": res.id},
+        ).one()
+    for kind, r in by.items():
+        assert r["bad"] == 0 and r["no_terms"] == 0, (kind, r)
+    assert by["sanction_episode"]["facets"] == 2  # TIES and EUSANCT never merged
+    assert hz.via[0].startswith("ncei_hazards:tsunami:") and hz.temporal["kind"] == "point"
+    assert res.report["kg_dataset"]["hazard_shared_event"]["count"] == counts["hazard_shared_event"]
+
+
+def test_evmap_pair_and_country_views(loaded: Any, materialised: Any) -> None:
+    from reva.links import service as svc
+
+    with loaded.api.connect() as c:
+        pair = svc.pair_view(c, "USA", "CUB", atlas=_atlas(loaded))
+        view = svc.country_view(c, "CUB", kinds=["sanction_episode", "us_sanctions_program"], atlas=_atlas(loaded))
+    se = pair["kinds"]["sanction_episode"]
+    assert se["count"] > 10 and se["first_year"] <= 1960
+    assert {lk["facet"] for lk in se["links"]} >= {"source=ties"}
+    assert all(lk["basis"]["licence"] for lk in se["links"])
+    assert pair["kinds"]["us_sanctions_program"]["links"][0]["weight"] == "1"
+    groups = view["by_kind"]["sanction_episode"]["groups"]
+    assert any(g["facet"] == "source=ties" and g["direction"] == "incoming" for g in groups)

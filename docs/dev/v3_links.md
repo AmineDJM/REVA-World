@@ -608,3 +608,81 @@ through). `npm run typecheck`, vitest (190 passed) and `npm run build` pass.
 Not done: no live materialisation (A-INFRA's live tables lived in a dropped throwaway database; a live run of
 `atlas.wikidata_cables` costs ~400 Wikidata requests); `scripts/e2e_stack.py --v3-fixtures` does not replay the
 A-INFRA fixtures yet (owner: lead / LINKWIRE).
+
+
+# EVMAP — sanctions, colonial datasets and shared natural events between countries (agent EVMAP, 2026-10-16)
+
+Inputs: A-SANCTIONS' dyadic atlas tables (`docs/dev/v3_a_sanctions.md` §4-5), A-COLONIAL's KG statements
+(`docs/dev/v3_a_colonial.md` §5, §10), A-HAZARDS' NCEI tsunami records (`docs/dev/v3_a_hazards.md`). Five new link
+types (taxonomy: 38), wired like LINKS3's: derivation, materialised store, on-demand country view (atlas kinds), pair
+view, path engine (stored links are edges), NLQA (`LINK_GROUPS` / `LINK_KINDS`) and the Pays ↔ Pays screen. None is
+causal; each link carries its licence / terms in `basis.licence`.
+
+## EV.1 Link types
+
+| id | input | direction | weight | temporal | terms (`basis.licence`) |
+|---|---|---|---|---|---|
+| `sanction_episode` | `ties.dyad_year` + `eusanct.dyad_year` `CASES_ACTIVE\|partner=` (atlas_dyadic, two sources); companion `IMPOSITIONS_ACTIVE` → `basis.impositions_active` (cited) | sender → target | cases (REVA count of coded cases) | case-active year | TIES: no licence stated, cite-only (maintainer review); EUSANCT: CC BY 4.0 |
+| `us_sanctions_program` | `ofac.programs` `ACTIVE_PROGRAMS\|partner=` (row USA) | USA → country named by the program title | programs | retrieval day | public domain (US Government work) |
+| `colonised_by_coldat` | `coldat:colonized_by` (kg_dataset_colonial) | colonised country → colonizer | – | first .. last year | CC0 1.0 |
+| `colonial_rule_cow` | `cowent:colony_of` / `protectorate_of` / `mandated_to` / `possession_of` + `geopol:corresponds_to_iso3` | territory → ruler | – | status spell as printed, left-censored at 1816 (`basis.left_censored`, shown "≤ 1816") | COW terms: cite, no charging |
+| `hazard_shared_event` | `ncei:country` + `ncei:runup_country` (+ `ncei:tsunami_validity`, the event's `P585`) of one `ncei_hazards:tsunami:*` (new method `kg_dataset_hazard`) | source country → runup country, via the event | – | event date (point) | US Government work (NOAA NCEI) |
+
+* **Several datasets, one type, never summed.** New `atlas_spec` options (schema + `AtlasLinkReader`):
+  `extra_sources` (same datasets / indicators in further atlas sources), `facet_source` (each link's facet is
+  `source=<name>`: TIES and EUSANCT overlap — EUSANCT re-uses TIES cases — so their counts are separate links and
+  series, never added), `licences` (source → terms, overriding `licence`). Evidence and `basis.source` name the row's
+  own source; companions join on the same source. A `source=` facet is never a filter: the store's `country_rows` and
+  the on-demand ranking keep every source as its own group (`facet LIKE 'source=%'`). Organisation senders (EU, UN,
+  EEC code 1000) are not countries: counted `iso3_unmapped`, no link (an `org → country` kind would need an evidenced
+  org mapping, not proposed).
+* **COLDAT** states each spell under two date aggregations (last date, mean): statements with the same years give one
+  link citing both (`basis.aggregations`); different years give one link per aggregation. One spell per (country,
+  power): interruptions are not coded (said in `basis.note`).
+* **COW entities**: territory named like `colonial_rule_cshapes` (`basis.territory_mapping` qid / later_state /
+  same_entity / none — unmapped territories keep their `cowent:<code>` node and are counted
+  `territory_without_country`); occupied_by / claimed_by / leased_to / part_of / neutral_zone_of are not colonial rule:
+  no link. The CShapes derivation now shares this code (`_derive_territory_rule`), unchanged in behaviour.
+* **hazard_shared_event** exists only when one NCEI tsunami record lists runups in a country other than its source
+  country: "même événement naturel observé" — never a cause, never an exchange. Validity −1 (erroneous) → no link;
+  more than 60 runup countries on one event → not expanded (counted `too_many_runup_countries`); ≤ 200,000 links;
+  `basis` = runup record count, published runup deaths sum, validity code, number of runup countries. The causal
+  side (earthquake → tsunami `coded_trigger`) stays A-HAZARDS' T1 claims, never this link.
+* ICOW data are not used for links (ICOW asks users not to redistribute; its independence events are in the event
+  view, cited, with the courtesy flagged by A-COLONIAL).
+
+## EV.2 Wiring
+
+* `src/reva/links/atlas_links.py` (`spec_sources`, multi-source CTEs, per-source licence), `dataset_kg.py`
+  (`derive_coldat`, `derive_cow_colonial`, `derive_hazard_shared_event`, `DATASET_PROPERTIES` extended so the
+  materialiser reads them), `store.py` / `service.py` (source facets), schema `kg_dataset_hazard` +
+  `extra_sources` / `facet_source` / `licences`.
+* NLQA: `colonial` gains `colonised_by_coldat`, `colonial_rule_cow`; new user-level groups `sanctions`
+  (`sanction_episode`, `us_sanctions_program`) and `natural_hazard` (`hazard_shared_event`) in `LINK_GROUPS` and
+  `LINK_KINDS` (coverage test-enforced); the UI Demander fixture's `catalog_digest` regenerated.
+* UI (`ui/src/v3/lib/relation.ts`): themes "Sanctions (épisodes codés TIES / EUSANCT, programmes OFAC)" and
+  "Catastrophes naturelles (même événement observé dans les deux pays)"; COLDAT / COW kinds in the colonial lane next to
+  CShapes; sanction series are named by dataset ("jeu de données TIES (1945-2005)"), never merged; hazard and colonial
+  items carry their basis details (runup records, aggregation, status); the stored licence of each kind is shown once.
+
+## EV.3 Tests and figures
+
+* `tests/unit/links/test_links_evmap.py` (6): A-SANCTIONS' builders on its recorded fixtures → DuckDB built like
+  `_build_db` → `sanction_episode` (TIES and EUSANCT links, facet per source, per-source licence, USA → CUB 1960 from
+  the TIES Cuba case, organisation senders counted unmapped, store row round trip) and `us_sanctions_program` (20
+  links, USA → CUB = 1 program); COLDAT aggregation merge / split; COW left-censoring and occupation excluded; hazard
+  links (source → runup countries only, erroneous record, no source country, bound).
+* `tests/integration/test_events_dataset_kinds.py` (`db`): after the all-fixtures load, one materialisation
+  (test_fixture snapshot + KG) gives `sanction_episode` 5,561 (787 cells with an unmapped sender, 571 with an
+  unmapped target), `us_sanctions_program` 20, `colonised_by_coldat` 255, `colonial_rule_cow` 620 (442 rule
+  statements on territories without a country correspondence, kept on their own node), `hazard_shared_event` 23 (19
+  runups in the source country itself: no link); every row evidenced, with terms, no zero weight; two facets for
+  `sanction_episode`; the pair view USA ↔ CUB lists TIES episodes from 1960 and the OFAC program; the country view of
+  CUB groups `source=ties` incoming.
+* Green: `tests/unit/links` (126), `tests/unit/events`, `tests/unit/nlqa`, `tests/review_v3`,
+  `tests/integration/test_links_{store,db,ops,infra_store}.py`, `test_events_{view,datasets}.py`,
+  `test_api_contract.py` (`contracts/openapi.json` unchanged: route models carry `data: dict`); UI typecheck, vitest
+  (221 passed), build.
+
+Not done: no live materialisation (the new sources' budgets are not merged); `scripts/e2e_stack.py --v3-fixtures`
+does not replay these fixtures (owner: lead / LINKWIRE).

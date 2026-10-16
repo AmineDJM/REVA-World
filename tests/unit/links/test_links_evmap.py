@@ -42,7 +42,7 @@ EVMAP = ("sanction_episode", "us_sanctions_program", "colonised_by_coldat", "col
 def _fixture(name: str, url: str) -> bytes:
     man = json.loads((FIXTURE_ROOT / name / "manifest.json").read_text())
     e = next(e for e in man if e["url"] == url)
-    return (FIXTURE_ROOT / name / e["file"]).read_bytes()
+    return bytes((FIXTURE_ROOT / name / e["file"]).read_bytes())
 
 
 _FRAMES: list[pl.DataFrame] = []
@@ -62,7 +62,9 @@ def frames() -> list[pl.DataFrame]:
         cases, file = S.build_cases(ds, _fixture(f"atlas.{ds}", url), strict=strict)
         dyad, _ = S.case_atlas_rows(cases, raw_sha256=SHA, crosswalk=cw, last_year=last, file=file)
         _FRAMES.append(validate_atlas_frame(atlas_frame(dyad), source=ds, dataset="dyad_year", raw_sha256s=[SHA])[0])
-    rows = S.ofac_rows(S.parse_ofac(_fixture("atlas.ofac_programs", S.OFAC_URL)), raw_sha256=SHA, day=date(2026, 10, 16))
+    rows = S.ofac_rows(
+        S.parse_ofac(_fixture("atlas.ofac_programs", S.OFAC_URL)), raw_sha256=SHA, day=date(2026, 10, 16)
+    )
     _FRAMES.append(validate_atlas_frame(atlas_frame(rows), source="ofac", dataset="programs", raw_sha256s=[SHA])[0])
     return _FRAMES
 
@@ -140,7 +142,9 @@ def test_sanction_episode_one_link_per_source_with_its_terms(reader: AtlasLinkRe
     for lk in d.links:
         by_src.setdefault(lk.basis["source"], []).append(lk)
         assert lk.basis["facet"] == f"source={lk.basis['source']}"
-        assert lk.evidence[0].source == lk.basis["source"] and lk.evidence[0].pid.startswith("CASES_ACTIVE|partner=")
+        assert lk.evidence[0].source == lk.basis["source"] and str(lk.evidence[0].pid).startswith(
+            "CASES_ACTIVE|partner="
+        )
         assert lk.temporal.kind == "snapshot" and lk.unit and int(lk.weight or "0") > 0
     assert set(by_src) == {"ties", "eusanct"}
     assert all("cite" in lk.basis["licence"] for lk in by_src["ties"])
@@ -182,7 +186,7 @@ QID_ISO3 = {"Q155": "BRA", "Q45": "PRT", "Q252": "IDN", "Q854": "LKA", "Q668": "
 
 
 def test_coldat_spell_merges_equal_aggregations_and_cites_both() -> None:
-    q = {"colonizer_as_coded": "portugal", "country_as_coded": "Brazil"}
+    q: dict[str, tuple[str, ...]] = {"colonizer_as_coded": ("portugal",), "country_as_coded": ("Brazil",)}
     sts = [
         Stmt("c1", "Q155", "coldat:colonized_by", "Q45", start=y(1533), end=y(1822),
              qualifiers={**q, "aggregation": ("last date aggregation",)}, source_key="harvard.dataverse.coldat"),
