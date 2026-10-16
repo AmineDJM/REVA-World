@@ -22,7 +22,7 @@ projection under stated assumptions, not a forecast*.
 | Model registry | `registry/models/methods.yaml` (1.1.0 entries, listed before the 1.0.0 entries) |
 | Capabilities | `simulation.platform.model_versions`, `demography.cohort_component.world`, `social.retirement_age.world` (implemented); `economic.io_price.world` (reserved, reason below) |
 | Budget request | `registry/atlas/budget_requests/simworld.yaml` (`un.wpp` 20/day; merged as budgets-1.3.5) |
-| Tests | `tests/unit/test_simworld_connectors.py` (7), `tests/unit/test_simworld_models.py` (13), `tests/integration/test_simworld_pipeline.py` (5, DB), `tests/integration/test_simworld_live.py` (`live`); fixtures `tests/fixtures/source/un.wpp/`, `tests/fixtures/source/ilostat.labour_age5/`, helper `tests/fixtures/simworld/simworld_fixtures.py` |
+| Tests | `tests/unit/test_simworld_connectors.py` (7), `tests/unit/test_simworld_models.py` (12), `tests/integration/test_simworld_pipeline.py` (5, DB), `tests/integration/test_simworld_live.py` (`live`); fixtures `tests/fixtures/source/un.wpp/`, `tests/fixtures/source/ilostat.labour_age5/`, helper `tests/fixtures/simworld/simworld_fixtures.py` |
 
 Connector versions: both were first registered as 1.0.0 in the dev database while the code was still
 changing; the final content is **`un.wpp@1.0.1`** and **`ilostat.labour_age5@1.0.1`** (registered rows

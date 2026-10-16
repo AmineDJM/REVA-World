@@ -25,7 +25,9 @@ from reva.links.taxonomy import load_taxonomy
 
 ISO3_RE = re.compile(r"^[A-Z]{3}$")
 #: properties read around a country for ``/v1/links/{iso3}`` (2 hops: country → shared object → others)
-COUNTRY_LINK_PROPERTIES = ("P47", "P530", "P37", "P2936", "P38", "P35", "P463", "P1891", "P710", "P1344", "P607")
+COUNTRY_LINK_PROPERTIES = (
+    "P47", "P530", "P37", "P2936", "P38", "P35", "P463", "P1891", "P710", "P1344", "P607", "geo:covered_territory_of",
+)  # fmt: skip
 SUCCESSION_PROPERTIES = ("P1365", "P1366", "P155", "P156", "P17", "P361")
 LANGUAGE_GENEALOGY = ("P279", "P361")
 

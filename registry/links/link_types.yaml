@@ -582,14 +582,39 @@ derived_links:
         DERIVED spatial overlay (reva.kg.overlay) of a Cliopatria polygon (approximate borders, CC BY 4.0) with
         Natural Earth 1:10m Admin-0 (de facto view) and cites both raw artifacts and geometry digests; its
         qualifiers carry the share of the country's area (no weight: computed by REVA, not a source quantity).
-        The statements are loaded (source key cliopatria.github); the derivation is not wired into
-        src/reva/links/derive.py yet (request to LINKS), so no link of this type is produced until then.
-        Polities with more than max_members covered countries should not be expanded pairwise (hub rule).
+        The statements are loaded (source key cliopatria.github); wired by LINKS2 (reva.links.derive.derive_shared_subject):
+        polities with more than max_members (60) covered countries are not expanded pairwise (hub rule) and at most
+        200,000 pairs are produced; both bounds are recorded in the derivation report.
     temporal: {kind: interval, description: "intersection of the two overlay statements' runs (first FromYear .. last ToYear, astronomical years)"}
     weight: {kind: none}
     honesty: {fr: "relié via : territoires actuels en partie couverts par {via} (superposition calculée, frontières approximatives)", en: "connected via: present-day territories partly covered by {via} (computed overlay, approximate borders)"}
     causal: false
-    status: awaiting_source
+    status: derivable
+    path_cost: 1.5
+
+  # ---------------------------------------------------------------- UN peace operations (A-MILITARY)
+  - id: peacekeeping_contributor_to_host
+    labels: {fr: "a fourni du personnel en uniforme à une mission de l'ONU dans", en: "contributed uniformed personnel to a UN mission in"}
+    inverse_labels: {fr: "a accueilli une mission de l'ONU avec du personnel de", en: "hosted a UN mission with personnel from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_dataset_peacekeeping
+      properties: ["unpk:contributed_personnel_to", "unpk:mission_country"]
+      sources: [unpk]
+      via: mission
+      notes: >-
+        UN Peace and Security Data Hub (CC BY 3.0 IGO, A-MILITARY, source key un.psdata): country -> mission per
+        calendar year (unpk:contributed_personnel_to) and mission -> country as reported (unpk:mission_country),
+        overlapping periods. Linear in the contribution statements (one link per contribution x reported mission
+        country; at most 200,000, cap recorded). The reported maximum of uniformed personnel is kept in basis (a REVA
+        sum over personnel types at one reporting date), not as a weight. A deployment under a UN mandate: it says
+        nothing about alliances or positions.
+    temporal: {kind: interval, description: "overlap of the contribution year (first..last reporting date) and the mission-country statement"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : personnel en uniforme fourni à {via} (ONU)", en: "connected via: uniformed personnel contributed to {via} (UN)"}
+    causal: false
+    status: derivable
     path_cost: 1.5
 
 # Properties the path engine traverses as single hops. labels: subject -> object; inverse_labels: object ->
@@ -710,3 +735,5 @@ statement_edges:
   - {property: "glottolog:spoken_in", labels: {fr: "parlée dans (pays selon Glottolog)", en: "spoken in (Glottolog countries)"}, inverse_labels: {fr: "pays où est parlé le languoïde (Glottolog)", en: "country of the languoid (Glottolog)"}, path_cost: 1.2}
   - {property: "glottolog:parent", labels: {fr: "est un sous-groupe de (classification Glottolog)", en: "is a subgroup of (Glottolog classification)"}, inverse_labels: {fr: "a pour sous-groupe (classification Glottolog)", en: "has subgroup (Glottolog classification)"}, path_cost: 1.0}
   - {property: "glottolog:wikidata_item", labels: {fr: "élément Wikidata (selon Wikidata P1394)", en: "Wikidata item (per Wikidata P1394)"}, inverse_labels: {fr: "languoïde Glottolog de", en: "Glottolog languoid of"}, path_cost: 0.5}
+  - {property: "unpk:contributed_personnel_to", labels: {fr: "a fourni du personnel en uniforme à (opération de paix de l'ONU)", en: "contributed uniformed personnel to (UN peace operation)"}, inverse_labels: {fr: "a reçu du personnel en uniforme de", en: "received uniformed personnel from"}, path_cost: 1.2}
+  - {property: "unpk:mission_country", labels: {fr: "pays de la mission (selon l'ONU)", en: "mission country (as reported by the UN)"}, inverse_labels: {fr: "pays d'accueil de la mission de l'ONU", en: "country of UN mission (as reported)"}, path_cost: 1.0}

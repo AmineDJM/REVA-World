@@ -81,6 +81,22 @@ def test_shared_polity_territory_and_hub_rule() -> None:
         Stmt(f"o{i}", "cliopatria:ottoman", "geo:covered_territory_of", f"iso3:{x}", start=PartialDate(1550), end=PartialDate(1830))
         for i, x in enumerate(("DZA", "TUN"))
     ] + [Stmt(f"h{i}", "cliopatria:huge", "geo:covered_territory_of", f"iso3:X{i:02d}") for i in range(70)]
-    out = derive_dataset_links(sts, node_of=node_of, qid_iso3=QID_ISO3)["shared_polity_territory"]
+    from reva.links.derive import derive_all
+
+    out = derive_all(sts).by_type["shared_polity_territory"]
     assert [(lk.subject, lk.object, lk.via) for lk in out.links] == [("iso3:DZA", "iso3:TUN", ("cliopatria:ottoman",))]
     assert out.skipped["hub_subject_not_expanded"] == 1
+
+
+def test_peacekeeping_contributor_to_host_via_the_mission() -> None:
+    m = "unpk:mission:unifil"
+    sts = [
+        Stmt("k1", "Q142", "unpk:contributed_personnel_to", m, start=d(2010, 1, 31), end=d(2010, 12, 31),
+             qualifiers={"year": ("2010",), "max_uniformed_personnel_reported": ("1500",)}, source_key="un.psdata"),  # fmt: skip
+        Stmt("k2", m, "unpk:mission_country", "iso3:LBN", start=d(1990, 11, 30), end=d(2009, 12, 31), source_key="un.psdata"),
+        Stmt("k3", m, "unpk:mission_country", "iso3:ISR", start=d(2010, 3, 1), end=d(2026, 7, 31), source_key="un.psdata"),
+    ]
+    out = derive_dataset_links(sts, node_of=node_of, qid_iso3=QID_ISO3)["peacekeeping_contributor_to_host"]
+    assert [(lk.subject, lk.object, lk.via) for lk in out.links] == [("Q142", "iso3:ISR", (m,))]
+    assert out.skipped["disjoint_periods"] == 1 and out.links[0].basis["max_uniformed_personnel_reported"] == "1500"
+    assert out.links[0].weight is None

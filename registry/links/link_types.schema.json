@@ -113,7 +113,8 @@
                 "atlas_computed",
                 "kg_dataset_border",
                 "kg_dataset_colonial",
-                "kg_dataset_sides"
+                "kg_dataset_sides",
+                "kg_dataset_peacekeeping"
               ]
             },
             "properties": {

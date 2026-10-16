@@ -150,6 +150,12 @@ def kg_allowlist() -> set[str]:
         out |= set(GEOPOL_PROPERTIES)
     except ImportError:  # pragma: no cover
         pass
+    try:
+        from reva.adapters.connectors.atlas_peacekeeping import UNPK_PROPERTIES
+
+        out |= set(UNPK_PROPERTIES)
+    except ImportError:  # pragma: no cover
+        pass
     return out
 
 
