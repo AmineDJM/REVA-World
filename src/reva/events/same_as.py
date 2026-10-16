@@ -101,24 +101,35 @@ def shared_property_links(
 ) -> tuple[list[SameAsLink], list[dict[str, Any]]]:
     """Entities sharing a value of one identifier property (``kind: same_property``)."""
     rows = conn.execute(
-        text(f"""SELECT s.subject_qid, s.value, s.statement_key FROM kg.statement_current s
+        text(f"""SELECT s.subject_qid, s.value, s.statement_key, s.source_key FROM kg.statement_current s
                   WHERE s.property_pid = :p AND s.value IS NOT NULL{_origin_sql(origin, "s")}
                   ORDER BY s.subject_qid LIMIT :lim"""),
         {"p": rule["property"], "origin": origin, "lim": MAX_LINKS * 2},
     ).all()
     by_value: dict[str, dict[str, str]] = defaultdict(dict)
-    for subj, val, key in rows:
+    sources: dict[str, dict[str, str]] = defaultdict(dict)
+    for subj, val, key, src in rows:
         v = _id_value(val)
         if v is not None:
             by_value[v].setdefault(subj, key)
+            sources[v].setdefault(subj, src)
     links: list[SameAsLink] = []
     ambiguous: list[dict[str, Any]] = []
     max_group = int(rule.get("max_group", 2))
+    # `one_per_source`: the key identifies an event only ACROSS datasets (e.g. A-COLONIAL's independence key is
+    # `state|from|ruler`, which one dataset may code twice: 1918 and 1991). Two holders from one source are
+    # two events of that source, so the value is ambiguous, never a link.
+    one_per_source = bool(rule.get("one_per_source", False))
     for v, holders in sorted(by_value.items()):
         if len(holders) < 2:
             continue
         if len(holders) > max_group:
             ambiguous.append({"rule": rule["id"], "value": v, "holders": sorted(holders)})
+            continue
+        if one_per_source and len(set(sources[v].values())) < len(holders):
+            ambiguous.append(
+                {"rule": rule["id"], "value": v, "holders": sorted(holders), "reason": "several_records_of_one_source"}
+            )
             continue
         subs = sorted(holders)
         for i, a in enumerate(subs):

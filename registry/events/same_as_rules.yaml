@@ -17,6 +17,20 @@ rules:
       UNTC's MTDSG number (e.g. XXVII-7-d) is the depositary's own key of a multilateral treaty; two KG records
       carrying the same number denote the same treaty (e.g. a record loaded before A-TREATIES mapped the treaty
       to its Wikidata item and the item itself).
+  - id: colonial_independence_key
+    kind: same_property
+    property: "colonial:independence_key"
+    status: active
+    max_group: 2
+    one_per_source: true
+    note: >-
+      A-COLONIAL's key `independence|cow:<state>|from|cow:<former ruler>`, written on ICOW Colonial History
+      independence records and on COW Territorial Change independences when both code the same COW state gaining
+      independence from the same COW state (shared COW codes; dates are not part of the key). Full data 2026-10-16:
+      145 links, 9 keys held by more than two records (e.g. Baltic and Caucasus states' independences from Russia
+      in 1918-21 and 1991) reported ambiguous, never linked. `one_per_source`: two records of ONE dataset with the
+      same key are two events of that dataset (e.g. two COW TC independences when ICOW's record is absent), so the
+      key is ambiguous, never a link (EVMAP). A linked pair can still disagree on the date (shown).
   - id: ucdp_conflict_id_on_wikidata
     kind: prefix_vs_property
     id_prefix: "ucdp:conflict:"

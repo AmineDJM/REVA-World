@@ -35,6 +35,7 @@ from reva.adapters.connectors import (
 )
 from reva.atlas.ingest import run_atlas_ingest
 from reva.atlas.sources import ensure_registered
+from reva.events import same_as as sa
 from reva.events import view as ev
 from reva.events.taxonomy import load_taxonomy
 
@@ -75,7 +76,7 @@ EVENT_KINDS = {
 NON_EVENT_KINDS = {
     "crisis_outcome", "dispute_outcome", "conflict_termination", "coded_outcome", "campaign_outcome", "volcano",
     "person", "armed_group", "organization", "place_name", "sanction_regime", "sanction_program", "condition",
-    "protracted_conflict", "state_code",
+    "protracted_conflict", "state_code", "territory",
 }  # fmt: skip
 
 #: record family -> the types its records may get (every family must be present in the fixtures).
@@ -103,6 +104,11 @@ EXPECTED = {
     "ecrises:rr": {"banking_crisis", "currency_crisis", "sovereign_debt_crisis", "inflation_crisis"},
     "ecrises:jst": {"banking_crisis"},
     "ecrises:esrb": {"financial_crisis", "financial_stress_episode"},
+    "icowcol:independence": {"independence"},
+    "icowcol:secession": {"secession"},
+    "icowcol:merger": {"state_merger"},
+    "cowtc": {"independence", "transfer_of_sovereignty"},
+    "icowclaim": {"territorial_claim"},
 }
 
 
@@ -130,7 +136,7 @@ async def loaded(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Any:
 
 def _family(qid: str) -> str:
     head = qid.split(":")[0]
-    if head.startswith(("navco", "mec", "mmp", "ptcoup")):
+    if head.startswith(("navco", "mec", "mmp", "ptcoup", "cowtc", "icowclaim")):
         return head
     return ":".join(qid.split(":")[:2])
 
@@ -248,3 +254,16 @@ def test_cards_and_listing_of_dataset_events(loaded: Any) -> None:
     assert banking["items"] and all(i["id"].startswith("ecrises:") for i in banking["items"])
     assert removals["items"] and all(i["id"].startswith("archigos:exit:") for i in removals["items"])
     assert ts_card is not None and any(pl["place"] and pl["place"]["id"].startswith("Q") for pl in ts_card["places"])
+
+
+def test_colonial_independence_same_as_is_cross_dataset_only(loaded: Any) -> None:
+    """A-COLONIAL's independence key links an ICOW independence to the COW TC independence of the same state from
+    the same ruler; two records of ONE dataset sharing the key (Baltic states 1918 and 1991) are never linked."""
+    with loaded.worker.connect() as c:
+        report = sa.derive_links(c, origin="test_fixture")
+    col = [x for x in report.links if x.rule == "colonial_independence_key"]
+    assert col and all({x.left.split(":")[0], x.right.split(":")[0]} == {"cowtc", "icowcol"} for x in col)
+    assert ("cowtc:46", "icowcol:independence:140") in {(x.left, x.right) for x in col}  # Brazil from Portugal
+    amb = [a for a in report.ambiguous if a["rule"] == "colonial_independence_key"]
+    assert amb and all(a.get("reason") == "several_records_of_one_source" for a in amb if len(a["holders"]) == 2)
+    assert not any({x.left, x.right} == set(a["holders"]) for x in col for a in amb)

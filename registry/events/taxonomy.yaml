@@ -33,6 +33,8 @@ roles:
   - {id: contributor, label_en: personnel contributor, label_fr: contributeur en personnel}
   - {id: former_ruler, label_en: former ruling state, label_fr: ancien État souverain}
   - {id: sender, label_en: sender (sanctions), label_fr: émetteur (sanctions)}
+  - {id: gainer, label_en: gaining state or entity (territory, independence), label_fr: entité bénéficiaire (territoire, indépendance)}
+  - {id: challenger, label_en: challenger (territorial claim), label_fr: État revendicateur (revendication territoriale)}
 
 types:
   - id: event
@@ -236,6 +238,29 @@ types:
     description: >-
       Accession to independence. Wikidata's 'independence' (Q37055) is a concept, not an event class (recorded
       lookup); CShapes status changes are derived events of this type; declarations are a sub-type.
+  - id: secession
+    label_en: secession (ICOW coding)
+    label_fr: sécession (codage ICOW)
+    parent: independence
+    wikidata_classes: []
+    roles: [gainer, former_ruler]
+    description: ICOW Colonial History 1.1 secession records (a COW state seceding from another); dataset type.
+  - id: state_merger
+    label_en: merger of states (ICOW coding)
+    label_fr: fusion d'États (codage ICOW)
+    parent: event
+    wikidata_classes: []
+    roles: [participant, gainer]
+    description: ICOW Colonial History 1.1 merger records (a state merged into another); dataset type.
+  - id: territorial_claim
+    label_en: territorial claim (ICOW coding)
+    label_fr: revendication territoriale (codage ICOW)
+    parent: event
+    wikidata_classes: []
+    roles: [challenger, target]
+    description: >-
+      ICOW territorial claims (provisional 1.01), dyadic: a challenger state's explicit claim to territory a target
+      state administers, from its beginning to its end (or ongoing at 2001-12-31). A dated episode, not a war.
   - id: declaration_of_independence
     label_en: declaration of independence
     label_fr: déclaration d'indépendance
@@ -575,6 +600,7 @@ properties:
   - {pid: "coup:against_state", family: place, role: country, note: "A-COUPS: the state whose executive the coup targeted"}
   - {pid: "archigos:removed_from", family: place, role: country, note: "Archigos: the state the leader was removed from"}
   - {pid: "contention:location", family: place, role: location, note: "NAVCO / MEC / MMP location (country QID or provider place)"}
+  - {pid: "cowtc:territory", family: place, role: location, note: "COW TC: the territory that changed hands (COW entity)"}
   # participants (out: the event is the subject; in: the event is the object)
   - {pid: P710, family: participant, role: participant}
   - {pid: P1344, family: participant, role: participant, direction: in, note: "X participant in event"}
@@ -596,6 +622,16 @@ properties:
   - {pid: "eusanct:target", family: participant, role: target}
   - {pid: "coup:leader_removed", family: participant, role: target, note: "Archigos: the leader the coup removed"}
   - {pid: "archigos:removal_of", family: participant, role: target, note: "Archigos: the leader removed"}
+  - {pid: "icowcol:independence_of", family: participant, role: gainer, note: "ICOW: the state becoming independent"}
+  - {pid: "icowcol:independence_from", family: participant, role: former_ruler}
+  - {pid: "icowcol:secession_of", family: participant, role: gainer}
+  - {pid: "icowcol:seceded_from", family: participant, role: former_ruler}
+  - {pid: "icowcol:merger_of", family: participant, role: participant, note: "ICOW: the state that merged"}
+  - {pid: "icowcol:merged_into", family: participant, role: gainer}
+  - {pid: "cowtc:gainer", family: participant, role: gainer}
+  - {pid: "cowtc:loser", family: participant, role: former_ruler, note: "COW TC: the state that lost the territory"}
+  - {pid: "icowclaim:challenger", family: participant, role: challenger}
+  - {pid: "icowclaim:target", family: participant, role: target}
   # structure (context, never causal)
   - {pid: P361, family: structure, role: part_of}
   - {pid: P527, family: structure, role: has_part}
@@ -722,6 +758,21 @@ dataset_kinds:
                      armed_conflict_episode: armed_conflict_episode, conflict_termination: null,
                      peace_agreement: peace_agreement, state_code: null}
     note: CAUSDATA (docs/dev/v3_causdata.md) types each record with causdata:event_type; outcomes and terminations are coded outcomes, not events.
+  - id_prefix: ""
+    marker_property: "colonial:event_type"
+    source_key: null
+    type: event
+    label_en: colonial / territorial record (ICOW colonial history and claims, COW Territorial Change; A-COLONIAL)
+    coded_type_property: "colonial:event_type"
+    coded_type_map: {independence: independence, secession: secession, merger: state_merger,
+                     territorial_change: transfer_of_sovereignty, territorial_claim: territorial_claim}
+    coded_properties: ["icowcol:independence_type", "icowcol:independence_violent", "icowcol:secession_violent",
+                       "cowtc:procedure", "cowtc:independence", "cowtc:military_conflict", "cowtc:portion",
+                       "icowclaim:resolution", "icowclaim:salience", "icowclaim:ended_through_violence"]
+    note: >-
+      A-COLONIAL (docs/dev/v3_a_colonial.md): `icowcol:{independence,secession,merger}:*`, `cowtc:*` (COW TC changes;
+      independence when COW codes one) and `icowclaim:*`. COW entities (`cowent:*`) are territories, not events.
+      ICOW asks users not to redistribute its data (cite-only courtesy); COW terms: cite, no charging.
   - id_prefix: ""
     marker_property: "contention:event_type"
     source_key: null
