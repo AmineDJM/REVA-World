@@ -27,9 +27,12 @@ ISO3_RE = re.compile(r"^[A-Z]{3}$")
 #: properties read around a country for ``/v1/links/{iso3}`` (2 hops: country → shared object → others)
 COUNTRY_LINK_PROPERTIES = (
     "P47", "P530", "P37", "P2936", "P38", "P35", "P463", "P1891", "P710", "P1344", "P607", "geo:covered_territory_of",
+    "glottolog:spoken_in",
 )  # fmt: skip
 SUCCESSION_PROPERTIES = ("P1365", "P1366", "P155", "P156", "P17", "P361")
-LANGUAGE_GENEALOGY = ("P279", "P361")
+LANGUAGE_GENEALOGY = (
+    "P279", "P361", "glottolog:parent", "glottolog:in_group", "glottolog:family", "glottolog:wikidata_item",
+)  # fmt: skip
 
 #: atlas rows provider: (iso3 or None for all, link types) -> {link_type: (rows, directed)}
 AtlasProvider = Callable[[str | None, Iterable[str]], Mapping[str, tuple[Iterable[AtlasRowRef], bool]]]

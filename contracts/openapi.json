@@ -22287,7 +22287,7 @@
             "required": false,
             "schema": {
               "default": 4,
-              "maximum": 6,
+              "maximum": 8,
               "minimum": 1,
               "title": "Max Hops",
               "type": "integer"

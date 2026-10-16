@@ -151,7 +151,7 @@ derived_links:
     directed: false
     derivation:
       method: kg_language_family
-      properties: [P37, P2936, P279, P361]
+      properties: [P37, P2936, P279, P361, "glottolog:parent", "glottolog:in_group", "glottolog:family", "glottolog:wikidata_item"]
       sources: [wikidata]
       via: language_family
       notes: >-
@@ -164,6 +164,28 @@ derived_links:
     causal: false
     status: derivable
     path_cost: 1.5
+
+  - id: shared_language_glottolog
+    labels: {fr: "langue parlée dans les deux pays (Glottolog)", en: "language spoken in both (Glottolog)"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_subject
+      properties: ["glottolog:spoken_in"]
+      sources: [glottolog]
+      via: language
+      notes: >-
+        KGLANG's Glottolog CLDF load (CC BY 4.0): languoid --glottolog:spoken_in--> country (Glottolog's Countries
+        field). Two countries listed for the same language-level languoid. Glottolog lists are not speaker
+        numbers and include minority languages. Bounded: a language listed in more than max_members (60)
+        countries is not expanded pairwise (hub, recorded), at most 200,000 pairs. WALS / Grambank feature values
+        are text values and never become links.
+    temporal: {kind: undated, description: "Glottolog lists are undated (state of the release)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : langue parlée dans les deux pays selon Glottolog ({via})", en: "connected via: language spoken in both per Glottolog ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.3
 
   # ---------------------------------------------------------------- colonial ties, succession
   - id: colony_of
@@ -737,3 +759,5 @@ statement_edges:
   - {property: "glottolog:wikidata_item", labels: {fr: "élément Wikidata (selon Wikidata P1394)", en: "Wikidata item (per Wikidata P1394)"}, inverse_labels: {fr: "languoïde Glottolog de", en: "Glottolog languoid of"}, path_cost: 0.5}
   - {property: "unpk:contributed_personnel_to", labels: {fr: "a fourni du personnel en uniforme à (opération de paix de l'ONU)", en: "contributed uniformed personnel to (UN peace operation)"}, inverse_labels: {fr: "a reçu du personnel en uniforme de", en: "received uniformed personnel from"}, path_cost: 1.2}
   - {property: "unpk:mission_country", labels: {fr: "pays de la mission (selon l'ONU)", en: "mission country (as reported by the UN)"}, inverse_labels: {fr: "pays d'accueil de la mission de l'ONU", en: "country of UN mission (as reported)"}, path_cost: 1.0}
+  - {property: "glottolog:family", labels: {fr: "appartient à la famille de langues (Glottolog)", en: "belongs to the language family (Glottolog)"}, inverse_labels: {fr: "famille de langues de (Glottolog)", en: "language family of (Glottolog)"}, path_cost: 1.5}
+  - {property: "glottolog:in_group", labels: {fr: "appartient au groupe de langues (Glottolog)", en: "belongs to the language group (Glottolog)"}, inverse_labels: {fr: "groupe de langues de (Glottolog)", en: "language group of (Glottolog)"}, path_cost: 1.5}
