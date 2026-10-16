@@ -60,8 +60,16 @@ async def test_cow_war_interval_is_derived_from_spells(datasets: Any) -> None:
 async def test_peace_operation_and_treaty_cards(datasets: Any) -> None:
     with datasets.api.connect() as c:
         unef = ev.event_card(c, "unpk:mission:UNEF_I", origin="test_fixture")
-        rows = c.execute(text("SELECT DISTINCT subject_qid FROM kg.statement_current WHERE property_pid = "
-                              "'untc:party' ORDER BY 1 LIMIT 1")).scalars().all()
+        rows = (
+            c.execute(
+                text(
+                    "SELECT DISTINCT subject_qid FROM kg.statement_current WHERE property_pid = "
+                    "'untc:party' ORDER BY 1 LIMIT 1"
+                )
+            )
+            .scalars()
+            .all()
+        )
         treaty = ev.event_card(c, rows[0], origin="test_fixture") if rows else None
     assert unef is not None and unef["types"]["primary"][0]["id"] == "peacekeeping_mission"
     assert unef["interval"]["start"]["time"] == "1956-11-01"
@@ -76,21 +84,24 @@ async def test_cshapes_independence_is_derived_and_labelled(datasets: Any) -> No
         dz = [e for e in evs if e["territory"] == "cshapes:gw:615"]
         assert [e["date"] for e in dz] == ["1962-07-05"]
         card = ev.event_card(c, dz[0]["id"], origin="test_fixture")
-        listed = ev.list_events(c, types=["independence"], start="1962", end="1962", origin="test_fixture",
-                                limit=200)
+        listed = ev.list_events(c, types=["independence"], start="1962", end="1962", origin="test_fixture", limit=200)
         dza = ev.list_events(c, types=["independence"], country="Q262", origin="test_fixture")
     assert card is not None and card["derived"]["method"] == "reva.events.cshapes_status_change/1"
     assert card["types"]["primary"][0]["id"] == "independence"
     assert card["interval"]["point_in_time"]["lo"] == "1962-07-05"
-    assert card["participants"][0]["role"]["id"] == "former_ruler" and card["participants"][0]["participant"]["id"] == "Q142"
+    assert (
+        card["participants"][0]["role"]["id"] == "former_ruler"
+        and card["participants"][0]["participant"]["id"] == "Q142"
+    )
     assert dz[0]["id"] in {i["id"] for i in listed["items"]}
     assert [i["id"] for i in dza["items"]] == [dz[0]["id"]]
 
 
 async def test_listing_mixes_wikidata_and_dataset_events(datasets: Any) -> None:
     with datasets.api.connect() as c:
-        res = ev.list_events(c, types=["armed_conflict"], start="1954", end="1962", country="Q262",
-                             origin="test_fixture")
+        res = ev.list_events(
+            c, types=["armed_conflict"], start="1954", end="1962", country="Q262", origin="test_fixture"
+        )
     ids = {i["id"] for i in res["items"]}
     assert "ucdp:conflict:246" in ids
 
@@ -98,18 +109,30 @@ async def test_listing_mixes_wikidata_and_dataset_events(datasets: Any) -> None:
 async def test_same_as_from_evidence_only(datasets: Any) -> None:
     db = datasets
     with db.api.connect() as c:
-        has_paris = c.execute(text("SELECT count(*) FROM kg.statement_current WHERE subject_qid = 'Q21707860'")
-                              ).scalar_one()
+        has_paris = c.execute(
+            text("SELECT count(*) FROM kg.statement_current WHERE subject_qid = 'Q21707860'")
+        ).scalar_one()
     if not has_paris:
         pytest.skip("UNTC fixture has no Paris Agreement rows")
     # an untc:treaty record as a load made before the mapping would have keyed it, with the same MTDSG number
     raw = db.store.put_bytes(b"events same_as test record", "raw", "application/json").sha256
-    rep = load_batch(db.worker, db.store, entities=[KgEntity("untc:treaty:XXVII-7-d", "treaty",
-                                                             {"en": "Paris Agreement"})],
-                     statements=[KgStatement("untc:treaty:XXVII-7-d", "untc:mtdsg_number",
-                                             value={"type": "string", "value": "XXVII-7-d"}, statement_id="m1")],
-                     source_key="eventstest.untc", raw_sha256s=[raw], retrieved_at=datetime.now(UTC),
-                     origin="test_fixture")
+    rep = load_batch(
+        db.worker,
+        db.store,
+        entities=[KgEntity("untc:treaty:XXVII-7-d", "treaty", {"en": "Paris Agreement"})],
+        statements=[
+            KgStatement(
+                "untc:treaty:XXVII-7-d",
+                "untc:mtdsg_number",
+                value={"type": "string", "value": "XXVII-7-d"},
+                statement_id="m1",
+            )
+        ],
+        source_key="eventstest.untc",
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
     assert rep.rejected_total == 0, rep.rejected
     with db.worker.connect() as c:
         report = sa.derive_links(c, origin="test_fixture")

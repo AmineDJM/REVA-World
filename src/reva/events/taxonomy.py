@@ -74,11 +74,12 @@ class DatasetKind:
     """Dataset records that are events by construction of the dataset (a UCDP conflict, a COW war ...)."""
 
     id_prefix: str
-    source_key: str
+    source_key: str | None
     type: str
     label_en: str
     coded_type_property: str | None = None
-    coded_type_map: Mapping[str, str] = field(default_factory=dict)
+    #: coded value -> type id; ``None`` = the dataset codes such a record as not an event (e.g. an outcome).
+    coded_type_map: Mapping[str, str | None] = field(default_factory=dict)
     interval_from_incoming: tuple[str, ...] = ()
     coded_properties: tuple[str, ...] = ()
     note: str = ""
@@ -206,7 +207,7 @@ def _parse(doc: Mapping[str, Any], sha: str) -> Taxonomy:
     kinds = tuple(
         DatasetKind(
             id_prefix=d["id_prefix"],
-            source_key=d["source_key"],
+            source_key=d.get("source_key"),
             type=d["type"],
             label_en=d["label_en"],
             coded_type_property=d.get("coded_type_property"),
@@ -287,7 +288,7 @@ def check_taxonomy(tax: Taxonomy, verification: Mapping[str, Any] | None = None)
         if d.type not in tax.types:
             errs.append(f"dataset kind {d.id_prefix}: unknown type {d.type!r}")
         for v in d.coded_type_map.values():
-            if v not in tax.types:
+            if v is not None and v not in tax.types:
                 errs.append(f"dataset kind {d.id_prefix}: coded type maps to unknown type {v!r}")
     for name, spec in tax.derived.items():
         if spec.get("type") not in tax.types:

@@ -1,0 +1,67 @@
+[
+ {
+  "request_fingerprint": "71d4ffadfeeb00407ba539979dda17f52a8b12d6627825ac42f95b9740d84b46",
+  "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/3.0?persistentId=doi:10.7910/DVN/T9SDEW",
+  "file": "71d4ffadfeeb0040.json",
+  "sha256": "a9adad2d1e984d853baff5bcd0d416918c517b515a6d6dd49ba1266528ca5eb1",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "CC0 1.0",
+  "note": "Dataverse version 3.0 record, unmodified"
+ },
+ {
+  "request_fingerprint": "be1871b8c2ed8036b9f35743e595b3fb939ea8f234ba28128b17a6b417aa8e13",
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7416947",
+  "file": "be1871b8c2ed8036.tab",
+  "sha256": "d6672bc4ab75b62324553166f321d3253a1f79e49ddb73744bc16722686707c6",
+  "status": 200,
+  "headers": {
+   "content-type": "text/tab-separated-values"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "CC0 1.0",
+  "note": "COLDAT_dyads.tab, full file, unmodified"
+ },
+ {
+  "request_fingerprint": "4f1f194489669711a9260103c5ab7738737a0a9405b2648706ff80c8365131f9",
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7416946",
+  "file": "4f1f194489669711.tab",
+  "sha256": "d8aa83c1985c4bda32eb57918fccebc272417da4b64ba138a8b4987e6029fc85",
+  "status": 200,
+  "headers": {
+   "content-type": "text/tab-separated-values"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "CC0 1.0",
+  "note": "COLDAT_colonies.tab, full file, unmodified"
+ },
+ {
+  "request_fingerprint": "e17be78f3c32825fe90f404629489fd834e4bd3db58f215bae7a85e80b5e09df",
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7416948",
+  "file": "e17be78f3c32825f.txt",
+  "sha256": "9583c06b2b8e9d5cc947d88620c679c397653b52cf65edaa06d2f5aa3abc34dd",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "CC0 1.0",
+  "note": "read_me.txt, unmodified"
+ },
+ {
+  "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+  "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+  "file": "../atlas.icow/countrycode_1.9.0.tar.gz",
+  "sha256": "d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-gzip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "GPL-3 (countrycode R package)",
+  "note": "countrycode 1.9.0 CRAN tarball, unmodified (shared file of atlas.icow)"
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "request_fingerprint": "6366bdfab6dd44431badbf2213cf32f9dd23848308e5fb8cea0f009a06e49889",
+  "url": "https://correlatesofwar.org/wp-content/uploads/terr-changes-v6.zip",
+  "file": "6366bdfab6dd4443.zip",
+  "sha256": "849341106d5536d0ded0c83a0fedf76e107161fd4d6e84b58c3e02a00729600e",
+  "status": 200,
+  "headers": {
+   "content-type": "application/zip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "COW terms: cite; no charging",
+  "note": "terr-changes-v6.zip, full file, unmodified"
+ },
+ {
+  "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+  "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+  "file": "../atlas.icow/countrycode_1.9.0.tar.gz",
+  "sha256": "d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-gzip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "GPL-3 (countrycode R package)",
+  "note": "countrycode 1.9.0 CRAN tarball, unmodified (shared file of atlas.icow)"
+ }
+]

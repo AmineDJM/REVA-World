@@ -1,0 +1,24 @@
+# Budget request from agent A-COLONIAL (COLDAT, ICOW, COW Territorial Change). ATLASCORE merges into
+# registry/policies/budgets.yaml. Every source is downloaded whole (small static files); one full refresh of the three
+# sources is 10 requests / ~2.5 MB (each run also archives the countrycode 1.9.0 tarball, 0.54 MB, from CRAN).
+agent: A-COLONIAL
+requests:
+  - source_key: harvard.dataverse.coldat
+    # version record (7 KB) + COLDAT_dyads.tab (46 KB) + COLDAT_colonies.tab (15 KB) + read_me.txt + countrycode tarball.
+    # planned_requests 7 (5 + redirect/retry margin). CC0.
+    daily_requests: 10
+    expected_bytes_per_day: 3000000
+    reason: "COLDAT v3.0 pinned Dataverse version: 5 requests per run (~0.6 MB)"
+  - source_key: icow.paulhensel
+    # colhist.zip (180 KB) + ICOWprov.zip (375 KB) + countrycode tarball (539 KB). planned_requests 5.
+    daily_requests: 8
+    expected_bytes_per_day: 5000000
+    reason: "ICOW Colonial History 1.1 + Territorial Claims provisional 1.01: 3 requests per run (~1.1 MB)"
+  - source_key: cow.terrchange
+    # terr-changes-v6.zip (261 KB) + countrycode tarball (539 KB). planned_requests 4.
+    daily_requests: 6
+    expected_bytes_per_day: 3000000
+    reason: "COW Territorial Change v6 zip: 2 requests per run (~0.8 MB)"
+daily_totals_increase:
+  http_requests_total: "+24"
+  http_bytes_total: "+11_000_000"

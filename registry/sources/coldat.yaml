@@ -1,0 +1,27 @@
+# V3 (agent A-COLONIAL): COLDAT -- Colonial Dates Dataset (Becker 2019), Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_colonial.py (atlas.coldat) -> atlas table coldat.dyads_v3 + KG
+# coldat:colonized_by. See docs/dev/v3_a_colonial.md.
+source_key: harvard.dataverse.coldat
+title: COLDAT Colonial Dates Dataset v3.0 (8 European colonizers x contemporary states, colonial start/end years)
+provider_url: https://doi.org/10.7910/DVN/T9SDEW
+lineage_family: coldat_becker
+rights:
+  licence: CC0 1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Becker, Bastian (2019), Introducing COLDAT: The Colonial Dates Dataset, SOCIUM SFB 1342 WorkingPapers No. 2;
+    Becker, Bastian, Colonial Dates Dataset (COLDAT), Harvard Dataverse, doi:10.7910/DVN/T9SDEW, V3 (2023-09-21).
+  licence_evidence: Dataverse version 3.0 record, license.name "CC0 1.0" (checked by the connector on every run; read 2026-10-16).
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com, cran.r-project.org]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/3.0?persistentId=doi:10.7910/DVN/T9SDEW
+    - https://dataverse.harvard.edu/api/access/datafile/7416947   # COLDAT_dyads.tab (45,560 B)
+    - https://dataverse.harvard.edu/api/access/datafile/7416946   # COLDAT_colonies.tab (14,940 B), cross-checked
+    - https://dataverse.harvard.edu/api/access/datafile/7416948   # read_me.txt (630 B, update notes)
+    - https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz   # COW-code crosswalk (KG colonizer entities)
+  codebooks:
+    - {file_id: 3476840, name: "Introducing COLDAT.pdf", md5: 31f7a831f4125d70497d6d0922094615}
+  code_crosswalk: country names -> geo scheme coldat_name (registry/atlas/geo_aliases/a_colonial.yaml)
+  authentication: none
+  cadence: pinned version; re-check twice a year

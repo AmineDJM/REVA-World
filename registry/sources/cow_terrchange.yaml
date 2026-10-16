@@ -1,0 +1,26 @@
+# V3 (agent A-COLONIAL): Correlates of War Territorial Change v6 (1816-2018) and the COW political-entities list.
+# Connector: src/reva/adapters/connectors/atlas_terrchange.py (atlas.cowtc) -> atlas tables cowtc.changes_cy
+# (computed), cowtc.entity_status + KG cowtc:/cowent:. See docs/dev/v3_a_colonial.md.
+source_key: cow.terrchange
+title: COW Territorial Change v6 (tc2018.csv, 1816-2018) and Entities list (colonies, dependencies, possessions)
+provider_url: https://correlatesofwar.org/data-sets/territorial-change/
+lineage_family: correlates_of_war
+rights:
+  licence: "COW terms of use (not an open licence): data must be cited; users cannot charge for access"
+  licence_url: https://correlatesofwar.org/faq/
+  attribution: >-
+    Tir, Jaroslav, Philip Schafer, Paul Diehl, and Gary Goertz. 1998. "Territorial Changes, 1816-1996: Procedures
+    and Data", Conflict Management and Peace Science 16:89-97 (Territorial Change v6, 1816-2018, hosted by Steven V.
+    Miller, Clemson University).
+metadata:
+  allowed_hosts: [correlatesofwar.org, cran.r-project.org]
+  open_licence: false
+  redistribution: free of charge with citation (COW FAQ); flagged for maintainer review
+  files:
+    - https://correlatesofwar.org/wp-content/uploads/terr-changes-v6.zip   # 261,434 B; sha256 849341106d55...
+    - https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz
+  code_crosswalk: >-
+    COW state numbers -> KGGEOPOL's StateCodeCrosswalk; COW entity numbers -> geo scheme cowent (exact-name aliases
+    with evidence, registry/atlas/geo_aliases/a_colonial.yaml)
+  authentication: none
+  cadence: v6 released 2019-03-25; re-check yearly

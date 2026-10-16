@@ -262,6 +262,68 @@ types:
     parent: event
     wikidata_classes: [Q381072]
     roles: [actor, participant, target]
+  - id: international_crisis
+    label_en: international crisis
+    label_fr: crise internationale
+    parent: crisis
+    wikidata_classes: []
+    roles: [actor, target, participant]
+    description: ICB international crises (CAUSDATA, kind international_crisis).
+  - id: foreign_policy_crisis
+    label_en: foreign-policy crisis (ICB, one actor)
+    label_fr: crise de politique étrangère (ICB, un acteur)
+    parent: international_crisis
+    wikidata_classes: []
+    roles: [actor, target]
+  - id: crisis_trigger
+    label_en: crisis trigger act (ICB)
+    label_fr: acte déclencheur de crise (ICB)
+    parent: event
+    wikidata_classes: []
+    roles: [actor, target]
+    description: The act ICB codes as triggering a crisis for an actor; its relation to the crisis is a coded claim (CAUSCORE), not part of this view.
+  - id: crisis_response
+    label_en: crisis response act (ICB)
+    label_fr: réponse à une crise (ICB)
+    parent: event
+    wikidata_classes: []
+    roles: [actor, target]
+  - id: militarized_interstate_dispute
+    label_en: militarized interstate dispute (COW MID)
+    label_fr: différend interétatique militarisé (COW MID)
+    parent: event
+    wikidata_classes: []
+    roles: [belligerent, target]
+  - id: militarized_incident
+    label_en: militarized incident (COW MID)
+    label_fr: incident militarisé (COW MID)
+    parent: militarized_interstate_dispute
+    wikidata_classes: []
+    roles: [belligerent, target]
+  - id: armed_conflict_episode
+    label_en: armed conflict episode (UCDP)
+    label_fr: épisode de conflit armé (UCDP)
+    parent: armed_conflict
+    wikidata_classes: []
+    roles: [belligerent, supporting_party]
+  - id: resistance_campaign
+    label_en: resistance campaign (NAVCO)
+    label_fr: campagne de résistance (NAVCO)
+    parent: protest
+    wikidata_classes: []
+    roles: [actor, target, participant]
+  - id: state_repression
+    label_en: state repression
+    label_fr: répression d'État
+    parent: event
+    wikidata_classes: []
+    roles: [perpetrator, victim, target]
+  - id: state_response
+    label_en: state response to protest (MMP)
+    label_fr: réponse de l'État à une manifestation (MMP)
+    parent: event
+    wikidata_classes: []
+    roles: [actor, target]
   - id: peacekeeping_mission
     label_en: peace operation (UN)
     label_fr: opération de paix (ONU)
@@ -298,6 +360,12 @@ types:
     label_fr: traité de paix
     parent: treaty
     wikidata_classes: [Q625298]
+    roles: [signatory, party]
+  - id: peace_agreement
+    label_en: peace agreement (UCDP)
+    label_fr: accord de paix (UCDP)
+    parent: treaty
+    wikidata_classes: []
     roles: [signatory, party]
 
   - id: conference
@@ -403,7 +471,7 @@ types:
   - id: epidemic
     label_en: epidemic
     label_fr: épidémie
-    parent: event
+    parent: disease_outbreak
     wikidata_classes: [Q44512]
     roles: [victim]
   - id: pandemic
@@ -508,6 +576,55 @@ dataset_kinds:
     label_en: UN-deposited multilateral treaty (UNTC, Wikidata-keyed)
     coded_properties: ["untc:mtdsg_number"]
     note: Treaties A-TREATIES mapped to their Wikidata item (registry/entities/treaty_qids.json); recognised by UNTC's MTDSG number statement even when no Wikidata snapshot is loaded.
+
+  # dataset agents of the causality work split (prefixes and kinds as documented in their docs/dev pages)
+  - id_prefix: "ptcoup:"
+    source_key: null
+    type: coup
+    label_en: coup (Powell & Thyne)
+    note: A-COUPS (docs/dev/v3_a_coups.md); successful and failed attempts, outcome coded verbatim.
+  - id_prefix: "ncei_hazards:earthquake:"
+    source_key: null
+    type: earthquake
+    label_en: earthquake (NOAA NCEI)
+  - id_prefix: "ncei_hazards:tsunami:"
+    source_key: null
+    type: tsunami
+    label_en: tsunami event (NOAA NCEI)
+  - id_prefix: "ncei_hazards:eruption:"
+    source_key: null
+    type: volcanic_eruption
+    label_en: volcanic eruption (NOAA NCEI)
+  - id_prefix: "ties:case:"
+    source_key: null
+    type: sanction_episode
+    label_en: sanction case (TIES)
+  - id_prefix: "eusanct:case:"
+    source_key: null
+    type: sanction_episode
+    label_en: sanction case (EUSANCT)
+  - id_prefix: ""
+    marker_property: "causdata:event_type"
+    source_key: null
+    type: event
+    label_en: expert-coded crisis/conflict record (ICB, COW MID, UCDP; CAUSDATA)
+    coded_type_property: "causdata:event_type"
+    coded_type_map: {international_crisis: international_crisis, foreign_policy_crisis: foreign_policy_crisis,
+                     crisis_trigger: crisis_trigger, crisis_response: crisis_response, crisis_outcome: null,
+                     protracted_conflict: null, militarized_interstate_dispute: militarized_interstate_dispute,
+                     militarized_incident: militarized_incident, dispute_outcome: null,
+                     armed_conflict_episode: armed_conflict_episode, conflict_termination: null,
+                     peace_agreement: peace_agreement, state_code: null}
+    note: CAUSDATA (docs/dev/v3_causdata.md) types each record with causdata:event_type; outcomes and terminations are coded outcomes, not events.
+  - id_prefix: ""
+    marker_property: "contention:event_type"
+    source_key: null
+    type: protest
+    label_en: contention record (NAVCO, MEC, Mass Mobilization; A-CONTENTION)
+    coded_type_property: "contention:event_type"
+    coded_type_map: {resistance_campaign: resistance_campaign, contentious_episode: protest, protest: protest,
+                     state_repression: state_repression, state_response: state_response, coded_outcome: null}
+    note: A-CONTENTION (docs/dev/v3_a_contention.md); campaign outcomes are coded outcomes, not events.
 
 derived:
   cshapes_independence:

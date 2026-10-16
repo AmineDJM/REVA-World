@@ -338,10 +338,16 @@ async def probe_specs(paths: Sequence[Path], *, max_specs: int = 11) -> dict[str
     async with wbapi_client(purpose="eventsprobe", planned_wbapi=len(specs), mode="linked_data") as sess:
         for sp in specs:
             root = sp.get("api_search")["instance_of"][0]
-            hits, total, sha = await sess.client.search_page(f"haswbstatement:P31={root}", limit=100,
-                                                             meta={"purpose": "events_spec_probe", "spec": sp.id})
-            out[sp.id] = {"root": root, "hits": len(hits), "total_reported": total, "first": hits[:5],
-                          "raw_sha256": sha}
+            hits, total, sha = await sess.client.search_page(
+                f"haswbstatement:P31={root}", limit=100, meta={"purpose": "events_spec_probe", "spec": sp.id}
+            )
+            out[sp.id] = {
+                "root": root,
+                "hits": len(hits),
+                "total_reported": total,
+                "first": hits[:5],
+                "raw_sha256": sha,
+            }
         out["_usage"] = sess.usage.get("budget")
     return out
 

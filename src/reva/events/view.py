@@ -42,7 +42,7 @@ from reva.events.taxonomy import (
 )
 from reva.kernel.errors import ValidationProblem
 from reva.kg import query as kq
-from reva.kg.model import CAUSAL_PIDS
+from reva.kg.model import CAUSAL_PIDS, QID_RE
 
 VIEW_VERSION = "reva.events.view/1"
 MAX_CLASS_DEPTH = 8
@@ -63,7 +63,7 @@ CAUSAL_NOTE = (
     "claims: /v1/causal/events/{id}."
 )
 
-_ID_RE = kq.QID_RE
+_ID_RE = QID_RE
 _CSHAPES_ID_RE = re.compile(r"^cshapes:independence:([0-9]{1,4}):(-?[0-9]{4}-[0-9]{2}-[0-9]{2})$")
 
 
@@ -221,7 +221,7 @@ def _dataset_kind(conn: Connection, event_id: str, tax: Taxonomy, origin: str | 
         hit = conn.execute(
             text(
                 f"""SELECT 1 FROM kg.statement_current s WHERE s.subject_qid = :q AND s.property_pid = :p
-                     AND s.source_key = :sk{kq._origin_sql(origin)} LIMIT 1"""
+                     AND (CAST(:sk AS text) IS NULL OR s.source_key = :sk){kq._origin_sql(origin)} LIMIT 1"""
             ),
             {"q": event_id, "p": d.marker_property, "sk": d.source_key, "origin": origin},
         ).first()
@@ -266,8 +266,9 @@ def classify(
     basis = "wikidata_p31"
     kind = _dataset_kind(conn, event_id, tax, origin)
     if kind is not None:
-        type_id = kind.type
+        kind_type: str | None = kind.type
         coded = None
+        excluded = False
         if kind.coded_type_property:
             vals = _rows(
                 conn,
@@ -279,11 +280,14 @@ def classify(
             for v in vals:
                 code = str((v.get("value") or {}).get("value", ""))
                 coded = code or coded
-                type_id = kind.coded_type_map.get(code, type_id)
+                if code in kind.coded_type_map and kind.coded_type_map[code] is None:
+                    excluded = True  # the dataset codes this record as something other than an event
+                    continue
+                mapped = kind.coded_type_map.get(code, kind.type)
                 matches.append(
                     {
-                        "type": type_id,
-                        "dataset_kind": kind.id_prefix,
+                        "type": mapped,
+                        "dataset_kind": kind.id_prefix or kind.marker_property,
                         "coded_type": code,
                         "rank": v["rank"],
                         "chain": [],
@@ -291,11 +295,13 @@ def classify(
                         "statement": _prov(v),
                     }
                 )
-        if not any(m.get("dataset_kind") for m in matches):
+        if excluded and not any(m.get("dataset_kind") for m in matches):
+            kind_type = None
+        if kind_type is not None and not any(m.get("dataset_kind") for m in matches):
             matches.append(
                 {
-                    "type": type_id,
-                    "dataset_kind": kind.id_prefix,
+                    "type": kind_type,
+                    "dataset_kind": kind.id_prefix or kind.marker_property,
                     "coded_type": coded,
                     "rank": "normal",
                     "chain": [],
@@ -303,7 +309,8 @@ def classify(
                     "statement": None,
                 }
             )
-        basis = "dataset_kind" if not p31 else "wikidata_p31+dataset_kind"
+        if kind_type is not None:
+            basis = "dataset_kind" if not p31 else "wikidata_p31+dataset_kind"
     preferred = [m for m in matches if m["rank"] == "preferred"]
     pool = preferred or matches
     primary = tax.most_specific({m["type"] for m in pool})
@@ -540,7 +547,7 @@ def event_card(
 
     # places
     place_props = tax.props("place", "out")
-    places = []
+    places: list[dict[str, Any]] = []
     for r in own:
         pr = place_props.get(r["property_pid"])
         if pr is None:
@@ -599,7 +606,7 @@ def event_card(
             if r["pit_time"] and r["valid_lo"] and g["_lo"] is None:
                 g["_lo"] = r["valid_lo"]
             if len(g["statements"]) < MAX_STATEMENTS_PER_ITEM:
-                coded = {
+                coded_q = {
                     k: v
                     for k, v in (r["qualifiers"] or {}).items()
                     if k not in ("P2868", "P3831", "side", "years") and not k.startswith("_")
@@ -608,7 +615,7 @@ def event_card(
                     {
                         **_prov(r),
                         "point_in_time": kq._time_out(r["pit_time"], r["pit_precision"]),
-                        "coded": coded or None,
+                        "coded": coded_q or None,
                     }
                 )
     participants = []
@@ -987,9 +994,22 @@ def list_events(
         "origin": origin,
         "lim": limit + 1,
         **{f"pfx{i}": d.id_prefix.replace("_", r"\_") + "%" for i, d in enumerate(kinds) if d.id_prefix},
-        "mp": [d.marker_property for d in markers],
-        "ms": [d.source_key for d in markers],
+        **{f"mp{i}": d.marker_property for i, d in enumerate(markers)},
+        **{f"ms{i}": d.source_key for i, d in enumerate(markers)},
+        **{f"mx{i}": sorted(k for k, v in d.coded_type_map.items() if v is None) for i, d in enumerate(markers)},
     }
+    marker_sql = (
+        " OR ".join(
+            f"(x.property_pid = :mp{i} AND (CAST(:ms{i} AS text) IS NULL OR x.source_key = :ms{i})"
+            + (
+                f" AND NOT coalesce(x.value->>'value', '') = ANY(:mx{i}))"
+                if d.coded_type_property == d.marker_property
+                else ")"
+            )
+            for i, d in enumerate(markers)
+        )
+        or "FALSE"
+    )
     filters = []
     if w is not None:
         overlap = "daterange(t.lo, t.hi, '[]') && daterange(CAST(:w_lo AS date), CAST(:w_hi AS date), '[]')"
@@ -1029,7 +1049,7 @@ def list_events(
         SELECT DISTINCT e.qid FROM kg.entity_current e WHERE ({prefix_sql}){kq._origin_sql(origin, "e")}
         UNION
         SELECT DISTINCT x.subject_qid FROM kg.statement_current x
-         WHERE x.property_pid = ANY(:mp) AND x.source_key = ANY(:ms){o}
+         WHERE ({marker_sql}){o}
       ), tv AS (
         SELECT c.qid, coalesce(x.value_time_lo, x.valid_lo) AS lo, coalesce(x.value_time_hi, x.valid_hi) AS hi
           FROM cand c JOIN kg.statement_current x ON x.subject_qid = c.qid AND x.property_pid = ANY(:tp){o}
@@ -1081,6 +1101,8 @@ def list_events(
             )
             continue
         cls = classify(conn, r["qid"], origin=origin, tax=tax, recorded=recorded)
+        if not cls["is_event"]:
+            continue  # e.g. a dataset record coded as an outcome, not an event (a page may then hold fewer items)
         origins.update(m["statement"]["origin"] for m in cls["matches"] if m.get("statement"))
         if not any(m.get("statement") for m in cls["matches"]):
             origins.update(

@@ -1083,6 +1083,12 @@ def wdqs_query(titles: Sequence[str]) -> str:
     )
 
 
+def _wdqs_year(v: str | None) -> int | None:
+    """Year of an ``xsd:dateTime`` literal from WDQS (``1822-04-27T00:00:00Z``; CE years only)."""
+    m = re.match(r"^\+?(\d{4,})-\d{2}-\d{2}T", v or "")
+    return int(m.group(1)) if m else None
+
+
 def resolve_same_as(
     spells: Sequence[Spell], responses: Sequence[tuple[bytes, str]]
 ) -> tuple[dict[str, dict[str, Any]], dict[str, int]]:
@@ -1135,9 +1141,7 @@ def resolve_same_as(
         if not any(h["human"] for h in hits):
             reasons["item_not_instance_of_human_Q5"] += 1
             continue
-        births = sorted(
-            {int(h["birth"][:5].lstrip("+")) for h in hits if h["birth"] and re.match(r"^[+-]?\d{4}-", h["birth"])}
-        )
+        births = sorted({y for h in hits if (y := _wdqs_year(h["birth"])) is not None})
         if s.yrborn is not None and births and s.yrborn not in births:
             reasons["birth_year_disagrees"] += 1
             continue

@@ -8,6 +8,7 @@
   write ``DIR/candidates.jsonl`` + ``DIR/report.json``.
 * ``relink --out DIR [--offline] [--use-requested-budget]`` -- re-run the (re-tuned) extractor on the
   stored sentences; resolve only link targets not yet cached (live, budgeted) unless ``--offline``.
+* ``insert --out DIR --db reva_causcand_kg --objects STORE`` -- CAUSCORE ``insert_candidates`` into a throwaway DB.
 * ``sample --out DIR --n 50 --seed 20261016`` -- a reproducible random sample for hand evaluation.
 
 Live commands write the budget ledger into a throwaway database (``--db``, default ``reva_causcand``;
@@ -167,6 +168,10 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator 
     r.add_argument("--offline", action="store_true")
     r.add_argument("--db", default=F.DEFAULT_DB)
     r.add_argument("--use-requested-budget", action="store_true")
+    ins = sub.add_parser("insert", help="insert candidates.jsonl into kg.causal_candidate of a throwaway DB")
+    ins.add_argument("--out", required=True)
+    ins.add_argument("--db", default="reva_causcand_kg")
+    ins.add_argument("--objects", required=True, help="artifact store root for the sentence bundles")
     m = sub.add_parser("sample")
     m.add_argument("--out", required=True)
     m.add_argument("--n", type=int, default=50)
@@ -179,6 +184,11 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator 
         print(json.dumps({"items_matching": doc["items_matching"], "seeds": len(doc["seeds"])}))
     elif args.cmd == "harvest":
         print(json.dumps(asyncio.run(_harvest(args)), indent=1, default=str))
+    elif args.cmd == "insert":
+        from reva.causal_candidates.insert import insert_into_db
+
+        rep = insert_into_db(Path(args.out), db_name=args.db, object_root=Path(args.objects))
+        print(json.dumps(rep, indent=1, default=str))
     elif args.cmd == "relink":
         print(json.dumps(asyncio.run(_relink(args)), indent=1, default=str))
     else:

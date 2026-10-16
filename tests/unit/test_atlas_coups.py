@@ -259,7 +259,7 @@ def test_same_as_requires_identifier_human_and_birth_year() -> None:
     a, b, c = titled[0], titled[1], titled[2]
     resp = _wdqs(
         [
-            _b(a.enwiki_title or "", "Q100", True, f"+{a.yrborn}-04-27T00:00:00Z"),
+            _b(a.enwiki_title or "", "Q100", True, f"{a.yrborn}-04-27T00:00:00Z"),  # WDQS: no "+"
             _b(b.enwiki_title or "", "Q200", True, f"+{(b.yrborn or 0) + 3}-01-01T00:00:00Z"),
             _b(c.enwiki_title or "", "Q300", False, None),
         ]

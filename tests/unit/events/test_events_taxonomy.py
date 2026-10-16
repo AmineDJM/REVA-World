@@ -72,10 +72,19 @@ def test_properties_are_verified_and_typed() -> None:
 
 def test_check_taxonomy_refuses_bad_definitions() -> None:
     doc = yaml.safe_load(TAXONOMY_PATH.read_text())
-    doc["types"].append({"id": "dup", "label_en": "dup", "label_fr": "dup", "parent": "event",
-                         "wikidata_classes": ["Q198"], "roles": ["nobody"]})
-    doc["types"].append({"id": "orphan", "label_en": "o", "label_fr": "", "parent": "nope",
-                         "wikidata_classes": [], "roles": []})
+    doc["types"].append(
+        {
+            "id": "dup",
+            "label_en": "dup",
+            "label_fr": "dup",
+            "parent": "event",
+            "wikidata_classes": ["Q198"],
+            "roles": ["nobody"],
+        }
+    )
+    doc["types"].append(
+        {"id": "orphan", "label_en": "o", "label_fr": "", "parent": "nope", "wikidata_classes": [], "roles": []}
+    )
     errs = check_taxonomy(_parse(doc, "x"))
     text = " | ".join(errs)
     assert "Q198 mapped to both" in text and "unknown role" in text and "unknown parent" in text
@@ -106,7 +115,9 @@ def test_recorded_classes_index() -> None:
     # every recorded parent edge is non-deprecated and names its statement
     for c, ps in rec.parents.items():
         for parent, rank, sid in ps:
-            assert rank in ("preferred", "normal") and parent.startswith("Q") and sid.lower().startswith(c.lower() + "$"), (c, parent)
+            assert (
+                rank in ("preferred", "normal") and parent.startswith("Q") and sid.lower().startswith(c.lower() + "$")
+            ), (c, parent)
 
 
 def test_recorded_verification_is_compact_and_has_no_personal_data() -> None:
@@ -119,9 +130,19 @@ def test_recorded_verification_is_compact_and_has_no_personal_data() -> None:
 
 # ------------------------------------------------------------------------------------------- pure view parts
 def _row(pid: str, time: str, prec: int, lo: str, hi: str, rank: str = "normal", key: str = "k") -> dict[str, Any]:
-    return {"property_pid": pid, "value": {"type": "time", "time": time, "precision": prec}, "value_time_lo": lo,
-            "value_time_hi": hi, "statement_key": key, "source_key": "wikidata.wbapi", "source_revision": "1",
-            "raw_sha256": "0" * 64, "rank": rank, "origin": "live", "qualifiers": {}}
+    return {
+        "property_pid": pid,
+        "value": {"type": "time", "time": time, "precision": prec},
+        "value_time_lo": lo,
+        "value_time_hi": hi,
+        "statement_key": key,
+        "source_key": "wikidata.wbapi",
+        "source_revision": "1",
+        "raw_sha256": "0" * 64,
+        "rank": rank,
+        "origin": "live",
+        "qualifiers": {},
+    }
 
 
 def test_interval_prefers_rank_then_extremes_and_keeps_alternatives() -> None:
@@ -141,30 +162,51 @@ def test_interval_prefers_rank_then_extremes_and_keeps_alternatives() -> None:
 
 def test_interval_inconsistent_undated_and_spells() -> None:
     tax = load_taxonomy()
-    bad = ev._interval(tax, [_row("P580", "1990", 9, "1990-01-01", "1990-12-31"),
-                             _row("P582", "1980", 9, "1980-01-01", "1980-12-31")], [])
+    bad = ev._interval(
+        tax,
+        [_row("P580", "1990", 9, "1990-01-01", "1990-12-31"), _row("P582", "1980", 9, "1980-01-01", "1980-12-31")],
+        [],
+    )
     assert bad["consistency"] == "inconsistent"
     assert ev._interval(tax, [], [])["basis"] == "undated"
-    sp = ev._interval(tax, [], [{"valid_lo": "1823-04-07", "valid_hi": "1823-11-13"},
-                                {"valid_lo": "1823-05-01", "valid_hi": None}])
+    sp = ev._interval(
+        tax, [], [{"valid_lo": "1823-04-07", "valid_hi": "1823-11-13"}, {"valid_lo": "1823-05-01", "valid_hi": None}]
+    )
     assert sp["basis"] == "derived_from_participation_spells" and sp["earliest"] == "1823-04-07"
     bce = ev._interval(tax, [_row("P585", "-0043-03-15", 11, "0044-03-15 BC", "0044-03-15 BC")], [])
     assert bce["earliest"] == "-0043-03-15" and bce["latest"] == "-0043-03-15"
 
 
 def test_chains_are_shortest_and_cite_hops() -> None:
-    g = ev.ClassGraph({"A": [{"parent": "B", "via": "kg", "statement_key": "s1"},
-                             {"parent": "Q198", "via": "recorded", "statement_id": "s2"}],
-                       "B": [{"parent": "Q198", "via": "kg", "statement_key": "s3"}]}, False)
+    g = ev.ClassGraph(
+        {
+            "A": [
+                {"parent": "B", "via": "kg", "statement_key": "s1"},
+                {"parent": "Q198", "via": "recorded", "statement_id": "s2"},
+            ],
+            "B": [{"parent": "Q198", "via": "kg", "statement_key": "s3"}],
+        },
+        False,
+    )
     out = ev._chains(g, "A", {"Q198": ("war",)})
     assert [h["subclass_of"] for h in out["Q198"]] == ["Q198"] and out["Q198"][0]["via"] == "recorded"
     assert ev._chains(g, "Q198", {"Q198": ("war",)}) == {"Q198": []}
 
 
 def test_recorded_classes_from_document() -> None:
-    doc = {"entities": {"Q1": {"labels": {"en": "x"}, "P279": [{"o": "Q2", "rank": "normal", "statement": "Q1$a"},
-                                                               {"o": "Q3", "rank": "deprecated", "statement": "Q1$b"}],
-                               "lastrevid": 5, "raw_sha256": "f" * 64}}}
+    doc = {
+        "entities": {
+            "Q1": {
+                "labels": {"en": "x"},
+                "P279": [
+                    {"o": "Q2", "rank": "normal", "statement": "Q1$a"},
+                    {"o": "Q3", "rank": "deprecated", "statement": "Q1$b"},
+                ],
+                "lastrevid": 5,
+                "raw_sha256": "f" * 64,
+            }
+        }
+    }
     rec = recorded_classes(doc)
     assert rec.parents == {"Q1": (("Q2", "normal", "Q1$a"),)} and rec.children() == {"Q2": ["Q1"]}
     assert isinstance(rec, RecordedClasses)

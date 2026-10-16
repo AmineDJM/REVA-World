@@ -1,4 +1,4 @@
-"""Live A-HAZARDS ingest (NOAA NCEI hazard-service, ~240 GETs, ~25 MB; then one WDQS query) into the per-session
+"""Live A-HAZARDS ingest (NOAA NCEI hazard-service, ~240 GETs, ~20 MB, ~8 min; then one WDQS query) into the per-session
 throwaway database of the ``db`` fixture (created and dropped by the fixture; never the dev database).
 
 Deselected by default: ``pytest -m "live and db" tests/integration/test_atlas_hazards_events_live.py
@@ -82,6 +82,13 @@ async def test_live_ncei_hazards(db, requested_budget: None) -> None:  # type: i
     assert s["kg"]["status"] == "loaded", s["kg"]
     if s["causal"].get("status") != "unavailable":
         assert not s["causal"].get("rejected_counts"), s["causal"]
+
+
+async def test_live_wikidata_volcano_xref(db) -> None:  # type: ignore[no-untyped-def]
+    """Needs the NCEI volcanoes of the previous test (same session database). Runs on the WDHARVEST budget key
+    wikidata.wdqs and waits for the machine-wide WDQS cool-down when other agents triggered 429s (minutes)."""
+    if hz.NAME not in _RESULTS:
+        pytest.skip("the NCEI live run did not complete in this session")
     wd = await run_atlas_ingest(db.settings, db.worker, db.store, hz.WD_NAME, mode="live")
     _RESULTS[hz.WD_NAME] = {
         "status": wd["status"],
@@ -91,3 +98,4 @@ async def test_live_ncei_hazards(db, requested_budget: None) -> None:  # type: i
     }
     _save()
     assert wd["status"] == "completed", wd.get("error")
+    assert wd["summary"]["build"]["same_as"] > 100

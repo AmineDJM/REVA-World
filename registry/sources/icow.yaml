@@ -1,0 +1,35 @@
+# V3 (agent A-COLONIAL): Issue Correlates of War (ICOW) project, Paul R. Hensel -- Colonial History 1.1 and
+# Territorial Claims provisional 1.01. Connector: src/reva/adapters/connectors/atlas_colonial.py (atlas.icow) ->
+# atlas tables icow.colhist_v11, icow.claims_prov101 + KG icowcol:/icowclaim: events. See docs/dev/v3_a_colonial.md.
+source_key: icow.paulhensel
+title: ICOW Colonial History Data Set 1.1 (2018) and ICOW Territorial Claims Data, provisional version 1.01
+provider_url: https://www.paulhensel.org/icowcol.html
+lineage_family: icow_hensel
+rights:
+  licence: "ICOW terms (not an open licence): free download, citation requested"
+  licence_url: https://www.paulhensel.org/icowcol.html
+  attribution: >-
+    Paul R. Hensel (2018). "ICOW Colonial History Data Set, version 1.1." Available at
+    <http://www.paulhensel.org/icowcol.html>. Bryan A. Frederick, Paul R. Hensel, and Christopher Macaulay (2017).
+    "The Issue Correlates of War Territorial Claims Data, 1816-2001." Journal of Peace Research 54(1).
+  terms_quote: >-
+    "All ICOW data sets may be downloaded freely, but we request several professional courtesies from users: (1)
+    Please do not redistribute ICOW data to other scholars. Instead, every user should be directed to this web site
+    to download the latest officially released version of the data ... (2) ... report [errors] to the ICOW project
+    ... (3) Please email us a copy of any of your research that uses ICOW data as a professional courtesy."
+  redistribution: >-
+    requested not to redistribute the data files; REVA stores derived rows with the citation and serves facts, the
+    test fixtures are small slices (flagged). Maintainer to confirm.
+  review_flag: no open licence; no-redistribution courtesy -- maintainer to confirm use and fixture slices in REVA
+metadata:
+  allowed_hosts: [www.paulhensel.org, cran.r-project.org]
+  files:
+    - https://www.paulhensel.org/Data/colhist.zip    # coldata110.csv + colcode.pdf (codebook, sha256 pinned)
+    - https://www.paulhensel.org/Data/ICOWprov.zip   # ICOWprov101.csv + UsersManual.pdf (sha256 pinned)
+    - https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz
+  access_note: >-
+    http://www.paulhensel.org/Data/*.zip answers a JavaScript bot-verification page (HTML, 7 KB) instead of the zip;
+    the https URLs serve the zips. The connector refuses a body that is not a zip (schema_drift).
+  code_crosswalk: COW state numbers -> crosswalk through KGGEOPOL's StateCodeCrosswalk (countrycode 1.9.0 + policy)
+  authentication: none
+  cadence: last updated 2018-11-13 (colonial) / 2014-03 (claims); re-check yearly

@@ -814,7 +814,7 @@ class IcowState:
 
 
 def parse_icow_colhist(body: bytes) -> list[IcowState]:
-    t = read_delimited(body, name=ICOW_COLHIST_MEMBER, columns=_ICOW_COLS, delimiter=",", min_rows=150)
+    t = read_delimited(body, name=ICOW_COLHIST_MEMBER, columns=_ICOW_COLS, delimiter=",", min_rows=10)
     out: list[IcowState] = []
     seen: set[int] = set()
     for line, r in t:
@@ -877,7 +877,7 @@ class IcowClaim:
 
 
 def parse_icow_claims(body: bytes) -> list[IcowClaim]:
-    t = read_delimited(body, name=ICOW_CLAIMS_MEMBER, columns=_CLAIM_COLS, delimiter=",", min_rows=100)
+    t = read_delimited(body, name=ICOW_CLAIMS_MEMBER, columns=_CLAIM_COLS, delimiter=",", min_rows=10)
     out: list[IcowClaim] = []
     seen: set[str] = set()
     for line, r in t:

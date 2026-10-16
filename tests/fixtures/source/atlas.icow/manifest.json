@@ -1,0 +1,41 @@
+[
+ {
+  "request_fingerprint": "87b4e8f8cfa3a3e6cd213b5b25aad72a4e272d7e75079623d055b71b7d8ee246",
+  "url": "https://www.paulhensel.org/Data/colhist.zip",
+  "file": "87b4e8f8cfa3a3e6.zip",
+  "sha256": "5da1996a9980afee3374d40acb464bf68a9c76953dbcd26d6dc8f6b844ccecdb",
+  "status": 200,
+  "headers": {
+   "content-type": "application/zip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "ICOW terms: free download, cite; 'Please do not redistribute ICOW data to other scholars' (fixture = small slice, flagged)",
+  "note": "colhist.zip re-zipped: colcode.pdf unmodified (sha256 pinned), coldata110.csv = header + 21 of the 217 real rows (lines byte-identical), .dta dropped; real zip sha256 ece7ccba24f2292c0fa4bc153c67255ff85bdfcb01dd69d07d520167f4e0f437"
+ },
+ {
+  "request_fingerprint": "bc45b7b464d87030907c56a458dc29b76eb8ce1ddcb2fd1a455768b0399b5e74",
+  "url": "https://www.paulhensel.org/Data/ICOWprov.zip",
+  "file": "bc45b7b464d87030.zip",
+  "sha256": "59d407bd1b4c5df72bb8b9832e08253428c70003940fc7733777006e178f2cf8",
+  "status": 200,
+  "headers": {
+   "content-type": "application/zip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "ICOW terms: free download, cite; 'Please do not redistribute ICOW data to other scholars' (fixture = small slice, flagged)",
+  "note": "ICOWprov.zip re-zipped: UsersManual.pdf unmodified (sha256 pinned), ICOWprov101.csv = header + 50 of the 837 real rows (lines byte-identical), dyad-year files and .dta dropped; real zip sha256 6ea2f79935a1e600023006b31bdbfb9839cdbcc9d0c13989f9988cd5439778bd"
+ },
+ {
+  "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+  "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+  "file": "countrycode_1.9.0.tar.gz",
+  "sha256": "d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-gzip"
+  },
+  "retrieved_at": "2026-10-16T21:10:00+00:00",
+  "licence": "GPL-3 (countrycode R package)",
+  "note": "countrycode 1.9.0 CRAN tarball, unmodified"
+ }
+]

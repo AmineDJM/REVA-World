@@ -142,7 +142,25 @@ EM-DAT, none NCEI), and NCEI list records carry none of those ids. Never by name
 
 ## Live run (throwaway database, 2026-10-16)
 
-LIVE_RESULTS
+Run through `run_atlas_ingest(mode="live")` (budget overlay of the request, policy `budgets-1.3.6+a_hazards_request`)
+into a per-session throwaway database, then `atlas.noaa_hazards_wikidata` live on `wikidata.wdqs` (the WDQS call
+waited ~6 min for the machine-wide WDQS cool-down set by other agents' 429s; the pytest session timed out on that
+wait, the Wikidata step was finished on the same throwaway database and the database was then dropped).
+
+| | Result |
+|---|---|
+| NCEI requests | 239 consumed of 260 reserved, 20.4 MB, 0 refused; 239 raw artifacts archived |
+| Records | 6,697 earthquakes, 3,138 tsunami sources, 35,129 runups, 903 eruptions |
+| Atlas `ncei_hazards.country_year` | 19,332 rows, 183 crosswalk countries, years −4359 … 2026 (134 rows BCE); unmapped kept: USA TERRITORY (178 rows), UK TERRITORY (30), PACIFIC OCEAN (16), ATLANTIC OCEAN (14), 10 other seas/regions, "(NO COUNTRY)" (4) |
+| Rows per indicator | eq_events 4,503 · eq_deaths 1,746 · eq_deaths_total 1,646 · eq_injuries 980 · eq_houses_destroyed 706 · eq_damage_musd 525 · ts_events 2,175 · ts_events_valid34 1,291 · ts_deaths 268 · ts_deaths_total 640 · ts_runups 2,909 · ts_runup_deaths 278 · vo_eruptions 732 · vo_deaths 373 · vo_deaths_total 395 · vo_injuries 94 · vo_houses_destroyed 48 · vo_damage_musd 23 |
+| KG | 11,017 entities (6,697 earthquakes, 3,138 tsunamis, 903 eruptions, 279 volcanoes), 174,629 statements, 0 rejected; 115 country statements not written (unmapped NCEI name), 17 (mapped entity without a country QID) |
+| Coded triggers | 2,186 T1 `coded_trigger` claims (2,026 earthquake→tsunami, 160 eruption→tsunami), 0 rejected, 0 unknown entities. Context only: earthquake links with cause code 6 (14), 0 (9), 9 (6), 7 (3), none (2); eruption links with cause code 1 (23), 3 (3), 8 (2). Skipped as "Erroneous entry": 64 + 3 |
+| Grades (rules v1) | B 2,171 (2,150 `overlapping`, 21 `consistent`); **E 15** `temporal.inconsistent`: NCEI dates the source event after its tsunami, e.g. Vesuvius eruption 1348 79-08-25 vs tsunami 3093 79-08-24, eruption 5324 (NCEI 197 BC) vs tsunami 3473 (198 BC), earthquake 9212 1899-01-29 vs tsunami 4862 1899-01-17 — kept and shown, never corrected |
+| Wikidata `same_as` | 1 WDQS request (0.87 MB): 1,853 P1886 rows; 276 NCEI GVP numbers → 231 `same_as`, 44 ambiguous (number on several items), 1 not on Wikidata |
+
+Spot checks (atlas): 2004 tsunami deaths by runup country IDN 167,540 · LKA 35,322 · IND 26,047 · THA 8,212 · SOM 572;
+Japan 2011 eq_deaths 1,484, eq_deaths_total 18,433, ts_deaths 18,423, ts_runup_deaths 15,950, ts_runups 5,542 — the
+"total" series overlap by design and are never added.
 
 ## Open items
 

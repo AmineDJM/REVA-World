@@ -110,13 +110,13 @@ datasets` — and Archigos itself codes both the coup and its outcome. So:
 * "Removed in Military Power Struggle Short of Coup", rebels, popular protest, assassination and foreign removal are
   **not** coups by Archigos's own words and get no coup event or claim.
 * Temporal check: cause and effect carry the same `P585` day → `overlapping`; without corroboration the grader
-  gives **B** (T1). Graded in the live run (§6).
+  gives **B** (T1): live, 327 × B (§6).
 * **Context, not identity, not causation**: when a *successful* P&T coup has the same COW code and the same day as an
   Archigos coup, `archigos:coup:<obsid> coup:same_state_and_day_as ptcoup:<…>` (qualifiers: method, P&T version,
   row, raw sha256). 149 of 327 match; of the 238 since 1950 the 89 others are 25 one day apart, 17 at 2-7 days,
-  5 at 8-31 days, 36 further, 6 in states without any P&T coup — **not linked** (no date tolerance). 21 successful
+  5 at 8-31 days, 36 further, 6 in states without any P&T coup — **not linked** (no date tolerance). 22 successful
   P&T coups fall on the end day of a spell Archigos codes otherwise (8 "Short of Coup", 6 Regular, 4 popular
-  protest, 3 rebels …): not linked, counted. No P&T event matches two Archigos coups. EVENTS may decide whether these
+  protest, 3 rebels, 1 natural death): not linked, counted. No P&T event matches two Archigos coups. EVENTS may decide whether these
   context edges justify `same_as`; A-COUPS does not assert it.
 
 ## 4. Wikidata `same_as` (option `wikidata=1`)
@@ -127,7 +127,9 @@ encoding, sitelink `schema:about`) to an item and reading `P31` and `P569`. `arc
 the title is a sitelink of exactly one item, the item is an instance of human (Q5) and, when both sides have one,
 the Wikidata birth year equals Archigos's `yrborn`; redirects/renamed titles, several titles per leader, non-humans
 and birth-year disagreements are counted, not linked. Never by name. Each statement names its WDQS response
-(`raw_sha256`) and carries the evidence in qualifiers. Result of the live run: §6.
+(`raw_sha256`) and carries the evidence in qualifiers. Live: **1,028 of 1,167 titled leaders linked** (87 titles
+not a sitelink, 44 birth-year disagreements, 7 non-human items, 1 leader with two titles). A WDQS refusal (429/503)
+sets a machine-wide cool-down and the run continues without `same_as`.
 
 ## 5. Tests
 
@@ -145,7 +147,19 @@ and birth-year disagreements are counted, not linked. Never by name. Each statem
 
 ## 6. Live run (2026-10-16, throwaway DB, budget overlay of `a_coups.yaml`)
 
-LIVE_RESULTS_PLACEHOLDER
+`pytest -m "live and db" tests/integration/test_atlas_coups_live.py` — 1 passed (129 s, after a first attempt that
+waited ~30 min on the machine-wide WDQS cool-down and then failed on a WDQS date format; fixed, unit-tested).
+
+| source | result |
+|---|---|
+| `atlas.coups` | **provider refused**: HTTP 403 from `jonathanmpowell.com` (bot challenge to the platform client), 1 request, nothing archived or registered |
+| `atlas.archigos` (`wikidata=1`) | **completed**: 8 metered requests / 4.1 MB (countrycode, `.dta`, the refused P&T page, 5 WDQS POSTs), 7 raw artifacts archived; atlas `archigos.leaders_cy` 26,474 cells, 27 indicators, 172 countries, 1840-2015 (identical to §2); KG 3,808 entities + **14,603 statements, 0 rejected**; **327 T1 `coded_outcome` claims loaded** (0 rejected, 0 unknown entities) and graded by CAUSCORE's grader: **327 × B** (T1, temporal `overlapping` — same day —, single source); `same_as`: **1,028 leaders linked** to Wikidata; 87 titles not a sitelink (redirect/renamed), 44 birth-year disagreements, 7 items not humans, 1 leader with two titles — not linked; the P&T context edges were skipped (P&T host refused: `join.powell_thyne.status = powell_thyne_unavailable`) |
+| `atlas.reign_leaders` | **provider refused**: HTTP 403 from `jonathanmpowell.com` |
+
+KG statements by predicate after the run: `archigos:leader_of` 3,409, `archigos:birth_year` 2,783,
+`archigos:death_date` 1,892, `archigos:enwiki_title` 1,168, `archigos:same_as` 1,028, `P585` 999, removal statements
+672 × 3, coup statements 327 × 4. The 149 `coup:same_state_and_day_as` edges and the P&T events/atlas tables are
+verified on the real captures (§2) and in fixture mode, not live.
 
 ## 7. Requests to other agents / lead (not edited by me)
 

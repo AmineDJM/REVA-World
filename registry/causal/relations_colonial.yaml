@@ -1,0 +1,201 @@
+# Coded relations of the colonial / decolonisation datasets (owner: agent A-COLONIAL).
+#
+# Connectors: src/reva/adapters/connectors/atlas_colonial.py (COLDAT, ICOW Colonial History, ICOW Territorial
+# Claims) and src/reva/adapters/connectors/atlas_terrchange.py (COW Territorial Change v6 + COW Entities list).
+# Report: docs/dev/v3_a_colonial.md.
+#
+# Policy (docs/roadmap/v3_causality.md; lead instruction for this agent): a T1 claim (reva.causal.load_dataset_claims)
+# only where the codebook codes a relation that is causal BY DEFINITION and the dataset IDENTIFIES both ends (e.g.
+# "independence achieved through war" -> coded_outcome / precipitated between the war event and the independence
+# ONLY if the dataset names the war). Otherwise the coded mode is an ATTRIBUTE of the event (or a CONTEXT edge) and
+# is never worded causally.
+#
+# Result: none of the four datasets identifies the cause event of any coded relation, so **no causal claim is
+# delivered** (claims: []). Every coded variable that could be read causally is listed below with the codebook text,
+# the decision and the reason. The connectors read `documents` (sha256 of the codebooks shipped in the provider
+# archives): a changed codebook stops the dataset (the quoted labels may no longer be the provider's).
+version: 1
+owner: A-COLONIAL
+claims: []
+documents:
+  coldat_paper:
+    title: "Becker (2019), Introducing COLDAT: The Colonial Dates Dataset, SOCIUM SFB 1342 WorkingPapers No. 2"
+    dataverse: {doi: "doi:10.7910/DVN/T9SDEW", version: "3.0", file_id: 3476840, md5: 31f7a831f4125d70497d6d0922094615}
+    sha256: 4a1000b6040ab37ab0306e52dcf12a23ff2213333ce79633d65c837f764972bd
+    use: quoted definitions (Appendix I); md5 checked against the pinned Dataverse version record on every run
+  icow_colcode:
+    title: "Codebook for ICOW Colonial History Data Set, Version 1.1 (colcode.pdf in colhist.zip)"
+    url: https://www.paulhensel.org/Data/colhist.zip
+    sha256: dc5d1823c1c5353d87d494edc7dce32435867a1ce6cfad9ecbbb9581693b11c0
+  icow_claims_manual:
+    title: "ICOW Territorial Claims provisional 1.01, User's Manual (UsersManual.pdf in ICOWprov.zip)"
+    url: https://www.paulhensel.org/Data/ICOWprov.zip
+    sha256: ae847e378db99316c81c5ef6cdb2cf15d9b2e42e1f456e77e25289c2072f9f98
+  cowtc_manual:
+    title: "Territorial Change Coding Manual (tcmanual.pdf in terr-changes-v6.zip)"
+    url: https://correlatesofwar.org/wp-content/uploads/terr-changes-v6.zip
+    sha256: a52665fcb500f1099926305a47d6f4a17b908cc26e20de574cf66bba58444bdd
+  cowtc_entities:
+    title: "COW list of political entities (Entities.pdf in terr-changes-v6.zip; PDF title 'gpus - dependencies.xls')"
+    url: https://correlatesofwar.org/wp-content/uploads/terr-changes-v6.zip
+    sha256: 3c25abc3c48f0c13e268738570e15d0887f8e36a622db6c57ba91ba5b7ebc9dd
+    use: "parsed by atlas_terrchange.pdf_text_rows (layout-dependent; a new file must be re-checked)"
+
+rules:
+  # ------------------------------------------------------------------ COLDAT
+  - id: coldat_colonial_spell
+    source_key: harvard.dataverse.coldat
+    dataset: "COLDAT v3.0 COLDAT_dyads.tab (col, colstart_max/_mean, colend_max/_mean)"
+    family: attribute
+    relation: null
+    kg: "coldat:colonized_by (country -> colonizer, start/end year), atlas coldat.dyads_v3"
+    codebook: >-
+      "col Dummy indicating whether country was ever colonized by colonizer." "colstart_max First year during which
+      country was colonized by colonizer. Based on last date aggregation." "colend_max Last year during which country
+      was colonized by colonizer. Based on last date aggregation." (Appendix I; _mean: "Based on mean aggregation.")
+    rationale: >-
+      A dated relation between a country and a colonial power (a state of affairs), not a relation between events.
+      Nothing in COLDAT codes why a colonial spell began or ended.
+
+  # ------------------------------------------------------------------ ICOW Colonial History 1.1
+  - id: icow_independence_violent
+    source_key: icow.paulhensel
+    dataset: "ICOW Colonial History 1.1 coldata110.csv, IndViol"
+    family: attribute
+    relation: null
+    candidate_relation_rejected: precipitated / coded_outcome (war -> independence)
+    kg: "icowcol:independence_violent (string, the codebook label) on icowcol:independence:<ccode>; atlas icow.colhist_v11 independence_violent"
+    codebook: >-
+      "IndViol: Violent Independence? 1: Yes = The independence occurred through organized violence. 0: No = The
+      independence did not involve organized violence. An independence process is considered violent if it occurred
+      through armed revolt by the entity, or if it occurred through armed conflict between the former ruler and another
+      state (as when the entity in question is conquered or freed by a foreign power, or when it changed hands as part
+      of a treaty ending a war)."
+    rationale: >-
+      The codebook does code a causal mode ("occurred through organized violence") but the data set does not identify
+      the violent episode (no war, MID or conflict identifier; IndViol is a 0/1 dummy). Per the lead's rule a claim
+      needs both ends identified by the dataset: the mode stays an attribute of the independence event. Linking it to
+      a war REVA would choose by name or date is forbidden.
+  - id: icow_independence_type
+    source_key: icow.paulhensel
+    dataset: "ICOW Colonial History 1.1, IndType"
+    family: attribute
+    relation: null
+    codebook: >-
+      "1: Formation ... 2: Decolonization = The entity was a dependency ruled by a foreign power before achieving
+      independence. ... 3: Secession ... 4: Partition ..."
+    rationale: A classification of the independence process, not a relation between two events.
+  - id: icow_independence_from
+    source_key: icow.paulhensel
+    dataset: "ICOW Colonial History 1.1, IndFrom / IndDate"
+    family: context
+    relation: null
+    kg: "icowcol:independence_of / icowcol:independence_from (participants of the independence event); colonial:independence_key"
+    codebook: >-
+      "IndFrom: Entity from Which Independence Was Gained. The COW country code for the state, empire, or other entity
+      from which this state gained independence."
+    rationale: "Participants of the event (the new state and the former ruler): context, never causal."
+  - id: icow_primary_colonial_ruler
+    source_key: icow.paulhensel
+    dataset: "ICOW Colonial History 1.1, ColRuler"
+    family: attribute
+    relation: null
+    kg: "icowcol:primary_colonial_ruler (state -> ruler, undated: ICOW 1.1 codes no years of rule)"
+    codebook: >-
+      "ColRuler: Primary Colonial Ruler. The colonial or imperial power that was most responsible for shaping the
+      development of the entity (or entities) that became this modern state."
+    rationale: >-
+      "Most responsible for shaping the development" is a coder's summary judgement about a state, not a coded
+      relation between two events; it is stored as an attribute statement with the definition quoted.
+  - id: icow_secession_merger
+    source_key: icow.paulhensel
+    dataset: "ICOW Colonial History 1.1, SecFrom / SecDate / SecViol, Into / IntoDate"
+    family: attribute
+    relation: null
+    codebook: >-
+      "SecViol: Violent Secession? 1: Yes = The secession occurred through organized violence." / "Into: The COW
+      country code for a state that absorbed this state after independence."
+    rationale: Same as IndViol (no violent episode identified) and participants (context).
+
+  # ------------------------------------------------------------------ ICOW Territorial Claims provisional 1.01
+  - id: icow_claim_resolution
+    source_key: icow.paulhensel
+    dataset: "ICOW Territorial Claims provisional 1.01 ICOWprov101.csv, resolved / endviol"
+    family: attribute
+    relation: null
+    candidate_relation_rejected: coded_outcome (claim -> resolution)
+    kg: "icowclaim:resolution, icowclaim:ended_through_violence on icowclaim:<claimdy>"
+    codebook: >-
+      "resolved: Type of claim resolution ... 5: Independence ... 7: Military Conquest/Occupation ... 12: Binding Third
+      Party Decision ..." "endviol: Did claim end through organized violence? 1: Yes (claim ended through organized
+      violence) 0: No (claim ending did not involve organized violence)"
+    rationale: >-
+      The way a claim ended is coded as a category; the event that ended it (the conquest, the independence, the
+      arbitration award) is not identified, so there is no second event for a claim to point to.
+  - id: icow_claim_mids_wars
+    source_key: icow.paulhensel
+    dataset: "ICOW Territorial Claims provisional 1.01, midsiss / midsfat / warsiss"
+    family: context
+    relation: null
+    codebook: >-
+      "midsiss: Total number of militarized interstate disputes (MIDs) over the issue that occurred during this dyadic
+      claim. (Note that this only includes MIDs that directly involved attempts to settle this specific issue ...)"
+    rationale: >-
+      Counts of disputes over the issue (the claim is the issue at stake, as CAUSDATA's causdata:coded_issue: not a
+      cause). The disputes are counted, not identified (no MID numbers in the provisional data).
+
+  # ------------------------------------------------------------------ COW Territorial Change v6
+  - id: cowtc_procedure_conquest
+    source_key: cow.terrchange
+    dataset: "COW Territorial Change v6 tc2018.csv, procedur"
+    family: attribute
+    relation: null
+    candidate_relation_rejected: has_cause (armed force -> transfer)
+    kg: "cowtc:procedure (string, manual label + definition) on cowtc:<number>; atlas cowtc.changes_cy |procedure="
+    codebook: >-
+      "Conquest occurs when armed force is the primary agent of the territorial change. It is possible that the
+      conquest tools place with a bare minimum of force and no organized military resistance was encountered. In this
+      case the change is coded as involving no military conflict." "Annexation occurs when one political entity
+      unilaterally extends its sovereignty over another political entity when the primary agent of change is
+      diplomacy ..."
+    rationale: >-
+      The procedure says how the transfer happened ("primary agent"); the campaign or war is not identified, and a
+      conquest coded without military conflict shows the code is a mode of transfer, not an event.
+  - id: cowtc_military_conflict
+    source_key: cow.terrchange
+    dataset: "COW Territorial Change v6, conflict"
+    family: attribute
+    relation: null
+    codebook: >-
+      "Military Conflict: ... This is coded if there was military conflict between organized forces of both sides.
+      Unorganized violence, such as riots, is not so classified. This variable is coded "1" for military conflict and
+      "0" for no military conflict."
+    rationale: A 0/1 attribute of the change; no conflict identifier (no COW war or MID number in v6).
+  - id: cowtc_independence
+    source_key: cow.terrchange
+    dataset: "COW Territorial Change v6, indep / gainer / loser / entity"
+    family: context
+    relation: null
+    kg: "cowtc:gainer / cowtc:loser / cowtc:territory (participants), colonial:independence_key"
+    codebook: >-
+      "Independence refers to the termination of colonial rule over a dependency. This termination must involve the
+      former dependency's attaining effective control over its own foreign affairs and armed forces as wed as achieving
+      some measure of diplomatic recognition."
+    rationale: Participants of the change; the independence is the change itself.
+  - id: cowent_status_spells
+    source_key: cow.terrchange
+    dataset: "COW Entities list (Entities.pdf), Begin Year / End Year / Ending Political Status"
+    family: attribute
+    relation: null
+    kg: "cowent:colony_of / protectorate_of / mandated_to / possession_of / leased_to / occupied_by / claimed_by / part_of / neutral_zone_of"
+    codebook: >-
+      Column headers as printed: "Entity Number", "Name", "Begin Year", "End Year", "Ending Political Status"; status
+      phrases as printed, e.g. "Became colony of 235". The TC manual calls the list "The list of political entities
+      (colonies, dependencies, and possessions)" (correlatesofwar.org data-set page).
+    rationale: Dated political status of a territory relative to another entity (a state of affairs), not causal.
+
+# Identity (not causal): an independence event of ICOW (icowcol:independence:<state>) and a COW TC independence
+# (cowtc:<number>, indep = 1) that share the same COW state code AND the same former-ruler code carry the same
+# `colonial:independence_key` value. EVENTS' `same_property` rule (registry/events/same_as_rules.yaml, requested) can
+# then write `events:same_as` with that shared-identifier evidence. Dates may differ (e.g. Brazil: ICOW 1822-09, TC
+# 1824-12): that is a recorded disagreement, never resolved (docs/dev/v3_a_colonial.md section 7).
