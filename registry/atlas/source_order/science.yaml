@@ -10,4 +10,14 @@ concepts:
         justification: "UN SDG indicator 17.8.1 (ITU estimates), both sexes, global reporting: the ITU series."
       - series: "wb.wdi_econ.IT.NET.USER.ZS"
         justification: "WDI \"Individuals using the Internet (% of population)\" republishes the ITU series."
+      - series: spc.digital.DD024
+        reported_unit: percent
+        justification: SPC DF_DIGITAL_DEVELOPMENT DD024 "Individuals using the Internet, total (%)" is the ITU indicator
+          (the same series the UN SDG database publishes as IT_USE_ii99), re-published by SPC for Pacific territories.
+        caveats: Same lineage as the SDG/ITU series ranked first (not independent evidence).
+      - series: eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_IU3
+        reported_unit: '% of individuals'
+        justification: 'Eurostat "Last internet use: in last 3 months", % of individuals: the ITU definition of an Internet
+          user (used the Internet from any location in the last three months); ITU takes this Eurostat survey for EU members.'
+        caveats: Population aged 16-74 (Eurostat ICT survey), regional NUTS-2 estimate for the overseas departments.
     related_catalog_concepts: []

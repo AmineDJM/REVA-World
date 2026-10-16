@@ -206,6 +206,55 @@ models:
         products (FIGARO DOM x D21X31 x P3_S14) fixed in money per unit; ad valorem taxes would keep the
         basic-price figure, so the two readings bracket the tax treatment; neither is a CPI
       - a shocked industry is a whole table industry (NACE B is broader than crude petroleum)
+  # V3 SIMFIX: version 1.2.0 = 1.1.0 + pension coverage (ILOSTAT SDG 1.3.1); listed before 1.1.0 and 1.0.0
+  # (consumers indexing by model_key alone keep resolving the 1.0.0 entry, the last one).
+  - model_key: social.retirement_age
+    version: "1.2.0"
+    kind: scenario
+    approval_status: candidate
+    review_status: maintainer_review_pending
+    description: >-
+      Version 1.2.0 of the world retirement-age module: the 1.1.0 inputs, rule tables, eligibility arithmetic
+      and cited response grid, with the legal-age change applied only to the pension-covered share of each
+      (sex, single age 55-64) cell. Coverage = ILOSTAT SDG indicator 1.3.1 "persons above retirement age
+      receiving a pension" (connector ilostat.social_protection), the source's own value of the latest year
+      <= the reference year (at most 10 years older), by sex when ILOSTAT gives F and M, else the total for
+      both sexes; the uncovered share keeps the observed rates. Countries without a coverage value are refused
+      (missing_input), never assumed covered. Coverage counts contributory and non-contributory pensions and
+      is measured above pensionable age: results can remain overstated where a social pension with its own
+      age drives coverage.
+    input_ports:
+      - {name: employment_rate, kind: dataset, concept: labour.ilostat.employment_to_population_ratio.age5_sex}
+      - {name: activity_rate, kind: dataset, concept: labour.ilostat.labour_force_participation_rate.age5_sex}
+      - {name: pension_coverage, kind: dataset, concept: social_protection.ilostat.old_age_pension_coverage.sex}
+      - {name: population, kind: dataset, concept: demography.wpp.population.jan1_age_sex}
+      - {name: deaths, kind: dataset, concept: demography.wpp.deaths.age_sex}
+      - {name: births, kind: dataset, concept: demography.wpp.live_births.mother_age5_newborn_sex}
+    output_ports:
+      - {name: employed_persons_55_64, unit: unit.persons}
+      - {name: employment_change_55_64, unit: unit.persons}
+      - {name: pension_recipients_change_55_64, unit: unit.persons}
+      - {name: old_age_dependency_ratio, unit: unit.ratio}
+      - {name: employment_rate_by_sex_and_group, unit: unit.percent}
+    applicability:
+      rule_tables: registry/rules/retirement_age (law text) + registry/rules/retirement_age_wbl2026 (WBL 2026)
+      countries_refused_capability_gap: registry/rules/retirement_age_wbl2026/wbl2026_gaps.yaml
+      countries_refused_missing_input: countries without ILOSTAT SDG 1.3.1 old-age pension coverage within 10 years
+      horizon: {max_end_year: 2040, unit: calendar_year}
+      reference_year_max: 2022
+      ages: [55, 64]
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [pension_recipients, pension_expenditure_change_approx_eur, employed_persons_55_69, gdp_loss, unemployment, wages, household_welfare]
+    assumptions:
+      - legal-age change applied to the pension-covered share c only (ILOSTAT SDG 1.3.1, source's own value, no coverage variant)
+      - coverage measured above pensionable age applied unchanged to ages 55-64 in every year, uniform across ages; by sex when published, else the total for both sexes
+      - coverage includes non-contributory pensions (possible overstatement where a social pension with its own age drives it)
+      - ILOSTAT rates of the latest complete year (at most 10 years before the reference year) held constant
+      - pension-receipt drop = share outside the labour force of the age band (proxy of unknown direction; L2 bounding variants 55-59 / 60-64)
+      - employment response = cited European literature value (transferred outside its country, labelled)
+      - WBL 2026 age held constant for every claim year (counterfactual reference path; reforms not captured)
+      - exceptions to the general eligibility age not represented
   # V3 SIMWORLD: version 1.1.0 (countries outside the Eurostat LFS); listed before 1.0.0 (see above).
   - model_key: social.retirement_age
     version: "1.1.0"

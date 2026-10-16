@@ -97,7 +97,7 @@ def test_country_links_from_db(kg) -> None:  # type: ignore[no-untyped-def]
     assert "shared_official_language" in types
     for lk in out["links"]:
         assert lk["evidence"], lk
-    assert out["link_types"]["bilateral_trade"]["status"] == "awaiting_source"
+    assert out["link_types"]["bilateral_trade"]["status"] == "derivable"
 
 
 def test_links_http_api(kg, db) -> None:  # type: ignore[no-untyped-def]

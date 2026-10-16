@@ -297,6 +297,24 @@ class Stmt:
 COUNTERPART_DIMS = ("counterpart", "partner", "origin", "destination")
 
 
+_YEAR_RE = re.compile(r"^\s*([+-]?)(\d{1,6})-")
+
+
+def period_year(value: Any) -> int:
+    """Astronomical year of an atlas period start: ISO text with a signed year (``-0043-03-15``), a Python
+    ``date``, or DuckDB's VARCHAR form of a BCE date (``0044-03-15 (BC)`` = astronomical -43)."""
+    if hasattr(value, "year") and not isinstance(value, str):
+        return int(value.year)
+    s = str(value)
+    m = _YEAR_RE.match(s)
+    if not m:
+        raise ValueError(f"not a period start: {s!r}")
+    y = int(m.group(2))
+    if s.rstrip().endswith("(BC)"):
+        return 1 - y
+    return -y if m.group(1) == "-" else y
+
+
 def split_indicator(indicator: str) -> tuple[str, dict[str, str]]:
     """``"TXG_FOB_USD|counterpart=USA"`` → ``("TXG_FOB_USD", {"counterpart": "USA"})``."""
     code, *parts = indicator.split("|")
@@ -377,7 +395,8 @@ class AtlasRowRef:
 
     @property
     def year(self) -> int:
-        return int(str(self.period_start)[:4])
+        """Astronomical year of ``period_start`` (``-0043-03-15`` → -43; a DuckDB ``0044-03-15 (BC)`` → -43)."""
+        return period_year(self.period_start)
 
     @property
     def subject_object(self) -> tuple[str, str | None]:
@@ -540,13 +559,14 @@ class Link:
         return tuple(seen)
 
     @property
-    def key(self) -> tuple[str, str, str, tuple[str, ...], str, str | None]:
-        """Identity for de-duplication: same type, endpoints (unordered when undirected), via, dates and
-        weight. Two links differing only by evidence are merged (evidence united)."""
+    def key(self) -> tuple[str, str, str, tuple[str, ...], str, str | None, str]:
+        """Identity for de-duplication: same type, endpoints (unordered when undirected), via, dates, weight
+        and facet (HS section, vote issue). Two links differing only by evidence are merged (evidence united)."""
         a, b = (self.subject, self.object)
         if not self.directed and b < a:
             a, b = b, a
-        return (self.link_type, a, b, self.via, self.temporal.label(), self.weight)
+        facet = str(self.basis.get("facet") or self.basis.get("issue") or "")
+        return (self.link_type, a, b, self.via, self.temporal.label(), self.weight, facet)
 
     def to_json(self) -> dict[str, Any]:
         d: dict[str, Any] = {

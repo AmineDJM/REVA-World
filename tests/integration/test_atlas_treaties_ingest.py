@@ -47,8 +47,9 @@ async def test_untc_ingest(db: Any) -> None:
         n = c.execute(
             text(
                 "SELECT count(*) FROM kg.statement_current WHERE source_key = 'untc.mtdsg' AND property_pid = 'P1891' "
-                "AND subject_qid = 'untc:treaty:XVIII-10'"
-            )
+                "AND subject_qid = :s"
+            ),
+            {"s": atlas_treaties.load_treaty_qids().get("XVIII-10", "untc:treaty:XVIII-10")},
         ).scalar_one()
         assert n == s["treaties"]["XVIII-10"]["listed_signatures"] + 2  # + Burundi, Philippines (bracketed)
     again = await _run(db, atlas_treaties)

@@ -89,6 +89,7 @@ class AtlasRun:
         params: dict[str, Any] | None,
         fingerprint: str,
         extra_headers: dict[str, str] | None = None,
+        request: dict[str, Any] | None = None,
     ) -> Any:
         from reva.ports.connectors import FetchItem, RawAcquisition
 
@@ -96,6 +97,8 @@ class AtlasRun:
         meta = r.response_metadata()
         if extra_headers:
             meta["headers"] = {**meta.get("headers", {}), **extra_headers}
+        if request:
+            meta["request"] = request  # POST: the request body is archived with the response
         return RawAcquisition(
             item=item,
             body=r.body,
@@ -185,6 +188,115 @@ class AtlasRun:
             extra_headers={"content-range": r.headers.get("content-range", "")},
         )
 
+    async def post(
+        self,
+        url: str,
+        *,
+        key: str,
+        json_body: Any = None,
+        content: bytes | None = None,
+        content_type: str | None = None,
+        media_types: tuple[str, ...] = ("application/json",),
+        headers: dict[str, str] | None = None,
+        max_bytes: int | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> Any:
+        """POST one query (PxWeb and other POST-only APIs) and return a ``RawAcquisition``.
+
+        Same guarantees as :meth:`get`: the source's allow-listed hosts, politeness and size caps
+        (``reva.atlas.http_post.safe_post`` through the run's SafeHttpClient, never a new client),
+        metered on the run's budget reservation exactly like a GET (one request; response and request
+        bytes counted). Fixture mode replays a capture keyed by URL + request-body sha256. The request
+        body (<= 64 KiB; canonical JSON for ``json_body``) is archived with the response in
+        ``response_metadata.request`` (method, content type, body text, sha256), and the acquisition's
+        fingerprint covers it, so two different queries to one URL are two acquisitions."""
+        import base64
+        import hashlib
+
+        from reva.adapters.http.safe_client import redact_url
+
+        if self.is_cancelled():
+            raise PolicyDenied("atlas ingest cancelled")
+        if (json_body is None) == (content is None):
+            raise ValidationProblem("POST needs exactly one of json_body or content")
+        body = (
+            json.dumps(json_body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+            if json_body is not None
+            else bytes(content or b"")
+        )
+        if len(body) > POST_BODY_MAX:
+            raise ValidationProblem("POST body too large to archive with the response", bytes=len(body))
+        ctype = content_type or ("application/json" if json_body is not None else "application/octet-stream")
+        send = {"Content-Type": ctype, **(headers or {})}
+        cap = self._cap(max_bytes)
+        body_sha = hashlib.sha256(body).hexdigest()
+        fp = hashlib.sha256(f"POST {redact_url(url)} body:{body_sha}".encode()).hexdigest()
+        r = await self._post(url, body, send, cap, fp)
+        try:
+            text = body.decode("utf-8")
+        except UnicodeDecodeError:
+            text = None
+        request = {
+            "method": "POST",
+            "content_type": ctype,
+            "body_sha256": body_sha,
+            "body_bytes": len(body),
+            "body": text,
+            "body_base64": None if text is not None else base64.b64encode(body).decode(),
+        }
+        return self._raw(
+            r,
+            url=url,
+            key=key,
+            media_types=media_types,
+            cap=cap,
+            params={**(params or {}), "method": "POST", "request_body_sha256": body_sha},
+            fingerprint=fp,
+            request=request,
+        )
+
+    async def _post(self, url: str, body: bytes, headers: dict[str, str], cap: int, fp: str) -> Any:
+        import asyncio as _asyncio
+
+        from reva.atlas.http_post import safe_post
+        from reva.operations.budgets import MeteredHttp, top_up
+
+        http = self.http
+        if isinstance(http, MeteredHttp):  # live: the same ledger accounting as MeteredHttp.get
+            if http.requests + 1 > http.reserved_requests:
+                granted = await _asyncio.to_thread(
+                    top_up, http.engine, http.reservation, unit="requests", want=http.request_chunk, budget=http.budget
+                )
+                http.reserved_requests += granted
+                if http.requests + 1 > http.reserved_requests:
+                    raise http._refuse("requests")
+            need = cap + len(body)
+            headroom = http.reserved_bytes - http.bytes
+            if headroom < need:
+                granted = await _asyncio.to_thread(
+                    top_up, http.engine, http.reservation, unit="bytes", want=need - headroom, budget=http.budget
+                )
+                http.reserved_bytes += granted
+                headroom += granted
+                if headroom <= len(body):
+                    raise http._refuse("bytes")
+            http.requests += 1
+            http.bytes += len(body)  # request bytes count against the egress budget too
+            r = await safe_post(
+                http.inner, url, content=body, headers=headers, max_bytes=min(cap, headroom - len(body))
+            )
+            http.bytes += len(r.body)
+            return r
+        entries = getattr(http, "entries", None)
+        if getattr(http, "origin", "") == "test_fixture" and isinstance(entries, dict):
+            return _fixture_post(http, url, fp)  # FixtureHttp capture keyed by URL + body sha256
+        poster = getattr(http, "post", None)
+        if poster is not None and getattr(http, "origin", "") == "test_fixture":
+            return await poster(url, content=body, headers=headers, max_bytes=cap)
+        if self.engine is None:  # AtlasRun.offline with a live client (live layout tests): nothing archived
+            return await safe_post(http, url, content=body, headers=headers, max_bytes=cap)
+        raise PolicyDenied("live atlas POST requires the metered client of run_atlas_ingest")
+
     def archive(self, raw: Any) -> str:
         """Archive raw bytes as an ``evidence.acquisition`` of this source's connector version."""
         from reva.evidence.ingest import publish_acquisition
@@ -228,6 +340,36 @@ class AtlasRun:
         )
         self.registered.append({k: out[k] for k in ("dataset_key", "dataset_id", "row_count", "created")})
         return out
+
+
+POST_BODY_MAX = 65_536  # a POST query is archived in full with its response
+
+
+def _fixture_post(http: Any, url: str, fp: str) -> Any:
+    """A captured POST response from a FixtureHttp manifest (entry ``request_fingerprint`` = the POST
+    fingerprint of ``AtlasRun.post``: sha256 of ``POST <url> body:<body sha256>``)."""
+    import hashlib
+
+    from reva.adapters.http.safe_client import HttpResult
+    from reva.kernel.errors import SourceResponseError
+
+    e = http.entries.get(fp)
+    if e is None:
+        raise SourceResponseError("no captured fixture for this POST query", retryable=False, kind="fixture_missing")
+    body = (http.dir / e["file"]).read_bytes()
+    if hashlib.sha256(body).hexdigest() != e["sha256"]:
+        raise SourceResponseError("fixture bytes do not match manifest hash", retryable=False)
+    return HttpResult(
+        url,
+        url,
+        int(e.get("status", 200)),
+        dict(e.get("headers") or {}),
+        body,
+        datetime.fromisoformat(e.get("retrieved_at", "2026-10-16T00:00:00+00:00")),
+        0.0,
+        (),
+        1,
+    )
 
 
 class ArchiveRangeFixtureHttp:

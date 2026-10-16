@@ -1,0 +1,20 @@
+[
+  {
+    "request_fingerprint": "7248c3423664d642ffb7208dfddccbcebcc57c5fcdea9cee6f68ac6c960b1693",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=SDG_0131_SEX_SOC_RT_A&format=.csv.gz",
+    "file": "SDG_0131_SEX_SOC_RT_A.csv.gz",
+    "sha256": "b34d82e3f4599bf0c07933f3415cda0de784364c2cfaa934a8188f712fab1c21",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T18:40:00+00:00",
+    "licence": "CC-BY-4.0 (ILO, ILOSTAT)",
+    "excerpt_of": {
+      "full_sha256": "0c5c2567c07ec1e503da8ca925edd715665b929697ced52e9bba4408b3c57a9f",
+      "full_bytes": 184757,
+      "kept": "rows of SEN, JPN, BRA, IND, MEX, IDN, JOR, KOS, X01 (verbatim lines, every function)",
+      "rows": 653
+    }
+  }
+]

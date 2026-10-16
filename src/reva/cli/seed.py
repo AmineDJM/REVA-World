@@ -476,6 +476,11 @@ ATLAS_SCHEDULE_SLOTS: tuple[tuple[str, int], ...] = (
     ("atlas.cckp_climatology", 244),
     ("atlas.inform_risk_hazards", 245),
     ("atlas.fao", 266),  # day 11
+    ("atlas.gap_spc", 290),  # day 12: GAPHUNT gap fills (territories)
+    ("atlas.gap_eurostat_nuts", 291),
+    ("atlas.gap_insee", 292),
+    ("atlas.gap_cbs_bes", 293),
+    ("atlas.gap_jersey", 294),
 )
 
 DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (

@@ -221,3 +221,232 @@ letting it delegate to the LINKS engine.
    statement (seen in this capture). Add `"info"` to `ENTITY_PROPS` (one word; `LABEL_PROPS` too).
 9. **Lead**: `contracts/openapi.json` must be re-exported (`scripts/export_contracts.py`) after the
    `/v1/links` router registration (one line in `src/reva/api/app.py`).
+
+---
+
+# LINKS2 — country–country "neurons" from atlas snapshots + KG, materialised (agent LINKS2, 2026-10-16)
+
+Owner: agent LINKS2 (second pass on `src/reva/links/**`, `registry/links/**`, `src/reva/api/routes/links.py`,
+`tests/unit/links/**`, `tests/integration/test_links_*.py`, migration `0012_links_store`). Supersedes the
+`awaiting_source` statuses of §2: every atlas-based type whose data now exists is `derivable`.
+
+## L2.1 What was added
+
+| Piece | Path |
+|---|---|
+| Atlas derivations over a snapshot's DuckDB file (dyadic kinds + computed UNGA vote agreement, top-k, pair and country reads) | `src/reva/links/atlas_links.py` |
+| Dataset-statement derivations (CShapes borders / colonial rule, UCDP sides, UN peacekeeping) with dated `geopol:corresponds_to_iso3` mapping | `src/reva/links/dataset_kg.py` |
+| `shared_polity_territory` (KGPOLITY overlay) and `shared_language_glottolog` (KGLANG) — `derive_shared_subject`, bounded; Glottolog genealogy in `shared_language_family` | `src/reva/links/derive.py` |
+| Materialised link store: materialiser (worker), readers (API), CLI | `src/reva/links/store.py`, `uv run python -m reva.links.store materialise …` |
+| Store tables (append-only, sealed per transaction) | `migrations/versions/0012_links_store.py`, `migrations/schema_contract.json` regenerated (head `0012_links_store`) |
+| Country view / pair view (store first, on-demand fallback), predecessor-state links | `src/reva/links/service.py` (`country_view`, `pair_view`) |
+| API: `GET /v1/links/{iso3}?kind=&year=&facet=&limit=`, `GET /v1/links/pair?a=&b=…` | `src/reva/api/routes/links.py`, `contracts/openapi.json` re-exported |
+| Path engine: stored links as edges, namespaced predicates as hops, ordered hop-type steps, `via_any`/`via_all`, non-transit entity kinds, `max_hops` ≤ 8 | `src/reva/links/paths.py`, `registry/links/link_types.yaml` (`statement_edges`) |
+| Tests | `tests/unit/links/test_links_atlas.py` (12), `test_links_dataset_kg.py` (7), `test_links_anchor_chains.py` (22: KGHIST's 20 chains), BCE year test in `test_links_model.py`; `tests/integration/test_links_store.py` (6, own throwaway DB, 7 atlas fixture sources) |
+
+## L2.2 Link types now derived (29 in the taxonomy; `link_types.schema.json` adds `derivation.atlas`, methods `atlas_computed`, `kg_dataset_*`, weight kind `derived_index`, namespaced `statement_edges`)
+
+| id | input | weight | temporal |
+|---|---|---|---|
+| `land_border` | A-GEO `naturalearth.admin0_10m_borders` (`land_border_km\|partner=`, `flags.partner_iso3`); both directions merged into one undirected link (both rows are evidence; disagreeing rows → no link, counted) | km (1:10m, as measured) | retrieval-day snapshot year |
+| `land_border_cshapes` (new) | KGGEOPOL `cshapes:shares_border_with` ∩ `geopol:corresponds_to_iso3` of both territories | – | dated interval (day precision) |
+| `colonial_rule_cshapes` (new, directed territory → ruler) | `cshapes:ruled_by` (+status) ; territory named by the country it corresponds to (`basis.territory_mapping`) | – | dependency period |
+| `bilateral_trade` | A-IMF `imf.imts` `XG_FOB_USD\|partner=` (exports reported by the exporter) | US dollars as reported | year |
+| `bilateral_trade_imports` (new) | `imf.imts` `MG_CIF_USD\|partner=` (imports reported by the importer; exporter → importer). Mirror flows are never merged | US dollars | year |
+| `bilateral_trade_baci` (new) | A-TRADE `baci.hs92_pair_*` `X\|partner=…\|section=S` (facet `section=`; `TOTAL` default) | thousand US dollars | year |
+| `migrant_stock` | A-UN `un_desa.ims2024` `migrant_stock\|origin=…\|sex=T` (origin → destination) | persons | year |
+| `unga_vote_agreement` | **computed** from `unga.votes` + `unga.rollcalls` (below) | `derived_index` share 0–1 | decade (stored) / year (pair view) |
+| `conflict_same_side`, `conflict_opposing_sides` | UCDP `ucdp:primary_party`/`ucdp:secondary_party` with qualifier `side` a/b, overlapping conflict-year runs, via the conflict | – | overlap |
+| `peacekeeping_contributor_to_host` (new, A-MILITARY) | `unpk:contributed_personnel_to` (country → mission, per year) ∘ `unpk:mission_country` (mission → country), overlapping; linear (≤ 200,000, cap recorded); max personnel kept in `basis`, not a weight | – | overlap |
+| `shared_polity_territory` (KGPOLITY) | two countries objects of `geo:covered_territory_of` with the same polity, overlapping runs; polities covering > 60 countries not expanded (recorded), ≤ 200,000 pairs | – | intersection |
+| `shared_language_glottolog` (new, KGLANG) | two countries in `glottolog:spoken_in` of the same languoid; languages listed in > 60 countries are hubs (recorded), ≤ 200,000 pairs | – | undated |
+| `shared_language_family` | unchanged + Glottolog genealogy (`glottolog:parent`/`in_group`/`family`, entered from a Wikidata language through `glottolog:wikidata_item`) | – | interval |
+| Wikidata KG kinds (§2) | unchanged; `border_wikidata` now keeps Wikidata-sourced P47 only (Natural Earth / GeoNames P47 loads would otherwise be mislabelled) | – | – |
+
+Not derived: `maritime_neighbour` (no open source ingested), `shared_legal_family` (A-LAW categorical rows not wired),
+treaty co-parties beyond Wikidata P1891 (no A-TREATIES data), factbook partner shares (not needed: IMTS/BACI are the
+quantities). WALS/Grambank feature values are text and never become links.
+
+**UNGA vote agreement (labelled `derived`).** For a pair and a period (decade stored; year in the pair view) and an
+issue (`all`, or Voeten's keyword codes `co hr me nu di ec`): `share = n_identical / n_common`, `n_common` = roll calls
+on which both cast yes / no / abstain (absent and non-member excluded), identical = same position (abstain = abstain
+counts). Requires `n_common ≥ 10`, else no link (counted `fewer_than_min_common_rollcalls`). `basis` keeps `n_common`,
+`n_identical`, `both_yes/no/abstain`, the roll-call years and method `links-vote-agreement/1`; the response adds the
+formula and the caveat ("a share of identical votes, not an alliance, friendship or alignment of interests").
+Evidence = the archived RData's raw sha256 + a selector stating the computation (`pair`, `years`, `issue`,
+`positions`, `min_common`): reproducible from the archived file. Historical voters keep their own node (USSR Q15180,
+never RUS). The pair view can list the per-roll-call positions behind a value (`votes_detail_from/to/issue`, ≤ 200).
+
+Identity: `Link.key` now includes the facet (issue / HS section), so two issues with the same share stay two links.
+BCE: `AtlasRowRef.year` / `period_year()` parse the signed astronomical year (`-0043-…` → -43, DuckDB `0044-… (BC)` →
+-43); vote-detail dates use `reva.atlas.query.iso_date_sql` (KGBCE request).
+
+## L2.3 Materialised store (`kg.link_materialisation`, `kg.link_row`; migration 0012)
+
+* One materialisation per (atlas snapshot sha256 + origin, KG watermark = max `kg.load.id` + its `recorded_at`, KG origin,
+  method `links-materialise/1`, taxonomy sha256); `report` holds per-type counts and skip reasons; written by the worker
+  in **one transaction** (statement trigger: link rows must belong to a materialisation created in the same
+  transaction — complete or absent). Append-only (`meta.reject_mutation`), server `recorded_at`/`recorded_by`.
+  Grants: worker INSERT+SELECT, api/sim SELECT, gate none (0011 already revoked its `kg` usage). In the `kg` schema
+  on purpose (schema-contract `APP_SCHEMAS` and the runtime grant model already cover it).
+* KG kinds and `land_border` are stored in full; atlas kinds keep, per (country, period, facet) and direction, the
+  **union of both endpoints' top-k** (default k = 10) — every country's top-k is complete. Full pair histories are
+  re-read from the same snapshot on demand.
+* Each row: type, facet, endpoints (QID / `iso3:<KEY>` / dataset entity) + their ISO3 keys, direction, `year_lo/hi`
+  (astronomical integers), exact temporal JSON, `weight` decimal string + `weight_num` (ordering only) + unit, `via`,
+  evidence (non-empty; `jsonb_array_length ≥ 1` check), basis, origin (`live`/`test_fixture`/`mixed`).
+* Readers: `latest_materialisation(live_only=…)` (production serves only live atlas + live KG materialisations),
+  `country_rows` (SQL top-N per kind/facet/direction, latest period for snapshot/decade kinds unless `year`),
+  `pair_rows`, `rows_touching` (path engine, ≤ 20,000 rows/query, cap reported as truncation), `predecessors` +
+  `rows_between_nodes` (pair view: links with the other country's predecessor states through stored
+  `successor_of`, each shown with its succession chain).
+* Fallback: no materialisation → on-demand (KG neighbourhood derivation + the latest atlas snapshot read for that
+  country), same response shape with `mode: "on_demand"`.
+
+## L2.4 API
+
+* `GET /v1/links/{iso3|qid}?kind=…&year=&facet=issue=co|section=XVI&limit=1..10` — `data.mode`
+  (`materialised`/`on_demand`), `store` (materialisation id, atlas snapshot, KG watermark, top_k), `by_kind[kind].groups[]`
+  (direction `outgoing`/`incoming`/`both`, facet, `period`, `total`, ranked `links` with `text.fr/en`, evidence, `iso3`,
+  `weight_kind`), flat `links`, `labels` (KG labels, else crosswalk names), `link_types` (status + stored count), `notes`.
+  Warnings: `link_not_causal` first, `derived_index` when vote agreement is present, `fixture_data`/`community_edited`
+  per evidence origin. `link_type=` stays as an alias of `kind=`; `qid` is kept for the UI3 schema.
+* `GET /v1/links/pair?a=BRA&b=PRT[&kind=…][&from_year&to_year][&votes_detail_from=1960&votes_detail_to=1960&votes_detail_issue=co]`
+  — `kinds[kind]` (count, first/last year, every link with evidence), `kinds_without_links` (an absent kind is "no
+  link", never zero), `predecessor_links`, `vote_detail`, `store`, `atlas_snapshot`, `truncated`.
+* Bounds (SEC-1 style): limit ≤ 10; pair: ≤ 1,200 rows per atlas kind, ≤ 5,000 store rows, 8 s budget checked between
+  kinds (truncation listed and warned), vote detail ≤ 11 years and ≤ 200 roll calls; country store read ≤ 20,000 rows;
+  path: ≤ 20,000 stored links per query, constrained search ≤ 2,000,000 DFS steps + the 20 s request budget,
+  `max_hops` ≤ 8, ≤ 8 ordered steps.
+* `/v1/links/path`: hop kinds may be namespaced predicates (`kind=geo:covered_territory_of`); the service accepts
+  `steps`, `via_any`, `via_all`, `non_transit_props` (Python API; route parameters not added — see L2.8).
+
+## L2.5 Path engine and KGHIST's anchor chains
+
+`PathQuery` gains `steps` (ordered hop-kind sets matched in order by distinct hops, greedy subsequence matching —
+exact), `via_any`, `via_all` (unordered waypoints; ordered `via` waypoints stay), `non_transit_props` (objects of
+these properties — languages, continents, eras — may end a path but are never passed through: `PathGraph.passable`).
+Constrained queries use an iterative-deepening DFS over the pruned graph (shortest admissible first, ≥ 10 admissible
+candidates ranked by cost, `k` kept) instead of Yen over collapsed parallel edges; a constrained "no path" answers
+`no_path_satisfying_constraints`. Namespaced dataset predicates are `statement_edges` now (validated against
+`registry/kg/predicates_*.yaml` + KGGEOPOL `GEOPOL_PROPERTIES` + A-MILITARY `UNPK_PROPERTIES`):
+`geo:covered_territory_of`, `cliopatria:denotes`, `cliopatria:member_of`, `cshapes:ruled_by`,
+`cshapes:shares_border_with`, `ucdp:primary_party`, `ucdp:secondary_party`, `glottolog:spoken_in|parent|family|in_group|wikidata_item`,
+`unpk:contributed_personnel_to`, `unpk:mission_country` (Brazil → Portuguese Empire: `—territoire actuel couvert en
+partie par (superposition calculée)→ … —décrite (selon Cliopatria) par→ Q200464`, unit-tested).
+
+`tests/unit/links/test_links_anchor_chains.py` evaluates all 20 chains of `registry/kg/anchor_chains.yaml` on the
+recorded Wikidata claims (6,187 claims, 109 entities; every hop cites its statement GUID + revision): **18 found, 2
+"no sourced path"** (`berlin_conference_congo`, `suez_crisis_usa_decolonisation`), exactly the expectations.
+E.g. Columbus → Portuguese (via Tordesillas, steps leadership/participation → signatory/territorial → territorial/
+succession → official language, Portuguese never transited): Columbus — significant event → Q3771259 — country →
+Crown of Castile — citizen ← Q45859 — signatory of → Treaty of Tordesillas (1494) — significant event of → Portuguese
+Empire — country of → State of Brazil — official language → Portuguese. Without non-transit kinds the plain shortest
+path is the trivial language hop (test-enforced).
+
+## L2.6 Demonstration on real data (throwaway DB `reva_links2_demo`, dropped afterwards)
+
+Live, budget-metered ingests (2026-10-16, policy `budgets-1.3.5`, 0 refusals): `atlas.cshapes` (2 req, 4.7 MB; KG
+1,884 statements), `atlas.ucdp` (5 req, 0.87 MB; KG 9,588), `atlas.naturalearth_10m` (6 req, 16.4 MB),
+`atlas.un_ims` (1 req, 6.0 MB), `atlas.unga_votes --dataset votes` and `--dataset rollcalls` (4 req, 9.3 MB each run;
+KG vote statements deliberately not loaded), `atlas.imf --dataset imts` (23 req, 112 MB). KG Wikidata kinds come
+from the captured real-Wikidata links fixture (76 entities, 544 statements, origin `test_fixture` — so answers carry
+`fixture_data`). Live snapshot `2aed9d60691e…` (11 tables, 3,431,862 rows). Materialisation (top-k 10): **384,583
+links in 87 s** (KG + dataset 17.6k, IMTS exports 97,944, imports 98,520, migrant stock 26,125, NE borders 321,
+UNGA agreement 144,043 decade×issue links), `kg.link_row` 419 MB. Response times (warm): pair BRA–PRT 1.6 s (cold
+2.8 s), USA–x votes 0.2–0.45 s, country view 0.05 s, path BRA→PRT 2.2 s. Per-type counts:
+
+```
+bilateral_trade 97944 · bilateral_trade_imports 98520 · unga_vote_agreement 144043 · migrant_stock 26125
+conflict_same_side 15926 · conflict_opposing_sides 335 · land_border_cshapes 646 · colonial_rule_cshapes 343
+land_border 321 · co_member 135 · shared_official_language 81 · shared_language_used 72 · diplomatic_relation 44
+successor_of 15 · border_wikidata 13 · former_colony_of 6 · colony_of 4 · conflict_co_participant 7 · co_signatory 3
+```
+
+**`/v1/links/pair?a=BRA&b=PRT`** (every line cites its evidence; IMTS cites the raw sha + SDMX series selector, UN DESA
+the xlsx cell, Wikidata the statement GUID + revision):
+
+* Trade (IMF IMTS, 2000–2025, 52 + 52 cells): Brazil → Portugal exports reported by Brazil 379,774,421 USD (2000),
+  3,416,220,938 (2024), 3,299,445,083 (2025) `[imf:a2531395fb83#…"series":"BRA.XG_FOB_USD.PRT.A","time_period":"2025"]`;
+  Portugal → Brazil 180,369,496 (2000), 1,233,438,789 (2024), 1,202,294,976 (2025). Mirror flows (Portugal's imports
+  from Brazil, CIF) are a separate kind: 3,036,664,742 USD (2025).
+* Migrant stock (UN DESA 2024, 1990–2024): born in Brazil living in Portugal 23,722 (1990) → 173,266 (2024)
+  `[un_desa:0e10179d0518#{"cell":"O19258",…"sheet":"Table 1"}]`; born in Portugal living in Brazil 270,645 (1990) →
+  146,697 (2024).
+* Share of identical UNGA votes (computed, all roll calls / colonialism-coded): 1950s 0.5989 (n=187) / 0.5185;
+  1960s 0.3902 / 0.3800; 1970s 0.6004 / 0.5833; 1980s 0.4532 / 0.5305; 1990s 0.6154 / 0.6183; 2000s 0.6767 /
+  0.7542; 2010s 0.6055 / 0.6609; 2020–24 0.5407 / 0.4348 `[unga:987f89d81054#{"pair":["BRA","PRT"],"years":[1950,1959],"issue":"all",…}]`.
+* Language (Wikidata, fixture): shared official language and language used via Portuguese (undated in source).
+* Colonial (via predecessors, `predecessor_links`): Brazil — former colony of (via Colonial Brazil) → Portuguese Empire
+  (1500–1822), shown with "Portugal — successor of → Portuguese Empire" `[wikidata.links_fixture:Q45$6b62100c-…]`;
+  Brazil — former colony of → United Kingdom of Portugal, Brazil and the Algarves (1815–1822) with "Portugal — successor
+  of → Kingdom of Portugal — successor of → United Kingdom…(1822)". CShapes has no BRA–PRT colonial row (starts 1886).
+* Also: co-members via the United Nations since 1955-12-14; diplomatic relations (undated); UCDP same side (secondary
+  parties on side A of the Central African Republic conflicts 416 and 15283, 2020–2023 — UCDP codes troop
+  contributors to a side as secondary parties).
+
+**USA vs GBR / FRA / IND, share of identical votes on colonialism-coded roll calls (Voeten `co`), by decade**
+(computed; `n_identical / n_common`, both voted):
+
+| decade | USA–GBR | USA–FRA | USA–IND |
+|---|---|---|---|
+| 1950s | 0.7600 (57/75) | 0.6269 (42/67) | 0.4133 (31/75) |
+| 1960s | 0.8673 (98/113) | 0.6429 (72/112) | 0.2479 (29/117) |
+| 1970s | 0.6548 (110/168) | 0.5460 (95/174) | 0.1420 (25/176) |
+| 1980s | 0.5793 (95/164) | 0.3899 (62/159) | 0.0305 (5/164) |
+| 1990s | 0.5682 (75/132) | 0.3588 (47/131) | 0.0379 (5/132) |
+| 2000s | 0.4298 (52/121) | 0.2645 (32/121) | 0.0667 (8/120) |
+| 2010s | 0.4914 (57/116) | 0.3276 (38/116) | 0.0690 (8/116) |
+| 2020–24 | 0.8714 (61/70) | 0.7857 (55/70) | 0.2714 (19/70) |
+
+All roll calls, 1960s: USA–GBR 0.8595 (422/491), USA–FRA 0.6151, USA–IND 0.3154. Consistent with KGGEOPOL's counts
+(USA on CO roll calls 1960s: 30 yes / 47 no / 41 abstain = 118 positions; 113 shared with the UK). Per-roll-call
+evidence (`votes_detail_from=1960&votes_detail_to=1960&votes_detail_issue=co`, 11 roll calls): 1960-12-01 R/15/1273D
+"TO ADOPT THE 43-POWER DRAFT RESOLUTION (A/L.323 AND ADD. 1-6)" — USA abstain, GBR abstain; R/15/1272 (USSR draft
+declaration on granting independence) — USA no, GBR no; 1960-12-02 R/15/1291 — USA yes, GBR abstain. These are
+shares of identical votes, not a measure of alliance or of interests; the issue coding is keyword-based.
+
+**`/v1/links/BRA?limit=5`** (materialised, latest period per kind, labels from the crosswalk when the KG has none):
+exports 2025 reported by Brazil to China 99,940,244,710 USD, United States 38,056,005,598, Argentina 18,105,303,283;
+exports to Brazil from China 71,604,309,339, United States 54,383,648,702, Germany 14,558,571,108; born in Brazil
+living in the United States 738,994, Japan 207,220, Spain 179,946 (2024); living in Brazil, born in Venezuela 571,919,
+Portugal 146,697, Haiti 88,383; land borders (NE 1:10m) Bolivia 2,664.44 km, Peru 1,800.03 km, Venezuela 1,601.95 km;
+highest shares of identical votes 2020–24 (all roll calls) Equatorial Guinea 0.8398, Eswatini 0.8351, Ghana 0.8290;
+former colony of the Portuguese Empire (via Colonial Brazil, 1500–1822). Response 0.05 s.
+
+**`/v1/links/pair?a=DZA&b=FRA`**: CShapes "Algeria — territory ruled by → France", 4 periods 1886-01-01 → 1962-07-04
+(status colony; fixed-border periods), `[cshapes.cran:gw615:ruled_by:452 rev cshapes-2.0; cshapes.cran:gw615:iso3:DZA:1886]`
+(CC BY-NC-SA: non-commercial); migrants born in Algeria living in France 1,344,293 (1990); IMTS Algeria → France
+2,920,739,361 USD (2000).
+
+## L2.7 Honesty and limits
+
+* A link is "connected via", never a cause; vote agreement is a share of identical votes (derived index, formula and N
+  shown); missing data gives no link (`kinds_without_links`, skip counters), a reported zero gives no link
+  (`reported_zero` counted); no zero-weight row can be stored (integration test).
+* The store keeps top-10 partners for atlas kinds; a pair outside both top-10s is still answered by the pair view
+  (snapshot re-read), not by `/v1/links/{iso3}`.
+* Decade links are labelled with the decade (`2020–2029`) while the data end in 2024 (`basis.roll_call_years` gives
+  the real span).
+* `conflict_same_side` is dominated by secondary parties (15,037 of 15,926: coalitions and troop contributors);
+  `basis.roles` says which.
+* KG Wikidata kinds in the demo come from the 76-entity fixture; a full WDHARVEST KG makes them planet-wide (the
+  materialiser reads ≤ 5 M statements, refuses beyond). CShapes/UCDP/UNPK/Cliopatria/Glottolog derivations read code
+  entities through `geopol:corresponds_to_iso3`; peacekeeping, polity-overlay and Glottolog links are unit-tested on
+  statements shaped like the connectors' (their data were not loaded in the demo DB).
+* `kg.link_row` costs ~1.1 KB per row (419 MB for 385k rows); constant wording (formula, caveat, flow) is added at
+  response time, not stored.
+
+## L2.8 Requests to other owners
+
+1. **Lead / ATLASOPS**: a worker job kind `links_materialise` (`reva.links.store.materialise`) scheduled after the daily
+   atlas snapshot (needs `ops.submit_job` allow-list; lead-owned migration) and a `reva links materialise` CLI alias.
+2. **NLQA** (`src/reva/nlqa/adapters.py` `LINK_GROUPS`): add `bilateral_trade_imports`, `bilateral_trade_baci` (trade),
+   `land_border_cshapes` (border), `colonial_rule_cshapes` (colonial), `peacekeeping_contributor_to_host`,
+   `shared_polity_territory`, `shared_language_glottolog`; use `service.pair_view` for "X and Y" questions and render
+   `unga_vote_agreement` as "share of identical votes" with N.
+3. **UI3**: `/v1/links/{iso3}` now carries `by_kind` groups and `mode`; `/v1/links/pair` is new (zod schemas in
+   `ui/src/v3/api/links.ts` stay valid: `qid`, `links`, `link_types[*].derived` kept).
+4. **Route parameters for constrained paths**: `steps`/`via_any`/`via_all`/`non_transit` are in `PathQuery` and the service;
+   exposing them on `/v1/links/path` (and on KGCORE's `/v1/kg/path`) is a small follow-up.
+5. **A-TREATIES / A-LAW**: no data delivered; `co_signatory` remains Wikidata P1891 only, `shared_legal_family` awaiting.

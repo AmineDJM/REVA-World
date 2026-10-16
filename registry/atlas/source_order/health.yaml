@@ -25,4 +25,20 @@ concepts:
           differ systematically (A-HEALTHEDU's catalog keeps it separate); kept as health.life_expectancy_birth.
       - series: "clio.infra.Total_life_expectancy-historical / gapminder.fasttrack.lex"
         reason: "Long-run historical compilations (cohort/period mixes, interpolations)."
+      - series: spc.pocket.LEBM / spc.pocket.LEBF
+        reason: Sex-specific values only; a both-sexes value is not published in the pocket summary (never averaged by
+          REVA).
     related_catalog_concepts: [un.wpp.life_expectancy, health.life_expectancy_birth, quality_of_life.le]
+
+  - id: reva.health.life_expectancy_national_tables
+    labels:
+      fr: Espérance de vie à la naissance (tables de mortalité nationales)
+      en: Life expectancy at birth (national period life tables)
+    definition: Period life expectancy at birth, both sexes, computed by a national or regional statistical office
+      from registered deaths and population of the year (not a modelled estimate).
+    unit: years
+    series:
+    - series: eurostat.nuts2_gapfill.demo_r_mlifexp|unit=YR|sex=T|age=Y_LT1
+      justification: 'Eurostat demo_r_mlifexp, life expectancy at age < 1 (at birth), both sexes: a period life table
+        from registered deaths.'
+    caveats: Separate from reva.health.life_expectancy (UN WPP model) for the same reason ATLASOPS keeps WHO GHE separate.

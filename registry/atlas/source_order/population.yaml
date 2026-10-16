@@ -38,6 +38,11 @@ concepts:
         reason: >-
           Long-run historical compilations (back-casts, interpolations, different territorial bases);
           kept as history concepts.
+      - series: spc.pocket.MIDYEARPOPEST
+        reason: SPC's mid-year estimates are census-based national figures; SPC does not state whether they are de facto
+          or de jure, so they cannot be declared the WPP de facto definition. Catalog concept gapfill.spc.population_midyear.
+      - series: eurostat.nuts2_gapfill.demo_r_d2jan / cbs.bes_population.population_1_january
+        reason: '1 January stocks, not mid-year populations: proposed as reva.population.total_1_january.'
     related_catalog_concepts: [un.wpp.population, imf.population, history.population_persons]
 
   - id: reva.population.density
@@ -64,4 +69,24 @@ concepts:
         reason: >-
           The WPP file does not state whether its denominator is land or total surface area; kept as its own
           concept (un.wpp.population_density) until the definition is confirmed.
+      - series: eurostat.nuts2_gapfill.demo_r_d3dens|unit=PER_KM2 / spc.pocket.POPDENS
+        reason: Eurostat divides the average population of the year (mean of two 1 January stocks) by land area, not the
+          mid-year population; SPC does not state its denominator. Catalog concepts only.
     related_catalog_concepts: [un.wpp.population_density]
+
+  - id: reva.population.total_1_january
+    labels:
+      fr: Population au 1er janvier
+      en: Population on 1 January
+    definition: Usually resident population on 1 January of the year as published by national or regional statistical
+      offices (registers or census-based estimates). A stock at the start of the year, not the mid-year population
+      of reva.population.total.
+    unit: persons
+    series:
+    - series: eurostat.nuts2_gapfill.demo_r_d2jan|unit=NR|sex=T|age=TOTAL
+      justification: 'Eurostat demo_r_d2jan ''Population on 1 January'', both sexes, all ages: this definition.'
+    - series: cbs.bes_population.population_1_january
+      justification: 'CBS 83774ENG ''Population on 1 January'' of the Caribbean Netherlands (population register):
+        this definition.'
+    caveats: Filled for GLP, MTQ, GUF, REU, MYT, ALA, SJM (Eurostat) and BES (CBS); proposed so these entities have
+      a population at all.

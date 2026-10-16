@@ -146,3 +146,27 @@ def test_atlas_row_counterpart_from_folded_indicator() -> None:
     assert r.subject_object == ("BRA", "USA") and r.year == 2022 and r.selector == '{"row":3}'
     m = AtlasRowRef.from_mapping({**base, "indicator": "MIGSTOCK|origin=PRT", "iso3": "BRA"})
     assert m.subject_object == ("PRT", "BRA")  # origin -> destination
+
+
+def test_atlas_period_year_is_astronomical_and_bce_safe() -> None:
+    from datetime import date
+
+    from reva.links.model import AtlasRowRef, period_year
+
+    assert period_year("-0043-03-15") == -43
+    assert period_year("0044-03-15 (BC)") == -43  # DuckDB VARCHAR of a BCE date (1 BCE = year 0)
+    assert period_year("2020-01-01") == 2020 and period_year(date(1960, 1, 1)) == 1960
+    r = AtlasRowRef.from_mapping(
+        {
+            "source": "x",
+            "dataset": "y",
+            "indicator": "v|partner=FRA",
+            "iso3": "ITA",
+            "period_start": "-0043-01-01",
+            "period_end": "-0042-01-01",
+            "value": "1",
+            "raw_sha256": "a" * 64,
+            "selector": "{}",
+        }
+    )
+    assert r.year == -43

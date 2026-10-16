@@ -11,6 +11,7 @@ from reva.adapters.connectors.eurostat_demography import WINDOW_YEARS as EUROSTA
 from reva.adapters.connectors.eurostat_demography import EurostatDemographyConnector
 from reva.adapters.connectors.eurostat_labour import EurostatLabourPensionsConnector
 from reva.adapters.connectors.ilostat_labour import IlostatLabourConnector
+from reva.adapters.connectors.ilostat_social_protection import IlostatSocialProtectionConnector
 from reva.adapters.connectors.io_tables import FigaroConnector
 from reva.adapters.connectors.naturalearth import NaturalEarthConnector
 from reva.adapters.connectors.un_wpp_demography import UnWppDemographyConnector
@@ -37,5 +38,7 @@ def builtin_connectors(contact_email: str | None = None) -> dict[str, Any]:
         # social.retirement_age@1.1.0 (WPP 2024 single-age demography; ILOSTAT rates by age band)
         UnWppDemographyConnector(),
         IlostatLabourConnector(),
+        # V3 SIMFIX: ILOSTAT SDG 1.3.1 old-age pension coverage by sex (social.retirement_age@1.2.0)
+        IlostatSocialProtectionConnector(),
     ]
     return {c.describe().name: c for c in conns}

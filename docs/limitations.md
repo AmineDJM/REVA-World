@@ -212,6 +212,28 @@ labelled "experimental model, not yet reviewed". A scientific review of the V2 m
 * A target age (e.g. "65 years") is a level, not a shift: natural-language drafts never convert one
   into the other; they ask, or use the model's target-age intervention where it is registered.
 
+#### Outside the EU (`social.retirement_age@1.1.0` and `@1.2.0`)
+
+* Legal ages are the World Bank WBL 2026 full-benefit ages (agent transcription, maintainer review
+  pending) held constant as a counterfactual reference; ages 55-64 only (ILOSTAT has no 65-69 band);
+  the employment response is a European estimate transferred to the country; no back-test outside
+  France. See [dev/v3_simworld.md](dev/v3_simworld.md).
+* **1.1.0 assumes full pension coverage**: every person of an affected age is treated as bound by the
+  legal age, so in informal economies the employment and pension-receipt changes are overstated
+  (India, age 62 from the 1965 cohort, 2030: +10.6 M employed, −24.2 M recipients). Use **1.2.0**,
+  which applies the change only to the pension-covered share. 1.1.0 stays available unchanged for
+  existing specs.
+* 1.2.0's coverage is ILOSTAT SDG 1.3.1 "persons above retirement age receiving a pension" — the
+  source's own value of the latest year ≤ the reference year (stated per row, flagged when older),
+  by sex when published, else the total for both sexes. It is **not** the share of today's 55-64
+  year-olds bound by the contributory age: it counts non-contributory (social) pensions and is
+  measured above pensionable age, and it is applied uniformly to every single age 55-64. Where a social
+  pension with its own age drives coverage (e.g. Mexico's universal pension, 100 % coverage) results
+  stay overstated; elsewhere the direction is unknown. No coverage sensitivity is invented. Countries
+  without a coverage value within 10 years are refused (`missing_input`), never assumed covered.
+  ILOSTAT publishes no contributor series, and the ILO World Social Protection Database was not
+  reachable (HTTP 403), so contributors are not used.
+
 ## Governance limits (residual risk)
 
 * **Governance approvals are enforced in the database, and the gate is a separate process.** Since

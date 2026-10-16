@@ -138,7 +138,9 @@ def test_materialisation_records_snapshot_watermark_and_counts(env: Env) -> None
         m = c.execute(text("SELECT * FROM kg.link_materialisation ORDER BY id DESC LIMIT 1")).mappings().one()
         assert m["atlas_snapshot_sha256"] == env.snapshot.sha256 and m["atlas_origin"] == "test_fixture"
         assert m["kg_load_watermark"] is not None and m["recorded_by"] == "reva_worker"
-        n = c.execute(text("SELECT count(*) FROM kg.link_row WHERE materialisation_id = :m"), {"m": m["id"]}).scalar_one()
+        n = c.execute(
+            text("SELECT count(*) FROM kg.link_row WHERE materialisation_id = :m"), {"m": m["id"]}
+        ).scalar_one()
         assert n == m["link_count"] == env.materialisation.link_count
         # every stored row has evidence; no zero-weight link; weights are decimal strings with a unit
         bad = c.execute(
@@ -233,7 +235,7 @@ def test_pair_vote_agreement_by_year_and_decade(env: Env) -> None:
         ).first()
     if row is None:
         pytest.skip("UNGA fixture slice has no pair with >= 10 common roll calls")
-    a, b, facet, lo = row
+    a, b, _facet, lo = row
     r = get(env, "/v1/links/pair", a=a, b=b, kind="unga_vote_agreement", votes_detail_from=lo, votes_detail_to=lo + 9)
     assert r.status_code == 200, r.text
     d = r.json()["data"]

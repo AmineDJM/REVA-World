@@ -3,6 +3,9 @@
 # V3 SIMWORLD: also the reviewed built-in connector ilostat.labour_age5 (src/reva/adapters/connectors/
 # ilostat_labour.py): EMP_DWAP_SEX_AGE_RT_A and EAP_DWAP_SEX_AGE_RT_A -> dataset inputs of
 # social.retirement_age@1.1.0.
+# V3 SIMFIX: also the reviewed built-in connector ilostat.social_protection (src/reva/adapters/connectors/
+# ilostat_social_protection.py): SDG_0131_SEX_SOC_RT_A, function SOC_CONTIG_PENSION -> dataset inputs of
+# social.retirement_age@1.2.0 (one request per refresh, within the ilostat.rplumber budget).
 source_key: ilostat.rplumber
 title: ILOSTAT (International Labour Organization) bulk download / API service
 provider_url: https://rplumber.ilo.org/

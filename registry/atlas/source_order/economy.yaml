@@ -21,6 +21,20 @@ concepts:
           IMF WEO "Gross domestic product, current prices, U.S. dollars": national-currency GDP converted at
           period-average market exchange rates — the same quantity. Values in full US dollars.
         caveats: "Exchange-rate choices can differ from the WDI for economies with multiple or parallel rates."
+      - series: cbs.bes_gdp.gdp_current_prices
+        reported_unit: million USD
+        scale: '1000000'
+        justification: 'CBS "Caribbean Netherlands; gross domestic product (GDP)", value at current prices, million US
+          dollars. The US dollar is the legal currency of Bonaire, Sint Eustatius and Saba since 2011, so no exchange-rate
+          conversion is involved: GDP at purchasers'' prices in current US dollars, this definition.'
+        caveats: Published in whole millions (rounding of the provider).
+      - series: spc.pocket.GDPCUSD
+        reported_unit: thousand USD
+        scale: '1000'
+        justification: SPC PDH.Stat pocket summary "GDP, current price, in USD" (DF_NATIONAL_ACCOUNTS, national-currency
+          GDP at current prices converted to US dollars by SPC); only cells whose DATA_YEAR is the cell year are kept.
+        caveats: SPC states the conversion rate per cell (flags.obs_comment, e.g. 'Converted 0.7041 NZD/USD') but not
+          whether it is the annual average market rate; ranked after WDI and WEO, so it answers only where they have nothing.
     not_equivalent:
       - series: "imf.weo.PPPGDP / wb NY.GDP.MKTP.PP.CD"
         reason: "PPP-converted GDP is a different quantity (international dollars), see reva.economy.gdp_per_capita_ppp."
@@ -41,6 +55,16 @@ concepts:
           IMF WEO "Gross domestic product per capita, current prices, U.S. dollars": GDP in US dollars divided by
           the WEO population — the same quantity.
         caveats: "The IMF divides by its own population series (national definitions), the WDI by its midyear population."
+      - series: cbs.bes_gdp.gdp_per_capita
+        reported_unit: USD
+        justification: 'CBS "Caribbean Netherlands; gross domestic product (GDP) per capita", US dollars at current prices:
+          GDP in current US dollars divided by the population, this definition (no currency conversion, see gdp_usd).'
+        caveats: CBS divides by its own population figure; rounded to hundreds of dollars by the provider.
+      - series: spc.pocket.GDPCPCUSD
+        reported_unit: USD per person
+        justification: 'SPC pocket summary "GDP, per capita, in USD": GDP in US dollars divided by the mid-year population
+          (SPC states the division per cell in flags.obs_comment), the same quantity.'
+        caveats: SPC conversion rate and population (see spc.pocket.GDPCUSD).
     related_catalog_concepts: [imf.gdp_per_capita_usd]
 
   - id: reva.economy.gdp_per_capita_ppp
@@ -77,6 +101,9 @@ concepts:
           local currency — this definition.
       - series: "imf.weo.NGDP_RPCH"
         justification: "IMF WEO \"Gross domestic product, constant prices, percent change\" — the same quantity."
+      - series: cbs.bes_gdp.gdp_volume_change
+        reported_unit: '% change'
+        justification: 'CBS ''GDP, volume changes'' (%): annual change of GDP at constant prices, this definition.'
     related_catalog_concepts: [imf.gdp_real_growth]
 
   - id: reva.economy.inflation_cpi
@@ -92,9 +119,17 @@ concepts:
         justification: >-
           WDI "Inflation, consumer prices (annual %)": annual percentage change in the cost to the average
           consumer of a basket of goods and services (Laspeyres CPI, IMF IFS data) — the same quantity.
+      - series: insee.ipc_dom.CPI_ANNUAL_CHANGE|coicop=00|households=ENSEMBLE|base=2025
+        reported_unit: '% change'
+        justification: 'Insee "Indice annuel des prix à la consommation - Base 2025 - Variation annuelle - Ensemble des
+          ménages - <department> - Ensemble": the change of the annual average all-items CPI over the previous year, i.e.
+          this concept''s definition, for the overseas departments that the IMF and the World Bank include in France.'
+        caveats: Insee national CPI methodology (Laspeyres, all households); 2016-2025 in base 2025 (Mayotte from 2024).
     not_equivalent:
       - series: "imf.weo.PCPIEPCH"
         reason: "End-of-period (December over December) inflation: a different measure (imf.inflation_cpi_eop)."
       - series: "wb NY.GDP.DEFL.KD.ZG"
         reason: "GDP-deflator inflation measures a different price index."
+      - series: spc.pocket.INFRATE
+        reason: The pocket summary does not state whether its inflation rate is the annual-average or the December change.
     related_catalog_concepts: [imf.inflation_cpi_avg]

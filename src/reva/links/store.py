@@ -584,3 +584,58 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
+
+
+def node_of_iso3(conn: Connection, mid: int, iso3: str) -> str | None:
+    row = conn.execute(
+        text(
+            """(SELECT subject FROM kg.link_row WHERE materialisation_id = :m AND subject_iso3 = :c LIMIT 1)
+               UNION ALL (SELECT object FROM kg.link_row WHERE materialisation_id = :m AND object_iso3 = :c LIMIT 1)
+               LIMIT 1"""
+        ),
+        {"m": mid, "c": iso3},
+    ).first()
+    return str(row[0]) if row else None
+
+
+def predecessors(
+    conn: Connection, mid: int, node: str, depth: int = 2, cap: int = 50
+) -> dict[str, list[dict[str, Any]]]:
+    """Predecessor states of ``node`` through stored ``successor_of`` links (≤ ``depth`` steps): {predecessor:
+    [the successor_of rows of the chain]}. Used by the pair view to show links of a country's predecessors
+    (Portugal ← Portuguese Empire), each with the succession evidence."""
+    out: dict[str, list[dict[str, Any]]] = {}
+    frontier = {node: []}  # type: dict[str, list[dict[str, Any]]]
+    for _ in range(depth):
+        nxt: dict[str, list[dict[str, Any]]] = {}
+        for n, chain in frontier.items():
+            rows = conn.execute(
+                text(
+                    f"""SELECT {_ROW_COLS} FROM kg.link_row WHERE materialisation_id = :m AND link_type = 'successor_of'
+                         AND subject = :n LIMIT :cap"""
+                ),
+                {"m": mid, "n": n, "cap": cap},
+            ).mappings()
+            for r in rows:
+                p = r["object"]
+                if p == node or p in out:
+                    continue
+                out[p] = [*chain, dict(r)]
+                nxt[p] = out[p]
+        frontier = nxt
+        if len(out) >= cap:
+            break
+    return out
+
+
+def rows_between_nodes(
+    conn: Connection, mid: int, a: Sequence[str], b: Sequence[str], cap: int = 2_000
+) -> list[dict[str, Any]]:
+    rows = conn.execute(
+        text(
+            f"""SELECT {_ROW_COLS} FROM kg.link_row WHERE materialisation_id = :m AND link_type <> 'successor_of'
+                 AND ((subject = ANY(:a) AND object = ANY(:b)) OR (subject = ANY(:b) AND object = ANY(:a))) LIMIT :cap"""
+        ),
+        {"m": mid, "a": list(a), "b": list(b), "cap": cap},
+    ).mappings()
+    return [dict(r) for r in rows]

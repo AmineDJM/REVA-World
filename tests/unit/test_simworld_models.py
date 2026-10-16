@@ -93,7 +93,8 @@ def test_registry_keeps_1_0_0_as_default_and_serves_1_1_0_by_version() -> None:
         assert plugins.get(key) is old and plugins.REGISTRY[key] is old and old.model_version == "1.0.0"
         assert plugins.get(key, "1.0.0") is old
         assert plugins.get(key, "1.1.0").model_version == "1.1.0"
-        assert set(plugins.versions_of(key)) == {"1.0.0", "1.1.0"}
+        # V3 SIMFIX added social.retirement_age@1.2.0 (pension coverage); 1.0.0 stays the default
+        assert set(plugins.versions_of(key)) >= {"1.0.0", "1.1.0"}
         with pytest.raises(CapabilityGap):
             plugins.get(key, "9.9.9")
     schema = build_schema()

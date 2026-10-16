@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import functools
 import re
 import time
 from collections.abc import Callable, Iterable, Mapping
@@ -170,28 +171,27 @@ class UnknownLinkKind(ValueError):
     pass
 
 
+@functools.cache
 def _crosswalk_labels() -> dict[str, dict[str, str]]:
-    from functools import cache
+    import json
 
-    @cache
-    def load() -> dict[str, dict[str, str]]:
-        import json
+    from reva.links.taxonomy import REPO_ROOT
 
-        from reva.links.taxonomy import REPO_ROOT
-
-        doc = json.loads((REPO_ROOT / "registry" / "entities" / "country_crosswalk.json").read_text(encoding="utf-8"))
-        out = {}
-        for e in doc["entities"]:
-            d = {"en": e.get("label") or e["key"]}
-            if e.get("label_fr"):
-                d["fr"] = e["label_fr"]
-            out[e["key"]] = d
-        return out
-
-    return load()
+    doc = json.loads((REPO_ROOT / "registry" / "entities" / "country_crosswalk.json").read_text(encoding="utf-8"))
+    out = {}
+    for e in doc["entities"]:
+        d = {"en": e.get("label") or e["key"]}
+        if e.get("label_fr"):
+            d["fr"] = e["label_fr"]
+        out[e["key"]] = d
+    return out
 
 
-def _labels(conn: Any, nodes: Iterable[str], origin: str | None = None) -> dict[str, dict[str, str]]:
+def _labels(
+    conn: Any, nodes: Iterable[str], origin: str | None = None, node_iso3: Mapping[str, str | None] | None = None
+) -> dict[str, dict[str, str]]:
+    """fr/en labels: KG labels first; crosswalk names for ``iso3:`` nodes and for QID nodes whose ISO3 is known
+    (the store records it), so a country is never shown as a bare QID."""
     nodes = set(nodes)
     cw = _crosswalk_labels()
     out: dict[str, dict[str, str]] = {}
@@ -204,6 +204,9 @@ def _labels(conn: Any, nodes: Iterable[str], origin: str | None = None) -> dict[
     if q:
         for k, v in KgNeighbourhood(conn, origin=origin).labels(q).items():
             out[k] = v
+    for n, c in (node_iso3 or {}).items():
+        if n in nodes and c and c in cw:
+            out[n] = {**cw[c], **out.get(n, {})}
     return out
 
 
@@ -231,7 +234,10 @@ def describe(lk: Link, labels: Mapping[str, Mapping[str, str]]) -> dict[str, str
 def _link_json(
     lk: Link, labels: Mapping[str, Mapping[str, str]], iso3: tuple[str | None, str | None]
 ) -> dict[str, Any]:
+    from reva.links.atlas_links import explain_basis
+
     d = lk.to_json()
+    d["basis"] = explain_basis(lk.link_type, lk.basis)
     d["iso3"] = list(iso3)
     d["facet"] = str(lk.basis.get("facet") or (f"issue={lk.basis['issue']}" if "issue" in lk.basis else ""))
     d["text"] = describe(lk, labels)
@@ -325,7 +331,10 @@ def country_view(
         if yq is not None and not temporal_allows(lk.temporal, yq):
             continue
         items.append((r, lk))
-    labels = _labels(conn, {n for _, lk in items for n in (lk.subject, lk.object, *lk.via)} | {f"iso3:{iso3}"})
+    node_iso3 = {lk.subject: r["subject_iso3"] for r, lk in items} | {lk.object: r["object_iso3"] for r, lk in items}
+    labels = _labels(
+        conn, {n for _, lk in items for n in (lk.subject, lk.object, *lk.via)} | {f"iso3:{iso3}"}, node_iso3=node_iso3
+    )
     counts = (m.get("parameters") or {}).get("counts") or {}
     by_kind: dict[str, Any] = {}
     flat = []
@@ -344,15 +353,17 @@ def country_view(
     for k in by_kind.values():
         k["groups"] = list(k["groups"].values())
     status = {
-        t: {"status": lt.status, "stored": counts.get(t)}
+        t: {"status": lt.status, "derived": int(counts.get(t) or 0), "stored": int(counts.get(t) or 0)}
         for t, lt in sorted(tax.link_types.items())
         if kinds_l is None or t in kinds_l
     }
+    node = next((lk.subject if r["subject_iso3"] == iso3 else lk.object for r, lk in items), f"iso3:{iso3}")
     return {
         "mode": "materialised",
+        "qid": node,  # the country's node (QID, else iso3:<KEY>); same key as the on-demand answer
         "query": ref,
         "iso3": iso3,
-        "node": next((lk.subject if r["subject_iso3"] == iso3 else lk.object for r, lk in items), f"iso3:{iso3}"),
+        "node": node,
         "year": year,
         "limit": limit,
         "facets": _facets(facet),
@@ -457,7 +468,11 @@ def _country_on_demand(
                 links.extend(v.links)
     node = iso_map.get(iso3 or "", qid) if iso3 else qid
     ranked = _rank_in_python(links, node, year, _facets(facet), limit, _period_kinds(tax))
-    labels = _labels(conn, {n for *_, lk in ranked for n in (lk.subject, lk.object, *lk.via)} | {node})
+    labels = _labels(
+        conn,
+        {n for *_, lk in ranked for n in (lk.subject, lk.object, *lk.via)} | {node},
+        node_iso3={q_: c for c, q_ in iso_map.items()},
+    )
     by_kind: dict[str, Any] = {}
     flat = []
     for d, fac, rank, total, lk in ranked:
@@ -607,8 +622,35 @@ def pair_view(
                     "issue": issue,
                     **reader.vote_detail(a, b, year_lo=lo, year_hi=hi, issue=issue),
                 }
+    predecessor_links: list[dict[str, Any]] = []
+    pred_nodes: set[str] = set()
+    if m is not None:
+        # links of each country with the other's predecessor states (Brazil -> Portuguese Empire, Portugal's
+        # predecessor), each shown with the stored succession chain that makes it relevant
+        na, nb_ = st.node_of_iso3(conn, m["id"], a), st.node_of_iso3(conn, m["id"], b)
+        for x, nx_, other, nother in ((a, na, b, nb_), (b, nb_, a, na)):
+            if nx_ is None or nother is None:
+                continue
+            preds = st.predecessors(conn, m["id"], nother)
+            if not preds:
+                continue
+            for r in st.rows_between_nodes(conn, m["id"], [nx_], sorted(preds)):
+                lk = st.link_from_row(r)
+                if kinds_l is not None and lk.link_type not in kinds_l:
+                    continue
+                p = lk.object if lk.subject == nx_ else lk.subject
+                chain = [st.link_from_row(c) for c in preds[p]]
+                pred_nodes |= {p, *(n for c in chain for n in (c.subject, c.object))}
+                predecessor_links.append(
+                    {"country": x, "predecessor_of": other, "predecessor": p, "link": lk, "chain": chain}
+                )
     labels = _labels(
-        conn, {n for lk, _ in links for n in (lk.subject, lk.object, *lk.via)} | {f"iso3:{a}", f"iso3:{b}"}
+        conn,
+        {n for lk, _ in links for n in (lk.subject, lk.object, *lk.via)}
+        | {f"iso3:{a}", f"iso3:{b}"}
+        | pred_nodes
+        | {n for pl in predecessor_links for n in pl["link"].via},
+        node_iso3={lk.subject: i[0] for lk, i in links} | {lk.object: i[1] for lk, i in links},
     )
     kinds_out: dict[str, Any] = {}
     for lk, iso in sorted(
@@ -637,6 +679,16 @@ def pair_view(
             k for k in (kinds_l or tax.link_types) if k not in kinds_out and tax.link(k).scope == "country_country"
         ),
         "vote_detail": vote_detail,
+        "predecessor_links": [
+            {
+                "country": pl["country"],
+                "predecessor_of": pl["predecessor_of"],
+                "predecessor": pl["predecessor"],
+                "link": _link_json(pl["link"], labels, (None, None)),
+                "succession": [_link_json(c, labels, (None, None)) for c in pl["chain"]],
+            }
+            for pl in predecessor_links
+        ],
         "labels": labels,
         "truncated": sorted(set(truncated)),
         "notes": notes,

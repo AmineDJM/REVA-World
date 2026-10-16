@@ -76,3 +76,6 @@ concepts:
         same reporter and year. Covers economies without BOP data (e.g. CUB, PRK, GRL).
     caveats: "IMTS includes IMF estimates for non-reporting economies (not always flagged per cell)."
     related_catalog_concepts: [imf.goods_exports_world_usd, imf.goods_imports_world_usd]
+    not_equivalent:
+      - series: spc.pocket.TRADEBALUSD
+        reason: SPC's IMTS balance does not state the valuation (FOB/CIF) of exports and imports; catalog concept only.

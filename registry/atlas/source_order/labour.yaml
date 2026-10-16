@@ -41,6 +41,10 @@ concepts:
           national estimates — the same definition.
     caveats: "Definitions, age bounds and coverage follow each national source (see each cell's flags)."
     related_catalog_concepts: [labour.unemployment_rate.national]
+    not_equivalent:
+      - series: eurostat.nuts2_gapfill.lfst_r_lfu3rt (15-74) / cbs.bes_labour.unemployment_rate (15-74) / spc.emprates.UNEMPRATE
+        reason: Eurostat and CBS rates are for ages 15-74 (the listed ILOSTAT series cover 15+); SPC does not state the
+          age band or the definition (census or survey). Catalog concepts only (gapfill.*.unemployment_rate*).
 
   - id: reva.labour.minimum_wage_monthly_lcu
     labels: {fr: "Salaire minimum mensuel (monnaie nationale, à une date de référence)", en: "Monthly minimum wage (national currency, at a reference date)"}
@@ -66,6 +70,9 @@ concepts:
         reason: "OECD averages the monthly minimum wage over the year: a different reference period (review V3 DATA-1)."
       - series: "oecd ... pay_period=A / pay_period=H"
         reason: "Annual or hourly minimum wages are different units; never converted with assumed hours."
+      - series: insee.smic_dom.SMIC_HOURLY_GROSS
+        reason: Insee publishes the overseas Smic per hour; converting to a monthly amount (x 151.67 h) would be a REVA
+          computation. Catalog concept gapfill.insee.smic_hourly.
     related_catalog_concepts: [labour.minimum_wage.monthly.local_currency, labour.minimum_wage.monthly.national_currency.annual_average]
 
   - id: reva.labour.average_monthly_earnings_lcu

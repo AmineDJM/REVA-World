@@ -12,6 +12,11 @@ concepts:
         justification: >-
           WDI "Land area (sq. km)" from FAO: "a country's total area, excluding area under inland water
           bodies, national claims to continental shelf, and exclusive economic zones" — this definition.
+      - series: eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=L0008
+        reported_unit: km2
+        justification: 'Eurostat reg_area3 "Land area - total": the region''s area excluding inland water, the definition
+          of this concept (FAO land area as used by the World Bank).'
+        caveats: Eurostat land cover based; the year is the NUTS release year, not a survey year.
     not_equivalent:
       - series: "naturalearth.admin0_10m.area_km2"
         reason: "Computed from 1:10m polygons (includes lakes not cut out by the map); a geometric estimate, not land area."
@@ -28,6 +33,9 @@ concepts:
         justification: >-
           WDI "Surface area (sq. km)" from FAO: "a country's total area, including areas under inland bodies
           of water and some coastal waterways" — this definition.
+      - series: eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=TOTAL
+        reported_unit: km2
+        justification: 'Eurostat reg_area3 ''Total area'' of the region including inland water: this definition.'
     not_equivalent:
       - series: "unsd.syb68_t02.Surface area (thousand km2)"
         reason: >-

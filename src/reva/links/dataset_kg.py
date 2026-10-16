@@ -130,6 +130,7 @@ def derive_cshapes_colonial(
             continue
         # the territory is named by the one country it corresponds to (any period): its link keeps the rule
         # period (a correspondence starting at independence must not trim the colonial period)
+        subj: list[tuple[str, Temporal, tuple[Stmt, ...], str | None]]
         if s.subject in qid_iso3:
             subj = [(node_of(qid_iso3[s.subject]), s.temporal, (), qid_iso3[s.subject])]
             mapping = "qid"

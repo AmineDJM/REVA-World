@@ -719,6 +719,40 @@ _BASE: tuple[Capability, ...] = (
             "pension recipient levels and expenditure are not computed on this path."
         ),
     ),
+    # --- V3 SIMFIX: pension coverage in the world retirement module (social.retirement_age@1.2.0) ---
+    Capability(
+        "social.retirement_age.pension_coverage",
+        "Retirement-age changes applied to the pension-covered share only (social.retirement_age@1.2.0, "
+        "ILOSTAT SDG 1.3.1 old-age pension coverage)",
+        "implemented",
+        "V2",
+        "reva.models.social.retirement_coverage",
+        (
+            "coverage is a release-pinned dataset input from a reviewed built-in connector "
+            "(ilostat.social_protection, archived raw bytes, Parquet)",
+            "the source's own value and year are stated in every row (by sex when published); no invented "
+            "coverage variant",
+            "countries without coverage are refused with missing_input (never assumed covered)",
+            "1.0.0 and 1.1.0 are unchanged",
+        ),
+        interface="reva.simulation.plugins",
+        tests=(
+            "tests/unit/test_simfix_coverage.py::test_parse_keeps_the_pension_function_by_sex_verbatim",
+            "tests/unit/test_simfix_coverage.py::test_coverage_selection_by_sex_total_and_year",
+            "tests/unit/test_simfix_coverage.py::test_effects_scale_with_coverage_and_full_coverage_equals_1_1_0",
+            "tests/unit/test_simfix_coverage.py::test_missing_coverage_is_refused_never_assumed",
+            "tests/integration/test_simfix_pipeline.py::test_coverage_ingest_registers_dataset_inputs",
+            "tests/integration/test_simfix_pipeline.py::test_retirement_1_2_0_scales_with_coverage_through_the_job_path",
+            "tests/integration/test_simfix_pipeline.py::test_retirement_1_2_0_refuses_countries_without_coverage",
+        ),
+        docs=("docs/dev/v3_simworld.md", "docs/limitations.md"),
+        notes=(
+            "Experimental (maintainer review pending). Coverage (persons above pensionable age receiving a "
+            "pension) includes non-contributory pensions and is applied uniformly to ages 55-64: results can "
+            "remain overstated where a social pension with its own age drives coverage. ILOSTAT publishes no "
+            "contributor series; the ILO World Social Protection Database was not reachable (HTTP 403)."
+        ),
+    ),
     Capability(
         "economic.io_price.world",
         "Input-output price model beyond the FIGARO economies (a global multi-region IO table)",

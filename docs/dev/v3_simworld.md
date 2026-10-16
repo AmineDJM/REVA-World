@@ -195,6 +195,8 @@ countries; e.g. India's EPS age 58 applies to formal-sector members only) the af
 the employment and recipient changes, are **overstated** — they describe what the stated legal change would
 do if the whole population were covered. Pension coverage (e.g. ILOSTAT SDG 1.3.1) is not used yet. There is
 no back-test outside France.
+*(Addressed in `social.retirement_age@1.2.0`, which applies the change to the pension-covered share only;
+1.1.0 is unchanged — see the SIMFIX section at the end of this file.)*
 
 ## 4. Input-output price model for every country — not implemented
 

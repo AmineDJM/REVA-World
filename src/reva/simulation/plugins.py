@@ -445,6 +445,8 @@ KNOWN_MODEL_MODULES: tuple[str, ...] = (
     # V3 SIMWORLD: second registered versions (1.1.0) of the two models above (every country)
     "reva.models.population.cohort_world",
     "reva.models.social.retirement_world",
+    # V3 SIMFIX: retirement age 1.2.0 (1.1.0 + pension coverage, ILOSTAT SDG 1.3.1)
+    "reva.models.social.retirement_coverage",
 )
 
 _REQUIRED_ATTRS = (

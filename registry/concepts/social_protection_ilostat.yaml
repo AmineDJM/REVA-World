@@ -1,0 +1,28 @@
+# ILOSTAT SDG indicator 1.3.1, old-age pension function, by sex (V3 agent SIMFIX), read by
+# social.retirement_age@1.2.0 as the pension coverage share. Fetched by the reviewed built-in connector
+# ilostat.social_protection (src/reva/adapters/connectors/ilostat_social_protection.py) and stored as
+# dataset inputs (Parquet). Published versions are immutable: changing meaning requires a new version.
+concepts:
+  - concept_id: social_protection.ilostat.old_age_pension_coverage.sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Persons above statutory pensionable age receiving an old-age pension, by sex (%), ILOSTAT SDG 1.3.1 (SDG_0131_SEX_SOC_RT_A, SOC_CONTIG_PENSION)"}
+    definition: >-
+      ILOSTAT SDG_0131_SEX_SOC_RT, function SOC_CONTIG_PENSION ("Persons above retirement age receiving a
+      pension"): persons above the statutory pensionable age who receive an old-age pension (contributory or
+      non-contributory) as a percentage of the population above that age, by sex (F, M, T), annual, from the
+      ILO Social Security Inquiry (source XA:<n>). ILOSTAT caps values at 100. Observation status and the
+      classification note (e.g. "Estimated based on legal coverage") kept verbatim. Not a share of
+      contributors among workers.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: population_above_statutory_pensionable_age_ilo_ssi
+      denominator: population above the statutory pensionable age of the same sex
+      temporal_support: calendar_year
+      spatial_support: ilostat_ref_area
+      aggregation: point_in_time_share
+      scale_type: rate
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable]
+      measurement_method: administrative_records_compiled_by_ilo_social_security_inquiry

@@ -1484,6 +1484,8 @@ async def harvest_wikidata_api(
     max_ids: int = 600,
     state_dir: Path | None = None,
     report_path: Path | None = None,
+    mode: str = "linked_data",
+    reuse_hours: float = 24.0,
 ) -> dict[str, Any]:
     """The WDQS-free variant of :func:`harvest_wikidata` for a bounded priority subset of geonameids
     (capitals and seats of government first): P1566 links from entity snapshots, the P36 cross-check from
@@ -1492,7 +1494,9 @@ async def harvest_wikidata_api(
     from reva.adapters.connectors.wikidata import load_allowlist
     from reva.kg.harvest import KgDbSink, budgeted_client
 
-    async with budgeted_client(purpose="citiesapi", db_name=db_name, planned_wdqs=0, planned_wbapi=40) as sess:
+    async with budgeted_client(
+        purpose="citiesapi", db_name=db_name, planned_wdqs=0, planned_wbapi=40, mode=mode, reuse_hours=reuse_hours
+    ) as sess:
         engine = sess.engine
         got_c = latest_raw(engine, atlas_store, URL_CITIES)
         got_a = latest_raw(engine, atlas_store, URL_ADMIN1)
@@ -1504,7 +1508,8 @@ async def harvest_wikidata_api(
         sink.register_properties(allow)
         ids = priority_ids(places, admin1)[:max_ids]
         out: dict[str, Any] = {"database": db_name, "run_id": sess.run_id, "via": "wikibase_api"}
-        out["p1566"] = await map_via_search(sess, sink, allow, ids, state_dir=state_dir)
+        if ids:
+            out["p1566"] = await map_via_search(sess, sink, allow, ids, state_dir=state_dir)
         countries = load_country_qids()
         res = await sess.client.get_entities(
             sorted(set(countries.values()), key=lambda q: int(q[1:])),
@@ -1514,7 +1519,23 @@ async def harvest_wikidata_api(
         )
         ents = dict(res.entities)
         caps = {str(v) for e in ents.values() for v, _ in _claim_values(e.get("claims") or {}, "P36")}
-        missing = sorted((c for c in caps if c not in ents and c.startswith("Q")), key=lambda q: int(q[1:]))
+        caps_q = sorted((c for c in caps if c.startswith("Q")), key=lambda q: int(q[1:]))
+        # Wikidata's own capitals (P36 objects) are loaded as full snapshots: their own P1566 claims link them to
+        # GeoNames places (no search needed); recent archived snapshots are reused, not re-requested
+        from reva.kg.harvest import STATE_DIR, Harvester, HarvestState, SpecReport
+
+        spec = _load_spec(SPEC_GEONAMES_IDS)
+        st = HarvestState(state_dir or STATE_DIR, spec.id + ".capitals")
+        st.reset_for(spec.sha256)
+        rep = SpecReport(spec.id, "seed_entities")
+        await Harvester(sess.client, sink, allow=allow).fetch_entities(
+            spec, caps_q, st, rep, full=True, kind="city", properties=CITY_PROPERTIES
+        )
+        out["capital_entities"] = {
+            "qids": len(caps_q),
+            **{k: rep.as_dict()[k] for k in ("entities_full", "statements", "failures")},
+        }
+        missing = [c for c in caps_q if c not in ents]
         if missing:
             res2 = await sess.client.get_entities(
                 missing,
@@ -1573,7 +1594,18 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
         default="wdqs",
         help="api: CirrusSearch + wbgetentities for a priority subset (WDQS refusing our egress)",
     )
-    w.add_argument("--max-ids", type=int, default=600, help="--via api: how many priority geonameids")
+    w.add_argument(
+        "--max-ids",
+        type=int,
+        default=600,
+        help="--via api: how many priority geonameids to look up by search (0: capitals via P36 only)",
+    )
+    w.add_argument(
+        "--client-mode",
+        choices=("api", "auto", "hybrid", "linked_data"),
+        default="linked_data",
+        help="--via api: WDHARVEST client mode (linked_data = REST search + Special:EntityData)",
+    )
     w.add_argument("--max-chunks", type=int, default=None)
     w.add_argument("--chunk-size", type=int, default=300)
     w.add_argument("--state-dir", type=Path, default=None)
@@ -1599,6 +1631,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - operat
                     db_name=args.db,
                     atlas_store=store,
                     max_ids=args.max_ids,
+                    mode=args.client_mode,
                     state_dir=args.state_dir,
                     report_path=args.report,
                 )

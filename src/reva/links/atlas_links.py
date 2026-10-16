@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any
 
+from reva.atlas.query import iso_date_sql
 from reva.links.model import Evidence, Link, LinkError, Temporal
 from reva.links.taxonomy import LinkType, Taxonomy, load_taxonomy
 
@@ -79,6 +80,22 @@ class AtlasDerivation:
             "considered": self.considered,
             "skipped": dict(self.skipped),
         }
+
+
+def explain_basis(link_type: str, basis: Mapping[str, Any], taxonomy: Taxonomy | None = None) -> dict[str, Any]:
+    """The constant wording a stored basis leaves out (kept once here, not on every row): the vote-agreement
+    index, formula, issue label and caveat; the flow of a dyadic atlas kind."""
+    out = dict(basis)
+    if link_type == "unga_vote_agreement":
+        out.setdefault("index", "share of identical votes")
+        out.setdefault("formula", VOTE_FORMULA)
+        out.setdefault("issue_label", VOTE_ISSUE_LABELS.get(str(basis.get("issue")), basis.get("issue")))
+        out.setdefault("caveat", VOTE_CAVEAT)
+    elif basis.get("method") == "atlas_dyadic":
+        lt = (taxonomy or load_taxonomy()).link_types.get(link_type)
+        if lt is not None and lt.atlas:
+            out.setdefault("flow", lt.atlas.get("flow"))
+    return out
 
 
 def _short_flags(flags: Any) -> dict[str, Any]:
@@ -232,10 +249,8 @@ class AtlasLinkReader:
             "dataset": r["dataset"],
             "indicator": r["indicator"],
             "reported_by": r["row_iso3"],
-            "flow": spec.get("flow"),
             "iso3": [r["subj"], r["obj"]],
             "table_artifact_sha256": r["table_sha"],
-            "atlas_snapshot_sha256": self.snapshot_sha256,
         }
         fl = _short_flags(r["flags"])
         if fl:
@@ -413,10 +428,7 @@ class AtlasLinkReader:
         basis = {
             "method": "derived",
             "method_version": VOTE_METHOD,
-            "index": "share of identical votes",
-            "formula": VOTE_FORMULA,
             "issue": r["issue"],
-            "issue_label": VOTE_ISSUE_LABELS.get(r["issue"], r["issue"]),
             "grain": grain,
             "n_common": n,
             "n_identical": k,
@@ -425,16 +437,16 @@ class AtlasLinkReader:
             "both_abstain": int(r["both_abstain"]),
             "roll_call_years": [int(r["first_year"]), int(r["last_year"])],
             "voters": {r["na"]: r["iso3_a"], r["nb"]: r["iso3_b"]},
-            "caveat": VOTE_CAVEAT,
             "table_artifact_sha256": r["table_sha"],
-            "atlas_snapshot_sha256": self.snapshot_sha256,
         }
         return Link(
             a,
             b,
             "unga_vote_agreement",
             False,
-            Temporal("interval", PartialDate(lo), PartialDate(hi)),
+            Temporal("interval", PartialDate(lo), PartialDate(hi))
+            if grain == "decade"
+            else Temporal("snapshot", year=lo),
             (ev,),
             weight=format(share, "f"),
             unit=VOTE_UNIT,
@@ -503,7 +515,8 @@ class AtlasLinkReader:
         rows = self._rows(
             f"""WITH {self._votes_cte(sorted((a, b))).strip()},
                 d AS (SELECT CAST(substr(s.indicator, 15) AS INTEGER) AS rcid, c.value_text AS descr,
-                             json_extract_string(c.flags, '$.unres') AS unres, c.period_start AS date,
+                             json_extract_string(c.flags, '$.unres') AS unres, c.period_start AS day,
+                             {iso_date_sql("c.period_start")} AS date,
                              c.selector AS rc_selector
                         FROM cells c JOIN series s USING (sid)
                        WHERE s.source = 'unga' AND s.dataset = 'rollcalls')
@@ -511,7 +524,7 @@ class AtlasLinkReader:
                   FROM v x JOIN v y ON x.rcid = y.rcid AND x.node = {_sql_str(a)} AND y.node = {_sql_str(b)}
                   JOIN rc ON rc.rcid = x.rcid JOIN d ON d.rcid = x.rcid
                  WHERE x.y BETWEEN {int(year_lo)} AND {int(year_hi)}{iss}
-                 ORDER BY d.date, x.rcid
+                 ORDER BY d.day, x.rcid
                  LIMIT {int(limit) + 1}""",
             (),
         )
@@ -519,7 +532,7 @@ class AtlasLinkReader:
         out = [
             {
                 "rcid": int(r["rcid"]),
-                "date": str(r["date"])[:10],
+                "date": r["date"],  # astronomical ISO text (BCE-safe)
                 "resolution": r["unres"],
                 "description": (r["descr"] or "")[:300],
                 a: names[int(r["pos_a"])],

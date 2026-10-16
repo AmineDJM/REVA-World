@@ -125,7 +125,9 @@ def test_migrant_stock_runs_origin_to_destination_both_sexes_only() -> None:
         s.cell("un_desa", "ims2024", f"migrant_stock|origin=076|sex={sex}", "PRT", year=2020, value=v, unit="persons",
                flags={"counterpart_iso3": "BRA"})  # fmt: skip
     d = s.reader().dyadic(s.reader().taxonomy.link("migrant_stock"), top_k=5)
-    assert [(lk.subject, lk.object, lk.weight, lk.unit) for lk in d.links] == [("iso3:BRA", "iso3:PRT", "150", "persons")]
+    assert [(lk.subject, lk.object, lk.weight, lk.unit) for lk in d.links] == [
+        ("iso3:BRA", "iso3:PRT", "150", "persons")
+    ]
 
 
 def test_land_border_merges_both_directions_and_refuses_disagreement() -> None:
@@ -141,7 +143,13 @@ def test_land_border_merges_both_directions_and_refuses_disagreement() -> None:
     d = s.reader().dyadic(s.reader().taxonomy.link("land_border"))
     assert len(d.links) == 1
     lk = d.links[0]
-    assert (lk.subject, lk.object, lk.weight, lk.directed, len(lk.evidence)) == ("iso3:ESP", "iso3:PRT", "1224.3", False, 2)
+    assert (lk.subject, lk.object, lk.weight, lk.directed, len(lk.evidence)) == (
+        "iso3:ESP",
+        "iso3:PRT",
+        "1224.3",
+        False,
+        2,
+    )
     assert d.skipped["directions_disagree"] == 1
 
 
@@ -170,7 +178,7 @@ def test_vote_agreement_is_a_share_of_identical_votes_with_counts() -> None:
     assert (co.basis["n_common"], co.basis["n_identical"], co.weight) == (12, 9, "0.7500")
     assert co.basis["both_abstain"] == 3 and co.unit == "share of identical votes (0-1)"
     assert co.temporal.kind == "interval" and (co.temporal.first_year, co.temporal.last_year) == (1960, 1969)
-    assert "alliance" not in json.dumps(co.basis["index"]) and co.basis["method"] == "derived"
+    assert co.basis["method"] == "derived" and co.basis["method_version"] == "links-vote-agreement/1"
     sel = json.loads(co.evidence[0].selector or "")
     assert sel["pair"] == ["GBR", "USA"] and sel["issue"] == "co" and co.evidence[0].raw_sha256 == SHA
     assert by_issue["all"].basis["n_common"] == 12  # rcid 200 (absent) and 201 (missing) excluded
@@ -213,3 +221,13 @@ def test_dyadic_kinds_declare_their_atlas_spec(kind: str) -> None:
 
     lt = load_taxonomy().link(kind)
     assert lt.atlas and lt.status == "derivable" and lt.weight_kind == "source_quantity"
+
+
+def test_issues_with_equal_shares_stay_distinct_links() -> None:
+    from reva.links.derive import merge_links
+
+    s = Snap()
+    for i in range(10):
+        _votes(s, i, date(1981, 2, 1 + i), ["co", "hr"], {"USA": "no", "GBR": "no"})
+    links = s.reader().votes(grain="decade", pair=("GBR", "USA")).links
+    assert len(merge_links(links)) == len(links) == 3  # all, co, hr: same share 1.0000, three facets

@@ -198,6 +198,15 @@ async def atlas_ingest(run) -> dict:             # run: reva.atlas.ingest.AtlasR
   `content-range` (WID reads an 882 MB zip this way). Fixture mode serves byte ranges from a manifest
   object `{"kind": "byte_range_archive", "url", "file", "sha256", "etag"}`
   (`reva.atlas.ingest.ArchiveRangeFixtureHttp`).
+* `run.post(url, key=, json_body= | content=, content_type=, media_types=, headers=, max_bytes=, params=)`:
+  one POST for POST-only APIs (PxWeb of Greenland/Faroe/Kosovo ASK/Åland/Andorra, IRENA, UNECE). Same
+  allow-list, pinning, politeness, size caps and retries as GET (`reva.atlas.http_post.safe_post` through the
+  run's SafeHttpClient; redirects are not followed), metered on the run's reservation exactly like a GET
+  (one request; request + response bytes). The request body (≤ 64 KiB; `json_body` is sent as canonical JSON)
+  is archived with the response in `response_metadata.request` (method, content type, body text or base64,
+  sha256) and the fingerprint covers it (`POST <url> body:<sha256>`), so each query is its own acquisition.
+  Fixture mode replays a FixtureHttp manifest entry whose `request_fingerprint` is that POST fingerprint.
+  A live run never POSTs outside the metered client.
 * Run options: `run.options` (CLI `--option KEY=VALUE`, job payload `"options"`), e.g. WID
   `countries=FR,DE` for a country-subset run.
 * `AtlasRun.offline(spec, http)`: a fetch-only run for parser unit tests (no archive/register).
