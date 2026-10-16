@@ -3,9 +3,13 @@
 Two families, both declared in ``registry/links/link_types.yaml``:
 
 * **atlas_dyadic** — a provider reports a quantity per (country, partner, year): IMF IMTS exports / imports,
-  UN DESA migrant stock, CEPII BACI by HS section, Natural Earth shared boundary length. One link per reported
-  cell, weighted by the cell's own decimal string and unit; evidence = the cell's raw sha256 + selector. A
-  missing cell gives no link; a reported zero gives no link either (counted as ``reported_zero``).
+  UN DESA migrant stock, CEPII BACI by HS section, Natural Earth shared boundary length; A-INFRA's physical
+  networks (LINKS3): Wikidata submarine cables, OpenFlights June-2014 routes, GCAT payloads by launch-site state.
+  One link per reported cell, weighted by the cell's own decimal string and unit; evidence = the cell's raw
+  sha256 + selector (+ companion rows such as the cables' first service year, each cited). A missing cell gives
+  no link; a reported zero gives no link either (counted as ``reported_zero``). A provider geography outside the
+  crosswalk gives no link, except through an explicit mapping hop (:mod:`reva.links.geo_hops`) whose KG
+  statement is then cited on the link. A type's ``caveat`` and ``licence`` are stored in every link's basis.
 * **atlas_computed** — ``unga_vote_agreement``: the share of identical votes of two states over the roll calls
   both voted on (yes / no / abstain), per decade (stored) or per year (pair view), per issue. The index is
   computed by REVA (labelled ``derived_index``, formula and counts in ``basis``); its evidence is the raw
@@ -53,13 +57,38 @@ VOTE_CAVEAT = (
     "friendship or alignment of interests. Issue codes are Voeten's keyword-based classification; roll-call "
     "selection (amendments, paragraph votes) and absences shape the share."
 )
-#: link types stored in full (small tables; a top-k would drop real neighbours: China has 14+ land borders)
+#: link types stored in full (small tables; a top-k would drop real neighbours: China has 14+ land borders);
+#: atlas specs may also say ``stored_in_full: true`` (LINKS3: cables, 2014 air routes, launch services)
 STORED_IN_FULL = frozenset({"land_border"})
+#: A-INFRA folds a partner outside the crosswalk as ``|partner_code=<provider code>`` (flags.partner_code)
+PARTNER_CODE_DIM = "partner_code"
 DEFAULT_FACETS = {"unga_vote_agreement": "issue=all", "bilateral_trade_baci": "section=TOTAL"}
 #: flags keys dropped from a link's basis (long provider text repeated on every row)
 _LONG_FLAG_KEYS = frozenset({"definition", "method", "notes", "typing", "data_type_meaning"})
 
 NodeOf = Callable[[str], str]
+
+
+def stored_in_full(lt: LinkType) -> bool:
+    return lt.id in STORED_IN_FULL or bool((lt.atlas or {}).get("stored_in_full"))
+
+
+def _int_or_str(v: Any) -> Any:
+    t = str(v)
+    return int(t) if t.lstrip("-").isdigit() else t
+
+
+def _cable_note(flags: Mapping[str, Any]) -> str | None:
+    """Evidence gloss of a Wikidata cable row: the cable items it counts (label, QID, revision)."""
+    cs = flags.get("cables")
+    if not isinstance(cs, list) or not cs:
+        return None
+    parts = [f"{c.get('label')} ({c.get('qid')}, rev {c.get('rev')})" for c in cs if isinstance(c, Mapping)]
+    out = "Wikidata cable items: " + "; ".join(parts)
+    total, listed = flags.get("cables_total"), flags.get("cables_listed")
+    if isinstance(total, int) and isinstance(listed, int) and total > listed:
+        out += f"; +{total - listed} more (every QID is in the selector)"
+    return out if len(out) <= 1200 else out[:1190] + "…"
 
 
 def _default_node(iso3: str) -> str:
@@ -72,14 +101,19 @@ class AtlasDerivation:
     links: list[Link] = field(default_factory=list)
     skipped: Counter[str] = field(default_factory=Counter)
     considered: int = 0
+    #: rows attached to a country through a cited mapping hop, per provider code (LINKS3)
+    mapped_via_hop: Counter[str] = field(default_factory=Counter)
 
     def to_json(self) -> dict[str, Any]:
-        return {
+        out = {
             "link_type": self.link_type,
             "count": len(self.links),
             "considered": self.considered,
             "skipped": dict(self.skipped),
         }
+        if self.mapped_via_hop:
+            out["mapped_via_hop"] = dict(self.mapped_via_hop)
+        return out
 
 
 def explain_basis(link_type: str, basis: Mapping[str, Any], taxonomy: Taxonomy | None = None) -> dict[str, Any]:
@@ -134,12 +168,15 @@ class AtlasLinkReader:
         origin: str,
         taxonomy: Taxonomy | None = None,
         node_of: NodeOf = _default_node,
+        hop_evidence: Mapping[str, Evidence] | None = None,
     ) -> None:
         self._rows = rows
         self.snapshot_sha256 = snapshot_sha256
         self.origin = origin
         self.taxonomy = taxonomy or load_taxonomy()
         self.node_of = node_of
+        #: provider code -> evidence (KG statement) of its mapping hop; a hop without evidence is never applied
+        self.hop_evidence: Mapping[str, Evidence] = dict(hop_evidence or {})
         self._present: set[tuple[str, str]] | None = None
 
     @classmethod
@@ -170,12 +207,37 @@ class AtlasLinkReader:
         return any((spec["source"], d) in self.present() for d in spec["datasets"])
 
     # ------------------------------------------------------------------ dyadic
+    def _hops(self, lt: LinkType) -> tuple[dict[str, Any], list[str]]:
+        """(provider code -> hop applied for this type, registry codes applicable but without KG evidence)."""
+        spec = lt.atlas or {}
+        if not spec.get("mapping_hops"):
+            return {}, []
+        from reva.links.geo_hops import load_hops
+
+        active, missing = {}, []
+        for h in load_hops():
+            if not h.applies(spec["source"], spec["datasets"]):
+                continue
+            if h.provider_code in self.hop_evidence:
+                active[h.provider_code] = h
+            else:
+                missing.append(h.provider_code)
+        return active, sorted(missing)
+
     def _dyadic_base(self, lt: LinkType) -> str:
-        """CTE ``r``: every cell of the type's series with aliases row_iso3, partner, year, value, facet, v."""
+        """CTE ``r``: every cell of the type's series with aliases row_iso3, partner, year, value, facet, v
+        (+ row_geo, partner_code, hop, and comp_<key>[_sha|_sel] for companion rows)."""
         spec = lt.atlas
         assert spec is not None
         partner_key = spec["partner"].split(".", 1)[1]
         datasets = ", ".join(_sql_str(d) for d in spec["datasets"])
+        prefix = spec["indicator_prefix"]
+        name = prefix.split("|", 1)[0]
+        active, missing = self._hops(lt)
+        sel = f"starts_with(indicator, {_sql_str(prefix)})"
+        if active or missing:  # the partner side of a hop: rows folded as |partner_code=<code>
+            codes = ", ".join(_sql_str(f"{name}|{PARTNER_CODE_DIM}={c}") for c in sorted({*active, *missing}))
+            sel = f"({sel} OR indicator IN ({codes}))"
         req = ""
         for k, v in sorted((spec.get("require_dims") or {}).items()):
             pat = "\\|" + k + "=" + v + "(\\||$)"
@@ -185,16 +247,52 @@ class AtlasLinkReader:
             pat = "\\|" + dim + "=([^|]+)"
             facet_parts.append(f"'{dim}=' || coalesce(regexp_extract(s.indicator, {_sql_str(pat)}, 1), '')")
         facet = " || ',' || ".join(facet_parts) if facet_parts else "''"
+        raw_partner = f"json_extract_string(c.flags, '$.{partner_key}')"
+        pcode = f"json_extract_string(c.flags, '$.{PARTNER_CODE_DIM}')"
+        row_iso, partner, hop = "c.iso3", raw_partner, "CAST(NULL AS VARCHAR)"
+        if active:
+            geo_case = " ".join(f"WHEN {_sql_str(c)} THEN {_sql_str(h.iso3)}" for c, h in sorted(active.items()))
+            in_codes = ", ".join(_sql_str(c) for c in sorted(active))
+            row_iso = f"coalesce(c.iso3, CASE c.provider_geo {geo_case} END)"
+            partner = f"coalesce({raw_partner}, CASE {pcode} {geo_case} END)"
+            hop = (
+                f"CASE WHEN c.iso3 IS NULL AND c.provider_geo IN ({in_codes}) THEN 'row:' || c.provider_geo "
+                f"WHEN {raw_partner} IS NULL AND {pcode} IN ({in_codes}) THEN 'partner:' || {pcode} END"
+            )
+        if spec.get("year_from") == "period_start":
+            year = "CAST(year(c.period_start) AS INTEGER)"
+        else:
+            year = """coalesce(c.year, CASE WHEN datediff('day', c.period_start, c.period_end) <= 1
+                                           THEN CAST(year(c.period_start) AS INTEGER) END)"""
+        comps = sorted((spec.get("companions") or {}).items())
+        comp_cte, comp_cols, comp_join = "", "", ""
+        if comps:
+            starts = " OR ".join(f"starts_with(indicator, {_sql_str(cn + '|')})" for _, cn in comps)
+            comp_cte = f""",
+        ks AS (SELECT sid, dataset, indicator FROM series
+                WHERE source = {_sql_str(spec["source"])} AND dataset IN ({datasets}) AND ({starts})),
+        kc AS (SELECT ks.dataset, ks.indicator, c.provider_geo, c.period_start, c.value, c.raw_sha256, c.selector
+                 FROM cells_s c JOIN ks USING (sid))"""
+            for i, (key, cn) in enumerate(comps):
+                a = f"k{i}"
+                comp_cols += (
+                    f", {a}.value AS comp_{key}, {a}.raw_sha256 AS comp_{key}_sha, {a}.selector AS comp_{key}_sel"
+                )
+                comp_join += (
+                    f" LEFT JOIN kc {a} ON {a}.provider_geo = c.provider_geo AND {a}.dataset = s.dataset"
+                    f" AND {a}.period_start = c.period_start"
+                    f" AND {a}.indicator = {_sql_str(cn)} || substr(s.indicator, {len(name) + 1})"
+                )
         return f"""
         s AS (SELECT sid, dataset, indicator FROM series
                WHERE source = {_sql_str(spec["source"])} AND dataset IN ({datasets})
-                 AND starts_with(indicator, {_sql_str(spec["indicator_prefix"])}){req}),
-        r AS (SELECT c.iso3 AS row_iso3, json_extract_string(c.flags, '$.{partner_key}') AS partner,
-                     coalesce(c.year, CASE WHEN datediff('day', c.period_start, c.period_end) <= 1
-                                           THEN CAST(year(c.period_start) AS INTEGER) END) AS year,
+                 AND {sel}{req}){comp_cte},
+        r AS (SELECT {row_iso} AS row_iso3, {partner} AS partner,
+                     c.provider_geo AS row_geo, {pcode} AS partner_code, {hop} AS hop,
+                     {year} AS year,
                      c.value, c.unit, c.flags, c.raw_sha256, c.selector, c.table_sha, s.dataset, s.indicator,
-                     {facet} AS facet, TRY_CAST(c.value AS DOUBLE) AS v
-                FROM cells_s c JOIN s USING (sid))"""
+                     {facet} AS facet, TRY_CAST(c.value AS DOUBLE) AS v{comp_cols}
+                FROM cells_s c JOIN s USING (sid){comp_join})"""
 
     def _dyadic_sql(self, lt: LinkType, where: str, top_k: int | None, cap: int) -> str:
         spec = lt.atlas
@@ -216,6 +314,11 @@ class AtlasLinkReader:
         LIMIT {int(cap) + 1}"""
 
     def _dyadic_counts(self, lt: LinkType, where: str) -> Counter[str]:
+        _active, missing = self._hops(lt)
+        no_ev = "0"
+        if missing:
+            codes = ", ".join(_sql_str(c) for c in missing)
+            no_ev = f"count(*) FILTER (WHERE (row_iso3 IS NULL AND row_geo IN ({codes})) OR (partner IS NULL AND partner_code IN ({codes})))"
         rows = self._rows(
             f"""WITH {self._dyadic_base(lt).strip()}
                 SELECT count(*) AS cells,
@@ -223,7 +326,8 @@ class AtlasLinkReader:
                        count(*) FILTER (WHERE row_iso3 IS NULL) AS iso3_unmapped,
                        count(*) FILTER (WHERE partner IS NULL) AS partner_unmapped,
                        count(*) FILTER (WHERE v = 0) AS reported_zero,
-                       count(*) FILTER (WHERE year IS NULL) AS no_calendar_year
+                       count(*) FILTER (WHERE year IS NULL) AS no_calendar_year,
+                       {no_ev} AS mapping_hop_without_kg_evidence
                   FROM r WHERE ({where.replace("partner", "coalesce(partner, '')").replace("row_iso3", "coalesce(row_iso3, '')")})""",
             (),
         )
@@ -233,6 +337,7 @@ class AtlasLinkReader:
         spec = lt.atlas
         assert spec is not None
         sel = r["selector"] if isinstance(r["selector"], str) else json.dumps(r["selector"], sort_keys=True)
+        fl = _short_flags(r["flags"])
         ev = Evidence(
             kind="atlas_row",
             source=spec["source"],
@@ -242,7 +347,9 @@ class AtlasLinkReader:
             object=r["partner"],
             pid=r["indicator"],
             origin=self.origin,
+            note=_cable_note(fl),
         )
+        evs = [ev]
         basis: dict[str, Any] = {
             "method": "atlas_dyadic",
             "source": spec["source"],
@@ -252,44 +359,130 @@ class AtlasLinkReader:
             "iso3": [r["subj"], r["obj"]],
             "table_artifact_sha256": r["table_sha"],
         }
-        fl = _short_flags(r["flags"])
         if fl:
             basis["source_flags"] = fl
         if r.get("facet"):
             basis["facet"] = r["facet"]
+        name = spec["indicator_prefix"].split("|", 1)[0]
+        for key, cn in sorted((spec.get("companions") or {}).items()):
+            v = r.get(f"comp_{key}")
+            if v is None or not r.get(f"comp_{key}_sha") or not r.get(f"comp_{key}_sel"):
+                continue
+            basis[key] = _int_or_str(v)
+            csel = r[f"comp_{key}_sel"]
+            evs.append(
+                Evidence(
+                    kind="atlas_row",
+                    source=spec["source"],
+                    raw_sha256=r[f"comp_{key}_sha"],
+                    selector=csel if isinstance(csel, str) else json.dumps(csel, sort_keys=True),
+                    subject=r["row_iso3"],
+                    object=r["partner"],
+                    pid=cn + str(r["indicator"])[len(name) :],
+                    origin=self.origin,
+                )
+            )
+        if r.get("hop"):
+            code = str(r["hop"]).split(":", 1)[1]
+            active, _missing = self._hops(lt)
+            hev = self.hop_evidence[code]
+            evs.append(hev)
+            basis["mapping_hop"] = {**active[code].basis(hev), "side": str(r["hop"]).split(":", 1)[0]}
+        if spec.get("caveat"):
+            basis["caveat"] = dict(spec["caveat"])
+        if spec.get("licence"):
+            basis["licence"] = spec["licence"]
         return Link(
             self.node_of(r["subj"]),
             self.node_of(r["obj"]),
             lt.id,
             lt.directed,
             Temporal("snapshot", year=int(r["year"])),
-            (ev,),
+            tuple(evs),
             weight=str(r["value"]),
             unit=r["unit"],
             basis=basis,
         )
 
+    @staticmethod
+    def _variant(r: Mapping[str, Any]) -> frozenset[str]:
+        """The provider pair a row reports (geography codes as the provider wrote them)."""
+        return frozenset({str(r["row_geo"]), str(r.get("partner_code") or r["partner"])})
+
+    def _union(
+        self, lt: LinkType, rs: Sequence[Mapping[str, Any]], links: Sequence[Link], d: AtlasDerivation
+    ) -> tuple[str, dict[str, Any]] | None:
+        """Rows reaching one pair from different provider geographies (through a mapping hop): the union of the
+        items their selectors list (``union_selector_key``); None when a row's list is not complete."""
+        spec = lt.atlas or {}
+        key = spec["union_selector_key"]
+        items: set[str] = set()
+        for r in rs:
+            try:
+                lst = json.loads(r["selector"] if isinstance(r["selector"], str) else json.dumps(r["selector"]))[key]
+            except (ValueError, KeyError, TypeError):
+                lst = None
+            if not isinstance(lst, list) or len(lst) != int(Decimal(str(r["value"]))):
+                d.skipped["union_selector_list_incomplete"] += 1
+                return None
+            items |= {str(x) for x in lst}
+        extra: dict[str, Any] = {
+            "combined_from": sorted(sorted(v) for v in {self._variant(r) for r in rs}),
+            "combination": f"union of the items listed by the rows' selectors ({key}); "
+            f"{len(items)} distinct of {sum(int(Decimal(str(r['value']))) for r in rs)} listed",
+            "items": sorted(items),
+        }
+        for ck in spec.get("companions") or {}:
+            vals = [lk.basis[ck] for lk in links if isinstance(lk.basis.get(ck), int)]
+            if ck.endswith("_year") and vals:
+                extra[ck] = min(vals)  # the earliest year of the union is the earliest of the rows' earliest
+        return str(len(items)), extra
+
     def _merge_undirected(self, lt: LinkType, rows: Iterable[Mapping[str, Any]], d: AtlasDerivation) -> None:
-        """Both directions of an undirected measure (NE border length) → one link with both rows as evidence;
-        rows that disagree on the value give no link (``directions_disagree``)."""
+        """Both directions of an undirected measure (NE border length, shared cables) → one link with both rows as
+        evidence; rows that disagree on the value give no link (``directions_disagree``). With a mapping hop, rows
+        of different provider geographies may reach one pair: they are combined by the union of their listed items
+        (``union_selector_key``), never summed; a type without that key gives no link then (counted)."""
         groups: dict[tuple[str, str, int, str], list[Mapping[str, Any]]] = defaultdict(list)
         for r in rows:
             a, b = sorted((r["row_iso3"], r["partner"]))
             groups[(a, b, int(r["year"]), r.get("facet") or "")].append(r)
+        union_key = (lt.atlas or {}).get("union_selector_key")
         for (a, b, _y, _f), rs in sorted(groups.items()):
-            vals = {Decimal(str(r["value"])) for r in rs}
-            if len(vals) > 1:
-                d.skipped["directions_disagree"] += 1
-                continue
             links = [self._row_link(lt, r) for r in rs]
             first = links[0]
-            ev = tuple(e for lk in links for e in lk.evidence)
+            basis = {k: v for k, v in first.basis.items() if k != "mapping_hop"}
+            weight = first.weight
+            # several provider pairs reach one country pair only through a mapping hop
+            variants = {self._variant(r) for r in rs} if any(r.get("hop") for r in rs) else {frozenset()}
+            if len(variants) > 1:
+                if not union_key:
+                    d.skipped["mapping_hop_collides_with_direct_row"] += 1
+                    continue
+                u = self._union(lt, rs, links, d)
+                if u is None:
+                    continue
+                weight, extra = u
+                basis.update(extra)
+            elif len({Decimal(str(r["value"])) for r in rs}) > 1:
+                d.skipped["directions_disagree"] += 1
+                continue
+            seen: set[str] = set()
+            ev = []
+            for lk in links:
+                for e in lk.evidence:
+                    k = json.dumps(e.to_json(), sort_keys=True)
+                    if k not in seen:
+                        seen.add(k)
+                        ev.append(e)
+            hops = [lk.basis["mapping_hop"] for lk in links if "mapping_hop" in lk.basis]
+            if hops:
+                basis["mapping_hop"] = {k: v for k, v in hops[0].items() if k != "side"}
             na, nb = sorted((first.subject, first.object))
-            basis = dict(first.basis)
             basis["iso3"] = [a, b]
             basis["reported_by"] = sorted({r["row_iso3"] for r in rs})
             d.links.append(
-                Link(na, nb, lt.id, False, first.temporal, ev, weight=first.weight, unit=first.unit, basis=basis)
+                Link(na, nb, lt.id, False, first.temporal, tuple(ev), weight=weight, unit=first.unit, basis=basis)
             )
 
     def dyadic(
@@ -299,7 +492,7 @@ class AtlasLinkReader:
         if not self.available(lt):
             d.skipped["source_not_in_snapshot"] += 1
             return d
-        rows = self._rows(self._dyadic_sql(lt, where, None if lt.id in STORED_IN_FULL else top_k, cap), ())
+        rows = self._rows(self._dyadic_sql(lt, where, None if stored_in_full(lt) else top_k, cap), ())
         if len(rows) > cap:
             d.skipped["row_cap_reached"] += 1
             rows = rows[:cap]
@@ -308,9 +501,18 @@ class AtlasLinkReader:
                 d.considered = n
             else:
                 d.skipped[k] += n
+        for r in rows:
+            if r.get("hop"):
+                d.mapped_via_hop[str(r["hop"]).split(":", 1)[1]] += 1
         if not lt.directed:
             self._merge_undirected(lt, rows, d)
             return d
+        if any(r.get("hop") for r in rows):  # a hop must never add a second value to a reported pair
+            seen: Counter[tuple[Any, ...]] = Counter((r["subj"], r["obj"], r["year"], r["facet"]) for r in rows)
+            dup = {k for k, n in seen.items() if n > 1}
+            if dup:
+                d.skipped["mapping_hop_collides_with_direct_row"] += sum(seen[k] for k in dup)
+                rows = [r for r in rows if (r["subj"], r["obj"], r["year"], r["facet"]) not in dup]
         for r in rows:
             try:
                 d.links.append(self._row_link(lt, r))

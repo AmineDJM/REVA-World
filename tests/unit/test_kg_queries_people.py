@@ -73,6 +73,29 @@ WD_LABELS: dict[str, tuple[str, ...]] = {
 }
 
 
+# Anchors whose QID could not be confirmed by a recorded WDQS label lookup (the label lookups for
+# "Marie Curie" / "Marie Skłodowska-Curie" / "Maria Skłodowska-Curie" and a QID -> English-label check returned
+# no row, see _recorded/resolve_2*, resolve_3*; the WDQS daily budget was then exhausted). Confirmed instead by
+# an independent recorded source: the Nobel Prize API response captured by agent A-SCI, whose laureate record
+# with English Wikipedia slug "Marie_Curie" carries this Wikidata id. name -> (fixture, wikipedia slug).
+EXTERNAL_CONFIRMATION: dict[str, tuple[str, str]] = {
+    "Marie Curie": ("tests/fixtures/source/atlas.nobel/6165c0a0b18ad8ba.json", "Marie_Curie"),
+}
+
+
+def _nobel_records(obj: Any) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    if isinstance(obj, dict):
+        if isinstance(obj.get("wikidata"), dict) and isinstance(obj.get("wikipedia"), dict):
+            out.append(obj)
+        for v in obj.values():
+            out.extend(_nobel_records(v))
+    elif isinstance(obj, list):
+        for v in obj:
+            out.extend(_nobel_records(v))
+    return out
+
+
 def anchor_labels(names: list[str] | None = None) -> list[str]:
     """English labels to resolve for the given anchor names (default: all)."""
     out: list[str] = []
@@ -105,10 +128,29 @@ EXPECTED: dict[str, tuple[str, ...]] = {
 
 # Extra English labels looked up in the same request (candidate classes for later spec revisions).
 LOOKUP_LABELS: tuple[str, ...] = (
-    "navigator", "conquistador", "viceroy", "governor-general", "colonial governor", "colonial administrator",
-    "religious leader", "prophet", "trade unionist", "independence activist", "essayist", "polar explorer",
-    "sailor", "military commander", "general officer", "admiral", "head of state", "head of government",
-    "monarch", "pope", "caliph", "missionary", "cartographer",
+    "navigator",
+    "conquistador",
+    "viceroy",
+    "governor-general",
+    "colonial governor",
+    "colonial administrator",
+    "religious leader",
+    "prophet",
+    "trade unionist",
+    "independence activist",
+    "essayist",
+    "polar explorer",
+    "sailor",
+    "military commander",
+    "general officer",
+    "admiral",
+    "head of state",
+    "head of government",
+    "monarch",
+    "pope",
+    "caliph",
+    "missionary",
+    "cartographer",
 )
 
 
@@ -150,26 +192,37 @@ def _min(q: str) -> str:
     return re.sub(r"\s+", " ", q).strip()
 
 
-def resolve_query(specs: dict[str, dict[str, Any]], labels: list[str],
-                  lookup_labels: tuple[str, ...] = LOOKUP_LABELS, anchor_qids: tuple[str, ...] = ()) -> str:
+def resolve_query(
+    specs: dict[str, dict[str, Any]],
+    labels: list[str],
+    lookup_labels: tuple[str, ...] = LOOKUP_LABELS,
+    anchor_qids: tuple[str, ...] = (),
+) -> str:
     """Anchor label -> human QIDs (``?a_l ?a_item ?a_sl``), English labels of every class QID the specs use
     (``?c_item ?c_l``) and candidate-class label lookups (``?lk_l ?lk_item ?lk_sl``); rows tagged ``?part``."""
     classes = sorted(set().union(*(spec_class_qids(s) for s in specs.values())), key=lambda q: int(q[1:]))
     branches = [
         f"{{ VALUES ?a_l {{ {_lits(labels)} }} ?a_item rdfs:label ?a_l ; wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . "
-        f"BIND(\"anchor\" AS ?part) }}",
+        f'BIND("anchor" AS ?part) }}',
         f"{{ VALUES ?c_item {{ {' '.join('wd:' + q for q in classes)} }} "
-        f"OPTIONAL {{ ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = \"en\") }} BIND(\"class\" AS ?part) }}",
+        f'OPTIONAL {{ ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = "en") }} BIND("class" AS ?part) }}',
     ]
     if anchor_qids:  # reverse check: QID -> English label (rows tagged "anchor" too)
-        branches.append(f"{{ VALUES ?a_item {{ {' '.join('wd:' + q for q in anchor_qids)} }} ?a_item rdfs:label ?a_l ; "
-                        f"wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . FILTER(LANG(?a_l) = \"en\") "
-                        f"BIND(\"anchor\" AS ?part) }}")
+        branches.append(
+            f"{{ VALUES ?a_item {{ {' '.join('wd:' + q for q in anchor_qids)} }} ?a_item rdfs:label ?a_l ; "
+            f'wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . FILTER(LANG(?a_l) = "en") '
+            f'BIND("anchor" AS ?part) }}'
+        )
     if lookup_labels:  # an empty VALUES would leave ?lk_l unbound: a scan of every label (WDQS timeout)
-        branches.append(f"{{ VALUES ?lk_l {{ {_lits(lookup_labels)} }} ?lk_item rdfs:label ?lk_l ; "
-                        f"wikibase:sitelinks ?lk_sl . FILTER(?lk_sl >= 10) BIND(\"lookup\" AS ?part) }}")
-    return ("SELECT DISTINCT ?part ?a_l ?a_item ?a_sl ?c_item ?c_l ?lk_l ?lk_item ?lk_sl WHERE { "
-            + " UNION ".join(branches) + " }")
+        branches.append(
+            f"{{ VALUES ?lk_l {{ {_lits(lookup_labels)} }} ?lk_item rdfs:label ?lk_l ; "
+            f'wikibase:sitelinks ?lk_sl . FILTER(?lk_sl >= 10) BIND("lookup" AS ?part) }}'
+        )
+    return (
+        "SELECT DISTINCT ?part ?a_l ?a_item ?a_sl ?c_item ?c_l ?lk_l ?lk_item ?lk_sl WHERE { "
+        + " UNION ".join(branches)
+        + " }"
+    )
 
 
 def membership_branch(sid: str, spec: dict[str, Any], qids: list[str]) -> str:
@@ -177,19 +230,22 @@ def membership_branch(sid: str, spec: dict[str, Any], qids: list[str]) -> str:
     q = spec_whole_range_query(spec)
     m = re.search(r"WHERE\s*\{", q)
     assert m, "spec query has no WHERE {"
-    body = q[m.end(): q.rindex("}")]
+    body = q[m.end() : q.rindex("}")]
     var = probe_variable(spec)
     bind = f"BIND(?{var} AS ?m_s)"
     if spec["purpose"] == "statements":
         bind += f" BIND(?{spec['columns']['subject']} AS ?m_o)"
-    return _min(f"{{ VALUES ?{var} {{ {' '.join('wd:' + x for x in qids)} }} {body} {bind} BIND(\"m:{sid}\" AS ?part) }}")
+    return _min(f'{{ VALUES ?{var} {{ {" ".join("wd:" + x for x in qids)} }} {body} {bind} BIND("m:{sid}" AS ?part) }}')
 
 
 def membership_query(specs: dict[str, dict[str, Any]], spec_ids: list[str], qids: list[str]) -> str:
     """One request probing several specs: rows ``?part = m:<spec id>``, ``?m_s`` selected anchor, ``?m_o``
     statement subject (statements specs)."""
-    return ("SELECT DISTINCT ?part ?m_s ?m_o WHERE { "
-            + " UNION ".join(membership_branch(s, specs[s], qids) for s in spec_ids) + " }")
+    return (
+        "SELECT DISTINCT ?part ?m_s ?m_o WHERE { "
+        + " UNION ".join(membership_branch(s, specs[s], qids) for s in spec_ids)
+        + " }"
+    )
 
 
 def pack_membership(specs: dict[str, dict[str, Any]], qids: list[str], max_url: int = 7000) -> list[list[str]]:
@@ -260,8 +316,9 @@ def test_people_specs_validate_against_schema_and_allowlist() -> None:
 
 def test_people_specs_are_bounded_and_within_people_budget() -> None:
     specs = _specs()
-    person_seeds = [s for s in specs.values()
-                    if s.data["purpose"] == "seed_entities" and s.data.get("entity_kind") == "person"]
+    person_seeds = [
+        s for s in specs.values() if s.data["purpose"] == "seed_entities" and s.data.get("entity_kind") == "person"
+    ]
     assert len(person_seeds) >= 10
     total = sum(int(s.data["max_rows"]) for s in person_seeds)
     assert total <= PEOPLE_BUDGET, total
@@ -314,7 +371,8 @@ def test_membership_probes_match_current_specs() -> None:
         assert rec["probe_qids"] == list(ANCHORS.values()), rec["_path"].name
         expected = membership_query(specs, rec["spec_ids"], rec["probe_qids"])
         assert re.sub(r"\s*LIMIT \d+$", "", rec["query"].strip()) == expected, (
-            f"{rec['_path'].name}: a people spec changed since the probe was recorded; re-record it")
+            f"{rec['_path'].name}: a people spec changed since the probe was recorded; re-record it"
+        )
         covered |= set(rec["spec_ids"])
     assert covered == set(specs), f"specs without a membership probe: {sorted(set(specs) - covered)}"
 
@@ -330,15 +388,23 @@ def test_anchor_qids_confirmed_by_recorded_lookup() -> None:
         if name not in best or sl > best[name][0]:
             best[name] = (sl, r["a_item"])
     for name, qid in ANCHORS.items():
+        if name in EXTERNAL_CONFIRMATION:
+            assert name not in best, f"{name} is now confirmed by a lookup: drop it from EXTERNAL_CONFIRMATION"
+            fixture, slug = EXTERNAL_CONFIRMATION[name]
+            recs = _nobel_records(json.loads((ROOT / fixture).read_text()))
+            assert any(r["wikidata"].get("id") == qid and r["wikipedia"].get("slug") == slug for r in recs), name
+            continue
         assert name in best, f"{name}: no human with this English label in the recordings"
         assert best[name][1] == qid, (name, best[name], qid)
+    assert set(EXTERNAL_CONFIRMATION) <= {"Marie Curie"}  # keep the exception list visible and short
 
 
 @pytest.mark.parametrize("label", list(ANCHORS))
 def test_anchor_people_are_captured_by_seed_sets(label: str) -> None:
     qid = ANCHORS[label]
-    selected_by = {r["part"][2:] for r in _all_rows("membership")
-                   if r.get("part", "").startswith("m:") and r.get("m_s") == qid}
+    selected_by = {
+        r["part"][2:] for r in _all_rows("membership") if r.get("part", "").startswith("m:") and r.get("m_s") == qid
+    }
     assert selected_by, f"{label} ({qid}) is selected by no people spec"
     assert selected_by & set(EXPECTED[label]), (label, sorted(selected_by), EXPECTED[label])
 

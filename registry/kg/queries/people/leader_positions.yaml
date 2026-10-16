@@ -22,7 +22,7 @@ sparql: |
     }
     FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 }
   }
-max_rows: 25000
+max_rows: 5000
 timeout_seconds: 55
 expand_hops: 1
 properties: [P31, P279, P361, P527, P1001, P17, P571, P576, P580, P582, P1365, P1366, P155, P156]

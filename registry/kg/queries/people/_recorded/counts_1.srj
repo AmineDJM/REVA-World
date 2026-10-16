@@ -1,0 +1,68 @@
+{
+  "head" : {
+    "vars" : [ "part", "n" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.monarchs"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "13642"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.nobel_laureates"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1000"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.state_leaders"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "14068"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.country_heads"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3269"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.colonial_officials"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "18557"
+      }
+    }, {
+      "part" : {
+        "type" : "literal",
+        "value" : "people.leader_positions"
+      },
+      "n" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1391"
+      }
+    } ]
+  }
+}

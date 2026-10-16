@@ -612,6 +612,136 @@ derived_links:
     status: derivable
     path_cost: 1.5
 
+  # ---------------------------------------------------------------- physical networks (A-INFRA; LINKS3)
+  - id: submarine_cable
+    labels: {fr: "câbles sous-marins listant les deux pays (Wikidata)", en: "submarine cables listing both countries (Wikidata)"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: atlas_dyadic
+      sources: [wikidata]
+      atlas:
+        source: wikidata
+        datasets: [submarine_cables]
+        indicator_prefix: "CABLES_SHARED|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        companions: {first_service_year: CABLE_FIRST_SERVICE_YEAR}
+        union_selector_key: wikidata_entities
+        stored_in_full: true
+        mapping_hops: true
+        licence: "CC0-1.0 (Wikidata, community-edited, not verified by REVA)"
+        caveat:
+          fr: >-
+            Contribution communautaire Wikidata, non vérifiée : seuls les câbles ayant un élément Wikidata comptent
+            (environ 190 sur quelque 600 systèmes), et les pays sont ceux que les contributeurs ont indiqués (P17).
+            Les câbles retirés ne sont pas exclus. Absence de lien = aucun élément ne liste les deux pays, pas
+            « aucun câble ».
+          en: >-
+            Community-edited Wikidata, not verified: only cables with a Wikidata item count (about 190 of some 600
+            systems), and the countries are those editors listed (P17). Retired cables are not excluded. No link =
+            no item lists both countries, not "no cable".
+        flow: "Wikidata cable items whose P17 lists both countries (A-INFRA emits both directions; merged here)"
+      notes: >-
+        A-INFRA table wikidata.submarine_cables (CC0, community-edited): CABLES_SHARED|partner=<ISO3> counts the
+        Wikidata items of the cable classes (Q506572 and subclasses) whose P17 lists both countries; the table
+        holds both directions of each pair, merged into one undirected link (both rows are evidence; rows that
+        disagree give no link). The cable items (QID, label, service year, revision) are in basis.source_flags.cables
+        and in the evidence note; CABLE_FIRST_SERVICE_YEAR (earliest P729 service entry, else P571 inception, of
+        the shared cables that have one) is basis.first_service_year, cited as a second evidence row. A P17 value
+        outside the crosswalk gives no link, except Q55 (Netherlands, constituent country) through the cited
+        mapping hop of registry/links/geo_mapping_hops.yaml (Q55 — country (P17) → Q29999 = NLD, applied only when
+        that statement is in the KG); when both Q55 and Q29999 rows reach the same pair the link counts the union
+        of the listed cable items.
+    temporal: {kind: snapshot, description: "retrieval day of the Wikidata items (the earliest service year of the shared cables is in basis, not a validity interval)"}
+    weight: {kind: source_quantity, unit: cables, notes: "count of Wikidata cable items listing both countries (derived count of provider records, A-INFRA)"}
+    honesty: {fr: "relié via : câbles sous-marins listant les deux pays (selon Wikidata, contribution communautaire)", en: "connected via: submarine cables listing both countries (per Wikidata, community-edited)"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  - id: air_routes_2014
+    labels: {fr: "liaisons aériennes directes recensées en juin 2014 (OpenFlights, données figées)", en: "direct air routes recorded in June 2014 (OpenFlights, frozen data)"}
+    inverse_labels: {fr: "destination de liaisons aériennes directes (juin 2014, OpenFlights) depuis", en: "destination of direct air routes (June 2014, OpenFlights) from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [openflights]
+      atlas:
+        source: openflights
+        datasets: [routes_2014]
+        indicator_prefix: "ROUTES_OPERATED|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        year_from: period_start
+        companions: {airport_pairs: ROUTE_AIRPORT_PAIRS, airlines: ROUTE_AIRLINES}
+        stored_in_full: true
+        licence: "ODbL-1.0 (OpenFlights.org; a derived database made public must be offered under ODbL 1.0)"
+        caveat:
+          fr: >-
+            Données figées : OpenFlights a cessé de mettre à jour ses routes en juin 2014 (avertissement du
+            fournisseur) — c'est le réseau aérien de 2014, pas celui d'aujourd'hui. Licence ODbL 1.0 (attribution
+            OpenFlights ; partage à l'identique pour une base dérivée publiée). Un enregistrement = une compagnie ×
+            une paire d'aéroports, vols en partage de code exclus.
+          en: >-
+            Frozen data: OpenFlights stopped updating its routes in June 2014 (provider warning) — this is the 2014
+            air network, not today's. Licence ODbL 1.0 (attribute OpenFlights; share-alike for a published derived
+            database). One record = one airline × airport pair, codeshares excluded.
+        flow: "routes.dat records (airline x airport pair, codeshares excluded) from the origin country to the destination country, June 2014"
+      notes: >-
+        A-INFRA table openflights.routes_2014 (ODbL 1.0, stale since June 2014): ROUTES_OPERATED|partner=<ISO3>,
+        origin country -> destination country (row = origin). The distinct airport pairs and airlines of the same
+        country pair (codeshares included) are basis.airport_pairs / basis.airlines, each cited as an evidence row.
+        Every link carries the staleness and licence caveat in its basis. A country pair served only by codeshare
+        records has no operated route and gives no link.
+    temporal: {kind: snapshot, description: "June 2014 (reference year 2014): the provider's route data stopped being updated then"}
+    weight: {kind: source_quantity, unit: routes, notes: "count of route records (derived count of provider records, A-INFRA)"}
+    honesty: {fr: "relié via : liaisons aériennes directes recensées en juin 2014 (OpenFlights, ODbL ; données figées, pas le réseau actuel)", en: "connected via: direct air routes recorded in June 2014 (OpenFlights, ODbL; frozen data, not today's network)"}
+    causal: false
+    status: derivable
+    path_cost: 2.0
+
+  - id: launch_service
+    labels: {fr: "charges utiles lancées depuis un site attribué à", en: "payloads launched from a site attributed to"}
+    inverse_labels: {fr: "site de lancement (selon GCAT) de charges utiles de", en: "launch-site state (per GCAT) for payloads of"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [gcat]
+      atlas:
+        source: gcat
+        datasets: [payloads]
+        indicator_prefix: "PAYLOADS_LAUNCHED_FROM|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        stored_in_full: true
+        licence: "CC BY 4.0 (J. C. McDowell, General Catalog of Artificial Space Objects, planet4589.org/space/gcat)"
+        caveat:
+          fr: >-
+            Compilation d'un chercheur (GCAT, J. McDowell), non vérifiée par REVA. Le pays « propriétaire » est
+            l'État du propriétaire ou de l'exploitant de la charge utile selon GCAT ; le site est rattaché à l'État
+            auquel GCAT attribue l'enregistrement du site (Kourou = Guyane française GUF ; Baïkonour = URSS avant
+            1989). Cela ne dit pas qui a fourni le lanceur. URSS et organisations internationales (ESA…) : non
+            rattachées à un pays actuel, donc pas de lien.
+          en: >-
+            One researcher's compilation (GCAT, J. McDowell), not verified by REVA. The owner state is the payload
+            owner/operator's state per GCAT; the site belongs to the state GCAT attributes that site record to
+            (Kourou = French Guiana GUF; Baikonur = USSR before 1989). It does not say who supplied the launcher.
+            USSR and intergovernmental organisations (ESA...) are not mapped to a present country: no link.
+        flow: "satcat payloads of the owner state launched from a site attributed to another state, by launch year"
+      notes: >-
+        A-INFRA table gcat.payloads (CC BY 4.0): PAYLOADS_LAUNCHED_FROM|partner=<ISO3> = satcat payloads (Type P*)
+        whose State is the row state and whose launch site (Launch_Tag -> launch.tsv -> sites.tsv StateCode) is
+        attributed to the partner state, by year of LDate (objects that reached orbit). Owner -> site state.
+    temporal: {kind: snapshot, description: "launch year (year of LDate)"}
+    weight: {kind: source_quantity, unit: payloads, notes: "count of catalogued payloads (derived count of provider records, A-INFRA)"}
+    honesty: {fr: "relié via : charges utiles de l'un lancées depuis un site attribué à l'autre (GCAT ; ne désigne pas le fournisseur du lanceur)", en: "connected via: payloads of one launched from a site attributed to the other (GCAT; does not name the launcher's supplier)"}
+    causal: false
+    status: derivable
+    path_cost: 2.0
+
   # ---------------------------------------------------------------- polity territory (KGPOLITY, proposed)
   - id: shared_polity_territory
     labels: {fr: "territoires couverts par une même entité politique", en: "territories covered by the same polity"}

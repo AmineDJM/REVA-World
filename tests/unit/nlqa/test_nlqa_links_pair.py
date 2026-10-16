@@ -220,6 +220,9 @@ def test_every_link_type_has_a_user_level_group() -> None:
         ("shared_polity_territory", "historical_polity"),
         ("shared_language_glottolog", "shared_language"),
         ("co_party", "treaty"),
+        ("submarine_cable", "infrastructure"),
+        ("air_routes_2014", "infrastructure"),
+        ("launch_service", "infrastructure"),
     ):
         assert link_kind(t) == g
 

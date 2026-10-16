@@ -1,0 +1,19 @@
+{
+ "anchor": "religions",
+ "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?item { wd:Q1841 wd:Q9592 wd:Q432 }\n  {\n    VALUES ?class { wd:Q9174 wd:Q13414953 }\n    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .\n    FILTER(?links >= 5)\n  }\n  UNION\n  { VALUES ?country { wd:Q155 } ?country wdt:P140 ?item . }\n}",
+ "raw_sha256": "4b20914c2b776a4dc3e4d4377cda86d9da822787252efebb26537858abeb66a7",
+ "response": {
+  "head": {
+   "vars": [
+    "item"
+   ]
+  },
+  "results": {
+   "bindings": []
+  }
+ },
+ "response_sha256": "0aa90f449b5e58abebafc13bcf9a97ef9d407f4424fed4acef757dcc922dbb14",
+ "retrieved_at": "2026-10-16T19:58:29.051069+00:00",
+ "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
+ "spec": "religions.yaml"
+}

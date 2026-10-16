@@ -1,0 +1,8681 @@
+{
+ "concepts": {
+  "population": {
+   "labels": {
+    "en": "Population",
+    "fr": "Population"
+   },
+   "headline_concepts": [
+    "reva.population.total"
+   ],
+   "series_consulted": [
+    "un_wpp.wpp2024_demo.TPopulation1July",
+    "wb.wdi_social.SP.POP.TOTL",
+    "un_wpp.wpp2024_demo.TPopulation1Jan",
+    "imf.weo.LP",
+    "factbook.figures_2026_01.population.total",
+    "unsd.ama.xr_pop|Population",
+    "unsd.syb68_t02.Population*",
+    "geonames.countryinfo.population",
+    "spc.pocket.MIDYEARPOPEST",
+    "eurostat.nuts2_gapfill.demo_r_d2jan|unit=NR|sex=T|age=TOTAL",
+    "cbs.bes_population.population_1_january"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.population.total": 234,
+    "geonames.countryinfo.population": 250,
+    "imf.weo.LP": 197,
+    "un_wpp.wpp2024_demo.TPopulation1Jan": 237,
+    "un_wpp.wpp2024_demo.TPopulation1July": 237,
+    "unsd.ama.xr_pop|Population": 210,
+    "unsd.syb68_t02.Population aged 0 to 14 years old (percentage)": 237,
+    "unsd.syb68_t02.Population aged 60+ years old (percentage)": 237,
+    "unsd.syb68_t02.Population density": 237,
+    "unsd.syb68_t02.Population mid-year estimates (millions)": 237,
+    "unsd.syb68_t02.Population mid-year estimates for females (millions)": 237,
+    "unsd.syb68_t02.Population mid-year estimates for males (millions)": 237,
+    "wb.wdi_social.SP.POP.TOTL": 217
+   },
+   "headline_covered": 238,
+   "any_covered": 251,
+   "headline_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "UMI"
+   ],
+   "any_missing": []
+  },
+  "area": {
+   "labels": {
+    "en": "Area",
+    "fr": "Superficie"
+   },
+   "headline_concepts": [
+    "reva.geography.surface_area",
+    "reva.geography.land_area"
+   ],
+   "series_consulted": [
+    "wb.wdi_social.AG.SRF.TOTL.K2",
+    "eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=TOTAL",
+    "wb.wdi_social.AG.LND.TOTL.K2",
+    "eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=L0008",
+    "factbook.figures_2026_01.area.total",
+    "geonames.countryinfo.area_km2",
+    "naturalearth.admin0_10m.area_km2",
+    "unsd.syb68_t02.Surface area*",
+    "spc.pocket.LAR",
+    "eurostat.nuts2_gapfill.reg_area3*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.area.total": 239,
+    "geonames.countryinfo.area_km2": 250,
+    "naturalearth.admin0_10m.area_km2": 250,
+    "unsd.syb68_t02.Surface area (thousand km2)": 226,
+    "wb.wdi_social.AG.LND.TOTL.K2": 216,
+    "wb.wdi_social.AG.SRF.TOTL.K2": 216
+   },
+   "headline_covered": 216,
+   "any_covered": 251,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "COK",
+    "CXR",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "JEY",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "TWN",
+    "UMI",
+    "VAT",
+    "WLF",
+    "XKX"
+   ],
+   "any_missing": []
+  },
+  "density": {
+   "labels": {
+    "en": "Population density",
+    "fr": "Densité"
+   },
+   "headline_concepts": [
+    "reva.population.density"
+   ],
+   "series_consulted": [
+    "wb.wdi_social.EN.POP.DNST",
+    "un_wpp.wpp2024_demo.PopDensity",
+    "unsd.syb68_t02.Population density*",
+    "spc.pocket.POPDENS",
+    "eurostat.nuts2_gapfill.demo_r_d3dens|unit=PER_KM2"
+   ],
+   "series_with_data": {
+    "un_wpp.wpp2024_demo.PopDensity": 237,
+    "unsd.syb68_t02.Population density": 237,
+    "wb.wdi_social.EN.POP.DNST": 216
+   },
+   "headline_covered": 216,
+   "any_covered": 238,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "COK",
+    "CXR",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "JEY",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "TWN",
+    "UMI",
+    "VAT",
+    "WLF",
+    "XKX"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "UMI"
+   ]
+  },
+  "gdp": {
+   "labels": {
+    "en": "GDP",
+    "fr": "PIB"
+   },
+   "headline_concepts": [
+    "reva.economy.gdp_usd"
+   ],
+   "series_consulted": [
+    "wb.wdi_econ.NY.GDP.MKTP.CD",
+    "imf.weo.NGDPD",
+    "cbs.bes_gdp.gdp_current_prices",
+    "spc.pocket.GDPCUSD",
+    "unsd.ama.gdp_current_usd|Gross Domestic Product (GDP)",
+    "imf.weo.PPPGDP",
+    "factbook.figures_2026_01.gdp.real_ppp",
+    "spc.pocket.GDPCUSD",
+    "spc.pocket.GDPCDOM",
+    "cbs.bes_gdp.gdp_current_prices",
+    "eurostat.nuts2_gapfill.nama_10r_2gdp|unit=MIO_EUR"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.gdp.real_ppp": 219,
+    "imf.weo.NGDPD": 197,
+    "imf.weo.PPPGDP": 197,
+    "unsd.ama.gdp_current_usd|Gross Domestic Product (GDP)": 210,
+    "wb.wdi_econ.NY.GDP.MKTP.CD": 214
+   },
+   "headline_covered": 215,
+   "any_covered": 224,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "COK",
+    "CXR",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "JEY",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "UMI",
+    "VAT",
+    "VGB",
+    "WLF"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CXR",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "PCN",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "UMI",
+    "VAT",
+    "WLF"
+   ]
+  },
+  "gdp_per_capita": {
+   "labels": {
+    "en": "GDP per capita",
+    "fr": "PIB par habitant"
+   },
+   "headline_concepts": [
+    "reva.economy.gdp_per_capita_usd",
+    "reva.economy.gdp_per_capita_ppp"
+   ],
+   "series_consulted": [
+    "wb.wdi_econ.NY.GDP.PCAP.CD",
+    "imf.weo.NGDPDPC",
+    "cbs.bes_gdp.gdp_per_capita",
+    "spc.pocket.GDPCPCUSD",
+    "wb.wdi_econ.NY.GDP.PCAP.PP.CD",
+    "imf.weo.PPPPC",
+    "unsd.ama.gdp_pc_current_usd",
+    "factbook.figures_2026_01.gdp.real_per_capita_ppp",
+    "spc.pocket.GDPCPCUSD",
+    "cbs.bes_gdp.gdp_per_capita",
+    "eurostat.nuts2_gapfill.nama_10r_2gdp|unit=EUR_HAB"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.gdp.real_per_capita_ppp": 217,
+    "imf.weo.NGDPDPC": 197,
+    "imf.weo.PPPPC": 197,
+    "unsd.ama.gdp_pc_current_usd": 210,
+    "wb.wdi_econ.NY.GDP.PCAP.CD": 214,
+    "wb.wdi_econ.NY.GDP.PCAP.PP.CD": 203
+   },
+   "headline_covered": 215,
+   "any_covered": 223,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "COK",
+    "CXR",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "JEY",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "UMI",
+    "VAT",
+    "VGB",
+    "WLF"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CXR",
+    "ESH",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "JEY",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "PCN",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "UMI",
+    "VAT",
+    "WLF"
+   ]
+  },
+  "unemployment": {
+   "labels": {
+    "en": "Unemployment rate",
+    "fr": "Taux de chômage"
+   },
+   "headline_concepts": [
+    "reva.labour.unemployment_rate",
+    "reva.labour.unemployment_rate_national"
+   ],
+   "series_consulted": [
+    "ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15",
+    "wb.wdi_social.SL.UEM.TOTL.ZS",
+    "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15",
+    "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_YGE15",
+    "wb.wdi_social.SL.UEM.TOTL.NE.ZS",
+    "imf.weo.LUR",
+    "factbook.figures_2026_01.unemployment_rate",
+    "un_sdg.sdg_headline.SL_TLF_UEM*",
+    "spc.emprates.UNEMPRATE|sex=_T|age=_T|urbanization=_T|disability=_T",
+    "eurostat.nuts2_gapfill.lfst_r_lfu3rt*",
+    "cbs.bes_labour.unemployment_rate*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.unemployment_rate": 188,
+    "ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15": 189,
+    "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_YGE15": 218,
+    "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15": 223,
+    "imf.weo.LUR": 118,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15+|Reporting Type=G|Sex=BOTHSEX": 217,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15+|Reporting Type=G|Sex=FEMALE": 215,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15+|Reporting Type=G|Sex=MALE": 215,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15+|Reporting Type=G|Sex=_O": 1,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15-24|Reporting Type=G|Sex=BOTHSEX": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15-24|Reporting Type=G|Sex=FEMALE": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=15-24|Reporting Type=G|Sex=MALE": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=25+|Reporting Type=G|Sex=BOTHSEX": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=25+|Reporting Type=G|Sex=FEMALE": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=25+|Reporting Type=G|Sex=MALE": 208,
+    "un_sdg.sdg_headline.SL_TLF_UEM|Age=25+|Reporting Type=G|Sex=_O": 1,
+    "wb.wdi_social.SL.UEM.TOTL.NE.ZS": 209,
+    "wb.wdi_social.SL.UEM.TOTL.ZS": 187
+   },
+   "headline_covered": 229,
+   "any_covered": 230,
+   "headline_missing": [
+    "ALA",
+    "AND",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "MAF",
+    "MYT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TKL",
+    "UMI",
+    "VAT"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "MAF",
+    "MYT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TKL",
+    "UMI",
+    "VAT"
+   ]
+  },
+  "minimum_wage": {
+   "labels": {
+    "en": "Minimum wage",
+    "fr": "Salaire minimum"
+   },
+   "headline_concepts": [
+    "reva.labour.minimum_wage_monthly_lcu"
+   ],
+   "series_consulted": [
+    "ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU",
+    "eurostat.earn_mw_cur.earn_mw_cur|currency=NAC",
+    "oecd.earnings_mw_curp.*",
+    "insee.smic_dom.*"
+   ],
+   "series_with_data": {
+    "eurostat.earn_mw_cur.earn_mw_cur|currency=NAC": 31,
+    "ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU": 175,
+    "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=A|price_base=V": 37,
+    "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=D|price_base=V": 5,
+    "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=H|price_base=V": 19,
+    "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V": 29,
+    "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=W|price_base=V": 4
+   },
+   "headline_covered": 175,
+   "any_covered": 175,
+   "headline_missing": [
+    "ABW",
+    "AIA",
+    "ALA",
+    "ARE",
+    "ASM",
+    "ATA",
+    "ATF",
+    "AUT",
+    "BES",
+    "BLM",
+    "BMU",
+    "BRN",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CUW",
+    "CXR",
+    "CYM",
+    "DJI",
+    "DNK",
+    "ERI",
+    "ESH",
+    "FIN",
+    "FLK",
+    "FRO",
+    "FSM",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "ITA",
+    "LCA",
+    "LIE",
+    "MAC",
+    "MAF",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NAM",
+    "NFK",
+    "NIU",
+    "NOR",
+    "NRU",
+    "PCN",
+    "PRI",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SOM",
+    "SPM",
+    "SSD",
+    "STP",
+    "SWE",
+    "SXM",
+    "TCA",
+    "TKL",
+    "TON",
+    "TUV",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF",
+    "XKX",
+    "YEM",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ABW",
+    "AIA",
+    "ALA",
+    "ARE",
+    "ASM",
+    "ATA",
+    "ATF",
+    "AUT",
+    "BES",
+    "BLM",
+    "BMU",
+    "BRN",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CUW",
+    "CXR",
+    "CYM",
+    "DJI",
+    "DNK",
+    "ERI",
+    "ESH",
+    "FIN",
+    "FLK",
+    "FRO",
+    "FSM",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "ITA",
+    "LCA",
+    "LIE",
+    "MAC",
+    "MAF",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NAM",
+    "NFK",
+    "NIU",
+    "NOR",
+    "NRU",
+    "PCN",
+    "PRI",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SOM",
+    "SPM",
+    "SSD",
+    "STP",
+    "SWE",
+    "SXM",
+    "TCA",
+    "TKL",
+    "TON",
+    "TUV",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF",
+    "XKX",
+    "YEM",
+    "ZWE"
+   ]
+  },
+  "average_wage": {
+   "labels": {
+    "en": "Average wage",
+    "fr": "Salaire moyen"
+   },
+   "headline_concepts": [
+    "reva.labour.average_monthly_earnings_lcu"
+   ],
+   "series_consulted": [
+    "ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU",
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_LCU",
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_LCU",
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_LCU",
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_LCU",
+    "oecd.earnings_av_an_wage.*",
+    "ilostat.ear_emtm_sex_cur_nb_a.*",
+    "statsjersey.earnings.*"
+   ],
+   "series_with_data": {
+    "ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU": 192,
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_LCU": 187,
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_LCU": 98,
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_LCU": 164,
+    "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_LCU": 191,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_F|classif1=CUR_TYPE_LCU": 150,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_F|classif1=CUR_TYPE_PPP": 138,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_F|classif1=CUR_TYPE_USD": 141,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_M|classif1=CUR_TYPE_LCU": 150,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_M|classif1=CUR_TYPE_PPP": 138,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_M|classif1=CUR_TYPE_USD": 141,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_O|classif1=CUR_TYPE_LCU": 2,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_O|classif1=CUR_TYPE_PPP": 2,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_O|classif1=CUR_TYPE_USD": 2,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU": 150,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_PPP": 138,
+    "ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_USD": 141,
+    "oecd.earnings_av_an_wage.WG|unit=NCU|pay_period=A|price_base=Q|agg=MEAN": 41,
+    "oecd.earnings_av_an_wage.WG|unit=NCU|pay_period=A|price_base=V|agg=MEAN": 41,
+    "oecd.earnings_av_an_wage.WG|unit=USD_PPP|pay_period=A|price_base=Q|agg=MEAN": 38
+   },
+   "headline_covered": 192,
+   "any_covered": 192,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BLR",
+    "BVT",
+    "CAF",
+    "CCK",
+    "CHI",
+    "CXR",
+    "CYM",
+    "DMA",
+    "DZA",
+    "ERI",
+    "ESH",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GLP",
+    "GRD",
+    "GRL",
+    "GUF",
+    "HMD",
+    "HTI",
+    "IOT",
+    "IRN",
+    "IRQ",
+    "KNA",
+    "LBY",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "OMN",
+    "PCN",
+    "PRK",
+    "PYF",
+    "SGS",
+    "SJM",
+    "SPM",
+    "SSD",
+    "STP",
+    "SXM",
+    "TCA",
+    "TUV",
+    "TWN",
+    "UMI",
+    "VAT",
+    "VCT",
+    "VGB",
+    "VIR"
+   ],
+   "any_missing": [
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BLR",
+    "BVT",
+    "CAF",
+    "CCK",
+    "CHI",
+    "CXR",
+    "CYM",
+    "DMA",
+    "DZA",
+    "ERI",
+    "ESH",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GLP",
+    "GRD",
+    "GRL",
+    "GUF",
+    "HMD",
+    "HTI",
+    "IOT",
+    "IRN",
+    "IRQ",
+    "KNA",
+    "LBY",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "OMN",
+    "PCN",
+    "PRK",
+    "PYF",
+    "SGS",
+    "SJM",
+    "SPM",
+    "SSD",
+    "STP",
+    "SXM",
+    "TCA",
+    "TUV",
+    "TWN",
+    "UMI",
+    "VAT",
+    "VCT",
+    "VGB",
+    "VIR"
+   ]
+  },
+  "life_expectancy": {
+   "labels": {
+    "en": "Life expectancy",
+    "fr": "Espérance de vie"
+   },
+   "headline_concepts": [
+    "reva.health.life_expectancy"
+   ],
+   "series_consulted": [
+    "un_wpp.wpp2024_demo.LEx",
+    "wb.wdi_social.SP.DYN.LE00.IN",
+    "undp.hdr25.le",
+    "who.gho.WHOSIS_000001*",
+    "factbook.figures_2026_01.life_expectancy.total",
+    "spc.pocket.LEBM",
+    "spc.pocket.LEBF",
+    "eurostat.nuts2_gapfill.demo_r_mlifexp*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.life_expectancy.total": 226,
+    "un_wpp.wpp2024_demo.LEx": 237,
+    "undp.hdr25.le": 195,
+    "wb.wdi_social.SP.DYN.LE00.IN": 217,
+    "who.gho.WHOSIS_000001|sex=SEX_BTSX": 185,
+    "who.gho.WHOSIS_000001|sex=SEX_FMLE": 185,
+    "who.gho.WHOSIS_000001|sex=SEX_MLE": 185
+   },
+   "headline_covered": 238,
+   "any_covered": 238,
+   "headline_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "UMI"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BVT",
+    "CCK",
+    "CXR",
+    "HMD",
+    "IOT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "UMI"
+   ]
+  },
+  "literacy_schooling": {
+   "labels": {
+    "en": "Literacy / schooling",
+    "fr": "Alphabétisation / scolarité"
+   },
+   "headline_concepts": [
+    "reva.education.literacy_rate_adult"
+   ],
+   "series_consulted": [
+    "uis.api.LR.AG15T99",
+    "wb.wdi_social.SE.ADT.LITR.ZS",
+    "factbook.figures_2026_01.literacy.total",
+    "factbook.figures_2026_01.school_life_expectancy.total",
+    "uis.api.MYS.1T8.AG25T99",
+    "undp.hdr25.mys"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.literacy.total": 120,
+    "factbook.figures_2026_01.school_life_expectancy.total": 154,
+    "uis.api.LR.AG15T99": 180,
+    "uis.api.MYS.1T8.AG25T99": 207,
+    "undp.hdr25.mys": 193,
+    "wb.wdi_social.SE.ADT.LITR.ZS": 170
+   },
+   "headline_covered": 180,
+   "any_covered": 219,
+   "headline_missing": [
+    "ALA",
+    "AND",
+    "ATA",
+    "ATF",
+    "AUS",
+    "AUT",
+    "BEL",
+    "BES",
+    "BHS",
+    "BLM",
+    "BMU",
+    "BVT",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "COK",
+    "CUW",
+    "CXR",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "ESH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GBR",
+    "GGY",
+    "GIB",
+    "GRL",
+    "HKG",
+    "HMD",
+    "IMN",
+    "IOT",
+    "IRL",
+    "ISL",
+    "JEY",
+    "JPN",
+    "KNA",
+    "LCA",
+    "LIE",
+    "LUX",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MYT",
+    "NFK",
+    "NLD",
+    "NOR",
+    "NZL",
+    "PCN",
+    "PYF",
+    "SGS",
+    "SJM",
+    "SVK",
+    "SWE",
+    "SXM",
+    "TCA",
+    "TWN",
+    "UMI",
+    "USA",
+    "VAT",
+    "VGB",
+    "VIR",
+    "XKX"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CXR",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GRL",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MNP",
+    "MYT",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "SXM",
+    "TWN",
+    "UMI",
+    "VAT",
+    "VIR",
+    "XKX"
+   ]
+  },
+  "hdi": {
+   "labels": {
+    "en": "HDI-like index",
+    "fr": "Indice de type IDH"
+   },
+   "headline_concepts": [
+    "reva.society.hdi"
+   ],
+   "series_consulted": [
+    "undp.hdr25.hdi",
+    "undp.hdr25.phdi"
+   ],
+   "series_with_data": {
+    "undp.hdr25.hdi": 193,
+    "undp.hdr25.phdi": 156
+   },
+   "headline_covered": 193,
+   "any_covered": 193,
+   "headline_missing": [
+    "ABW",
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BMU",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CUW",
+    "CXR",
+    "CYM",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAC",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NCL",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRI",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TCA",
+    "TKL",
+    "TWN",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF",
+    "XKX"
+   ],
+   "any_missing": [
+    "ABW",
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BMU",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CUW",
+    "CXR",
+    "CYM",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAC",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NCL",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRI",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TCA",
+    "TKL",
+    "TWN",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF",
+    "XKX"
+   ]
+  },
+  "inflation": {
+   "labels": {
+    "en": "Inflation",
+    "fr": "Inflation"
+   },
+   "headline_concepts": [
+    "reva.economy.inflation_cpi"
+   ],
+   "series_consulted": [
+    "imf.weo.PCPIPCH",
+    "wb.wdi_econ.FP.CPI.TOTL.ZG",
+    "insee.ipc_dom.CPI_ANNUAL_CHANGE|coicop=00|households=ENSEMBLE|base=2025",
+    "imf.weo.PCPIEPCH",
+    "factbook.figures_2026_01.inflation",
+    "spc.pocket.INFRATE",
+    "insee.ipc_dom.CPI_ANNUAL_CHANGE*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.inflation": 211,
+    "imf.weo.PCPIEPCH": 196,
+    "imf.weo.PCPIPCH": 197,
+    "wb.wdi_econ.FP.CPI.TOTL.ZG": 193
+   },
+   "headline_covered": 201,
+   "any_covered": 212,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BMU",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CUB",
+    "CXR",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TCA",
+    "TKL",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF"
+   ],
+   "any_missing": [
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CXR",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MNP",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "UMI",
+    "VAT",
+    "VIR",
+    "WLF"
+   ]
+  },
+  "government_balance": {
+   "labels": {
+    "en": "Government balance / budget",
+    "fr": "Solde public / budget"
+   },
+   "headline_concepts": [
+    "reva.finance.government_net_lending_gdp"
+   ],
+   "series_consulted": [
+    "imf.gfs_soo.GNLB_T|sector=S13",
+    "imf.weo.GGXCNL_NGDP",
+    "imf.weo.GGXONLB_NGDP",
+    "imf.gfs_soo.GNLB_T*",
+    "factbook.figures_2026_01.budget.revenues",
+    "spc.pocket.GOVREVGDPC"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.budget.revenues": 210,
+    "imf.gfs_soo.GNLB_T|sector=S13": 115,
+    "imf.gfs_soo.GNLB_T|sector=S1311": 130,
+    "imf.weo.GGXCNL_NGDP": 197,
+    "imf.weo.GGXONLB_NGDP": 190
+   },
+   "headline_covered": 197,
+   "any_covered": 213,
+   "headline_missing": [
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BMU",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NCL",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TCA",
+    "TKL",
+    "UMI",
+    "VAT",
+    "VGB",
+    "VIR",
+    "WLF"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CUW",
+    "CXR",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "SXM",
+    "UMI",
+    "VAT"
+   ]
+  },
+  "trade_balance": {
+   "labels": {
+    "en": "Trade balance / exports-imports",
+    "fr": "Balance commerciale / exportations-importations"
+   },
+   "headline_concepts": [
+    "reva.trade.goods_balance_usd",
+    "reva.trade.goods_services_balance_usd",
+    "reva.trade.current_account_gdp",
+    "reva.trade.merchandise_balance_imts"
+   ],
+   "series_consulted": [
+    "imf.bop.G|entry=NETCD_T",
+    "wb.wdi_econ.BN.GSR.MRCH.CD",
+    "imf.bop.GS|entry=NETCD_T",
+    "wb.wdi_econ.BN.GSR.GNFS.CD",
+    "imf.weo.BCA_NGDPD",
+    "wb.wdi_econ.BN.CAB.XOKA.GD.ZS",
+    "imf.imts.XG_FOB_USD|partner=G001",
+    "wb.wdi_econ.NE.RSB.GNFS.CD",
+    "wb.wdi_econ.BN.CAB.XOKA.CD",
+    "factbook.figures_2026_01.exports",
+    "spc.pocket.TRADEBALUSD"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.exports": 211,
+    "imf.bop.GS|entry=NETCD_T": 202,
+    "imf.bop.G|entry=NETCD_T": 202,
+    "imf.imts.XG_FOB_USD|partner=G001": 209,
+    "imf.weo.BCA_NGDPD": 196,
+    "wb.wdi_econ.BN.CAB.XOKA.CD": 200,
+    "wb.wdi_econ.BN.CAB.XOKA.GD.ZS": 200,
+    "wb.wdi_econ.BN.GSR.GNFS.CD": 200,
+    "wb.wdi_econ.BN.GSR.MRCH.CD": 200,
+    "wb.wdi_econ.NE.RSB.GNFS.CD": 194
+   },
+   "headline_covered": 214,
+   "any_covered": 217,
+   "headline_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CXR",
+    "ESH",
+    "GGY",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "PRI",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "UMI",
+    "VGB",
+    "VIR",
+    "WLF"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CXR",
+    "ESH",
+    "GGY",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "NIU",
+    "PCN",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "TKL",
+    "UMI",
+    "VGB",
+    "WLF"
+   ]
+  },
+  "co2": {
+   "labels": {
+    "en": "CO2 emissions",
+    "fr": "Émissions de CO2"
+   },
+   "headline_concepts": [
+    "reva.environment.co2_per_capita"
+   ],
+   "series_consulted": [
+    "owid.co2.co2_per_capita",
+    "undp.hdr25.co2_prod",
+    "owid.co2.co2",
+    "factbook.figures_2026_01.co2_emissions",
+    "un_sdg.sdg_headline.EN_ATM_CO2*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.co2_emissions": 211,
+    "owid.co2.co2": 216,
+    "owid.co2.co2_per_capita": 214,
+    "un_sdg.sdg_headline.EN_ATM_CO2|Activity=ISIC4_C10T32X19|Reporting Type=G": 149,
+    "un_sdg.sdg_headline.EN_ATM_CO2|Activity=TOTAL|Reporting Type=G": 149,
+    "undp.hdr25.co2_prod": 193
+   },
+   "headline_covered": 214,
+   "any_covered": 223,
+   "headline_missing": [
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CXR",
+    "CYM",
+    "ESH",
+    "FLK",
+    "GGY",
+    "GIB",
+    "GLP",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "PCN",
+    "PRI",
+    "REU",
+    "SGS",
+    "SJM",
+    "SMR",
+    "TKL",
+    "UMI",
+    "VAT",
+    "VIR"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATF",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "ESH",
+    "GGY",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAF",
+    "MCO",
+    "MNP",
+    "MTQ",
+    "MYT",
+    "NFK",
+    "PCN",
+    "REU",
+    "SGS",
+    "SJM",
+    "SMR",
+    "TKL",
+    "UMI",
+    "VAT"
+   ]
+  },
+  "internet": {
+   "labels": {
+    "en": "Internet use",
+    "fr": "Usage d'Internet"
+   },
+   "headline_concepts": [
+    "reva.science.internet_users"
+   ],
+   "series_consulted": [
+    "un_sdg.sdg_headline.IT_USE_ii99|Reporting Type=G|Sex=BOTHSEX",
+    "wb.wdi_econ.IT.NET.USER.ZS",
+    "spc.digital.DD024",
+    "eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_IU3",
+    "factbook.figures_2026_01.internet_users",
+    "spc.digital.DD024",
+    "eurostat.nuts2_gapfill.isoc_r_iuse_i*"
+   ],
+   "series_with_data": {
+    "factbook.figures_2026_01.internet_users": 232,
+    "un_sdg.sdg_headline.IT_USE_ii99|Reporting Type=G|Sex=BOTHSEX": 226,
+    "wb.wdi_econ.IT.NET.USER.ZS": 213
+   },
+   "headline_covered": 230,
+   "any_covered": 239,
+   "headline_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "CXR",
+    "ESH",
+    "HMD",
+    "IMN",
+    "IOT",
+    "MAF",
+    "NFK",
+    "PCN",
+    "SGS",
+    "SJM",
+    "SPM",
+    "SXM",
+    "UMI"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATF",
+    "BES",
+    "BVT",
+    "CHI",
+    "ESH",
+    "HMD",
+    "IMN",
+    "IOT",
+    "SGS",
+    "SJM",
+    "UMI"
+   ]
+  },
+  "languages": {
+   "labels": {
+    "en": "Languages",
+    "fr": "Langues"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "factbook.texts_2026_01.people_and_society.languages*",
+    "geonames.countryinfo.languages",
+    "spc.keyfacts.LAN"
+   ],
+   "series_with_data": {
+    "factbook.texts_2026_01.people_and_society.languages": 99,
+    "factbook.texts_2026_01.people_and_society.languages.languages": 135,
+    "factbook.texts_2026_01.people_and_society.languages.major_language_sample_s": 135,
+    "factbook.texts_2026_01.people_and_society.languages.note": 78,
+    "geonames.countryinfo.languages": 247
+   },
+   "headline_covered": 0,
+   "any_covered": 247,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ATA",
+    "BVT",
+    "CHI",
+    "HMD"
+   ]
+  },
+  "capital": {
+   "labels": {
+    "en": "Capital",
+    "fr": "Capitale"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "factbook.texts_2026_01.government.capital.name",
+    "geonames.countryinfo.capital",
+    "un_wup.wup2025_capitals.*",
+    "spc.keyfacts.CAP"
+   ],
+   "series_with_data": {
+    "factbook.texts_2026_01.government.capital.name": 231,
+    "geonames.countryinfo.capital": 244
+   },
+   "headline_covered": 0,
+   "any_covered": 244,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ATA",
+    "BES",
+    "BVT",
+    "CHI",
+    "HMD",
+    "TKL",
+    "UMI"
+   ]
+  },
+  "currency": {
+   "labels": {
+    "en": "Currency",
+    "fr": "Monnaie"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "factbook.texts_2026_01.economy.exchange_rates.currency",
+    "geonames.countryinfo.currency_code",
+    "spc.keyfacts.CUR"
+   ],
+   "series_with_data": {
+    "factbook.texts_2026_01.economy.exchange_rates.currency": 219,
+    "geonames.countryinfo.currency_code": 249
+   },
+   "headline_covered": 0,
+   "any_covered": 249,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ATA",
+    "CHI"
+   ]
+  },
+  "legal_system": {
+   "labels": {
+    "en": "Legal system",
+    "fr": "Système juridique"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "factbook.legal_2026_01.legal_system"
+   ],
+   "series_with_data": {
+    "factbook.legal_2026_01.legal_system": 238
+   },
+   "headline_covered": 0,
+   "any_covered": 238,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ALA",
+    "BES",
+    "CHI",
+    "ESH",
+    "GLP",
+    "GUF",
+    "MTQ",
+    "MYT",
+    "PSE",
+    "REU",
+    "SJM",
+    "SSD",
+    "UMI"
+   ]
+  },
+  "retirement_age": {
+   "labels": {
+    "en": "Retirement age",
+    "fr": "Âge de la retraite"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "wbl.wbl2026.Pen_Law_PensAgeEq_FullM",
+    "wbl.wbl2026.Pen_Law_PensAgeEq_PartM",
+    "ssa.ssptw_2018_2019.old_age.pension_age.men"
+   ],
+   "series_with_data": {
+    "ssa.ssptw_2018_2019.old_age.pension_age.men": 141,
+    "wbl.wbl2026.Pen_Law_PensAgeEq_FullM": 190,
+    "wbl.wbl2026.Pen_Law_PensAgeEq_PartM": 190
+   },
+   "headline_covered": 0,
+   "any_covered": 198,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ABW",
+    "AIA",
+    "ALA",
+    "ASM",
+    "ATA",
+    "ATF",
+    "BES",
+    "BLM",
+    "BVT",
+    "CCK",
+    "CHI",
+    "COK",
+    "CUW",
+    "CXR",
+    "CYM",
+    "ESH",
+    "FLK",
+    "FRO",
+    "GIB",
+    "GLP",
+    "GRL",
+    "GUF",
+    "GUM",
+    "HMD",
+    "IMN",
+    "IOT",
+    "JEY",
+    "MAC",
+    "MAF",
+    "MNP",
+    "MSR",
+    "MTQ",
+    "MYT",
+    "NCL",
+    "NFK",
+    "NIU",
+    "NRU",
+    "PCN",
+    "PRK",
+    "PYF",
+    "REU",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SPM",
+    "SXM",
+    "TCA",
+    "TKL",
+    "TUV",
+    "UMI",
+    "VAT",
+    "VIR",
+    "WLF"
+   ]
+  },
+  "voting_age": {
+   "labels": {
+    "en": "Voting age",
+    "fr": "Âge du droit de vote"
+   },
+   "headline_concepts": [],
+   "series_consulted": [
+    "factbook.legal_2026_01.suffrage.minimum_age",
+    "factbook.legal_2026_01.suffrage",
+    "ccp.characteristics_v5.votemin"
+   ],
+   "series_with_data": {
+    "ccp.characteristics_v5.votemin": 192,
+    "factbook.legal_2026_01.suffrage": 234,
+    "factbook.legal_2026_01.suffrage.minimum_age": 228
+   },
+   "headline_covered": 0,
+   "any_covered": 234,
+   "headline_missing": [
+    "ABW",
+    "AFG",
+    "AGO",
+    "AIA",
+    "ALA",
+    "ALB",
+    "AND",
+    "ARE",
+    "ARG",
+    "ARM",
+    "ASM",
+    "ATA",
+    "ATF",
+    "ATG",
+    "AUS",
+    "AUT",
+    "AZE",
+    "BDI",
+    "BEL",
+    "BEN",
+    "BES",
+    "BFA",
+    "BGD",
+    "BGR",
+    "BHR",
+    "BHS",
+    "BIH",
+    "BLM",
+    "BLR",
+    "BLZ",
+    "BMU",
+    "BOL",
+    "BRA",
+    "BRB",
+    "BRN",
+    "BTN",
+    "BVT",
+    "BWA",
+    "CAF",
+    "CAN",
+    "CCK",
+    "CHE",
+    "CHI",
+    "CHL",
+    "CHN",
+    "CIV",
+    "CMR",
+    "COD",
+    "COG",
+    "COK",
+    "COL",
+    "COM",
+    "CPV",
+    "CRI",
+    "CUB",
+    "CUW",
+    "CXR",
+    "CYM",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DJI",
+    "DMA",
+    "DNK",
+    "DOM",
+    "DZA",
+    "ECU",
+    "EGY",
+    "ERI",
+    "ESH",
+    "ESP",
+    "EST",
+    "ETH",
+    "FIN",
+    "FJI",
+    "FLK",
+    "FRA",
+    "FRO",
+    "FSM",
+    "GAB",
+    "GBR",
+    "GEO",
+    "GGY",
+    "GHA",
+    "GIB",
+    "GIN",
+    "GLP",
+    "GMB",
+    "GNB",
+    "GNQ",
+    "GRC",
+    "GRD",
+    "GRL",
+    "GTM",
+    "GUF",
+    "GUM",
+    "GUY",
+    "HKG",
+    "HMD",
+    "HND",
+    "HRV",
+    "HTI",
+    "HUN",
+    "IDN",
+    "IMN",
+    "IND",
+    "IOT",
+    "IRL",
+    "IRN",
+    "IRQ",
+    "ISL",
+    "ISR",
+    "ITA",
+    "JAM",
+    "JEY",
+    "JOR",
+    "JPN",
+    "KAZ",
+    "KEN",
+    "KGZ",
+    "KHM",
+    "KIR",
+    "KNA",
+    "KOR",
+    "KWT",
+    "LAO",
+    "LBN",
+    "LBR",
+    "LBY",
+    "LCA",
+    "LIE",
+    "LKA",
+    "LSO",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MAC",
+    "MAF",
+    "MAR",
+    "MCO",
+    "MDA",
+    "MDG",
+    "MDV",
+    "MEX",
+    "MHL",
+    "MKD",
+    "MLI",
+    "MLT",
+    "MMR",
+    "MNE",
+    "MNG",
+    "MNP",
+    "MOZ",
+    "MRT",
+    "MSR",
+    "MTQ",
+    "MUS",
+    "MWI",
+    "MYS",
+    "MYT",
+    "NAM",
+    "NCL",
+    "NER",
+    "NFK",
+    "NGA",
+    "NIC",
+    "NIU",
+    "NLD",
+    "NOR",
+    "NPL",
+    "NRU",
+    "NZL",
+    "OMN",
+    "PAK",
+    "PAN",
+    "PCN",
+    "PER",
+    "PHL",
+    "PLW",
+    "PNG",
+    "POL",
+    "PRI",
+    "PRK",
+    "PRT",
+    "PRY",
+    "PSE",
+    "PYF",
+    "QAT",
+    "REU",
+    "ROU",
+    "RUS",
+    "RWA",
+    "SAU",
+    "SDN",
+    "SEN",
+    "SGP",
+    "SGS",
+    "SHN",
+    "SJM",
+    "SLB",
+    "SLE",
+    "SLV",
+    "SMR",
+    "SOM",
+    "SPM",
+    "SRB",
+    "SSD",
+    "STP",
+    "SUR",
+    "SVK",
+    "SVN",
+    "SWE",
+    "SWZ",
+    "SXM",
+    "SYC",
+    "SYR",
+    "TCA",
+    "TCD",
+    "TGO",
+    "THA",
+    "TJK",
+    "TKL",
+    "TKM",
+    "TLS",
+    "TON",
+    "TTO",
+    "TUN",
+    "TUR",
+    "TUV",
+    "TWN",
+    "TZA",
+    "UGA",
+    "UKR",
+    "UMI",
+    "URY",
+    "USA",
+    "UZB",
+    "VAT",
+    "VCT",
+    "VEN",
+    "VGB",
+    "VIR",
+    "VNM",
+    "VUT",
+    "WLF",
+    "WSM",
+    "XKX",
+    "YEM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
+   ],
+   "any_missing": [
+    "ALA",
+    "ATA",
+    "ATF",
+    "BES",
+    "BVT",
+    "CHI",
+    "GLP",
+    "GUF",
+    "HMD",
+    "IOT",
+    "MTQ",
+    "MYT",
+    "PSE",
+    "REU",
+    "SGS",
+    "SJM",
+    "UMI"
+   ]
+  }
+ },
+ "entities": {
+  "ABW": {
+   "label": "Aruba",
+   "missing_any": [
+    "minimum_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "hdi",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "cbs.aw"
+   ]
+  },
+  "AFG": {
+   "label": "Afghanistan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AGO": {
+   "label": "Angola",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AIA": {
+   "label": "Anguilla",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb"
+   ]
+  },
+  "ALA": {
+   "label": "Åland Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "asub.ax"
+   ]
+  },
+  "ALB": {
+   "label": "Albania",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AND": {
+   "label": "Andorra",
+   "missing_any": [],
+   "missing_headline": [
+    "unemployment",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "estadistica.ad"
+   ]
+  },
+  "ARE": {
+   "label": "United Arab Emirates",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ARG": {
+   "label": "Argentina",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ARM": {
+   "label": "Armenia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ASM": {
+   "label": "American Samoa",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "census.idb",
+    "census.decennial"
+   ]
+  },
+  "ATA": {
+   "label": "Antarctica",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "ATF": {
+   "label": "French Southern Territories",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "ATG": {
+   "label": "Antigua and Barbuda",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AUS": {
+   "label": "Australia",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AUT": {
+   "label": "Austria",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "AZE": {
+   "label": "Azerbaijan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BDI": {
+   "label": "Burundi",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BEL": {
+   "label": "Belgium",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BEN": {
+   "label": "Benin",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BES": {
+   "label": "Bonaire, Sint Eustatius and Saba",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "internet",
+    "capital",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "cbs.opendata"
+   ]
+  },
+  "BFA": {
+   "label": "Burkina Faso",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BGD": {
+   "label": "Bangladesh",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BGR": {
+   "label": "Bulgaria",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BHR": {
+   "label": "Bahrain",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BHS": {
+   "label": "Bahamas",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BIH": {
+   "label": "Bosnia and Herzegovina",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BLM": {
+   "label": "Saint Barthélemy",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "insee.local",
+    "ieom",
+    "census.idb"
+   ]
+  },
+  "BLR": {
+   "label": "Belarus",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BLZ": {
+   "label": "Belize",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BMU": {
+   "label": "Bermuda",
+   "missing_any": [
+    "minimum_wage",
+    "hdi"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "gov.bm"
+   ]
+  },
+  "BOL": {
+   "label": "Bolivia (Plurinational State of)",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BRA": {
+   "label": "Brazil",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BRB": {
+   "label": "Barbados",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BRN": {
+   "label": "Brunei Darussalam",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BTN": {
+   "label": "Bhutan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "BVT": {
+   "label": "Bouvet Island",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "BWA": {
+   "label": "Botswana",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CAF": {
+   "label": "Central African Republic",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CAN": {
+   "label": "Canada",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CCK": {
+   "label": "Cocos (Keeling) Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CHE": {
+   "label": "Switzerland",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CHI": {
+   "label": "Channel Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CHL": {
+   "label": "Chile",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CHN": {
+   "label": "China",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CIV": {
+   "label": "Côte d’Ivoire",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CMR": {
+   "label": "Cameroon",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "COD": {
+   "label": "Democratic Republic of the Congo",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "COG": {
+   "label": "Congo",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "COK": {
+   "label": "Cook Islands",
+   "missing_any": [
+    "hdi",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "COL": {
+   "label": "Colombia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "COM": {
+   "label": "Comoros",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CPV": {
+   "label": "Cabo Verde",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CRI": {
+   "label": "Costa Rica",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CUB": {
+   "label": "Cuba",
+   "missing_any": [],
+   "missing_headline": [
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CUW": {
+   "label": "Curaçao",
+   "missing_any": [
+    "minimum_wage",
+    "hdi",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "cbs.cw"
+   ]
+  },
+  "CXR": {
+   "label": "Christmas Island",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CYM": {
+   "label": "Cayman Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eso.ky"
+   ]
+  },
+  "CYP": {
+   "label": "Cyprus",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "CZE": {
+   "label": "Czechia",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DEU": {
+   "label": "Germany",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DJI": {
+   "label": "Djibouti",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DMA": {
+   "label": "Dominica",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DNK": {
+   "label": "Denmark",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DOM": {
+   "label": "Dominican Republic",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "DZA": {
+   "label": "Algeria",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ECU": {
+   "label": "Ecuador",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "EGY": {
+   "label": "Egypt",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ERI": {
+   "label": "Eritrea",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ESH": {
+   "label": "Western Sahara",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "legal_system",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "esh"
+   ]
+  },
+  "ESP": {
+   "label": "Spain",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "EST": {
+   "label": "Estonia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ETH": {
+   "label": "Ethiopia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "FIN": {
+   "label": "Finland",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "FJI": {
+   "label": "Fiji",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "FLK": {
+   "label": "Falkland Islands (Malvinas)",
+   "missing_any": [
+    "gdp",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb",
+    "falklands.gov.fk"
+   ]
+  },
+  "FRA": {
+   "label": "France",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "FRO": {
+   "label": "Faroe Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "hagstova.fo"
+   ]
+  },
+  "FSM": {
+   "label": "Micronesia (Federated States of)",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "GAB": {
+   "label": "Gabon",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GBR": {
+   "label": "United Kingdom of Great Britain and Northern Ireland",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GEO": {
+   "label": "Georgia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GGY": {
+   "label": "Guernsey",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb",
+    "gov.gg"
+   ]
+  },
+  "GHA": {
+   "label": "Ghana",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GIB": {
+   "label": "Gibraltar",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "gibraltar.gov.gi"
+   ]
+  },
+  "GIN": {
+   "label": "Guinea",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GLP": {
+   "label": "Guadeloupe",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "insee.bdm"
+   ]
+  },
+  "GMB": {
+   "label": "Gambia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GNB": {
+   "label": "Guinea-Bissau",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GNQ": {
+   "label": "Equatorial Guinea",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GRC": {
+   "label": "Greece",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GRD": {
+   "label": "Grenada",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GRL": {
+   "label": "Greenland",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "stat.gl"
+   ]
+  },
+  "GTM": {
+   "label": "Guatemala",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "GUF": {
+   "label": "French Guiana",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "insee.bdm"
+   ]
+  },
+  "GUM": {
+   "label": "Guam",
+   "missing_any": [
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "census.idb",
+    "census.decennial"
+   ]
+  },
+  "GUY": {
+   "label": "Guyana",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "HKG": {
+   "label": "China, Hong Kong Special Administrative Region",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "censtatd.hk"
+   ]
+  },
+  "HMD": {
+   "label": "Heard Island and McDonald Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "HND": {
+   "label": "Honduras",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "HRV": {
+   "label": "Croatia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "HTI": {
+   "label": "Haiti",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "HUN": {
+   "label": "Hungary",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "IDN": {
+   "label": "Indonesia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "IMN": {
+   "label": "Isle of Man",
+   "missing_any": [
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb",
+    "gov.im"
+   ]
+  },
+  "IND": {
+   "label": "India",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "IOT": {
+   "label": "British Indian Ocean Territory",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "IRL": {
+   "label": "Ireland",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "IRN": {
+   "label": "Iran (Islamic Republic of)",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "IRQ": {
+   "label": "Iraq",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ISL": {
+   "label": "Iceland",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ISR": {
+   "label": "Israel",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ITA": {
+   "label": "Italy",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "JAM": {
+   "label": "Jamaica",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "JEY": {
+   "label": "Jersey",
+   "missing_any": [
+    "gdp_per_capita",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "statistics_jersey.opendata",
+    "census.idb"
+   ]
+  },
+  "JOR": {
+   "label": "Jordan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "JPN": {
+   "label": "Japan",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KAZ": {
+   "label": "Kazakhstan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KEN": {
+   "label": "Kenya",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KGZ": {
+   "label": "Kyrgyzstan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KHM": {
+   "label": "Cambodia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KIR": {
+   "label": "Kiribati",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "KNA": {
+   "label": "Saint Kitts and Nevis",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KOR": {
+   "label": "Republic of Korea",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "KWT": {
+   "label": "Kuwait",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LAO": {
+   "label": "Lao People's Democratic Republic",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LBN": {
+   "label": "Lebanon",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LBR": {
+   "label": "Liberia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LBY": {
+   "label": "Libya",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LCA": {
+   "label": "Saint Lucia",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LIE": {
+   "label": "Liechtenstein",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "llv.li"
+   ]
+  },
+  "LKA": {
+   "label": "Sri Lanka",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LSO": {
+   "label": "Lesotho",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LTU": {
+   "label": "Lithuania",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LUX": {
+   "label": "Luxembourg",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "LVA": {
+   "label": "Latvia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MAC": {
+   "label": "China, Macao Special Administrative Region",
+   "missing_any": [
+    "minimum_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "hdi",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "dsec.mo"
+   ]
+  },
+  "MAF": {
+   "label": "Saint Martin (French Part)",
+   "missing_any": [
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "insee.local",
+    "ieom",
+    "census.idb"
+   ]
+  },
+  "MAR": {
+   "label": "Morocco",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MCO": {
+   "label": "Monaco",
+   "missing_any": [
+    "average_wage",
+    "hdi",
+    "government_balance",
+    "trade_balance",
+    "co2"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "imsee.mc"
+   ]
+  },
+  "MDA": {
+   "label": "Republic of Moldova",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MDG": {
+   "label": "Madagascar",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MDV": {
+   "label": "Maldives",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MEX": {
+   "label": "Mexico",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MHL": {
+   "label": "Marshall Islands",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "MKD": {
+   "label": "North Macedonia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MLI": {
+   "label": "Mali",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MLT": {
+   "label": "Malta",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MMR": {
+   "label": "Myanmar",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MNE": {
+   "label": "Montenegro",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MNG": {
+   "label": "Mongolia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MNP": {
+   "label": "Northern Mariana Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "census.idb",
+    "census.decennial"
+   ]
+  },
+  "MOZ": {
+   "label": "Mozambique",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MRT": {
+   "label": "Mauritania",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MSR": {
+   "label": "Montserrat",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb"
+   ]
+  },
+  "MTQ": {
+   "label": "Martinique",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "insee.bdm"
+   ]
+  },
+  "MUS": {
+   "label": "Mauritius",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MWI": {
+   "label": "Malawi",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MYS": {
+   "label": "Malaysia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "MYT": {
+   "label": "Mayotte",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "insee.bdm"
+   ]
+  },
+  "NAM": {
+   "label": "Namibia",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NCL": {
+   "label": "New Caledonia",
+   "missing_any": [
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "hdi",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "ieom",
+    "isee.nc"
+   ]
+  },
+  "NER": {
+   "label": "Niger",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NFK": {
+   "label": "Norfolk Island",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NGA": {
+   "label": "Nigeria",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NIC": {
+   "label": "Nicaragua",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NIU": {
+   "label": "Niue",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "NLD": {
+   "label": "Netherlands (Kingdom of the)",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NOR": {
+   "label": "Norway",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NPL": {
+   "label": "Nepal",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "NRU": {
+   "label": "Naoero",
+   "missing_any": [
+    "minimum_wage",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "NZL": {
+   "label": "New Zealand",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "OMN": {
+   "label": "Oman",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PAK": {
+   "label": "Pakistan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PAN": {
+   "label": "Panama",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PCN": {
+   "label": "Pitcairn",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "PER": {
+   "label": "Peru",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PHL": {
+   "label": "Philippines",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PLW": {
+   "label": "Palau",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "PNG": {
+   "label": "Papua New Guinea",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "POL": {
+   "label": "Poland",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PRI": {
+   "label": "Puerto Rico",
+   "missing_any": [
+    "minimum_wage",
+    "hdi"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "hdi",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb",
+    "census.decennial"
+   ]
+  },
+  "PRK": {
+   "label": "Democratic People's Republic of Korea",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "bok.ecos"
+   ]
+  },
+  "PRT": {
+   "label": "Portugal",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PRY": {
+   "label": "Paraguay",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "PSE": {
+   "label": "State of Palestine",
+   "missing_any": [
+    "legal_system",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "pcbs.ps"
+   ]
+  },
+  "PYF": {
+   "label": "French Polynesia",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "ieom",
+    "ispf"
+   ]
+  },
+  "QAT": {
+   "label": "Qatar",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "REU": {
+   "label": "Réunion",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "insee.bdm"
+   ]
+  },
+  "ROU": {
+   "label": "Romania",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "RUS": {
+   "label": "Russian Federation",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "RWA": {
+   "label": "Rwanda",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SAU": {
+   "label": "Saudi Arabia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SDN": {
+   "label": "Sudan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SEN": {
+   "label": "Senegal",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SGP": {
+   "label": "Singapore",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SGS": {
+   "label": "South Georgia and the South Sandwich Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "SHN": {
+   "label": "Saint Helena",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb"
+   ]
+  },
+  "SJM": {
+   "label": "Svalbard and Jan Mayen Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "eurostat.nuts2",
+    "ssb.no"
+   ]
+  },
+  "SLB": {
+   "label": "Solomon Islands",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "SLE": {
+   "label": "Sierra Leone",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SLV": {
+   "label": "El Salvador",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SMR": {
+   "label": "San Marino",
+   "missing_any": [
+    "co2"
+   ],
+   "missing_headline": [
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "statistica.sm"
+   ]
+  },
+  "SOM": {
+   "label": "Somalia",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SPM": {
+   "label": "Saint Pierre and Miquelon",
+   "missing_any": [
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "insee.local",
+    "ieom",
+    "census.idb"
+   ]
+  },
+  "SRB": {
+   "label": "Serbia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SSD": {
+   "label": "South Sudan",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "legal_system"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "STP": {
+   "label": "Sao Tome and Principe",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SUR": {
+   "label": "Suriname",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SVK": {
+   "label": "Slovakia",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SVN": {
+   "label": "Slovenia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SWE": {
+   "label": "Sweden",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SWZ": {
+   "label": "Eswatini",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SXM": {
+   "label": "Sint Maarten (Dutch part)",
+   "missing_any": [
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "government_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "government_balance",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "stat.gov.sx"
+   ]
+  },
+  "SYC": {
+   "label": "Seychelles",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "SYR": {
+   "label": "Syrian Arab Republic",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TCA": {
+   "label": "Turks and Caicos Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TCD": {
+   "label": "Chad",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TGO": {
+   "label": "Togo",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "THA": {
+   "label": "Thailand",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TJK": {
+   "label": "Tajikistan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TKL": {
+   "label": "Tokelau",
+   "missing_any": [
+    "unemployment",
+    "minimum_wage",
+    "hdi",
+    "trade_balance",
+    "co2",
+    "capital",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "TKM": {
+   "label": "Turkmenistan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TLS": {
+   "label": "Timor-Leste",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TON": {
+   "label": "Tonga",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "TTO": {
+   "label": "Trinidad and Tobago",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TUN": {
+   "label": "Tunisia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TUR": {
+   "label": "Türkiye",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "TUV": {
+   "label": "Tuvalu",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "TWN": {
+   "label": "Taiwan",
+   "missing_any": [
+    "average_wage",
+    "literacy_schooling",
+    "hdi"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "dgbas.tw"
+   ]
+  },
+  "TZA": {
+   "label": "United Republic of Tanzania",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "UGA": {
+   "label": "Uganda",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "UKR": {
+   "label": "Ukraine",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "UMI": {
+   "label": "United States Minor Outlying Islands",
+   "missing_any": [
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "capital",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "missing_headline": [
+    "population",
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "life_expectancy",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "internet",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "uninhabited"
+   ]
+  },
+  "URY": {
+   "label": "Uruguay",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "USA": {
+   "label": "United States of America",
+   "missing_any": [],
+   "missing_headline": [
+    "literacy_schooling",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "UZB": {
+   "label": "Uzbekistan",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "VAT": {
+   "label": "Holy See",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "unemployment",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "vatican"
+   ]
+  },
+  "VCT": {
+   "label": "Saint Vincent and the Grenadines",
+   "missing_any": [
+    "average_wage"
+   ],
+   "missing_headline": [
+    "average_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "VEN": {
+   "label": "Venezuela (Bolivarian Republic of)",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "VGB": {
+   "label": "British Virgin Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "hdi",
+    "trade_balance"
+   ],
+   "missing_headline": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "VIR": {
+   "label": "United States Virgin Islands",
+   "missing_any": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "average_wage",
+    "literacy_schooling",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "co2",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "census.idb",
+    "census.decennial"
+   ]
+  },
+  "VNM": {
+   "label": "Viet Nam",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "VUT": {
+   "label": "Vanuatu",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "WLF": {
+   "label": "Wallis and Futuna Islands",
+   "missing_any": [
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "trade_balance",
+    "retirement_age"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "gdp",
+    "gdp_per_capita",
+    "minimum_wage",
+    "hdi",
+    "inflation",
+    "government_balance",
+    "trade_balance",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat",
+    "ieom",
+    "census.idb"
+   ]
+  },
+  "WSM": {
+   "label": "Samoa",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "spc.pdh_stat"
+   ]
+  },
+  "XKX": {
+   "label": "Kosovo",
+   "missing_any": [
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi"
+   ],
+   "missing_headline": [
+    "area",
+    "density",
+    "minimum_wage",
+    "literacy_schooling",
+    "hdi",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": [
+    "ask.rks"
+   ]
+  },
+  "YEM": {
+   "label": "Yemen",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ZAF": {
+   "label": "South Africa",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ZMB": {
+   "label": "Zambia",
+   "missing_any": [],
+   "missing_headline": [
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  },
+  "ZWE": {
+   "label": "Zimbabwe",
+   "missing_any": [
+    "minimum_wage"
+   ],
+   "missing_headline": [
+    "minimum_wage",
+    "languages",
+    "capital",
+    "currency",
+    "legal_system",
+    "retirement_age",
+    "voting_age"
+   ],
+   "searched": []
+  }
+ },
+ "with_proposals": false,
+ "searched_sources": [
+  {
+   "id": "spc.pdh_stat",
+   "name": "Pacific Community (SPC) Pacific Data Hub .Stat",
+   "url": "https://stats-sdmx-disseminate.pacificdata.org/rest/",
+   "licence": "PDH catalogue 'Other (Open)', per-dataset licence (pending review)",
+   "targets": [
+    "ASM",
+    "COK",
+    "FJI",
+    "PYF",
+    "GUM",
+    "KIR",
+    "MHL",
+    "FSM",
+    "NRU",
+    "NCL",
+    "NIU",
+    "MNP",
+    "PLW",
+    "PNG",
+    "PCN",
+    "WSM",
+    "SLB",
+    "TKL",
+    "TON",
+    "TUV",
+    "VUT",
+    "WLF"
+   ],
+   "result": "used",
+   "connector": "atlas.gap_spc",
+   "note": "DF_POCKET, DF_KEYFACTS, DF_EMPRATES, DF_DIGITAL_DEVELOPMENT; ingested live 2026-10-16 (budget spc.pdh_stat)"
+  },
+  {
+   "id": "eurostat.nuts2",
+   "name": "Eurostat regional statistics (NUTS-2)",
+   "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/",
+   "licence": "Eurostat reuse policy (CC BY 4.0)",
+   "targets": [
+    "GLP",
+    "MTQ",
+    "GUF",
+    "REU",
+    "MYT",
+    "ALA",
+    "SJM"
+   ],
+   "result": "used",
+   "connector": "atlas.gap_eurostat_nuts",
+   "note": "ingested live 2026-10-16 (budget eurostat.dissemination)"
+  },
+  {
+   "id": "insee.bdm",
+   "name": "Insee BDM (SDMX)",
+   "url": "https://bdm.insee.fr/series/sdmx/",
+   "licence": "Licence Ouverte 2.0 (Etalab)",
+   "targets": [
+    "GLP",
+    "MTQ",
+    "GUF",
+    "REU",
+    "MYT"
+   ],
+   "result": "used",
+   "connector": "atlas.gap_insee",
+   "note": "CPI (annual average change) and Smic of the overseas departments; ingested live 2026-10-16 (budget insee.bdm)"
+  },
+  {
+   "id": "cbs.opendata",
+   "name": "CBS Statistics Netherlands StatLine (OData)",
+   "url": "https://opendata.cbs.nl/ODataApi/odata/",
+   "licence": "CC BY 4.0",
+   "targets": [
+    "BES"
+   ],
+   "result": "used",
+   "connector": "atlas.gap_cbs_bes",
+   "note": "population, GDP (USD), labour survey; CPI only quarterly per island (not taken); ingested live 2026-10-16 (budget cbs.opendata)"
+  },
+  {
+   "id": "statistics_jersey.opendata",
+   "name": "Statistics Jersey (opendata.gov.je, CKAN)",
+   "url": "https://opendata.gov.je/",
+   "licence": "Open Government Licence - Jersey v1.0",
+   "targets": [
+    "JEY"
+   ],
+   "result": "used",
+   "connector": "atlas.gap_jersey",
+   "note": "monthly FTE earnings (second source after ILOSTAT); RPI is not a CPI (not taken); registered unemployment is not ILO (not taken); ingested live 2026-10-16"
+  },
+  {
+   "id": "insee.local",
+   "name": "Insee populations légales / COM (Saint-Martin, Saint-Barthélemy, Saint-Pierre-et-Miquelon)",
+   "url": "https://www.insee.fr/fr/statistiques/2011101?geo=COM-97701",
+   "licence": "Licence Ouverte 2.0",
+   "targets": [
+    "MAF",
+    "BLM",
+    "SPM"
+   ],
+   "result": "skipped",
+   "note": "census figures are HTML pages per collectivity, no SDMX series in the BDM; population already in WPP/Factbook"
+  },
+  {
+   "id": "ieom",
+   "name": "IEOM / IEDOM (overseas issuing institutes)",
+   "url": "https://www.ieom.fr/",
+   "licence": "not stated for data reuse",
+   "targets": [
+    "NCL",
+    "PYF",
+    "WLF",
+    "SPM",
+    "BLM",
+    "MAF"
+   ],
+   "result": "skipped",
+   "note": "annual reports in PDF; no machine-readable open series found"
+  },
+  {
+   "id": "isee.nc",
+   "name": "ISEE Nouvelle-Calédonie",
+   "url": "https://www.isee.nc/",
+   "licence": "not verified",
+   "targets": [
+    "NCL"
+   ],
+   "result": "skipped",
+   "note": "data.isee.nc unreachable from the container (connection failed); NCL already covered by WB/AMA/SPC"
+  },
+  {
+   "id": "ispf",
+   "name": "ISPF Polynésie française",
+   "url": "https://www.ispf.pf/",
+   "licence": "not verified",
+   "targets": [
+    "PYF"
+   ],
+   "result": "skipped",
+   "note": "Excel/PDF publications; PYF covered by WB, AMA, SPC"
+  },
+  {
+   "id": "census.idb",
+   "name": "US Census Bureau International Database (IDB) API",
+   "url": "https://api.census.gov/data/timeseries/idb/5year",
+   "licence": "US public domain",
+   "targets": [
+    "GGY",
+    "JEY",
+    "IMN",
+    "AIA",
+    "MSR",
+    "SPM",
+    "WLF",
+    "SHN",
+    "FLK",
+    "MAF",
+    "BLM",
+    "PRI",
+    "GUM",
+    "VIR",
+    "ASM",
+    "MNP"
+   ],
+   "result": "skipped",
+   "note": "API now answers 302 to missing_key.html: a key is required (registration with an e-mail address; not done, no personal data in requests); no bulk file found"
+  },
+  {
+   "id": "census.decennial",
+   "name": "US Census Bureau (Puerto Rico, Guam, USVI, CNMI, American Samoa)",
+   "url": "https://data.census.gov/",
+   "licence": "US public domain",
+   "targets": [
+    "PRI",
+    "GUM",
+    "VIR",
+    "MNP",
+    "ASM"
+   ],
+   "result": "skipped",
+   "note": "same API key requirement; island areas already in WB/WPP; SPC covers GUM/MNP/ASM"
+  },
+  {
+   "id": "stat.gl",
+   "name": "Statistics Greenland (PxWeb)",
+   "url": "https://bank.stat.gl/api/v1/en/Greenland/",
+   "licence": "not verified",
+   "targets": [
+    "GRL"
+   ],
+   "result": "skipped",
+   "note": "PxWeb v1 data queries need POST (the atlas platform is GET-only); remaining GRL gaps (minimum/average wage, literacy, HDI) are not published as such"
+  },
+  {
+   "id": "hagstova.fo",
+   "name": "Statistics Faroe Islands (PxWeb)",
+   "url": "https://statbank.hagstova.fo/api/v1/en/H2/",
+   "licence": "not verified",
+   "targets": [
+    "FRO"
+   ],
+   "result": "skipped",
+   "note": "PxWeb v1 data queries need POST (GET-only platform)"
+  },
+  {
+   "id": "ask.rks",
+   "name": "Kosovo Agency of Statistics (ASKdata PxWeb)",
+   "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/",
+   "licence": "not verified",
+   "targets": [
+    "XKX"
+   ],
+   "result": "skipped",
+   "note": "PxWeb v1 data queries need POST; XKX gaps are minimum wage, literacy and HDI"
+  },
+  {
+   "id": "ssb.no",
+   "name": "Statistics Norway (Svalbard)",
+   "url": "https://data.ssb.no/api/pxwebapi/v2/",
+   "licence": "CC BY 4.0 (SSB)",
+   "targets": [
+    "SJM"
+   ],
+   "result": "skipped",
+   "note": "Eurostat NO0B already gives SJM population, area, GDP; PxWeb v2 GET exists (candidate for Svalbard settlements detail)"
+  },
+  {
+   "id": "asub.ax",
+   "name": "Statistics and Research Åland (ÅSUB, PxWeb)",
+   "url": "https://pxweb.asub.ax/PXWeb/api/v1/en/",
+   "licence": "not verified",
+   "targets": [
+    "ALA"
+   ],
+   "result": "skipped",
+   "note": "PxWeb v1 POST; Eurostat FI20 covers ALA population, area, GDP, life expectancy"
+  },
+  {
+   "id": "gov.gg",
+   "name": "Guernsey data and analysis",
+   "url": "https://www.gov.gg/data",
+   "licence": "not verified",
+   "targets": [
+    "GGY"
+   ],
+   "result": "skipped",
+   "note": "bulletins in PDF/Excel only"
+  },
+  {
+   "id": "gov.im",
+   "name": "Isle of Man Economic Affairs",
+   "url": "https://www.gov.im/",
+   "licence": "not verified",
+   "targets": [
+    "IMN"
+   ],
+   "result": "skipped",
+   "note": "HTTP 403 to automated requests"
+  },
+  {
+   "id": "gibraltar.gov.gi",
+   "name": "HM Government of Gibraltar statistics",
+   "url": "https://www.gibraltar.gov.gi/statistics",
+   "licence": "not verified",
+   "targets": [
+    "GIB"
+   ],
+   "result": "skipped",
+   "note": "PDF abstracts only"
+  },
+  {
+   "id": "gov.bm",
+   "name": "Bermuda Department of Statistics",
+   "url": "https://www.gov.bm/department/statistics",
+   "licence": "not verified",
+   "targets": [
+    "BMU"
+   ],
+   "result": "skipped",
+   "note": "PDF reports; BMU covered by WB/AMA/IMF BOP"
+  },
+  {
+   "id": "eso.ky",
+   "name": "Cayman Islands Economics and Statistics Office",
+   "url": "https://www.eso.ky/",
+   "licence": "not verified",
+   "targets": [
+    "CYM"
+   ],
+   "result": "skipped",
+   "note": "PDF/Excel; CYM covered by WB/AMA"
+  },
+  {
+   "id": "falklands.gov.fk",
+   "name": "Falkland Islands Government statistics",
+   "url": "https://www.falklands.gov.fk/policy/statistics",
+   "licence": "not verified",
+   "targets": [
+    "FLK"
+   ],
+   "result": "skipped",
+   "note": "unreachable from the container (connection failed)"
+  },
+  {
+   "id": "cbs.aw",
+   "name": "CBS Aruba",
+   "url": "https://cbs.aw/wp/",
+   "licence": "not verified",
+   "targets": [
+    "ABW"
+   ],
+   "result": "skipped",
+   "note": "Excel/PDF downloads, no API; ABW covered by WB"
+  },
+  {
+   "id": "cbs.cw",
+   "name": "CBS Curaçao",
+   "url": "https://www.cbs.cw/",
+   "licence": "not verified",
+   "targets": [
+    "CUW"
+   ],
+   "result": "skipped",
+   "note": "Excel/PDF downloads, no API; CUW covered by WB/AMA"
+  },
+  {
+   "id": "stat.gov.sx",
+   "name": "STAT Sint Maarten",
+   "url": "https://stat.gov.sx/",
+   "licence": "not verified",
+   "targets": [
+    "SXM"
+   ],
+   "result": "skipped",
+   "note": "unreachable from the container"
+  },
+  {
+   "id": "dgbas.tw",
+   "name": "Taiwan DGBAS national statistics",
+   "url": "https://nstatdb.dgbas.gov.tw/dgbasall/webMain.aspx?k=engmain",
+   "licence": "Open Government Data License v1.0 (data.gov.tw) for data.gov.tw datasets",
+   "targets": [
+    "TWN"
+   ],
+   "result": "skipped",
+   "note": "TWN gaps are literacy, HDI and average wage in ILOSTAT form: DGBAS computes a 'Taiwan HDI' with UNDP's method (a national computation, not UNDP's HDI) and publishes it in PDF/HTML; eng.stat.gov.tw unreachable; data.gov.tw reachable but no machine-readable HDI/literacy series found"
+  },
+  {
+   "id": "censtatd.hk",
+   "name": "Hong Kong Census and Statistics Department (API)",
+   "url": "https://www.censtatd.gov.hk/api/",
+   "licence": "HK Government data terms",
+   "targets": [
+    "HKG"
+   ],
+   "result": "no_data",
+   "note": "API works; HKG has no remaining gap in the 22 concepts (every concept has at least one source)"
+  },
+  {
+   "id": "dsec.mo",
+   "name": "Macao DSEC",
+   "url": "https://www.dsec.gov.mo/",
+   "licence": "not verified",
+   "targets": [
+    "MAC"
+   ],
+   "result": "skipped",
+   "note": "MAC gaps: minimum wage (statutory since 2020) and retirement age; DSEC publishes neither as a series (legal texts)"
+  },
+  {
+   "id": "imsee.mc",
+   "name": "Monaco IMSEE",
+   "url": "https://www.imsee.mc/",
+   "licence": "not verified",
+   "targets": [
+    "MCO"
+   ],
+   "result": "skipped",
+   "note": "PDF publications (Monaco en chiffres)"
+  },
+  {
+   "id": "statistica.sm",
+   "name": "San Marino statistics office",
+   "url": "https://www.statistica.sm/",
+   "licence": "not verified",
+   "targets": [
+    "SMR"
+   ],
+   "result": "skipped",
+   "note": "HTML/PDF only; SMR gap is CO2"
+  },
+  {
+   "id": "llv.li",
+   "name": "Liechtenstein Amt für Statistik",
+   "url": "https://www.llv.li/",
+   "licence": "not verified",
+   "targets": [
+    "LIE"
+   ],
+   "result": "skipped",
+   "note": "HTTP 403 to automated requests"
+  },
+  {
+   "id": "estadistica.ad",
+   "name": "Andorra Departament d'Estadística",
+   "url": "https://www.estadistica.ad/",
+   "licence": "not verified",
+   "targets": [
+    "AND"
+   ],
+   "result": "skipped",
+   "note": "HTML/PxWeb (POST); AND has no remaining any-source gap (WDI/ILO modelled unemployment missing, Factbook has it)"
+  },
+  {
+   "id": "vatican",
+   "name": "Holy See / Vatican City State",
+   "url": "https://www.vatican.va/",
+   "licence": "-",
+   "targets": [
+    "VAT"
+   ],
+   "result": "no_data",
+   "note": "no statistical office and no national accounts, labour or price statistics exist; Factbook population and area only"
+  },
+  {
+   "id": "bok.ecos",
+   "name": "Bank of Korea (North Korea GDP estimates)",
+   "url": "https://ecos.bok.or.kr/api/",
+   "licence": "API key required",
+   "targets": [
+    "PRK"
+   ],
+   "result": "skipped",
+   "note": "an external estimate (not an official DPRK statistic); API needs a key and was unreachable; PRK GDP already in UNSD AMA and Factbook"
+  },
+  {
+   "id": "esh",
+   "name": "Western Sahara",
+   "url": "-",
+   "licence": "-",
+   "targets": [
+    "ESH"
+   ],
+   "result": "no_data",
+   "note": "no official statistics office for the territory; only the (stale, 2021) Factbook profile and UN WPP population"
+  },
+  {
+   "id": "pcbs.ps",
+   "name": "Palestinian Central Bureau of Statistics",
+   "url": "https://www.pcbs.gov.ps/",
+   "licence": "not verified",
+   "targets": [
+    "PSE"
+   ],
+   "result": "skipped",
+   "note": "unreachable from the container; PSE remaining gaps are legal system and voting age (Factbook has only West Bank/Gaza partial profiles)"
+  },
+  {
+   "id": "stat.gov.ct.tr",
+   "name": "Northern Cyprus statistics (unrecognised; not a crosswalk entity)",
+   "url": "https://www.stat.gov.ct.tr/",
+   "licence": "not verified",
+   "targets": [],
+   "result": "skipped",
+   "note": "unreachable; would stay a separate unmapped provider geography, never merged into CYP"
+  },
+  {
+   "id": "somaliland",
+   "name": "Somaliland (unrecognised; not a crosswalk entity)",
+   "url": "-",
+   "licence": "-",
+   "targets": [],
+   "result": "skipped",
+   "note": "no open machine-readable statistics found; WHR/NE keep 'Somaliland' unmapped, never merged into SOM"
+  },
+  {
+   "id": "uninhabited",
+   "name": "Uninhabited / no permanent population",
+   "url": "-",
+   "licence": "-",
+   "targets": [
+    "ATA",
+    "BVT",
+    "HMD",
+    "SGS",
+    "IOT",
+    "UMI",
+    "ATF"
+   ],
+   "result": "no_data",
+   "note": "no resident population: no economy, labour, price, health or legal statistics exist; area (and GeoNames/Factbook texts) only"
+  }
+ ],
+ "inputs": [
+  "snapshot b11f1c51bc14 (reva)"
+ ]
+}

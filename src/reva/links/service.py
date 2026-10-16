@@ -453,7 +453,11 @@ def _country_on_demand(
             from reva.links.atlas_links import AtlasLinkReader
 
             atlas_ref = q.snapshot.ref()
-            reader = AtlasLinkReader.of_query(q, node_of=lambda c: iso_map.get(c) or f"iso3:{c}")
+            from reva.links.geo_hops import hop_evidence_from_db
+
+            reader = AtlasLinkReader.of_query(
+                q, node_of=lambda c: iso_map.get(c) or f"iso3:{c}", hop_evidence=hop_evidence_from_db(conn)
+            )
             for lt in reader.dyadic_types():
                 if kinds is not None and lt.id not in kinds:
                     continue
@@ -587,7 +591,11 @@ def pair_view(
         atlas_ref = q.snapshot.ref()
         nb = KgNeighbourhood(conn)
         iso_map = nb.iso3_to_qid([a, b])
-        reader = AtlasLinkReader.of_query(q, node_of=lambda c: iso_map.get(c) or f"iso3:{c}")
+        from reva.links.geo_hops import hop_evidence_from_db
+
+        reader = AtlasLinkReader.of_query(
+            q, node_of=lambda c: iso_map.get(c) or f"iso3:{c}", hop_evidence=hop_evidence_from_db(conn)
+        )
         node_iso = {iso_map.get(c) or f"iso3:{c}": c for c in (a, b)}
 
         def iso_of(lk: Link) -> tuple[str | None, str | None]:

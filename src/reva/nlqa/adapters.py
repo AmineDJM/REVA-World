@@ -434,6 +434,9 @@ LINK_GROUPS: dict[str, tuple[str, ...]] = {
     "shared_institution": ("shared_head_of_state", "shared_currency", "shared_legal_family"),
     "peacekeeping": ("peacekeeping_contributor_to_host",),
     "historical_polity": ("shared_polity_territory",),
+    # LINKS3 (A-INFRA atlas tables): cables listed by Wikidata, OpenFlights routes frozen in June 2014, GCAT
+    # payloads by launch-site state — physical connections, each with its caveat in basis
+    "infrastructure": ("submarine_cable", "air_routes_2014", "launch_service"),
 }
 
 

@@ -383,7 +383,25 @@
           "description": "apply registry/links/geo_mapping_hops.yaml (only with the hop statement in the KG, cited)"
         },
         "caveat": {
-          "$ref": "#/$defs/labels"
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fr",
+            "en"
+          ],
+          "description": "stated on every link of the type (stored in basis.caveat)",
+          "properties": {
+            "fr": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "en": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            }
+          }
         },
         "licence": {
           "type": "string",

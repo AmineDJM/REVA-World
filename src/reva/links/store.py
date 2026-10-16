@@ -5,9 +5,10 @@ One materialisation = every link derivable from one atlas snapshot plus the KG a
 
 * KG kinds (Wikidata P37/P463/P47/P530/colonies/succession..., derived on the whole KG) and dataset KG kinds
   (CShapes borders and colonial rule, UCDP sides, Cliopatria overlay) are stored in full;
-* atlas dyadic kinds (IMF IMTS, UN DESA migrant stock, BACI, Natural Earth) and the computed UNGA
+* atlas dyadic kinds (IMF IMTS, UN DESA migrant stock, BACI) and the computed UNGA
   vote-agreement index (per decade and issue) keep, per (country, period, facet) and direction, the top
-  ``top_k`` partners — the union over both endpoints, so every country's top-``top_k`` is complete. Full
+  ``top_k`` partners (Natural Earth borders and LINKS3's small physical-network kinds — cables, 2014 air
+  routes, launch services — are stored in full) — the union over both endpoints, so every country's top-``top_k`` is complete. Full
   histories of one pair are read from the atlas snapshot on demand (:mod:`reva.links.service`).
 
 Entry point (worker credentials; throwaway or deployment database)::
@@ -55,7 +56,14 @@ class MaterialisationError(RuntimeError):
 
 # ---------------------------------------------------------------------------------------------- helpers
 def taxonomy_sha256() -> str:
-    return hashlib.sha256(LINK_TYPES_FILE.read_bytes()).hexdigest()
+    """sha256 of the link taxonomy; LINKS3: the explicit geography mapping hops are part of it (a changed hop
+    changes which atlas rows become links, so an unchanged-inputs materialisation must not be reused)."""
+    from reva.links.geo_hops import HOPS_FILE
+
+    body = LINK_TYPES_FILE.read_bytes()
+    if HOPS_FILE.exists():
+        body += b"\n# geo_mapping_hops.yaml\n" + HOPS_FILE.read_bytes()
+    return hashlib.sha256(body).hexdigest()
 
 
 def node_iso3(node: str, qid_iso3: Mapping[str, str]) -> str | None:
@@ -344,12 +352,17 @@ def materialise(
             names = [d[0] for d in res.description]
             return [dict(zip(names, r, strict=True)) for r in res.fetchall()]
 
+        from reva.links.geo_hops import hop_evidence_from_statements
+
+        hop_ev = hop_evidence_from_statements(stmts)
         reader = AtlasLinkReader(
             rows,
             snapshot_sha256=snap.sha256,
             origin=snap.origin,
             node_of=lambda c: iso3_to_qid.get(c) or f"iso3:{c}",
+            hop_evidence=hop_ev,
         )
+        log_fn(f"mapping hops with KG evidence: {sorted(hop_ev) or 'none'}")
     try:
         links, report = derive_everything(
             stmts, iso3_to_qid=iso3_to_qid, atlas_reader=reader, top_k=top_k, log_fn=log_fn
@@ -359,11 +372,14 @@ def materialise(
             con.close()
     report["kg_read"] = kg_rep
     report["ambiguous_iso3"] = ambiguous
+    if reader is not None:
+        report["mapping_hops"] = {c: e.statement_id for c, e in sorted(reader.hop_evidence.items())}
     qid_iso3 = {q: c for c, q in iso3_to_qid.items()}
     params = {
         "counts": report["counts"],
         "top_k": top_k,
-        "stored_in_full": "KG kinds and land_border; atlas kinds keep the union of both endpoints' top_k per period and facet",
+        "stored_in_full": "KG kinds, land_border and atlas kinds marked stored_in_full (submarine_cable, "
+        "air_routes_2014, launch_service); other atlas kinds keep the union of both endpoints' top_k per period and facet",
         "min_common_rollcalls": 10,
     }
     with engine.begin() as conn:
