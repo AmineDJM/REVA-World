@@ -12,6 +12,7 @@ from typing import Any
 
 import pytest
 from sqlalchemy import text
+from sqlalchemy.exc import DataError
 
 from reva.adapters.connectors import atlas_cliopatria as ac
 from reva.atlas.ingest import run_atlas_ingest
@@ -126,7 +127,7 @@ async def test_new_build_without_a_statement_retracts_it(db: Any) -> None:
     reason="KGCORE bug (reported in docs/dev/v3_kgpolity.md): reva.kg.query selects kg.statement valid_lo/valid_hi as "
     "SQL dates and psycopg cannot load BC dates into datetime.date ('date too small (before year 1)'), so a path, "
     "neighbour or timeline query touching a BCE-dated statement fails",
-    raises=Exception,
+    raises=DataError,
     strict=False,
 )
 async def test_path_across_bce_dated_overlay(db: Any) -> None:

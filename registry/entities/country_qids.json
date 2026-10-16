@@ -1,0 +1,3486 @@
+{
+ "schema": "reva-country-qids/1",
+ "review_status": "machine_derived_pending_maintainer_review",
+ "built_by": "reva.kg.harvest map-countries (wdharvest/1.0.0, agent WDHARVEST)",
+ "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
+ "method": "Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).\n\n    Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character\n    query limit) gives every item holding one of the ISO 3166-1 alpha-3 codes; their snapshots are read with\n    wbgetentities (props info|claims|labels) and each code is assigned from the items' own P298 statements:\n    non-deprecated, without end time (P582), on items without dissolution date (P576). Several candidates ->\n    the one classed as a country/sovereign state/territory (P31); still several -> left unmapped (listed).\n    Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title. ``extra_codes`` (TWN)\n    are mapped even when the crosswalk does not list them yet (flagged ``not_in_crosswalk``).",
+ "sources": {
+  "endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
+  "retrieved_at": "2026-10-16T00:14:24.567142+00:00",
+  "raw_sha256": [
+   "ee66935966400c7077069df227340cf833764af2aad11e64e06c6ac8c7fe9f3b",
+   "cc6274b1263a31dc3f8a102c337a8d00ad75bdd66d65bc6bf8a44b9811843943",
+   "49af3f08ddd239eb863207223f8e88e380365ceb68cb1cb0b112f76a9ebd0b47",
+   "1630d2f89b3a8e8cee65d0d8afa0c7860a57b030cbe14022a43a3a09cf1cd545",
+   "ff456f12e687e7232cc940a77cb15e7cf1dcf40480b1888a15b0c34e8009f8fe",
+   "a1e9ce41f04bbaacaf7443566b21ffc99655c434a6a00d0895a453fd73b86c67",
+   "e37aaf6435ebc22b9f961407cd2f6b87761e2cc2a47c8f742365735cc2fbfb41",
+   "662fb4b0f9dab6eea914af1d9260aa83db3289e540b3bfbdc80c9373b622561c",
+   "4c89cc4ce3e0c21a4da998990cdf8e1eabe4a59731c74da95edac4fd390d5ee2",
+   "fb1c3adcb0d248aa8b78bf54b89c414e8a2fbc6952b7f197c81fed3a17b84fa8",
+   "68ddea2c9076ceb3b27f78d1b62460c944fba4829ba75ee731d3d8c825a9b509",
+   "bb181e2874f931e30519b5441528408bf20698c5534863c5717e0059546d3c4b",
+   "16a0ff77f2ceff5f4d40fefc2a8145e64523d7874657fbfac9218a6627c61a36",
+   "37c071444426237b60449848bcd2565189bf032839a2d4e9ed282ff9bf3447f9",
+   "6e41409cf4f045af55883611f663c446e6a3ec0eaaeab0aefd0cca962359e768",
+   "5201834832d882f678759801408350460b5cfb5d0705fe76f5d95197fdc7e9ed",
+   "c299f771efaa648e45e985ca30f543d13223f0229079d86118df6789b6811156",
+   "61c98aa227dcc6dd1630559fbad6dc7f069f8fccd7f1b898623a154627e007d8",
+   "161380197121d967a769d29972c14a07111eb6208b05006ee3c4ed9bc6c3def7",
+   "5eb930053165f3ce8a38351abc8e790d373b6c8f1af5c207d185110df012aac3",
+   "fafcd4676702a5730c3d037fb711cf4fa18fc0d7c4d7c8bcd72c5492c9cad0f5",
+   "69ee93f410a281dad1779e2442dfcfefaf797e9946fe4a51816711ee94835a59",
+   "d69cc8bb793f742cadc40fb0a82a0427b0493dff58b49fb4b9ec073020984954",
+   "526dbf30c4da87f2c803c201e53f66e6feff4dafd83a09d8efbfd699caa4ebff",
+   "1c6b88eaa2c09ab461d414d9912874e2fb3532bf95f705892ef7d4dda6509c09",
+   "a7f4d1c4b9ac1e49b775620882f30fea10ea60928a52923c9abbf6fb4e298c28",
+   "98ad658f7c91c4c13da6fb2180519e9e38f2030fdf374c43215477ed13b5e9a1",
+   "cd8591f32a37a3e6c96f4137b651b36c23de8476c41d89be40ca18a0826001ac",
+   "8b8cfb2b87038542218c64025bc91030d9618c6b0bfc5e87732bdff56643d9e4",
+   "c7a1fc540d8ec9aa30560d6d5fa30c93918a6aa9aacb549db5a72023492d4620",
+   "43ff556c909279c17a226cba53de76ce5df022b6eb6c6f9e1f055f0f54997d75",
+   "d3e986e54db88ccac5e150a41531c34f8e58f953eb929e7fc4a59678072757a9",
+   "4818c280b409fe1beba87598b16720bcd2df96ce70b36ced22c561a264dcb9dc",
+   "e8fd4530c93172747b6eccfa6531761cf2f4cccf0f6c89bb031d7e4d54b76279",
+   "c266c8b293daaa60bbdd40cde94fb4f5f1426781a2126cea74d4755b4f235c2c",
+   "e3c76a93b36b9da48b603cc1baa14dc0279e0ea8d75485dbbd38d52cf8c118e0",
+   "99f438b28f34bdf0cee5a744e1d7490f20c9c95137b9b3727c4595f1b764a81f",
+   "50b9c60e3e271ec0d0cf7c8f23c8842d61e2bc32d9bcc46d35278830edf86c73",
+   "ca48b8ffa540b2add177ddf1081dd3fd9dc3132e62b7063699e440540190a8fd",
+   "b42767b38990392b72bafff692bb3d7537a3dfa91a59bc7eadc0335a2c86e2be",
+   "ba9d040a3fbfcbb1712861d567f53dc2c7208ff57217379f0248deb595d22795",
+   "0949f6ef5edba1a0a48f32d4673575d6ac54d9f364f20579544ac4627afe35a7",
+   "3e2d7705a7a63de0601d13b44758ae19c2f800cc4d6a5a43151d29a1c817d54a",
+   "be341e893702fbbfc97d68d4c010a4218fe781e4b4923beb3c76106f0d76bdbb",
+   "3f26bf83dab83d5dc9416a15a00b5c1b94cd6ead687a7f9fdbef8f5ea7988129",
+   "a730a5a853b467aa8463f1d3cd91a382d29340abcfdfc63c33697349b742a045",
+   "5d231146971e7b774b8b1a6ec344a66bc62087884aded865a046737bb0702719",
+   "9df6a3b23ca1d6ac64c80bdaa7cc7ff8143b1f18cb55f4ee1b9f41910f44d42b",
+   "9f0a7e38c666336c13b3abaf9fd7c8e794f573547c918c2ce293e5b8dcd9f26b",
+   "a55b624e5f0c739a9fb0af44d1ffb9468abcdcbbb6aef1a074f13e88990443f6",
+   "b5589853b92b0023ca3ec96f574b78c9f7e2d625652f6173375edf1c63e879f8",
+   "8b795ce5da53717a770265e71a119064a4500b8796b6dd48503980f65601ba07",
+   "d83863b454e44d2a043da4a7d3d5bfe34422e860a43f45ffb8b434a9b94e7e5d",
+   "4c57b7588d7b913e575e11c3f79681fbab2772446a321ffd5760265e209b3dca",
+   "2952a60f2de4cc69716038b15581719024cd9bd2c79805602d8d425448f9d53c",
+   "682875645c7cd44ac1db7b7bf49ebc3da2354cee23e146671ac7a1cf374dd41c",
+   "f5c1ad30f4e3d77500212b12c38984392fb09808c0ab43fd37fdf4a6040c3dcd",
+   "9c820d09160d6c6cf871bdcdba91b719e2a616f9b726c873e491110909178ca5",
+   "851f26bc378d622a51deb599b9b48d3ac92992a74576f439a7a5b2bd43c01a66",
+   "0c3294a14764b2614b103e5ad3aeec8d6c891409c0b2a20ea36ec367c42e1bc0",
+   "6e74e1890a732c0422e579fc2b5e95b2c5f660e4141829cee340980d1fa2e43d",
+   "75e232766dd7490e9655f69c30d31800aa6bb7e6a549ad304e14cba882de5764",
+   "04fb28aeebe64c47508883e9337bb666d140a28586c0f3543d3351f179c8a004",
+   "cad25b0cd325a824dbc147f683affdcfd45c21fa06029b29b3618b76c921be38",
+   "8ac1867209b80142a6ebbc7af8d194230a7168f79fc333d2e8cd1e9c6bd37555",
+   "8628b1ddd2d54d9496e0b041bf70231a584dee7c29f61b7de1190a6fad4d50ea",
+   "8a64a6a383345abfb642b1ead07aa79b7c92bb4e3c92229937abe3995de8fda0",
+   "31a1758c9c80e87c0e589fd486963cbed732eee46a863a22e3c44042e2e6b18c",
+   "adaf100709b05b87b3d8af43f2f85a4c9ecb77a15de61db6b24290d2ae9a8099",
+   "920392d58a11af58ce4dfe867341dd24b2ab5ec9b589fa0c93bbaaad21c7bd85",
+   "af14ee4d1a3475606082825816375052fb97f10f54cd921f9462bafb2dd60a4e",
+   "bd434b2c8e912acecc5a83b9454de5a8fe203ef5ffc82a39d96cb360eca757e3",
+   "8af98cb4022d4502005b000b842ee7a1a7e07eb8b325fb5979588703ab5001ac",
+   "11e93c24cbfb1bd2ff4a1982bbc1472223c7dfc9fc47e1f00c790849fb127623",
+   "540844e402a87bd3d88f5542d806b8b875483c7fc1720f0be24dff7903301258",
+   "438195eda93d7701dc272db351c232be39a1e2ab77f2a8160297965b64e57dc3",
+   "b084858cb0e95a560025853d9676cee0feb71439b867e954f0443b3f655766fc",
+   "de19119427c23a1ee8b5be6b4b1e5c8e35e890c6ecfdd4a77c4079d39777e180",
+   "314d3fd1b91f76a7379befe57b7f641622bfe453e00545a4256c8bcb935d5bc7",
+   "ffbece980c6361bc076de4ff13d1bc1a7b44435c58f68bff2fe0ecc7bc7d21d2",
+   "fea8947bf16aedba58d15afd287acb86384c1aca0fcfe0922e8571fcf18585c6",
+   "da76a83508e8dc45849c28310f7a001836a6e2079f2266ffaf20d41215cdc1d2",
+   "2c4f0408d1bdd4a4bc2d8ca2e6f17e1c41435704e79d7e2586ffb4ca7eaf9a52",
+   "7e58dad566c57290ae4c834bbcbd5083495c47d4fbbf510c0f1ca653824d9732",
+   "f6b7efae3c51cfec3b51c1adf3917cd1a74d50ab85d87d5b3c9f1c59a4ada48d",
+   "4b25d7d27e6a48eecf91c21191b72c72d4283a393f8e853ab846d2a210832617",
+   "f5ee32542c1470bdb2470b6a9fffbd6413b25209c9222107dfeebdb977786cea",
+   "131e6e34c212e6a4a82b0828e79da9bbd8f9bcb08c9b1925ba9484b10b827fd7",
+   "00ab00aa39021522de7b7878282cfcde70a1e15cdd58186ac17e7dc02e22af7a",
+   "a708114ef64425542d16ec20242a145ecc65607721670f257487a482b73e262f",
+   "57ebbf516eaa0f919610bf0b1eae02a279199024fcd37a333b3e2047d56d291b",
+   "721844baa5d77b35bbdfdfa13e045ea42d828361aa69e26a2e8921b04bd6b7dd",
+   "b3b5fe67237888e8f4c9d3cdfccc7b3dd368bb52d47ca4317bc68a02dda90a9f",
+   "4b0117a5f45535d3bd694644b1867662199fcadb073083b9eac50c115f280952",
+   "a2f462235f93fcdfb72eaa5dac80cb2233b733d0d977bacf510565135b764532",
+   "2a7d2a534b0963cbf00ef5f3fddf57a20e604b37a7952f6fe0c39d765b348829",
+   "b9d50a54f6a4331492debb2a3d6341469a5526f251bd7b7e5f698952a5e6c0c0",
+   "72ccc8ea5da047f397739fe3107413a81fe93e50a63baa5e3de6a46356251410",
+   "833bd1e8f5f80e7bedb926c76693b3d0b76c1884e80accadb3aad279da69ebd6",
+   "78456bcab569351871e73a6112bd4629a8786f26df710266bcb3a83e7e92532a",
+   "1369cd9618903b71c856489da5401ce68f7911a07508fedf26724b20e6034fe8",
+   "051284b833987d4c440c97c01993e85840573f6e324287fd8242b8b3ada41cb5",
+   "7d2ad7810b135abb84fe4b7d4b29f9824949a26dbf78775c09dd5ef6392d6964",
+   "bcadae24c6cabdef03e9bad5a700b03b073071ea57601cc530d9fa30e85b069a",
+   "a980829c0f8a566fde70deac7f9414bae413feb9c79bd3d641ab91a178d610ab",
+   "4c5c6bf44671cd8c897706f90d7b61670fdfa8d6c2f8f64b5dc3dfa502de5094",
+   "c5f3e513f5f89502651bea41b60e44a05d0845bc7bd5bb3d7a4e507ccece1e58",
+   "76ad59d52106ee660fecdae3d8af054660009d19aa49da3d0b355a540671b465",
+   "19d93986cdd4d40410dc9dd863f3dcc59654ace5b02ba13054b3217b36608d89",
+   "e04ed37314296c56d89f4353639ec24872a65514dbbff0d6a26cbf9cf0346ad7",
+   "9ca02a03614dc70fb3914766efd0238aba95ad7079df7d8b2856ffd60d70a627",
+   "dd960ff1710639136150156f487401353e71e948b111652a2a643a7b82201182",
+   "1ad14e243be9d4135d0b1b1e7afa30f537f90726d4e8cbb96b875895da967a43",
+   "012a235fb18c2e5f85265c418c6efc8480fb65fcef748b5e6334e212a7c5548b",
+   "566606dc9890d70988927306be0c6a1c48d195ff6ba58eaedd7bb60f1a05157b",
+   "b9eac8c376f795af39af4109da2a4cbfb4c1623b08a7e78b06119e248db1b1f0",
+   "f9cea94115c7768819d9e18e42edfd7668345144bae2007c558f79a374afc71f",
+   "59f1e807ba9465ecbdae12755a958aae8736da9738c8bf9340409aef6b3cdee9",
+   "2a6be07c89c6ea4b968423d27514b2d3549433161d68c2430a65aee4ac6819c8",
+   "b40f3de18ddade02e690334e6918e07ab786d2299cf3d43d7360c1bd2eb7460b",
+   "de149e8d389f551476eb96745eacd6d88daf55858b8d05753805612178fbb57b",
+   "79e55c2d805b69a000055a78fc7d591e8002c1306316b1384149f92088850e91",
+   "1a5e0797c0c6269267d4f8afa64c2fb0e9d0b9d5165dae79309887b304a262e3",
+   "9914e30a4f46bf2c8070b89109891aa456a213e91b9b7bbe39b55e2dc35527dc",
+   "ef926d7e7681ca0f748540a28c4c478a21a9e4febeecf2f7d47b51e9dac3b7cc",
+   "a34e6cbcf3ec010d7dddd3efd9b99c4f7d4afc2c2e76cf8cc86170a8ea7527a6",
+   "db205358d7b52e15ae1a768871a54704bdef965a0241584e6b3d7db148c07b36",
+   "1532bf477fce898ffee85e14f11d97738e62db7f22e787422d4d9268fafa437b",
+   "42a6e1aa1de06f78084300cd736c8934b8c004c4ec7a1ebfac8ff4b637e2739c",
+   "46fd5b597c11c5bee7f735f1686d13b9b29ee8eddc7352fb043d140cd683ee87",
+   "6afb4621086af5b573e43be2bdb2ccbbfd0bbed8b455c7ad7c7973409df7d356",
+   "c8fc1bd3f2b9c36bf882c73960db4fba25b51658ef56c698ff92f9c74d94ae18",
+   "a03a6b84605ea0b71fadf6ed5aaaf70f4146a0e31cf070adc0acdf84aac72aef",
+   "21df6918accfa410ff1a91f11a5341cb874f0810e5fc5b9ff4f45b185be8b101",
+   "5bcef93d374b0e0259dcdfed411ecdbf7512c3ecb45ba1090161adc7cf96a402",
+   "77528fa4b01a28cabb4cdfb1184aa747d68d170fd549fb8d10d506813d7af186",
+   "91da1aa817c09f73fcc90a221c6030a53ef7498b8e2b2f404b55ee072b62e827",
+   "df297492e2b301cc94345e0de59e9aef5005dade3483b7077b7415160e4aa4f9",
+   "4c4a505e466d0a1db72fec441a92a4d74c2dfc722f18eefab8a2fa31257f8fd3",
+   "e9372093db5c6232ba756e92d291bc6feff1dc9b53cc4cbedcdd9d90ebf21558",
+   "ca3afccdf125d0f434b219ba1c2ef6259ce77ae7eacd8987b975754201259dee",
+   "56742cbe965867cf08035c81a651e9f4c4e29feaf8a1cf866e0523bd6df2f68f",
+   "6e8f7db5af9305dd1411528e59ef0a029fef56e31b31ec91dd4168bf89af51eb",
+   "be5b515ea0344eee02ca262dd8d2a3a1e2cfe54cb0e29de0a8aa619aea99d28d",
+   "5d4d0822fc519b043ca79afd8b6461732ddf8be7581ae3502c15e529b8997ea8",
+   "7eeea8d7fc7322d725b99f64935012fe01c488e9f94c9d14afc099d801a31880",
+   "c6114e668b770a5d14c9a9cc41117b418aeb75393eb589da2db5bf0a90e83232",
+   "e95cc62f13472875dc985d658f940a062e5cf5a2fabe10ffb7b8b1545b330c8a",
+   "b950cdbcc75828307149811e0b96774e15078f9b03e7f9608d72deb5aa1d3430",
+   "71dddf76b5a55396a7f1aea86cf3bea67f7b65b10a5d86b8d60b473f0fca8098",
+   "cbb763f529f918667ded9993429385062015269469f8ce6fc87bcfa3a29f2ce5",
+   "5e26d8427bd267e68c9763635b6310cc5e858d98f86827a8a72ef7f528121980",
+   "497119ecc15bed107a043aff8323df76227259d7ae9e54770f27c46a6187b0d1",
+   "af22a0625c91aa9c1407b2307ff2b7649ab0bef8e7bf93dabdbce15534800252",
+   "8c65c05ed8b71e2d2019a44ab21d150c14b679eebe0235a37bdb6bc5e0fb654a",
+   "90a8499288b0e82b48b88721ea26f31880e2e07956bf82ae7cc794da69ff1b73",
+   "0946b938e95cc055f809fec6e30410323b76b47c23035e2dbe4ec2bbfd40910d",
+   "981cf4112022f4b87c6f23e88ea38666060835550a0a0034e5b1d5ca4034e8bf",
+   "69337dcc35f18cfa1dc6759381a45ee97412fdfd63ffbc433f5d395144aeab48",
+   "4261e878ac93a97f71afbab59e56ff09030b18370006227a92f5814c9e5b72f5",
+   "89d9636fcc49c4a0b64d0783f16d6d71db359d99a011e667c74bf268dc7f3a30",
+   "2a64f0df4bace25a6d80bcb1d7a4979cc1402e65d7d92b99c855d7dbe318d37d",
+   "2253174c4fd14e32922618ef232c7ec0646781fa52e20974d49d7bffcf5d3b89",
+   "5018b1e08daa2c60bddee73fd791c42a0daca3b9f3247e3bc5eb59eb9c31608a",
+   "34ff989904d010dfdfa0d52566b4f7ef026af9f5d9ad18c500a6c1840635488e",
+   "93ecb70dd31ac96f8551f504ff87312d6643519262ceb079289532f6157ced94",
+   "3e6e55e079ea8fd27e82fd53fad502a4a21821790a01c0b47a576a2d1cfbbeb8",
+   "696e7a9adf48c964a229419ccee559b0b4a9b1d65b623a8ffe2bb8d81c04b3c1",
+   "3b55904490bbe10f70ad80ac8ac9fd20b4a50833edd90e0151d426c4040171b9",
+   "5a396e43796ae4a9db34fea85b83362a0fb4420c5a2897c96447ead37d8e035c",
+   "a4a7fd6c5690f72e1b2ee55711aee872efc3c0b9efe7ff51812016d0b2a416e0",
+   "441c14e78f471ce2b756e295f3b050a6ce1262f0c9771cda9cfbf0e42dfbd81d",
+   "65bf37ed9657722489e2910db362caebf4ecb962e1171f0c4439bec78dc240c3",
+   "47865e988043892e520aab37fe934157c3ef5abcc025c3667e130317c2d829be",
+   "5e7eaea7ff73fde1ebe77363b42aea03292c82dc27feee576a3988722cd73479",
+   "39f5fc55332b041acc98f7cac681112f9d7da12ee9bb83bb5479f9e645725681",
+   "c2332cca7ce1994339abf05bc716ed7824334f69e1b110866101613c5af16846",
+   "35b8db116b9ea0fb4756d3979367edf50f69c683b0839c509760c60aa3ad3abd",
+   "107fd48bf5dbd716c1ce14cd463ee9d30a68852e2be27b9ea690b5a7b62b8ce4",
+   "765c60c21d8ed8074ace2e45b2b5b386c02159309d0cf7cb40205890c8432207",
+   "31f8a8ff9ec25827917fe7f1faf8992da5b943372099bcf4c4f9b2bd8dffe0a6",
+   "717c6f36088400ca0b88c08aa209b3003e19e1e962f9176193f58401c8547130",
+   "4cc68e4bc959b6ca6ec7df7856ea49a0fa9a8184a6b4698774c69d7074f35927",
+   "69b9476963dfddc2524cc37af26d658b1905c152475b97abe4945bcefed7a2c1",
+   "644bbe0ebd99597f2f50a62d785209920bdaf9d3cfa650c0c4b199c4ef7baf49",
+   "04730bd2378d7d3d00417cf92afd20a298a894b727eb701f60ed7540e167389d",
+   "fe7e31c64398387a7c8a4104cfd0dfbd1332eac3346f86a814877610c01adad7",
+   "7444981bcf91600b1205c67841b4c758dd0c8e17bb48f338807e0ae3565b8eed",
+   "b880a320a5a10025458e26353ae0c0ca4fc49baedaa925da24d87e2d5af62799",
+   "4566ef72564d4e6ca5cf69a30660e704e8d064d03227a3e7a2580085fa6d50c6",
+   "263a1cee62ce8b70520613005a5d4fca51bd0a014ef0960f4f9df0bd7ed07d7f",
+   "82e5ee67485695431f126434196066bdcd7724a1a765aee109afd66b27cae1d8",
+   "dbb31b443a87903df154fe1212aa9c9f3e357be0a30ef4d0d58af7ae40ab3b2d",
+   "3f9106e7f72bc549a14df911621fbff5d5a1215d1a1b87c08dc60103bf2deb95",
+   "cbe974a4ae30f9ac301bd0507c322bbd27dcf621ecf34590aaefddc6f25a7bac",
+   "5bd5cdc30d9519fbf52f8b557dc2c6eebd44080a42639b1231004151bae0af4e",
+   "0e459e640abbba7040f2f6fe5669f883055dd9fa909812e20c86136923e7ebb8",
+   "5a464c66fb6ed85ec685798b4aea5ae82a9da92f98354d03262ff64cf76c5055",
+   "a01124c618e47d28c40e3543b8b2dcb64eaa3ac1ef3ef911ac6e17c9c0fe6b07",
+   "0fe80cfc0d40379e01b3b37561c920f37b67500ed5d83763f9b522f262317f1d",
+   "ec55e1ba23cef4424fe6ba8bcb19eb4fc63cd2d334ba514641a3b2c130b3146e",
+   "539686791cb5e5f816f36dfa571b8c2978640ce6b41521f6140e9cc638a16ed2",
+   "accdda7df5ab93016654a8fa0afc59e1bb457958e48c75f28476f51ef2c61b9f",
+   "67f59feae41230937c118cf062b8d0fca376fa354124b33577e3186cb51b43cd",
+   "5e0df9560243ce4db8b7daffd540a52ed5bfc4e129b0791c0b19a108903277c0",
+   "a3baaf49543194236413cf7c8c62b0ae5ec41ee54ae60c7a9f5b94ddecb65999",
+   "1fc63d7761474d3911a01b2c3f5cb0b60e63347905669529de60faee74f3559d",
+   "187c590f250a856b09d3af6f73b55cab78a5661d32dfaf3abdf2a6335e648e74",
+   "f9dc9c44dd0879f5aa821c94a4281396908119d059dfaba64178af18e60deda4",
+   "f8ebe05f9549fd60def08f87b989d353ce33afecf36df837ec784fe2bc23a989",
+   "cc6f93e2510b880d50a700db26d087dd88d84daf37529bf16140430abc2ea643",
+   "1e1dead0147deec3ef346658f524061fa09bafe6f524b695479ea7e96523748a",
+   "2d311abafeb312ced4d18f1d5e819283953160a31e56d1a62b842b48fdd2dbc0",
+   "68a745d406023302c60598d86b868c0b7142811e78a511a15c92c2183d0706e2",
+   "5211b1a610b5a69ad974b3fcb260f4421b4cc3933ef83f2f459cb2546a200b5c",
+   "914bb44f76eb080c0000e036a9267576a6a7d20de220440890c0b05500a2405a",
+   "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
+   "5f87f1c88592afa000e88a053893d0f1f2f72613ed964da6351ec909b6fed3f9",
+   "d0e786be298835254f4382f5bc5e7b13e660049c6d0e4aeae5ce7a87b666d699",
+   "7fe3ed08d71b85dc17de7d09af7d6e403ff66a01be4c201a9d9e3325f88b6a62",
+   "a8a603319257d6565e345c3d1adafef819837de44ae815e156fd3ae53b56a6d6",
+   "3dd1c3c2dfafdb804390aae761c98dd25fad06c905d3a5fdc1866e214c3c1756",
+   "1f947788bd01c20cdfa66229a1655d418045d693299d300ef27753d124a5c530",
+   "cf36f49e493bb687e60b4dd60e1ea3aaba9b77d94222f3d7a315a379f2c3e2ff",
+   "ccf934ea095bd7eb7ddf096fae9affccbfdbd99f1cbdf8ce7d0ddd3ce93f6aee",
+   "06802ff3e747a2384d639abef333cb89834d823c503db9daafcbd8d60c51182c",
+   "0d95b547ddd61bdab105f15b6416918fb36bac45facc2da8f0c4f00232942a07",
+   "a80dedd3fff208cd0b392fc138b7abfc43efa400d522ae2ac36113b0936c0444",
+   "b0797c9e1ece1598c35ccf9e1511c03002176434ca28b328bedce1727d5ed3ae",
+   "76475de7bed8979ca1f6f2078477ed2e64f429765bba885a6df76d8e5cec19b5",
+   "3257c3335422066977150904d58fbc60b72f460f0d12416087903d4af82e6f90",
+   "ed58f67a54b7d7a164bf859cea2991b50fe38d1ddb907da12b270b693278d13b",
+   "260542654853fe56f0858da376f0ae37bd488c944cc59baf88823e9d345126b6",
+   "543150131d90d0152276bb88978a495404a3872e5326bb3c771b50f7dff11b74",
+   "37664f833583fe5db0f05d3e625f0ed4082bc05735243de1093a03972763db84",
+   "3a4719c4ced2e9920f685d621ba419c5ba2a923f99971d6064d0802728b336d6",
+   "04572345f683a306ab692a7cb68aa8629018180a20ad01d80caf1aa4ffe7b0d9",
+   "db314801fd45f674b72c816b872c8d47492862daeda08fe213bff904059e14bb",
+   "dc6a8f7e7c57830e4516fb58a4c99be5602aa521530fefef5e5b7f3ff54ce8ad",
+   "c49be51771555348ba3194eaa635eb5531c959b1909d24316eadc36ab196622d",
+   "9e1839bb8bfd80c481cb9b6fb052d19235afac0514e957a3b400eed161e32164",
+   "5b9c4c56d55fa5251f2ebf30a010a0d381ed835f7691853ad5afecb8ad63b4cd",
+   "cb2c35419f86c0936a56d4f3bbc4c1afac3168ce6cf21097b20bef6aab6c105b",
+   "30546253aee1fed89d91cd8a3a4e529db2facaf6ea05bd5586e6faee56e681a2",
+   "00c04a5d08ca3db171e5fafa736426b962d6e64b5558c9170994f0e12cdacef7",
+   "bf7c8c21b53011b1d273f1aff0f0d418665400d8ed7e36803257b21aa084a43b",
+   "566bd5d8cd20ce3af7e9c7c954b33dfa5980bf0bea2ba1ffae94b192a8b4485b",
+   "3d3410dc7bd72b3dc149db1f6ab02762ce1ca06b73a8ba52895801e0a48d2c0e",
+   "3d25532ba7bc69c7984b6d0b5c20df4c0521bd34937ad52c612e8cbaabd5f707",
+   "aaf3196a22613795d8ccc1ee61b808420d230d722a0f12e16ba9a911180f261e",
+   "811600d781413198897a9f6c2231314da56d83ba77a043092d862ed458069505",
+   "9b0f4b51d116631b6dd0bc3d19ea0dcbb5e6554adece3c8ac10bc5c1a36aa1e4",
+   "bdfeb5ef7163c5b9797605861894e59eb2cde94832871d725823a9d7180e441d",
+   "15571ce3d37d12ee9e51560d5f730e8195c66e5bf5396ce631d6743549d6fe6d",
+   "46ca4e715ab06c9a8c0fe4b4647c8773ae9b954f5aecee740daba30036302860",
+   "0fd31598e1eb99519f670e5e9e081665ca5a7c2f7d5638c0ef1549cc418e7411",
+   "ad2831408598375e2aff24823f49407a3c0189b37d5851de01ba7b3a05da5d7b",
+   "2d0064c56e8a5d5571a5f4a616f4b3a7a0546ba7f3907fe5643a760004b09ecf",
+   "22273c71df788e28458746d71174bb2dc6968ac6f369827e489ae963d6e4c902",
+   "b0320db62eff57558991669e307fcef740092fb5bb4f31e2ae8ac273254defcb",
+   "9d859a71ae6a921023bb93d81e9e9a26e29d455619a96d458d1dd50968cd3c3f",
+   "3a634914b79369e2b44e4d846ce7d992216242ebe8e4dbd2b65185cc046ecef3",
+   "ae424aabf2da2b6aa64baa8148c23436dec9146bb96ea00a536d75e6ad3b94e2",
+   "5a442ebd1c9bfc50e56f296c9fd07f6897cf01826150e72ad84b651c81ad108b",
+   "fc412e6d6ea472f1aebe289508b026da8985c7a7f9e6a25ff82b7ef239df3fa4",
+   "24d0833c04a0b6f6b08fe602056a2bc11ed47d52a4b2b83a469148cdad9b08b1",
+   "4cd896323e3404d05704d2719b6d97c9aeeb2f330db11ee8d2349e8ab1e103a8",
+   "8ff1e07cfc001c6c37dc92b80b1c9bc9df4b3850bc8781ac4ca564620afd1ac8",
+   "3fab79b0ca50ba50fe75b8ffe356987320ff373d89e756aea8efac3addfa9aac",
+   "f3c795d9ee36fc8b9a93ebbe0c1a9463ac822df3fd9710e5b4794d6e73c3bca5",
+   "57a0c631bc24d7885b447ec97429120d32ee28b327ea800622e18269a32f5a82",
+   "287edaddb6ede6dabac7462b2012ea0b09ff7558b1f350a3ec1451016e946e29",
+   "9d10eff06e4914d0042e61cc80f06fb5db578389b05168f13491dc439d035cac",
+   "1e7bf0c5616a9e7658ba83b7b3b25d345a8dc5acdff39ccc772d2bf5e451311e",
+   "301585537145c228ab7f15c658f7c35209ec528e734a029da7c7eb1d7bec0716",
+   "bdd7eb7f693aa69eee88eadfb8dca3f2d8798b79214af1f5e03ed816289a73a3",
+   "1b9c2d44f2f02086cd558fbcef231c4ac8921edac2fd957ca25deac664af055b",
+   "b4c8cd1fd2672f363964fa25b1f82f237e1233f4eee452b3b1deb77ec4ecb9c3",
+   "b74d08ee0d6783f408fd30f75a35cafea8dc77a8f7fd75f0c21f85d1bbb746ac",
+   "c06cb0c1f0f2a3d326da839ddbe6de47de822e3f83ab8d45070cec6d75bccc58",
+   "ea0500087eb34bf79e103e5f7ce18512508ec5d0ac68d2dd1e889b24d5e3a523",
+   "48a35a5ae17a23d1c0bb57af33c7c899392da1dfa0b30206e040e75623007324",
+   "ccfc2f617d7082bbd98b35cdc25ed54d4211bb8586422f07d1e28edaaee19093",
+   "8f445d1ac6e3be99cec025a0f712d9d62f62a3508257368209af56406a93073e",
+   "ed7e1806909b5d2fd144771b4580cad3968a6e24c374fcc817e681046cd9cc17",
+   "84d95dc8bb477395ccea7340fbd71d6174bdcf59f439bce4d1ba8dfc788ae1e2",
+   "1faad6822fca44e1a81513619b29762fa2e6a816e2b41f342ee72bfdc73dc9c2",
+   "2462dc0438f4919979dd74b2c6fa41d2ace5673d3c6725ff1e91f78be2400987",
+   "38b4d094200af46c8092608eb7d5a1311f0e815dd03f2cc8cb5faaaf30c0cabe",
+   "ec55e1ba23cef4424fe6ba8bcb19eb4fc63cd2d334ba514641a3b2c130b3146e",
+   "d313104665325c5421f9308a5878ef120d65fda963865141b759b0da8b0bc548"
+  ]
+ },
+ "crosswalk_sha256": "9e71dbfdde68717a0c47246d718883cf7f4a04ac66c07e256784308d25cb0ea9",
+ "stats": {
+  "crosswalk_entities": 251,
+  "mapped": 249,
+  "mapped_crosswalk": 249,
+  "unmapped": 2,
+  "by_method": {
+   "P298": 247,
+   "enwiki_sitelink": 2
+  },
+  "distinct_qids": 249,
+  "shared_qids": {}
+ },
+ "countries": {
+  "ABW": {
+   "qid": "Q21203",
+   "method": "P298",
+   "label_en": "Aruba",
+   "label_fr": "Aruba",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2549078115,
+   "raw_sha256": "a80dedd3fff208cd0b392fc138b7abfc43efa400d522ae2ac36113b0936c0444",
+   "crosswalk_label": "Aruba"
+  },
+  "AFG": {
+   "qid": "Q889",
+   "method": "P298",
+   "label_en": "Afghanistan",
+   "label_fr": "Afghanistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549462459,
+   "raw_sha256": "e95cc62f13472875dc985d658f940a062e5cf5a2fabe10ffb7b8b1545b330c8a",
+   "crosswalk_label": "Afghanistan"
+  },
+  "AGO": {
+   "qid": "Q916",
+   "method": "P298",
+   "label_en": "Angola",
+   "label_fr": "Angola",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556705685,
+   "raw_sha256": "cbb763f529f918667ded9993429385062015269469f8ce6fc87bcfa3a29f2ce5",
+   "crosswalk_label": "Angola"
+  },
+  "AIA": {
+   "qid": "Q25228",
+   "method": "P298",
+   "label_en": "Anguilla",
+   "label_fr": "Anguilla",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2556575919,
+   "raw_sha256": "ed58f67a54b7d7a164bf859cea2991b50fe38d1ddb907da12b270b693278d13b",
+   "crosswalk_label": "Anguilla"
+  },
+  "ALA": {
+   "qid": "Q5689",
+   "method": "P298",
+   "label_en": "Åland",
+   "label_fr": "Åland",
+   "classes": [],
+   "lastrevid": 2556518875,
+   "raw_sha256": "a3baaf49543194236413cf7c8c62b0ae5ec41ee54ae60c7a9f5b94ddecb65999",
+   "crosswalk_label": "Åland Islands"
+  },
+  "ALB": {
+   "qid": "Q222",
+   "method": "P298",
+   "label_en": "Albania",
+   "label_fr": "Albanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556200683,
+   "raw_sha256": "9df6a3b23ca1d6ac64c80bdaa7cc7ff8143b1f18cb55f4ee1b9f41910f44d42b",
+   "crosswalk_label": "Albania"
+  },
+  "AND": {
+   "qid": "Q228",
+   "method": "P298",
+   "label_en": "Andorra",
+   "label_fr": "Andorre",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551238303,
+   "raw_sha256": "d83863b454e44d2a043da4a7d3d5bfe34422e860a43f45ffb8b434a9b94e7e5d",
+   "crosswalk_label": "Andorra"
+  },
+  "ARE": {
+   "qid": "Q878",
+   "method": "P298",
+   "label_en": "United Arab Emirates",
+   "label_fr": "Émirats arabes unis",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554006423,
+   "raw_sha256": "5d4d0822fc519b043ca79afd8b6461732ddf8be7581ae3502c15e529b8997ea8",
+   "crosswalk_label": "United Arab Emirates"
+  },
+  "ARG": {
+   "qid": "Q414",
+   "method": "P298",
+   "label_en": "Argentina",
+   "label_fr": "Argentine",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556709016,
+   "raw_sha256": "438195eda93d7701dc272db351c232be39a1e2ab77f2a8160297965b64e57dc3",
+   "crosswalk_label": "Argentina"
+  },
+  "ARM": {
+   "qid": "Q399",
+   "method": "P298",
+   "label_en": "Armenia",
+   "label_fr": "Arménie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556203673,
+   "raw_sha256": "8af98cb4022d4502005b000b842ee7a1a7e07eb8b325fb5979588703ab5001ac",
+   "crosswalk_label": "Armenia"
+  },
+  "ASM": {
+   "qid": "Q16641",
+   "method": "P298",
+   "label_en": "American Samoa",
+   "label_fr": "Samoa américaines",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2552063810,
+   "raw_sha256": "d0e786be298835254f4382f5bc5e7b13e660049c6d0e4aeae5ce7a87b666d699",
+   "crosswalk_label": "American Samoa"
+  },
+  "ATF": {
+   "qid": "Q129003",
+   "method": "P298",
+   "label_en": "French Southern and Antarctic Lands",
+   "label_fr": "Terres australes et antarctiques françaises",
+   "classes": [
+    "Q1048835",
+    "Q161243"
+   ],
+   "lastrevid": 2531591042,
+   "raw_sha256": "22273c71df788e28458746d71174bb2dc6968ac6f369827e489ae963d6e4c902",
+   "crosswalk_label": "French Southern Territories"
+  },
+  "ATG": {
+   "qid": "Q781",
+   "method": "P298",
+   "label_en": "Antigua and Barbuda",
+   "label_fr": "Antigua-et-Barbuda",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555283751,
+   "raw_sha256": "dd960ff1710639136150156f487401353e71e948b111652a2a643a7b82201182",
+   "crosswalk_label": "Antigua and Barbuda"
+  },
+  "AUS": {
+   "qid": "Q408",
+   "method": "P298",
+   "label_en": "Australia",
+   "label_fr": "Australie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557296734,
+   "raw_sha256": "540844e402a87bd3d88f5542d806b8b875483c7fc1720f0be24dff7903301258",
+   "crosswalk_label": "Australia"
+  },
+  "AUT": {
+   "qid": "Q40",
+   "method": "P298",
+   "label_en": "Austria",
+   "label_fr": "Autriche",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555049134,
+   "raw_sha256": "61c98aa227dcc6dd1630559fbad6dc7f069f8fccd7f1b898623a154627e007d8",
+   "crosswalk_label": "Austria"
+  },
+  "AZE": {
+   "qid": "Q227",
+   "method": "P298",
+   "label_en": "Azerbaijan",
+   "label_fr": "Azerbaïdjan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555719768,
+   "raw_sha256": "8b795ce5da53717a770265e71a119064a4500b8796b6dd48503980f65601ba07",
+   "crosswalk_label": "Azerbaijan"
+  },
+  "BDI": {
+   "qid": "Q967",
+   "method": "P298",
+   "label_en": "Burundi",
+   "label_fr": "Burundi",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556270255,
+   "raw_sha256": "34ff989904d010dfdfa0d52566b4f7ef026af9f5d9ad18c500a6c1840635488e",
+   "crosswalk_label": "Burundi"
+  },
+  "BEL": {
+   "qid": "Q31",
+   "method": "P298",
+   "label_en": "Belgium",
+   "label_fr": "Belgique",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556209623,
+   "raw_sha256": "4c89cc4ce3e0c21a4da998990cdf8e1eabe4a59731c74da95edac4fd390d5ee2",
+   "crosswalk_label": "Belgium"
+  },
+  "BEN": {
+   "qid": "Q962",
+   "method": "P298",
+   "label_en": "Benin",
+   "label_fr": "Bénin",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553582804,
+   "raw_sha256": "2a64f0df4bace25a6d80bcb1d7a4979cc1402e65d7d92b99c855d7dbe318d37d",
+   "crosswalk_label": "Benin"
+  },
+  "BES": {
+   "qid": "Q27561",
+   "method": "P298",
+   "label_en": "Caribbean Netherlands",
+   "label_fr": "Pays-Bas caribéens",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2530036561,
+   "raw_sha256": "dc6a8f7e7c57830e4516fb58a4c99be5602aa521530fefef5e5b7f3ff54ce8ad",
+   "crosswalk_label": "Bonaire, Sint Eustatius and Saba"
+  },
+  "BFA": {
+   "qid": "Q965",
+   "method": "P298",
+   "label_en": "Burkina Faso",
+   "label_fr": "Burkina Faso",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556068223,
+   "raw_sha256": "5018b1e08daa2c60bddee73fd791c42a0daca3b9f3247e3bc5eb59eb9c31608a",
+   "crosswalk_label": "Burkina Faso"
+  },
+  "BGD": {
+   "qid": "Q902",
+   "method": "P298",
+   "label_en": "Bangladesh",
+   "label_fr": "Bangladesh",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555349509,
+   "raw_sha256": "b950cdbcc75828307149811e0b96774e15078f9b03e7f9608d72deb5aa1d3430",
+   "crosswalk_label": "Bangladesh"
+  },
+  "BGR": {
+   "qid": "Q219",
+   "method": "P298",
+   "label_en": "Bulgaria",
+   "label_fr": "Bulgarie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553103593,
+   "raw_sha256": "a730a5a853b467aa8463f1d3cd91a382d29340abcfdfc63c33697349b742a045",
+   "crosswalk_label": "Bulgaria"
+  },
+  "BHR": {
+   "qid": "Q398",
+   "method": "P298",
+   "label_en": "Bahrain",
+   "label_fr": "Bahreïn",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553221476,
+   "raw_sha256": "bd434b2c8e912acecc5a83b9454de5a8fe203ef5ffc82a39d96cb360eca757e3",
+   "crosswalk_label": "Bahrain"
+  },
+  "BHS": {
+   "qid": "Q778",
+   "method": "P298",
+   "label_en": "The Bahamas",
+   "label_fr": "Bahamas",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556355235,
+   "raw_sha256": "9ca02a03614dc70fb3914766efd0238aba95ad7079df7d8b2856ffd60d70a627",
+   "crosswalk_label": "Bahamas"
+  },
+  "BIH": {
+   "qid": "Q225",
+   "method": "P298",
+   "label_en": "Bosnia and Herzegovina",
+   "label_fr": "Bosnie-Herzégovine",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555710818,
+   "raw_sha256": "b5589853b92b0023ca3ec96f574b78c9f7e2d625652f6173375edf1c63e879f8",
+   "crosswalk_label": "Bosnia and Herzegovina"
+  },
+  "BLM": {
+   "qid": "Q25362",
+   "method": "P298",
+   "label_en": "Saint Barthélemy",
+   "label_fr": "Saint-Barthélemy",
+   "classes": [],
+   "lastrevid": 2551055023,
+   "raw_sha256": "3a4719c4ced2e9920f685d621ba419c5ba2a923f99971d6064d0802728b336d6",
+   "crosswalk_label": "Saint Barthélemy"
+  },
+  "BLR": {
+   "qid": "Q184",
+   "method": "P298",
+   "label_en": "Belarus",
+   "label_fr": "Biélorussie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2552817165,
+   "raw_sha256": "e3c76a93b36b9da48b603cc1baa14dc0279e0ea8d75485dbbd38d52cf8c118e0",
+   "crosswalk_label": "Belarus"
+  },
+  "BLZ": {
+   "qid": "Q242",
+   "method": "P298",
+   "label_en": "Belize",
+   "label_fr": "Belize",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557210704,
+   "raw_sha256": "04fb28aeebe64c47508883e9337bb666d140a28586c0f3543d3351f179c8a004",
+   "crosswalk_label": "Belize"
+  },
+  "BMU": {
+   "qid": "Q23635",
+   "method": "P298",
+   "label_en": "Bermuda",
+   "label_fr": "Bermudes",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2552068707,
+   "raw_sha256": "76475de7bed8979ca1f6f2078477ed2e64f429765bba885a6df76d8e5cec19b5",
+   "crosswalk_label": "Bermuda"
+  },
+  "BOL": {
+   "qid": "Q750",
+   "method": "P298",
+   "label_en": "Bolivia",
+   "label_fr": "Bolivie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119940,
+   "raw_sha256": "7d2ad7810b135abb84fe4b7d4b29f9824949a26dbf78775c09dd5ef6392d6964",
+   "crosswalk_label": "Bolivia (Plurinational State of)"
+  },
+  "BRA": {
+   "qid": "Q155",
+   "method": "P298",
+   "label_en": "Brazil",
+   "label_fr": "Brésil",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556213157,
+   "raw_sha256": "4818c280b409fe1beba87598b16720bcd2df96ce70b36ced22c561a264dcb9dc",
+   "crosswalk_label": "Brazil"
+  },
+  "BRB": {
+   "qid": "Q244",
+   "method": "P298",
+   "label_en": "Barbados",
+   "label_fr": "Barbade",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557420363,
+   "raw_sha256": "cad25b0cd325a824dbc147f683affdcfd45c21fa06029b29b3618b76c921be38",
+   "crosswalk_label": "Barbados"
+  },
+  "BRN": {
+   "qid": "Q921",
+   "method": "P298",
+   "label_en": "Brunei",
+   "label_fr": "Brunei",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2546770216,
+   "raw_sha256": "497119ecc15bed107a043aff8323df76227259d7ae9e54770f27c46a6187b0d1",
+   "crosswalk_label": "Brunei Darussalam"
+  },
+  "BTN": {
+   "qid": "Q917",
+   "method": "P298",
+   "label_en": "Bhutan",
+   "label_fr": "Bhoutan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554748677,
+   "raw_sha256": "5e26d8427bd267e68c9763635b6310cc5e858d98f86827a8a72ef7f528121980",
+   "crosswalk_label": "Bhutan"
+  },
+  "BVT": {
+   "qid": "Q23408",
+   "method": "P298",
+   "label_en": "Bouvet Island",
+   "label_fr": "île Bouvet",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2555309594,
+   "raw_sha256": "b0797c9e1ece1598c35ccf9e1511c03002176434ca28b328bedce1727d5ed3ae",
+   "crosswalk_label": "Bouvet Island"
+  },
+  "BWA": {
+   "qid": "Q963",
+   "method": "P298",
+   "label_en": "Botswana",
+   "label_fr": "Botswana",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553735284,
+   "raw_sha256": "2253174c4fd14e32922618ef232c7ec0646781fa52e20974d49d7bffcf5d3b89",
+   "crosswalk_label": "Botswana"
+  },
+  "CAF": {
+   "qid": "Q929",
+   "method": "P298",
+   "label_en": "Central African Republic",
+   "label_fr": "République centrafricaine",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2545500602,
+   "raw_sha256": "90a8499288b0e82b48b88721ea26f31880e2e07956bf82ae7cc794da69ff1b73",
+   "crosswalk_label": "Central African Republic"
+  },
+  "CAN": {
+   "qid": "Q16",
+   "method": "P298",
+   "label_en": "Canada",
+   "label_fr": "Canada",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555105353,
+   "raw_sha256": "cc6274b1263a31dc3f8a102c337a8d00ad75bdd66d65bc6bf8a44b9811843943",
+   "crosswalk_label": "Canada"
+  },
+  "CCK": {
+   "qid": "Q36004",
+   "method": "P298",
+   "label_en": "Cocos (Keeling) Islands",
+   "label_fr": "îles Cocos",
+   "classes": [],
+   "lastrevid": 2526102574,
+   "raw_sha256": "811600d781413198897a9f6c2231314da56d83ba77a043092d862ed458069505",
+   "crosswalk_label": "Cocos (Keeling) Islands"
+  },
+  "CHE": {
+   "qid": "Q39",
+   "method": "P298",
+   "label_en": "Switzerland",
+   "label_fr": "Suisse",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2550802861,
+   "raw_sha256": "c299f771efaa648e45e985ca30f543d13223f0229079d86118df6789b6811156",
+   "crosswalk_label": "Switzerland"
+  },
+  "CHI": {
+   "qid": "Q42314",
+   "method": "enwiki_sitelink",
+   "enwiki_title": "Channel Islands",
+   "label_en": "Channel Islands",
+   "label_fr": "îles Anglo-Normandes",
+   "lastrevid": 2556392564,
+   "raw_sha256": "38b4d094200af46c8092608eb7d5a1311f0e815dd03f2cc8cb5faaaf30c0cabe",
+   "crosswalk_label": "Channel Islands"
+  },
+  "CHL": {
+   "qid": "Q298",
+   "method": "P298",
+   "label_en": "Chile",
+   "label_fr": "Chili",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556733726,
+   "raw_sha256": "adaf100709b05b87b3d8af43f2f85a4c9ecb77a15de61db6b24290d2ae9a8099",
+   "crosswalk_label": "Chile"
+  },
+  "CHN": {
+   "qid": "Q148",
+   "method": "P298",
+   "label_en": "People's Republic of China",
+   "label_fr": "république populaire de Chine",
+   "classes": [
+    "Q10711424",
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556630660,
+   "raw_sha256": "d3e986e54db88ccac5e150a41531c34f8e58f953eb929e7fc4a59678072757a9",
+   "crosswalk_label": "China"
+  },
+  "CIV": {
+   "qid": "Q1008",
+   "method": "P298",
+   "label_en": "Ivory Coast",
+   "label_fr": "Côte d'Ivoire",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555869548,
+   "raw_sha256": "39f5fc55332b041acc98f7cac681112f9d7da12ee9bb83bb5479f9e645725681",
+   "crosswalk_label": "Côte d’Ivoire"
+  },
+  "CMR": {
+   "qid": "Q1009",
+   "method": "P298",
+   "label_en": "Cameroon",
+   "label_fr": "Cameroun",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551200598,
+   "raw_sha256": "c2332cca7ce1994339abf05bc716ed7824334f69e1b110866101613c5af16846",
+   "crosswalk_label": "Cameroon"
+  },
+  "COD": {
+   "qid": "Q974",
+   "method": "P298",
+   "label_en": "Democratic Republic of the Congo",
+   "label_fr": "République démocratique du Congo",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551704950,
+   "raw_sha256": "696e7a9adf48c964a229419ccee559b0b4a9b1d65b623a8ffe2bb8d81c04b3c1",
+   "crosswalk_label": "Democratic Republic of the Congo"
+  },
+  "COG": {
+   "qid": "Q971",
+   "method": "P298",
+   "label_en": "Republic of the Congo",
+   "label_fr": "République du Congo",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557298695,
+   "raw_sha256": "3e6e55e079ea8fd27e82fd53fad502a4a21821790a01c0b47a576a2d1cfbbeb8",
+   "crosswalk_label": "Congo"
+  },
+  "COK": {
+   "qid": "Q26988",
+   "method": "P298",
+   "label_en": "Cook Islands",
+   "label_fr": "Îles Cook",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2556378044,
+   "raw_sha256": "db314801fd45f674b72c816b872c8d47492862daeda08fe213bff904059e14bb",
+   "crosswalk_label": "Cook Islands"
+  },
+  "COL": {
+   "qid": "Q739",
+   "method": "P298",
+   "label_en": "Colombia",
+   "label_fr": "Colombie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553656408,
+   "raw_sha256": "051284b833987d4c440c97c01993e85840573f6e324287fd8242b8b3ada41cb5",
+   "crosswalk_label": "Colombia"
+  },
+  "COM": {
+   "qid": "Q970",
+   "method": "P298",
+   "label_en": "Comoros",
+   "label_fr": "Comores",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555828769,
+   "raw_sha256": "93ecb70dd31ac96f8551f504ff87312d6643519262ceb079289532f6157ced94",
+   "crosswalk_label": "Comoros"
+  },
+  "CPV": {
+   "qid": "Q1011",
+   "method": "P298",
+   "label_en": "Cape Verde",
+   "label_fr": "Cap-Vert",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555315327,
+   "raw_sha256": "35b8db116b9ea0fb4756d3979367edf50f69c683b0839c509760c60aa3ad3abd",
+   "crosswalk_label": "Cabo Verde"
+  },
+  "CRI": {
+   "qid": "Q800",
+   "method": "P298",
+   "label_en": "Costa Rica",
+   "label_fr": "Costa Rica",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119624,
+   "raw_sha256": "de149e8d389f551476eb96745eacd6d88daf55858b8d05753805612178fbb57b",
+   "crosswalk_label": "Costa Rica"
+  },
+  "CUB": {
+   "qid": "Q241",
+   "method": "P298",
+   "label_en": "Cuba",
+   "label_fr": "Cuba",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547611320,
+   "raw_sha256": "75e232766dd7490e9655f69c30d31800aa6bb7e6a549ad304e14cba882de5764",
+   "crosswalk_label": "Cuba"
+  },
+  "CUW": {
+   "qid": "Q25279",
+   "method": "P298",
+   "label_en": "Curaçao",
+   "label_fr": "Curaçao",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2547884251,
+   "raw_sha256": "543150131d90d0152276bb88978a495404a3872e5326bb3c771b50f7dff11b74",
+   "crosswalk_label": "Curaçao"
+  },
+  "CXR": {
+   "qid": "Q31063",
+   "method": "P298",
+   "label_en": "Christmas Island",
+   "label_fr": "île Christmas",
+   "classes": [],
+   "lastrevid": 2555313534,
+   "raw_sha256": "cb2c35419f86c0936a56d4f3bbc4c1afac3168ce6cf21097b20bef6aab6c105b",
+   "crosswalk_label": "Christmas Island"
+  },
+  "CYM": {
+   "qid": "Q5785",
+   "method": "P298",
+   "label_en": "Cayman Islands",
+   "label_fr": "îles Caïmans",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2538601683,
+   "raw_sha256": "1fc63d7761474d3911a01b2c3f5cb0b60e63347905669529de60faee74f3559d",
+   "crosswalk_label": "Cayman Islands"
+  },
+  "CYP": {
+   "qid": "Q229",
+   "method": "P298",
+   "label_en": "Cyprus",
+   "label_fr": "Chypre",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555055135,
+   "raw_sha256": "4c57b7588d7b913e575e11c3f79681fbab2772446a321ffd5760265e209b3dca",
+   "crosswalk_label": "Cyprus"
+  },
+  "CZE": {
+   "qid": "Q213",
+   "method": "P298",
+   "label_en": "Czech Republic",
+   "label_fr": "Tchéquie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549072609,
+   "raw_sha256": "ba9d040a3fbfcbb1712861d567f53dc2c7208ff57217379f0248deb595d22795",
+   "crosswalk_label": "Czechia"
+  },
+  "DEU": {
+   "qid": "Q183",
+   "method": "P298",
+   "label_en": "Germany",
+   "label_fr": "Allemagne",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557182420,
+   "raw_sha256": "c266c8b293daaa60bbdd40cde94fb4f5f1426781a2126cea74d4755b4f235c2c",
+   "crosswalk_label": "Germany"
+  },
+  "DJI": {
+   "qid": "Q977",
+   "method": "P298",
+   "label_en": "Djibouti",
+   "label_fr": "Djibouti",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555828078,
+   "raw_sha256": "3b55904490bbe10f70ad80ac8ac9fd20b4a50833edd90e0151d426c4040171b9",
+   "crosswalk_label": "Djibouti"
+  },
+  "DMA": {
+   "qid": "Q784",
+   "method": "P298",
+   "label_en": "Dominica",
+   "label_fr": "Dominique",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556922954,
+   "raw_sha256": "012a235fb18c2e5f85265c418c6efc8480fb65fcef748b5e6334e212a7c5548b",
+   "crosswalk_label": "Dominica"
+  },
+  "DNK": {
+   "qid": "Q35",
+   "method": "P298",
+   "label_en": "Denmark",
+   "label_fr": "Danemark",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2556683159,
+   "raw_sha256": "16a0ff77f2ceff5f4d40fefc2a8145e64523d7874657fbfac9218a6627c61a36",
+   "crosswalk_label": "Denmark"
+  },
+  "DOM": {
+   "qid": "Q786",
+   "method": "P298",
+   "label_en": "Dominican Republic",
+   "label_fr": "République dominicaine",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555667180,
+   "raw_sha256": "b9eac8c376f795af39af4109da2a4cbfb4c1623b08a7e78b06119e248db1b1f0",
+   "crosswalk_label": "Dominican Republic"
+  },
+  "DZA": {
+   "qid": "Q262",
+   "method": "P298",
+   "label_en": "Algeria",
+   "label_fr": "Algérie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555306891,
+   "raw_sha256": "8a64a6a383345abfb642b1ead07aa79b7c92bb4e3c92229937abe3995de8fda0",
+   "crosswalk_label": "Algeria"
+  },
+  "ECU": {
+   "qid": "Q736",
+   "method": "P298",
+   "label_en": "Ecuador",
+   "label_fr": "Équateur",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554084327,
+   "raw_sha256": "1369cd9618903b71c856489da5401ce68f7911a07508fedf26724b20e6034fe8",
+   "crosswalk_label": "Ecuador"
+  },
+  "EGY": {
+   "qid": "Q79",
+   "method": "P298",
+   "label_en": "Egypt",
+   "label_fr": "Égypte",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553710637,
+   "raw_sha256": "1c6b88eaa2c09ab461d414d9912874e2fb3532bf95f705892ef7d4dda6509c09",
+   "crosswalk_label": "Egypt"
+  },
+  "ERI": {
+   "qid": "Q986",
+   "method": "P298",
+   "label_en": "Eritrea",
+   "label_fr": "Érythrée",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553307633,
+   "raw_sha256": "a4a7fd6c5690f72e1b2ee55711aee872efc3c0b9efe7ff51812016d0b2a416e0",
+   "crosswalk_label": "Eritrea"
+  },
+  "ESH": {
+   "qid": "Q6250",
+   "method": "P298",
+   "label_en": "Western Sahara",
+   "label_fr": "Sahara occidental",
+   "classes": [],
+   "lastrevid": 2548817470,
+   "raw_sha256": "f9dc9c44dd0879f5aa821c94a4281396908119d059dfaba64178af18e60deda4",
+   "crosswalk_label": "Western Sahara"
+  },
+  "ESP": {
+   "qid": "Q29",
+   "method": "P298",
+   "label_en": "Spain",
+   "label_fr": "Espagne",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555283528,
+   "raw_sha256": "e37aaf6435ebc22b9f961407cd2f6b87761e2cc2a47c8f742365735cc2fbfb41",
+   "crosswalk_label": "Spain"
+  },
+  "EST": {
+   "qid": "Q191",
+   "method": "P298",
+   "label_en": "Estonia",
+   "label_fr": "Estonie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556531355,
+   "raw_sha256": "50b9c60e3e271ec0d0cf7c8f23c8842d61e2bc32d9bcc46d35278830edf86c73",
+   "crosswalk_label": "Estonia"
+  },
+  "ETH": {
+   "qid": "Q115",
+   "method": "P298",
+   "label_en": "Ethiopia",
+   "label_fr": "Éthiopie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547882878,
+   "raw_sha256": "cd8591f32a37a3e6c96f4137b651b36c23de8476c41d89be40ca18a0826001ac",
+   "crosswalk_label": "Ethiopia"
+  },
+  "FIN": {
+   "qid": "Q33",
+   "method": "P298",
+   "label_en": "Finland",
+   "label_fr": "Finlande",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547805152,
+   "raw_sha256": "68ddea2c9076ceb3b27f78d1b62460c944fba4829ba75ee731d3d8c825a9b509",
+   "crosswalk_label": "Finland"
+  },
+  "FJI": {
+   "qid": "Q712",
+   "method": "P298",
+   "label_en": "Fiji",
+   "label_fr": "Fidji",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547611037,
+   "raw_sha256": "2a7d2a534b0963cbf00ef5f3fddf57a20e604b37a7952f6fe0c39d765b348829",
+   "crosswalk_label": "Fiji"
+  },
+  "FLK": {
+   "qid": "Q9648",
+   "method": "P298",
+   "label_en": "Falkland Islands",
+   "label_fr": "îles Malouines",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2547493727,
+   "raw_sha256": "1e1dead0147deec3ef346658f524061fa09bafe6f524b695479ea7e96523748a",
+   "crosswalk_label": "Falkland Islands (Malvinas)"
+  },
+  "FRA": {
+   "qid": "Q142",
+   "method": "P298",
+   "label_en": "France",
+   "label_fr": "France",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555583941,
+   "raw_sha256": "c7a1fc540d8ec9aa30560d6d5fa30c93918a6aa9aacb549db5a72023492d4620",
+   "crosswalk_label": "France"
+  },
+  "FRO": {
+   "qid": "Q4628",
+   "method": "P298",
+   "label_en": "Faroe Islands",
+   "label_fr": "îles Féroé",
+   "classes": [],
+   "lastrevid": 2555406958,
+   "raw_sha256": "5e0df9560243ce4db8b7daffd540a52ed5bfc4e129b0791c0b19a108903277c0",
+   "crosswalk_label": "Faroe Islands"
+  },
+  "FSM": {
+   "qid": "Q702",
+   "method": "P298",
+   "label_en": "Federated States of Micronesia",
+   "label_fr": "États fédérés de Micronésie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2539053376,
+   "raw_sha256": "721844baa5d77b35bbdfdfa13e045ea42d828361aa69e26a2e8921b04bd6b7dd",
+   "crosswalk_label": "Micronesia (Federated States of)"
+  },
+  "GAB": {
+   "qid": "Q1000",
+   "method": "P298",
+   "label_en": "Gabon",
+   "label_fr": "Gabon",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555820990,
+   "raw_sha256": "441c14e78f471ce2b756e295f3b050a6ce1262f0c9771cda9cfbf0e42dfbd81d",
+   "crosswalk_label": "Gabon"
+  },
+  "GBR": {
+   "qid": "Q145",
+   "method": "P298",
+   "label_en": "United Kingdom",
+   "label_fr": "Royaume-Uni",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554939741,
+   "raw_sha256": "43ff556c909279c17a226cba53de76ce5df022b6eb6c6f9e1f055f0f54997d75",
+   "crosswalk_label": "United Kingdom of Great Britain and Northern Ireland"
+  },
+  "GEO": {
+   "qid": "Q230",
+   "method": "P298",
+   "label_en": "Georgia",
+   "label_fr": "Géorgie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553982298,
+   "raw_sha256": "2952a60f2de4cc69716038b15581719024cd9bd2c79805602d8d425448f9d53c",
+   "crosswalk_label": "Georgia"
+  },
+  "GGY": {
+   "qid": "Q25230",
+   "method": "P298",
+   "label_en": "Guernsey",
+   "label_fr": "Guernesey",
+   "classes": [],
+   "lastrevid": 2554428039,
+   "raw_sha256": "260542654853fe56f0858da376f0ae37bd488c944cc59baf88823e9d345126b6",
+   "crosswalk_label": "Guernsey"
+  },
+  "GHA": {
+   "qid": "Q117",
+   "method": "P298",
+   "label_en": "Ghana",
+   "label_fr": "Ghana",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556380626,
+   "raw_sha256": "8b8cfb2b87038542218c64025bc91030d9618c6b0bfc5e87732bdff56643d9e4",
+   "crosswalk_label": "Ghana"
+  },
+  "GIB": {
+   "qid": "Q1410",
+   "method": "P298",
+   "label_en": "Gibraltar",
+   "label_fr": "Gibraltar",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2532329570,
+   "raw_sha256": "539686791cb5e5f816f36dfa571b8c2978640ce6b41521f6140e9cc638a16ed2",
+   "crosswalk_label": "Gibraltar"
+  },
+  "GIN": {
+   "qid": "Q1006",
+   "method": "P298",
+   "label_en": "Guinea",
+   "label_fr": "Guinée",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551267713,
+   "raw_sha256": "47865e988043892e520aab37fe934157c3ef5abcc025c3667e130317c2d829be",
+   "crosswalk_label": "Guinea"
+  },
+  "GLP": {
+   "qid": "Q17012",
+   "method": "P298",
+   "label_en": "Guadeloupe",
+   "label_fr": "Guadeloupe",
+   "classes": [
+    "Q161243",
+    "Q202216"
+   ],
+   "lastrevid": 2549208072,
+   "raw_sha256": "1f947788bd01c20cdfa66229a1655d418045d693299d300ef27753d124a5c530",
+   "crosswalk_label": "Guadeloupe"
+  },
+  "GMB": {
+   "qid": "Q1005",
+   "method": "P298",
+   "label_en": "The Gambia",
+   "label_fr": "Gambie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2538784372,
+   "raw_sha256": "65bf37ed9657722489e2910db362caebf4ecb962e1171f0c4439bec78dc240c3",
+   "crosswalk_label": "Gambia"
+  },
+  "GNB": {
+   "qid": "Q1007",
+   "method": "P298",
+   "label_en": "Guinea-Bissau",
+   "label_fr": "Guinée-Bissau",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551267717,
+   "raw_sha256": "5e7eaea7ff73fde1ebe77363b42aea03292c82dc27feee576a3988722cd73479",
+   "crosswalk_label": "Guinea-Bissau"
+  },
+  "GNQ": {
+   "qid": "Q983",
+   "method": "P298",
+   "label_en": "Equatorial Guinea",
+   "label_fr": "Guinée équatoriale",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551267732,
+   "raw_sha256": "5a396e43796ae4a9db34fea85b83362a0fb4420c5a2897c96447ead37d8e035c",
+   "crosswalk_label": "Equatorial Guinea"
+  },
+  "GRC": {
+   "qid": "Q41",
+   "method": "P298",
+   "label_en": "Greece",
+   "label_fr": "Grèce",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547805317,
+   "raw_sha256": "161380197121d967a769d29972c14a07111eb6208b05006ee3c4ed9bc6c3def7",
+   "crosswalk_label": "Greece"
+  },
+  "GRD": {
+   "qid": "Q769",
+   "method": "P298",
+   "label_en": "Grenada",
+   "label_fr": "Grenade",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119817,
+   "raw_sha256": "19d93986cdd4d40410dc9dd863f3dcc59654ace5b02ba13054b3217b36608d89",
+   "crosswalk_label": "Grenada"
+  },
+  "GRL": {
+   "qid": "Q223",
+   "method": "P298",
+   "label_en": "Greenland",
+   "label_fr": "Groenland",
+   "classes": [
+    "Q161243",
+    "Q6256"
+   ],
+   "lastrevid": 2547611719,
+   "raw_sha256": "9f0a7e38c666336c13b3abaf9fd7c8e794f573547c918c2ce293e5b8dcd9f26b",
+   "crosswalk_label": "Greenland"
+  },
+  "GTM": {
+   "qid": "Q774",
+   "method": "P298",
+   "label_en": "Guatemala",
+   "label_fr": "Guatemala",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119783,
+   "raw_sha256": "e04ed37314296c56d89f4353639ec24872a65514dbbff0d6a26cbf9cf0346ad7",
+   "crosswalk_label": "Guatemala"
+  },
+  "GUF": {
+   "qid": "Q3769",
+   "method": "P298",
+   "label_en": "French Guiana",
+   "label_fr": "Guyane",
+   "classes": [
+    "Q202216"
+   ],
+   "lastrevid": 2556362695,
+   "raw_sha256": "67f59feae41230937c118cf062b8d0fca376fa354124b33577e3186cb51b43cd",
+   "crosswalk_label": "French Guiana"
+  },
+  "GUM": {
+   "qid": "Q16635",
+   "method": "P298",
+   "label_en": "Guam",
+   "label_fr": "Guam",
+   "classes": [],
+   "lastrevid": 2556558442,
+   "raw_sha256": "5f87f1c88592afa000e88a053893d0f1f2f72613ed964da6351ec909b6fed3f9",
+   "crosswalk_label": "Guam"
+  },
+  "GUY": {
+   "qid": "Q734",
+   "method": "P298",
+   "label_en": "Guyana",
+   "label_fr": "Guyana",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553384102,
+   "raw_sha256": "78456bcab569351871e73a6112bd4629a8786f26df710266bcb3a83e7e92532a",
+   "crosswalk_label": "Guyana"
+  },
+  "HKG": {
+   "qid": "Q8646",
+   "method": "P298",
+   "label_en": "Hong Kong",
+   "label_fr": "Hong Kong",
+   "classes": [
+    "Q161243"
+   ],
+   "lastrevid": 2553158367,
+   "raw_sha256": "cc6f93e2510b880d50a700db26d087dd88d84daf37529bf16140430abc2ea643",
+   "crosswalk_label": "China, Hong Kong Special Administrative Region"
+  },
+  "HMD": {
+   "qid": "Q131198",
+   "method": "P298",
+   "label_en": "Heard Island and McDonald Islands",
+   "label_fr": "îles Heard-et-MacDonald",
+   "classes": [],
+   "lastrevid": 2552056637,
+   "raw_sha256": "3a634914b79369e2b44e4d846ce7d992216242ebe8e4dbd2b65185cc046ecef3",
+   "crosswalk_label": "Heard Island and McDonald Islands"
+  },
+  "HND": {
+   "qid": "Q783",
+   "method": "P298",
+   "label_en": "Honduras",
+   "label_fr": "Honduras",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556207872,
+   "raw_sha256": "1ad14e243be9d4135d0b1b1e7afa30f537f90726d4e8cbb96b875895da967a43",
+   "crosswalk_label": "Honduras"
+  },
+  "HRV": {
+   "qid": "Q224",
+   "method": "P298",
+   "label_en": "Croatia",
+   "label_fr": "Croatie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547610554,
+   "raw_sha256": "a55b624e5f0c739a9fb0af44d1ffb9468abcdcbbb6aef1a074f13e88990443f6",
+   "crosswalk_label": "Croatia"
+  },
+  "HTI": {
+   "qid": "Q790",
+   "method": "P298",
+   "label_en": "Haiti",
+   "label_fr": "Haïti",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556274496,
+   "raw_sha256": "f9cea94115c7768819d9e18e42edfd7668345144bae2007c558f79a374afc71f",
+   "crosswalk_label": "Haiti"
+  },
+  "HUN": {
+   "qid": "Q28",
+   "method": "P298",
+   "label_en": "Hungary",
+   "label_fr": "Hongrie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556374352,
+   "raw_sha256": "a1e9ce41f04bbaacaf7443566b21ffc99655c434a6a00d0895a453fd73b86c67",
+   "crosswalk_label": "Hungary"
+  },
+  "IDN": {
+   "qid": "Q252",
+   "method": "P298",
+   "label_en": "Indonesia",
+   "label_fr": "Indonésie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556941409,
+   "raw_sha256": "8ac1867209b80142a6ebbc7af8d194230a7168f79fc333d2e8cd1e9c6bd37555",
+   "crosswalk_label": "Indonesia"
+  },
+  "IMN": {
+   "qid": "Q9676",
+   "method": "P298",
+   "label_en": "Isle of Man",
+   "label_fr": "Île de Man",
+   "classes": [],
+   "lastrevid": 2545481030,
+   "raw_sha256": "2d311abafeb312ced4d18f1d5e819283953160a31e56d1a62b842b48fdd2dbc0",
+   "crosswalk_label": "Isle of Man"
+  },
+  "IND": {
+   "qid": "Q668",
+   "method": "P298",
+   "label_en": "India",
+   "label_fr": "Inde",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556654803,
+   "raw_sha256": "2c4f0408d1bdd4a4bc2d8ca2e6f17e1c41435704e79d7e2586ffb4ca7eaf9a52",
+   "crosswalk_label": "India"
+  },
+  "IOT": {
+   "qid": "Q43448",
+   "method": "P298",
+   "label_en": "British Indian Ocean Territory",
+   "label_fr": "Territoire britannique de l’océan Indien",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2545511826,
+   "raw_sha256": "46ca4e715ab06c9a8c0fe4b4647c8773ae9b954f5aecee740daba30036302860",
+   "crosswalk_label": "British Indian Ocean Territory"
+  },
+  "IRL": {
+   "qid": "Q27",
+   "method": "P298",
+   "label_en": "Ireland",
+   "label_fr": "Irlande",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554722464,
+   "raw_sha256": "ff456f12e687e7232cc940a77cb15e7cf1dcf40480b1888a15b0c34e8009f8fe",
+   "crosswalk_label": "Ireland"
+  },
+  "IRN": {
+   "qid": "Q794",
+   "method": "P298",
+   "label_en": "Iran",
+   "label_fr": "Iran",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553179121,
+   "raw_sha256": "2a6be07c89c6ea4b968423d27514b2d3549433161d68c2430a65aee4ac6819c8",
+   "crosswalk_label": "Iran (Islamic Republic of)"
+  },
+  "IRQ": {
+   "qid": "Q796",
+   "method": "P298",
+   "label_en": "Iraq",
+   "label_fr": "Irak",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556344118,
+   "raw_sha256": "b40f3de18ddade02e690334e6918e07ab786d2299cf3d43d7360c1bd2eb7460b",
+   "crosswalk_label": "Iraq"
+  },
+  "ISL": {
+   "qid": "Q189",
+   "method": "P298",
+   "label_en": "Iceland",
+   "label_fr": "Islande",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555966132,
+   "raw_sha256": "99f438b28f34bdf0cee5a744e1d7490f20c9c95137b9b3727c4595f1b764a81f",
+   "crosswalk_label": "Iceland"
+  },
+  "ISR": {
+   "qid": "Q801",
+   "method": "P298",
+   "label_en": "Israel",
+   "label_fr": "Israël",
+   "classes": [
+    "Q10711424",
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555681105,
+   "raw_sha256": "79e55c2d805b69a000055a78fc7d591e8002c1306316b1384149f92088850e91",
+   "crosswalk_label": "Israel"
+  },
+  "ITA": {
+   "qid": "Q38",
+   "method": "P298",
+   "label_en": "Italy",
+   "label_fr": "Italie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555049153,
+   "raw_sha256": "5201834832d882f678759801408350460b5cfb5d0705fe76f5d95197fdc7e9ed",
+   "crosswalk_label": "Italy"
+  },
+  "JAM": {
+   "qid": "Q766",
+   "method": "P298",
+   "label_en": "Jamaica",
+   "label_fr": "Jamaïque",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2526810321,
+   "raw_sha256": "76ad59d52106ee660fecdae3d8af054660009d19aa49da3d0b355a540671b465",
+   "crosswalk_label": "Jamaica"
+  },
+  "JEY": {
+   "qid": "Q785",
+   "method": "P298",
+   "label_en": "Jersey",
+   "label_fr": "Jersey",
+   "classes": [],
+   "lastrevid": 2546953271,
+   "raw_sha256": "566606dc9890d70988927306be0c6a1c48d195ff6ba58eaedd7bb60f1a05157b",
+   "crosswalk_label": "Jersey"
+  },
+  "JOR": {
+   "qid": "Q810",
+   "method": "P298",
+   "label_en": "Jordan",
+   "label_fr": "Jordanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553390437,
+   "raw_sha256": "ef926d7e7681ca0f748540a28c4c478a21a9e4febeecf2f7d47b51e9dac3b7cc",
+   "crosswalk_label": "Jordan"
+  },
+  "JPN": {
+   "qid": "Q17",
+   "method": "P298",
+   "label_en": "Japan",
+   "label_fr": "Japon",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555599058,
+   "raw_sha256": "49af3f08ddd239eb863207223f8e88e380365ceb68cb1cb0b112f76a9ebd0b47",
+   "crosswalk_label": "Japan"
+  },
+  "KAZ": {
+   "qid": "Q232",
+   "method": "P298",
+   "label_en": "Kazakhstan",
+   "label_fr": "Kazakhstan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556180896,
+   "raw_sha256": "682875645c7cd44ac1db7b7bf49ebc3da2354cee23e146671ac7a1cf374dd41c",
+   "crosswalk_label": "Kazakhstan"
+  },
+  "KEN": {
+   "qid": "Q114",
+   "method": "P298",
+   "label_en": "Kenya",
+   "label_fr": "Kenya",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555864714,
+   "raw_sha256": "98ad658f7c91c4c13da6fb2180519e9e38f2030fdf374c43215477ed13b5e9a1",
+   "crosswalk_label": "Kenya"
+  },
+  "KGZ": {
+   "qid": "Q813",
+   "method": "P298",
+   "label_en": "Kyrgyzstan",
+   "label_fr": "Kirghizistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551076203,
+   "raw_sha256": "db205358d7b52e15ae1a768871a54704bdef965a0241584e6b3d7db148c07b36",
+   "crosswalk_label": "Kyrgyzstan"
+  },
+  "KHM": {
+   "qid": "Q424",
+   "method": "P298",
+   "label_en": "Cambodia",
+   "label_fr": "Cambodge",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547610584,
+   "raw_sha256": "314d3fd1b91f76a7379befe57b7f641622bfe453e00545a4256c8bcb935d5bc7",
+   "crosswalk_label": "Cambodia"
+  },
+  "KIR": {
+   "qid": "Q710",
+   "method": "P298",
+   "label_en": "Kiribati",
+   "label_fr": "Kiribati",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549866204,
+   "raw_sha256": "4b0117a5f45535d3bd694644b1867662199fcadb073083b9eac50c115f280952",
+   "crosswalk_label": "Kiribati"
+  },
+  "KNA": {
+   "qid": "Q763",
+   "method": "P298",
+   "label_en": "Saint Kitts and Nevis",
+   "label_fr": "Saint-Christophe-et-Niévès",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2552068350,
+   "raw_sha256": "c5f3e513f5f89502651bea41b60e44a05d0845bc7bd5bb3d7a4e507ccece1e58",
+   "crosswalk_label": "Saint Kitts and Nevis"
+  },
+  "KOR": {
+   "qid": "Q884",
+   "method": "P298",
+   "label_en": "South Korea",
+   "label_fr": "Corée du Sud",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553312750,
+   "raw_sha256": "c6114e668b770a5d14c9a9cc41117b418aeb75393eb589da2db5bf0a90e83232",
+   "crosswalk_label": "Republic of Korea"
+  },
+  "KWT": {
+   "qid": "Q817",
+   "method": "P298",
+   "label_en": "Kuwait",
+   "label_fr": "Koweït",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553216609,
+   "raw_sha256": "1532bf477fce898ffee85e14f11d97738e62db7f22e787422d4d9268fafa437b",
+   "crosswalk_label": "Kuwait"
+  },
+  "LAO": {
+   "qid": "Q819",
+   "method": "P298",
+   "label_en": "Laos",
+   "label_fr": "Laos",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551121185,
+   "raw_sha256": "42a6e1aa1de06f78084300cd736c8934b8c004c4ec7a1ebfac8ff4b637e2739c",
+   "crosswalk_label": "Lao People's Democratic Republic"
+  },
+  "LBN": {
+   "qid": "Q822",
+   "method": "P298",
+   "label_en": "Lebanon",
+   "label_fr": "Liban",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553216544,
+   "raw_sha256": "46fd5b597c11c5bee7f735f1686d13b9b29ee8eddc7352fb043d140cd683ee87",
+   "crosswalk_label": "Lebanon"
+  },
+  "LBR": {
+   "qid": "Q1014",
+   "method": "P298",
+   "label_en": "Liberia",
+   "label_fr": "Liberia",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2538457032,
+   "raw_sha256": "765c60c21d8ed8074ace2e45b2b5b386c02159309d0cf7cb40205890c8432207",
+   "crosswalk_label": "Liberia"
+  },
+  "LBY": {
+   "qid": "Q1016",
+   "method": "P298",
+   "label_en": "Libya",
+   "label_fr": "Libye",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556966981,
+   "raw_sha256": "31f8a8ff9ec25827917fe7f1faf8992da5b943372099bcf4c4f9b2bd8dffe0a6",
+   "crosswalk_label": "Libya"
+  },
+  "LCA": {
+   "qid": "Q760",
+   "method": "P298",
+   "label_en": "Saint Lucia",
+   "label_fr": "Sainte-Lucie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551120059,
+   "raw_sha256": "4c5c6bf44671cd8c897706f90d7b61670fdfa8d6c2f8f64b5dc3dfa502de5094",
+   "crosswalk_label": "Saint Lucia"
+  },
+  "LIE": {
+   "qid": "Q347",
+   "method": "P298",
+   "label_en": "Liechtenstein",
+   "label_fr": "Liechtenstein",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551255333,
+   "raw_sha256": "af14ee4d1a3475606082825816375052fb97f10f54cd921f9462bafb2dd60a4e",
+   "crosswalk_label": "Liechtenstein"
+  },
+  "LKA": {
+   "qid": "Q854",
+   "method": "P298",
+   "label_en": "Sri Lanka",
+   "label_fr": "Sri Lanka",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547808912,
+   "raw_sha256": "4c4a505e466d0a1db72fec441a92a4d74c2dfc722f18eefab8a2fa31257f8fd3",
+   "crosswalk_label": "Sri Lanka"
+  },
+  "LSO": {
+   "qid": "Q1013",
+   "method": "P298",
+   "label_en": "Lesotho",
+   "label_fr": "Lesotho",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555829523,
+   "raw_sha256": "107fd48bf5dbd716c1ce14cd463ee9d30a68852e2be27b9ea690b5a7b62b8ce4",
+   "crosswalk_label": "Lesotho"
+  },
+  "LTU": {
+   "qid": "Q37",
+   "method": "P298",
+   "label_en": "Lithuania",
+   "label_fr": "Lituanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553986848,
+   "raw_sha256": "6e41409cf4f045af55883611f663c446e6a3ec0eaaeab0aefd0cca962359e768",
+   "crosswalk_label": "Lithuania"
+  },
+  "LUX": {
+   "qid": "Q32",
+   "method": "P298",
+   "label_en": "Luxembourg",
+   "label_fr": "Luxembourg",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2548496472,
+   "raw_sha256": "fb1c3adcb0d248aa8b78bf54b89c414e8a2fbc6952b7f197c81fed3a17b84fa8",
+   "crosswalk_label": "Luxembourg"
+  },
+  "LVA": {
+   "qid": "Q211",
+   "method": "P298",
+   "label_en": "Latvia",
+   "label_fr": "Lettonie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556619353,
+   "raw_sha256": "ca48b8ffa540b2add177ddf1081dd3fd9dc3132e62b7063699e440540190a8fd",
+   "crosswalk_label": "Latvia"
+  },
+  "MAC": {
+   "qid": "Q14773",
+   "method": "P298",
+   "label_en": "Macau",
+   "label_fr": "Macao",
+   "classes": [
+    "Q161243"
+   ],
+   "lastrevid": 2551256752,
+   "raw_sha256": "914bb44f76eb080c0000e036a9267576a6a7d20de220440890c0b05500a2405a",
+   "crosswalk_label": "China, Macao Special Administrative Region"
+  },
+  "MAF": {
+   "qid": "Q126125",
+   "method": "P298",
+   "label_en": "Saint-Martin",
+   "label_fr": "Saint-Martin",
+   "classes": [
+    "Q161243"
+   ],
+   "lastrevid": 2537157866,
+   "raw_sha256": "2d0064c56e8a5d5571a5f4a616f4b3a7a0546ba7f3907fe5643a760004b09ecf",
+   "crosswalk_label": "Saint Martin (French Part)"
+  },
+  "MAR": {
+   "qid": "Q1028",
+   "method": "P298",
+   "label_en": "Morocco",
+   "label_fr": "Maroc",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556989374,
+   "raw_sha256": "04730bd2378d7d3d00417cf92afd20a298a894b727eb701f60ed7540e167389d",
+   "crosswalk_label": "Morocco"
+  },
+  "MCO": {
+   "qid": "Q235",
+   "method": "P298",
+   "label_en": "Monaco",
+   "label_fr": "Monaco",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556770482,
+   "raw_sha256": "9c820d09160d6c6cf871bdcdba91b719e2a616f9b726c873e491110909178ca5",
+   "crosswalk_label": "Monaco"
+  },
+  "MDA": {
+   "qid": "Q217",
+   "method": "P298",
+   "label_en": "Moldova",
+   "label_fr": "Moldavie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555866583,
+   "raw_sha256": "be341e893702fbbfc97d68d4c010a4218fe781e4b4923beb3c76106f0d76bdbb",
+   "crosswalk_label": "Republic of Moldova"
+  },
+  "MDG": {
+   "qid": "Q1019",
+   "method": "P298",
+   "label_en": "Madagascar",
+   "label_fr": "Madagascar",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553272880,
+   "raw_sha256": "717c6f36088400ca0b88c08aa209b3003e19e1e962f9176193f58401c8547130",
+   "crosswalk_label": "Madagascar"
+  },
+  "MDV": {
+   "qid": "Q826",
+   "method": "P298",
+   "label_en": "Maldives",
+   "label_fr": "Maldives",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551225000,
+   "raw_sha256": "6afb4621086af5b573e43be2bdb2ccbbfd0bbed8b455c7ad7c7973409df7d356",
+   "crosswalk_label": "Maldives"
+  },
+  "MEX": {
+   "qid": "Q96",
+   "method": "P298",
+   "label_en": "Mexico",
+   "label_fr": "Mexique",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556454604,
+   "raw_sha256": "a7f4d1c4b9ac1e49b775620882f30fea10ea60928a52923c9abbf6fb4e298c28",
+   "crosswalk_label": "Mexico"
+  },
+  "MHL": {
+   "qid": "Q709",
+   "method": "P298",
+   "label_en": "Marshall Islands",
+   "label_fr": "Îles Marshall",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2544222040,
+   "raw_sha256": "b3b5fe67237888e8f4c9d3cdfccc7b3dd368bb52d47ca4317bc68a02dda90a9f",
+   "crosswalk_label": "Marshall Islands"
+  },
+  "MKD": {
+   "qid": "Q221",
+   "method": "P298",
+   "label_en": "North Macedonia",
+   "label_fr": "Macédoine du Nord",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556262577,
+   "raw_sha256": "5d231146971e7b774b8b1a6ec344a66bc62087884aded865a046737bb0702719",
+   "crosswalk_label": "North Macedonia"
+  },
+  "MLI": {
+   "qid": "Q912",
+   "method": "P298",
+   "label_en": "Mali",
+   "label_fr": "Mali",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2538782225,
+   "raw_sha256": "71dddf76b5a55396a7f1aea86cf3bea67f7b65b10a5d86b8d60b473f0fca8098",
+   "crosswalk_label": "Mali"
+  },
+  "MLT": {
+   "qid": "Q233",
+   "method": "P298",
+   "label_en": "Malta",
+   "label_fr": "Malte",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2550793530,
+   "raw_sha256": "f5c1ad30f4e3d77500212b12c38984392fb09808c0ab43fd37fdf4a6040c3dcd",
+   "crosswalk_label": "Malta"
+  },
+  "MMR": {
+   "qid": "Q836",
+   "method": "P298",
+   "label_en": "Myanmar",
+   "label_fr": "Birmanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547610398,
+   "raw_sha256": "a03a6b84605ea0b71fadf6ed5aaaf70f4146a0e31cf070adc0acdf84aac72aef",
+   "crosswalk_label": "Myanmar"
+  },
+  "MNE": {
+   "qid": "Q236",
+   "method": "P298",
+   "label_en": "Montenegro",
+   "label_fr": "Monténégro",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553408154,
+   "raw_sha256": "851f26bc378d622a51deb599b9b48d3ac92992a74576f439a7a5b2bd43c01a66",
+   "crosswalk_label": "Montenegro"
+  },
+  "MNG": {
+   "qid": "Q711",
+   "method": "P298",
+   "label_en": "Mongolia",
+   "label_fr": "Mongolie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2552304647,
+   "raw_sha256": "a2f462235f93fcdfb72eaa5dac80cb2233b733d0d977bacf510565135b764532",
+   "crosswalk_label": "Mongolia"
+  },
+  "MNP": {
+   "qid": "Q16644",
+   "method": "P298",
+   "label_en": "Northern Mariana Islands",
+   "label_fr": "îles Mariannes du Nord",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2555345385,
+   "raw_sha256": "7fe3ed08d71b85dc17de7d09af7d6e403ff66a01be4c201a9d9e3325f88b6a62",
+   "crosswalk_label": "Northern Mariana Islands"
+  },
+  "MOZ": {
+   "qid": "Q1029",
+   "method": "P298",
+   "label_en": "Mozambique",
+   "label_fr": "Mozambique",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2531713838,
+   "raw_sha256": "fe7e31c64398387a7c8a4104cfd0dfbd1332eac3346f86a814877610c01adad7",
+   "crosswalk_label": "Mozambique"
+  },
+  "MRT": {
+   "qid": "Q1025",
+   "method": "P298",
+   "label_en": "Mauritania",
+   "label_fr": "Mauritanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555899500,
+   "raw_sha256": "69b9476963dfddc2524cc37af26d658b1905c152475b97abe4945bcefed7a2c1",
+   "crosswalk_label": "Mauritania"
+  },
+  "MSR": {
+   "qid": "Q13353",
+   "method": "P298",
+   "label_en": "Montserrat",
+   "label_fr": "Montserrat",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2555305911,
+   "raw_sha256": "5211b1a610b5a69ad974b3fcb260f4421b4cc3933ef83f2f459cb2546a200b5c",
+   "crosswalk_label": "Montserrat"
+  },
+  "MTQ": {
+   "qid": "Q17054",
+   "method": "P298",
+   "label_en": "Martinique",
+   "label_fr": "Martinique",
+   "classes": [
+    "Q161243",
+    "Q202216"
+   ],
+   "lastrevid": 2555333966,
+   "raw_sha256": "cf36f49e493bb687e60b4dd60e1ea3aaba9b77d94222f3d7a315a379f2c3e2ff",
+   "crosswalk_label": "Martinique"
+  },
+  "MUS": {
+   "qid": "Q1027",
+   "method": "P298",
+   "label_en": "Mauritius",
+   "label_fr": "Maurice",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2545655051,
+   "raw_sha256": "644bbe0ebd99597f2f50a62d785209920bdaf9d3cfa650c0c4b199c4ef7baf49",
+   "crosswalk_label": "Mauritius"
+  },
+  "MWI": {
+   "qid": "Q1020",
+   "method": "P298",
+   "label_en": "Malawi",
+   "label_fr": "Malawi",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2550387699,
+   "raw_sha256": "4cc68e4bc959b6ca6ec7df7856ea49a0fa9a8184a6b4698774c69d7074f35927",
+   "crosswalk_label": "Malawi"
+  },
+  "MYS": {
+   "qid": "Q833",
+   "method": "P298",
+   "label_en": "Malaysia",
+   "label_fr": "Malaisie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547611053,
+   "raw_sha256": "c8fc1bd3f2b9c36bf882c73960db4fba25b51658ef56c698ff92f9c74d94ae18",
+   "crosswalk_label": "Malaysia"
+  },
+  "MYT": {
+   "qid": "Q17063",
+   "method": "P298",
+   "label_en": "Mayotte",
+   "label_fr": "Mayotte",
+   "classes": [
+    "Q202216"
+   ],
+   "lastrevid": 2517827951,
+   "raw_sha256": "ccf934ea095bd7eb7ddf096fae9affccbfdbd99f1cbdf8ce7d0ddd3ce93f6aee",
+   "crosswalk_label": "Mayotte"
+  },
+  "NAM": {
+   "qid": "Q1030",
+   "method": "P298",
+   "label_en": "Namibia",
+   "label_fr": "Namibie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555864239,
+   "raw_sha256": "7444981bcf91600b1205c67841b4c758dd0c8e17bb48f338807e0ae3565b8eed",
+   "crosswalk_label": "Namibia"
+  },
+  "NCL": {
+   "qid": "Q33788",
+   "method": "P298",
+   "label_en": "New Caledonia",
+   "label_fr": "Nouvelle-Calédonie",
+   "classes": [
+    "Q161243"
+   ],
+   "lastrevid": 2547891518,
+   "raw_sha256": "30546253aee1fed89d91cd8a3a4e529db2facaf6ea05bd5586e6faee56e681a2",
+   "crosswalk_label": "New Caledonia"
+  },
+  "NER": {
+   "qid": "Q1032",
+   "method": "P298",
+   "label_en": "Niger",
+   "label_fr": "Niger",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2542474582,
+   "raw_sha256": "b880a320a5a10025458e26353ae0c0ca4fc49baedaa925da24d87e2d5af62799",
+   "crosswalk_label": "Niger"
+  },
+  "NFK": {
+   "qid": "Q31057",
+   "method": "P298",
+   "label_en": "Norfolk Island",
+   "label_fr": "île Norfolk",
+   "classes": [],
+   "lastrevid": 2531993946,
+   "raw_sha256": "5b9c4c56d55fa5251f2ebf30a010a0d381ed835f7691853ad5afecb8ad63b4cd",
+   "crosswalk_label": "Norfolk Island"
+  },
+  "NGA": {
+   "qid": "Q1033",
+   "method": "P298",
+   "label_en": "Nigeria",
+   "label_fr": "Nigeria",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547805730,
+   "raw_sha256": "4566ef72564d4e6ca5cf69a30660e704e8d064d03227a3e7a2580085fa6d50c6",
+   "crosswalk_label": "Nigeria"
+  },
+  "NIC": {
+   "qid": "Q811",
+   "method": "P298",
+   "label_en": "Nicaragua",
+   "label_fr": "Nicaragua",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553236642,
+   "raw_sha256": "a34e6cbcf3ec010d7dddd3efd9b99c4f7d4afc2c2e76cf8cc86170a8ea7527a6",
+   "crosswalk_label": "Nicaragua"
+  },
+  "NIU": {
+   "qid": "Q34020",
+   "method": "P298",
+   "label_en": "Niue",
+   "label_fr": "Niue",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2554886129,
+   "raw_sha256": "bf7c8c21b53011b1d273f1aff0f0d418665400d8ed7e36803257b21aa084a43b",
+   "crosswalk_label": "Niue"
+  },
+  "NLD": {
+   "qid": "Q29999",
+   "method": "P298",
+   "label_en": "Kingdom of the Netherlands",
+   "label_fr": "Royaume des Pays-Bas",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557056449,
+   "raw_sha256": "c49be51771555348ba3194eaa635eb5531c959b1909d24316eadc36ab196622d",
+   "crosswalk_label": "Netherlands (Kingdom of the)"
+  },
+  "NOR": {
+   "qid": "Q20",
+   "method": "P298",
+   "label_en": "Norway",
+   "label_fr": "Norvège",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2552025448,
+   "raw_sha256": "1630d2f89b3a8e8cee65d0d8afa0c7860a57b030cbe14022a43a3a09cf1cd545",
+   "crosswalk_label": "Norway"
+  },
+  "NPL": {
+   "qid": "Q837",
+   "method": "P298",
+   "label_en": "Nepal",
+   "label_fr": "Népal",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547610569,
+   "raw_sha256": "21df6918accfa410ff1a91f11a5341cb874f0810e5fc5b9ff4f45b185be8b101",
+   "crosswalk_label": "Nepal"
+  },
+  "NRU": {
+   "qid": "Q697",
+   "method": "P298",
+   "label_en": "Nauru",
+   "label_fr": "Nauru",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556233118,
+   "raw_sha256": "57ebbf516eaa0f919610bf0b1eae02a279199024fcd37a333b3e2047d56d291b",
+   "crosswalk_label": "Naoero"
+  },
+  "NZL": {
+   "qid": "Q664",
+   "method": "P298",
+   "label_en": "New Zealand",
+   "label_fr": "Nouvelle-Zélande",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555964127,
+   "raw_sha256": "da76a83508e8dc45849c28310f7a001836a6e2079f2266ffaf20d41215cdc1d2",
+   "crosswalk_label": "New Zealand"
+  },
+  "OMN": {
+   "qid": "Q842",
+   "method": "P298",
+   "label_en": "Oman",
+   "label_fr": "Oman",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553216560,
+   "raw_sha256": "5bcef93d374b0e0259dcdfed411ecdbf7512c3ecb45ba1090161adc7cf96a402",
+   "crosswalk_label": "Oman"
+  },
+  "PAK": {
+   "qid": "Q843",
+   "method": "P298",
+   "label_en": "Pakistan",
+   "label_fr": "Pakistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555299631,
+   "raw_sha256": "77528fa4b01a28cabb4cdfb1184aa747d68d170fd549fb8d10d506813d7af186",
+   "crosswalk_label": "Pakistan"
+  },
+  "PAN": {
+   "qid": "Q804",
+   "method": "P298",
+   "label_en": "Panama",
+   "label_fr": "Panama",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2548420874,
+   "raw_sha256": "1a5e0797c0c6269267d4f8afa64c2fb0e9d0b9d5165dae79309887b304a262e3",
+   "crosswalk_label": "Panama"
+  },
+  "PCN": {
+   "qid": "Q35672",
+   "method": "P298",
+   "label_en": "Pitcairn Islands",
+   "label_fr": "îles Pitcairn",
+   "classes": [
+    "Q1048835",
+    "Q46395"
+   ],
+   "lastrevid": 2549563020,
+   "raw_sha256": "aaf3196a22613795d8ccc1ee61b808420d230d722a0f12e16ba9a911180f261e",
+   "crosswalk_label": "Pitcairn"
+  },
+  "PER": {
+   "qid": "Q419",
+   "method": "P298",
+   "label_en": "Peru",
+   "label_fr": "Pérou",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555679482,
+   "raw_sha256": "b084858cb0e95a560025853d9676cee0feb71439b867e954f0443b3f655766fc",
+   "crosswalk_label": "Peru"
+  },
+  "PHL": {
+   "qid": "Q928",
+   "method": "P298",
+   "label_en": "Philippines",
+   "label_fr": "Philippines",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2550247664,
+   "raw_sha256": "8c65c05ed8b71e2d2019a44ab21d150c14b679eebe0235a37bdb6bc5e0fb654a",
+   "crosswalk_label": "Philippines"
+  },
+  "PLW": {
+   "qid": "Q695",
+   "method": "P298",
+   "label_en": "Palau",
+   "label_fr": "Palaos",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2544193376,
+   "raw_sha256": "a708114ef64425542d16ec20242a145ecc65607721670f257487a482b73e262f",
+   "crosswalk_label": "Palau"
+  },
+  "PNG": {
+   "qid": "Q691",
+   "method": "P298",
+   "label_en": "Papua New Guinea",
+   "label_fr": "Papouasie-Nouvelle-Guinée",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551270130,
+   "raw_sha256": "00ab00aa39021522de7b7878282cfcde70a1e15cdd58186ac17e7dc02e22af7a",
+   "crosswalk_label": "Papua New Guinea"
+  },
+  "POL": {
+   "qid": "Q36",
+   "method": "P298",
+   "label_en": "Poland",
+   "label_fr": "Pologne",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556206734,
+   "raw_sha256": "37c071444426237b60449848bcd2565189bf032839a2d4e9ed282ff9bf3447f9",
+   "crosswalk_label": "Poland"
+  },
+  "PRI": {
+   "qid": "Q1183",
+   "method": "P298",
+   "label_en": "Puerto Rico",
+   "label_fr": "Porto Rico",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2556875739,
+   "raw_sha256": "0fe80cfc0d40379e01b3b37561c920f37b67500ed5d83763f9b522f262317f1d",
+   "crosswalk_label": "Puerto Rico"
+  },
+  "PRK": {
+   "qid": "Q423",
+   "method": "P298",
+   "label_en": "North Korea",
+   "label_fr": "Corée du Nord",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553412150,
+   "raw_sha256": "de19119427c23a1ee8b5be6b4b1e5c8e35e890c6ecfdd4a77c4079d39777e180",
+   "crosswalk_label": "Democratic People's Republic of Korea"
+  },
+  "PRT": {
+   "qid": "Q45",
+   "method": "P298",
+   "label_en": "Portugal",
+   "label_fr": "Portugal",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556596512,
+   "raw_sha256": "fafcd4676702a5730c3d037fb711cf4fa18fc0d7c4d7c8bcd72c5492c9cad0f5",
+   "crosswalk_label": "Portugal"
+  },
+  "PRY": {
+   "qid": "Q733",
+   "method": "P298",
+   "label_en": "Paraguay",
+   "label_fr": "Paraguay",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119873,
+   "raw_sha256": "833bd1e8f5f80e7bedb926c76693b3d0b76c1884e80accadb3aad279da69ebd6",
+   "crosswalk_label": "Paraguay"
+  },
+  "PYF": {
+   "qid": "Q30971",
+   "method": "P298",
+   "label_en": "French Polynesia",
+   "label_fr": "Polynésie française",
+   "classes": [],
+   "lastrevid": 2553740237,
+   "raw_sha256": "9e1839bb8bfd80c481cb9b6fb052d19235afac0514e957a3b400eed161e32164",
+   "crosswalk_label": "French Polynesia"
+  },
+  "QAT": {
+   "qid": "Q846",
+   "method": "P298",
+   "label_en": "Qatar",
+   "label_fr": "Qatar",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556343592,
+   "raw_sha256": "91da1aa817c09f73fcc90a221c6030a53ef7498b8e2b2f404b55ee072b62e827",
+   "crosswalk_label": "Qatar"
+  },
+  "REU": {
+   "qid": "Q17070",
+   "method": "P298",
+   "label_en": "Réunion",
+   "label_fr": "La Réunion",
+   "classes": [
+    "Q161243",
+    "Q202216"
+   ],
+   "lastrevid": 2548428230,
+   "raw_sha256": "06802ff3e747a2384d639abef333cb89834d823c503db9daafcbd8d60c51182c",
+   "crosswalk_label": "Réunion"
+  },
+  "ROU": {
+   "qid": "Q218",
+   "method": "P298",
+   "label_en": "Romania",
+   "label_fr": "Roumanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553817468,
+   "raw_sha256": "3f26bf83dab83d5dc9416a15a00b5c1b94cd6ead687a7f9fdbef8f5ea7988129",
+   "crosswalk_label": "Romania"
+  },
+  "RUS": {
+   "qid": "Q159",
+   "method": "P298",
+   "label_en": "Russia",
+   "label_fr": "Russie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557221747,
+   "raw_sha256": "e8fd4530c93172747b6eccfa6531761cf2f4cccf0f6c89bb031d7e4d54b76279",
+   "crosswalk_label": "Russian Federation"
+  },
+  "RWA": {
+   "qid": "Q1037",
+   "method": "P298",
+   "label_en": "Rwanda",
+   "label_fr": "Rwanda",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549914338,
+   "raw_sha256": "82e5ee67485695431f126434196066bdcd7724a1a765aee109afd66b27cae1d8",
+   "crosswalk_label": "Rwanda"
+  },
+  "SAU": {
+   "qid": "Q851",
+   "method": "P298",
+   "label_en": "Saudi Arabia",
+   "label_fr": "Arabie saoudite",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556230690,
+   "raw_sha256": "df297492e2b301cc94345e0de59e9aef5005dade3483b7077b7415160e4aa4f9",
+   "crosswalk_label": "Saudi Arabia"
+  },
+  "SDN": {
+   "qid": "Q1049",
+   "method": "P298",
+   "label_en": "Sudan",
+   "label_fr": "Soudan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547610677,
+   "raw_sha256": "5a464c66fb6ed85ec685798b4aea5ae82a9da92f98354d03262ff64cf76c5055",
+   "crosswalk_label": "Sudan"
+  },
+  "SEN": {
+   "qid": "Q1041",
+   "method": "P298",
+   "label_en": "Senegal",
+   "label_fr": "Sénégal",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553962244,
+   "raw_sha256": "3f9106e7f72bc549a14df911621fbff5d5a1215d1a1b87c08dc60103bf2deb95",
+   "crosswalk_label": "Senegal"
+  },
+  "SGP": {
+   "qid": "Q334",
+   "method": "P298",
+   "label_en": "Singapore",
+   "label_fr": "Singapour",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555341784,
+   "raw_sha256": "920392d58a11af58ce4dfe867341dd24b2ab5ec9b589fa0c93bbaaad21c7bd85",
+   "crosswalk_label": "Singapore"
+  },
+  "SGS": {
+   "qid": "Q35086",
+   "method": "P298",
+   "label_en": "South Georgia and the South Sandwich Islands",
+   "label_fr": "Géorgie du Sud-et-les Îles Sandwich du Sud",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2549148187,
+   "raw_sha256": "3d3410dc7bd72b3dc149db1f6ab02762ce1ca06b73a8ba52895801e0a48d2c0e",
+   "crosswalk_label": "South Georgia and the South Sandwich Islands"
+  },
+  "SHN": {
+   "qid": "Q192184",
+   "method": "P298",
+   "label_en": "Saint Helena, Ascension and Tristan da Cunha",
+   "label_fr": "Sainte-Hélène, Ascension et Tristan da Cunha",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2530843689,
+   "raw_sha256": "4cd896323e3404d05704d2719b6d97c9aeeb2f330db11ee8d2349e8ab1e103a8",
+   "crosswalk_label": "Saint Helena"
+  },
+  "SJM": {
+   "qid": "Q842829",
+   "method": "P298",
+   "label_en": "Svalbard and Jan Mayen",
+   "label_fr": "Svalbard et Jan Mayen",
+   "classes": [],
+   "lastrevid": 2509267172,
+   "raw_sha256": "1b9c2d44f2f02086cd558fbcef231c4ac8921edac2fd957ca25deac664af055b",
+   "crosswalk_label": "Svalbard and Jan Mayen Islands"
+  },
+  "SLB": {
+   "qid": "Q685",
+   "method": "P298",
+   "label_en": "Solomon Islands",
+   "label_fr": "Îles Salomon",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549011358,
+   "raw_sha256": "f5ee32542c1470bdb2470b6a9fffbd6413b25209c9222107dfeebdb977786cea",
+   "crosswalk_label": "Solomon Islands"
+  },
+  "SLE": {
+   "qid": "Q1044",
+   "method": "P298",
+   "label_en": "Sierra Leone",
+   "label_fr": "Sierra Leone",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2538457108,
+   "raw_sha256": "5bd5cdc30d9519fbf52f8b557dc2c6eebd44080a42639b1231004151bae0af4e",
+   "crosswalk_label": "Sierra Leone"
+  },
+  "SLV": {
+   "qid": "Q792",
+   "method": "P298",
+   "label_en": "El Salvador",
+   "label_fr": "Salvador",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556838851,
+   "raw_sha256": "59f1e807ba9465ecbdae12755a958aae8736da9738c8bf9340409aef6b3cdee9",
+   "crosswalk_label": "El Salvador"
+  },
+  "SMR": {
+   "qid": "Q238",
+   "method": "P298",
+   "label_en": "San Marino",
+   "label_fr": "Saint-Marin",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555929678,
+   "raw_sha256": "6e74e1890a732c0422e579fc2b5e95b2c5f660e4141829cee340980d1fa2e43d",
+   "crosswalk_label": "San Marino"
+  },
+  "SOM": {
+   "qid": "Q1045",
+   "method": "P298",
+   "label_en": "Somalia",
+   "label_fr": "Somalie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555450820,
+   "raw_sha256": "0e459e640abbba7040f2f6fe5669f883055dd9fa909812e20c86136923e7ebb8",
+   "crosswalk_label": "Somalia"
+  },
+  "SPM": {
+   "qid": "Q34617",
+   "method": "P298",
+   "label_en": "Saint Pierre and Miquelon",
+   "label_fr": "Saint-Pierre-et-Miquelon",
+   "classes": [],
+   "lastrevid": 2554541659,
+   "raw_sha256": "566bd5d8cd20ce3af7e9c7c954b33dfa5980bf0bea2ba1ffae94b192a8b4485b",
+   "crosswalk_label": "Saint Pierre and Miquelon"
+  },
+  "SRB": {
+   "qid": "Q403",
+   "method": "P298",
+   "label_en": "Serbia",
+   "label_fr": "Serbie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555417483,
+   "raw_sha256": "11e93c24cbfb1bd2ff4a1982bbc1472223c7dfc9fc47e1f00c790849fb127623",
+   "crosswalk_label": "Serbia"
+  },
+  "SSD": {
+   "qid": "Q958",
+   "method": "P298",
+   "label_en": "South Sudan",
+   "label_fr": "Soudan du Sud",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553559126,
+   "raw_sha256": "89d9636fcc49c4a0b64d0783f16d6d71db359d99a011e667c74bf268dc7f3a30",
+   "crosswalk_label": "South Sudan"
+  },
+  "STP": {
+   "qid": "Q1039",
+   "method": "P298",
+   "label_en": "São Tomé and Príncipe",
+   "label_fr": "Sao Tomé-et-Principe",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555126359,
+   "raw_sha256": "dbb31b443a87903df154fe1212aa9c9f3e357be0a30ef4d0d58af7ae40ab3b2d",
+   "crosswalk_label": "Sao Tome and Principe"
+  },
+  "SUR": {
+   "qid": "Q730",
+   "method": "P298",
+   "label_en": "Suriname",
+   "label_fr": "Suriname",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551248662,
+   "raw_sha256": "72ccc8ea5da047f397739fe3107413a81fe93e50a63baa5e3de6a46356251410",
+   "crosswalk_label": "Suriname"
+  },
+  "SVK": {
+   "qid": "Q214",
+   "method": "P298",
+   "label_en": "Slovakia",
+   "label_fr": "Slovaquie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2557168021,
+   "raw_sha256": "0949f6ef5edba1a0a48f32d4673575d6ac54d9f364f20579544ac4627afe35a7",
+   "crosswalk_label": "Slovakia"
+  },
+  "SVN": {
+   "qid": "Q215",
+   "method": "P298",
+   "label_en": "Slovenia",
+   "label_fr": "Slovénie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553980698,
+   "raw_sha256": "3e2d7705a7a63de0601d13b44758ae19c2f800cc4d6a5a43151d29a1c817d54a",
+   "crosswalk_label": "Slovenia"
+  },
+  "SWE": {
+   "qid": "Q34",
+   "method": "P298",
+   "label_en": "Sweden",
+   "label_fr": "Suède",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547805093,
+   "raw_sha256": "bb181e2874f931e30519b5441528408bf20698c5534863c5717e0059546d3c4b",
+   "crosswalk_label": "Sweden"
+  },
+  "SWZ": {
+   "qid": "Q1050",
+   "method": "P298",
+   "label_en": "Eswatini",
+   "label_fr": "Eswatini",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555826804,
+   "raw_sha256": "a01124c618e47d28c40e3543b8b2dcb64eaa3ac1ef3ef911ac6e17c9c0fe6b07",
+   "crosswalk_label": "Eswatini"
+  },
+  "SXM": {
+   "qid": "Q26273",
+   "method": "P298",
+   "label_en": "Sint Maarten",
+   "label_fr": "Saint-Martin",
+   "classes": [
+    "Q6256"
+   ],
+   "lastrevid": 2541129627,
+   "raw_sha256": "04572345f683a306ab692a7cb68aa8629018180a20ad01d80caf1aa4ffe7b0d9",
+   "crosswalk_label": "Sint Maarten (Dutch part)"
+  },
+  "SYC": {
+   "qid": "Q1042",
+   "method": "P298",
+   "label_en": "Seychelles",
+   "label_fr": "Seychelles",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2530965864,
+   "raw_sha256": "cbe974a4ae30f9ac301bd0507c322bbd27dcf621ecf34590aaefddc6f25a7bac",
+   "crosswalk_label": "Seychelles"
+  },
+  "SYR": {
+   "qid": "Q858",
+   "method": "P298",
+   "label_en": "Syria",
+   "label_fr": "Syrie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554190792,
+   "raw_sha256": "e9372093db5c6232ba756e92d291bc6feff1dc9b53cc4cbedcdd9d90ebf21558",
+   "crosswalk_label": "Syrian Arab Republic"
+  },
+  "TCA": {
+   "qid": "Q18221",
+   "method": "P298",
+   "label_en": "Turks and Caicos Islands",
+   "label_fr": "Îles Turques et Caïques",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2526998696,
+   "raw_sha256": "0d95b547ddd61bdab105f15b6416918fb36bac45facc2da8f0c4f00232942a07",
+   "crosswalk_label": "Turks and Caicos Islands"
+  },
+  "TCD": {
+   "qid": "Q657",
+   "method": "P298",
+   "label_en": "Chad",
+   "label_fr": "Tchad",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553748429,
+   "raw_sha256": "fea8947bf16aedba58d15afd287acb86384c1aca0fcfe0922e8571fcf18585c6",
+   "crosswalk_label": "Chad"
+  },
+  "TGO": {
+   "qid": "Q945",
+   "method": "P298",
+   "label_en": "Togo",
+   "label_fr": "Togo",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553216393,
+   "raw_sha256": "0946b938e95cc055f809fec6e30410323b76b47c23035e2dbe4ec2bbfd40910d",
+   "crosswalk_label": "Togo"
+  },
+  "THA": {
+   "qid": "Q869",
+   "method": "P298",
+   "label_en": "Thailand",
+   "label_fr": "Thaïlande",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556596487,
+   "raw_sha256": "6e8f7db5af9305dd1411528e59ef0a029fef56e31b31ec91dd4168bf89af51eb",
+   "crosswalk_label": "Thailand"
+  },
+  "TJK": {
+   "qid": "Q863",
+   "method": "P298",
+   "label_en": "Tajikistan",
+   "label_fr": "Tadjikistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553209557,
+   "raw_sha256": "ca3afccdf125d0f434b219ba1c2ef6259ce77ae7eacd8987b975754201259dee",
+   "crosswalk_label": "Tajikistan"
+  },
+  "TKL": {
+   "qid": "Q36823",
+   "method": "P298",
+   "label_en": "Tokelau",
+   "label_fr": "Tokelau",
+   "classes": [
+    "Q1048835",
+    "Q161243"
+   ],
+   "lastrevid": 2548709680,
+   "raw_sha256": "9b0f4b51d116631b6dd0bc3d19ea0dcbb5e6554adece3c8ac10bc5c1a36aa1e4",
+   "crosswalk_label": "Tokelau"
+  },
+  "TKM": {
+   "qid": "Q874",
+   "method": "P298",
+   "label_en": "Turkmenistan",
+   "label_fr": "Turkménistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553274572,
+   "raw_sha256": "be5b515ea0344eee02ca262dd8d2a3a1e2cfe54cb0e29de0a8aa619aea99d28d",
+   "crosswalk_label": "Turkmenistan"
+  },
+  "TLS": {
+   "qid": "Q574",
+   "method": "P298",
+   "label_en": "Timor-Leste",
+   "label_fr": "Timor oriental",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2549842686,
+   "raw_sha256": "ffbece980c6361bc076de4ff13d1bc1a7b44435c58f68bff2fe0ecc7bc7d21d2",
+   "crosswalk_label": "Timor-Leste"
+  },
+  "TON": {
+   "qid": "Q678",
+   "method": "P298",
+   "label_en": "Tonga",
+   "label_fr": "Tonga",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2544189535,
+   "raw_sha256": "f6b7efae3c51cfec3b51c1adf3917cd1a74d50ab85d87d5b3c9f1c59a4ada48d",
+   "crosswalk_label": "Tonga"
+  },
+  "TTO": {
+   "qid": "Q754",
+   "method": "P298",
+   "label_en": "Trinidad and Tobago",
+   "label_fr": "Trinité-et-Tobago",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551120075,
+   "raw_sha256": "bcadae24c6cabdef03e9bad5a700b03b073071ea57601cc530d9fa30e85b069a",
+   "crosswalk_label": "Trinidad and Tobago"
+  },
+  "TUN": {
+   "qid": "Q948",
+   "method": "P298",
+   "label_en": "Tunisia",
+   "label_fr": "Tunisie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2554590216,
+   "raw_sha256": "981cf4112022f4b87c6f23e88ea38666060835550a0a0034e5b1d5ca4034e8bf",
+   "crosswalk_label": "Tunisia"
+  },
+  "TUR": {
+   "qid": "Q43",
+   "method": "P298",
+   "label_en": "Turkey",
+   "label_fr": "Turquie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556542746,
+   "raw_sha256": "5eb930053165f3ce8a38351abc8e790d373b6c8f1af5c207d185110df012aac3",
+   "crosswalk_label": "Türkiye"
+  },
+  "TUV": {
+   "qid": "Q672",
+   "method": "P298",
+   "label_en": "Tuvalu",
+   "label_fr": "Tuvalu",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2544189169,
+   "raw_sha256": "7e58dad566c57290ae4c834bbcbd5083495c47d4fbbf510c0f1ca653824d9732",
+   "crosswalk_label": "Tuvalu"
+  },
+  "TWN": {
+   "qid": "Q865",
+   "method": "P298",
+   "label_en": "Taiwan",
+   "label_fr": "Taïwan",
+   "classes": [
+    "Q10711424",
+    "Q3624078"
+   ],
+   "lastrevid": 2553025887,
+   "raw_sha256": "56742cbe965867cf08035c81a651e9f4c4e29feaf8a1cf866e0523bd6df2f68f",
+   "crosswalk_label": "Taiwan"
+  },
+  "TZA": {
+   "qid": "Q924",
+   "method": "P298",
+   "label_en": "Tanzania",
+   "label_fr": "Tanzanie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2542474565,
+   "raw_sha256": "af22a0625c91aa9c1407b2307ff2b7649ab0bef8e7bf93dabdbce15534800252",
+   "crosswalk_label": "United Republic of Tanzania"
+  },
+  "UGA": {
+   "qid": "Q1036",
+   "method": "P298",
+   "label_en": "Uganda",
+   "label_fr": "Ouganda",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556285158,
+   "raw_sha256": "263a1cee62ce8b70520613005a5d4fca51bd0a014ef0960f4f9df0bd7ed07d7f",
+   "crosswalk_label": "Uganda"
+  },
+  "UKR": {
+   "qid": "Q212",
+   "method": "P298",
+   "label_en": "Ukraine",
+   "label_fr": "Ukraine",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556631988,
+   "raw_sha256": "b42767b38990392b72bafff692bb3d7537a3dfa91a59bc7eadc0335a2c86e2be",
+   "crosswalk_label": "Ukraine"
+  },
+  "UMI": {
+   "qid": "Q16645",
+   "method": "P298",
+   "label_en": "United States Minor Outlying Islands",
+   "label_fr": "îles mineures éloignées des États-Unis",
+   "classes": [],
+   "lastrevid": 2555301063,
+   "raw_sha256": "a8a603319257d6565e345c3d1adafef819837de44ae815e156fd3ae53b56a6d6",
+   "crosswalk_label": "United States Minor Outlying Islands"
+  },
+  "URY": {
+   "qid": "Q77",
+   "method": "P298",
+   "label_en": "Uruguay",
+   "label_fr": "Uruguay",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551444976,
+   "raw_sha256": "526dbf30c4da87f2c803c201e53f66e6feff4dafd83a09d8efbfd699caa4ebff",
+   "crosswalk_label": "Uruguay"
+  },
+  "USA": {
+   "qid": "Q30",
+   "method": "P298",
+   "label_en": "United States",
+   "label_fr": "États-Unis",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2556188301,
+   "raw_sha256": "662fb4b0f9dab6eea914af1d9260aa83db3289e540b3bfbdc80c9373b622561c",
+   "crosswalk_label": "United States of America"
+  },
+  "UZB": {
+   "qid": "Q265",
+   "method": "P298",
+   "label_en": "Uzbekistan",
+   "label_fr": "Ouzbékistan",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2555973201,
+   "raw_sha256": "31a1758c9c80e87c0e589fd486963cbed732eee46a863a22e3c44042e2e6b18c",
+   "crosswalk_label": "Uzbekistan"
+  },
+  "VAT": {
+   "qid": "Q237",
+   "method": "P298",
+   "label_en": "Vatican City",
+   "label_fr": "Vatican",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2544158403,
+   "raw_sha256": "0c3294a14764b2614b103e5ad3aeec8d6c891409c0b2a20ea36ec367c42e1bc0",
+   "crosswalk_label": "Holy See"
+  },
+  "VCT": {
+   "qid": "Q757",
+   "method": "P298",
+   "label_en": "Saint Vincent and the Grenadines",
+   "label_fr": "Saint-Vincent-et-les-Grenadines",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551119921,
+   "raw_sha256": "a980829c0f8a566fde70deac7f9414bae413feb9c79bd3d641ab91a178d610ab",
+   "crosswalk_label": "Saint Vincent and the Grenadines"
+  },
+  "VEN": {
+   "qid": "Q717",
+   "method": "P298",
+   "label_en": "Venezuela",
+   "label_fr": "Venezuela",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551253549,
+   "raw_sha256": "b9d50a54f6a4331492debb2a3d6341469a5526f251bd7b7e5f698952a5e6c0c0",
+   "crosswalk_label": "Venezuela (Bolivarian Republic of)"
+  },
+  "VGB": {
+   "qid": "Q25305",
+   "method": "P298",
+   "label_en": "British Virgin Islands",
+   "label_fr": "îles Vierges britanniques",
+   "classes": [
+    "Q46395"
+   ],
+   "lastrevid": 2526151657,
+   "raw_sha256": "37664f833583fe5db0f05d3e625f0ed4082bc05735243de1093a03972763db84",
+   "crosswalk_label": "British Virgin Islands"
+  },
+  "VIR": {
+   "qid": "Q11703",
+   "method": "P298",
+   "label_en": "United States Virgin Islands",
+   "label_fr": "îles Vierges des États-Unis",
+   "classes": [
+    "Q1048835"
+   ],
+   "lastrevid": 2545343773,
+   "raw_sha256": "68a745d406023302c60598d86b868c0b7142811e78a511a15c92c2183d0706e2",
+   "crosswalk_label": "United States Virgin Islands"
+  },
+  "VNM": {
+   "qid": "Q881",
+   "method": "P298",
+   "label_en": "Vietnam",
+   "label_fr": "Vietnam",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553189547,
+   "raw_sha256": "7eeea8d7fc7322d725b99f64935012fe01c488e9f94c9d14afc099d801a31880",
+   "crosswalk_label": "Viet Nam"
+  },
+  "VUT": {
+   "qid": "Q686",
+   "method": "P298",
+   "label_en": "Vanuatu",
+   "label_fr": "Vanuatu",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2551262783,
+   "raw_sha256": "131e6e34c212e6a4a82b0828e79da9bbd8f9bcb08c9b1925ba9484b10b827fd7",
+   "crosswalk_label": "Vanuatu"
+  },
+  "WLF": {
+   "qid": "Q35555",
+   "method": "P298",
+   "label_en": "Wallis and Futuna",
+   "label_fr": "Wallis-et-Futuna",
+   "classes": [],
+   "lastrevid": 2517835629,
+   "raw_sha256": "3d25532ba7bc69c7984b6d0b5c20df4c0521bd34937ad52c612e8cbaabd5f707",
+   "crosswalk_label": "Wallis and Futuna Islands"
+  },
+  "WSM": {
+   "qid": "Q683",
+   "method": "P298",
+   "label_en": "Samoa",
+   "label_fr": "Samoa",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2525548172,
+   "raw_sha256": "4b25d7d27e6a48eecf91c21191b72c72d4283a393f8e853ab846d2a210832617",
+   "crosswalk_label": "Samoa"
+  },
+  "XKX": {
+   "qid": "Q1246",
+   "method": "enwiki_sitelink",
+   "enwiki_title": "Kosovo",
+   "label_en": "Kosovo",
+   "label_fr": "Kosovo",
+   "lastrevid": 2557182713,
+   "raw_sha256": "d313104665325c5421f9308a5878ef120d65fda963865141b759b0da8b0bc548",
+   "crosswalk_label": "Kosovo"
+  },
+  "YEM": {
+   "qid": "Q805",
+   "method": "P298",
+   "label_en": "Yemen",
+   "label_fr": "Yémen",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2553343121,
+   "raw_sha256": "9914e30a4f46bf2c8070b89109891aa456a213e91b9b7bbe39b55e2dc35527dc",
+   "crosswalk_label": "Yemen"
+  },
+  "ZAF": {
+   "qid": "Q258",
+   "method": "P298",
+   "label_en": "South Africa",
+   "label_fr": "Afrique du Sud",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2550287219,
+   "raw_sha256": "8628b1ddd2d54d9496e0b041bf70231a584dee7c29f61b7de1190a6fad4d50ea",
+   "crosswalk_label": "South Africa"
+  },
+  "ZMB": {
+   "qid": "Q953",
+   "method": "P298",
+   "label_en": "Zambia",
+   "label_fr": "Zambie",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2538617937,
+   "raw_sha256": "69337dcc35f18cfa1dc6759381a45ee97412fdfd63ffbc433f5d395144aeab48",
+   "crosswalk_label": "Zambia"
+  },
+  "ZWE": {
+   "qid": "Q954",
+   "method": "P298",
+   "label_en": "Zimbabwe",
+   "label_fr": "Zimbabwe",
+   "classes": [
+    "Q3624078",
+    "Q6256"
+   ],
+   "lastrevid": 2547611570,
+   "raw_sha256": "4261e878ac93a97f71afbab59e56ff09030b18370006227a92f5814c9e5b72f5",
+   "crosswalk_label": "Zimbabwe"
+  }
+ },
+ "unmapped": [
+  "ATA",
+  "PSE"
+ ],
+ "ambiguous": {
+  "ATA": [
+   "Q51",
+   "Q10372207"
+  ],
+  "PSE": [
+   "Q219060",
+   "Q407199"
+  ]
+ }
+}

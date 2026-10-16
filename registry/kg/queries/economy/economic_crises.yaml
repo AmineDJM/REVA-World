@@ -1,0 +1,26 @@
+id: economy.economic_crises
+domain: economy
+owner: KGSCIECO
+description: >-
+  Economic crises and events: instances of economic crisis (Q290178), financial crisis (Q114380), recession
+  (Q176494), energy crisis (Q123193388), stock market crash (Q1020018), economic bubble (Q207781) or
+  hyperinflation (Q185565), or of a subclass, with at least 3 sitelinks (Great Depression, Wall Street crash
+  of 1929, 1973 oil crisis, 1997 Asian financial crisis, 2007-2008 financial crisis, tulip mania, dot-com
+  bubble, Weimar hyperinflation ...), plus the Marshall Plan and the Bretton Woods system by id. Snapshots keep
+  countries affected (P17), location (P276), start/end/point in time, has cause / has effect / immediate cause
+  / contributing factor (P828/P1542/P1478/P1479, shown only as "asserted by Wikidata", e.g. 1973 oil crisis
+  -> has cause -> Yom Kippur War when Wikidata states it), part of (P361), followed by / follows.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?root { wd:Q290178 wd:Q114380 wd:Q176494 wd:Q123193388 wd:Q1020018 wd:Q207781 wd:Q185565 }
+      ?item wdt:P31/wdt:P279* ?root ; wikibase:sitelinks ?links .
+      FILTER(?links >= 3)
+    }
+    UNION
+    { VALUES ?item { wd:Q4576 wd:Q188532 } }
+  }
+max_rows: 3000
+expand_hops: 1

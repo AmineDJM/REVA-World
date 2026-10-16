@@ -58,7 +58,7 @@ class AtlasSourceSpec(BaseModel):
     datasets: tuple[str, ...] = Field(min_length=1, description="Atlas dataset keys this source produces")
     dataset_ids: tuple[str, ...] = Field(default=(), description="Provider dataset identifiers")
     cadence_seconds: int = Field(ge=3600, description="Expected refresh cadence")
-    budget_key: str = Field("", description="Budget ledger key (default: source_key)")
+    budget_key: str = Field(default="", description="Budget ledger key (default: source_key)")
     planned_requests: int = Field(ge=1, le=5000, description="Requests reserved up front for one full run")
     max_response_bytes: int = Field(52_428_800, ge=1, le=MAX_ATLAS_RESPONSE_BYTES)
     min_interval_seconds: float = Field(1.0, ge=0.2, le=60, description="Politeness: >= this between requests")

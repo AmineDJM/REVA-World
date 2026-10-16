@@ -361,3 +361,44 @@ def test_llm_question_is_charged_to_the_shared_v2_ledger(env: Env) -> None:
     finally:
         for k in ("nlqa_planner_factory", "nlqa_ledger", "nlqa_budget"):
             delattr(env.app.state, k)
+
+
+def test_keyword_planner_concept_ties_are_resolved_or_reported_as_ambiguity(env: Env) -> None:
+    """V3 e2e FIX2: "salaire minimum en France" ties across the catalog's minimum-wage concepts. ATLASOPS's
+    headline source order (the real ``registry/atlas/source_order``) picks the monthly local-currency concept
+    and the value is answered; a tie nothing decides is reported as an ambiguity with its candidates, never
+    as "not covered"."""
+    from reva.nlqa.catalog import QaCatalog, build_catalog
+    from reva.nlqa.ports import Concept
+
+    real = build_catalog()
+    mw = {k: c for k, c in real.concepts.items() if k.startswith("labour.minimum_wage.")}
+    lcu = "labour.minimum_wage.monthly.local_currency"
+    if lcu not in mw:  # pragma: no cover - registry catalog changed
+        pytest.skip("registry catalog has no monthly local-currency minimum wage")
+    cells = [
+        F.cell("ilostat", "ear_inee_cur_nb_a", "EAR_INEE_CUR_NB", "FRA", 2026, "1867", "EUR per month", F.RAW_ILO, lcu)
+    ]
+    atlas = F.FakeAtlas(cells)
+    atlas.order = {k: c.source_order for k, c in mw.items()}
+    saved = (env.app.state.nlqa_catalog, env.app.state.nlqa_backends.atlas)
+    try:
+        env.app.state.nlqa_catalog = QaCatalog(mw, real.countries, real.properties)
+        env.app.state.nlqa_backends.atlas = atlas
+        b = ask(env, "Quel est le salaire minimum en France ?").json()
+        cited(b)
+        assert b["planner"] == "keyword_fallback"
+        assert [(o["op"], o["concept"], o["country"]) for o in b["plan"]["operations"]] == [("atlas_value", lcu, "FRA")]
+        assert b["plan"]["ambiguities"][0]["headline"] == "reva.labour.minimum_wage_monthly_lcu"
+        assert "867 EUR per month" in b["answer_text"] and "Non couvert" not in b["answer_text"], b["answer_text"]
+        assert any(s["kind"] == "note" and "reva.labour.minimum_wage_monthly_lcu" in s["text"] for s in b["sentences"])
+
+        tied = {f"labour.mw.v{i}": Concept(f"labour.mw.v{i}", {"fr": f"Salaire minimum variante{i}"}) for i in range(7)}
+        env.app.state.nlqa_catalog = QaCatalog(tied, real.countries, real.properties)
+        b = ask(env, "Quel est le salaire minimum en France ?").json()
+        cited(b)
+        assert b["plan"]["operations"] == [] and b["unsupported"] == []
+        assert "Question ambiguë" in b["answer_text"] and "Non couvert" not in b["answer_text"], b["answer_text"]
+        assert any(s["kind"] == "ambiguous" and "labour.mw.v6" in s["text"] for s in b["sentences"])
+    finally:
+        env.app.state.nlqa_catalog, env.app.state.nlqa_backends.atlas = saved

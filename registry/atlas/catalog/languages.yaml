@@ -1,0 +1,120 @@
+# Language concepts of the atlas (agent KGLANG). Provider-declared, not human-reviewed.
+# Source: Glottolog CLDF release (Zenodo, CC BY 4.0; attribution "Hammarström, Forkel, Haspelmath & Bank,
+# Glottolog <version>, Max Planck Institute for Evolutionary Anthropology"); atlas table glottolog.languages built
+# by src/reva/adapters/connectors/atlas_glottolog.py.
+#
+# Every value is an EXACT COUNT OF GLOTTOLOG RECORDS derived by REVA (flags.aggregation = count,
+# flags.derived_by): language-level languoids (Level = language) whose `Countries` column lists the country, at the
+# release (period = the release day; flags carry the Glottolog version and DOI). A language spoken in several
+# countries counts in each. These are not speaker numbers, not official-language counts, and not an estimate of
+# the "true" number of languages of a country: they are what Glottolog lists. Endangerment is Glottolog's
+# Agglomerated Endangerment Status (AES), compiled by Glottolog from Ethnologue (EGIDS), UNESCO and ElCat.
+# A country with no Glottolog record at all has no row (never a filled zero); a country listed by at least one
+# languoid has rows for every indicator, zero included (an exact enumeration of the release).
+domain: languages
+labels: {fr: "Langues", en: "Languages"}
+maintainer: KGLANG
+concepts:
+  - id: languages.languages_listed
+    labels: {fr: "Langues recensées par Glottolog dans le pays", en: "Languages listed in the country by Glottolog"}
+    definition: >-
+      Number of Glottolog language-level languoids (any category: spoken L1, sign, pidgin, mixed, unattested,
+      unclassifiable, bookkeeping, artificial, speech register) whose Countries column lists the country, at the
+      Glottolog release. Count of records, not of speakers.
+    unit: count
+    domain: languages
+    subdomain: diversity
+    theme: culture
+    source_order:
+      - "glottolog.languages.languages_listed"
+    provider_declared: true
+    notes: "Derived by REVA (count of Glottolog records); flags name the Glottolog version and DOI."
+  - id: languages.spoken_l1_listed
+    labels: {fr: "Langues parlées (L1) recensées par Glottolog", en: "Spoken L1 languages listed by Glottolog"}
+    definition: >-
+      Number of Glottolog language-level languoids of category Spoken L1 Language whose Countries column lists the
+      country, whatever their endangerment status (extinct languages included), at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: diversity
+    theme: culture
+    source_order:
+      - "glottolog.languages.languages_listed|category=Spoken_L1_Language"
+    provider_declared: true
+  - id: languages.living_spoken_l1
+    labels: {fr: "Langues vivantes parlées dans le pays (Glottolog)", en: "Living languages spoken in the country (Glottolog)"}
+    definition: >-
+      Number of Glottolog language-level languoids of category Spoken L1 Language listing the country whose
+      Agglomerated Endangerment Status is not endangered, threatened, shifting, moribund or nearly extinct (i.e. not
+      extinct and with a status), at the Glottolog release. Languages without an AES value are not counted (the
+      table reports them as spoken_l1|aes=none).
+    unit: count
+    domain: languages
+    subdomain: vitality
+    theme: culture
+    source_order:
+      - "glottolog.languages.spoken_l1_living"
+    provider_declared: true
+    notes: "'Living' is REVA's label for AES 1-5 (Glottolog CodeTable aes-not_endangered .. aes-nearly_extinct)."
+  - id: languages.endangered_spoken_l1
+    labels: {fr: "Langues menacées parlées dans le pays (Glottolog)", en: "Endangered languages spoken in the country (Glottolog)"}
+    definition: >-
+      Number of Glottolog language-level languoids of category Spoken L1 Language listing the country whose
+      Agglomerated Endangerment Status is threatened, shifting, moribund or nearly extinct (EGIDS 6b-8b; UNESCO
+      vulnerable to critically endangered), at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: vitality
+    theme: culture
+    source_order:
+      - "glottolog.languages.spoken_l1_endangered"
+    provider_declared: true
+    notes: "'Endangered' is REVA's label for AES 2-5; the AES equivalences are Glottolog's CodeTable descriptions."
+  - id: languages.not_endangered_spoken_l1
+    labels: {fr: "Langues non menacées (Glottolog)", en: "Not endangered languages (Glottolog)"}
+    definition: >-
+      Number of Glottolog spoken L1 languages listing the country with Agglomerated Endangerment Status 'not
+      endangered' (EGIDS <= 6a; UNESCO safe), at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: vitality
+    theme: culture
+    source_order:
+      - "glottolog.languages.spoken_l1|aes=not_endangered"
+    provider_declared: true
+  - id: languages.nearly_extinct_spoken_l1
+    labels: {fr: "Langues presque éteintes (Glottolog)", en: "Nearly extinct languages (Glottolog)"}
+    definition: >-
+      Number of Glottolog spoken L1 languages listing the country with Agglomerated Endangerment Status 'nearly
+      extinct' (EGIDS 8b; UNESCO critically endangered), at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: vitality
+    theme: culture
+    source_order:
+      - "glottolog.languages.spoken_l1|aes=nearly_extinct"
+    provider_declared: true
+  - id: languages.extinct_spoken_l1
+    labels: {fr: "Langues éteintes recensées (Glottolog)", en: "Extinct languages listed (Glottolog)"}
+    definition: >-
+      Number of Glottolog spoken L1 languages listing the country with Agglomerated Endangerment Status 'extinct'
+      (EGIDS >= 9; UNESCO extinct), at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: vitality
+    theme: culture
+    source_order:
+      - "glottolog.languages.spoken_l1|aes=extinct"
+    provider_declared: true
+  - id: languages.sign_languages_listed
+    labels: {fr: "Langues des signes recensées (Glottolog)", en: "Sign languages listed (Glottolog)"}
+    definition: >-
+      Number of Glottolog language-level languoids of category Sign Language whose Countries column lists the
+      country, at the Glottolog release.
+    unit: count
+    domain: languages
+    subdomain: diversity
+    theme: culture
+    source_order:
+      - "glottolog.languages.languages_listed|category=Sign_Language"
+    provider_declared: true

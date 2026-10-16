@@ -134,13 +134,18 @@ def plan(
     by_agent: dict[str, int] = {}
     caps: dict[str, int | None] = {}
     for key in new_keys:
-        r = asked.get(key)
-        if r is None:
+        found = asked.get(key)
+        if found is None:
             continue
-        b = r["bytes_per_day"] if r["bytes_per_day"] is not None else r["daily_requests"] * DEFAULT_BYTES_PER_REQUEST
-        by_agent[r["agent"]] = by_agent.get(r["agent"], 0) + b
-        caps[r["agent"]] = r["agent_bytes_total"]
-    extra_bytes = sum(min(v, caps[a]) if caps[a] is not None else v for a, v in by_agent.items())
+        req: dict[str, Any] = found
+        b = (
+            req["bytes_per_day"]
+            if req["bytes_per_day"] is not None
+            else req["daily_requests"] * DEFAULT_BYTES_PER_REQUEST
+        )
+        by_agent[req["agent"]] = by_agent.get(req["agent"], 0) + b
+        caps[req["agent"]] = req["agent_bytes_total"]
+    extra_bytes = sum(v if (cap := caps[a]) is None else min(v, cap) for a, v in by_agent.items())
     total_bytes = BASE_TOTAL_BYTES + extra_bytes
     return (
         dict(sorted(per.items(), key=lambda kv: (kv[0] not in BASE_PER_SOURCE, kv[0]))),
