@@ -362,9 +362,16 @@ test('Dossier pays BRA: links grouped by kind from the link store, partners open
   const groups = page.getByTestId('link-kind');
   await expect(groups.first()).toBeVisible(SLOW);
   await expect(groups).toHaveCount(Object.keys(api.data.by_kind).length);
-  const toPrt = page.locator('#dom-links a[href="/v3/relation?a=BRA&b=PRT"]').first();
-  await expect(toPrt).toBeVisible();
-  await toPrt.click();
+  const partner = Object.values(api.data.by_kind as Record<string, any>)
+    .flatMap((k: any) => k.groups.flatMap((g: any) => g.links))
+    .map((l: any) => (l.iso3 ?? []).find((x: string | null) => x && x !== 'BRA'))
+    .find(Boolean);
+  expect(partner, 'a partner country with an ISO3 code').toBeTruthy();
+  await page.locator('#dom-links details.v3-link-group').evaluateAll((els) => els.forEach((e) => ((e as HTMLDetailsElement).open = true)));
+  const toPartner = page.locator(`#dom-links a[href="/v3/relation?a=BRA&b=${partner}"]`).first();
+  await toPartner.scrollIntoViewIfNeeded();
+  await expect(toPartner).toBeVisible();
+  await toPartner.click();
   await expect(page.getByRole('heading', { level: 1, name: /Pays ↔ Pays/ })).toBeVisible(SLOW);
 });
 

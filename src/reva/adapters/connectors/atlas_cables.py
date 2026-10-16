@@ -68,6 +68,7 @@ API_URL = (
     "&languages=en&format=json&maxlag=5"
 )
 API_BATCH = 50
+CABLE_LIST_CHARS = 2200  # flags must stay <= 4,000 characters (atlas schema); the selector lists every QID
 #: tests replace the machine-wide Wikidata lock (``wikidata.MachineLock``) with a no-op one
 LOCK_FACTORY: Any = None
 MAX_SUBCLASS_DEPTH = 2
@@ -127,6 +128,9 @@ async def _locked_get(
         raw = await run.get(url, key=key, media_types=media, max_bytes=run.spec.max_response_bytes,
                             headers={"User-Agent": user_agent(), "Accept": media[0]})  # fmt: skip
         return ic.Fetched(name=key, url=url, body=raw.body, sha256=run.archive(raw), retrieved_at=raw.retrieved_at)
+    reused = _reuse(run, url)
+    if reused is not None:
+        return reused
     lock = (LOCK_FACTORY or MachineLock)()
     for attempt in range(1, attempts + 1):
         async with lock.slot(endpoint) as slot:
@@ -143,6 +147,35 @@ async def _locked_get(
         sha = run.archive(raw)
         return ic.Fetched(name=key, url=url, body=raw.body, sha256=sha, retrieved_at=raw.retrieved_at)
     raise SourceResponseError("Wikidata still throttled", retryable=True, kind="throttled")
+
+
+def _reuse(run: Any, url: str) -> ic.Fetched | None:
+    """Run option ``reuse_archived_hours=N``: serve a live response this source already archived (same request
+    fingerprint, origin live, retrieved < N hours ago) instead of asking Wikidata again. The raw keeps its own
+    sha256 and original retrieval time; nothing is re-archived. Used to resume a long run without re-fetching."""
+    hours = float((run.options or {}).get("reuse_archived_hours") or 0)
+    if hours <= 0 or run.engine is None:
+        return None
+    from sqlalchemy import text
+
+    from reva.adapters.http.safe_client import SECRET_QUERY_PARAMS, request_fingerprint
+
+    fp = request_fingerprint("GET", url, secret_params=tuple(SECRET_QUERY_PARAMS))
+    with run.engine.connect() as c:
+        row = c.execute(
+            text(
+                "SELECT a.raw_sha256, a.retrieved_at FROM evidence.acquisition a "
+                "JOIN evidence.connector_version v ON v.id = a.connector_version_id "
+                "WHERE a.request_fingerprint = :fp AND a.origin = 'live' AND v.name = :name "
+                "AND a.retrieved_at > now() - make_interval(secs => :secs) ORDER BY a.retrieved_at DESC LIMIT 1"
+            ),
+            {"fp": fp, "name": run.spec.name, "secs": hours * 3600},
+        ).first()
+    if row is None:
+        return None
+    body = run.store.get("raw", row[0])
+    run.archived.append(row[0])
+    return ic.Fetched(name=url, url=url, body=body, sha256=row[0], retrieved_at=row[1])
 
 
 def parse_links(html: bytes, target: str) -> list[str]:
@@ -239,21 +272,25 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
             "coverage": "Wikidata cable items only (not every cable system has one); countries = P17 as edited"}  # fmt: skip
 
     def ref(cs: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
+        """(raw sha of the first cable, compact cable list fitting the 4,000-character flags limit)."""
         cs = sorted(cs, key=lambda c: int(c["qid"][1:]))
-        return raws[cs[0]["qid"]], {
-            "cables": [
-                {"qid": c["qid"], "label": c["label"], "year": c["year"], "year_property": c["year_property"],
-                 "revision": c["revision"], "raw_sha256": raws[c["qid"]]}
-                for c in cs[:60]
-            ],
-            "cables_total": len(cs),
-        }  # fmt: skip
+        listed, used = [], 0
+        for c in cs:
+            item = {"qid": c["qid"], "label": str(c["label"])[:60], "year": c["year"], "rev": c["revision"]}
+            if c["year_property"] and c["year_property"] != "P729":
+                item["year_property"] = c["year_property"]
+            n = len(json.dumps(item, ensure_ascii=False)) + 1
+            if used + n > CABLE_LIST_CHARS:
+                break
+            listed.append(item)
+            used += n
+        return raws[cs[0]["qid"]], {"cables": listed, "cables_total": len(cs), "cables_listed": len(listed)}
 
     def put(ind: str, geo: str, period: tuple[date, date], value: int, unit: str, cs: list[dict[str, Any]],
             formula: str, **extra: Any) -> None:  # fmt: skip
         sha, fl = ref(cs)
         rb.count(indicator=ind, provider_geo=geo, iso3=cidx.get(geo), period=period, value=value, unit=unit,
-                 raw_sha256=sha, selector={"wikidata_entities": [c["qid"] for c in cs][:60], "aggregate": ind},
+                 raw_sha256=sha, selector={"wikidata_entities": [c["qid"] for c in cs][:250], "aggregate": ind},
                  flags={**ic.derived(formula, **base, **extra), **fl})  # fmt: skip
 
     pairs: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
@@ -298,7 +335,7 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
                                        "formula": "earliest service year (P729, else P571) among the cables listing "
                                                   "both countries that have one", "undated_cables": len(cs) - len(dated)}),
                     "raw_sha256": sha,
-                    "selector": ic.canon({"wikidata_entities": [c["qid"] for c in dated][:60], "aggregate": "min_year"}),
+                    "selector": ic.canon({"wikidata_entities": [c["qid"] for c in dated][:250], "aggregate": "min_year"}),
                 })  # fmt: skip
     report = {
         "cables": len(cables),

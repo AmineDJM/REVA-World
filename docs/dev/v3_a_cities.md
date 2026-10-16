@@ -137,6 +137,16 @@ uv run python -m reva.adapters.connectors.atlas_cities wikidata --db reva_xxx --
   * `disagree`;
   * `geonames_only`;
   * `wikidata_only`.
+* **WDQS-free path** (`--via api`, used live on 2026-10-16). It applies when WDQS answers our shared egress with
+  `429 Retry-After: 1000` on every request.
+  * The countries' own snapshots (`country_qids.json`; Special:EntityData through WDHARVEST's client in
+    `linked_data` mode, recent archived snapshots reused) give their P36 claims.
+  * Every P36 object is loaded as a full snapshot, its claims filtered to P31/P17/P131/P1376/P1566/P625/P1082,
+    with source `wikidata.wbapi` and the entity revision. Its own P1566 claims are the link: still Wikidata's
+    statements, never a name.
+  * `--max-ids N` additionally looks up the first N priority geonameids by CirrusSearch
+    (`haswbstatement:P1566=…`, candidates only, verified by their snapshots' P1566 claims). That needs the
+    action/REST search API, which was saturated during the run.
 * The two specs are `enabled: false` for the generic harvester:
   * the first fans out over GeoNames ids, while the harvester splits only by QIDs;
   * the second is a cross-check, because countries' P36 claims already come from `core.countries`.

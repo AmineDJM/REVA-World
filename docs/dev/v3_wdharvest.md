@@ -125,3 +125,51 @@ fetched from Wikidata (every P-id was verified to exist and its datatype to matc
 drift vs. my expected labels was reviewed: e.g. P607 is "participated in conflict"). Rejected: P642 ("of",
 deleted from Wikidata). 30 qualifiers and 4 reference properties are kept. Every property has its fr label. Requests:
 `registry/kg/property_requests/<agent>.yaml` → `python -m reva.kg.harvest merge-property-requests`.
+
+## Results
+
+### Country → QID (`registry/entities/country_qids.json`, new file; the crosswalk is unchanged)
+
+| | |
+|---|---|
+| crosswalk entities | 251 (250 + TWN added by XWALK) |
+| mapped | **249** — 247 from the items' own non-deprecated, non-ended ISO 3166-1 alpha-3 (P298) claim on non-dissolved items, 2 via enwiki sitelink (CHI → Q42314 Channel Islands, XKX → Q1246 Kosovo) |
+| ambiguous (never picked) | **ATA**: Q51 Antarctica / Q10372207 Antarctic Treaty area (no class distinguishes them); **PSE**: Q219060 State of Palestine / Q407199 Occupied Palestinian territory (class-tier suggestion: Q219060) — candidates listed with lastrevid and raw sha for maintainer review |
+| distinct QIDs | 249 (no QID shared by two codes) |
+| provenance | every entry: method, `lastrevid`, raw sha256 of the archived snapshot; candidates from `Special:WhatLinksHere/Property:P298` (286 items), snapshots via `Special:EntityData` (291 requests, 138 MB raw / ~25 MB archived gzip) |
+
+### Seed run (throwaway DB `reva_kg_wdharvest`, `run registry/kg/queries/core --via api --api-mode auto --no-expand`)
+
+| spec | candidates | loaded entities | statements | requests | time |
+|---|---|---|---|---|---|
+| core.countries | 249 (country_qids) | 249 | 60,538 | 0 (archived snapshots < 24 h reused) | 49 s |
+| core.sovereign_states | 960 (WhatLinksHere/Q3624078) | 442 (own P31 contains Q3624078; former states with ended P31 included) | 64,410 | 760 | 69 min |
+| core.historical_states | 4,382 (WhatLinksHere/Q3024240) | in progress at report time: ~69 % accepted (≈ 3,000 expected); ≥ 1,500 expected ~3.5 h after 19:30 UTC | | ~11 req/min | ~7 h total |
+
+At report time: 565 entities current, 70,706 current statements, **100 % with a source revision**, 23,087
+(33 %) with references; 311 entities have P31 = historical country (former sovereign states included). Loader
+rejections: a handful of `end_before_start` (Wikidata data errors, kept out by KGCORE). DB 73 MB, archive 54 MB
+(gzip). After the core run, the same detached job runs KGHIST's specs `--via api` (6 with `api_search`;
+WDQS-only specs are reported `skipped`). Progress: `uv run python -m reva.kg.harvest status`,
+`var/kg/logs/seed_run2.log`, `var/kg/logs/history_run.log`, reports in `var/kg/reports/`.
+
+### Throughput and sizes (observed 2026-10-15/16)
+
+* WDQS: effectively unavailable from the shared egress (429 with Retry-After 1,000 s renewed for hours by
+  global traffic); 1 successful SPARQL response in the whole session. Statements specs (all domains) need WDQS
+  and have not been run.
+* Action API: ~1 success per 2-3 min machine-wide ("You are making too many requests to the API").
+* `Special:EntityData`: ~11-15 entities/min at our 2 s pacing; country snapshots ~0.5 MB raw, historical states
+  ~10-50 KB; gzip archive ≈ 1/5 of raw.
+* KG footprint: ~240 allow-listed statements per country, ~145 per accepted sovereign state, ~1 KB per
+  statement in Postgres (indexes included).
+
+### Not done / follow-ups
+
+* Domain statements specs (29) and SPARQL-only seed specs wait for WDQS; KGCULT's
+  `culture.historical_state_languages` still selects with truthy `wdt:P31` (under-selects empires — use
+  `p:P31/ps:P31` + rank filter).
+* `expand_hops` label snapshots were skipped in the seed run (`--no-expand`) to spend the scarce requests on
+  full snapshots; objects are present as QIDs and can be labelled later (`run` without `--no-expand`).
+* QLever not adopted (no published usage policy).
+* Live test `tests/integration/test_wikidata_live.py` (marked live) not run at the end (WDQS throttled).

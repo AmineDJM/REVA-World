@@ -30,6 +30,7 @@ import polars as pl
 
 DAY = 86_400
 ACTOR = "worker:atlas_ingest"
+MAX_JSON_CHARS = 4000  # atlas schema limit for flags / selector text
 ABSENT_NOTE = "rows exist only for counts >= 1; an absent row means no such record in the source, not zero"
 
 
@@ -195,6 +196,11 @@ class RowBuilder:
 
     def frame(self) -> pl.DataFrame:
         from reva.atlas.tables import ATLAS_SCHEMA
+
+        for r in self.rows:  # the atlas validator's limit: fail at build time, not after a long fetch
+            for col in ("flags", "selector"):
+                if not 2 <= len(r[col]) <= MAX_JSON_CHARS:
+                    raise ValueError(f"{col} of {r['indicator']}/{r['provider_geo']} has {len(r[col])} characters")
 
         cols = ATLAS_SCHEMA.names()
         return pl.DataFrame({c: [r[c] for r in self.rows] for c in cols}, schema=ATLAS_SCHEMA)
