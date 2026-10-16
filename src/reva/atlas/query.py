@@ -56,12 +56,13 @@ from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
 from reva.ports.storage import ArtifactStore
 
-DB_FORMAT = "atlas-duckdb/5"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
-DB_SUFFIX = "-v5.duckdb"
-#: Non-calendar cells attach to a year view when they span 150..1097 days (semesters, 12-month fiscal
-#: years, survey and 3-year windows): to ``flags.label_year`` when the provider labels the cell with a
-#: year inside the period, else to the year containing the period's last day. Shorter (monthly,
-#: quarterly) and longer windows stay in per-source views only and are never reported "absent".
+DB_FORMAT = "atlas-duckdb/6"  # /4: year view attaches non-calendar cells (ATLAS-2), period_basis column
+DB_SUFFIX = "-v6.duckdb"
+#: Non-calendar cells attach to a year view when they are a point in time (a 1-day "as of" period:
+#: GeoNames, Natural Earth, Factbook, WBL, Constitute) or span 150..1097 days (semesters, 12-month
+#: fiscal years, survey and 3-year windows): to ``flags.label_year`` when the provider labels the cell
+#: with a year inside the period, else to the year containing the period's last day. Monthly/quarterly
+#: and longer windows stay in per-source views only and are never reported "absent".
 ATTACH_MIN_DAYS = 150
 ATTACH_MAX_DAYS = 1097
 KEEP_SNAPSHOT_DBS = 2
@@ -83,8 +84,8 @@ def iso_date_sql(col: str) -> str:
     """ISO 8601 text of a DATE in astronomical years (``-9999-01-01`` = 10000 BCE; DuckDB's own
     VARCHAR form is ``10000-01-01 (BC)`` and Python dates stop at year 1)."""
     return (
-        f"((CASE WHEN year({col}) < 0 THEN '-' ELSE '' END) || lpad(CAST(abs(year({col})) AS VARCHAR), 4, '0') "
-        f"|| '-' || lpad(CAST(month({col}) AS VARCHAR), 2, '0') || '-' || lpad(CAST(day({col}) AS VARCHAR), 2, '0'))"
+        f"printf('%s%04d-%02d-%02d', CASE WHEN year({col}) < 0 THEN '-' ELSE '' END, abs(year({col})), "
+        f"month({col}), day({col}))"
     )
 
 
@@ -108,10 +109,10 @@ WITH pre AS (
 att AS (
   SELECT *,
          CASE WHEN cal THEN CAST(year(period_start) AS INTEGER)
-              WHEN span BETWEEN {ATTACH_MIN_DAYS} AND {ATTACH_MAX_DAYS} THEN
+              WHEN span <= 1 OR span BETWEEN {ATTACH_MIN_DAYS} AND {ATTACH_MAX_DAYS} THEN
                 CASE WHEN label_year BETWEEN year(period_start) AND last_year THEN label_year ELSE last_year END
          END AS attach,
-         CASE WHEN cal THEN 'calendar_year' WHEN span < 365 THEN 'sub_annual'
+         CASE WHEN cal THEN 'calendar_year' WHEN span <= 1 THEN 'point_in_time' WHEN span < 365 THEN 'sub_annual'
               WHEN span <= 366 THEN 'twelve_month_window' ELSE 'multi_year' END AS basis
   FROM pre),
 ranked AS (

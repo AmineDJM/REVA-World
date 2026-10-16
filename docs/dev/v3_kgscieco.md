@@ -177,7 +177,19 @@ WDQS and the Wikidata API were heavily throttled during this work (shared machin
 request went through `reva.kg.harvest.budgeted_client` / `python -m reva.kg.harvest try` (lock, pacing,
 Retry-After, budget meter, raw archive). No direct curl/httpx.
 
-TRIES_PLACEHOLDER
+| # | Request | Endpoint | Result |
+|---|---|---|---|
+| 1 | Anchor lookup by English label (64 science labels → item, sitelinks, P31 classes) | WDQS | 78 rows; served after ~36 min of lock/cool-down wait (`anchors_sci`) |
+| 2–5 | 200 enwiki titles → QID, en label, sitelinks, P31 (4 × 50) | wbgetentities | 192 found (8 titles not found — title variants, not used: ISRO, French East India Company, Mississippi Company, South Sea Bubble, European debt crisis, Banque de France, Krebs cycle, Halley's comet) |
+| 6–9 | 161 class QIDs + requested PIDs → en label + datatype (4 × 50) | wbgetentities | 160 found; **P448 (launch site) missing** → request dropped. Corrected from it: space agency is Q17505024 (Q11753232 = launch service provider), chartered company is Q162157 (Q1700154 = colonial society), Q166620 = drainage basin (removed from seas), Pasteur Institute is Q391083 |
+| 10 | `try science.chemical_elements --limit 5` | WDQS | **5/5 rows in 7.4 s** (raw `1f067cd661bc…`) |
+| 11 | Claims of 50 anchor items (the chains above) | wbgetentities | 50 entities (raw `b669861e4596…`) |
+| 12 | `COUNT(*)` of all 28 seed specs (one request each) | WDQS | **not served**: HTTP 429 with `Retry-After: 1000` at every slot for ~45 min; job stopped |
+| 13 | `try science.discoveries_inventions --limit 5` (+ 5 more specs queued) | WDQS | **not served**: two further 429s (Retry-After 1000 s each); stopped to stop prolonging the machine-wide cool-down |
+
+The recorded label check (`tests/fixtures/kg/scieco/qid_labels.json`, 132 ids) is built from requests 2–9:
+the labels are re-read from the archived raw bodies (sha256 checked) by the test when the archive is present.
+Full harvest runs were **not** attempted (WDHARVEST owns them; WDQS was refusing this host).
 
 ## Validation
 
