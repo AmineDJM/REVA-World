@@ -37,6 +37,8 @@ from reva.nlqa.ports import (
     EntityMatch,
     KgPath,
     KgStatement,
+    PairLinkGroup,
+    PairLinks,
     PathHop,
     is_projection,
     per_country_unit,
@@ -195,8 +197,18 @@ class Evidence:
         return [eid, *cited]
 
     def link(self, link: CountryLink, cited: Sequence[str]) -> str:
+        extra: dict[str, Any] = {}
+        if link.facet:
+            extra["facet"] = link.facet
+        if link.link_type == "unga_vote_agreement" and link.basis:
+            # a computed index: the counts it rests on travel with it (share = n_identical / n_common)
+            extra["basis"] = {
+                k: link.basis[k]
+                for k in ("index", "formula", "n_common", "n_identical", "issue", "grain", "roll_call_years", "caveat")
+                if k in link.basis
+            }
         return self._add(
-            ("link", link.kind, link.a_iso3, link.b_iso3, link.period, tuple(cited)),
+            ("link", link.kind, link.link_type, link.a_iso3, link.b_iso3, link.period, link.facet, tuple(cited)),
             {
                 "kind": "link",
                 "link_kind": link.kind,
@@ -209,6 +221,7 @@ class Evidence:
                 "derived_by": link.derived_by,
                 "supporting_evidence": list(cited),
                 "citation": {"source": link.source or link.derived_by, "status": "derived_link"},
+                **extra,
             },
         )
 
@@ -434,7 +447,41 @@ class Executor:
                 cited = [ev.statement(s) for s in lk.statements] + [ev.cell(c) for c in lk.cells]
                 rows.append((lk, ev.link(lk, cited), cited))
             return OpResult(op, "ok", data={"iso3": iso3, "links": rows}, consulted=consulted)
+        if op.op == "links_pair":
+            return self._links_pair(op, lookups, ev)
         raise CapabilityUnavailable(f"operation {op.op} has no executor", backend="plan")
+
+    def _links_pair(self, op: PlanOp, lookups: dict[str, Resolved], ev: Evidence) -> OpResult:
+        a = op.args
+        ia, ib = self._iso3(a["country"], lookups), self._iso3(a["other_country"], lookups)
+        if not ia or not ib:
+            return OpResult(op, "unresolved", data={"lookup": a["country"] if not ia else a["other_country"]})
+        if ia == ib:
+            return OpResult(op, "unresolved", data={"lookup": a["other_country"]})
+        pair = getattr(self.b.links, "pair", None) if self.b.links is not None else None
+        if not callable(pair):
+            raise CapabilityUnavailable("the pair view of the interconnection layer is not available", backend="links")
+        assert self.b.links is not None
+        res: PairLinks = pair(ia, ib, a["kinds"] or None, a["from_year"], a["to_year"])
+        consulted = [f"{self.b.links.name} (pair view{', ' + res.store if res.store else ''})"]
+        data: dict[str, Any] = {"a": ia, "b": ib, "pair": res}
+        if res.kinds_without_links:
+            data["absent"] = ev.absence(
+                "links_pair_kinds", consulted, a=ia, b=ib, kinds=",".join(res.kinds_without_links)
+            )
+        if not res.groups and not res.predecessor_links:
+            data["absence"] = data.get("absent") or ev.absence(
+                "links_pair", consulted, a=ia, b=ib, kinds=",".join(a["kinds"])
+            )
+            return OpResult(op, "empty", data=data, consulted=consulted)
+
+        def cite(lk: CountryLink) -> tuple[CountryLink, str, list[str]]:
+            cited = [ev.statement(s) for s in lk.statements] + [ev.cell(c) for c in lk.cells]
+            return lk, ev.link(lk, cited), cited
+
+        data["groups"] = [(g, [cite(lk) for lk in pair_links_shown(g)]) for g in res.groups]
+        data["predecessors"] = [(p, cite(p.link), [cite(c) for c in p.succession]) for p in res.predecessor_links]
+        return OpResult(op, "ok", data=data, consulted=consulted)
 
     def _need_kg(self) -> Any:
         if self.b.kg is None:
@@ -583,6 +630,8 @@ class Executor:
                     wanted.add(c.iso3)
             if res.data.get("iso3") and res.data["iso3"] != "ALL":
                 wanted.add(res.data["iso3"])
+            if res.op.op == "links_pair":
+                wanted.update(x for x in (res.data.get("a"), res.data.get("b")) if x)
             for lk, _, _ in res.data.get("links") or []:
                 wanted.update((lk.a_iso3, lk.b_iso3))
         missing = sorted(wanted - set(out))
@@ -595,6 +644,40 @@ class Executor:
         for iso3 in wanted:
             out.setdefault(iso3, {"en": self.catalog.country_label(iso3)})
         return out
+
+
+#: ``links_pair``: links of one type kept as evidence for the answer (the earliest and latest per direction and
+#: facet, plus every link of an undated or interval type up to this many)
+MAX_PAIR_LINKS_PER_TYPE = 12
+#: vote agreement: decade links of these issues are kept (all roll calls first; per-year links are left to the UI)
+PAIR_VOTE_ISSUES = ("issue=all", "issue=co")
+
+
+def pair_links_shown(g: PairLinkGroup) -> list[CountryLink]:
+    """The links of a pair group the answer cites: a series kind (one value per year) keeps its first and last
+    value per direction and facet (the default facet only when present); vote agreement keeps its decade values
+    (issues :data:`PAIR_VOTE_ISSUES`); other kinds keep up to :data:`MAX_PAIR_LINKS_PER_TYPE` links."""
+    links = list(g.links)
+    if g.link_type == "unga_vote_agreement":
+        dec = [lk for lk in links if str(lk.basis.get("grain", "decade")) == "decade"]
+        return [lk for lk in dec if (lk.facet or "issue=all") in PAIR_VOTE_ISSUES][:24]
+    series = [lk for lk in links if lk.weight is not None and _single_year(lk.period)]
+    if series and len(series) == len(links):
+        facets = {lk.facet for lk in links}
+        default = "section=TOTAL" if "section=TOTAL" in facets else None
+        if default is not None:
+            links = [lk for lk in links if lk.facet == default]
+        out: list[CountryLink] = []
+        keys = dict.fromkeys((lk.a_iso3, lk.b_iso3, lk.facet) for lk in links)
+        for key in list(keys)[:6]:
+            same = sorted((lk for lk in links if (lk.a_iso3, lk.b_iso3, lk.facet) == key), key=lambda x: str(x.period))
+            out += [same[0]] + ([same[-1]] if len(same) > 1 else [])
+        return out
+    return links[:MAX_PAIR_LINKS_PER_TYPE]
+
+
+def _single_year(period: str | None) -> bool:
+    return bool(period) and re.fullmatch(r"-?\d{1,4}", str(period)) is not None
 
 
 def _choose(matches: list[EntityMatch], kind: str | None) -> tuple[EntityMatch, list[Entity]]:

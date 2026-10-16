@@ -65,7 +65,10 @@ class PlanReplay:
         fx = self.find(request.text_sha256)
         if fx is None:
             raise LlmProviderError("no planner fixture for this text (offline replay)", reason="fixture_missing")
-        if fx.get("prompt_version") != request.prompt_version:
+        # a recorded provider refusal (HTTP 402/429 quota) does not depend on the prompt: it replays under a later
+        # prompt version; a recorded or synthetic *plan* must match the version it was written for
+        refusal = fx["fixture_kind"] == "recorded_live_response" and int(fx.get("http_status", 200)) != 200
+        if fx.get("prompt_version") != request.prompt_version and not refusal:
             raise LlmProviderError(
                 f"fixture {fx['_file']} has prompt {fx.get('prompt_version')}, not {request.prompt_version}: re-capture",
                 reason="fixture_stale",

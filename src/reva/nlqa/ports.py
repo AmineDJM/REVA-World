@@ -345,6 +345,7 @@ class CountryLink:
     facet: str | None = None  # ``issue=co`` (vote agreement), ``section=XVI`` (BACI)
     a_node: str | None = None  # node ids when an end is not a crosswalk country (a predecessor state)
     b_node: str | None = None
+    via: tuple[str, ...] = ()  # shared node ids (the language, the organisation) of a derived co-link
 
 
 @dataclass(frozen=True)
@@ -358,6 +359,7 @@ class PairLinkGroup:
     last_year: int | None
     links: tuple[CountryLink, ...]
     labels: Mapping[str, str] = field(default_factory=dict)  # type labels {fr, en}
+    directed: bool = False
 
 
 @dataclass(frozen=True)
@@ -383,6 +385,8 @@ class PairLinks:
     truncated: tuple[str, ...] = ()
     node_labels: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
     store: str | None = None  # "materialisation <id>" or "on demand"
+    #: {link type: {fr, en}} labels (taxonomy) of every type named, incl. those without links
+    type_labels: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
 
 
 @runtime_checkable

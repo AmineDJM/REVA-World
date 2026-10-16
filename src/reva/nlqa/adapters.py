@@ -651,6 +651,7 @@ class LinksAdapter:
                     last_year=k.get("last_year"),
                     links=tuple(_pair_link(lk, labels, props) for lk in k["links"]),
                     labels={x: str(v) for x, v in (k.get("labels") or {}).items()},
+                    directed=bool(k.get("directed")),
                 )
             )
         preds = tuple(
@@ -663,6 +664,15 @@ class LinksAdapter:
             for p in d.get("predecessor_links") or []
         )
         store = d.get("store") or {}
+        try:
+            from reva.links.taxonomy import load_taxonomy
+
+            tax = load_taxonomy().link_types
+            type_labels = {
+                t: dict(tax[t].labels) for t in (*d["kinds"], *(d.get("kinds_without_links") or ())) if t in tax
+            }
+        except Exception:  # labels are cosmetic: ids are shown instead
+            type_labels = {}
         return PairLinks(
             a,
             b,
@@ -676,6 +686,7 @@ class LinksAdapter:
                 if store
                 else "on demand (no materialised link store)"
             ),
+            type_labels=type_labels,
         )
 
     def links(self, iso3: str, kinds: Sequence[str] | None, limit: int) -> list[CountryLink]:
@@ -772,6 +783,7 @@ def _pair_link(lk: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]], p
         facet=lk.get("facet") or None,
         a_node=None if iso[0] else subj,
         b_node=None if iso[1] else obj,
+        via=tuple(str(v) for v in lk.get("via") or ()),
     )
 
 

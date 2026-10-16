@@ -23,6 +23,11 @@ _RANK_DESC = re.compile(
 _RANK_ASC = re.compile(r"\b(plus faible\w*|plus bas\w*|plus petit\w*|lowest|smallest|least|moins)\b", re.IGNORECASE)
 _RELATION = re.compile(r"\b(li[ée]e?s?|reli[ée]e?s?|rapport|lien|connect\w*|link\w*|relat\w*)\b", re.IGNORECASE)
 _YEAR = re.compile(r"\b(1[0-9]{3}|20[0-9]{2})\b")
+#: "liens entre X et Y", "relation(s) entre X et Y", "links/relations between X and Y" (links_pair)
+_PAIR = re.compile(
+    r"\b(liens?|relations?|rapports?|connexions?|links?|relations?hips?|ties|connections?)\s+(entre|between)\b",
+    re.IGNORECASE,
+)
 _CAP_SPAN = re.compile(
     r"(?:[A-ZÀ-ÖØ-Þ][\w'’-]+)(?:\s+(?:de|du|des|d'|la|le|of|the|von|van|da|di)?\s*[A-ZÀ-ÖØ-Þ][\w'’-]+)*"
 )
@@ -158,6 +163,19 @@ def match_concept(question: str, catalog: QaCatalog, headlines: Any = _UNSET) ->
 MAX_TIED_CONCEPTS = 5
 
 
+def _spans(question: str) -> list[str]:
+    """Capitalised names of the question (leading question words dropped), at most 4, in order."""
+    spans = []
+    for m in _CAP_SPAN.finditer(question):
+        words = m.group(0).strip().split()
+        while words and fold(words[0]) in _QUESTION_WORDS:
+            words = words[1:]
+        span = " ".join(words)
+        if len(span) >= 3 and fold(span) not in _QUESTION_WORDS:
+            spans.append(span)
+    return list(dict.fromkeys(spans))[:4]
+
+
 def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> dict[str, Any]:
     q = fold(question)
     lang = detect_language(question)
@@ -192,6 +210,30 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
             if m:
                 found.append((m.start(), c.iso3))
     countries = [iso for _, iso in sorted(set(found))]
+    if _PAIR.search(question):
+        # links between two countries: crosswalk names / ISO3 codes, else the capitalised names (resolved by the
+        # server to countries through the KG; a name that is not a country leaves the operation unresolved)
+        ends: list[str] = countries[:2]
+        if len(ends) < 2:
+            ends = [op(op="entity_lookup", text=sp, kind="country")["id"] for sp in _spans(question)[:2]]
+        if len(ends) == 2:
+            span = sorted(years)
+            op(
+                op="links_pair",
+                country=ends[0],
+                other_country=ends[1],
+                link_kinds=[],
+                from_year=span[0] if span else None,
+                to_year=span[-1] if span else None,
+            )
+            return {
+                "input_language": lang,
+                "restatement": "",
+                "operations": ops,
+                "unsupported": [],
+                "ambiguities": [],
+            }
+        ops.clear()
     if concept:
         if _RANK_ASC.search(question) or _RANK_DESC.search(question):
             order = "asc" if _RANK_ASC.search(question) else "desc"
@@ -214,16 +256,7 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
         ambiguity["resolution"] = "each_queried"
         ambiguous = []
     elif not ambiguous:
-        spans = []
-        for m in _CAP_SPAN.finditer(question):
-            span = m.group(0).strip()
-            words = span.split()
-            while words and fold(words[0]) in _QUESTION_WORDS:
-                words = words[1:]
-            span = " ".join(words)
-            if len(span) >= 3 and fold(span) not in _QUESTION_WORDS:
-                spans.append(span)
-        spans = list(dict.fromkeys(spans))[:4]
+        spans = _spans(question)
         lookups = [op(op="entity_lookup", text=s, kind=None)["id"] for s in spans]
         if len(lookups) >= 2 and _RELATION.search(question):
             op(op="kg_path", from_entity=lookups[0], to_entity=lookups[1], max_hops=3, as_of=None)

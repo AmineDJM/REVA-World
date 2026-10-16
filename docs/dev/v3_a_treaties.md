@@ -51,8 +51,10 @@ raw response (`run.archive`) **after** the whole run parsed (layout drift archiv
   attributed to a participant referencing the note. Bracketed participants without a stated effect date: **Jamaica**
   (ICCPR-OP1, notification 1997-10-23 only).
 * **Historical successor-state actions** are recorded as UNTC states them: the table's participant name and date
-  (e.g. "Russian Federation" with the USSR's 1973 ICCPR ratification; "Czech Republic"/"Slovakia" successions),
-  every referenced footnote kept verbatim as an atlas row `<mtdsg>|note=<n>` (≤ 4000 chars, truncation flagged) and
+  (e.g. ICCPR: "Russian Federation" listed with the USSR's 1968 signature and 1973 ratification dates and no note on
+  that page — continuity is explained in UNTC's general "Historical Information"; "Czech Republic" and "Slovakia"
+  listed with successions `d` of 22 Feb 1993 / 28 May 1993 and note 7 "Czechoslovakia had signed and ratified the
+  Convention on 7 October 1968 and 23 December 1975…"), every referenced footnote kept verbatim as an atlas row `<mtdsg>|note=<n>` (≤ 4000 chars, truncation flagged) and
   as `untc_notes` qualifier in the KG. Former States themselves (USSR, Yugoslavia, Czechoslovakia, GDR) appear in UNTC
   only inside notes, so no rows are created for them.
 
@@ -161,3 +163,48 @@ Bhutan, Solomon Islands; CRPD-OP Georgia; OP-CAT Congo). OHCHR `LastSynced` per 
 
 ## 6. Treaty QIDs (`registry/entities/treaty_qids.json`)
 
+**3 of 55 verified**: UNFCCC → Q208645, Kyoto Protocol → Q47359, Paris Agreement → Q21707860 (English label or alias
+equals the UNTC title; item has P31; revision ids and raw response sha256 in the file). Method: Wikidata's search
+endpoints (CirrusSearch on `api.php` and the REST search) were under machine-wide 429 cool-downs for the whole session
+(other agents' traffic), so a search-based run (55 queries) did not progress (3 queries in ~15 min) and was stopped.
+Instead 30 agent-proposed candidate QIDs were fetched with `Special:EntityData` through WDHARVEST's locked, budgeted
+client (`reva.kg.harvest.budgeted_client`, mode `linked_data`) and checked: **26 were wrong items** (e.g. a dam, a
+village, a shark) and were rejected, 1 is missing — which is exactly why nothing is mapped without verification. No
+Wikidata identifier keyed by the MTDSG number was found (the Paris Agreement item has a UNTC `showDetails` URL in P973,
+keyed by UNTC's objid). Unmapped treaties are `untc:treaty:<mtdsg>` KG entities (en/fr labels); statement ids do not
+depend on the subject, so mapping more QIDs later makes new revisions of the same statements. The live load above ran
+before the 3 QIDs existed (all treaty subjects were `untc:` nodes); the fixture tests run with the mapping.
+
+## 7. Gaps and what would fill them
+
+* **ILO conventions (NORMLEX)**: blocked by Cloudflare for non-browser clients — not ingested. Fill: an ILO data export
+  or permission/allow-listing for a documented crawler; Wikidata has no systematic per-State ratification statements.
+* **NPT, BWC** (UNODA database behind an AWS WAF challenge), **CITES**, **Ramsar**, **Geneva Conventions** (non-UN
+  depositaries; CITES/Ramsar sites answer 403): not covered.
+* **Entry into force per State** is not on the status pages (only the treaty's general entry into force): `untc:party`
+  starts at the deposit date (qualifier `start_basis` says so).
+* **Withdrawal dates from notes** are parsed with two bounded sentence patterns + footnote tables; a note phrased
+  otherwise leaves a bracketed participant with `untc:former_party` (no end date; today: Jamaica/ICCPR-OP1 only).
+  Re-accessions after a denunciation (Trinidad and Tobago 1998, Guyana 1999, Bhutan/UNCAC 2023) are read from the
+  table only (the latest listed date), earlier periods stay in the `withdrawal_events` qualifier.
+* **Reservations/declarations text** comes from OHCHR for the 18 instruments only; for the other UNTC treaties the
+  atlas/KG carry a boolean (participant name linked to declarations) — the UNTC declaration texts are in the archived
+  pages (`dgDec` table) but not parsed.
+* **Treaty QIDs**: 52 of 55 unmapped (see §6).
+
+## 8. Requests to other owners
+
+1. **LINKS** (`registry/links/link_types.yaml`): `co_signatory` already applies (P1891 on the treaty, here with exact
+   signature dates). Please add a `co_party` link type over `untc:party` (two States with overlapping party intervals
+   on the same treaty, `via` = treaty, temporal = interval overlap; hub damping for near-universal treaties such as
+   UNFCCC/Montreal with 198 parties) and allow-list `untc:party`/`untc:former_party` as statement edges
+   ("partie à" / "party to").
+2. **KGHIST / WDHARVEST**: when `history.treaties` is harvested, map Wikidata treaty items to MTDSG numbers by label
+   (or add candidates to `registry/entities/treaty_qids.json` with the same verification rule); re-running `atlas.untc`
+   then re-keys the subjects. WDHARVEST's `country_qids.json` has no entry for PSE (State of Palestine): its statements
+   use `iso3:PSE`.
+3. **Lead / maintainer**: both sources are **not openly licensed** (UN Terms of Use): keep the tables and statements
+   internal; review before any redistribution.
+4. **Budget note**: one stopped Wikidata search run (SIGTERM) may have left an unsettled `wikidata.*` reservation in
+   the harvest ledger (`reva_kg_wdharvest`, run id prefix `kgatreaties-`); it only reduces that day's remaining
+   allowance.

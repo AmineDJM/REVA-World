@@ -276,6 +276,59 @@ def test_keyword_planner_when_llm_is_not_enabled(env: Env) -> None:
     assert "1. Monaco" in b["answer_text"]
 
 
+def test_links_between_two_countries_keyword_planner(env: Env) -> None:
+    """LINKWIRE: "liens entre X et Y" → ``links_pair`` through the real LINKS pair view (on demand here: no link
+    store, no atlas snapshot), every sentence cited, absent link types said as "no link", never zero."""
+    from reva.kg.model import KgEntity, KgProperty, KgStatement, load_batch, register_properties
+    from reva.nlqa.adapters import _atlas_snapshot_factory
+
+    # without any polity classification LINKS derives no country-country link on demand: said as "no link"
+    b = ask(env, "Quels sont les liens entre le Brésil et le Portugal ?").json()
+    cited(b)
+    assert "Aucun lien entre Brésil et Portugal" in b["answer_text"] and "pas une valeur nulle" in b["answer_text"]
+    # P31 country (a blocked hub for paths) lets LINKS treat both as polities
+    worker = make_engine("worker", env.app.state.settings)
+    try:
+        register_properties(worker, [KgProperty("P31", "item", "instance_of", "instance of", "nature de l'élément")])
+        store = FilesystemArtifactStore(env.app.state.settings.reva_object_root, env.app.state.settings.reva_s3_prefix)
+        raw = store.put_bytes(b"nlqa integration fixture graph v1 (P31)", "raw", "application/json").sha256
+        rep = load_batch(
+            worker,
+            store,
+            entities=[KgEntity("Q6256", "other", {"en": "country", "fr": "pays"})],
+            statements=[KgStatement(q, "P31", "Q6256", statement_id=f"{q}$FIXTURE-P31") for q in ("Q155", "Q45")],
+            source_key="wikidata",
+            raw_sha256s=[raw],
+            retrieved_at=datetime.now(UTC),
+            origin="test_fixture",
+        )
+        assert rep.rejected_total == 0, rep.rejected
+    finally:
+        worker.dispose()
+    assert _atlas_snapshot_factory(env.app.state.engine(), env.app.state.settings, store)(None) is None  # no snapshot
+    r = ask(env, "Quels sont les liens entre le Brésil et le Portugal ?")
+    assert r.status_code == 200, r.text
+    b = r.json()
+    cited(b)
+    ops = b["plan"]["operations"]
+    assert [o["op"] for o in ops] == ["entity_lookup", "entity_lookup", "links_pair"], ops
+    assert "les liens (tous types) entre « Brésil » et « Portugal »" in b["restatement"]
+    text = b["answer_text"]
+    assert "Brésil — langue officielle commune (via portugais) — Portugal" in text, text
+    assert "pas une valeur nulle" in text
+    # vote agreement is a share of identical votes, never an alliance (the alliance_co_member type may be named)
+    assert not any(
+        x["kind"] == "fact" and "vote" in x["text"] and "alliance" in x["text"].lower() for x in b["sentences"]
+    )
+    link_ev = [e for e in b["evidence"] if e["kind"] == "link" and e["link_type"] == "shared_official_language"]
+    assert link_ev and {e["kind"] for e in b["evidence"] if e["id"] in link_ev[0]["supporting_evidence"]} == {
+        "kg_statement"
+    }
+    absent = next(e for e in b["evidence"] if e["kind"] == "absence" and e["what"] == "links_pair_kinds")
+    assert "unga_vote_agreement" in absent["kinds"] and "bilateral_trade" in absent["kinds"]
+    assert any("on demand" in c for c in absent["sources_consulted"])
+
+
 def test_real_wiring_reports_missing_atlas_snapshot(env: Env) -> None:
     notes = env.app.state.nlqa_real_notes
     assert any(n.startswith("capability_unavailable: atlas") for n in notes), notes

@@ -2,7 +2,7 @@
  "fixture_kind": "synthetic_plan",
  "label": "en_density_rank_2022",
  "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
- "prompt_version": "nlqa-plan-1.0.0",
+ "prompt_version": "nlqa-plan-1.1.0",
  "text": "Which countries have the highest population density in 2022?",
  "text_sha256": "011c8b5372f0d702eb7f06b38dc514ac5497a4a96dcf479eecf327e354161d14",
  "output": {
@@ -21,6 +21,7 @@
     "max_hops": null,
     "concept": "population.density",
     "country": null,
+    "other_country": null,
     "year": 2022,
     "order": "desc",
     "limit": 5,

@@ -1,0 +1,650 @@
+{
+ "schema": "reva-treaty-qids/1",
+ "built_by": "A-TREATIES (V3), 2026-10-16",
+ "review_status": "agent_mapped_pending_maintainer_review",
+ "rules": [
+  "candidate QIDs proposed by the agent (Wikidata search endpoints were throttled machine-wide on 2026-10-16), each verified with a Special:EntityData snapshot fetched through WDHARVEST's locked, budgeted client (src/reva/kg/harvest.py budgeted_client, mode linked_data); raw responses archived content-addressed in var/kg/objects (raw_sha256)",
+  "'verified' = the item has P31 and its English label or an English alias equals the UNTC page title or the connector's label (normalised: case, punctuation, '(yyyy)'); otherwise qid null and the KG keeps untc:treaty:<mtdsg>",
+  "no Wikidata identifier keyed by the MTDSG number was found on the fetched items (the Paris Agreement item carries a UNTC showDetails URL in P973 'described at URL', keyed by the UNTC objid, not by MTDSG), so the mapping is this evidenced table",
+  "most agent-proposed candidates were rejected by the check (wrong items); their treaties stay unmapped until candidates come from a search (WDQS/CirrusSearch throttled) or from KGHIST's harvested treaty items",
+  "Wikidata is community-edited: pending maintainer review"
+ ],
+ "retrieved_at": "2026-10-16T19:07:51.711793+00:00",
+ "raw_sha256s": [
+  "a430ecf641005cc6abbab8320f0b88b89762a387ce985a4542fd2db2768a5ea2",
+  "9751f935edf0015ca5159c6a38ca2cee05823dca678a27b0ea2647a6820a28d7",
+  "98fd31c72ef7bda304c3994cc64778dd7377a52272b601d4d5ad32293389043a",
+  "27ac8404aef81e0ca8450cbf6f8df0f73bcb3ebc1eb8143a7ecb3be94944c151",
+  "a24b2c6e3b75a52c1a2f372b41a82ede79ad0a665826ee27ddc1481c0639364f",
+  "1c20ce952ae024b0875054eac1ededee528d62a25ee58fafe6d7b3a692adb5e0",
+  "25265053d71c616f00120a2cc1a3d85850ece1a161241426483d3ad63f1dc94a",
+  "d2a8f13329dfd15a0bb4ed104c78b7724076cbba47ef29bead9f6d8332dd4104",
+  "b8f9fb24023d3e0a92037dc56f6b40395cbfeaf04c44f62ad4d28b2de44f33b5",
+  "72298944d068cf35e237bc096c1ac38134f73797b5629769a1fe08f0e5c23bc7",
+  "ed5cdde3f8a216052396f391b91a24b0d2576a518b067b73a7fb5dbec60d3ba4",
+  "1cb03c667e353f66ecc331e7abda98077ad54d9c850492ac8bc9250a61c029ec",
+  "f087706f496f720edb255b0615e7bdfcc5d3e1b5c6ab7673514ffa170b3144af",
+  "fbbc506fa94bb53aca739183e5a5016eec870c20a36025391f2c4de57d918d05",
+  "d98821c2a957df6d714575e954cfd9596bc10cc2a261a67d618f2dd4307d079b",
+  "0280bc199c7edd70551866a5f1c9221c359b8d7eb8f1d0cedf7afe35d9c01f19",
+  "65cf32e354e6048c11c7e910e9b771e495bf40bc0bbd37d16527aef468ade759",
+  "7cfa2b0e34bc5560ff5a3500a1e74dfa45f07efa00cdbc1e5429d7d685d7df94",
+  "93181b67d1b788ac3102f452ffda44d465d19dc985734ce6e9a0ff5d16303eab",
+  "3022b1250a0bcd88454ab9c4747a1f9db866faf04e4333dcc07ad5940ff66101",
+  "cb072c1414d703d2e64ea34bcc5be440c3be453c4973e1ac81e0e55b50f73174",
+  "9f7486a76dd85f0c20038e111eaa5971c3122dc63d49e70791df8993067d44c6",
+  "8fc7d7cd6b53ad851bad5515c841e19e8aa659356b813889b79763d030cc430e",
+  "6d57020854a800950c58de8bae4bcb53958fce1f58e0de0738ddac779624370a",
+  "c95a8ca0d0443d5d7359fb8a84ef3e61f7cd5761b868d9d328d22dd687e1728d",
+  "2257a62430e35791a8bfa46daeda2403837156bde7ca49623ccd6283efaf7ea6",
+  "efe37ee6ba2faa73e96c1824a40e6c55fdb3dd671f7117d99efc8adc550337eb",
+  "bed9988382d89fa6e213aed766765a2382cfbeab9a8510c9cd2996e2bf9cb64e",
+  "328400ed6d1b2dad6fc7cd3bd0c0f107eba1d6de7bcc8692cfe71cf03e4f8bb1"
+ ],
+ "entries": [
+  {
+   "mtdsg": "IV-1",
+   "untc_title": "Convention on the Prevention and Punishment of the Crime of Genocide",
+   "candidates": [
+    "Q190531"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-2",
+   "untc_title": "International Convention on the Elimination of All Forms of Racial Discrimination",
+   "candidates": [
+    "Q1130440"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-3",
+   "untc_title": "International Covenant on Economic, Social and Cultural Rights",
+   "candidates": [
+    "Q1060989"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-3-a",
+   "untc_title": "Optional Protocol to the International Covenant on Economic, Social and Cultural Rights",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-4",
+   "untc_title": "International Covenant on Civil and Political Rights",
+   "candidates": [
+    "Q1046046"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1046046",
+     "label_en": null
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-5",
+   "untc_title": "Optional Protocol to the International Covenant on Civil and Political Rights",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-12",
+   "untc_title": "Second Optional Protocol to the International Covenant on Civil and Political Rights, aiming at the abolition of the death penalty",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-7",
+   "untc_title": "International Convention on the Suppression and Punishment of the Crime of Apartheid",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-8",
+   "untc_title": "Convention on the Elimination of All Forms of Discrimination against Women",
+   "candidates": [
+    "Q1091839"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1091839",
+     "label_en": "Madra Dam"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-8-b",
+   "untc_title": "Optional Protocol to the Convention on the Elimination of All Forms of Discrimination against Women",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-9",
+   "untc_title": "Convention against Torture and Other Cruel, Inhuman or Degrading Treatment or Punishment",
+   "candidates": [
+    "Q1129125"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1129125",
+     "label_en": null
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-9-b",
+   "untc_title": "Optional Protocol to the Convention against Torture and Other Cruel, Inhuman or Degrading Treatment or Punishment",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-11",
+   "untc_title": "Convention on the Rights of the Child",
+   "candidates": [
+    "Q332247"
+   ],
+   "rejected": [
+    {
+     "qid": "Q332247",
+     "label_en": "Steve Largent"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-11-b",
+   "untc_title": "Optional Protocol to the Convention on the Rights of the Child on the involvement of children in armed conflict",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-11-c",
+   "untc_title": "Optional Protocol to the Convention on the Rights of the Child on the sale of children, child prostitution and child pornography",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-11-d",
+   "untc_title": "Optional Protocol to the Convention on the Rights of the Child on a communications procedure",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-13",
+   "untc_title": "International Convention on the Protection of the Rights of All Migrant Workers and Members of their Families",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-15",
+   "untc_title": "Convention on the Rights of Persons with Disabilities",
+   "candidates": [
+    "Q630932"
+   ],
+   "rejected": [
+    {
+     "qid": "Q630932",
+     "label_en": "Arc-et-Senans"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "IV-15-a",
+   "untc_title": "Optional Protocol to the Convention on the Rights of Persons with Disabilities",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IV-16",
+   "untc_title": "International Convention for the Protection of All Persons from Enforced Disappearance",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "V-2",
+   "untc_title": "Convention relating to the Status of Refugees",
+   "candidates": [
+    "Q1123543"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1123543",
+     "label_en": "Sansui Electric"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "V-5",
+   "untc_title": "Protocol relating to the Status of Refugees",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "V-3",
+   "untc_title": "Convention relating to the Status of Stateless Persons",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "V-4",
+   "untc_title": "Convention on the Reduction of Statelessness",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "III-3",
+   "untc_title": "Vienna Convention on Diplomatic Relations",
+   "candidates": [
+    "Q1132870"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "III-6",
+   "untc_title": "Vienna Convention on Consular Relations",
+   "candidates": [
+    "Q1189563"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1189563",
+     "label_en": "Flutist Wren"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXIII-1",
+   "untc_title": "Vienna Convention on the Law of Treaties",
+   "candidates": [
+    "Q1416154"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXI-6",
+   "untc_title": "United Nations Convention on the Law of the Sea",
+   "candidates": [
+    "Q207630"
+   ],
+   "rejected": [
+    {
+     "qid": "Q207630",
+     "label_en": "longfin mako shark"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXI-10",
+   "untc_title": "Agreement under the United Nations Convention on the Law of the Sea on the Conservation and Sustainable Use of Marine Biological Diversity of Areas beyond National Jurisdiction",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XVIII-10",
+   "untc_title": "Rome Statute of the International Criminal Court",
+   "candidates": [
+    "Q1188240"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1188240",
+     "label_en": "Topraisar"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XVIII-11",
+   "untc_title": "International Convention for the Suppression of the Financing of Terrorism",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XVIII-12",
+   "untc_title": "United Nations Convention against Transnational Organized Crime",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XVIII-12-a",
+   "untc_title": "Protocol to Prevent, Suppress and Punish Trafficking in Persons, Especially Women and Children, supplementing the United Nations Convention against Transnational Organized Crime",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XVIII-14",
+   "untc_title": "United Nations Convention against Corruption",
+   "candidates": [
+    "Q1046519"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1046519",
+     "label_en": "Casa de Oro-Mount Helix"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "VI-19",
+   "untc_title": "United Nations Convention against Illicit Traffic in Narcotic Drugs and Psychotropic Substances",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "IX-4",
+   "untc_title": "WHO Framework Convention on Tobacco Control",
+   "candidates": [
+    "Q1052929"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1052929",
+     "label_en": "Céline Fontanges"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-2",
+   "untc_title": "Convention on Prohibitions or Restrictions on the Use of Certain Conventional Weapons which may be deemed to be Excessively Injurious or to have Indiscriminate Effects (with Protocols I, II and III)",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XXVI-3",
+   "untc_title": "Convention on the Prohibition of the Development, Production, Stockpiling and Use of Chemical Weapons and on their Destruction",
+   "candidates": [
+    "Q622526"
+   ],
+   "rejected": [
+    {
+     "qid": "Q622526",
+     "label_en": "Alfons Berg"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-4",
+   "untc_title": "Comprehensive Nuclear-Test-Ban Treaty",
+   "candidates": [
+    "Q622404"
+   ],
+   "rejected": [
+    {
+     "qid": "Q622404",
+     "label_en": "boyfriend"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-5",
+   "untc_title": "Convention on the Prohibition of the Use, Stockpiling, Production and Transfer of Anti-Personnel Mines and on their Destruction",
+   "candidates": [
+    "Q311919"
+   ],
+   "rejected": [
+    {
+     "qid": "Q311919",
+     "label_en": "Matthew Booth"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-6",
+   "untc_title": "Convention on Cluster Munitions",
+   "candidates": [
+    "Q1116006"
+   ],
+   "rejected": [
+    {
+     "qid": "Q335163",
+     "label_en": "Guy Carleton"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-8",
+   "untc_title": "Arms Trade Treaty",
+   "candidates": [
+    "Q2869014"
+   ],
+   "rejected": [
+    {
+     "qid": "Q2869014",
+     "label_en": "Atheme"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVI-9",
+   "untc_title": "Treaty on the Prohibition of Nuclear Weapons",
+   "candidates": [
+    "Q28457862"
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVII-2",
+   "untc_title": "Vienna Convention for the Protection of the Ozone Layer",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XXVII-2-a",
+   "untc_title": "Montreal Protocol on Substances that Deplete the Ozone Layer",
+   "candidates": [
+    "Q205994"
+   ],
+   "rejected": [
+    {
+     "qid": "Q205994",
+     "label_en": "Zirndorf"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVII-3",
+   "untc_title": "Basel Convention on the Control of Transboundary Movements of Hazardous Wastes and their Disposal",
+   "candidates": [
+    "Q1032853"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1032853",
+     "label_en": "Imre Halasi"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVII-7",
+   "untc_title": "United Nations Framework Convention on Climate Change",
+   "candidates": [
+    "Q208645"
+   ],
+   "qid": "Q208645",
+   "status": "verified",
+   "basis": [
+    "Wikidata en label 'United Nations Framework Convention on Climate Change' == UNTC page title"
+   ],
+   "wikidata_label_en": "United Nations Framework Convention on Climate Change",
+   "wikidata_label_fr": "Convention-cadre des Nations unies sur les changements climatiques",
+   "wikidata_p31": [
+    "Q1691434"
+   ],
+   "wikidata_revision": 2547610835,
+   "raw_sha256": "a24b2c6e3b75a52c1a2f372b41a82ede79ad0a665826ee27ddc1481c0639364f"
+  },
+  {
+   "mtdsg": "XXVII-7-a",
+   "untc_title": "Kyoto Protocol to the United Nations Framework Convention on Climate Change",
+   "candidates": [
+    "Q47359"
+   ],
+   "qid": "Q47359",
+   "status": "verified",
+   "basis": [
+    "Wikidata en label 'Kyoto Protocol' == connector label",
+    "Wikidata en alias 'Kyoto Protocol to the United Nations Framework Convention on Climate Change' == UNTC page title"
+   ],
+   "wikidata_label_en": "Kyoto Protocol",
+   "wikidata_label_fr": "protocole de Kyoto",
+   "wikidata_p31": [
+    "Q5381350"
+   ],
+   "wikidata_revision": 2546851139,
+   "raw_sha256": "a430ecf641005cc6abbab8320f0b88b89762a387ce985a4542fd2db2768a5ea2"
+  },
+  {
+   "mtdsg": "XXVII-7-d",
+   "untc_title": "Paris Agreement",
+   "candidates": [
+    "Q21707860"
+   ],
+   "qid": "Q21707860",
+   "status": "verified",
+   "basis": [
+    "Wikidata en label 'Paris Agreement' == UNTC page title"
+   ],
+   "wikidata_label_en": "Paris Agreement",
+   "wikidata_label_fr": "accord universel des négociations climatiques de Paris",
+   "wikidata_p31": [
+    "Q131569",
+    "Q5381350",
+    "Q5133412"
+   ],
+   "wikidata_revision": 2551254418,
+   "raw_sha256": "328400ed6d1b2dad6fc7cd3bd0c0f107eba1d6de7bcc8692cfe71cf03e4f8bb1"
+  },
+  {
+   "mtdsg": "XXVII-8",
+   "untc_title": "Convention on Biological Diversity",
+   "candidates": [
+    "Q1240946"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1240946",
+     "label_en": "Arieş River"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVII-8-a",
+   "untc_title": "Cartagena Protocol on Biosafety to the Convention on Biological Diversity",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XXVII-10",
+   "untc_title": "United Nations Convention to Combat Desertification in those Countries Experiencing Serious Drought and/or Desertification, Particularly in Africa",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XXVII-14",
+   "untc_title": "Rotterdam Convention on the Prior Informed Consent Procedure for Certain Hazardous Chemicals and Pesticides in International Trade",
+   "candidates": [],
+   "qid": null,
+   "status": "no_candidate"
+  },
+  {
+   "mtdsg": "XXVII-15",
+   "untc_title": "Stockholm Convention on Persistent Organic Pollutants",
+   "candidates": [
+    "Q1145063"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1145063",
+     "label_en": "Curt Frenzel"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  },
+  {
+   "mtdsg": "XXVII-17",
+   "untc_title": "Minamata Convention on Mercury",
+   "candidates": [
+    "Q1324599"
+   ],
+   "rejected": [
+    {
+     "qid": "Q1324599",
+     "label_en": "Subaru Forester"
+    }
+   ],
+   "qid": null,
+   "status": "rejected"
+  }
+ ]
+}

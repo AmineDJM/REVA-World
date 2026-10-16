@@ -179,8 +179,10 @@ def test_provider_429_recorded_live_falls_back_and_stays_charged() -> None:
     led = Ledger()
     q = load(FAILURES)[1]["text"]
     replay = PlanReplay(FAILURES)
-    # the recorded 429 was captured with this prompt version
-    assert replay.fixtures[1]["prompt_version"] == PROMPT_VERSION and replay.fixtures[1]["http_status"] == 429
+    # the recorded 429 was captured with prompt 1.0.0; a quota refusal does not depend on the prompt, so it
+    # replays under the current version (plans must match theirs)
+    assert replay.fixtures[1]["prompt_version"] == "nlqa-plan-1.0.0" != PROMPT_VERSION
+    assert replay.fixtures[1]["http_status"] == 429
     r = ask(q, [replay], led)
     assert r.planner == "keyword_fallback"
     assert any("llm_provider_error" in w and "all_providers_failed" in w for w in r.warnings)

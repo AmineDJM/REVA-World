@@ -525,6 +525,17 @@ class Composer:
                         "fact",
                         op.id,
                     )
+        elif op.op == "links_pair":
+            self.add(
+                f"Aucun lien entre {self.country(d['a'])} et {self.country(d['b'])} dans les données consultées "
+                f"({consulted}) : absence de lien, pas une valeur nulle."
+                if fr
+                else f"No link between {self.country(d['a'])} and {self.country(d['b'])} in the data consulted "
+                f"({consulted}): no link, not a zero value.",
+                [d["absence"]],
+                "missing",
+                op.id,
+            )
         elif op.op == "links":
             self.add(
                 f"Aucun lien de {self.country(d['iso3'])} dans les sources consultées ({consulted})."
@@ -857,6 +868,149 @@ class Composer:
                 [eid, *cited],
                 "fact",
                 res.op.id,
+            )
+
+    # -- links between two countries
+    def node(self, iso3: str, node: str | None, pair: Any) -> str:
+        if node is None and re.fullmatch(r"[A-Z]{3}", iso3 or ""):
+            return self.country(iso3)
+        n = node or iso3
+        return pick_label(pair.node_labels.get(n), self.lang, n)
+
+    def type_label(self, link_type: str, pair: Any, group: Any = None) -> str:
+        labels = (group.labels if group is not None and group.labels else None) or pair.type_labels.get(link_type)
+        return pick_label(labels, self.lang, link_type)
+
+    def pair_link_text(self, lk: Any, pair: Any, *, directed: bool, label: str | None = None) -> str:
+        fr = self.fr()
+        a = self.node(lk.a_iso3, lk.a_node, pair)
+        b = self.node(lk.b_iso3, lk.b_node, pair)
+        rel = label or self.type_label(lk.link_type or lk.kind, pair)
+        via = ", ".join(pick_label(pair.node_labels.get(v), self.lang, v) for v in lk.via)
+        via = f" (via {via})" if via else ""
+        when = lk.period or ("non daté dans la source" if fr else "undated in the source")
+        weight = f", {format_number(lk.weight, self.lang)}{(' ' + lk.unit) if lk.unit else ''}" if lk.weight else ""
+        return f"{a} — {rel}{via} {'→' if directed else '—'} {b} ({when}{weight})"
+
+    def op_links_pair(self, res: OpResult) -> None:
+        fr = self.fr()
+        d = res.data
+        pair = d["pair"]
+        a, b = self.country(d["a"]), self.country(d["b"])
+        op_id = res.op.id
+        for g, shown in d["groups"]:
+            if not shown:
+                continue
+            label = self.type_label(g.link_type, pair, g)
+            if g.link_type == "unga_vote_agreement":
+                self._vote_agreement(g, shown, a, b, op_id)
+                continue
+            series = all(
+                lk.weight is not None and re.fullmatch(r"-?\d{1,4}", str(lk.period or "")) for lk, _, _ in shown
+            )
+            if series:
+                by_dir: dict[tuple[str, str, str | None], list[tuple[Any, str, list[str]]]] = {}
+                for item in shown:
+                    lk = item[0]
+                    by_dir.setdefault((lk.a_iso3, lk.b_iso3, lk.facet), []).append(item)
+                for (ia, ib, facet), items in by_dir.items():
+                    total = sum(1 for lk in g.links if (lk.a_iso3, lk.b_iso3, lk.facet) == (ia, ib, facet))
+                    values = " ; ".join(
+                        f"{format_number(lk.weight, self.lang)}{(' ' + lk.unit) if lk.unit else ''} ({lk.period})"
+                        for lk, _, _ in items
+                    )
+                    src = ", ".join(sorted({lk.source for lk, _, _ in items if lk.source})) or g.link_type
+                    fac = f" [{facet}]" if facet else ""
+                    self.add(
+                        f"{label}{fac}, {self.country(ia)} → {self.country(ib)} : {values} ; {total} valeur(s) "
+                        f"annuelle(s) dans ce sens (source : {src}, telle que rapportée)."
+                        if fr
+                        else f"{label}{fac}, {self.country(ia)} → {self.country(ib)}: {values}; {total} yearly "
+                        f"value(s) in this direction (source: {src}, as reported).",
+                        [c for _, eid, cited in items for c in (eid, *cited)],
+                        "fact",
+                        op_id,
+                    )
+                continue
+            texts = [self.pair_link_text(lk, pair, directed=g.directed, label=label) for lk, _, _ in shown]
+            more = g.count - len(shown)
+            tail = (f" ; et {more} autre(s)" if fr else f"; and {more} more") if more > 0 else ""
+            self.add(
+                (" ; " if fr else "; ").join(texts) + tail + ".",
+                [c for _, eid, cited in shown for c in (eid, *cited)],
+                "fact",
+                op_id,
+            )
+        for p, (lk, eid, cited), chain in d["predecessors"][:MAX_LINKS]:
+            succ = " ; ".join(self.pair_link_text(c, pair, directed=True) for c, _, _ in chain)
+            self.add(
+                f"Lien avec un État prédécesseur de {self.country(p.predecessor_of)} : "
+                f"{self.pair_link_text(lk, pair, directed=True)} ; succession : {succ}."
+                if fr
+                else f"Link with a predecessor state of {self.country(p.predecessor_of)}: "
+                f"{self.pair_link_text(lk, pair, directed=True)}; succession: {succ}.",
+                [eid, *cited, *(x for _, ceid, ccited in chain for x in (ceid, *ccited))],
+                "fact",
+                op_id,
+            )
+        if d.get("absent"):
+            names = ", ".join(self.type_label(t, pair) for t in pair.kinds_without_links)
+            self.add(
+                f"Aucun lien entre {a} et {b} dans les données consultées pour : {names} (absence de lien, pas une "
+                f"valeur nulle)."
+                if fr
+                else f"No link between {a} and {b} in the data consulted for: {names} (no link, not a zero value).",
+                [d["absent"]],
+                "missing",
+                op_id,
+            )
+        if pair.truncated:
+            cites = (
+                [d["absent"]] if d.get("absent") else [eid for _, items in d["groups"][:1] for _, eid, _ in items[:1]]
+            )
+            self.add(
+                f"Lecture bornée par le serveur pour : {', '.join(pair.truncated)} ; d'autres liens peuvent exister."
+                if fr
+                else f"Bounded read on the server for: {', '.join(pair.truncated)}; more links may exist.",
+                cites,
+                "note",
+                op_id,
+            )
+
+    def _vote_agreement(self, g: Any, shown: Sequence[Any], a: str, b: str, op_id: str) -> None:
+        fr = self.fr()
+        by_issue: dict[str, list[Any]] = {}
+        for item in shown:
+            by_issue.setdefault(item[0].facet or "issue=all", []).append(item)
+        issue_fr = {"issue=all": "tous les votes enregistrés", "issue=co": "votes codés « colonialisme » (Voeten)"}
+        issue_en = {"issue=all": "all recorded votes", "issue=co": "votes coded “colonialism” (Voeten)"}
+        for issue, items in by_issue.items():
+            parts = []
+            for lk, _, _ in sorted(items, key=lambda x: str(x[0].period)):
+                yrs = re.findall(r"-?\d{4}", str(lk.period or ""))
+                span = "–".join(dict.fromkeys(yrs[:1] + yrs[-1:])) or (lk.period or "")
+                n, k = lk.basis.get("n_common"), lk.basis.get("n_identical")
+                counts = (
+                    (f" ({k} identiques sur {n} votes communs)" if fr else f" ({k} identical of {n} common votes)")
+                    if n is not None and k is not None
+                    else ""
+                )
+                # the share exactly as computed (4 decimals), never rounded further
+                share = str(lk.weight).replace(".", ",") if fr else str(lk.weight)
+                parts.append(f"{span} : {share}{counts}" if fr else f"{span}: {share}{counts}")
+            self.add(
+                f"Part de votes identiques à l'AG de l'ONU entre {a} et {b} ({issue_fr.get(issue, issue)} ; indice "
+                f"calculé par REVA = votes identiques / votes où les deux ont voté oui, non ou abstention) : "
+                + " ; ".join(parts)
+                + ". C'est une part de votes identiques : elle ne mesure ni une amitié ni une convergence d'intérêts."
+                if fr
+                else f"Share of identical UN General Assembly votes between {a} and {b} ({issue_en.get(issue, issue)}; "
+                f"index computed by REVA = identical votes / votes where both voted yes, no or abstain): "
+                + "; ".join(parts)
+                + ". It is a share of identical votes: it measures neither friendship nor a convergence of interests.",
+                [c for _, eid, cited in items for c in (eid, *cited)],
+                "fact",
+                op_id,
             )
 
 
