@@ -1504,6 +1504,293 @@ properties:
     wikidata_datatype: wikibase-item
     requested_by: KGCULT
     why: "World Heritage criteria of a site (criteria (i)-(x))"
+# merged property requests (wbgetentities labels|datatype 2026-10-16T18:23:49.933739+00:00 raw cac8c372bf75,b68651a08ff6,7b20982476b0,fd160b86b8c0,68f189cc5f1d,6b340aa7e3c6,7427c74b2d45,00ea4ec2c2f5,91e0e57ec136,3853d8fc7aa7,38ac5c7c8c78,85b4e6ad4593,eafd6774e9c6,5ae90fc0c7e2,0a9d9e8a8db1,4f677856e6e2,48e1c8bf972f,a2121541b257,77e7acdcf235,fc194d771708,b0b8c4747237,dbcf560d3bdf,ed9c60dd3d36,f7bda073e6b6,a159e379b18d,4f8729d2c0fc,a4b8ed57b9f7)
+  - property: P241
+    reva_predicate: military_branch
+    inverse: "has_member_of_branch"
+    kind: entity
+    group: requested
+    expected_en: "military branch"
+    label_en: "military branch"
+    label_fr: "corps militaire"
+    wikidata_datatype: wikibase-item
+    requested_by: KGPEOPLE
+    why: "military branch (person -> army/navy/air force of a state); links military leaders and conquerors to the polity whose forces they served, when no position or citizenship statement does."
+  - property: P138
+    reva_predicate: named_after
+    inverse: "eponym_of"
+    kind: entity
+    group: science
+    expected_en: "named after"
+    label_en: "named after"
+    label_fr: "nommé(e) en référence à"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "named after (theory/law/unit/element/discovery -> person or place), e.g. polonium -> Poland, curium -> Marie Curie, Doppler effect -> Christian Doppler, Halley's Comet -> Edmond Halley."
+  - property: P1027
+    reva_predicate: conferred_by
+    inverse: "confers"
+    kind: entity
+    group: science
+    expected_en: "conferred by"
+    label_en: "conferred by"
+    label_fr: "conféré par"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "conferred by (award -> institution), e.g. Nobel Prize in Physics -> Royal Swedish Academy of Sciences."
+  - property: P1924
+    reva_predicate: vaccine_for
+    inverse: "prevented_by_vaccine"
+    kind: entity
+    group: science
+    expected_en: "vaccine for"
+    label_en: "vaccine for"
+    label_fr: "vaccin pour"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "vaccine for (vaccine -> disease), e.g. rabies vaccine -> rabies."
+  - property: P178
+    reva_predicate: developer
+    inverse: "developer_of"
+    kind: entity
+    group: science
+    expected_en: "developer"
+    label_en: "developer"
+    label_fr: "développé par"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "developer (vaccine/technology/software -> organisation or person), e.g. a COVID-19 vaccine -> BioNTech."
+  - property: P176
+    reva_predicate: manufacturer
+    inverse: "manufacturer_of"
+    kind: entity
+    group: science
+    expected_en: "manufacturer"
+    label_en: "manufacturer"
+    label_fr: "fabricant"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "manufacturer (vaccine/spacecraft/product -> company), e.g. a satellite -> its builder."
+  - property: P619
+    reva_predicate: launch_date
+    inverse: null
+    kind: time
+    group: science
+    expected_en: "UTC date of spacecraft launch"
+    label_en: "UTC date of spacecraft launch"
+    label_fr: "date UTC de lancement du véhicule spatial"
+    wikidata_datatype: time
+    requested_by: KGSCIECO
+    why: "UTC date of spacecraft launch (space missions/satellites), dates the mission -> agency -> country chain."
+  - property: P1304
+    reva_predicate: central_bank
+    inverse: "central_bank_of"
+    kind: entity
+    group: economy
+    expected_en: "central bank"
+    label_en: "central bank"
+    label_fr: "banque centrale"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "central bank (country -> central bank), e.g. Japan -> Bank of Japan; harvested with core.countries."
+  - property: P562
+    reva_predicate: issuer
+    inverse: "issuer_of"
+    kind: entity
+    group: economy
+    expected_en: "central bank/issuer"
+    label_en: "central bank/issuer"
+    label_fr: "autorité émettrice"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "central bank/issuer (currency -> issuing bank), e.g. euro -> European Central Bank."
+  - property: P414
+    reva_predicate: listed_on
+    inverse: "lists"
+    kind: entity
+    group: economy
+    expected_en: "stock exchange"
+    label_en: "stock exchange"
+    label_fr: "place de cotation"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "stock exchange (company -> exchange it is listed on), e.g. Toyota -> Tokyo Stock Exchange."
+  - property: P2541
+    reva_predicate: operating_area
+    inverse: "operating_area_of"
+    kind: entity
+    group: economy
+    expected_en: "operating area"
+    label_en: "operating area"
+    label_fr: "zone opérationnelle"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "operating area (organisation -> territory it operates in), the colonial trading company -> territory hop, e.g. Dutch East India Company -> Dutch East Indies / Indonesia; Hudson's Bay Company -> Rupert's Land."
+  - property: P1056
+    reva_predicate: produces
+    inverse: "produced_by"
+    kind: entity
+    group: economy
+    expected_en: "product or material produced"
+    label_en: "product or material produced"
+    label_fr: "produit ou prestation"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "product or material produced (company/country -> product), e.g. Saudi Aramco -> petroleum."
+  - property: P610
+    reva_predicate: highest_point
+    inverse: "highest_point_of"
+    kind: entity
+    group: nature
+    expected_en: "highest point"
+    label_en: "highest point"
+    label_fr: "point culminant"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "highest point (country/region/range -> mountain), e.g. Nepal -> Mount Everest; harvested with core.countries."
+  - property: P1589
+    reva_predicate: lowest_point
+    inverse: "lowest_point_of"
+    kind: entity
+    group: nature
+    expected_en: "lowest point"
+    label_en: "lowest point"
+    label_fr: "point le plus bas"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "lowest point (country -> place), e.g. Israel/Jordan -> Dead Sea."
+  - property: P2044
+    reva_predicate: elevation
+    inverse: null
+    kind: quantity
+    group: nature
+    expected_en: "elevation above sea level"
+    label_en: "elevation above sea level"
+    label_fr: "altitude"
+    wikidata_datatype: quantity
+    requested_by: KGSCIECO
+    why: "elevation above sea level (mountains, lakes, observatories, cities)."
+  - property: P4552
+    reva_predicate: in_mountain_range
+    inverse: "mountain_range_of"
+    kind: entity
+    group: nature
+    expected_en: "mountain range"
+    label_en: "mountain range"
+    label_fr: "chaîne de montagnes"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "mountain range (mountain -> range), e.g. Mont Blanc -> Alps."
+  - property: P403
+    reva_predicate: mouth
+    inverse: "receives_watercourse"
+    kind: entity
+    group: nature
+    expected_en: "mouth of the watercourse"
+    label_en: "mouth of the watercourse"
+    label_fr: "se jette dans"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "mouth of the watercourse (river -> sea/river/lake), e.g. Danube -> Black Sea."
+  - property: P885
+    reva_predicate: watercourse_origin
+    inverse: "origin_of_watercourse"
+    kind: entity
+    group: nature
+    expected_en: "origin of the watercourse"
+    label_en: "origin of the watercourse"
+    label_fr: "source"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "origin of the watercourse (river -> source lake/glacier/mountain), e.g. Nile (White Nile) -> Lake Victoria."
+  - property: P974
+    reva_predicate: tributary
+    inverse: "tributary_of"
+    kind: entity
+    group: nature
+    expected_en: "tributary"
+    label_en: "tributary"
+    label_fr: "affluent"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "tributary (river -> tributary river), e.g. Amazon -> Rio Negro."
+  - property: P4614
+    reva_predicate: drainage_basin
+    inverse: "drainage_basin_of"
+    kind: entity
+    group: nature
+    expected_en: "drainage basin"
+    label_en: "drainage basin"
+    label_fr: "bassin versant"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "drainage basin (river/lake/place -> basin), e.g. Lake Victoria -> Nile basin."
+  - property: P205
+    reva_predicate: basin_country
+    inverse: "country_in_basin_of"
+    kind: entity
+    group: nature
+    expected_en: "basin country"
+    label_en: "basin country"
+    label_fr: "pays souverain sur le bassin versant"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "basin country (lake/sea/river basin -> country bordering or containing it), e.g. Caspian Sea -> Iran."
+  - property: P2043
+    reva_predicate: length
+    inverse: null
+    kind: quantity
+    group: nature
+    expected_en: "length"
+    label_en: "length"
+    label_fr: "longueur"
+    wikidata_datatype: quantity
+    requested_by: KGSCIECO
+    why: "length (rivers, straits, mountain ranges)."
+  - property: P2528
+    reva_predicate: magnitude_richter
+    inverse: null
+    kind: quantity
+    group: nature
+    expected_en: "earthquake magnitude on the Richter magnitude scale"
+    label_en: "earthquake magnitude on the Richter magnitude scale"
+    label_fr: "magnitude sur l'échelle de Richter"
+    wikidata_datatype: quantity
+    requested_by: KGSCIECO
+    why: "earthquake magnitude on the Richter magnitude scale (earthquakes)."
+  - property: P2527
+    reva_predicate: magnitude_moment
+    inverse: null
+    kind: quantity
+    group: nature
+    expected_en: "earthquake magnitude on the moment magnitude scale"
+    label_en: "earthquake magnitude on the moment magnitude scale"
+    label_fr: "échelle de magnitude du moment"
+    wikidata_datatype: quantity
+    requested_by: KGSCIECO
+    why: "earthquake magnitude on the moment magnitude scale (earthquakes; the usual modern measure)."
+  - property: P1603
+    reva_predicate: number_of_cases
+    inverse: null
+    kind: quantity
+    group: nature
+    expected_en: "number of cases"
+    label_en: "number of cases"
+    label_fr: "nombre de cas"
+    wikidata_datatype: quantity
+    requested_by: KGSCIECO
+    why: "number of cases (epidemics/pandemics, often with point-in-time qualifiers)."
+  - property: P814
+    reva_predicate: iucn_category
+    inverse: "iucn_category_of"
+    kind: entity
+    group: nature
+    expected_en: "IUCN protected areas category"
+    label_en: "IUCN protected areas category"
+    label_fr: "catégorie des aires protégées de l'UICN"
+    wikidata_datatype: wikibase-item
+    requested_by: KGSCIECO
+    why: "IUCN protected areas category (national parks -> IUCN category II ...)."
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:
@@ -1536,6 +1823,7 @@ qualifiers:
   - {property: P1107, expected_en: "proportion", label_en: "proportion", label_fr: "proportion", requested_by: KGCULT}
   - {property: P1098, expected_en: "number of speakers, writers, or signers", label_en: "number of speakers, writers, or signers", label_fr: "nombre de locuteurs, auteurs ou signeurs", requested_by: KGCULT}
   - {property: P1114, expected_en: "quantity", label_en: "quantity", label_fr: "quantité", requested_by: KGCULT}
+  - {property: P1686, expected_en: "for work", label_en: "for work", label_fr: "récompense pour", requested_by: KGPEOPLE}
 # Reference properties kept (compactly) per statement reference.
 references:
   - {property: P248, expected_en: "stated in", label_en: "stated in", label_fr: "affirmé dans"}

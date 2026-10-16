@@ -43,9 +43,7 @@ def raws() -> dict[str, Any]:
 @pytest.fixture(scope="module")
 def built(raws: dict[str, Any]) -> dict[str, Any]:
     qids = json.loads((REPO / "registry/entities/country_qids.json").read_text())["countries"]
-    return pk.build(
-        raws["csv"], current_year=2026, strict=False, qid_for_iso3={k: v["qid"] for k, v in qids.items()}
-    )
+    return pk.build(raws["csv"], current_year=2026, strict=False, qid_for_iso3={k: v["qid"] for k, v in qids.items()})
 
 
 def test_spec_is_discovered_and_budgeted_by_the_platform() -> None:
@@ -192,7 +190,9 @@ def test_fatalities_repeats_collapsed_and_flagged(built: dict[str, Any]) -> None
 def test_annual_trailing_space_type_and_incomplete_year(built: dict[str, Any]) -> None:
     rows = _rows(built, "contrib_annual")
     assert not any(r["indicator"].endswith(" |sex=male") or "Troops |" in r["indicator"] for r in rows)
-    ury = [r for r in rows if r["provider_geo"] == "ARM" and r["period_start"].year == 2017 and "Troops" in r["indicator"]]
+    ury = [
+        r for r in rows if r["provider_geo"] == "ARM" and r["period_start"].year == 2017 and "Troops" in r["indicator"]
+    ]
     assert ury and json.loads(ury[0]["flags"]).get("personnel_type_as_published") == "Troops "
     cur = [r for r in rows if r["period_start"].year == 2026]
     assert cur and all(json.loads(r["flags"]).get("year_incomplete_at_retrieval") for r in cur)
@@ -227,7 +227,11 @@ def test_kg_records(built: dict[str, Any]) -> None:
     assert all(s.qualifiers["reporting_dates"] >= 1 and s.start <= s.end for s in contrib)
     keys = [s.key for s in stmts]
     assert len(keys) == len(set(keys))
-    mc = {(s.subject, s.object_qid, s.qualifiers["provider_field"].split(" ")[0]) for s in stmts if s.property == "unpk:mission_country"}
+    mc = {
+        (s.subject, s.object_qid, s.qualifiers["provider_field"].split(" ")[0])
+        for s in stmts
+        if s.property == "unpk:mission_country"
+    }
     assert ("unpk:mission:UNIFIL", "Q822", "location") in mc  # Lebanon (Field Missions Dashboard)
     assert ("unpk:mission:UNIFIL", "Q822", "Mission_Country") in mc  # Lebanon (pre-2010 file)
     unmik = {o for s, o, f in mc if s == "unpk:mission:UNMIK"}

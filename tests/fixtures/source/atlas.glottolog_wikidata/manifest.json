@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "3573c0043699f418c3fa492340ff2e9c715ff000f09f615448face55f9df6d70",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+WHERE+%7B%0A++%3Fitem+p%3AP1394+%3Fstatement+.%0A++%3Fstatement+ps%3AP1394+%3Fcode+%3B%0A+++++++++++++wikibase%3Arank+%3Frank+.%0A++FILTER%28%3Frank+%21%3D+wikibase%3ADeprecatedRank%29%0A%7D&format=json",
+    "file": "results.json",
+    "sha256": "4d4612c0093cfb5cd7121fbd18fe3066c3ea97a2ca528d9ccd70bae3b96ae59d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-16T01:00:00+00:00",
+    "licence": "CC0-1.0 (Wikidata)",
+    "fixture_note": "trimmed: the live WDQS P1394 response (raw sha256 afad5c89185649900027e12272a0bcb184a48d53f5515c21c6fa4d540e93b740, 11,963 rows) restricted to the 49 rows whose code is a languoid of the atlas.glottolog fixture"
+  }
+]

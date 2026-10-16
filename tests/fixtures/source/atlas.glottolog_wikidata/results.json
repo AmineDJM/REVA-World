@@ -1,0 +1,896 @@
+{
+ "head": {
+  "vars": [
+   "item",
+   "statement",
+   "code",
+   "rank"
+  ]
+ },
+ "results": {
+  "bindings": [
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q104170922-03970232-43b8-23e3-6dd3-a71666b95121"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tupi1287"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q104170922"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q107866441-5AD2AC72-8B82-4FDA-86B8-41F3EC9978AE"
+    },
+    "code": {
+     "type": "literal",
+     "value": "deaf1237"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q107866441"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q129256519-f2af0e7c-425a-51e2-571a-23fb3174c66d"
+    },
+    "code": {
+     "type": "literal",
+     "value": "basq1248"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q129256519"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q8752-0176A7E1-CCC4-4792-8C08-AA31D1B450F8"
+    },
+    "code": {
+     "type": "literal",
+     "value": "basq1248"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q8752"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q21200-BF0ECBAC-4F92-4A7D-821F-55DC3ECB0544"
+    },
+    "code": {
+     "type": "literal",
+     "value": "germ1287"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q21200"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q13137302-CD322B63-51E3-43FC-9550-3973642E4876"
+    },
+    "code": {
+     "type": "literal",
+     "value": "nort3152"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q13137302"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q131848-1fea74d3-44e1-1cd9-be33-cd122bd320d0"
+    },
+    "code": {
+     "type": "literal",
+     "value": "ital1284"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q131848"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q1483594-d447784a-48e2-eb3e-5453-d8d86e554fda"
+    },
+    "code": {
+     "type": "literal",
+     "value": "jeee1236"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q1483594"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q148610-1c94302a-4e1f-bd04-9049-1e7c07494077"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tupi1276"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q148610"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q150-6f103682-447c-f17d-14c4-a9be8db64293"
+    },
+    "code": {
+     "type": "literal",
+     "value": "stan1290"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q150"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q19814-a817f373-4922-8c07-0df9-f645fc8e6de6"
+    },
+    "code": {
+     "type": "literal",
+     "value": "roma1334"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q19814"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q19860-37996d9f-4e48-7e65-65c4-e99a05ff83c9"
+    },
+    "code": {
+     "type": "literal",
+     "value": "indo1319"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q19860"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q19927274-d23dcc65-4f3a-553d-3bc0-a79d6a89d072"
+    },
+    "code": {
+     "type": "literal",
+     "value": "earl1243"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q19927274"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q2886400-BD658A21-8CCF-4F36-8FB8-EC9E0CD14C60"
+    },
+    "code": {
+     "type": "literal",
+     "value": "basq1252"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q2886400"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q1321-468C86DF-57F0-4BA9-A096-80757CE2475F"
+    },
+    "code": {
+     "type": "literal",
+     "value": "stan1288"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q1321"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q112608-b7e8873b-40c3-657f-012d-2ccf1a5f8712"
+    },
+    "code": {
+     "type": "literal",
+     "value": "ital1285"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q112608"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q2665734-45BF927D-1B3E-4CBB-BFBC-91BF34F81FA8"
+    },
+    "code": {
+     "type": "literal",
+     "value": "kain1271"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q2665734"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q2665734-AE5A9067-F77C-4354-BDD8-4A9DCF968CDB"
+    },
+    "code": {
+     "type": "literal",
+     "value": "kain1272"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q2665734"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q1346342-C3868F73-EFD9-4BBB-9F9E-E46EBB1771CA"
+    },
+    "code": {
+     "type": "literal",
+     "value": "angl1265"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q1346342"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q1377152-8B767A71-C817-472D-84C8-7493FF32D642"
+    },
+    "code": {
+     "type": "literal",
+     "value": "west2838"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q1377152"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q34228-5CEFFC15-1C97-48F9-BBBF-39452E782A0D"
+    },
+    "code": {
+     "type": "literal",
+     "value": "sign1238"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q34228"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#PreferredRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q34333-4C1369FF-70B5-4CD7-82C0-B266A67F92BE"
+    },
+    "code": {
+     "type": "literal",
+     "value": "nhen1239"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q34333"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q26721-7FBAB592-B97C-41F3-AA72-18E0A63937BE"
+    },
+    "code": {
+     "type": "literal",
+     "value": "west2793"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q26721"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q33478-0a565007-47bf-4069-8303-f2bdcc5576a6"
+    },
+    "code": {
+     "type": "literal",
+     "value": "lati1262"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q33478"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q33491-AD737F91-1149-4D8A-B833-ECE96226DD49"
+    },
+    "code": {
+     "type": "literal",
+     "value": "hait1244"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q33491"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q35876-dadbda94-44b9-e71b-7088-b09d225c0e54"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tupi1282"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q35876"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q2714388-89ce34c4-4f7f-e9ca-8c0e-b13f2c4a03ba"
+    },
+    "code": {
+     "type": "literal",
+     "value": "west2813"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q2714388"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q35963-5668E6AC-BD21-4E32-AB6B-802FED64B38B"
+    },
+    "code": {
+     "type": "literal",
+     "value": "kabu1256"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q35963"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q33856-0F0EB618-6A0D-4F0C-BDC9-152EB5E4A3FD"
+    },
+    "code": {
+     "type": "literal",
+     "value": "papi1253"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q33856"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q5329170-368E8BE4-63F2-47B8-8E61-256266C4E864"
+    },
+    "code": {
+     "type": "literal",
+     "value": "angl1264"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q5329170"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q3915584-C42091FF-F09A-42EA-9265-3DAF6BAF2601"
+    },
+    "code": {
+     "type": "literal",
+     "value": "mbya1239"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q3915584"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q34159-B7E90A1C-E165-49B1-9BA9-B711DD9BA06B"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tokp1240"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q34159"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q9080204-e9426fee-4ca1-6907-51ae-14b5c369cfca"
+    },
+    "code": {
+     "type": "literal",
+     "value": "gali1263"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q9080204"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q34070-C03D6ADE-1862-460E-8132-4FAC48B584A1"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tupi1275"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q34070"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q2997494-8710f543-41f6-843d-4d11-37708d80ef36"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tupi1277"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q2997494"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q30134-19C7E43E-5867-4E42-898A-0E7C93B49A67"
+    },
+    "code": {
+     "type": "literal",
+     "value": "nort3175"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q30134"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q37351-d69f6744-47fe-b130-1b13-9fb255338643"
+    },
+    "code": {
+     "type": "literal",
+     "value": "oila1234"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q37351"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q397-E44E8C52-9519-4B4E-A198-DC53B7FD2F0C"
+    },
+    "code": {
+     "type": "literal",
+     "value": "lati1261"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q397"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q3322101-668CB148-4DF8-49CD-A6DF-39FE0E42D87B"
+    },
+    "code": {
+     "type": "literal",
+     "value": "urub1243"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q3322101"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q20053590-2D639606-4E2B-4C1A-8E6C-C8402943ADDF"
+    },
+    "code": {
+     "type": "literal",
+     "value": "uppe1458"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q20053590"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q5146-14E8544F-F13D-4B08-ABAB-D7905B9BE2A0"
+    },
+    "code": {
+     "type": "literal",
+     "value": "port1283"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q5146"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q954321-2317356c-4017-1c3c-97f2-72c7296b33d8"
+    },
+    "code": {
+     "type": "literal",
+     "value": "shif1234"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q954321"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q98078232-923676DD-0F14-4B3C-84A9-9228940BE92B"
+    },
+    "code": {
+     "type": "literal",
+     "value": "jeme1246"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q98078232"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q98078245-4E548312-7274-4FA2-AEED-2B8DEC83E9CC"
+    },
+    "code": {
+     "type": "literal",
+     "value": "kain1270"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q98078245"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q7857217-5AC2806B-E52B-4B48-A944-D8D2AF430021"
+    },
+    "code": {
+     "type": "literal",
+     "value": "tuxa1239"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q7857217"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q5886200-C96F5AF5-962A-495A-9F3D-C457813EE64B"
+    },
+    "code": {
+     "type": "literal",
+     "value": "gall1280"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q5886200"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q749533-dc405e5a-49b1-ab68-3f79-5180733d3674"
+    },
+    "code": {
+     "type": "literal",
+     "value": "sout3183"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q749533"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q750553-59B1BAD1-7C4E-4A8D-97B9-F91E5CB74287"
+    },
+    "code": {
+     "type": "literal",
+     "value": "braz1246"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q750553"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   },
+   {
+    "statement": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/statement/Q71924-74A7F81A-74CF-40C2-9959-3629F312309F"
+    },
+    "code": {
+     "type": "literal",
+     "value": "cast1243"
+    },
+    "item": {
+     "type": "uri",
+     "value": "http://www.wikidata.org/entity/Q71924"
+    },
+    "rank": {
+     "type": "uri",
+     "value": "http://wikiba.se/ontology#NormalRank"
+    }
+   }
+  ]
+ }
+}

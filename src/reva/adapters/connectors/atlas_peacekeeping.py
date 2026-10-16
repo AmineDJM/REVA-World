@@ -147,7 +147,15 @@ FILES: dict[str, tuple[str, str, int, tuple[str, ...]]] = {
         "DataCommons-Fatalities",
         "datacommons-fatalities",
         2_000,
-        ("Incident_Year", "mission_id", "Mission", "Casualty_Nationality", "Type_of_Fatalities", "ISOCode3", "Fatalities"),
+        (
+            "Incident_Year",
+            "mission_id",
+            "Mission",
+            "Casualty_Nationality",
+            "Type_of_Fatalities",
+            "ISOCode3",
+            "Fatalities",
+        ),
     ),
     "pko": (
         "DPPADPOSS-PKO",
@@ -956,9 +964,7 @@ def kg_records(
         node: str, acr: str, d: date, total: Any, types: Iterable[str], file: str, raw: str, origin: str
     ) -> None:
         m = mission(acr, origin)
-        e = contrib.setdefault(
-            (node, m, d.year), {"dates": {}, "types": set(), "file": file, "raw": raw, "acr": acr}
-        )
+        e = contrib.setdefault((node, m, d.year), {"dates": {}, "types": set(), "file": file, "raw": raw, "acr": acr})
         e["dates"][d] = e["dates"].get(d, 0) + total
         e["types"].update(types)
 
@@ -1180,7 +1186,10 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     hdx_raws: dict[str, Any] = {}
     for k in keys:
         raw = await run.get(
-            HDX_URL.format(name=FILES[k][1]), key=f"hdx:{FILES[k][1]}", media_types=("application/json",), max_bytes=2_000_000
+            HDX_URL.format(name=FILES[k][1]),
+            key=f"hdx:{FILES[k][1]}",
+            media_types=("application/json",),
+            max_bytes=2_000_000,
         )
         licences[k] = check_hdx_record(raw.body, k)
         hdx_raws[k] = raw
@@ -1203,7 +1212,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     shas = out["shas"]
     res: dict[str, Any] = {
         "row_counts": out["row_counts"],
-        "licences": {k: {x: v[x] for x in ("hdx_dataset", "licence_id", "hdx_last_modified")} for k, v in licences.items()},
+        "licences": {
+            k: {x: v[x] for x in ("hdx_dataset", "licence_id", "hdx_last_modified")} for k, v in licences.items()
+        },
         "atlas": {},
     }
     for ds in DATASETS:
@@ -1220,7 +1231,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             rights=rights,
             coverage_note=_COVERAGE[ds],
         )
-        res["atlas"][ds] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
+        res["atlas"][ds] = {
+            k: r[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")
+        }
     for k in ("pre2010_overlap_check", "fatalities_repeats"):
         if k in out:
             res[k] = out[k]

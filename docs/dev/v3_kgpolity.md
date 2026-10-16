@@ -86,15 +86,33 @@ one). One full run = 3 requests (licence, Cliopatria zip, NE map units), ~51 MB.
   WKB of the NE country), `ne_units`, `ne_version`, `ne_raw_sha256`, `cliopatria_raw_sha256`, `min_share`,
   `derivation: computed_spatial_overlay`, `label: derived`, `caveat`; references name both URLs. The statement's
   `raw_sha256` is the Cliopatria zip; the load's raw artifacts are the licence, the zip and the NE layer.
-* **Object node**: the country's Wikidata QID from WDHARVEST's `registry/entities/country_qids.json` (250 mapped,
-  delivered during this work) — else unambiguous same-origin P298 statements in the KG — else the REVA node
+* **Object node**: the country's Wikidata QID from WDHARVEST's `registry/entities/country_qids.json` (249 crosswalk keys mapped,
+  delivered during this work; `PSE` and `ATA` unmapped) — else unambiguous same-origin P298 statements in the KG — else the REVA node
   `iso3:<KEY>` (LINKS' convention). Statement ids do not depend on the node, so a load with QIDs after one without is
   a new revision of the same statements.
 * A full run retracts (`removed_at_source`) current statements of this source/origin that the new build lacks.
 
 ## 4. Live run
 
-LIVE3_PLACEHOLDER
+Three live attempts (each into its own throwaway database, dropped; each 3 requests / 51.0 MB, metered):
+attempt 1 stopped at the KG load (a KGCORE migration, `0011_kg_fixes`, was landing at that moment: column
+`reinstates_row_id` missing); attempt 2 completed under an in-process copy of the pinned policy extended with exactly
+the requested `cliopatria.github: 6` (the request was not merged yet; ledger real, in the throwaway DB); **attempt 3
+(reported here) ran under the merged policy `budgets-1.3.5`** after WDHARVEST had delivered
+`registry/entities/country_qids.json`. Attempts 2 and 3 produced the same 26,079 statements.
+
+| | |
+|---|---|
+| status / time | `completed`, 1,011 s end to end (overlay ~15 min on the loaded shared host) |
+| budget | reserved 3, consumed 3 requests, 51,009,299 bytes, 0 refused |
+| raw artifacts | `LICENSE.md` `62ca7e92dee4…` (404 B); `cliopatria.geojson.zip` `e10a4e429fca…` (46,005,176 B); `ne_10m_admin_0_map_units.zip` `45bebe2aaf8b…` (5,003,719 B, NE 5.1.1) |
+| KG load | 1 batch: 1,647 entities, **26,079 statements inserted, 0 rejected**, 5 properties registered |
+| statements | `reported_area` 13,797 · `denotes` 2,065 · `seshat_polity_id` 1,115 · `member_of` 692 · `geo:covered_territory_of` **8,410** |
+| overlay objects | 8,121 → Wikidata QIDs (`country_qids.json`, 249 resolved), 67 → `iso3:PSE` (no QID in that file; ATA has none either but no run), 222 → `naturalearth:*` units (Somaliland, N. Cyprus, Siachen, Bir Tawil, …) |
+| entities | 1,587 `polity`, 50 `polity_relation`, 9 NE-only `territory`, 1 `country` (`iso3:PSE`) |
+| size | `kg` schema 54 MB in the throwaway DB (incl. KGCORE's own tables, which held only this load); object store 51 MB (the three raws) |
+| paths (KGCORE `paths`, 2 hops) | Brazil Q155 → Q200464: found — `(Portuguese Empire) —covered part of the present-day territory of→ Q155` … `—denotes→ Q200464`. Algeria→Q12560, India→Q33296/Q129286, Tunisia→Q2429397: **fail with KGCORE's BCE-date bug** (request 1) because these countries have BCE-dated overlay statements |
+
 
 ## 5. Polities by era
 
@@ -490,5 +508,8 @@ Nuevo, Wake Island as NE names it, Scarborough Shoal, Serranilla). `CHI` (Channe
    a spec seeded from them (labels, P31, P571/P576, P1365/P1366) would join this layer to the Wikidata graph.
 5. **Maintainer** — Seshat Databank variables need an account and acceptance of the Seshat user agreement (Public
    Data CC BY-SA 4.0); decide whether REVA does that.
-6. **Lead** — `pyproject.toml`/`uv.lock` gained `shapely==2.1.2`; seed the atlas connector versions as planned
+6. **Follow-up (KGPOLITY or ATLASCORE)** — atlas periods now accept BCE years (`src/reva/atlas/tables.py`): the
+   per-row shares could also be published as an atlas table (country × polity × row years), which this work did not do
+   (the KG statements carry the same numbers per row in `rows[]`).
+7. **Lead** — `pyproject.toml`/`uv.lock` gained `shapely==2.1.2`; seed the atlas connector versions as planned
    (`register_atlas_connector_versions`) so `atlas.cliopatria` can run in the deployment.

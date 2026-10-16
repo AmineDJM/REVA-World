@@ -257,6 +257,59 @@ def _t(t: Any) -> dict[str, Any] | None:
     return None if t is None else {"time": t.iso, "precision": t.precision, "calendar": t.calendar}
 
 
+
+def load_into_kg(engine: Any, store: Any, *, source_key: str = "wikidata.links_fixture") -> Any:
+    """Load the captured fixture into ``kg.*`` with KGCORE's ``load_batch`` (origin ``test_fixture``; the
+    fixture file archived as the raw artifact). Idempotent. Used by tests and the LINKS2 demo database."""
+    import hashlib
+
+    from reva.adapters.connectors.wikidata import load_allowlist
+    from reva.kg.harvest import kg_properties
+    from reva.kg.model import KgEntity, KgStatement, KgTime, load_batch, register_properties
+
+    register_properties(engine, kg_properties(load_allowlist()))
+    body = FIXTURE_FILE.read_bytes()
+    raw = store.put_bytes(body, "raw", "application/json").sha256
+    assert raw == hashlib.sha256(body).hexdigest()
+    fx = load_fixture()
+
+    def t(d: Any) -> Any:
+        return None if d is None else KgTime(d["time"], d["precision"], d.get("calendar", "gregorian"))
+
+    sts = [
+        KgStatement(
+            subject_qid=r["subject_qid"],
+            property_pid=r["property_pid"],
+            object_qid=r["object_qid"],
+            value=r["value"],
+            start=t(r["start"]),
+            end=t(r["end"]),
+            point_in_time=t(r["point_in_time"]),
+            qualifiers=r["qualifiers"],
+            rank=r["rank"],
+            references=r["references"],
+            source_key=source_key,
+            source_revision=r["source_revision"],
+            statement_id=r["statement_id"],
+            raw_sha256=raw,
+        )
+        for r in fx.raw_statements
+    ]
+    ents = [
+        KgEntity(q, "fixture_entity", e["labels"], e.get("descriptions") or {}, source_revision=str(e["lastrevid"]))
+        for q, e in fx.entities.items()
+    ]
+    return load_batch(
+        engine,
+        store,
+        entities=ents,
+        statements=sts,
+        source_key=source_key,
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
+
 def main(argv: list[str]) -> int:  # pragma: no cover - CLI
     if not argv or argv[0] != "capture":
         print("usage: python -m reva.links.fixture capture [out.json]")
