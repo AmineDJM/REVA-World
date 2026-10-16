@@ -213,7 +213,84 @@ Peak RSS while building `wup2025_cities_area` (2.3 M rows) was about 3 GB.
 | EH, IL, PS have no PPLC in GeoNames | GeoNames coding | Wikidata P36 (cross-check), WUP F20 capital types |
 | DEGURBA level 2 (suburbs, villages…) | not needed for country concepts | `WUP2025-DB-DEGURBA-Level2…csv.gz` (14 MB) if wanted |
 
-KG_SECTION
+### KG link (live, same throwaway database, 2026-10-16 18:5x UTC)
+
+* **WDQS was unusable for us.** Every request got `429 Retry-After: 1000` (machine-wide cool-down shared with
+  the other agents). The 38,028-id P1566 fan-out (`--via wdqs`, about 96 requests of 400 ids) therefore did not
+  run; it stays the method for a quiet window. The CirrusSearch/REST search API was saturated too
+  (`429 You are making too many requests`).
+* **Run `--via api --max-ids 0 --client-mode linked_data`:**
+  * 301 Special:EntityData requests, 41.8 MB, 556 snapshots reused from the shared archive;
+  * metered under `wikidata.wbapi` (reserved 40, consumed 301, refused 0; policy budgets-1.3.6).
+* **What it read and loaded:**
+  * The 251 countries' snapshots (`country_qids.json`) gave 306 distinct P36 objects.
+  * Each was loaded as a full snapshot: 7,581 `wikidata.wbapi` statements; WDHARVEST's loader rejected 1
+    (`invalid_time`) in one batch.
+  * Mapping through their own P1566 claims:
+    * 255 of the 34,163 places are mapped, including 218 of the 241 PPLC places;
+    * 29 of the 3,865 admin-1 divisions are mapped (capital cities that are also divisions);
+    * 1 geonameid is ambiguous and not used: 1816670 Beijing, on Q956 and Q7334692.
+* **GeoNames statements loaded** (`geonames.cities`): 747 in total, 0 rejected.
+  * P17: 255; P1376: 218; P1082: 253; P131: 21.
+  * Reloading inserts nothing (integration test).
+* **Chain check** in the database:
+  * Q597 has the fr label "Lisbonne" and the en label "Lisbon".
+  * Q597 —P1376 (`geonames.cities`, PPLC, mapped via Wikidata's P1566 = 2267057)→ Q45. Wikidata's own
+    `wikidata.wbapi` P1376 → Q45 sits next to it.
+* **Remaining mapping** (33,908 places and 3,836 divisions) needs the WDQS fan-out or a bounded
+  `--max-ids` search run, once Wikidata accepts our traffic again. The GeoNames statements of newly mapped
+  places load automatically on the next atlas ingest or `wikidata` run, and are idempotent.
+
+### Capitals: GeoNames PPLC vs Wikidata P36 (current claims), 2026-10-16
+
+| status | countries |
+|---|---:|
+| agree (one PPLC = the GeoNames ID of the one current P36 capital) | 209 |
+| agree_partial_multiple (Wikidata lists several current capitals; one matches the PPLC) | 9 |
+| disagree (IDs differ) | 19 |
+| geonames_only (PPLC, no current P36 on an ISO-coded item) | 4 |
+| wikidata_only (P36, no PPLC in GeoNames) | 2 |
+
+* **Several current capitals in Wikidata** (both sides listed, none chosen):
+  * BEN: Porto-Novo preferred, Cotonou;
+  * BOL: Sucre, La Paz;
+  * LKA: Sri Jayawardenepura Kotte, Colombo;
+  * MSR: Plymouth, Brades;
+  * MYS: Kuala Lumpur preferred, Putrajaya;
+  * SGS: King Edward Point preferred, Grytviken;
+  * SWZ: Mbabane, Lobamba;
+  * YEM: Sanaa, Aden;
+  * ZAF: Pretoria, Cape Town, Bloemfontein.
+* **wikidata_only:**
+  * ISR: Jerusalem (Q1218, P1566 281184). GeoNames codes it PPLA, not PPLC.
+  * IOT: Diego Garcia.
+* **geonames_only:** BES (Kralendijk), HKG, MAC, SJM (Longyearbyen).
+* **"disagree" is an ID disagreement, not necessarily another city.** Each case is listed with both sides:
+  * ALA: Mariehamn 3041732 vs Q48329 → 3041733;
+  * ARM: Yerevan 616052 vs Q1953 → 616051;
+  * AZE: Baku 587084 vs Q9248 → 587081;
+  * CCK: West Island 7304591 vs Q48675 → 1547351;
+  * CHE: Bern 2661552 vs Q70 → 7285212;
+  * ESP: Madrid 3117735 vs Q2807 → 6359304;
+  * GNQ: Ciudad de la Paz 12226438 vs Q1140136 (Malabo) → 2306898;
+  * GTM: Guatemala City 3598132 vs Q1555 → 3595529;
+  * HTI: Port-au-Prince 3718426 vs Q34261 → 3718427;
+  * KGZ: Bishkek 1528675 vs Q9361 → 1528334;
+  * KIR: Tarawa 2110257 vs Q131233 (no P1566);
+  * MCO: Monaco 2993458 vs Q235 → 2993457;
+  * MLI: Bamako 2460596 vs Q3703 → 2460594;
+  * MLT: Valletta 2562305 vs Q23800 → 8334638;
+  * NRU: Yaren 7626461 vs Q31026 → 2110418;
+  * PRK: Pyongyang 1871859 vs Q18808 → 1871856;
+  * SGP: Singapore 1880252 vs Q334 → 1880251;
+  * TJK: Dushanbe 1221874 vs Q9365 → 1221873;
+  * VAT: Vatican City 6691831 vs Q237 → 3164670.
+* **Reading the disagreements.** In most cases Wikidata's P1566 points to another GeoNames record of the same
+  place: an administrative-division or neighbouring-id record, judging from the names. Equatorial Guinea is a
+  real difference: GeoNames codes the new capital Ciudad de la Paz PPLC, while Wikidata keeps Malabo.
+  Kiribati's Wikidata capital has no GeoNames ID. Nothing is merged or corrected; the PPLC-based P1376
+  statements are loaded only for places that Wikidata links to that same geonameid.
+
 
 ### Per country (GeoNames cities15000 live bytes; WUP 2025)
 

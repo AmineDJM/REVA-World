@@ -54,7 +54,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.wikidata_cables"
-VERSION = "1.1.0"  # 1.1.0: wbgetentities batches with EntityData fallback; 404 pages skipped
+VERSION = "1.2.0"  # 1.2.0: compact flags (atlas 4,000-char limit), reuse_archived_hours option
 SOURCE_KEY = "wikidata.wbapi"
 ATLAS_SOURCE = "wikidata"
 DATASET = "submarine_cables"
