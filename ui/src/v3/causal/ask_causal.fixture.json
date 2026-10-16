@@ -506,7 +506,7 @@
   "model_requested": null,
   "prompt_version": "nlqa-plan-1.2.0",
   "prompt_sha256": null,
-  "catalog_digest": "fda2709a38c7d4c06b2abbfc97dd6518f7bd908610c532e9abba4137da9d1b2b",
+  "catalog_digest": "93744e1d29eca75cf8f74da97710c9579aeaec17888dffd116a1a6014b3bd99e",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
@@ -788,7 +788,7 @@
   "model_requested": null,
   "prompt_version": "nlqa-plan-1.2.0",
   "prompt_sha256": null,
-  "catalog_digest": "fda2709a38c7d4c06b2abbfc97dd6518f7bd908610c532e9abba4137da9d1b2b",
+  "catalog_digest": "93744e1d29eca75cf8f74da97710c9579aeaec17888dffd116a1a6014b3bd99e",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,

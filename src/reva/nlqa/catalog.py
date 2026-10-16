@@ -68,6 +68,8 @@ LINK_KINDS: tuple[str, ...] = (
     "peacekeeping",  # LINKWIRE: UN peacekeeping personnel contributed to a mission in the other country
     "historical_polity",  # LINKWIRE: present territories covered by the same historical polity (overlay)
     "infrastructure",  # LINKS3: submarine cables (Wikidata), air routes (OpenFlights, June 2014), launch-site states (GCAT)
+    "sanctions",  # EVMAP: coded sanctions episodes (TIES / EUSANCT) and active OFAC programs (sender -> target)
+    "natural_hazard",  # EVMAP: the same tsunami observed in two countries (NCEI; source -> runup country)
 )
 #: Entity kinds a lookup may ask for (a hint for server-side resolution, never an id).
 ENTITY_KINDS: tuple[str, ...] = (

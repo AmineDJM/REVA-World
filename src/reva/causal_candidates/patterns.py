@@ -321,7 +321,7 @@ HEDGE = {
         r"\bpeut[- ]être\b|\b(?:probablement|vraisemblablement|possiblement|supposément|prétendument|apparemment|"
         r"hypothétiquement)\b|\bsans\s+doute\b|\bselon\s+(?:certains|d['’]autres|plusieurs|quelques|une\s+hypothèse)\b|"
         r"\b(?:certains|plusieurs|de\s+nombreux|d['’]autres|les|des)\s+(?:historiens|chercheurs|spécialistes|"
-        r"auteurs|économistes)\b|\b(?:débat\w*|controvers\w*|contest\w*|discut\w*|hypoth\w*|incertain\w*|théorie\w*|"
+        r"auteurs|économistes)\b|\b(?:débat\w*|controvers\w*|contest(?:é|ée|és|ées)\b|discut(?:é|ée|és|ées|able)\b|hypoth\w*|incertain\w*|théorie\w*|"
         r"spécul\w*)\b|\bil\s+est\s+possible\b|\bon\s+(?:pense|estime|suppose|considère|croit|attribue)\b|"
         r"\bserait\s+(?:dû|due|dus|dues|la\s+conséquence)\b|\bsi\b|\bselon\b|\b(?:affirme|affirment|affirmait|"
         r"déclare|déclarent|déclarait|estime|estiment|estimait|soutient|soutiennent|juge|jugent)\s+que\b",
@@ -362,9 +362,7 @@ RELATIVE = {
         r"subsequently|quickly|directly|indirectly)\s+)?(?:(?:has|had|have|would|will)\s+)?$",
         I,
     ),
-    "fr": re.compile(
-        r"^\s*,?\s*qui\s+(?:(?:à\s+son\s+tour|elle-même|lui-même|ensuite|aussi|alors)\s+)?$", I
-    ),
+    "fr": re.compile(r"^\s*,?\s*qui\s+(?:(?:à\s+son\s+tour|elle-même|lui-même|ensuite|aussi|alors)\s+)?$", I),
 }
 
 #: Between two links, these gaps attach the right link to the left one's noun phrase ("[[A]] of [[B]]",
@@ -472,7 +470,6 @@ NOT_HEADS = {
         "cause",
         "raison",
         "suite",
-        
         "face",
         "près",
         "loin",

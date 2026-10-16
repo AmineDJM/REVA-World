@@ -10,10 +10,10 @@ client (``reva.kg.harvest.budgeted_client``: ``reserve_ingest`` -> metered -> ``
 (``var/kg/archive_index.jsonl``). The result is a *recorded snapshot*: ``seeds.json`` with the query
 sha256, the raw sha256 and the retrieval time; later runs read the snapshot, not the live service.
 
-When the KG holds event entities (EVENTS / CAUSWD harvests), :func:`seeds_from_kg` can replace the
-query: it reads ``kg.entity_current`` rows of kind ``event`` with their sitelink counts from a
-*throwaway* database (never the dev database ``reva``) — titles then come from the recorded entity
-snapshots' sitelinks (``enwiki`` / ``frwiki``).
+When the KG holds event entities with sitelink counts (EVENTS / CAUSWD harvests, not loaded when this
+ran), the seed list should be read from them instead (a throwaway database's ``kg.entity_current``, never
+the dev database ``reva``), titles coming from the recorded entity snapshots' ``enwiki`` / ``frwiki``
+sitelinks.
 """
 
 from __future__ import annotations

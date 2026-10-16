@@ -1,0 +1,4399 @@
+{
+ "extractor_version": "1.1.0",
+ "judge": "agent CAUSCAND, reading each sentence, 2026-10-16",
+ "criteria": {
+  "direction": "cause->effect as the sentence writes it, given the two arguments",
+  "cause_link": "the QID denotes the cause argument of the sentence (not a modifier, place, person or broader topic)",
+  "effect_link": "same for the effect",
+  "correct": "cause_link and effect_link (direction was correct in every item)"
+ },
+ "sample": {
+  "lenient_sample50": "random.Random(20261016).sample of the 82 candidates linked with keep_modifier_arguments=True",
+  "strict_census": "all 21 published candidates"
+ },
+ "licence": "sentences: CC BY-SA 4.0, Wikipedia contributors; article title and revision id in each record",
+ "items": [
+  {
+   "set": "strict_census",
+   "index": 0,
+   "candidate_id": "96fb20e092c0048ebf0eaa8d867f6014",
+   "connective": "en.caused_by",
+   "cause_target": "Bacteria",
+   "effect_target": "Opportunistic infections",
+   "cause_qid": "Q10876",
+   "effect_qid": "Q835718",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "HIV/AIDS",
+    "page_id": 5069516,
+    "article_qid": "Q12199",
+    "revision_id": 1379701401,
+    "revision_timestamp": "2026-10-11T12:17:00Z",
+    "section": "Third main stage: AIDS",
+    "paragraph": 12,
+    "index": 0,
+    "sentence": "Opportunistic infections may be caused by bacteria, viruses, fungi, and parasites that are normally controlled by the immune system.",
+    "wikitext": "[[Opportunistic infections]] may be caused by [[bacteria]], [[virus]]es, [[fungi]], and [[parasite]]s that are normally controlled by the immune system.",
+    "links": [
+     {
+      "target": "Opportunistic infections",
+      "anchor": "Opportunistic infections",
+      "start": 0,
+      "end": 24
+     },
+     {
+      "target": "Bacteria",
+      "anchor": "bacteria",
+      "start": 42,
+      "end": 50
+     },
+     {
+      "target": "Virus",
+      "anchor": "viruses",
+      "start": 52,
+      "end": 59
+     },
+     {
+      "target": "Fungi",
+      "anchor": "fungi",
+      "start": 61,
+      "end": 66
+     },
+     {
+      "target": "Parasite",
+      "anchor": "parasites",
+      "start": 72,
+      "end": 81
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "453da929390a611581ad70e6c9d6a9a131c82b35e7fbfb67e09525e18785e115",
+    "retrieved_at": "2026-10-16T20:42:09.460517+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 1,
+   "candidate_id": "bb88d437ac75a255f892f337aa8b705e",
+   "connective": "en.led_to",
+   "cause_target": "Russian attacks on civilians in the Russo-Ukrainian war (2022–present)",
+   "effect_target": "Allegations of genocide of Ukrainians in the Russo-Ukrainian War",
+   "cause_qid": "Q113625077",
+   "effect_qid": "Q111648183",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Russo-Ukrainian war (2022–present)",
+    "page_id": 70149799,
+    "article_qid": "Q110999040",
+    "revision_id": 1380543061,
+    "revision_timestamp": "2026-10-16T10:50:06Z",
+    "section": "",
+    "paragraph": 3,
+    "index": 1,
+    "sentence": "Russia's attacks on civilians, as well as its policies in occupied territories, have led to allegations of genocide.",
+    "wikitext": "Russia's [[Russian attacks on civilians in the Russo-Ukrainian war (2022–present)|attacks on civilians]], as well as its policies in occupied territories, have led to [[Allegations of genocide of Ukrainians in the Russo-Ukrainian War|allegations of genocide]].",
+    "links": [
+     {
+      "target": "Russian attacks on civilians in the Russo-Ukrainian war (2022–present)",
+      "anchor": "attacks on civilians",
+      "start": 9,
+      "end": 29
+     },
+     {
+      "target": "Allegations of genocide of Ukrainians in the Russo-Ukrainian War",
+      "anchor": "allegations of genocide",
+      "start": 92,
+      "end": 115
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "1ecb194a38606ef0cd87d2fd209cc69a26a2452602eebe2dd68fa343273edee4",
+    "retrieved_at": "2026-10-16T20:43:00.862078+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 2,
+   "candidate_id": "2581f49330e220bf929afe9a87b834ef",
+   "connective": "en.resulted_in",
+   "cause_target": "Industrialization in the Russian Empire",
+   "effect_target": "Overcrowding",
+   "cause_qid": "Q85769404",
+   "effect_qid": "Q7113614",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Russian Revolution",
+    "page_id": 25762,
+    "article_qid": "Q8729",
+    "revision_id": 1379985248,
+    "revision_timestamp": "2026-10-13T02:26:38Z",
+    "section": "Economic and social changes",
+    "paragraph": 16,
+    "index": 0,
+    "sentence": "The rapid industrialization of Russia also resulted in urban overcrowding and poor conditions for urban industrial workers (as mentioned above).",
+    "wikitext": "The [[Industrialization in the Russian Empire|rapid industrialization of Russia]] also resulted in urban [[overcrowding]] and poor conditions for urban industrial workers (as mentioned above).",
+    "links": [
+     {
+      "target": "Industrialization in the Russian Empire",
+      "anchor": "rapid industrialization of Russia",
+      "start": 4,
+      "end": 37
+     },
+     {
+      "target": "Overcrowding",
+      "anchor": "overcrowding",
+      "start": 61,
+      "end": 73
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "56a746754813c53928a8b33edb8d8ac9289712dcf8b4a91128f157f12ba326df",
+    "retrieved_at": "2026-10-16T20:43:10.101622+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 3,
+   "candidate_id": "d43d4a64dacf3c5ee305fd63514595f2",
+   "connective": "en.due_to",
+   "cause_target": "Disseminated intravascular coagulation",
+   "effect_target": "Purpura",
+   "cause_qid": "Q823027",
+   "effect_qid": "Q935293",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Black Death",
+    "page_id": 4501,
+    "article_qid": "Q42005",
+    "revision_id": 1377102371,
+    "revision_timestamp": "2026-09-27T22:20:21Z",
+    "section": "Signs and symptoms",
+    "paragraph": 46,
+    "index": 1,
+    "sentence": "Symptoms are high fevers and purple skin patches (purpura due to disseminated intravascular coagulation).",
+    "wikitext": "Symptoms are high fevers and purple skin patches ([[purpura]] due to [[disseminated intravascular coagulation]]).",
+    "links": [
+     {
+      "target": "Purpura",
+      "anchor": "purpura",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Disseminated intravascular coagulation",
+      "anchor": "disseminated intravascular coagulation",
+      "start": 65,
+      "end": 103
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "56a746754813c53928a8b33edb8d8ac9289712dcf8b4a91128f157f12ba326df",
+    "retrieved_at": "2026-10-16T20:43:10.101622+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 4,
+   "candidate_id": "cf626782aec8f92acf9d4df1355c87a7",
+   "connective": "en.resulted_in",
+   "cause_target": "First Balkan War",
+   "effect_target": "Territorial evolution of the Ottoman Empire",
+   "cause_qid": "Q177918",
+   "effect_qid": "Q7703781",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "effect piped to a broader article (Territorial evolution of the Ottoman Empire) for 'loss of ... territory'",
+   "record": {
+    "lang": "en",
+    "title": "Armenian genocide",
+    "page_id": 140376,
+    "article_qid": "Q80034",
+    "revision_id": 1379445785,
+    "revision_timestamp": "2026-10-10T01:27:58Z",
+    "section": "Balkan Wars",
+    "paragraph": 11,
+    "index": 0,
+    "sentence": "The 1912 First Balkan War resulted in the loss of almost all of the empire's European territory and the mass expulsion of Muslims from the Balkans.",
+    "wikitext": "The 1912 [[First Balkan War]] resulted in the [[Territorial evolution of the Ottoman Empire#1913|loss of almost all of the empire's European territory]]{{sfn|Suny|2015|pp=184–185}} and the mass expulsion of Muslims from the Balkans.",
+    "links": [
+     {
+      "target": "First Balkan War",
+      "anchor": "First Balkan War",
+      "start": 9,
+      "end": 25
+     },
+     {
+      "target": "Territorial evolution of the Ottoman Empire",
+      "anchor": "loss of almost all of the empire's European territory",
+      "start": 42,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 2,
+    "raw_sha256": "66fc8a522507bd59de032b1b601db25d7e8bb5015fbf81a2b6ccec11a70cc591",
+    "retrieved_at": "2026-10-16T20:44:00.625005+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 5,
+   "candidate_id": "dd6b5da8b03862f33504f250bf188691",
+   "connective": "en.contributed_to",
+   "cause_target": "Israeli blockade of the Gaza Strip (2023–present)",
+   "effect_target": "Gaza Strip famine",
+   "cause_qid": "Q122982851",
+   "effect_qid": "Q124302798",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Gaza genocide",
+    "page_id": 75668427,
+    "article_qid": "Q124086054",
+    "revision_id": 1380243947,
+    "revision_timestamp": "2026-10-14T17:05:00Z",
+    "section": "",
+    "paragraph": 7,
+    "index": 0,
+    "sentence": "An Israeli blockade heavily contributed to starvation and confirmed famine.",
+    "wikitext": "[[Israeli blockade of the Gaza Strip (2023–present)|An Israeli blockade]] heavily contributed to [[Gaza Strip famine|starvation and confirmed famine]].",
+    "links": [
+     {
+      "target": "Israeli blockade of the Gaza Strip (2023–present)",
+      "anchor": "An Israeli blockade",
+      "start": 0,
+      "end": 19
+     },
+     {
+      "target": "Gaza Strip famine",
+      "anchor": "starvation and confirmed famine",
+      "start": 43,
+      "end": 74
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "cee0a9f7a8911cde2266215191b705da4acf5b21aa4aa656a92319e0340a5602",
+    "retrieved_at": "2026-10-16T20:48:59.519603+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 6,
+   "candidate_id": "d4c0cb182fd7575d5fee70e0f516af19",
+   "connective": "en.resulted_in",
+   "cause_target": "Operation Dani",
+   "effect_target": "1948 Palestinian expulsion from Lydda and Ramle",
+   "cause_qid": "Q2916659",
+   "effect_qid": "Q774054",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "1948 Palestine war",
+    "page_id": 45137635,
+    "article_qid": "Q49097",
+    "revision_id": 1379281169,
+    "revision_timestamp": "2026-10-09T01:14:40Z",
+    "section": "Second phase: 8–18 July 1948",
+    "paragraph": 45,
+    "index": 0,
+    "sentence": "Israeli Operation Dani resulted in the expulsion from Lydda and Ramle of 60,000 Palestinian residents.",
+    "wikitext": "Israeli [[Operation Dani]] resulted in the [[1948 Palestinian expulsion from Lydda and Ramle|expulsion from Lydda and Ramle]] of 60,000 Palestinian residents.",
+    "links": [
+     {
+      "target": "Operation Dani",
+      "anchor": "Operation Dani",
+      "start": 8,
+      "end": 22
+     },
+     {
+      "target": "1948 Palestinian expulsion from Lydda and Ramle",
+      "anchor": "expulsion from Lydda and Ramle",
+      "start": 39,
+      "end": 69
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "77d1175086b50c3c35a0222264e947ec9ed472b5a2200f4854b16bf11961001a",
+    "retrieved_at": "2026-10-16T21:00:00.399005+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 7,
+   "candidate_id": "ecad8ea0ac75fb668810b45c8c2cedab",
+   "connective": "en.led_to",
+   "cause_target": "United Nations Partition Plan for Palestine",
+   "effect_target": "1947–48 Civil War in Mandatory Palestine",
+   "cause_qid": "Q846795",
+   "effect_qid": "Q2379101",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Lebanese Civil War",
+    "page_id": 312905,
+    "article_qid": "Q208484",
+    "revision_id": 1377695649,
+    "revision_timestamp": "2026-09-30T16:59:07Z",
+    "section": "Lebanese independence",
+    "paragraph": 9,
+    "index": 0,
+    "sentence": "In 1947, the United Nations Partition Plan for Palestine led to civil war in Palestine, the end of Mandatory Palestine, and the Israeli Declaration of Independence on 14 May 1948.",
+    "wikitext": "In 1947, the [[United Nations Partition Plan for Palestine]] led to [[1947–48 Civil War in Mandatory Palestine|civil war in Palestine]], the end of [[Mandatory Palestine]], and the [[Israeli Declaration of Independence]] on 14 May 1948.",
+    "links": [
+     {
+      "target": "United Nations Partition Plan for Palestine",
+      "anchor": "United Nations Partition Plan for Palestine",
+      "start": 13,
+      "end": 56
+     },
+     {
+      "target": "1947–48 Civil War in Mandatory Palestine",
+      "anchor": "civil war in Palestine",
+      "start": 64,
+      "end": 86
+     },
+     {
+      "target": "Mandatory Palestine",
+      "anchor": "Mandatory Palestine",
+      "start": 99,
+      "end": 118
+     },
+     {
+      "target": "Israeli Declaration of Independence",
+      "anchor": "Israeli Declaration of Independence",
+      "start": 128,
+      "end": 163
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "22fc95ac5b59697a11f5820e6bc789f287da314fe28be6cced837288863d63a9",
+    "retrieved_at": "2026-10-16T21:02:00.540745+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 8,
+   "candidate_id": "6f73ae18ea1f142e19df58f34ee2f0a7",
+   "connective": "en.led_to",
+   "cause_target": "Russo-Japanese War",
+   "effect_target": "Russian Revolution of 1905",
+   "cause_qid": "Q159950",
+   "effect_qid": "Q184928",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Finnish Civil War",
+    "page_id": 11772,
+    "article_qid": "Q211855",
+    "revision_id": 1379820038,
+    "revision_timestamp": "2026-10-12T02:49:31Z",
+    "section": "Domestic politics",
+    "paragraph": 10,
+    "index": 7,
+    "sentence": "The political struggle for democracy was solved outside Finland, in international politics: the Russian Empire's failed 1904–1905 war against Japan led to the 1905 Revolution in Russia and to a general strike in Finland.",
+    "wikitext": "The political struggle for democracy was solved outside Finland, in international politics: the Russian Empire's failed [[Russo-Japanese War|1904–1905 war against Japan]] led to the [[Russian Revolution of 1905|1905 Revolution]] in Russia and to [[Russian Revolution of 1905#Finland|a general strike in Finland]].",
+    "links": [
+     {
+      "target": "Russo-Japanese War",
+      "anchor": "1904–1905 war against Japan",
+      "start": 120,
+      "end": 147
+     },
+     {
+      "target": "Russian Revolution of 1905",
+      "anchor": "1905 Revolution",
+      "start": 159,
+      "end": 174
+     },
+     {
+      "target": "Russian Revolution of 1905",
+      "anchor": "a general strike in Finland",
+      "start": 192,
+      "end": 219
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "70d8f01b5a70add3509dde07f5f1722ef78a4770566ae34e9790234b5adab3f7",
+    "retrieved_at": "2026-10-16T21:06:00.199241+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 9,
+   "candidate_id": "67213b17c38faa4d0faeaf75f4c2e859",
+   "connective": "en.sparked",
+   "cause_target": "Operation Gibraltar",
+   "effect_target": "Indo-Pakistani War of 1965",
+   "cause_qid": "Q2607169",
+   "effect_qid": "Q233583",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Kargil War",
+    "page_id": 803754,
+    "article_qid": "Q404517",
+    "revision_id": 1380249508,
+    "revision_timestamp": "2026-10-14T17:40:09Z",
+    "section": "Pakistan",
+    "paragraph": 98,
+    "index": 3,
+    "sentence": "And like previous unsuccessful infiltrations attempts, such as Operation Gibraltar, which sparked the 1965 war, there was little co-ordination or information sharing among the branches of the Pakistani Armed Forces.",
+    "wikitext": "And like previous unsuccessful infiltrations attempts, such as ''[[Operation Gibraltar]]'', which sparked [[Indo-Pakistani War of 1965|the 1965 war]], there was little co-ordination or information sharing among the branches of the [[Pakistani Armed Forces]].",
+    "links": [
+     {
+      "target": "Operation Gibraltar",
+      "anchor": "Operation Gibraltar",
+      "start": 63,
+      "end": 82
+     },
+     {
+      "target": "Indo-Pakistani War of 1965",
+      "anchor": "the 1965 war",
+      "start": 98,
+      "end": 110
+     },
+     {
+      "target": "Pakistani Armed Forces",
+      "anchor": "Pakistani Armed Forces",
+      "start": 192,
+      "end": 214
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "1d70a27935e8ed6936e9d1eeca14ffa33066de1c92401d959adf1d84703606f2",
+    "retrieved_at": "2026-10-16T21:11:10.047115+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 10,
+   "candidate_id": "54b8feb9ed70f4a10da79c9bf42419be",
+   "connective": "en.led_to",
+   "cause_target": "Rise of nationalism in the Ottoman Empire",
+   "effect_target": "Turkish nationalism",
+   "cause_qid": "Q7335949",
+   "effect_qid": "Q3568928",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Sayfo",
+    "page_id": 1406373,
+    "article_qid": "Q852236",
+    "revision_id": 1370631734,
+    "revision_timestamp": "2026-08-22T05:07:17Z",
+    "section": "World War I",
+    "paragraph": 15,
+    "index": 1,
+    "sentence": "The rise of nationalism led to competing Turkish, Kurdish, Persian, and Arab national movements, which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "wikitext": "The [[rise of nationalism in the Ottoman Empire|rise of nationalism]] led to competing [[Turkish nationalism|Turkish]], [[Kurdish nationalism|Kurdish]], [[Iranian nationalism|Persian]], and [[Arab nationalism|Arab national movements]], which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "links": [
+     {
+      "target": "Rise of nationalism in the Ottoman Empire",
+      "anchor": "rise of nationalism",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Turkish nationalism",
+      "anchor": "Turkish",
+      "start": 41,
+      "end": 48
+     },
+     {
+      "target": "Kurdish nationalism",
+      "anchor": "Kurdish",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Iranian nationalism",
+      "anchor": "Persian",
+      "start": 59,
+      "end": 66
+     },
+     {
+      "target": "Arab nationalism",
+      "anchor": "Arab national movements",
+      "start": 72,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "a6649e5b1b06ab2d7acd55f10127226232537456148de78d3d1033ced9842196",
+    "retrieved_at": "2026-10-16T21:12:09.642512+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 11,
+   "candidate_id": "b28d70aa1d8922f3086f7bc1de3c3d70",
+   "connective": "en.led_to",
+   "cause_target": "Rise of nationalism in the Ottoman Empire",
+   "effect_target": "Kurdish nationalism",
+   "cause_qid": "Q7335949",
+   "effect_qid": "Q7057435",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Sayfo",
+    "page_id": 1406373,
+    "article_qid": "Q852236",
+    "revision_id": 1370631734,
+    "revision_timestamp": "2026-08-22T05:07:17Z",
+    "section": "World War I",
+    "paragraph": 15,
+    "index": 1,
+    "sentence": "The rise of nationalism led to competing Turkish, Kurdish, Persian, and Arab national movements, which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "wikitext": "The [[rise of nationalism in the Ottoman Empire|rise of nationalism]] led to competing [[Turkish nationalism|Turkish]], [[Kurdish nationalism|Kurdish]], [[Iranian nationalism|Persian]], and [[Arab nationalism|Arab national movements]], which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "links": [
+     {
+      "target": "Rise of nationalism in the Ottoman Empire",
+      "anchor": "rise of nationalism",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Turkish nationalism",
+      "anchor": "Turkish",
+      "start": 41,
+      "end": 48
+     },
+     {
+      "target": "Kurdish nationalism",
+      "anchor": "Kurdish",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Iranian nationalism",
+      "anchor": "Persian",
+      "start": 59,
+      "end": 66
+     },
+     {
+      "target": "Arab nationalism",
+      "anchor": "Arab national movements",
+      "start": 72,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "a6649e5b1b06ab2d7acd55f10127226232537456148de78d3d1033ced9842196",
+    "retrieved_at": "2026-10-16T21:12:09.642512+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 12,
+   "candidate_id": "e4c33aec1b94263408cf31ae69065f86",
+   "connective": "en.led_to",
+   "cause_target": "Rise of nationalism in the Ottoman Empire",
+   "effect_target": "Iranian nationalism",
+   "cause_qid": "Q7335949",
+   "effect_qid": "Q3850231",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "anchor 'Persian' -> Iranian nationalism (correct; anchor/target hint false)",
+   "record": {
+    "lang": "en",
+    "title": "Sayfo",
+    "page_id": 1406373,
+    "article_qid": "Q852236",
+    "revision_id": 1370631734,
+    "revision_timestamp": "2026-08-22T05:07:17Z",
+    "section": "World War I",
+    "paragraph": 15,
+    "index": 1,
+    "sentence": "The rise of nationalism led to competing Turkish, Kurdish, Persian, and Arab national movements, which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "wikitext": "The [[rise of nationalism in the Ottoman Empire|rise of nationalism]] led to competing [[Turkish nationalism|Turkish]], [[Kurdish nationalism|Kurdish]], [[Iranian nationalism|Persian]], and [[Arab nationalism|Arab national movements]], which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "links": [
+     {
+      "target": "Rise of nationalism in the Ottoman Empire",
+      "anchor": "rise of nationalism",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Turkish nationalism",
+      "anchor": "Turkish",
+      "start": 41,
+      "end": 48
+     },
+     {
+      "target": "Kurdish nationalism",
+      "anchor": "Kurdish",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Iranian nationalism",
+      "anchor": "Persian",
+      "start": 59,
+      "end": 66
+     },
+     {
+      "target": "Arab nationalism",
+      "anchor": "Arab national movements",
+      "start": 72,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "a6649e5b1b06ab2d7acd55f10127226232537456148de78d3d1033ced9842196",
+    "retrieved_at": "2026-10-16T21:12:09.642512+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 13,
+   "candidate_id": "19835ae10c1ae874eb1ce3df6cf6e5de",
+   "connective": "en.led_to",
+   "cause_target": "Rise of nationalism in the Ottoman Empire",
+   "effect_target": "Arab nationalism",
+   "cause_qid": "Q7335949",
+   "effect_qid": "Q114213",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Sayfo",
+    "page_id": 1406373,
+    "article_qid": "Q852236",
+    "revision_id": 1370631734,
+    "revision_timestamp": "2026-08-22T05:07:17Z",
+    "section": "World War I",
+    "paragraph": 15,
+    "index": 1,
+    "sentence": "The rise of nationalism led to competing Turkish, Kurdish, Persian, and Arab national movements, which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "wikitext": "The [[rise of nationalism in the Ottoman Empire|rise of nationalism]] led to competing [[Turkish nationalism|Turkish]], [[Kurdish nationalism|Kurdish]], [[Iranian nationalism|Persian]], and [[Arab nationalism|Arab national movements]], which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "links": [
+     {
+      "target": "Rise of nationalism in the Ottoman Empire",
+      "anchor": "rise of nationalism",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Turkish nationalism",
+      "anchor": "Turkish",
+      "start": 41,
+      "end": 48
+     },
+     {
+      "target": "Kurdish nationalism",
+      "anchor": "Kurdish",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Iranian nationalism",
+      "anchor": "Persian",
+      "start": 59,
+      "end": 66
+     },
+     {
+      "target": "Arab nationalism",
+      "anchor": "Arab national movements",
+      "start": 72,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "a6649e5b1b06ab2d7acd55f10127226232537456148de78d3d1033ced9842196",
+    "retrieved_at": "2026-10-16T21:12:09.642512+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 14,
+   "candidate_id": "38f282e43ef940b57ddfcd5cb59875f7",
+   "connective": "en.as_a_result_of",
+   "cause_target": "Habitat fragmentation",
+   "effect_target": "Edge effects",
+   "cause_qid": "Q913302",
+   "effect_qid": "Q1156520",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Second Congo War",
+    "page_id": 877492,
+    "article_qid": "Q75756",
+    "revision_id": 1370736925,
+    "revision_timestamp": "2026-08-22T20:53:26Z",
+    "section": "Deforestation",
+    "paragraph": 76,
+    "index": 1,
+    "sentence": "These activities had an outsized effect due to the edge effect as a result of the forest fragmentation.",
+    "wikitext": "These activities had an outsized effect due to the [[Edge effects|edge effect]] as a result of the [[Habitat fragmentation|forest fragmentation]].",
+    "links": [
+     {
+      "target": "Edge effects",
+      "anchor": "edge effect",
+      "start": 51,
+      "end": 62
+     },
+     {
+      "target": "Habitat fragmentation",
+      "anchor": "forest fragmentation",
+      "start": 82,
+      "end": 102
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "b33d6ccd5b2e4e57f6fb0c9d7c2083f166950fad330e7e4663d829cc55a919e6",
+    "retrieved_at": "2026-10-16T21:13:10.033030+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 15,
+   "candidate_id": "aca4eeaf89e33f6ae9f7231972463f4a",
+   "connective": "fr.a_entraine",
+   "cause_target": "Inondation du fleuve Jaune de 1938",
+   "effect_target": "Noyade",
+   "cause_qid": "Q129151",
+   "effect_qid": "Q506616",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "fr",
+    "title": "Seconde Guerre mondiale",
+    "page_id": 2757,
+    "article_qid": "Q362",
+    "revision_id": 240347813,
+    "revision_timestamp": "2026-10-13T22:30:59Z",
+    "section": "Massacre de Nankin",
+    "paragraph": 19,
+    "index": 4,
+    "sentence": "Le 9 juin, le Kuomintang ordonne la destruction des digues du fleuve Jaune dans le Henan, provoquant des inondations, qui entraînent des noyades et des épidémies tuant des centaines de milliers de personnes.",
+    "wikitext": "Le {{date|9 juin}}, le [[Kuomintang]] ordonne la destruction des digues du fleuve Jaune dans le [[Henan]], provoquant des [[Inondation du fleuve Jaune de 1938|inondations]], qui entraînent des [[noyade]]s et des épidémies tuant des centaines de milliers de personnes<ref name=\":3\" />.",
+    "links": [
+     {
+      "target": "Kuomintang",
+      "anchor": "Kuomintang",
+      "start": 14,
+      "end": 24
+     },
+     {
+      "target": "Henan",
+      "anchor": "Henan",
+      "start": 83,
+      "end": 88
+     },
+     {
+      "target": "Inondation du fleuve Jaune de 1938",
+      "anchor": "inondations",
+      "start": 105,
+      "end": 116
+     },
+     {
+      "target": "Noyade",
+      "anchor": "noyades",
+      "start": 137,
+      "end": 144
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "6b27c3cecafc3cf78344751b9f8c854070ab7ff203cb6533f47cfd86ab2b0301",
+    "retrieved_at": "2026-10-16T21:20:59.481936+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 16,
+   "candidate_id": "66a05cd3e6a4a8bc51bd124c3131e24a",
+   "connective": "fr.a_provoque",
+   "cause_target": "Bombes",
+   "effect_target": "Pollution des sols",
+   "cause_qid": "Q127197",
+   "effect_qid": "Q212734",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "generic concept link is right: 'les bombes' is generic",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre de Gaza depuis 2023",
+    "page_id": 15911338,
+    "article_qid": "Q122962941",
+    "revision_id": 240364589,
+    "revision_timestamp": "2026-10-14T14:36:47Z",
+    "section": "Pollution",
+    "paragraph": 387,
+    "index": 0,
+    "sentence": "Les bombes provoquent une pollution des sols, de l'air et de l'eau à Gaza.",
+    "wikitext": "Les [[bombes]] provoquent une [[pollution des sols]], de l'[[Pollution de l'air|air]] et de l'[[Pollution de l'eau|eau]] à Gaza<ref name=\"Euronewspollution\" />.",
+    "links": [
+     {
+      "target": "Bombes",
+      "anchor": "bombes",
+      "start": 4,
+      "end": 10
+     },
+     {
+      "target": "Pollution des sols",
+      "anchor": "pollution des sols",
+      "start": 26,
+      "end": 44
+     },
+     {
+      "target": "Pollution de l'air",
+      "anchor": "air",
+      "start": 51,
+      "end": 54
+     },
+     {
+      "target": "Pollution de l'eau",
+      "anchor": "eau",
+      "start": 63,
+      "end": 66
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "8d2e04d4e9c2c9ebfd7b42bbba82eacc7a818487a9e6fe4ab0b6a1eb0e23fbe9",
+    "retrieved_at": "2026-10-16T21:22:00.041172+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 17,
+   "candidate_id": "4954ad899a917d9504254df2278e6dcd",
+   "connective": "fr.a_provoque",
+   "cause_target": "Attentat",
+   "effect_target": "Première guerre civile irakienne",
+   "cause_qid": "Q2223653",
+   "effect_qid": "Q17183365",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "cause is a specific attack (al-Askari mosque bombing) linked to the generic concept Attentat",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre d'Irak",
+    "page_id": 12155,
+    "article_qid": "Q545449",
+    "revision_id": 240398633,
+    "revision_timestamp": "2026-10-15T14:11:19Z",
+    "section": "",
+    "paragraph": 4,
+    "index": 0,
+    "sentence": "Le 22 février 2006, un attentat contre le sanctuaire Al-Askari à Samarra provoque la première guerre civile irakienne, entre sunnites et chiites, qui fait des centaines de milliers de morts.",
+    "wikitext": "Le {{date|22|février|2006}}<ref name=\"LeMonde22022006\">{{Article |auteur1= |titre=Affrontements entre chiites et sunnites en Irak après l'attaque du mausolée de Samarra |périodique=Le Monde |date= 22 février 2006|pages= |lire en ligne=https://www.lemonde.fr/proche-orient/article/2006/02/22/l-attentat-contre-le-mausolee-de-samarra_743778_3218.html }}.</ref>{{,}}<ref name=\"LeMonde14062006\">{{Article|auteur1=Maxime Blanchard|titre=« Liberté en Irak », retour sur le fiasco de l'invasion américaine|périodique=Le Monde|pages=|date=14 juin 2006|lire en ligne=https://www.lemonde.fr/proche-orient/article/2014/06/14/liberte-en-irak-retour-sur-le-fiasco-de-l-invasion-americaine_4438289_3218.html}}.</ref>, un [[attentat]] contre le [[sanctuaire Al-Askari]] à [[Samarra]] provoque la [[première guerre civile irakienne]], entre [[Sunnisme|sunnites]] et [[Chiisme|chiites]], qui fait des centaines de milliers de morts.",
+    "links": [
+     {
+      "target": "Attentat",
+      "anchor": "attentat",
+      "start": 23,
+      "end": 31
+     },
+     {
+      "target": "Sanctuaire Al-Askari",
+      "anchor": "sanctuaire Al-Askari",
+      "start": 42,
+      "end": 62
+     },
+     {
+      "target": "Samarra",
+      "anchor": "Samarra",
+      "start": 65,
+      "end": 72
+     },
+     {
+      "target": "Première guerre civile irakienne",
+      "anchor": "première guerre civile irakienne",
+      "start": 85,
+      "end": 117
+     },
+     {
+      "target": "Sunnisme",
+      "anchor": "sunnites",
+      "start": 125,
+      "end": 133
+     },
+     {
+      "target": "Chiisme",
+      "anchor": "chiites",
+      "start": 137,
+      "end": 144
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "1037fb90037b985d387b7e81882d2f04501bde324d530b4eca1c74b581871672",
+    "retrieved_at": "2026-10-16T21:23:00.274842+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 18,
+   "candidate_id": "71c88878f522a47d06a3432931f6dfbb",
+   "connective": "fr.a_provoque",
+   "cause_target": "Bombes",
+   "effect_target": "Pollution des sols",
+   "cause_qid": "Q127197",
+   "effect_qid": "Q212734",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "same sentence in a second article",
+   "record": {
+    "lang": "fr",
+    "title": "Génocide à Gaza",
+    "page_id": 16065368,
+    "article_qid": "Q124086054",
+    "revision_id": 240431076,
+    "revision_timestamp": "2026-10-16T16:13:10Z",
+    "section": "Pollution",
+    "paragraph": 123,
+    "index": 0,
+    "sentence": "Les bombes provoquent une pollution des sols, de l'air et de l'eau à Gaza.",
+    "wikitext": "Les [[bombes]] provoquent une [[pollution des sols]], de l'[[Pollution de l'air|air]] et de l'[[Pollution de l'eau|eau]] à Gaza<ref name=\"Euronewspollution\"/>.",
+    "links": [
+     {
+      "target": "Bombes",
+      "anchor": "bombes",
+      "start": 4,
+      "end": 10
+     },
+     {
+      "target": "Pollution des sols",
+      "anchor": "pollution des sols",
+      "start": 26,
+      "end": 44
+     },
+     {
+      "target": "Pollution de l'air",
+      "anchor": "air",
+      "start": 51,
+      "end": 54
+     },
+     {
+      "target": "Pollution de l'eau",
+      "anchor": "eau",
+      "start": 63,
+      "end": 66
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "fc7878d2409f0f82078663370a58f3b8bb6a614c1b12e95de3b62fb96be49d4c",
+    "retrieved_at": "2026-10-16T21:25:00.172394+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 19,
+   "candidate_id": "6810563d7c889f854fc699a234ff24f1",
+   "connective": "fr.a_declenche",
+   "cause_target": "Italie",
+   "effect_target": "Guerre italo-turque",
+   "cause_qid": "Q38",
+   "effect_qid": "Q203824",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "agentive cause (a state)",
+   "record": {
+    "lang": "fr",
+    "title": "Première guerre balkanique",
+    "page_id": 407181,
+    "article_qid": "Q177918",
+    "revision_id": 235617602,
+    "revision_timestamp": "2026-04-27T07:20:08Z",
+    "section": "La politique des États balkaniques",
+    "paragraph": 8,
+    "index": 0,
+    "sentence": "En 1911, l'Italie déclencha la guerre italo-turque et s'empara de la Libye et des îles du Dodécanèse.",
+    "wikitext": "En 1911, l'[[Italie]] déclencha la [[guerre italo-turque]] et s'empara de la [[Libye]] et des îles du [[Dodécanèse]].",
+    "links": [
+     {
+      "target": "Italie",
+      "anchor": "Italie",
+      "start": 11,
+      "end": 17
+     },
+     {
+      "target": "Guerre italo-turque",
+      "anchor": "guerre italo-turque",
+      "start": 31,
+      "end": 50
+     },
+     {
+      "target": "Libye",
+      "anchor": "Libye",
+      "start": 69,
+      "end": 74
+     },
+     {
+      "target": "Dodécanèse",
+      "anchor": "Dodécanèse",
+      "start": 90,
+      "end": 100
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "aae0111e8637e6af2f6f630020c7f4e5fd6a348a69449fb544b7e49a5e29f48e",
+    "retrieved_at": "2026-10-16T21:28:19.526239+00:00"
+   }
+  },
+  {
+   "set": "strict_census",
+   "index": 20,
+   "candidate_id": "92b6f8ca3e540086e7e7b52d0a91350e",
+   "connective": "fr.a_declenche",
+   "cause_target": "Grève des techniciens et journalistes de l'ORTF en mai-juin 1968",
+   "effect_target": "Slogans de Mai 68",
+   "cause_qid": "Q85853350",
+   "effect_qid": "Q109036069",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "anchor/target mismatch: cause anchor is a verb phrase linked to a strike article, effect linked to 'Slogans de Mai 68'",
+   "record": {
+    "lang": "fr",
+    "title": "Mai 68",
+    "page_id": 2059,
+    "article_qid": "Q6743",
+    "revision_id": 239616077,
+    "revision_timestamp": "2026-09-18T20:19:39Z",
+    "section": "Vendredi 10 mai",
+    "paragraph": 57,
+    "index": 0,
+    "sentence": "Dans le Journal du dimanche, Philippe Labro lance un « bravo ! » aux radios privées RTL et Europe1 dans les colonnes du JDD, le dimanche 12 mai, au lendemain de la première nuit des barricades de Mai 68 qu'elles ont couvertes en direct en utilisant les fréquences de la police, alors que l'ORTF y a renoncé déclenchant une violente contestation de ses émissions par les contestataires.",
+    "wikitext": "Dans le ''[[Journal du dimanche]]'', [[Philippe Labro]]<ref name=\"caron\">{{Ouvrage|prénom1=Gilles|nom1=Caron|titre=Sous les pavés la plage : mai 68|éditeur=[[Éditions de La Sirène|La Sirène]]|date=1993|pages totales=127|isbn=978-2-840-450474|lire en ligne=https://books.google.fr/books?id=HplYDwAAQBAJ&pg=PT161&lpg=PT161&dq=%22journal+du+dimanche%22+%22mai+68%22&source=bl&ots=ukMFW7gtUU&sig=ACfU3U2ID7VCxiLEBVaHzKCBWM9hZvuPtg&hl=fr&sa=X&ved=2ahUKEwjU6_vrmNSAAxWMTaQEHQJzDK04HhDoAXoECBEQAw#v=onepage&q=%22journal%20du%20dimanche%22%20%22mai%2068%22&f=false|consulté le=11 août 2023}}</ref> lance un {{citation|bravo !}} aux radios privées RTL et Europe1 dans les colonnes du JDD, le dimanche {{date|12 mai}}, au lendemain de la première [[nuit des barricades de Mai 68]] qu'elles ont couvertes en direct en utilisant les fréquences de la police, alors que [[Grève des techniciens et journalistes de l'ORTF en mai-juin 1968|l'ORTF y a renoncé]]<ref name=Artières>{{Ouvrage|prénom1=Philippe|nom1=Artières|prénom2=Michelle|nom2=Zancarini-Fournel|titre=68, une histoire collective (1962-1981)|éditeur=[[La Découverte]]|date=2018-05-09|isbn=978-2-348-04044-3|lire en ligne=https://books.google.fr/books?id=qG1YDwAAQBAJ&pg=PT194&lpg=PT194&dq=%22journal+du+dimanche%22+%22mai+68%22&source=bl&ots=YI3FdPc3Te&sig=ACfU3U0bJS2zcWIpUWtGzOqhyC8dFyVKEQ&hl=fr&sa=X&ved=2ahUKEwjU6_vrmNSAAxWMTaQEHQJzDK04HhDoAXoECBIQAw#v=onepage&q=%22journal%20du%20dimanche%22%20%22mai%2068%22&f=false|consulté le=2023-08-11}}</ref> déclenchant [[slogans de Mai 68|une violente contestation de ses émissions par les contestataires]].",
+    "links": [
+     {
+      "target": "Journal du dimanche",
+      "anchor": "Journal du dimanche",
+      "start": 8,
+      "end": 27
+     },
+     {
+      "target": "Philippe Labro",
+      "anchor": "Philippe Labro",
+      "start": 29,
+      "end": 43
+     },
+     {
+      "target": "Nuit des barricades de Mai 68",
+      "anchor": "nuit des barricades de Mai 68",
+      "start": 173,
+      "end": 202
+     },
+     {
+      "target": "Grève des techniciens et journalistes de l'ORTF en mai-juin 1968",
+      "anchor": "l'ORTF y a renoncé",
+      "start": 288,
+      "end": 306
+     },
+     {
+      "target": "Slogans de Mai 68",
+      "anchor": "une violente contestation de ses émissions par les contestataires",
+      "start": 319,
+      "end": 384
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "e90df4b041f09eb0df513bdf378a133e9d014a9364fe56cd71a0374b0d13a574",
+    "retrieved_at": "2026-10-16T21:30:59.763951+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 0,
+   "candidate_id": "51af515cdc47b45e7d9cb46dba0e2ddb",
+   "connective": "en.resulted_in",
+   "cause_target": "February Revolution",
+   "effect_target": "Nicholas II of Russia",
+   "cause_qid": "Q101534",
+   "effect_qid": "Q40787",
+   "modifier_heads": [
+    null,
+    "abdication"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "abdication of Nicholas II",
+   "record": {
+    "lang": "en",
+    "title": "Russian Civil War",
+    "page_id": 26295,
+    "article_qid": "Q79911",
+    "revision_id": 1379062560,
+    "revision_timestamp": "2026-10-07T18:24:52Z",
+    "section": "From World War I to the Russian Revolution",
+    "paragraph": 7,
+    "index": 0,
+    "sentence": "The February Revolution of 1917 resulted in the abdication of Emperor Nicholas II of Russia.",
+    "wikitext": "The [[February Revolution]] of 1917 resulted in the abdication of Emperor [[Nicholas II of Russia]].",
+    "links": [
+     {
+      "target": "February Revolution",
+      "anchor": "February Revolution",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Nicholas II of Russia",
+      "anchor": "Nicholas II of Russia",
+      "start": 70,
+      "end": 91
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "8e3455e91fedc3d727dadbbc94b69781a8c09ca8d3226d19f72a0957f50946c8",
+    "retrieved_at": "2026-10-16T20:45:59.907350+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 1,
+   "candidate_id": "71c88878f522a47d06a3432931f6dfbb",
+   "connective": "fr.a_provoque",
+   "cause_target": "Bombes",
+   "effect_target": "Pollution des sols",
+   "cause_qid": "Q127197",
+   "effect_qid": "Q212734",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "fr",
+    "title": "Génocide à Gaza",
+    "page_id": 16065368,
+    "article_qid": "Q124086054",
+    "revision_id": 240431076,
+    "revision_timestamp": "2026-10-16T16:13:10Z",
+    "section": "Pollution",
+    "paragraph": 123,
+    "index": 0,
+    "sentence": "Les bombes provoquent une pollution des sols, de l'air et de l'eau à Gaza.",
+    "wikitext": "Les [[bombes]] provoquent une [[pollution des sols]], de l'[[Pollution de l'air|air]] et de l'[[Pollution de l'eau|eau]] à Gaza<ref name=\"Euronewspollution\"/>.",
+    "links": [
+     {
+      "target": "Bombes",
+      "anchor": "bombes",
+      "start": 4,
+      "end": 10
+     },
+     {
+      "target": "Pollution des sols",
+      "anchor": "pollution des sols",
+      "start": 26,
+      "end": 44
+     },
+     {
+      "target": "Pollution de l'air",
+      "anchor": "air",
+      "start": 51,
+      "end": 54
+     },
+     {
+      "target": "Pollution de l'eau",
+      "anchor": "eau",
+      "start": 63,
+      "end": 66
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "fc7878d2409f0f82078663370a58f3b8bb6a614c1b12e95de3b62fb96be49d4c",
+    "retrieved_at": "2026-10-16T21:25:00.172394+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 2,
+   "candidate_id": "4edefef6f0542deb184192bc708a9ebf",
+   "connective": "fr.est_due_a",
+   "cause_target": "Ports du Koweït",
+   "effect_target": "Marée noire",
+   "cause_qid": "Q3399536",
+   "effect_qid": "Q220187",
+   "modifier_heads": [
+    "volontaire",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "cause = opening of the terminal; effect = the Gulf War oil spill, linked to the generic concept",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre du Golfe",
+    "page_id": 48762,
+    "article_qid": "Q37643",
+    "revision_id": 238989445,
+    "revision_timestamp": "2026-08-27T04:23:01Z",
+    "section": "Bilan écologique et déminage",
+    "paragraph": 130,
+    "index": 0,
+    "sentence": "Lors de la marée noire due à l'ouverture volontaire du terminal de Mina al Ahmadi par l'Irak le 20 janvier 1991, 800000 tonnes de pétrole brut se répandirent dans le golfe Persique et polluèrent les côtes koweïtiennes, saoudiennes et iraniennes.",
+    "wikitext": "Lors de la [[marée noire]] due à l'ouverture volontaire du terminal de ''[[Ports du Koweït#Mina Al-Ahmadi|Mina al Ahmadi]]'' par l'Irak le {{date|20|janvier|1991}}, {{unité|800000|tonnes}} de pétrole brut se répandirent dans le golfe Persique et polluèrent les côtes koweïtiennes, saoudiennes et iraniennes.",
+    "links": [
+     {
+      "target": "Marée noire",
+      "anchor": "marée noire",
+      "start": 11,
+      "end": 22
+     },
+     {
+      "target": "Ports du Koweït",
+      "anchor": "Mina al Ahmadi",
+      "start": 67,
+      "end": 81
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "0dd6c67eeacdbf4a9114113ea9ad436c9367d9da65b2b43cf9ae658b2f549c75",
+    "retrieved_at": "2026-10-16T21:22:09.829738+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 3,
+   "candidate_id": "54b8feb9ed70f4a10da79c9bf42419be",
+   "connective": "en.led_to",
+   "cause_target": "Rise of nationalism in the Ottoman Empire",
+   "effect_target": "Turkish nationalism",
+   "cause_qid": "Q7335949",
+   "effect_qid": "Q3568928",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Sayfo",
+    "page_id": 1406373,
+    "article_qid": "Q852236",
+    "revision_id": 1370631734,
+    "revision_timestamp": "2026-08-22T05:07:17Z",
+    "section": "World War I",
+    "paragraph": 15,
+    "index": 1,
+    "sentence": "The rise of nationalism led to competing Turkish, Kurdish, Persian, and Arab national movements, which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "wikitext": "The [[rise of nationalism in the Ottoman Empire|rise of nationalism]] led to competing [[Turkish nationalism|Turkish]], [[Kurdish nationalism|Kurdish]], [[Iranian nationalism|Persian]], and [[Arab nationalism|Arab national movements]], which contributed to increasing violence in the already conflict-ridden borderlands inhabited by the Assyrians.",
+    "links": [
+     {
+      "target": "Rise of nationalism in the Ottoman Empire",
+      "anchor": "rise of nationalism",
+      "start": 4,
+      "end": 23
+     },
+     {
+      "target": "Turkish nationalism",
+      "anchor": "Turkish",
+      "start": 41,
+      "end": 48
+     },
+     {
+      "target": "Kurdish nationalism",
+      "anchor": "Kurdish",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Iranian nationalism",
+      "anchor": "Persian",
+      "start": 59,
+      "end": 66
+     },
+     {
+      "target": "Arab nationalism",
+      "anchor": "Arab national movements",
+      "start": 72,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "a6649e5b1b06ab2d7acd55f10127226232537456148de78d3d1033ced9842196",
+    "retrieved_at": "2026-10-16T21:12:09.642512+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 4,
+   "candidate_id": "003158022602857ff21a5d1cfa317d59",
+   "connective": "fr.a_entraine",
+   "cause_target": "Première Guerre mondiale",
+   "effect_target": "Révolution russe",
+   "cause_qid": "Q361",
+   "effect_qid": "Q8729",
+   "modifier_heads": [
+    null,
+    "lors"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "collapse of the Russian Empire during the Revolution",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre d'Hiver",
+    "page_id": 296116,
+    "article_qid": "Q134949",
+    "revision_id": 240191232,
+    "revision_timestamp": "2026-10-08T16:39:47Z",
+    "section": "Relations finno-soviétiques",
+    "paragraph": 5,
+    "index": 0,
+    "sentence": "La Première Guerre mondiale entraîne l’effondrement de l’Empire russe lors de la Révolution de 1917 et de la guerre civile qui s'ensuit.",
+    "wikitext": "La [[Première Guerre mondiale]] entraîne l’effondrement de l’Empire russe lors de la [[Révolution russe|Révolution]] de {{date|1917}} et de la [[Guerre civile russe|guerre civile]] qui s'ensuit.",
+    "links": [
+     {
+      "target": "Première Guerre mondiale",
+      "anchor": "Première Guerre mondiale",
+      "start": 3,
+      "end": 27
+     },
+     {
+      "target": "Révolution russe",
+      "anchor": "Révolution",
+      "start": 81,
+      "end": 91
+     },
+     {
+      "target": "Guerre civile russe",
+      "anchor": "guerre civile",
+      "start": 109,
+      "end": 122
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "e73ffbe3ea534f1881c4c034b2dae145c740633c82386946b469bd98c5c51ee0",
+    "retrieved_at": "2026-10-16T21:24:09.586560+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 5,
+   "candidate_id": "07d95ca82dd625d278bba95e9a84cc80",
+   "connective": "en.resulted_in",
+   "cause_target": "Self-determination",
+   "effect_target": "Bangladesh",
+   "cause_qid": "Q156595",
+   "effect_qid": "Q902",
+   "modifier_heads": [
+    "rise",
+    "independence"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "'which' refers to the war; effect = independence of Bangladesh",
+   "record": {
+    "lang": "en",
+    "title": "Bangladesh Liberation War",
+    "page_id": 672766,
+    "article_qid": "Q371394",
+    "revision_id": 1376667314,
+    "revision_timestamp": "2026-09-25T15:19:04Z",
+    "section": "",
+    "paragraph": 0,
+    "index": 0,
+    "sentence": "The Bangladesh Liberation War (, ), also known as the Bangladesh War of Independence, was an armed conflict sparked by the rise of the Bengali nationalist and self-determination movement in East Pakistan, which resulted in the independence of Bangladesh with the help of India.",
+    "wikitext": "The '''Bangladesh Liberation War'''{{NoteTag|This war is known as the Liberation War or the War of Independence in Bangladesh.<ref>[https://books.google.com/books?id=bJfcCPUr0OoC&q=+Muktijuddho&pg=PA289 ''Historical Dictionary of Bangladesh''], Page 289</ref> This war is also called the Civil War in Pakistan.<ref name=\"Social 2005 p93\">{{Cite book |last=Moss |first=Peter |title=Secondary Social Studies For Pakistan |date=2005 |publisher=[[Oxford University Press]] |isbn=9780195977042 |location=Karachi |page=93 |oclc=651126824}}</ref>}} ({{langx|bn|মুক্তিযুদ্ধ}}, {{IPA|bn|mukt̪iɟud̪d̪ʱo|pron}}), also known as the '''Bangladesh War of Independence''', was an [[War|armed conflict]] sparked by the rise of the [[Bengali nationalism|Bengali nationalist]] and [[self-determination]] movement in [[East Pakistan]], which resulted in the independence of [[Bangladesh]] with the help of [[India]].",
+    "links": [
+     {
+      "target": "War",
+      "anchor": "armed conflict",
+      "start": 93,
+      "end": 107
+     },
+     {
+      "target": "Bengali nationalism",
+      "anchor": "Bengali nationalist",
+      "start": 135,
+      "end": 154
+     },
+     {
+      "target": "Self-determination",
+      "anchor": "self-determination",
+      "start": 159,
+      "end": 177
+     },
+     {
+      "target": "East Pakistan",
+      "anchor": "East Pakistan",
+      "start": 190,
+      "end": 203
+     },
+     {
+      "target": "Bangladesh",
+      "anchor": "Bangladesh",
+      "start": 243,
+      "end": 253
+     },
+     {
+      "target": "India",
+      "anchor": "India",
+      "start": 271,
+      "end": 276
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 3,
+    "raw_sha256": "a7156057a92358cad32b0404bd2d6420e1d2a54cb0ec21022e40054325916d3a",
+    "retrieved_at": "2026-10-16T20:59:09.927809+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 6,
+   "candidate_id": "b5a5944787e66d9bddbc79b13109c355",
+   "connective": "en.led_to",
+   "cause_target": "Slavery Abolition Act 1833",
+   "effect_target": "Great Trek",
+   "cause_qid": "Q487420",
+   "effect_qid": "Q338949",
+   "modifier_heads": [
+    null,
+    "attempting"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "modifier flag false positive (participle 'attempting')",
+   "record": {
+    "lang": "en",
+    "title": "First Boer War",
+    "page_id": 329210,
+    "article_qid": "Q329203",
+    "revision_id": 1379911011,
+    "revision_timestamp": "2026-10-12T16:40:27Z",
+    "section": "Background",
+    "paragraph": 5,
+    "index": 1,
+    "sentence": "The formal abolition of slavery in the British Empire in 1834 led to more organised groups of Boer settlers attempting to escape British rule, some travelling as far north as modern-day Mozambique.",
+    "wikitext": "The formal [[Slavery Abolition Act 1833|abolition of slavery]] in the [[British Empire]] in 1834<ref name=\"SAHOL\" /> led to [[Great Trek|more organised groups of Boer settlers]] attempting to escape British rule, some travelling as far north as modern-day [[Mozambique]].",
+    "links": [
+     {
+      "target": "Slavery Abolition Act 1833",
+      "anchor": "abolition of slavery",
+      "start": 11,
+      "end": 31
+     },
+     {
+      "target": "British Empire",
+      "anchor": "British Empire",
+      "start": 39,
+      "end": 53
+     },
+     {
+      "target": "Great Trek",
+      "anchor": "more organised groups of Boer settlers",
+      "start": 69,
+      "end": 107
+     },
+     {
+      "target": "Mozambique",
+      "anchor": "Mozambique",
+      "start": 186,
+      "end": 196
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "218d1411d0dd16e0d19caf9cd45cbe114ac944de1ba62fcd15608713ab235dd3",
+    "retrieved_at": "2026-10-16T21:12:59.908420+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 7,
+   "candidate_id": "dd6b5da8b03862f33504f250bf188691",
+   "connective": "en.contributed_to",
+   "cause_target": "Israeli blockade of the Gaza Strip (2023–present)",
+   "effect_target": "Gaza Strip famine",
+   "cause_qid": "Q122982851",
+   "effect_qid": "Q124302798",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Gaza genocide",
+    "page_id": 75668427,
+    "article_qid": "Q124086054",
+    "revision_id": 1380243947,
+    "revision_timestamp": "2026-10-14T17:05:00Z",
+    "section": "",
+    "paragraph": 7,
+    "index": 0,
+    "sentence": "An Israeli blockade heavily contributed to starvation and confirmed famine.",
+    "wikitext": "[[Israeli blockade of the Gaza Strip (2023–present)|An Israeli blockade]] heavily contributed to [[Gaza Strip famine|starvation and confirmed famine]].",
+    "links": [
+     {
+      "target": "Israeli blockade of the Gaza Strip (2023–present)",
+      "anchor": "An Israeli blockade",
+      "start": 0,
+      "end": 19
+     },
+     {
+      "target": "Gaza Strip famine",
+      "anchor": "starvation and confirmed famine",
+      "start": 43,
+      "end": 74
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "cee0a9f7a8911cde2266215191b705da4acf5b21aa4aa656a92319e0340a5602",
+    "retrieved_at": "2026-10-16T20:48:59.519603+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 8,
+   "candidate_id": "fb29e9215dc25a13664d015925a462a1",
+   "connective": "en.led_to",
+   "cause_target": "Crisis of 1772",
+   "effect_target": "East India Company",
+   "cause_qid": "Q5183770",
+   "effect_qid": "Q83164",
+   "modifier_heads": [
+    null,
+    "near-collapse"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "near-collapse of the EIC",
+   "record": {
+    "lang": "en",
+    "title": "American Revolutionary War",
+    "page_id": 771,
+    "article_qid": "Q40949",
+    "revision_id": 1380179269,
+    "revision_timestamp": "2026-10-14T06:49:11Z",
+    "section": "Taxation and legislation",
+    "paragraph": 8,
+    "index": 3,
+    "sentence": "A banking crisis led to the near-collapse of the East India Company, which dominated the British economy; to support it, Parliament passed the Tea Act, giving it a trading monopoly in the Thirteen Colonies.",
+    "wikitext": "A [[Crisis of 1772|banking crisis]] led to the near-collapse of the [[East India Company]], which dominated the British economy; to support it, Parliament passed the [[Tea Act]], giving it a trading monopoly in the [[Thirteen Colonies]].",
+    "links": [
+     {
+      "target": "Crisis of 1772",
+      "anchor": "banking crisis",
+      "start": 2,
+      "end": 16
+     },
+     {
+      "target": "East India Company",
+      "anchor": "East India Company",
+      "start": 49,
+      "end": 67
+     },
+     {
+      "target": "Tea Act",
+      "anchor": "Tea Act",
+      "start": 143,
+      "end": 150
+     },
+     {
+      "target": "Thirteen Colonies",
+      "anchor": "Thirteen Colonies",
+      "start": 188,
+      "end": 205
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "2525f42d69f223cb170ba2eb884a3bb7e9f7a8062740acf171cfe15c22922947",
+    "retrieved_at": "2026-10-16T20:45:00.215915+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 9,
+   "candidate_id": "4954ad899a917d9504254df2278e6dcd",
+   "connective": "fr.a_provoque",
+   "cause_target": "Attentat",
+   "effect_target": "Première guerre civile irakienne",
+   "cause_qid": "Q2223653",
+   "effect_qid": "Q17183365",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "generic Attentat for a specific attack",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre d'Irak",
+    "page_id": 12155,
+    "article_qid": "Q545449",
+    "revision_id": 240398633,
+    "revision_timestamp": "2026-10-15T14:11:19Z",
+    "section": "",
+    "paragraph": 4,
+    "index": 0,
+    "sentence": "Le 22 février 2006, un attentat contre le sanctuaire Al-Askari à Samarra provoque la première guerre civile irakienne, entre sunnites et chiites, qui fait des centaines de milliers de morts.",
+    "wikitext": "Le {{date|22|février|2006}}<ref name=\"LeMonde22022006\">{{Article |auteur1= |titre=Affrontements entre chiites et sunnites en Irak après l'attaque du mausolée de Samarra |périodique=Le Monde |date= 22 février 2006|pages= |lire en ligne=https://www.lemonde.fr/proche-orient/article/2006/02/22/l-attentat-contre-le-mausolee-de-samarra_743778_3218.html }}.</ref>{{,}}<ref name=\"LeMonde14062006\">{{Article|auteur1=Maxime Blanchard|titre=« Liberté en Irak », retour sur le fiasco de l'invasion américaine|périodique=Le Monde|pages=|date=14 juin 2006|lire en ligne=https://www.lemonde.fr/proche-orient/article/2014/06/14/liberte-en-irak-retour-sur-le-fiasco-de-l-invasion-americaine_4438289_3218.html}}.</ref>, un [[attentat]] contre le [[sanctuaire Al-Askari]] à [[Samarra]] provoque la [[première guerre civile irakienne]], entre [[Sunnisme|sunnites]] et [[Chiisme|chiites]], qui fait des centaines de milliers de morts.",
+    "links": [
+     {
+      "target": "Attentat",
+      "anchor": "attentat",
+      "start": 23,
+      "end": 31
+     },
+     {
+      "target": "Sanctuaire Al-Askari",
+      "anchor": "sanctuaire Al-Askari",
+      "start": 42,
+      "end": 62
+     },
+     {
+      "target": "Samarra",
+      "anchor": "Samarra",
+      "start": 65,
+      "end": 72
+     },
+     {
+      "target": "Première guerre civile irakienne",
+      "anchor": "première guerre civile irakienne",
+      "start": 85,
+      "end": 117
+     },
+     {
+      "target": "Sunnisme",
+      "anchor": "sunnites",
+      "start": 125,
+      "end": 133
+     },
+     {
+      "target": "Chiisme",
+      "anchor": "chiites",
+      "start": 137,
+      "end": 144
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "1037fb90037b985d387b7e81882d2f04501bde324d530b4eca1c74b581871672",
+    "retrieved_at": "2026-10-16T21:23:00.274842+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 10,
+   "candidate_id": "abbee3ed7da77955fa1719f8d047a181",
+   "connective": "en.due_to",
+   "cause_target": "United States armed forces",
+   "effect_target": "Awards and decorations of the United States military",
+   "cause_qid": "Q11211",
+   "effect_qid": "Q784242",
+   "modifier_heads": [
+    "involvement",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "involvement of the US forces; effect piped to a broad article",
+   "record": {
+    "lang": "en",
+    "title": "Kosovo War",
+    "page_id": 16760,
+    "article_qid": "Q190029",
+    "revision_id": 1379723790,
+    "revision_timestamp": "2026-10-11T15:45:03Z",
+    "section": "Military decorations",
+    "paragraph": 187,
+    "index": 0,
+    "sentence": "Due to the involvement of the United States armed forces, a separate US military decoration, known as the Kosovo Campaign Medal, was established by President Bill Clinton in 2000.",
+    "wikitext": "Due to the involvement of the [[United States armed forces]], a separate [[awards and decorations of the United States military|US military decoration]], known as the [[Kosovo Campaign Medal]], was established by President [[Bill Clinton]] in 2000.",
+    "links": [
+     {
+      "target": "United States armed forces",
+      "anchor": "United States armed forces",
+      "start": 30,
+      "end": 56
+     },
+     {
+      "target": "Awards and decorations of the United States military",
+      "anchor": "US military decoration",
+      "start": 69,
+      "end": 91
+     },
+     {
+      "target": "Kosovo Campaign Medal",
+      "anchor": "Kosovo Campaign Medal",
+      "start": 106,
+      "end": 127
+     },
+     {
+      "target": "Bill Clinton",
+      "anchor": "Bill Clinton",
+      "start": 158,
+      "end": 170
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "2c4541e037432347dd9bbb23782d0091cb8a7e3eda08c405f8444265400c48e1",
+    "retrieved_at": "2026-10-16T20:55:09.822096+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 11,
+   "candidate_id": "aa32b69cbd390a56fa717894604232e4",
+   "connective": "fr.provoque_par",
+   "cause_target": "Crise des subprimes",
+   "effect_target": "Établissement financier",
+   "cause_qid": "Q844541",
+   "effect_qid": "Q3591545",
+   "modifier_heads": [
+    null,
+    "importantes"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "effect = losses of the institutions",
+   "record": {
+    "lang": "fr",
+    "title": "Crise financière mondiale de 2007-2008",
+    "page_id": 3486189,
+    "article_qid": "Q896666",
+    "revision_id": 239454741,
+    "revision_timestamp": "2026-09-13T11:07:05Z",
+    "section": "",
+    "paragraph": 0,
+    "index": 1,
+    "sentence": "Amorcée en juillet 2007, elle trouve son origine dans le dégonflement de bulles de prix (dont la bulle immobilière américaine des années 2000) et les pertes importantes des établissements financiers provoquées par la crise des subprimes.",
+    "wikitext": "Amorcée en {{date|juillet 2007}}, elle trouve son origine dans le dégonflement de [[bulle (économie)|bulles de prix]] (dont la [[bulle immobilière américaine des années 2000]]) et les pertes importantes des [[établissement financier|établissements financiers]] provoquées par la [[crise des subprimes]].",
+    "links": [
+     {
+      "target": "Bulle (économie)",
+      "anchor": "bulles de prix",
+      "start": 73,
+      "end": 87
+     },
+     {
+      "target": "Bulle immobilière américaine des années 2000",
+      "anchor": "bulle immobilière américaine des années 2000",
+      "start": 97,
+      "end": 141
+     },
+     {
+      "target": "Établissement financier",
+      "anchor": "établissements financiers",
+      "start": 173,
+      "end": 198
+     },
+     {
+      "target": "Crise des subprimes",
+      "anchor": "crise des subprimes",
+      "start": 217,
+      "end": 236
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "db74b19c04a4f0e9faefb34588367a7919db98e0e93a0786b1c99508efba5a71",
+    "retrieved_at": "2026-10-16T21:27:59.307508+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 12,
+   "candidate_id": "1bc2e59c1869b91b4e506c7b9ee0500c",
+   "connective": "en.resulted_in",
+   "cause_target": "Orangist revolution",
+   "effect_target": "William IV, Prince of Orange",
+   "cause_qid": "Q117706191",
+   "effect_qid": "Q380949",
+   "modifier_heads": [
+    null,
+    "appointment"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "appointment of William IV",
+   "record": {
+    "lang": "en",
+    "title": "War of the Austrian Succession",
+    "page_id": 52266,
+    "article_qid": "Q32929",
+    "revision_id": 1379905840,
+    "revision_timestamp": "2026-10-12T15:57:41Z",
+    "section": "The Low Countries, 1745–1748",
+    "paragraph": 56,
+    "index": 2,
+    "sentence": "This prompted an Orangist revolution, which resulted in the appointment of William IV, Prince of Orange, as stadtholder and head of the Dutch military.",
+    "wikitext": "This prompted an [[Orangist revolution]], which resulted in the appointment of [[William IV, Prince of Orange]], as [[stadtholder]] and head of the Dutch military.",
+    "links": [
+     {
+      "target": "Orangist revolution",
+      "anchor": "Orangist revolution",
+      "start": 17,
+      "end": 36
+     },
+     {
+      "target": "William IV, Prince of Orange",
+      "anchor": "William IV, Prince of Orange",
+      "start": 75,
+      "end": 103
+     },
+     {
+      "target": "Stadtholder",
+      "anchor": "stadtholder",
+      "start": 108,
+      "end": 119
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "6e53ded3cc3df139bbcf14ce0bbf4e5c8d293176e522fe262ad17ab1c136d496",
+    "retrieved_at": "2026-10-16T20:58:09.623130+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 13,
+   "candidate_id": "bb88d437ac75a255f892f337aa8b705e",
+   "connective": "en.led_to",
+   "cause_target": "Russian attacks on civilians in the Russo-Ukrainian war (2022–present)",
+   "effect_target": "Allegations of genocide of Ukrainians in the Russo-Ukrainian War",
+   "cause_qid": "Q113625077",
+   "effect_qid": "Q111648183",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Russo-Ukrainian war (2022–present)",
+    "page_id": 70149799,
+    "article_qid": "Q110999040",
+    "revision_id": 1380543061,
+    "revision_timestamp": "2026-10-16T10:50:06Z",
+    "section": "",
+    "paragraph": 3,
+    "index": 1,
+    "sentence": "Russia's attacks on civilians, as well as its policies in occupied territories, have led to allegations of genocide.",
+    "wikitext": "Russia's [[Russian attacks on civilians in the Russo-Ukrainian war (2022–present)|attacks on civilians]], as well as its policies in occupied territories, have led to [[Allegations of genocide of Ukrainians in the Russo-Ukrainian War|allegations of genocide]].",
+    "links": [
+     {
+      "target": "Russian attacks on civilians in the Russo-Ukrainian war (2022–present)",
+      "anchor": "attacks on civilians",
+      "start": 9,
+      "end": 29
+     },
+     {
+      "target": "Allegations of genocide of Ukrainians in the Russo-Ukrainian War",
+      "anchor": "allegations of genocide",
+      "start": 92,
+      "end": 115
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "1ecb194a38606ef0cd87d2fd209cc69a26a2452602eebe2dd68fa343273edee4",
+    "retrieved_at": "2026-10-16T20:43:00.862078+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 14,
+   "candidate_id": "89b0ef9d5e0b3f05d1671b8cf88124b0",
+   "connective": "en.led_to",
+   "cause_target": "World War I",
+   "effect_target": "Russian Revolution",
+   "cause_qid": "Q361",
+   "effect_qid": "Q8729",
+   "modifier_heads": [
+    null,
+    "empire"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "collapse of the Russian Empire",
+   "record": {
+    "lang": "en",
+    "title": "Winter War",
+    "page_id": 33924,
+    "article_qid": "Q134949",
+    "revision_id": 1380602709,
+    "revision_timestamp": "2026-10-16T19:29:10Z",
+    "section": "Finnish-Soviet relations and politics",
+    "paragraph": 6,
+    "index": 0,
+    "sentence": "World War I led to the collapse of the Russian Empire during the Russian Revolution of 1917 and the Russian Civil War.",
+    "wikitext": "[[World War I]] led to the collapse of the Russian Empire during the [[Russian Revolution]] of 1917 and the [[Russian Civil War]].",
+    "links": [
+     {
+      "target": "World War I",
+      "anchor": "World War I",
+      "start": 0,
+      "end": 11
+     },
+     {
+      "target": "Russian Revolution",
+      "anchor": "Russian Revolution",
+      "start": 65,
+      "end": 83
+     },
+     {
+      "target": "Russian Civil War",
+      "anchor": "Russian Civil War",
+      "start": 100,
+      "end": 117
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "d8029b683109da815fce8b8b7afab5b1f4f2adf3fe74c6feaa9e8446cfd7bf2b",
+    "retrieved_at": "2026-10-16T20:47:59.897763+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 15,
+   "candidate_id": "2581f49330e220bf929afe9a87b834ef",
+   "connective": "en.resulted_in",
+   "cause_target": "Industrialization in the Russian Empire",
+   "effect_target": "Overcrowding",
+   "cause_qid": "Q85769404",
+   "effect_qid": "Q7113614",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Russian Revolution",
+    "page_id": 25762,
+    "article_qid": "Q8729",
+    "revision_id": 1379985248,
+    "revision_timestamp": "2026-10-13T02:26:38Z",
+    "section": "Economic and social changes",
+    "paragraph": 16,
+    "index": 0,
+    "sentence": "The rapid industrialization of Russia also resulted in urban overcrowding and poor conditions for urban industrial workers (as mentioned above).",
+    "wikitext": "The [[Industrialization in the Russian Empire|rapid industrialization of Russia]] also resulted in urban [[overcrowding]] and poor conditions for urban industrial workers (as mentioned above).",
+    "links": [
+     {
+      "target": "Industrialization in the Russian Empire",
+      "anchor": "rapid industrialization of Russia",
+      "start": 4,
+      "end": 37
+     },
+     {
+      "target": "Overcrowding",
+      "anchor": "overcrowding",
+      "start": 61,
+      "end": 73
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "56a746754813c53928a8b33edb8d8ac9289712dcf8b4a91128f157f12ba326df",
+    "retrieved_at": "2026-10-16T20:43:10.101622+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 16,
+   "candidate_id": "2fc96c4962c2255f6dae0382943487a2",
+   "connective": "en.led_to",
+   "cause_target": "Second Vienna Award",
+   "effect_target": "Northern Transylvania",
+   "cause_qid": "Q243618",
+   "effect_qid": "Q917134",
+   "modifier_heads": [
+    null,
+    "transfer"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "transfer of Northern Transylvania",
+   "record": {
+    "lang": "en",
+    "title": "World War II",
+    "page_id": 32927,
+    "article_qid": "Q362",
+    "revision_id": 1379691426,
+    "revision_timestamp": "2026-10-11T10:27:00Z",
+    "section": "War breaks out in Europe (1939–1940)",
+    "paragraph": 30,
+    "index": 1,
+    "sentence": "In August 1940, Hitler imposed the Second Vienna Award on Romania which led to the transfer of Northern Transylvania to Hungary.",
+    "wikitext": "In August 1940, Hitler imposed the [[Second Vienna Award]] on Romania which led to the transfer of [[Northern Transylvania]] to Hungary.",
+    "links": [
+     {
+      "target": "Second Vienna Award",
+      "anchor": "Second Vienna Award",
+      "start": 35,
+      "end": 54
+     },
+     {
+      "target": "Northern Transylvania",
+      "anchor": "Northern Transylvania",
+      "start": 95,
+      "end": 116
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "453da929390a611581ad70e6c9d6a9a131c82b35e7fbfb67e09525e18785e115",
+    "retrieved_at": "2026-10-16T20:42:09.460517+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 17,
+   "candidate_id": "955f862e211993e39f1870b6372db67f",
+   "connective": "fr.a_entraine",
+   "cause_target": "Aktion T4",
+   "effect_target": "Chambre à gaz",
+   "cause_qid": "Q154494",
+   "effect_qid": "Q205348",
+   "modifier_heads": [
+    null,
+    "extermination"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "extermination by gassing",
+   "record": {
+    "lang": "fr",
+    "title": "Shoah",
+    "page_id": 4013722,
+    "article_qid": "Q2763",
+    "revision_id": 239993681,
+    "revision_timestamp": "2026-10-02T07:27:52Z",
+    "section": "La Shoah comme terme d'un processus",
+    "paragraph": 16,
+    "index": 0,
+    "sentence": "En octobre 1939, dans un acte antidaté au 1 septembre 1939 pour le faire coïncider avec le début de la guerre, Hitler autorise personnellement l'Aktion T4, qui entraîne l'extermination par gazage d'environ 70000 handicapés mentaux allemands en deux ans, dans des « centres d'euthanasie » prévus à cet effet.",
+    "wikitext": "En {{date|octobre 1939}}, dans un acte antidaté au {{date|1 septembre 1939}} pour le faire coïncider avec le début de la guerre<ref>[[Georges Bensoussan (historien)|Georges Bensoussan]], [http://www.memorialdelashoah.org/upload/medias/fr/RHS_editorial_183.pdf Éditorial], Revue d'Histoire de la Shoah, {{n°|183}}, juillet-décembre 2005, « Classer/Penser/Exclure. De l'eugénisme à l'[[hygiène raciale]] », {{p.|9}}.</ref>, Hitler autorise personnellement l'[[Aktion T4]], qui entraîne l'extermination par [[chambre à gaz|gazage]] d'environ {{unité|70000|handicapés}}<ref>{{Ouvrage|langue=fr|langue originale=de|auteur1=Bernhard Strebel|titre=Ravensbrûck|sous-titre=un complexe concentrationnaire|lieu=Paris|éditeur=[[Librairie Arthème Fayard]]|année=2005|pages totales=764|passage=303|isbn=2-213-62423-2}}{{Citation bloc|70 273 exterminés entre janvier 1940 et août 1941}}</ref> mentaux allemands en deux ans<ref name=\"Buttlar\">{{Article|langue=de|prénom1=Horst von|nom1=Buttlar|titre=Nazi-\"Euthanasie\": Forscher öffnen Inventar des Schreckens|périodique=Der Spiegel|date=2003-10-01|issn=2195-1349|lire en ligne=https://www.spiegel.de/wissenschaft/mensch/nazi-euthanasie-forscher-oeffnen-inventar-des-schreckens-a-267983.html|consulté le=2023-03-15}}</ref>, dans des « [[Centres d'extermination nazis|centres d'euthanasie]] » prévus à cet effet.",
+    "links": [
+     {
+      "target": "Aktion T4",
+      "anchor": "Aktion T4",
+      "start": 145,
+      "end": 154
+     },
+     {
+      "target": "Chambre à gaz",
+      "anchor": "gazage",
+      "start": 189,
+      "end": 195
+     },
+     {
+      "target": "Centres d'extermination nazis",
+      "anchor": "centres d'euthanasie",
+      "start": 265,
+      "end": 285
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "ba88a99783e33085bde2a6e137fcd33f178a5c1de440b0d16546f6df37d79790",
+    "retrieved_at": "2026-10-16T21:21:09.575903+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 18,
+   "candidate_id": "191a052ed7a62ca07d388779f4a3587a",
+   "connective": "en.due_to",
+   "cause_target": "Land mine",
+   "effect_target": "Jaffna",
+   "cause_qid": "Q178795",
+   "effect_qid": "Q215277",
+   "modifier_heads": [
+    "blast",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "deaths at a place; blast of a land mine",
+   "record": {
+    "lang": "en",
+    "title": "Sri Lankan civil war",
+    "page_id": 225283,
+    "article_qid": "Q213394",
+    "revision_id": 1379774680,
+    "revision_timestamp": "2026-10-11T21:47:50Z",
+    "section": "Eelam War II (1990–1995)",
+    "paragraph": 34,
+    "index": 3,
+    "sentence": "Lt. Gen. Denzil Kobbekaduwa together with Maj. Gen. Vijaya Wimalaratne and Rear Adm. Mohan Jayamaha, died on 8 August 1992 at Araly (Aeraella) point Jaffna due to a land mine blast.",
+    "wikitext": "Lt. Gen. [[Denzil Kobbekaduwa]] together with Maj. Gen. [[Vijaya Wimalaratne]] and Rear Adm. [[Mohan Jayamaha]], died on 8 August 1992 at Araly (Aeraella) point [[Jaffna]] due to a [[land mine]] blast.",
+    "links": [
+     {
+      "target": "Denzil Kobbekaduwa",
+      "anchor": "Denzil Kobbekaduwa",
+      "start": 9,
+      "end": 27
+     },
+     {
+      "target": "Vijaya Wimalaratne",
+      "anchor": "Vijaya Wimalaratne",
+      "start": 52,
+      "end": 70
+     },
+     {
+      "target": "Mohan Jayamaha",
+      "anchor": "Mohan Jayamaha",
+      "start": 85,
+      "end": 99
+     },
+     {
+      "target": "Jaffna",
+      "anchor": "Jaffna",
+      "start": 149,
+      "end": 155
+     },
+     {
+      "target": "Land mine",
+      "anchor": "land mine",
+      "start": 165,
+      "end": 174
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "0a2325b512f690a620b857a3ac94e23b1549a98870dabc23163b5720bad884bb",
+    "retrieved_at": "2026-10-16T21:09:09.369084+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 19,
+   "candidate_id": "d904dcbf76390452ae90840461323a47",
+   "connective": "en.resulted_in",
+   "cause_target": "Bengali nationalism",
+   "effect_target": "Bangladesh",
+   "cause_qid": "Q3250202",
+   "effect_qid": "Q902",
+   "modifier_heads": [
+    "rise",
+    "independence"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "'which' refers to the war; independence of Bangladesh",
+   "record": {
+    "lang": "en",
+    "title": "Bangladesh Liberation War",
+    "page_id": 672766,
+    "article_qid": "Q371394",
+    "revision_id": 1376667314,
+    "revision_timestamp": "2026-09-25T15:19:04Z",
+    "section": "",
+    "paragraph": 0,
+    "index": 0,
+    "sentence": "The Bangladesh Liberation War (, ), also known as the Bangladesh War of Independence, was an armed conflict sparked by the rise of the Bengali nationalist and self-determination movement in East Pakistan, which resulted in the independence of Bangladesh with the help of India.",
+    "wikitext": "The '''Bangladesh Liberation War'''{{NoteTag|This war is known as the Liberation War or the War of Independence in Bangladesh.<ref>[https://books.google.com/books?id=bJfcCPUr0OoC&q=+Muktijuddho&pg=PA289 ''Historical Dictionary of Bangladesh''], Page 289</ref> This war is also called the Civil War in Pakistan.<ref name=\"Social 2005 p93\">{{Cite book |last=Moss |first=Peter |title=Secondary Social Studies For Pakistan |date=2005 |publisher=[[Oxford University Press]] |isbn=9780195977042 |location=Karachi |page=93 |oclc=651126824}}</ref>}} ({{langx|bn|মুক্তিযুদ্ধ}}, {{IPA|bn|mukt̪iɟud̪d̪ʱo|pron}}), also known as the '''Bangladesh War of Independence''', was an [[War|armed conflict]] sparked by the rise of the [[Bengali nationalism|Bengali nationalist]] and [[self-determination]] movement in [[East Pakistan]], which resulted in the independence of [[Bangladesh]] with the help of [[India]].",
+    "links": [
+     {
+      "target": "War",
+      "anchor": "armed conflict",
+      "start": 93,
+      "end": 107
+     },
+     {
+      "target": "Bengali nationalism",
+      "anchor": "Bengali nationalist",
+      "start": 135,
+      "end": 154
+     },
+     {
+      "target": "Self-determination",
+      "anchor": "self-determination",
+      "start": 159,
+      "end": 177
+     },
+     {
+      "target": "East Pakistan",
+      "anchor": "East Pakistan",
+      "start": 190,
+      "end": 203
+     },
+     {
+      "target": "Bangladesh",
+      "anchor": "Bangladesh",
+      "start": 243,
+      "end": 253
+     },
+     {
+      "target": "India",
+      "anchor": "India",
+      "start": 271,
+      "end": 276
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 3,
+    "raw_sha256": "a7156057a92358cad32b0404bd2d6420e1d2a54cb0ec21022e40054325916d3a",
+    "retrieved_at": "2026-10-16T20:59:09.927809+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 20,
+   "candidate_id": "4eff197cc7b7128ce14e53b35b8726e3",
+   "connective": "en.resulted_from",
+   "cause_target": "Kremlin",
+   "effect_target": "Moscow–Washington hotline",
+   "cause_qid": "Q133274",
+   "effect_qid": "Q735219",
+   "modifier_heads": [
+    "trouble",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "trouble between White House and Kremlin",
+   "record": {
+    "lang": "en",
+    "title": "World War III",
+    "page_id": 65307,
+    "article_qid": "Q363",
+    "revision_id": 1380405688,
+    "revision_timestamp": "2026-10-15T14:56:42Z",
+    "section": "Cuban Missile Crisis: 15–29 October 1962",
+    "paragraph": 33,
+    "index": 0,
+    "sentence": "A Washington to Moscow hotline resulted from the communication trouble between the White House and the Kremlin during the crisis.",
+    "wikitext": "A [[Moscow–Washington hotline|Washington to Moscow hotline]] resulted from the communication trouble between the [[White House]] and the [[Kremlin]] during the crisis.",
+    "links": [
+     {
+      "target": "Moscow–Washington hotline",
+      "anchor": "Washington to Moscow hotline",
+      "start": 2,
+      "end": 30
+     },
+     {
+      "target": "White House",
+      "anchor": "White House",
+      "start": 83,
+      "end": 94
+     },
+     {
+      "target": "Kremlin",
+      "anchor": "Kremlin",
+      "start": 103,
+      "end": 110
+     }
+    ],
+    "in_list": true,
+    "templates_dropped": 0,
+    "raw_sha256": "8e5d3d04ab3085e5a1011d8f538d8b19a81ee8bd711af343c00b9db8063154ae",
+    "retrieved_at": "2026-10-16T20:51:00.511749+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 21,
+   "candidate_id": "6f73ae18ea1f142e19df58f34ee2f0a7",
+   "connective": "en.led_to",
+   "cause_target": "Russo-Japanese War",
+   "effect_target": "Russian Revolution of 1905",
+   "cause_qid": "Q159950",
+   "effect_qid": "Q184928",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Finnish Civil War",
+    "page_id": 11772,
+    "article_qid": "Q211855",
+    "revision_id": 1379820038,
+    "revision_timestamp": "2026-10-12T02:49:31Z",
+    "section": "Domestic politics",
+    "paragraph": 10,
+    "index": 7,
+    "sentence": "The political struggle for democracy was solved outside Finland, in international politics: the Russian Empire's failed 1904–1905 war against Japan led to the 1905 Revolution in Russia and to a general strike in Finland.",
+    "wikitext": "The political struggle for democracy was solved outside Finland, in international politics: the Russian Empire's failed [[Russo-Japanese War|1904–1905 war against Japan]] led to the [[Russian Revolution of 1905|1905 Revolution]] in Russia and to [[Russian Revolution of 1905#Finland|a general strike in Finland]].",
+    "links": [
+     {
+      "target": "Russo-Japanese War",
+      "anchor": "1904–1905 war against Japan",
+      "start": 120,
+      "end": 147
+     },
+     {
+      "target": "Russian Revolution of 1905",
+      "anchor": "1905 Revolution",
+      "start": 159,
+      "end": 174
+     },
+     {
+      "target": "Russian Revolution of 1905",
+      "anchor": "a general strike in Finland",
+      "start": 192,
+      "end": 219
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "70d8f01b5a70add3509dde07f5f1722ef78a4770566ae34e9790234b5adab3f7",
+    "retrieved_at": "2026-10-16T21:06:00.199241+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 22,
+   "candidate_id": "b80f94d2cc546431b67a967297388122",
+   "connective": "en.triggered",
+   "cause_target": "Census of Quirinius",
+   "effect_target": "Judas of Galilee",
+   "cause_qid": "Q1217517",
+   "effect_qid": "Q371624",
+   "modifier_heads": [
+    null,
+    "uprising"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "uprising led by Judas",
+   "record": {
+    "lang": "en",
+    "title": "First Jewish–Roman War",
+    "page_id": 429438,
+    "article_qid": "Q202578",
+    "revision_id": 1378646370,
+    "revision_timestamp": "2026-10-05T12:29:35Z",
+    "section": "Judaea under the Romans",
+    "paragraph": 6,
+    "index": 1,
+    "sentence": "With the onset of direct Roman rule, the census of Quirinius, instituted by the governor of Syria, triggered an uprising led by Judas of Galilee.",
+    "wikitext": "With the onset of direct Roman rule, the [[census of Quirinius]], instituted by the governor of Syria, triggered an uprising led by [[Judas of Galilee]].",
+    "links": [
+     {
+      "target": "Census of Quirinius",
+      "anchor": "census of Quirinius",
+      "start": 41,
+      "end": 60
+     },
+     {
+      "target": "Judas of Galilee",
+      "anchor": "Judas of Galilee",
+      "start": 128,
+      "end": 144
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "45429acca14022b54855531533de9041b97e24c20e3102654029d4b4d26a8544",
+    "retrieved_at": "2026-10-16T21:02:59.767183+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 23,
+   "candidate_id": "5b269f16efe0603728db102c8cc79319",
+   "connective": "en.sparked",
+   "cause_target": "Rafik Hariri",
+   "effect_target": "Cedar Revolution",
+   "cause_qid": "Q192778",
+   "effect_qid": "Q184310",
+   "modifier_heads": [
+    "assassination",
+    "leading"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "assassination of Hariri; modifier flag on the effect is a false positive",
+   "record": {
+    "lang": "en",
+    "title": "Lebanese Civil War",
+    "page_id": 312905,
+    "article_qid": "Q208484",
+    "revision_id": 1377695649,
+    "revision_timestamp": "2026-09-30T16:59:07Z",
+    "section": "Post-conflict Syrian occupation",
+    "paragraph": 135,
+    "index": 0,
+    "sentence": "In 2005, the assassination of Rafik Hariri sparked the Cedar Revolution leading to Syrian military withdrawal from the country.",
+    "wikitext": "In 2005, the assassination of [[Rafik Hariri]] sparked the [[Cedar Revolution]] leading to Syrian military withdrawal from the country.",
+    "links": [
+     {
+      "target": "Rafik Hariri",
+      "anchor": "Rafik Hariri",
+      "start": 30,
+      "end": 42
+     },
+     {
+      "target": "Cedar Revolution",
+      "anchor": "Cedar Revolution",
+      "start": 55,
+      "end": 71
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "22fc95ac5b59697a11f5820e6bc789f287da314fe28be6cced837288863d63a9",
+    "retrieved_at": "2026-10-16T21:02:00.540745+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 24,
+   "candidate_id": "0e335843b18d3b81c0e5674959226ff5",
+   "connective": "en.contributed_to",
+   "cause_target": "Free France",
+   "effect_target": "Normandie-Niemen",
+   "cause_qid": "Q152582",
+   "effect_qid": "Q1345569",
+   "modifier_heads": [
+    null,
+    "formation"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "effect is the Red Army (unlinked)",
+   "record": {
+    "lang": "en",
+    "title": "Eastern Front (World War II)",
+    "page_id": 519489,
+    "article_qid": "Q189266",
+    "revision_id": 1379559142,
+    "revision_timestamp": "2026-10-10T18:34:03Z",
+    "section": "Forces",
+    "paragraph": 23,
+    "index": 2,
+    "sentence": "The Free French Forces also contributed to the Red Army by the formation of the GC3 (Groupe de Chasse 3 or 3rd Fighter Group) unit to fulfil the commitment of Charles de Gaulle, leader of the Free French, who thought that it was important for French servicemen to serve on all fronts.",
+    "wikitext": "The [[Free France|Free French Forces]] also contributed to the Red Army by the formation of the [[Normandie-Niemen|GC3]] (''Groupe de Chasse 3'' or 3rd Fighter Group) unit to fulfil the commitment of [[Charles de Gaulle]], leader of the Free French, who thought that it was important for French servicemen to serve on all fronts.",
+    "links": [
+     {
+      "target": "Free France",
+      "anchor": "Free French Forces",
+      "start": 4,
+      "end": 22
+     },
+     {
+      "target": "Normandie-Niemen",
+      "anchor": "GC3",
+      "start": 80,
+      "end": 83
+     },
+     {
+      "target": "Charles de Gaulle",
+      "anchor": "Charles de Gaulle",
+      "start": 159,
+      "end": 176
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "d9ac4fe2b86c845887500ecc8e07eca68697bb024c57645a0c98be3ddae07aed",
+    "retrieved_at": "2026-10-16T20:49:09.799734+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 25,
+   "candidate_id": "763f16943ef420245c5185cf1d0db513",
+   "connective": "fr.a_declenche",
+   "cause_target": "Révolution russe",
+   "effect_target": "Guerre civile russe",
+   "cause_qid": "Q8729",
+   "effect_qid": "Q79911",
+   "modifier_heads": [
+    "compare",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "modifier flag false positive ('compare')",
+   "record": {
+    "lang": "fr",
+    "title": "Rébellion du groupe Wagner",
+    "page_id": 15717406,
+    "article_qid": "Q119860532",
+    "revision_id": 237311373,
+    "revision_timestamp": "2026-06-24T13:45:12Z",
+    "section": "Réponse des forces de sécurité",
+    "paragraph": 33,
+    "index": 1,
+    "sentence": "Ce traitement médiatique est repris jusqu'à , heure à laquelle Vladimir Poutine apparaît sur les télévisions russes pour une allocution au cours de laquelle il assimile la rébellion en cours à un coup de poignard dans le dos, et la compare aux troubles politiques de 1917, qui déclenchèrent la guerre civile russe.",
+    "wikitext": "Ce traitement médiatique est repris jusqu'à {{heure|9|59}}, heure à laquelle Vladimir Poutine apparaît sur les télévisions russes pour une allocution au cours de laquelle il assimile la rébellion en cours à un coup de poignard dans le dos, et la compare aux [[Révolution russe|troubles politiques de 1917]], qui déclenchèrent la [[guerre civile russe]]{{Sfn|Goode|2023}}.",
+    "links": [
+     {
+      "target": "Révolution russe",
+      "anchor": "troubles politiques de 1917",
+      "start": 244,
+      "end": 271
+     },
+     {
+      "target": "Guerre civile russe",
+      "anchor": "guerre civile russe",
+      "start": 294,
+      "end": 313
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 2,
+    "raw_sha256": "eaa7d77da401389f1fb23a65313dd53156a03080b9d74df33926ee7cfe809958",
+    "retrieved_at": "2026-10-16T21:32:10.127396+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 26,
+   "candidate_id": "d614e71737c6f882ffbfc07115131ab8",
+   "connective": "en.resulted_from",
+   "cause_target": "White House",
+   "effect_target": "Moscow–Washington hotline",
+   "cause_qid": "Q35525",
+   "effect_qid": "Q735219",
+   "modifier_heads": [
+    "trouble",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "trouble between White House and Kremlin",
+   "record": {
+    "lang": "en",
+    "title": "World War III",
+    "page_id": 65307,
+    "article_qid": "Q363",
+    "revision_id": 1380405688,
+    "revision_timestamp": "2026-10-15T14:56:42Z",
+    "section": "Cuban Missile Crisis: 15–29 October 1962",
+    "paragraph": 33,
+    "index": 0,
+    "sentence": "A Washington to Moscow hotline resulted from the communication trouble between the White House and the Kremlin during the crisis.",
+    "wikitext": "A [[Moscow–Washington hotline|Washington to Moscow hotline]] resulted from the communication trouble between the [[White House]] and the [[Kremlin]] during the crisis.",
+    "links": [
+     {
+      "target": "Moscow–Washington hotline",
+      "anchor": "Washington to Moscow hotline",
+      "start": 2,
+      "end": 30
+     },
+     {
+      "target": "White House",
+      "anchor": "White House",
+      "start": 83,
+      "end": 94
+     },
+     {
+      "target": "Kremlin",
+      "anchor": "Kremlin",
+      "start": 103,
+      "end": 110
+     }
+    ],
+    "in_list": true,
+    "templates_dropped": 0,
+    "raw_sha256": "8e5d3d04ab3085e5a1011d8f538d8b19a81ee8bd711af343c00b9db8063154ae",
+    "retrieved_at": "2026-10-16T20:51:00.511749+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 27,
+   "candidate_id": "4624606256b836e3b79ea7e4d6c7b04a",
+   "connective": "fr.a_declenche",
+   "cause_target": "Tutsis",
+   "effect_target": "Goma",
+   "cause_qid": "Q193092",
+   "effect_qid": "Q204381",
+   "modifier_heads": [
+    null,
+    "villes"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "Tutsi soldiers; rebellion in Goma",
+   "record": {
+    "lang": "fr",
+    "title": "Deuxième guerre du Congo",
+    "page_id": 195101,
+    "article_qid": "Q75756",
+    "revision_id": 236733420,
+    "revision_timestamp": "2026-06-03T07:03:44Z",
+    "section": "Attaque des rebelles sur Kinshasa",
+    "paragraph": 24,
+    "index": 0,
+    "sentence": "Le 2 août 1998, quatorze mois après la fin de la première guerre du Congo, des soldats tutsis déclenchent un rébellion dans les villes de Goma dans le Nord-Kivu, et Bukavu dans le Sud-Kivu, dans le but de renverser le Président Laurent Désiré Kabila.",
+    "wikitext": "Le {{Date|2 août 1998}}, quatorze mois après la fin de la [[première guerre du Congo]], des soldats [[tutsis]] déclenchent un rébellion dans les villes de [[Goma]] dans le Nord-Kivu, et [[Bukavu]] dans le Sud-Kivu<ref name=\"REFWORLD_Rébellion_d'Août_1998\">{{Lien web |langue=en |titre=La Rébellion d'Août 1998 et les Groupes Touchés |url=https://www.refworld.org/reference/countryrep/irbc/1998/fr/95160 |site=[[Refworld]] |consulté le=2024-04-05}}</ref>{{,}}{{Sfn|Texte=|Deuxième guerre|2010|loc=Paragraphe 308|p=159}}{{,}}{{Sfn|Filip Reyntjens|2009|p=194}}, dans le but de renverser le Président [[Laurent Désiré Kabila]]{{Sfn|Deuxième guerre|2010|loc=Paragraphe 308|p=159}}.",
+    "links": [
+     {
+      "target": "Première guerre du Congo",
+      "anchor": "première guerre du Congo",
+      "start": 49,
+      "end": 73
+     },
+     {
+      "target": "Tutsis",
+      "anchor": "tutsis",
+      "start": 87,
+      "end": 93
+     },
+     {
+      "target": "Goma",
+      "anchor": "Goma",
+      "start": 138,
+      "end": 142
+     },
+     {
+      "target": "Bukavu",
+      "anchor": "Bukavu",
+      "start": 165,
+      "end": 171
+     },
+     {
+      "target": "Laurent Désiré Kabila",
+      "anchor": "Laurent Désiré Kabila",
+      "start": 228,
+      "end": 249
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 5,
+    "raw_sha256": "ec865e9e80d874e1b41f944449ecdcaabc0311e417fdf9c1c95b9d508cb5f64c",
+    "retrieved_at": "2026-10-16T21:43:19.927580+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 28,
+   "candidate_id": "8f76db992916c9e488ae661578819b01",
+   "connective": "fr.a_provoque",
+   "cause_target": "Révolution égyptienne de 2011",
+   "effect_target": "Hosni Moubarak",
+   "cause_qid": "Q29198",
+   "effect_qid": "Q34105",
+   "modifier_heads": [
+    null,
+    "démission"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "resignation of Mubarak",
+   "record": {
+    "lang": "fr",
+    "title": "Printemps arabe",
+    "page_id": 5259818,
+    "article_qid": "Q33761",
+    "revision_id": 238451415,
+    "revision_timestamp": "2026-08-08T05:48:52Z",
+    "section": "",
+    "paragraph": 4,
+    "index": 0,
+    "sentence": "Alors que la révolution égyptienne provoque la démission de Hosni Moubarak et une transition démocratique, les autres n'ont pas les mêmes conséquences : en Libye, elle tourne à la guerre civile entre les forces fidèles au régime de la Jamahiriya de Mouammar Kadhafi et les insurgés, soutenus par une intervention étrangère sous mandat de l'ONU ; à Bahreïn, la solidarité contre-révolutionnaire des monarchies du golfe Persique fait échec au mouvement de contestation mais elle reprend à partir de juin 2011 ; au Yémen, le dictateur Saleh qui réprime la révolte louvoie entre exigences de l’opposition et le soutien international à une transition pacifique et finit par démissionner le 25 février 2012, et en Syrie, la répression exercée par le régime de Bachar el-Assad cause des milliers de morts.",
+    "wikitext": "Alors que la [[révolution égyptienne de 2011|révolution égyptienne]] provoque la démission de [[Hosni Moubarak]] et une transition démocratique, les autres n'ont pas les mêmes conséquences : en [[Libye]], elle tourne à la [[Première guerre civile libyenne|guerre civile]] entre les forces fidèles au régime de la [[Jamahiriya arabe libyenne|Jamahiriya]] de [[Mouammar Kadhafi]] et les insurgés, soutenus par une intervention étrangère sous mandat de l'[[Organisation des Nations unies|ONU]] ; à [[Bahreïn]], la solidarité contre-révolutionnaire des [[monarchie]]s du [[golfe Persique]] [[Soulèvement bahreïnien|fait échec au mouvement de contestation mais elle reprend à partir de {{date|juin 2011}}]] ; au [[Yémen]], le dictateur [[Ali Abdallah Saleh|Saleh]] qui réprime la révolte louvoie entre [[Révolution yéménite|exigences de l’opposition et le soutien international à une transition pacifique]] et finit par démissionner le {{date|25 février 2012}}, et en [[Syrie]], la [[Guerre civile syrienne|répression exercée par le régime]] de [[Bachar el-Assad]] cause des milliers de morts.",
+    "links": [
+     {
+      "target": "Révolution égyptienne de 2011",
+      "anchor": "révolution égyptienne",
+      "start": 13,
+      "end": 34
+     },
+     {
+      "target": "Hosni Moubarak",
+      "anchor": "Hosni Moubarak",
+      "start": 60,
+      "end": 74
+     },
+     {
+      "target": "Libye",
+      "anchor": "Libye",
+      "start": 156,
+      "end": 161
+     },
+     {
+      "target": "Première guerre civile libyenne",
+      "anchor": "guerre civile",
+      "start": 180,
+      "end": 193
+     },
+     {
+      "target": "Jamahiriya arabe libyenne",
+      "anchor": "Jamahiriya",
+      "start": 235,
+      "end": 245
+     },
+     {
+      "target": "Mouammar Kadhafi",
+      "anchor": "Mouammar Kadhafi",
+      "start": 249,
+      "end": 265
+     },
+     {
+      "target": "Organisation des Nations unies",
+      "anchor": "ONU",
+      "start": 340,
+      "end": 343
+     },
+     {
+      "target": "Bahreïn",
+      "anchor": "Bahreïn",
+      "start": 348,
+      "end": 355
+     },
+     {
+      "target": "Monarchie",
+      "anchor": "monarchies",
+      "start": 398,
+      "end": 408
+     },
+     {
+      "target": "Golfe Persique",
+      "anchor": "golfe Persique",
+      "start": 412,
+      "end": 426
+     },
+     {
+      "target": "Soulèvement bahreïnien",
+      "anchor": "fait échec au mouvement de contestation mais elle reprend à partir de juin 2011",
+      "start": 427,
+      "end": 506
+     },
+     {
+      "target": "Yémen",
+      "anchor": "Yémen",
+      "start": 512,
+      "end": 517
+     },
+     {
+      "target": "Ali Abdallah Saleh",
+      "anchor": "Saleh",
+      "start": 532,
+      "end": 537
+     },
+     {
+      "target": "Révolution yéménite",
+      "anchor": "exigences de l’opposition et le soutien international à une transition pacifique",
+      "start": 575,
+      "end": 655
+     },
+     {
+      "target": "Syrie",
+      "anchor": "Syrie",
+      "start": 708,
+      "end": 713
+     },
+     {
+      "target": "Guerre civile syrienne",
+      "anchor": "répression exercée par le régime",
+      "start": 718,
+      "end": 750
+     },
+     {
+      "target": "Bachar el-Assad",
+      "anchor": "Bachar el-Assad",
+      "start": 754,
+      "end": 769
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "0dd6c67eeacdbf4a9114113ea9ad436c9367d9da65b2b43cf9ae658b2f549c75",
+    "retrieved_at": "2026-10-16T21:22:09.829738+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 29,
+   "candidate_id": "c81bdf04c65a3910d02f6141a715ae67",
+   "connective": "en.resulted_in",
+   "cause_target": "Gold standard",
+   "effect_target": "Great Recoinage of 1816",
+   "cause_qid": "Q173509",
+   "effect_qid": "Q5599849",
+   "modifier_heads": [
+    "adoption",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "adoption of the gold standard; minting",
+   "record": {
+    "lang": "en",
+    "title": "First Opium War",
+    "page_id": 143829,
+    "article_qid": "Q191282",
+    "revision_id": 1379278395,
+    "revision_timestamp": "2026-10-09T00:47:52Z",
+    "section": "Changing trade policy",
+    "paragraph": 20,
+    "index": 6,
+    "sentence": "In Great Britain, the adoption of the gold standard in 1821 resulted in the empire minting standardised silver shillings, further reducing the availability of silver for trade in Asia and spurring the British government to press for more trading rights in China.",
+    "wikitext": "In Great Britain, the adoption of the [[gold standard]] in 1821 resulted in the empire [[Great Recoinage of 1816|minting]] standardised silver shillings, further reducing the availability of silver for trade in Asia and spurring the British government to press for more trading rights in China.",
+    "links": [
+     {
+      "target": "Gold standard",
+      "anchor": "gold standard",
+      "start": 38,
+      "end": 51
+     },
+     {
+      "target": "Great Recoinage of 1816",
+      "anchor": "minting",
+      "start": 83,
+      "end": 90
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "441b0f04fd00d74878fd8e16a50e590f7a50fe6f93251971e30761478d4f5d04",
+    "retrieved_at": "2026-10-16T20:54:00.271687+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 30,
+   "candidate_id": "4af4fbe3a7b7276a141b03e860f42ad4",
+   "connective": "en.led_to",
+   "cause_target": "Polish Army",
+   "effect_target": "Officer (armed forces)",
+   "cause_qid": "Q248989",
+   "effect_qid": "Q189290",
+   "modifier_heads": [
+    "command",
+    "conflicts"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "his command over the army; conflicts within the officer corps",
+   "record": {
+    "lang": "en",
+    "title": "November Uprising",
+    "page_id": 404204,
+    "article_qid": "Q462964",
+    "revision_id": 1378564588,
+    "revision_timestamp": "2026-10-05T01:08:52Z",
+    "section": "Background",
+    "paragraph": 9,
+    "index": 3,
+    "sentence": "Also, his command over the Polish Army led to serious conflicts within the officer corps.",
+    "wikitext": "Also, his command over the [[Polish Army]] led to serious conflicts within the [[officer (armed forces)|officer]] corps.",
+    "links": [
+     {
+      "target": "Polish Army",
+      "anchor": "Polish Army",
+      "start": 27,
+      "end": 38
+     },
+     {
+      "target": "Officer (armed forces)",
+      "anchor": "officer",
+      "start": 75,
+      "end": 82
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "c0c01b357202e89f4058a6787de807fba91c3927b627aa2bd829456a0bb08372",
+    "retrieved_at": "2026-10-16T21:16:59.836228+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 31,
+   "candidate_id": "cf62311286beefac7f785427b5354781",
+   "connective": "fr.a_declenche",
+   "cause_target": "Mordechaj Anielewicz",
+   "effect_target": "Soulèvement du ghetto de Varsovie",
+   "cause_qid": "Q327892",
+   "effect_qid": "Q160161",
+   "modifier_heads": [
+    "ordres",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "fighters under Anielewicz's orders",
+   "record": {
+    "lang": "fr",
+    "title": "Shoah",
+    "page_id": 4013722,
+    "article_qid": "Q2763",
+    "revision_id": 239993681,
+    "revision_timestamp": "2026-10-02T07:27:52Z",
+    "section": "Juifs dans la Résistance, résistances juives et révoltes armées",
+    "paragraph": 166,
+    "index": 0,
+    "sentence": "Alors que sur plus de 500000 habitants initiaux du ghetto, il n'en reste que moins de 90000 au printemps 1943, un millier de combattants sous les ordres du jeune et charismatique Mordechaj Anielewicz déclenchent le 19 avril 1943 le soulèvement du ghetto de Varsovie.",
+    "wikitext": "Alors que sur plus de {{unité|500000|habitants}} initiaux du ghetto, il n'en reste que moins de {{formatnum:90000}} au printemps 1943, un millier de combattants sous les ordres du jeune et charismatique [[Mordechaj Anielewicz]] déclenchent le {{date|19|avril|1943}} le [[soulèvement du ghetto de Varsovie]].",
+    "links": [
+     {
+      "target": "Mordechaj Anielewicz",
+      "anchor": "Mordechaj Anielewicz",
+      "start": 179,
+      "end": 199
+     },
+     {
+      "target": "Soulèvement du ghetto de Varsovie",
+      "anchor": "soulèvement du ghetto de Varsovie",
+      "start": 232,
+      "end": 265
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "ba88a99783e33085bde2a6e137fcd33f178a5c1de440b0d16546f6df37d79790",
+    "retrieved_at": "2026-10-16T21:21:09.575903+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 32,
+   "candidate_id": "cef439fd431ae03c1980cce81a02ab44",
+   "connective": "fr.a_entraine",
+   "cause_target": "Révolution ukrainienne de 2014",
+   "effect_target": "Viktor Ianoukovytch",
+   "cause_qid": "Q15733401",
+   "effect_qid": "Q1459658",
+   "modifier_heads": [
+    null,
+    "renversement"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "overthrow of the Yanukovych government",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre du Donbass",
+    "page_id": 7896696,
+    "article_qid": "Q16335075",
+    "revision_id": 240085710,
+    "revision_timestamp": "2026-10-05T03:22:49Z",
+    "section": "",
+    "paragraph": 1,
+    "index": 1,
+    "sentence": "La révolution ukrainienne de février 2014 qui s'ensuit entraîne le renversement du gouvernement prorusse de Viktor Ianoukovytch et l'arrivée au pouvoir d'un gouvernement intérimaire dirigé par les proeuropéens Oleksandr Tourtchynov (le 22 2 2014-) et Arseni Iatseniouk (nommé Premier ministre le 27 2 2014-).",
+    "wikitext": "La [[révolution ukrainienne de 2014|révolution ukrainienne de février {{date|2014}}]] qui s'ensuit entraîne le renversement du gouvernement prorusse de [[Viktor Ianoukovytch]] et l'arrivée au pouvoir d'un gouvernement intérimaire dirigé par les proeuropéens<ref name=\":14\" /> [[Oleksandr Tourtchynov]] (le {{date|22|2|2014-}}) et [[Arseni Iatseniouk]] (nommé [[Premier ministre d'Ukraine|Premier ministre]] le {{date|27|2|2014-}}).",
+    "links": [
+     {
+      "target": "Révolution ukrainienne de 2014",
+      "anchor": "révolution ukrainienne de février 2014",
+      "start": 3,
+      "end": 41
+     },
+     {
+      "target": "Viktor Ianoukovytch",
+      "anchor": "Viktor Ianoukovytch",
+      "start": 108,
+      "end": 127
+     },
+     {
+      "target": "Oleksandr Tourtchynov",
+      "anchor": "Oleksandr Tourtchynov",
+      "start": 210,
+      "end": 231
+     },
+     {
+      "target": "Arseni Iatseniouk",
+      "anchor": "Arseni Iatseniouk",
+      "start": 251,
+      "end": 268
+     },
+     {
+      "target": "Premier ministre d'Ukraine",
+      "anchor": "Premier ministre",
+      "start": 276,
+      "end": 292
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "e90df4b041f09eb0df513bdf378a133e9d014a9364fe56cd71a0374b0d13a574",
+    "retrieved_at": "2026-10-16T21:30:59.763951+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 33,
+   "candidate_id": "0077a426efee0687fde73517aa814daf",
+   "connective": "en.caused",
+   "cause_target": "Coronavirus",
+   "effect_target": "Severe acute respiratory syndrome",
+   "cause_qid": "Q57751738",
+   "effect_qid": "Q103177",
+   "modifier_heads": [
+    "function",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "modifier flag false positive: 'coronaviruses causing diseases like SARS'",
+   "record": {
+    "lang": "en",
+    "title": "COVID-19 pandemic",
+    "page_id": 62750956,
+    "article_qid": "Q81068910",
+    "revision_id": 1380137455,
+    "revision_timestamp": "2026-10-14T00:51:47Z",
+    "section": "Vaccines",
+    "paragraph": 42,
+    "index": 1,
+    "sentence": "Prior to the COVID-19 pandemic, an established body of knowledge existed about the structure and function of coronaviruses causing diseases like severe acute respiratory syndrome (SARS) and Middle East respiratory syndrome (MERS).",
+    "wikitext": "Prior to the COVID-19 pandemic, an established body of knowledge existed about the structure and function of [[coronavirus]]es causing diseases like [[severe acute respiratory syndrome]] (SARS) and [[Middle East respiratory syndrome]] (MERS).",
+    "links": [
+     {
+      "target": "Coronavirus",
+      "anchor": "coronaviruses",
+      "start": 109,
+      "end": 122
+     },
+     {
+      "target": "Severe acute respiratory syndrome",
+      "anchor": "severe acute respiratory syndrome",
+      "start": 145,
+      "end": 178
+     },
+     {
+      "target": "Middle East respiratory syndrome",
+      "anchor": "Middle East respiratory syndrome",
+      "start": 190,
+      "end": 222
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "453da929390a611581ad70e6c9d6a9a131c82b35e7fbfb67e09525e18785e115",
+    "retrieved_at": "2026-10-16T20:42:09.460517+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 34,
+   "candidate_id": "1fa3a543c2bf27efc41377f453eda1e0",
+   "connective": "en.led_to",
+   "cause_target": "Protest",
+   "effect_target": "Ukraine",
+   "cause_qid": "Q273120",
+   "effect_qid": "Q212",
+   "modifier_heads": [
+    null,
+    "upheaval"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "generic Protest; upheaval in Ukraine",
+   "record": {
+    "lang": "en",
+    "title": "Orange Revolution",
+    "page_id": 1209133,
+    "article_qid": "Q836386",
+    "revision_id": 1374383386,
+    "revision_timestamp": "2026-09-11T18:38:21Z",
+    "section": "",
+    "paragraph": 0,
+    "index": 0,
+    "sentence": "The Orange Revolution () was a series of protests that led to political upheaval in Ukraine from late November 2004 to January 2005.",
+    "wikitext": "The '''Orange Revolution''' ({{langx|uk|Помаранчева революція|translit=Pomarancheva revoliutsiia}}) was a series of [[protest]]s that led to political upheaval in [[Ukraine]] from late November 2004 to January 2005.",
+    "links": [
+     {
+      "target": "Protest",
+      "anchor": "protests",
+      "start": 41,
+      "end": 49
+     },
+     {
+      "target": "Ukraine",
+      "anchor": "Ukraine",
+      "start": 84,
+      "end": 91
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "6e53ded3cc3df139bbcf14ce0bbf4e5c8d293176e522fe262ad17ab1c136d496",
+    "retrieved_at": "2026-10-16T20:58:09.623130+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 35,
+   "candidate_id": "d4c0cb182fd7575d5fee70e0f516af19",
+   "connective": "en.resulted_in",
+   "cause_target": "Operation Dani",
+   "effect_target": "1948 Palestinian expulsion from Lydda and Ramle",
+   "cause_qid": "Q2916659",
+   "effect_qid": "Q774054",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "1948 Palestine war",
+    "page_id": 45137635,
+    "article_qid": "Q49097",
+    "revision_id": 1379281169,
+    "revision_timestamp": "2026-10-09T01:14:40Z",
+    "section": "Second phase: 8–18 July 1948",
+    "paragraph": 45,
+    "index": 0,
+    "sentence": "Israeli Operation Dani resulted in the expulsion from Lydda and Ramle of 60,000 Palestinian residents.",
+    "wikitext": "Israeli [[Operation Dani]] resulted in the [[1948 Palestinian expulsion from Lydda and Ramle|expulsion from Lydda and Ramle]] of 60,000 Palestinian residents.",
+    "links": [
+     {
+      "target": "Operation Dani",
+      "anchor": "Operation Dani",
+      "start": 8,
+      "end": 22
+     },
+     {
+      "target": "1948 Palestinian expulsion from Lydda and Ramle",
+      "anchor": "expulsion from Lydda and Ramle",
+      "start": 39,
+      "end": 69
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "77d1175086b50c3c35a0222264e947ec9ed472b5a2200f4854b16bf11961001a",
+    "retrieved_at": "2026-10-16T21:00:00.399005+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 36,
+   "candidate_id": "c142074182278a474b7ae0afe46442d6",
+   "connective": "en.sparked_by",
+   "cause_target": "Mohamed Bouazizi",
+   "effect_target": "Revolutionary wave",
+   "cause_qid": "Q214088",
+   "effect_qid": "Q1886460",
+   "modifier_heads": [
+    "struck",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "modifier flag false positive (main verb 'struck')",
+   "record": {
+    "lang": "en",
+    "title": "Arab Spring",
+    "page_id": 30655949,
+    "article_qid": "Q33761",
+    "revision_id": 1380399999,
+    "revision_timestamp": "2026-10-15T14:23:09Z",
+    "section": "Protests and uprisings",
+    "paragraph": 23,
+    "index": 2,
+    "sentence": "With the success of the protests in Tunisia, a wave of unrest sparked by the Tunisian \"Burning Man\" struck Algeria, Jordan, Egypt, and Yemen, then spread to other countries.",
+    "wikitext": "With the success of the protests in Tunisia, a [[revolutionary wave|wave of unrest]] sparked by the [[Mohamed Bouazizi|Tunisian \"Burning Man\"]] struck [[Algeria]], [[Jordan]], [[Egypt]], and [[Yemen]],<ref name=\"Inspired by Tunisia and Egypt, Yemenis join in anti-government protests\" /> then spread to other countries.",
+    "links": [
+     {
+      "target": "Revolutionary wave",
+      "anchor": "wave of unrest",
+      "start": 47,
+      "end": 61
+     },
+     {
+      "target": "Mohamed Bouazizi",
+      "anchor": "Tunisian \"Burning Man\"",
+      "start": 77,
+      "end": 99
+     },
+     {
+      "target": "Algeria",
+      "anchor": "Algeria",
+      "start": 107,
+      "end": 114
+     },
+     {
+      "target": "Jordan",
+      "anchor": "Jordan",
+      "start": 116,
+      "end": 122
+     },
+     {
+      "target": "Egypt",
+      "anchor": "Egypt",
+      "start": 124,
+      "end": 129
+     },
+     {
+      "target": "Yemen",
+      "anchor": "Yemen",
+      "start": 135,
+      "end": 140
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "2525f42d69f223cb170ba2eb884a3bb7e9f7a8062740acf171cfe15c22922947",
+    "retrieved_at": "2026-10-16T20:45:00.215915+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 37,
+   "candidate_id": "66a05cd3e6a4a8bc51bd124c3131e24a",
+   "connective": "fr.a_provoque",
+   "cause_target": "Bombes",
+   "effect_target": "Pollution des sols",
+   "cause_qid": "Q127197",
+   "effect_qid": "Q212734",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre de Gaza depuis 2023",
+    "page_id": 15911338,
+    "article_qid": "Q122962941",
+    "revision_id": 240364589,
+    "revision_timestamp": "2026-10-14T14:36:47Z",
+    "section": "Pollution",
+    "paragraph": 387,
+    "index": 0,
+    "sentence": "Les bombes provoquent une pollution des sols, de l'air et de l'eau à Gaza.",
+    "wikitext": "Les [[bombes]] provoquent une [[pollution des sols]], de l'[[Pollution de l'air|air]] et de l'[[Pollution de l'eau|eau]] à Gaza<ref name=\"Euronewspollution\" />.",
+    "links": [
+     {
+      "target": "Bombes",
+      "anchor": "bombes",
+      "start": 4,
+      "end": 10
+     },
+     {
+      "target": "Pollution des sols",
+      "anchor": "pollution des sols",
+      "start": 26,
+      "end": 44
+     },
+     {
+      "target": "Pollution de l'air",
+      "anchor": "air",
+      "start": 51,
+      "end": 54
+     },
+     {
+      "target": "Pollution de l'eau",
+      "anchor": "eau",
+      "start": 63,
+      "end": 66
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "8d2e04d4e9c2c9ebfd7b42bbba82eacc7a818487a9e6fe4ab0b6a1eb0e23fbe9",
+    "retrieved_at": "2026-10-16T21:22:00.041172+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 38,
+   "candidate_id": "704032d325710b58ce8c971bb8531fba",
+   "connective": "en.led_to",
+   "cause_target": "Norway Debate",
+   "effect_target": "Neville Chamberlain",
+   "cause_qid": "Q128535",
+   "effect_qid": "Q10664",
+   "modifier_heads": [
+    null,
+    "resignation"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "resignation of Chamberlain",
+   "record": {
+    "lang": "en",
+    "title": "World War II",
+    "page_id": 32927,
+    "article_qid": "Q362",
+    "revision_id": 1379691426,
+    "revision_timestamp": "2026-10-11T10:27:00Z",
+    "section": "Western Europe (1940–1941)",
+    "paragraph": 31,
+    "index": 2,
+    "sentence": "British discontent over the Norwegian campaign led to the resignation of Prime Minister Neville Chamberlain, who was replaced by Winston Churchill on 10May 1940.",
+    "wikitext": "[[Norway Debate|British discontent over the Norwegian campaign]] led to the resignation of Prime Minister [[Neville Chamberlain]], who was replaced by [[Winston Churchill]] on 10{{spaces}}May 1940.",
+    "links": [
+     {
+      "target": "Norway Debate",
+      "anchor": "British discontent over the Norwegian campaign",
+      "start": 0,
+      "end": 46
+     },
+     {
+      "target": "Neville Chamberlain",
+      "anchor": "Neville Chamberlain",
+      "start": 88,
+      "end": 107
+     },
+     {
+      "target": "Winston Churchill",
+      "anchor": "Winston Churchill",
+      "start": 129,
+      "end": 146
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 2,
+    "raw_sha256": "453da929390a611581ad70e6c9d6a9a131c82b35e7fbfb67e09525e18785e115",
+    "retrieved_at": "2026-10-16T20:42:09.460517+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 39,
+   "candidate_id": "9967bcf70c08ced2d2b650a7c35b1447",
+   "connective": "en.resulted_in",
+   "cause_target": "Anti-Armenian sentiment",
+   "effect_target": "Ethnic violence",
+   "cause_qid": "Q2996568",
+   "effect_qid": "Q766875",
+   "modifier_heads": [
+    "growth",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "growth of anti-Armenian sentiment",
+   "record": {
+    "lang": "en",
+    "title": "Second Nagorno-Karabakh War",
+    "page_id": 65431221,
+    "article_qid": "Q99659280",
+    "revision_id": 1380540885,
+    "revision_timestamp": "2026-10-16T10:18:54Z",
+    "section": "Nationalist sentiment",
+    "paragraph": 59,
+    "index": 1,
+    "sentence": "Before, during and after the First Nagorno-Karabakh War, the growth of anti-Armenian and anti-Azerbaijan sentiment resulted in ethnic violence, including pogroms against Armenians in Azerbaijan, as in Sumgait and Baku, and against Azerbaijanis in Armenia and Nagorno-Karabakh, as at Gugark and Stepanakert.",
+    "wikitext": "Before, during and after the First Nagorno-Karabakh War, the growth of [[Anti-Armenian sentiment|anti-Armenian]] and [[Anti-Azerbaijani sentiment|anti-Azerbaijan]] sentiment resulted in [[ethnic violence]], including pogroms against Armenians in Azerbaijan, as in [[Sumgait pogrom|Sumgait]] and [[Baku pogrom|Baku]],<ref>{{cite book|last=Cornell|first=Svante|title=Azerbaijan Since Independence|publisher=M.E. Sharpe|year=2010|isbn=978-0765630032|page=48}}</ref><ref>{{cite news|title=Rferl.org: Nagorno-Karabakh: Timeline Of The Long Road To Peace|newspaper=Radio Free Europe/Radio Liberty |date=2 February 2012 |url=https://www.rferl.org/a/1065626.html|url-status=live|archive-url=https://web.archive.org/web/20140329025222/http://www.rferl.org/content/article/1065626.html|archive-date=29 March 2014|access-date=2 January 2020}}</ref><ref>{{cite news|date=3 February 2003|title=Newsline|newspaper=Radio Free Europe/Radio Liberty|url=https://www.rferl.org/a/1142847.html|url-status=live|access-date=31 January 2013|archive-url=https://web.archive.org/web/20141006122039/http://www.rferl.org/content/article/1142847.html|archive-date=6 October 2014}}</ref><ref>{{cite web|date=17 June 2013|title=The South Caucasus Between The EU and the Eurasian Union|url=http://www.css.ethz.ch/publications/pdfs/CAD-51-52.pdf|url-status=dead|archive-url=https://web.archive.org/web/20131029210003/http://www.css.ethz.ch/publications/pdfs/CAD-51-52.pdf|archive-date=29 October 2013|access-date=3 July 2013|work=Caucasus Analytical Digest #51–52|publisher=Forschungsstelle Osteuropa, Bremen and Center for Security Studies, Zürich|page=21|issn=1867-9323}}</ref> and against Azerbaijanis in Armenia and Nagorno-Karabakh, as at [[Gugark massacre|Gugark]] and [[1988 violence in Shusha and Stepanakert|Stepanakert]].",
+    "links": [
+     {
+      "target": "Anti-Armenian sentiment",
+      "anchor": "anti-Armenian",
+      "start": 71,
+      "end": 84
+     },
+     {
+      "target": "Anti-Azerbaijani sentiment",
+      "anchor": "anti-Azerbaijan",
+      "start": 89,
+      "end": 104
+     },
+     {
+      "target": "Ethnic violence",
+      "anchor": "ethnic violence",
+      "start": 127,
+      "end": 142
+     },
+     {
+      "target": "Sumgait pogrom",
+      "anchor": "Sumgait",
+      "start": 201,
+      "end": 208
+     },
+     {
+      "target": "Baku pogrom",
+      "anchor": "Baku",
+      "start": 213,
+      "end": 217
+     },
+     {
+      "target": "Gugark massacre",
+      "anchor": "Gugark",
+      "start": 283,
+      "end": 289
+     },
+     {
+      "target": "1988 violence in Shusha and Stepanakert",
+      "anchor": "Stepanakert",
+      "start": 294,
+      "end": 305
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "227fb901e263f029a30bc516ee510f6c18522e8108ca617f297b7dc9db4be7b0",
+    "retrieved_at": "2026-10-16T20:56:00.311499+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 40,
+   "candidate_id": "fa490192726bcdea695be10b602ee554",
+   "connective": "fr.a_declenche",
+   "cause_target": "Confédération nationale du travail (Espagne)",
+   "effect_target": "Saragosse",
+   "cause_qid": "Q550420",
+   "effect_qid": "Q10305",
+   "modifier_heads": [
+    null,
+    "insurrection"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "insurrection in Zaragoza",
+   "record": {
+    "lang": "fr",
+    "title": "Guerre d'Espagne",
+    "page_id": 45733,
+    "article_qid": "Q10859",
+    "revision_id": 240424371,
+    "revision_timestamp": "2026-10-16T11:34:48Z",
+    "section": "Bienio negro (1934-1935)",
+    "paragraph": 17,
+    "index": 0,
+    "sentence": "Le 8 décembre 1933, la CNT déclenche une insurrection à Saragosse.",
+    "wikitext": "Le {{Date|8 décembre 1933}}, la [[Confédération nationale du travail (Espagne)|CNT]] déclenche une insurrection à [[Saragosse]].",
+    "links": [
+     {
+      "target": "Confédération nationale du travail (Espagne)",
+      "anchor": "CNT",
+      "start": 23,
+      "end": 26
+     },
+     {
+      "target": "Saragosse",
+      "anchor": "Saragosse",
+      "start": 56,
+      "end": 65
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "4b25d585565db5b683e20f88363da1c960151c24bdfa84830eeef64cf986eebb",
+    "retrieved_at": "2026-10-16T21:21:29.470670+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 41,
+   "candidate_id": "f554ad660ece893c69618e46ae99b38d",
+   "connective": "en.sparked_by",
+   "cause_target": "Bengali nationalism",
+   "effect_target": "War",
+   "cause_qid": "Q3250202",
+   "effect_qid": "Q198",
+   "modifier_heads": [
+    "rise",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "rise of Bengali nationalism; generic War",
+   "record": {
+    "lang": "en",
+    "title": "Bangladesh Liberation War",
+    "page_id": 672766,
+    "article_qid": "Q371394",
+    "revision_id": 1376667314,
+    "revision_timestamp": "2026-09-25T15:19:04Z",
+    "section": "",
+    "paragraph": 0,
+    "index": 0,
+    "sentence": "The Bangladesh Liberation War (, ), also known as the Bangladesh War of Independence, was an armed conflict sparked by the rise of the Bengali nationalist and self-determination movement in East Pakistan, which resulted in the independence of Bangladesh with the help of India.",
+    "wikitext": "The '''Bangladesh Liberation War'''{{NoteTag|This war is known as the Liberation War or the War of Independence in Bangladesh.<ref>[https://books.google.com/books?id=bJfcCPUr0OoC&q=+Muktijuddho&pg=PA289 ''Historical Dictionary of Bangladesh''], Page 289</ref> This war is also called the Civil War in Pakistan.<ref name=\"Social 2005 p93\">{{Cite book |last=Moss |first=Peter |title=Secondary Social Studies For Pakistan |date=2005 |publisher=[[Oxford University Press]] |isbn=9780195977042 |location=Karachi |page=93 |oclc=651126824}}</ref>}} ({{langx|bn|মুক্তিযুদ্ধ}}, {{IPA|bn|mukt̪iɟud̪d̪ʱo|pron}}), also known as the '''Bangladesh War of Independence''', was an [[War|armed conflict]] sparked by the rise of the [[Bengali nationalism|Bengali nationalist]] and [[self-determination]] movement in [[East Pakistan]], which resulted in the independence of [[Bangladesh]] with the help of [[India]].",
+    "links": [
+     {
+      "target": "War",
+      "anchor": "armed conflict",
+      "start": 93,
+      "end": 107
+     },
+     {
+      "target": "Bengali nationalism",
+      "anchor": "Bengali nationalist",
+      "start": 135,
+      "end": 154
+     },
+     {
+      "target": "Self-determination",
+      "anchor": "self-determination",
+      "start": 159,
+      "end": 177
+     },
+     {
+      "target": "East Pakistan",
+      "anchor": "East Pakistan",
+      "start": 190,
+      "end": 203
+     },
+     {
+      "target": "Bangladesh",
+      "anchor": "Bangladesh",
+      "start": 243,
+      "end": 253
+     },
+     {
+      "target": "India",
+      "anchor": "India",
+      "start": 271,
+      "end": 276
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 3,
+    "raw_sha256": "a7156057a92358cad32b0404bd2d6420e1d2a54cb0ec21022e40054325916d3a",
+    "retrieved_at": "2026-10-16T20:59:09.927809+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 42,
+   "candidate_id": "3e012238180c6c173a6dfe9891589247",
+   "connective": "en.led_to",
+   "cause_target": "Konstantinos Karamanlis",
+   "effect_target": "Abolition of monarchy",
+   "cause_qid": "Q156806",
+   "effect_qid": "Q7995869",
+   "modifier_heads": [
+    "government",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 1,
+    "correct": 0
+   },
+   "note": "a government under Karamanlis",
+   "record": {
+    "lang": "en",
+    "title": "Greek Civil War",
+    "page_id": 28830649,
+    "article_qid": "Q188972",
+    "revision_id": 1377015406,
+    "revision_timestamp": "2026-09-27T13:00:35Z",
+    "section": "Postwar division and reconciliation",
+    "paragraph": 56,
+    "index": 0,
+    "sentence": "After the collapse of the military junta, a conservative government under Konstantinos Karamanlis led to the abolition of monarchy, the legalization of the KKE, and a new constitution, which guaranteed political freedoms, individual rights, and free elections.",
+    "wikitext": "After the collapse of the military junta, a conservative government under [[Konstantinos Karamanlis]] led to the [[abolition of monarchy]], the legalization of the KKE, and [[Constitution of Greece|a new constitution]], which guaranteed political freedoms, individual rights, and free elections.",
+    "links": [
+     {
+      "target": "Konstantinos Karamanlis",
+      "anchor": "Konstantinos Karamanlis",
+      "start": 74,
+      "end": 97
+     },
+     {
+      "target": "Abolition of monarchy",
+      "anchor": "abolition of monarchy",
+      "start": 109,
+      "end": 130
+     },
+     {
+      "target": "Constitution of Greece",
+      "anchor": "a new constitution",
+      "start": 165,
+      "end": 183
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "8e601ba4e8bb1239551d4733f80e690e7d52521a7273c2fa293e74bce266bb4f",
+    "retrieved_at": "2026-10-16T21:11:00.279058+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 43,
+   "candidate_id": "0e4a99b72cddcbd1e847102314a4e7df",
+   "connective": "en.because_of",
+   "cause_target": "Conservation of angular momentum",
+   "effect_target": "Inertia",
+   "cause_qid": "Q161254",
+   "effect_qid": "Q122508",
+   "modifier_heads": [
+    null,
+    "changes"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "fronted parse: effect is 'changes of inertia result in ...'",
+   "record": {
+    "lang": "en",
+    "title": "2011 Tōhoku earthquake and tsunami",
+    "page_id": 31150160,
+    "article_qid": "Q36204",
+    "revision_id": 1377633491,
+    "revision_timestamp": "2026-09-30T07:27:52Z",
+    "section": "Geophysical effects",
+    "paragraph": 15,
+    "index": 4,
+    "sentence": "Because of conservation of angular momentum, such changes of inertia result in small changes to the Earth's rate of rotation.",
+    "wikitext": "Because of [[conservation of angular momentum]], such changes of [[inertia]] result in small changes to the Earth's rate of rotation.",
+    "links": [
+     {
+      "target": "Conservation of angular momentum",
+      "anchor": "conservation of angular momentum",
+      "start": 11,
+      "end": 43
+     },
+     {
+      "target": "Inertia",
+      "anchor": "inertia",
+      "start": 61,
+      "end": 68
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "0cc08eefe165c166c70835c4344f6ff9873267889d403eca6d5620102438a30a",
+    "retrieved_at": "2026-10-16T20:47:00.450587+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 44,
+   "candidate_id": "9134d7300624c80654bb5ffd79216832",
+   "connective": "en.led_to",
+   "cause_target": "Glorious Revolution (Spain)",
+   "effect_target": "Queen Isabella II",
+   "cause_qid": "Q1540751",
+   "effect_qid": "Q183085",
+   "modifier_heads": [
+    null,
+    "overthrow"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "overthrow of Isabella II",
+   "record": {
+    "lang": "en",
+    "title": "Spanish Civil War",
+    "page_id": 18842471,
+    "article_qid": "Q10859",
+    "revision_id": 1380520404,
+    "revision_timestamp": "2026-10-16T06:15:50Z",
+    "section": "First Republic and restoration",
+    "paragraph": 5,
+    "index": 0,
+    "sentence": "In 1868, popular uprisings led to the overthrow of Queen Isabella II.",
+    "wikitext": "In 1868, [[Glorious Revolution (Spain)|popular uprisings]] led to the overthrow of [[Queen Isabella II]].",
+    "links": [
+     {
+      "target": "Glorious Revolution (Spain)",
+      "anchor": "popular uprisings",
+      "start": 9,
+      "end": 26
+     },
+     {
+      "target": "Queen Isabella II",
+      "anchor": "Queen Isabella II",
+      "start": 51,
+      "end": 68
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "66fc8a522507bd59de032b1b601db25d7e8bb5015fbf81a2b6ccec11a70cc591",
+    "retrieved_at": "2026-10-16T20:44:00.625005+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 45,
+   "candidate_id": "d43d4a64dacf3c5ee305fd63514595f2",
+   "connective": "en.due_to",
+   "cause_target": "Disseminated intravascular coagulation",
+   "effect_target": "Purpura",
+   "cause_qid": "Q823027",
+   "effect_qid": "Q935293",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "Black Death",
+    "page_id": 4501,
+    "article_qid": "Q42005",
+    "revision_id": 1377102371,
+    "revision_timestamp": "2026-09-27T22:20:21Z",
+    "section": "Signs and symptoms",
+    "paragraph": 46,
+    "index": 1,
+    "sentence": "Symptoms are high fevers and purple skin patches (purpura due to disseminated intravascular coagulation).",
+    "wikitext": "Symptoms are high fevers and purple skin patches ([[purpura]] due to [[disseminated intravascular coagulation]]).",
+    "links": [
+     {
+      "target": "Purpura",
+      "anchor": "purpura",
+      "start": 50,
+      "end": 57
+     },
+     {
+      "target": "Disseminated intravascular coagulation",
+      "anchor": "disseminated intravascular coagulation",
+      "start": 65,
+      "end": 103
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 1,
+    "raw_sha256": "56a746754813c53928a8b33edb8d8ac9289712dcf8b4a91128f157f12ba326df",
+    "retrieved_at": "2026-10-16T20:43:10.101622+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 46,
+   "candidate_id": "6f53ca2eb411155a18a190fcb72d83c8",
+   "connective": "en.resulted_in",
+   "cause_target": "Kuwait",
+   "effect_target": "Nasser Al-Sabah",
+   "cause_qid": "Q817",
+   "effect_qid": "Q334718",
+   "modifier_heads": [
+    "unrest",
+    "resignation"
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "unrest in Kuwait; resignation of the cabinet",
+   "record": {
+    "lang": "en",
+    "title": "Arab Spring",
+    "page_id": 30655949,
+    "article_qid": "Q33761",
+    "revision_id": 1380399999,
+    "revision_timestamp": "2026-10-15T14:23:09Z",
+    "section": "Protests and uprisings",
+    "paragraph": 25,
+    "index": 3,
+    "sentence": "The popular unrest in Kuwait also resulted in the resignation of Prime Minister Nasser Al-Sabah's cabinet.",
+    "wikitext": "The popular unrest in [[Kuwait]] also resulted in the resignation of Prime Minister [[Nasser Al-Sabah]]'s cabinet.",
+    "links": [
+     {
+      "target": "Kuwait",
+      "anchor": "Kuwait",
+      "start": 22,
+      "end": 28
+     },
+     {
+      "target": "Nasser Al-Sabah",
+      "anchor": "Nasser Al-Sabah",
+      "start": 80,
+      "end": 95
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "2525f42d69f223cb170ba2eb884a3bb7e9f7a8062740acf171cfe15c22922947",
+    "retrieved_at": "2026-10-16T20:45:00.215915+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 47,
+   "candidate_id": "f349f6bba159c47cd8e1a906762ad9eb",
+   "connective": "en.led_to",
+   "cause_target": "Battle of Kesselsdorf",
+   "effect_target": "Treaty of Dresden",
+   "cause_qid": "Q695325",
+   "effect_qid": "Q700716",
+   "modifier_heads": [
+    "victory",
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "victory at Kesselsdorf = the battle; modifier flag false positive",
+   "record": {
+    "lang": "en",
+    "title": "War of the Austrian Succession",
+    "page_id": 52266,
+    "article_qid": "Q32929",
+    "revision_id": 1379905840,
+    "revision_timestamp": "2026-10-12T15:57:41Z",
+    "section": "Campaign of 1745",
+    "paragraph": 44,
+    "index": 2,
+    "sentence": "On 15 December, Prussian victory at Kesseldorf led to the Treaty of Dresden on 25th.",
+    "wikitext": "On 15 December, Prussian victory at [[Battle of Kesselsdorf|Kesseldorf]] led to the [[Treaty of Dresden]] on 25th.",
+    "links": [
+     {
+      "target": "Battle of Kesselsdorf",
+      "anchor": "Kesseldorf",
+      "start": 36,
+      "end": 46
+     },
+     {
+      "target": "Treaty of Dresden",
+      "anchor": "Treaty of Dresden",
+      "start": 58,
+      "end": 75
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "6e53ded3cc3df139bbcf14ce0bbf4e5c8d293176e522fe262ad17ab1c136d496",
+    "retrieved_at": "2026-10-16T20:58:09.623130+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 48,
+   "candidate_id": "92b6f8ca3e540086e7e7b52d0a91350e",
+   "connective": "fr.a_declenche",
+   "cause_target": "Grève des techniciens et journalistes de l'ORTF en mai-juin 1968",
+   "effect_target": "Slogans de Mai 68",
+   "cause_qid": "Q85853350",
+   "effect_qid": "Q109036069",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 0,
+    "effect_link": 0,
+    "correct": 0
+   },
+   "note": "see strict #20",
+   "record": {
+    "lang": "fr",
+    "title": "Mai 68",
+    "page_id": 2059,
+    "article_qid": "Q6743",
+    "revision_id": 239616077,
+    "revision_timestamp": "2026-09-18T20:19:39Z",
+    "section": "Vendredi 10 mai",
+    "paragraph": 57,
+    "index": 0,
+    "sentence": "Dans le Journal du dimanche, Philippe Labro lance un « bravo ! » aux radios privées RTL et Europe1 dans les colonnes du JDD, le dimanche 12 mai, au lendemain de la première nuit des barricades de Mai 68 qu'elles ont couvertes en direct en utilisant les fréquences de la police, alors que l'ORTF y a renoncé déclenchant une violente contestation de ses émissions par les contestataires.",
+    "wikitext": "Dans le ''[[Journal du dimanche]]'', [[Philippe Labro]]<ref name=\"caron\">{{Ouvrage|prénom1=Gilles|nom1=Caron|titre=Sous les pavés la plage : mai 68|éditeur=[[Éditions de La Sirène|La Sirène]]|date=1993|pages totales=127|isbn=978-2-840-450474|lire en ligne=https://books.google.fr/books?id=HplYDwAAQBAJ&pg=PT161&lpg=PT161&dq=%22journal+du+dimanche%22+%22mai+68%22&source=bl&ots=ukMFW7gtUU&sig=ACfU3U2ID7VCxiLEBVaHzKCBWM9hZvuPtg&hl=fr&sa=X&ved=2ahUKEwjU6_vrmNSAAxWMTaQEHQJzDK04HhDoAXoECBEQAw#v=onepage&q=%22journal%20du%20dimanche%22%20%22mai%2068%22&f=false|consulté le=11 août 2023}}</ref> lance un {{citation|bravo !}} aux radios privées RTL et Europe1 dans les colonnes du JDD, le dimanche {{date|12 mai}}, au lendemain de la première [[nuit des barricades de Mai 68]] qu'elles ont couvertes en direct en utilisant les fréquences de la police, alors que [[Grève des techniciens et journalistes de l'ORTF en mai-juin 1968|l'ORTF y a renoncé]]<ref name=Artières>{{Ouvrage|prénom1=Philippe|nom1=Artières|prénom2=Michelle|nom2=Zancarini-Fournel|titre=68, une histoire collective (1962-1981)|éditeur=[[La Découverte]]|date=2018-05-09|isbn=978-2-348-04044-3|lire en ligne=https://books.google.fr/books?id=qG1YDwAAQBAJ&pg=PT194&lpg=PT194&dq=%22journal+du+dimanche%22+%22mai+68%22&source=bl&ots=YI3FdPc3Te&sig=ACfU3U0bJS2zcWIpUWtGzOqhyC8dFyVKEQ&hl=fr&sa=X&ved=2ahUKEwjU6_vrmNSAAxWMTaQEHQJzDK04HhDoAXoECBIQAw#v=onepage&q=%22journal%20du%20dimanche%22%20%22mai%2068%22&f=false|consulté le=2023-08-11}}</ref> déclenchant [[slogans de Mai 68|une violente contestation de ses émissions par les contestataires]].",
+    "links": [
+     {
+      "target": "Journal du dimanche",
+      "anchor": "Journal du dimanche",
+      "start": 8,
+      "end": 27
+     },
+     {
+      "target": "Philippe Labro",
+      "anchor": "Philippe Labro",
+      "start": 29,
+      "end": 43
+     },
+     {
+      "target": "Nuit des barricades de Mai 68",
+      "anchor": "nuit des barricades de Mai 68",
+      "start": 173,
+      "end": 202
+     },
+     {
+      "target": "Grève des techniciens et journalistes de l'ORTF en mai-juin 1968",
+      "anchor": "l'ORTF y a renoncé",
+      "start": 288,
+      "end": 306
+     },
+     {
+      "target": "Slogans de Mai 68",
+      "anchor": "une violente contestation de ses émissions par les contestataires",
+      "start": 319,
+      "end": 384
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "e90df4b041f09eb0df513bdf378a133e9d014a9364fe56cd71a0374b0d13a574",
+    "retrieved_at": "2026-10-16T21:30:59.763951+00:00"
+   }
+  },
+  {
+   "set": "lenient_sample50",
+   "index": 49,
+   "candidate_id": "96fb20e092c0048ebf0eaa8d867f6014",
+   "connective": "en.caused_by",
+   "cause_target": "Bacteria",
+   "effect_target": "Opportunistic infections",
+   "cause_qid": "Q10876",
+   "effect_qid": "Q835718",
+   "modifier_heads": [
+    null,
+    null
+   ],
+   "labels": {
+    "direction": 1,
+    "cause_link": 1,
+    "effect_link": 1,
+    "correct": 1
+   },
+   "note": "",
+   "record": {
+    "lang": "en",
+    "title": "HIV/AIDS",
+    "page_id": 5069516,
+    "article_qid": "Q12199",
+    "revision_id": 1379701401,
+    "revision_timestamp": "2026-10-11T12:17:00Z",
+    "section": "Third main stage: AIDS",
+    "paragraph": 12,
+    "index": 0,
+    "sentence": "Opportunistic infections may be caused by bacteria, viruses, fungi, and parasites that are normally controlled by the immune system.",
+    "wikitext": "[[Opportunistic infections]] may be caused by [[bacteria]], [[virus]]es, [[fungi]], and [[parasite]]s that are normally controlled by the immune system.",
+    "links": [
+     {
+      "target": "Opportunistic infections",
+      "anchor": "Opportunistic infections",
+      "start": 0,
+      "end": 24
+     },
+     {
+      "target": "Bacteria",
+      "anchor": "bacteria",
+      "start": 42,
+      "end": 50
+     },
+     {
+      "target": "Virus",
+      "anchor": "viruses",
+      "start": 52,
+      "end": 59
+     },
+     {
+      "target": "Fungi",
+      "anchor": "fungi",
+      "start": 61,
+      "end": 66
+     },
+     {
+      "target": "Parasite",
+      "anchor": "parasites",
+      "start": 72,
+      "end": 81
+     }
+    ],
+    "in_list": false,
+    "templates_dropped": 0,
+    "raw_sha256": "453da929390a611581ad70e6c9d6a9a131c82b35e7fbfb67e09525e18785e115",
+    "retrieved_at": "2026-10-16T20:42:09.460517+00:00"
+   }
+  }
+ ]
+}

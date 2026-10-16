@@ -477,7 +477,7 @@ def country_rows(
             FROM kg.link_row
            WHERE materialisation_id = :m AND (subject_iso3 = :c OR object_iso3 = :c)
              AND (CAST(:kinds AS text[]) IS NULL OR link_type = ANY(CAST(:kinds AS text[])))
-             AND (facet = '' OR facet = ANY(:facets))
+             AND (facet = '' OR facet = ANY(:facets) OR facet LIKE 'source=%')
              AND (CAST(:y AS integer) IS NULL OR ((year_lo IS NULL OR year_lo <= :y) AND (year_hi IS NULL OR year_hi >= :y)))
            LIMIT :cap),
         latest AS (SELECT link_type, facet, dir, max(year_hi) AS yh FROM x

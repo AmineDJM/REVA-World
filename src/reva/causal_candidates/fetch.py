@@ -8,8 +8,8 @@ refusal before the transport is called), ``settle_metered`` with the actual usag
 (invariant 30). The ledger lives in a throwaway ``reva_*`` database (never the dev database ``reva``).
 
 Politeness: one request at a time, >= 10 s between requests to the same host (the rate limiter of the
-client), ``maxlag=5``. A 429/503 is waited out once (Retry-After <= 120 s, counted as a new request);
-a second one ends the run: what was done is checkpointed and a later run resumes.
+client), ``maxlag=5``. A 429/503 is waited out (Retry-After <= 120 s) and retried, at most 3 attempts per
+request, each attempt metered; then the run stops: what was done is checkpointed and a later run resumes.
 
 Storage (CC BY-SA 4.0 text): full articles are **never** stored. Each response is hashed (``raw_sha256``,
 recorded with the revision ids in ``fetch_log.jsonl``) and reduced in memory to the sentences that match the

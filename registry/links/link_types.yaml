@@ -794,6 +794,165 @@ derived_links:
     status: derivable
     path_cost: 1.5
 
+  # ---------------------------------------------------------------- sanctions (A-SANCTIONS; EVMAP)
+  - id: sanction_episode
+    labels: {fr: "épisodes de sanctions (menace ou imposition) visant", en: "sanctions episodes (threat or imposition) against"}
+    inverse_labels: {fr: "cible d'épisodes de sanctions de", en: "target of sanctions episodes by"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [ties, eusanct]
+      atlas:
+        source: ties
+        extra_sources: [eusanct]
+        datasets: [dyad_year]
+        indicator_prefix: "CASES_ACTIVE|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        facet_source: true
+        companions: {impositions_active: IMPOSITIONS_ACTIVE}
+        stored_in_full: true
+        licences:
+          ties: "TIES 4.1 (Morgan, Bapat, Kobayashi): no licence stated, citation requested; cite-only, redistribution not stated (maintainer review)"
+          eusanct: "CC BY 4.0 (EUSANCT, Weber & Schneider; attribution required)"
+        caveat:
+          fr: >-
+            Comptage par REVA des cas codés par le jeu de données (TIES 1945-2005, EUSANCT 1989-2015) actifs dans
+            l'année, de l'émetteur vers la cible : une menace ou une imposition de sanctions, pas leur effet. TIES et
+            EUSANCT se recouvrent (EUSANCT reprend des cas TIES) : leurs comptes sont montrés séparément, jamais
+            additionnés. Émetteurs UE/ONU (organisations) non rattachés à un pays : pas de lien. Fin non codée : cas
+            compté jusqu'à sa dernière mention (« ongoing as of »), ou l'année de début seule.
+          en: >-
+            REVA count of the dataset's coded cases (TIES 1945-2005, EUSANCT 1989-2015) active in the year, sender to
+            target: a threat or imposition of sanctions, not their effect. TIES and EUSANCT overlap (EUSANCT re-uses
+            TIES cases): their counts are shown separately, never added. EU/UN senders (organisations) are not
+            mapped to a country: no link. No coded end: counted through its last report, or its start year only.
+        flow: "coded sanctions cases (threat and/or imposition) of the sender against the target, active in the year"
+      notes: >-
+        A-SANCTIONS tables ties.dyad_year and eusanct.dyad_year (docs/dev/v3_a_sanctions.md §4): row = sender (COW
+        state through the date-aware crosswalk; org:EU / org:UN / cow:1000 are organisations and stay unmapped),
+        CASES_ACTIVE|partner=<ISO3> = count of the dataset's cases of that sender against that target active in the
+        year (start .. coded end; end basis and case ids in flags). The same year's IMPOSITIONS_ACTIVE is a cited
+        companion (basis.impositions_active). One link per source (facet source=ties|eusanct). The case events
+        themselves are ties:case:* / eusanct:case:* (event type sanction_episode); coded outcomes are T1 claims of
+        those cases, never of this link.
+    temporal: {kind: snapshot, description: "case-active year (start .. coded end; end basis in flags)"}
+    weight: {kind: source_quantity, unit: cases, notes: "count of coded cases (REVA count of TIES / EUSANCT rows; a derived count of provider records, like A-INFRA's)"}
+    honesty: {fr: "relié via : épisodes de sanctions codés ({weight}, {year} ; menace ou imposition, pas un effet)", en: "connected via: coded sanctions episodes ({weight}, {year}; threat or imposition, not an effect)"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  - id: us_sanctions_program
+    labels: {fr: "programme de sanctions américain actif (OFAC) visant", en: "active US sanctions program (OFAC) against"}
+    inverse_labels: {fr: "visé par un programme de sanctions américain actif (OFAC)", en: "target of an active US sanctions program (OFAC)"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [ofac]
+      atlas:
+        source: ofac
+        datasets: [programs]
+        indicator_prefix: "ACTIVE_PROGRAMS|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        stored_in_full: true
+        licence: "public domain (US Government work, 17 U.S.C. 105)"
+        caveat:
+          fr: >-
+            Liste des programmes actifs de l'OFAC au jour de la collecte : seuls les programmes dont le titre nomme
+            exactement ce pays comptent (20 sur 36) ; les programmes thématiques ou multi-pays (lutte antiterroriste,
+            Russie/Ukraine…) ne sont rattachés à aucun pays. Un programme peut viser des personnes ou entités, pas
+            l'État entier.
+          en: >-
+            OFAC's list of active programs on the retrieval day: only programs whose title names exactly this
+            country count (20 of 36); thematic or multi-country programs (counter-terrorism, Russia/Ukraine...) are
+            not mapped to a country. A program may target persons or entities, not the whole state.
+        flow: "active OFAC sanctions programs whose title names the partner country (row = United States)"
+      notes: >-
+        A-SANCTIONS table ofac.programs: ACTIVE_PROGRAMS|partner=<ISO3> (row USA) = count of active programs
+        whose title names that country (registry/atlas/geo_aliases/a_sanctions.yaml); the program slugs are in
+        basis.source_flags.programs.
+    temporal: {kind: snapshot, description: "retrieval day of the OFAC program list"}
+    weight: {kind: source_quantity, unit: programs, notes: "count of active OFAC programs naming the country (derived count of provider records)"}
+    honesty: {fr: "relié via : programme de sanctions américain actif nommant ce pays (OFAC, au jour de la collecte)", en: "connected via: active US sanctions program naming this country (OFAC, on the retrieval day)"}
+    causal: false
+    status: derivable
+    path_cost: 2.0
+
+  # ---------------------------------------------------------------- colonial datasets (A-COLONIAL; EVMAP)
+  - id: colonised_by_coldat
+    labels: {fr: "colonisé par (COLDAT)", en: "colonised by (COLDAT)"}
+    inverse_labels: {fr: "puissance coloniale de (COLDAT)", en: "colonial power over (COLDAT)"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_dataset_colonial
+      properties: ["coldat:colonized_by"]
+      sources: [coldat]
+      notes: >-
+        COLDAT v3.0 (Becker 2019, CC0; A-COLONIAL, source key harvard.dataverse.coldat): present-day country (QID)
+        coldat:colonized_by colonizer (one of eight European powers), first .. last year of colonisation, one
+        statement per date aggregation (last-date and mean). Statements of both aggregations with the same years
+        give one link citing both; different years give one link per aggregation (basis.aggregations). One spell
+        per (country, power): interruptions are not coded. Says who ruled, never why anything followed.
+    temporal: {kind: interval, description: "first .. last year of colonisation as COLDAT aggregates it (year precision)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : colonisé par l'autre État (COLDAT, {aggregation})", en: "connected via: colonised by the other state (COLDAT, {aggregation})"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: colonial_rule_cow
+    labels: {fr: "territoire sous l'autorité de (entités COW)", en: "territory ruled by (COW entities)"}
+    inverse_labels: {fr: "autorité sur le territoire de (entités COW)", en: "ruled the territory of (COW entities)"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_dataset_colonial
+      properties: ["cowent:colony_of", "cowent:protectorate_of", "cowent:mandated_to", "cowent:possession_of", "geopol:corresponds_to_iso3"]
+      sources: [cow_terrchange]
+      notes: >-
+        COW Territorial Change v6 entities list (A-COLONIAL, source key cow.terrchange; COW terms: cite, no
+        charging for access): territory cowent:<code> colony_of / protectorate_of / mandated_to / possession_of a
+        state, dated as printed (begin .. end year). The territory is named by the one country it corresponds to
+        (geopol:corresponds_to_iso3; basis.territory_mapping), like colonial_rule_cshapes. The list starts in 1816
+        (left-censored: rule may be older) and its latest end year is 1993. Occupied_by / claimed_by / leased_to /
+        part_of spells are not colonial rule and give no link.
+    temporal: {kind: interval, description: "the status spell as printed in the COW entities list (year precision)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : territoire sous l'autorité de l'autre Etat ({status}, entités COW)", en: "connected via: territory ruled by the other state ({status}, COW entities)"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  # ---------------------------------------------------------------- natural hazards (A-HAZARDS; EVMAP)
+  - id: hazard_shared_event
+    labels: {fr: "même événement naturel observé (tsunami : source → pays où des vagues ont été relevées)", en: "same natural event observed (tsunami: source → country where runups were recorded)"}
+    inverse_labels: {fr: "vagues relevées d'un tsunami ayant sa source en", en: "runups recorded of a tsunami with its source in"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_dataset_hazard
+      properties: ["ncei:country", "ncei:runup_country", "ncei:tsunami_validity"]
+      sources: [noaa_ncei_hazards]
+      via: event
+      notes: >-
+        NOAA NCEI Global Historical Tsunami Database (A-HAZARDS, source key noaa.ncei_hazards; US Government work):
+        one tsunami source record ncei_hazards:tsunami:<id> with its source country (ncei:country) and the countries
+        where its runups were observed (ncei:runup_country, runup record count in the qualifiers). One link per
+        event and runup country other than the source country, via the event, dated by the event's P585. Records
+        NCEI marks erroneous (validity -1) give no link; events with more than 60 runup countries are not expanded
+        (counted); at most 200,000 links. The same event observed in two places: not a cause, not an exchange.
+    temporal: {kind: point, description: "date of the tsunami source event (NCEI P585)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : même événement naturel observé ({via} : source dans l'un, vagues relevées dans l'autre)", en: "connected via: the same natural event observed ({via}: source in one, runups recorded in the other)"}
+    causal: false
+    status: derivable
+    path_cost: 2.5
+
 # Properties the path engine traverses as single hops. labels: subject -> object; inverse_labels: object ->
 # subject. causal: true only for properties whose statements are causal claims of the source.
 statement_edges:

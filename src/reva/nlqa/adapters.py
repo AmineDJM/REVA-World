@@ -423,7 +423,7 @@ LINK_GROUPS: dict[str, tuple[str, ...]] = {
         "shared_language_family",
         "shared_language_glottolog",
     ),
-    "colonial": ("colony_of", "former_colony_of", "colonial_rule_cshapes"),
+    "colonial": ("colony_of", "former_colony_of", "colonial_rule_cshapes", "colonised_by_coldat", "colonial_rule_cow"),
     "succession": ("successor_of",),
     "membership": ("co_member",),
     "alliance": ("alliance_co_member",),
@@ -438,6 +438,10 @@ LINK_GROUPS: dict[str, tuple[str, ...]] = {
     # LINKS3 (A-INFRA atlas tables): cables listed by Wikidata, OpenFlights routes frozen in June 2014, GCAT
     # payloads by launch-site state — physical connections, each with its caveat in basis
     "infrastructure": ("submarine_cable", "air_routes_2014", "launch_service"),
+    # EVMAP: coded sanctions episodes (TIES / EUSANCT, sender -> target) and active OFAC programs naming a country
+    "sanctions": ("sanction_episode", "us_sanctions_program"),
+    # EVMAP: the same NCEI tsunami observed in two countries (source -> runup country); never a cause
+    "natural_hazard": ("hazard_shared_event",),
 }
 
 

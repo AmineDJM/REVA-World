@@ -402,7 +402,8 @@ def _rank_in_python(
     groups: dict[tuple[str, str, str], list[Link]] = {}
     for lk in links:
         fac = str(lk.basis.get("facet") or (f"issue={lk.basis['issue']}" if "issue" in lk.basis else ""))
-        if fac and fac not in facets:
+        # a source facet (EVMAP: TIES vs EUSANCT counts of one kind) is never a filter: each source is its own group
+        if fac and fac not in facets and not fac.startswith("source="):
             continue
         d = "both" if not lk.directed else ("outgoing" if lk.subject == node else "incoming")
         groups.setdefault((lk.link_type, fac, d), []).append(lk)

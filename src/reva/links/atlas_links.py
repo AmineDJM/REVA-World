@@ -98,6 +98,12 @@ def _cable_note(flags: Mapping[str, Any]) -> str | None:
     return out if len(out) <= 1200 else out[:1190] + "…"
 
 
+def spec_sources(spec: Mapping[str, Any]) -> list[str]:
+    """The atlas sources of a dyadic spec: ``source`` + ``extra_sources`` (EVMAP: one link type fed by several
+    datasets with the same indicators, e.g. TIES and EUSANCT sanction cases; each link keeps its source)."""
+    return [str(spec["source"]), *(str(x) for x in spec.get("extra_sources") or ())]
+
+
 def _default_node(iso3: str) -> str:
     return f"iso3:{iso3}"
 
@@ -213,7 +219,7 @@ class AtlasLinkReader:
         spec = lt.atlas
         if not spec:
             return False
-        return any((spec["source"], d) in self.present() for d in spec["datasets"])
+        return any((src, d) in self.present() for src in spec_sources(spec) for d in spec["datasets"])
 
     # ------------------------------------------------------------------ dyadic
     def _hops(self, lt: LinkType) -> tuple[dict[str, Any], list[str]]:
@@ -240,6 +246,7 @@ class AtlasLinkReader:
         assert spec is not None
         partner_key = spec["partner"].split(".", 1)[1]
         datasets = ", ".join(_sql_str(d) for d in spec["datasets"])
+        sources = ", ".join(_sql_str(x) for x in spec_sources(spec))
         prefix = spec["indicator_prefix"]
         name = prefix.split("|", 1)[0]
         active, _missing = self._hops(lt)
@@ -254,6 +261,8 @@ class AtlasLinkReader:
             pat = "\\|" + k + "=" + v + "(\\||$)"
             req += f" AND regexp_matches(indicator, {_sql_str(pat)})"
         facet_parts = []
+        if spec.get("facet_source"):  # several datasets in one type: their counts stay separate, never summed
+            facet_parts.append("'source=' || s.source")
         for dim in spec.get("facet_dims") or ():
             pat = "\\|" + dim + "=([^|]+)"
             facet_parts.append(f"'{dim}=' || coalesce(regexp_extract(s.indicator, {_sql_str(pat)}, 1), '')")
@@ -280,9 +289,10 @@ class AtlasLinkReader:
         if comps:
             starts = " OR ".join(f"starts_with(indicator, {_sql_str(cn + '|')})" for _, cn in comps)
             comp_cte = f""",
-        ks AS (SELECT sid, dataset, indicator FROM series
-                WHERE source = {_sql_str(spec["source"])} AND dataset IN ({datasets}) AND ({starts})),
-        kc AS (SELECT ks.dataset, ks.indicator, c.provider_geo, c.period_start, c.value, c.raw_sha256, c.selector
+        ks AS (SELECT sid, source, dataset, indicator FROM series
+                WHERE source IN ({sources}) AND dataset IN ({datasets}) AND ({starts})),
+        kc AS (SELECT ks.source, ks.dataset, ks.indicator, c.provider_geo, c.period_start, c.value, c.raw_sha256,
+                      c.selector
                  FROM cells_s c JOIN ks USING (sid))"""
             for i, (key, cn) in enumerate(comps):
                 a = f"k{i}"
@@ -291,17 +301,19 @@ class AtlasLinkReader:
                 )
                 comp_join += (
                     f" LEFT JOIN kc {a} ON {a}.provider_geo = c.provider_geo AND {a}.dataset = s.dataset"
+                    f" AND {a}.source = s.source"
                     f" AND {a}.period_start = c.period_start"
                     f" AND {a}.indicator = {_sql_str(cn)} || substr(s.indicator, {len(name) + 1})"
                 )
         return f"""
-        s AS (SELECT sid, dataset, indicator FROM series
-               WHERE source = {_sql_str(spec["source"])} AND dataset IN ({datasets})
+        s AS (SELECT sid, source, dataset, indicator FROM series
+               WHERE source IN ({sources}) AND dataset IN ({datasets})
                  AND {sel}{req}){comp_cte},
         r AS (SELECT {row_iso} AS row_iso3, {partner} AS partner,
                      c.provider_geo AS row_geo, {pcode} AS partner_code, {hop} AS hop,
                      {year} AS year,
-                     c.value, c.unit, c.flags, c.raw_sha256, c.selector, c.table_sha, s.dataset, s.indicator,
+                     c.value, c.unit, c.flags, c.raw_sha256, c.selector, c.table_sha, s.source, s.dataset,
+                     s.indicator,
                      {facet} AS facet, TRY_CAST(c.value AS DOUBLE) AS v{comp_cols}
                 FROM cells_s c JOIN s USING (sid){comp_join})"""
 
@@ -349,9 +361,10 @@ class AtlasLinkReader:
         assert spec is not None
         sel = r["selector"] if isinstance(r["selector"], str) else json.dumps(r["selector"], sort_keys=True)
         fl = _short_flags(r["flags"])
+        src = str(r.get("source") or spec["source"])
         ev = Evidence(
             kind="atlas_row",
-            source=spec["source"],
+            source=src,
             raw_sha256=r["raw_sha256"],
             selector=sel,
             subject=r["row_iso3"],
@@ -363,7 +376,7 @@ class AtlasLinkReader:
         evs = [ev]
         basis: dict[str, Any] = {
             "method": "atlas_dyadic",
-            "source": spec["source"],
+            "source": src,
             "dataset": r["dataset"],
             "indicator": r["indicator"],
             "reported_by": r["row_iso3"],
@@ -384,7 +397,7 @@ class AtlasLinkReader:
             evs.append(
                 Evidence(
                     kind="atlas_row",
-                    source=spec["source"],
+                    source=src,
                     raw_sha256=r[f"comp_{key}_sha"],
                     selector=csel if isinstance(csel, str) else json.dumps(csel, sort_keys=True),
                     subject=r["row_iso3"],
@@ -403,6 +416,8 @@ class AtlasLinkReader:
             basis["caveat"] = dict(spec["caveat"])
         if spec.get("licence"):
             basis["licence"] = spec["licence"]
+        if (spec.get("licences") or {}).get(src):  # per-source terms (EVMAP: TIES cite-only, EUSANCT CC BY)
+            basis["licence"] = spec["licences"][src]
         return Link(
             self.node_of(r["subj"]),
             self.node_of(r["obj"]),

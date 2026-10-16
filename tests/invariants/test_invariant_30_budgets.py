@@ -180,6 +180,7 @@ LIVE_CALLS = (
     "urlopen(",
 )
 BUDGETED = {  # file -> markers that must all be present (reserve before, meter/cap, settle after)
+    "src/reva/causal_candidates/fetch.py": ("reserve_ingest(", "metered(", "settle_metered("),
     "src/reva/operations/jobs.py": ("reserve_ingest(", "metered(", "settle_metered("),
     "src/reva/cli/main.py": ("reserve_ingest(", "metered(", "settle_metered(", "except BudgetExhausted"),
     "src/reva/autonomy/jobs.py": ("reserve_discovery(", "settle_discovery(", "max_requests=reservation.max_requests"),

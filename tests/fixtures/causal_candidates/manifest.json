@@ -45,6 +45,10 @@
   "event_seeds_2026-10-16.json": {
    "kind": "recorded WDQS seed snapshot (CC0)",
    "note": "full snapshot of the live query"
+  },
+  "eval_v1.1.0.json": {
+   "kind": "hand-labelled evaluation (agent CAUSCAND, 2026-10-16)",
+   "note": "labels + the stored sentence record (rendered sentence, verbatim wikitext, wikilinks, revision) of each judged candidate; CC BY-SA 4.0 sentences, attribution in each record (title + revision id)"
   }
  }
 }

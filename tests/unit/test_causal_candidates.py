@@ -291,9 +291,49 @@ def test_coordinated_arguments_share_the_modifier_status() -> None:
     # "between the [[A]] and the [[B]]": both only modify "trouble"
     assert _pairs("The [[H]] resulted from the trouble between the [[Aa]] and the [[Bb]] during the crisis.") == []
     # a participle after the subject's link is not a compound noun
-    assert _pairs("A [[Ceasefire]] brokered by mediators resulted in the [[Commission]].") == [("Ceasefire", "Commission")]
+    assert _pairs("A [[Ceasefire]] brokered by mediators resulted in the [[Commission]].") == [
+        ("Ceasefire", "Commission")
+    ]
 
 
 def test_literal_uses_without_links_on_both_sides_yield_nothing() -> None:
     cands, misses = _cands("Two cables were cut off [[Beirut]], one of which led to Alexandria.")
     assert cands == [] and misses
+
+
+# ----------------------------------------------------------------------------- hand-labelled evaluation
+
+
+def _eval() -> dict:
+    import json
+    from pathlib import Path
+
+    return json.loads((Path(__file__).resolve().parents[1] / "fixtures/causal_candidates/eval_v1.1.0.json").read_text())
+
+
+def test_hand_labelled_metrics_match_the_published_notes() -> None:
+    items = _eval()["items"]
+
+    def tally(name: str) -> tuple[int, ...]:
+        it = [x for x in items if x["set"] == name]
+        return (
+            len(it),
+            *(sum(x["labels"][m] for x in it) for m in ("direction", "cause_link", "effect_link", "correct")),
+        )
+
+    assert tally("strict_census") == (21, 21, 19, 19, 18)  # docs/dev/v3_causcand.md section 5
+    assert tally("lenient_sample50") == (50, 50, 31, 22, 15)
+
+
+def test_labelled_correct_candidates_are_still_extracted() -> None:
+    """Regression: every candidate judged correct in the strict census is still produced, same pair, same rule."""
+    for x in _eval()["items"]:
+        if x["set"] != "strict_census" or not x["labels"]["correct"]:
+            continue
+        cands, _ = X.extract([X.record_from_dict(x["record"])])
+        got = {
+            (c.connective_id, c.cause.target, c.effect.target)
+            for c in cands
+            if not (c.cause.modifier_head or c.effect.modifier_head)
+        }
+        assert (x["connective"], x["cause_target"], x["effect_target"]) in got, x["record"]["sentence"][:120]

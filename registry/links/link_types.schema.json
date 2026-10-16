@@ -114,7 +114,8 @@
                 "kg_dataset_border",
                 "kg_dataset_colonial",
                 "kg_dataset_sides",
-                "kg_dataset_peacekeeping"
+                "kg_dataset_peacekeeping",
+                "kg_dataset_hazard"
               ]
             },
             "properties": {
@@ -406,6 +407,27 @@
         "licence": {
           "type": "string",
           "maxLength": 200
+        },
+        "extra_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,23}$"
+          },
+          "description": "further atlas sources with the same datasets and indicators (EVMAP: TIES + EUSANCT); each link keeps its own source"
+        },
+        "facet_source": {
+          "type": "boolean",
+          "description": "facet each link by its atlas source (source=<name>): counts of different datasets stay separate, never summed"
+        },
+        "licences": {
+          "type": "object",
+          "description": "atlas source -> licence / terms stated on its links (basis.licence), overriding licence",
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 200
+          }
         }
       }
     }

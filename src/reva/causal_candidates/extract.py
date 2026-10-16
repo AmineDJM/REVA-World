@@ -30,7 +30,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from reva.causal_candidates import patterns as P
-from reva.causal_candidates.wikitext import Paragraph, paragraphs, sentences
+from reva.causal_candidates.wikitext import paragraphs, sentences
 
 EXTRACTOR_ID = "reva.causal_candidates.extract"
 EXTRACTOR_VERSION = "1.1.0"
@@ -57,6 +57,8 @@ MAX_LEFT_GAP = 60
 MAX_RIGHT_GAP = 50
 MAX_SENTENCE_CHARS = 1200
 MAX_PAIRS = 4
+#: "cause X to V": the effect is the verb's event, not the linked X.
+CAUSATIVE = frozenset({"en.caused", "en.cause_base"})
 
 _DATE_TARGET = re.compile(
     r"^(?:\d{1,4}(?:s)?(?:\s*(?:BC|BCE|AD|CE|av\.?\s*J\.?-C\.?))?|"
@@ -152,10 +154,6 @@ def sentence_records(
     return out
 
 
-def _para_for_tests(text: str) -> Paragraph:  # pragma: no cover - debugging helper
-    return paragraphs(text)[0]
-
-
 # ----------------------------------------------------------------------------- argument rules
 
 
@@ -234,8 +232,8 @@ def _left_args(
         return [], {"left": "no_link"}
     k = len(cands) - 1
     gap = text[cands[k].end : cs]
-    if P.PARTICIPLE[lang].match(text[cs:]) and re.search(r",\s*$", text[:cs]):
-        return [], {"left": "participial_clause"}
+    if P.PARTICIPLE[lang].match(text[cs:]) and gap.strip():
+        return [], {"left": "participial_clause"}  # "..., provoquant": the cause is the preceding clause
     if P.VP_COORD_GAP[lang].match(gap):
         return [], {"left": "coordinated_verb_phrase"}
     if P.RELATIVE[lang].match(gap):
@@ -248,6 +246,8 @@ def _left_args(
         return [], {"left": "gap_too_long"}
     elif gap.count(",") % 2 or not P.LEFT_GAP_SHAPE.match(gap):  # "..., encountering little opposition due to"
         return [], {"left": "gap_crosses_clause"}
+    elif re.match(r"^\s*,\s*(?:or|ou|also|aussi|dit|dite|known|plus\s+connu)\b", gap, re.I):
+        return [], {"left": "renamed_subject"}  # "[[X]], or more commonly the Y, triggered": the subject is Y
     while k > 0 and P.PP_GAP[lang].match(text[cands[k - 1].end : cands[k].start]):
         k -= 1
     first = k
@@ -306,7 +306,12 @@ INTRO_RE = re.compile(
 
 
 def _right_args(
-    text: str, links: Sequence[_L], ce: int, ceiling: int, lang: str, stop_at_comma: bool = False
+    text: str,
+    links: Sequence[_L],
+    ce: int,
+    ceiling: int,
+    lang: str,
+    causative: bool = False,
 ) -> tuple[list[Arg], dict[str, Any]]:
     region_end = ceiling
     m = P.CLAUSE_BREAK[lang].search(text, ce, ceiling)
@@ -321,9 +326,11 @@ def _right_args(
         return [], {"right": "gap_too_long"}
     if P.RIGHT_GAP_STOP[lang].search(gap):
         return [], {"right": "gap_crosses_clause"}
-    if lang == "en" and re.search(r"\b[a-z]{3,}ing\b", gap) and not re.search(r"\b(?:during|following)\b", gap):
+    if lang == "en" and re.search(
+        r"\b(?!(?:the|a|an|to|in|of)\b)[A-Za-z]+\s+(?!during\b|following\b)[a-z]{3,}ing\b", gap
+    ):
         return [], {"right": "gerund_clause"}  # "resulted in the British occupying [[Java]]"
-    if lang == "en" and re.match(r"^\s+to\s+(?!the\b|a\b|an\b)[a-z]+", text[first.end :]):
+    if causative and re.match(r"^[^,.;]{0,40}?\bto\s+(?!the\b|a\b|an\b)[a-z]+", text[first.end :]):
         return [], {"right": "infinitive_subject"}  # "caused [[LTCM]] to collapse": the effect is the collapse
     out = [
         Arg(
@@ -418,7 +425,7 @@ def extract_sentence(rec: SentenceRecord) -> tuple[list[RawCandidate], list[dict
         floor = conns[n - 1][1].end() if n else 0
         ceiling = conns[n + 1][1].start() if n + 1 < len(conns) else len(text)
         left, linfo = _left_args(text, links, cs, floor, lang, backward=c.direction == "cause_right")
-        right, rinfo = _right_args(text, links, ce, ceiling, lang)
+        right, rinfo = _right_args(text, links, ce, ceiling, lang, causative=c.id in CAUSATIVE)
         flags: dict[str, Any] = {**linfo, **rinfo}
         if c.direction == "cause_right" and not left and P.FRONT_OK.match(text[floor:cs]):
             eff = _fronted_effect(text, links, right[0].end, ceiling, lang) if right else []
