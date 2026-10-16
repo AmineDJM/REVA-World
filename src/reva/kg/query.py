@@ -53,6 +53,13 @@ MAX_SEARCH = 100
 #: through classes such as "human" or "country"; they are excluded from paths unless explicitly allowed.
 DEFAULT_PATH_EXCLUDED = ("P31", "P279")
 COMMUNITY_EDITED_SOURCES = frozenset({"wikidata"})
+
+
+def is_community_edited(source_key: str | None) -> bool:
+    """Wikidata and every ``wikidata.*`` sub-key (fixtures, harvest variants) is community-edited."""
+    return bool(source_key) and any(source_key == s or source_key.startswith(s + ".") for s in COMMUNITY_EDITED_SOURCES)
+
+
 PATH_NOTE = (
     "A path is a chain of sourced statements that connect two entities; it is not a causal explanation. "
     "Each hop cites its statement. Causal wording appears only where a source itself asserts a cause or "
@@ -240,7 +247,7 @@ def _provenance(r: Mapping[str, Any]) -> dict[str, Any]:
         "rank": r["rank"],
         "references": r["refs"],
         "verification": "community_edited_not_verified"
-        if r["source_key"] in COMMUNITY_EDITED_SOURCES
+        if is_community_edited(r["source_key"])
         else "source_reported_not_verified",
     }
 
@@ -356,7 +363,7 @@ def entity(conn: Connection, qid: str, *, origin: str | None = None) -> dict[str
             "raw_sha256s": list(row["raw_sha256s"]),
             "origin": row["origin"],
             "verification": "community_edited_not_verified"
-            if row["source_key"] in COMMUNITY_EDITED_SOURCES
+            if is_community_edited(row["source_key"])
             else "source_reported_not_verified",
         },
         **_degree(conn, qid),
@@ -947,6 +954,6 @@ def _finish(
     ]
     d["hubs_skipped_count"] = len(diag.hubs_skipped)
     result["search"] = d
-    if any(h["provenance"]["source_key"] in COMMUNITY_EDITED_SOURCES for p in out_paths for h in p["hops"]):
+    if any(is_community_edited(h["provenance"]["source_key"]) for p in out_paths for h in p["hops"]):
         result["community_note"] = COMMUNITY_NOTE
     return result

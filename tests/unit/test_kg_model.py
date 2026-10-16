@@ -165,3 +165,13 @@ def test_window_bounds() -> None:
         window("1970", "1960")
     with pytest.raises(ValidationProblem):
         window("1960-13", None)
+
+
+def test_wikidata_sub_keys_are_community_edited() -> None:
+    from reva.kg.query import is_community_edited
+
+    assert is_community_edited("wikidata")
+    assert is_community_edited("wikidata.links_fixture")
+    assert not is_community_edited("wikidatafake")
+    assert not is_community_edited("cow")
+    assert not is_community_edited(None)
