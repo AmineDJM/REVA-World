@@ -68,7 +68,7 @@
     "request_fingerprint": "bf0ce1efa3bc644e26912d6a4ad8e39931216edc180341bbff3394278e0db67b",
     "url": "https://api.psdata.un.org/public/data/DataCommons-UCHISTORICAL/csv",
     "file": "bf0ce1efa3bc644e.csv",
-    "sha256": "8c6b5165950cc8bb6f745cc850e4e2535317510538a72e4bb31515ad7424fabd",
+    "sha256": "e88f84489db1d3598ddbefd038a93206a516cf34e9dcc2585ef2755eee7831f8",
     "status": 200,
     "headers": {
       "content-type": "text/csv; charset=utf-8"

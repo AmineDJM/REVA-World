@@ -122,17 +122,22 @@ def derive_cshapes_colonial(
     for s in index.by_prop.get(CSHAPES_RULED_BY, ()):
         if s.object is None:
             continue
-        subj = _resolve(s.subject, s.temporal, corr, node_of, qid_iso3)
-        mapping = "during"
-        if subj[0][3] is None:
+        # the territory is named by the one country it corresponds to (any period): its link keeps the rule
+        # period (a correspondence starting at independence must not trim the colonial period)
+        if s.subject in qid_iso3:
+            subj = [(node_of(qid_iso3[s.subject]), s.temporal, (), qid_iso3[s.subject])]
+            mapping = "qid"
+        else:
             later = corr.any_iso3(s.subject)
             if later is None:
                 d.skip("territory_without_country", statement=s.statement_id)
                 subj = [(s.subject, s.temporal, (), None)]
                 mapping = "none"
             else:
+                cs = later[1].temporal.first_year
+                rs = s.temporal.first_year
+                mapping = "later_state" if cs is not None and rs is not None and cs > rs else "same_entity"
                 subj = [(node_of(later[0]), s.temporal, (later[1],), later[0])]
-                mapping = "later_state"
         for na, ta, ea, ia in subj:
             for nb, tb, eb, ib in _resolve(s.object, ta, corr, node_of, qid_iso3):
                 if na == nb:

@@ -1,0 +1,31 @@
+# V3 (agent A-CULTURE): Olympic Games medal tables 1896-2026 from English Wikipedia's {{Medals table}} template.
+# Connector: src/reva/adapters/connectors/atlas_olympics.py (source atlas.olympics_medals) -> atlas table
+# olympics.medal_tables + KG statements (source_key wikipedia.olympic_medal_tables).
+source_key: wikipedia.olympic_medal_tables
+title: Olympic Games medal tables (English Wikipedia, template {{Medals table}})
+provider_url: https://en.wikipedia.org/wiki/All-time_Olympic_Games_medal_table
+lineage_family: wikipedia_olympics
+rights:
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: "Wikipedia contributors, '<year> <Summer|Winter> Olympics medal table', English Wikipedia (revision ids per cell)"
+metadata:
+  allowed_hosts: [en.wikipedia.org]
+  api: https://en.wikipedia.org/w/api.php (action=query, GET, no key, no personal data)
+  terms_of_use: >-
+    Wikipedia text is licensed CC BY-SA 4.0 (the REST page metadata of each medal-table article states
+    "Creative Commons Attribution-Share Alike 4.0"). The counts are facts reported by the International
+    Olympic Committee; each table's caption cites the IOC medal table (olympics.com) or the Official Report.
+    Rejected alternatives: olympics.com (IOC, all rights reserved, no open data), Olympedia (no licence stated
+    -> all rights reserved), Kaggle "120 years of Olympic history" (unlicensed scrape of Olympedia/
+    sports-reference), Wikidata (no per-Games medal counts per NOC).
+  share_alike: derived atlas tables are distributed under CC BY-SA 4.0
+  editorial_status: >-
+    community-edited encyclopedia (flag community_edited_cites_ioc on every cell); retroactive IOC
+    reallocations (doping) appear as the page revision reports them
+  coverage: >-
+    55 Games: Summer 1896-2024 (30), Winter 1924-2026 (25); medal-winning NOCs (and hosts) only;
+    historical NOCs (URS, GDR, FRG, EUN, TCH, YUG, ...) kept unmapped
+  authentication: none
+  rate_limits: Wikimedia throttles anonymous API traffic per IP (HTTP 429 observed 2026-10-16); 10 s between requests
+  cadence: monthly check; tables change after each Games and after IOC reallocations

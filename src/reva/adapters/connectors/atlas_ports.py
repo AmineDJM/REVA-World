@@ -16,8 +16,11 @@ China). Every row is a derived count of WPI records (``derived: count`` with its
 Atoll) are parts of ISO ``UM`` (UMI): they stay unmapped (kept, listed) rather than being merged into one country.
 
 * ``PORTS_LISTED``: records of the country;
-* ``PORTS_LISTED|harbor_size=<L|M|S|V>``: by the WPI harbour size code (Large, Medium, Small, Very small);
-* ``PORTS_LISTED|container_facilities=Y``: records with ``loContainer`` = ``Y``.
+* ``PORTS_LISTED|harbor_size=<L|M|S|V>``: by the WPI harbour size code (Large, Medium, Small, Very small).
+
+Facility columns (e.g. ``loContainer``) are not counted: in the 2026-10-16 export 2,905 of 2,951 records say
+``U`` (unknown) for container handling, so a count would read as "no container port" where the source says
+"unknown".
 
 UNCTAD's liner shipping connectivity (LSCI/LSBCI, a country-pair shipping network) is A-TRADE's
 (``unctad.lsbci``); it is referenced, not duplicated, here.
@@ -80,7 +83,7 @@ def build(raw: ic.Fetched) -> tuple[ic.RowBuilder, dict[str, Any]]:
     from reva.atlas.tables import country_iso3
 
     rows = list(csv.DictReader(io.StringIO(raw.body.decode("utf-8-sig"))))
-    need = {"portNumber", "countryCode", "countryName", "harborSize", "loContainer"}
+    need = {"portNumber", "countryCode", "countryName", "harborSize"}
     if not rows or not need <= set(rows[0]):
         raise SourceResponseError("WPI CSV lacks expected columns", retryable=False, kind="schema_drift")
     if len(rows) < MIN_PORTS:
@@ -88,7 +91,6 @@ def build(raw: ic.Fetched) -> tuple[ic.RowBuilder, dict[str, Any]]:
                                   kind="schema_drift")  # fmt: skip
     total: dict[str, int] = defaultdict(int)
     size: dict[tuple[str, str], int] = defaultdict(int)
-    cont: dict[str, int] = defaultdict(int)
     names: dict[str, str] = {}
     no_country = 0
     for r in rows:
@@ -101,8 +103,6 @@ def build(raw: ic.Fetched) -> tuple[ic.RowBuilder, dict[str, Any]]:
         s = r["harborSize"].strip()
         if s in SIZES:
             size[(c, s)] += 1
-        if r["loContainer"].strip() == "Y":
-            cont[c] += 1
     period = ic.day_span(raw.retrieved_at.date())
     rb = ic.RowBuilder(ATLAS_SOURCE, DATASET)
     extra = {"coverage": "WPI lists ports for navigation; not a census of ports", "licence": "US Government work"}
@@ -121,8 +121,6 @@ def build(raw: ic.Fetched) -> tuple[ic.RowBuilder, dict[str, Any]]:
             emit(f"PORTS_LISTED|harbor_size={s}", size.get((c, s), 0),
                  f"count of WPI records with countryCode = the code and harborSize = {s} ({label})",
                  {"countryCode": c, "harborSize": s})  # fmt: skip
-        emit("PORTS_LISTED|container_facilities=Y", cont.get(c, 0),
-             "count of WPI records with countryCode = the code and loContainer = Y", {"countryCode": c, "loContainer": "Y"})  # fmt: skip
     report = {"ports": len(rows), "countries": len(total), "without_country": no_country,
               "unmapped": sorted(c for c in total if country_iso3(c, "nga_wpi") is None)}  # fmt: skip
     return rb, report

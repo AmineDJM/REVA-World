@@ -108,15 +108,6 @@ concepts:
   theme: economy
   source_order: ["nga.wpi.PORTS_LISTED|harbor_size=L"]
   provider_declared: true
-- id: infrastructure.ports_container.nga_wpi
-  labels: {fr: "Ports avec manutention de conteneurs (World Port Index)", en: "Ports with container handling (World Port Index)"}
-  definition: Number of NGA World Port Index records of the country with container load/offload facilities (loContainer = Y).
-  unit: ports
-  domain: infrastructure
-  subdomain: maritime
-  theme: economy
-  source_order: ["nga.wpi.PORTS_LISTED|container_facilities=Y"]
-  provider_declared: true
 - id: infrastructure.space_orbital_launch_attempts_site.gcat
   labels: {fr: "Tentatives de lancement orbital depuis le territoire (GCAT)", en: "Orbital launch attempts from the state's sites (GCAT)"}
   definition: >-

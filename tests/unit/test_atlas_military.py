@@ -20,7 +20,6 @@ from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import ValidationProblem
 
 REPO = Path(__file__).resolve().parents[2]
-QIDS = {"RUS1990": "Q15180"}
 
 
 def _fetch_all() -> dict[str, Any]:
@@ -193,7 +192,7 @@ def test_fatalities_repeats_collapsed_and_flagged(built: dict[str, Any]) -> None
 def test_annual_trailing_space_type_and_incomplete_year(built: dict[str, Any]) -> None:
     rows = _rows(built, "contrib_annual")
     assert not any(r["indicator"].endswith(" |sex=male") or "Troops |" in r["indicator"] for r in rows)
-    ury = [r for r in rows if r["provider_geo"] == "URY" and r["period_start"].year == 2017 and "Troops" in r["indicator"]]
+    ury = [r for r in rows if r["provider_geo"] == "ARM" and r["period_start"].year == 2017 and "Troops" in r["indicator"]]
     assert ury and json.loads(ury[0]["flags"]).get("personnel_type_as_published") == "Troops "
     cur = [r for r in rows if r["period_start"].year == 2026]
     assert cur and all(json.loads(r["flags"]).get("year_incomplete_at_retrieval") for r in cur)

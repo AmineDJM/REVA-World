@@ -11,9 +11,13 @@ id,Year,Contributing_Country,M49_Code,ISOCode3,Personnel_Type,Male,Female
 175,2010,Nepal,524,NPL,Individual Police,393.83,15.42
 176,2010,Nepal,524,NPL,Troops,4004.42,53.75
 177,2010,Nepal,524,NPL,Experts on Mission,61.5,0.5
+1837,2016,Armenia,51,ARM,Troops,39.42,0.0
 2146,2016,Uruguay,858,URY,Individual Police,7.0,0.0
 2147,2016,Uruguay,858,URY,Experts on Mission,21.83,1.33
 2148,2016,Uruguay,858,URY,Troops,1319.25,80.0
+2166,2017,Armenia,51,ARM,Troops ,35.33,0.0
+2167,2017,Armenia,51,ARM,Experts on Mission,1.0,0.0
+2168,2017,Armenia,51,ARM,Staff Officer,1.88,0.0
 2580,2017,Uruguay,858,URY,Staff Officer,9.38,0.0
 2581,2017,Uruguay,858,URY,Troops,1097.75,77.75
 2582,2017,Uruguay,858,URY,Individual Police,4.92,0.0
