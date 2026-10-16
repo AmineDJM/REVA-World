@@ -219,7 +219,7 @@ def test_cables_are_one_undirected_link_per_pair_with_names_and_first_service_ye
     main = next(e for e in gu.evidence if e.pid == "CABLES_SHARED|partner=USA")
     assert main.note and "Apollo (Q618973" in main.note and json.loads(main.selector or "")["wikidata_entities"]
     assert [c["label"] for c in gu.basis["source_flags"]["cables"]] == ["Apollo"]
-    assert "community" in gu.basis["caveat"]["en"] and gu.basis["licence"].startswith("CC0")
+    assert "community" in gu.basis["caveat"]["en"].lower() and gu.basis["licence"].startswith("CC0")
     (cg,) = pair(d.links, "CAN", "GBR")
     assert cg.basis["first_service_year"] == 1956  # TAT-1, P729 1956-09-25
     assert not pair(d.links, "GBR", "NLD")  # Q55 rows without the KG hop statement: no link

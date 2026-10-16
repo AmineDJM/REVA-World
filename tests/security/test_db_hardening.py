@@ -593,6 +593,20 @@ def test_runtime_roles_cannot_backdate_recorded_at(w: dict[str, Any]) -> None:
                 ),
                 {"old": old},
             )
+        with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+            c.execute(  # a future value is rejected too
+                text(
+                    "INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
+                    "VALUES ('worker:x', 'x', '{}', '{}', clock_timestamp() + interval '1 hour')"
+                )
+            )
+        with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+            c.execute(  # backdated by only a little, but before the current statement started
+                text(
+                    "INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
+                    "VALUES ('worker:x', 'x', '{}', '{}', statement_timestamp() - interval '5 seconds')"
+                )
+            )
         # positive controls: omitted (column default) and "now" are accepted; the stored value is server time
         start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         oid = copy_obs(c, w, "fx1:not-backdated")
@@ -624,6 +638,55 @@ def test_runtime_roles_cannot_backdate_recorded_at(w: dict[str, Any]) -> None:
             c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"), {"o": oid}).scalar_one()
             == old
         )
+
+
+def test_default_recorded_at_survives_a_delay_before_the_trigger(w: dict[str, Any]) -> None:
+    """(R-08 regression) The column default (clock_timestamp()) is evaluated before the BEFORE INSERT
+    triggers; under load the gap exceeded the old one-second tolerance and a legitimate insert failed with
+    "recorded_at is server-generated". A default evaluated during the statement is accepted whatever the
+    delay, and the stored value is still the server clock at trigger time; a value captured before the
+    statement is still rejected."""
+    db = w["db"]
+    suffix = uuid.uuid4().hex[:8]
+    tbl, fn = f"ops.r08_delay_{suffix}", f"ops.r08_delay_fn_{suffix}"
+    with db.owner.begin() as c:
+        c.execute(
+            text(f"CREATE TABLE {tbl} (id int PRIMARY KEY, recorded_at timestamptz NOT NULL DEFAULT clock_timestamp())")
+        )
+        c.execute(
+            text(f"""CREATE FUNCTION {fn}() RETURNS trigger LANGUAGE plpgsql AS $$
+                     BEGIN PERFORM pg_catalog.pg_sleep(1.5); RETURN NEW; END $$""")
+        )
+        # 'a000_…' sorts before 'a00_server_recorded_at', so the delay sits between default and check
+        c.execute(text(f"CREATE TRIGGER a000_delay BEFORE INSERT ON {tbl} FOR EACH ROW EXECUTE FUNCTION {fn}()"))
+        c.execute(
+            text(
+                f"CREATE TRIGGER a00_server_recorded_at BEFORE INSERT ON {tbl} "
+                "FOR EACH ROW EXECUTE FUNCTION meta.force_recorded_at()"
+            )
+        )
+        c.execute(text(f"GRANT SELECT, INSERT ON {tbl} TO reva_worker"))
+    try:
+        with tx(db.worker) as c:
+            row = c.execute(
+                text(
+                    f"INSERT INTO {tbl}(id) VALUES (1) RETURNING recorded_at, statement_timestamp(), clock_timestamp()"
+                )
+            ).one()
+            stored, stmt_start, after = row
+            # overwritten with the trigger-time server clock, i.e. after the delay
+            assert stmt_start.timestamp() + 1.4 <= stored.timestamp() <= after.timestamp()
+            # an explicit value computed by the same statement is equally accepted
+            c.execute(text(f"INSERT INTO {tbl}(id, recorded_at) VALUES (2, clock_timestamp())"))
+            # a value from an earlier statement (well before this one started) is rejected
+            earlier = c.execute(text("SELECT clock_timestamp()")).scalar_one()
+            c.execute(text("SELECT pg_sleep(1.5)"))
+            with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+                c.execute(text(f"INSERT INTO {tbl}(id, recorded_at) VALUES (3, :t)"), {"t": earlier})
+    finally:
+        with db.owner.begin() as c:
+            c.execute(text(f"DROP TABLE {tbl}"))
+            c.execute(text(f"DROP FUNCTION {fn}()"))
 
 
 def test_security_definer_code_cannot_forward_a_backdated_recorded_at(w: dict[str, Any]) -> None:

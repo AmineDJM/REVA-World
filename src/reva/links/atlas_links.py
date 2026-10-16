@@ -234,10 +234,12 @@ class AtlasLinkReader:
         prefix = spec["indicator_prefix"]
         name = prefix.split("|", 1)[0]
         active, missing = self._hops(lt)
-        sel = f"starts_with(indicator, {_sql_str(prefix)})"
-        if active or missing:  # the partner side of a hop: rows folded as |partner_code=<code>
-            codes = ", ".join(_sql_str(f"{name}|{PARTNER_CODE_DIM}={c}") for c in sorted({*active, *missing}))
-            sel = f"({sel} OR indicator IN ({codes}))"
+        # partners outside the crosswalk folded as |partner_code=<code> (A-INFRA): read too, so that they are
+        # counted as partner_unmapped (or mapped through a cited hop), never silently left out of the report
+        sel = (
+            f"(starts_with(indicator, {_sql_str(prefix)})"
+            f" OR starts_with(indicator, {_sql_str(name + '|' + PARTNER_CODE_DIM + '=')}))"
+        )
         req = ""
         for k, v in sorted((spec.get("require_dims") or {}).items()):
             pat = "\\|" + k + "=" + v + "(\\||$)"
