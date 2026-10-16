@@ -1,0 +1,210 @@
+id,Incident_Year,mission_id,Mission,Casualty_Nationality,Type_of_Fatalities,M49_Code,ISOCode3,Fatalities
+1,1948,81,UNTSO,France,Malicious Act,250.0,FRA,4
+21,1957,44,UNEF,Canada,Accident,124.0,CAN,4
+22,1957,44,UNEF,Canada,Illness,124.0,CAN,1
+23,1957,44,UNEF,Canada,Malicious Act,124.0,CAN,1
+24,1957,45,UNEF,Canada,Accident,124.0,CAN,4
+25,1957,45,UNEF,Canada,Illness,124.0,CAN,1
+26,1957,45,UNEF,Canada,Malicious Act,124.0,CAN,1
+27,1957,46,UNEF,Canada,Accident,124.0,CAN,4
+28,1957,46,UNEF,Canada,Illness,124.0,CAN,1
+29,1957,46,UNEF,Canada,Malicious Act,124.0,CAN,1
+45,1957,44,UNEF,Yugoslavia,Malicious Act,890.0,YUG,1
+46,1957,45,UNEF,Yugoslavia,Malicious Act,890.0,YUG,1
+47,1957,46,UNEF,Yugoslavia,Malicious Act,890.0,YUG,1
+51,1958,44,UNEF,Canada,Accident,124.0,CAN,8
+52,1958,45,UNEF,Canada,Accident,124.0,CAN,8
+53,1958,46,UNEF,Canada,Accident,124.0,CAN,8
+67,1959,44,UNEF,Canada,Accident,124.0,CAN,1
+68,1959,44,UNEF,Canada,Illness,124.0,CAN,1
+69,1959,44,UNEF,Canada,Malicious Act,124.0,CAN,1
+70,1959,45,UNEF,Canada,Accident,124.0,CAN,1
+71,1959,45,UNEF,Canada,Illness,124.0,CAN,1
+72,1959,45,UNEF,Canada,Malicious Act,124.0,CAN,1
+73,1959,46,UNEF,Canada,Accident,124.0,CAN,1
+74,1959,46,UNEF,Canada,Illness,124.0,CAN,1
+75,1959,46,UNEF,Canada,Malicious Act,124.0,CAN,1
+95,1960,62,ONUC,India,Illness,356.0,IND,1
+108,1960,62,ONUC,ZZ [Undetermined],Accident,,,1
+109,1960,44,UNEF,Canada,Illness,124.0,CAN,2
+110,1960,45,UNEF,Canada,Illness,124.0,CAN,2
+111,1960,46,UNEF,Canada,Illness,124.0,CAN,2
+112,1960,44,UNEF,India,Accident,356.0,IND,2
+113,1960,45,UNEF,India,Accident,356.0,IND,2
+114,1960,46,UNEF,India,Accident,356.0,IND,2
+121,1960,44,UNEF,Yugoslavia,Accident,890.0,YUG,2
+122,1960,45,UNEF,Yugoslavia,Accident,890.0,YUG,2
+123,1960,46,UNEF,Yugoslavia,Accident,890.0,YUG,2
+152,1961,44,UNEF,Canada,Accident,124.0,CAN,2
+153,1961,44,UNEF,Canada,Illness,124.0,CAN,2
+154,1961,45,UNEF,Canada,Accident,124.0,CAN,2
+155,1961,45,UNEF,Canada,Illness,124.0,CAN,2
+156,1961,46,UNEF,Canada,Accident,124.0,CAN,2
+157,1961,46,UNEF,Canada,Illness,124.0,CAN,2
+167,1961,44,UNEF,Yugoslavia,Other,890.0,YUG,1
+168,1961,45,UNEF,Yugoslavia,Other,890.0,YUG,1
+169,1961,46,UNEF,Yugoslavia,Other,890.0,YUG,1
+170,1961,44,UNEF,ZZ [Undetermined],Accident,,,1
+171,1961,45,UNEF,ZZ [Undetermined],Accident,,,1
+172,1961,46,UNEF,ZZ [Undetermined],Accident,,,1
+198,1962,44,UNEF,Canada,Illness,124.0,CAN,1
+199,1962,45,UNEF,Canada,Illness,124.0,CAN,1
+200,1962,46,UNEF,Canada,Illness,124.0,CAN,1
+225,1963,62,ONUC,ZZ [Undetermined],Accident,,,1
+226,1963,44,UNEF,Canada,Accident,124.0,CAN,2
+227,1963,44,UNEF,Canada,Illness,124.0,CAN,1
+228,1963,45,UNEF,Canada,Accident,124.0,CAN,2
+229,1963,45,UNEF,Canada,Illness,124.0,CAN,1
+230,1963,46,UNEF,Canada,Accident,124.0,CAN,2
+231,1963,46,UNEF,Canada,Illness,124.0,CAN,1
+241,1964,44,UNEF,Canada,Accident,124.0,CAN,1
+242,1964,44,UNEF,Canada,Malicious Act,124.0,CAN,2
+243,1964,45,UNEF,Canada,Accident,124.0,CAN,1
+244,1964,45,UNEF,Canada,Malicious Act,124.0,CAN,2
+245,1964,46,UNEF,Canada,Accident,124.0,CAN,1
+246,1964,46,UNEF,Canada,Malicious Act,124.0,CAN,2
+274,1965,44,UNEF,Yugoslavia,Accident,890.0,YUG,2
+275,1965,45,UNEF,Yugoslavia,Accident,890.0,YUG,2
+276,1965,46,UNEF,Yugoslavia,Accident,890.0,YUG,2
+288,1966,44,UNEF,Canada,Accident,124.0,CAN,5
+289,1966,44,UNEF,Canada,Illness,124.0,CAN,1
+290,1966,45,UNEF,Canada,Accident,124.0,CAN,5
+291,1966,45,UNEF,Canada,Illness,124.0,CAN,1
+292,1966,46,UNEF,Canada,Accident,124.0,CAN,5
+293,1966,46,UNEF,Canada,Illness,124.0,CAN,1
+294,1966,44,UNEF,Yugoslavia,Accident,890.0,YUG,1
+295,1966,45,UNEF,Yugoslavia,Accident,890.0,YUG,1
+296,1966,46,UNEF,Yugoslavia,Accident,890.0,YUG,1
+349,1973,44,UNEF,Canada,Illness,124.0,CAN,1
+350,1973,45,UNEF,Canada,Illness,124.0,CAN,1
+351,1973,46,UNEF,Canada,Illness,124.0,CAN,1
+360,1973,43,UNFICYP,ZZ [Undetermined],Accident,,,1
+365,1974,44,UNEF,Canada,Accident,124.0,CAN,3
+366,1974,44,UNEF,Canada,Malicious Act,124.0,CAN,9
+367,1974,45,UNEF,Canada,Accident,124.0,CAN,3
+368,1974,45,UNEF,Canada,Malicious Act,124.0,CAN,9
+369,1974,46,UNEF,Canada,Accident,124.0,CAN,3
+370,1974,46,UNEF,Canada,Malicious Act,124.0,CAN,9
+400,1975,44,UNEF,Canada,Accident,124.0,CAN,1
+401,1975,45,UNEF,Canada,Accident,124.0,CAN,1
+402,1975,46,UNEF,Canada,Accident,124.0,CAN,1
+451,1977,44,UNEF,Canada,Accident,124.0,CAN,1
+452,1977,44,UNEF,Canada,Other,124.0,CAN,1
+453,1977,45,UNEF,Canada,Accident,124.0,CAN,1
+454,1977,45,UNEF,Canada,Other,124.0,CAN,1
+455,1977,46,UNEF,Canada,Accident,124.0,CAN,1
+456,1977,46,UNEF,Canada,Other,124.0,CAN,1
+498,1979,44,UNEF,Canada,Accident,124.0,CAN,1
+499,1979,45,UNEF,Canada,Accident,124.0,CAN,1
+500,1979,46,UNEF,Canada,Accident,124.0,CAN,1
+631,1986,81,UNTSO,Russian Federation,Accident,643.0,RUS,1
+665,1989,26,UNMOGIP,ZZ [Undetermined],Accident,,,2
+717,1992,50,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+718,1992,51,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+719,1992,52,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+720,1992,53,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+741,1992,11,UNPROFOR,Russian Federation,Illness,643.0,RUS,1
+742,1992,11,UNPROFOR,Ukraine,Malicious Act,804.0,UKR,3
+867,1993,14,UNOSOM,ZZ [Undetermined],Accident,,,2
+868,1993,15,UNOSOM,ZZ [Undetermined],Accident,,,2
+869,1993,16,UNOSOM,ZZ [Undetermined],Accident,,,2
+888,1993,11,UNPROFOR,Russian Federation,Accident,643.0,RUS,1
+889,1993,11,UNPROFOR,Russian Federation,Malicious Act,643.0,RUS,1
+894,1993,11,UNPROFOR,Ukraine,Malicious Act,804.0,UKR,2
+932,1993,4,UNTAC,ZZ [Undetermined],Illness,,,1
+964,1994,37,UNIKOM,ZZ [Undetermined],Accident,,,1
+1044,1994,11,UNPROFOR,Russian Federation,Accident,643.0,RUS,4
+1045,1994,11,UNPROFOR,Russian Federation,Malicious Act,643.0,RUS,4
+1050,1994,11,UNPROFOR,Ukraine,Accident,804.0,UKR,1
+1051,1994,11,UNPROFOR,Ukraine,Malicious Act,804.0,UKR,3
+1052,1994,11,UNPROFOR,Ukraine,Other,804.0,UKR,2
+1056,1994,11,UNPROFOR,ZZ [Undetermined],Accident,,,1
+1089,1995,50,UNAVEM,Russian Federation,Illness,643.0,RUS,2
+1090,1995,51,UNAVEM,Russian Federation,Illness,643.0,RUS,2
+1091,1995,52,UNAVEM,Russian Federation,Illness,643.0,RUS,2
+1092,1995,53,UNAVEM,Russian Federation,Illness,643.0,RUS,2
+1106,1995,48,UNCRO,Russian Federation,Accident,643.0,RUS,2
+1107,1995,48,UNCRO,Ukraine,Malicious Act,804.0,UKR,1
+1132,1995,155,UNPF,ZZ [Undetermined],Accident,,,2
+1133,1995,155,UNPF,ZZ [Undetermined],Malicious Act,,,1
+1152,1995,11,UNPROFOR,Russian Federation,Illness,643.0,RUS,1
+1156,1995,11,UNPROFOR,Ukraine,Malicious Act,804.0,UKR,1
+1157,1995,11,UNPROFOR,Ukraine,Other,804.0,UKR,1
+1158,1995,11,UNPROFOR,Ukraine,Other,804.0,UKR,1
+1192,1996,50,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+1193,1996,51,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+1194,1996,52,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+1195,1996,53,UNAVEM,Russian Federation,Accident,643.0,RUS,1
+1196,1996,50,UNAVEM,Ukraine,Accident,804.0,UKR,1
+1197,1996,51,UNAVEM,Ukraine,Accident,804.0,UKR,1
+1198,1996,52,UNAVEM,Ukraine,Accident,804.0,UKR,1
+1199,1996,53,UNAVEM,Ukraine,Accident,804.0,UKR,1
+1249,1996,155,UNPF,Russian Federation,Malicious Act,643.0,RUS,1
+1250,1996,11,UNPROFOR,Russian Federation,Other,643.0,RUS,1
+1252,1996,3,UNTAES,Russian Federation,Accident,643.0,RUS,2
+1253,1996,3,UNTAES,Russian Federation,Malicious Act,643.0,RUS,1
+1259,1997,66,MONUA,Russian Federation,Illness,643.0,RUS,1
+1306,1997,3,UNTAES,Russian Federation,Accident,643.0,RUS,3
+1307,1997,3,UNTAES,Russian Federation,Illness,643.0,RUS,1
+1325,1998,66,MONUA,Russian Federation,Malicious Act,643.0,RUS,2
+1326,1998,66,MONUA,Russian Federation,Other,643.0,RUS,1
+1394,2000,31,UNMIK,Yugoslavia,Accident,890.0,YUG,1
+1395,2000,31,UNMIK,Yugoslavia,Malicious Act,890.0,YUG,1
+1396,2000,31,UNMIK,Yugoslavia,Other,890.0,YUG,1
+1428,2001,55,UNAMSIL,Russian Federation,Illness,643.0,RUS,1
+1431,2001,55,UNAMSIL,Ukraine,Accident,804.0,UKR,4
+1476,2002,55,UNAMSIL,Ukraine,Accident,804.0,UKR,1
+1494,2002,31,UNMIK,Yugoslavia,Illness,890.0,YUG,3
+1495,2002,31,UNMIK,Yugoslavia,Malicious Act,890.0,YUG,1
+1517,2003,65,MONUC,Russian Federation,Malicious Act,643.0,RUS,1
+1533,2003,55,UNAMSIL,Russian Federation,Illness,643.0,RUS,1
+1548,2003,31,UNMIK,Serbia and Montenegro,Illness,891.0,SCG,1
+1549,2003,31,UNMIK,Serbia and Montenegro,Other,891.0,SCG,1
+1605,2004,55,UNAMSIL,Ukraine,Accident,804.0,UKR,1
+1614,2004,31,UNMIK,Serbia and Montenegro,Accident,891.0,SCG,1
+1615,2004,31,UNMIK,Serbia and Montenegro,Illness,891.0,SCG,1
+1680,2005,55,UNAMSIL,Russian Federation,Accident,643.0,RUS,1
+1691,2005,31,UNMIK,Serbia and Montenegro,Accident,891.0,SCG,1
+1692,2005,31,UNMIK,Serbia and Montenegro,Illness,891.0,SCG,1
+1709,2005,30,UNMIL,Ukraine,Accident,804.0,UKR,1
+1727,2005,20,UNOMIG,Russian Federation,Malicious Act,643.0,RUS,1
+1761,2006,31,UNMIK,Serbia,Illness,688.0,SRB,1
+1769,2006,30,UNMIL,Russian Federation,Illness,643.0,RUS,1
+1831,2007,31,UNMIK,Serbia,Illness,688.0,SRB,2
+1858,2007,81,UNTSO,Occupied Palestinian Territory,Accident,,,1
+1912,2008,31,UNMIK,Serbia,Accident,688.0,SRB,1
+1913,2008,31,UNMIK,Serbia,Other,688.0,SRB,1
+1914,2008,31,UNMIK,Ukraine,Malicious Act,804.0,UKR,1
+1958,2009,72,MINURCAT,Russian Federation,Illness,643.0,RUS,1
+2012,2009,30,UNMIL,Ukraine,Accident,804.0,UKR,1
+2033,2009,81,UNTSO,Occupied Palestinian Territory,Illness,,,1
+2086,2010,57,UNAMID,Russian Federation,Accident,643.0,RUS,1
+2184,2011,30,UNMIL,Ukraine,Accident,804.0,UKR,1
+2187,2011,29,UNMIS,Russian Federation,Illness,643.0,RUS,1
+2263,2012,31,UNMIK,Serbia,Accident,688.0,SRB,1
+2267,2012,30,UNMIL,Ukraine,Accident,804.0,UKR,1
+2271,2012,80,UNMISS,Russian Federation,Accident,643.0,RUS,4
+2293,2013,68,MINUSTAH,Russian Federation,Illness,643.0,RUS,1
+2309,2013,113,UNAMI,Russian Federation,Illness,643.0,RUS,1
+2386,2014,115,UNAMA,Russian Federation,Malicious Act,643.0,RUS,1
+2427,2014,80,UNMISS,Russian Federation,Accident,643.0,RUS,3
+2463,2015,69,MINUSMA,Serbia,Illness,688.0,SRB,1
+2522,2015,23,UNOCI,Ukraine,Illness,804.0,UKR,1
+2563,2016,64,MONUSCO,Ukraine,Illness,804.0,UKR,2
+2588,2016,30,UNMIL,Ukraine,Accident,804.0,UKR,1
+2594,2016,23,UNOCI,,Malicious Act,,,1
+2666,2017,57,UNAMID,Serbia,Illness,688.0,SRB,1
+2672,2017,47,UNDOF,Occupied Palestinian Territory,Illness,,,1
+2779,2019,64,MONUSCO,Ukraine,Illness,804.0,UKR,1
+2852,2020,64,MONUSCO,Ukraine,Illness,804.0,UKR,2
+2904,2021,70,MINUSCA,Serbia,Illness,688.0,SRB,1
+2938,2021,64,MONUSCO,Ukraine,To Be Determined,804.0,UKR,1
+2946,2021,113,UNAMI,Occupied Palestinian Territory,Illness,,,1
+3009,2022,64,MONUSCO,Russian Federation,Malicious Act,643.0,RUS,1
+3011,2022,64,MONUSCO,Serbia,Malicious Act,688.0,SRB,1
+3027,2022,31,UNMIK,Serbia,Illness,688.0,SRB,1
+3097,2024,70,MINUSCA,France,Illness,250.0,FRA,1
+3105,2024,64,MONUSCO,India,Illness,356.0,IND,1
+3115,2024,47,UNDOF,India,Illness,356.0,IND,1
+3118,2024,39,UNIFIL,France,Accident,250.0,FRA,1
+3134,2024,80,UNMISS,Serbia,Other,688.0,SRB,1

@@ -155,7 +155,7 @@ class CountryLayer:
 
     @property
     def piece_count(self) -> int:
-        return int(len(self._pieces))
+        return len(self._pieces)
 
     def by_key(self) -> dict[str, Territory]:
         return {t.key: t for t in self.territories}

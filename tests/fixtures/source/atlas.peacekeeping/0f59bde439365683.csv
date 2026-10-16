@@ -1,0 +1,34 @@
+id,missions,initial_symbol,latest_symbol,no_of_mandate_tasks,mission_name,location,lead_entity,duration,mandate_expiry,chapter_vii,location_city,mission_latitude,mission_longitude,open_closed,last_update
+1,BINUH,S/RES/2476 (2019),S/RES/2814 (2026),8.0,United Nations Integrated Office in Haiti,Haiti,Special Political Mission,1 year,2027-01-31,No,Port-au-Prince,18.575394,-72.294708,Open ,2026-10-16
+2,MINURSO,S/RES/690 (1991),S/RES/2797 (2025),6.0,United Nations Mission for the Referendum in Western Sahara,Western Sahara,Peacekeeping Mission,1 year,2026-10-31,No,Laayoune,27.1536,-13.2033,Open ,2026-10-16
+3,MINUSCA,S/RES/2149 (2014),S/RES/2800 (2025),20.0,United Nations Multidimensional Integrated Stabilization Mission in the Central African Republic,CAR,Peacekeeping Mission,1 year,2026-11-15,Yes,Bangui,4.36669999999999,18.5833,Open ,2026-10-16
+4,MONUSCO,S/RES/1925 (2010),S/RES/2808 (2025),19.0,United Nations Organization Stabilization Mission in the Democratic Republic of the Congo,DRC,Peacekeeping Mission,1 year,2026-12-20,Yes,Kinshasa,-4.325,15.3222,Open ,2026-10-16
+5,UN Verification Mission in Colombia,S/RES/2366 (2017),S/RES/2798 (2025),5.0,UN Verification Mission in Colombia,Colombia,Special Political Mission,1 year,2026-10-31,No,Bogotá,4.711,-74.0721,Open ,2026-10-16
+6,UNAMA,S/RES/1401 (2002),S/RES/2822 (2026),12.0,United Nations Assistance Mission in Afghanistan,Afghanistan,Special Political Mission,1 year,2027-06-17,No,Kabul,34.5553,69.2075,Open ,2026-10-16
+7,UNAMI,S/RES/1500 (2003),S/RES/2760 (2024),12.0,United Nations Assistance Mission for Iraq,Iraq,Special Political Mission,1 year,2025-12-31,No,Baghdad,33.3128,44.3615,Closed ,2026-10-16
+8,UNDOF,S/RES/350 (1974),S/RES/2824 (2026),3.0,United Nations Disengagement Observer Force,Golan Heights,Peacekeeping Mission,6 months,2026-12-31,No,Camp Faouar,33.2366999999999,35.9211,Open ,2026-10-16
+9,UNFICYP,S/RES/186 (1964),S/RES/2815 (2026),6.0,United Nations Peacekeeping Force in Cyprus,Cyprus,Peacekeeping Mission,1 year,2027-01-31,No,Nicosia,35.1666999999999,33.3667,Open ,2026-10-16
+10,UNIFIL,S/RES/425 (1978),S/RES/2790 (2025),11.0,United Nations Interim Force in Lebanon,Lebanon,Peacekeeping Mission,1 year,2026-12-31,No,An Naqurah,33.1199999999999,35.1342,Open ,2026-10-16
+11,UNISFA,S/RES/1990 (2011),S/RES/2802 (2025),11.0,United Nations Organization Interim Security Force for Abyei,Abyei,Peacekeeping Mission,1 year,2026-11-15,Yes,Abyei,9.59999999999999,28.4332999999999,Open ,2026-10-16
+12,UNMHA,S/RES/2452 (2019),S/RES/2813 (2026),4.0,United Nations Mission to support the Hudaydah Agreement,Yemen,Special Political Mission,2 months,2026-03-31,Yes,Al Hudaydah,14.7909,42.9709,Closed,2026-10-16
+13,UNMIK,S/RES/1244 (1999),S/RES/1244 (1999),7.0,United Nations Interim Administration Mission in Kosovo,Kosovo,Peacekeeping Mission,,,Yes,Pristina,42.6666999999999,21.1666999999999,Open ,2026-10-16
+14,UNMISS,S/RES/1996 (2011),S/RES/2820 (2026),19.0,United Nations Mission in the Republic of South Sudan,South Sudan,Peacekeeping Mission,12 months,2027-04-30,Yes,Juba,4.84999999999999,31.5713,Open ,2026-10-16
+15,UNMOGIP,S/RES/47 (1948),S/RES/307 (1971),1.0,United Nations Military Observer Group in India and Pakistan,India / Pakistan,Peacekeeping Mission,,,No,Islamabad,33.7167,73.0666999999999,Open ,2026-10-16
+16,UNOCA,S/2009/697,S/2024/649,8.0,United Nations Regional Office for Central Africa,Central Africa,Special Political Mission,3 years,2027-08-31,No,Libreville,0.4162,9.4673,Open ,2026-10-16
+17,UNOWAS,S/2016/89,S/2026/83,9.0,United Nations Office for West Africa and the Sahel,West Africa,Special Political Mission,3 year,2029-01-31,No,Dakar,14.7167,-17.4677,Open ,2026-10-16
+18,UNRCCA,S/2007/279,S/2008/286,2.0,United Nations Regional Centre for Preventive Diplomacy for Central Asia,Central Asia,Special Political Mission,,,No,Ashgabat,37.9601,58.3261,Open ,2026-10-16
+19,UNSCOL,S/2007/86,S/2008/517,2.0,Office of the United Nations Special Coordinator for Lebanon,Lebanon,Special Political Mission,,,No,Beirut,33.8938,35.5018,Open ,2026-10-16
+20,UNSMIL,S/RES/2009 (2011),S/RES/2796 (2025),14.0,United Nations Support Mission in Libya,Libya,Special Political Mission,1 year,2026-10-31,No,Tripoli,32.8872,13.1913,Open ,2026-10-16
+21,UNTSO,S/RES/50 (1948),S/RES/2571 (2022),2.0,United Nations Truce Supervision Organization,Middle East,Peacekeeping Mission,,,No,Jerusalem,31.7833,35.2167,Open ,2026-10-16
+22,UNTMIS,S/RES/2753 (2024),S/RES/2809 (2025),8.0,The United Nations Transitional Assistance Mission in Somalia,Somalia,Special Political Mission,1 year,2026-10-31,No,Mogadishu,2.046934,45.318161,Open ,2026-10-16
+23,MINUJUSTH,S/RES/2350 (2017),S/RES/2466 (2019),8.0,United Nations Mission for Justice Support in Haiti,Haiti,Peacekeeping Mission,,2019-10-15,Yes,Port-au-Prince,18.575394,-72.294708,Closed,2026-10-16
+24,MINUSMA,S/RES/2100 (2013),S/RES/2690 (2023),21.0,United Nations Multidimensional Integrated Stabilization Mission in Mali,Mali,Peacekeeping Mission,,2023-12-31,Yes,Bamako,12.6392,-8.0029,Closed,2026-10-16
+25,UNAMID,S/RES/1769 (2007),S/RES/2559 (2020),16.0,African Union-United Nations Hybrid Operation in Darfur,Sudan / Darfur,Peacekeeping Mission/AU,,2022-12-31,Yes,Al Fashir,13.6305999999999,25.3549,Closed,2026-10-16
+26,UNIOGBIS,S/RES/1876 (2009),S/RES/2512 (2020),10.0,United Nations Integrated Peace-building Office in Guinea-Bissau,Guinea-Bissau,Special Political Mission,,2020-12-31,No,Bissau,11.8632,-15.5843,Closed,2026-10-16
+27,UNSOM,S/RES/2102 (2013),S/RES/2705 (2023),11.0,United Nations Assistance Mission in Somalia,Somalia,Special Political Mission,,2024-10-31,No,Mogadishu,2.0469,45.3182,Closed,2026-10-16
+28,UNMIL,S/RES/1509 (2003),S/RES/2333 (2016) OR S/PRST/2017/11,, ,Liberia,,,,,,,,,2026-10-16
+29,UNOCI,S/RES/1528 (2004),S/RES/2284 (2016),,,Cote d'Ivore,,,,,,,,,2026-10-16
+30,,,,,,,,,,,,,,,2026-10-16
+31,"FR NOTE: New additions in yellow. For closed missions, the latest doc symbol is the last mandate renewal and the component no is the latest no of components recorded in our data (before sunsetting the mission).",,,,,,,,,,,,,,2026-10-16
+32,,,,,,,,,,,,,,,2026-10-16
+33,,,,,,,,,,,,,,,2026-10-16

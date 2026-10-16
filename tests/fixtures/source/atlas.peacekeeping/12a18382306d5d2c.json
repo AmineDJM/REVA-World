@@ -1,0 +1,28 @@
+{
+ "help": "https://data.humdata.org/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "name": "datacommons-uchistorical",
+  "title": "Peace and Security Pillar: Annual Uniformed Personnel Contribution Statistics",
+  "license_id": "cc-by-igo",
+  "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+  "dataset_date": "[2010-01-01T00:00:00 TO *]",
+  "last_modified": "2026-10-16T09:55:46.859902",
+  "dataset_source": "Peace and Security Pillar",
+  "isopen": false,
+  "organization": {
+   "name": "unpeacesecurity",
+   "title": "United Nations Peace and Security Data Hub"
+  },
+  "notes": "This dataset provides historical annual statistics on uniformed personnel contributed by countries to United Nations peacekeeping operations.  \n  \nThe data is organized by contributing country, personnel category, calendar year and sex. Separate values are provided for male and female personnel.  \n  \nThe personnel categories represented in the dataset include troops, staff officers, experts on mission, individual police and formed police units.  \n  \nThe annual values are derived from monthly uniformed personnel deployment records. Decimal values therefore represent annual average personnel lev",
+  "resources": [
+   {
+    "name": "datacommons-uchistorical.csv",
+    "format": "CSV",
+    "last_modified": "2026-10-16T09:55:46.859902",
+    "size": 324517
+   }
+  ]
+ }
+}

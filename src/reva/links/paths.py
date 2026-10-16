@@ -515,6 +515,8 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
             f"neighbourhood truncated at {len(graph.truncated_nodes)} node(s) (statement rows beyond the "
             "per-node / per-hop read caps were not loaded)"
         )
+    if graph.skipped.get("stored_links_cap_reached"):
+        res.cut("stored links (kg.link_row) around the reached nodes capped: some derived links were not loaded")
     for n in (q.source, q.target):
         if n not in graph:
             # known entity (labelled) without any traversable statement vs an id the graph has never seen
@@ -852,5 +854,26 @@ def graph_from_db(
         except (LinkError, NoEvidence):  # pragma: no cover - a malformed row never blocks the path query
             g.skipped["derivation_error"] += 1
     g.truncated_nodes = t1 | t2
+    if with_derived:
+        _add_stored_links(conn, g, reached, origin)
     g.add_labels(nb.labels(set(g.adj) | reached))
     return g
+
+
+#: stored links read around the reached nodes of one path query (SEC-1 bound)
+MAX_STORED_LINKS_PER_QUERY = 20_000
+
+
+def _add_stored_links(conn: Any, g: PathGraph, nodes: set[str], origin: str | None) -> None:
+    """Links of the latest materialisation (``kg.link_row``: atlas flows, vote agreement, CShapes/UCDP kinds...)
+    incident to the reached nodes; a materialisation built from another KG origin is not mixed in."""
+    from reva.links.store import latest_materialisation, rows_touching
+
+    m = latest_materialisation(conn)
+    if m is None or (origin is not None and m.get("kg_origin") not in (None, origin)):
+        return
+    links, cut = rows_touching(conn, m["id"], nodes, cap=MAX_STORED_LINKS_PER_QUERY)
+    g.add_links(links)
+    g.skipped["stored_links"] += len(links)
+    if cut:
+        g.skipped["stored_links_cap_reached"] += 1  # reported by find_paths as a truncation

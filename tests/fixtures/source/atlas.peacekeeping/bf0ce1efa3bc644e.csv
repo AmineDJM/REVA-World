@@ -1,0 +1,48 @@
+id,Year,Contributing_Country,M49_Code,ISOCode3,Personnel_Type,Male,Female
+90,2010,France,250,FRA,Formed Police Units,101.9,0.6
+91,2010,France,250,FRA,Experts on Mission,20.08,0.67
+92,2010,France,250,FRA,Individual Police,87.83,5.42
+93,2010,France,250,FRA,Troops,1414.83,85.83
+116,2010,India,356,IND,Individual Police,81.33,5.83
+117,2010,India,356,IND,Experts on Mission,79.58,1.67
+118,2010,India,356,IND,Formed Police Units,634.25,108.67
+119,2010,India,356,IND,Troops,7869.33,24.17
+174,2010,Nepal,524,NPL,Formed Police Units,488.33,26.67
+175,2010,Nepal,524,NPL,Individual Police,393.83,15.42
+176,2010,Nepal,524,NPL,Troops,4004.42,53.75
+177,2010,Nepal,524,NPL,Experts on Mission,61.5,0.5
+2146,2016,Uruguay,858,URY,Individual Police,7.0,0.0
+2147,2016,Uruguay,858,URY,Experts on Mission,21.83,1.33
+2148,2016,Uruguay,858,URY,Troops,1319.25,80.0
+2580,2017,Uruguay,858,URY,Staff Officer,9.38,0.0
+2581,2017,Uruguay,858,URY,Troops,1097.75,77.75
+2582,2017,Uruguay,858,URY,Individual Police,4.92,0.0
+2583,2017,Uruguay,858,URY,Experts on Mission,27.92,1.58
+5432,2025,France,250,FRA,Experts on Mission,2.0,0.25
+5433,2025,France,250,FRA,Troops,594.75,53.08
+5434,2025,France,250,FRA,Individual Police,3.25,0.0
+5435,2025,France,250,FRA,Staff Officer,18.75,1.08
+5462,2025,India,356,IND,Troops,4777.67,97.08
+5463,2025,India,356,IND,Formed Police Units,135.83,23.08
+5464,2025,India,356,IND,Experts on Mission,31.58,13.17
+5465,2025,India,356,IND,Individual Police,13.92,6.83
+5466,2025,India,356,IND,Staff Officer,105.83,23.42
+5531,2025,Nepal,524,NPL,Troops,4952.17,515.58
+5532,2025,Nepal,524,NPL,Experts on Mission,28.08,10.58
+5533,2025,Nepal,524,NPL,Formed Police Units,142.5,35.83
+5534,2025,Nepal,524,NPL,Staff Officer,98.25,13.5
+5535,2025,Nepal,524,NPL,Individual Police,29.75,11.08
+5784,2026,France,250,FRA,Troops,563.71,44.29
+5785,2026,France,250,FRA,Staff Officer,16.0,1.0
+5786,2026,France,250,FRA,Experts on Mission,0.71,0.43
+5787,2026,France,250,FRA,Individual Police,3.29,0.0
+5812,2026,India,356,IND,Individual Police,12.0,5.57
+5813,2026,India,356,IND,Formed Police Units,134.29,24.0
+5814,2026,India,356,IND,Experts on Mission,21.0,8.43
+5815,2026,India,356,IND,Staff Officer,75.71,16.29
+5816,2026,India,356,IND,Troops,3867.0,100.71
+5881,2026,Nepal,524,NPL,Experts on Mission,20.57,4.86
+5882,2026,Nepal,524,NPL,Staff Officer,71.29,6.71
+5883,2026,Nepal,524,NPL,Troops,3734.0,312.71
+5884,2026,Nepal,524,NPL,Formed Police Units,125.0,35.0
+5885,2026,Nepal,524,NPL,Individual Police,28.14,7.71

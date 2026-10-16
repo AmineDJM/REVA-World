@@ -1,0 +1,28 @@
+{
+ "help": "https://data.humdata.org/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "name": "peacekeeping-uniformed-contributions-by-gender",
+  "title": "Peace and Security Pillar: Historical Uniformed Personnel Contribution",
+  "license_id": "cc-by-igo",
+  "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+  "dataset_date": "[2010-01-31T00:00:00 TO 2026-07-31T23:59:59]",
+  "last_modified": "2026-10-01T11:29:13.705939",
+  "dataset_source": "Peace and Security Pillar",
+  "isopen": false,
+  "organization": {
+   "name": "unpeacesecurity",
+   "title": "United Nations Peace and Security Data Hub"
+  },
+  "notes": "Summary of total contributions of uniformed personnel by Member States to UN Missions broken down by gender. UN police and military personnel are contributed to serve under the blue flag from over 100 countries to carry out the mandates defined by the Security Council.  \n  \nData is typically updated approximately six weeks after the conclusion of each month.",
+  "resources": [
+   {
+    "name": "dpo-uchistorical.csv",
+    "format": "CSV",
+    "last_modified": "2026-10-01T11:29:13.705939",
+    "size": 13465209
+   }
+  ]
+ }
+}

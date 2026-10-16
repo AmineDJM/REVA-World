@@ -1,0 +1,28 @@
+{
+ "help": "https://data.humdata.org/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "name": "peacekeeping-core-dataset-active-missions",
+  "title": "Peace and Security Pillar: Peacekeeping Operations",
+  "license_id": "cc-by-igo",
+  "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+  "dataset_date": "[2026-10-12T00:00:00 TO 2026-10-12T23:59:59]",
+  "last_modified": "2026-10-13T09:20:11.282096",
+  "dataset_source": "Peace and Security Pillar",
+  "isopen": false,
+  "organization": {
+   "name": "unpeacesecurity",
+   "title": "United Nations Peace and Security Data Hub"
+  },
+  "notes": "A list of all past and present United Nations Peacekeeping Operations with coordinates of their headquarters and mandate dates.",
+  "resources": [
+   {
+    "name": "dppadposs-pko.csv",
+    "format": "CSV",
+    "last_modified": "2026-10-13T09:20:11.282096",
+    "size": 9490
+   }
+  ]
+ }
+}

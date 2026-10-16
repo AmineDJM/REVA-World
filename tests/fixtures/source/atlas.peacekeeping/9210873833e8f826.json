@@ -1,0 +1,28 @@
+{
+ "help": "https://data.humdata.org/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "name": "datacommons-fatalities",
+  "title": "Peace and Security Pillar: Annual Mission Fatalities Statistics",
+  "license_id": "cc-by-igo",
+  "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+  "dataset_date": "[1948-01-01T00:00:00 TO *]",
+  "last_modified": "2026-10-01T11:30:11.021365",
+  "dataset_source": "Peace and Security Pillar",
+  "isopen": false,
+  "organization": {
+   "name": "unpeacesecurity",
+   "title": "United Nations Peace and Security Data Hub"
+  },
+  "notes": "This dataset provides aggregated annual counts of fatalities among personnel associated with United Nations missions. Fatality counts are grouped by incident year, United Nations mission, casualty nationality and type of fatality.  \n  \nCountry identifiers, including United Nations M49 and ISO alpha-3 codes refer to the nationality of the casualties, not to the geographic location where the incident occurred.  \n  \nThe dataset covers annual fatalities recorded from 1948 onward and includes categories such as malicious acts, accidents, illnesses, others. To see the comprehensive mission fatalitie",
+  "resources": [
+   {
+    "name": "datacommons-fatalities.csv",
+    "format": "CSV",
+    "last_modified": "2026-10-01T11:30:11.021365",
+    "size": 162369
+   }
+  ]
+ }
+}

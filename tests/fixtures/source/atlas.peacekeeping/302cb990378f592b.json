@@ -1,0 +1,28 @@
+{
+ "help": "https://data.humdata.org/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "name": "dppa-fieldmissions-missions",
+  "title": "Peace and Security Pillar: Field Missions Dashboard (Mission Information)",
+  "license_id": "cc-by-igo",
+  "license_title": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+  "dataset_date": "[2019-10-15T00:00:00 TO 2029-01-31T23:59:59]",
+  "last_modified": "2026-10-16T09:54:58.277536",
+  "dataset_source": "Peace and Security Pillar",
+  "isopen": false,
+  "organization": {
+   "name": "unpeacesecurity",
+   "title": "United Nations Peace and Security Data Hub"
+  },
+  "notes": "The Field Missions Dashboard is produced by the Security Council Affairs Division as an information resource for the preparation of the Repertoire of the Practice of the Security Council. The Dashboard categorizes the mandates of all United Nations peacekeeping operations and special political missions since 2018 into 21 mandate components on the basis of provisions of relevant Security Council decisions.",
+  "resources": [
+   {
+    "name": "dppa-fieldmissions-missions.csv",
+    "format": "CSV",
+    "last_modified": "2026-10-16T09:54:58.277536",
+    "size": 6176
+   }
+  ]
+ }
+}

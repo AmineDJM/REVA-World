@@ -1,0 +1,158 @@
+[
+  {
+    "request_fingerprint": "c0c036207c0443f4fb3f957a5ca1e82fa0df40c5fbd6071d0879ab4fad1fb7de",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=peacekeeping-uniformed-contributions-by-gender",
+    "file": "c0c036207c0443f4.json",
+    "sha256": "0bba633462a91789367c6876f0692bb2cef85e99c48de528e0c21a8900b1748f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of peacekeeping-uniformed-contributions-by-gender retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 8d7d2453fbcbea36ead3f679c84fcc96cfe4ea1869fe8ab7028eb9f31c73d5c4"
+  },
+  {
+    "request_fingerprint": "efa2ce206b2d975568d6e8eb400c35637c1b3abe551449289964db3e1b1d59ca",
+    "url": "https://api.psdata.un.org/public/data/DPO-UCHISTORICAL/csv",
+    "file": "efa2ce206b2d9755.csv",
+    "sha256": "b1f072254fd95ae99e3432137819a6943195abb00252429dc2e492d6855d8ccc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "slice of DPO-UCHISTORICAL.csv (Hub API, 2026-10-16): header + selected rows, row text verbatim; full file sha256 a3174ccab744a3b3e7c4c37880ee848c58123275071b2f5d1a670b6412754646, 182231 lines"
+  },
+  {
+    "request_fingerprint": "e8a8eb474c17da95852fa8ce49afe865e522ec8a8694550879bd76b0b9aaa378",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=dppadpo-ucpre2010",
+    "file": "e8a8eb474c17da95.json",
+    "sha256": "5d4ded9b3854b6c4f95dd1da0703e51eb0079ef8303b737393511028523f2985",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of dppadpo-ucpre2010 retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 3c39552ffc91c7a42cc90ca875183e45f3f990180315f42356933ae7d0f7f362"
+  },
+  {
+    "request_fingerprint": "0bb7db349cf0967db0456cec404d9dcda7e1aabb1f5d6db3a1150a0b2ed85ca9",
+    "url": "https://api.psdata.un.org/public/data/DPPADPO-UCPre2010/csv",
+    "file": "0bb7db349cf0967d.csv",
+    "sha256": "2b4d77948dfcb47b5039fd49690dcca80e9804eb216c37408463a71558c4f663",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "slice of DPPADPO-UCPre2010.csv (Hub API, 2026-10-16): header + selected rows, row text verbatim; full file sha256 d26ad67c2445c9b45bfeb443d842cbc66251d59734be35fd5bd566bf2a3aa7fb, 91845 lines"
+  },
+  {
+    "request_fingerprint": "12a18382306d5d2c88c70f5a8da296372a1d4ca25e14b03c81c138cead14078a",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=datacommons-uchistorical",
+    "file": "12a18382306d5d2c.json",
+    "sha256": "6196f74eeecbe79fec3db3caef56a44c2a78b932c24d86780e8cf81c05a70f56",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of datacommons-uchistorical retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 3e285fadd5e6462e1a19e153c6cc6d23ac0a85a262816d47968ce89afee38858"
+  },
+  {
+    "request_fingerprint": "bf0ce1efa3bc644e26912d6a4ad8e39931216edc180341bbff3394278e0db67b",
+    "url": "https://api.psdata.un.org/public/data/DataCommons-UCHISTORICAL/csv",
+    "file": "bf0ce1efa3bc644e.csv",
+    "sha256": "8c6b5165950cc8bb6f745cc850e4e2535317510538a72e4bb31515ad7424fabd",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "slice of DataCommons-UCHISTORICAL.csv (Hub API, 2026-10-16): header + selected rows, row text verbatim; full file sha256 d818d60fd1541983c63a21fe39fbad22d26916dea6027804d2e22953398ce41b, 6022 lines"
+  },
+  {
+    "request_fingerprint": "9210873833e8f826ca938794c1f94eb37db4bae40b5f0889d1e5e9f9149ef601",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=datacommons-fatalities",
+    "file": "9210873833e8f826.json",
+    "sha256": "f5396f8e7158fcd435958d0790285f214c99e9add9ae432dfce118ce16cc99b0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of datacommons-fatalities retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 cd86c275e813b70068cfe0642b6d9ac8c49881b5139580e212fd23a84ed946a9"
+  },
+  {
+    "request_fingerprint": "863c7a10064468a120abc34c8a8e2a288e0ca02af029c527591f39a30b38175f",
+    "url": "https://api.psdata.un.org/public/data/DataCommons-Fatalities/csv",
+    "file": "863c7a10064468a1.csv",
+    "sha256": "6c108f6f4e565f2eeea0aee27a0e120de146e11aec69aff2d0a32d7ffbd81269",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "slice of DataCommons-Fatalities.csv (Hub API, 2026-10-16): header + selected rows, row text verbatim; full file sha256 ba3d2779579e271b6a7cb49df0991878ddc65c0d30e8c8f31a656bc3b3be8a82, 3190 lines"
+  },
+  {
+    "request_fingerprint": "f8436e92ad321f45a8728c701454ccdfc5006058a596dfbb156302676391366a",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=peacekeeping-core-dataset-active-missions",
+    "file": "f8436e92ad321f45.json",
+    "sha256": "2753162254d565320671369645749c0207279c14e3de91146228e9515890bc85",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of peacekeeping-core-dataset-active-missions retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 acfdfeab75f8824b571b0a1208482334a42f6df45a0378b13017dbe68f2c490e"
+  },
+  {
+    "request_fingerprint": "6d6de591c753cef076b19025d8292789d45d835c145bcc8e3ea871d02e78a57d",
+    "url": "https://api.psdata.un.org/public/data/DPPADPOSS-PKO/csv",
+    "file": "6d6de591c753cef0.csv",
+    "sha256": "011958451f902095160c519617496dbd884427181ce8f94f26a8133fecb7f2ab",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "DPPADPOSS-PKO.csv (Hub API, 2026-10-16), complete"
+  },
+  {
+    "request_fingerprint": "302cb990378f592bd6552acf55160586347ce95b7debb09a7a64f4806fc7314b",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=dppa-fieldmissions-missions",
+    "file": "302cb990378f592b.json",
+    "sha256": "b5f9e7d370507c0f9837a6951551d4656f5e261199d83ca17651277e3af5b82a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "HDX package_show record of dppa-fieldmissions-missions retrieved 2026-10-16, trimmed to licence/organisation/resource fields (user and maintainer identifiers removed); values verbatim; full record sha256 eae64de2d8da0fddd0b7e38f979dee8f7638b975e7ce4f0f473878cc1f68890f"
+  },
+  {
+    "request_fingerprint": "0f59bde439365683f8c6fb087173b3e42fa54d2b004fa24e0c5fad32daf04736",
+    "url": "https://api.psdata.un.org/public/data/DPPA-FieldMissions-Missions/csv",
+    "file": "0f59bde439365683.csv",
+    "sha256": "85d16b416fb554bc233bf706f57cbc8b2ea2abd93d3c97dd4603d091dd16e1e1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:16:09+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "note": "DPPA-FieldMissions-Missions.csv (Hub API, 2026-10-16), complete"
+  }
+]

@@ -1724,7 +1724,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _budget_guard(mapc)
     if args.cmd == "merge-property-requests":
         async def merge() -> int:
-            async with budgeted_client(purpose="properties", planned_wdqs=0, planned_wbapi=2) as sess:
+            async with budgeted_client(purpose="properties", planned_wdqs=0, planned_wbapi=2, mode="auto") as sess:
                 _print(await merge_property_requests(sess.client))
             return 0
 
