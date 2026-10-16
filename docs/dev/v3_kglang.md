@@ -65,7 +65,7 @@ release zip; `source_revision` = `<version> doi:<version DOI>` of the release th
 | `wals:f<feature>` (192) | string | WALS values.csv, value = code name (`SOV`) | 76,475 |
 | `grambank:<feature>` (195) | string | Grambank values.csv, value = code description (`absent`, `N-Num`) | 362,025 |
 
-Totals in the live database: 27,194 entities (27,177 Glottolog + 17 `wals:language:*`), **604,833 current
+Totals in the live database: 27,194 entities (27,177 Glottolog + 17 `wals:language:*`), **602,817 current
 statements**, 0 rejected, 0 conflicting. `kg.statement` 637 MB on disk for the whole throwaway database
 (≈ 0.6 kB/statement, as KGCORE measured; Grambank is 60 % of it). Load times on the shared host: Glottolog 65–76 s
 (incl. the 50 MB download), WALS 66 s, Grambank 183 s (two batches), Wikidata 922 s (820 s of it waiting for the

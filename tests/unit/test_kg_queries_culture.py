@@ -96,7 +96,7 @@ def test_specs_are_schema_valid_and_unique():
         errors = [e.message for e in validator.iter_errors(spec)]
         assert not errors, (fname, errors)
         assert spec["domain"] == "culture" and spec["id"].startswith("culture.")
-        assert spec["owner"] == "KGCULT"
+        assert spec.get("owner") in ("KGCULT", "KGLANG"), fname  # KGLANG adds Glottolog seeds here
 
 
 def test_specs_follow_harvest_rules():
@@ -139,7 +139,7 @@ def test_specs_pass_the_harvester_validator_when_available():
 
 
 def test_entity_budget():
-    specs = load_specs()
+    specs = {k: v for k, v in load_specs().items() if v.get("owner") == "KGCULT"}  # KGLANG budgets its own
     seeded = sum(s["max_rows"] for s in specs.values() if s["purpose"] == "seed_entities")
     # statements specs add at most one new subject + one new object entity per row; subjects of the
     # country specs are the 250 crosswalk countries, objects are mostly entities seeded above, so

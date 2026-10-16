@@ -879,7 +879,8 @@ def to_markdown(res: dict[str, Any]) -> str:
     ]
     for v in res["concepts"].values():
         miss = " ".join(v["any_missing"]) or "—"
-        lines.append(f"| {v['labels']['en']} | {v['headline_covered']} | {v['any_covered']} | {miss} |")
+        head = v["headline_covered"] if v["headline_concepts"] else "–"
+        lines.append(f"| {v['labels']['en']} | {head} | {v['any_covered']} | {miss} |")
     return "\n".join(lines) + "\n"
 
 
