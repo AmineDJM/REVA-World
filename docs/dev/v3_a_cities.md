@@ -29,7 +29,9 @@ uv run python -m reva.atlas.ingest atlas.geonames_cities [--dataset cities15000]
 uv run python -m reva.atlas.ingest atlas.un_wup [--dataset wup2025_capitals] [--fixture]
 # Wikidata links (throwaway reva_* database that holds the GeoNames ingest):
 uv run python -m reva.adapters.connectors.atlas_cities wikidata --db reva_xxx --atlas-object-root <root> \
-    [--labels none|capitals|all] [--max-chunks N] [--report out.json]
+    [--labels none|capitals|all] [--max-chunks N] [--report out.json]          # WDQS fan-out (all places)
+uv run python -m reva.adapters.connectors.atlas_cities wikidata --db reva_xxx --atlas-object-root <root> \
+    --via api [--max-ids N] [--client-mode linked_data]                        # WDQS-free (capitals + N ids)
 ```
 
 ## Design and honesty decisions
@@ -560,16 +562,16 @@ share is WUP 2025, national definitions, 2025.
 
 ## Requests to other owners
 
-1. **ATLASCORE/ATLASOPS:** merge `registry/atlas/budget_requests/a_cities.yaml` (`geonames.cities` 6/day,
-   `un.wup` 10/day). Until then `tests/invariants/test_invariant_30_budgets.py::test_budget_keys_are_registered…`
-   lists `geonames.cities` and `un.wup`, next to other agents' pending keys. My modules create no HTTP client: the
-   request-path invariant passes.
+1. **ATLASCORE:** done. The budget request was merged (`geonames.cities` 6/day, `un.wup` 10/day; budgets-1.3.5)
+   and `tests/invariants/test_invariant_30_budgets.py` passes. My modules create no HTTP client.
 2. **WDHARVEST:**
    * add `places` to the domain enum of `registry/kg/queries/_schema.json`; I will then move the two specs to
      `places/`;
-   * a `split: {by: literal_values}` option would let the generic harvester run the GeoNames-id fan-out itself.
-3. **Lead:**
-   * the seed hook registers both atlas sources automatically;
-   * `migrations/versions/0011_kg_fixes.py` (REVFIX, in flight) is not yet in `migrations/schema_contract.json`, so
-     `bootstrap()` raises a schema-drift error on a fresh database. My throwaway database was bootstrapped with
-     the error caught: migrations and roles complete, then the registry seeded.
+   * a `split: {by: literal_values}` option would let the generic harvester run the GeoNames-id fan-out itself;
+   * when WDQS accepts traffic again, run (or let me run) the full P1566 fan-out:
+     `atlas_cities wikidata --via wdqs`, about 96 requests.
+   * In the loaded capital snapshots, one `wikidata.wbapi` statement was rejected by `load_batch`
+     (`invalid_time`) in WDHARVEST's converter.
+3. **Lead:** the seed hook registers both atlas sources automatically. During my first bootstrap on
+   2026-10-15, the in-flight `0011_kg_fixes` migration was not yet in the schema contract; that was fixed since
+   (the contract verified on 2026-10-16).
