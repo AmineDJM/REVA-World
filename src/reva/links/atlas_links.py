@@ -233,7 +233,7 @@ class AtlasLinkReader:
         datasets = ", ".join(_sql_str(d) for d in spec["datasets"])
         prefix = spec["indicator_prefix"]
         name = prefix.split("|", 1)[0]
-        active, missing = self._hops(lt)
+        active, _missing = self._hops(lt)
         # partners outside the crosswalk folded as |partner_code=<code> (A-INFRA): read too, so that they are
         # counted as partner_unmapped (or mapped through a cited hop), never silently left out of the report
         sel = (
