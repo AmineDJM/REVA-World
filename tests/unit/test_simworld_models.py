@@ -349,3 +349,21 @@ def test_oversized_runs_are_refused_with_a_typed_gap() -> None:
     with pytest.raises(CapabilityGap) as e:
         CW.result_size_guard([row] * 20_000, "m")
     assert e.value.details["capability"] == "simulation.result_size"
+
+
+def test_a_country_out_of_bounds_is_skipped_not_the_whole_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    real = rw.compute_point
+
+    def fake(plan: Any, point: Any, years: Any, rho_basis: str = "own_group") -> Any:
+        vals, problems = real(plan, point, years, rho_basis)
+        if plan.iso3 == "SEN":
+            problems = [{"code": "employment_rate_out_of_bounds", "country": "SEN"}]
+        return vals, problems
+
+    monkeypatch.setattr(rw, "compute_point", fake)
+    compiled, rows = run_ret(ret_spec(missing_input_policy="skip_missing_countries"))
+    st = {p.iso3: p.status for p in compiled.countries}
+    assert st == {"SEN": "incompatible", "JPN": "ready", "BRA": "ready"}
+    assert {r.iso3 for r in rows} == {"JPN", "BRA"} and compiled.incompatible == []
+    compiled, _ = run_ret(ret_spec(countries=["SEN"]))
+    assert compiled.incompatible and compiled.incompatible[0]["country"] == "SEN"

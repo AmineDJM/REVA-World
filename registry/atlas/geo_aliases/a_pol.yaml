@@ -11,7 +11,14 @@ schemes:
   # Excluded: PSE -- V-Dem's unit "Palestine/West Bank" covers the West Bank only (Gaza is unit PSG), so it is
   # not the crosswalk entity PSE "State of Palestine".
   # Unmapped (not crosswalk keys): BDN BRW BVR DDR HDM HKS HRG HVR MCL MDN NSS OLD PPS PRM PSB PSG SAX SML SPD
-  # SXN TSC TWN TWS VDR WRG YMD ZZB (historical states, sub-national units, Taiwan).
+  # SXN TSC TWS VDR WRG YMD ZZB (historical states, sub-national units).
+  # TWN (V-Dem unit 48 "Taiwan", 1900-2025) maps to TWN through the base since crosswalk 1.1.0 (agent TWNMAP
+  # decision, maintainer review pending). V-Dem's unit is the territory of Taiwan in every year; its own unit
+  # history (histname) is 1900-1944 "Taiwan under Japanese occupation", 1945-1948 "Republic of China
+  # [headquartered in the mainland]", 1949-2025 "Republic of China [headquartered in Taiwan]". The rows keep
+  # V-Dem's mapping of all years: each row carries flags.vdem_histname, and entity_qid is the period's QID
+  # (1945-1948: Q13426199 Republic of China 1912-1949, the same polity as V-Dem CHN 1928-1948), so the
+  # 1945-1948 mainland-government years are flagged, never silently read as the post-1949 state.
   vdem:
     base: iso3
     exclude: [PSE]
@@ -24,7 +31,7 @@ schemes:
 
   # LIED v6.9 unit keys '<countryn>|vdem=<id>' or '<countryn>|cow=<code>' (LIED_6.9.xlsx, raw sha256 4de421e6ab9636247e332b69cf3964b8c915e5ad797d3f2c4381185f78deefc7). Rule: a name maps through LIED's own
   # vdem id -> V-Dem v16 country_text_id when that is a crosswalk key (PSE excluded, see vdem), else by exact
-  # crosswalk label, else by the three listed name matches. Unmapped keys (kept): Newfoundland|cow=21, Hanover|vdem=357, Hamburg|vdem=362, Brunswick|vdem=363, Bavaria|vdem=350, Germany, East|vdem=137, Oldenburg|vdem=364, Baden|vdem=349, Saxe-Weimar-Eisenach|vdem=365, Saxony|vdem=353, Wuerttemberg|vdem=355, Hesse-Kassel|vdem=358, Hesse-Darmstadt|vdem=359, Nassau|vdem=366, Mecklenburg-Schwerin|vdem=360, Sardinia|vdem=373, Papal states, the|vdem=361, Sicily|vdem=356, Modena|vdem=351, Parma|vdem=352, Tuscany|vdem=354, Zanzibar|vdem=236, Somaliland|vdem=139, Orange Free State|cow=556, Transvaal|cow=557, Natal|cow=558, Cape Colony|cow=559, Sahrawi|cow=601, Palestine/British Mandate|vdem=209, Palestine/West Bank|vdem=128, Palestine/Gaza|vdem=138, Yemen, South|vdem=23, Tibet|cow=711, Taiwan|vdem=48, Vietnam|vdem=35, Vietnam, South|vdem=35.
+  # crosswalk label, else by the three listed name matches. Unmapped keys (kept): Newfoundland|cow=21, Hanover|vdem=357, Hamburg|vdem=362, Brunswick|vdem=363, Bavaria|vdem=350, Germany, East|vdem=137, Oldenburg|vdem=364, Baden|vdem=349, Saxe-Weimar-Eisenach|vdem=365, Saxony|vdem=353, Wuerttemberg|vdem=355, Hesse-Kassel|vdem=358, Hesse-Darmstadt|vdem=359, Nassau|vdem=366, Mecklenburg-Schwerin|vdem=360, Sardinia|vdem=373, Papal states, the|vdem=361, Sicily|vdem=356, Modena|vdem=351, Parma|vdem=352, Tuscany|vdem=354, Zanzibar|vdem=236, Somaliland|vdem=139, Orange Free State|cow=556, Transvaal|cow=557, Natal|cow=558, Cape Colony|cow=559, Sahrawi|cow=601, Palestine/British Mandate|vdem=209, Palestine/West Bank|vdem=128, Palestine/Gaza|vdem=138, Yemen, South|vdem=23, Tibet|cow=711, Vietnam|vdem=35, Vietnam, South|vdem=35.
   lied:
     aliases:
       - {code: "Afghanistan|vdem=36", iso3: AFG, source: "LIED vdem=36 = V-Dem v16 country_text_id AFG (years 1789-2025)"}
@@ -206,6 +213,7 @@ schemes:
       - {code: "Sweden|vdem=5", iso3: SWE, source: "LIED vdem=5 = V-Dem v16 country_text_id SWE (years 1789-2025)"}
       - {code: "Switzerland|vdem=6", iso3: CHE, source: "LIED vdem=6 = V-Dem v16 country_text_id CHE (years 1798-2025)"}
       - {code: "Syria|vdem=97", iso3: SYR, source: "LIED vdem=97 = V-Dem v16 country_text_id SYR (years 1918-2025)"}
+      - {code: "Taiwan|vdem=48", iso3: TWN, source: "LIED vdem=48 = V-Dem v16 country_text_id TWN (years 1895-2025); LIED countryn \"Taiwan\" (cow 713); TWN crosswalk key since crosswalk 1.1.0 (agent TWNMAP, maintainer review pending). Unit = territory of Taiwan (1895-1944 Japanese colony, 1945-1948 under the Republic of China headquartered on the mainland per V-Dem histname): entity_qid follows the V-Dem period (1945-1948 Q13426199)"}
       - {code: "Tajikistan|vdem=133", iso3: TJK, source: "LIED vdem=133 = V-Dem v16 country_text_id TJK (years 1990-2025)"}
       - {code: "Tanzania|vdem=47", iso3: TZA, source: "LIED vdem=47 = V-Dem v16 country_text_id TZA (years 1914-2025)"}
       - {code: "Thailand|vdem=49", iso3: THA, source: "LIED vdem=49 = V-Dem v16 country_text_id THA (years 1789-2025)"}
@@ -241,7 +249,7 @@ schemes:
 
   # BMR v4.0 COW ccodes (democracy-v4.0.csv, raw sha256 18e2ea831875e0d163d44f933e4ccf3f6beca199f94adf4784405e0993a0d6b6). Rule: ccode -> its BMR abbreviation when that is
   # a current World Bank code of the crosswalk ('abbreviation: World Bank 3-letter code', BMR codebook), plus the
-  # listed aliases. Unmapped ccodes (kept): 89 Central American Union, 99 Great Colombia, 245 Bavaria, 260 Germany, West, 265 Germany, East, 267 Baden, 269 Saxony, 271 Wurttemberg, 315 Czechoslovakia, 324 Sardinia, 327 Papal States, 329 Sicily, 332 Modena, 335 Parma, 337 Tuscany, 345 Yugoslavia, 347 Yugoslavia, Fed. Rep., 364 Ussr, 564 Orange Free State, 680 Yemen, South, 713 Taiwan, 730 Korea, 816 Vietnam, North, 817 Vietnam, South.
+  # listed aliases. Unmapped ccodes (kept): 89 Central American Union, 99 Great Colombia, 245 Bavaria, 260 Germany, West, 265 Germany, East, 267 Baden, 269 Saxony, 271 Wurttemberg, 315 Czechoslovakia, 324 Sardinia, 327 Papal States, 329 Sicily, 332 Modena, 335 Parma, 337 Tuscany, 345 Yugoslavia, 347 Yugoslavia, Fed. Rep., 364 Ussr, 564 Orange Free State, 680 Yemen, South, 730 Korea, 816 Vietnam, North, 817 Vietnam, South.
   bmr:
     aliases:
       - {code: "2", iso3: USA, source: "abbreviation USA (World Bank code per BMR codebook), country UNITED STATES OF AMERICA (years 1800-2020)"}
@@ -406,6 +414,7 @@ schemes:
       - {code: "705", iso3: KAZ, source: "abbreviation KAZ (World Bank code per BMR codebook), country KAZAKHSTAN (years 1991-2020)"}
       - {code: "710", iso3: CHN, source: "abbreviation CHN (World Bank code per BMR codebook), country CHINA (years 1800-2020)"}
       - {code: "712", iso3: MNG, source: "abbreviation MNG (World Bank code per BMR codebook), country MONGOLIA (years 1924-2020)"}
+      - {code: "713", iso3: TWN, source: "manual (agent TWNMAP, maintainer review pending): country TAIWAN, abbreviation TWN (not a World Bank code: Taiwan has no World Bank economy) (years 1949-2020); TWN = ISO 3166-1 alpha-3 crosswalk key since crosswalk 1.1.0; BMR 710 CHINA stays CHN"}
       - {code: "731", iso3: PRK, source: "abbreviation PRK (World Bank code per BMR codebook), country KOREA, NORTH (years 1948-2020)"}
       - {code: "732", iso3: KOR, source: "abbreviation KOR (World Bank code per BMR codebook), country KOREA, SOUTH (years 1948-2020)"}
       - {code: "740", iso3: JPN, source: "abbreviation JPN (World Bank code per BMR codebook), country JAPAN (years 1800-2020)"}

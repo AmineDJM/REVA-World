@@ -1,6 +1,6 @@
 # Agent A-LAW: provider geography schemes for WBL (KSV), SSPTW (page slug), Constitute (country_id) and CCP (COW code|name).
 # Built by scratch script from the archived provider lists; reviewed entry by entry by the agent.
-note: Agent A-LAW provider geography schemes. Every alias names its evidence; manual entries are agent decisions pending maintainer review. Unmapped provider geographies (historical states, Taiwan) are
+note: Agent A-LAW provider geography schemes. Every alias names its evidence; manual entries are agent decisions pending maintainer review. Unmapped provider geographies (historical states) are
   deliberately absent and stay unmapped (kept, listed) in the atlas tables.
 schemes:
   wbl:
@@ -505,6 +505,9 @@ schemes:
     - code: syria
       iso3: SYR
       source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "syria" titled "Syria"; crosswalk label "Syrian Arab Republic"'
+    - code: taiwan
+      iso3: TWN
+      source: 'manual (agent TWNMAP, maintainer review pending): SSPTW asia page "taiwan" titled "Taiwan (China)" (<title> "Social Security Programs Throughout the World: Asia and the Pacific, 2018 - Taiwan (China)"); the provider labels the unit Taiwan; TWN crosswalk entity since crosswalk 1.1.0 (ISO 3166-1, label "Taiwan"); agent TWNMAP decision, maintainer review pending. SSPTW''s "china" page is a separate unit (CHN): no double mapping'
     - code: tajikistan
       iso3: TJK
       source: 'exact normalised name match: SSPTW asia page "tajikistan" titled "Tajikistan" = crosswalk label "Tajikistan"'
@@ -565,9 +568,6 @@ schemes:
     - code: zimbabwe
       iso3: ZWE
       source: 'exact normalised name match: SSPTW africa page "zimbabwe" titled "Zimbabwe" = crosswalk label "Zimbabwe"'
-    unmapped:
-    - code: taiwan
-      reason: Taiwan is not an entity of the ALLC crosswalk
     code_format: SSPTW 2018-2019 country page slug (/policy/docs/progdesc/ssptw/2018-2019/<region>/<slug>.html)
     source:
       kind: provider_data
@@ -1084,6 +1084,9 @@ schemes:
     - code: Syrian_Arab_Republic_the
       iso3: SYR
       source: 'exact normalised name match: provider country_id "Syrian_Arab_Republic_the" / country "Syrian Arab Republic" = crosswalk label "Syrian Arab Republic"'
+    - code: Taiwan
+      iso3: TWN
+      source: 'manual (agent TWNMAP, maintainer review pending): provider country_id "Taiwan" / country "Republic of China" / title "Taiwan (Republic of China) 1947 (rev. 2005)" (in-force constitution Taiwan_2005); the provider labels the unit Taiwan; TWN crosswalk entity since crosswalk 1.1.0 (ISO 3166-1, label "Taiwan"); agent TWNMAP decision, maintainer review pending. The rows are a current in-force snapshot; year_enacted 1947 is the document''s enactment (on the mainland), kept verbatim. Constitute "China" (People''s Republic of China) is a separate unit (CHN)'
     - code: Tajikistan
       iso3: TJK
       source: 'exact normalised name match: provider country_id "Tajikistan" / country "Republic of Tajikistan" = crosswalk label "Tajikistan"'
@@ -1167,8 +1170,6 @@ schemes:
       reason: historical state (Kingdom of Bavaria, constitution 1808); no crosswalk entity
     - code: Germany_Prussia
       reason: provider country "Germany (Prussia)" (Weimar constitution 1919); predecessor state, not mapped to DEU
-    - code: Taiwan
-      reason: Republic of China (Taiwan) is not an entity of the ALLC crosswalk
     source:
       kind: provider_data
       url: https://www.constituteproject.org/service/constitutions?lang=en
@@ -1725,6 +1726,9 @@ schemes:
     - code: 712|Mongolia
       iso3: MNG
       source: 'exact normalised name match: CCP COW 712 "Mongolia" (1921-2023) = crosswalk label "Mongolia"'
+    - code: 713|Taiwan
+      iso3: TWN
+      source: 'manual (agent TWNMAP, maintainer review pending): CCP COW 713 "Taiwan" (1949-2019, constitutional system 856); the provider labels the unit Taiwan; TWN crosswalk entity since crosswalk 1.1.0 (ISO 3166-1, label "Taiwan"); agent TWNMAP decision, maintainer review pending. CCP''s own unit history starts Taiwan in 1949: the 1947 Republic of China constitution on the mainland (1947-1948) is coded under COW 710 "China" (system 844 -> CHN), so no pre-1949 mainland row is mapped to TWN'
     - code: 731|Korea, People's Republic of
       iso3: PRK
       source: 'manual (agent A-LAW, maintainer review pending): CCP COW 731 "Korea, People''s Republic of" (1948-2025) -> Democratic People''s Republic of Korea; crosswalk label "Democratic People''s Republic
@@ -1924,8 +1928,6 @@ schemes:
     - code: 680|Yemen, People's Republic of
       reason: historical or non-crosswalk state
     - code: 711|Tibet
-      reason: historical or non-crosswalk state
-    - code: 713|Taiwan
       reason: historical or non-crosswalk state
     - code: 730|Korea
       reason: historical or non-crosswalk state

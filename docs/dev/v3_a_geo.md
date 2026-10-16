@@ -25,10 +25,18 @@ atlas_ingest(run)` fetches only through `run.get`, archives with `run.archive` b
 registers with `run.register`. None of them builds an HTTP client.
 
 Run: `uv run python -m reva.atlas.ingest atlas.naturalearth_10m` (and likewise for `atlas.geonames_countryinfo`,
-`atlas.cckp_climatology`, `atlas.inform_risk_hazards`). The other three also run in `--fixture` mode.
-Natural Earth has no offline fixture mode: its four large layers (16 MB) are not committed. Offline tests
-replace them with a synthetic shapefile world (`tests/fixtures/source/atlas.naturalearth_10m/synthetic_world.py`)
-plus the two small real layers, which are captured.
+`atlas.cckp_climatology`, `atlas.inform_risk_hazards`); all four also run in `--fixture` mode.
+`--dataset admin0_10m|admin0_10m_borders|admin0_10m_disputed` fetches only the layers that dataset is computed
+from (country table: map units + the two country layers; borders: map units + the two boundary-line layers;
+disputed: the disputed-areas layer) and registers the same rows a full run does.
+Natural Earth's four large layers (16 MB) are not committed: fixture mode replays a **derived excerpt** of
+them (real release-5.1.1 features of the closed country groups Ireland+UK, Hispaniola, Cyprus with its
+buffer zone/base areas/Northern Cyprus, and Saint-Martin; ~300 KB), cut reproducibly by
+`tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py` (its `--verify` checks that every value
+computed from the excerpt equals the whole-world value). Each excerpt ZIP carries a `REVA_EXCERPT.json`
+member and a `derived` block in the manifest; the connector accepts such a layer only from a `test_fixture`
+acquisition and flags every row computed from it `ne_excerpt`. The two small layers are full captures.
+Unit tests also use a synthetic shapefile world (`synthetic_world.py`) for closed-form checks.
 
 ## Methods and limits
 

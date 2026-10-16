@@ -1,0 +1,93 @@
+[
+  {
+    "request_fingerprint": "95ab5d36b2e8025b9730ca729a627eaef18a6c9683adc133005e00cf044c9c1d",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_d2jan?sex=T&age=TOTAL&unit=NR&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "95ab5d36b2e8025b.json",
+    "sha256": "d64796154671a6f3332b69f67d1de6f6f87b620db1f7af3e64533901946cd99b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:53.395347+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "880128ec4abd012b822959815fc406ced3a6fc4f9a7a5838369542895bee9f47",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/reg_area3?unit=KM2&landuse=TOTAL&landuse=L0008&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "880128ec4abd012b.json",
+    "sha256": "0fe1fd9c5d9b6f24c00ed181112490f23722a898ee54a49d329cb89c925627e2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:53.824844+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "8fdd695ce8e65cb134d8e17042919aaef08a9c2cea85f7a679030596b43d72a4",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_d3dens?unit=PER_KM2&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "8fdd695ce8e65cb1.json",
+    "sha256": "1f031af54ad2922a12fa077824f4caeeb9ad767c286ec10aa00c537eb3710883",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:54.350395+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "bc7c9fb76e9329a9c2ef85ef00234d6cdbf571d1d5512606069c6bf24d87d9d6",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_2gdp?unit=MIO_EUR&unit=EUR_HAB&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "bc7c9fb76e9329a9.json",
+    "sha256": "c520ecca68df3232f2344b64fc1d558db57f8279327cfbbae886d6e99cfc37b7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:54.795501+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "ecb3465847e68dc7e46f66e754f12ccef1f86a3f8955838ab2a945007de39a2a",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfst_r_lfu3rt?sex=T&age=Y15-74&isced11=TOTAL&unit=PC&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "ecb3465847e68dc7.json",
+    "sha256": "c2edeeb801e010dc74e82314a90db9c8da7c9fbdc10a5edbffed8bdec823f5a9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:55.228298+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "d5380a20b3ac88ed5db8473a1d05e341d2f43dffdebaebbeeda222f58baa5328",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_mlifexp?sex=T&age=Y_LT1&unit=YR&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "d5380a20b3ac88ed.json",
+    "sha256": "44ac9751a287ca9ff250a66dd057f74df98ec13df2a9922767ce680c3fa6d1c8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:55.660703+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "0fed08ad6d1259964f4b047e1241b3e1ca61ad2684cfb821365b8f14c4a94b45",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/isoc_r_iuse_i?unit=PC_IND&indic_is=I_IU3&indic_is=I_ILT12&geo=FRY1&geo=FRY2&geo=FRY3&geo=FRY4&geo=FRY5&geo=FI20&geo=NO0B&format=JSON&lang=EN",
+    "file": "0fed08ad6d125996.json",
+    "sha256": "6a952735106425d8241929122e3410e3eaa6b4fe93cb35f19839709ff330c266",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:14:56.115442+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0; acknowledgement required)",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  }
+]

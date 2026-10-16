@@ -1,0 +1,30 @@
+# V3 (agent A-INFRA): OpenFlights Airport, Airline and Route databases (GitHub data dump).
+# Connector: src/reva/adapters/connectors/atlas_flights.py (atlas.openflights -> atlas table openflights.routes_2014).
+source_key: openflights.data
+title: OpenFlights airports, airlines and routes (data dump on GitHub, routes frozen June 2014)
+provider_url: https://openflights.org/data.php
+lineage_family: openflights
+rights:
+  licence: ODbL-1.0
+  licence_url: https://opendatacommons.org/licenses/odbl/1-0/
+  contents_licence: Database Contents License (DbCL) 1.0
+  terms_url: https://openflights.org/data.php
+  attribution: "OpenFlights.org (Airport, Airline and Route databases), https://openflights.org/data.php"
+  share_alike: >-
+    ODbL: any derived database made available to the public must be offered under ODbL 1.0 and attribute
+    OpenFlights. REVA tables derived from it (openflights.routes_2014) inherit this obligation; their rows carry
+    licence ODbL-1.0 and share_alike true. (The repository's AGPL-3.0 LICENSE covers the software only.)
+  commercial_note: "Provider: licences for commercial use of data or derived images are available on request."
+metadata:
+  allowed_hosts: [raw.githubusercontent.com, openflights.org]
+  files:
+    - https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat
+    - https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat
+    - https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat
+    - https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat
+  authentication: none
+  staleness: >-
+    STALE. Provider warning on the data page: "The third-party that OpenFlights uses for route data ceased providing
+    updates in June 2014. The current data is of historical value only." Every route row is flagged stale with
+    data_as_of 2014-06. The GitHub copy is "a sporadically updated static snapshot of the live OpenFlights database".
+  cadence: yearly re-check (the dump rarely changes)

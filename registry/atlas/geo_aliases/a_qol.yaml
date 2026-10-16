@@ -4,8 +4,9 @@
 # source-specific regions such as "Africa (EI)", WID world regions and sub-national areas).
 # Not mapped on purpose: OWID "Czechoslovakia", "East Germany", "Serbia and Montenegro", "USSR"-type
 # historical areas; WID AN (Netherlands Antilles), CS/XC (Czechoslovakia), DD (GDR), SU (USSR),
-# YU (Yugoslavia), XE (former Ethiopia), ZZ (Zanzibar), TW (Taiwan: not a crosswalk entity),
+# YU (Yugoslavia), XE (former Ethiopia), ZZ (Zanzibar),
 # XK (WID lists a second "Kosovo" code whose data member is header-only: never mapped twice).
+# WID TW (Taiwan) maps to TWN through the iso2 base since crosswalk 1.1.0 (TWN added from ISO 3166-1).
 schemes:
   owid:
     base: iso3

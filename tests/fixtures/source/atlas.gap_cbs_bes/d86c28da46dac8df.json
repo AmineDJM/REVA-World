@@ -1,0 +1,101 @@
+{
+  "odata.metadata":"https://opendata.cbs.nl/ODataApi/OData/85251ENG/$metadata#Cbs.OData.WebAPI.TypedDataSet","value":[
+    {
+      "ID":0,"CaribbeanNetherlands":"CN01  ","Periods":"2012JJ00","GrossDomesticProductPerCapita_1":26000
+    },{
+      "ID":1,"CaribbeanNetherlands":"CN01  ","Periods":"2013JJ00","GrossDomesticProductPerCapita_1":25900
+    },{
+      "ID":2,"CaribbeanNetherlands":"CN01  ","Periods":"2014JJ00","GrossDomesticProductPerCapita_1":25800
+    },{
+      "ID":3,"CaribbeanNetherlands":"CN01  ","Periods":"2015JJ00","GrossDomesticProductPerCapita_1":26300
+    },{
+      "ID":4,"CaribbeanNetherlands":"CN01  ","Periods":"2016JJ00","GrossDomesticProductPerCapita_1":27200
+    },{
+      "ID":5,"CaribbeanNetherlands":"CN01  ","Periods":"2017JJ00","GrossDomesticProductPerCapita_1":27100
+    },{
+      "ID":6,"CaribbeanNetherlands":"CN01  ","Periods":"2018JJ00","GrossDomesticProductPerCapita_1":27100
+    },{
+      "ID":7,"CaribbeanNetherlands":"CN01  ","Periods":"2019JJ00","GrossDomesticProductPerCapita_1":28200
+    },{
+      "ID":8,"CaribbeanNetherlands":"CN01  ","Periods":"2020JJ00","GrossDomesticProductPerCapita_1":24100
+    },{
+      "ID":9,"CaribbeanNetherlands":"CN01  ","Periods":"2021JJ00","GrossDomesticProductPerCapita_1":27000
+    },{
+      "ID":10,"CaribbeanNetherlands":"CN01  ","Periods":"2022JJ00","GrossDomesticProductPerCapita_1":28000
+    },{
+      "ID":11,"CaribbeanNetherlands":"CN01  ","Periods":"2023JJ00","GrossDomesticProductPerCapita_1":29100
+    },{
+      "ID":12,"CaribbeanNetherlands":"GM9001","Periods":"2012JJ00","GrossDomesticProductPerCapita_1":24600
+    },{
+      "ID":13,"CaribbeanNetherlands":"GM9001","Periods":"2013JJ00","GrossDomesticProductPerCapita_1":24300
+    },{
+      "ID":14,"CaribbeanNetherlands":"GM9001","Periods":"2014JJ00","GrossDomesticProductPerCapita_1":24200
+    },{
+      "ID":15,"CaribbeanNetherlands":"GM9001","Periods":"2015JJ00","GrossDomesticProductPerCapita_1":24300
+    },{
+      "ID":16,"CaribbeanNetherlands":"GM9001","Periods":"2016JJ00","GrossDomesticProductPerCapita_1":25300
+    },{
+      "ID":17,"CaribbeanNetherlands":"GM9001","Periods":"2017JJ00","GrossDomesticProductPerCapita_1":24800
+    },{
+      "ID":18,"CaribbeanNetherlands":"GM9001","Periods":"2018JJ00","GrossDomesticProductPerCapita_1":25400
+    },{
+      "ID":19,"CaribbeanNetherlands":"GM9001","Periods":"2019JJ00","GrossDomesticProductPerCapita_1":27000
+    },{
+      "ID":20,"CaribbeanNetherlands":"GM9001","Periods":"2020JJ00","GrossDomesticProductPerCapita_1":23700
+    },{
+      "ID":21,"CaribbeanNetherlands":"GM9001","Periods":"2021JJ00","GrossDomesticProductPerCapita_1":26300
+    },{
+      "ID":22,"CaribbeanNetherlands":"GM9001","Periods":"2022JJ00","GrossDomesticProductPerCapita_1":28400
+    },{
+      "ID":23,"CaribbeanNetherlands":"GM9001","Periods":"2023JJ00","GrossDomesticProductPerCapita_1":29300
+    },{
+      "ID":24,"CaribbeanNetherlands":"GM9002","Periods":"2012JJ00","GrossDomesticProductPerCapita_1":34500
+    },{
+      "ID":25,"CaribbeanNetherlands":"GM9002","Periods":"2013JJ00","GrossDomesticProductPerCapita_1":34600
+    },{
+      "ID":26,"CaribbeanNetherlands":"GM9002","Periods":"2014JJ00","GrossDomesticProductPerCapita_1":33100
+    },{
+      "ID":27,"CaribbeanNetherlands":"GM9002","Periods":"2015JJ00","GrossDomesticProductPerCapita_1":37800
+    },{
+      "ID":28,"CaribbeanNetherlands":"GM9002","Periods":"2016JJ00","GrossDomesticProductPerCapita_1":40600
+    },{
+      "ID":29,"CaribbeanNetherlands":"GM9002","Periods":"2017JJ00","GrossDomesticProductPerCapita_1":43000
+    },{
+      "ID":30,"CaribbeanNetherlands":"GM9002","Periods":"2018JJ00","GrossDomesticProductPerCapita_1":39500
+    },{
+      "ID":31,"CaribbeanNetherlands":"GM9002","Periods":"2019JJ00","GrossDomesticProductPerCapita_1":38400
+    },{
+      "ID":32,"CaribbeanNetherlands":"GM9002","Periods":"2020JJ00","GrossDomesticProductPerCapita_1":28200
+    },{
+      "ID":33,"CaribbeanNetherlands":"GM9002","Periods":"2021JJ00","GrossDomesticProductPerCapita_1":33400
+    },{
+      "ID":34,"CaribbeanNetherlands":"GM9002","Periods":"2022JJ00","GrossDomesticProductPerCapita_1":27300
+    },{
+      "ID":35,"CaribbeanNetherlands":"GM9002","Periods":"2023JJ00","GrossDomesticProductPerCapita_1":29700
+    },{
+      "ID":36,"CaribbeanNetherlands":"GM9003","Periods":"2012JJ00","GrossDomesticProductPerCapita_1":21600
+    },{
+      "ID":37,"CaribbeanNetherlands":"GM9003","Periods":"2013JJ00","GrossDomesticProductPerCapita_1":23800
+    },{
+      "ID":38,"CaribbeanNetherlands":"GM9003","Periods":"2014JJ00","GrossDomesticProductPerCapita_1":25400
+    },{
+      "ID":39,"CaribbeanNetherlands":"GM9003","Periods":"2015JJ00","GrossDomesticProductPerCapita_1":25100
+    },{
+      "ID":40,"CaribbeanNetherlands":"GM9003","Periods":"2016JJ00","GrossDomesticProductPerCapita_1":24500
+    },{
+      "ID":41,"CaribbeanNetherlands":"GM9003","Periods":"2017JJ00","GrossDomesticProductPerCapita_1":22900
+    },{
+      "ID":42,"CaribbeanNetherlands":"GM9003","Periods":"2018JJ00","GrossDomesticProductPerCapita_1":23500
+    },{
+      "ID":43,"CaribbeanNetherlands":"GM9003","Periods":"2019JJ00","GrossDomesticProductPerCapita_1":24300
+    },{
+      "ID":44,"CaribbeanNetherlands":"GM9003","Periods":"2020JJ00","GrossDomesticProductPerCapita_1":22800
+    },{
+      "ID":45,"CaribbeanNetherlands":"GM9003","Periods":"2021JJ00","GrossDomesticProductPerCapita_1":24000
+    },{
+      "ID":46,"CaribbeanNetherlands":"GM9003","Periods":"2022JJ00","GrossDomesticProductPerCapita_1":24700
+    },{
+      "ID":47,"CaribbeanNetherlands":"GM9003","Periods":"2023JJ00","GrossDomesticProductPerCapita_1":25600
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "2d5c6ccd669cd02f6106c41ec563beaacc778c201909346905ab45734946845d",
+    "url": "https://opendata.cbs.nl/ODataApi/odata/83774ENG/TypedDataSet?$format=json",
+    "file": "2d5c6ccd669cd02f.json",
+    "sha256": "f39d038185f3bb15aa46b594fff1be91e2fb89c91df188967be52c708ca13e78",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:15:00.834306+00:00",
+    "licence": "CC BY 4.0 (CBS website copyright notice: 'Unless otherwise stated, the content of this website is subject to Creative Commons Attribution (CC BY 4.0)')",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "b443b8142f8e891bb92305a09bcb842f7d46fcf28239f6368d5b627c7a539af2",
+    "url": "https://opendata.cbs.nl/ODataApi/odata/84789ENG/TypedDataSet?$format=json",
+    "file": "b443b8142f8e891b.json",
+    "sha256": "b4c93c5442b4df00ed24dc084d1abfb6913965de6a3b9d7ebb41ee0b454bfc65",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:15:01.598236+00:00",
+    "licence": "CC BY 4.0 (CBS website copyright notice: 'Unless otherwise stated, the content of this website is subject to Creative Commons Attribution (CC BY 4.0)')",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "d86c28da46dac8dfa45401732d6219c9b88d803cf7c00d66e6e1c9f89b12e869",
+    "url": "https://opendata.cbs.nl/ODataApi/odata/85251ENG/TypedDataSet?$format=json",
+    "file": "d86c28da46dac8df.json",
+    "sha256": "4d167275b1c832166156ba9e5a8ee4c14aa2916edf7668a0910b78c3d292294e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:15:02.455807+00:00",
+    "licence": "CC BY 4.0 (CBS website copyright notice: 'Unless otherwise stated, the content of this website is subject to Creative Commons Attribution (CC BY 4.0)')",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "115859db59ccf0f1c41884151fb00ecb852cede6b21fa80eccbb912254d27295",
+    "url": "https://opendata.cbs.nl/ODataApi/odata/83165ENG/TypedDataSet?$format=json&$filter=Sex%20eq%20%27T001038%27%20and%20Age%20eq%20%2752052%27%20and%20LevelOfEducation%20eq%20%27T001143%27",
+    "file": "115859db59ccf0f1.json",
+    "sha256": "e06b921ceacc2f7a5a5fd3127b487accf164a417fbf6cb7c4c3deade99530da2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:15:03.116640+00:00",
+    "licence": "CC BY 4.0 (CBS website copyright notice: 'Unless otherwise stated, the content of this website is subject to Creative Commons Attribution (CC BY 4.0)')",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  }
+]

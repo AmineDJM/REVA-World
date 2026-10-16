@@ -1,0 +1,29 @@
+[
+  {
+    "request_fingerprint": "a2f6647e46620e8e1436e3cfd6e25008d06546395ebf74edbc5d1f8ff8a23de1",
+    "url": "https://api.uis.unesco.org/api/public/versions/default",
+    "file": "a2f6647e46620e8e.json",
+    "sha256": "0a477d4df91b0eec26ea6d0e409a4d59348ce755191b6a7662b9c04974031c08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:13:08.978440+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "real live capture"
+  },
+  {
+    "request_fingerprint": "11f0a122637882fdd92d55a08d05796b2fb66abeaa59b43291c91defd30558bf",
+    "url": "https://api.uis.unesco.org/api/public/data/indicators?indicator=220174&indicator=CE.RA.CULOCC1.1.O.CULIND1.1.OV.ILOSTAT.1&indicator=CE.RA.CULOCC1.1.OV.ILOSTAT.1&indicator=CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.1&indicator=CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.2&indicator=CE.RA.OCCDOMAIN1.1.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.2.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.3.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.4.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.5.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.6.OV.CULOCC1.1&indicator=CE.RA.OCCDOMAIN1.7.OV.CULOCC1.1&indicator=CE.RA.OCCICH1.1.OV.CULOCC1.0&indicator=CE.RA.SEX.2.OV.CULOCC1.1&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.1&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.2&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.3&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.4&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.5&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.6&indicator=CE.RA.SEX.2.OV.OCCDOMAIN1.7&indicator=CE.RA.SEX.2.OV.OCCICH1.1&indicator=HEXPCSTPPPCAP.CULHER&indicator=HEXPCSTPPPCAP.HER&indicator=HEXPCSTPPPCAP.HER.PR&indicator=HEXPCSTPPPCAP.HER.PU&indicator=HEXPCSTPPPCAP.NATHER&indicator=HEXPCSTPPPCAPGOV.LOC.HER.PU&indicator=HEXPCSTPPPCAPGOV.NTL.HER.PU&indicator=HEXPCSTPPPCAPGOV.REG.HER.PU&geoUnitType=NATIONAL&version=20260507-91260335&indicatorMetadata=true&footnotes=true",
+    "file": "11f0a122637882fd.json",
+    "sha256": "ac7a4ab40bf645a9a2ffeac9d3b58cb29bfbebfaa19d4a327b9e92380b78c341",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T18:13:10.029147+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "EXCERPT: the 320 records of ['BDI', 'BEL', 'BRA', 'FRA', 'MEX', 'SYC'] out of 3923 (real records copied verbatim; indicatorMetadata and hints kept whole)",
+    "excerpt_of_sha256": "40cceaeb7b46fd014f6998e3cd2206f80721d09be0d29e99a00d954557fc552c"
+  }
+]

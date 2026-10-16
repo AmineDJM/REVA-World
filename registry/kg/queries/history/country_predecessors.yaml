@@ -20,7 +20,7 @@ sparql: |
     FILTER(?item != ?country)
     FILTER EXISTS {
       VALUES ?polity { wd:Q3024240 wd:Q48349 wd:Q133156 wd:Q164142 wd:Q161243 wd:Q6256 wd:Q7275 wd:Q1048835 }
-      ?item wdt:P31/wdt:P279* ?polity .
+      ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* ?polity ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
     }
   }
 split: {by: values, source: countries, chunk_size: 25}

@@ -1,4 +1,4 @@
-# Culture concepts of the atlas (agent KGCULT). Provider-declared, not human-reviewed.
+# Culture concepts of the atlas (agents KGCULT, then A-CULTURE: ICH, UIS culture, Olympic medals). Provider-declared, not human-reviewed.
 # Source: UNESCO World Heritage List, data.unesco.org dataset whc001 (CC BY-SA 4.0, attribution
 # "UNESCO World Heritage Centre"); atlas table unesco_whc.whc001 built by
 # src/reva/adapters/connectors/atlas_unesco_whc.py. Every value is a count of the List's own records
@@ -85,3 +85,474 @@ concepts:
     source_order:
       - "unesco_whc.whc001.whc_properties_inscribed_in_year"
     provider_declared: true
+
+  # ---- A-CULTURE: UNESCO Intangible Cultural Heritage lists (data.unesco.org ich001, CC BY-SA 4.0),
+  # atlas table unesco_ich.ich001 (src/reva/adapters/connectors/atlas_culture.py). Counts per submitting
+  # State of the elements on the lists at the source revision; a multinational element counts for each State.
+  - id: culture.ich_elements_total
+    labels: {fr: "Éléments du patrimoine culturel immatériel (UNESCO)", en: "Intangible cultural heritage elements (UNESCO)"}
+    definition: "Number of elements inscribed on the UNESCO lists of the Intangible Cultural Heritage (Representative List, Urgent Safeguarding List, Register of Good Safeguarding Practices) for which the country is a submitting State, at the source revision. A multinational element counts for each of its States."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_total"
+    provider_declared: true
+    notes: "Current lists only. Counted by REVA from the lists' records (flags.aggregation = count); a State absent from the lists has no row."
+  - id: culture.ich_elements_representative_list
+    labels: {fr: "Éléments de la Liste représentative du PCI", en: "Elements on the ICH Representative List"}
+    definition: "Number of elements on the Representative List of the Intangible Cultural Heritage of Humanity for which the country is a submitting State, at the source revision."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_rl"
+    provider_declared: true
+    notes: "Current lists only. Counted by REVA from the lists' records (flags.aggregation = count); a State absent from the lists has no row."
+  - id: culture.ich_elements_urgent_safeguarding
+    labels: {fr: "Éléments du PCI nécessitant une sauvegarde urgente", en: "Elements on the ICH Urgent Safeguarding List"}
+    definition: "Number of elements on the List of Intangible Cultural Heritage in Need of Urgent Safeguarding for which the country is a submitting State, at the source revision."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_usl"
+    provider_declared: true
+    notes: "Current lists only. Counted by REVA from the lists' records (flags.aggregation = count); a State absent from the lists has no row."
+  - id: culture.ich_good_safeguarding_practices
+    labels: {fr: "Bonnes pratiques de sauvegarde du PCI", en: "ICH Good Safeguarding Practices"}
+    definition: "Number of programmes on the Register of Good Safeguarding Practices (Convention art. 18) for which the country is a submitting State, at the source revision."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_gsp"
+    provider_declared: true
+    notes: "Current lists only. Counted by REVA from the lists' records (flags.aggregation = count); a State absent from the lists has no row."
+  - id: culture.ich_elements_multinational
+    labels: {fr: "Éléments du PCI multinationaux", en: "Multinational ICH elements"}
+    definition: "Number of the country's inscribed ICH elements (all three lists) that were submitted jointly with at least one other State, at the source revision."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_multinational"
+    provider_declared: true
+    notes: "Current lists only. Counted by REVA from the lists' records (flags.aggregation = count); a State absent from the lists has no row."
+  - id: culture.ich_elements_inscribed_in_year
+    labels: {fr: "Éléments du PCI inscrits dans l'année", en: "ICH elements inscribed in the year"}
+    definition: "Number of elements currently on the UNESCO ICH lists for which the country is a submitting State and whose inscription year (inscription_year) is the period's year. The dataset gives one year per element and the current States: a State that joined through a later extension is counted in the element's original year (flag country_may_have_joined_by_extension)."
+    unit: "count"
+    domain: culture
+    subdomain: intangible_heritage
+    source_order:
+      - "unesco_ich.ich001.ich_elements_inscribed_in_year"
+    provider_declared: true
+    notes: "2008 includes the elements proclaimed Masterpieces of the Oral and Intangible Heritage of Humanity (2001-2005), which UNESCO incorporated into the Representative List in 2008."
+
+  # ---- A-CULTURE: UNESCO UIS Data API, theme CULTURE (CC BY-SA 4.0), atlas table uis.culture
+  # (atlas.uis_culture). Indicator codes and names verbatim from the UIS; values as served.
+  - id: culture.uis_indoor_cinemas
+    labels: {fr: "Nombre total de cinémas en salle", en: "Total number of indoor cinemas"}
+    definition: "Total number of indoor cinemas (UNESCO Institute for Statistics, indicator 220174)."
+    unit: "count"
+    domain: culture
+    subdomain: cinema
+    source_order:
+      - "uis.culture.220174"
+    provider_declared: true
+    notes: "UIS cinema survey; several values come from the European Audiovisual Observatory Yearbook (footnotes kept per cell)."
+  - id: culture.uis_cultural_employment_share
+    labels: {fr: "Part des personnes dans l'emploi culturel", en: "Percentage of persons in cultural employment"}
+    definition: "Percentage of persons in cultural employment (UNESCO Institute for Statistics, indicator CE.RA.CULOCC1.1.O.CULIND1.1.OV.ILOSTAT.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.CULOCC1.1.O.CULIND1.1.OV.ILOSTAT.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_share
+    labels: {fr: "Part des personnes employées exerçant une profession culturelle", en: "Percentage of persons employed in cultural occupations"}
+    definition: "Percentage of persons employed in cultural occupations (UNESCO Institute for Statistics, indicator CE.RA.CULOCC1.1.OV.ILOSTAT.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.CULOCC1.1.OV.ILOSTAT.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_share_male
+    labels: {fr: "Part des personnes employées exerçant une profession culturelle, hommes", en: "Percentage of persons employed in cultural occupations, males"}
+    definition: "Percentage of persons employed in cultural occupations, males (UNESCO Institute for Statistics, indicator CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_share_female
+    labels: {fr: "Part des personnes employées exerçant une profession culturelle, femmes", en: "Percentage of persons employed in cultural occupations, females"}
+    definition: "Percentage of persons employed in cultural occupations, females (UNESCO Institute for Statistics, indicator CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.2)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.CULOCC1.1.OV.ILOSTAT.1.A.SEX.2"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_heritage
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans le patrimoine culturel et naturel", en: "Percentage of persons employed in cultural occupations that are working in cultural and natural heritage"}
+    definition: "Percentage of persons employed in cultural occupations that are working in cultural and natural heritage (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.1.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.1.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_performance
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans les arts de la scène et les célébrations", en: "Percentage of persons employed in cultural occupations that are working in performance and celebration"}
+    definition: "Percentage of persons employed in cultural occupations that are working in performance and celebration (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.2.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.2.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_visual_arts
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans les arts visuels et l'artisanat", en: "Percentage of persons employed in cultural occupations that are working in visual arts and crafts"}
+    definition: "Percentage of persons employed in cultural occupations that are working in visual arts and crafts (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.3.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.3.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_books_press
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans le livre et la presse", en: "Percentage of persons employed in cultural occupations that are working in books and press"}
+    definition: "Percentage of persons employed in cultural occupations that are working in books and press (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.4.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.4.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_audiovisual
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans l'audiovisuel et les médias interactifs", en: "Percentage of persons employed in cultural occupations that are working in audio-visual and interactive media"}
+    definition: "Percentage of persons employed in cultural occupations that are working in audio-visual and interactive media (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.5.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.5.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_design
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans le design et les services créatifs", en: "Percentage of persons employed in cultural occupations that are working in design and creative services"}
+    definition: "Percentage of persons employed in cultural occupations that are working in design and creative services (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.6.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.6.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_in_education
+    labels: {fr: "Part des personnes exerçant une profession culturelle qui travaillent dans l'éducation et la formation culturelles", en: "Percentage of persons employed in cultural occupations that are working in cultural education and training"}
+    definition: "Percentage of persons employed in cultural occupations that are working in cultural education and training (UNESCO Institute for Statistics, indicator CE.RA.OCCDOMAIN1.7.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCDOMAIN1.7.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_noncultural_occupations_in_ich
+    labels: {fr: "Part des personnes exerçant une profession non culturelle qui travaillent dans le patrimoine culturel immatériel", en: "Percentage of persons employed in non cultural occupations that are working in intangible cultural heritage"}
+    definition: "Percentage of persons employed in non cultural occupations that are working in intangible cultural heritage (UNESCO Institute for Statistics, indicator CE.RA.OCCICH1.1.OV.CULOCC1.0)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.OCCICH1.1.OV.CULOCC1.0"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_cultural_occupations_female_share
+    labels: {fr: "Part des femmes parmi les personnes exerçant une profession culturelle", en: "Percentage of persons employed in cultural occupations that are females"}
+    definition: "Percentage of persons employed in cultural occupations that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.CULOCC1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.CULOCC1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_heritage
+    labels: {fr: "Part des femmes parmi les personnes employées dans le patrimoine culturel et naturel", en: "Percentage of persons employed in cultural and natural heritage that are females"}
+    definition: "Percentage of persons employed in cultural and natural heritage that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_performance
+    labels: {fr: "Part des femmes parmi les personnes employées dans les arts de la scène et les célébrations", en: "Percentage of persons employed in performance and celebration that are females"}
+    definition: "Percentage of persons employed in performance and celebration that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.2)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.2"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_visual_arts
+    labels: {fr: "Part des femmes parmi les personnes employées dans les arts visuels et l'artisanat", en: "Percentage of persons employed in visual arts and crafts that are females"}
+    definition: "Percentage of persons employed in visual arts and crafts that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.3)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.3"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_books_press
+    labels: {fr: "Part des femmes parmi les personnes employées dans le livre et la presse", en: "Percentage of persons employed in books and press that are females"}
+    definition: "Percentage of persons employed in books and press that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.4)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.4"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_audiovisual
+    labels: {fr: "Part des femmes parmi les personnes employées dans l'audiovisuel et les médias interactifs", en: "Percentage of persons employed in audio-visual and interactive media that are females"}
+    definition: "Percentage of persons employed in audio-visual and interactive media that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.5)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.5"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_design
+    labels: {fr: "Part des femmes parmi les personnes employées dans le design et les services créatifs", en: "Percentage of persons employed in design and creative services that are females"}
+    definition: "Percentage of persons employed in design and creative services that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.6)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.6"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_education
+    labels: {fr: "Part des femmes parmi les personnes employées dans l'éducation et la formation", en: "Percentage of persons employed in education and training that are females"}
+    definition: "Percentage of persons employed in education and training that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCDOMAIN1.7)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCDOMAIN1.7"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_female_share_ich
+    labels: {fr: "Part des femmes parmi les personnes employées dans le patrimoine culturel immatériel", en: "Percentage of persons employed in intangible cultural heritage that are females"}
+    definition: "Percentage of persons employed in intangible cultural heritage that are females (UNESCO Institute for Statistics, indicator CE.RA.SEX.2.OV.OCCICH1.1)."
+    unit: "%"
+    domain: culture
+    subdomain: employment
+    source_order:
+      - "uis.culture.CE.RA.SEX.2.OV.OCCICH1.1"
+    provider_declared: true
+    notes: "UIS indicators on cultural employment (UIS Framework for Cultural Statistics 2009), from labour force data via ILOSTAT; 2010-2016 only."
+  - id: culture.uis_heritage_exp_cultural_pc
+    labels: {fr: "Dépense totale par habitant (publique et privée) pour le patrimoine culturel ($ PPA constants 2017)", en: "Total per capita expenditure (public and private) on cultural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita expenditure (public and private) on cultural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAP.CULHER)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAP.CULHER"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_total_pc
+    labels: {fr: "Dépense totale par habitant pour la préservation, la protection et la conservation de l'ensemble du patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita expenditure on the preservation, protection and conservation of all cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita expenditure on the preservation, protection and conservation of all cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAP.HER)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAP.HER"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_private_pc
+    labels: {fr: "Dépense privée totale par habitant pour le patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita private expenditure on cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita private expenditure on cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAP.HER.PR)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAP.HER.PR"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_public_pc
+    labels: {fr: "Dépense publique totale par habitant pour le patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita public expenditure on cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita public expenditure on cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAP.HER.PU)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAP.HER.PU"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_natural_pc
+    labels: {fr: "Dépense totale par habitant (publique et privée) pour le patrimoine naturel ($ PPA constants 2017)", en: "Total per capita expenditure (public and private) on natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita expenditure (public and private) on natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAP.NATHER)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAP.NATHER"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_public_local_pc
+    labels: {fr: "Dépense publique par habitant au niveau local/municipal pour le patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita public expenditure at local/municipal level on cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita public expenditure at local/municipal level on cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAPGOV.LOC.HER.PU)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAPGOV.LOC.HER.PU"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_public_national_pc
+    labels: {fr: "Dépense publique par habitant au niveau national/fédéral pour le patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita public expenditure at national/federal level on cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita public expenditure at national/federal level on cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAPGOV.NTL.HER.PU)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAPGOV.NTL.HER.PU"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+  - id: culture.uis_heritage_exp_public_regional_pc
+    labels: {fr: "Dépense publique par habitant au niveau régional pour le patrimoine culturel et naturel ($ PPA constants 2017)", en: "Total per capita public expenditure at regional level on cultural and natural heritage (constant PPP$ - 2017)"}
+    definition: "Total per capita public expenditure at regional level on cultural and natural heritage (constant PPP$ - 2017) (UNESCO Institute for Statistics, indicator HEXPCSTPPPCAPGOV.REG.HER.PU)."
+    unit: "constant 2017 PPP$ per capita"
+    domain: culture
+    subdomain: heritage_expenditure
+    source_order:
+      - "uis.culture.HEXPCSTPPPCAPGOV.REG.HER.PU"
+    provider_declared: true
+    notes: "SDG indicator 11.4.1 (UIS survey on expenditure on cultural and natural heritage); constant 2017 PPP$ per capita."
+
+  # ---- A-CULTURE: Olympic Games medal tables 1896-2026 (English Wikipedia {{Medals table}}, CC BY-SA 4.0,
+  # counts cite the IOC), atlas table olympics.medal_tables (src/reva/adapters/connectors/atlas_olympics.py).
+  # provider_geo = IOC NOC code; historical NOCs (URS, GDR, FRG, EUN, TCH, YUG, ...) unmapped, never given to successors.
+  - id: culture.olympic_gold_medals_summer
+    labels: {fr: "Médailles d'or olympiques (Jeux d'été)", en: "Olympic gold medals (Summer Games)"}
+    definition: "Number of gold medals won by the country's National Olympic Committee at the Summer Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.gold|season=summer"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_gold_medals_winter
+    labels: {fr: "Médailles d'or olympiques (Jeux d'hiver)", en: "Olympic gold medals (Winter Games)"}
+    definition: "Number of gold medals won by the country's National Olympic Committee at the Winter Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.gold|season=winter"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_silver_medals_summer
+    labels: {fr: "Médailles d'argent olympiques (Jeux d'été)", en: "Olympic silver medals (Summer Games)"}
+    definition: "Number of silver medals won by the country's National Olympic Committee at the Summer Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.silver|season=summer"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_silver_medals_winter
+    labels: {fr: "Médailles d'argent olympiques (Jeux d'hiver)", en: "Olympic silver medals (Winter Games)"}
+    definition: "Number of silver medals won by the country's National Olympic Committee at the Winter Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.silver|season=winter"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_bronze_medals_summer
+    labels: {fr: "Médailles de bronze olympiques (Jeux d'été)", en: "Olympic bronze medals (Summer Games)"}
+    definition: "Number of bronze medals won by the country's National Olympic Committee at the Summer Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.bronze|season=summer"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_bronze_medals_winter
+    labels: {fr: "Médailles de bronze olympiques (Jeux d'hiver)", en: "Olympic bronze medals (Winter Games)"}
+    definition: "Number of bronze medals won by the country's National Olympic Committee at the Winter Olympic Games held in the period's year, as listed in the Games' medal table."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.bronze|season=winter"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_medals_total_summer
+    labels: {fr: "Médailles olympiques (total) (Jeux d'été)", en: "Olympic medals (total) (Summer Games)"}
+    definition: "Gold + silver + bronze medals of the country's National Olympic Committee at the Summer Olympic Games held in the period's year (sum computed by REVA from the medal table)."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.total|season=summer"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_medals_total_winter
+    labels: {fr: "Médailles olympiques (total) (Jeux d'hiver)", en: "Olympic medals (total) (Winter Games)"}
+    definition: "Gold + silver + bronze medals of the country's National Olympic Committee at the Winter Olympic Games held in the period's year (sum computed by REVA from the medal table)."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.total|season=winter"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_games_host_summer
+    labels: {fr: "Pays hôte des Jeux olympiques (Jeux d'été)", en: "Olympic Games host (Summer Games)"}
+    definition: "1 when the medal table marks the country's NOC as host of the Summer Olympic Games held in the period's year (one host per table; 1956 Stockholm equestrian events not marked)."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.games_host|season=summer"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."
+  - id: culture.olympic_games_host_winter
+    labels: {fr: "Pays hôte des Jeux olympiques (Jeux d'hiver)", en: "Olympic Games host (Winter Games)"}
+    definition: "1 when the medal table marks the country's NOC as host of the Winter Olympic Games held in the period's year (one host per table; 1956 Stockholm equestrian events not marked)."
+    unit: count
+    domain: culture
+    subdomain: olympics
+    source_order:
+      - "olympics.medal_tables.games_host|season=winter"
+    provider_declared: true
+    notes: "Source: English Wikipedia medal-table articles (community-edited; each table cites the IOC medal table or Official Report; revision id per cell). Only medal-winning NOCs (and the host) appear: no row means no medal or no participation, never a reported zero. NOC codes map to present-day countries by IOC code continuity (territory may differ, e.g. GER 1896-1936). Tokyo 2020 is dated 2021 (held_in)."

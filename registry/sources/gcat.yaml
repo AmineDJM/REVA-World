@@ -1,0 +1,22 @@
+# V3 (agent A-INFRA): GCAT, General Catalog of Artificial Space Objects (J. C. McDowell).
+# Connector: src/reva/adapters/connectors/atlas_space.py (atlas.gcat -> atlas tables gcat.launches, gcat.payloads).
+source_key: gcat.planet4589
+title: GCAT - General Catalog of Artificial Space Objects (launch list, object catalogue, organisations, sites)
+provider_url: https://planet4589.org/space/gcat/
+lineage_family: gcat
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  terms_quote: "GCAT is released under the Creative Commons CC-BY licence ... Licence: CC-BY-4.0 Creative Commons/Attribution"
+  attribution: "McDowell, Jonathan C., 2020. General Catalog of Artificial Space Objects, Release <x>, https://planet4589.org/space/gcat"
+metadata:
+  allowed_hosts: [planet4589.org]
+  files:
+    - https://planet4589.org/space/gcat/index.html
+    - https://planet4589.org/space/gcat/tsv/tables/orgs.tsv
+    - https://planet4589.org/space/gcat/tsv/tables/sites.tsv
+    - https://planet4589.org/space/gcat/tsv/launch/launch.tsv
+    - https://planet4589.org/space/gcat/tsv/cat/satcat.tsv
+  authentication: none
+  editorial_status: compiled by one researcher from public sources; release 1.8.8 (2026-09-03), data updated near-daily
+  cadence: monthly re-download

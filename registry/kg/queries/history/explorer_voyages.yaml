@@ -12,7 +12,7 @@ entity_kind: person
 sparql: |
   SELECT DISTINCT ?person ?statement ?prop ?voyage ?rank ?start ?end ?pit WHERE {
     VALUES (?p ?ps ?prop) { (p:P1344 ps:P1344 wd:P1344) (p:P793 ps:P793 wd:P793) }
-    ?voyage wdt:P31/wdt:P279* wd:Q2401485 .
+    ?voyage p:P31 ?voyage_p31 . ?voyage_p31 ps:P31/wdt:P279* wd:Q2401485 ; wikibase:rank ?voyage_p31r . FILTER(?voyage_p31r != wikibase:DeprecatedRank)
     ?person ?p ?statement .
     ?statement ?ps ?voyage ; wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)

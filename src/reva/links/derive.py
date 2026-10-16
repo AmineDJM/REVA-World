@@ -34,6 +34,7 @@ from reva.links.model import (
     NoEvidence,
     Stmt,
     Temporal,
+    is_wikidata,
 )
 
 # --- classes (Wikidata) -------------------------------------------------------------------------------
@@ -222,12 +223,23 @@ def _temporal_basis(t: Temporal) -> str:
 
 # ---------------------------------------------------------------------------------------------- KG derivations
 def derive_symmetric(
-    index: KgIndex, prop: str, link_type: str, nodes: set[str], *, focus: set[str] | None = None
+    index: KgIndex,
+    prop: str,
+    link_type: str,
+    nodes: set[str],
+    *,
+    focus: set[str] | None = None,
+    sources: Callable[[str], bool] | None = None,
 ) -> Derivation:
-    """P47 (shares border with) / P530 (diplomatic relation) between two nodes; both directions merge."""
+    """P47 (shares border with) / P530 (diplomatic relation) between two nodes; both directions merge.
+    ``sources``: keep only statements whose source key passes (``border_wikidata`` is Wikidata's P47 only;
+    Natural Earth / GeoNames P47 loads are the ``land_border`` atlas kind)."""
     d = Derivation(link_type)
     for s in index.by_prop.get(prop, ()):
         if s.object is None:
+            continue
+        if sources is not None and not sources(s.source_key):
+            d.skip("other_source", statement=s.statement_id, source=s.source_key)
             continue
         if s.subject not in nodes or s.object not in nodes:
             d.skip("endpoint_not_a_polity", statement=s.statement_id)
@@ -433,7 +445,8 @@ def derive_colonial(index: KgIndex, polity_nodes: set[str]) -> Derivation:
                     # a colony that is part of a larger colony: not a colonial power
                     d.skip("part_of_another_colony", colony=colony, object=s.object)
                     continue
-                t, date_ev = s.temporal, ()
+                t = s.temporal
+                date_ev: tuple[Stmt, ...] = ()
                 if t.kind == "undated":
                     t, date_ev = index.entity_temporal(colony)
                 d.add(
@@ -798,7 +811,7 @@ class DerivedSet:
 
 
 def derive_all(
-    statements: Iterable[Stmt],
+    statements: Iterable[Stmt] | KgIndex,
     *,
     countries: Iterable[str] = (),
     focus: Iterable[str] | None = None,
@@ -815,7 +828,7 @@ def derive_all(
     pol = polities(index, countries)
     fset = set(focus) if focus is not None else None
     out: dict[str, Derivation] = {}
-    out["border_wikidata"] = derive_symmetric(index, "P47", "border_wikidata", pol, focus=fset)
+    out["border_wikidata"] = derive_symmetric(index, "P47", "border_wikidata", pol, focus=fset, sources=is_wikidata)
     out["diplomatic_relation"] = derive_symmetric(index, "P530", "diplomatic_relation", pol, focus=fset)
     out["shared_official_language"] = derive_shared_object(index, "P37", "shared_official_language", pol, focus=fset)
     out["shared_language_used"] = derive_shared_object(index, "P2936", "shared_language_used", pol, focus=fset)

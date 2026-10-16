@@ -11,17 +11,17 @@ purpose: seed_entities
 entity_kind: war
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    ?item wdt:P31/wdt:P279* wd:Q198 .
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* wd:Q198 ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
     ?item (wdt:P580|wdt:P585|wdt:P571) ?d .
     FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}})
   }
 sparql_undated: |
   SELECT DISTINCT ?item WHERE {
-    ?item wdt:P31/wdt:P279* wd:Q198 .
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* wd:Q198 ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
     FILTER NOT EXISTS { ?item (wdt:P580|wdt:P585|wdt:P571) ?d . }
   }
 split: {by: year, from: -3000, to: 2029, step: 500, include_undated: true}
-max_rows: 25000
+max_rows: 12000
 expand_hops: 1
 # WDQS-free selection (run --via api) when WDQS is throttled; same classes, CirrusSearch semantics.
 api_search: {instance_of: [Q198], subclass_depth: 3}

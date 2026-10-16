@@ -10,9 +10,9 @@ purpose: seed_entities
 entity_kind: event
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    ?item wdt:P31/wdt:P279* wd:Q10931 .
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* wd:Q10931 ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
   }
-max_rows: 5000
+max_rows: 2000
 expand_hops: 1
 # WDQS-free selection (run --via api) when WDQS is throttled; same classes, CirrusSearch semantics.
 api_search: {instance_of: [Q10931], subclass_depth: 3}

@@ -1,0 +1,27 @@
+agent: A-CULTURE
+requests:
+  - source_key: unesco.ich
+    daily_requests: 4
+    expected_bytes_per_day: 1000000
+    reason: >-
+      data.unesco.org dataset ich001 (ICH lists, CC BY-SA 4.0): one dataset record (~20 kB) + one JSON
+      export of 11 columns (~0.4 MB) per run (atlas.unesco_ich); weekly cadence; 4/day allows one retry.
+  - source_key: unesco.whc
+    daily_requests: 4
+    expected_bytes_per_day: 1500000
+    reason: >-
+      Additional to KGCULT's 4/day: atlas.unesco_whc_links (budget_key unesco.whc) re-reads the same two
+      whc001 items (~0.75 MB) to load World Heritage KG statements; requested total for the key = 8/day.
+  - source_key: unesco.uis
+    daily_requests: 4
+    expected_bytes_per_day: 2000000
+    reason: >-
+      Additional to A-HEALTHEDU's 30/day: atlas.uis_culture (budget_key unesco.uis) makes 2 requests per
+      run (versions/default + one CULTURE-theme query, ~0.9 MB); monthly cadence; requested total 34/day.
+  - source_key: wikipedia.olympic_medal_tables
+    daily_requests: 12
+    expected_bytes_per_day: 6000000
+    reason: >-
+      en.wikipedia.org action API: Olympic medal tables 1896-2026 (55 pages in batches of 10 titles with
+      content = 6 requests, ~2.3 MB) + Games articles pageprops (wikibase_item, 2 requests, ~20 kB);
+      monthly cadence; 12/day allows a retry after a Wikimedia 429.

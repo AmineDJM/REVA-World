@@ -60,7 +60,7 @@ async def test_lied_and_bmr_ingest(db):
     frame = read_atlas_table(db.store, t["artifact_sha256"])
     assert frame.filter(pl.col("provider_geo") == "Prussia|vdem=77")["iso3"].unique().to_list() == ["DEU"]
     bmr = await _run(db, "atlas.bmr")
-    assert {"260", "364", "713"} == {u["provider_geo"] for u in bmr["summary"]["table"]["unmapped_provider_geo"]}
+    assert {"260", "364"} == {u["provider_geo"] for u in bmr["summary"]["table"]["unmapped_provider_geo"]}  # 713 -> TWN
     assert _rights(db, "atlas.bmr.bmr")["licence"] == "CC0-1.0"
 
 

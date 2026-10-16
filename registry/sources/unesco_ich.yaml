@@ -1,0 +1,26 @@
+# V3 (agent A-CULTURE): UNESCO Intangible Cultural Heritage lists via UNESCO's open-data portal (Opendatasoft).
+# Connector: src/reva/adapters/connectors/atlas_culture.py (source atlas.unesco_ich) -> atlas table
+# unesco_ich.ich001 + KG statements (source_key unesco.ich).
+source_key: unesco.ich
+title: UNESCO Intangible Cultural Heritage Lists (data.unesco.org dataset ich001)
+provider_url: https://data.unesco.org/explore/dataset/ich001/
+lineage_family: unesco_ich
+rights:
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: "UNESCO Intangible Cultural Heritage - Lists (data.unesco.org, ich001)"
+metadata:
+  allowed_hosts: [data.unesco.org]
+  dataset_record: https://data.unesco.org/api/explore/v2.1/catalog/datasets/ich001
+  terms_of_use: >-
+    Licence as declared in the dataset record (metas.default.license = "CC BY-SA 4.0", checked
+    2026-10-16); a different licence blocks the run (kind "licence"). Attribution + share-alike on
+    derived tables. Only identifiers, titles, list, year, States and associated World Heritage
+    properties are requested (no descriptions, images, videos or photo credits).
+  share_alike: derived atlas tables are distributed under CC BY-SA 4.0
+  coverage: >-
+    current lists only (849 elements at the 2026-10-15 revision: 716 Representative List, 90 Urgent
+    Safeguarding List, 43 Register of Good Safeguarding Practices; 157 States; 103 multinational
+    elements); one inscription year per element; States added by later extensions are not dated
+  authentication: none
+  cadence: weekly check; the lists change once a year (Intergovernmental Committee session)

@@ -13,11 +13,11 @@ entity_kind: colony
 sparql: |
   SELECT DISTINCT ?item WHERE {
     VALUES ?root { wd:Q133156 wd:Q164142 wd:Q161243 }
-    ?item wdt:P31/wdt:P279* ?root .
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* ?root ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
     {{qid_filter}}
   }
 split: {by: qid_prefix}
-max_rows: 20000
+max_rows: 30000
 expand_hops: 1
 # WDQS-free selection (run --via api) when WDQS is throttled; same classes, CirrusSearch semantics.
 api_search: {instance_of: [Q133156, Q164142, Q161243], subclass_depth: 3}

@@ -1,0 +1,24 @@
+# Budget request from agent GAPHUNT (gap-fill sources: national/regional statistical offices).
+# ATLASCORE/ATLASOPS merge into registry/policies/budgets.yaml (src/reva/atlas/budget_merge.py).
+# atlas.gap_eurostat_nuts uses the existing key eurostat.dissemination (100/day; 7 requests per run) - no request.
+agent: GAPHUNT
+requests:
+  - source_key: spc.pdh_stat
+    # atlas.gap_spc: 4 SDMX-CSV requests per run (DF_POCKET ~2.5 MB, DF_DIGITAL_DEVELOPMENT ~0.1 MB filtered,
+    # DF_KEYFACTS 23 kB, DF_EMPRATES 5 kB), measured 2026-10-16.
+    daily_requests: 12
+    expected_bytes_per_day: 10000000
+    reason: "SPC PDH.Stat: 4 requests (~2.6 MB) per monthly run, two retries"
+  - source_key: insee.bdm
+    # atlas.gap_insee: IPC-2025 annual all-items (55 kB) + two Smic series by idbank (39 kB).
+    daily_requests: 6
+    expected_bytes_per_day: 1000000
+    reason: "Insee BDM SDMX: 2 requests (~0.1 MB) per monthly run, two retries"
+  - source_key: cbs.opendata
+    # atlas.gap_cbs_bes: 4 OData TypedDataSet requests (37 + 9 + 6 + 24 kB, labour table filtered server-side).
+    daily_requests: 12
+    expected_bytes_per_day: 1000000
+    reason: "CBS StatLine OData: 4 requests (~0.1 MB) per monthly run, two retries"
+daily_totals_increase:
+  http_requests_total: "+30"
+  http_bytes_total: "+12_000_000"

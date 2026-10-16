@@ -33,7 +33,7 @@ All connectors use template `atlas_bulk` and run fetch → archive every raw res
 |---|---|---:|---:|---:|---|---|
 | `atlas_undp.py` (`atlas.undp_hdr`) | `undp.hdr25` | 200,350 | 195 | 42 | 1990-2023 | 11 UNDP aggregates (ZZA.VHHD … ZZK.WORLD) |
 | | `undp.gmpi2026` | 4,865 | 113 | 27 (`t1.*` 13, `t2.*` 14) | survey years 2001-2025 | none (8 regional aggregates have no survey or period, so they are skipped and listed) |
-| `atlas_whr.py` (`atlas.whr`) | `whr.whr26_fig21` | 13,085 | 162 | 11 | windows 2010-12 … 2023-25 | Taiwan Province of China, North Cyprus, Somaliland Region |
+| `atlas_whr.py` (`atlas.whr`) | `whr.whr26_fig21` | 13,085 | 162 | 11 | windows 2010-12 … 2023-25 | North Cyprus, Somaliland Region (Taiwan Province of China → TWN since crosswalk 1.1.0) |
 | `atlas_owid.py` (`atlas.owid`) | `owid.energy` | 947,092 | 219 | 125 | 1900-2025 | 95 (continents, income groups, "Africa (EI)"-type source regions, USSR, Czechoslovakia, East/West Germany, Yugoslavia, Serbia and Montenegro, ANT, TWN) |
 | | `owid.co2` | 1,677,565 | 218 | 74 | 1750-2024 | 36 (regions, International aviation/shipping, Kuwaiti Oil Fires, Ryukyu Islands, TWN) |
 | | `owid.g_ghg_by_sector` | 74,673 | 193 | 11 | 1990-2023 | 12 OWID_* aggregates |
@@ -88,7 +88,7 @@ Parquet sha256 of the live tables:
 Two schemes are defined in `registry/atlas/geo_aliases/a_qol.yaml`, each alias with its evidence:
 
 - **`owid`**: base iso3, plus `OWID_KOS` → XKX and `Kosovo` → XKX. OWID's GitHub CSVs leave `iso_code` empty for Kosovo, so the connector uses the entity name there.
-- **`wid`**: base iso2, plus `KS` → XKX and `XI` → CHI. WID also lists `XK` "Kosovo", but its data member is header-only, so it is never mapped. Taiwan (TW, TWN) is not a crosswalk entity and stays unmapped everywhere.
+- **`wid`**: base iso2, plus `KS` → XKX and `XI` → CHI. WID also lists `XK` "Kosovo", but its data member is header-only, so it is never mapped. Taiwan: TWN joined the crosswalk in 1.1.0, so WID `TW` maps through the iso2 base and WHR "Taiwan Province of China" through a `NAME_ALIASES` entry (→ TWN).
 
 ## 3. Coverage by key concept (latest year per country, live tables)
 

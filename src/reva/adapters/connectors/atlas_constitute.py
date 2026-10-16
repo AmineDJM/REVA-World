@@ -22,7 +22,8 @@ reinterpret them (e.g. ``years_in_force`` looks computed against a fixed referen
 Period: the retrieval day ``[d, d+1)`` (a snapshot of the list; ``year_*`` values are years
 reported by the source, not the period of the cell). Geography: ``provider_geo`` = ``country_id``,
 mapped with the agent's ``constitute`` scheme (``registry/atlas/geo_aliases/a_law.yaml``);
-Baden, Bavaria, Germany (Prussia) and Taiwan stay unmapped (kept, listed).
+Baden, Bavaria and Germany (Prussia) stay unmapped (kept, listed); Taiwan (provider "Republic of
+China") maps to TWN since crosswalk 1.1.0.
 """
 
 from __future__ import annotations

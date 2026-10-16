@@ -53,7 +53,7 @@ async def test_constitute_ccp_factbook_ssa(db):
     out = await _fixture_run(db, atlas_constitute)
     (t,) = out["summary"]["tables"]
     assert t["dataset_key"] == "atlas.constitute.constitutions" and t["countries"] >= 185
-    assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} == {"Baden", "Bavaria", "Germany_Prussia", "Taiwan"}
+    assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} == {"Baden", "Bavaria", "Germany_Prussia"}
 
     out = await _fixture_run(db, atlas_ccp)
     rep = out["summary"]

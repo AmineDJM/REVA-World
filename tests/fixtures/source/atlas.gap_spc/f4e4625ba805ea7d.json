@@ -1,0 +1,5 @@
+DATAFLOW,FREQ: Frequency,GEO_PICT: Pacific Island Countries and territories,INDICATOR: Indicator,SEX: Sex,AGE: Age,URBANIZATION: Urbanization,DISABILITY: Disability,TIME_PERIOD: Time,OBS_VALUE,UNIT_MEASURE: Unit of measure,UNIT_MULT: Unit multiplier,OBS_STATUS: Observation Status,DATA_SOURCE: Data source,OBS_COMMENT: Comment,CONF_STATUS: Confidentiality status
+SPC:DF_EMPRATES(1.0),A: Annual,CK: Cook Islands,UNEMPRATE: Unemployment rate,_T: Total,_T: All ages,_T: National,_T: No breakdown by disability,2015,1.97,PERCENT: percent,,,,,
+SPC:DF_EMPRATES(1.0),A: Annual,TO: Tonga,UNEMPRATE: Unemployment rate,_T: Total,_T: All ages,_T: National,_T: No breakdown by disability,2016,2.08,PERCENT: percent,,,,,
+SPC:DF_EMPRATES(1.0),A: Annual,TO: Tonga,UNEMPRATE: Unemployment rate,_T: Total,_T: All ages,_T: National,_T: No breakdown by disability,2018,3.07,PERCENT: percent,,,,,
+SPC:DF_EMPRATES(1.0),A: Annual,TO: Tonga,UNEMPRATE: Unemployment rate,_T: Total,_T: All ages,_T: National,_T: No breakdown by disability,2021,3.8,PERCENT: percent,,,,,

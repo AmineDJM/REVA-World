@@ -125,7 +125,14 @@ RIGHTS = {
 LEVELS = ("family", "language", "dialect")
 LEVEL_FR = {"family": "famille", "language": "langue", "dialect": "dialecte"}
 #: AES code ids in order (CodeTable aes-*; numerical value 1..6)
-AES_ORDER = ("aes-not_endangered", "aes-threatened", "aes-shifting", "aes-moribund", "aes-nearly_extinct", "aes-extinct")
+AES_ORDER = (
+    "aes-not_endangered",
+    "aes-threatened",
+    "aes-shifting",
+    "aes-moribund",
+    "aes-nearly_extinct",
+    "aes-extinct",
+)
 LIVING_AES = frozenset(AES_ORDER[:5])
 ENDANGERED_AES = frozenset(AES_ORDER[1:5])
 
@@ -322,8 +329,16 @@ def load_predicates(path: Path = PREDICATES_FILE) -> list[Any]:
     from reva.kg.model import KgProperty
 
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    keys = ("pid", "value_kind", "reva_predicate", "label_en", "label_fr", "inverse_name", "inverse_label_en",
-            "inverse_label_fr")  # fmt: skip
+    keys = (
+        "pid",
+        "value_kind",
+        "reva_predicate",
+        "label_en",
+        "label_fr",
+        "inverse_name",
+        "inverse_label_en",
+        "inverse_label_fr",
+    )
     return [KgProperty(**{k: p[k] for k in keys if k in p}) for p in doc["predicates"]]
 
 
@@ -364,8 +379,13 @@ def load_kg(
 ) -> dict[str, Any]:
     """Register the predicates, then load in bounded batches; statements of this source (and prefix) that the
     new build no longer has are retracted (``removed_at_source``). ``retract_prefix=None``: no retraction."""
-    from reva.kg.model import MAX_ENTITIES_PER_BATCH, MAX_RETRACTIONS_PER_BATCH, MAX_STATEMENTS_PER_BATCH
-    from reva.kg.model import load_batch, statement_key
+    from reva.kg.model import (
+        MAX_ENTITIES_PER_BATCH,
+        MAX_RETRACTIONS_PER_BATCH,
+        MAX_STATEMENTS_PER_BATCH,
+        load_batch,
+        statement_key,
+    )
 
     props = ensure_kg_properties(engine, extra_properties)
     retract: list[str] = []
@@ -393,9 +413,18 @@ def load_kg(
             parameters=dict(parameters),
         )
         reports.append(rep.as_dict())
-    keys = ("entities_inserted", "entities_unchanged", "entities_conflicting", "labels_inserted",
-            "statements_inserted", "statements_new_revision", "statements_unchanged", "statements_stale",
-            "statements_conflicting", "retractions_inserted")  # fmt: skip
+    keys = (
+        "entities_inserted",
+        "entities_unchanged",
+        "entities_conflicting",
+        "labels_inserted",
+        "statements_inserted",
+        "statements_new_revision",
+        "statements_unchanged",
+        "statements_stale",
+        "statements_conflicting",
+        "retractions_inserted",
+    )
     rejected: Counter[str] = Counter()
     sample: list[Any] = []
     for r in reports:
@@ -445,8 +474,18 @@ class GlottologData:
     report: dict[str, Any]
 
 
-LANG_COLS = ("ID", "Name", "Level", "Macroarea", "Latitude", "Longitude", "Glottocode", "ISO639P3code", "Countries",
-             "Family_ID")  # fmt: skip
+LANG_COLS = (
+    "ID",
+    "Name",
+    "Level",
+    "Macroarea",
+    "Latitude",
+    "Longitude",
+    "Glottocode",
+    "ISO639P3code",
+    "Countries",
+    "Family_ID",
+)
 VALUE_COLS = ("ID", "Language_ID", "Parameter_ID", "Value", "Code_ID", "Comment", "Source")
 CODE_COLS = ("ID", "Parameter_ID", "Name", "Description")
 NAME_COLS = ("Language_ID", "Name", "Provider", "lang")
@@ -572,8 +611,16 @@ def glottolog_kg(
         key = "parameter" if table == "values.csv" else "column"
         return [{"stated_in": "Glottolog (CLDF)", "selector": {"table": table, "row_id": row_id, key: what}}]
 
-    def st(subject: str, pid: str, sid: str, refs: list[dict[str, Any]], *, obj: str | None = None,
-           value: Mapping[str, Any] | None = None, quals: Mapping[str, Any] | None = None) -> None:  # fmt: skip
+    def st(
+        subject: str,
+        pid: str,
+        sid: str,
+        refs: list[dict[str, Any]],
+        *,
+        obj: str | None = None,
+        value: Mapping[str, Any] | None = None,
+        quals: Mapping[str, Any] | None = None,
+    ) -> None:
         sts.append(
             KgStatement(
                 subject_qid=subject,
@@ -619,8 +666,14 @@ def glottolog_kg(
             )
         )
         if lg.parent:
-            st(node, P_PARENT, f"parent:{gc}", ref("values.csv", f"{gc}-classification", "classification"),
-               obj=f"glottolog:{lg.parent}", quals={"depth": len(lg.classification), "level": lg.level})  # fmt: skip
+            st(
+                node,
+                P_PARENT,
+                f"parent:{gc}",
+                ref("values.csv", f"{gc}-classification", "classification"),
+                obj=f"glottolog:{lg.parent}",
+                quals={"depth": len(lg.classification), "level": lg.level},
+            )
         if lg.family_id and lg.family_id != gc:
             st(node, P_FAMILY, f"family:{gc}", ref("languages.csv", gc, "Family_ID"), obj=f"glottolog:{lg.family_id}")
         for c in lg.countries:
@@ -629,8 +682,14 @@ def glottolog_kg(
                 unmapped[c] += 1
                 continue
             obj, how = country_node(iso3, country_qids)
-            st(node, P_SPOKEN_IN, f"spoken_in:{gc}:{c}", ref("languages.csv", gc, "Countries"), obj=obj,
-               quals={"iso2": c, "iso3": iso3, "country_node": how, "level": lg.level})  # fmt: skip
+            st(
+                node,
+                P_SPOKEN_IN,
+                f"spoken_in:{gc}:{c}",
+                ref("languages.csv", gc, "Countries"),
+                obj=obj,
+                quals={"iso2": c, "iso3": iso3, "country_node": how, "level": lg.level},
+            )
         if lg.aes:
             row = codes.get(lg.aes, {})
             q: dict[str, Any] = {"aes_code": lg.aes, "aes_rank": AES_ORDER.index(lg.aes) + 1}
@@ -640,21 +699,48 @@ def glottolog_kg(
                 q["comment"] = lg.aes_comment[:2000]
             if lg.aes_source:
                 q["glottolog_source_ids"] = lg.aes_source[:500]
-            st(node, P_AES, f"aes:{gc}", ref("values.csv", f"{gc}-aes", "aes"),
-               value={"type": "string", "value": _code_name(codes, lg.aes)}, quals=q)  # fmt: skip
+            st(
+                node,
+                P_AES,
+                f"aes:{gc}",
+                ref("values.csv", f"{gc}-aes", "aes"),
+                value={"type": "string", "value": _code_name(codes, lg.aes)},
+                quals=q,
+            )
         if lg.iso:
-            st(node, P_ISO, f"iso639_3:{gc}", ref("languages.csv", gc, "ISO639P3code"),
-               value={"type": "external_id", "value": lg.iso})  # fmt: skip
+            st(
+                node,
+                P_ISO,
+                f"iso639_3:{gc}",
+                ref("languages.csv", gc, "ISO639P3code"),
+                value={"type": "external_id", "value": lg.iso},
+            )
         if lg.level != "dialect":
             for m in lg.macroareas:
-                st(node, P_MACROAREA, f"macroarea:{gc}:{m}", ref("languages.csv", gc, "Macroarea"),
-                   value={"type": "string", "value": m})  # fmt: skip
+                st(
+                    node,
+                    P_MACROAREA,
+                    f"macroarea:{gc}:{m}",
+                    ref("languages.csv", gc, "Macroarea"),
+                    value={"type": "string", "value": m},
+                )
             if lg.category:
-                st(node, P_CATEGORY, f"category:{gc}", ref("values.csv", f"{gc}-category", "category"),
-                   value={"type": "string", "value": cat}, quals={"category_code": lg.category})  # fmt: skip
+                st(
+                    node,
+                    P_CATEGORY,
+                    f"category:{gc}",
+                    ref("values.csv", f"{gc}-category", "category"),
+                    value={"type": "string", "value": cat},
+                    quals={"category_code": lg.category},
+                )
         if lg.level == "language" and lg.lat is not None and lg.lon is not None:
-            st(node, P_COORDS, f"coords:{gc}", ref("languages.csv", gc, "Latitude;Longitude"),
-               value={"type": "globe_coordinate", "lat": lg.lat, "lon": lg.lon, "globe": "Q2"})  # fmt: skip
+            st(
+                node,
+                P_COORDS,
+                f"coords:{gc}",
+                ref("languages.csv", gc, "Latitude;Longitude"),
+                value={"type": "globe_coordinate", "lat": lg.lat, "lon": lg.lon, "globe": "Q2"},
+            )
     report = {
         "entities": len(ents),
         "statements": len(sts),
@@ -703,22 +789,34 @@ def atlas_rows(data: GlottologData, *, raw_sha256: str, release: Release) -> lis
     ]
     for c in cats:
         indicators.append(
-            (f"languages_listed|category={c.removeprefix('category-')}", f"category {c}",
-             lambda xs, c=c: [x for x in xs if (x.category or "none") == c])  # fmt: skip
+            (
+                f"languages_listed|category={c.removeprefix('category-')}",
+                f"category {c}",
+                lambda xs, c=c: [x for x in xs if (x.category or "none") == c],
+            )
         )
     for a in (*AES_ORDER, None):
         name = a.removeprefix("aes-") if a else "none"
         indicators.append(
-            (f"spoken_l1|aes={name}", f"category-Spoken_L1_Language and AES {a or 'not given'}",
-             lambda xs, a=a: [x for x in spoken(xs) if x.aes == a])  # fmt: skip
+            (
+                f"spoken_l1|aes={name}",
+                f"category-Spoken_L1_Language and AES {a or 'not given'}",
+                lambda xs, a=a: [x for x in spoken(xs) if x.aes == a],
+            )
         )
     indicators.append(
-        ("spoken_l1_living", "category-Spoken_L1_Language and AES in not_endangered..nearly_extinct",
-         lambda xs: [x for x in spoken(xs) if x.aes in LIVING_AES])  # fmt: skip
+        (
+            "spoken_l1_living",
+            "category-Spoken_L1_Language and AES in not_endangered..nearly_extinct",
+            lambda xs: [x for x in spoken(xs) if x.aes in LIVING_AES],
+        )
     )
     indicators.append(
-        ("spoken_l1_endangered", "category-Spoken_L1_Language and AES in threatened..nearly_extinct",
-         lambda xs: [x for x in spoken(xs) if x.aes in ENDANGERED_AES])  # fmt: skip
+        (
+            "spoken_l1_endangered",
+            "category-Spoken_L1_Language and AES in threatened..nearly_extinct",
+            lambda xs: [x for x in spoken(xs) if x.aes in ENDANGERED_AES],
+        )
     )
     rows = []
     for geo in sorted(by_geo):
@@ -869,7 +967,10 @@ def feature_statements(
             KgStatement(
                 subject_qid=subject,
                 property_pid=prop.pid,
-                value={"type": "string", "value": ((code[src.value_column] or code["Name"]) if code is not None else val)},
+                value={
+                    "type": "string",
+                    "value": ((code[src.value_column] or code["Name"]) if code is not None else val),
+                },
                 qualifiers=q,
                 references=[{"stated_in": src.stated_in, "selector": {"table": "values.csv", "row_id": r["ID"]}}],
                 statement_id=f"value:{r['ID']}",
@@ -955,8 +1056,9 @@ WD_PREFIX = "glottolog_xref:"
 RANKS = {"http://wikiba.se/ontology#PreferredRank": "preferred", "http://wikiba.se/ontology#NormalRank": "normal"}
 
 
-def wikidata_statements(bindings: Sequence[Mapping[str, Any]], *, raw_sha256: str, retrieved_at: datetime,
-                        query_sha256: str) -> tuple[list[Any], dict[str, Any]]:  # fmt: skip
+def wikidata_statements(
+    bindings: Sequence[Mapping[str, Any]], *, raw_sha256: str, retrieved_at: datetime, query_sha256: str
+) -> tuple[list[Any], dict[str, Any]]:
     """WDQS rows -> ``glottolog:<code> --glottolog:wikidata_item--> Q`` statements (source wikidata.wdqs)."""
     from reva.adapters.connectors.wikidata import qid_from_uri, statement_id_from_uri
     from reva.kg.model import KgStatement
@@ -1048,8 +1150,13 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
         parameters={"connector": WD_NAME, "parser": PARSER_VERSION, "query_sha256": res.query_sha256},
         retract_prefix=WD_PREFIX,
     )
-    return {"raw_sha256": res.raw_sha256, "query_sha256": res.query_sha256, "build": report, "kg": kg,
-            "client": client.stats.as_dict()}  # fmt: skip
+    return {
+        "raw_sha256": res.raw_sha256,
+        "query_sha256": res.query_sha256,
+        "build": report,
+        "kg": kg,
+        "client": client.stats.as_dict(),
+    }
 
 
 def _known_glottocodes(engine: Any, origin: str) -> set[str]:

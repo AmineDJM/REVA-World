@@ -1,0 +1,23 @@
+id: science.vaccines
+domain: science
+owner: KGSCIECO
+description: >-
+  Vaccines: items with a "vaccine for" (P1924) statement, or instances of vaccine (Q134808) or of a subclass,
+  or direct instances of vaccine type (Q105967696), with at least 3 sitelinks (smallpox, rabies, BCG, polio,
+  the COVID-19 vaccines ...). Snapshots keep discoverer/inventor (P61, e.g. rabies vaccine -> Louis Pasteur),
+  time of discovery (P575), country of origin (P495); vaccine for (P1924), developer (P178) and manufacturer
+  (P176) are requested and arrive with the snapshots once allow-listed.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { ?item wdt:P1924 ?disease . }
+    UNION
+    { ?item wdt:P31/wdt:P279* wd:Q134808 . }
+    UNION
+    { ?item wdt:P31 wd:Q105967696 . }
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 3000
+expand_hops: 1

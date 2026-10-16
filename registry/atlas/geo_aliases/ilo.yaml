@@ -1,9 +1,9 @@
 # ILOSTAT reference-area codes (agent A-ILO). ILOSTAT uses ISO 3166-1 alpha-3 codes for
 # countries and territories, plus its own codes for a few areas and "X.." codes for regional /
 # income aggregates. Only codes whose ILOSTAT label names exactly the same entity as a crosswalk
-# key are aliased; everything else (aggregates X01..X99, ANT "Netherlands Antilles" (historical),
-# TWN "Taiwan, China" (not an entity of registry/entities/country_crosswalk.json)) stays unmapped
-# and is listed in each atlas table's manifest, never dropped.
+# key are aliased; everything else (aggregates X01..X99, ANT "Netherlands Antilles" (historical))
+# stays unmapped and is listed in each atlas table's manifest, never dropped. TWN "Taiwan, China"
+# maps to TWN through the iso3 base since crosswalk 1.1.0 (ISO 3166-1).
 scheme: ilo
 base: iso3
 aliases:

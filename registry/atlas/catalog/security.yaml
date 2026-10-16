@@ -1,0 +1,150 @@
+# Security and defence (agent A-MILITARY). Provider-declared concepts (not human-reviewed).
+# Atlas tables: unpk.contrib_monthly / contrib_pre2010 / contrib_annual / fatalities (UN Peace and Security Data Hub,
+# values verbatim) and unpk.totals (COMPUTED by REVA: sums over missions, personnel types and sexes; flagged
+# computed_from). Licence CC BY 3.0 IGO. See docs/dev/v3_a_military.md.
+#
+# Not here, on purpose (no duplicate concepts; see the report):
+# * military expenditure (% GDP, current US$, LCU, % government spending) and arms imports/exports (SIPRI TIV):
+#   SIPRI's own databases are not ingested (SIPRI terms: reproducing > 10 % of a data set needs SIPRI's written
+#   authorisation); the World Bank WDI copies are concepts wb.ms.mil.xpnd.gd.zs, wb.ms.mil.xpnd.cd,
+#   wb.ms.mil.xpnd.cn, wb.ms.mil.xpnd.zs, wb.ms.mil.mprt.kd, wb.ms.mil.xprt.kd (registry/atlas/catalog/worldbank.yaml,
+#   tagged licence:check: "SIPRI terms and conditions"); CIA Factbook factbook.military_expenditure_gdp;
+#   COW NMC military expenditure 1816-2016 (history.yaml, A-HISTECON);
+# * armed forces personnel: wb.ms.mil.totl.p1 / wb.ms.mil.totl.tf.zs (WDI, from IISS Military Balance via the
+#   World Bank) and history.military_personnel (COW NMC, 1816-2016). IISS Military Balance itself is proprietary.
+domain: security
+labels: {fr: "Sécurité et défense (maintien de la paix de l'ONU)", en: "Security and defence (UN peacekeeping)"}
+maintainer: A-MILITARY
+concepts:
+  - id: security.un_peacekeeping_personnel_annual_avg
+    labels: {fr: "Personnel en uniforme fourni aux opérations de paix de l'ONU (moyenne annuelle, calculé)", en: "Uniformed personnel contributed to UN peace operations (annual average, computed)"}
+    definition: >-
+      COMPUTED by REVA from the UN Peace and Security Data Hub "Annual Uniformed Personnel Contribution Statistics"
+      (DataCommons-UCHISTORICAL): sum over personnel types (troops, staff officers, experts on mission, individual
+      police, formed police units) and sexes of the provider's annual averages of the uniformed personnel a country
+      deployed to UN missions (peacekeeping operations and special political missions), 2010 onwards. Annual
+      averages, not unique individuals and not the 31 December strength. The current year is incomplete
+      (flagged).
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total"]
+    provider_declared: true
+    notes: "Per type and sex as published: unpk.contrib_annual.annual_average_uniformed_personnel|type=<type>|sex=<male|female>."
+  - id: security.un_peacekeeping_troops_annual_avg
+    labels: {fr: "Troupes fournies aux opérations de paix de l'ONU (moyenne annuelle, calculé)", en: "Troops contributed to UN peace operations (annual average, computed)"}
+    definition: "COMPUTED: male + female annual averages of personnel type 'Troops' (DataCommons-UCHISTORICAL; 'Troops ' with a trailing space in 2017-2019 is the same type), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|type=Troops"]
+    provider_declared: true
+  - id: security.un_peacekeeping_staff_officers_annual_avg
+    labels: {fr: "Officiers d'état-major fournis aux opérations de paix de l'ONU (moyenne annuelle, calculé)", en: "Staff officers contributed to UN peace operations (annual average, computed)"}
+    definition: "COMPUTED: male + female annual averages of personnel type 'Staff Officer' (DataCommons-UCHISTORICAL), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|type=Staff Officer"]
+    provider_declared: true
+  - id: security.un_peacekeeping_experts_annual_avg
+    labels: {fr: "Experts en mission (observateurs militaires) fournis à l'ONU (moyenne annuelle, calculé)", en: "Experts on mission (military observers) contributed to the UN (annual average, computed)"}
+    definition: "COMPUTED: male + female annual averages of personnel type 'Experts on Mission' (DataCommons-UCHISTORICAL), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|type=Experts on Mission"]
+    provider_declared: true
+  - id: security.un_peacekeeping_individual_police_annual_avg
+    labels: {fr: "Policiers individuels fournis à l'ONU (moyenne annuelle, calculé)", en: "Individual police contributed to the UN (annual average, computed)"}
+    definition: "COMPUTED: male + female annual averages of personnel type 'Individual Police' (DataCommons-UCHISTORICAL), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|type=Individual Police"]
+    provider_declared: true
+  - id: security.un_peacekeeping_formed_police_annual_avg
+    labels: {fr: "Unités de police constituées fournies à l'ONU (moyenne annuelle, calculé)", en: "Formed police units contributed to the UN (annual average, computed)"}
+    definition: "COMPUTED: male + female annual averages of personnel type 'Formed Police Units' (DataCommons-UCHISTORICAL), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|type=Formed Police Units"]
+    provider_declared: true
+  - id: security.un_peacekeeping_women_annual_avg
+    labels: {fr: "Femmes en uniforme fournies aux opérations de paix de l'ONU (moyenne annuelle, calculé)", en: "Uniformed women contributed to UN peace operations (annual average, computed)"}
+    definition: "COMPUTED: sum over personnel types of the provider's female annual averages (DataCommons-UCHISTORICAL), 2010 onwards."
+    unit: persons (annual average)
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.annual_average_uniformed_personnel_total|sex=female"]
+    provider_declared: true
+  - id: security.un_peacekeeping_personnel_month_end
+    labels: {fr: "Personnel en uniforme déployé auprès de l'ONU à la date de fin de mois (calculé)", en: "Uniformed personnel deployed with the UN at the month-end reporting date (computed)"}
+    definition: >-
+      COMPUTED by REVA: total uniformed personnel a country had deployed in UN missions at each month's last
+      reporting date, summed over missions and personnel types. 2010-01 onwards: male + female of every type
+      (DPO-UCHISTORICAL). 1990-11 to 2009-12: Troops + Civilian_Police + Observers (DPPADPO-UCPre2010; the late-2009
+      categories Individual_Police, Formed_Police_Units, Experts_on_Mission overlap these and are not added).
+      Periods are single days (the reporting date). Dates when the provider coded a dissolved state with its
+      successor's code (USSR as RUS, Czechoslovakia as CZE, Yugoslavia as SRB) are kept unmapped with the
+      historical state's QID.
+    unit: persons
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.uniformed_personnel_total"]
+    provider_declared: true
+    notes: "Per mission and type as published: unpk.contrib_monthly (2010+) and unpk.contrib_pre2010 (1990-2009). Some months are missing in the provider data (provider caveat)."
+  - id: security.un_peacekeeping_women_month_end
+    labels: {fr: "Femmes en uniforme déployées auprès de l'ONU à la date de fin de mois (calculé)", en: "Uniformed women deployed with the UN at the month-end reporting date (computed)"}
+    definition: "COMPUTED: sum of female_personnel over missions and personnel types at each month-end reporting date (DPO-UCHISTORICAL), 2010-01 onwards."
+    unit: persons
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.uniformed_personnel_total|sex=female"]
+    provider_declared: true
+  - id: security.un_peacekeeping_fatalities
+    labels: {fr: "Morts parmi le personnel des missions de l'ONU, par nationalité (calculé)", en: "Fatalities among UN mission personnel, by nationality (computed)"}
+    definition: >-
+      COMPUTED by REVA from the UN Peace and Security Data Hub "Annual Mission Fatalities Statistics"
+      (DataCommons-Fatalities): fatalities among personnel of UN peacekeeping operations and special political
+      missions of the country's nationality in the incident year, summed over missions and types of fatality
+      (malicious act, accident, illness, other, to be determined), 1948 onwards. By nationality of the casualty,
+      not the incident location; data before 2000 may be incomplete (provider). Provider rows repeated under
+      several mission ids (UNEF) are counted once.
+    unit: deaths
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.fatalities_total"]
+    provider_declared: true
+    notes: "Per mission and type as published: unpk.fatalities.fatalities|mission=<acronym>|type=<type>."
+  - id: security.un_peacekeeping_fatalities_malicious
+    labels: {fr: "Morts par acte malveillant parmi le personnel des missions de l'ONU, par nationalité (calculé)", en: "Fatalities from malicious acts among UN mission personnel, by nationality (computed)"}
+    definition: "COMPUTED: fatalities of type 'Malicious Act' summed over missions (DataCommons-Fatalities), by nationality of the casualty and incident year, 1948 onwards."
+    unit: deaths
+    domain: security
+    subdomain: peacekeeping
+    theme: politics
+    value_kind: numeric
+    source_order: ["unpk.totals.fatalities_total|type=Malicious Act"]
+    provider_declared: true

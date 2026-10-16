@@ -30,6 +30,14 @@ async def _run(db: Any) -> dict[str, Any]:
     return out["summary"]
 
 
+def _node(iso3: str) -> str:
+    """The KG node the overlay uses for a country: its QID from WDHARVEST's registry/entities/country_qids.json when
+    that file maps it, else the REVA node iso3:<KEY> (same rule as the connector)."""
+    from reva.adapters.connectors.atlas_geo_common import load_country_qids
+
+    return load_country_qids().get(iso3) or f"iso3:{iso3}"
+
+
 def _pid(name: str) -> str:
     return ac.entity_ids([name])[name]
 
@@ -40,13 +48,14 @@ async def test_cliopatria_fixture_ingest_overlay_and_paths(db: Any) -> None:
     assert not kg["rejected_counts"], kg["rejected_sample"]
     assert kg["statements_inserted"] > 100 and kg["entities_inserted"] > 10
     assert s["release"] == "v0.2.1" and s["licence"] == "CC BY 4.0"
-    assert s["country_qids"]["resolved"] == 0  # throwaway DB: no P298 harvest, no country_qids.json -> iso3 nodes
+    bra = _node("BRA")
+    assert (s["country_qids"]["resolved"] > 0) == bra.startswith("Q")
     with db.owner.connect() as c:
         rows = c.execute(
             text("""SELECT start_time, end_time, qualifiers, raw_sha256, source_key, origin FROM kg.statement_current
-                    WHERE subject_qid = :s AND property_pid = 'geo:covered_territory_of' AND object_qid = 'iso3:BRA'
+                    WHERE subject_qid = :s AND property_pid = 'geo:covered_territory_of' AND object_qid = :o
                     ORDER BY start_time"""),
-            {"s": _pid("Portuguese Empire")},
+            {"s": _pid("Portuguese Empire"), "o": bra},
         ).all()
         assert rows, "Brazil <- Portuguese Empire"
         q = rows[0].qualifiers
@@ -72,7 +81,7 @@ async def test_cliopatria_fixture_ingest_overlay_and_paths(db: Any) -> None:
             {"s": _pid("Portuguese Empire")},
         ).scalar_one()
         # the neurons: Brazil -- (overlay) -- Portuguese Empire (Cliopatria) -- denotes -- Q200464 (Wikidata)
-        res = kq.paths(c, "iso3:BRA", "Q200464", max_hops=2)
+        res = kq.paths(c, bra, "Q200464", max_hops=2)
         assert res["paths"], res
         hops = res["paths"][0]["hops"]
         assert [h["property"]["pid"] for h in hops] == ["geo:covered_territory_of", "cliopatria:denotes"]
@@ -133,5 +142,5 @@ async def test_new_build_without_a_statement_retracts_it(db: Any) -> None:
 async def test_path_across_bce_dated_overlay(db: Any) -> None:
     await _run(db)
     with db.owner.connect() as c:
-        res = kq.paths(c, "iso3:ITA", "Q12544", max_hops=2)  # Italy -- Roman Empire (-31..20) -- Q12544
+        res = kq.paths(c, _node("ITA"), "Q12544", max_hops=2)  # Italy -- Roman Empire (-31..20) -- Q12544
     assert res["paths"]

@@ -1,0 +1,182 @@
+# Physical-network concepts of the atlas (agent A-INFRA): airports, air routes, ports, space launches and payloads,
+# submarine cables. Provider-declared definitions, not human-reviewed. Every value is a REVA-derived COUNT of provider
+# records (flags.derived = "count" with the exact formula); a country without a row has no such record in the source
+# (never a zero). Country-pair (dyadic) series -- partner in the indicator, flags.partner_iso3 -- are link-layer tables
+# for LINKS, not country concepts: openflights.routes_2014 ROUTES_OPERATED|partner=*, ROUTE_AIRPORT_PAIRS|partner=*,
+# ROUTE_AIRLINES|partner=*; gcat.payloads PAYLOADS_LAUNCHED_FROM|partner=*; wikidata.submarine_cables
+# CABLES_SHARED|partner=*, CABLE_FIRST_SERVICE_YEAR|partner=* (docs/dev/v3_a_infra.md).
+# Every series string is checked against the fixture tables by tests/unit/test_atlas_infra.py.
+domain: infrastructure
+labels:
+  fr: Infrastructures et réseaux physiques
+  en: Infrastructure and physical networks
+maintainer: A-INFRA
+concepts:
+- id: infrastructure.airports_open.ourairports
+  labels: {fr: "Aérodromes ouverts (OurAirports)", en: "Open airfields (OurAirports)"}
+  definition: >-
+    Number of OurAirports records located in the country whose type is not 'closed' (large, medium and small airports,
+    heliports, seaplane bases, balloonports), at the retrieval day.
+  unit: airports
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["ourairports.airports.AIRPORTS_OPEN"]
+  provider_declared: true
+  notes: Crowd-sourced public-domain database updated daily; counts are snapshots, not an official register.
+- id: infrastructure.airports_large.ourairports
+  labels: {fr: "Grands aéroports (OurAirports)", en: "Large airports (OurAirports)"}
+  definition: Number of OurAirports records of type 'large_airport' located in the country, at the retrieval day.
+  unit: airports
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["ourairports.airports.AIRPORTS|type=large_airport"]
+  provider_declared: true
+- id: infrastructure.airports_medium.ourairports
+  labels: {fr: "Aéroports moyens (OurAirports)", en: "Medium airports (OurAirports)"}
+  definition: Number of OurAirports records of type 'medium_airport' located in the country, at the retrieval day.
+  unit: airports
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["ourairports.airports.AIRPORTS|type=medium_airport"]
+  provider_declared: true
+- id: infrastructure.airports_scheduled_service.ourairports
+  labels: {fr: "Aéroports avec vols réguliers (OurAirports)", en: "Airports with scheduled service (OurAirports)"}
+  definition: Number of open OurAirports records in the country flagged scheduled_service = yes, at the retrieval day.
+  unit: airports
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["ourairports.airports.AIRPORTS_SCHEDULED_SERVICE"]
+  provider_declared: true
+- id: infrastructure.air_routes_international_out_2014.openflights
+  labels: {fr: "Liaisons aériennes internationales au départ, 2014 (OpenFlights)", en: "International air routes out, 2014 (OpenFlights)"}
+  definition: >-
+    Number of OpenFlights route records (one airline on one directed airport pair, codeshares excluded) from an airport
+    of the country to an airport of another country, as of June 2014.
+  unit: routes
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["openflights.routes_2014.ROUTES_OPERATED_INTL_OUT"]
+  provider_declared: true
+  notes: STALE - the provider's route data stopped being updated in June 2014 (historical value only). ODbL share-alike.
+  tags: ["stale:2014-06", "bilateral_detail:openflights.routes_2014"]
+- id: infrastructure.air_routes_domestic_2014.openflights
+  labels: {fr: "Liaisons aériennes intérieures, 2014 (OpenFlights)", en: "Domestic air routes, 2014 (OpenFlights)"}
+  definition: >-
+    Number of OpenFlights route records (codeshares excluded) with both airports in the country, as of June 2014.
+  unit: routes
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["openflights.routes_2014.ROUTES_OPERATED_DOMESTIC"]
+  provider_declared: true
+  notes: STALE - route data frozen in June 2014.
+  tags: ["stale:2014-06"]
+- id: infrastructure.air_destination_countries_2014.openflights
+  labels: {fr: "Pays desservis par avion, 2014 (OpenFlights)", en: "Countries reached by direct flights, 2014 (OpenFlights)"}
+  definition: >-
+    Number of distinct other countries with at least one OpenFlights route record (codeshares included) from an
+    airport of the country, as of June 2014.
+  unit: countries
+  domain: infrastructure
+  subdomain: air
+  theme: economy
+  source_order: ["openflights.routes_2014.ROUTE_DEST_COUNTRIES"]
+  provider_declared: true
+  notes: STALE - route data frozen in June 2014.
+  tags: ["stale:2014-06", "bilateral_detail:openflights.routes_2014"]
+- id: infrastructure.ports_listed.nga_wpi
+  labels: {fr: "Ports répertoriés (World Port Index)", en: "Ports listed (World Port Index)"}
+  definition: Number of NGA World Port Index records of the country, at the retrieval day.
+  unit: ports
+  domain: infrastructure
+  subdomain: maritime
+  theme: economy
+  source_order: ["nga.wpi.PORTS_LISTED"]
+  provider_declared: true
+  notes: The WPI lists ports for navigation; it is not a census of ports and its coverage is uneven between countries.
+- id: infrastructure.ports_large.nga_wpi
+  labels: {fr: "Grands ports (World Port Index)", en: "Large harbours (World Port Index)"}
+  definition: Number of NGA World Port Index records of the country with harbour size code L (large), at the retrieval day.
+  unit: ports
+  domain: infrastructure
+  subdomain: maritime
+  theme: economy
+  source_order: ["nga.wpi.PORTS_LISTED|harbor_size=L"]
+  provider_declared: true
+- id: infrastructure.ports_container.nga_wpi
+  labels: {fr: "Ports avec manutention de conteneurs (World Port Index)", en: "Ports with container handling (World Port Index)"}
+  definition: Number of NGA World Port Index records of the country with container load/offload facilities (loContainer = Y).
+  unit: ports
+  domain: infrastructure
+  subdomain: maritime
+  theme: economy
+  source_order: ["nga.wpi.PORTS_LISTED|container_facilities=Y"]
+  provider_declared: true
+- id: infrastructure.space_orbital_launch_attempts_site.gcat
+  labels: {fr: "Tentatives de lancement orbital depuis le territoire (GCAT)", en: "Orbital launch attempts from the state's sites (GCAT)"}
+  definition: >-
+    Number of orbital or deep-space launch attempts (GCAT LaunchCode O*/D* with outcome S, F or U) in the year from
+    launch sites that GCAT attributes to the state.
+  unit: launches
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.launches.ORBITAL_LAUNCH_ATTEMPTS|by=site_state"]
+  provider_declared: true
+  notes: GCAT attributes a site record to a state for its period (Baikonur = USSR before 1989, Russia after; Kourou = French Guiana).
+- id: infrastructure.space_orbital_launch_successes_site.gcat
+  labels: {fr: "Lancements orbitaux réussis depuis le territoire (GCAT)", en: "Successful orbital launches from the state's sites (GCAT)"}
+  definition: As the attempts concept, limited to launches GCAT codes as successes (second LaunchCode letter S).
+  unit: launches
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.launches.ORBITAL_LAUNCH_SUCCESSES|by=site_state"]
+  provider_declared: true
+- id: infrastructure.space_orbital_launch_attempts_agency.gcat
+  labels: {fr: "Tentatives de lancement orbital par les agences de l'État (GCAT)", en: "Orbital launch attempts by the state's launch agencies (GCAT)"}
+  definition: >-
+    Number of orbital or deep-space launch attempts in the year whose launch agency GCAT attributes to the state.
+  unit: launches
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.launches.ORBITAL_LAUNCH_ATTEMPTS|by=agency_state"]
+  provider_declared: true
+- id: infrastructure.space_launch_sites_used.gcat
+  labels: {fr: "Sites de lancement orbital utilisés (GCAT)", en: "Orbital launch sites used (GCAT)"}
+  definition: Number of distinct GCAT launch sites attributed to the state with at least one orbital launch attempt in the year.
+  unit: sites
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.launches.ORBITAL_LAUNCH_SITES_USED|by=site_state"]
+  provider_declared: true
+- id: infrastructure.space_payloads_catalogued.gcat
+  labels: {fr: "Satellites (charges utiles) mis en orbite, par État propriétaire (GCAT)", en: "Payloads placed in orbit, by owner state (GCAT)"}
+  definition: >-
+    Number of GCAT standard-catalogue payloads (objects that reached orbit, type P) launched in the year whose
+    owner/operator state is the state.
+  unit: payloads
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.payloads.PAYLOADS_CATALOGUED|by=owner_state"]
+  provider_declared: true
+  tags: ["bilateral_detail:gcat.payloads"]
+- id: infrastructure.space_payloads_in_orbit.gcat
+  labels: {fr: "Charges utiles en orbite, par État propriétaire (GCAT)", en: "Payloads in orbit, by owner state (GCAT)"}
+  definition: >-
+    Number of GCAT standard-catalogue payloads of the owner state whose current status is 'O' (in orbit, free flight) at
+    the GCAT data update; includes inactive payloads.
+  unit: payloads
+  domain: infrastructure
+  subdomain: space
+  theme: science
+  source_order: ["gcat.payloads.PAYLOADS_STATUS_IN_ORBIT|by=owner_state"]
+  provider_declared: true

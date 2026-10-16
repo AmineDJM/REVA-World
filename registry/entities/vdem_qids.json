@@ -8491,9 +8491,9 @@
     1900,
     2025
    ],
-   "crosswalk_iso3": null,
+   "crosswalk_iso3": "TWN",
    "qid": null,
-   "method": "periods only",
+   "method": "periods only; crosswalk entity TWN since crosswalk 1.1.0 (agent TWNMAP): period QIDs kept because the unit's 1945-1948 period is the Republic of China headquartered on the mainland (Q13426199), not the post-1949 state (Q865)",
    "periods": [
     {
      "histname": "Taiwan under Japanese occupation",
@@ -9473,7 +9473,7 @@
     "713"
    ],
    "qid": "Q865",
-   "method": "agent_decision (name: Taiwan)"
+   "method": "agent_decision (name: Taiwan); BMR 713 maps to crosswalk TWN since crosswalk 1.1.0 (QID kept, same entity)"
   },
   {
    "bmr_ccode": [

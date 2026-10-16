@@ -275,11 +275,25 @@ def parse_flow(
         order = [c for c in csvd.components if c in flow.dims]
         if tuple(order) != flow.dims:
             raise FiscalParseError(f"{flow.flow}: dimension order changed", got=order, expected=list(flow.dims))
+        # BIS writes series-level attributes on their own rows (no FREQ, period or value), keyed by the
+        # other dimensions; observation rows leave those cells empty -> filled from the series row.
+        series_attrs: dict[tuple[str, ...], Row] = {}
+        sdims = [d for d in flow.dims if d != "FREQ"]
+        for r in csvd.rows:
+            if not _get(r, "TIME_PERIOD")[0] and _get(r, "OBS_VALUE")[0].strip() in NO_VALUE:
+                k = tuple(_get(r, d)[0] for d in sdims)
+                series_attrs.setdefault(k, {}).update({c: v for c, v in r.items() if v[0] and c not in flow.dims})
         for n, r in enumerate(csvd.rows, start=1):
             rep.rows += 1
             sid = _get(r, "STRUCTURE_ID")[0]
             if flow.flow not in sid:
                 raise FiscalParseError(f"{flow.flow}: row of another structure", row=n, structure=sid[:120])
+            if not _get(r, "TIME_PERIOD")[0] and _get(r, "OBS_VALUE")[0].strip() in NO_VALUE:
+                rep.no_value["(series attribute row)"] += 1
+                continue
+            sa = series_attrs.get(tuple(_get(r, d)[0] for d in sdims))
+            if sa:
+                r = {**sa, **{c: v for c, v in r.items() if v[0]}}
             freq = _get(r, "FREQ")[0] or "A"
             if freq not in flow.freqs:
                 raise FiscalParseError(f"{flow.flow}: unexpected frequency", row=n, freq=freq[:4])
@@ -470,7 +484,9 @@ async def ingest_flows(
             except BudgetExhausted:
                 raise
             except Exception as e:
-                out["errors"].append({"dataset": fl.dataset, "item": rq.key, "error": type(e).__name__, "message": str(e)[:300]})
+                out["errors"].append(
+                    {"dataset": fl.dataset, "item": rq.key, "error": type(e).__name__, "message": str(e)[:300]}
+                )
                 failed = True
                 break
             sha = run.archive(raw)
@@ -521,9 +537,9 @@ async def ingest_flows(
 
 
 __all__ = [
+    "FiscalParseError",
     "Flow",
     "FlowReport",
-    "FiscalParseError",
     "LabelledCsv",
     "Request",
     "canon",

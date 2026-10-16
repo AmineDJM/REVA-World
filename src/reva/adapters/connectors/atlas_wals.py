@@ -93,8 +93,12 @@ def wals_subjects(z: gl.CldfZip) -> tuple[dict[str, str], dict[str, str], list[A
             )
         )
     shared = len(subject) - len(set(subject.values()))
-    return subject, names, ents, {"languages": len(subject), "without_glottocode": sorted(no_gc),
-                                  "languages_sharing_a_glottocode": shared}  # fmt: skip
+    return (
+        subject,
+        names,
+        ents,
+        {"languages": len(subject), "without_glottocode": sorted(no_gc), "languages_sharing_a_glottocode": shared},
+    )
 
 
 def atlas_source() -> AtlasSourceSpec:

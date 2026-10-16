@@ -1,0 +1,801 @@
+# Agent A-TREATIES geography aliases (UNTC participant names; OHCHR ISO3 area ids).
+note: 'Agent A-TREATIES provider geography scheme ''untc'': participant names exactly as the UN Treaty Collection status pages
+  write them -> crosswalk keys. Built from the 53 archived MTDSG pages (2026-10-16) by exact normalised match against the
+  crosswalk''s un_name/label/iso_name/worldbank_name; one manual entry (Czech Republic). Non-State participants (European
+  Union) are deliberately absent and stay unmapped (kept, listed). The OHCHR dashboard uses ISO3 (scheme ohchr below, base
+  iso3).'
+schemes:
+  untc:
+    base: null
+    aliases:
+    - code: Afghanistan
+      iso3: AFG
+      source: 'exact normalised name match: UNTC participant ''Afghanistan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AFG'
+    - code: Albania
+      iso3: ALB
+      source: 'exact normalised name match: UNTC participant ''Albania'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ALB'
+    - code: Algeria
+      iso3: DZA
+      source: 'exact normalised name match: UNTC participant ''Algeria'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of DZA'
+    - code: Andorra
+      iso3: AND
+      source: 'exact normalised name match: UNTC participant ''Andorra'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AND'
+    - code: Angola
+      iso3: AGO
+      source: 'exact normalised name match: UNTC participant ''Angola'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AGO'
+    - code: Antigua and Barbuda
+      iso3: ATG
+      source: 'exact normalised name match: UNTC participant ''Antigua and Barbuda'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ATG'
+    - code: Argentina
+      iso3: ARG
+      source: 'exact normalised name match: UNTC participant ''Argentina'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ARG'
+    - code: Armenia
+      iso3: ARM
+      source: 'exact normalised name match: UNTC participant ''Armenia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ARM'
+    - code: Australia
+      iso3: AUS
+      source: 'exact normalised name match: UNTC participant ''Australia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AUS'
+    - code: Austria
+      iso3: AUT
+      source: 'exact normalised name match: UNTC participant ''Austria'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AUT'
+    - code: Azerbaijan
+      iso3: AZE
+      source: 'exact normalised name match: UNTC participant ''Azerbaijan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of AZE'
+    - code: Bahamas (The)
+      iso3: BHS
+      source: 'exact normalised name match: UNTC participant ''Bahamas (The)'' = crosswalk un_name of BHS'
+    - code: Bahrain
+      iso3: BHR
+      source: 'exact normalised name match: UNTC participant ''Bahrain'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BHR'
+    - code: Bangladesh
+      iso3: BGD
+      source: 'exact normalised name match: UNTC participant ''Bangladesh'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BGD'
+    - code: Barbados
+      iso3: BRB
+      source: 'exact normalised name match: UNTC participant ''Barbados'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BRB'
+    - code: Belarus
+      iso3: BLR
+      source: 'exact normalised name match: UNTC participant ''Belarus'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BLR'
+    - code: Belgium
+      iso3: BEL
+      source: 'exact normalised name match: UNTC participant ''Belgium'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BEL'
+    - code: Belize
+      iso3: BLZ
+      source: 'exact normalised name match: UNTC participant ''Belize'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BLZ'
+    - code: Benin
+      iso3: BEN
+      source: 'exact normalised name match: UNTC participant ''Benin'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BEN'
+    - code: Bhutan
+      iso3: BTN
+      source: 'exact normalised name match: UNTC participant ''Bhutan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BTN'
+    - code: Bolivia (Plurinational State of)
+      iso3: BOL
+      source: 'exact normalised name match: UNTC participant ''Bolivia (Plurinational State of)'' = crosswalk comtrade_reporter_label/label/un_name
+        of BOL'
+    - code: Bosnia and Herzegovina
+      iso3: BIH
+      source: 'exact normalised name match: UNTC participant ''Bosnia and Herzegovina'' = crosswalk iso_name/label/un_name/worldbank_name
+        of BIH'
+    - code: Botswana
+      iso3: BWA
+      source: 'exact normalised name match: UNTC participant ''Botswana'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BWA'
+    - code: Brazil
+      iso3: BRA
+      source: 'exact normalised name match: UNTC participant ''Brazil'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BRA'
+    - code: Brunei Darussalam
+      iso3: BRN
+      source: 'exact normalised name match: UNTC participant ''Brunei Darussalam'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BRN'
+    - code: Bulgaria
+      iso3: BGR
+      source: 'exact normalised name match: UNTC participant ''Bulgaria'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BGR'
+    - code: Burkina Faso
+      iso3: BFA
+      source: 'exact normalised name match: UNTC participant ''Burkina Faso'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BFA'
+    - code: Burundi
+      iso3: BDI
+      source: 'exact normalised name match: UNTC participant ''Burundi'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of BDI'
+    - code: Cabo Verde
+      iso3: CPV
+      source: 'exact normalised name match: UNTC participant ''Cabo Verde'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CPV'
+    - code: Cambodia
+      iso3: KHM
+      source: 'exact normalised name match: UNTC participant ''Cambodia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of KHM'
+    - code: Cameroon
+      iso3: CMR
+      source: 'exact normalised name match: UNTC participant ''Cameroon'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CMR'
+    - code: Canada
+      iso3: CAN
+      source: 'exact normalised name match: UNTC participant ''Canada'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CAN'
+    - code: Central African Republic
+      iso3: CAF
+      source: 'exact normalised name match: UNTC participant ''Central African Republic'' = crosswalk iso_name/label/un_name/worldbank_name
+        of CAF'
+    - code: Chad
+      iso3: TCD
+      source: 'exact normalised name match: UNTC participant ''Chad'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TCD'
+    - code: Chile
+      iso3: CHL
+      source: 'exact normalised name match: UNTC participant ''Chile'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CHL'
+    - code: China
+      iso3: CHN
+      source: 'exact normalised name match: UNTC participant ''China'' = crosswalk comtrade_reporter_label/iso_name/label/worldbank_name
+        of CHN'
+    - code: Colombia
+      iso3: COL
+      source: 'exact normalised name match: UNTC participant ''Colombia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of COL'
+    - code: Comoros
+      iso3: COM
+      source: 'exact normalised name match: UNTC participant ''Comoros'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of COM'
+    - code: Congo
+      iso3: COG
+      source: 'exact normalised name match: UNTC participant ''Congo'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of COG'
+    - code: Cook Islands
+      iso3: COK
+      source: 'exact normalised name match: UNTC participant ''Cook Islands'' = crosswalk iso_name/label of COK'
+    - code: Costa Rica
+      iso3: CRI
+      source: 'exact normalised name match: UNTC participant ''Costa Rica'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CRI'
+    - code: Croatia
+      iso3: HRV
+      source: 'exact normalised name match: UNTC participant ''Croatia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of HRV'
+    - code: Cuba
+      iso3: CUB
+      source: 'exact normalised name match: UNTC participant ''Cuba'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CUB'
+    - code: Cyprus
+      iso3: CYP
+      source: 'exact normalised name match: UNTC participant ''Cyprus'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CYP'
+    - code: Czech Republic
+      iso3: CZE
+      source: UNTC status pages (e.g. MTDSG IV-11 participant table, 2026-10-16) list 'Czech Republic' with a footnote on
+        the succession to Czechoslovakia; ISO 3166-1 alpha-3 CZE, crosswalk label 'Czechia' (ISO short name changed from 'Czech
+        Republic' in 2016)
+    - code: Côte d'Ivoire
+      iso3: CIV
+      source: 'exact normalised name match: UNTC participant ''Côte d''Ivoire'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of CIV'
+    - code: Democratic People's Republic of Korea
+      iso3: PRK
+      source: 'exact normalised name match: UNTC participant ''Democratic People''s Republic of Korea'' = crosswalk label/un_name
+        of PRK'
+    - code: Democratic Republic of the Congo
+      iso3: COD
+      source: 'exact normalised name match: UNTC participant ''Democratic Republic of the Congo'' = crosswalk label/un_name
+        of COD'
+    - code: Denmark
+      iso3: DNK
+      source: 'exact normalised name match: UNTC participant ''Denmark'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of DNK'
+    - code: Djibouti
+      iso3: DJI
+      source: 'exact normalised name match: UNTC participant ''Djibouti'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of DJI'
+    - code: Dominica
+      iso3: DMA
+      source: 'exact normalised name match: UNTC participant ''Dominica'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of DMA'
+    - code: Dominican Republic
+      iso3: DOM
+      source: 'exact normalised name match: UNTC participant ''Dominican Republic'' = crosswalk iso_name/label/un_name/worldbank_name
+        of DOM'
+    - code: Ecuador
+      iso3: ECU
+      source: 'exact normalised name match: UNTC participant ''Ecuador'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ECU'
+    - code: Egypt
+      iso3: EGY
+      source: 'exact normalised name match: UNTC participant ''Egypt'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of EGY'
+    - code: El Salvador
+      iso3: SLV
+      source: 'exact normalised name match: UNTC participant ''El Salvador'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SLV'
+    - code: Equatorial Guinea
+      iso3: GNQ
+      source: 'exact normalised name match: UNTC participant ''Equatorial Guinea'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GNQ'
+    - code: Eritrea
+      iso3: ERI
+      source: 'exact normalised name match: UNTC participant ''Eritrea'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ERI'
+    - code: Estonia
+      iso3: EST
+      source: 'exact normalised name match: UNTC participant ''Estonia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of EST'
+    - code: Eswatini
+      iso3: SWZ
+      source: 'exact normalised name match: UNTC participant ''Eswatini'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SWZ'
+    - code: Ethiopia
+      iso3: ETH
+      source: 'exact normalised name match: UNTC participant ''Ethiopia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ETH'
+    - code: Fiji
+      iso3: FJI
+      source: 'exact normalised name match: UNTC participant ''Fiji'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of FJI'
+    - code: Finland
+      iso3: FIN
+      source: 'exact normalised name match: UNTC participant ''Finland'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of FIN'
+    - code: France
+      iso3: FRA
+      source: 'exact normalised name match: UNTC participant ''France'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of FRA'
+    - code: Gabon
+      iso3: GAB
+      source: 'exact normalised name match: UNTC participant ''Gabon'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GAB'
+    - code: Gambia
+      iso3: GMB
+      source: 'exact normalised name match: UNTC participant ''Gambia'' = crosswalk comtrade_reporter_label/iso_name/label
+        of GMB'
+    - code: Georgia
+      iso3: GEO
+      source: 'exact normalised name match: UNTC participant ''Georgia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GEO'
+    - code: Germany
+      iso3: DEU
+      source: 'exact normalised name match: UNTC participant ''Germany'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of DEU'
+    - code: Ghana
+      iso3: GHA
+      source: 'exact normalised name match: UNTC participant ''Ghana'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GHA'
+    - code: Greece
+      iso3: GRC
+      source: 'exact normalised name match: UNTC participant ''Greece'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GRC'
+    - code: Grenada
+      iso3: GRD
+      source: 'exact normalised name match: UNTC participant ''Grenada'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GRD'
+    - code: Guatemala
+      iso3: GTM
+      source: 'exact normalised name match: UNTC participant ''Guatemala'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GTM'
+    - code: Guinea
+      iso3: GIN
+      source: 'exact normalised name match: UNTC participant ''Guinea'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GIN'
+    - code: Guinea-Bissau
+      iso3: GNB
+      source: 'exact normalised name match: UNTC participant ''Guinea-Bissau'' = crosswalk comtrade_reporter_label/iso_name/label/worldbank_name
+        of GNB'
+    - code: Guyana
+      iso3: GUY
+      source: 'exact normalised name match: UNTC participant ''Guyana'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of GUY'
+    - code: Haiti
+      iso3: HTI
+      source: 'exact normalised name match: UNTC participant ''Haiti'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of HTI'
+    - code: Holy See
+      iso3: VAT
+      source: 'exact normalised name match: UNTC participant ''Holy See'' = crosswalk label/un_name of VAT'
+    - code: Honduras
+      iso3: HND
+      source: 'exact normalised name match: UNTC participant ''Honduras'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of HND'
+    - code: Hungary
+      iso3: HUN
+      source: 'exact normalised name match: UNTC participant ''Hungary'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of HUN'
+    - code: Iceland
+      iso3: ISL
+      source: 'exact normalised name match: UNTC participant ''Iceland'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ISL'
+    - code: India
+      iso3: IND
+      source: 'exact normalised name match: UNTC participant ''India'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of IND'
+    - code: Indonesia
+      iso3: IDN
+      source: 'exact normalised name match: UNTC participant ''Indonesia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of IDN'
+    - code: Iran (Islamic Republic of)
+      iso3: IRN
+      source: 'exact normalised name match: UNTC participant ''Iran (Islamic Republic of)'' = crosswalk label/un_name of IRN'
+    - code: Iraq
+      iso3: IRQ
+      source: 'exact normalised name match: UNTC participant ''Iraq'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of IRQ'
+    - code: Ireland
+      iso3: IRL
+      source: 'exact normalised name match: UNTC participant ''Ireland'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of IRL'
+    - code: Israel
+      iso3: ISR
+      source: 'exact normalised name match: UNTC participant ''Israel'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ISR'
+    - code: Italy
+      iso3: ITA
+      source: 'exact normalised name match: UNTC participant ''Italy'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ITA'
+    - code: Jamaica
+      iso3: JAM
+      source: 'exact normalised name match: UNTC participant ''Jamaica'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of JAM'
+    - code: Japan
+      iso3: JPN
+      source: 'exact normalised name match: UNTC participant ''Japan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of JPN'
+    - code: Jordan
+      iso3: JOR
+      source: 'exact normalised name match: UNTC participant ''Jordan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of JOR'
+    - code: Kazakhstan
+      iso3: KAZ
+      source: 'exact normalised name match: UNTC participant ''Kazakhstan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of KAZ'
+    - code: Kenya
+      iso3: KEN
+      source: 'exact normalised name match: UNTC participant ''Kenya'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of KEN'
+    - code: Kiribati
+      iso3: KIR
+      source: 'exact normalised name match: UNTC participant ''Kiribati'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of KIR'
+    - code: Kuwait
+      iso3: KWT
+      source: 'exact normalised name match: UNTC participant ''Kuwait'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of KWT'
+    - code: Kyrgyzstan
+      iso3: KGZ
+      source: 'exact normalised name match: UNTC participant ''Kyrgyzstan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of KGZ'
+    - code: Lao People's Democratic Republic
+      iso3: LAO
+      source: 'exact normalised name match: UNTC participant ''Lao People''s Democratic Republic'' = crosswalk iso_name/label/un_name
+        of LAO'
+    - code: Latvia
+      iso3: LVA
+      source: 'exact normalised name match: UNTC participant ''Latvia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LVA'
+    - code: Lebanon
+      iso3: LBN
+      source: 'exact normalised name match: UNTC participant ''Lebanon'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LBN'
+    - code: Lesotho
+      iso3: LSO
+      source: 'exact normalised name match: UNTC participant ''Lesotho'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LSO'
+    - code: Liberia
+      iso3: LBR
+      source: 'exact normalised name match: UNTC participant ''Liberia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LBR'
+    - code: Libya
+      iso3: LBY
+      source: 'exact normalised name match: UNTC participant ''Libya'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LBY'
+    - code: Liechtenstein
+      iso3: LIE
+      source: 'exact normalised name match: UNTC participant ''Liechtenstein'' = crosswalk iso_name/label/un_name/worldbank_name
+        of LIE'
+    - code: Lithuania
+      iso3: LTU
+      source: 'exact normalised name match: UNTC participant ''Lithuania'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LTU'
+    - code: Luxembourg
+      iso3: LUX
+      source: 'exact normalised name match: UNTC participant ''Luxembourg'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LUX'
+    - code: Madagascar
+      iso3: MDG
+      source: 'exact normalised name match: UNTC participant ''Madagascar'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MDG'
+    - code: Malawi
+      iso3: MWI
+      source: 'exact normalised name match: UNTC participant ''Malawi'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MWI'
+    - code: Malaysia
+      iso3: MYS
+      source: 'exact normalised name match: UNTC participant ''Malaysia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MYS'
+    - code: Maldives
+      iso3: MDV
+      source: 'exact normalised name match: UNTC participant ''Maldives'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MDV'
+    - code: Mali
+      iso3: MLI
+      source: 'exact normalised name match: UNTC participant ''Mali'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MLI'
+    - code: Malta
+      iso3: MLT
+      source: 'exact normalised name match: UNTC participant ''Malta'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MLT'
+    - code: Marshall Islands
+      iso3: MHL
+      source: 'exact normalised name match: UNTC participant ''Marshall Islands'' = crosswalk iso_name/label/un_name/worldbank_name
+        of MHL'
+    - code: Mauritania
+      iso3: MRT
+      source: 'exact normalised name match: UNTC participant ''Mauritania'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MRT'
+    - code: Mauritius
+      iso3: MUS
+      source: 'exact normalised name match: UNTC participant ''Mauritius'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MUS'
+    - code: Mexico
+      iso3: MEX
+      source: 'exact normalised name match: UNTC participant ''Mexico'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MEX'
+    - code: Micronesia (Federated States of)
+      iso3: FSM
+      source: 'exact normalised name match: UNTC participant ''Micronesia (Federated States of)'' = crosswalk label/un_name
+        of FSM'
+    - code: Monaco
+      iso3: MCO
+      source: 'exact normalised name match: UNTC participant ''Monaco'' = crosswalk iso_name/label/un_name/worldbank_name
+        of MCO'
+    - code: Mongolia
+      iso3: MNG
+      source: 'exact normalised name match: UNTC participant ''Mongolia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MNG'
+    - code: Montenegro
+      iso3: MNE
+      source: 'exact normalised name match: UNTC participant ''Montenegro'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MNE'
+    - code: Morocco
+      iso3: MAR
+      source: 'exact normalised name match: UNTC participant ''Morocco'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MAR'
+    - code: Mozambique
+      iso3: MOZ
+      source: 'exact normalised name match: UNTC participant ''Mozambique'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MOZ'
+    - code: Myanmar
+      iso3: MMR
+      source: 'exact normalised name match: UNTC participant ''Myanmar'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MMR'
+    - code: Namibia
+      iso3: NAM
+      source: 'exact normalised name match: UNTC participant ''Namibia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NAM'
+    - code: Naoero
+      iso3: NRU
+      source: 'exact normalised name match: UNTC participant ''Naoero'' = crosswalk comtrade_reporter_label/label/un_name/worldbank_name
+        of NRU'
+    - code: Nepal
+      iso3: NPL
+      source: 'exact normalised name match: UNTC participant ''Nepal'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NPL'
+    - code: Netherlands (Kingdom of the)
+      iso3: NLD
+      source: 'exact normalised name match: UNTC participant ''Netherlands (Kingdom of the)'' = crosswalk label/un_name of
+        NLD'
+    - code: New Zealand
+      iso3: NZL
+      source: 'exact normalised name match: UNTC participant ''New Zealand'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NZL'
+    - code: Nicaragua
+      iso3: NIC
+      source: 'exact normalised name match: UNTC participant ''Nicaragua'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NIC'
+    - code: Niger
+      iso3: NER
+      source: 'exact normalised name match: UNTC participant ''Niger'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NER'
+    - code: Nigeria
+      iso3: NGA
+      source: 'exact normalised name match: UNTC participant ''Nigeria'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NGA'
+    - code: Niue
+      iso3: NIU
+      source: 'exact normalised name match: UNTC participant ''Niue'' = crosswalk comtrade_reporter_label/iso_name/label of
+        NIU'
+    - code: North Macedonia
+      iso3: MKD
+      source: 'exact normalised name match: UNTC participant ''North Macedonia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of MKD'
+    - code: Norway
+      iso3: NOR
+      source: 'exact normalised name match: UNTC participant ''Norway'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of NOR'
+    - code: Oman
+      iso3: OMN
+      source: 'exact normalised name match: UNTC participant ''Oman'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of OMN'
+    - code: Pakistan
+      iso3: PAK
+      source: 'exact normalised name match: UNTC participant ''Pakistan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PAK'
+    - code: Palau
+      iso3: PLW
+      source: 'exact normalised name match: UNTC participant ''Palau'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PLW'
+    - code: Panama
+      iso3: PAN
+      source: 'exact normalised name match: UNTC participant ''Panama'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PAN'
+    - code: Papua New Guinea
+      iso3: PNG
+      source: 'exact normalised name match: UNTC participant ''Papua New Guinea'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PNG'
+    - code: Paraguay
+      iso3: PRY
+      source: 'exact normalised name match: UNTC participant ''Paraguay'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PRY'
+    - code: Peru
+      iso3: PER
+      source: 'exact normalised name match: UNTC participant ''Peru'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PER'
+    - code: Philippines
+      iso3: PHL
+      source: 'exact normalised name match: UNTC participant ''Philippines'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PHL'
+    - code: Poland
+      iso3: POL
+      source: 'exact normalised name match: UNTC participant ''Poland'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of POL'
+    - code: Portugal
+      iso3: PRT
+      source: 'exact normalised name match: UNTC participant ''Portugal'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of PRT'
+    - code: Qatar
+      iso3: QAT
+      source: 'exact normalised name match: UNTC participant ''Qatar'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of QAT'
+    - code: Republic of Korea
+      iso3: KOR
+      source: 'exact normalised name match: UNTC participant ''Republic of Korea'' = crosswalk label/un_name of KOR'
+    - code: Republic of Moldova
+      iso3: MDA
+      source: 'exact normalised name match: UNTC participant ''Republic of Moldova'' = crosswalk label/un_name of MDA'
+    - code: Romania
+      iso3: ROU
+      source: 'exact normalised name match: UNTC participant ''Romania'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ROU'
+    - code: Russian Federation
+      iso3: RUS
+      source: 'exact normalised name match: UNTC participant ''Russian Federation'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of RUS'
+    - code: Rwanda
+      iso3: RWA
+      source: 'exact normalised name match: UNTC participant ''Rwanda'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of RWA'
+    - code: Samoa
+      iso3: WSM
+      source: 'exact normalised name match: UNTC participant ''Samoa'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of WSM'
+    - code: San Marino
+      iso3: SMR
+      source: 'exact normalised name match: UNTC participant ''San Marino'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SMR'
+    - code: Sao Tome and Principe
+      iso3: STP
+      source: 'exact normalised name match: UNTC participant ''Sao Tome and Principe'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of STP'
+    - code: Saudi Arabia
+      iso3: SAU
+      source: 'exact normalised name match: UNTC participant ''Saudi Arabia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SAU'
+    - code: Senegal
+      iso3: SEN
+      source: 'exact normalised name match: UNTC participant ''Senegal'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SEN'
+    - code: Serbia
+      iso3: SRB
+      source: 'exact normalised name match: UNTC participant ''Serbia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SRB'
+    - code: Seychelles
+      iso3: SYC
+      source: 'exact normalised name match: UNTC participant ''Seychelles'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SYC'
+    - code: Sierra Leone
+      iso3: SLE
+      source: 'exact normalised name match: UNTC participant ''Sierra Leone'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SLE'
+    - code: Singapore
+      iso3: SGP
+      source: 'exact normalised name match: UNTC participant ''Singapore'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SGP'
+    - code: Slovakia
+      iso3: SVK
+      source: 'exact normalised name match: UNTC participant ''Slovakia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of SVK'
+    - code: Slovenia
+      iso3: SVN
+      source: 'exact normalised name match: UNTC participant ''Slovenia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SVN'
+    - code: Solomon Islands
+      iso3: SLB
+      source: 'exact normalised name match: UNTC participant ''Solomon Islands'' = crosswalk iso_name/label/un_name/worldbank_name
+        of SLB'
+    - code: Somalia
+      iso3: SOM
+      source: 'exact normalised name match: UNTC participant ''Somalia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of SOM'
+    - code: South Africa
+      iso3: ZAF
+      source: 'exact normalised name match: UNTC participant ''South Africa'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ZAF'
+    - code: South Sudan
+      iso3: SSD
+      source: 'exact normalised name match: UNTC participant ''South Sudan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SSD'
+    - code: Spain
+      iso3: ESP
+      source: 'exact normalised name match: UNTC participant ''Spain'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ESP'
+    - code: Sri Lanka
+      iso3: LKA
+      source: 'exact normalised name match: UNTC participant ''Sri Lanka'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of LKA'
+    - code: St. Kitts and Nevis
+      iso3: KNA
+      source: 'exact normalised name match: UNTC participant ''St. Kitts and Nevis'' = crosswalk worldbank_name of KNA'
+    - code: St. Lucia
+      iso3: LCA
+      source: 'exact normalised name match: UNTC participant ''St. Lucia'' = crosswalk worldbank_name of LCA'
+    - code: St. Vincent and the Grenadines
+      iso3: VCT
+      source: 'exact normalised name match: UNTC participant ''St. Vincent and the Grenadines'' = crosswalk worldbank_name
+        of VCT'
+    - code: State of Palestine
+      iso3: PSE
+      source: 'exact normalised name match: UNTC participant ''State of Palestine'' = crosswalk comtrade_reporter_label/label/un_name
+        of PSE'
+    - code: Sudan
+      iso3: SDN
+      source: 'exact normalised name match: UNTC participant ''Sudan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SDN'
+    - code: Suriname
+      iso3: SUR
+      source: 'exact normalised name match: UNTC participant ''Suriname'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SUR'
+    - code: Sweden
+      iso3: SWE
+      source: 'exact normalised name match: UNTC participant ''Sweden'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of SWE'
+    - code: Switzerland
+      iso3: CHE
+      source: 'exact normalised name match: UNTC participant ''Switzerland'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of CHE'
+    - code: Syrian Arab Republic
+      iso3: SYR
+      source: 'exact normalised name match: UNTC participant ''Syrian Arab Republic'' = crosswalk iso_name/label/un_name/worldbank_name
+        of SYR'
+    - code: Tajikistan
+      iso3: TJK
+      source: 'exact normalised name match: UNTC participant ''Tajikistan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TJK'
+    - code: Thailand
+      iso3: THA
+      source: 'exact normalised name match: UNTC participant ''Thailand'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of THA'
+    - code: Timor-Leste
+      iso3: TLS
+      source: 'exact normalised name match: UNTC participant ''Timor-Leste'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TLS'
+    - code: Togo
+      iso3: TGO
+      source: 'exact normalised name match: UNTC participant ''Togo'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TGO'
+    - code: Tonga
+      iso3: TON
+      source: 'exact normalised name match: UNTC participant ''Tonga'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TON'
+    - code: Trinidad and Tobago
+      iso3: TTO
+      source: 'exact normalised name match: UNTC participant ''Trinidad and Tobago'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TTO'
+    - code: Tunisia
+      iso3: TUN
+      source: 'exact normalised name match: UNTC participant ''Tunisia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TUN'
+    - code: Turkmenistan
+      iso3: TKM
+      source: 'exact normalised name match: UNTC participant ''Turkmenistan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TKM'
+    - code: Tuvalu
+      iso3: TUV
+      source: 'exact normalised name match: UNTC participant ''Tuvalu'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of TUV'
+    - code: Türkiye
+      iso3: TUR
+      source: 'exact normalised name match: UNTC participant ''Türkiye'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of TUR'
+    - code: Uganda
+      iso3: UGA
+      source: 'exact normalised name match: UNTC participant ''Uganda'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of UGA'
+    - code: Ukraine
+      iso3: UKR
+      source: 'exact normalised name match: UNTC participant ''Ukraine'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of UKR'
+    - code: United Arab Emirates
+      iso3: ARE
+      source: 'exact normalised name match: UNTC participant ''United Arab Emirates'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ARE'
+    - code: United Kingdom of Great Britain and Northern Ireland
+      iso3: GBR
+      source: 'exact normalised name match: UNTC participant ''United Kingdom of Great Britain and Northern Ireland'' = crosswalk
+        label/un_name of GBR'
+    - code: United Republic of Tanzania
+      iso3: TZA
+      source: 'exact normalised name match: UNTC participant ''United Republic of Tanzania'' = crosswalk label/un_name of
+        TZA'
+    - code: United States of America
+      iso3: USA
+      source: 'exact normalised name match: UNTC participant ''United States of America'' = crosswalk label/un_name of USA'
+    - code: Uruguay
+      iso3: URY
+      source: 'exact normalised name match: UNTC participant ''Uruguay'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of URY'
+    - code: Uzbekistan
+      iso3: UZB
+      source: 'exact normalised name match: UNTC participant ''Uzbekistan'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of UZB'
+    - code: Vanuatu
+      iso3: VUT
+      source: 'exact normalised name match: UNTC participant ''Vanuatu'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of VUT'
+    - code: Venezuela (Bolivarian Republic of)
+      iso3: VEN
+      source: 'exact normalised name match: UNTC participant ''Venezuela (Bolivarian Republic of)'' = crosswalk label of VEN'
+    - code: Viet Nam
+      iso3: VNM
+      source: 'exact normalised name match: UNTC participant ''Viet Nam'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of VNM'
+    - code: Yemen
+      iso3: YEM
+      source: 'exact normalised name match: UNTC participant ''Yemen'' = crosswalk comtrade_reporter_label/iso_name/label/un_name
+        of YEM'
+    - code: Zambia
+      iso3: ZMB
+      source: 'exact normalised name match: UNTC participant ''Zambia'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ZMB'
+    - code: Zimbabwe
+      iso3: ZWE
+      source: 'exact normalised name match: UNTC participant ''Zimbabwe'' = crosswalk comtrade_reporter_label/iso_name/label/un_name/worldbank_name
+        of ZWE'
+    source:
+      kind: provider_data
+      url: https://treaties.un.org/Pages/ParticipationStatus.aspx
+  ohchr:
+    base: iso3
+    aliases:
+    - code: PLS
+      iso3: PSE
+      source: "OHCHR dashboard GetCountries (2026-10-16): Id 134, AreaId 'PLS', CountryName 'State of Palestine' (non-ISO area id); crosswalk PSE = State of Palestine. AreaId 'ERU' (European Union) stays unmapped."
+    source:
+      kind: provider_data
+      url: https://indicators.ohchr.org/webapi/dashboarddata/GetCountries

@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "8dd373332715cf84b241c699893755373e9f1169da12d6c88465c7b02f9b75d2",
+    "url": "https://planet4589.org/space/gcat/index.html",
+    "file": "8dd373332715cf84.bin",
+    "sha256": "d2c855d65a010211e974e5a157855230d9df669f1ffd66182882c65ab82e12b6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "trimmed excerpt: orbital launches of 1957, 1965, 1977, 1999 and a 2024 sample, their satcat objects, referenced sites/orgs; index.html verbatim"
+  },
+  {
+    "request_fingerprint": "953dec7edc919c4e24d7013246e2894c80a97c756072446dd67aca8e6854345b",
+    "url": "https://planet4589.org/space/gcat/tsv/tables/orgs.tsv",
+    "file": "953dec7edc919c4e.bin",
+    "sha256": "db0ac17af8cba629fe173b725f78d03725df5ed9aedb173bc9d4772a7e574515",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "trimmed excerpt: orbital launches of 1957, 1965, 1977, 1999 and a 2024 sample, their satcat objects, referenced sites/orgs; index.html verbatim"
+  },
+  {
+    "request_fingerprint": "15521542d79bf5bb2ad685ddf1bb52e82894bbbb30c7b159b7eda0bc39117df0",
+    "url": "https://planet4589.org/space/gcat/tsv/tables/sites.tsv",
+    "file": "15521542d79bf5bb.bin",
+    "sha256": "bf2c8dab7c467d92ff4235fbfaab118f71d187544368678e8655dbf19ebea22d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "trimmed excerpt: orbital launches of 1957, 1965, 1977, 1999 and a 2024 sample, their satcat objects, referenced sites/orgs; index.html verbatim"
+  },
+  {
+    "request_fingerprint": "c3ed18e670ce64ecf9a14c9a304ec0fa8d5d26a50bb0ad73825b676a2708f879",
+    "url": "https://planet4589.org/space/gcat/tsv/launch/launch.tsv",
+    "file": "c3ed18e670ce64ec.bin",
+    "sha256": "a49a6c02ed03b1433d6d52d4ee5d1a8403c4e00ab515c6c37fc2f13e0485ef03",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "trimmed excerpt: orbital launches of 1957, 1965, 1977, 1999 and a 2024 sample, their satcat objects, referenced sites/orgs; index.html verbatim"
+  },
+  {
+    "request_fingerprint": "a9fac667eea11d4debf3ff442fb9f18c1f383cfd9a0a369b5f34323e29a5d5d8",
+    "url": "https://planet4589.org/space/gcat/tsv/cat/satcat.tsv",
+    "file": "a9fac667eea11d4d.bin",
+    "sha256": "64bb2e71a4320f61791dc81046a00bcafccc0f942a72556d12f9da2d7d5b96de",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "trimmed excerpt: orbital launches of 1957, 1965, 1977, 1999 and a 2024 sample, their satcat objects, referenced sites/orgs; index.html verbatim"
+  }
+]

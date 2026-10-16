@@ -250,7 +250,8 @@ chains:
     via_any: ["congo_free_state", "belgian_congo", "leopold_ii"]
     exclude: ["modern_relations"]
     max_hops: 6
-    expectation: path_expected
+    expectation: path_may_be_absent
+    note: "Recorded Wikidata (2026-10-15/16) links Berlin Conference -participant-> International Association of the Congo -replaced by-> Congo Free State -replaced by-> Belgian Congo, but states no succession from the Belgian Congo (Q213510, no P1366) to the Democratic Republic of the Congo (Q974, whose P1365 lists only Zaire) and no item for the Republic of the Congo (Leopoldville) was found by title. The engine must report the gap ('Belgian Congo -> DR Congo: no sourced succession statement') rather than bridge it with a shared language."
     expected_facts:
       - {"subject": "berlin_conference", "property": "P580", "year": 1884}
       - {"subject": "berlin_conference", "property": "P361", "object": "scramble_for_africa"}

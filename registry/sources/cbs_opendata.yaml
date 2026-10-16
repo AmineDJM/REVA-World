@@ -1,0 +1,22 @@
+# V3 (agent GAPHUNT): Statistics Netherlands (CBS) StatLine open data, OData v3 API.
+# Atlas connector: src/reva/adapters/connectors/atlas_gap_cbs_bes.py (atlas.gap_cbs_bes -> cbs.bes_*).
+source_key: cbs.opendata
+title: "CBS (Statistics Netherlands) StatLine open data - OData API"
+provider_url: https://opendata.cbs.nl/
+lineage_family: cbs
+rights:
+  licence: "CC BY 4.0"
+  licence_url: https://www.cbs.nl/en-gb/about-us/website/copyright
+  attribution: "Source: CBS"
+  provider_statement: >-
+    "Unless otherwise stated, the content of this website is subject to Creative Commons Attribution (CC BY 4.0).
+    This means that the re-use of the content of this site is permitted, provided Statistics Netherlands is cited
+    as the source." (read 2026-10-16)
+metadata:
+  allowed_hosts: [opendata.cbs.nl]
+  endpoints:
+    data: "https://opendata.cbs.nl/ODataApi/odata/<table>/TypedDataSet?$format=json[&$filter=...]"
+  authentication: none
+  limits: "TypedDataSet queries must return fewer than 10,000 records (else HTTP 400); filters are applied server-side"
+  cadence: yearly / two-yearly tables
+  coverage: "Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) = ISO 3166-1 BES"

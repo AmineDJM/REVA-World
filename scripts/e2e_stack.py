@@ -127,8 +127,9 @@ V3_ATLAS_SOURCES = (
     "atlas.undp_hdr",
     "atlas.whr",
     "atlas.owid",
-    # atlas.naturalearth_10m is not replayable: its capture holds 2 of the 6 layers one run fetches
-    # (its ingest test serves a synthetic world instead)
+    # 1:10m geography from a derived excerpt of the real layers (closed groups: Ireland+UK, Hispaniola,
+    # Cyprus, Saint-Martin; tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py), rows flagged ne_excerpt
+    "atlas.naturalearth_10m",
     "atlas.geonames_countryinfo",
     "atlas.worldbank",
     "atlas.fao",
@@ -221,18 +222,33 @@ class Stack:
         from reva.evidence.runner import FixtureHttp, post_publish_for, run_connector
         from reva.kernel.context import Origin
 
+        boot: dict[str, Any] = {}
         for attempt in range(3):  # concurrent bootstraps may race on cluster-global role DDL
             try:
-                bootstrap(settings)
+                boot = bootstrap(settings)
                 break
-            except Exception:
+            except Exception as e:  # logged, never swallowed silently; the last attempt raises it
                 if attempt == 2:
                     raise
+                log.warning("bootstrap attempt %d failed (%s: %s); retrying", attempt + 1, type(e).__name__, e)
                 time.sleep(1 + attempt)
+        owner_seed = (boot or {}).get("seed") or {}
+        log.info(
+            "registry seeded by the owner: %s (fingerprint %s)", owner_seed.get("status"), owner_seed.get("fingerprint")
+        )
         store = FilesystemArtifactStore(self.object_root, settings.reva_s3_prefix)
         worker = make_engine("worker", settings)
         try:
-            with_connection_retry("seed", lambda: seed(worker, store))
+            # the runtime role only confirms the owner's seed; same process, same registry snapshot
+            # (reva.cli.seed.registry_snapshot) and the same contact email as bootstrap's seed
+            confirmed = with_connection_retry(
+                "seed", lambda: seed(worker, store, contact_email=settings.reva_http_contact_email)
+            )
+            if owner_seed.get("fingerprint") and confirmed.get("fingerprint") != owner_seed["fingerprint"]:
+                raise RuntimeError(
+                    f"registry fingerprint changed between the owner's seed ({owner_seed['fingerprint']}) and the "
+                    f"worker's confirmation ({confirmed.get('fingerprint')})"
+                )
             connectors = builtin_connectors()
             ingest: dict[str, Any] = {}
             for name in FIXTURE_CONNECTORS:

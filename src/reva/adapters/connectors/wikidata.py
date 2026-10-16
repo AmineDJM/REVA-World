@@ -155,6 +155,10 @@ class MachineLock:
         tmp.write_text(json.dumps(dict(state)))
         os.replace(tmp, self.state_path)
 
+    def cooling_down(self, endpoint: str) -> bool:
+        """True when a 429/503 cool-down for ``endpoint`` is still running (any process)."""
+        return bool(self._read_state().get(f"cooldown_until:{endpoint}", 0.0) > float(self._clock()))
+
     def cooldown(self, seconds: float) -> None:
         """Ask every process to wait ``seconds`` before its next request (429/503/maxlag)."""
         self._cooldown = max(self._cooldown or 0.0, seconds)
@@ -282,7 +286,7 @@ class Archive:
 
         try:
             data = self.store.get("raw", sha)
-        except Exception:  # noqa: BLE001 - missing object: fetch again
+        except Exception:
             return None
         return (gzip.decompress(data) if enc == "gzip" else data), sha, retrieved
 
@@ -386,12 +390,14 @@ class WikidataClient:
         self.lock = lock or MachineLock()
         self.ua = user_agent()
         self.max_retries = max_retries
-        if mode not in ("api", "linked_data", "hybrid"):
-            raise ValueError("mode must be 'api', 'linked_data' or 'hybrid'")
+        if mode not in ("api", "linked_data", "hybrid", "auto"):
+            raise ValueError("mode must be 'api', 'linked_data', 'hybrid' or 'auto'")
         #: ``api``: action API (wbgetentities 50 ids/call, list=search with paging). ``linked_data``: used when the
         #: action API is saturated for our shared egress — Special:EntityData/<id>.json (one entity per request,
         #: CDN-cacheable, same JSON + lastrevid) and the MediaWiki REST search (<= 100 hits, no paging).
         #: ``hybrid``: action-API search (paging, few requests) + Special:EntityData snapshots (the bulk).
+        #: ``auto``: each 50-id chunk tries one wbgetentities call when the API is not cooling down (no retry) and
+        #: falls back to per-entity Special:EntityData on 429/maxlag.
         self.mode = mode
         #: Special:EntityData snapshots archived less than ``reuse_seconds`` ago are reused (raw sha and original
         #: retrieval time cited) instead of being requested again.
@@ -401,7 +407,7 @@ class WikidataClient:
 
     # -- core request loop -------------------------------------------------------------------------
     async def _request(self, http: Any, url: str, *, endpoint: str, accept: str, meta: Mapping[str, Any],
-                       max_bytes: int | None = None) -> tuple[Any, str]:
+                       max_bytes: int | None = None, max_retries: int | None = None) -> tuple[Any, str]:
         if len(url) > MAX_GET_URL and endpoint == "wdqs":
             raise WikidataError(f"query URL too long ({len(url)} chars): reduce the VALUES chunk size",
                                 reason="url_too_long")
@@ -442,7 +448,7 @@ class WikidataClient:
                     self.stats.maxlag_relaxed += 1
                     log.warning("wbapi: sustained query-service lag; sending this read without maxlag")
             if status in (429, 503) or maxlag:
-                if attempt > self.max_retries:
+                if attempt > (self.max_retries if max_retries is None else max_retries):
                     raise RateLimited(f"{endpoint}: still throttled after {attempt} attempts", status=status)
                 self.stats.retries += 1
                 log.warning("%s throttled (HTTP %s%s, retry-after=%s): %s", endpoint, status,
@@ -542,6 +548,54 @@ class WikidataClient:
                 break
         return list(dict.fromkeys(out)), total, shas
 
+    async def links_to(self, qid: str, *, meta: Mapping[str, Any] | None = None,
+                       max_pages: int = 40) -> tuple[list[str], list[str]]:
+        """Items (namespace 0) linking to ``qid`` — Special:WhatLinksHere page views (5,000 per page), used to
+        discover candidates when the action API is saturated. Candidates only: callers check the items' claims."""
+        out: list[str] = []
+        shas: list[str] = []
+        frm = 0
+        for _ in range(max_pages):
+            url = (f"https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/{qid}&namespace=0&limit=5000"
+                   + (f"&from={frm}&back=0" if frm else ""))
+            result, sha = await self._request(self.wbapi_http, url, endpoint="pages", accept="text/html",
+                                              meta={"kind": "whatlinkshere", "target": qid, "from": frm, **(meta or {})})
+            shas.append(sha)
+            html = result.body.decode("utf-8", "replace")
+            out.extend(re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html))
+            nxt = re.search(r'<a href="[^"]*[?&;]from=([0-9]+)[^"]*"[^>]*class="mw-nextlink"', html)
+            if not nxt:
+                break
+            frm = int(nxt.group(1))
+        return [q for q in dict.fromkeys(out) if q != qid], shas
+
+    async def _api_chunk(self, chunk: Sequence[str], props: Sequence[str], languages: Sequence[str],
+                         meta: Mapping[str, Any] | None) -> tuple[dict[str, Any], list[str], dict[str, str], str, int,
+                                                                  datetime] | None:
+        """One wbgetentities call without retry (auto mode); None when the answer cannot be used."""
+        url = self.entities_url(chunk, props, languages)
+        try:
+            result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
+                                              meta={"kind": "wbgetentities", "ids": list(chunk), "props": list(props),
+                                                    **(meta or {})}, max_retries=0)
+        except UnsafeRequest:
+            return None
+        doc = _json(result.body)
+        if "error" in doc:
+            return None
+        ents: dict[str, Any] = {}
+        miss: list[str] = []
+        redir: dict[str, str] = {}
+        for key, ent in (doc.get("entities") or {}).items():
+            if "missing" in ent:
+                miss.append(key)
+                continue
+            eid = ent.get("id", key)
+            if eid != key:
+                redir[key] = eid
+            ents[eid] = ent
+        return ents, miss, redir, sha, len(result.body), result.retrieved_at
+
     # -- wbgetentities -----------------------------------------------------------------------------
     @staticmethod
     def entities_url(ids: Sequence[str], props: Sequence[str] = ENTITY_PROPS,
@@ -563,11 +617,33 @@ class WikidataClient:
         nbytes = 0
         requests = 0
         retrieved = datetime.now(UTC)
+        times: list[datetime] = []  # linked-data mode: per-entity retrieval times (archive reuse keeps the original)
         if self.mode in ("linked_data", "hybrid"):
             batch_size = 1
         queue: list[list[str]] = [todo[i:i + batch_size] for i in range(0, len(todo), batch_size)]
+        if self.mode == "auto":
+            per_entity: list[list[str]] = []
+            for chunk in queue:
+                if not self.lock.cooling_down("wbapi"):
+                    try:
+                        sub = await WikidataClient._api_chunk(self, chunk, props, languages, meta)
+                    except RateLimited:
+                        sub = None
+                    if sub is not None:
+                        r_ents, r_missing, r_redirects, r_sha, r_bytes, r_time = sub
+                        entities.update(r_ents)
+                        missing.extend(r_missing)
+                        redirects.update(r_redirects)
+                        shas.append(r_sha)
+                        sha_by_id.update({k: r_sha for k in r_ents})
+                        nbytes += r_bytes
+                        requests += 1
+                        times.append(r_time)
+                        continue
+                per_entity.extend([[i] for i in chunk])
+            queue = per_entity
         while queue:
-            if self.mode in ("linked_data", "hybrid"):
+            if self.mode in ("linked_data", "hybrid", "auto"):
                 eid0 = queue.pop(0)[0]
                 cached = self.archive.recent_entitydata(eid0, self.reuse_seconds)
                 if cached is not None:  # archived snapshot of the same entity, recent enough: no request
@@ -584,6 +660,7 @@ class WikidataClient:
                     requests += 1
                     nbytes += len(result.body)
                     body, retrieved = result.body, result.retrieved_at
+                times.append(retrieved)
                 shas.append(sha)
                 for key, ent in (_json(body).get("entities") or {}).items():
                     ent = _prune(ent, props, languages)
@@ -625,6 +702,8 @@ class WikidataClient:
                 sha_by_id[eid] = sha
             for key, eid in (doc.get("redirects") or {}).items() if isinstance(doc.get("redirects"), dict) else []:
                 redirects.setdefault(key, eid)
+        if times:  # a mixed batch is as old as its oldest snapshot
+            retrieved = min(times)
         return EntitiesResult(entities, tuple(missing), redirects, tuple(shas), sha_by_id, nbytes, requests, retrieved)
 
 

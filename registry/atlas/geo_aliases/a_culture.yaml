@@ -1,0 +1,232 @@
+# Geography aliases of agent A-CULTURE: IOC National Olympic Committee codes -> crosswalk entities.
+# Used by src/reva/adapters/connectors/atlas_olympics.py (provider_geo = the NOC code of the Wikipedia
+# {{Medals table}} template, i.e. the IOC country code). No `base`: IOC codes are NOT ISO alpha-3 codes and
+# several collide with other ISO/crosswalk keys (IOC CHI = Chile, crosswalk CHI = Channel Islands; IOC ANT =
+# Antigua and Barbuda, ISO ANT = former Netherlands Antilles), so every code is listed explicitly.
+#
+# A code maps to the present-day country whose NOC uses it (IOC continuity): the territory represented may
+# differ from today's (e.g. GER 1896-1936, AUT and HUN before 1918) -- rows carry that note in their flags.
+# NOT mapped, kept as provider geographies (never assigned to a successor): URS, EUN, GDR, FRG, EUA, TCH,
+# YUG, SCG, BOH, ANZ, RU1, ZZX, IOP, IOA, ROC (Republic of China 1956-1976 AND Russian Olympic Committee
+# 2020-2022: ambiguous), OAR, AIN, EOR/ROT, BWI, RAU, AHO, SAA, MAL, NBO, RHO, NRH, VNM (South Vietnam).
+scheme: ioc_noc
+aliases:
+  - {code: AFG, iso3: AFG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ALB, iso3: ALB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ALG, iso3: DZA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: AND, iso3: AND, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ANG, iso3: AGO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ANT, iso3: ATG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ARG, iso3: ARG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ARM, iso3: ARM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ARU, iso3: ABW, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ASA, iso3: ASM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: AUS, iso3: AUS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: AUT, iso3: AUT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: AZE, iso3: AZE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BAH, iso3: BHS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BAN, iso3: BGD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BAR, iso3: BRB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BDI, iso3: BDI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BEL, iso3: BEL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BEN, iso3: BEN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BER, iso3: BMU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BHU, iso3: BTN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BIH, iso3: BIH, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BIZ, iso3: BLZ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BLR, iso3: BLR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BOL, iso3: BOL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BOT, iso3: BWA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BRA, iso3: BRA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BRN, iso3: BHR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BRU, iso3: BRN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BUL, iso3: BGR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: BUR, iso3: BFA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CAF, iso3: CAF, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CAM, iso3: KHM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CAN, iso3: CAN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CAY, iso3: CYM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CGO, iso3: COG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CHA, iso3: TCD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CHI, iso3: CHL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CHN, iso3: CHN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CIV, iso3: CIV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CMR, iso3: CMR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: COD, iso3: COD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: COK, iso3: COK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: COL, iso3: COL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: COM, iso3: COM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CPV, iso3: CPV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CRC, iso3: CRI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CRO, iso3: HRV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CUB, iso3: CUB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CYP, iso3: CYP, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: CZE, iso3: CZE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: DEN, iso3: DNK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: DJI, iso3: DJI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: DMA, iso3: DMA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: DOM, iso3: DOM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ECU, iso3: ECU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: EGY, iso3: EGY, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ERI, iso3: ERI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ESA, iso3: SLV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ESP, iso3: ESP, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: EST, iso3: EST, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ETH, iso3: ETH, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: FIJ, iso3: FJI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: FIN, iso3: FIN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: FRA, iso3: FRA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: FSM, iso3: FSM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GAB, iso3: GAB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GAM, iso3: GMB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GBR, iso3: GBR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GBS, iso3: GNB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GEO, iso3: GEO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GEQ, iso3: GNQ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GER, iso3: DEU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GHA, iso3: GHA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GRE, iso3: GRC, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GRN, iso3: GRD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GUA, iso3: GTM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GUI, iso3: GIN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GUM, iso3: GUM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: GUY, iso3: GUY, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: HAI, iso3: HTI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: HKG, iso3: HKG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: HON, iso3: HND, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: HUN, iso3: HUN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: INA, iso3: IDN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: IND, iso3: IND, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: IRI, iso3: IRN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: IRL, iso3: IRL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: IRQ, iso3: IRQ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ISL, iso3: ISL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ISR, iso3: ISR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ISV, iso3: VIR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ITA, iso3: ITA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: IVB, iso3: VGB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: JAM, iso3: JAM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: JOR, iso3: JOR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: JPN, iso3: JPN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KAZ, iso3: KAZ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KEN, iso3: KEN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KGZ, iso3: KGZ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KIR, iso3: KIR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KOR, iso3: KOR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KOS, iso3: XKX, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KSA, iso3: SAU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: KUW, iso3: KWT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LAO, iso3: LAO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LAT, iso3: LVA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LBA, iso3: LBY, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LBR, iso3: LBR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LCA, iso3: LCA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LES, iso3: LSO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LIB, iso3: LBN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LIE, iso3: LIE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LTU, iso3: LTU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: LUX, iso3: LUX, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MAD, iso3: MDG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MAR, iso3: MAR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MAS, iso3: MYS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MAW, iso3: MWI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MDA, iso3: MDA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MDV, iso3: MDV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MEX, iso3: MEX, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MGL, iso3: MNG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MHL, iso3: MHL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MKD, iso3: MKD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MLI, iso3: MLI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MLT, iso3: MLT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MNE, iso3: MNE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MON, iso3: MCO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MOZ, iso3: MOZ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MRI, iso3: MUS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MTN, iso3: MRT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: MYA, iso3: MMR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NAM, iso3: NAM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NCA, iso3: NIC, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NED, iso3: NLD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NEP, iso3: NPL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NGR, iso3: NGA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NIG, iso3: NER, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NOR, iso3: NOR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NRU, iso3: NRU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: NZL, iso3: NZL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: OMA, iso3: OMN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PAK, iso3: PAK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PAN, iso3: PAN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PAR, iso3: PRY, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PER, iso3: PER, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PHI, iso3: PHL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PLE, iso3: PSE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PLW, iso3: PLW, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PNG, iso3: PNG, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: POL, iso3: POL, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: POR, iso3: PRT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PRK, iso3: PRK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: PUR, iso3: PRI, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: QAT, iso3: QAT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ROU, iso3: ROU, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: RSA, iso3: ZAF, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: RUS, iso3: RUS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: RWA, iso3: RWA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SAM, iso3: WSM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SEN, iso3: SEN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SEY, iso3: SYC, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SGP, iso3: SGP, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SKN, iso3: KNA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SLE, iso3: SLE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SLO, iso3: SVN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SMR, iso3: SMR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SOL, iso3: SLB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SOM, iso3: SOM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SRB, iso3: SRB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SRI, iso3: LKA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SSD, iso3: SSD, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: STP, iso3: STP, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SUD, iso3: SDN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SUI, iso3: CHE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SUR, iso3: SUR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SVK, iso3: SVK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SWE, iso3: SWE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SWZ, iso3: SWZ, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SYR, iso3: SYR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TAN, iso3: TZA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TGA, iso3: TON, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: THA, iso3: THA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TJK, iso3: TJK, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TKM, iso3: TKM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TLS, iso3: TLS, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TOG, iso3: TGO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TPE, iso3: TWN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TTO, iso3: TTO, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TUN, iso3: TUN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TUR, iso3: TUR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: TUV, iso3: TUV, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: UAE, iso3: ARE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: UGA, iso3: UGA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: UKR, iso3: UKR, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: URU, iso3: URY, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: USA, iso3: USA, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: UZB, iso3: UZB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: VAN, iso3: VUT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: VEN, iso3: VEN, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: VIE, iso3: VNM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: VIN, iso3: VCT, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: YEM, iso3: YEM, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ZAM, iso3: ZMB, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: ZIM, iso3: ZWE, source: "IOC National Olympic Committee country code (olympics.com NOC list; Wikipedia 'List of IOC country codes', current NOCs table)"}
+  - {code: SIN, iso3: SGP, source: "former IOC code of the same state: Singapore's IOC code until 2016 (now SGP)"}
+  - {code: TRI, iso3: TTO, source: "former IOC code of the same state: Trinidad and Tobago's IOC code until 2012 (now TTO)"}
+  - {code: CEY, iso3: LKA, source: "former IOC code of the same state: Ceylon, renamed Sri Lanka in 1972 (IOC code SRI)"}
+  - {code: BIR, iso3: MMR, source: "former IOC code of the same state: Burma, renamed Myanmar in 1989 (IOC code MYA)"}
+  - {code: DAH, iso3: BEN, source: "former IOC code of the same state: Dahomey, renamed Benin in 1975 (IOC code BEN)"}
+  - {code: VOL, iso3: BFA, source: "former IOC code of the same state: Upper Volta, renamed Burkina Faso in 1984 (IOC code BUR)"}
+  - {code: ZAI, iso3: COD, source: "former IOC code of the same state: Zaire, renamed Democratic Republic of the Congo in 1997 (IOC code COD)"}
+  - {code: HBR, iso3: BLZ, source: "former IOC code of the same state: British Honduras, renamed Belize in 1973 (IOC code BIZ)"}
+  - {code: IRN, iso3: IRN, source: "former IOC code of the same state: Iran's IOC code before IRI"}
+source:
+  kind: reference_list
+  url: https://en.wikipedia.org/wiki/List_of_IOC_country_codes
+  note: "codes as used by the IOC; mapping to ISO 3166 entities by A-CULTURE (reviewed by name, 2026-10-16)"

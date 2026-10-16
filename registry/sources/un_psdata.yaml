@@ -1,0 +1,47 @@
+# V3 (agent A-MILITARY): UN Peace and Security Data Hub (DPPA-DPO Information Management Unit).
+# Connector: src/reva/adapters/connectors/atlas_peacekeeping.py (atlas.peacekeeping) -> atlas tables
+# unpk.contrib_monthly, unpk.contrib_pre2010, unpk.contrib_annual, unpk.fatalities, unpk.totals (computed)
+# + KG statements (source_key un.psdata): missions, country -> mission contributions, mission countries.
+source_key: un.psdata
+title: "UN Peace and Security Data Hub - uniformed personnel contributions, peacekeeping fatalities, missions"
+provider_url: https://psdata.un.org
+lineage_family: un_peacekeeping
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: http://creativecommons.org/licenses/by/3.0/igo/legalcode
+  attribution: "United Nations Peace and Security Data Hub (DPPA-DPO), https://psdata.un.org"
+  provider_statement: >-
+    Each dataset's record on HDX, published by the Hub itself (organisation 'unpeacesecurity', "United Nations
+    Peace and Security Data Hub"), states license_id 'cc-by-igo', license_title "Creative Commons Attribution
+    for Intergovernmental Organisations (CC BY-IGO)", license_url
+    http://creativecommons.org/licenses/by/3.0/igo/legalcode (read 2026-10-16 for the 6 datasets used; the
+    connector re-reads the records on every run and refuses to ingest if the licence or publisher changes).
+  review: >-
+    pending maintainer review: the psdata.un.org web application's footer links the generic "Terms and
+    Conditions of Use of United Nations Web Sites" (personal, non-commercial use of site materials). The
+    dataset-level CC BY 3.0 IGO licence set by the same publisher on its open-data records is the more specific
+    statement and is the one applied; CKAN marks CC BY-IGO "isopen: false" only because it is not in CKAN's
+    default open-licence list.
+metadata:
+  allowed_hosts: [api.psdata.un.org, data.humdata.org]
+  endpoints:
+    data: https://api.psdata.un.org/public/data/<dataset id>/csv
+    licence_record: https://data.humdata.org/api/3/action/package_show?id=<hdx dataset name>
+  datasets:
+    DPO-UCHISTORICAL: "Historical Uniformed Personnel Contribution (2010-01 -> latest month; HDX peacekeeping-uniformed-contributions-by-gender; ~13 MB)"
+    DPPADPO-UCPre2010: "Historical Uniformed Personnel Contribution prior to 2010 (1990-11 -> 2009-12, archived; HDX dppadpo-ucpre2010; ~33 MB)"
+    DataCommons-UCHISTORICAL: "Annual Uniformed Personnel Contribution Statistics (annual averages, 2010 -> current year; HDX datacommons-uchistorical)"
+    DataCommons-Fatalities: "Annual Mission Fatalities Statistics (1948 -> latest year; HDX datacommons-fatalities)"
+    DPPADPOSS-PKO: "Peacekeeping Operations (all past and present PKOs: dates, HQ; HDX peacekeeping-core-dataset-active-missions)"
+    DPPA-FieldMissions-Missions: "Field Missions Dashboard, Mission Information (location, initial mandate; HDX dppa-fieldmissions-missions)"
+  not_ingested:
+    - "DPPADPOSS-FATALITIES (one row per casualty, incl. incident dates): the annual aggregate is enough for the atlas and carries no per-person rows"
+    - "DPO-UHISTORICALPOL (police only): a subset of DPO-UCHISTORICAL"
+    - "Security Council voting/vetoes/membership datasets: candidates for KGGEOPOL (same licence)"
+  authentication: none
+  cadence: monthly (contributions ~6 weeks after month end); annual (fatalities, annual averages)
+  editorial_status: >-
+    Official UN Secretariat figures as published by DPO/DPPA. Contribution figures are deployment strengths at
+    each month's last reporting date (not unique individuals); annual figures are provider averages. Fatalities
+    are by nationality of the casualty; data before 2000 may be incomplete (provider). Provider defects are
+    flagged, not corrected (pre-2010 overlapping categories, repeated UNEF fatality rows, swapped HQ coordinates).

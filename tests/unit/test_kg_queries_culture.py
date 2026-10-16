@@ -371,8 +371,17 @@ async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
 
     try:
         await fetch({*ANCHOR_LANGUAGES, BRAZIL, PORTUGAL, CATHOLICISM, CATHOLIC_CHURCH, ISLAM})
-        frontier = set(ANCHOR_LANGUAGES) | {CATHOLICISM, CATHOLIC_CHURCH, ISLAM}
-        for _ in range(12):  # P279 closure, bounded depth
+        # language genealogy: walk P279 only through Glottolog-coded nodes (as culture.language_ancestors)
+        frontier = set(ANCHOR_LANGUAGES)
+        for _ in range(15):
+            nxt = {o for q in frontier for o in objects(q, "P279")} - set(out)
+            if not nxt:
+                break
+            await fetch(nxt)
+            frontier = {q for q in nxt if out.get(q, {}).get("claims", {}).get("P1394")}
+        # religions: three P279 levels (e.g. Catholicism -> Western Christianity -> Christianity)
+        frontier = {CATHOLICISM, CATHOLIC_CHURCH, ISLAM}
+        for _ in range(3):
             nxt = {o for q in frontier for o in objects(q, "P279")} - set(out)
             if not nxt:
                 break

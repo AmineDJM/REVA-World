@@ -877,9 +877,26 @@ class RetirementAgeWorldModel:
             tables = {n: (None if (ds := inputs.dataset(n, iso3)).is_missing else ds.table) for n in CONCEPTS}
             plans.append(build_country_plan(iso3, inputs.subject(iso3).entity_id, spec, tables))
         outputs = tuple(spec.get("outputs") or DEFAULT_OUTPUTS)
-        return Compiled(
+        compiled = Compiled(
             dict(spec), b, years, outputs, plans, str(spec.get("missing_input_policy", "fail")), dict(inputs.release)
         )
+        # Evaluate every ready country now (pure and cheap): a country whose response assumption drives an
+        # employment rate out of [0, 100] becomes an incompatible country (reported per country, skipped under
+        # skip_missing_countries) instead of failing the whole run at compute.
+        from reva.simulation.plugins import ResultRow
+
+        fidelity = str(spec.get("fidelity", "L1"))
+        if fidelity in self.fidelities:
+            for plan in plans:
+                if plan.status != "ready":
+                    continue
+                try:
+                    plan.rows = rows_for_country(plan, compiled, fidelity, ResultRow)  # type: ignore[attr-defined]
+                    plan.rows_fidelity = fidelity  # type: ignore[attr-defined]
+                except ValidationProblem as e:
+                    plan.status = "incompatible"
+                    plan.problems.append({**e.problem(), "country": plan.iso3})
+        return compiled
 
     def compute(self, compiled: Compiled, fidelity: str) -> list[Any]:
         from reva.simulation.plugins import ResultRow
@@ -891,7 +908,11 @@ class RetirementAgeWorldModel:
         rows: list[Any] = []
         for plan in compiled.countries:
             if plan.status == "ready":
-                rows.extend(rows_for_country(plan, compiled, fidelity, ResultRow))
+                cached = getattr(plan, "rows", None)
+                if cached is not None and getattr(plan, "rows_fidelity", None) == fidelity:
+                    rows.extend(cached)
+                else:
+                    rows.extend(rows_for_country(plan, compiled, fidelity, ResultRow))
         from reva.models.population.cohort_world import result_size_guard
 
         result_size_guard(rows, f"{MODEL_KEY}@{MODEL_VERSION}")

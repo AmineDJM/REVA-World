@@ -82,7 +82,8 @@ def _specs() -> dict[str, Any]:
 
 @cache
 def _chains_doc() -> dict[str, Any]:
-    return yaml.safe_load(CHAINS.read_text())
+    doc: dict[str, Any] = yaml.safe_load(CHAINS.read_text())
+    return doc
 
 
 @cache
@@ -141,7 +142,9 @@ def test_class_specs_use_the_documented_root_classes() -> None:
         q = specs[spec_id].data["sparql"]
         for r in roots:
             assert f"wd:{r}" in q, (spec_id, r)
-        assert "wdt:P31/wdt:P279*" in q, spec_id
+        # rank-aware membership: wdt:P31 hides non-preferred P31 values (e.g. "empire" when "historical
+        # country" is preferred), so the specs walk every non-deprecated P31 statement
+        assert "ps:P31/wdt:P279*" in q and "wdt:P31/wdt:P279*" not in q, spec_id
 
 
 # --------------------------------------------------------------------------- recordings
@@ -152,6 +155,18 @@ def test_recorded_label_lookup_is_intact() -> None:
     assert _sha(meta["query"].strip().encode()) == meta["query_sha256"]
     assert meta["endpoint"] == "https://query.wikidata.org/sparql"
     assert "wikibase:label" not in meta["query"]
+
+
+def test_recorded_counts_are_intact() -> None:
+    metas = sorted(RECORDED.glob("wdqs_counts_*.json"))
+    assert metas
+    for m in metas:
+        meta = json.loads(m.read_text())
+        body = (RECORDED / meta["raw_file"]).read_bytes()
+        assert meta["kind"] == "wdqs_counts" and _sha(body) == meta["body_sha256"]
+        assert _sha(meta["query"].strip().encode()) == meta["query_sha256"]
+        rows = json.loads(body)["results"]["bindings"]
+        assert rows and all(int(b["n"]["value"]) >= 0 for b in rows)
 
 
 def test_recorded_title_lookups_are_intact() -> None:
@@ -448,7 +463,19 @@ def witness_path(chain: dict[str, Any], *, budget: int = 3_000_000) -> list[tupl
     work = [0]
     found: list[list[tuple[str, str, str]]] = []
 
-    def dfs(node: str, nodes: list[str], hops: list[tuple[str, str, str]]) -> None:
+    # Prefer explanatory hops (succession, sovereignty, signatures, participation) over loose ones, and entities
+    # whose claims were recorded; search by increasing length so the witness is a shortest admissible path.
+    rank = {"state_succession": 0, "treaty_signatory": 0, "official_language": 0, "participation": 1,
+            "territorial": 1, "voyage_geography": 1, "asserted_causation": 1, "leadership": 2, "location": 2,
+            "significant_event": 3, "era": 3}
+
+    def order(item: tuple[str, str, bool]) -> tuple[int, int, str]:
+        m, p, _ = item
+        return (min((rank.get(c, 4) for c in prop_classes[p]), default=4), 0 if m in _snapshot() else 1, m + p)
+
+    nbrs = {n: sorted(v, key=order) for n, v in adj.items()}
+
+    def dfs(node: str, nodes: list[str], hops: list[tuple[str, str, str]], limit: int) -> None:
         work[0] += 1
         if found or work[0] > budget:
             return
@@ -458,18 +485,21 @@ def witness_path(chain: dict[str, Any], *, budget: int = 3_000_000) -> list[tupl
                     [prop_classes[h[1]] for h in hops], chain["steps"]):
                 found.append(list(hops))
             return
-        if len(hops) >= max_hops or (node in non_transit and node != src):
+        if len(hops) >= limit or (node in non_transit and node != src):
             return
-        for m, p, out in adj.get(node, ()):
-            if m in nodes or m not in dist or len(hops) + 1 + dist[m] > max_hops:
+        for m, p, out in nbrs.get(node, ()):
+            if m in nodes or m not in dist or len(hops) + 1 + dist[m] > limit:
                 continue
             nodes.append(m)
             hops.append((node, p, m) if out else (m, p, node))
-            dfs(m, nodes, hops)
+            dfs(m, nodes, hops, limit)
             nodes.pop()
             hops.pop()
 
-    dfs(src, [src], [])
+    for limit in range(dist[src], max_hops + 1):
+        dfs(src, [src], [], limit)
+        if found:
+            break
     return found[0] if found else None
 
 

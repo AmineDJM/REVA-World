@@ -26,6 +26,9 @@ Geography
   code of the crosswalk, plus a few listed aliases (old World Bank codes ROM/ZAR/TMP, rows without an
   abbreviation). West Germany (260), the USSR (364), Yugoslavia (345/347), Czechoslovakia (315), the
   GDR, both Vietnams before 1976, South Yemen and the pre-1871 German/Italian states stay unmapped.
+* Taiwan (crosswalk entity TWN since crosswalk 1.1.0): LIED "Taiwan|vdem=48" (via V-Dem TWN, 1895-2025;
+  1945-1948 rows carry the V-Dem period QID of the Republic of China) and BMR 713 "TAIWAN" (1949-2020,
+  abbreviation TWN) map to TWN; China (LIED vdem=110, BMR 710) stays CHN.
 
 Every cell is the provider's integer code as text, with the codebook label in ``value_text`` for
 categorical variables. ``NA`` cells are omitted, except BMR ``democracy_omitteddata`` where ``NA``

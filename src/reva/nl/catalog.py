@@ -548,6 +548,11 @@ def build_catalog(
     for br in model_branches(schema):
         props = br.get("properties") or {}
         key = str(_const(props.get("model_key"))[1])
+        version = _const(props.get("model_version"))
+        if key in registry and version[0] and version[1] != getattr(registry[key], "model_version", version[1]):
+            # V3 SIMWORLD: a second registered version of a model (schema branch "<key>@<version>") is not
+            # draftable here; drafts target the key's default version, as before
+            continue
         if state == "registered" and key not in registry:
             log.info("scenario schema branch %s has no registered plugin; not draftable", key)
             continue

@@ -69,6 +69,14 @@ def test_state_code_policy(crosswalk: G.StateCodeCrosswalk) -> None:
     assert r("cow", 260, date(1991, 1, 1)).iso3 is None
     assert r("cow", 255, date(1995, 1, 1)).iso3 == "DEU"
     assert r("gw", 99999, date(2000, 1, 1)).reason == "unmapped"
+    # Taiwan (crosswalk 1.1.0): COW State System 713 starts 1949-12-08; before, the code (e.g. Voeten's UNGA
+    # China seat) denotes the ROC government on the mainland -> never TWN
+    tw = r("cow", 713, date(1960, 1, 1))
+    assert (tw.iso3, tw.qid, tw.reason) == ("TWN", "Q865", "policy")
+    assert r("gw", 713, date(2024, 6, 1)).iso3 == "TWN" and r("ucdp", 713, date(2024, 6, 1)).iso3 == "TWN"
+    early = r("cow", 713, date(1949, 12, 7))
+    assert early.iso3 is None and early.qid == "Q865" and early.reason == "historical_qid"
+    assert r("cow", 710, date(1960, 1, 1)).iso3 == "CHN"
 
 
 def test_resolver_uses_qids_and_code_entities(crosswalk: G.StateCodeCrosswalk) -> None:
@@ -113,7 +121,10 @@ def test_ucdp_orgvio_cy_values_verbatim(ucdp: dict[str, Any]) -> None:
     assert srb == {"SRB"}
     zero = [r for r in rows if r["value"] == "0" and r["unit"] == "deaths"]
     assert zero and all("zero_semantics" in json.loads(r["flags"]) for r in zero)
-    assert {u["provider_geo"] for u in unmapped} >= {"gw:365", "gw:713"}
+    assert "gw:365" in {u["provider_geo"] for u in unmapped}
+    # Taiwan: GW 713 -> TWN since crosswalk 1.1.0 (COW/GW 713 from 1949-12-08), keeping its verified QID
+    twn = [r for r in rows if r["provider_geo"] == "gw:713"]
+    assert twn and {(r["iso3"], r["entity_qid"]) for r in twn} == {("TWN", "Q865")}
 
 
 def test_ucdp_acd_counts_are_labelled_computed(ucdp: dict[str, Any]) -> None:
@@ -176,6 +187,10 @@ def test_unga_tables_validate(unga: dict[str, Any]) -> None:
     for ds, rows in (("votes", unga["votes"]), ("rollcalls", unga["rollcalls"]), ("vote_shares", unga["shares"])):
         validate_atlas_frame(G.atlas_frame(rows), source="unga", dataset=ds, raw_sha256s=[unga["sha"]])
     assert unga["meta"]["licence"] == "CC0 1.0"
+    # Voeten codes the China seat 1946-1971 as 713 "Taiwan, Province of China": after 1949-12-08 -> TWN
+    tw = [r for r in unga["votes"] if r["provider_geo"] == "cow:713"]
+    assert tw and all(r["iso3"] == "TWN" for r in tw if r["period_start"] >= date(1949, 12, 8))
+    assert all(r["iso3"] is None for r in tw if r["period_start"] < date(1949, 12, 8))
 
 
 def test_unga_provider_defects_are_flagged_not_counted(unga: dict[str, Any]) -> None:

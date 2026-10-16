@@ -1,0 +1,18 @@
+id: science.observatories
+domain: science
+owner: KGSCIECO
+description: >-
+  Observatories: direct instances of astronomical observatory (Q1254933) or observatory (Q62832) with at
+  least 5 sitelinks (Royal Observatory Greenwich, Paranal, Mauna Kea, Jantar Mantar, Ulugh Beg ...).
+  Snapshots keep country (P17), location (P131), inception (P571), operator (P137), founders (P112),
+  coordinates; elevation (P2044) is requested.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q1254933 wd:Q62832 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 5)
+  }
+max_rows: 3000
+expand_hops: 0

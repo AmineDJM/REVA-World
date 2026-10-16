@@ -17,6 +17,6 @@ sparql: |
 max_rows: 400
 depends_on: [core.countries]
 expand_hops: 1
-# WDQS-free selection (run --via api): every item with a P31 sovereign-state statement and no dissolution date
-# (search cannot test the P582 qualifier: ended P31 statements are included; their snapshots show the end time).
-api_search: {instance_of: [Q3624078], extra: "-haswbstatement:P576"}
+# WDQS-free selection (run --via api): items whose own P31 contains sovereign state
+# (candidates from WhatLinksHere/Q3624078; dissolved states with an ended P31 are included, their snapshots show it).
+api_search: {instance_of: [Q3624078], discover: whatlinkshere}

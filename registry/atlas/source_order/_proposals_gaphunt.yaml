@@ -1,0 +1,168 @@
+# PROPOSALS from agent GAPHUNT to ATLASOPS / the lead — NOT loaded by reva.atlas.source_order (file name starts
+# with "_"). Each `add_series.entry` is written in the source_order schema (_schema.json $defs/series) so it can be
+# pasted, after review, into the `series:` list of the named headline concept, AFTER the existing entries (the
+# multilateral series stay first; these only answer cells nobody else reports). `new_concepts` are complete
+# headline concepts in the schema; `not_equivalent` entries are for the named concept's not_equivalent list.
+# The gap-fill series are in registry/atlas/catalog/gapfill.yaml; evidence in docs/dev/v3_gaps.md.
+# A test (tests/unit/test_atlas_gaphunt.py) validates every entry against _schema.json.
+maintainer: GAPHUNT
+add_series:
+  - concept: reva.economy.inflation_cpi
+    fills: [GLP, MTQ, GUF, REU, MYT]
+    entry:
+      series: "insee.ipc_dom.CPI_ANNUAL_CHANGE|coicop=00|households=ENSEMBLE|base=2025"
+      reported_unit: "% change"
+      justification: >-
+        Insee "Indice annuel des prix à la consommation - Base 2025 - Variation annuelle - Ensemble des ménages -
+        <department> - Ensemble": the change of the annual average all-items CPI over the previous year, i.e. this
+        concept's definition, for the overseas departments that the IMF and the World Bank include in France.
+      caveats: "Insee national CPI methodology (Laspeyres, all households); 2016-2025 in base 2025 (Mayotte from 2024)."
+  - concept: reva.economy.gdp_usd
+    fills: [BES]
+    entry:
+      series: "cbs.bes_gdp.gdp_current_prices"
+      reported_unit: "million USD"
+      scale: "1000000"
+      justification: >-
+        CBS "Caribbean Netherlands; gross domestic product (GDP)", value at current prices, million US dollars. The US
+        dollar is the legal currency of Bonaire, Sint Eustatius and Saba since 2011, so no exchange-rate conversion is
+        involved: GDP at purchasers' prices in current US dollars, this definition.
+      caveats: "Published in whole millions (rounding of the provider)."
+  - concept: reva.economy.gdp_usd
+    fills: [NIU, TKL, WLF, COK, PCN]
+    entry:
+      series: "spc.pocket.GDPCUSD"
+      reported_unit: "thousand USD"
+      scale: "1000"
+      justification: >-
+        SPC PDH.Stat pocket summary "GDP, current price, in USD" (DF_NATIONAL_ACCOUNTS, national-currency GDP at
+        current prices converted to US dollars by SPC); only cells whose DATA_YEAR is the cell year are kept.
+      caveats: >-
+        SPC states the conversion rate per cell (flags.obs_comment, e.g. 'Converted 0.7041 NZD/USD') but not whether it
+        is the annual average market rate; ranked after WDI and WEO, so it answers only where they have nothing.
+  - concept: reva.economy.gdp_per_capita_usd
+    fills: [BES]
+    entry:
+      series: "cbs.bes_gdp.gdp_per_capita"
+      reported_unit: "USD"
+      justification: >-
+        CBS "Caribbean Netherlands; gross domestic product (GDP) per capita", US dollars at current prices: GDP in
+        current US dollars divided by the population, this definition (no currency conversion, see gdp_usd).
+      caveats: "CBS divides by its own population figure; rounded to hundreds of dollars by the provider."
+  - concept: reva.economy.gdp_per_capita_usd
+    fills: [NIU, TKL, WLF, COK, PCN]
+    entry:
+      series: "spc.pocket.GDPCPCUSD"
+      reported_unit: "USD per person"
+      justification: >-
+        SPC pocket summary "GDP, per capita, in USD": GDP in US dollars divided by the mid-year population (SPC states
+        the division per cell in flags.obs_comment), the same quantity.
+      caveats: "SPC conversion rate and population (see spc.pocket.GDPCUSD)."
+  - concept: reva.economy.gdp_real_growth
+    fills: [BES]
+    entry:
+      series: "cbs.bes_gdp.gdp_volume_change"
+      reported_unit: "% change"
+      justification: "CBS 'GDP, volume changes' (%): annual change of GDP at constant prices, this definition."
+  - concept: reva.science.internet_users
+    fills: [NIU, TKL, WLF]
+    entry:
+      series: "spc.digital.DD024"
+      reported_unit: "percent"
+      justification: >-
+        SPC DF_DIGITAL_DEVELOPMENT DD024 "Individuals using the Internet, total (%)" is the ITU indicator (the same
+        series the UN SDG database publishes as IT_USE_ii99), re-published by SPC for Pacific territories.
+      caveats: "Same lineage as the SDG/ITU series ranked first (not independent evidence)."
+  - concept: reva.science.internet_users
+    fills: [GLP, MTQ, GUF, REU]
+    entry:
+      series: "eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_IU3"
+      reported_unit: "% of individuals"
+      justification: >-
+        Eurostat "Last internet use: in last 3 months", % of individuals: the ITU definition of an Internet user
+        (used the Internet from any location in the last three months); ITU takes this Eurostat survey for EU members.
+      caveats: "Population aged 16-74 (Eurostat ICT survey), regional NUTS-2 estimate for the overseas departments."
+  - concept: reva.geography.land_area
+    fills: [GLP, MTQ, GUF, REU, MYT, ALA, SJM]
+    entry:
+      series: "eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=L0008"
+      reported_unit: "km2"
+      justification: >-
+        Eurostat reg_area3 "Land area - total": the region's area excluding inland water, the definition of this
+        concept (FAO land area as used by the World Bank).
+      caveats: "Eurostat land cover based; the year is the NUTS release year, not a survey year."
+  - concept: reva.geography.surface_area
+    fills: [GLP, MTQ, GUF, REU, MYT, ALA, SJM]
+    entry:
+      series: "eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=TOTAL"
+      reported_unit: "km2"
+      justification: "Eurostat reg_area3 'Total area' of the region including inland water: this definition."
+new_concepts:
+  - theme: population
+    concept:
+      id: reva.population.total_1_january
+      labels: {fr: "Population au 1er janvier", en: "Population on 1 January"}
+      definition: >-
+        Usually resident population on 1 January of the year as published by national or regional statistical
+        offices (registers or census-based estimates). A stock at the start of the year, not the mid-year population
+        of reva.population.total.
+      unit: persons
+      series:
+        - series: "eurostat.nuts2_gapfill.demo_r_d2jan|unit=NR|sex=T|age=TOTAL"
+          justification: "Eurostat demo_r_d2jan 'Population on 1 January', both sexes, all ages: this definition."
+        - series: "cbs.bes_population.population_1_january"
+          justification: "CBS 83774ENG 'Population on 1 January' of the Caribbean Netherlands (population register): this definition."
+      caveats: "Filled for GLP, MTQ, GUF, REU, MYT, ALA, SJM (Eurostat) and BES (CBS); proposed so these entities have a population at all."
+  - theme: health
+    concept:
+      id: reva.health.life_expectancy_national_tables
+      labels: {fr: "Espérance de vie à la naissance (tables de mortalité nationales)", en: "Life expectancy at birth (national period life tables)"}
+      definition: >-
+        Period life expectancy at birth, both sexes, computed by a national or regional statistical office from
+        registered deaths and population of the year (not a modelled estimate).
+      unit: years
+      series:
+        - series: "eurostat.nuts2_gapfill.demo_r_mlifexp|unit=YR|sex=T|age=Y_LT1"
+          justification: "Eurostat demo_r_mlifexp, life expectancy at age < 1 (at birth), both sexes: a period life table from registered deaths."
+      caveats: "Separate from reva.health.life_expectancy (UN WPP model) for the same reason ATLASOPS keeps WHO GHE separate."
+not_equivalent:
+  - concept: reva.population.total
+    entry:
+      series: "spc.pocket.MIDYEARPOPEST"
+      reason: >-
+        SPC's mid-year estimates are census-based national figures; SPC does not state whether they are de facto or
+        de jure, so they cannot be declared the WPP de facto definition. Catalog concept gapfill.spc.population_midyear.
+  - concept: reva.population.total
+    entry:
+      series: "eurostat.nuts2_gapfill.demo_r_d2jan / cbs.bes_population.population_1_january"
+      reason: "1 January stocks, not mid-year populations: proposed as reva.population.total_1_january."
+  - concept: reva.population.density
+    entry:
+      series: "eurostat.nuts2_gapfill.demo_r_d3dens|unit=PER_KM2 / spc.pocket.POPDENS"
+      reason: >-
+        Eurostat divides the average population of the year (mean of two 1 January stocks) by land area, not the
+        mid-year population; SPC does not state its denominator. Catalog concepts only.
+  - concept: reva.labour.unemployment_rate_national
+    entry:
+      series: "eurostat.nuts2_gapfill.lfst_r_lfu3rt (15-74) / cbs.bes_labour.unemployment_rate (15-74) / spc.emprates.UNEMPRATE"
+      reason: >-
+        Eurostat and CBS rates are for ages 15-74 (the listed ILOSTAT series cover 15+); SPC does not state the age
+        band or the definition (census or survey). Catalog concepts only (gapfill.*.unemployment_rate*).
+  - concept: reva.labour.minimum_wage_monthly_lcu
+    entry:
+      series: "insee.smic_dom.SMIC_HOURLY_GROSS"
+      reason: >-
+        Insee publishes the overseas Smic per hour; converting to a monthly amount (x 151.67 h) would be a REVA
+        computation. Catalog concept gapfill.insee.smic_hourly.
+  - concept: reva.health.life_expectancy
+    entry:
+      series: "spc.pocket.LEBM / spc.pocket.LEBF"
+      reason: "Sex-specific values only; a both-sexes value is not published in the pocket summary (never averaged by REVA)."
+  - concept: reva.trade.merchandise_balance_imts
+    entry:
+      series: "spc.pocket.TRADEBALUSD"
+      reason: "SPC's IMTS balance does not state the valuation (FOB/CIF) of exports and imports; catalog concept only."
+  - concept: reva.economy.inflation_cpi
+    entry:
+      series: "spc.pocket.INFRATE"
+      reason: "The pocket summary does not state whether its inflation rate is the annual-average or the December change."

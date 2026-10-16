@@ -217,6 +217,12 @@ async def test_cow_tables_units_and_code_resolution() -> None:
     assert all(not v.startswith(".") for v in cinc)
     assert builds[0].report["nmc"]["missing_code_minus9"]  # -9 omitted and counted
     assert by["system2024"]["value"].unique().to_list() == ["1"]
+    # COW 713 Taiwan -> TWN from 1949-12-08 (KGGEOPOL policy window, crosswalk 1.1.0); the 1949 row (resolved at
+    # mid-year, before membership starts) keeps iso3 null; Q865 stays the entity in every year
+    tw = by["system2024"].filter(pl.col("provider_geo") == "713")
+    tw_iso = {r["period_start"].year: r["iso3"] for r in tw.to_dicts()}
+    assert tw_iso[1949] is None and tw_iso[1950] == "TWN" and tw_iso[2024] == "TWN"
+    assert set(tw["entity_qid"].to_list()) == {"Q865"}
     wars = by["wars4"]
     w1 = wars.filter(pl.col("indicator") == "batdeath|type=inter|war=1|side=2")
     assert w1["value"].to_list() == ["600"] and w1["iso3"].to_list() == ["ESP"]

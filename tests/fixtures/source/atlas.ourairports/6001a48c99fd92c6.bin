@@ -1,0 +1,163 @@
+id,ident,type,name,latitude_deg,longitude_deg,elevation_ft,continent,iso_country,iso_region,municipality,scheduled_service,icao_code,iata_code,gps_code,local_code,home_link,wikipedia_link,keywords
+325353,AL-0002,closed,Korroticës së Ulët Airport,42.605253,20.910351,1962,EU,XK,XK-01,Korroticë e Poshtme,no,,,,,,,"Korroticës së Ulët, Lower Korotica"
+4614,BKPR,large_airport,Priština Adem Jashari International Airport,42.5728,21.035801,1789,EU,XK,XK-01,Prishtina,yes,BKPR,PRN,BKPR,,http://www.airportpristina.com/,https://en.wikipedia.org/wiki/Pristina_International_Airport,"LYPR, Pristina, Slatina Air Base"
+316472,BKVR,heliport,Vali Ranch Heliport,42.513732,21.534508,2168,EU,XK,XK-06,Përlepnice,no,,,BKVR,,,,Vali
+2145,DA10,small_airport,Illizi Airport,26.573601,8.48366,1778,AF,DZ,DZ-33,Illizi,no,,,DA10,DA10,,,
+2146,DA11,small_airport,Hamaguir Airport,30.879,-3.06775,2454,AF,DZ,DZ-08,Hamaguir,no,DAOM,,DAOM,,,,DA11
+2147,DA12,small_airport,El Abiodh Sidi Cheikh Airport,32.898499,0.524694,2965,AF,DZ,DZ-32,El Abiodh Sidi Cheikh,no,,,DA12,DA12,,,
+2148,DA13,small_airport,Tinfouchy Airport,28.879299,-5.8229,1804,AF,DZ,DZ-37,Oum El Assel,no,,,DA13,DA13,,,
+2149,DA14,small_airport,Mostaganem Airport,35.90518,0.144539,732,AF,DZ,DZ-27,Sayada,no,,MQV,DA14,DA14,,https://en.wikipedia.org/wiki/Mostaganem_Airport,Matemore Airfield
+2150,DA15,small_airport,Saïda Airport,34.897202,0.151694,2444,AF,DZ,DZ-20,Ouled Khaled,no,,,DA15,DA15,,,Rebahia
+2151,DA16,small_airport,Tindouf East Airport,27.585899,-7.50011,1425,AF,DZ,DZ-37,Tindouf,no,,,DA16,DA16,,,
+2047,DAAB,medium_airport,Blida Airport,36.503601,2.81417,535,AF,DZ,DZ-09,Blida,no,DAAB,,DAAB,,,https://en.wikipedia.org/wiki/Blida_Airport,QLD
+2048,DAAD,medium_airport,Bou Saada Airport,35.3325,4.20639,1506,AF,DZ,DZ-28,Ouled Sidi Brahim,no,DAAD,BUJ,DAAD,,,https://en.wikipedia.org/wiki/Bou_Saada_Airport,
+2049,DAAE,large_airport,Soummam–Abane Ramdane Airport,36.712547,5.069909,20,AF,DZ,DZ-06,Béjaïa,yes,DAAE,BJA,DAAE,BJ1,,https://en.wikipedia.org/wiki/Abane_Ramdane_Airport,"Béjaïa, Soummam"
+314958,DAAF,small_airport,Aoulef Airport,27.0624,1.1111,1017,AF,DZ,DZ-01,Aoulef,no,,,DAAF,,,,
+2050,DAAG,large_airport,Houari Boumediene Airport,36.693886,3.214531,82,AF,DZ,DZ-16,Algiers,yes,DAAG,ALG,DAAG,,,https://en.wikipedia.org/wiki/Houari_Boumediene_Airport,"Algiers, Maison Blanche"
+2051,DAAJ,large_airport,Tiska Djanet Airport,24.285448,9.463652,3176,AF,DZ,DZ-56,Djanet,yes,DAAJ,DJG,DAAJ,,,https://en.wikipedia.org/wiki/Djanet_Inedbirene_Airport,"Cheikh Amoud Ben el Mokhtar, Djanet Inedbirene Airport"
+2052,DAAK,medium_airport,Boufarik Air Base,36.545799,2.87611,335,AF,DZ,DZ-09,Boufarik,no,DAAK,,DAAK,,,https://en.wikipedia.org/wiki/Boufarik_Airport,QFD
+30872,DAAM,small_airport,Telerghma Airport,36.1087,6.3646,2484,AF,DZ,DZ-43,Telerghma,no,DAAM,,DAAM,,,https://en.wikipedia.org/wiki/Telergma_Airport,
+2053,DAAN,small_airport,Reggane Air Base,26.712418,0.288219,955,AF,DZ,DZ-01,Reggane,no,DAAN,,DAAN,,,https://en.wikipedia.org/wiki/Reggane_Airport,
+2054,DAAP,medium_airport,Illizi Takhamalt Airport,26.723499,8.62265,1778,AF,DZ,DZ-33,Illizi,yes,DAAP,VVZ,DAAP,,,https://en.wikipedia.org/wiki/Illizi_Airport,
+2055,DAAQ,small_airport,Ain Oussera Airport,35.525398,2.87871,2132,AF,DZ,DZ-17,Ain Oussera,no,DAAQ,,DAAQ,,,https://en.wikipedia.org/wiki/A%C3%AFn_Oussera_Airport,
+32193,DAAS,medium_airport,Ain Arnat Airport,36.178488,5.329909,3360,AF,DZ,DZ-19,Sétif,yes,DAAS,QSF,DAAS,,https://www.egsa-constantine.dz/setif.html,https://en.wikipedia.org/wiki/Ain_Arnat_Airport,"Sétif International Airport, 8 Mai 45 Airport"
+2056,DAAT,large_airport,Aguenar – Hadj Bey Akhamok Airport,22.810992,5.450832,4518,AF,DZ,DZ-11,Tamanrasset,yes,DAAT,TMR,DAAT,,,https://en.wikipedia.org/wiki/Tamanrasset_Airport,
+2057,DAAV,large_airport,Jijel Ferhat Abbas Airport,36.794125,5.873652,36,AF,DZ,DZ-18,Tahir,yes,DAAV,GJL,DAAV,,,https://en.wikipedia.org/wiki/Jijel_Ferhat_Abbas_Airport,
+30873,DAAW,small_airport,Bordj Omar Driss Airport,28.136042,6.836156,1207,AF,DZ,DZ-33,Bordj Omar Driss,no,DAAW,,DAAW,,,https://en.wikipedia.org/wiki/Bordj_Omar_Driss_Airport,
+312616,DAAX,small_airport,Chéraga Airport,36.7782,2.9284,396,AF,DZ,DZ-16,Chéraga,no,DAAX,,DAAX,,,,
+2058,DAAY,medium_airport,Mecheria Airport,33.5359,-0.242353,3855,AF,DZ,DZ-45,Mecheria,yes,DAAY,MZW,DAAY,,,http://fr.wikipedia.org/wiki/A%C3%A9roport_de_Mecheria,
+2059,DAAZ,medium_airport,Relizane Airport,35.752955,0.625877,282,AF,DZ,DZ-48,Relizane,no,DAAZ,,DAAZ,,,https://en.wikipedia.org/wiki/Relizane_Airport,QZN
+2060,DABB,large_airport,Annaba Rabah Bitat Airport,36.826781,7.81334,16,AF,DZ,DZ-23,Annaba,yes,DABB,AAE,DABB,,,https://en.wikipedia.org/wiki/Rabah_Bitat_Airport,"Les Salines Airport, El Mellah Airport, Annabah"
+2061,DABC,large_airport,Mohamed Boudiaf International Airport,36.276001,6.62039,2265,AF,DZ,DZ-25,Constantine,yes,DABC,CZL,DABC,,https://www.egsa-constantine.dz/constantine.html,https://en.wikipedia.org/wiki/Mohamed_Boudiaf_International_Airport,
+42529,DABO,small_airport,Oum El Bouaghi Air Base,35.874356,7.267742,2980,AF,DZ,DZ-04,Oum El Bouaghi,no,,,DAEO,,,https://en.wikipedia.org/wiki/Oum_el_Bouaghi_Airport,DABO
+2062,DABS,medium_airport,Cheikh Larbi Tébessi Airport,35.4315986633,8.12071990967,2661,AF,DZ,DZ-12,Tébessi,yes,DABS,TEE,DABS,,,https://en.wikipedia.org/wiki/T%C3%A9bessa_Airport,
+2063,DABT,large_airport,Batna Mostefa Ben Boulaid Airport,35.752102,6.30859,2697,AF,DZ,DZ-05,Batna,yes,DABT,BLJ,DABT,,,https://en.wikipedia.org/wiki/Batna_Airport,
+602988,DAEN,small_airport,Rhoud Nouss Airport,29.728878,6.711316,830,AF,DZ,DZ-33,Rhoude Nouss,no,DAEN,,DAEN,,,,
+2064,DAFH,medium_airport,Hassi R'Mel Airport,32.930401,3.31154,2540,AF,DZ,DZ-03,Hassi R'Mel,no,DAFH,HRM,DAFH,,,https://en.wikipedia.org/wiki/Hassi_R'Mel_Airport,
+302293,DAFI,small_airport,Tsletsi Airport,34.6657,3.351,3753,AF,DZ,DZ-17,Djelfa,no,DAFI,,DAFI,,,https://en.wikipedia.org/wiki/Tsletsi_Airport,QDJ
+2065,DAOB,medium_airport,Abdelhafid Boussouf Bou Chekif Airport,35.341099,1.46315,3245,AF,DZ,DZ-14,Tiaret,no,DAOB,TID,DAOB,,,https://en.wikipedia.org/wiki/Bou_Chekif_Airport,
+30874,DAOC,small_airport,Béchar Ouakda Aerodrome,31.642901,-2.18466,2660,AF,DZ,DZ-08,Béchar,no,DAOC,,DAOC,,,https://en.wikipedia.org/wiki/B%C3%A9char_Ouakda_aerodrome,
+2066,DAOE,small_airport,Bousfer Air Base,35.735401,-0.805389,187,AF,DZ,DZ-31,Bousfer,no,DAOE,,DAOE,,,https://en.wikipedia.org/wiki/Bousfer_Air_Base,Bou Sfer
+2067,DAOF,medium_airport,Tindouf Airport,27.7003993988,-8.167099952700001,1453,AF,DZ,DZ-37,Tindouf,yes,DAOF,TIN,DAOF,,,https://en.wikipedia.org/wiki/Tindouf_Airport,
+602989,DAOH,small_airport,Chenachene Airport,26.050969,-4.220039,1229,AF,DZ,DZ-37,Chenachen,no,DAOH,,DAOH,,,,
+2068,DAOI,large_airport,Chlef Aboubakr Belkaid International Airport,36.216614,1.341114,463,AF,DZ,DZ-02,Chlef,yes,DAOI,CFK,DAOI,,,https://en.wikipedia.org/wiki/Chlef_International_Airport,Ech Cheliff Airport
+2069,DAOL,medium_airport,Oran Tafraoui Airport,35.5424,-0.532278,367,AF,DZ,DZ-31,Tafraoui,no,DAOL,TAF,DAOL,,,https://en.wikipedia.org/wiki/Oran_Tafraoui_Airport,
+2070,DAON,large_airport,Zenata – Messali El Hadj Airport,35.012732,-1.457117,814,AF,DZ,DZ-13,Zenata,yes,DAON,TLM,DAON,,,https://en.wikipedia.org/wiki/Zenata_%E2%80%93_Messali_El_Hadj_Airport,Tlemcen
+2071,DAOO,large_airport,Oran Es-Sénia (Ahmed Ben Bella) International Airport,35.620648,-0.622486,295,AF,DZ,DZ-31,Es-Sénia,yes,DAOO,ORN,DAOO,,,https://en.wikipedia.org/wiki/Oran_Es_Senia_Airport,Es Senia
+2072,DAOR,medium_airport,Béchar Boudghene Ben Ali Lotfi Airport,31.645700454711914,-2.269860029220581,2661,AF,DZ,DZ-08,Béchar,yes,DAOR,CBH,DAOR,,,https://en.wikipedia.org/wiki/B%C3%A9char_Ouakda_Airport,Béchar Ouakda Airport
+2073,DAOS,small_airport,Sidi Bel Abbes Airport,35.1717987061,-0.593275010586,1614,AF,DZ,DZ-22,Sidi Bel Abbès,no,DAOS,BFW,DAOS,,,https://en.wikipedia.org/wiki/Sidi_Bel_Abb%C3%A8s_Airport,
+2074,DAOV,medium_airport,Ghriss Airport,35.207699,0.147142,1686,AF,DZ,DZ-29,Ghriss,no,DAOV,MUW,DAOV,,,https://en.wikipedia.org/wiki/Ghriss_Airport,
+300333,DAOY,small_airport,El Bayadh Airport,33.721667,1.0925,4493,AF,DZ,DZ-32,El Bayadh,yes,DAOY,EBH,DAOY,,,https://en.wikipedia.org/wiki/El_Bayadh_Airport,
+31678,DATG,small_airport,In Guezzam Airport,19.560518,5.749326,1312,AF,DZ,DZ-58,In Guezzam,no,DATG,INF,DATG,,,https://en.wikipedia.org/wiki/In_Guezzam_Airport,
+30777,DATM,medium_airport,Bordj Badji Mokhtar Airport,21.3778,0.92698,1303,AF,DZ,DZ-52,Bordj Badji Mokhtar,yes,DATM,BMW,DATM,,,https://en.wikipedia.org/wiki/Bordj_Mokhtar_Airport,
+2075,DAUA,medium_airport,Touat-Cheikh Sidi Mohamed Belkebir Airport,27.837601,-0.186414,919,AF,DZ,DZ-01,Adrar,yes,DAUA,AZR,DAUA,,,https://en.wikipedia.org/wiki/Touat_Cheikh_Sidi_Mohamed_Belkebir_Airport,لكبير  مطار أدرار – توات الشيخ سيدي محمد بن
+2076,DAUB,large_airport,Biskra - Mohamed Khider Airport,34.79318,5.738899,289,AF,DZ,DZ-07,Biskra,yes,DAUB,BSK,DAUB,,,https://en.wikipedia.org/wiki/Biskra_Airport,
+2077,DAUE,medium_airport,El Golea Airport,30.580732,2.861595,1306,AF,DZ,DZ-50,El Menia,yes,DAUE,ELG,DAUE,,,https://en.wikipedia.org/wiki/El_Golea_Airport,
+2078,DAUG,medium_airport,Noumérat - Moufdi Zakaria Airport,32.384102,3.79411,1512,AF,DZ,DZ-47,El Atteuf,yes,DAUG,GHA,DAUG,,,https://en.wikipedia.org/wiki/Noumerate_Airport,Ghardaïa
+2079,DAUH,medium_airport,Hassi Messaoud-Oued Irara Krim Belkacem Airport,31.673,6.14044,463,AF,DZ,DZ-30,Hassi Messaoud,yes,DAUH,HME,DAUH,,,https://en.wikipedia.org/wiki/Oued_Irara_Airport,
+2080,DAUI,medium_airport,In Salah Airport,27.250999,2.51202,896,AF,DZ,DZ-57,In Salah,yes,DAUI,INZ,DAUI,,,https://en.wikipedia.org/wiki/In_Salah_Airport,
+2081,DAUK,medium_airport,Touggourt Sidi Madhi Airport,33.067799,6.08867,279,AF,DZ,DZ-55,Touggourt,yes,DAUK,TGR,DAUK,,,https://en.wikipedia.org/wiki/Touggourt_Sidi_Madhi_Airport,
+2082,DAUL,medium_airport,Laghouat - Molay Ahmed Medeghri Airport,33.7644,2.92834,2510,AF,DZ,DZ-03,Laghouat,yes,DAUL,LOO,DAUL,,,https://en.wikipedia.org/wiki/L%27Mekrareg_Airport,
+2083,DAUO,medium_airport,Guemar Airport - مطار قمار بالوادي,33.511398,6.77679,203,AF,DZ,DZ-39,Guemar,yes,DAUO,ELU,DAUO,,,https://en.wikipedia.org/wiki/Guemar_Airport,
+2084,DAUT,medium_airport,Timimoun Airport,29.237101,0.276033,1027,AF,DZ,DZ-54,Timimoun,yes,DAUT,TMX,DAUT,,,https://en.wikipedia.org/wiki/Timimoun_Airport,
+2085,DAUU,medium_airport,Ain Beida Airport,31.9172,5.41278,492,AF,DZ,DZ-30,Ouargla,yes,DAUU,OGX,DAUU,,,https://en.wikipedia.org/wiki/Ain_Beida_Airport,"Ain el Beida, Sedrata Airfield"
+2086,DAUZ,medium_airport,Zarzaitine - In Aménas Airport,28.0515,9.64291,1847,AF,DZ,DZ-33,In Aménas,yes,DAUZ,IAM,DAUZ,,,https://en.wikipedia.org/wiki/In_Amenas_Airport,
+2790,FAHS,closed,Non-Existent Airport,-46.181902,-12.114796,1743,AF,ZZ,ZZ-U-A,,no,,,,,,,
+43341,FR-0001,heliport,Emile Muller Hospital Heliport,47.725328,7.344995,1081,EU,FR,FR-GES,Mulhouse,no,,,,,,,Centre Hospitalier De Moenchsberg Heliport
+43342,FR-0002,heliport,Hautepierre Hospital Heliport,48.593357,7.704855,487,EU,FR,FR-GES,Strasbourg,no,,,,,,,
+43343,FR-0003,heliport,Haguenau Hospital Heliport,48.797797,7.776888,530,EU,FR,FR-GES,Haguenau,no,,,,,,,Helisurface de Centre Hospitalier de Haguenau
+43344,FR-0004,heliport,Ingwiller Hospital Heliport,48.872538,7.486496,659,EU,FR,FR-GES,"Ingwiller, Bas-Rhin",no,,,,,,,
+43345,FR-0005,heliport,Sainte Catherine Hospital Heliport,48.745702,7.350851,672,EU,FR,FR-GES,Saverne,no,,,,,,,
+43346,FR-0006,heliport,Graffenstaden Hospital Heliport,48.537178,7.721645,515,EU,FR,FR-GES,Illkirch-Graffenstaden,no,,,,,,,
+43347,FR-0007,heliport,Louis Pasteur Colmar Hospital Heliport,48.073861,7.338105,660,EU,FR,FR-GES,Colmar,no,,,,,,,
+43348,FR-0008,heliport,New City Hospital Heliport,48.575786,7.740673,540,EU,FR,FR-GES,Strasbourg,no,,,,,,,"NHC, Nouvelle Hôpital Civil"
+350567,FR-0009,small_airport,Altisurface Notre-Dame-des-Neiges-Abbaye,44.601293,3.927773,3760,EU,FR,FR-ARA,Saint-Laurent-les-Bains,no,,,,LF0723,,,
+43350,FR-0010,heliport,Castets Heliport,43.91666793823242,-1.1569440364837646,184,EU,FR,FR-NAQ,Dax,no,,,,,,,
+43351,FR-0011,heliport,Bayonne Centre Hospitalier De La Côte Basque Heliport,43.482515,-1.479968,150,EU,FR,FR-NAQ,Bayonne,no,,,,,,,
+43352,FR-0012,heliport,Arcachon Centre Hospitalier Heliport,44.6125,-1.113889,46,EU,FR,FR-NAQ,,no,,,,,,,
+43353,FR-0013,heliport,Centre Hospitalier Heliport,43.712501525878906,-1.0402779579162598,31,EU,FR,FR-NAQ,Dax,no,,,,,,,
+43354,FR-0014,heliport,Centre Hospitalier Heliport,43.893333435058594,-0.48611098527908325,197,EU,FR,FR-NAQ,Mont De Marsan,no,,,,,,,
+43355,FR-0015,heliport,Centre Hospitalier Heliport,45.19175338745117,0.7315620183944702,502,EU,FR,FR-NAQ,Perigueux,no,,,,,,,
+43356,FR-0016,heliport,Pau Centre Hospitalier Heliport,43.328056,-0.350833,709,EU,FR,FR-NAQ,Pau,no,,,,,,,
+43357,FR-0017,heliport,Centre Hospitalier Heliport,43.19633865356445,-0.6160079836845398,758,EU,FR,FR-NAQ,Oloron Sainte Marie,no,,,,,,,
+43358,FR-0018,heliport,Centre Hospitalier Saint Nicolas De Blay Heliport,45.135780334472656,-0.6595829725265503,81,EU,FR,FR-NAQ,Blaye,no,,,,,,,
+43359,FR-0019,heliport,Clinique Du Medoc Heliport,45.30278778076172,-0.9378859996795654,30,EU,FR,FR-NAQ,Lesparre,no,,,,,,,
+43360,FR-0020,small_airport,Escary Aramits Altiport,43.121208,-0.742491,1076,EU,FR,FR-NAQ,Aramits,no,,,,LF6428,,,
+43361,FR-0021,closed,Aérodrome de Herm,43.821646,-1.103475,253,EU,FR,FR-NAQ,Dax,no,,,,,,,
+43362,FR-0022,heliport,La Canéda Centre Hospitalier Heliport,44.90024948120117,1.2231240272521973,656,EU,FR,FR-NAQ,Sarlat,no,,,,,,,
+43363,FR-0023,heliport,Le Huga Heliport,45.00694274902344,-1.164721965789795,52,EU,FR,FR-NAQ,Lacanau,no,,,,,,,
+43364,FR-0024,heliport,Pellegrin Centre Hospitalier Heliport,44.82749938964844,-0.6044440269470215,344,EU,FR,FR-NAQ,Bordeaux,no,,,,,,,
+43365,FR-0025,heliport,Pontonx Heliport,43.77777862548828,-0.9194440245628357,53,EU,FR,FR-NAQ,Dax,no,,,,,,,
+43366,FR-0026,heliport,Relais De Margaux Heliport,45.052955627441406,-0.6622499823570251,7,EU,FR,FR-NAQ,Margaux,no,,,,,,,
+43367,FR-0027,heliport,Robert Piqué Hôpital Militaire Heliport,44.79999923706055,-0.574167013168335,62,EU,FR,FR-NAQ,Bordeaux,no,,,,,,,
+43368,FR-0028,heliport,Tinon Heliport,43.733333587646484,-1.1777780055999756,151,EU,FR,FR-NAQ,Dax,no,,,,,,,
+43369,FR-0029,heliport,Centre Hospitalier Heliport,46.56666564941406,3.3333330154418945,686,EU,FR,FR-ARA,Moulins,no,,,,,,,
+43370,FR-0030,heliport,Clermont-Ferrand University Gabriel-Monpied Hospital Heliport,45.756963,3.091822,1366,EU,FR,FR-ARA,"Clermont-Ferrand, Puy-de-Dôme",no,,,,,,,
+43371,FR-0031,heliport,Sens Fire and Rescue Center Heliport,48.191991,3.306123,266,EU,FR,FR-BFC,"Sens, Yonne",no,,,,,,,
+43372,FR-0032,heliport,CEA Study Center Heliport,47.584882,4.879574,1611,EU,FR,FR-BFC,"Salives, Côte-d'Or",no,,,,,,,
+43373,FR-0033,closed,Troyes Hospital Heliport,48.277917,4.070177,407,EU,FR,FR-BFC,"Troyes, Aube",no,,,,,,,
+43374,FR-0034,heliport,Auxerre Hospital Heliport,47.804155,3.557979,528,EU,FR,FR-BFC,"Auxerre, Yonne",no,,,,,,,Centre Hospitalier d’Auxerre
+43375,FR-0035,heliport,Mâcon Hospital Heliport,46.31445,4.8123,727,EU,FR,FR-BFC,"Mâcon, Saône-et-Loire",no,,,,,,,
+43376,FR-0036,heliport,Centre Hospitalier Heliport,46.981388092041016,3.1222219467163086,736,EU,FR,FR-BFC,Nevers,no,,,,,,,
+43377,FR-0037,heliport,Châtillon-sur-Seine Hospital Heliport,47.862186,4.558043,792,EU,FR,FR-BFC,Châtillon-sur-Seine,no,,,,,,,
+43378,FR-0038,heliport,Paray-le-Monial Hospital Heliport,46.46502,4.10967,824,EU,FR,FR-BFC,"Paray-le-Monial, Saône-et-Loire",no,,,,,,,
+43379,FR-0039,heliport,Semur-en-Auxois Hospital Heliport,47.495699,4.344583,957,EU,FR,FR-BFC,"Semur-en-Auxois, Côte-d'Or",no,,,,,,,
+43380,FR-0040,heliport,Centre Hospitalier Hotel Dieu Heliport,46.80500030517578,4.448888778686523,1180,EU,FR,FR-BFC,Le Creusot,no,,,,,,,
+43381,FR-0041,heliport,Centre Hospitalier J. Bouveri Heliport,46.650001525878906,4.333889007568359,957,EU,FR,FR-BFC,Montceau Les Mines,no,,,,,,,
+43382,FR-0042,closed,Dijon Regional Hospital Heliport,47.317223,5.026944,781,EU,FR,FR-BFC,"Dijon, Côte-d'Or",no,,,,,,,
+43383,FR-0043,heliport,Chalon Sur Saone Centre Hospitalier W. Morey Heliport,46.777401,4.841688,665,EU,FR,FR-BFC,Chalons-Sur-Saone,no,,,,,,,
+43384,FR-0044,heliport,Circuit Automobile de Nevers Magny-Cours Heliport,46.856388092041016,3.1541669368743896,751,EU,FR,FR-BFC,Magny Cours,no,,,,,,,
+43385,FR-0045,heliport,Le Port Heliport,47.981175,3.386718,254,EU,FR,FR-BFC,"Joigny, Yonne",no,,,,,,,
+43386,FR-0046,heliport,Amirauté Heliport,48.38055419921875,-4.491666793823242,8,EU,FR,FR-BRE,Brest,no,,,,,,,
+43387,FR-0047,heliport,Scorff Hospital Heliport,47.753644,-3.356066,79,EU,FR,FR-BRE,Lorient,no,,,,,,,Bretagne Sud Centre Hospital Heliport
+43388,FR-0048,heliport,Centre Hospitalier Heliport,48.63888931274414,-2.0083329677581787,26,EU,FR,FR-BRE,Saint-Malo,no,,,,,,,
+43389,FR-0049,heliport,Centre Hospitalier Heliport,48.7227783203125,-3.465277910232544,92,EU,FR,FR-BRE,Lannion,no,,,,,,,
+43390,FR-0050,heliport,Centre Hospitalier Heliport,48.4908332824707,-2.7511110305786133,354,EU,FR,FR-BRE,Saint-Brieuc,no,,,,,,,
+43391,FR-0051,heliport,Vannes Centre Hospitalier Heliport,47.663917,-2.744672,39,EU,FR,FR-BRE,Vannes,no,,,,,,,
+43392,FR-0052,heliport,Cornouailles Heliport,47.98527526855469,-4.096109867095947,177,EU,FR,FR-BRE,Quimper,no,,,,,,,
+43393,FR-0053,heliport,La Cavale Blanche Centre Hospitalier Heliport,48.40353012084961,-4.529566764831543,121,EU,FR,FR-BRE,Brest,no,,,,,,,
+43394,FR-0054,heliport,Mairie Heliport,48.20277786254883,-3.8205559253692627,495,EU,FR,FR-BRE,Chateauneuf Du Faou,no,,,,,,,
+43395,FR-0055,heliport,Pont Chaillou Heliport,48.12305450439453,-1.6961109638214111,148,EU,FR,FR-BRE,Rennes,no,,,,,,,
+43396,FR-0056,heliport,Centre Hospitalier de l'agglomeration Montargeoise Heliport,47.996665954589844,2.774444103240967,353,EU,FR,FR-CVL,Amilly,no,,,,,,,
+43397,FR-0057,heliport,Centre Hospitalier Heliport,47.360557556152344,1.731943964958191,293,EU,FR,FR-CVL,Romorantin,no,,,,,,,
+43398,FR-0058,heliport,Centre Hospitalier Heliport,47.60472106933594,1.3424999713897705,355,EU,FR,FR-CVL,Blois,no,,,,,,,
+43399,FR-0059,heliport,Centre Hospitalier Heliport,47.08416748046875,2.4352779388427734,445,EU,FR,FR-CVL,Bourges,no,,,,,,,
+43400,FR-0060,heliport,Victor Jousselin Hospital Heliport,48.727484,1.384667,451,EU,FR,FR-CVL,"Dreux, Yvelines",no,,,,,,,
+30153,LNMC,heliport,Monaco Heliport,43.725798,7.419673,20,EU,MC,MC-U-A,Fontvieille,yes,LNMC,MCM,LNMC,,,https://en.wikipedia.org/w/index.php?title=Monaco_Heliport&oldid=1139229385,"Monte Carlo Heliport, Heli Air Monaco"
+308218,LYBS,heliport,Camp Bondsteel Army Heliport,42.36632,21.24234,1900,EU,XK,XK-05,Sojevë / Camp Bondsteel,no,,,,BK12,,https://en.wikipedia.org/wiki/Camp_Bondsteel,
+319195,MC-0001,heliport,Terre-Plein du Larvotto Heliport,43.746543,7.43894,,EU,MC,MC-U-A,Larvotto,no,,,,,,,Jimmy'z
+340399,MC-0002,heliport,Helipuerto del Centro Hospitalario “Princess Grace”,43.729392,7.410111,,EU,MC,MC-U-A,La Colle,no,,,,,,,
+44571,NGFU,medium_airport,Funafuti International Airport,-8.523885,179.196976,9,OC,TV,TV-FUN,Funafuti,yes,NGFU,FUN,NGFU,,,https://en.wikipedia.org/wiki/Funafuti_International_Airport,
+325371,TV-0001,closed,Nanumea Airfield,-5.683334,176.129,36,OC,TV,TV-NMA,,no,,,,,,https://en.wikipedia.org/wiki/Nanumea_Airfield,Ellice Islands
+325372,TV-0002,closed,Nukufetau Airfield,-8.065,178.377224,55,OC,TV,TV-NKF,Motulalo Island,no,,,,,,https://en.wikipedia.org/wiki/Nukufetau_Airfield,Ellice Islands
+316471,XK-0001,closed,Ferizaj Airfield,42.346508,21.194129,1916,EU,XK,XK-05,Ferizaj,no,,,,,,https://en.wikipedia.org/wiki/Camp_Bondsteel,Kaçanik Agricultural Airport
+351080,XK-0002,closed,Krusheva Airfield,42.63982,20.50275,1634,EU,XK,XK-03,Jagodë,no,,,,,,,Aeroporti Bujqësor Jagodë
+351081,XK-0003,closed,Malisheva Airfield,42.47664,20.78648,1943,EU,XK,XK-04,Banjë,no,,,,,,,Aerodrumi Bujqësor Banjë
+351082,XK-0004,heliport,Dubrava Prison Heliport,42.78575,20.55182,1844,EU,XK,XK-03,Istog,no,,,,,,,
+513807,XK-0005,closed,Camp Christina Heliport,42.5411,21.11224,1795,EU,XK,XK-01,Suhadoll,no,,,,,,,
+513808,XK-0006,heliport,KFOR Headquarters Heliport,42.664529,21.141505,2113,EU,XK,XK-01,Pristina,no,,,,,,,
+514487,XK-0007,heliport,Gjilan Regional Hospital Heliport,42.45883,21.46207,1791,EU,XK,XK-06,Gjilan,no,,,,,,,Heliporti i Spitalit Rajonal të Gjilanit
+514509,XK-0008,heliport,KFOR Camp Maxhunaj Heliport,42.78224,21.03111,1837,EU,XK,XK-02,Maxhunaj,no,,,,,,,Heliporti i bazës së KFOR-it në Maxhunaj
+34925,XK-0009,closed,Batlava-Donja Penduha Air Base,42.849898,21.221705,1978,EU,XK,XK-01,Dumosh,no,,,,,,https://en.wikipedia.org/wiki/Batlava-Donja_Penduha_Airfield,"Аеродром Батлава, LYPT"
+1651,XK-0010,small_airport,Gjakovë Air Base,42.435066,20.427768,1370,EU,XK,XK-07,Gjakovë,no,,,,,,https://en.wikipedia.org/wiki/Gjakova_Airport,"Dakovica, Aerodrom Đakovica, Аеродром Ђаковица, Aeroporti i Gjakovës, Dakovjca, LYDK"
+594422,XK-0011,closed,Gjilan Airfield,42.46204,21.44515,1867,EU,XK,XK-06,Gjilan,no,,,,,,,
+594423,XK-0012,closed,Marinë Airfield,42.70257,20.82276,2123,EU,XK,XK-07,Morinë,no,,,,,,,"Marina, Morinë"
+594428,XK-0013,closed,Rahovec Airfield,42.37305,20.61994,1243,EU,XK,XK-07,Rahovec,no,,,,,,,
+594429,XK-0014,closed,Dubrava Airfield,42.7716,20.54152,1720,EU,XK,XK-03,Dubravë,no,,,,,,,
+594430,XK-0015,closed,Jashanica Airfield,42.66261,20.66298,16,EU,XK,XK-03,Klina,no,,,,,,,
+594445,XK-0016,closed,Prizren Airfield,42.24272,20.72063,1302,EU,XK,XK-04,Prizren,no,,,,,,,
+594446,XK-0017,heliport,Prizren Heliport,42.22165,20.749683,1490,EU,XK,XK-04,Prizren,no,,,,,,,
+594447,XK-0018,heliport,University Clinical Center of Kosovo Heliport,42.64596,21.1627,1978,EU,XK,XK-01,Pristina,no,,,,,,,
+594452,XK-0019,heliport,UNMIK Mitrovica Heliport,42.89382,20.87722,1657,EU,XK,XK-02,Mitrovica,no,,,,,,,
+594457,XK-0020,heliport,Gjakova Heliport,42.38589,20.43589,1204,EU,XK,XK-07,Gjakova,no,,,,,,,
+594458,XK-0021,heliport,Camp Villaggio Italia Heliport,42.63094,20.28684,2021,EU,XK,XK-03,Peja,no,,,,,,,
+354410,XP-0001,heliport,Zhongjian Dao (Triton Island) Heliport,15.782977,111.198893,,AS,XP,XP-U-A,Triton Island,no,,,,,,https://en.wikipedia.org/wiki/Triton_Island,
+511181,XP-0002,small_airport,Zhongjian Dao (Triton Island) Air Base,15.783471,111.20274,,AS,XP,XP-U-A,Triton Island,no,,,,,,,
+32745,XP-0003,small_airport,Yongxing Dao (Woody Island) Air Base,16.8328,112.344002,,AS,XP,XP-U-A,Woody Island,yes,,,,,,https://en.wikipedia.org/wiki/Woody_Island%2C_South_China_Sea,"VH84, ZJYX,"
+354409,XP-0004,heliport,Chenhang Dao (Duncan Island) Heliport,16.454206,111.706946,,AS,XP,XP-U-A,Duncan Island,no,,,,,,https://sv.wikipedia.org/wiki/Duncan_Islands_(%C3%B6),
+354408,XP-0005,heliport,Lingyang Jiao (Antelope Reef) Heliport,16.44635,111.606529,,AS,XP,XP-U-A,Antelope Reef,no,,,,,,https://sv.wikipedia.org/wiki/Antelope_Reef,
+342167,XP-0006,heliport,Jinyin Dao (Money Island) Heliport,16.447476,111.507111,23,AS,XP,XP-U-A,Money Island,no,,,,,,,
+342166,XP-0007,heliport,Shanhu Dao (Pattle Island) Heliport,16.535115,111.608675,10,AS,XP,XP-U-A,Pattle Island,no,,,,,,,
+504769,XP-0008,heliport,Bei Dao (North Island) Heliport,16.96058,112.3147,,AS,XP,XP-U-A,North Island,no,,,,,,,
+342165,XP-0009,heliport,Zhaoshu Dao (Tree Island) Heliport,16.9782,112.2664,,AS,XP,XP-U-A,Tree Island,no,,,,,,,
+599952,ZZ-0004,heliport,(Bogus)Jezero Crater(Location is India not Planet Mars),18.44,77.45,8530,AF,ZZ,ZZ-U-A,,no,JZRO,,,,,,

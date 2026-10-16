@@ -410,3 +410,13 @@ def test_priority_ids_capitals_regions_first(places, admin1) -> None:
     first = {p.geonameid for p in places if p.feature_code in ("PPLC", "PPLG")}
     assert set(ids[: len(first)]) == first
     assert ids.index(admin1[0].geonameid) < ids.index("2735943")  # regions before PPLA seats (Porto)
+
+
+def test_altnames_real_excerpt(places) -> None:
+    body = _fixture(C.CONNECTOR_NAME, C.URL_ALTNAMES)
+    found = list(C.iter_altnames(body, {p.geonameid for p in places}))
+    assert found and {a.lang for a in found} == {"fr", "en"}
+    kept, _dropped = C.bounded_names(found)
+    lis = [a for a in kept if a.geonameid == "2267057"]
+    assert {a.lang for a in lis} == {"fr", "en"} and len([a for a in lis if a.lang == "fr"]) <= C.MAX_NAMES_PER_LANG
+    assert "Lisbonne" in {a.name for a in lis if a.lang == "fr"}

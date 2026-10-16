@@ -318,6 +318,14 @@
           "type": "string",
           "maxLength": 300,
           "description": "Extra CirrusSearch terms ANDed to each instance query, e.g. '-haswbstatement:P576'."
+        },
+        "discover": {
+          "enum": [
+            "search",
+            "whatlinkshere"
+          ],
+          "default": "search",
+          "description": "search: CirrusSearch haswbstatement (action API). whatlinkshere: candidates are the items linking to each instance_of class (Special:WhatLinksHere page views, outside the action-API limiter; subclass_depth must be 0); only candidates whose own P31 claim contains the class are loaded."
         }
       }
     }

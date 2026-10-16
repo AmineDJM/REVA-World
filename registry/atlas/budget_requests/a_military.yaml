@@ -1,0 +1,13 @@
+# Budget request from agent A-MILITARY (UN peacekeeping, UN Peace and Security Data Hub). ATLASCORE/ATLASOPS merge
+# into registry/policies/budgets.yaml. One full run = 6 HDX licence records (package_show, 9-47 KB each) + 6 whole
+# CSV datasets from api.psdata.un.org (~13 MB + ~33 MB + 4 small files): 12 requests, ~46.5 MB. planned_requests 14
+# (12 + 2 retries). SIPRI and FAS are not fetched (terms: see docs/dev/v3_a_military.md).
+agent: A-MILITARY
+requests:
+  - source_key: un.psdata
+    daily_requests: 30
+    expected_bytes_per_day: 100000000
+    reason: "UN Peace and Security Data Hub: 6 CSV datasets + 6 HDX licence records per run (12 requests, ~46.5 MB); room for one retry run per day"
+daily_totals_increase:
+  http_requests_total: "+30"
+  http_bytes_total: "+100_000_000"

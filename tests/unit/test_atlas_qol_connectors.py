@@ -60,9 +60,9 @@ def test_decimal_text_is_lossless_and_strict() -> None:
 
 
 def test_name_index_uses_aliases_then_crosswalk_labels_only() -> None:
-    ni = NameIndex({"DR Congo": "COD", "Taiwan Province of China": None})
+    ni = NameIndex({"DR Congo": "COD", "North Cyprus": None})
     assert ni.lookup("DR Congo") == ("COD", "alias")
-    assert ni.lookup("Taiwan Province of China") == (None, "alias_unmapped")
+    assert ni.lookup("North Cyprus") == (None, "alias_unmapped")
     assert ni.lookup("Bolivia") == ("BOL", "crosswalk")  # crosswalk worldbank_name
     assert ni.lookup("Atlantis") == (None, "unmapped")
     with pytest.raises(ValueError):
@@ -166,7 +166,10 @@ async def test_whr_three_year_windows_aliases_and_licence_flag() -> None:
     assert json.loads(fin["flags"])["averaging_window_years"] == [2023, 2025]
     assert _cell(f, indicator="rank", iso3="FIN", period_start=date(2023, 1, 1))["value"] == "1"
     assert f.filter(pl.col("provider_geo") == "DR Congo")["iso3"].unique().to_list() == ["COD"]
-    assert {"Taiwan Province of China", "North Cyprus", "Somaliland Region"} == {u["provider_geo"] for u in unmapped}
+    assert {"North Cyprus", "Somaliland Region"} == {u["provider_geo"] for u in unmapped}
+    # crosswalk 1.1.0: WHR "Taiwan Province of China" -> TWN (alias); "China" stays CHN (validator: no clash)
+    assert f.filter(pl.col("provider_geo") == "Taiwan Province of China")["iso3"].unique().to_list() == ["TWN"]
+    assert f.filter(pl.col("provider_geo") == "China")["iso3"].unique().to_list() == ["CHN"]
 
 
 # ----------------------------------------------------------------------------- OWID

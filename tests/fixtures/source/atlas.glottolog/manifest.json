@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "639f9629af07dd8d8ba1b3b0fef04e544ba8856d3003194e44aa859c6441966c",
+    "url": "https://zenodo.org/api/records/3260727/versions/latest",
+    "file": "record.json",
+    "sha256": "21be1807eeb4bcce5fc308d1e95ab220ccd4952b5d597f8af9a2dfe6d360f2a8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: 69 languoids (seeds port1283,braz1246,stan1288,stan1290,hait1244,kabu1256,papi1253,mbya1239,kain1272,nhen1239,basq1248,lati1261,tokp1240,urub1243,tuxa1239,basq1252 + ancestors) of glottolog-cldf v5.3; values.csv only level/category/classification/aes rows; names.csv only fr/en; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  },
+  {
+    "request_fingerprint": "be5b87fb8a9966325eda0c9e708225c7c5cc23e9fa1d80288d7e3b7972aa63f3",
+    "url": "https://zenodo.org/api/records/18840967/files/glottolog/glottolog-cldf-v5.3.zip/content",
+    "file": "release.zip",
+    "sha256": "74a2d3beda82faadbcfddf029e3a138ee52982e34f3513f2ef079c1a29104852",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: 69 languoids (seeds port1283,braz1246,stan1288,stan1290,hait1244,kabu1256,papi1253,mbya1239,kain1272,nhen1239,basq1248,lati1261,tokp1240,urub1243,tuxa1239,basq1252 + ancestors) of glottolog-cldf v5.3; values.csv only level/category/classification/aes rows; names.csv only fr/en; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  }
+]

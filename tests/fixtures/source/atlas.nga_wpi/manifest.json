@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "d080c04300bfebcaaa2206c254e090cfd3714b26c938c7b47c579dfd376e27dd",
+    "url": "https://msi.nga.mil/api/publications/world-port-index?output=csv",
+    "file": "d080c04300bfebca.bin",
+    "sha256": "47645cd5d86a6168cc449c83c54fee5cc19ccbd7468b5a3893e4308a75ca4b1d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T18:11:46+00:00",
+    "licence": "US Government work",
+    "note": "trimmed excerpt: <=30 ports for FR, DZ, QM, XU, MA, SG"
+  }
+]

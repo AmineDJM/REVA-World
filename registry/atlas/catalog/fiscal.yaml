@@ -1,0 +1,1015 @@
+# Atlas catalog 'fiscal' (agent A-FISCAL, 2026-10-16). Provider-declared concepts (not human-reviewed).
+# Generated from the live dataflow contents; see docs/dev/v3_a_fiscal.md.
+domain: fiscal
+labels:
+  fr: Fiscalité et dépenses publiques (OCDE)
+  en: Taxes and public spending (OECD)
+maintainer: A-FISCAL
+concepts:
+- id: fiscal.tax_total_gdp
+  labels:
+    fr: Recettes fiscales totales (% du PIB)
+    en: Total tax revenue (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    total tax revenue, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=_T|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Headline tax-to-GDP ratio. Regional averages (Africa, Asia-Pacific, LAC, OECD) are unmapped rows.
+- id: fiscal.tax_income_profits_gdp
+  labels:
+    fr: Impôts sur le revenu, les bénéfices et les gains en capital (% du PIB)
+    en: Taxes on income, profits and capital gains (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on income, profits and capital gains, percentage of GDP. Compiled by the OECD with national authorities for ~130
+    countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_1000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_personal_income_gdp
+  labels:
+    fr: Impôts sur le revenu des personnes physiques (% du PIB)
+    en: Taxes on income, profits and capital gains of individuals (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on income, profits and capital gains of individuals, percentage of GDP. Compiled by the OECD with national authorities
+    for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_1100|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_corporate_income_gdp
+  labels:
+    fr: Impôts sur les bénéfices des sociétés (% du PIB)
+    en: Taxes on income, profits and capital gains of corporations (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on income, profits and capital gains of corporations, percentage of GDP. Compiled by the OECD with national authorities
+    for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_1200|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_social_security_gdp
+  labels:
+    fr: Cotisations de sécurité sociale (% du PIB)
+    en: Social security contributions (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    social security contributions, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_2000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_payroll_gdp
+  labels:
+    fr: Impôts sur les salaires et la main-d'œuvre (% du PIB)
+    en: Taxes on payroll and workforce (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on payroll and workforce, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_3000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_property_gdp
+  labels:
+    fr: Impôts sur le patrimoine (% du PIB)
+    en: Taxes on property (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on property, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_4000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_immovable_property_gdp
+  labels:
+    fr: Impôts périodiques sur la propriété immobilière (% du PIB)
+    en: Recurrent taxes on immovable property (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    recurrent taxes on immovable property, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_4100|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_goods_services_gdp
+  labels:
+    fr: Impôts sur les biens et services (% du PIB)
+    en: Taxes on goods and services (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on goods and services, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_vat_gdp
+  labels:
+    fr: Taxes sur la valeur ajoutée (TVA) (% du PIB)
+    en: Value added taxes (VAT) (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    value added taxes (vat), percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5111|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_excises_gdp
+  labels:
+    fr: Droits d'accise (% du PIB)
+    en: Excises (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    excises, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5121|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_customs_gdp
+  labels:
+    fr: Droits de douane et à l'importation (% du PIB)
+    en: Customs and import duties (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    customs and import duties, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5123|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_other_gdp
+  labels:
+    fr: Autres impôts (% du PIB)
+    en: Other taxes (% of GDP)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    other taxes, percentage of GDP. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_6000|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Tax categories not levied are reported by the OECD as 0 (kept as reported).
+- id: fiscal.tax_income_profits_share
+  labels:
+    fr: Impôts sur le revenu, les bénéfices et les gains en capital (% des recettes fiscales totales)
+    en: Taxes on income, profits and capital gains (% of total taxation)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on income, profits and capital gains, percentage of total tax revenue. Compiled by the OECD with national authorities
+    for ~130 countries.'
+  unit: '% of total taxation'
+  domain: fiscal
+  subdomain: tax_structure
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_1000|unit_measure=PT_OTR_REV_CAT
+  provider_declared: true
+- id: fiscal.tax_social_security_share
+  labels:
+    fr: Cotisations de sécurité sociale (% des recettes fiscales totales)
+    en: Social security contributions (% of total taxation)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    social security contributions, percentage of total tax revenue. Compiled by the OECD with national authorities for ~130
+    countries.'
+  unit: '% of total taxation'
+  domain: fiscal
+  subdomain: tax_structure
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_2000|unit_measure=PT_OTR_REV_CAT
+  provider_declared: true
+- id: fiscal.tax_property_share
+  labels:
+    fr: Impôts sur le patrimoine (% des recettes fiscales totales)
+    en: Taxes on property (% of total taxation)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on property, percentage of total tax revenue. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of total taxation'
+  domain: fiscal
+  subdomain: tax_structure
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_4000|unit_measure=PT_OTR_REV_CAT
+  provider_declared: true
+- id: fiscal.tax_goods_services_share
+  labels:
+    fr: Impôts sur les biens et services (% des recettes fiscales totales)
+    en: Taxes on goods and services (% of total taxation)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    taxes on goods and services, percentage of total tax revenue. Compiled by the OECD with national authorities for ~130
+    countries.'
+  unit: '% of total taxation'
+  domain: fiscal
+  subdomain: tax_structure
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5000|unit_measure=PT_OTR_REV_CAT
+  provider_declared: true
+- id: fiscal.tax_vat_share
+  labels:
+    fr: Taxes sur la valeur ajoutée (TVA) (% des recettes fiscales totales)
+    en: Value added taxes (VAT) (% of total taxation)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    value added taxes (vat), percentage of total tax revenue. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: '% of total taxation'
+  domain: fiscal
+  subdomain: tax_structure
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=T_5111|unit_measure=PT_OTR_REV_CAT
+  provider_declared: true
+- id: fiscal.tax_revenue_national_currency
+  labels:
+    fr: Recettes fiscales totales (monnaie nationale)
+    en: Total tax revenue (national currency)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    total tax revenue, national currency; the cell unit carries the OECD unit multiplier (x10^6 or x10^9) and flags.currency
+    the ISO 4217 code. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: national currency (UNIT_MULT in flags)
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=_T|unit_measure=XDC
+  provider_declared: true
+- id: fiscal.tax_revenue_usd
+  labels:
+    fr: Recettes fiscales totales (dollars US)
+    en: Total tax revenue (US dollars)
+  definition: 'OECD Global Revenue Statistics (comparative tables, OECD classification of taxes): general government (S13)
+    total tax revenue, US dollars at OECD exchange rates. Compiled by the OECD with national authorities for ~130 countries.'
+  unit: US dollars (UNIT_MULT in flags)
+  domain: fiscal
+  subdomain: tax_revenue
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S13|standard_revenue=_T|unit_measure=USD
+  provider_declared: true
+- id: fiscal.tax_share_central
+  labels:
+    fr: Recettes fiscales attribuées aux administration centrale (% des recettes totales)
+    en: Tax revenue attributed to central government (% of total tax revenue)
+  definition: 'OECD Global Revenue Statistics: total tax revenue attributed to the central government sub-sector (S1311),
+    percentage of total general government tax revenue (fiscal decentralisation).'
+  unit: '% of total tax revenue'
+  domain: fiscal
+  subdomain: fiscal_decentralisation
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S1311|standard_revenue=_T|unit_measure=PT_OTR_SECTOR
+  provider_declared: true
+- id: fiscal.tax_share_state
+  labels:
+    fr: Recettes fiscales attribuées aux États fédérés / régions (% des recettes totales)
+    en: Tax revenue attributed to state/regional government (% of total tax revenue)
+  definition: 'OECD Global Revenue Statistics: total tax revenue attributed to the state/regional government sub-sector (S1312),
+    percentage of total general government tax revenue (fiscal decentralisation).'
+  unit: '% of total tax revenue'
+  domain: fiscal
+  subdomain: fiscal_decentralisation
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S1312|standard_revenue=_T|unit_measure=PT_OTR_SECTOR
+  provider_declared: true
+- id: fiscal.tax_share_local
+  labels:
+    fr: Recettes fiscales attribuées aux administrations locales (% des recettes totales)
+    en: Tax revenue attributed to local government (% of total tax revenue)
+  definition: 'OECD Global Revenue Statistics: total tax revenue attributed to the local government sub-sector (S1313), percentage
+    of total general government tax revenue (fiscal decentralisation).'
+  unit: '% of total tax revenue'
+  domain: fiscal
+  subdomain: fiscal_decentralisation
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S1313|standard_revenue=_T|unit_measure=PT_OTR_SECTOR
+  provider_declared: true
+- id: fiscal.tax_share_social_security_funds
+  labels:
+    fr: Recettes fiscales attribuées aux administrations de sécurité sociale (% des recettes totales)
+    en: Tax revenue attributed to social security funds (% of total tax revenue)
+  definition: 'OECD Global Revenue Statistics: total tax revenue attributed to the social security funds sub-sector (S1314),
+    percentage of total general government tax revenue (fiscal decentralisation).'
+  unit: '% of total tax revenue'
+  domain: fiscal
+  subdomain: fiscal_decentralisation
+  theme: finance
+  source_order:
+  - oecd.rs_global.TAX_REV|sector=S1314|standard_revenue=_T|unit_measure=PT_OTR_SECTOR
+  provider_declared: true
+- id: fiscal.cit_rate_combined
+  labels:
+    fr: Taux légal combiné de l'impôt sur les sociétés
+    en: Combined statutory corporate income tax rate
+  definition: 'OECD Corporate Tax Statistics: statutory corporate income tax rate combining central and sub-central government
+    rates (CIT_C), general rate (not targeted), percent of taxable income.'
+  unit: '% of taxable income'
+  domain: fiscal
+  subdomain: corporate_tax
+  theme: finance
+  source_order:
+  - oecd.cts_cit.CIT_C|targeting=ST|sector=S13|unit_measure=PT_INC_TAX
+  provider_declared: true
+  tags:
+  - statutory rate
+- id: fiscal.cit_rate_central
+  labels:
+    fr: Taux légal de l'impôt sur les sociétés (administration centrale)
+    en: Central government statutory corporate income tax rate
+  definition: 'OECD Corporate Tax Statistics: central government statutory corporate income tax rate, general rate (CIT).'
+  unit: '% of taxable income'
+  domain: fiscal
+  subdomain: corporate_tax
+  theme: finance
+  source_order:
+  - oecd.cts_cit.CIT|targeting=ST|sector=S1311|unit_measure=PT_INC_TAX
+  provider_declared: true
+- id: fiscal.cit_rate_small_business
+  labels:
+    fr: Taux combiné de l'impôt sur les sociétés pour les petites entreprises
+    en: Combined corporate income tax rate targeted at small business
+  definition: 'OECD Corporate Tax Statistics: combined CIT rate targeted at small businesses (only jurisdictions with such
+    a rate).'
+  unit: '% of taxable income'
+  domain: fiscal
+  subdomain: corporate_tax
+  theme: finance
+  source_order:
+  - oecd.cts_cit.CIT_C|targeting=TA|sector=S13|unit_measure=PT_INC_TAX
+  provider_declared: true
+- id: fiscal.tax_wedge_single
+  labels:
+    fr: Coin fiscal moyen (célibataire sans enfant, 100 % du salaire moyen)
+    en: Average tax wedge (single person, no child, 100% of average wage)
+  definition: 'OECD Taxing Wages: income tax plus employee and employer social security contributions minus cash benefits,
+    as a percentage of total labour costs, single person, no child, 100% of average wage.'
+  unit: '% of labour costs'
+  domain: fiscal
+  subdomain: labour_taxation
+  theme: finance
+  source_order:
+  - oecd.tw_comp.AV_TW|unit_measure=PT_COS_LB|household_type=S_C0|income_principal=AW100
+  provider_declared: true
+- id: fiscal.net_personal_avg_tax_rate_single
+  labels:
+    fr: Taux moyen net d'imposition personnelle (célibataire sans enfant, 100 % du salaire moyen)
+    en: Net personal average tax rate (single person, no child, 100% of average wage)
+  definition: 'OECD Taxing Wages: income tax plus employee SSC minus cash benefits, percentage of gross wage earnings, single
+    person, no child, 100% of average wage.'
+  unit: '% of gross wage earnings'
+  domain: fiscal
+  subdomain: labour_taxation
+  theme: finance
+  source_order:
+  - oecd.tw_comp.NPATR|unit_measure=PT_WG_EARN_G|household_type=S_C0|income_principal=AW100
+  provider_declared: true
+- id: fiscal.tax_wedge_couple_2c_one_earner
+  labels:
+    fr: Coin fiscal moyen (couple avec 2 enfants, un seul revenu (100 % du salaire moyen))
+    en: Average tax wedge (one-earner couple, 2 children, 100% of average wage)
+  definition: 'OECD Taxing Wages: income tax plus employee and employer social security contributions minus cash benefits,
+    as a percentage of total labour costs, one-earner couple, 2 children, 100% of average wage.'
+  unit: '% of labour costs'
+  domain: fiscal
+  subdomain: labour_taxation
+  theme: finance
+  source_order:
+  - oecd.tw_comp.AV_TW|unit_measure=PT_COS_LB|household_type=C_C2|income_principal=AW100|income_spouse=NOEARN_UNEMP
+  provider_declared: true
+- id: fiscal.net_personal_avg_tax_rate_couple_2c_one_earner
+  labels:
+    fr: Taux moyen net d'imposition personnelle (couple avec 2 enfants, un seul revenu (100 % du salaire moyen))
+    en: Net personal average tax rate (one-earner couple, 2 children, 100% of average wage)
+  definition: 'OECD Taxing Wages: income tax plus employee SSC minus cash benefits, percentage of gross wage earnings, one-earner
+    couple, 2 children, 100% of average wage.'
+  unit: '% of gross wage earnings'
+  domain: fiscal
+  subdomain: labour_taxation
+  theme: finance
+  source_order:
+  - oecd.tw_comp.NPATR|unit_measure=PT_WG_EARN_G|household_type=C_C2|income_principal=AW100|income_spouse=NOEARN_UNEMP
+  provider_declared: true
+- id: fiscal.marginal_tax_wedge_single
+  labels:
+    fr: Coin fiscal marginal (célibataire, 100 % du salaire moyen)
+    en: Marginal tax wedge (single person, 100% of average wage)
+  definition: 'OECD Taxing Wages: marginal tax wedge of the principal earner, single person without children earning the average
+    wage.'
+  unit: '% of labour costs'
+  domain: fiscal
+  subdomain: labour_taxation
+  theme: finance
+  source_order:
+  - oecd.tw_comp.MR_TW_PE|unit_measure=PT_COS_LB|household_type=S_C0|income_principal=AW100
+  provider_declared: true
+- id: fiscal.socx_public_gdp
+  labels:
+    fr: Dépenses sociales publiques (% du PIB)
+    en: Public social expenditure (% of GDP)
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure, cash and in-kind benefits, percentage of
+    GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=_T
+  provider_declared: true
+- id: fiscal.socx_mandatory_private_gdp
+  labels:
+    fr: Dépenses sociales privées obligatoires (% du PIB)
+    en: Mandatory private social expenditure (% of GDP)
+  definition: 'OECD Social Expenditure Database (SOCX): mandatory private social expenditure, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES20|spending_type=_T|programme_type=_T
+  provider_declared: true
+- id: fiscal.socx_voluntary_private_gdp
+  labels:
+    fr: Dépenses sociales privées facultatives (% du PIB)
+    en: Voluntary private social expenditure (% of GDP)
+  definition: 'OECD Social Expenditure Database (SOCX): voluntary private social expenditure, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES30|spending_type=_T|programme_type=_T
+  provider_declared: true
+- id: fiscal.socx_net_public_gdp
+  labels:
+    fr: Dépenses sociales publiques nettes (% du PIB)
+    en: Net public social expenditure (% of GDP)
+  definition: 'OECD Social Expenditure Database (SOCX): net public social expenditure, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES40|spending_type=_T|programme_type=_T
+  provider_declared: true
+  notes: Net measures (ES40/ES50) account for the tax treatment of benefits and tax breaks for social purposes.
+- id: fiscal.socx_net_total_gdp
+  labels:
+    fr: Dépenses sociales totales nettes (% du PIB)
+    en: Net total social expenditure (% of GDP)
+  definition: 'OECD Social Expenditure Database (SOCX): net total social expenditure, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES50|spending_type=_T|programme_type=_T
+  provider_declared: true
+  notes: Net measures (ES40/ES50) account for the tax treatment of benefits and tax breaks for social purposes.
+- id: fiscal.socx_public_old_age_survivors_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : vieillesse et survivants (% du PIB)'
+    en: 'Public social expenditure: old age and survivors (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: old age and survivors, cash and in-kind
+    benefits, percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP01
+  provider_declared: true
+- id: fiscal.socx_public_incapacity_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : invalidité (% du PIB)'
+    en: 'Public social expenditure: incapacity related (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: incapacity related, cash and in-kind benefits,
+    percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP31
+  provider_declared: true
+- id: fiscal.socx_public_health_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : santé (% du PIB)'
+    en: 'Public social expenditure: health (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: health, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP41
+  provider_declared: true
+- id: fiscal.socx_public_family_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : famille (% du PIB)'
+    en: 'Public social expenditure: family (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: family, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP51
+  provider_declared: true
+- id: fiscal.socx_public_almp_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : politiques actives du marché du travail (% du PIB)'
+    en: 'Public social expenditure: active labour market programmes (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: active labour market programmes, cash and
+    in-kind benefits, percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP60
+  provider_declared: true
+- id: fiscal.socx_public_unemployment_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : chômage (% du PIB)'
+    en: 'Public social expenditure: unemployment (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: unemployment, cash and in-kind benefits,
+    percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP71
+  provider_declared: true
+- id: fiscal.socx_public_housing_gdp
+  labels:
+    fr: 'Dépenses sociales publiques : logement (% du PIB)'
+    en: 'Public social expenditure: housing (% of GDP)'
+  definition: 'OECD Social Expenditure Database (SOCX): public social expenditure: housing, cash and in-kind benefits, percentage
+    of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: social_expenditure
+  theme: finance
+  source_order:
+  - oecd.socx_agg.SOCX|unit_measure=PT_B1GQ|expend_source=ES10|spending_type=_T|programme_type=TP82
+  provider_declared: true
+- id: fiscal.pension_normal_retirement_age_men
+  labels:
+    fr: Âge normal actuel de la retraite, hommes
+    en: Current normal retirement age, men
+  definition: 'OECD Pensions at a Glance: current normal retirement age for a man with a full career from age 22.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.CRPLF22|unit_measure=Y|sex=M
+  provider_declared: true
+- id: fiscal.pension_normal_retirement_age_women
+  labels:
+    fr: Âge normal actuel de la retraite, femmes
+    en: Current normal retirement age, women
+  definition: 'OECD Pensions at a Glance: current normal retirement age for a woman with a full career from age 22.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.CRPLF22|unit_measure=Y|sex=F
+  provider_declared: true
+- id: fiscal.pension_future_retirement_age_men
+  labels:
+    fr: Âge normal futur de la retraite, hommes
+    en: Future normal retirement age, men
+  definition: 'OECD Pensions at a Glance: normal retirement age under current legislation for a man entering the labour market
+    at 22 in the reference year.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.FRPLF22|unit_measure=Y|sex=M
+  provider_declared: true
+- id: fiscal.pension_future_retirement_age_women
+  labels:
+    fr: Âge normal futur de la retraite, femmes
+    en: Future normal retirement age, women
+  definition: 'OECD Pensions at a Glance: normal retirement age under current legislation for a woman entering the labour
+    market at 22 in the reference year.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.FRPLF22|unit_measure=Y|sex=F
+  provider_declared: true
+- id: fiscal.pension_effective_exit_age_men
+  labels:
+    fr: Âge effectif de sortie du marché du travail, hommes
+    en: Effective labour market exit age, men
+  definition: 'OECD Pensions at a Glance: average effective age of labour market exit, men.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.ELMEA|unit_measure=Y|sex=M
+  provider_declared: true
+- id: fiscal.pension_effective_exit_age_women
+  labels:
+    fr: Âge effectif de sortie du marché du travail, femmes
+    en: Effective labour market exit age, women
+  definition: 'OECD Pensions at a Glance: average effective age of labour market exit, women.'
+  unit: years
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.ELMEA|unit_measure=Y|sex=F
+  provider_declared: true
+- id: fiscal.pension_gross_replacement_rate
+  labels:
+    fr: Taux de remplacement brut des pensions (régimes obligatoires, salaire moyen)
+    en: Gross pension replacement rate (mandatory, average earner)
+  definition: 'OECD Pensions at a Glance: gross pension entitlement from mandatory schemes as a percentage of gross pre-retirement
+    earnings, man at 100% of average wage, full career.'
+  unit: '% of gross pre-retirement earnings'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.GPRR100|unit_measure=PT_EARN_G_PRE_RET_INC|sex=M|optionality=M
+  provider_declared: true
+- id: fiscal.pension_net_replacement_rate
+  labels:
+    fr: Taux de remplacement net des pensions (régimes obligatoires, salaire moyen)
+    en: Net pension replacement rate (mandatory, average earner)
+  definition: 'OECD Pensions at a Glance: net pension entitlement from mandatory schemes as a percentage of net pre-retirement
+    earnings, man at 100% of average wage.'
+  unit: '% of net pre-retirement earnings'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.NPRR100|unit_measure=PT_EARN_N_PRE_RET_INC|sex=M|optionality=M
+  provider_declared: true
+- id: fiscal.pension_public_pension_spending_gdp
+  labels:
+    fr: Dépenses publiques de retraite (% du PIB)
+    en: Public expenditure on pensions (% of GDP)
+  definition: 'OECD Pensions at a Glance: public expenditure on cash old-age and survivors pensions, percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.PEP|unit_measure=PT_B1GQ
+  provider_declared: true
+- id: fiscal.pension_old_age_poverty
+  labels:
+    fr: Taux de pauvreté des personnes âgées (66 ans et plus)
+    en: Old-age income poverty rate (66+)
+  definition: 'OECD Pensions at a Glance: share of people aged 66 or over with income below 50% of median equivalised disposable
+    income.'
+  unit: '% of population aged 66+'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.OAIP|unit_measure=PT_POP_SEX_AGE|sex=_T|age=Y_GE66
+  provider_declared: true
+- id: fiscal.pension_old_age_dependency
+  labels:
+    fr: Rapport entre personnes âgées et population d'âge actif
+    en: Old-age to working-age ratio
+  definition: 'OECD Pensions at a Glance: number of people aged 65 or over as a percentage of the population aged 20-64 (OECD
+    unit PT_POP_Y20T64).'
+  unit: '% of population aged 20-64'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.OAWAR|unit_measure=PT_POP_Y20T64|age=Y_GE65
+  provider_declared: true
+- id: fiscal.pension_public_spending_projection
+  labels:
+    fr: Projections des dépenses publiques de retraite (% du PIB)
+    en: Projected public expenditure on pensions (% of GDP)
+  definition: 'OECD Pensions at a Glance: projections of public expenditure on pensions, percentage of GDP (future years are
+    projections by definition).'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: pensions
+  theme: finance
+  source_order:
+  - oecd.pag.PPEP|unit_measure=PT_B1GQ
+  provider_declared: true
+  notes: Projections, not outcomes.
+- id: fiscal.gov_exp_general_public_services_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : services généraux des administrations publiques (% du PIB)'
+    en: 'General government expenditure: general public services (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on general public services
+    (COFOG GF01), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF01
+  provider_declared: true
+- id: fiscal.gov_exp_general_public_services_share
+  labels:
+    fr: 'Dépenses des administrations publiques : services généraux des administrations publiques (% des dépenses totales)'
+    en: 'General government expenditure: general public services (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on general public services (COFOG GF01), percentage of total
+    general government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF01
+  provider_declared: true
+- id: fiscal.gov_exp_defence_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : défense (% du PIB)'
+    en: 'General government expenditure: defence (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on defence (COFOG GF02),
+    percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF02
+  provider_declared: true
+- id: fiscal.gov_exp_defence_share
+  labels:
+    fr: 'Dépenses des administrations publiques : défense (% des dépenses totales)'
+    en: 'General government expenditure: defence (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on defence (COFOG GF02), percentage of total general government
+    expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF02
+  provider_declared: true
+- id: fiscal.gov_exp_public_order_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : ordre et sécurité publics (% du PIB)'
+    en: 'General government expenditure: public order and safety (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on public order and safety
+    (COFOG GF03), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF03
+  provider_declared: true
+- id: fiscal.gov_exp_public_order_share
+  labels:
+    fr: 'Dépenses des administrations publiques : ordre et sécurité publics (% des dépenses totales)'
+    en: 'General government expenditure: public order and safety (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on public order and safety (COFOG GF03), percentage of total
+    general government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF03
+  provider_declared: true
+- id: fiscal.gov_exp_economic_affairs_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : affaires économiques (% du PIB)'
+    en: 'General government expenditure: economic affairs (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on economic affairs (COFOG
+    GF04), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF04
+  provider_declared: true
+- id: fiscal.gov_exp_economic_affairs_share
+  labels:
+    fr: 'Dépenses des administrations publiques : affaires économiques (% des dépenses totales)'
+    en: 'General government expenditure: economic affairs (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on economic affairs (COFOG GF04), percentage of total general
+    government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF04
+  provider_declared: true
+- id: fiscal.gov_exp_environment_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : protection de l''environnement (% du PIB)'
+    en: 'General government expenditure: environmental protection (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on environmental protection
+    (COFOG GF05), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF05
+  provider_declared: true
+- id: fiscal.gov_exp_environment_share
+  labels:
+    fr: 'Dépenses des administrations publiques : protection de l''environnement (% des dépenses totales)'
+    en: 'General government expenditure: environmental protection (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on environmental protection (COFOG GF05), percentage of total
+    general government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF05
+  provider_declared: true
+- id: fiscal.gov_exp_housing_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : logement et équipements collectifs (% du PIB)'
+    en: 'General government expenditure: housing and community amenities (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on housing and community
+    amenities (COFOG GF06), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF06
+  provider_declared: true
+- id: fiscal.gov_exp_housing_share
+  labels:
+    fr: 'Dépenses des administrations publiques : logement et équipements collectifs (% des dépenses totales)'
+    en: 'General government expenditure: housing and community amenities (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on housing and community amenities (COFOG GF06), percentage
+    of total general government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF06
+  provider_declared: true
+- id: fiscal.gov_exp_health_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : santé (% du PIB)'
+    en: 'General government expenditure: health (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on health (COFOG GF07),
+    percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF07
+  provider_declared: true
+- id: fiscal.gov_exp_health_share
+  labels:
+    fr: 'Dépenses des administrations publiques : santé (% des dépenses totales)'
+    en: 'General government expenditure: health (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on health (COFOG GF07), percentage of total general government
+    expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF07
+  provider_declared: true
+- id: fiscal.gov_exp_recreation_culture_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : loisirs, culture et culte (% du PIB)'
+    en: 'General government expenditure: recreation, culture and religion (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on recreation, culture
+    and religion (COFOG GF08), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF08
+  provider_declared: true
+- id: fiscal.gov_exp_recreation_culture_share
+  labels:
+    fr: 'Dépenses des administrations publiques : loisirs, culture et culte (% des dépenses totales)'
+    en: 'General government expenditure: recreation, culture and religion (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on recreation, culture and religion (COFOG GF08), percentage
+    of total general government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF08
+  provider_declared: true
+- id: fiscal.gov_exp_education_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : enseignement (% du PIB)'
+    en: 'General government expenditure: education (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on education (COFOG GF09),
+    percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF09
+  provider_declared: true
+- id: fiscal.gov_exp_education_share
+  labels:
+    fr: 'Dépenses des administrations publiques : enseignement (% des dépenses totales)'
+    en: 'General government expenditure: education (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on education (COFOG GF09), percentage of total general government
+    expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF09
+  provider_declared: true
+- id: fiscal.gov_exp_social_protection_gdp
+  labels:
+    fr: 'Dépenses des administrations publiques : protection sociale (% du PIB)'
+    en: 'General government expenditure: social protection (% of GDP)'
+  definition: 'OECD Government at a Glance (COFOG, yearly updates): general government expenditure on social protection (COFOG
+    GF10), percentage of GDP.'
+  unit: '% of GDP'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_B1GQ|sector=S13|expenditure=GF10
+  provider_declared: true
+- id: fiscal.gov_exp_social_protection_share
+  labels:
+    fr: 'Dépenses des administrations publiques : protection sociale (% des dépenses totales)'
+    en: 'General government expenditure: social protection (% of total expenditure)'
+  definition: 'OECD Government at a Glance (COFOG): expenditure on social protection (COFOG GF10), percentage of total general
+    government expenditure.'
+  unit: '% of general government expenditure'
+  domain: fiscal
+  subdomain: expenditure_by_function
+  theme: finance
+  source_order:
+  - oecd.gov_cofog.GE|unit_measure=PT_OTE_S13|sector=S13|expenditure=GF10
+  provider_declared: true

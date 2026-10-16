@@ -1,0 +1,182 @@
+# Atlas catalog 'education_outcomes' (agent A-FISCAL, 2026-10-16). Provider-declared concepts (not human-reviewed).
+# Generated from the live dataflow contents; see docs/dev/v3_a_fiscal.md.
+domain: education_outcomes
+labels:
+  fr: Acquis scolaires et compétences (OCDE)
+  en: Learning outcomes and skills (OECD)
+maintainer: A-FISCAL
+concepts:
+- id: education_outcomes.pisa_math_mean
+  labels:
+    fr: Score moyen PISA en mathématiques
+    en: PISA mean score in mathematics
+  definition: OECD PISA mean performance of 15-year-old students in mathematics, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_2|unit_measure=PO|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_math_mean_girls
+  labels:
+    fr: Score moyen PISA en mathématiques, filles
+    en: PISA mean score in mathematics, girls
+  definition: OECD PISA mean performance of 15-year-old students in mathematics, girls, as published in the OECD How's Life?
+    well-being database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_2|unit_measure=PO|age=_T|sex=F|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_math_mean_boys
+  labels:
+    fr: Score moyen PISA en mathématiques, garçons
+    en: PISA mean score in mathematics, boys
+  definition: OECD PISA mean performance of 15-year-old students in mathematics, boys, as published in the OECD How's Life?
+    well-being database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_2|unit_measure=PO|age=_T|sex=M|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_reading_mean
+  labels:
+    fr: Score moyen PISA en compréhension de l'écrit
+    en: PISA mean score in reading
+  definition: OECD PISA mean performance of 15-year-old students in reading, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_1|unit_measure=PO|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_reading_mean_girls
+  labels:
+    fr: Score moyen PISA en compréhension de l'écrit, filles
+    en: PISA mean score in reading, girls
+  definition: OECD PISA mean performance of 15-year-old students in reading, girls, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_1|unit_measure=PO|age=_T|sex=F|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_reading_mean_boys
+  labels:
+    fr: Score moyen PISA en compréhension de l'écrit, garçons
+    en: PISA mean score in reading, boys
+  definition: OECD PISA mean performance of 15-year-old students in reading, boys, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_1|unit_measure=PO|age=_T|sex=M|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_science_mean
+  labels:
+    fr: Score moyen PISA en sciences
+    en: PISA mean score in science
+  definition: OECD PISA mean performance of 15-year-old students in science, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_3|unit_measure=PO|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_science_mean_girls
+  labels:
+    fr: Score moyen PISA en sciences, filles
+    en: PISA mean score in science, girls
+  definition: OECD PISA mean performance of 15-year-old students in science, girls, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_3|unit_measure=PO|age=_T|sex=F|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_science_mean_boys
+  labels:
+    fr: Score moyen PISA en sciences, garçons
+    en: PISA mean score in science, boys
+  definition: OECD PISA mean performance of 15-year-old students in science, boys, as published in the OECD How's Life? well-being
+    database (assessment year).
+  unit: PISA score points
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_3|unit_measure=PO|age=_T|sex=M|education_lev=_T
+  provider_declared: true
+  notes: PISA 2006-2022 (by sex 2018 and 2022 only) for ~40 OECD members and partners.
+- id: education_outcomes.pisa_low_skills_all_domains
+  labels:
+    fr: Élèves peu performants en lecture, mathématiques et sciences
+    en: Students with low skills in reading, mathematics and science
+  definition: 'OECD How''s Life?: share of 15-year-old students below PISA proficiency level 2 in all three domains.'
+  unit: '% of students'
+  domain: education_outcomes
+  subdomain: pisa
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_1_DEP|unit_measure=PT_ST|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+- id: education_outcomes.piaac_numeracy_mean
+  labels:
+    fr: Compétences des adultes en numératie (score moyen PIAAC)
+    en: Adult numeracy skills (PIAAC mean score)
+  definition: OECD Survey of Adult Skills (PIAAC) mean numeracy score of adults aged 16-65, as published in How's Life?.
+  unit: PIAAC score points
+  domain: education_outcomes
+  subdomain: piaac
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_4|unit_measure=PO|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+- id: education_outcomes.piaac_literacy_mean
+  labels:
+    fr: Compétences des adultes en littératie (score moyen PIAAC)
+    en: Adult literacy skills (PIAAC mean score)
+  definition: OECD Survey of Adult Skills (PIAAC) mean literacy score of adults aged 16-65, as published in How's Life?.
+  unit: PIAAC score points
+  domain: education_outcomes
+  subdomain: piaac
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_5|unit_measure=PO|age=_T|sex=_T|education_lev=_T
+  provider_declared: true
+- id: education_outcomes.piaac_low_numeracy
+  labels:
+    fr: Adultes ayant de faibles compétences en numératie
+    en: Adults with low numeracy skills
+  definition: 'OECD How''s Life?: share of adults (16-65) scoring at or below PIAAC numeracy level 1.'
+  unit: '% of adults'
+  domain: education_outcomes
+  subdomain: piaac
+  theme: education
+  source_order:
+  - oecd.hsl_skills.6_4_DEP|unit_measure=PT_ST|age=_T|sex=_T|education_lev=_T
+  provider_declared: true

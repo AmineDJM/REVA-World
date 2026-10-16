@@ -46,7 +46,10 @@ Disk: raw ~85 MB per full run, Parquet ~35 MB; well under the 1.5 GB agent budge
   omitted, R `NaN` too. Election variables (V-Dem) only in election years; V-Dem's `fill_vars` is not applied.
 * **V-Dem unit continuity is V-Dem's**: `DEU` 1789-1866 = Kingdom of Prussia, `RUS` 1918-1990 = RSFSR/USSR, `MEX` 1789-1820 = Viceroyalty of New Spain, `TUR` = Ottoman Empire, etc. Every V-Dem cell carries `flags.vdem_histname` (V-Dem's name of the polity that year) and, where verified, `entity_qid` of that period (Kingdom of Prussia Q27306, German Empire Q43287, Weimar Q41304, Third Reich Q7318, Russian Empire Q34266, Joseon Q28179, Qing Q8733, …).
 * **Palestine**: V-Dem `PSE` is "Palestine/West Bank" (Gaza is `PSG`), so it is *not* mapped to crosswalk `PSE` (State of Palestine); both kept unmapped with QIDs West Bank Q36678 / Gaza Strip Q39760. Hence PSE has no politics cell.
-* **Taiwan** is not in the ALLC crosswalk; kept unmapped (Q865) in all four sources.
+* **Taiwan** (V3 TWNMAP, crosswalk 1.1.0 adds TWN): V-Dem `TWN` (base iso3), LIED `Taiwan|vdem=48` (via V-Dem
+  TWN) and BMR `713` ("TAIWAN", abbreviation TWN) now map to TWN; China stays CHN (no double mapping). V-Dem's
+  unit is the territory of Taiwan in every year: 1945-1948 rows are V-Dem's "Republic of China [headquartered in
+  the mainland]" (`flags.vdem_histname`, entity_qid Q13426199), so the mainland-government years stay flagged.
 * **Category labels** (RoW, electoral systems, HOS appointment, LIED levels, transition/breakdown types, BMR) are short forms of the providers' codebook texts written by A-POL; codes outside the codebook fail closed (V-Dem, LIED lexical indices) — except the 10 LIED cells below.
 * **LIED v6.9 anomaly**: Botswana 1961-1965 has `legislative_elections` = 2 and `multi-party_legislative_elections` = 2 (description: 0/1 only). Kept as reported, no label, `flags.undocumented_code`; listed in the run summary.
 * **V-Dem codebook vs data**: `v2xdd_i_ci` is documented 0-1 but v16 values reach 1.92; unit says so, nothing rescaled. Unbounded indices (`v2x_accountability`, `v2x_veracc`, `v2x_diagacc`, `v2x_horacc`, `v2x_divparctrl`) are labelled as such; the catalog uses V-Dem's own 0-1 `_osp` for accountability.

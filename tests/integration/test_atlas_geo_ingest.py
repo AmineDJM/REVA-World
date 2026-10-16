@@ -105,7 +105,7 @@ async def test_geonames_climate_hazards_ingest(registered) -> None:  # type: ign
     assert {"atlas.geonames.countryinfo", f"atlas.cckp.{cl.DS_CRU}", f"atlas.inform.{hz.ATLAS_DATASET}"} <= keys
 
 
-@pytest.mark.parametrize("source", [gn.CONNECTOR_NAME, cl.CONNECTOR_NAME, hz.CONNECTOR_NAME])
+@pytest.mark.parametrize("source", [gn.CONNECTOR_NAME, cl.CONNECTOR_NAME, hz.CONNECTOR_NAME, ne.CONNECTOR_NAME])
 async def test_single_entry_point_fixture_mode(registered, source) -> None:  # type: ignore[no-untyped-def]
     """The lead's single atlas ingest entry point replays the captured responses (origin test_fixture)."""
     from reva.atlas.ingest import run_atlas_ingest
@@ -123,3 +123,26 @@ async def test_live_geonames_through_entry_point(registered) -> None:  # type: i
         registered.settings, registered.worker, registered.store, gn.CONNECTOR_NAME, mode="live"
     )
     assert out["status"] == "completed" and out["registered"][0]["row_count"] > 3000
+
+
+async def test_natural_earth_fixture_mode_and_dataset_runs(registered) -> None:  # type: ignore[no-untyped-def]
+    """Fixture mode replays the derived excerpt (FIX2): every table built from it says so; a ``--dataset``
+    run fetches only that dataset's layers."""
+    from reva.atlas.ingest import run_atlas_ingest
+
+    db = registered
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, ne.CONNECTOR_NAME, mode="fixture")
+    assert out["status"] == "completed" and out["archived_raw"] == 6
+    s = out["summary"]
+    assert s["excerpt_layers"] == ["boundary_lines_land", "countries", "countries_lakes", "map_units"]
+    tables = s["tables"]
+    country = read_atlas_table(db.store, tables[ne.DS_COUNTRY]["artifact_sha256"])
+    assert set(country["iso3"].drop_nulls().to_list()) == {"CYP", "DOM", "GBR", "HTI", "IRL", "MAF", "SXM"}
+    assert all("ne_excerpt" in f for f in country["flags"].to_list())
+    one = await run_atlas_ingest(
+        db.settings, db.worker, db.store, ne.CONNECTOR_NAME, mode="fixture", dataset=ne.DS_DISPUTED
+    )
+    assert one["summary"]["layers"] == ["disputed_areas"] and [r["dataset_key"] for r in one["registered"]] == [
+        f"atlas.naturalearth.{ne.DS_DISPUTED}"
+    ]
+    assert one["summary"]["kg"] == {"loaded": False}

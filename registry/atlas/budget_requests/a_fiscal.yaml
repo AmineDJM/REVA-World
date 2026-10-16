@@ -1,0 +1,25 @@
+# Budget request from agent A-FISCAL (taxes, public/social spending, pensions, PISA/PIAAC skills, BIS finance).
+# ATLASCORE/ATLASOPS merges into registry/policies/budgets.yaml. Measured in the live runs of 2026-10-16.
+agent: A-FISCAL
+requests:
+  - source_key: oecd.sdmx
+    # atlas.oecd.fiscal: 8 SDMX-CSV-with-labels requests per full run, 182.3 MB measured (Global Revenue Statistics
+    # 83.3 + 7.5 + 2.4 MB, Taxing Wages 45.9 MB, SOCX 22.5 MB, COFOG 10.9 MB, CIT 5.0 MB, Pensions at a Glance 4.6 MB);
+    # atlas.oecd.skills: 1 request, 0.7 MB. Cumulative with the earlier requests on this key (A-ILO 2, A-TRADE 21,
+    # A-SOCIETY 2 per run = 56/day, 92 MB/day in a_society.yaml): +20/day (one full run + one retry).
+    daily_requests: 76
+    expected_bytes_per_day: 460000000
+    reason: "A-ILO/A-TRADE/A-SOCIETY 56/day + A-FISCAL 9 requests (~183 MB) per full run plus one retry"
+  - source_key: bis.stats
+    # atlas.bis: 6 requests per full run, 126.5 MB measured (WS_TC 74.5 MB, WS_EER monthly 21.2 MB, WS_CBPOL
+    # monthly 16.1 MB, WS_SPP 6.7 MB, WS_CREDIT_GAP 6.5 MB, WS_DSR 1.5 MB). New source key (registry/sources/bis_stats.yaml).
+    daily_requests: 14
+    expected_bytes_per_day: 260000000
+    reason: "one full BIS run (6 requests, ~127 MB) plus one retry; no key; monthly/quarterly releases"
+daily_totals_increase:
+  http_requests_total: "+34"
+  http_bytes_total: "+630_000_000"
+notes: >-
+  Not requested: UNU-WIDER GRD (download behind a personal-information form, no open licence stated), IEA
+  TIMSS/PIRLS (IEA permission required to reproduce; commercial redistribution restricted), www.oecd.org PISA result
+  workbooks (403 to non-browser clients). Disk: raw ~310 MB + Parquet ~25 MB per full set of runs.

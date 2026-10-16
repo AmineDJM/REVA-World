@@ -307,11 +307,15 @@ base fixtures and the `test_fixture` belief release, `--v3-fixtures`:
 * replays the atlas sources of `V3_ATLAS_SOURCES` in fixture mode
   (`reva.atlas.ingest.run_atlas_ingest(..., mode="fixture")`, recorded responses, never the network,
   never charged): IMF, ILOSTAT, Eurostat minimum wages, OECD earnings, WHO GHO, UNESCO UIS, UNDP HDR,
-  WHR, OWID, GeoNames country info, World Bank, FAO. `--v3-atlas-source NAME` (repeatable) picks
-  others. A failing source is recorded with its error under `v3.atlas` in the stack file and the
-  stack still starts; the spec requires at least 8 completed sources. Natural Earth 10m is not in
-  the list: its capture holds only 2 of the 6 layers a run fetches;
+  WHR, OWID, Natural Earth 10m (a derived excerpt of the real layers: Ireland+UK, Hispaniola, Cyprus,
+  Saint-Martin; rows flagged `ne_excerpt`), GeoNames country info, World Bank, FAO.
+  `--v3-atlas-source NAME` (repeatable) picks others. A failing source is recorded with its error under
+  `v3.atlas` in the stack file and the stack still starts; the spec requires at least 8 completed sources;
 * records a `test_fixture` atlas snapshot (`reva.atlas.snapshot.take_snapshot`);
+* (all modes) bootstraps as the owner, then confirms the seed as `reva_worker` in the same process: both
+  use one registry snapshot (`reva.cli.seed.registry_snapshot`), so concurrent edits under `registry/` no
+  longer make the confirmation fail; a failed bootstrap attempt is logged, and a refusal names both
+  fingerprints;
 * keeps `POST /v1/ask` on the deterministic keyword planner (no LLM planner is wired, whatever
   `.env` says).
 

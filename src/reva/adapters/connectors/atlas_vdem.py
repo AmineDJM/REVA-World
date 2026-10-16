@@ -40,8 +40,11 @@ Semantics
 * ``iso3`` is filled through the ``vdem`` geo scheme (``registry/atlas/geo_aliases/a_pol.yaml``):
   V-Dem's ``country_text_id`` when it is a crosswalk key, except ``PSE`` (V-Dem codes the West Bank
   only; Gaza is ``PSG``), which is kept unmapped. Historical units (Baden, Bavaria, Papal States, GDR,
-  South Yemen, Republic of Vietnam, ...) and Taiwan (not in the ALLC crosswalk) are kept with
-  ``iso3 = null``; ``entity_qid`` comes from ``registry/entities/vdem_qids.json`` (agent-mapped).
+  South Yemen, Republic of Vietnam, ...) are kept with ``iso3 = null``; ``entity_qid`` comes from
+  ``registry/entities/vdem_qids.json`` (agent-mapped). ``TWN`` maps to the crosswalk entity TWN since
+  crosswalk 1.1.0 for all its years (V-Dem's unit is the territory of Taiwan); its 1945-1948 rows are
+  V-Dem's "Republic of China [headquartered in the mainland]" (``flags.vdem_histname``, entity_qid
+  Q13426199), never silently the post-1949 state.
 * Values are the exact shortest decimal text of V-Dem's stored doubles (``repr``), never rounded;
   NA cells are omitted (the provider reports nothing).
 """
@@ -866,8 +869,8 @@ def raw_sha256(body: bytes) -> str:
 def coverage_note(dataset: str, release: str, data: RFrame) -> str:
     return (
         f"V-Dem Country-Year Full+Others v{release} (vdemdata R package, V-Dem Institute), {data.nrows} "
-        f"country-years, 202 V-Dem units (26 historical states, Taiwan and the Palestinian West Bank/Gaza "
-        f"units unmapped, kept). Dataset '{dataset}': V-Dem-produced variables only (no e_* third-party "
+        f"country-years, 202 V-Dem units (26 historical states and the Palestinian West Bank/Gaza units "
+        f"unmapped, kept; Taiwan = TWN, 1945-1948 flagged by histname). Dataset '{dataset}': V-Dem-produced variables only (no e_* third-party "
         "variables). NA cells omitted; election variables in election years only (not filled forward). "
         "Licence CC BY-SA 4.0."
     )

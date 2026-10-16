@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "c4303551df227995f2dfa0b08e3b109a484153db29a598d4764a1a76d21fa52f",
+    "url": "https://stats.bis.org/api/v1/data/WS_CBPOL/M.US+XM?startPeriod=2023",
+    "file": "c4303551df227995.csv",
+    "sha256": "0a980da8363b9e3960ea56d11d49796e95377a858a0d207ff727e832544e312a",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE0NjgzNiQqJDEkV1NfQ0JQT0w=",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:07.210346+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  },
+  {
+    "request_fingerprint": "781d16558437d473b996eb59f5a38aae18defaeafa19f461aa97486d6b537c81",
+    "url": "https://stats.bis.org/api/v1/data/WS_TC/Q.FR+CN+XM.P+H+G.A.M.770.A?startPeriod=2023",
+    "file": "781d16558437d473.csv",
+    "sha256": "756b618892e9c737f58b6304af86345d42785226cd487dc8aefb2ea03152d699",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE1MDAyOCQqJDEkV1NfVEM=",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:10.189196+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  },
+  {
+    "request_fingerprint": "25f619d85419bdb84ccee0668be6fb0862ab7c78bc5d0934814ce22f8c8abe5a",
+    "url": "https://stats.bis.org/api/v1/data/WS_SPP/Q.FR+XM..?startPeriod=2023",
+    "file": "25f619d85419bdb8.csv",
+    "sha256": "d243bdb229ecf0a09e2d84deaf3eae7a64c01fda6d075c7223a53b72b5cb2a41",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE1MjIwOSQqJDEkV1NfU1BQ",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:12.272308+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  },
+  {
+    "request_fingerprint": "bcbd4671abc474bae04d94e2cad495089864bf511435736e0ff06ae7bc4c8304",
+    "url": "https://stats.bis.org/api/v1/data/WS_DSR/Q.FR+CN.?startPeriod=2023",
+    "file": "bcbd4671abc474ba.csv",
+    "sha256": "149e55c36b84da14c974d4650df7087031571eea4892100679077dec8a91e002",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE1NDM4MyQqJDEkV1NfRFNS",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:14.500116+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  },
+  {
+    "request_fingerprint": "01ae70d5b48abe66e43df3fa6deb2b5aa2f115cf634592bb0911752b6f819229",
+    "url": "https://stats.bis.org/api/v1/data/WS_EER/M.R+N.B.FR+CN+XM?startPeriod=2023",
+    "file": "01ae70d5b48abe66.csv",
+    "sha256": "cdd71e2a427da42435add3fb589b3a4ccb45368c08807c13a20fac89a9ce25f7",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE1NjUxNyQqJDEkV1NfRUVS",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:16.679463+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  },
+  {
+    "request_fingerprint": "9f9b0b0f2c476d8586b01c402165b3662c43fa7282db62e7d329e345b834c740",
+    "url": "https://stats.bis.org/api/v1/data/WS_CREDIT_GAP/Q.FR+CN...?startPeriod=2023",
+    "file": "9f9b0b0f2c476d85.csv",
+    "sha256": "cb3393b73b14e1684862a27e1e7bf802560069f4a2fc024d14f65ae97cce680a",
+    "status": 200,
+    "headers": {
+      "etag": "Z3Vlc3QkMTc5MjE3NDE1ODc1MyQqJDEkV1NfQ1JFRElUX0dBUA==",
+      "content-type": "text/csv;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:09:18.826313+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products"
+  }
+]

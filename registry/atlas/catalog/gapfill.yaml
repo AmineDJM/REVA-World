@@ -1,0 +1,644 @@
+# Agent GAPHUNT: catalog of the gap-fill atlas sources (src/reva/adapters/connectors/atlas_gap_*.py).
+# Each concept is one provider series, named per provider (never merged across providers here); cross-source
+# equivalences are proposed to ATLASOPS in registry/atlas/source_order/_proposals_gaphunt.yaml. Generated, then reviewed.
+domain: gapfill
+labels:
+  fr: Comblement de lacunes (instituts statistiques nationaux et régionaux)
+  en: Gap fill (national and regional statistical offices)
+maintainer: GAPHUNT
+concepts:
+- id: gapfill.spc.population_midyear
+  labels:
+    fr: Population estimée en milieu d'année (CPS)
+    en: Mid-year population estimate (SPC)
+  definition: SPC DF_POCKET 'Mid-year population estimate' (from SPC DF_POP_PROJ; census-based national estimates).
+  unit: persons (SPC unit 'units')
+  domain: gapfill
+  subdomain: spc
+  theme: population
+  value_kind: numeric
+  source_order:
+  - spc.pocket.MIDYEARPOPEST
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.land_area
+  labels:
+    fr: Superficie terrestre (CPS)
+    en: Land area (SPC)
+  definition: SPC DF_POCKET 'Land area' (from DF_POP_DENSITY LANDAREA).
+  unit: square kilometre
+  domain: gapfill
+  subdomain: spc
+  theme: geography
+  value_kind: numeric
+  source_order:
+  - spc.pocket.LAR
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.population_density
+  labels:
+    fr: Densité de population (CPS)
+    en: Population density (SPC)
+  definition: SPC DF_POCKET 'Population density' (mid-year population / land area, computed by SPC).
+  unit: persons per square kilometre
+  domain: gapfill
+  subdomain: spc
+  theme: population
+  value_kind: numeric
+  source_order:
+  - spc.pocket.POPDENS
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.life_expectancy_male
+  labels:
+    fr: Espérance de vie à la naissance, hommes (CPS)
+    en: Life expectancy at birth, male (SPC)
+  definition: SPC DF_POCKET 'Life expectancy at birth - Male' (from DF_VITAL).
+  unit: years
+  domain: gapfill
+  subdomain: spc
+  theme: health
+  value_kind: numeric
+  source_order:
+  - spc.pocket.LEBM
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted). No both-sexes value is published in the pocket summary.
+- id: gapfill.spc.life_expectancy_female
+  labels:
+    fr: Espérance de vie à la naissance, femmes (CPS)
+    en: Life expectancy at birth, female (SPC)
+  definition: SPC DF_POCKET 'Life expectancy at birth - Female' (from DF_VITAL).
+  unit: years
+  domain: gapfill
+  subdomain: spc
+  theme: health
+  value_kind: numeric
+  source_order:
+  - spc.pocket.LEBF
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.gdp_usd
+  labels:
+    fr: PIB à prix courants, USD (CPS)
+    en: GDP, current prices, USD (SPC)
+  definition: SPC DF_POCKET 'GDP, current price, in USD' (DF_NATIONAL_ACCOUNTS; national-currency GDP converted by SPC, conversion
+    rate in flags.obs_comment).
+  unit: thousand USD
+  domain: gapfill
+  subdomain: spc
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - spc.pocket.GDPCUSD
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.gdp_lcu
+  labels:
+    fr: PIB à prix courants, monnaie nationale (CPS)
+    en: GDP, current prices, national currency (SPC)
+  definition: SPC DF_POCKET 'GDP, current prices, in local currency units'.
+  unit: thousand units of national currency (named per cell)
+  domain: gapfill
+  subdomain: spc
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - spc.pocket.GDPCDOM
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.gdp_per_capita_usd
+  labels:
+    fr: PIB par habitant, USD (CPS)
+    en: GDP per capita, USD (SPC)
+  definition: 'SPC DF_POCKET ''GDP, per capita, in USD'' (SPC: GDP in USD / mid-year population; formula in flags.obs_comment).'
+  unit: USD per person
+  domain: gapfill
+  subdomain: spc
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - spc.pocket.GDPCPCUSD
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.inflation
+  labels:
+    fr: Taux d'inflation (CPS)
+    en: Inflation rate (SPC)
+  definition: SPC DF_POCKET 'Inflation rate' (from SPC DF_CPI indicator INF, annual).
+  unit: percent
+  domain: gapfill
+  subdomain: spc
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - spc.pocket.INFRATE
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted). SPC does not state in the pocket summary whether this is the annual-average or the December-on-December
+    change.
+- id: gapfill.spc.merchandise_exports_usd
+  labels:
+    fr: Exportations de marchandises, USD (CPS)
+    en: Merchandise exports, USD (SPC)
+  definition: SPC DF_POCKET 'Exports' (International Merchandise Trade Statistics).
+  unit: thousand USD
+  domain: gapfill
+  subdomain: spc
+  theme: trade
+  value_kind: numeric
+  source_order:
+  - spc.pocket.EXPUSD
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.merchandise_imports_usd
+  labels:
+    fr: Importations de marchandises, USD (CPS)
+    en: Merchandise imports, USD (SPC)
+  definition: SPC DF_POCKET 'Imports' (International Merchandise Trade Statistics).
+  unit: thousand USD
+  domain: gapfill
+  subdomain: spc
+  theme: trade
+  value_kind: numeric
+  source_order:
+  - spc.pocket.IMPUSD
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.merchandise_trade_balance_usd
+  labels:
+    fr: Solde commercial des marchandises, USD (CPS)
+    en: Merchandise trade balance, USD (SPC)
+  definition: SPC DF_POCKET 'Trade balance' (merchandise exports minus imports, IMTS, as computed by SPC).
+  unit: thousand USD
+  domain: gapfill
+  subdomain: spc
+  theme: trade
+  value_kind: numeric
+  source_order:
+  - spc.pocket.TRADEBALUSD
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted). Not the balance-of-payments goods balance.
+- id: gapfill.spc.government_revenue_gdp
+  labels:
+    fr: Recettes publiques, % du PIB (CPS)
+    en: Government revenue, % of GDP (SPC)
+  definition: SPC DF_POCKET 'Government revenue as percent of GDP (current prices)'; data source per cell (OECD Revenue Statistics,
+    NSO via SPC GFS).
+  unit: percent
+  domain: gapfill
+  subdomain: spc
+  theme: finance
+  value_kind: numeric
+  source_order:
+  - spc.pocket.GOVREVGDPC
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.government_expenditure_gdp
+  labels:
+    fr: Dépenses publiques, % du PIB (CPS)
+    en: Government expenditure, % of GDP (SPC)
+  definition: SPC DF_POCKET 'Government expenditure as percent of GDP (current prices)'.
+  unit: percent
+  domain: gapfill
+  subdomain: spc
+  theme: finance
+  value_kind: numeric
+  source_order:
+  - spc.pocket.GOVEXPGDPC
+  provider_declared: true
+  notes: SPC PDH.Stat pocket summary (DF_POCKET); only cells whose DATA_YEAR is the cell year are kept (repeats of an older
+    value are omitted).
+- id: gapfill.spc.unemployment_rate
+  labels:
+    fr: Taux de chômage, national (CPS)
+    en: Unemployment rate, national (SPC)
+  definition: SPC DF_EMPRATES 'Unemployment rate', both sexes, all ages, national, all disability statuses (census or labour-force
+    survey years).
+  unit: percent
+  domain: gapfill
+  subdomain: spc
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - spc.emprates.UNEMPRATE|sex=_T|age=_T|urbanization=_T|disability=_T
+  provider_declared: true
+- id: gapfill.spc.internet_users
+  labels:
+    fr: Personnes utilisant Internet (CPS/UIT)
+    en: Individuals using the Internet (SPC/ITU)
+  definition: SPC DF_DIGITAL_DEVELOPMENT DD024 'Individuals using the Internet, total (%)' (ITU indicator, re-published by
+    SPC).
+  unit: percent
+  domain: gapfill
+  subdomain: spc
+  theme: science
+  value_kind: numeric
+  source_order:
+  - spc.digital.DD024
+  provider_declared: true
+- id: gapfill.spc.capital
+  labels:
+    fr: Capitale (CPS)
+    en: Capital (SPC)
+  definition: SPC DF_KEYFACTS 'Capital', verbatim.
+  unit: text
+  domain: gapfill
+  subdomain: spc
+  theme: geography
+  value_kind: text
+  source_order:
+  - spc.keyfacts.CAP
+  provider_declared: true
+- id: gapfill.spc.languages
+  labels:
+    fr: Langues (CPS)
+    en: Languages (SPC)
+  definition: SPC DF_KEYFACTS 'Languages', verbatim (SPC does not separate official and other languages).
+  unit: text
+  domain: gapfill
+  subdomain: spc
+  theme: culture
+  value_kind: text
+  source_order:
+  - spc.keyfacts.LAN
+  provider_declared: true
+- id: gapfill.spc.currency
+  labels:
+    fr: Monnaie (CPS)
+    en: Currency (SPC)
+  definition: SPC DF_KEYFACTS 'Currency', verbatim.
+  unit: text
+  domain: gapfill
+  subdomain: spc
+  theme: finance
+  value_kind: text
+  source_order:
+  - spc.keyfacts.CUR
+  provider_declared: true
+- id: gapfill.spc.government
+  labels:
+    fr: Gouvernement / statut politique (CPS)
+    en: Government / political status (SPC)
+  definition: SPC DF_KEYFACTS 'Government', verbatim (SPC's wording, not a legal finding).
+  unit: text
+  domain: gapfill
+  subdomain: spc
+  theme: politics
+  value_kind: text
+  source_order:
+  - spc.keyfacts.GOV
+  provider_declared: true
+- id: gapfill.eurostat_nuts.population_1_january
+  labels:
+    fr: Population au 1er janvier (Eurostat, NUTS 2)
+    en: Population on 1 January (Eurostat, NUTS-2)
+  definition: 'Eurostat demo_r_d2jan: population on 1 January, both sexes, all ages.'
+  unit: persons
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: population
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.demo_r_d2jan|unit=NR|sex=T|age=TOTAL
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B). A 1 January stock, not a mid-year population.
+- id: gapfill.eurostat_nuts.total_area
+  labels:
+    fr: Superficie totale (Eurostat, NUTS 2)
+    en: Total area (Eurostat, NUTS-2)
+  definition: Eurostat reg_area3 'Total area'.
+  unit: km2
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: geography
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=TOTAL
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.land_area
+  labels:
+    fr: Superficie terrestre (Eurostat, NUTS 2)
+    en: Land area (Eurostat, NUTS-2)
+  definition: Eurostat reg_area3 'Land area - total' (area excluding inland water).
+  unit: km2
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: geography
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.reg_area3|unit=KM2|landuse=L0008
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.population_density
+  labels:
+    fr: Densité de population (Eurostat, NUTS 2)
+    en: Population density (Eurostat, NUTS-2)
+  definition: Eurostat demo_r_d3dens 'Population density' (average population of the year per km2 of land area, Eurostat definition).
+  unit: persons per km2
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: population
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.demo_r_d3dens|unit=PER_KM2
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.gdp_mio_eur
+  labels:
+    fr: PIB à prix courants, millions d'euros (Eurostat, NUTS 2)
+    en: GDP, current prices, million EUR (Eurostat, NUTS-2)
+  definition: Eurostat nama_10r_2gdp, GDP at current market prices, million euro.
+  unit: million EUR
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.nama_10r_2gdp|unit=MIO_EUR
+  provider_declared: true
+  notes: 'Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or
+    Norway (FRY1-FRY5, FI20, NO0B). In euro: never converted to US dollars by REVA.'
+- id: gapfill.eurostat_nuts.gdp_eur_per_inhabitant
+  labels:
+    fr: PIB par habitant, euros (Eurostat, NUTS 2)
+    en: GDP per inhabitant, EUR (Eurostat, NUTS-2)
+  definition: Eurostat nama_10r_2gdp, GDP at current market prices, euro per inhabitant.
+  unit: EUR per inhabitant
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.nama_10r_2gdp|unit=EUR_HAB
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.unemployment_rate_15_74
+  labels:
+    fr: Taux de chômage, 15-74 ans (Eurostat EFT, NUTS 2)
+    en: Unemployment rate, 15-74 (Eurostat LFS, NUTS-2)
+  definition: 'Eurostat lfst_r_lfu3rt: unemployed persons as % of the labour force, ILO definition, ages 15-74, all education
+    levels (Labour Force Survey).'
+  unit: '%'
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.lfst_r_lfu3rt|unit=PC|isced11=TOTAL|sex=T|age=Y15-74
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.life_expectancy
+  labels:
+    fr: Espérance de vie à la naissance (Eurostat, NUTS 2)
+    en: Life expectancy at birth (Eurostat, NUTS-2)
+  definition: 'Eurostat demo_r_mlifexp: life expectancy at age less than 1 year (at birth), both sexes; period life table
+    from registered deaths.'
+  unit: years
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: health
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.demo_r_mlifexp|unit=YR|sex=T|age=Y_LT1
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.internet_users_3_months
+  labels:
+    fr: Personnes ayant utilisé Internet au cours des 3 derniers mois (Eurostat, NUTS 2)
+    en: Individuals who used the internet in the last 3 months (Eurostat, NUTS-2)
+  definition: 'Eurostat isoc_r_iuse_i I_IU3 ''Last internet use: in last 3 months'', % of individuals aged 16-74.'
+  unit: '% of individuals'
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: science
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_IU3
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.eurostat_nuts.internet_users_12_months
+  labels:
+    fr: Personnes ayant utilisé Internet au cours des 12 derniers mois (Eurostat, NUTS 2)
+    en: Individuals who used the internet in the last 12 months (Eurostat, NUTS-2)
+  definition: 'Eurostat isoc_r_iuse_i I_ILT12 ''Last internet use: in the last 12 months'', % of individuals aged 16-74.'
+  unit: '% of individuals'
+  domain: gapfill
+  subdomain: eurostat_nuts
+  theme: science
+  value_kind: numeric
+  source_order:
+  - eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_ILT12
+  provider_declared: true
+  notes: Eurostat NUTS-2 region published for an ISO 3166 entity that multilateral sources include in France, Finland or Norway
+    (FRY1-FRY5, FI20, NO0B).
+- id: gapfill.insee.cpi_index
+  labels:
+    fr: Indice des prix à la consommation, ensemble (Insee, DOM)
+    en: Consumer price index, all items (Insee, overseas departments)
+  definition: Insee IPC-2025 'Indice annuel des prix à la consommation - Base 2025 - Ensemble des ménages - <department> -
+    Ensemble'.
+  unit: index (2025 = 100)
+  domain: gapfill
+  subdomain: insee
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - insee.ipc_dom.CPI|coicop=00|households=ENSEMBLE|base=2025
+  provider_declared: true
+  notes: Insee BDM, French overseas departments (REF_AREA D971-D974, D976).
+- id: gapfill.insee.inflation_cpi
+  labels:
+    fr: Inflation des prix à la consommation, moyenne annuelle (Insee, DOM)
+    en: Consumer price inflation, annual average (Insee, overseas departments)
+  definition: 'Insee IPC-2025 ''Indice annuel des prix à la consommation - Variation annuelle - Ensemble des ménages - <department>'':
+    change of the annual average index over the previous year.'
+  unit: '% change'
+  domain: gapfill
+  subdomain: insee
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - insee.ipc_dom.CPI_ANNUAL_CHANGE|coicop=00|households=ENSEMBLE|base=2025
+  provider_declared: true
+  notes: Insee BDM, French overseas departments (REF_AREA D971-D974, D976).
+- id: gapfill.insee.smic_hourly
+  labels:
+    fr: Smic brut horaire (Insee, DOM)
+    en: Statutory minimum wage (Smic), gross per hour (Insee, overseas departments)
+  definition: Insee series 000822501 (Smic brut horaire dans les DOM hors Mayotte; one series written per department it names)
+    and 011800491 (Smic brut horaire à Mayotte). Monthly cells, value in force.
+  unit: EUR per hour
+  domain: gapfill
+  subdomain: insee
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - insee.smic_dom.SMIC_HOURLY_GROSS|applies_to=D971
+  - insee.smic_dom.SMIC_HOURLY_GROSS|applies_to=D972
+  - insee.smic_dom.SMIC_HOURLY_GROSS|applies_to=D973
+  - insee.smic_dom.SMIC_HOURLY_GROSS|applies_to=D974
+  - insee.smic_dom.SMIC_HOURLY_GROSS
+  provider_declared: true
+  notes: 'Insee BDM, French overseas departments (REF_AREA D971-D974, D976). Hourly amount: not the monthly minimum wage of
+    reva.labour.minimum_wage_monthly_lcu.'
+- id: gapfill.cbs_bes.population_1_january
+  labels:
+    fr: Population au 1er janvier (CBS, Pays-Bas caribéens)
+    en: Population on 1 January (CBS, Caribbean Netherlands)
+  definition: CBS 83774ENG 'Population on 1 January'.
+  unit: persons
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: population
+  value_kind: numeric
+  source_order:
+  - cbs.bes_population.population_1_january
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.population_31_december
+  labels:
+    fr: Population au 31 décembre (CBS, Pays-Bas caribéens)
+    en: Population on 31 December (CBS, Caribbean Netherlands)
+  definition: CBS 83774ENG 'Population on 31 December'.
+  unit: persons
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: population
+  value_kind: numeric
+  source_order:
+  - cbs.bes_population.population_31_december
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.live_births
+  labels:
+    fr: Naissances vivantes (CBS, Pays-Bas caribéens)
+    en: Live births (CBS, Caribbean Netherlands)
+  definition: CBS 83774ENG 'Live born children'.
+  unit: persons
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: population
+  value_kind: numeric
+  source_order:
+  - cbs.bes_population.live_births
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.deaths
+  labels:
+    fr: Décès (CBS, Pays-Bas caribéens)
+    en: Deaths (CBS, Caribbean Netherlands)
+  definition: CBS 83774ENG 'Deaths'.
+  unit: persons
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: population
+  value_kind: numeric
+  source_order:
+  - cbs.bes_population.deaths
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.gdp_current_usd
+  labels:
+    fr: PIB à prix courants, millions USD (CBS, Pays-Bas caribéens)
+    en: GDP, current prices, million USD (CBS, Caribbean Netherlands)
+  definition: CBS 84789ENG 'GDP, value at current prices' (million USD; the US dollar is the islands' currency since 2011).
+  unit: million USD
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - cbs.bes_gdp.gdp_current_prices
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.gdp_prices_2017_usd
+  labels:
+    fr: PIB aux prix de 2017, millions USD (CBS, Pays-Bas caribéens)
+    en: GDP at prices of 2017, million USD (CBS, Caribbean Netherlands)
+  definition: CBS 84789ENG 'GDP, value at prices of 2017'.
+  unit: million USD (prices of 2017)
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - cbs.bes_gdp.gdp_prices_of_2017
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.gdp_volume_change
+  labels:
+    fr: Croissance du PIB en volume (CBS, Pays-Bas caribéens)
+    en: Real GDP growth (CBS, Caribbean Netherlands)
+  definition: CBS 84789ENG 'GDP, volume changes' (%).
+  unit: '% change'
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - cbs.bes_gdp.gdp_volume_change
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.gdp_per_capita_usd
+  labels:
+    fr: PIB par habitant, USD (CBS, Pays-Bas caribéens)
+    en: GDP per capita, USD (CBS, Caribbean Netherlands)
+  definition: CBS 85251ENG 'Gross domestic product per capita' (USD, current prices).
+  unit: USD
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: economy
+  value_kind: numeric
+  source_order:
+  - cbs.bes_gdp.gdp_per_capita
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.unemployment_rate
+  labels:
+    fr: Taux de chômage, 15-74 ans (CBS, Pays-Bas caribéens)
+    en: Unemployment rate, 15-74 (CBS labour survey, Caribbean Netherlands)
+  definition: CBS 83165ENG 'Unemployment rate', both sexes, 15-74 years, all education levels (two-yearly labour force survey).
+  unit: '%'
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - cbs.bes_labour.unemployment_rate|sex=total|age=15-74
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).
+- id: gapfill.cbs_bes.net_labour_participation_rate
+  labels:
+    fr: Taux d'activité net, 15-74 ans (CBS, Pays-Bas caribéens)
+    en: Net labour participation rate, 15-74 (CBS, Caribbean Netherlands)
+  definition: CBS 83165ENG 'Net labour participation rate' (employed labour force as % of the population 15-74).
+  unit: '%'
+  domain: gapfill
+  subdomain: cbs_bes
+  theme: labour
+  value_kind: numeric
+  source_order:
+  - cbs.bes_labour.net_labour_participation_rate|sex=total|age=15-74
+  provider_declared: true
+  notes: CBS StatLine, Caribbean Netherlands (CN01 = Bonaire, St. Eustatius and Saba together; islands kept as parts).

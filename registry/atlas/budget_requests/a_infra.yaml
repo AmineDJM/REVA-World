@@ -1,0 +1,34 @@
+# Budget request from agent A-INFRA (physical networks: air routes, airports, space, ports, submarine cables).
+# ATLASOPS/ATLASCORE merges into registry/policies/budgets.yaml. Sizes measured 2026-10-16 (docs/dev/v3_a_infra.md).
+agent: A-INFRA
+requests:
+  - source_key: openflights.data
+    # data page (32 KB) + countries.dat (6 KB) + airports.dat (1.1 MB) + airlines.dat (0.4 MB) + routes.dat (2.4 MB)
+    # = 5 requests, ~3.9 MB per run; the dump changes rarely (yearly check). One retry allowed.
+    daily_requests: 10
+    expected_bytes_per_day: 8000000
+    reason: "OpenFlights data dump (routes frozen June 2014): 5 requests per run"
+  - source_key: ourairports.data
+    # terms page (13 KB) + countries.csv (25 KB) + airports.csv (12.7 MB) = 3 requests, ~12.8 MB per run (monthly).
+    daily_requests: 6
+    expected_bytes_per_day: 26000000
+    reason: "OurAirports daily dump (public domain): 3 requests per run"
+  - source_key: gcat.planet4589
+    # index.html (13 KB) + orgs.tsv (0.7 MB) + sites.tsv (0.13 MB) + launch.tsv (13.8 MB) + satcat.tsv (19.3 MB)
+    # = 5 requests, ~34 MB per run (monthly). One retry allowed.
+    daily_requests: 10
+    expected_bytes_per_day: 70000000
+    reason: "GCAT launch list, standard object catalogue, organisations and sites (CC BY 4.0): 5 requests per run"
+  - source_key: nga.wpi
+    # one CSV export (1.3 MB) per run (quarterly).
+    daily_requests: 3
+    expected_bytes_per_day: 4000000
+    reason: "NGA World Port Index CSV export: 1 request per run"
+daily_totals_increase:
+  http_requests_total: "+29"
+  http_bytes_total: "+108_000_000"
+notes: >-
+  atlas.wikidata_cables shares WDHARVEST's wikidata.wbapi budget (4000/day; no raise requested): one run =
+  1-3 CirrusSearch pages + ~12 wbgetentities batches of <= 50 cable items (< 20 requests, ~6 MB).
+  All four new sources are small bulk files fetched once per run; nothing is paginated. The Wikidata cable run
+  goes through the machine-wide Wikidata lock (var/locks/wikidata.lock) like WDHARVEST, one request at a time.

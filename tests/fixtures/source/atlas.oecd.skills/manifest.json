@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "f2229e0aabea14ed5f47fc3b178143e39bab6aa36499bb21f6aa36a0e75cf010",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,/FRA+CHL+ZAF.6_1+6_2+6_3+6_1_DEP+6_4.....?format=csvfilewithlabels&startPeriod=2016",
+    "file": "f2229e0aabea14ed.csv",
+    "sha256": "941a1ce4448e9bc6bb374a48c33f622a883cc396beb3d0f4180aca614381d03a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=name; version=2",
+      "last-modified": "2024-06-04"
+    },
+    "retrieved_at": "2026-10-16T18:09:04.044856+00:00",
+    "licence": "OECD Terms and Conditions (Data Explorer: '\u00a9 OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+  }
+]

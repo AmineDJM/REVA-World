@@ -53,17 +53,45 @@ derived_links:
     directed: false
     derivation:
       method: atlas_dyadic
-      concepts: [geography.land_border_length]
       sources: [naturalearth]
+      atlas:
+        source: naturalearth
+        datasets: [admin0_10m_borders]
+        indicator_prefix: "land_border_km|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        flow: "shared Admin-0 boundary length at 1:10m, measured by A-GEO (both directions stored; merged here)"
       notes: >-
-        Adjacency of Natural Earth 10m admin-0 polygons computed by A-GEO (one row per pair with the shared
-        boundary length when the source geometry provides it). Display-grade geometry: disputed segments are
-        not resolved.
-    temporal: {kind: snapshot, description: "Natural Earth release year of the geometry"}
-    weight: {kind: source_quantity, unit: km, notes: "shared boundary length as measured on the source geometry"}
-    honesty: {fr: "relié via : frontière terrestre (Natural Earth)", en: "connected via: land border (Natural Earth)"}
+        Natural Earth 1:10m Admin-0 map units (de facto view, release 5.1.1), adjacency and shared boundary length
+        computed by A-GEO (Vincenty lengths of shared polygon edges; atlas naturalearth.admin0_10m_borders). The
+        table has both directions of each pair; the undirected link keeps both rows as evidence. Borders with
+        features outside the crosswalk (Somaliland, Northern Cyprus...) have no ISO3 partner and give no link.
+    temporal: {kind: snapshot, description: "retrieval day of the Natural Earth release (NE does not date its boundaries)"}
+    weight: {kind: source_quantity, unit: km, notes: "shared boundary length as measured on the 1:10m geometry (scale-dependent)"}
+    honesty: {fr: "relié via : frontière terrestre (Natural Earth 1:10m)", en: "connected via: land border (Natural Earth 1:10m)"}
     causal: false
-    status: awaiting_source
+    status: derivable
+    path_cost: 1.0
+
+  - id: land_border_cshapes
+    labels: {fr: "frontière terrestre datée (CShapes)", en: "dated land border (CShapes)"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_dataset_border
+      properties: ["cshapes:shares_border_with", "geopol:corresponds_to_iso3"]
+      sources: [cshapes]
+      notes: >-
+        CShapes 2.0 (ETH Zurich ICR, CC BY-NC-SA 4.0: non-commercial) as loaded by KGGEOPOL: two polities valid at
+        the same time share a boundary arc of the simplified topology (land borders only), 1886-2019. Territory
+        entities (cshapes:gw:<code>) are mapped to crosswalk countries through their dated
+        geopol:corresponds_to_iso3 statements (both statements are evidence); a territory without such a
+        statement (historical state) keeps its own node.
+    temporal: {kind: interval, description: "overlap of the two polities' validity (day precision), consecutive periods merged"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : frontière terrestre datée (CShapes)", en: "connected via: dated land border (CShapes)"}
+    causal: false
+    status: derivable
     path_cost: 1.0
 
   - id: maritime_neighbour
@@ -181,6 +209,28 @@ derived_links:
     status: derivable
     path_cost: 1.0
 
+  - id: colonial_rule_cshapes
+    labels: {fr: "territoire sous l'autorité de (CShapes)", en: "territory ruled by (CShapes)"}
+    inverse_labels: {fr: "autorité sur le territoire de (CShapes)", en: "ruled the territory of (CShapes)"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_dataset_colonial
+      properties: ["cshapes:ruled_by", "geopol:corresponds_to_iso3"]
+      sources: [cshapes]
+      notes: >-
+        CShapes 2.0 dependency periods (status colony / protectorate / mandate / occupied) with their owner state,
+        loaded by KGGEOPOL as cshapes:ruled_by (dated, status in the qualifiers). The subject is the territory,
+        named by the crosswalk country it corresponds to in any year (geopol:corresponds_to_iso3: the territory
+        *later became* that state; its borders may differ), the object the ruling state. Status is kept in
+        basis.status. Coverage starts in 1886 (earlier colonial rule, e.g. Brazil, is not in CShapes).
+    temporal: {kind: interval, description: "the dependency period (day precision)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : territoire sous l'autorité de l'autre Etat ({status}, CShapes)", en: "connected via: territory ruled by the other state ({status}, CShapes)"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
   - id: successor_of
     labels: {fr: "successeur de", en: "successor of"}
     inverse_labels: {fr: "prédécesseur de", en: "predecessor of"}
@@ -281,18 +331,21 @@ derived_links:
     scope: country_country
     directed: false
     derivation:
-      method: kg_conflict_sides
-      properties: ["ucdp:side_a", "ucdp:side_b"]
+      method: kg_dataset_sides
+      properties: ["ucdp:primary_party", "ucdp:secondary_party", "geopol:corresponds_to_iso3"]
       sources: [ucdp]
       via: conflict
       notes: >-
-        UCDP/PRIO armed conflict dyads (side_a / side_b per conflict-year), loaded by KGGEOPOL as dataset
-        statements carrying the side. Two states on the same side of the same conflict.
-    temporal: {kind: snapshot, description: "UCDP conflict-year"}
+        UCDP/PRIO Armed Conflict Dataset (CC BY 4.0) as loaded by KGGEOPOL: ucdp:conflict:<id> has primary or
+        secondary party <state> with qualifier side = a | b, as runs of conflict-years. Two states on the
+        same side over overlapping years. Secondary parties are states
+        supporting a side with troops (UCDP definition); the role is kept in basis. State-code entities are
+        mapped to countries through dated geopol:corresponds_to_iso3 statements (evidence too).
+    temporal: {kind: interval, description: "overlap of the two parties' conflict-year runs"}
     weight: {kind: none}
     honesty: {fr: "relié via : même camp dans {via} (UCDP)", en: "connected via: same side in {via} (UCDP)"}
     causal: false
-    status: awaiting_source
+    status: derivable
     path_cost: 1.0
 
   - id: conflict_opposing_sides
@@ -300,15 +353,21 @@ derived_links:
     scope: country_country
     directed: false
     derivation:
-      method: kg_conflict_sides
-      properties: ["ucdp:side_a", "ucdp:side_b"]
+      method: kg_dataset_sides
+      properties: ["ucdp:primary_party", "ucdp:secondary_party", "geopol:corresponds_to_iso3"]
       sources: [ucdp]
       via: conflict
-    temporal: {kind: snapshot, description: "UCDP conflict-year"}
+      notes: >-
+        UCDP/PRIO Armed Conflict Dataset (CC BY 4.0) as loaded by KGGEOPOL: ucdp:conflict:<id> has primary or
+        secondary party <state> with qualifier side = a | b, as runs of conflict-years. Two states on the
+        opposite sides over overlapping years. Secondary parties are states
+        supporting a side with troops (UCDP definition); the role is kept in basis. State-code entities are
+        mapped to countries through dated geopol:corresponds_to_iso3 statements (evidence too).
+    temporal: {kind: interval, description: "overlap of the two parties' conflict-year runs"}
     weight: {kind: none}
     honesty: {fr: "relié via : camps opposés dans {via} (UCDP)", en: "connected via: opposing sides in {via} (UCDP)"}
     causal: false
-    status: awaiting_source
+    status: derivable
     path_cost: 1.0
 
   # ---------------------------------------------------------------- diplomacy, politics
@@ -380,42 +439,103 @@ derived_links:
     path_cost: 2.0
 
   - id: unga_vote_agreement
-    labels: {fr: "concordance des votes à l'AG de l'ONU", en: "UN General Assembly vote agreement"}
+    labels: {fr: "part de votes identiques à l'AG de l'ONU", en: "share of identical UNGA votes"}
     scope: country_country
     directed: false
     derivation:
-      method: atlas_dyadic
-      concepts: [geopolitics.unga_vote_agreement]
-      sources: [unga_votes]
+      method: atlas_computed
+      sources: [unga]
+      concepts: [unga.votes, unga.rollcalls]
       notes: >-
-        Agreement score per country pair and session year exactly as the source dataset publishes it (e.g.
-        Voeten/Bailey/Strezhnev "Agree" index). LINKS does not compute it.
-    temporal: {kind: snapshot, description: "UNGA session year"}
-    weight: {kind: source_quantity, unit: "1 (share of votes in agreement)"}
-    honesty: {fr: "relié via : concordance des votes à l'AG de l'ONU ({weight}, {year})", en: "connected via: UNGA vote agreement ({weight}, {year})"}
+        COMPUTED by REVA (method links-vote-agreement/1) from the roll-call votes of Voeten et al. (Harvard
+        Dataverse v33.0, CC0; atlas unga.votes + unga.rollcalls, KGGEOPOL): for a pair of states and a period
+        (decade, or year in the pair view) and an issue (all roll calls, or Voeten's keyword-based issue codes
+        co colonialism, hr human rights, me Palestinian conflict, nu nuclear, di disarmament, ec economic
+        development), share = n_identical / n_common, where n_common counts the roll calls on which BOTH cast
+        yes, no or abstain (absences and non-membership excluded) and n_identical those with the same position
+        (abstain = abstain counts as identical). Requires n_common >= 10. It is a share of identical votes:
+        not an alliance, not friendship, not an alignment of interests; roll-call selection and issue coding
+        shape it. Historical states keep their own node (e.g. USSR Q15180 until 1991-12-20).
+    temporal: {kind: interval, description: "the decade (stored) or the year (pair view) of the roll calls"}
+    weight: {kind: derived_index, unit: "share of identical votes (0-1)", notes: "n_common and n_identical always in basis"}
+    honesty: {fr: "relié via : part de votes identiques à l'AG de l'ONU (indice calculé, {weight})", en: "connected via: share of identical UNGA votes (computed index, {weight})"}
     causal: false
-    status: awaiting_source
+    status: derivable
     path_cost: 2.0
 
   # ---------------------------------------------------------------- flows (atlas)
   - id: bilateral_trade
-    labels: {fr: "commerce bilatéral (exportations)", en: "bilateral trade (exports)"}
+    labels: {fr: "exportations de biens déclarées par l'exportateur", en: "goods exports reported by the exporter"}
     inverse_labels: {fr: "destination des exportations de", en: "export destination of"}
     scope: country_country
     directed: true
     derivation:
       method: atlas_dyadic
-      concepts: [trade.bilateral_exports_total]
-      sources: [imf_dots]
+      sources: [imf]
+      atlas:
+        source: imf
+        datasets: [imts]
+        indicator_prefix: "XG_FOB_USD|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        flow: "exports FOB as reported by the exporter (IMF IMTS)"
       notes: >-
-        IMF Direction of Trade Statistics, goods exports FOB reported by `iso3` to `counterpart_iso3`, one
-        reference year. A zero reported by the source is a reported zero: it is kept in the derivation
-        report and does not create a link. A missing cell is missing.
+        IMF International Trade in Goods by partner (IMTS, successor of DOTS; A-IMF table imf.imts): goods exports
+        FOB reported by the row country to the partner, US dollars, one year. Mirror flows (imports reported by
+        the partner) are a separate link type and are never merged or averaged. A reported zero gives no link
+        (counted); a missing cell is missing.
     temporal: {kind: snapshot, description: "reference year"}
-    weight: {kind: source_quantity, unit: "USD (as reported, see row unit)"}
-    honesty: {fr: "relié via : exportations déclarées ({weight} {unit}, {year}, FMI DOTS)", en: "connected via: reported exports ({weight} {unit}, {year}, IMF DOTS)"}
+    weight: {kind: source_quantity, unit: "US dollars"}
+    honesty: {fr: "relié via : exportations déclarées ({weight} {unit}, {year}, FMI IMTS)", en: "connected via: reported exports ({weight} {unit}, {year}, IMF IMTS)"}
     causal: false
-    status: awaiting_source
+    status: derivable
+    path_cost: 1.5
+
+  - id: bilateral_trade_imports
+    labels: {fr: "importations de biens déclarées par l'importateur", en: "goods imports reported by the importer"}
+    inverse_labels: {fr: "importe depuis", en: "imports from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [imf]
+      atlas:
+        source: imf
+        datasets: [imts]
+        indicator_prefix: "MG_CIF_USD|partner="
+        partner: flags.partner_iso3
+        row_role: object
+        flow: "imports CIF as reported by the importer (IMF IMTS); link direction exporter -> importer"
+      notes: "IMF IMTS goods imports CIF reported by the row country from the partner (mirror of bilateral_trade; valuation differs)."
+    temporal: {kind: snapshot, description: "reference year"}
+    weight: {kind: source_quantity, unit: "US dollars"}
+    honesty: {fr: "relié via : importations déclarées ({weight} {unit}, {year}, FMI IMTS)", en: "connected via: reported imports ({weight} {unit}, {year}, IMF IMTS)"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  - id: bilateral_trade_baci
+    labels: {fr: "exportations de biens (BACI, par section SH)", en: "goods exports (BACI, by HS section)"}
+    inverse_labels: {fr: "destination des exportations (BACI) de", en: "export destination (BACI) of"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [baci]
+      atlas:
+        source: baci
+        datasets: [hs92_pair_total, hs92_pair_section_1995_2010, hs92_pair_section_2011_2019, hs92_pair_section_2020_2024]
+        indicator_prefix: "X|partner="
+        partner: flags.partner_iso3
+        row_role: subject
+        facet_dims: [section]
+        flow: "exports FOB reconciled by CEPII (BACI HS92), by HS section (facet section=TOTAL for all goods)"
+      notes: "CEPII BACI HS92 V202601 (Etalab 2.0; A-TRADE): exporter -> importer, thousand US dollars, per HS section; reconciled mirror flows (cepii_reconciled)."
+    temporal: {kind: snapshot, description: "reference year"}
+    weight: {kind: source_quantity, unit: "thousand US dollars (current)"}
+    honesty: {fr: "relié via : exportations (BACI, {weight} {unit}, {year})", en: "connected via: exports (BACI, {weight} {unit}, {year})"}
+    causal: false
+    status: derivable
     path_cost: 1.5
 
   - id: migrant_stock
@@ -425,14 +545,24 @@ derived_links:
     directed: true
     derivation:
       method: atlas_dyadic
-      concepts: [population.migrant_stock_by_origin]
-      sources: [un_desa_migrant_stock]
-      notes: "UN DESA International Migrant Stock: persons born in `iso3` (origin) living in `counterpart_iso3` (destination) at mid-year."
-    temporal: {kind: snapshot, description: "reference year (1990, 1995, ..., 2020, 2024)"}
+      sources: [un_desa]
+      atlas:
+        source: un_desa
+        datasets: [ims2024]
+        indicator_prefix: "migrant_stock|origin="
+        partner: flags.counterpart_iso3
+        row_role: object
+        require_dims: {sex: T}
+        flow: "persons born in (or citizens of) the origin living in the destination at mid-year, both sexes"
+      notes: >-
+        UN DESA International Migrant Stock 2024 (A-UN table un_desa.ims2024): destination x origin, both sexes.
+        Origin is country of birth or, for some destinations, citizenship (flags.data_type). A string zero or a
+        '..' cell was never stored; a reported zero gives no link.
+    temporal: {kind: snapshot, description: "reference year (1990, 1995, ..., 2020, 2024; as of 1 July)"}
     weight: {kind: source_quantity, unit: persons}
     honesty: {fr: "relié via : migrants nés dans l'un et vivant dans l'autre ({weight}, {year}, ONU DESA)", en: "connected via: migrants born in one living in the other ({weight}, {year}, UN DESA)"}
     causal: false
-    status: awaiting_source
+    status: derivable
     path_cost: 1.5
 
   # ---------------------------------------------------------------- polity territory (KGPOLITY, proposed)

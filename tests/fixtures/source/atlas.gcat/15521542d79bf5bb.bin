@@ -1,0 +1,30 @@
+#Site	Code	UCode	Type	StateCode	TStart	TStop	ShortName	Name	Location	Longitude	Latitude	Error	Parent	ShortEName	EName	Group	UName
+# Updated 2026 Oct 15 1810:06
+ALCA	-	ALCA	LS	BR	1994 Aug 19	*	Alcantara	CLA, Alcantara Space Center	Alcantara, Maranhao, Brasil	    -44.3671 	   -2.3170 	0.0010 	AEB	-	-	-	CLA, Alcantara Space Center
+CC	-	CC	LS	US	1992	2000 Feb  4	Canaveral	Cape Canaveral Air Station, Florida	-	    -80.5400 	   28.4600 	0.0500 	USAF	Canaveral	-	CC	Cape Canaveral Air Station, Florida
+CSG	-	CSG	LS	GUF	1968	*	Kourou	Centre Spatial Guyanais, Kourou, Guyane Francaise	-	    -52.7517 	    5.2333 	0.0200 	CNES	-	-	-	Centre Spatial Guyanais, Kourou, Guyane Francaise
+GIK-1	-	GIK-1	LS	RU	1994 Nov  1	*	Plesetsk	1-y Gosudarstvenniy Ispitatelniy Kosmodrom MO RF	Plesetsk, Rossiya	     40.5000 	   62.9000 	0.0200 	RVSN	Plesetsk	-	PL	1-y Gosudarstvenniy Ispitatelniy Kosmodrom MO RF
+GIK-5	-	GIK-5	LS	RU	1989	*	Baykonur	GIK-5, Baykonur, Kazakstan	-	     63.0000 	   46.0000 	0.0200 	RVSN	Baykonur	-	KB	GIK-5, Baykonur, Kazakstan
+GTsMP-4	-	GTsP-4	LS	SU	1999	*	Kapustin Yar	GTsMP-4 MO RF, Znamensk (Kapustin Yar), Rossiya	-	     45.8000 	   48.5000 	0.1000 	RVSN	-	-	KY	GTsMP-4 MO RF, Znamensk (Kapustin Yar), Rossiya
+GTsP-4	-	GTsP-4	LS	SU	1946	1999	Kapustin Yar	GTsP-4, Kapustin Yar, Volgograd, Rossiya	-	     45.8000 	   48.5000 	0.1000 	RVSN	KY	-	KY	GTsP-4, Kapustin Yar, Volgograd, Rossiya
+HCSLS	-	HCSLS	LS	CN	2024	*	Hainan CLS	Hainan Shangye Hangtian Fashe Chang (Hainan Commercial Space Launch Site)	Wenchang, Hainan	    110.9308 	   19.5968 	0.0001 	HICAL	-	-	-	海南商业航天发射场
+HHAI	-	HHAI	LS	CN	2019	-	Huang Hai	Huang Hai CZ-11 launch zone	-	    121.1900 	   34.9000 	0.0100 	CALT	-	-	-	Huang Hai CZ-11 launch zone
+HMG	-	HMG	LS	DZ	1949	1967	Hammaguir	Centre Interarmees d'Essais d'Engins Speciaux (CIEES), Algerie	-	     -3.0830 	   30.8870 	0.0200 	F	-	-	-	Centre Interarmees d'Essais d'Engins Speciaux (CIEES), Algerie
+JQ	-	JQ	LS	CN	1968	*	Jiuquan	Jiuquan Space Center, Nei Monggol Zizhiqu, China	-	    100.3100 	   41.3100 	0.0400 	CN	-	-	-	Jiuquan Space Center, Nei Monggol Zizhiqu, China
+KASC	-	KASC	LS	J	1960	2003 Oct	Kagoshima	Kagoshima Space Center, Kagoshima, Kyushu, Nippon	-	    131.0790 	   31.2500 	0.0010 	ISAS	-	-	-	Kagoshima Space Center, Kagoshima, Kyushu, Nippon
+KLA	-	KLA	LS	KI	1998	*	Kirimati	Sea Launch Kiritimati Launch Area, Pacific Ocean	-	   -154.0000 	    0.0000 	0.0500 	BOSL	-	-	-	Sea Launch Kiritimati Launch Area, Pacific Ocean
+KSC	-	KSC	LS	US	1966 Dec	*	Kennedy	NASA John F. Kennedy Space Center, Florida	-	    -80.6041 	   28.6083 	0.0001 	NASA	-	-	CC	NASA John F. Kennedy Space Center, Florida
+NIIP-5	-	GIK-5	LS	SU	1956	1989	Baykonur	NIIP-5, Baykonur, Kazakstan	-	     63.0000 	   46.0000 	0.0200 	RVSN	Baykonur	-	KB	NIIP-5, Baykonur, Kazakstan
+NIIP-53	-	GIK-1	LS	SU	1960	1993	Plesetsk	53-y Nauchno-Issledovatelskiy Ispitatelniy Poligon,	Plesetsk	     40.5000 	   62.9000 	0.0200 	RVSN	Plesetsk	-	PL	53-y Nauchno-Issledovatelskiy Ispitatelniy Poligon,
+SHAR	-	SHAR	LS	IN	1971 Oct  9	2002	Sriharikota	Satish Dhawan Space Ctr, Sriharikota, Andhra Pradesh, India	-	     80.3030 	   13.6210 	0.0200 	ISRO	-	-	-	Satish Dhawan Space Ctr, Sriharikota, Andhra Pradesh, India
+SPFL	-	CCA	LS	US	1998 Jan  1	2006 May	Spaceport Florida	Spaceport Florida, Cape Canaveral	-	    -80.5272 	   28.4583 	0.0002 	SPFL	-	-	CC	Spaceport Florida, Cape Canaveral
+TNSC	-	TNSC	LS	J	1975	*	Tanegashima	Tanegashima Space Center, Tanegashima, Nippon	-	    130.9700 	   30.4000 	0.0200 	NASDA	-	-	-	Tanegashima Space Center, Tanegashima, Nippon
+TYSC	-	TYSC	LS	CN	1988	*	Taiyuan	Taiyuan weixing fashe zhongxin	Wuzhai, Shanxi, China	    112.6000 	   37.5000 	0.1000 	CN	-	Taiyuan Space Center	-	Taiyuan weixing fashe zhongxin
+V	-	V	LS	US	1958	2021 May 14	Vandenberg	Vandenberg AFB, California	-	   -120.6200 	   34.7500 	0.0200 	USAF	Vandenberg	-	WTR	Vandenberg AFB, California
+VOST	-	VOST	LS	RU	2016	*	Vostochniy	Vostochniy, Svobodniy, Amurskaya Oblast', Rossiya	-	    128.0000 	   51.7000 	0.5000 	RVSN	Vostochniy	-	VOST	Vostochniy, Svobodniy, Amurskaya Oblast', Rossiya
+VS	-	PA	LS	US	1964 Dec 31	2021 May 14	Vandenberg	South Vandenberg AFB, California	-	   -120.6100 	   34.6300 	0.0200 	USAF	-	-	WTR	South Vandenberg AFB, California
+VSFBS	-	PA	LS	US	2021 May 14	*	Vandenberg	South Base, Vandenberg Space Force Base, California	-	   -120.6100 	   34.6300 	0.0200 	USSF	-	-	WTR	South Base, Vandenberg Space Force Base, California
+WI	-	WI	LS	US	1946	*	Wallops I	Wallops Flight Facility, Wallops Island, Virginia	-	    -75.4800 	   37.8300 	0.0200 	NASA	-	-	WI	Wallops Flight Facility, Wallops Island, Virginia
+WIMB	-	NAOTS	LS	US	1959	*	Wallops I	Wallops Island Main Base, NASA Wallops Flight Facility, Chincoteague, Virginia	Chincoteague, Virginia	    -75.4633 	   37.9383 	0.0001 	NASA	-	-	WI	Wallops Island Main Base, NASA Wallops Flight Facility, Chincoteague, Virginia
+WS	-	WS	LS	US	1946	*	White Sands	White Sands Missile Range, New Mexico	-	   -106.5300 	   32.4000 	0.1000 	SMDC	-	-	WS	White Sands Missile Range, New Mexico
+XSC	-	XSC	LS	CN	1984	*	Xichang	Xichang Space Center (Songlin), Sichuan, China	-	    102.0291 	   28.2472 	0.0001 	CN	-	-	-	Xichang Space Center (Songlin), Sichuan, China

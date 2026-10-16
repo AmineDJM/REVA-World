@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "01539cfe93d9818cfab7a84ab05ce7c001c1d78b932ddc14d7535a60566225b8",
+    "url": "https://treaties.un.org/Pages/ViewDetails.aspx?src=TREATY&mtdsg_no=IV-5&chapter=4&clang=_en",
+    "file": "01539cfe93d9818c.html",
+    "sha256": "04e679d73690f25e5ae0fed7193ad23e4fe7fd89edc08a5676a79bb506f3bc63",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "UNTC status page IV-5, captured 2026-10-16; trimmed: __VIEWSTATE value and <script> bodies emptied (real page sha256 d87f6a73527f660a197893f3d9827126a50e24116305850d7551e0f07c783dce, 286464 bytes); parse result identical"
+  },
+  {
+    "request_fingerprint": "05c36426b2c2110eb13b25940742c2cb7d6227a132f7473b9a7a37966f82ed8b",
+    "url": "https://treaties.un.org/Pages/ViewDetails.aspx?src=TREATY&mtdsg_no=XVIII-10&chapter=18&clang=_en",
+    "file": "05c36426b2c2110e.html",
+    "sha256": "e391dbf95f2875fbb07a743f979b7e884ba3f0245138c7fbdaac036cf7a1b085",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "UNTC status page XVIII-10, captured 2026-10-16; trimmed: __VIEWSTATE value and <script> bodies emptied (real page sha256 ea8c0dd536bbb8ce6094f0e2ddb65e2d676b2a05ef9198622f47eb85ec42e450, 479295 bytes); parse result identical"
+  },
+  {
+    "request_fingerprint": "5484ebda532b2599d75d0d5cc306aa972150896915de602bcc6859f55f891028",
+    "url": "https://treaties.un.org/Pages/ViewDetails.aspx?src=TREATY&mtdsg_no=XXVII-7-a&chapter=27&clang=_en",
+    "file": "5484ebda532b2599.html",
+    "sha256": "fa462cf9457bcd0b2b532def91da58cf16eb402b42200988205ae356093c74a3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "UNTC status page XXVII-7-a, captured 2026-10-16; trimmed: __VIEWSTATE value and <script> bodies emptied (real page sha256 b12e28abaff1bfdb48f1376dfdddcb51845ecc41de3feee2549c3b51da44ddae, 202150 bytes); parse result identical"
+  },
+  {
+    "request_fingerprint": "ccf358935e9eb0e749e2bcd69ad1a640c763ce420b0e94398b11c2392877ebfb",
+    "url": "https://treaties.un.org/Pages/ViewDetails.aspx?src=TREATY&mtdsg_no=XXVII-7-d&chapter=27&clang=_en",
+    "file": "ccf358935e9eb0e7.html",
+    "sha256": "a5a3e58134786abf21357cf9d3aea0e6d9ea18e6beacc2d98281300fc7fcd11c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "UNTC status page XXVII-7-d, captured 2026-10-16; trimmed: __VIEWSTATE value and <script> bodies emptied (real page sha256 05b9015ee6f2b827c5622a923079622b1664324fdef8306c2056a44574c95066, 243991 bytes); parse result identical"
+  },
+  {
+    "request_fingerprint": "185d4b6edc6c5a2201bf0211305a22a90b45d2b62e55f494aed25667ceb60ae3",
+    "url": "https://www.un.org/en/about-us/terms-of-use",
+    "file": "185d4b6edc6c5a22.html",
+    "sha256": "2a1d5b3edc08803fc212324180ea51437e7095f625d528943a20a529c9cc3465",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (www.un.org/en/about-us/terms-of-use): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "UN Terms of Use page, captured 2026-10-16; trimmed to the terms text (real page sha256 7dfa046085d5462839dbb617d48756be11a0fd3cbfa75a39965c1003488cd6d6)"
+  }
+]

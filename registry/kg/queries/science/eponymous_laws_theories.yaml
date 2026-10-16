@@ -2,8 +2,10 @@ id: science.eponymous_laws_theories
 domain: science
 owner: KGSCIECO
 description: >-
-  Scientific laws, theories, theorems, effects, constants, units and equations -- direct instances of the
-  listed classes with at least 5 sitelinks. Most are named after a person (Ohm's law, Doppler effect,
+  Scientific laws, theories, theorems, effects, constants, units and equations -- direct instances (at least 5
+  sitelinks) of physical law Q214070, scientific law Q408891, gas law Q379231, scientific theory Q3239681,
+  physical phenomenon Q1293220, theorem Q65943, physical constant Q173227, equation Q11345, unit of
+  measurement Q47574, SI derived unit Q208469, SI base unit Q223662, conjecture Q319141. Most are named after a person (Ohm's law, Doppler effect,
   Kepler's laws, Fermat's Last Theorem, Avogadro constant, kelvin): the "named after" (P138) hop to the
   person arrives with the snapshot once P138 is allow-listed (requested); discoverer (P61), time of discovery
   (P575), "studied by" (P2579) and part of (P361) are kept already.
@@ -18,7 +20,7 @@ sparql: |
 split:
   by: values
   source: list
-  qids: [Q214070, Q408891, Q379231, Q3239681, Q1293220, Q65943, Q173227, Q11345, Q47574, Q319141]
-  chunk_size: 5
+  qids: [Q214070, Q408891, Q379231, Q3239681, Q1293220, Q65943, Q173227, Q11345, Q47574, Q208469, Q223662, Q319141]
+  chunk_size: 3
 max_rows: 15000
 expand_hops: 1

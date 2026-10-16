@@ -137,7 +137,10 @@ def test_constitute_list():
     body, sha = _fixture("atlas.constitute", "constitutions.json")
     rows = atlas_constitute.parse_list(body, sha, datetime(2026, 10, 15, 22, 5, tzinfo=UTC))
     frame, unmapped = _frame(rows, "constitute", "constitutions", [sha], "constitute")
-    assert {u["provider_geo"] for u in unmapped} == {"Baden", "Bavaria", "Germany_Prussia", "Taiwan"}
+    assert {u["provider_geo"] for u in unmapped} == {"Baden", "Bavaria", "Germany_Prussia"}
+    # crosswalk 1.1.0: provider "Taiwan" / "Republic of China" -> TWN; "China" stays CHN (no double mapping)
+    geo = dict(zip(frame["provider_geo"], frame["iso3"], strict=True))
+    assert geo["Taiwan"] == "TWN" and geo["China"] == "CHN"
     fra = {r["indicator"]: r for r in frame.filter(pl.col("iso3") == "FRA").to_dicts()}
     assert fra["in_force.year_enacted"]["value"] == "1958" and fra["in_force.id"]["value_text"].startswith("France_")
     assert fra["in_force.year_enacted"]["period_start"] == date(2026, 10, 15)
@@ -166,6 +169,15 @@ def test_ccp_chronology():
     assert "Soviet Union" in _flags(rus)["provider_continuity"]
     srb = frame.filter((pl.col("provider_geo") == "340|Serbia") & (pl.col("period_start") == date(2006, 1, 1)))
     assert srb.filter(pl.col("indicator") == "evnttype")["value_text"].to_list() == ["new"]
+
+
+def test_taiwan_maps_where_the_provider_labels_it_taiwan():
+    # crosswalk 1.1.0 added TWN; each provider's own Taiwan unit maps to it, its China unit stays CHN
+    assert country_iso3("713|Taiwan", "ccp") == "TWN"  # CCP COW 713 "Taiwan" (1949-2019)
+    assert country_iso3("710|China", "ccp") == "CHN"  # incl. the 1947 ROC constitution on the mainland
+    assert country_iso3("taiwan", "ssptw") == "TWN"  # SSPTW page "Taiwan (China)"
+    assert country_iso3("Taiwan", "constitute") == "TWN"  # "Taiwan (Republic of China) 1947 (rev. 2005)"
+    assert country_iso3("China", "constitute") == "CHN"
 
 
 def test_ccp_characteristics_codebook_transcription():

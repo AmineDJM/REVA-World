@@ -11,7 +11,7 @@ purpose: seed_entities
 entity_kind: treaty
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    ?item wdt:P31/wdt:P279* wd:Q131569 .
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279* wd:Q131569 ; wikibase:rank ?item_p31r . FILTER(?item_p31r != wikibase:DeprecatedRank)
     {{qid_filter}}
     { ?item wdt:P1891 [] . } UNION { ?item wikibase:sitelinks ?n . FILTER(?n >= 2) }
   }

@@ -1,0 +1,61 @@
+# Provider geography schemes of the security atlas tables (agent A-MILITARY). Every mapping is either the
+# provider's own ISO 3166 alpha-3 code (scheme base) or an alias quoting the provider's text with its raw
+# artifact; anything else stays unmapped (kept, listed in each table's manifest coverage.unmapped_provider_geo).
+#
+# SIPRI (Military Expenditure / Arms Transfers databases) is NOT ingested (SIPRI terms: reproduction of more than
+# 10 % of a data set needs SIPRI's written authorisation; docs/dev/v3_a_military.md), so no SIPRI country-name
+# alias list is kept here: names would have to be mapped without the data they belong to.
+schemes:
+  # UN Peace and Security Data Hub (api.psdata.un.org): DPO-UCHISTORICAL `isocode3`, DPPADPO-UCPre2010
+  # `Contributor_ISO-3` / `Mission_Country_ISO-3`, DataCommons-UCHISTORICAL / DataCommons-Fatalities `ISOCode3`
+  # (files retrieved 2026-10-16). All codes of the contribution files are crosswalk keys. The provider re-codes
+  # dissolved states with successor codes (RUS from 1990-11, CZE from 1990-11, SRB for Yugoslavia / FR Yugoslavia /
+  # Serbia and Montenegro) and uses YUG / SCG in the fatalities: the connector
+  # (src/reva/adapters/connectors/atlas_peacekeeping.py, HISTORICAL_WINDOWS) keeps rows dated before the
+  # successor existed unmapped, with the predecessor's QID from registry/entities/historical_states_qids.json
+  # (Q15180 Soviet Union until 1991-12-26, Q33946 Czechoslovakia until 1992-12-31, Q36704 Yugoslavia until
+  # 1992-04-26, Q838261 FR Yugoslavia until 2003-02-03, Q37024 Serbia and Montenegro until 2006-06-04).
+  # Unmapped (not crosswalk keys): YUG, SCG, blank codes ("ZZ [Undetermined]", "Occupied Palestinian Territory"
+  # rows of DataCommons-Fatalities carry no ISO code; not guessed).
+  unpk:
+    base: iso3
+    aliases: {}
+    source:
+      kind: provider_data
+      url: https://api.psdata.un.org/public/data/DPO-UCHISTORICAL/csv
+      raw_sha256: a3174ccab744a3b3e7c4c37880ee848c58123275071b2f5d1a670b6412754646
+      retrieved_at: "2026-10-16T00:16:09Z"
+  # Mission location text of the Hub's Field Missions Dashboard (DPPA-FieldMissions-Missions, column `location`,
+  # retrieved 2026-10-16, https://api.psdata.un.org/public/data/DPPA-FieldMissions-Missions/csv). Used only for
+  # KG statements `unpk:mission_country` (where the mission operates, as reported). Each alias quotes the
+  # provider's value; the crosswalk entity is the one with that name.
+  # Not mapped (not a single crosswalk country, or not a country): "Golan Heights" (UNDOF), "Abyei" (UNISFA),
+  # "India / Pakistan" (UNMOGIP), "Middle East" (UNTSO), "Central Africa" (UNOCA), "West Africa" (UNOWAS),
+  # "Central Asia" (UNRCCA).
+  unpk_location:
+    base: null
+    aliases:
+      - {code: "Haiti", iso3: HTI, source: "location 'Haiti' (BINUH, MINUJUSTH)"}
+      - {code: "Western Sahara", iso3: ESH, source: "location 'Western Sahara' (MINURSO)"}
+      - {code: "CAR", iso3: CAF, source: "location 'CAR' (MINUSCA, mission_name 'UN Multidimensional Integrated Stabilization Mission in the Central African Republic')"}
+      - {code: "DRC", iso3: COD, source: "location 'DRC' (MONUSCO, mission_name 'UN Organization Stabilization Mission in the Democratic Republic of the Congo')"}
+      - {code: "Colombia", iso3: COL, source: "location 'Colombia' (UN Verification Mission in Colombia)"}
+      - {code: "Afghanistan", iso3: AFG, source: "location 'Afghanistan' (UNAMA)"}
+      - {code: "Iraq", iso3: IRQ, source: "location 'Iraq' (UNAMI)"}
+      - {code: "Cyprus", iso3: CYP, source: "location 'Cyprus' (UNFICYP)"}
+      - {code: "Lebanon", iso3: LBN, source: "location 'Lebanon' (UNIFIL, UNSCOL)"}
+      - {code: "Yemen", iso3: YEM, source: "location 'Yemen' (UNMHA)"}
+      - {code: "Kosovo", iso3: XKX, source: "location 'Kosovo' (UNMIK)"}
+      - {code: "South Sudan", iso3: SSD, source: "location 'South Sudan' (UNMISS)"}
+      - {code: "Libya", iso3: LBY, source: "location 'Libya' (UNSMIL)"}
+      - {code: "Somalia", iso3: SOM, source: "location 'Somalia' (UNTMIS, UNSOM)"}
+      - {code: "Mali", iso3: MLI, source: "location 'Mali' (MINUSMA)"}
+      - {code: "Sudan / Darfur", iso3: SDN, source: "location 'Sudan / Darfur' (UNAMID): Darfur is a region of Sudan"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "location 'Guinea-Bissau' (UNIOGBIS)"}
+      - {code: "Liberia", iso3: LBR, source: "location 'Liberia' (UNMIL)"}
+      - {code: "Cote d'Ivore", iso3: CIV, source: "location \"Cote d'Ivore\" (sic, UNOCI): Côte d'Ivoire"}
+    source:
+      kind: provider_data
+      url: https://api.psdata.un.org/public/data/DPPA-FieldMissions-Missions/csv
+      raw_sha256: 85d16b416fb554bc233bf706f57cbc8b2ea2abd93d3c97dd4603d091dd16e1e1
+      retrieved_at: "2026-10-16T00:20:00Z"

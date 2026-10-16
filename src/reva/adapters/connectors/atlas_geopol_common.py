@@ -152,6 +152,21 @@ _p(
 # UCDP uses GW codes but keeps 345 ("Serbia (Yugoslavia)") for Serbia after 2006 instead of GW 340
 # (UCDP Country-Year Dataset 26.1 rows 2006-2025 for country_id 345).
 _p(("ucdp",), 345, date(2006, 6, 5), _FUTURE, "SRB", "Serbia", "UCDP keeps GW 345 for Serbia after 2006")
+# Taiwan: crosswalk entity TWN since crosswalk 1.1.0 (ISO 3166-1). COW State System 2024 (statelist2024.csv,
+# States2024.zip sha256 c11689e8c0aa70ede855f6b605c4dd71c7b04122b71d5827dab5ba06b32e2015): "TAW,713,Taiwan,1949,12,8,
+# 2024,12,31"; the countrycode panel gives cown/gwn 713 -> TWN for 1949-2020. Before 1949-12-08 there is no window:
+# the code then denotes the Republic of China government on the mainland (Voeten's UNGA data codes the China seat
+# 1946-1971 as 713 "Taiwan, Province of China"), so 1946-1949 rows keep iso3 null (historical entry Q865, flagged)
+# and are never read as TWN. Agent TWNMAP decision, maintainer review pending.
+_p(
+    _BOTH,
+    713,
+    date(1949, 12, 8),
+    _FUTURE,
+    "TWN",
+    "Taiwan",
+    "COW State System 2024: 713 Taiwan from 1949-12-08; TWN crosswalk entity since crosswalk 1.1.0",
+)
 _p(("gw",), 751, _OPEN, _FUTURE, None, "Hyderabad", "princely state, independent 1947-1948 (GW 751)")
 _p(("gw",), 396, _OPEN, _FUTURE, None, "Abkhazia", "GW microstates list; not a crosswalk entity")
 _p(("gw",), 397, _OPEN, _FUTURE, None, "South Ossetia", "GW microstates list; not a crosswalk entity")
@@ -251,9 +266,19 @@ class StateCodeCrosswalk:
             for start, end, iso3, label, _note in STATE_CODE_POLICY.get((sys_, code), []):
                 if window is None and start <= when <= end:
                     window = (iso3, label)
-        if window is not None and window[0] is not None:
-            return CodeResolution(system, code, self._known(window[0]), window[1], "policy")
         use_hist = system == "cow" or code in GW_SHARES_COW_HISTORICAL
+        if window is not None and window[0] is not None:
+            # a current entity that historical_states_qids.json lists as "non_crosswalk_current_entity" (COW 713
+            # Taiwan, Q865, listed before TWN joined the crosswalk) keeps its verified QID next to the iso3
+            q = next(
+                (
+                    h["qid"]
+                    for h in (self.historical if use_hist else ())
+                    if h["code"] == code and h.get("kind") == "non_crosswalk_current_entity"
+                ),
+                None,
+            )
+            return CodeResolution(system, code, self._known(window[0]), window[1], "policy", q)
         for h in self.historical if use_hist else ():
             if (
                 h["code"] == code
@@ -309,6 +334,7 @@ def load_historical_qids(system: str | None = None) -> list[dict[str, Any]]:
                 "to": e.get("valid_to_year"),
                 "qid": e["qid"],
                 "label": e.get("wikidata_label_en") or e.get("provider_label"),
+                "kind": e.get("kind"),
             }
         )
     return out

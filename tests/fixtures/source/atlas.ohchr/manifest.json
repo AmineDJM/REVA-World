@@ -1,0 +1,262 @@
+[
+  {
+    "request_fingerprint": "99e143d2e20d17f88a32cecb5e78f0c7458c31f16a0eb0166a613c8a92f8ccf4",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountries",
+    "file": "99e143d2e20d17f8.json",
+    "sha256": "d5e7e986c46e31190c6ecca5762f2fdb34ed6b390429c72116e25f62a941af77",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountries 2026-10-16 trimmed to ['AFG', 'BRA', 'CHN', 'CZE', 'ERU', 'FRA', 'IND', 'PLS', 'PRK', 'RUS', 'TUV', 'USA'] (real body sha256 e46ea95d4e60c93c0741175dfda5d03a72c8eb513928072c53add476001988ea)"
+  },
+  {
+    "request_fingerprint": "1915395a1fa6d26c18aa263ffb0f80cbe3ac139bc93ef5326c4a21cbe7a4ebef",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetRatifications",
+    "file": "1915395a1fa6d26c.json",
+    "sha256": "b7189b89f930ed3a16a58b522293a3d229ef620bdfab24fe15c75c4f0b3ac454",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetRatifications 2026-10-16 (complete)"
+  },
+  {
+    "request_fingerprint": "fff2e9e281cdeade30858fb88d707ac93825939af2a83ea34535f4332927fe68",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=1",
+    "file": "fff2e9e281cdeade.json",
+    "sha256": "680a93518452d617478187f2c3b4bb06c0c9eceb31cd93305aa3c01967bb986b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 1 (CAT) 2026-10-16 trimmed to the fixture countries (real body sha256 440f1b904a9a53e4601dc7e36f16c2d69a13764b241bbac2e16de4e25d1a319f, 342633 bytes)"
+  },
+  {
+    "request_fingerprint": "0be445539a3a89673ade7a6f91356b913fce7d20c79742fa38d39d33b04392b6",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=2",
+    "file": "0be445539a3a8967.json",
+    "sha256": "b326e1f56f8d6b6d348d31198632c1221c8304e15feaeff156884bcd8be8f860",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 2 (OP-CAT) 2026-10-16 trimmed to the fixture countries (real body sha256 dcaea24b41a7a997b1675e870a0fb999901336aa51a024473065556c69c0ef7f, 56676 bytes)"
+  },
+  {
+    "request_fingerprint": "97e1c85051d6b2e950a35fb4693dc527d06cf99acd21d8e1e1b5e06786d415ca",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=3",
+    "file": "97e1c85051d6b2e9.json",
+    "sha256": "37aed2ad95c1d62b055ed3253b1bf2fbfc7afbac05507eacae2d72a6013256f2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 3 (ICCPR) 2026-10-16 trimmed to the fixture countries (real body sha256 3921b426bbad963d327d412f745d6be4c85759b035475410ff6a9205e9ac7845, 717546 bytes)"
+  },
+  {
+    "request_fingerprint": "407293a1ce1e27dbdd258e6e923133d2cdde6a853490af6b75a5bd339b3a5e2d",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=4",
+    "file": "407293a1ce1e27db.json",
+    "sha256": "92d75310523a6bab98d89a180ecc75546bbe6a30178664e7983da4ad1edc5472",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 4 (ICCPR-OP1) 2026-10-16 trimmed to the fixture countries (real body sha256 10c651a4a4e8e1fe623aeece4b4edbdfd2bcc6b65b150977f0e36ddc15a70a5e, 112371 bytes)"
+  },
+  {
+    "request_fingerprint": "cf0462109fd426cdfabccf9e7668599a45322597a016d54d2de68a1b02680b18",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=5",
+    "file": "cf0462109fd426cd.json",
+    "sha256": "8447cac86514c6951349087716f413500a5c1d3537186acc5225644eb9d81e8c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 5 (ICCPR-OP2) 2026-10-16 trimmed to the fixture countries (real body sha256 112ba027e3232ec821a65127dbdc7f17d258d764c44cab379bffd233be54fb1f, 78498 bytes)"
+  },
+  {
+    "request_fingerprint": "d7ed74a6bd22d44a29d39ad03b27b4ac150b95f7b7c737e246e2b9c512ca6cd4",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=6",
+    "file": "d7ed74a6bd22d44a.json",
+    "sha256": "ad57b298f9f8ae62f676ca063f07ef365fe57d3041aac5c2c61a34508e93bfea",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 6 (CPED) 2026-10-16 trimmed to the fixture countries (real body sha256 433dae439c6822eaf67644a5ffa4ae2d95694ec7fd69facba69c40f02dfb4e5e, 93681 bytes)"
+  },
+  {
+    "request_fingerprint": "4f61a7de03514b7fc349fa2685deac2644cb949fd6a62d14dbd7ef4e69a0fda6",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=7",
+    "file": "4f61a7de03514b7f.json",
+    "sha256": "9d1985649e80c1a29c1cb05349f50173d9e0fcf997e912073c67c8af32a857ae",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 7 (CEDAW) 2026-10-16 trimmed to the fixture countries (real body sha256 db41bbe7b74bdb087e866e0f931e93f86a0f5773739b722275278fad1767145b, 529330 bytes)"
+  },
+  {
+    "request_fingerprint": "751686fa57dfec8a1d413c6485129751de3e296433a71aaf59fb0143047c3c9d",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=8",
+    "file": "751686fa57dfec8a.json",
+    "sha256": "1c36a2939d9a9ab98ac3b34d18f61ffd6f51e4c77785ee29e31867b885d559a3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 8 (OP-CEDAW) 2026-10-16 trimmed to the fixture countries (real body sha256 768a423d70010427d197feba62627ccf7b92a32932bbdee69617e1b6c02aa887, 66228 bytes)"
+  },
+  {
+    "request_fingerprint": "d0fb6d321686d6e41f731c5e8be0bce7d9c3399656ff1e384cf988a3e1949841",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=9",
+    "file": "d0fb6d321686d6e4.json",
+    "sha256": "cd60fa27338bdc6e599fac094b54c2321f62ed43d6924866e0fee22eb4fdfe32",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 9 (ICERD) 2026-10-16 trimmed to the fixture countries (real body sha256 88a5147a8f596502c38ce3e52f86b825d448d6852c87479998e5b6fc1bd2bae5, 243420 bytes)"
+  },
+  {
+    "request_fingerprint": "f1979e10ffccb540c9f10c86503e23c7a6f2e158feb9529b207f146c30f33582",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=10",
+    "file": "f1979e10ffccb540.json",
+    "sha256": "418d6a5cf1d8984cdd5052fbfa04bc94ca9495096547966069cb9b4ffff6ab20",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 10 (ICESCR) 2026-10-16 trimmed to the fixture countries (real body sha256 aa2fb5c89dfcfa91904a66fda04bf517d2a3a4bdfdf8eaa93e23e80f1ba45d03, 237657 bytes)"
+  },
+  {
+    "request_fingerprint": "e5fb55193c8bc9c5bbf353632b5379079f61dad7dd0d8610a4f80c4af114d501",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=11",
+    "file": "e5fb55193c8bc9c5.json",
+    "sha256": "205ab41bb71316fe1d077fb3cfcd0c73cba21960510c5f930395cccd9c4ed9ae",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 11 (CESCR-OP) 2026-10-16 trimmed to the fixture countries (real body sha256 a76fbf7283b0f3261000950f98ae1b6673928357d3a363bb0808310c06e69502, 31140 bytes)"
+  },
+  {
+    "request_fingerprint": "b60cd7b4905f852d6f696e3cb8243b1a896c137e7d05d5382c97f910ab75b434",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=12",
+    "file": "b60cd7b4905f852d.json",
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 12 (ICRMW) 2026-10-16 trimmed to the fixture countries (real body sha256 8afa2cba38ea986bd081dd466a9da8ee1da2b4c008f85a5016f58cb422d69e99, 48469 bytes)"
+  },
+  {
+    "request_fingerprint": "1be0cd3e905c9c834b7dfe84bbc84a9c922a4783c1cc2efd2d3b955c35d75fad",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=13",
+    "file": "1be0cd3e905c9c83.json",
+    "sha256": "945647e03acc202dfeeebb30440854595e67e4c644f0d3aa187bef3d1ef5cb13",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 13 (CRC) 2026-10-16 trimmed to the fixture countries (real body sha256 07265a52cba056d551a97a8f88d77b76b8f6436e7eaba3d11aaf72657e53e50c, 247425 bytes)"
+  },
+  {
+    "request_fingerprint": "41f524319af6fff1b137a55711ad71802b913af7926059f33d97a89dcbfbf652",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=14",
+    "file": "41f524319af6fff1.json",
+    "sha256": "f9b9dfe6c7c04e612f3c8c11fa20d2a5d1e4ff477cc758a6ac84623fae4f6d50",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 14 (OP-CRC-AC) 2026-10-16 trimmed to the fixture countries (real body sha256 c6ed4f34ea915d970c78bac09b101870219e69ff96155f6ff1b60ef8e0ebe913, 260589 bytes)"
+  },
+  {
+    "request_fingerprint": "04553e00c6b8e2e2370fb80acc2eba85da64ed5225b7388fc725740a089fdb97",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=15",
+    "file": "04553e00c6b8e2e2.json",
+    "sha256": "9e8125dff85659c95e4b53debd573301bff87d7ccb0c92f869f516a524fe5299",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 15 (OP-CRC-SC) 2026-10-16 trimmed to the fixture countries (real body sha256 a89987ab1c172f9b6eb2ce486786295d6a929a1a49823221b04a903286fa7307, 123503 bytes)"
+  },
+  {
+    "request_fingerprint": "495c031d02349d3c76600db33c06b63317baabd83ca240138c07432de47bafcf",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=16",
+    "file": "495c031d02349d3c.json",
+    "sha256": "e2bf6635fe3fc6714ffef6304403ed6211ddaed061adff6ebe271a4d02898282",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 16 (CRC-OP-IC) 2026-10-16 trimmed to the fixture countries (real body sha256 efdf13890eeca620e313ab247f0dc5734f62f2cb444876d1d14d4dc39b497a72, 37381 bytes)"
+  },
+  {
+    "request_fingerprint": "8bb8950a07ca3fe4ec2b2a8b809009fa0da6f1e86c44b4e92d66c5845946c0a4",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=17",
+    "file": "8bb8950a07ca3fe4.json",
+    "sha256": "e1871edac738e37ebe7b85e7f541f4fd93545183c92e42ead87e6aebc1dc9455",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 17 (CRPD) 2026-10-16 trimmed to the fixture countries (real body sha256 568940210bf983d172961253838ec01f55237bfee5eb72da1ed1586c969de70d, 256057 bytes)"
+  },
+  {
+    "request_fingerprint": "4f64989613acef734c782b379f7c716b7749a07e04e2d291fc0e012c65683589",
+    "url": "https://indicators.ohchr.org/webapi/dashboarddata/GetCountriesForRatification?ratificationId=18",
+    "file": "4f64989613acef73.json",
+    "sha256": "306526e6285b419b617f312a9632d59fa80b2691b3d21944fbe0accf1d42badd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T00:12:00+00:00",
+    "licence": "UN Terms of Use (OHCHR is part of the UN Secretariat): personal, non-commercial use; no redistribution or derivative compilations without permission -- not an open licence",
+    "note": "GetCountriesForRatification 18 (CRPD-OP) 2026-10-16 trimmed to the fixture countries (real body sha256 31304a8f9dcd076176ed6e243c6e2bf06e8ac9a4f136827cc6aaed00207bf45d, 69653 bytes)"
+  }
+]

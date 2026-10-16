@@ -1,0 +1,22 @@
+# V3 (agent GAPHUNT): Insee Banque de données macroéconomiques (BDM), SDMX 2.1 web service.
+# Atlas connector: src/reva/adapters/connectors/atlas_gap_insee.py (atlas.gap_insee -> insee.ipc_dom, insee.smic_dom).
+source_key: insee.bdm
+title: "Insee - Banque de données macroéconomiques (BDM), SDMX web service"
+provider_url: https://www.insee.fr/fr/information/2868055
+lineage_family: insee
+rights:
+  licence: "Licence Ouverte / Open Licence 2.0 (Etalab)"
+  licence_url: https://www.insee.fr/fr/information/2008466
+  attribution: "Source : Insee (with the date of last update)"
+  provider_statement: >-
+    Insee legal notice: "Sauf mention contraire, les informations publiques diffusées sur ce site (données, bases
+    de données, publications, fichiers téléchargeables) sont mises à disposition sous la Licence Ouverte / Open
+    Licence version 2.0 (Etalab)" (read via search 2026-10-16).
+metadata:
+  allowed_hosts: [bdm.insee.fr]
+  endpoints:
+    data: "https://bdm.insee.fr/series/sdmx/data/<DATAFLOW>/<key>"
+    series: "https://bdm.insee.fr/series/sdmx/data/SERIES_BDM/<idbank>+<idbank>"
+  authentication: none
+  cadence: monthly (CPI, Smic)
+  coverage: "French overseas departments Guadeloupe, Martinique, Guyane, La Réunion, Mayotte (REF_AREA D971-D974, D976)"

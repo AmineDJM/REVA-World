@@ -121,7 +121,7 @@ FLOWS: tuple[Flow, ...] = (
         area_dim="REF_AREA",
         fold=("MEASURE", "UNIT_MEASURE", "HOUSEHOLD_TYPE", "INCOME_PRINCIPAL", "INCOME_SPOUSE"),
         keys=("{areas}......",),
-        fixture_keys=("FRA+CHL+OECD_REP.AV_TW+AV_ITR+GEBT..S_C0+C_C2.AW100..A",),
+        fixture_keys=("FRA+CHL+OECD_REP.AV_TW+GEBT..S_C0.AW100..A",),
         attrs=("CIVIL_STATUS",),
     ),
     Flow(
@@ -180,8 +180,13 @@ FLOWS: tuple[Flow, ...] = (
 FLOWS_BY_DATASET = {f.dataset: f for f in FLOWS}
 
 
-def flow_url(flow: Flow, key: str, areas: Sequence[str] = ()) -> str:
-    return f"{BASE}/{flow.agency},{flow.flow},/{key.format(areas='+'.join(areas))}?format=csvfilewithlabels"
+#: recorded offline fixtures: restricted keys and periods (small real responses)
+FIXTURE_START = "2016"
+
+
+def flow_url(flow: Flow, key: str, areas: Sequence[str] = (), start: str | None = None) -> str:
+    url = f"{BASE}/{flow.agency},{flow.flow},/{key.format(areas='+'.join(areas))}?format=csvfilewithlabels"
+    return f"{url}&startPeriod={start}" if start else url
 
 
 def oecd_requests(flow: Flow, fixture: bool) -> list[Request]:
@@ -189,7 +194,7 @@ def oecd_requests(flow: Flow, fixture: bool) -> list[Request]:
     return [
         Request(
             key=f"data:{flow.flow}:{i}",
-            url=flow_url(flow, k),
+            url=flow_url(flow, k, start=FIXTURE_START if fixture else None),
             label=f"{flow.flow}.{i}.csv",
             media_types=MEDIA,
             max_bytes=flow.max_bytes,

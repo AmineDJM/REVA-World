@@ -577,7 +577,7 @@ def _literal(v: Any) -> str | None:
         try:
             v = json.loads(v) if v.startswith("{") else v
         except ValueError:
-            return v
+            return str(v)
         if isinstance(v, str):
             return v
     if isinstance(v, Mapping):

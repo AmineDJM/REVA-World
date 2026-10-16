@@ -1,0 +1,234 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="description" content="Jonathan McDowell's new homepage">
+<meta name="keywords" content="Jonathan, McDowell, space, astronomy, Chandra">
+<title>Jonathan's Space Report | GCAT</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<header>
+<H1>GCAT: General Catalog of Artificial Space Objects</H1>
+<H3>Jonathan C. McDowell</H3>
+<H2> Introduction  </H2>
+</header>
+<section style="font-size: 20px">
+<nav style="width:30%;">
+<UL id="navul">
+<LI><A HREF="https://planet4589.org/index.html">Back to Site Home</A>
+<LI><A HREF="https://planet4589.org/space/index.html">Back to Astronautics Home</A>
+<LI><A HREF="index.html">Introduction</A>
+<LI><A HREF="web/rel.html">Release Notes</A>
+<LI><A HREF="web/intro/index.html">I. Definitions and Conventions</A>
+<UL>
+<LI><A HREF="web/intro/vague.html">Time Representations and Vague Date Format</A>
+<LI><A HREF="web/intro/space.html">Space and Orbit</A>
+<LI><A HREF="web/intro/frames.html">Orbital Parameters and Coordinate Frames</A>
+<LI><A HREF="web/intro/jcat.html">JCAT catalog identifiers</A>
+<LI><A HREF="web/intro/desig.html">Launch and Piece Designations</A>
+<LI><A HREF="web/intro/type.html">SatType scheme</A>
+<LI><A HREF="web/intro/phases.html">Phases and Status values</A>
+<LI><A HREF="web/intro/success.html">Launch Success Fractions</A>
+<LI><A HREF="web/intro/orbits.html">Orbit Category values</A>
+<LI><A HREF="web/intro/u.html">Uncataloged ('U') Launches</A>
+<LI><A HREF="web/intro/analyst.html">Space Force 'Analyst' Objects</A>
+<LI><A HREF="web/intro/nom.html">Nomenclature Codes</A>
+<LI><A HREF="web/intro/service.html">Launch Service Codes</A>
+<LI><A HREF="web/intro/profile.html">Launch Profile Codes</A>
+</UL>
+<LI><A HREF="web/orgs/index.html">II: Organizations Database</A>
+<UL>
+ <LI>Orgs File: <A HREF="data/tables/orgs.html">Text</A> and <A HREF="tsv/tables/orgs.tsv">TSV</A>
+</UL>
+<LI><A HREF="web/sites/index.html">III: Launch Origins Database</A>
+<UL>
+ <LI>Sites File: <A HREF="data/tables/sites.html">Text</A> and <A HREF="tsv/tables/sites.tsv">TSV</A>
+ <LI>Launch Points File: <A HREF="data/tables/lp.html">Text</A> and <A HREF="tsv/tables/lp.tsv">TSV</A>
+</UL>
+<LI><A HREF="web/platforms/index.html">IV: Launch Platforms</A>
+<UL>
+ <LI>Platforms File: <A HREF="data/tables/platforms.html">Text</A> and <A HREF="tsv/tables/platforms.tsv">TSV</A>
+</UL>
+<LI><A HREF="web/lvs/index.html">V: Launch Vehicles</A>
+<LI><A HREF="web/launch/index.html">VI: Launch Lists</A>
+ <UL>
+  <LI>Data: <A HREF="web/launch/ldir.html">By family</A>  and <A HREF="tsv/launch/ldir.html">(TSV)</A>
+  <LI>Data: <A HREF="web/launch/ldes.html">By designation</A>
+  <LI>Data: <A HREF="tsv/launch/launch.tsv">Full list (TSV)</A>
+  <LI>Data: <A HREF="data/launches.tar.gz">By family (tar.gz)</A> <A HREF="data/tables.tar.gz">Supporting files (tar.gz)</A>
+ </UL>
+<LI><A HREF="web/worlds/index.html">VII: Worlds in the Solar System</A>
+ <UL>
+  <LI>Worlds Data: <A HREF="data/worlds/worlds.html">Text</A>  and <A HREF="tsv/worlds/worlds.tsv">TSV</A>
+  <LI>Spin Data: <A HREF="data/worlds/spin.html">Text</A>  and <A HREF="tsv/worlds/spin.tsv">TSV</A>
+ </UL>
+<LI><A HREF="web/cat/index.html">VIII: Object Catalogs</A>
+ <UL>
+  <LI>Documentation
+  <UL>
+  <LI><A HREF ="web/cat/index.html">Overview</A>
+  <LI><A HREF ="web/cat/cats.html">Object and payload catalog general description</A>
+  <LI><A HREF ="web/cat/cols.html">Object catalog column descriptions</A>
+  <LI><A HREF ="web/cat/pcols.html">Payload catalog column descriptions</A>
+  <LI><A HREF ="web/cat/del.html">List of deleted catalog entries</A>
+  </UL>
+  <LI>Main catalogs
+   <UL>
+   <LI>satcat (Standard)  <A HREF="data/cat/satcat.html">Text</A>  and <A HREF="tsv/cat/satcat.tsv">TSV</A>
+   <LI>auxcat (Auxiliary) <A HREF="data/cat/auxcat.html">Text</A>  and <A HREF="tsv/cat/auxcat.tsv">TSV</A>
+   <LI>ftocat (Failed to orbit) <A HREF="data/cat/ftocat.html">Text</A>  and <A HREF="tsv/cat/ftocat.tsv">TSV</A>
+   <LI>satcat100k (Extended)  <A HREF="data/cat/satcat100k.html">Text</A>  and <A HREF="tsv/cat/satcat100k.tsv">TSV</A>
+   </UL>
+  <LI> Temporary catalogs
+   <UL>
+   <LI> tmpcat (Temporary)  <A HREF="data/cat/tmpcat.html">Text</A>  and <A HREF="tsv/cat/tmpcat.tsv">TSV</A>
+   <LI> csocat (Complementary) <A HREF="data/cat/csocat.html">Text</A>  and <A HREF="tsv/cat/csocat.tsv">TSV</A>
+   <LI> satcat070k (Analyst 70000) <A HREF="data/cat/satcat070k.html">Text</A>  and <A HREF="tsv/cat/satcat070k.tsv">TSV</A>
+   <LI> satcat270k (Analyst 270000) <A HREF="data/cat/satcat270k.html">Text</A>  and <A HREF="tsv/cat/satcat270k.tsv">TSV</A>
+   <LI> satcat700M (Analyst 700M) <A HREF="data/cat/satcat700M.html">Text</A>  and <A HREF="tsv/cat/satcat700M.tsv">TSV</A>
+   <LI> vimcat (ISON VIMPEL) <A HREF="data/cat/vimcat.html">Text</A>  and <A HREF="tsv/cat/vimcat.tsv">TSV</A>
+   </UL>
+  <LI> Supporting catalogs
+   <UL>
+   <LI> lcat (Endoatmospheric/Low)  <A HREF="data/cat/lcat.html">Text</A>  and <A HREF="tsv/cat/lcat.tsv">TSV</A>
+   <LI> rcat (Suborbital/Rockets) <A HREF="data/cat/rcat.html">Text</A>  and <A HREF="tsv/cat/rcat.tsv">TSV</A>
+   </UL>
+  <LI> Event catalogs
+   <UL>
+   <LI> ecat (Events)  <A HREF="data/cat/ecat.html">Text</A>  and <A HREF="tsv/cat/ecat.tsv">TSV</A>
+   <LI> deepcat (Deep Space) <A HREF="data/cat/deepcat.html">Text</A>  and <A HREF="tsv/cat/deepcat.tsv">TSV</A>
+   <LI> deepcat to satcat/auxcat crossindex <A HREF="data/cat/deepindex.html">Text</A>  and <A HREF="tsv/cat/deepindex.tsv">TSV</A>
+   <LI> hcocat (Heliocentric Register) <A HREF="data/cat/hcocat.html">Text</A>  and <A HREF="tsv/cat/hcocat.tsv">TSV</A>
+   <LI> lprcat (Lunar and Planetary Register) <A HREF="data/cat/lprcat.html">Text</A>  and <A HREF="tsv/cat/lprcat.tsv">TSV</A>
+   <LI> landercat (Lunar and Planetary landings and impacts) <A HREF="web/cat/landercols.html">Docs,</A>,  Data: <A HREF="data/cat/landercat.html">Text</A>  and <A HREF="tsv/cat/landercat.tsv">TSV</A>
+   </UL>
+  <LI>Payload catalogs
+   <UL>
+   <LI> psatcat (Standard, Payloads)  <A HREF="data/cat/psatcat.html">Text</A>  and <A HREF="tsv/cat/psatcat.tsv">TSV</A>
+   <LI> pauxcat (Auxiliary, Payloads)  <A HREF="data/cat/pauxcat.html">Text</A>  and <A HREF="tsv/cat/pauxcat.tsv">TSV</A>
+   <LI> pftocat (Failed to orbit, Payloads)  <A HREF="data/cat/pftocat.html">Text</A>  and <A HREF="tsv/cat/pftocat.tsv">TSV</A>
+   <LI> psatcat100k (Extended, Payloads)  <A HREF="data/cat/psatcat100k.html">Text</A>  and <A HREF="tsv/cat/psatcat100k.tsv">TSV</A>
+   <LI> ptmpcat (Temporary, Payloads)  <A HREF="data/cat/ptmpcat.html">Text</A>  and <A HREF="tsv/cat/ptmpcat.tsv">TSV</A>
+   <LI> plcat (Low, Payloads)  <A HREF="data/cat/plcat.html">Text</A>  and <A HREF="tsv/cat/plcat.tsv">TSV</A>
+   <LI> prcat (Suborb, Payloads)  <A HREF="data/cat/prcat.html">Text</A>  and <A HREF="tsv/cat/prcat.tsv">TSV</A>
+   <LI> pdeepcat (Deep, Payloads)  <A HREF="data/cat/pdeepcat.html">Text</A>  and <A HREF="xtsv/cat/pdeepcat.tsv">TSV</A>
+   </UL>
+  <LI>usatcat (List of Unicode satellite names) <A HREF="data/cat/usatcat.html">Text</A> and <A HREF="tsv/cat/usatcat.tsv">TSV</A>
+  <LI>Derived catalogs
+  <UL>
+  <LI>Current Catalog (Summary of current space object catalog):  <A HREF ="web/cat/curcols.html">Column descriptions</A>;  <A HREF="data/derived/currentcat.html">Data (Text)</A> and <A HREF="tsv/derived/currentcat.tsv">Data (TSV)</A>
+  <LI>Orbital Launch Log (orbital launches and payloads)  - <A HREF ="web/cat/llog.html">Column descriptions</A>;    <A HREF="data/derived/launchlog.html">Data (Text)</A> and <A HREF="tsv/derived/launchlog.tsv">Data (TSV)</A>
+  <LI>Geosync Catalog -  <A HREF ="web/cat/geocat.html">Column descriptions</A>;   <A HREF="data/derived/geotab.html">Data (Text)</A> and <A HREF="tsv/derived/geotab.tsv">Data (TSV)</A>
+  <LI>Active Catalog -  <A HREF ="web/cat/active.html">Column descriptions</A>;   <A HREF="data/derived/active.html">Data (Text)</A> and <A HREF="tsv/derived/active.tsv">Data (TSV)</A>
+  </UL>
+  <LI>All catalogs <A HREF="data/cats.tar.gz">(tar.gz)</A>
+ </UL>
+<LI><A HREF="web/intro/ack.html">Acknowledgements</A>
+<LI><A HREF="pdf/doc.pdf">Documentation (PDF)</A> || <A HREF="pdf/cats.p1.pdf">Catalogs (left pages) (PDF)</A>  || <A HREF="pdf/cats.p2.pdf">Catalogs (right pages) (PDF)</A>
+</UL>
+</UL>
+</nav>
+<div class="core">
+<P><BR>
+GCAT Release 1.8.8  (2026 Sep  3) | Data Update 2026 Oct 15
+<P><BR>
+<B>NOTE: Space Force catalog numbers above 100000 are in the file </B>
+<A HREF="https://planet4589.org/space/gcat/data/cat/satcat100k.html">satcat100k.html</A>
+<P><BR>
+The General Catalog of Artificial Space Objects (GCAT) makes public the full satellite database that
+underlies
+<A HREF="https://planet4589.org/jsr.html">Jonathan's Space Report</A>
+<P><BR>
+The diagram below indicates the general structure of the database, which reflects
+the data model of the information it describes.
+<P><BR>
+An artificial space
+<B>object </B>
+(for short, in future simply `object')  a satellite or spacecraft (active payload, rocket stage, discarded component,
+piece of debris) outside the Earth's lower atmosphere. At a given time it can be in one of the following
+<B>object states:</B>
+<UL>
+<LI> Attached to another object
+<LI> In free flight in the gravitational field of a
+<B>world</B>
+or astronomical
+<B>body</B>
+<LI> On the surface of an astronomical body
+<LI> Destroyed (in a collision, explosion or by burnup in atmospheric entry).
+</UL>
+Each time the object transitions to another state (undocks, is attached to something, reenters,
+changes which body it is orbiting, etc.) marks the beginning or end of a
+<B>phase.</B>
+Most objects in GCAT have only a single phase - they separate from an object (launch vehicle) and
+then are either still in free flight or have reentered. However, some objects go through many phases.
+<P><BR>
+The main object catalogs define and list the first phase of each object.
+Objects with more than one phase have their subsequent phases listed as entries in the event object catalogs.
+A subset of objects are considered
+<B>payloads</B>
+and have additional data in the payload catalogs.
+<P><BR>
+Each object (with rare exceptions) is associated with a single
+<B>launch, </B>
+described in the launch lists.
+Each launch may be associated with many objects. The launch lists are the same as those in the already-published LVDB.
+<P><BR>
+Each launch is associated with a
+<B>launch vehicle </B>
+and a
+<B>launch origin </B>
+(generalization of launch site), and both
+launches and objects are associated with
+<B>organizations</B>
+of several kinds (countries, owners, manufacturers).
+These associations are expressed by strings which link the launch and object catalogs with the supporting tables.
+<P><BR>
+<A HREF="images/./models/map1.jpg"><IMG WIDTH=600 SRC="images/./models/map1.jpg"></A>
+<A HREF="images/./models/map2a.jpg"><IMG WIDTH=600 SRC="images/./models/map2a.jpg"></A>
+<P><BR>
+Figure: (1) Overall structure of GCAT.  (2) Detailed structure of the object catalogs.
+<P><BR>
+The supporting tables and the launch lists were published as GCAT release 1.0.2 in Aug 2020. Pre-release versions have been public
+for a decade as part of the
+<A HREF="https://planet4589.org/space/lvdb/index.html">Launch Vehicle Database (LVDB). </A>
+Release 1.1.0 is the first complete, formally versioned
+and documented release to include the object catalogs.
+<P><BR>
+<P><BR>
+For each payload, there is also a payload narrative and a payload event log. However, these are considerably
+further from being ready for publication, so don't hold your breath.
+<P><BR>
+<P><BR>
+Note that in fixed width versions of the table files, column names are truncated to the field width. Sorry about that!
+<P><BR>
+
+<H2>Citing GCAT</H2>
+GCAT is released under the Creative Commons CC-BY licence.
+You are free to use the data in GCAT as long as you include a citation to it. A suitable short
+citation is  'data from GCAT (J. McDowell, planet4589.org/space/gcat)'. A full citation is
+<P><BR>
+<PRE style="display:inline-block">
+McDowell, Jonathan C., 2020. General Catalog of Artificial Space Objects,
+  Release 1.8.8 , https://planet4589.org/space/gcat
+</PRE>
+</div>
+</section>
+<footer id="lfooter">
+<BR/>
+<BR/>
+<BR/>
+<small>
+<P>COPYRIGHT NOTICE
+<P>
+<P>(c) 2020-2026 Jonathan McDowell
+<P>
+<P>Licence: <A HREF="https://creativecommons.org/licenses/by/4.0">CC-BY-4.0 <IMG WIDTH=100 SRC="ccby.png"> Creative Commons/Attribution</A>
+<P>
+<P>This data may be freely reproduced as long as you cite it.
+<P>A minimal citation is  "Data from J. McDowell, planet4589.org".
+<P>A more complete citation is "McDowell, J, 2020: General Catalog
+of Artificial Space Objects, https://planet4589.org/space/gcat"
+</footer>
+<UL style="list-style:none;">
+<LI><A HREF="../index.html">Space home page</A>
+<LI><A HREF="../../index.html">Site home page</A>
+</UL>

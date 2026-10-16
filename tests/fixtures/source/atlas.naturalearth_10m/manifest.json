@@ -14,6 +14,102 @@
     "licence": "Public domain"
   },
   {
+    "request_fingerprint": "4d1e4ac49ff114d62d5ce0934afd38c11480d67b344d13846bf6832ab8ad95a0",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_boundary_lines_land.zip",
+    "file": "4d1e4ac49ff114d6.zip",
+    "sha256": "c5be2e37b26dcf960934f116fa1adc4403a89a02081368541003b19e7ae3a0be",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T00:16:00+00:00",
+    "licence": "Public domain",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py",
+      "source_sha256": "16ead035f539c8b6c23650c5845d86ad3556553e7456bdf9b4730210f26aacbe",
+      "features_kept": 20,
+      "selection_adm0_a3": [
+        "CNM",
+        "CYN",
+        "CYP",
+        "DOM",
+        "ESB",
+        "GBR",
+        "HTI",
+        "IRL",
+        "MAF",
+        "SXM",
+        "WSB"
+      ],
+      "note": "excerpt of the real layer (closed country groups), not a provider response"
+    }
+  },
+  {
+    "request_fingerprint": "40242c1aa214710d811cb6f874293721ea26174894375161f82bdcdccb9bda25",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip",
+    "file": "40242c1aa214710d.zip",
+    "sha256": "af354559ca30888edc395ac095bbaf715e1809b73bb04e34ffd573bd428230ad",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T00:16:00+00:00",
+    "licence": "Public domain",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py",
+      "source_sha256": "ce1ac7036499a0edd641fbc093cd209a98f96a49d2eca8480aaacad35138a7f6",
+      "features_kept": 11,
+      "selection_adm0_a3": [
+        "CNM",
+        "CYN",
+        "CYP",
+        "DOM",
+        "ESB",
+        "GBR",
+        "HTI",
+        "IRL",
+        "MAF",
+        "SXM",
+        "WSB"
+      ],
+      "note": "excerpt of the real layer (closed country groups), not a provider response"
+    }
+  },
+  {
+    "request_fingerprint": "2bcf53afa050b2ed23c08042e73547cc407d05f306ac7d65245e98fc11f9aeda",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries_lakes.zip",
+    "file": "2bcf53afa050b2ed.zip",
+    "sha256": "8adcc795eef34b546826c4e9e5c0a474ce4f2d33d1eda76fd9ebd3369d231f6b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T00:16:00+00:00",
+    "licence": "Public domain",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py",
+      "source_sha256": "3f1596b05b4a19bd97f3a54731497cffbb4dbed4cda494084e73dd6dd3d37264",
+      "features_kept": 11,
+      "selection_adm0_a3": [
+        "CNM",
+        "CYN",
+        "CYP",
+        "DOM",
+        "ESB",
+        "GBR",
+        "HTI",
+        "IRL",
+        "MAF",
+        "SXM",
+        "WSB"
+      ],
+      "note": "excerpt of the real layer (closed country groups), not a provider response"
+    }
+  },
+  {
     "request_fingerprint": "d0e6ad709a556b4c2b92ec05eb2a4c604fe383be86da5904b578d1d9c4f6e3bd",
     "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_disputed_areas.zip",
     "file": "d0e6ad709a556b4c.zip",
@@ -26,5 +122,37 @@
     },
     "retrieved_at": "2026-10-15T22:49:23.109558+00:00",
     "licence": "Public domain"
+  },
+  {
+    "request_fingerprint": "b7524bf7fe45f8c459b412868766f051997fc587037aedd9fa5e1efbbb79d62b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_map_units.zip",
+    "file": "b7524bf7fe45f8c4.zip",
+    "sha256": "36a06a39de8ea7a3dae9b1c549dba9113ca53932e85045327451bbc5d0220e92",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-16T00:16:00+00:00",
+    "licence": "Public domain",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py",
+      "source_sha256": "45bebe2aaf8bf42b9daf4428594925bcb11eabd32fe9dc6e0acf681438053eb5",
+      "features_kept": 14,
+      "selection_adm0_a3": [
+        "CNM",
+        "CYN",
+        "CYP",
+        "DOM",
+        "ESB",
+        "GBR",
+        "HTI",
+        "IRL",
+        "MAF",
+        "SXM",
+        "WSB"
+      ],
+      "note": "excerpt of the real layer (closed country groups), not a provider response"
+    }
   }
 ]

@@ -1,0 +1,20 @@
+# V3 (agent A-INFRA): NGA World Port Index (Pub. 150), CSV export of the MSI portal.
+# Connector: src/reva/adapters/connectors/atlas_ports.py (atlas.nga_wpi -> atlas table nga.wpi).
+source_key: nga.wpi
+title: NGA World Port Index (Pub. 150) - CSV export
+provider_url: https://msi.nga.mil/Publications/WPI
+lineage_family: nga_msi
+rights:
+  licence: "U.S. Government work (17 U.S.C. 105): no copyright in the United States"
+  licence_status: us_government_work_not_stated_in_file
+  attribution: "National Geospatial-Intelligence Agency, World Port Index (Pub. 150), https://msi.nga.mil"
+metadata:
+  allowed_hosts: [msi.nga.mil]
+  files: ["https://msi.nga.mil/api/publications/world-port-index?output=csv"]
+  authentication: none
+  notes: >-
+    The legacy download URL (api/publications/download?key=16694622/SFH00000/UpdatedPub150.csv) answers 403
+    ("There was an issue accessing this file", 2026-10-16); the world-port-index export endpoint is used instead.
+    The CSV has no edition date: rows are dated by the retrieval day. The WPI lists ports for navigation, not every
+    port (coverage uneven by country).
+  cadence: quarterly re-download

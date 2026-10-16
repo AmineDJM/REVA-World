@@ -1,0 +1,29 @@
+[
+  {
+    "request_fingerprint": "7a1a890260656732dd8935ce7dfcde6a17e143469dc449adfedf3d6faff6c940",
+    "url": "https://data.unesco.org/api/explore/v2.1/catalog/datasets/whc001",
+    "file": "7a1a890260656732.json",
+    "sha256": "8d6dc56c9e758b2d2eb1ed71f6836eb28f53043dc7877f63e47d1dd2a0fce038",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:08:56.903892+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "copy of KGCULT's real capture tests/fixtures/source/atlas.unesco_whc (dataset record)"
+  },
+  {
+    "request_fingerprint": "53dbf3ab54750c58ae91e5751ff23ed791e70bb0655d1a327c27c25d4cf6e5cd",
+    "url": "https://data.unesco.org/api/explore/v2.1/catalog/datasets/whc001/exports/json?select=id_no,name_en,name_fr,date_inscribed,secondary_dates,danger,date_end,danger_list,cultural_criteria,natural_criteria,criteria_txt,category,states_names,iso_codes,region,transboundary,area_hectares,uuid,components_count",
+    "file": "53dbf3ab54750c58.json",
+    "sha256": "afb96d9948d2e7e27a9605d66f25d713d6f414e21a291927a29931d04779489c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:08:57.733007+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "EXCERPT: 19 of 1273 real whc001 records copied verbatim from KGCULT's capture (transboundary properties, the property without State Party code, BR/PT/FR single-State properties, properties in danger)",
+    "excerpt_of_sha256": "acc05ad07a48f10be6873bc5701b8b9c94c55da097fe032009d680d0f8922f72"
+  }
+]

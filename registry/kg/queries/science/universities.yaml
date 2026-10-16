@@ -3,7 +3,7 @@ domain: science
 owner: KGSCIECO
 description: >-
   Major universities: direct instances of university (Q3918), public university (Q875538), private
-  university (Q902104), research university (Q15936437), institute of technology (Q1371037) or collegiate
+  university (Q902104), research university (Q15936437), university of technology (Q1371037) or collegiate
   university (Q3354859) with at least 20 sitelinks (University of Bologna, al-Qarawiyyin, Oxford, MIT, ...).
   Snapshots keep country (P17), location (P131), inception (P571), founders (P112), member of (P463, e.g.
   university networks), headquarters (P159). People -> university edges come from the people snapshots

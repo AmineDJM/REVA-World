@@ -43,6 +43,17 @@ whose Natural Earth TYPE is Indeterminate/Lease/Disputed/Overlay are flagged on 
 
 Atlas period: Natural Earth does not date its boundaries; rows carry the one-day retrieval snapshot
 ``[retrieval date, +1 day)`` with ``ne_version`` in flags.
+
+Datasets and layers: a run restricted to one dataset (``--dataset``) fetches only the layers it needs
+(:data:`DATASET_LAYERS`): ``admin0_10m`` = map units + the two country layers (boundary lakes);
+``admin0_10m_borders`` = map units + the two boundary-line layers (typing); ``admin0_10m_disputed`` = the
+disputed-areas layer. A full run fetches all six and produces exactly the same rows.
+
+Fixture mode: ``tests/fixtures/source/atlas.naturalearth_10m`` holds the two small layers as captured and the
+four large ones as a *derived excerpt* (real features of a few closed groups of countries, cut by that
+directory's ``cut_excerpt.py``). An excerpt ZIP carries a ``REVA_EXCERPT.json`` member; it is accepted only
+from a ``test_fixture`` acquisition (whole-world minimum feature counts waived, every row flagged
+``ne_excerpt``) and blocked from a live one.
 """
 
 from __future__ import annotations
@@ -84,7 +95,7 @@ from reva.ports.connectors import (
 )
 
 CONNECTOR_NAME = "atlas.naturalearth_10m"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: per-dataset layer fetch, excerpt fixtures (FIX2)
 SOURCE_KEY = "naturalearth.admin0_10m"
 PARSER_VERSION = "atlas-ne10m/1"
 ATLAS_SOURCE = "naturalearth"
@@ -104,6 +115,26 @@ LAYERS: dict[str, tuple[str, int, tuple[str, ...]]] = {
     "boundary_lines_disputed": ("ne_10m_admin_0_boundary_lines_disputed_areas", 40, ("FEATURECLA",)),
     "disputed_areas": ("ne_10m_admin_0_disputed_areas", 60, ("BRK_A3", "BRK_NAME", "NOTE_BRK", "ADM0_A3", "TYPE")),
 }
+
+#: atlas dataset -> the layers it is computed from (a ``--dataset`` run fetches only these)
+DATASET_LAYERS: dict[str, tuple[str, ...]] = {
+    DS_COUNTRY: ("map_units", "countries", "countries_lakes"),
+    DS_BORDERS: ("map_units", "boundary_lines_land", "boundary_lines_disputed"),
+    DS_DISPUTED: ("disputed_areas",),
+}
+#: ZIP member marking a derived excerpt of a layer (fixture mode only)
+EXCERPT_MEMBER = "REVA_EXCERPT.json"
+
+
+def layers_for(datasets: Sequence[str] | None = None) -> tuple[str, ...]:
+    """Layer keys (in :data:`LAYERS` order) needed by ``datasets`` (``None``: every dataset)."""
+    want = set(DATASET_LAYERS) if datasets is None else set(datasets)
+    unknown = want - set(DATASET_LAYERS)
+    if unknown:
+        raise _err(f"unknown dataset(s) {sorted(unknown)}", kind="invalid_request")
+    need = {k for ds in want for k in DATASET_LAYERS[ds]}
+    return tuple(k for k in LAYERS if k in need)
+
 
 RIGHTS = {
     "licence": "Public domain",
@@ -172,6 +203,7 @@ class Layer:
     version: str | None
     fields: list[str]
     features: list[Feature]
+    excerpt: dict[str, Any] | None = None  # REVA_EXCERPT.json of a derived fixture excerpt
 
 
 def read_layer(body: bytes, name: str) -> Layer:
@@ -186,6 +218,8 @@ def read_layer(body: bytes, name: str) -> Layer:
             if info.file_size > 60_000_000:
                 raise _err(f"{name}: member {info.filename} too large", kind="too_large")
             members[ext if not info.filename.upper().endswith("VERSION.TXT") else "version"] = zf.read(info)
+        elif info.filename == EXCERPT_MEMBER and info.file_size <= 1_000_000:
+            members["excerpt"] = zf.read(info)
     if not all(k in members for k in ("shp", "shx", "dbf")):
         raise _err(f"{name}: archive lacks shp/shx/dbf")
     version = members["version"].decode("utf-8", "replace").strip() if "version" in members else None
@@ -203,7 +237,15 @@ def read_layer(body: bytes, name: str) -> Layer:
         rings = [pts[a:b] for a, b in itertools.pairwise(parts) if b - a >= 2]
         rec = {k: (v.strip() if isinstance(v, str) else v) for k, v in sr.record.as_dict().items()}
         feats.append(Feature(i, rec, rings))
-    return Layer(name, version, fields, feats)
+    excerpt = None
+    if "excerpt" in members:
+        try:
+            excerpt = json.loads(members["excerpt"])
+        except ValueError as e:
+            raise _err(f"{name}: unreadable {EXCERPT_MEMBER}") from e
+        if not isinstance(excerpt, dict):
+            raise _err(f"{name}: unreadable {EXCERPT_MEMBER}")
+    return Layer(name, version, fields, feats, excerpt)
 
 
 # ============================================================================== entity assignment
@@ -452,7 +494,10 @@ def compute(layers: Mapping[str, Layer], keys: frozenset[str] | set[str]) -> Geo
     order = np.argsort(inverse, kind="stable")
     starts = np.concatenate([[0], np.cumsum(counts)[:-1]])
 
-    line_cls = line_segment_classes([layers["boundary_lines_land"], layers["boundary_lines_disputed"]])
+    # boundary-line typing only when the line layers were fetched (a country-table-only run does not type)
+    line_cls = line_segment_classes(
+        [layers[k] for k in ("boundary_lines_land", "boundary_lines_disputed") if k in layers]
+    )
     uf = _UF(len(polys))
     coast: dict[str, float] = defaultdict(float)
     caspian: dict[str, float] = defaultdict(float)
@@ -547,8 +592,8 @@ def compute(layers: Mapping[str, Layer], keys: frozenset[str] | set[str]) -> Geo
     # Boundary lakes: countries layer minus countries-without-boundary-lakes layer, per ADM0_A3 feature.
     lakes: dict[str, float] = defaultdict(float)
     lakes_rule: dict[str, str] = {}
-    ca = {f.rec["ADM0_A3"]: f for f in layers["countries"].features}
-    cl = {f.rec["ADM0_A3"]: f for f in layers["countries_lakes"].features}
+    ca = {f.rec["ADM0_A3"]: f for f in layers["countries"].features} if "countries" in layers else {}
+    cl = {f.rec["ADM0_A3"]: f for f in layers["countries_lakes"].features} if "countries_lakes" in layers else {}
     for adm, f in ca.items():
         g2 = cl.get(adm)
         if g2 is None:
@@ -639,16 +684,22 @@ def _provider_geo(key: str, units: Sequence[Unit]) -> str:
 
 
 def atlas_rows(
-    comp: GeoComputation,
-    disputed: Layer,
+    comp: GeoComputation | None,
+    disputed: Layer | None,
     raws: Mapping[str, RawRef],
     keys: frozenset[str] | set[str],
+    datasets: Sequence[str] | None = None,
+    excerpts: Sequence[str] = (),
 ) -> dict[str, list[dict[str, Any]]]:
-    """Rows of the three atlas tables (dataset -> rows in ATLAS_SCHEMA column order)."""
-    mu_raw = raws["map_units"]
+    """Rows of the atlas tables (dataset -> rows in ATLAS_SCHEMA column order) for ``datasets`` (default all;
+    ``comp`` is needed for the country and border tables, ``disputed`` for the disputed table). ``excerpts``
+    (layer keys of fixture excerpts) flag the rows of every dataset computed from one as ``ne_excerpt``."""
+    want = set(DATASET_LAYERS) if datasets is None else set(datasets)
+    mu_raw = raws.get("map_units") or raws["disputed_areas"]
     start, end = snapshot_period(mu_raw.retrieved_at)
-    groups = _unit_groups(comp)
-    base_flags = {"ne_version": comp.ne_version, "ne_view": "default (de facto) Admin-0", "derived": "computed"}
+    groups = _unit_groups(comp) if comp is not None else {}
+    version = comp.ne_version if comp is not None else (disputed.version if disputed is not None else None)
+    base_flags = {"ne_version": version, "ne_view": "default (de facto) Admin-0", "derived": "computed"}
 
     def row(
         ds: str,
@@ -679,7 +730,42 @@ def atlas_rows(
             "selector": json.dumps(selector, sort_keys=True, separators=(",", ":"), ensure_ascii=False),
         }
 
-    out: dict[str, list[dict[str, Any]]] = {DS_COUNTRY: [], DS_BORDERS: [], DS_DISPUTED: []}
+    out: dict[str, list[dict[str, Any]]] = {ds: [] for ds in (DS_COUNTRY, DS_BORDERS, DS_DISPUTED) if ds in want}
+    if DS_COUNTRY in want:
+        assert comp is not None
+        _country_rows(comp, groups, out[DS_COUNTRY], row, raws, mu_raw)
+    if DS_BORDERS in want:
+        assert comp is not None
+        _border_rows(comp, groups, out[DS_BORDERS], row, raws, mu_raw)
+    if DS_DISPUTED in want:
+        assert disputed is not None
+        # the disputed table describes its own layer: its version and retrieval snapshot (identical rows
+        # whether or not the map units were fetched in the same run)
+        d_start, d_end = snapshot_period(raws["disputed_areas"].retrieved_at)
+        _disputed_rows(
+            disputed, out[DS_DISPUTED], keys, raws, {**base_flags, "ne_version": disputed.version}, d_start, d_end
+        )
+    for ds, rows in out.items():
+        cut = [k for k in DATASET_LAYERS[ds] if k in excerpts]
+        if cut:
+            note = (
+                "test fixture: computed from a derived excerpt of the Natural Earth layer(s) "
+                + ", ".join(cut)
+                + " (selected countries only; tests/fixtures/source/atlas.naturalearth_10m/cut_excerpt.py)"
+            )
+            for r in rows:
+                r["flags"] = _flags(**json.loads(r["flags"]), ne_excerpt=note)
+    return out
+
+
+def _country_rows(
+    comp: GeoComputation,
+    groups: Mapping[str, list[Unit]],
+    R: list[dict[str, Any]],
+    row: Any,
+    raws: Mapping[str, RawRef],
+    mu_raw: RawRef,
+) -> None:
     landlocked = {k: comp.landlocked(k) for k in groups}
     for key in sorted(groups):
         us = groups[key]
@@ -695,7 +781,6 @@ def atlas_rows(
             "includes_contested_units": flagged or None,
             "unmapped_feature": True if key.startswith("ne:") else None,
         }
-        R = out[DS_COUNTRY]
         R.append(
             row(
                 DS_COUNTRY,
@@ -885,8 +970,15 @@ def atlas_rows(
             )
         )
 
-    # ---- border pairs (both directions)
-    B = out[DS_BORDERS]
+
+def _border_rows(
+    comp: GeoComputation,
+    groups: Mapping[str, list[Unit]],
+    B: list[dict[str, Any]],
+    row: Any,
+    raws: Mapping[str, RawRef],
+    mu_raw: RawRef,
+) -> None:
     lines_raw = raws["boundary_lines_land"]
     for (a, b), pb in sorted(comp.borders.items()):
         for s, t in ((a, b), (b, a)):
@@ -921,8 +1013,16 @@ def atlas_rows(
                 )
             )
 
-    # ---- disputed areas
-    D = out[DS_DISPUTED]
+
+def _disputed_rows(
+    disputed: Layer,
+    D: list[dict[str, Any]],
+    keys: frozenset[str] | set[str],
+    raws: Mapping[str, RawRef],
+    base_flags: Mapping[str, Any],
+    start: Any,
+    end: Any,
+) -> None:
     draw = raws["disputed_areas"]
     seen: Counter[str] = Counter()
     for f in disputed.features:
@@ -968,7 +1068,6 @@ def atlas_rows(
                 ),
             }
         )
-    return out
 
 
 # ============================================================================== KG statements
@@ -1055,14 +1154,30 @@ class NaturalEarth10mConnector:
             connector_version=CONNECTOR_VERSION,
             item_key=raw.item.key,
             observations=(),
-            metadata={"feature_count": len(layer.features), "ne_version": layer.version, "missing_fields": missing},
+            metadata={
+                "feature_count": len(layer.features),
+                "ne_version": layer.version,
+                "missing_fields": missing,
+                "excerpt": layer.excerpt is not None,
+                "origin": raw.origin,
+            },
             schema_fingerprint=schema_fingerprint(sorted(layer.fields)),
         )
 
     def validate(self, batch: ObservationBatch) -> QualityReport:
         _, minimum, _ = LAYERS[batch.item_key]
         findings = []
-        if batch.metadata.get("feature_count", 0) < minimum:
+        if batch.metadata.get("excerpt"):
+            # a derived excerpt (REVA_EXCERPT.json member) is a test fixture: never accepted from a live source
+            if batch.metadata.get("origin") != "test_fixture":
+                findings.append(
+                    Finding(code="excerpt_not_fixture", severity="blocker", message="excerpt marker in a live layer")
+                )
+            else:
+                findings.append(
+                    Finding(code="excerpt", severity="info", message="derived excerpt (test fixture): counts waived")
+                )
+        elif batch.metadata.get("feature_count", 0) < minimum:
             findings.append(Finding(code="incomplete", severity="blocker", message=f"fewer than {minimum} features"))
         if batch.metadata.get("missing_fields"):
             findings.append(
@@ -1073,7 +1188,7 @@ class NaturalEarth10mConnector:
                 )
             )
         return QualityReport(
-            outcome="blocked" if findings else "pass",
+            outcome="blocked" if any(f.severity == "blocker" for f in findings) else "pass",
             findings=tuple(findings),
             received_count=batch.metadata.get("feature_count", 0),
         )
@@ -1105,12 +1220,14 @@ def atlas_source() -> AtlasSourceSpec:
         parser_version=PARSER_VERSION,
         code_digest=module_digest(NaturalEarth10mConnector),
         field_mappings={"map_unit": "GU_A3", "entity": "ISO_A3 > ADM0_A3 > ISO_A3_EH > KOS->XKX"},
-        notes="computed geography from public-domain 1:10m geometry; NE default (de facto) view; offline fixture "
-        "mode is not available (the four large layers are not committed as fixtures)",
+        notes="computed geography from public-domain 1:10m geometry; NE default (de facto) view; fixture mode "
+        "replays a derived excerpt of the four large layers (closed country groups, flagged ne_excerpt)",
     )
 
 
-def fetch_items() -> tuple[FetchItem, ...]:
+def fetch_items(datasets: Sequence[str] | None = None) -> tuple[FetchItem, ...]:
+    """One item per layer needed by ``datasets`` (``None``: all six)."""
+    need = layers_for(datasets)
     return tuple(
         FetchItem(
             key=k,
@@ -1119,36 +1236,45 @@ def fetch_items() -> tuple[FetchItem, ...]:
             expected_media_types=("application/zip", "application/octet-stream"),
         )
         for k, (name, _, _) in LAYERS.items()
+        if k in need
     )
 
 
 @dataclass
 class NeBuild:
-    computation: GeoComputation
+    computation: GeoComputation | None
     rows: dict[str, list[dict[str, Any]]]
     ne_version: str | None
     raw_sha256s: dict[str, str]
+    excerpt_layers: list[str] = field(default_factory=list)  # fixture excerpts used (empty for real layers)
 
 
 def build(
-    raws: Mapping[str, RawAcquisition], raw_sha256s: Mapping[str, str], keys: frozenset[str] | set[str] | None = None
+    raws: Mapping[str, RawAcquisition],
+    raw_sha256s: Mapping[str, str],
+    keys: frozenset[str] | set[str] | None = None,
+    datasets: Sequence[str] | None = None,
 ) -> NeBuild:
-    """Parse and validate every layer, compute the geography and the atlas rows (no I/O)."""
+    """Parse and validate the layers ``datasets`` need (default: all), compute the geography and the atlas
+    rows of those datasets (no I/O). ``computation`` is ``None`` when only the disputed table is built."""
     keys = keys if keys is not None else _crosswalk_keys()
     conn = NaturalEarth10mConnector()
     layers: dict[str, Layer] = {}
-    for k, (name, _, _) in LAYERS.items():
+    for k in layers_for(datasets):
+        name = LAYERS[k][0]
         if k not in raws:
             raise _err(f"layer {k} missing", kind="incomplete")
         for b in conn.parse(raws[k]):
             q = conn.validate(b)
             if q.blocking:
-                raise _err(f"{name}: " + "; ".join(f.message for f in q.findings))
+                raise _err(f"{name}: " + "; ".join(f.message for f in q.findings if f.severity == "blocker"))
         layers[k] = read_layer(raws[k].body, name)
-    comp = compute(layers, keys)
-    refs = {k: RawRef(raw_sha256s[k], raws[k].retrieved_at, LAYERS[k][0]) for k in LAYERS}
-    rows = atlas_rows(comp, layers["disputed_areas"], refs, keys)
-    return NeBuild(comp, rows, layers["map_units"].version, dict(raw_sha256s))
+    comp = compute(layers, keys) if "map_units" in layers else None
+    refs = {k: RawRef(raw_sha256s[k], raws[k].retrieved_at, LAYERS[k][0]) for k in layers}
+    excerpts = sorted(k for k, lay in layers.items() if lay.excerpt is not None)
+    rows = atlas_rows(comp, layers.get("disputed_areas"), refs, keys, datasets, excerpts)
+    version = next(iter(layers.values())).version if comp is None else comp.ne_version
+    return NeBuild(comp, rows, version, {k: raw_sha256s[k] for k in layers}, excerpts)
 
 
 NOTES = {
@@ -1168,19 +1294,27 @@ async def _ingest(
     from reva.adapters.connectors.atlas_geo_common import run_get
     from reva.atlas.tables import ATLAS_SCHEMA
 
-    raws = {it.key: await run_get(run, it) for it in fetch_items()}
+    datasets = [ds for ds in (DS_COUNTRY, DS_BORDERS, DS_DISPUTED) if run.wants(ds)]
+    raws = {it.key: await run_get(run, it) for it in fetch_items(datasets)}  # only the layers needed
     shas = {k: run.archive(r) for k, r in raws.items()}  # raw bytes first
-    nb = build(raws, shas)  # parse + compute before any registration: a failure registers nothing
+    nb = build(raws, shas, datasets=datasets)  # parse + compute before any registration: a failure registers nothing
     tables = {}
     for ds, rows in nb.rows.items():
-        if not run.wants(ds):
-            continue
         frame = pl.DataFrame(rows, schema=ATLAS_SCHEMA)
         used = sorted(set(frame["raw_sha256"].to_list()))
         tables[ds] = run.register(
-            dataset=ds, frame=frame, raw_sha256s=used, coverage_note=NOTES[ds].format(v=nb.ne_version), rights=RIGHTS
+            dataset=ds,
+            frame=frame,
+            raw_sha256s=used,
+            coverage_note=NOTES[ds].format(v=nb.ne_version)
+            + (
+                "; TEST FIXTURE: derived excerpt (selected countries only)"
+                if set(DATASET_LAYERS[ds]) & set(nb.excerpt_layers)
+                else ""
+            ),
+            rights=RIGHTS,
         )
-    t = raws["map_units"].retrieved_at
+    t = (raws.get("map_units") or next(iter(raws.values()))).retrieved_at
     kg: dict[str, Any] = {"loaded": False}
     if load_kg and run.wants(DS_BORDERS):
         kg = load_adjacency_kg(run.engine, run.store, nb, retrieved_at=t, origin=run.origin, qids=qids)
@@ -1188,8 +1322,10 @@ async def _ingest(
         "connector": CONNECTOR_NAME,
         "ne_version": nb.ne_version,
         "raw_sha256s": shas,
+        "layers": sorted(raws),
+        "excerpt_layers": nb.excerpt_layers,
         "tables": tables,
-        "diagnostics": nb.computation.diagnostics,
+        "diagnostics": nb.computation.diagnostics if nb.computation is not None else {},
         "kg": kg,
     }
     return summary, nb, t
@@ -1228,6 +1364,8 @@ def load_adjacency_kg(
     q = dict(qids) if qids is not None else load_country_qids()
     if not q:
         return {"loaded": False, "blocked": "registry/entities/country_qids.json (ISO3 -> QID) not available"}
+    if nb.computation is None:
+        return {"loaded": False, "blocked": "no map-units computation in this build"}
     ensure_kg_property(engine, "P47")
     raw = nb.raw_sha256s["map_units"]
     sts, info = adjacency_statements(

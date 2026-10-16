@@ -1,0 +1,101 @@
+{
+  "odata.metadata":"https://opendata.cbs.nl/ODataApi/OData/84789ENG/$metadata#Cbs.OData.WebAPI.TypedDataSet","value":[
+    {
+      "ID":0,"CarribeanNetherlands":"CN01  ","Periods":"2012JJ00","GDPValueAtCurrentPrices_1":593,"GDPValueAtPricesOf2017_2":627,"GDPValueChanges_3":null,"GDPVolumeChanges_4":null
+    },{
+      "ID":1,"CarribeanNetherlands":"CN01  ","Periods":"2013JJ00","GDPValueAtCurrentPrices_1":617,"GDPValueAtPricesOf2017_2":641,"GDPValueChanges_3":4.1,"GDPVolumeChanges_4":2.3
+    },{
+      "ID":2,"CarribeanNetherlands":"CN01  ","Periods":"2014JJ00","GDPValueAtCurrentPrices_1":629,"GDPValueAtPricesOf2017_2":639,"GDPValueChanges_3":2,"GDPVolumeChanges_4":-0.4
+    },{
+      "ID":3,"CarribeanNetherlands":"CN01  ","Periods":"2015JJ00","GDPValueAtCurrentPrices_1":647,"GDPValueAtPricesOf2017_2":659,"GDPValueChanges_3":2.7,"GDPVolumeChanges_4":3.2
+    },{
+      "ID":4,"CarribeanNetherlands":"CN01  ","Periods":"2016JJ00","GDPValueAtCurrentPrices_1":666,"GDPValueAtPricesOf2017_2":668,"GDPValueChanges_3":3.1,"GDPVolumeChanges_4":1.3
+    },{
+      "ID":5,"CarribeanNetherlands":"CN01  ","Periods":"2017JJ00","GDPValueAtCurrentPrices_1":670,"GDPValueAtPricesOf2017_2":670,"GDPValueChanges_3":0.5,"GDPVolumeChanges_4":0.2
+    },{
+      "ID":6,"CarribeanNetherlands":"CN01  ","Periods":"2018JJ00","GDPValueAtCurrentPrices_1":680,"GDPValueAtPricesOf2017_2":671,"GDPValueChanges_3":1.6,"GDPVolumeChanges_4":0.1
+    },{
+      "ID":7,"CarribeanNetherlands":"CN01  ","Periods":"2019JJ00","GDPValueAtCurrentPrices_1":720,"GDPValueAtPricesOf2017_2":689,"GDPValueChanges_3":5.9,"GDPVolumeChanges_4":2.7
+    },{
+      "ID":8,"CarribeanNetherlands":"CN01  ","Periods":"2020JJ00","GDPValueAtCurrentPrices_1":637,"GDPValueAtPricesOf2017_2":612,"GDPValueChanges_3":-11.5,"GDPVolumeChanges_4":-11.2
+    },{
+      "ID":9,"CarribeanNetherlands":"CN01  ","Periods":"2021JJ00","GDPValueAtCurrentPrices_1":735,"GDPValueAtPricesOf2017_2":688,"GDPValueChanges_3":15.4,"GDPVolumeChanges_4":12.4
+    },{
+      "ID":10,"CarribeanNetherlands":"CN01  ","Periods":"2022JJ00","GDPValueAtCurrentPrices_1":800,"GDPValueAtPricesOf2017_2":725,"GDPValueChanges_3":8.8,"GDPVolumeChanges_4":5.4
+    },{
+      "ID":11,"CarribeanNetherlands":"CN01  ","Periods":"2023JJ00","GDPValueAtCurrentPrices_1":871,"GDPValueAtPricesOf2017_2":761,"GDPValueChanges_3":8.9,"GDPVolumeChanges_4":5.1
+    },{
+      "ID":12,"CarribeanNetherlands":"GM9001","Periods":"2012JJ00","GDPValueAtCurrentPrices_1":417,"GDPValueAtPricesOf2017_2":443,"GDPValueChanges_3":null,"GDPVolumeChanges_4":null
+    },{
+      "ID":13,"CarribeanNetherlands":"GM9001","Periods":"2013JJ00","GDPValueAtCurrentPrices_1":434,"GDPValueAtPricesOf2017_2":453,"GDPValueChanges_3":4.1,"GDPVolumeChanges_4":2.4
+    },{
+      "ID":14,"CarribeanNetherlands":"GM9001","Periods":"2014JJ00","GDPValueAtCurrentPrices_1":452,"GDPValueAtPricesOf2017_2":461,"GDPValueChanges_3":4.1,"GDPVolumeChanges_4":1.6
+    },{
+      "ID":15,"CarribeanNetherlands":"GM9001","Periods":"2015JJ00","GDPValueAtCurrentPrices_1":466,"GDPValueAtPricesOf2017_2":476,"GDPValueChanges_3":3,"GDPVolumeChanges_4":3.4
+    },{
+      "ID":16,"CarribeanNetherlands":"GM9001","Periods":"2016JJ00","GDPValueAtCurrentPrices_1":487,"GDPValueAtPricesOf2017_2":487,"GDPValueChanges_3":4.6,"GDPVolumeChanges_4":2.2
+    },{
+      "ID":17,"CarribeanNetherlands":"GM9001","Periods":"2017JJ00","GDPValueAtCurrentPrices_1":480,"GDPValueAtPricesOf2017_2":480,"GDPValueChanges_3":-1.4,"GDPVolumeChanges_4":-1.3
+    },{
+      "ID":18,"CarribeanNetherlands":"GM9001","Periods":"2018JJ00","GDPValueAtCurrentPrices_1":505,"GDPValueAtPricesOf2017_2":499,"GDPValueChanges_3":5,"GDPVolumeChanges_4":3.9
+    },{
+      "ID":19,"CarribeanNetherlands":"GM9001","Periods":"2019JJ00","GDPValueAtCurrentPrices_1":553,"GDPValueAtPricesOf2017_2":531,"GDPValueChanges_3":9.6,"GDPVolumeChanges_4":6.3
+    },{
+      "ID":20,"CarribeanNetherlands":"GM9001","Periods":"2020JJ00","GDPValueAtCurrentPrices_1":505,"GDPValueAtPricesOf2017_2":486,"GDPValueChanges_3":-8.8,"GDPVolumeChanges_4":-8.4
+    },{
+      "ID":21,"CarribeanNetherlands":"GM9001","Periods":"2021JJ00","GDPValueAtCurrentPrices_1":583,"GDPValueAtPricesOf2017_2":543,"GDPValueChanges_3":15.4,"GDPVolumeChanges_4":11.7
+    },{
+      "ID":22,"CarribeanNetherlands":"GM9001","Periods":"2022JJ00","GDPValueAtCurrentPrices_1":662,"GDPValueAtPricesOf2017_2":590,"GDPValueChanges_3":13.6,"GDPVolumeChanges_4":8.8
+    },{
+      "ID":23,"CarribeanNetherlands":"GM9001","Periods":"2023JJ00","GDPValueAtCurrentPrices_1":722,"GDPValueAtPricesOf2017_2":628,"GDPValueChanges_3":9.1,"GDPVolumeChanges_4":6.3
+    },{
+      "ID":24,"CarribeanNetherlands":"GM9002","Periods":"2012JJ00","GDPValueAtCurrentPrices_1":133,"GDPValueAtPricesOf2017_2":139,"GDPValueChanges_3":null,"GDPVolumeChanges_4":null
+    },{
+      "ID":25,"CarribeanNetherlands":"GM9002","Periods":"2013JJ00","GDPValueAtCurrentPrices_1":137,"GDPValueAtPricesOf2017_2":140,"GDPValueChanges_3":3.1,"GDPVolumeChanges_4":0.8
+    },{
+      "ID":26,"CarribeanNetherlands":"GM9002","Periods":"2014JJ00","GDPValueAtCurrentPrices_1":131,"GDPValueAtPricesOf2017_2":130,"GDPValueChanges_3":-4.4,"GDPVolumeChanges_4":-6.8
+    },{
+      "ID":27,"CarribeanNetherlands":"GM9002","Periods":"2015JJ00","GDPValueAtCurrentPrices_1":134,"GDPValueAtPricesOf2017_2":135,"GDPValueChanges_3":2.1,"GDPVolumeChanges_4":3.2
+    },{
+      "ID":28,"CarribeanNetherlands":"GM9002","Periods":"2016JJ00","GDPValueAtCurrentPrices_1":131,"GDPValueAtPricesOf2017_2":133,"GDPValueChanges_3":-2.1,"GDPVolumeChanges_4":-1
+    },{
+      "ID":29,"CarribeanNetherlands":"GM9002","Periods":"2017JJ00","GDPValueAtCurrentPrices_1":142,"GDPValueAtPricesOf2017_2":142,"GDPValueChanges_3":8.6,"GDPVolumeChanges_4":6.6
+    },{
+      "ID":30,"CarribeanNetherlands":"GM9002","Periods":"2018JJ00","GDPValueAtCurrentPrices_1":128,"GDPValueAtPricesOf2017_2":125,"GDPValueChanges_3":-9.8,"GDPVolumeChanges_4":-11.8
+    },{
+      "ID":31,"CarribeanNetherlands":"GM9002","Periods":"2019JJ00","GDPValueAtCurrentPrices_1":120,"GDPValueAtPricesOf2017_2":115,"GDPValueChanges_3":-6,"GDPVolumeChanges_4":-8.6
+    },{
+      "ID":32,"CarribeanNetherlands":"GM9002","Periods":"2020JJ00","GDPValueAtCurrentPrices_1":89,"GDPValueAtPricesOf2017_2":85,"GDPValueChanges_3":-26.4,"GDPVolumeChanges_4":-25.9
+    },{
+      "ID":33,"CarribeanNetherlands":"GM9002","Periods":"2021JJ00","GDPValueAtCurrentPrices_1":107,"GDPValueAtPricesOf2017_2":103,"GDPValueChanges_3":20.4,"GDPVolumeChanges_4":21.1
+    },{
+      "ID":34,"CarribeanNetherlands":"GM9002","Periods":"2022JJ00","GDPValueAtCurrentPrices_1":89,"GDPValueAtPricesOf2017_2":92,"GDPValueChanges_3":-16.4,"GDPVolumeChanges_4":-11
+    },{
+      "ID":35,"CarribeanNetherlands":"GM9002","Periods":"2023JJ00","GDPValueAtCurrentPrices_1":96,"GDPValueAtPricesOf2017_2":91,"GDPValueChanges_3":8.2,"GDPVolumeChanges_4":-0.5
+    },{
+      "ID":36,"CarribeanNetherlands":"GM9003","Periods":"2012JJ00","GDPValueAtCurrentPrices_1":43,"GDPValueAtPricesOf2017_2":46,"GDPValueChanges_3":null,"GDPVolumeChanges_4":null
+    },{
+      "ID":37,"CarribeanNetherlands":"GM9003","Periods":"2013JJ00","GDPValueAtCurrentPrices_1":46,"GDPValueAtPricesOf2017_2":48,"GDPValueChanges_3":6.9,"GDPVolumeChanges_4":5.5
+    },{
+      "ID":38,"CarribeanNetherlands":"GM9003","Periods":"2014JJ00","GDPValueAtCurrentPrices_1":47,"GDPValueAtPricesOf2017_2":48,"GDPValueChanges_3":1.8,"GDPVolumeChanges_4":-0.2
+    },{
+      "ID":39,"CarribeanNetherlands":"GM9003","Periods":"2015JJ00","GDPValueAtCurrentPrices_1":47,"GDPValueAtPricesOf2017_2":49,"GDPValueChanges_3":1.6,"GDPVolumeChanges_4":1.2
+    },{
+      "ID":40,"CarribeanNetherlands":"GM9003","Periods":"2016JJ00","GDPValueAtCurrentPrices_1":48,"GDPValueAtPricesOf2017_2":48,"GDPValueChanges_3":2.6,"GDPVolumeChanges_4":-0.5
+    },{
+      "ID":41,"CarribeanNetherlands":"GM9003","Periods":"2017JJ00","GDPValueAtCurrentPrices_1":48,"GDPValueAtPricesOf2017_2":48,"GDPValueChanges_3":-1.8,"GDPVolumeChanges_4":-1.4
+    },{
+      "ID":42,"CarribeanNetherlands":"GM9003","Periods":"2018JJ00","GDPValueAtCurrentPrices_1":48,"GDPValueAtPricesOf2017_2":46,"GDPValueChanges_3":0.5,"GDPVolumeChanges_4":-2.5
+    },{
+      "ID":43,"CarribeanNetherlands":"GM9003","Periods":"2019JJ00","GDPValueAtCurrentPrices_1":47,"GDPValueAtPricesOf2017_2":44,"GDPValueChanges_3":-2.2,"GDPVolumeChanges_4":-5.3
+    },{
+      "ID":44,"CarribeanNetherlands":"GM9003","Periods":"2020JJ00","GDPValueAtCurrentPrices_1":44,"GDPValueAtPricesOf2017_2":41,"GDPValueChanges_3":-6.2,"GDPVolumeChanges_4":-6.3
+    },{
+      "ID":45,"CarribeanNetherlands":"GM9003","Periods":"2021JJ00","GDPValueAtCurrentPrices_1":46,"GDPValueAtPricesOf2017_2":42,"GDPValueChanges_3":4.9,"GDPVolumeChanges_4":3
+    },{
+      "ID":46,"CarribeanNetherlands":"GM9003","Periods":"2022JJ00","GDPValueAtCurrentPrices_1":49,"GDPValueAtPricesOf2017_2":43,"GDPValueChanges_3":5.9,"GDPVolumeChanges_4":1.5
+    },{
+      "ID":47,"CarribeanNetherlands":"GM9003","Periods":"2023JJ00","GDPValueAtCurrentPrices_1":52,"GDPValueAtPricesOf2017_2":42,"GDPValueChanges_3":7.7,"GDPVolumeChanges_4":-1.6
+    }
+  ]
+}

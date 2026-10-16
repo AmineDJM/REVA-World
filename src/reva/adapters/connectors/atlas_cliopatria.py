@@ -732,10 +732,11 @@ def coverage(build: KgBuild, layer: ov.CountryLayer) -> dict[str, Any]:
         pol[sp.territory].add(sp.polity)
         for rr, _ in sp.rows:
             years[sp.territory].update(range(rr.from_year, rr.to_year + 1))
+    labels = crosswalk_labels()
     for t in layer.territories:
         ys = years.get(t.key, set())
         per[t.key] = {
-            "label": t.label,
+            "label": labels.get(t.iso3, t.label) if t.iso3 else t.label,
             "iso3": t.iso3,
             "area_km2": round(t.area_km2, 1),
             "polities": len(pol.get(t.key, ())),

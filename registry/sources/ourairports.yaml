@@ -1,0 +1,19 @@
+# V3 (agent A-INFRA): OurAirports open data (airports.csv, countries.csv), public domain, updated daily.
+# Connector: src/reva/adapters/connectors/atlas_flights.py (atlas.ourairports -> atlas table ourairports.airports).
+source_key: ourairports.data
+title: OurAirports open data downloads (airports and countries CSV)
+provider_url: https://ourairports.com/data/
+lineage_family: ourairports
+rights:
+  licence: Public domain
+  licence_url: https://ourairports.com/data/
+  terms_quote: "All data is released to the Public Domain, and comes with no guarantee of accuracy or fitness for use."
+  attribution: "OurAirports (https://ourairports.com), David Megginson and contributors (courtesy attribution)"
+metadata:
+  allowed_hosts: [davidmegginson.github.io, ourairports.com]
+  files:
+    - https://davidmegginson.github.io/ourairports-data/airports.csv
+    - https://davidmegginson.github.io/ourairports-data/countries.csv
+  authentication: none
+  editorial_status: crowd-sourced, community-edited; counts are snapshots of the retrieval day, not an official register
+  cadence: daily dump; monthly re-download

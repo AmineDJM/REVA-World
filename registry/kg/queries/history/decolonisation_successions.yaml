@@ -11,14 +11,15 @@ purpose: statements
 entity_kind: country
 sparql: |
   SELECT DISTINCT ?state ?statement ?colony ?rank ?start ?end ?pit WHERE {
-    ?state wdt:P31/wdt:P279* wd:Q6256 ; wdt:P571 ?inception .
+    ?state p:P31 ?state_p31 . ?state_p31 ps:P31/wdt:P279* wd:Q6256 ; wikibase:rank ?state_p31r . FILTER(?state_p31r != wikibase:DeprecatedRank)
+    ?state wdt:P571 ?inception .
     FILTER(YEAR(?inception) >= 1940 && YEAR(?inception) <= 1979)
     ?state p:P1365 ?statement .
     ?statement ps:P1365 ?colony ; wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)
     FILTER EXISTS {
       VALUES ?kind { wd:Q133156 wd:Q164142 wd:Q161243 wd:Q3024240 }
-      ?colony wdt:P31/wdt:P279* ?kind .
+      ?colony p:P31 ?colony_p31 . ?colony_p31 ps:P31/wdt:P279* ?kind ; wikibase:rank ?colony_p31r . FILTER(?colony_p31r != wikibase:DeprecatedRank)
     }
     OPTIONAL { ?statement pq:P580 ?start }
     OPTIONAL { ?statement pq:P582 ?end }

@@ -3,9 +3,10 @@
 # IMF:CL_COUNTRY 1.6.0). Economies use ISO 3166-1 alpha-3, plus two IMF codes that name exactly a
 # crosswalk entity. Everything else stays unmapped and is listed in each atlas table manifest:
 # aggregates (G001 World, G110, GX123, U0xx UN regions, TXnnn "not specified"), IMF department
-# areas (AFR, APD, EUR, MCD, WHD, SDS), TWN "Taiwan Province of China" (not a crosswalk entity),
+# areas (AFR, APD, EUR, MCD, WHD, SDS),
 # CWX "Curaçao and Sint Maarten" (a combined area; CUW and SXM are separate crosswalk entities),
 # historical areas (ANT, CSK, DDR, SCG, SUN, VDR, YAR, YMD, YUG).
+# TWN "Taiwan Province of China" maps to TWN through the iso3 base since crosswalk 1.1.0 (ISO 3166-1).
 scheme: imf
 base: iso3
 aliases:

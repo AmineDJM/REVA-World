@@ -2,21 +2,34 @@ id: economy.colonial_trading_companies
 domain: economy
 owner: KGSCIECO
 description: >-
-  Chartered / colonial trading companies: instances of chartered company (Q1700154) or of a subclass, plus
-  the main companies by id when typed only as business (Dutch East India Company, East India Company,
-  Hudson's Bay Company, Royal African Company, Muscovy Company, Imperial British East Africa Company,
-  Dutch West India Company, Virginia Company, Levant Company). Snapshots keep country (P17), inception and
-  dissolution (P571/P576), founders (P112), headquarters (P159), significant events (P793), replaced by
-  (P1366), owner (P127); operating area (P2541, company -> territory) is requested. Colonies they ran are
-  reached from history.colonies (P17/P361/P1365 statements) and KGHIST's voyages (P137 operator).
+  Chartered / colonial trading companies: instances of chartered company (Q162157) or East India company
+  (Q26236686) or of a subclass; direct instances of colonial society (Q1700154, how Wikidata types the
+  Danish/Swedish/Portuguese East India companies, the British South Africa and Royal Niger companies) and of
+  trading company (Q2865305, Dutch West India / Virginia / Levant companies) founded before 1900; plus the main
+  companies by id (Dutch East India Company, East India Company, Hudson's Bay Company, Royal African Company,
+  Muscovy Company, Imperial British East Africa Company, Dutch West India Company, Virginia Company, Levant
+  Company). Snapshots keep country (P17), inception and dissolution (P571/P576), founders (P112), headquarters
+  (P159), significant events (P793), replaced by (P1366), owner (P127); operating area (P2541, company ->
+  territory) is requested. Colonies they ran are reached from history.colonies (P17/P361/P1365) and KGHIST's
+  voyages (P137 operator).
 purpose: seed_entities
 entity_kind: organisation
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    { ?item wdt:P31/wdt:P279* wd:Q1700154 . }
+    {
+      VALUES ?root { wd:Q162157 wd:Q26236686 }
+      ?item wdt:P31/wdt:P279* ?root .
+    }
+    UNION
+    { ?item wdt:P31 wd:Q1700154 . }
+    UNION
+    {
+      ?item wdt:P31 wd:Q2865305 ; wdt:P571 ?founded .
+      FILTER(YEAR(?founded) < 1900)
+    }
     UNION
     { VALUES ?item { wd:Q159766 wd:Q83164 wd:Q76039 wd:Q769519 wd:Q1765656 wd:Q926921 wd:Q617066
                      wd:Q1152507 wd:Q3557480 } }
   }
-max_rows: 1500
+max_rows: 3000
 expand_hops: 1

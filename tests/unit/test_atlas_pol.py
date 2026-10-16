@@ -143,6 +143,9 @@ def test_vdem_values_flags_and_geo(vdem_frames):
     assert bvr["iso3"] is None and bvr["entity_qid"] is None  # 1800 = Electorate of Bavaria: not mapped
     assert cell("PSE", "v2x_polyarchy", 2024)[0]["entity_qid"] == "Q36678"  # West Bank
     assert cell("TWN", "v2x_polyarchy", 2024)[0]["iso3"] == "TWN"  # crosswalk 1.1.0 (ISO 3166-1)
+    tw46 = cell("TWN", "v2x_polyarchy", 1945)  # V-Dem unit history: ROC headquartered on the mainland
+    assert tw46 and tw46[0]["iso3"] == "TWN" and tw46[0]["entity_qid"] == "Q13426199"
+    assert "headquartered in the mainland" in json.loads(tw46[0]["flags"])["vdem_histname"]
     assert cell("USA", "v2x_regime", 1800) == []  # RoW starts 1900: no invented cell
     acc = cell("FRA", "v2x_accountability", 2024)[0]
     assert acc["unit"].startswith("V-Dem latent") and cell("FRA", "v2x_accountability_osp", 2024)[0]["unit"].startswith(
@@ -219,9 +222,14 @@ def test_lied_frame_geo_and_labels(regime_raws):
     q = dict(zip(zip(f["provider_geo"], f["period_start"].dt.year()), f["entity_qid"], strict=True))
     assert q[("Prussia|vdem=77", 1800)] == "Q27306" and q[("Bavaria|vdem=350", 1850)] == "Q154195"
     assert q[("Vietnam, North|vdem=34", 1960)] == "Q172640"
-    assert {"Vietnam|vdem=35", "Bavaria|vdem=350", "Taiwan|vdem=48", "Palestine/West Bank|vdem=128"} <= {
+    assert {"Vietnam|vdem=35", "Bavaria|vdem=350", "Palestine/West Bank|vdem=128"} <= {
         u["provider_geo"] for u in unmapped
     }
+    # crosswalk 1.1.0: LIED Taiwan (V-Dem unit 48) -> TWN; China stays CHN; no double mapping
+    assert geo["Taiwan|vdem=48"] == "TWN" and country_iso3("China|vdem=110", "lied") == "CHN"
+    assert "Taiwan|vdem=48" not in {u["provider_geo"] for u in unmapped}
+    # 1945-1948: V-Dem period "Republic of China [headquartered in the mainland]" -> its own QID, flagged
+    assert q[("Taiwan|vdem=48", 1946)] == "Q13426199" and q[("Taiwan|vdem=48", 2000)] == "Q865"
     fr = f.filter(
         (pl.col("iso3") == "FRA")
         & (pl.col("indicator") == "lexical_index")
@@ -274,7 +282,8 @@ def test_bmr_frame(regime_raws):
     )
     geo = dict(zip(f["provider_geo"], f["iso3"], strict=True))
     assert geo["2"] == "USA" and geo["255"] == "DEU" and geo["490"] == "COD" and geo["365"] == "RUS"
-    assert {u["provider_geo"] for u in unmapped} == {"260", "364", "713"}  # West Germany, USSR, Taiwan
+    assert {u["provider_geo"] for u in unmapped} == {"260", "364"}  # West Germany, USSR
+    assert geo["713"] == "TWN" and country_iso3("710", "bmr") == "CHN"  # BMR TAIWAN (abbr. TWN), crosswalk 1.1.0
     q = dict(zip(f["provider_geo"], f["entity_qid"], strict=True))
     assert (q["260"], q["364"], q["713"], q["2"]) == ("Q713750", "Q15180", "Q865", None)
     fr = f.filter(

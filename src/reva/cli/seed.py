@@ -15,6 +15,7 @@ holds for a connector (name, version) whose spec or code changed.
 from __future__ import annotations
 
 import json
+import threading
 from typing import Any
 from uuid import UUID
 
@@ -544,9 +545,58 @@ def _crosswalk_sha256() -> str:  # V2 step 1 (ALLC)
     return crosswalk_sha256()
 
 
+#: Per-process registry snapshot (FIX2 seed flake): ``seed`` loads the registry files once per process and
+#: memoises their fingerprint, so the owner's seed (``bootstrap``) and a later runtime-role confirmation in
+#: the same process compare the same snapshot even when other edits land in ``registry/`` (or the crosswalk)
+#: in between. Seeding is a one-shot deploy step (``reva db bootstrap`` / ``reva seed``): a new process sees
+#: the new files. :func:`reset_registry_snapshot` drops the snapshot (tests, long-lived callers).
+_SNAPSHOT_LOCK = threading.Lock()
+_SNAPSHOT: dict[str, Any] = {}
+
+
+def registry_snapshot() -> Registry:
+    """The reviewed registry as loaded by the first ``seed`` of this process."""
+    with _SNAPSHOT_LOCK:
+        if "registry" not in _SNAPSHOT:
+            reg = load_registry()
+            _SNAPSHOT["files"] = _file_digests(reg)  # read with the registry, not at each fingerprint
+            _SNAPSHOT["registry"] = reg
+            _SNAPSHOT["fingerprints"] = {}
+        return _SNAPSHOT["registry"]  # type: ignore[no-any-return]
+
+
+def reset_registry_snapshot() -> None:
+    with _SNAPSHOT_LOCK:
+        _SNAPSHOT.clear()
+
+
 def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
-    """Digest of everything ``seed`` writes (registry content, built-in connectors, schedules)."""
+    """Digest of everything ``seed`` writes (registry content, built-in connectors, schedules); memoised for
+    the process snapshot (:func:`registry_snapshot`), so it is computed once from one state of the files."""
+    with _SNAPSHOT_LOCK:
+        memo = _SNAPSHOT.get("fingerprints") if _SNAPSHOT.get("registry") is reg else None
+        if memo is not None and contact_email in memo:
+            return memo[contact_email]  # type: ignore[no-any-return]
+    fp = _compute_fingerprint(reg, contact_email)
+    if memo is not None:
+        with _SNAPSHOT_LOCK:
+            memo.setdefault(contact_email, fp)
+            return memo[contact_email]  # type: ignore[no-any-return]
+    return fp
+
+
+def _file_digests(reg: Registry) -> dict[str, str]:
     partners = reg.root / "reference" / "comtrade_partnerAreas.json"
+    return {
+        "partners_sha256": sha256_bytes(partners.read_bytes()),
+        "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
+    }
+
+
+def _compute_fingerprint(reg: Registry, contact_email: str | None) -> str:
+    with _SNAPSHOT_LOCK:
+        files = _SNAPSHOT.get("files") if _SNAPSHOT.get("registry") is reg else None
+    files = files or _file_digests(reg)
     return logical_hash(
         {
             "schema": "reva-seed-fingerprint/1",
@@ -555,8 +605,8 @@ def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
             "sources": list(reg.sources),
             "mappings": list(reg.mappings),
             "models": list(reg.models),
-            "partners_sha256": sha256_bytes(partners.read_bytes()),
-            "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
+            "partners_sha256": files["partners_sha256"],
+            "crosswalk_sha256": files["crosswalk_sha256"],
             # identity only: a changed spec/code under the same version is refused by
             # register_connector_version when the owner seeds, not hidden in the fingerprint
             "connectors": sorted(
@@ -574,6 +624,21 @@ def _atlas_source_ids() -> list[list[str]]:
     from reva.atlas.sources import atlas_sources
 
     return sorted([e.spec.name, e.spec.version] for e in atlas_sources().values())
+
+
+def _latest_seed(conn: Connection) -> dict[str, Any] | None:
+    row = (
+        conn.execute(
+            text(
+                "SELECT parameters->>'fingerprint' AS fingerprint, recorded_at FROM meta.activity "
+                "WHERE kind = 'registry.seed' AND actor = :a ORDER BY recorded_at DESC LIMIT 1"
+            ),
+            {"a": SEED_ACTOR},
+        )
+        .mappings()
+        .first()
+    )
+    return dict(row) if row else None
 
 
 def _already_seeded(conn: Connection, fingerprint: str) -> bool:
@@ -596,7 +661,7 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
     already_seeded`` when the owner seeded exactly this registry, and otherwise raises
     ``ConfigurationError`` (runtime roles cannot write approved registry state).
     """
-    reg = load_registry()
+    reg = registry_snapshot()
     fingerprint = seed_fingerprint(reg, contact_email)
     with engine.connect() as conn:
         login = conn.execute(text("SELECT session_user")).scalar_one()
@@ -609,9 +674,20 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
                     "status": "already_seeded",
                     "fingerprint": fingerprint,
                 }
+            latest = _latest_seed(conn)
             raise ConfigurationError(
                 f"registry seeding writes approved registry state and must run as the migration owner "
-                f"(`reva db bootstrap` / `reva seed`), not as {login}"
+                f"(`reva db bootstrap` / `reva seed`), not as {login}: the owner has not seeded this registry "
+                f"(fingerprint {fingerprint[:16]}…; latest owner seed: "
+                + (
+                    f"{str(latest['fingerprint'])[:16]}… at {latest['recorded_at']}"
+                    if latest
+                    else "none in this database"
+                )
+                + "). Registry files, the country crosswalk or the connector/atlas source versions changed since "
+                "that seed: run `reva db bootstrap` (or `reva seed`) as the owner.",
+                fingerprint=fingerprint,
+                latest_owner_fingerprint=latest["fingerprint"] if latest else None,
             )
     with engine.begin() as conn:
         take_evidence_write_lock(conn)  # writes eligibility decisions: evidence lock protocol (R-03)

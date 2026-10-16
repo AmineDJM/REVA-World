@@ -1,0 +1,167 @@
+{
+ "created": "2026-09-28T09:09:16.418609+00:00",
+ "modified": "2026-09-28T09:09:16.709410+00:00",
+ "id": 23010827,
+ "conceptrecid": "3606197",
+ "doi": "10.5281/zenodo.23010827",
+ "conceptdoi": "10.5281/zenodo.3606197",
+ "doi_url": "https://doi.org/10.5281/zenodo.23010827",
+ "metadata": {
+  "title": "The World Atlas of Language Structures Online",
+  "doi": "10.5281/zenodo.23010827",
+  "publication_date": "2026-09-28",
+  "description": "<p>Cite the source of the dataset as:</p>\n\n<blockquote>\n<p>Dryer, Matthew S. &amp; Haspelmath, Martin (eds.) 2013. The World Atlas of Language Structures Online. Leipzig: Max Planck Institute for Evolutionary Anthropology. (Available online at https://wals.info)</p>\n</blockquote>",
+  "access_right": "open",
+  "creators": [
+   {
+    "name": "Matthew Dryer",
+    "affiliation": null
+   },
+   {
+    "name": "Martin Haspelmath",
+    "affiliation": null
+   }
+  ],
+  "contributors": [
+   {
+    "name": "Matthew Dryer",
+    "affiliation": null,
+    "type": "Editor"
+   },
+   {
+    "name": "Martin Haspelmath",
+    "affiliation": null,
+    "type": "Editor"
+   },
+   {
+    "name": "Robert Forkel",
+    "affiliation": null,
+    "type": "DataManager"
+   }
+  ],
+  "keywords": [
+   "cldf:StructureDataset",
+   "linguistics"
+  ],
+  "related_identifiers": [
+   {
+    "identifier": "https://github.com/cldf-datasets/wals/tree/v2020.5",
+    "relation": "isSupplementTo",
+    "resource_type": "software",
+    "scheme": "url"
+   },
+   {
+    "identifier": "https://wals.info",
+    "relation": "isPartOf",
+    "resource_type": "publication",
+    "scheme": "url"
+   }
+  ],
+  "version": "v2020.6",
+  "custom": {
+   "code:codeRepository": "https://github.com/cldf-datasets/wals",
+   "code:programmingLanguage": [
+    {
+     "id": "python",
+     "title": {
+      "en": "Python"
+     }
+    }
+   ]
+  },
+  "resource_type": {
+   "title": "Dataset",
+   "type": "dataset"
+  },
+  "license": {
+   "id": "cc-by-4.0"
+  },
+  "communities": [
+   {
+    "id": "clld"
+   },
+   {
+    "id": "cldf-datasets"
+   }
+  ],
+  "relations": {
+   "version": [
+    {
+     "index": 10,
+     "is_last": true,
+     "parent": {
+      "pid_type": "recid",
+      "pid_value": "3606197"
+     }
+    }
+   ]
+  }
+ },
+ "title": "The World Atlas of Language Structures Online",
+ "links": {
+  "self": "https://zenodo.org/api/records/23010827",
+  "self_html": "https://zenodo.org/records/23010827",
+  "preview_html": "https://zenodo.org/records/23010827?preview=1",
+  "doi": "https://doi.org/10.5281/zenodo.23010827",
+  "self_doi": "https://doi.org/10.5281/zenodo.23010827",
+  "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.23010827",
+  "reserve_doi": "https://zenodo.org/api/records/23010827/draft/pids/doi",
+  "parent": "https://zenodo.org/api/records/3606197",
+  "parent_html": "https://zenodo.org/records/3606197",
+  "parent_doi": "https://doi.org/10.5281/zenodo.3606197",
+  "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.3606197",
+  "self_iiif_manifest": "https://zenodo.org/api/iiif/record:23010827/manifest",
+  "self_iiif_sequence": "https://zenodo.org/api/iiif/record:23010827/sequence/default",
+  "files": "https://zenodo.org/api/records/23010827/files",
+  "media_files": "https://zenodo.org/api/records/23010827/media-files",
+  "latest": "https://zenodo.org/api/records/23010827/versions/latest",
+  "latest_html": "https://zenodo.org/records/23010827/latest",
+  "versions": "https://zenodo.org/api/records/23010827/versions",
+  "draft": "https://zenodo.org/api/records/23010827/draft",
+  "access_links": "https://zenodo.org/api/records/23010827/access/links",
+  "access_grants": "https://zenodo.org/api/records/23010827/access/grants",
+  "access_users": "https://zenodo.org/api/records/23010827/access/users",
+  "access_request": "https://zenodo.org/api/records/23010827/access/request",
+  "access": "https://zenodo.org/api/records/23010827/access",
+  "communities": "https://zenodo.org/api/records/23010827/communities",
+  "communities-suggestions": "https://zenodo.org/api/records/23010827/communities-suggestions",
+  "request_deletion": "https://zenodo.org/api/records/23010827/request-deletion",
+  "file_modification": "https://zenodo.org/api/records/23010827/file-modification",
+  "quota_increase": "https://zenodo.org/api/records/23010827/quota-increase",
+  "requests": "https://zenodo.org/api/records/23010827/requests"
+ },
+ "updated": "2026-09-28T09:09:16.709410+00:00",
+ "recid": "23010827",
+ "revision": 4,
+ "files": [
+  {
+   "id": "0e4710b2-5208-4416-9a6d-cd01f6d51d57",
+   "key": "wals-2020.6.zip",
+   "size": 3617,
+   "checksum": "md5:cf42a8938fcdac69b05536400fb1efc3",
+   "links": {
+    "self": "https://zenodo.org/api/records/23010827/files/wals-2020.6.zip/content"
+   }
+  }
+ ],
+ "swh": {},
+ "owners": [
+  {
+   "id": "46881"
+  }
+ ],
+ "status": "published",
+ "stats": {
+  "downloads": 7840,
+  "unique_downloads": 7012,
+  "views": 37407,
+  "unique_views": 33465,
+  "version_downloads": 58,
+  "version_unique_downloads": 47,
+  "version_unique_views": 279,
+  "version_views": 300
+ },
+ "state": "done",
+ "submitted": true,
+ "_reva_fixture_note": "trimmed: WALS v2020.6 languages por,spa,fre,hcr,bsq,alb,jpn,tur,eng x features 81A,1A,37A,26A; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+}

@@ -4,100 +4,353 @@
   "title": "REVA link taxonomy (registry/links/link_types.yaml)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "owner", "derived_links", "statement_edges"],
+  "required": [
+    "version",
+    "owner",
+    "derived_links",
+    "statement_edges"
+  ],
   "properties": {
-    "version": {"const": 1},
-    "owner": {"const": "LINKS"},
+    "version": {
+      "const": 1
+    },
+    "owner": {
+      "const": "LINKS"
+    },
     "derived_links": {
       "type": "array",
       "minItems": 1,
-      "items": {"$ref": "#/$defs/derived_link"}
+      "items": {
+        "$ref": "#/$defs/derived_link"
+      }
     },
     "statement_edges": {
       "type": "array",
       "minItems": 1,
-      "items": {"$ref": "#/$defs/statement_edge"}
+      "items": {
+        "$ref": "#/$defs/statement_edge"
+      }
     }
   },
   "$defs": {
     "labels": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fr", "en"],
+      "required": [
+        "fr",
+        "en"
+      ],
       "properties": {
-        "fr": {"type": "string", "minLength": 1, "maxLength": 200},
-        "en": {"type": "string", "minLength": 1, "maxLength": 200}
+        "fr": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
       }
     },
     "derived_link": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "labels", "scope", "directed", "derivation", "temporal", "weight", "honesty", "causal",
-                   "status", "path_cost"],
+      "required": [
+        "id",
+        "labels",
+        "scope",
+        "directed",
+        "derivation",
+        "temporal",
+        "weight",
+        "honesty",
+        "causal",
+        "status",
+        "path_cost"
+      ],
       "properties": {
-        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
-        "labels": {"$ref": "#/$defs/labels"},
-        "inverse_labels": {"$ref": "#/$defs/labels"},
-        "scope": {"enum": ["country_country", "entity_entity"]},
-        "directed": {"type": "boolean"},
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{1,63}$"
+        },
+        "labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "inverse_labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "scope": {
+          "enum": [
+            "country_country",
+            "entity_entity"
+          ]
+        },
+        "directed": {
+          "type": "boolean"
+        },
         "derivation": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["method", "sources"],
+          "required": [
+            "method",
+            "sources"
+          ],
           "properties": {
-            "method": {"enum": ["kg_symmetric_property", "kg_shared_object", "kg_shared_subject", "kg_language_family",
-                                "kg_colonial", "kg_former_colony", "kg_succession", "kg_conflict",
-                                "kg_conflict_sides", "atlas_dyadic", "atlas_shared_value"]},
-            "properties": {"type": "array", "items": {"type": "string",
-                           "pattern": "^(P[1-9][0-9]*|[a-z][a-z0-9_]*:[a-z][a-z0-9_]*)$"}},
-            "concepts": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$"}},
-            "sources": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}},
-            "via": {"type": "string"},
-            "notes": {"type": "string"}
+            "method": {
+              "enum": [
+                "kg_symmetric_property",
+                "kg_shared_object",
+                "kg_shared_subject",
+                "kg_language_family",
+                "kg_colonial",
+                "kg_former_colony",
+                "kg_succession",
+                "kg_conflict",
+                "kg_conflict_sides",
+                "atlas_dyadic",
+                "atlas_shared_value",
+                "atlas_computed",
+                "kg_dataset_border",
+                "kg_dataset_colonial",
+                "kg_dataset_sides"
+              ]
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(P[1-9][0-9]*|[a-z][a-z0-9_]*:[a-z][a-z0-9_]*)$"
+              }
+            },
+            "concepts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$"
+              }
+            },
+            "sources": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              }
+            },
+            "via": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            },
+            "atlas": {
+              "$ref": "#/$defs/atlas_spec"
+            }
           },
-          "anyOf": [{"required": ["properties"]}, {"required": ["concepts"]}]
+          "anyOf": [
+            {
+              "required": [
+                "properties"
+              ]
+            },
+            {
+              "required": [
+                "concepts"
+              ]
+            },
+            {
+              "required": [
+                "atlas"
+              ]
+            }
+          ]
         },
         "temporal": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "description"],
+          "required": [
+            "kind",
+            "description"
+          ],
           "properties": {
-            "kind": {"enum": ["interval", "point", "snapshot", "undated"]},
-            "description": {"type": "string"}
+            "kind": {
+              "enum": [
+                "interval",
+                "point",
+                "snapshot",
+                "undated"
+              ]
+            },
+            "description": {
+              "type": "string"
+            }
           }
         },
         "weight": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind"],
+          "required": [
+            "kind"
+          ],
           "properties": {
-            "kind": {"enum": ["none", "source_quantity"]},
-            "unit": {"type": "string"},
-            "notes": {"type": "string"}
+            "kind": {
+              "enum": [
+                "none",
+                "source_quantity",
+                "derived_index"
+              ]
+            },
+            "unit": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            }
           }
         },
-        "honesty": {"$ref": "#/$defs/labels"},
-        "causal": {"const": false},
-        "status": {"enum": ["derivable", "awaiting_source", "no_open_source"]},
-        "path_cost": {"type": "number", "exclusiveMinimum": 0, "maximum": 10}
+        "honesty": {
+          "$ref": "#/$defs/labels"
+        },
+        "causal": {
+          "const": false
+        },
+        "status": {
+          "enum": [
+            "derivable",
+            "awaiting_source",
+            "no_open_source"
+          ]
+        },
+        "path_cost": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        }
       },
-      "if": {"properties": {"directed": {"const": true}}, "required": ["directed"]},
-      "then": {"required": ["inverse_labels"]}
+      "if": {
+        "properties": {
+          "directed": {
+            "const": true
+          }
+        },
+        "required": [
+          "directed"
+        ]
+      },
+      "then": {
+        "required": [
+          "inverse_labels"
+        ]
+      }
     },
     "statement_edge": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["property", "labels", "inverse_labels", "path_cost"],
+      "required": [
+        "property",
+        "labels",
+        "inverse_labels",
+        "path_cost"
+      ],
       "properties": {
-        "property": {"type": "string", "pattern": "^P[1-9][0-9]*$"},
-        "labels": {"$ref": "#/$defs/labels"},
-        "inverse_labels": {"$ref": "#/$defs/labels"},
-        "path_cost": {"type": "number", "exclusiveMinimum": 0, "maximum": 10},
-        "causal": {"type": "boolean"},
-        "causal_phrase": {"$ref": "#/$defs/labels"}
+        "property": {
+          "type": "string",
+          "pattern": "^P[1-9][0-9]*$"
+        },
+        "labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "inverse_labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "path_cost": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "causal": {
+          "type": "boolean"
+        },
+        "causal_phrase": {
+          "$ref": "#/$defs/labels"
+        }
       },
-      "if": {"properties": {"causal": {"const": true}}, "required": ["causal"]},
-      "then": {"required": ["causal_phrase"]}
+      "if": {
+        "properties": {
+          "causal": {
+            "const": true
+          }
+        },
+        "required": [
+          "causal"
+        ]
+      },
+      "then": {
+        "required": [
+          "causal_phrase"
+        ]
+      }
+    },
+    "atlas_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "datasets",
+        "indicator_prefix",
+        "partner",
+        "row_role"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,23}$"
+        },
+        "datasets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,38}$"
+          }
+        },
+        "indicator_prefix": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "partner": {
+          "enum": [
+            "flags.partner_iso3",
+            "flags.counterpart_iso3"
+          ]
+        },
+        "row_role": {
+          "enum": [
+            "subject",
+            "object"
+          ],
+          "description": "the row's iso3 is the link's subject (exporter, reporter) or object (destination)"
+        },
+        "require_dims": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "facet_dims": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "flow": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
     }
   }
 }

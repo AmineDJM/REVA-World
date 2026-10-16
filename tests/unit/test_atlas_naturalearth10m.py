@@ -279,3 +279,66 @@ def test_connector_blocks_schema_drift_and_truncation(raws: dict[str, RawAcquisi
         ne.build({**raws, "map_units": small}, {k: "0" * 64 for k in raws}, keys=KEYS)
     with pytest.raises(SourceResponseError, match="zip"):
         ne.read_layer(b"not a zip", "x")
+
+
+# ----------------------------------------------------------------------------- datasets and fixture excerpt
+def _fixture_raws(origin: str = "test_fixture") -> dict[str, RawAcquisition]:
+    from reva.adapters.connectors.atlas_geo_common import fetch_raw
+
+    http = FixtureHttp(ne.CONNECTOR_NAME)
+    raws = {it.key: asyncio.run(fetch_raw(it, http)) for it in ne.fetch_items()}
+    return {k: r.model_copy(update={"origin": origin}) for k, r in raws.items()}
+
+
+def test_dataset_runs_fetch_only_the_layers_they_need() -> None:
+    assert [i.key for i in ne.fetch_items()] == list(ne.LAYERS)
+    assert [i.key for i in ne.fetch_items([ne.DS_DISPUTED])] == ["disputed_areas"]
+    assert [i.key for i in ne.fetch_items([ne.DS_COUNTRY])] == ["map_units", "countries", "countries_lakes"]
+    assert [i.key for i in ne.fetch_items([ne.DS_BORDERS])] == [
+        "map_units",
+        "boundary_lines_land",
+        "boundary_lines_disputed",
+    ]
+    with pytest.raises(SourceResponseError):
+        ne.fetch_items(["nope"])
+
+
+def test_fixture_excerpt_is_real_closed_and_flagged() -> None:
+    """The committed fixture: real 1:10m features of closed country groups (cut_excerpt.py); every table
+    built from an excerpt says so, the full real disputed layer does not."""
+    raws = _fixture_raws()
+    shas = {k: f"{i:064x}" for i, k in enumerate(raws, start=1)}
+    nb = ne.build(raws, shas)
+    assert nb.excerpt_layers == ["boundary_lines_land", "countries", "countries_lakes", "map_units"]
+    assert nb.ne_version == "5.1.1"
+    c = nb.computation
+    assert c is not None and c.diagnostics["unmapped_units"] == ["CNM", "CYN", "ESB", "WSB"]
+    assert set(c.borders) >= {("GBR", "IRL"), ("DOM", "HTI"), ("MAF", "SXM"), ("CYP", "ne:CNM")}
+    assert 360 < c.borders[("GBR", "IRL")].length_m / 1e3 < 380
+    irl = c.borders[("GBR", "IRL")]
+    assert irl.by_class_m["international"] / irl.length_m > 0.95  # typed by the real boundary line
+    assert c.borders[("ne:CNM", "ne:CYN")].disputed  # line of control
+    assert 69_000 < c.area_m2["IRL"] / 1e6 < 70_000
+    for ds in (ne.DS_COUNTRY, ne.DS_BORDERS):
+        assert all("derived excerpt" in json.loads(r["flags"])["ne_excerpt"] for r in nb.rows[ds])
+    assert not any("ne_excerpt" in json.loads(r["flags"]) for r in nb.rows[ne.DS_DISPUTED])
+    assert len(nb.rows[ne.DS_DISPUTED]) >= 60
+
+
+def test_excerpt_is_refused_from_a_live_acquisition() -> None:
+    raws = _fixture_raws(origin="live")
+    with pytest.raises(SourceResponseError, match="excerpt marker in a live layer"):
+        ne.build(raws, {k: "0" * 64 for k in raws})
+    # the real (non-excerpt) small layers stay accepted from live
+    assert ne.build(raws, {k: "0" * 64 for k in raws}, datasets=[ne.DS_DISPUTED]).rows[ne.DS_DISPUTED]
+
+
+def test_dataset_build_equals_the_full_build_for_that_dataset(raws: dict[str, RawAcquisition]) -> None:
+    shas = {k: f"{i:064x}" for i, k in enumerate(raws, start=1)}
+    full = ne.build(raws, shas, keys=KEYS)
+    for ds in (ne.DS_COUNTRY, ne.DS_BORDERS, ne.DS_DISPUTED):
+        need = {k: raws[k] for k in ne.layers_for([ds])}
+        part = ne.build(need, {k: shas[k] for k in need}, keys=KEYS, datasets=[ds])
+        assert list(part.rows) == [ds] and part.rows[ds] == full.rows[ds]
+    with pytest.raises(SourceResponseError, match="missing"):
+        ne.build({"disputed_areas": raws["disputed_areas"]}, shas, keys=KEYS, datasets=[ne.DS_COUNTRY])

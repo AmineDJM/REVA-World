@@ -62,11 +62,15 @@ def test_every_link_type_is_complete() -> None:
         assert lt.labels["fr"] and lt.labels["en"]
         assert lt.honesty["fr"].startswith("relié via") and lt.honesty["en"].startswith("connected via")
         assert lt.temporal_kind in ("interval", "point", "snapshot", "undated")
-        assert lt.properties or lt.concepts
+        assert lt.properties or lt.concepts or lt.atlas
         if lt.directed:
             assert lt.inverse_labels != lt.labels
         if lt.weight_kind == "source_quantity":
-            assert lt.method.startswith("atlas_")
+            assert lt.method == "atlas_dyadic" and lt.atlas
+        if lt.weight_kind == "derived_index":
+            assert lt.method == "atlas_computed"
+            text = (lt.labels["en"] + lt.honesty["en"]).lower()
+            assert "alliance" not in text and "friend" not in text
 
 
 def test_causal_wording_reserved_to_causal_properties() -> None:

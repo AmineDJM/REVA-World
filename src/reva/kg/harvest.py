@@ -609,6 +609,7 @@ class SpecReport:
     statements: int = 0
     statements_dropped_deprecated: int = 0
     rows_skipped: int = 0
+    candidates_rejected: int = 0  # WhatLinksHere candidates whose own P31 does not contain the class
     statements_enriched: int = 0  # WDQS rows replaced by the snapshot claim (revision, refs, precision)
     statements_unenriched: int = 0  # WDQS rows loaded as such (revision unknown, no references)
     requests: int = 0
@@ -766,8 +767,11 @@ class Harvester:
             found, info = await self.api_seeds(spec)
             rows_total += len(found)
             rep.rows += len(found)
-            if rows_total > max_rows:
-                raise RowBoundExceeded(f"{spec.id}: {rows_total} search results > max_rows {max_rows}",
+            # WhatLinksHere candidates are a superset (filtered by their own P31 at fetch time): the declared
+            # bound applies to the accepted instances (checked after loading), candidates get 20x headroom.
+            bound = max_rows * 20 if info.get("method") == "whatlinkshere" else max_rows
+            if rows_total > bound:
+                raise RowBoundExceeded(f"{spec.id}: {rows_total} search results > bound {bound}",
                                        rows=rows_total, max_rows=max_rows)
             for q in found:
                 seeds.setdefault(q)
@@ -783,8 +787,15 @@ class Harvester:
             return
         assert state is not None
         if purpose == "seed_entities":
+            a = spec.get("api_search") or {}
+            require = set(a.get("instance_of") or []) if (self.via == "api" and a.get("discover") == "whatlinkshere") \
+                else None
             new_objects = await self.fetch_entities(spec, list(seeds), state, rep, full=True,
-                                                    kind=spec.get("entity_kind"), properties=spec.get("properties"))
+                                                    kind=spec.get("entity_kind"), properties=spec.get("properties"),
+                                                    require_p31=require)
+            if require is not None and rep.entities_full > max_rows:
+                rep.failures.append({"code": "row_bound_exceeded", "error": f"{rep.entities_full} accepted "
+                                     f"instances > max_rows {max_rows} (loaded; raise max_rows after review)"})
             for q in new_objects:
                 objects.setdefault(q)
         else:
@@ -850,6 +861,16 @@ class Harvester:
             qs = self.qids_for_source("countries") if self.qids_for_source else country_qids()
             return qs, {"method": "countries"}
         classes = list(dict.fromkeys(a["instance_of"]))
+        if a.get("discover") == "whatlinkshere":
+            cands: list[str] = []
+            wshas: list[str] = []
+            for c in classes:
+                found, sh = await self.client.links_to(c, meta={"spec": spec.id})
+                cands.extend(found)
+                wshas.extend(sh)
+            return list(dict.fromkeys(cands)), {"method": "whatlinkshere", "instance_of": classes,
+                                                "candidates": len(set(cands)), "raw_sha256": wshas,
+                                                "filter": "P31 claim must contain one of instance_of"}
         frontier = list(classes)
         shas: list[str] = []
         info: dict[str, Any] = {"method": "cirrussearch", "instance_of": classes,
@@ -880,7 +901,7 @@ class Harvester:
     # -- entities ---------------------------------------------------------------------------------
     async def fetch_entities(self, spec: Spec, qids: Sequence[str], state: HarvestState, rep: SpecReport, *,
                              full: bool, kind: str | None, properties: Sequence[str] | None = None,
-                             tag: str = "") -> list[str]:
+                             tag: str = "", require_p31: set[str] | None = None) -> list[str]:
         """Fetch + load snapshots in batches of 50 (resumable per batch). Returns object QIDs referenced."""
         done = set(state.data.get("loaded_batches") or [])
         objects: dict[str, None] = {}
@@ -900,6 +921,9 @@ class Harvester:
                     continue
                 e = extract_entity(raw, self.allow, raw_sha256=res.raw_sha_by_id[qid],
                                    retrieved_at=res.retrieved_at, kind_hint=kind, properties=properties)
+                if require_p31 is not None and not (set(e.instance_of) & require_p31):
+                    rep.candidates_rejected += 1  # linked to the class, but not an instance of it
+                    continue
                 ents.append(e)
                 stmts.extend(e.statements)
                 rep.statements_dropped_deprecated += e.dropped["deprecated"]
@@ -1054,27 +1078,11 @@ def ensure_database(db_name: str) -> Any:
                 c.execute(text(f'CREATE DATABASE "{db_name}"'))
     finally:
         admin.dispose()
-    if exists:
-        probe = create_engine(settings.migration_url())
-        try:
-            with probe.connect() as c:
-                ready = c.execute(text("SELECT to_regclass('kg.load') IS NOT NULL AND "
-                                       "to_regclass('ops.budget_ledger') IS NOT NULL")).scalar()
-        finally:
-            probe.dispose()
-        if ready:  # already migrated and seeded: no re-bootstrap per command
-            return settings
-    from reva.adapters.objects.filesystem import FilesystemArtifactStore
-    from reva.adapters.postgres.engine import make_engine
     from reva.cli.bootstrap import bootstrap
-    from reva.cli.seed import seed
 
-    bootstrap(settings)  # migrations to head (incl. 0009_kg) + runtime role passwords; idempotent
-    owner = make_engine("migration", settings)
-    try:
-        seed(owner, FilesystemArtifactStore(OBJECT_ROOT, settings.reva_s3_prefix))
-    finally:
-        owner.dispose()
+    # Migrations to head + runtime role passwords every time (idempotent; the schema moves while agents work);
+    # the registry seed only when the database is new (another agent's registry edit cannot block a harvest).
+    bootstrap(settings, seed_registry=not exists)
     return settings
 
 
@@ -1107,7 +1115,8 @@ class BudgetedSession:
 
 @contextlib.asynccontextmanager
 async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wdqs: int = 1,
-                          planned_wbapi: int = 1, mode: str = "api") -> AsyncIterator[BudgetedSession]:
+                          planned_wbapi: int = 1, mode: str = "api",
+                          reuse_hours: float = 0.0) -> AsyncIterator[BudgetedSession]:
     """The only live Wikidata entry point (invariant 30): reserve -> meter every request -> settle.
 
     The ledger lives in the throwaway harvest database. ``reserve_ingest`` refuses a run that does not fit the
@@ -1137,7 +1146,7 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
         wdqs = metered(inner, engine, res_q, budget=budget)
         wbapi = metered(inner, engine, res_a, budget=budget)
         client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"),
-                                mode=mode)
+                                mode=mode, reuse_seconds=reuse_hours * 3600.0)
         session = BudgetedSession(client, engine, store, run_id)
         yield session
     finally:
@@ -1150,7 +1159,7 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
 
 async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
                       planned_wdqs: int = 50, planned_wbapi: int = 100, via: str = "wdqs",
-                      expand: bool = True, mode: str = "api") -> dict[str, Any]:
+                      expand: bool = True, mode: str = "api", reuse_hours: float = 0.0) -> dict[str, Any]:
     """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
     specs = discover_specs(paths or None)
@@ -1161,7 +1170,7 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
                            "allowlist_sha256": allow.sha256, "specs": []}
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     async with budgeted_client(purpose="harvest", db_name=db_name, planned_wdqs=planned_wdqs,
-                               planned_wbapi=planned_wbapi, mode=mode) as sess:
+                               planned_wbapi=planned_wbapi, mode=mode, reuse_hours=reuse_hours) as sess:
         out["run_id"] = sess.run_id
         report_path = REPORT_DIR / f"{sess.run_id}.json"
         sink = KgDbSink(sess.engine, sess.store)
@@ -1342,7 +1351,7 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
     query limit) gives every item holding one of the ISO 3166-1 alpha-3 codes; their snapshots are read with
     wbgetentities (props info|claims|labels) and each code is assigned from the items' own P298 statements:
     non-deprecated, without end time (P582), on items without dissolution date (P576). Several candidates ->
-    the one classed as a country/sovereign state/territory (P31); still several -> left unmapped (listed).
+    never picked: listed under ``ambiguous`` with every candidate and a class-tier suggestion for review.
     Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title. ``extra_codes`` (TWN)
     are mapped even when the crosswalk does not list them yet (flagged ``not_in_crosswalk``).
     """
@@ -1389,6 +1398,7 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
                 by_code.setdefault(v, []).append(qid)
     countries: dict[str, Any] = {}
     ambiguous: dict[str, list[str]] = {}
+    ambiguous_detail: dict[str, Any] = {}
     unmapped: list[str] = []
     for code in codes:
         opts = sorted(set(by_code.get(code, [])), key=lambda q: int(q[1:]))
@@ -1396,17 +1406,21 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
         if len(opts) == 1:
             pick = opts[0]
         elif len(opts) > 1:
+            # Never picked automatically: listed as ambiguous with the class-tier suggestion for review.
+            suggestion = None
             for tier, tier_classes in enumerate(CLASS_TIERS, start=1):
                 classed = [q for q in opts if set(info[q]["classes"]) & tier_classes]
                 if len(classed) == 1:
-                    pick = classed[0]
-                    note = (f"several items hold the code; kept the only one classed in tier {tier} "
-                            f"({', '.join(sorted(COUNTRY_CLASSES[c] for c in tier_classes))})")
+                    suggestion = {"qid": classed[0], "rule": f"only candidate classed in tier {tier} ("
+                                  f"{', '.join(sorted(COUNTRY_CLASSES[c] for c in tier_classes))})"}
                     break
                 if len(classed) > 1:
                     break
-            if not pick:
-                ambiguous[code] = opts
+            ambiguous_detail[code] = {"candidates": [
+                {"qid": q, "label_en": info[q]["label_en"], "classes": info[q]["classes"],
+                 "lastrevid": info[q]["lastrevid"], "raw_sha256": info[q]["raw_sha256"]} for q in opts],
+                "suggested_by_class_tier": suggestion}
+            ambiguous[code] = opts
         if pick:
             countries[code] = {"qid": pick, "method": "P298", **{k: info[pick][k] for k in
                                ("label_en", "label_fr", "classes", "lastrevid", "raw_sha256")},
@@ -1466,7 +1480,7 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
                   "distinct_qids": len(dup), "shared_qids": {q: c for q, c in dup.items() if len(c) > 1}},
         "countries": dict(sorted(countries.items())),
         "unmapped": sorted(unmapped),
-        "ambiguous": ambiguous,
+        "ambiguous": ambiguous_detail,
     }
     out_path.write_text(json.dumps(doc_out, indent=1, ensure_ascii=False) + "\n")
     stats: dict[str, Any] = doc_out["stats"]
@@ -1621,10 +1635,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     r.add_argument("--via", choices=("wdqs", "api"), default="wdqs",
                    help="api: select seeds with the specs' api_search blocks (CirrusSearch) instead of WDQS")
     r.add_argument("--no-expand", action="store_true", help="skip label snapshots of object entities")
+    r.add_argument("--reuse-hours", type=float, default=24.0,
+                   help="reuse archived Special:EntityData snapshots younger than this (cites their sha/time)")
     for sp in (r, mc):
-        sp.add_argument("--api-mode", choices=("api", "linked_data", "hybrid"), default="api",
+        sp.add_argument("--api-mode", choices=("api", "linked_data", "hybrid", "auto"), default="api",
                         help="api: action API; linked_data: Special:EntityData + REST search; hybrid: action-API "
-                             "search + Special:EntityData (use when the action API is saturated)")
+                             "search + Special:EntityData; auto: wbgetentities per 50 ids, EntityData on 429")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     allow = load_allowlist()
@@ -1682,7 +1698,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
                                               planned_wdqs=args.planned_wdqs,
                                               planned_wbapi=args.planned_wbapi, via=args.via,
-                                              expand=not args.no_expand, mode=args.api_mode))
+                                              expand=not args.no_expand, mode=args.api_mode,
+                                              reuse_hours=args.reuse_hours))
         except BudgetExhausted as e:
             _print({"status": "budget_exhausted", "message": e.message, **e.details})
             return 3

@@ -46,8 +46,12 @@ Run: `uv run python -m reva.atlas.ingest atlas.ucdp|atlas.unga_votes|atlas.cshap
 2. **Historical-state QIDs** from A-HISTECON's `registry/entities/historical_states_qids.json` (dated, each checked
    against Wikidata with evidence; COW codes, applied to the GW codes that denote the same polity): Soviet Union
    Q15180 (1922–1991), Russian Empire, German Reich periods, West/East Germany, Yugoslavia/FRY/Serbia-Montenegro,
-   Czechoslovakia, North/South Yemen, North/South Vietnam, Ottoman Empire, Qing/ROC China, Zanzibar, Taiwan ...
+   Czechoslovakia, North/South Yemen, North/South Vietnam, Ottoman Empire, Qing/ROC China, Zanzibar, Taiwan before 1949-12-08 ...
    → `iso3 = null`, `entity_qid = Q…` in atlas rows; the QID is the KG subject.
+   **Taiwan (V3 TWNMAP)**: TWN joined the crosswalk in 1.1.0, so a policy window maps GW/COW/UCDP 713 → TWN from
+   **1949-12-08** (COW State System 2024 start date; countrycode panel 713 = TWN 1949-2020), keeping `entity_qid`
+   Q865. Earlier dates stay `iso3 = null` (Q865): Voeten's UNGA data codes the China seat 1946-1971 as 713
+   "Taiwan, Province of China", and 1946-1949 votes are the ROC government on the mainland.
 3. **Policy windows for historical states without QID** → `iso3 = null` with the state's name.
 4. **countrycode panel** (country-year); outside the panel's years, the nearest year only when the code maps to
    one entity across all years.
@@ -61,7 +65,7 @@ therefore not DEU).
 ### UCDP (`ucdp.downloads`)
 | Output | Coverage |
 |---|---|
-| atlas `ucdp.orgvio_cy` — 26 UCDP columns verbatim (sb/ns/os/total deaths best/low/high, dyad counts) | 185,432 cells, **194 crosswalk countries**, 1989–2025; 8 unmapped codes kept (USSR 1989–91 → `entity_qid` Q15180, GDR/FRG 1989–90, Czechoslovakia, Yugoslavia/FRY to 2006, North/South Yemen 1989–90, Taiwan). UCDP-coded zeros kept, flagged with the codebook caveat. |
+| atlas `ucdp.orgvio_cy` — 26 UCDP columns verbatim (sb/ns/os/total deaths best/low/high, dyad counts) | 185,432 cells, **194 crosswalk countries**, 1989–2025; 8 unmapped codes kept (USSR 1989–91 → `entity_qid` Q15180, GDR/FRG 1989–90, Czechoslovakia, Yugoslavia/FRY to 2006, North/South Yemen 1989–90; Taiwan was the 8th until crosswalk 1.1.0 — GW 713 → TWN since V3 TWNMAP, a re-ingest leaves 7). UCDP-coded zeros kept, flagged with the codebook caveat. |
 | atlas `ucdp.acd_cy` — **computed** counts of distinct conflicts per country-year: located / at war intensity / primary party / secondary party | 6,835 cells, 161 countries, 1946–2025 (only years with ≥ 1 conflict; no fabricated zeros); flags list the conflict ids and the method. |
 | KG | 303 conflicts (`ucdp:conflict:<id>`), 594 non-state actors (`ucdp:actor:<id>`), 10,159 statements: primary/secondary party, location, non-state side (each as runs of years with the exact years in qualifiers), incompatibility, type (history kept when it changes), start date (UCDP precision), episode ends, intensity per year (2,816), battle-related deaths per year with low/high bounds (1,650, 1989–2025). |
 

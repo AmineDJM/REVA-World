@@ -1,0 +1,29 @@
+[
+  {
+    "request_fingerprint": "93259a6214b39957b38de77f870b60afebde2dd138371a0bfbd1625441fb0b79",
+    "url": "https://data.unesco.org/api/explore/v2.1/catalog/datasets/ich001",
+    "file": "93259a6214b39957.json",
+    "sha256": "00cc7364b6155186fc91b9c5436d236201f3a1299aef1e26055bff919d30f16e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T18:13:06.187375+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "real live capture"
+  },
+  {
+    "request_fingerprint": "b1a5abee291e4d8cdda09a7bb3924d70ed5d32aeccfd73e52c54cdc45728b298",
+    "url": "https://data.unesco.org/api/explore/v2.1/catalog/datasets/ich001/exports/json?select=uuid,ich_public_ref,inscription_year,title_en,title_fr,type_acronym,type_of_element_en,type_of_element_fr,countries,whc_sites,http_url_en",
+    "file": "b1a5abee291e4d8c.json",
+    "sha256": "2911b0e59c45747bafa105d6bff10681a7620201621ac5b0ddedea55e169101e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T18:13:08.357592+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "EXCERPT: 20 of 849 real ich001 records copied verbatim from the live export (selection: multinational elements with >= 9 States or with associated World Heritage properties, plus single-State elements of FR/MX/VN/JP and one PS element); tests parse it with min_expected=1",
+    "excerpt_of_sha256": "3cdbf2710d396bbdf55d1689fe90209a612c0226515e542d5f952d78f6d3dbd5"
+  }
+]

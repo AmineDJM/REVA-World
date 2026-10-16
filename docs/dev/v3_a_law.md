@@ -32,9 +32,9 @@ Minimum-wage law is A-ILO's (not here).
 | `wbl.panel_1971_2024` | 861,840 | 189 | report years 1971-2024 (as-of 1970-10-01 … 2023-10-01) | 3 / 12.2 MB (3 tables) | TWN |
 | `wbl.wbl2026` | 55,100 | 189 | report years 2024-2026 (LF), 2026 (SF, EP) | | TWN |
 | `wbl.wbl1_2026` | 9,310 | 189 | report year 2026 | | TWN |
-| `constitute.constitutions` | 1,550 | 194 | snapshot 2026-10-15 | 1 / 0.15 MB | Baden, Bavaria, Germany_Prussia, Taiwan |
-| `ccp.chronology_v6` | 41,978 | 193 | 1789-2025 | 2 / 119 MB (2 tables) | 32 historical states (Prussia, Austria-Hungary, Yugoslavia, …), Taiwan |
-| `ccp.characteristics_v5` | 93,296 | 193 | 1789-2023 | | 23 historical states, Taiwan |
+| `constitute.constitutions` | 1,550 | 194 | snapshot 2026-10-15 | 1 / 0.15 MB | Baden, Bavaria, Germany_Prussia (Taiwan → TWN since crosswalk 1.1.0) |
+| `ccp.chronology_v6` | 41,978 | 193 | 1789-2025 | 2 / 119 MB (2 tables) | 32 historical states (Prussia, Austria-Hungary, Yugoslavia, …); 713 Taiwan → TWN since crosswalk 1.1.0 |
+| `ccp.characteristics_v5` | 93,296 | 193 | 1789-2023 | | 23 historical states; Taiwan → TWN since crosswalk 1.1.0 |
 | `factbook.legal_2026_01` | 2,369 | 240 | as published 2026-01-22 | 255 / 9.7 MB | AT, AX, BQ, CR, DX, EE (EU), IP, JN, TW, UM, WQ |
 | `ssa.ssptw_2018_2019` | — | — | — | (probe only, 1 request) | budget 10/day < 192 planned: refused until a_law.yaml is merged |
 
@@ -47,7 +47,7 @@ Disk: raw archives ≈ 142 MB + Parquet (temporary test store); well under the 1
 | WBL 1.0 index (2026; panel 1971-2024) | 189 / 189 |
 | WBL 2026 legal-frameworks index | 189 |
 | Full-pension age men / women (WBL 2026, legal basis per cell) | 180 numeric + 9 "NS" (no system) |
-| Pension age men/women, SSPTW 2018-19 (parser on all 184 pages, research copy) | 154 derived by rule, 29 text-only, Taiwan unmapped |
+| Pension age men/women, SSPTW 2018-19 (parser on all 184 pages, research copy) | 154 derived by rule, 29 text-only; `taiwan` ("Taiwan (China)") → TWN since crosswalk 1.1.0 |
 | Constitution in force: year enacted (Constitute) | 187 |
 | CCP last "new" constitution / system year | 193 / 191 |
 | Constitutional voting age (CCP 2023; numeric 154, label 122 over time) | 192 |

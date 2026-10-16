@@ -415,7 +415,7 @@ attempt waited out a shared WDQS 429 cool-down and was replaced by `wbgetentitie
 Only distinct states are mapped (USSR, Czechoslovakia, Yugoslavia/SFRY/FRY, both Germanies, Ottoman Empire, Prussia,
 German Confederation, Austrian Empire/Austria-Hungary, German Empire/Weimar/Nazi Germany, Qing/ROC, Sardinia/
 Kingdom of Italy, the German and Italian states of COW, Joseon/Korean Empire, Zanzibar, the Yemens and Vietnams,
-UAR, Netherlands Antilles) plus Taiwan (current, absent from the ALLC crosswalk). Earlier-border versions of current
+UAR, Netherlands Antilles) plus Taiwan (current; absent from the ALLC crosswalk when mapped — TWN is a crosswalk entity since 1.1.0, so these four entries now only supply Q865, see their `crosswalk_note`). Earlier-border versions of current
 countries (GEACRON "France 1820-1879") are deliberately not mapped. Never changes an iso3.
 
 ## 7. Limitations / follow-ups

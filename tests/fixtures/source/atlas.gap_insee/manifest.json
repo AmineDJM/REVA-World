@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "01c9e725a97cd35b00d517f1b724ab7fab5bb9217c7ebc5a97c8ee4b4630f071",
+    "url": "https://bdm.insee.fr/series/sdmx/data/IPC-2025/A...00........",
+    "file": "01c9e725a97cd35b.json",
+    "sha256": "6cbae95ab23903e92911eae7a6dc58af0d70b1e625333c3142f14a3870814f4d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:14:59.012393+00:00",
+    "licence": "Licence Ouverte / Open Licence 2.0 (Etalab): Insee legal notice, unless stated otherwise; attribution 'Source : Insee' + last update date",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "b49dedd9379a54ed0bae5d05c042725beedf31b6b3734d3e2f3e93adf927b845",
+    "url": "https://bdm.insee.fr/series/sdmx/data/SERIES_BDM/000822501+011800491",
+    "file": "b49dedd9379a54ed.json",
+    "sha256": "99bb6f3c6a8b7cbb65aa70bb8369b71d6b049823fc5fabafdb830ba5322c704c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-16T18:14:59.937068+00:00",
+    "licence": "Licence Ouverte / Open Licence 2.0 (Etalab): Insee legal notice, unless stated otherwise; attribution 'Source : Insee' + last update date",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  }
+]

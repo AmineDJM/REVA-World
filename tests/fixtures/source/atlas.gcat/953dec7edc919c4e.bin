@@ -1,0 +1,78 @@
+#Code	UCode	StateCode	Type	Class	TStart	TStop	ShortName	Name	Location	Longitude	Latitude	Error	Parent	ShortEName	EName	UName
+# Updated 2026 Oct 15 1810:06
+BR	BR	BR	CY	C	1822 Sep  7	-	Brasil	Republica Federativa do Brasil	Brasilia	    -47.8800 	  -15.7900 	0.0200 	-	Brazil	Brazil, Federal Republic of	República Federativa do Brasil
+CA	CA	CA	CY	C	1867 Jul  1	-	Canada	Canada	Ottawa, Ontario	    -75.6800 	   45.4200 	0.0200 	-	Canada	Canada	Canada
+CN	CN	CN	CY	C	1949 Oct  1	-	Zhongguo	Zhonghua Renmin Gongheguo	Beijing	    116.3800 	   39.9200 	0.0200 	-	China	China, People's Republic of	中华人民共和国
+CYM	CYM	CYM	CY	C	1962	*	Cayman Islands	Cayman Islands British Overseas Territory	Georgetown	    -81.3900 	   19.3000 	0.0200 	UK	Cayman Is.	Cayman Islands BOT	Cayman Islands British Overseas Territory
+D	D	D	CY	C	1949 May 23	*	BRD	Bundesrepublik Deutschland	Bonn, Deutschland  (later Berlin)	      7.1000 	   50.7300 	0.0200 	-	Germany	Germany, Federal Republic of	Bundesrepublik Deutschland
+DK	DK	DK	CY	C	 700?	-	Danmark	Kongeriget Danmark	Kobenhavn	     12.5700 	   55.6800 	0.0200 	-	Denmark	Denmark, Kingdom of	Kongeriget Danmark
+DZ	DZ	DZ	CY	C	1962 Jul  5	-	Al Jazair	Al Jumhuriyah al Jaza'iriyah al Dimuqratiyah ash Sha'biyah	Dzayer	      3.0600 	   36.7500 	0.0200 	-	Algeria	Algeria (al Jaza'ir), People's Democratic Republic of	الجمهورية الجزائرية الديمقراطية الشعبية
+E	E	E	CY	C	1580	-	Espana	Reino de Espana	Madrid	     -3.7200 	   40.3800 	0.0200 	-	Spain	Spain (Kingdom of)	Reino de España
+F	F	F	CY	C	 509	-	France	Republique Francaise	Paris	      2.3000 	   48.8600 	0.0200 	-	France	French Republic	République française
+GUF	GUF	GUF	CY	C	1763	-	Guyane	Guyane (DOM)	Cayenne	    -52.3300 	    4.9400 	0.0200 	F	French Guiana	French Guiana, Department	Guyane française
+HK	HK	CN	CYP	C	1997 Jul  1	-	Zhongguo/XG	Xianggang Tebie Xingzhengqu	Xianggang	    114.2000 	   22.3000 	0.0200 	CN	China(Hong Kong)	Hong Kong Special Administrative Region, China	中華人民共和國香港特別行政區
+I	I	I	CY	C	1861 Mar 17	-	Italia	Repubblica Italiana	Roma	     12.4900 	   41.8900 	0.0200 	-	Italy	Italian Republic	Repubblica Italiana
+I-ARAB	I-ARAB	I-ARAB	IGO	C	1976	-	Arabsat	Arabsat, Arab League	Riyadh, Saudi Arabia	     46.7200 	   24.6300 	0.0200 	-	ARABSAT	Arabsat	عرب سات
+I-ESA	I-ESRO	I-ESA	IGO	C	1975 Apr 30	*	ESA	European Space Agency	Paris	      2.3000 	   48.8600 	0.0200 	-	ESA	European Space Agency	European Space Agency
+I-EUT	I-EUT	I-EUT	IGO	C	1977	2001 Jul  2	EUTELSAT	European Telecommunications Satellite Organization	Paris	      2.3000 	   48.8600 	0.0200 	-	EUTELSAT	European Telecommunications Satellite Organization	European Telecommunications Satellite Organization
+I-INT	I-INT	I-INT	IGO	C	1964	2001 Jul 18	INTELSAT	International Telecommunications Satellite Organization	Washington, DC	    -77.0600 	   38.9000 	0.0200 	-	INTELSAT	International Telecommunications Satellite Organization	International Telecommunications Satellite Organization
+I-NATO	I-NATO	I-NATO	IGO	D	1949	-	NATO	North Atlantic Treaty Organization	Brussels	      4.3500 	   50.8500 	0.0200 	-	NATO	North Atlantic Treaty Organization	North Atlantic Treaty Organization
+ID	ID	ID	CY	C	1945 Aug 17	-	Indonesia	Republik Indonesia	Jakarta	    106.8200 	   -6.2000 	0.0200 	-	Indonesia	Indonesia, Republic of	Republik Indonesia
+IN	IN	IN	CY	C	1947 Aug 15	-	India	Republic of India	New Delhi	     77.2100 	   28.6100 	0.0200 	-	India	India, Republic of	Republic of India
+J	J	J	CY	C	 538	-	Nippon	Nippon-koku	Tokyo-to, Honshu, Nippon	    139.6800 	   35.6800 	0.0200 	-	Japan	Japan (Nippon), State of	日本国
+KI	KI	KI	CY	C	1979	-	Kiribati	Kiribati	South Tarawa, Tarawa Atoll	    173.0000 	    1.4300 	0.0200 	-	Kiribati	Kiribati, Republic of (Gilbert Islands)	Kiribati
+KR	KR	KR	CY	C	1948 Aug 15	-	Hanguk	Daehan Min'guk	Seoul	    126.9700 	   37.5700 	0.0200 	-	South Korea	Great Han People's Nation	대한민국
+L	L	L	CY	C	 963	-	Luxembourg	Grand Duche de Luxembourg	Luxembourg	      6.1300 	   49.6100 	0.0200 	-	Luxembourg	Luxembourg, Grand Duchy of	Grand-Duché de Luxembourg
+P	P	P	CY	C	1139 Jul 25	-	Portugal	Republica Portuguesa	Lisboa, Portugal	     -9.1400 	   38.7100 	0.0200 	-	Portugal	Portuguese Republic	República Portuguesa
+PL	PL	PL	CY	C	1989 Jan  1	*	Polska	Rzeczpospolita Polska	Warszawa, Polska	     21.0200 	   52.2300 	0.0200 	-	Poland	Poland, Republic of	Rzeczpospolita Polska
+RU	SU	RU	CY	C	1991 Dec 26	-	Rossiya	Rossiyskaya Federatsiya	Moskva, Rossiya	     37.6200 	   55.7500 	0.0200 	-	Russia	Russian Federation	Российская Федерация
+SK	SK	SK	CY	C	1993 Jan	-	Slovakia	Slovenska republika	Bratislava	     17.1100 	   48.1400 	0.0200 	-	Slovakia	Slovak Republic	Slovenská republika
+SU	SU	SU	CY	C	1922 Dec 30	1991 Dec 26	SSSR	Soyuz Sovetskikh Sotsialisticheskikh Respublik	Moskva, RSFSR, SSSR	     37.6200 	   55.7500 	0.0200 	-	USSR	Union of Soviet Socialist Republics	Союз Советских Социалистических Республик
+TW	TW	TW	CY	C	1949 Dec  7	-	Taiwan	Zhonghua Minguo	Taipei, Taiwan	    121.5200 	   25.0700 	0.0200 	-	Taiwan	China, Republic of (Taiwan)	中華民國
+UK	UK	UK	CY	C	1707 May  1	-	UK	United Kingdom of Great Britain and Northern Ireland	London	     -0.1300 	   51.5000 	0.0200 	-	UK	United Kingdom of Great Britain and Northern Ireland	United Kingdom of Great Britain and Northern Ireland
+US	US	US	CY	C	1776 Jul  4	-	USA	United States of America	Washington, DC	    -77.0200 	   38.9000 	0.0200 	-	USA	United States of America	United States of America
+ZA	ZA	ZA	CY	C	1910 May 31	-	South Africa	Republic of South Africa	Pretoria, Gauteng Province, South Africa	     28.1900 	  -25.7500 	0.0200 	-	South Africa	South Africa, Republic of	Republic of South Africa
+10ADS	10ADS	US	LA	D	1966?	-	ADCOM 10ADS	USAF Aerospace Defence Command, 10th Aerospace Defence Sqn.	Vandenberg AFB, California	   -120.6100 	   34.7500 	0.0200 	AFADC	-	-	USAF Aerospace Defence Command, 10th Aerospace Defence Sqn.
+2SLS	2SLS	US	LA	D	1990s	*	Boeing/2SLS	Boeing/USAF 2SLS	Patrick AFB, Florida	    -80.6100 	   28.2400 	0.0200 	USAF	-	-	Boeing/USAF 2SLS
+3SLS	3SLS	US	LA	D	1990s	*	USAF 3SLS	USAF 3SLS	Patrick AFB, Florida	    -80.6100 	   28.2400 	0.0200 	USAF	-	-	USAF 3SLS
+AE	AE	F	O/LA	B	1980 Mar 26	2017 Mar	Arianespace	Arianespace, Inc.	Paris:Evry, France	      2.4300 	   48.6200 	0.0200 	-	Arianespace	-	Arianespace, Inc.
+AEB	AEB	BR	O/LA/PL/LS/S	C	-	*	AEB	Agencia Espacial Brasileira	San Jose dos Campos, Brasil	    -45.8800 	  -23.1900 	0.0200 	BR	BSA	Brazilian Space Agency	Agência Espacial Brasileira
+AFSMC	AFWDD	US	O/LA/PL	D	1992 Jul	2019 Dec 20	USAF SMC	US Air Force Space and Missile Center	El Segundo, California	   -118.4100 	   33.9200 	0.0200 	USAF	-	-	US Air Force Space and Missile Center
+AFSSD	AFWDD	US	O	D	1961 Apr  1	1967 Jul	USAF SSD	US Air Force Space Systems Division	El Segundo, California	   -118.4100 	   33.9200 	0.0200 	AFSC	-	-	US Air Force Space Systems Division
+BLS	MDSSC	US	O/LA	B	1996	-	Boeing	Boeing Launch Services (?)	Huntington Beach, California	   -118.0000 	   33.6900 	0.0200 	BOHB	-	-	Boeing Launch Services (?)
+CALT	CALT	CN	O/LA/LV/PL/E/LS	C	1957 Nov 11	-	CALT	Zhongguo yunzaihuojian jishu yanjiu yuan	Beijing:Nanyuan	    116.3900 	   39.7800 	0.0200 	CASC	CALT	Chinese Academy of Launch Vehicle Technology (CASC 1st Acad)	中国运载火箭技术研究院
+CGWIC	CGWIC	CN	O	B	1980	-	CGWIC	Zhongguo changcheng gongye jituan	Beijing:Nanyuan	    116.3900 	   39.7800 	0.0200 	CASC	-	China Great Wall Industry Corp.	中国长城工业集团
+CNES	CNES	F	O/LA/LV/PL/W/LS/S	C	1962	-	CNES	Centre Nationale d'Etudes Spatiales, Paris	Paris	      2.3000 	   48.8600 	0.0200 	-	-	National Space Research Center	Centre national d'études spatiales
+ESA	ESRO	I-ESA	O/LA/PL/S	C	1975 Apr 30	-	ESA	European Space Agency	Paris	      2.3000 	   48.8600 	0.0200 	-	-	-	European Space Agency
+EXPACE	EXPACE	CN	LA	B	2016	-	CASIC ExPace	Hangtian kegong huojian jishu youxiangongsi	Beijing:Haidian	    116.3000 	   39.9600 	0.0200 	CASIC	ExPace	ExPace Technology Corp.	航天科工火箭技术有限公司
+FKA	MOM	RU	O/LA/PL	C	2004	2016 Jan  1	Roskosmos	Federal'noe kosmicheskoe agentstvo Rossii (Roskosmos)	Moskva	     37.6200 	   55.7500 	0.0200 	-	-	Roskosmos	Федеральное космическое агентство (Роскосмос)
+GSFC	GSFC	US	O/LA/LV/PL/S	C	1959 May  1	*	GSFC	NASA Goddard Space Flight Center	Greenbelt, Maryland	    -76.8900 	   38.9900 	0.0200 	NASA	-	-	NASA Goddard Space Flight Center
+ILSK	ILSK	RU	LA	B	1995	2019 Apr	ILS-K	International Launch Services, Khrunichev	Moskva	     37.6200 	   55.7500 	0.0200 	KHRU	-	-	International Launch Services, Khrunichev
+ISAS	ISAS	J	O/LA/LV/PL/W/E/LS/S	C	1964 Apr	1981 Apr	ISAS	Ucyu Koku Kenkyujyo	Tokyo:Komaba	    139.6800 	   35.6600 	0.0200 	-	-	Institute of Space and Aeronautical Sci	宇宙航空研究所
+ISRO	ISRO	IN	O/LA/LV/PL/W/E/LS/S	C	1969	-	ISRO	Indian Space Research Organization	Bangalore	     77.5800 	   12.9800 	0.0200 	-	-	-	Indian Space Research Organization
+JAXA	NASDA	J	O/LA/LV/PL/E/S	C	2003 Oct  1	-	JAXA	Ucyu Koku Kenkyu Kaihatsu Kikou	Tokyo:Chofu	    139.5400 	   35.6500 	0.0200 	-	-	Japan Aerospace Exploration Agency	宇宙航空研究開発機構
+JSC	JSC	US	O/LA/PL/S	C	1973 Feb 17	-	NASA JSC	NASA Johnson Space Flight Center	Houston:Clear Lake, Texas	    -95.1200 	   29.5600 	0.0200 	NASA	-	-	NASA Johnson Space Flight Center
+KHRU	KHRU	RU	O/LA/LV/PL/S	C	1994	1998	Khrunichev	GKNPTs im. M.V. Khrunichev, Zavod Khrunichev	Moskva:Fili	     37.5000 	   55.7500 	0.0200 	-	-	Khrunichev State Research and Production Center	ГКНПЦ им. М.В.Хруничева
+KTRAS	KTRAS	RU	O/LA	B	1997	-	Kosmotras	MKK Kosmotras	Moskva	     37.6200 	   55.7500 	0.0200 	-	-	-	ЗАО Международная космическая компания “Космотрас”
+LARCN	LARC	US	O/LA/LV/PL/S	C	1958 Oct  1	-	NASA LaRC	NASA Langley Research Center	Langley Field, Hampton, Virginia	    -76.3800 	   37.0900 	0.0200 	NASA	-	-	NASA Langley Research Center
+LERC	LERC	US	O/LA/PL/S	C	1958	1999 Mar  1	NASA LeRC	NASA Lewis Research Center	Cleveland, Ohio	    -81.8600 	   41.4100 	0.0200 	NASA	-	-	NASA Lewis Research Center
+LMA	MARTD	US	O/LA/LV/PL	B	1995 Mar 15	2003 Jan	LMA	Lockheed Martin Astronautics	Denver:Littleton, Colorado	   -105.0100 	   39.6000 	0.0200 	LMMS	-	-	Lockheed Martin Astronautics
+MHI	MHI	J	LA/LV/PL/E	B	1964	-	MHI	Mitsubishi Jukogyo Kabushiki-kaisha	Tokyo:Minato	    139.7500 	   35.6600 	0.0200 	-	-	Mitsubishi Heavy Industries (Launch Services)	三菱重工業株式会社
+MSC	JSC	US	O/LA/PL/S	C	1962 Mar  1	1973 Feb 17	MSC	NASA Manned Spacecraft Center	Houston:Clear Lake, Texas	    -95.1200 	   29.5600 	0.0200 	NASA	-	-	NASA Manned Spacecraft Center
+MSFC	MSFC	US	O/LA/LV/PL/E/S	C	1960	-	NASA MSFC	NASA Marshall Space Flight Center	Huntsville, Alabama	    -86.6500 	   34.6800 	0.0200 	NASA	-	-	NASA Marshall Space Flight Center
+MVS	MVS	SU	O/LA	D	1946 Mar	1950 Feb	MVS	Ministerstvo Voenniy Sili?	Moskva	     37.6200 	   55.7500 	0.0200 	-	-	Miinistry of the Armed Forces	Министерство Вооруженных Сил СССР
+NASDA	NASDA	J	O/LA/LV/PL/E/LS/S	C	1969 Oct	2003 Oct  1	NASDA	Ucyu Kaihatsu Jigyoudan	Tokyo, Nippon	    139.6800 	   35.6900 	0.0200 	-	-	National Space Development Adminstration	宇宙開発事業団
+NRL	NRL	US	O/LA/LV/PL/E/LS/S	D	1923	-	NRL	Naval Research Lab	Washington, D.C.	    -77.0200 	   38.9000 	0.0200 	USN	-	-	Naval Research Lab
+ORD	ORD	US	LA/S	D	1944	1949 Oct	USA OR	US Army Ordnance Dept. HQ, White Sands Proving Ground	White Sands, New Mexico	   -106.3800 	   32.4000 	0.0200 	OCO	-	-	US Army Ordnance Dept. HQ, White Sands Proving Ground
+OSC	OSC	US	O/LA/LV/PL/LS	B	1986	1993	OSC-Fairfax	Orbital Sciences Corp.	Fairfax, Virginia	    -77.3000 	   38.8500 	0.0200 	-	Orbital Sciences	-	Orbital Sciences Corp.
+OSCC	SDCO	US	O/LA/LV/PL/E	B	1988	2015 Feb 10	OSC Chandler	Orbital Sciences Corp./Chandler	Phoenix:Chandler, Arizona	   -111.8300 	   33.3000 	0.0200 	OSC	-	-	Orbital Sciences Corp./Chandler
+RVSN	RVSN	SU	O/LA/PL/LS	D	1959 Dec 17	1991 Dec	RVSN	Rakentiye Voiska Strategicheskogo Naznacheniye	Mosvka?	     37.6200 	   55.7500 	0.0200 	MO	-	Strategic Rocket Forces	Ракетные войска стратегического назначения
+RVSNR	RVSN	RU	O/LA/PL	D	1991 Dec	-	RVSN RF	Rakentiye Voiska Strategicheskogo Naznacheniye (Rossisk. Fed.)	Mosvka?	     37.6200 	   55.7500 	0.0200 	MORF	-	Russian Strategic Rocket Forces	Ракетные войска стратегического назначения Российской Федерации
+S4300	S4300	US	LA	D	-	-	SAC 4300SS	USAF Strategic Air Command, 4300th Support Sqn.	Vandenberg AFB, California	   -120.6100 	   34.7500 	0.0200 	USAF	-	-	USAF Strategic Air Command, 4300th Support Sqn.
+SAMSO	AFWDD	US	O/LA/LV/PL/S	D	1967 Jul	1979 Oct	SAMSO	USAF Space and Missile Systems Organization	El Segundo, California	   -118.4100 	   33.9200 	0.0200 	USAF	-	-	USAF Space and Missile Systems Organization
+SAST	SBA	CN	O/LA/LV/PL	B	1993	-	SAST	Shanghai hangtian jishu yanjiuyuan	Shanghai:Minghan	    121.3800 	   31.1100 	0.0200 	CASC	-	Shanghai Academy of Space Technology (CASC 8th Acad)	上海航天技术研究院
+SEALC	SEALP	CYM	O/LA	B	1997	2000 Sep	SeaLaunch	Sea Launch Limited Partnership	Georgetown, Cayman Islands	    -81.3900 	   19.3000 	0.0200 	-	-	-	Sea Launch Limited Partnership
+SPX	SPX	US	O/LA/LV/PL/E/LS/S	B	2007 Aug	-	SpaceX	SpaceX	Hawthorne, California	   -118.3500 	   33.9200 	0.0200 	-	-	-	SpaceX
+STSM	STSM	F	O/LA	B	1996 Aug  6	*	Starsem	Starsem	Paris:Evry	      2.4300 	   48.6200 	0.0200 	-	-	-	Starsem
+VVKO	GUKOS	RU	O/LA	D	2011 Dec  1	2015	VVKO	Voisk Vosdushno-Kosmicheskoi Oborona	Moskva	     37.6200 	   55.7500 	0.0200 	MORF	-	Aerospace Defence Forces	Войска воздушно-космической обороны
+XIDO	XIDO	CN	LA/LV	B	2015?	-	Xinghe Dongli	Xinghe Dongli (Beijing) kongjian keji YG	Beijing	    116.3800 	   39.9200 	0.0200 	-	Galactic Energy	Galactic Energy Co.	星河动力（北京）空间科技有限公司

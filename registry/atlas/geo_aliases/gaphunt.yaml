@@ -1,0 +1,33 @@
+# Agent GAPHUNT: provider geography codes of the gap-fill connectors (src/reva/adapters/connectors/atlas_gap_*.py).
+# Every alias names an ISO 3166-1 entity that the provider publishes under its own code; the evidence is the
+# provider's own label for the code, in the archived response (and checked by the parser where noted).
+# Not mapped (kept with iso3 = null): parts of an entity (CBS islands GM9001 Bonaire, GM9002 St. Eustatius,
+# GM9003 Saba = parts of BES; Eurostat NUTS-3 NO0B1), the INSEE group "DOM" (see atlas_gap_insee.py) and
+# national totals (INSEE FE/FM, Eurostat FR/FI/NO), which other sources already report for FRA/FIN/NOR.
+schemes:
+  nuts_gaphunt:
+    base: null
+    source: {kind: provider_label, url: "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_d2jan", note: "Eurostat NUTS 2021 labels returned with every response (dimension geo, lang=EN); atlas_gap_eurostat_nuts.GEOS checks them on each parse"}
+    aliases:
+      - {code: FRY1, iso3: GLP, source: "Eurostat geo label 'Guadeloupe' (NUTS-2 FRY1, French overseas department; ISO 3166-1 GLP)"}
+      - {code: FRY2, iso3: MTQ, source: "Eurostat geo label 'Martinique' (NUTS-2 FRY2; ISO 3166-1 MTQ)"}
+      - {code: FRY3, iso3: GUF, source: "Eurostat geo label 'Guyane' (NUTS-2 FRY3, French Guiana; ISO 3166-1 GUF)"}
+      - {code: FRY4, iso3: REU, source: "Eurostat geo label 'La Réunion' (NUTS-2 FRY4; ISO 3166-1 REU)"}
+      - {code: FRY5, iso3: MYT, source: "Eurostat geo label 'Mayotte' (NUTS-2 FRY5; ISO 3166-1 MYT)"}
+      - {code: FI20, iso3: ALA, source: "Eurostat geo label 'Åland' (NUTS-2 FI20; ISO 3166-1 ALA, Åland Islands)"}
+      - {code: NO0B, iso3: SJM, source: "Eurostat geo label 'Svalbard og Jan Mayen' (NUTS-2 NO0B, NUTS 2021; ISO 3166-1 SJM, Svalbard and Jan Mayen)"}
+  insee_gaphunt:
+    base: null
+    source: {kind: provider_label, url: "https://bdm.insee.fr/series/sdmx/data/IPC-2025", note: "INSEE BDM REF_AREA codes = department codes, named in each series title (TITLE_FR), checked by atlas_gap_insee"}
+    aliases:
+      - {code: D971, iso3: GLP, source: "INSEE BDM IPC-2025 series titles '... - Guadeloupe - ...' (REF_AREA D971, department 971)"}
+      - {code: D972, iso3: MTQ, source: "INSEE BDM IPC-2025 series titles '... - Martinique - ...' (REF_AREA D972)"}
+      - {code: D973, iso3: GUF, source: "INSEE BDM IPC-2025 series titles '... - Guyane - ...' (REF_AREA D973)"}
+      - {code: D974, iso3: REU, source: "INSEE BDM IPC-2025 series titles '... - La réunion - ...' (REF_AREA D974)"}
+      - {code: D976, iso3: MYT, source: "INSEE BDM IPC-2025 series titles '... - Mayotte - ...' (REF_AREA D976)"}
+      - {code: "976", iso3: MYT, source: "INSEE BDM SMIC-COTISATIONS series 011800491 'Montant du Smic ... brut horaire à Mayotte' (REF_AREA 976)"}
+  cbs_gaphunt:
+    base: null
+    source: {kind: provider_label, url: "https://opendata.cbs.nl/ODataApi/odata/83774ENG/CaribbeanNetherlands", note: "CBS StatLine region code list of the Caribbean Netherlands tables"}
+    aliases:
+      - {code: CN01, iso3: BES, source: "CBS code list 'CaribbeanNetherlands': CN01 = 'Caribbean Netherlands' (Bonaire, St. Eustatius and Saba together; ISO 3166-1 BES)"}

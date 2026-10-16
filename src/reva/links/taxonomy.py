@@ -49,6 +49,11 @@ class LinkType:
     path_cost: float
     raw: Mapping[str, Any] = field(repr=False, default_factory=dict)
 
+    @property
+    def atlas(self) -> Mapping[str, Any] | None:
+        """The dyadic atlas spec (``derivation.atlas``) of an ``atlas_dyadic`` type, if declared."""
+        return (self.raw.get("derivation") or {}).get("atlas")
+
 
 @dataclass(frozen=True)
 class EdgeType:
@@ -104,8 +109,20 @@ def validate_taxonomy(doc: Mapping[str, Any], kg_properties: set[str] | None = N
     for d in doc["derived_links"]:
         if not d["honesty"]["fr"].startswith("relié via") or not d["honesty"]["en"].startswith("connected via"):
             problems.append(f"{d['id']}: honesty wording must start with 'relié via' / 'connected via'")
-        if d["weight"]["kind"] == "source_quantity" and not d["derivation"]["method"].startswith("atlas_"):
+        if d["weight"]["kind"] == "source_quantity" and d["derivation"]["method"] != "atlas_dyadic":
             problems.append(f"{d['id']}: only atlas/dataset quantities may weight a link")
+        if d["weight"]["kind"] == "derived_index" and d["derivation"]["method"] != "atlas_computed":
+            problems.append(f"{d['id']}: a derived index weight needs method atlas_computed (formula in basis)")
+        if d["derivation"]["method"] == "atlas_computed" and d["weight"]["kind"] != "derived_index":
+            problems.append(f"{d['id']}: an atlas_computed link must label its weight derived_index")
+        if d["derivation"].get("atlas") and d["derivation"]["method"] != "atlas_dyadic":
+            problems.append(f"{d['id']}: derivation.atlas is only for atlas_dyadic types")
+        text = (d["labels"]["en"] + " " + d["honesty"]["en"]).lower()
+        for word in (
+            ("alliance", "friendship", "ally", "allies") if d["derivation"]["method"] == "atlas_computed" else ()
+        ):
+            if word in text:
+                problems.append(f"{d['id']}: a computed index is not an {word}")
         for word in ("cause", "because", "parce que", "à cause"):
             if word in d["honesty"]["en"].lower() or word in d["honesty"]["fr"].lower():
                 problems.append(f"{d['id']}: causal wording in a derived link")

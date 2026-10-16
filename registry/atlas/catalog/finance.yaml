@@ -1,0 +1,292 @@
+# Atlas catalog 'finance' (agent A-FISCAL, 2026-10-16). Provider-declared concepts (not human-reviewed).
+# Generated from the live dataflow contents; see docs/dev/v3_a_fiscal.md.
+domain: finance
+labels:
+  fr: Finance et monnaie (BRI)
+  en: Finance and money (BIS)
+maintainer: A-FISCAL
+concepts:
+- id: finance.policy_rate
+  labels:
+    fr: Taux directeur de la banque centrale (fin de mois)
+    en: Central bank policy rate (end of month)
+  definition: 'BIS central bank policy rates: the policy rate in force at the end of each month; flags.compilation gives the
+    BIS description of which rate is used in each period.'
+  unit: '% per year'
+  domain: finance
+  subdomain: monetary_policy
+  theme: finance
+  source_order:
+  - bis.cbpol.CBPOL
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: finance.credit_nonfin_gdp
+  labels:
+    fr: Crédit au secteur non financier (% du PIB)
+    en: Credit to the non-financial sector (% of GDP)
+  definition: 'BIS total credit statistics: credit to the non-financial sector from all sectors, market value, percentage
+    of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=C|tc_lenders=A|valuation=M|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.credit_private_nonfin_gdp
+  labels:
+    fr: Crédit au secteur privé non financier (% du PIB)
+    en: Credit to the private non-financial sector (% of GDP)
+  definition: 'BIS total credit statistics: credit to the private non-financial sector from all sectors, market value, percentage
+    of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=P|tc_lenders=A|valuation=M|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.credit_private_nonfin_banks_gdp
+  labels:
+    fr: Crédit au secteur privé non financier, par les banques (% du PIB)
+    en: Credit to the private non-financial sector, from banks (% of GDP)
+  definition: 'BIS total credit statistics: credit to the private non-financial sector, from banks from banks, market value,
+    percentage of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=P|tc_lenders=B|valuation=M|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.credit_households_gdp
+  labels:
+    fr: Crédit au ménages et ISBLSM (% du PIB)
+    en: Credit to the households and NPISHs (% of GDP)
+  definition: 'BIS total credit statistics: credit to the households and NPISHs from all sectors, market value, percentage
+    of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=H|tc_lenders=A|valuation=M|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.credit_nonfin_corporations_gdp
+  labels:
+    fr: Crédit au sociétés non financières (% du PIB)
+    en: Credit to the non-financial corporations (% of GDP)
+  definition: 'BIS total credit statistics: credit to the non-financial corporations from all sectors, market value, percentage
+    of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=N|tc_lenders=A|valuation=M|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.credit_government_nominal_gdp
+  labels:
+    fr: Crédit au administrations publiques (valeur nominale) (% du PIB)
+    en: Credit to the general government (nominal value) (% of GDP)
+  definition: 'BIS total credit statistics: credit to the general government (nominal value) from all sectors, nominal value,
+    percentage of GDP, adjusted for breaks; end of quarter.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.tc.TC|tc_borrowers=G|tc_lenders=A|valuation=N|unit_type=770|tc_adjust=A
+  provider_declared: true
+  notes: Quarterly cells (per-source series).
+- id: finance.property_prices_real_index
+  labels:
+    fr: Prix réels de l'immobilier résidentiel (indice 2010 = 100)
+    en: Real residential property prices (index 2010 = 100)
+  definition: 'BIS selected residential property price series: real residential property prices (index 2010 = 100), quarterly.'
+  unit: index 2010 = 100
+  domain: finance
+  subdomain: property_prices
+  theme: finance
+  source_order:
+  - bis.spp.SPP|value=R|unit_measure=628
+  provider_declared: true
+  notes: Quarterly cells; flags.title_ts / coverage give the series coverage.
+- id: finance.property_prices_nominal_index
+  labels:
+    fr: Prix nominaux de l'immobilier résidentiel (indice 2010 = 100)
+    en: Nominal residential property prices (index 2010 = 100)
+  definition: 'BIS selected residential property price series: nominal residential property prices (index 2010 = 100), quarterly.'
+  unit: index 2010 = 100
+  domain: finance
+  subdomain: property_prices
+  theme: finance
+  source_order:
+  - bis.spp.SPP|value=N|unit_measure=628
+  provider_declared: true
+  notes: Quarterly cells; flags.title_ts / coverage give the series coverage.
+- id: finance.property_prices_real_yoy
+  labels:
+    fr: Prix réels de l'immobilier résidentiel (variation sur un an)
+    en: Real residential property prices (year-on-year change)
+  definition: 'BIS selected residential property price series: real residential property prices (year-on-year change), quarterly.'
+  unit: '% year-on-year'
+  domain: finance
+  subdomain: property_prices
+  theme: finance
+  source_order:
+  - bis.spp.SPP|value=R|unit_measure=771
+  provider_declared: true
+  notes: Quarterly cells; flags.title_ts / coverage give the series coverage.
+- id: finance.property_prices_nominal_yoy
+  labels:
+    fr: Prix nominaux de l'immobilier résidentiel (variation sur un an)
+    en: Nominal residential property prices (year-on-year change)
+  definition: 'BIS selected residential property price series: nominal residential property prices (year-on-year change),
+    quarterly.'
+  unit: '% year-on-year'
+  domain: finance
+  subdomain: property_prices
+  theme: finance
+  source_order:
+  - bis.spp.SPP|value=N|unit_measure=771
+  provider_declared: true
+  notes: Quarterly cells; flags.title_ts / coverage give the series coverage.
+- id: finance.debt_service_ratio_private_nonfin
+  labels:
+    fr: Ratio du service de la dette, secteur privé non financier
+    en: Debt service ratio, private non-financial sector
+  definition: 'BIS debt service ratio: interest payments plus amortisations relative to income, private non-financial sector,
+    quarterly.'
+  unit: '% of income'
+  domain: finance
+  subdomain: debt_service
+  theme: finance
+  source_order:
+  - bis.dsr.DSR|dsr_borrowers=P
+  provider_declared: true
+- id: finance.debt_service_ratio_households
+  labels:
+    fr: Ratio du service de la dette, ménages et ISBLSM
+    en: Debt service ratio, households and NPISHs
+  definition: 'BIS debt service ratio: interest payments plus amortisations relative to income, households and NPISHs, quarterly.'
+  unit: '% of income'
+  domain: finance
+  subdomain: debt_service
+  theme: finance
+  source_order:
+  - bis.dsr.DSR|dsr_borrowers=H
+  provider_declared: true
+- id: finance.debt_service_ratio_nonfin_corporations
+  labels:
+    fr: Ratio du service de la dette, sociétés non financières
+    en: Debt service ratio, non-financial corporations
+  definition: 'BIS debt service ratio: interest payments plus amortisations relative to income, non-financial corporations,
+    quarterly.'
+  unit: '% of income'
+  domain: finance
+  subdomain: debt_service
+  theme: finance
+  source_order:
+  - bis.dsr.DSR|dsr_borrowers=N
+  provider_declared: true
+- id: finance.eer_real_broad
+  labels:
+    fr: Taux de change effectif réel (panier large)
+    en: Real effective exchange rate (broad basket)
+  definition: 'BIS effective exchange rate indices: real effective exchange rate (broad basket), monthly average (CPI-deflated
+    for real rates).'
+  unit: index 2020 = 100
+  domain: finance
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer.EER|eer_type=R|eer_basket=B
+  provider_declared: true
+  notes: Monthly cells (per-source series).
+- id: finance.eer_nominal_broad
+  labels:
+    fr: Taux de change effectif nominal (panier large)
+    en: Nominal effective exchange rate (broad basket)
+  definition: 'BIS effective exchange rate indices: nominal effective exchange rate (broad basket), monthly average (CPI-deflated
+    for real rates).'
+  unit: index 2020 = 100
+  domain: finance
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer.EER|eer_type=N|eer_basket=B
+  provider_declared: true
+  notes: Monthly cells (per-source series).
+- id: finance.eer_real_narrow
+  labels:
+    fr: Taux de change effectif réel (panier restreint)
+    en: Real effective exchange rate (narrow basket)
+  definition: 'BIS effective exchange rate indices: real effective exchange rate (narrow basket), monthly average (CPI-deflated
+    for real rates).'
+  unit: index 2020 = 100
+  domain: finance
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer.EER|eer_type=R|eer_basket=N
+  provider_declared: true
+  notes: Monthly cells (per-source series).
+- id: finance.eer_nominal_narrow
+  labels:
+    fr: Taux de change effectif nominal (panier restreint)
+    en: Nominal effective exchange rate (narrow basket)
+  definition: 'BIS effective exchange rate indices: nominal effective exchange rate (narrow basket), monthly average (CPI-deflated
+    for real rates).'
+  unit: index 2020 = 100
+  domain: finance
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer.EER|eer_type=N|eer_basket=N
+  provider_declared: true
+  notes: Monthly cells (per-source series).
+- id: finance.credit_gdp_ratio
+  labels:
+    fr: Ratio crédit/PIB (observé)
+    en: Credit-to-GDP ratio (actual)
+  definition: 'BIS credit-to-GDP gaps: credit-to-gdp ratio (actual), credit to the private non-financial sector from all sectors;
+    trend from a one-sided HP filter (lambda 400,000), quarterly.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.credit_gap.CG|tc_borrowers=P|tc_lenders=A|cg_dtype=A
+  provider_declared: true
+- id: finance.credit_gdp_trend
+  labels:
+    fr: Tendance du ratio crédit/PIB (filtre HP)
+    en: Credit-to-GDP trend (HP filter)
+  definition: 'BIS credit-to-GDP gaps: credit-to-gdp trend (hp filter), credit to the private non-financial sector from all
+    sectors; trend from a one-sided HP filter (lambda 400,000), quarterly.'
+  unit: '% of GDP'
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.credit_gap.CG|tc_borrowers=P|tc_lenders=A|cg_dtype=B
+  provider_declared: true
+- id: finance.credit_gdp_gap
+  labels:
+    fr: Écart du ratio crédit/PIB à sa tendance
+    en: Credit-to-GDP gap
+  definition: 'BIS credit-to-GDP gaps: credit-to-gdp gap, credit to the private non-financial sector from all sectors; trend
+    from a one-sided HP filter (lambda 400,000), quarterly.'
+  unit: percentage points of GDP
+  domain: finance
+  subdomain: credit
+  theme: finance
+  source_order:
+  - bis.credit_gap.CG|tc_borrowers=P|tc_lenders=A|cg_dtype=C
+  provider_declared: true

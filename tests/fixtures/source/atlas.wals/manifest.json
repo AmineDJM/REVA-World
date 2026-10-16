@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "c1b3b040552a37b99f9727ffcdfa9b6b65575b84b17ec0ca5681cffeb6b69ed8",
+    "url": "https://zenodo.org/api/records/3606197/versions/latest",
+    "file": "record.json",
+    "sha256": "9741e5f0385da2e28aaaf043f9d7343699a8636feaae79b8b388c6a239d0231d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: WALS v2020.6 languages por,spa,fre,hcr,bsq,alb,jpn,tur,eng x features 81A,1A,37A,26A; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  },
+  {
+    "request_fingerprint": "009f46965109b01dc54e00a910d5d081736c986da6a23358e6284147d9a5a985",
+    "url": "https://zenodo.org/api/records/23010827/files/wals-2020.6.zip/content",
+    "file": "release.zip",
+    "sha256": "475c24bfef59055f2b4d1a25031cac9b655d7eb3c40c2aa83a19c77ce4e5c29e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: WALS v2020.6 languages por,spa,fre,hcr,bsq,alb,jpn,tur,eng x features 81A,1A,37A,26A; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  }
+]

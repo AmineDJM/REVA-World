@@ -1,0 +1,30 @@
+# V3 atlas (agent A-FISCAL): BIS statistics through the BIS SDMX RESTful API (stats.bis.org).
+# Connector src/reva/adapters/connectors/atlas_bis.py (atlas tables bis.cbpol, bis.tc, bis.spp, bis.dsr,
+# bis.eer, bis.credit_gap).
+source_key: bis.stats
+title: BIS statistics (central bank policy rates, credit to the non-financial sector, property prices, debt service ratios, effective exchange rates, credit-to-GDP gaps)
+provider_url: https://data.bis.org/
+lineage_family: bis
+rights:
+  licence: "BIS terms of permitted use of BIS statistics (use unrestricted provided the BIS is cited as source)"
+  licence_url: https://data.bis.org/help/legal#terms-of-permitted-use-of-bis-statistics
+  attribution: "Source: Bank for International Settlements (BIS) statistics"
+  terms_quote: >-
+    The use of the statistics is unrestricted, provided that: if the statistics are reproduced, the BIS must be
+    cited in your publication or product as the source of the statistics; if the statistics will be translated
+    into another language, a statement must be included in your publication or product that the translation is
+    not an official BIS translation; your use of the statistics must not be potentially misleading, for example
+    by implying endorsement or affiliation with the BIS or any body affiliated with the BIS; if the statistics
+    will be used in a commercial publication or product, their inclusion in the publication or product will not
+    result in any additional charge to subscribers or other users; [no warranty; no investment advice]. No other
+    use is permissible.
+  licence_checked: "2026-10-16"
+metadata:
+  allowed_hosts: [stats.bis.org]
+  api: https://stats.bis.org/api/v1/data/<flow>/<key> (Accept application/vnd.sdmx.data+csv;version=2.0.0;labels=both)
+  bulk: https://data.bis.org/bulkdownload (same dataflows as ZIP; not used, the daily series make them large)
+  authentication: none
+  cadence: "monthly / quarterly releases (release calendar https://data.bis.org/release-calendar); monthly check"
+  notes: >-
+    Most BIS data sets rely on national statistics communicated by central banks and other national
+    authorities. The BIS ceased receiving data from public authorities in Russia after 28 February 2022.

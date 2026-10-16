@@ -94,7 +94,8 @@
    "review_status": "agent_mapped_pending_maintainer_review",
    "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan, Province of China'. Current entity absent from the ALLC crosswalk (not a historical state).",
    "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
-   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00",
+   "crosswalk_note": "TWN is a crosswalk entity since crosswalk 1.1.0 (2026-10-16): the 'Not in the ALLC crosswalk' evidence above predates it. maps to TWN through the Maddison iso3 scheme; this entry now only supplies the QID (agent TWNMAP)."
   },
   {
    "provider": "gapminder",
@@ -114,7 +115,8 @@
    "review_status": "agent_mapped_pending_maintainer_review",
    "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan'. Current entity absent from the ALLC crosswalk.",
    "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
-   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00",
+   "crosswalk_note": "TWN is a crosswalk entity since crosswalk 1.1.0 (2026-10-16): the 'Not in the ALLC crosswalk' evidence above predates it. maps to TWN through the Gapminder geo scheme; this entry now only supplies the QID (agent TWNMAP)."
   },
   {
    "provider": "hyde",
@@ -134,7 +136,8 @@
    "review_status": "agent_mapped_pending_maintainer_review",
    "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: '158 (Taiwan)'. ISO 3166 numeric 158; not in the crosswalk.",
    "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
-   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00",
+   "crosswalk_note": "TWN is a crosswalk entity since crosswalk 1.1.0 (2026-10-16): the 'Not in the ALLC crosswalk' evidence above predates it. maps to TWN as ISO 3166-1 numeric 158; this entry now only supplies the QID (agent TWNMAP)."
   },
   {
    "provider": "hyde",
@@ -1712,7 +1715,8 @@
    "review_status": "agent_mapped_pending_maintainer_review",
    "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan'. Not in the ALLC crosswalk.",
    "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
-   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00",
+   "crosswalk_note": "TWN is a crosswalk entity since crosswalk 1.1.0 (2026-10-16): the 'Not in the ALLC crosswalk' evidence above predates it. COW/GW 713 maps to TWN from 1949-12-08 (COW State System 2024 start date; KGGEOPOL STATE_CODE_POLICY in atlas_geopol_common.py); earlier dates keep iso3 null; this entry now only supplies the QID (agent TWNMAP)."
   }
  ]
 }

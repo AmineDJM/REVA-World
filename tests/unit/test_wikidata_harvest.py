@@ -536,6 +536,26 @@ async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytes
     assert stats["mapped_crosswalk"] == 2 and doc["unmapped"] == []
 
 
+async def test_map_countries_never_picks_between_several_holders(tmp_path: Path,
+                                                                 monkeypatch: pytest.MonkeyPatch) -> None:
+    cw = tmp_path / "cw.json"
+    cw.write_text(json.dumps({"entities": [{"key": "PSE", "iso3": "PSE", "label": "State of Palestine"}]}))
+    monkeypatch.setattr(hv, "CROSSWALK", cw)
+    claim = {"rank": "normal", "mainsnak": snak("P298", "PSE", "external-id")}
+    ents = {"Q219060": {"id": "Q219060", "lastrevid": 1, "claims": {
+                "P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]}},
+            "Q407199": {"id": "Q407199", "lastrevid": 2, "claims": {
+                "P298": [claim], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q1048835")}]}}}
+    http = ScriptedHttp(router=_search_router({"haswbstatement:P298=PSE": ["Q219060", "Q407199"]}, ents))
+    out = tmp_path / "q.json"
+    await hv.map_countries_search(client_for(http, tmp_path), out_path=out, extra_codes=())
+    doc = json.loads(out.read_text())
+    assert "PSE" not in doc["countries"] and doc["unmapped"] == ["PSE"]
+    amb = doc["ambiguous"]["PSE"]
+    assert [c["qid"] for c in amb["candidates"]] == ["Q219060", "Q407199"]
+    assert amb["suggested_by_class_tier"]["qid"] == "Q219060"  # a suggestion for review, not a pick
+
+
 async def test_requests_are_spaced_out_while_recovering_from_a_429(tmp_path: Path) -> None:
     clock = FakeClock()
     lock = wd.MachineLock(tmp_path, min_interval=2.0, clock=clock, sleep=clock.sleep)
@@ -617,3 +637,34 @@ async def test_linked_data_mode_uses_entitydata_and_rest_search(tmp_path: Path) 
     assert res.missing == ("Q404",) and res.entities["Q17167"]["lastrevid"] == 2_000_000_001
     assert "la" not in res.entities["Q17167"]["labels"]  # pruned to the requested languages
     assert all("Special:EntityData/" in u or u.startswith(wd.REST_SEARCH_URL) for u, _ in http.calls)
+
+
+async def test_auto_mode_falls_back_to_entitydata_on_429(tmp_path: Path) -> None:
+    def route(url: str) -> tuple[int, bytes, dict[str, str]]:
+        if "action=wbgetentities" in url:
+            return 429, b"You are making too many requests to the API.", {"retry-after": "30"}
+        q = url.split("Special:EntityData/")[1].split(".json")[0]
+        ent = entity_json()
+        ent["id"] = q
+        return 200, json.dumps({"entities": {q: ent}}).encode(), {}
+
+    http = ScriptedHttp(router=route)
+    c = client_for(http, tmp_path)
+    c.mode = "auto"
+    res = await c.get_entities(["Q1", "Q2", "Q3"])
+    assert set(res.entities) == {"Q1", "Q2", "Q3"} and res.entities["Q1"]["lastrevid"]
+    kinds = ["api" if "action=wbgetentities" in u else "ed" for u, _ in http.calls]
+    assert kinds == ["api", "ed", "ed", "ed"]  # one API try (no retry), then per-entity EntityData
+    assert c.lock.cooling_down("wbapi")
+
+
+def test_whatlinkshere_page_parsing() -> None:
+    html = ('<ul id="mw-whatlinkshere-list"><li><bdi dir="ltr"><a href="/wiki/Q30" title="x">US</a></bdi></li>'
+            '<li><bdi dir="ltr"><a href="/wiki/Q327">Brittany</a></bdi></li></ul>'
+            '<a href="/w/index.php?title=Special:WhatLinksHere/Q3024240&amp;from=12345&amp;back=0" '
+            'class="mw-nextlink">next 5,000</a>')
+    import re as _re
+
+    assert _re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html) == ["Q30", "Q327"]
+    m = _re.search(r'<a href="[^"]*[?&;]from=([0-9]+)[^"]*"[^>]*class="mw-nextlink"', html)
+    assert m and m.group(1) == "12345"

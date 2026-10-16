@@ -1,0 +1,397 @@
+# Geography aliases of agent A-INFRA (V3: submarine cables, air routes, airports, space, ports).
+# Every alias names the provider row it was read from; anything not listed stays unmapped (kept, listed in
+# each table's manifest). Nothing is guessed: historical states (GCAT SU, CSSR, CSFR, HKUK, TTPI),
+# intergovernmental organisations (GCAT I-*), OpenFlights "West Bank" (one airport, Jerusalem Atarot) and
+# OurAirports XP (Paracel Islands, disputed) / ZZ (unknown) are deliberately NOT mapped.
+schemes:
+  # OurAirports iso_country: ISO 3166-1 alpha-2 plus XK (Kosovo).
+  ourairports:
+    base: iso2
+    aliases:
+      - code: XK
+        iso3: XKX
+        source: >-
+          OurAirports countries.csv row: 302720,"XK","Kosovo","EU" (https://davidmegginson.github.io/ourairports-data/countries.csv,
+          retrieved 2026-10-16). XKX is the crosswalk key of Kosovo.
+    source: {kind: provider_data, url: "https://davidmegginson.github.io/ourairports-data/countries.csv", retrieved_at: "2026-10-16T00:15:00Z"}
+  # NGA World Port Index countryCode: ISO 3166-1 alpha-2 except three US minor outlying islands (GENC-style codes).
+  nga_wpi:
+    base: iso2
+    aliases:
+      - {code: QM, iso3: UMI, source: "NGA WPI (msi.nga.mil world-port-index CSV, 2026-10-16) row countryCode=QM countryName='Midway Islands'; ISO 3166-1 UM (United States Minor Outlying Islands) comprises Midway"}
+      - {code: QW, iso3: UMI, source: "NGA WPI row countryCode=QW countryName='Wake Island'; ISO 3166-1 UM comprises Wake Island"}
+      - {code: XU, iso3: UMI, source: "NGA WPI row countryCode=XU countryName='Johnston Atoll'; ISO 3166-1 UM comprises Johnston Atoll"}
+    source: {kind: provider_data, url: "https://msi.nga.mil/api/publications/world-port-index?output=csv", retrieved_at: "2026-10-16T18:11:46Z"}
+  # OpenFlights airports.dat country names that the provider's own countries.dat spells differently
+  # (all other names are mapped at run time through countries.dat name -> ISO alpha-2, provider data).
+  openflights_name:
+    base: null
+    aliases:
+      - {code: "Brunei", iso3: BRN, source: "OpenFlights countries.dat lists 'Brunei Darussalam','BN'; airports.dat uses 'Brunei' (e.g. Brunei International Airport BWN)"}
+      - {code: "Burma", iso3: MMR, source: "countries.dat 'Myanmar','MM'; airports.dat 'Burma' (e.g. Yangon International RGN)"}
+      - {code: "Cape Verde", iso3: CPV, source: "airports.dat 'Cape Verde' (e.g. Amilcar Cabral International SID); ISO 3166-1 CV Cabo Verde"}
+      - {code: "Congo (Brazzaville)", iso3: COG, source: "countries.dat 'Congo Republic','CG'; airports.dat 'Congo (Brazzaville)' (Maya-Maya BZV)"}
+      - {code: "Congo (Kinshasa)", iso3: COD, source: "countries.dat 'DR Congo','CD'; airports.dat 'Congo (Kinshasa)' (N'djili FIH)"}
+      - {code: "East Timor", iso3: TLS, source: "airports.dat 'East Timor' (Presidente Nicolau Lobato DIL); ISO 3166-1 TL Timor-Leste"}
+      - {code: "Faroe Islands", iso3: FRO, source: "airports.dat 'Faroe Islands' (Vagar FAE); ISO 3166-1 FO"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "airports.dat 'Kyrgyzstan' (Manas FRU); ISO 3166-1 KG"}
+      - {code: "Macau", iso3: MAC, source: "airports.dat 'Macau' (Macau International MFM); ISO 3166-1 MO"}
+      - {code: "Micronesia", iso3: FSM, source: "countries.dat 'Micronesia, Fed. Sts.','FM'; airports.dat 'Micronesia' (Chuuk TKK, Pohnpei PNI, Kosrae KSA, Yap YAP)"}
+      - {code: "Saint Helena", iso3: SHN, source: "countries.dat 'St. Helena','SH'; airports.dat 'Saint Helena' (RAF Ascension Island ASI; ISO SH covers Ascension)"}
+      - {code: "Saint Kitts and Nevis", iso3: KNA, source: "airports.dat 'Saint Kitts and Nevis' (Robert L. Bradshaw SKB); ISO 3166-1 KN"}
+      - {code: "Saint Lucia", iso3: LCA, source: "airports.dat 'Saint Lucia' (Hewanorra UVF); ISO 3166-1 LC"}
+      - {code: "Saint Pierre and Miquelon", iso3: SPM, source: "airports.dat 'Saint Pierre and Miquelon' (St Pierre FSP); ISO 3166-1 PM"}
+      - {code: "Saint Vincent and the Grenadines", iso3: VCT, source: "airports.dat 'Saint Vincent and the Grenadines'; ISO 3166-1 VC"}
+      - {code: "Svalbard", iso3: SJM, source: "countries.dat 'Svalbard and Jan Mayen Islands','SJ'; airports.dat 'Svalbard' (Svea ENSA, Ny-Alesund ENAS)"}
+      - {code: "Swaziland", iso3: SWZ, source: "airports.dat 'Swaziland' (former name of Eswatini; ISO 3166-1 SZ)"}
+      - {code: "Virgin Islands", iso3: VIR, source: "airports.dat 'Virgin Islands' = Cyril E. King STT/TIST and Henry E Rohlsen STX/TISX (US Virgin Islands; countries.dat 'United States Virgin Islands','VI')"}
+      - {code: "Wallis and Futuna", iso3: WLF, source: "airports.dat 'Wallis and Futuna' (Hihifo WLS); ISO 3166-1 WF"}
+    source: {kind: provider_data, url: "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat", retrieved_at: "2026-10-16T00:15:00Z"}
+  # GCAT (J. McDowell) organisation/state codes (orgs.tsv, column Code; payload State, site StateCode).
+  # Only current states/territories used by GCAT rows are listed; GCAT's site StateCode is the state the
+  # site is attributed to for that site record's period (e.g. Baikonur = SU before 1989 (NIIP-5), RU after (GIK-5)).
+  gcat:
+    base: null
+    aliases:
+      - code: "AM"
+        iso3: ARM
+        source: "GCAT orgs.tsv row Code=AM Type=CY Name=\"Hayastani Hanrapetut'yun\" ShortEName=\"Armenia\" TStart=1991 TStop=-"
+      - code: "AO"
+        iso3: AGO
+        source: "GCAT orgs.tsv row Code=AO Type=CY Name=\"Republica de Angola\" ShortEName=\"Angola\" TStart=1975 TStop=-"
+      - code: "AR"
+        iso3: ARG
+        source: "GCAT orgs.tsv row Code=AR Type=CY Name=\"Republica Argentina\" ShortEName=\"Argentina\" TStart=1816 Jul  9 TStop=-"
+      - code: "AT"
+        iso3: AUT
+        source: "GCAT orgs.tsv row Code=AT Type=CY Name=\"Republik \\\"Osterreich\" ShortEName=\"Austria\" TStart=1955 Jul 27 TStop=-"
+      - code: "AU"
+        iso3: AUS
+        source: "GCAT orgs.tsv row Code=AU Type=CY Name=\"Commonwealth of Australia\" ShortEName=\"Australia\" TStart=1901 Jan  1 TStop=-"
+      - code: "AZ"
+        iso3: AZE
+        source: "GCAT orgs.tsv row Code=AZ Type=CY Name=\"Azerbaycan Respublikasi\" ShortEName=\"Azerbaijan\" TStart=1991 Oct TStop=-"
+      - code: "B"
+        iso3: BEL
+        source: "GCAT orgs.tsv row Code=B Type=CY Name=\"Royaume de Belgique (Koninkrijk Belgie)\" ShortEName=\"Belgium\" TStart=1830 Oct  4 TStop=-"
+      - code: "BD"
+        iso3: BGD
+        source: "GCAT orgs.tsv row Code=BD Type=CY Name=\"Ganaprajatantri Bangladesa\" ShortEName=\"Bangladesh\" TStart=1971 TStop=-"
+      - code: "BGN"
+        iso3: BGR
+        source: "GCAT orgs.tsv row Code=BGN Type=CY Name=\"Narodna Republika B'lgariya\" ShortEName=\"PR Bulgaria\" TStart=1989 TStop=- (GCAT's code for Bulgaria from 1989, open-ended; used for post-1989 Bulgarian payloads)"
+      - code: "BH"
+        iso3: BHR
+        source: "GCAT orgs.tsv row Code=BH Type=CY Name=\"Mamlakat al-Bahrayn\" ShortEName=\"Bahrain\" TStart=1971 TStop=-"
+      - code: "BM"
+        iso3: BMU
+        source: "GCAT orgs.tsv row Code=BM Type=CY Name=\"UK Overseas Territory of Bermuda\" ShortEName=\"Bermuda\" TStart=1684 TStop=-"
+      - code: "BO"
+        iso3: BOL
+        source: "GCAT orgs.tsv row Code=BO Type=CY Name=\"Estado Plurinacional de Bolivia (Bulivya Mamallaqta)\" ShortEName=\"Bolivia\" TStart=1825 TStop=-"
+      - code: "BR"
+        iso3: BRA
+        source: "GCAT orgs.tsv row Code=BR Type=CY Name=\"Republica Federativa do Brasil\" ShortEName=\"Brazil\" TStart=1822 Sep  7 TStop=-"
+      - code: "BT"
+        iso3: BTN
+        source: "GCAT orgs.tsv row Code=BT Type=CY Name=\"Druk Gyal Khap\" ShortEName=\"Bhutan\" TStart=1634 TStop=-"
+      - code: "BW"
+        iso3: BWA
+        source: "GCAT orgs.tsv row Code=BW Type=CY Name=\"Lefatshe la Botswana\" ShortEName=\"Botswana\" TStart=1966 TStop=-"
+      - code: "BY"
+        iso3: BLR
+        source: "GCAT orgs.tsv row Code=BY Type=CY Name=\"Respublika Belarus'\" ShortEName=\"Belarus\" TStart=1990 Jul 27 TStop=-"
+      - code: "CA"
+        iso3: CAN
+        source: "GCAT orgs.tsv row Code=CA Type=CY Name=\"Canada\" ShortEName=\"Canada\" TStart=1867 Jul  1 TStop=-"
+      - code: "CH"
+        iso3: CHE
+        source: "GCAT orgs.tsv row Code=CH Type=CY Name=\"Confoederatio Helvetica (Confederation suisse/Schweizerische Eidgenossenschaft)\" ShortEName=\"Switzerland\" TStart=1291 TStop=-"
+      - code: "CL"
+        iso3: CHL
+        source: "GCAT orgs.tsv row Code=CL Type=CY Name=\"Republica de Chile\" ShortEName=\"Chile\" TStart=1818 Feb 12 TStop=-"
+      - code: "CN"
+        iso3: CHN
+        source: "GCAT orgs.tsv row Code=CN Type=CY Name=\"Zhonghua Renmin Gongheguo\" ShortEName=\"China\" TStart=1949 Oct  1 TStop=-"
+      - code: "CO"
+        iso3: COL
+        source: "GCAT orgs.tsv row Code=CO Type=CY Name=\"Republica de Colombia\" ShortEName=\"Colombia\" TStart=1810 Jul 20 TStop=-"
+      - code: "CR"
+        iso3: CRI
+        source: "GCAT orgs.tsv row Code=CR Type=CY Name=\"Republica de Costa Rica\" ShortEName=\"Costa Rica\" TStart=1838 TStop=-"
+      - code: "CYM"
+        iso3: CYM
+        source: "GCAT orgs.tsv row Code=CYM Type=CY Name=\"Cayman Islands British Overseas Territory\" ShortEName=\"Cayman Is.\" TStart=1962 TStop=*"
+      - code: "CZ"
+        iso3: CZE
+        source: "GCAT orgs.tsv row Code=CZ Type=CY Name=\"Ceska Republika\" ShortEName=\"Czech Republic\" TStart=1993 Jan  1 TStop=*"
+      - code: "D"
+        iso3: DEU
+        source: "GCAT orgs.tsv row Code=D Type=CY Name=\"Bundesrepublik Deutschland\" ShortEName=\"Germany\" TStart=1949 May 23 TStop=*"
+      - code: "DJ"
+        iso3: DJI
+        source: "GCAT orgs.tsv row Code=DJ Type=CY Name=\"Republique de Djibouti\" ShortEName=\"Djibouti\" TStart=1977 TStop=-"
+      - code: "DK"
+        iso3: DNK
+        source: "GCAT orgs.tsv row Code=DK Type=CY Name=\"Kongeriget Danmark\" ShortEName=\"Denmark\" TStart=700? TStop=-"
+      - code: "DZ"
+        iso3: DZA
+        source: "GCAT orgs.tsv row Code=DZ Type=CY Name=\"Al Jumhuriyah al Jaza'iriyah al Dimuqratiyah ash Sha'biyah\" ShortEName=\"Algeria\" TStart=1962 Jul  5 TStop=-"
+      - code: "E"
+        iso3: ESP
+        source: "GCAT orgs.tsv row Code=E Type=CY Name=\"Reino de Espana\" ShortEName=\"Spain\" TStart=1580 TStop=-"
+      - code: "EC"
+        iso3: ECU
+        source: "GCAT orgs.tsv row Code=EC Type=CY Name=\"Republica del Ecuador\" ShortEName=\"Ecuador\" TStart=1830 TStop=-"
+      - code: "EE"
+        iso3: EST
+        source: "GCAT orgs.tsv row Code=EE Type=CY Name=\"Eesti Vabariik\" ShortEName=\"Estonia\" TStart=1991 TStop=-"
+      - code: "EG"
+        iso3: EGY
+        source: "GCAT orgs.tsv row Code=EG Type=CY Name=\"Jumhuriyat Misr al-Arabiyah\" ShortEName=\"Egypt\" TStart=1922 Feb 22 TStop=-"
+      - code: "ESCN"
+        iso3: ESP
+        source: "GCAT orgs.tsv row Code=ESCN Type=CYP Name=\"Islas Canarias\" ShortEName=\"Canary Is\" TStart=1479 TStop=- (a Spanish autonomous community; GCAT type CYP, parent E)"
+      - code: "ESIB"
+        iso3: ESP
+        source: "GCAT orgs.tsv row Code=ESIB Type=CYP Name=\"Islas Baleares\" ShortEName=\"Balaeric Is.\" TStart=1983 TStop=- (a Spanish autonomous community; GCAT type CYP, parent E)"
+      - code: "ET"
+        iso3: ETH
+        source: "GCAT orgs.tsv row Code=ET Type=CY Name=\"ye Itiyoppya Federalawi Demokirasiyawi Ripebilik\" ShortEName=\"Ethiopia\" TStart=1941 TStop=-"
+      - code: "F"
+        iso3: FRA
+        source: "GCAT orgs.tsv row Code=F Type=CY Name=\"Republique Francaise\" ShortEName=\"France\" TStart=509 TStop=-"
+      - code: "FI"
+        iso3: FIN
+        source: "GCAT orgs.tsv row Code=FI Type=CY Name=\"Suomen tasavalta\" ShortEName=\"Finland\" TStart=1917 Dec  6 TStop=-"
+      - code: "GH"
+        iso3: GHA
+        source: "GCAT orgs.tsv row Code=GH Type=CY Name=\"Republic of Ghana\" ShortEName=\"Ghana\" TStart=1957 Mar TStop=-"
+      - code: "GR"
+        iso3: GRC
+        source: "GCAT orgs.tsv row Code=GR Type=CY Name=\"Helliniki Dhimokratia\" ShortEName=\"Greece\" TStart=1821 Mar TStop=-"
+      - code: "GT"
+        iso3: GTM
+        source: "GCAT orgs.tsv row Code=GT Type=CY Name=\"Republica de Guatemala\" ShortEName=\"Guatemala\" TStart=1821 TStop=-"
+      - code: "GUF"
+        iso3: GUF
+        source: "GCAT orgs.tsv row Code=GUF Type=CY Name=\"Guyane (DOM)\" ShortEName=\"French Guiana\" TStart=1763 TStop=-"
+      - code: "HK"
+        iso3: HKG
+        source: "GCAT orgs.tsv row Code=HK Type=CYP Name=\"Xianggang Tebie Xingzhengqu\" ShortEName=\"China(Hong Kong)\" TStart=1997 Jul  1 TStop=-"
+      - code: "HR"
+        iso3: HRV
+        source: "GCAT orgs.tsv row Code=HR Type=CY Name=\"Republica Hrvatska\" ShortEName=\"Croatia\" TStart=1991 Jun TStop=-"
+      - code: "HU"
+        iso3: HUN
+        source: "GCAT orgs.tsv row Code=HU Type=CY Name=\"Magyar Koztarsasag\" ShortEName=\"Hungary\" TStart=- TStop=-"
+      - code: "I"
+        iso3: ITA
+        source: "GCAT orgs.tsv row Code=I Type=CY Name=\"Repubblica Italiana\" ShortEName=\"Italy\" TStart=1861 Mar 17 TStop=-"
+      - code: "ID"
+        iso3: IDN
+        source: "GCAT orgs.tsv row Code=ID Type=CY Name=\"Republik Indonesia\" ShortEName=\"Indonesia\" TStart=1945 Aug 17 TStop=-"
+      - code: "IE"
+        iso3: IRL
+        source: "GCAT orgs.tsv row Code=IE Type=CY Name=\"Republic of Ireland (Poblacht na hEireann)\" ShortEName=\"Ireland\" TStart=1922 TStop=-"
+      - code: "IL"
+        iso3: ISR
+        source: "GCAT orgs.tsv row Code=IL Type=CY Name=\"Medinat Yisra'el\" ShortEName=\"Israel\" TStart=1948 May 14 TStop=-"
+      - code: "IN"
+        iso3: IND
+        source: "GCAT orgs.tsv row Code=IN Type=CY Name=\"Republic of India\" ShortEName=\"India\" TStart=1947 Aug 15 TStop=-"
+      - code: "IR"
+        iso3: IRN
+        source: "GCAT orgs.tsv row Code=IR Type=CY Name=\"Jomhuri-ye Eslami-ye Iran\" ShortEName=\"Iran\" TStart=1501 TStop=-"
+      - code: "J"
+        iso3: JPN
+        source: "GCAT orgs.tsv row Code=J Type=CY Name=\"Nippon-koku\" ShortEName=\"Japan\" TStart=538 TStop=-"
+      - code: "JO"
+        iso3: JOR
+        source: "GCAT orgs.tsv row Code=JO Type=CY Name=\"Al-Mamlakah Al-Urdunniyah Al-Hashimiyah\" ShortEName=\"Jordan\" TStart=1946 TStop=-"
+      - code: "KE"
+        iso3: KEN
+        source: "GCAT orgs.tsv row Code=KE Type=CY Name=\"Jamhuri ya Kenya\" ShortEName=\"Kenya\" TStart=1963 Dec 12 TStop=-"
+      - code: "KI"
+        iso3: KIR
+        source: "GCAT orgs.tsv row Code=KI Type=CY Name=\"Kiribati\" ShortEName=\"Kiribati\" TStart=1979 TStop=- (GCAT attributes the Sea Launch Kiritimati launch area KLA to Kiribati)"
+      - code: "KP"
+        iso3: PRK
+        source: "GCAT orgs.tsv row Code=KP Type=CY Name=\"Choson Minjujuui Inmin Konghwaguk\" ShortEName=\"North Korea\" TStart=1948 Sep  9 TStop=-"
+      - code: "KR"
+        iso3: KOR
+        source: "GCAT orgs.tsv row Code=KR Type=CY Name=\"Daehan Min'guk\" ShortEName=\"South Korea\" TStart=1948 Aug 15 TStop=-"
+      - code: "KW"
+        iso3: KWT
+        source: "GCAT orgs.tsv row Code=KW Type=CY Name=\"Dawlat al-Kuwayt\" ShortEName=\"Kuwait\" TStart=1752 TStop=-"
+      - code: "KZ"
+        iso3: KAZ
+        source: "GCAT orgs.tsv row Code=KZ Type=CY Name=\"Qazaqstan Respublikasy\" ShortEName=\"Kazakhstan\" TStart=1991 Dec 16 TStop=-"
+      - code: "L"
+        iso3: LUX
+        source: "GCAT orgs.tsv row Code=L Type=CY Name=\"Grand Duche de Luxembourg\" ShortEName=\"Luxembourg\" TStart=963 TStop=-"
+      - code: "LA"
+        iso3: LAO
+        source: "GCAT orgs.tsv row Code=LA Type=CY Name=\"Sathalanalat Paxathipatai Paxaxon Lao\" ShortEName=\"Laos\" TStart=1953 TStop=-"
+      - code: "LK"
+        iso3: LKA
+        source: "GCAT orgs.tsv row Code=LK Type=CY Name=\"Shri Lanka Prajatantrika Samajavadi Janarajaya\" ShortEName=\"Sri Lanka\" TStart=1972 TStop=-"
+      - code: "LT"
+        iso3: LTU
+        source: "GCAT orgs.tsv row Code=LT Type=CY Name=\"Lietuvos Respublika\" ShortEName=\"Lithuania\" TStart=1990 Mar 11 TStop=-"
+      - code: "LV"
+        iso3: LVA
+        source: "GCAT orgs.tsv row Code=LV Type=CY Name=\"Latvijas Republika\" ShortEName=\"Latvia\" TStart=1991 TStop=-"
+      - code: "MA"
+        iso3: MAR
+        source: "GCAT orgs.tsv row Code=MA Type=CY Name=\"Al Mamlakah al Maghribiyah\" ShortEName=\"Morocco\" TStart=1956 Mar  2 TStop=-"
+      - code: "MC"
+        iso3: MCO
+        source: "GCAT orgs.tsv row Code=MC Type=CY Name=\"Principaute de Monaco\" ShortEName=\"Monaco\" TStart=1297 TStop=-"
+      - code: "MD"
+        iso3: MDA
+        source: "GCAT orgs.tsv row Code=MD Type=CY Name=\"Republica Moldova\" ShortEName=\"Moldova\" TStart=1991 TStop=-"
+      - code: "ME"
+        iso3: MNE
+        source: "GCAT orgs.tsv row Code=ME Type=CY Name=\"Crna Gora\" ShortEName=\"Montenegro\" TStart=2006 May 21 TStop=-"
+      - code: "MN"
+        iso3: MNG
+        source: "GCAT orgs.tsv row Code=MN Type=CY Name=\"Mongol uls\" ShortEName=\"Mongolia\" TStart=1911 TStop=-"
+      - code: "MU"
+        iso3: MUS
+        source: "GCAT orgs.tsv row Code=MU Type=CY Name=\"Republique de Maurice\" ShortEName=\"Mauritius\" TStart=1968 Mar 12 TStop=-"
+      - code: "MX"
+        iso3: MEX
+        source: "GCAT orgs.tsv row Code=MX Type=CY Name=\"Estados Unidos Mexicanos\" ShortEName=\"Mexico\" TStart=1819 Sep 16 TStop=-"
+      - code: "MY"
+        iso3: MYS
+        source: "GCAT orgs.tsv row Code=MY Type=CY Name=\"Malaysia\" ShortEName=\"Malaysia\" TStart=1957 Aug 31 TStop=-"
+      - code: "MYM"
+        iso3: MMR
+        source: "GCAT orgs.tsv row Code=MYM Type=CY Name=\"Pyidaunzu Thanmada Myama Nainngandaw\" ShortEName=\"Myanmar\" TStart=1989 TStop=-"
+      - code: "N"
+        iso3: NOR
+        source: "GCAT orgs.tsv row Code=N Type=CY Name=\"Kongeriket Norge\" ShortEName=\"Norway\" TStart=872 TStop=-"
+      - code: "NG"
+        iso3: NGA
+        source: "GCAT orgs.tsv row Code=NG Type=CY Name=\"Federal Republic of Nigeria\" ShortEName=\"Nigeria\" TStart=1960 Oct  1 TStop=-"
+      - code: "NL"
+        iso3: NLD
+        source: "GCAT orgs.tsv row Code=NL Type=CY Name=\"Koninkrijk der Nederlanden\" ShortEName=\"Netherlands\" TStart=1581 Jul 26 TStop=-"
+      - code: "NP"
+        iso3: NPL
+        source: "GCAT orgs.tsv row Code=NP Type=CY Name=\"Sanghiya Lokatantrik Ganatantra Nepal\" ShortEName=\"Nepal\" TStart=2008 TStop=-"
+      - code: "NZ"
+        iso3: NZL
+        source: "GCAT orgs.tsv row Code=NZ Type=CY Name=\"New Zealand\" ShortEName=\"New Zealand\" TStart=1907 Sep 26 TStop=-"
+      - code: "OM"
+        iso3: OMN
+        source: "GCAT orgs.tsv row Code=OM Type=CY Name=\"Saltanat 'Uman\" ShortEName=\"Oman\" TStart=1970 TStop=-"
+      - code: "P"
+        iso3: PRT
+        source: "GCAT orgs.tsv row Code=P Type=CY Name=\"Republica Portuguesa\" ShortEName=\"Portugal\" TStart=1139 Jul 25 TStop=-"
+      - code: "PE"
+        iso3: PER
+        source: "GCAT orgs.tsv row Code=PE Type=CY Name=\"Republica del Peru (Piruw Republika)\" ShortEName=\"Peru\" TStart=1821 TStop=-"
+      - code: "PG"
+        iso3: PNG
+        source: "GCAT orgs.tsv row Code=PG Type=CY Name=\"Independen Stet bilong Papua Niugini\" ShortEName=\"Papua New Guinea\" TStart=1949 TStop=-"
+      - code: "PH"
+        iso3: PHL
+        source: "GCAT orgs.tsv row Code=PH Type=CY Name=\"Republika ng Pilipinas\" ShortEName=\"Phillipines\" TStart=1521 Mar 16 TStop=-"
+      - code: "PK"
+        iso3: PAK
+        source: "GCAT orgs.tsv row Code=PK Type=CY Name=\"Islami Jamhuriya-i-Pakistan\" ShortEName=\"Pakistan\" TStart=1947 Aug 14 TStop=-"
+      - code: "PL"
+        iso3: POL
+        source: "GCAT orgs.tsv row Code=PL Type=CY Name=\"Rzeczpospolita Polska\" ShortEName=\"Poland\" TStart=1989 Jan  1 TStop=*"
+      - code: "PR"
+        iso3: PRI
+        source: "GCAT orgs.tsv row Code=PR Type=CY Name=\"Estado Libre Asociado de Puerto Rico\" ShortEName=\"Puerto Rico\" TStart=1898 TStop=-"
+      - code: "PY"
+        iso3: PRY
+        source: "GCAT orgs.tsv row Code=PY Type=CY Name=\"Republica del Paraguay\" ShortEName=\"Paraguay\" TStart=1811 TStop=-"
+      - code: "QA"
+        iso3: QAT
+        source: "GCAT orgs.tsv row Code=QA Type=CY Name=\"Dawlat Qatar\" ShortEName=\"Qatar\" TStart=1878 TStop=-"
+      - code: "RO"
+        iso3: ROU
+        source: "GCAT orgs.tsv row Code=RO Type=CY Name=\"Romania\" ShortEName=\"Romania\" TStart=1859 TStop=-"
+      - code: "RU"
+        iso3: RUS
+        source: "GCAT orgs.tsv row Code=RU Type=CY Name=\"Rossiyskaya Federatsiya\" ShortEName=\"Russia\" TStart=1991 Dec 26 TStop=-"
+      - code: "RW"
+        iso3: RWA
+        source: "GCAT orgs.tsv row Code=RW Type=CY Name=\"Repubulika y'u Rwanda\" ShortEName=\"Rwanda\" TStart=1962 TStop=-"
+      - code: "S"
+        iso3: SWE
+        source: "GCAT orgs.tsv row Code=S Type=CY Name=\"Konungariket Sverige\" ShortEName=\"Sweden\" TStart=970 TStop=-"
+      - code: "SA"
+        iso3: SAU
+        source: "GCAT orgs.tsv row Code=SA Type=CY Name=\"Al Mamlakah al Arabiyah as Suudiyah\" ShortEName=\"Saudi Arabia\" TStart=1926 Jan  8 TStop=-"
+      - code: "SB"
+        iso3: SLB
+        source: "GCAT orgs.tsv row Code=SB Type=CY Name=\"Solomon Islands\" ShortEName=\"Solomon Is.\" TStart=1978 Jul  7 TStop=-"
+      - code: "SD"
+        iso3: SDN
+        source: "GCAT orgs.tsv row Code=SD Type=CY Name=\"Jumhuriyyat as-Sudan\" ShortEName=\"Sudan\" TStart=1956 TStop=-"
+      - code: "SG"
+        iso3: SGP
+        source: "GCAT orgs.tsv row Code=SG Type=CY Name=\"Republic of Singapore (Republik Singapura)\" ShortEName=\"Singapore\" TStart=1959 Jun  3 TStop=-"
+      - code: "SI"
+        iso3: SVN
+        source: "GCAT orgs.tsv row Code=SI Type=CY Name=\"Republika Slovenija\" ShortEName=\"Slovenia\" TStart=1991 TStop=-"
+      - code: "SK"
+        iso3: SVK
+        source: "GCAT orgs.tsv row Code=SK Type=CY Name=\"Slovenska republika\" ShortEName=\"Slovakia\" TStart=1993 Jan TStop=-"
+      - code: "SN"
+        iso3: SEN
+        source: "GCAT orgs.tsv row Code=SN Type=CY Name=\"Republique du Senegal\" ShortEName=\"Senegal\" TStart=1957 TStop=-"
+      - code: "T"
+        iso3: THA
+        source: "GCAT orgs.tsv row Code=T Type=CY Name=\"Ratcha Anachak Thai\" ShortEName=\"Thailand\" TStart=1238 TStop=-"
+      - code: "TN"
+        iso3: TUN
+        source: "GCAT orgs.tsv row Code=TN Type=CY Name=\"al-Jumhuriyah at-Tunisiyah\" ShortEName=\"Tunisia\" TStart=2014 TStop=-"
+      - code: "TR"
+        iso3: TUR
+        source: "GCAT orgs.tsv row Code=TR Type=CY Name=\"Turkiye Cumhuriyeti\" ShortEName=\"Turkey\" TStart=1919 May 19 TStop=-"
+      - code: "TW"
+        iso3: TWN
+        source: "GCAT orgs.tsv row Code=TW Type=CY Name=\"Zhonghua Minguo\" ShortEName=\"Taiwan\" TStart=1949 Dec  7 TStop=-"
+      - code: "UA"
+        iso3: UKR
+        source: "GCAT orgs.tsv row Code=UA Type=CY Name=\"Ukraina\" ShortEName=\"Ukraine\" TStart=1991 Dec 26 TStop=-"
+      - code: "UAE"
+        iso3: ARE
+        source: "GCAT orgs.tsv row Code=UAE Type=CY Name=\"Al-Imarat al-'Arabiya al-Muttahida\" ShortEName=\"UAE\" TStart=1971 Dec  2 TStop=-"
+      - code: "UG"
+        iso3: UGA
+        source: "GCAT orgs.tsv row Code=UG Type=CY Name=\"Jamhuri ya Uganda\" ShortEName=\"Uganda\" TStart=1962 Oct  9 TStop=-"
+      - code: "UK"
+        iso3: GBR
+        source: "GCAT orgs.tsv row Code=UK Type=CY Name=\"United Kingdom of Great Britain and Northern Ireland\" ShortEName=\"UK\" TStart=1707 May  1 TStop=-"
+      - code: "US"
+        iso3: USA
+        source: "GCAT orgs.tsv row Code=US Type=CY Name=\"United States of America\" ShortEName=\"USA\" TStart=1776 Jul  4 TStop=-"
+      - code: "UY"
+        iso3: URY
+        source: "GCAT orgs.tsv row Code=UY Type=CY Name=\"Republica Oriental del Uruguay\" ShortEName=\"Uruguay\" TStart=1825 TStop=-"
+      - code: "VE"
+        iso3: VEN
+        source: "GCAT orgs.tsv row Code=VE Type=CY Name=\"Rebulica Bolivariana de Venezuela\" ShortEName=\"Venezuela\" TStart=1830 Jan 13 TStop=-"
+      - code: "VN"
+        iso3: VNM
+        source: "GCAT orgs.tsv row Code=VN Type=CY Name=\"Cong hoa Xo hoi Chu nghia Viet Nam\" ShortEName=\"Vietnam\" TStart=1945 Sep  2 TStop=-"
+      - code: "ZA"
+        iso3: ZAF
+        source: "GCAT orgs.tsv row Code=ZA Type=CY Name=\"Republic of South Africa\" ShortEName=\"South Africa\" TStart=1910 May 31 TStop=-"
+      - code: "ZW"
+        iso3: ZWE
+        source: "GCAT orgs.tsv row Code=ZW Type=CY Name=\"Republic of Zimbabwe\" ShortEName=\"Zimbabwe\" TStart=1979 Jun TStop=-"
+    source:
+      kind: provider_data
+      url: https://planet4589.org/space/gcat/tsv/tables/orgs.tsv
+      retrieved_at: "2026-10-16T00:15:00Z"
+      sha256: 0d0ccb5615c0afc2c6e3a5fc35d06a4cd4065c285b19780133c61e6d4a21bcfb
+      licence: CC BY 4.0 (GCAT, J. McDowell)

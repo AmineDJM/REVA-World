@@ -1,0 +1,22 @@
+id: science.space_missions
+domain: science
+owner: KGSCIECO
+description: >-
+  Space missions, satellites, probes, crewed flights, space telescopes and stations: direct instances of
+  artificial satellite (Q26540), artificial satellite of the Earth (Q12832168), space probe (Q26529), flyby
+  probe (Q18819669), space mission (Q2133344), human spaceflight (Q752783), space telescope (Q148578) or space
+  laboratory (Q1471432) with at least 10 sitelinks (Sputnik 1, Apollo 11, Voyager 1, Hubble, ISS,
+  Chandrayaan-3 ...). The bound drops the thousands of single-wiki satellite items (e.g. constellation units).
+  Snapshots keep operator (P137 -> agency -> country), country of origin (P495), country (P17), significant
+  events (P793), part of (P361, programme), participants / crew (P710/P1029); launch date (P619),
+  manufacturer (P176) are requested.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q26540 wd:Q12832168 wd:Q26529 wd:Q18819669 wd:Q2133344 wd:Q752783 wd:Q148578 wd:Q1471432 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 10)
+  }
+max_rows: 4000
+expand_hops: 1

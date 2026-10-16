@@ -1,0 +1,22 @@
+id: economy.trade_agreements
+domain: economy
+owner: KGSCIECO
+description: >-
+  Trade agreements and economic blocs: instances of free trade agreement (Q3536928), trade bloc (Q1129645),
+  free trade area (Q5335686), customs union (Q218819) or currency union (Q1125321), or of a subclass, with at
+  least 3 sitelinks (NAFTA/USMCA, EFTA, AfCFTA, Mercosur, GCC, eurozone ...). Complements KGGEOPOL's
+  geopolitics.international_organisations (organisations with >= 3 state members) and KGHIST's
+  history.treaties: agreements not typed as treaties and blocs with members recorded only on the bloc are
+  added here (overlap is de-duplicated by QID). Snapshots keep signatories (P1891), parts/members (P527),
+  start/end, inception/dissolution, replaces/replaced by (NAFTA -> USMCA), valid in place (P3005). State-side
+  "member of" (P463) edges come from geopolitics.state_memberships and core.countries.
+purpose: seed_entities
+entity_kind: treaty
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q3536928 wd:Q1129645 wd:Q5335686 wd:Q218819 wd:Q1125321 }
+    ?item wdt:P31/wdt:P279* ?root ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 2500
+expand_hops: 1

@@ -79,7 +79,9 @@ NAME_ALIASES: dict[str, str | None] = {
     "DR Congo": "COD",
     "Swaziland": "SWZ",  # former name of Eswatini (WHR's older editions)
     "Hong Kong SAR of China": "HKG",
-    "Taiwan Province of China": None,  # not in the ALLC crosswalk (kept unmapped)
+    # WHR's own label names Taiwan (= ISO 3166-1 "Taiwan, Province of China"); crosswalk entity TWN since
+    # crosswalk 1.1.0 (agent TWNMAP). WHR's "China" is a separate row (-> CHN): never mapped twice.
+    "Taiwan Province of China": "TWN",
     "North Cyprus": None,  # not a crosswalk entity
     "Somaliland Region": None,  # not a crosswalk entity
 }

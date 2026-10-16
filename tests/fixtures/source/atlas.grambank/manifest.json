@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "ccfa385e3a02c72dd66f918ea1f73dfc31cb2d6b6caa79cf1a124185072dc3d1",
+    "url": "https://zenodo.org/api/records/7740139/versions/latest",
+    "file": "record.json",
+    "sha256": "265079bd88039efa4620ffcbefa729459342f856f291717f6867468ec3659658",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Grambank v1.0.3 languages port1283,stan1290,hait1244,basq1248,mbya1239,nucl1301 x features GB020,GB021,GB024,GB025; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  },
+  {
+    "request_fingerprint": "9ab9abe136ff6001ba2966432e5e95996fd3bdf68adf76e435a13f7449d24ba0",
+    "url": "https://zenodo.org/api/records/7844558/files/grambank/grambank-v1.0.3.zip/content",
+    "file": "release.zip",
+    "sha256": "1626d8484e87d839ad04335639f3524e7c8763822c9fb4f88004df23cc93d6d7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-16T00:30:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Grambank v1.0.3 languages port1283,stan1290,hait1244,basq1248,mbya1239,nucl1301 x features GB020,GB021,GB024,GB025; record JSON = live versions/latest response with files[0].size/checksum rewritten for the trimmed zip"
+  }
+]

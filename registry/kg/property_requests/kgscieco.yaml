@@ -42,7 +42,7 @@
   label_en: developer
   label_fr: développeur
 - property: P176
-  why: manufacturer (vaccine/spacecraft/product -> company), e.g. Sputnik 1 -> OKB-1.
+  why: manufacturer (vaccine/spacecraft/product -> company), e.g. a satellite -> its builder.
   reva_predicate: manufacturer
   inverse: manufacturer_of
   kind: entity
@@ -57,14 +57,6 @@
   group: science
   label_en: UTC date of spacecraft launch
   label_fr: date de lancement
-- property: P448
-  why: launch site (spacecraft -> cosmodrome), e.g. Sputnik 1 -> Baikonur Cosmodrome -> Kazakhstan.
-  reva_predicate: launch_site
-  inverse: launch_site_of
-  kind: entity
-  group: science
-  label_en: launch site
-  label_fr: site de lancement
 - property: P1686
   role: qualifier
   why: for work (qualifier of award received P166), e.g. the work a Nobel Prize was awarded for.
@@ -112,8 +104,8 @@
   inverse: produced_by
   kind: entity
   group: economy
-  label_en: product or material produced or service provided
-  label_fr: produit ou matériau fabriqué ou service fourni
+  label_en: product or material produced
+  label_fr: produit ou matériau fabriqué
 
 # ---------------------------------------------------------------- nature
 - property: P610

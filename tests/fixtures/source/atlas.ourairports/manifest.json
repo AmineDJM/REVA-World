@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "5bc5b60ee2927c043ac6db7dcd90766ea3f38db6e3c90887367bec1177e10ab3",
+    "url": "https://ourairports.com/data/",
+    "file": "5bc5b60ee2927c04.bin",
+    "sha256": "4d3c0636b49d5c3cf77a83232aa4086f31bf02d4a2f47014bf80e64866966698",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "Public domain",
+    "note": "trimmed excerpt: <=60 airports for FR, DZ, XK, XP, ZZ, MC, TV (first rows in file order)"
+  },
+  {
+    "request_fingerprint": "3036de69616192e94060e8314e30b3aeeed3f08537802abdde056fccf4014868",
+    "url": "https://davidmegginson.github.io/ourairports-data/countries.csv",
+    "file": "3036de69616192e9.bin",
+    "sha256": "2a9dbee691125b0cdb8ceb5fe227c48c903f99c488963b8e53e2ab366521c639",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "Public domain",
+    "note": "trimmed excerpt: <=60 airports for FR, DZ, XK, XP, ZZ, MC, TV (first rows in file order)"
+  },
+  {
+    "request_fingerprint": "6001a48c99fd92c6172a6596b61ac6feaa1792204c58a4f519badd6cb7f7e3f7",
+    "url": "https://davidmegginson.github.io/ourairports-data/airports.csv",
+    "file": "6001a48c99fd92c6.bin",
+    "sha256": "5cb4cf452f9b6120d9935002f66a7684e3f14ab06fbb7f44d8a1afbd386ccfe8",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "Public domain",
+    "note": "trimmed excerpt: <=60 airports for FR, DZ, XK, XP, ZZ, MC, TV (first rows in file order)"
+  }
+]

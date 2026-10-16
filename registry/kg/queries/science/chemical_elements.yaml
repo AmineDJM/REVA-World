@@ -11,3 +11,4 @@ sparql: |
   SELECT DISTINCT ?item WHERE { ?item wdt:P31 wd:Q11344 . }
 max_rows: 200
 expand_hops: 1
+api_search: {instance_of: [Q11344]}

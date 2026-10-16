@@ -1,0 +1,23 @@
+# V3 (agent GAPHUNT): Pacific Community (SPC) Pacific Data Hub .Stat, SDMX REST API.
+# Atlas connector: src/reva/adapters/connectors/atlas_gap_spc.py (atlas.gap_spc -> atlas tables spc.*).
+source_key: spc.pdh_stat
+title: "Pacific Community (SPC) - Pacific Data Hub .Stat (PDH.Stat) SDMX API"
+provider_url: https://stats.pacificdata.org/
+lineage_family: spc_pdh
+rights:
+  licence: "Pacific Data Hub catalogue lists the PDH.Stat pocket summary as 'Other (Open)'; site terms: each dataset carries its own licence"
+  licence_url: https://pacificdata.org/terms-use
+  attribution: "Pacific Community (SPC), Pacific Data Hub .Stat"
+  review: >-
+    pending maintainer review: pacificdata.org/terms-use and the CKAN catalogue answered HTTP 403 (Cloudflare
+    challenge) to automated reads on 2026-10-16; the 'Other (Open)' label was read from the catalogue
+    entry 'Pocket summary (latest available value per year)' via a web search result.
+metadata:
+  allowed_hosts: [stats-sdmx-disseminate.pacificdata.org]
+  endpoints:
+    data: "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,<DATAFLOW>,<version>/<key>"
+    dataflows: https://stats-sdmx-disseminate.pacificdata.org/rest/dataflow/SPC/all/latest
+  authentication: none
+  cadence: continuous (dataflow-specific); monthly refresh planned
+  coverage: "22 Pacific Island Countries and Territories: ASM COK FJI PYF GUM KIR MHL FSM NRU NCL NIU MNP PLW PNG PCN WSM SLB TKL TON TUV VUT WLF"
+  editorial_status: "Regional compilation of national statistics office figures and SPC estimates; per-cell OBS_STATUS and data source kept"

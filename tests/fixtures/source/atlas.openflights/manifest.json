@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "a3a0fef9469d29799041932869bd7768d3ac3b0a98d80d7e6370d5be0a02cca8",
+    "url": "https://openflights.org/data.php",
+    "file": "a3a0fef9469d2979.bin",
+    "sha256": "23461cf4032816c85b886fba99d55223641851a45d6a6079b96ba022ea711ef4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "ODbL-1.0",
+    "note": "trimmed excerpt (routes among 8 countries, <=25 per pair; one synthetic unresolvable route); data page and countries.dat verbatim"
+  },
+  {
+    "request_fingerprint": "a137f313f4b47fd1749e6a16dd943576deea7d88dc006c304d8b70f72068b966",
+    "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat",
+    "file": "a137f313f4b47fd1.bin",
+    "sha256": "5cbd1a7da0f4f8003f595d22d80f025f483caad7a0672354ef9bc70221d348ed",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "ODbL-1.0",
+    "note": "trimmed excerpt (routes among 8 countries, <=25 per pair; one synthetic unresolvable route); data page and countries.dat verbatim"
+  },
+  {
+    "request_fingerprint": "24e8fb48a753f3e7ee15c14d96e4396a03923122161edc87977127a70cc0f96f",
+    "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
+    "file": "24e8fb48a753f3e7.bin",
+    "sha256": "061fa98415dadb5c55d2f5722e1e08b131e70266f6326e549f70d72c3e28a37c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "ODbL-1.0",
+    "note": "trimmed excerpt (routes among 8 countries, <=25 per pair; one synthetic unresolvable route); data page and countries.dat verbatim"
+  },
+  {
+    "request_fingerprint": "70510787e6ec2946c8e8ea07f328c9b99e8ea13485d22160afb80f2b5ee6eba7",
+    "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat",
+    "file": "70510787e6ec2946.bin",
+    "sha256": "11b70d7f54e86968bf970d370af528242cff61010cba892f33516ebf475e7c61",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "ODbL-1.0",
+    "note": "trimmed excerpt (routes among 8 countries, <=25 per pair; one synthetic unresolvable route); data page and countries.dat verbatim"
+  },
+  {
+    "request_fingerprint": "b7e171739fd775ca21ce9c3ccc0fec8e2f1f35f950240fc03d3e9b7f58fd7bfb",
+    "url": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat",
+    "file": "b7e171739fd775ca.bin",
+    "sha256": "6b1616b8c4b76c52a1bd257b3f978bb84c1940902aedb00298060fa5886c9677",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-16T00:15:00+00:00",
+    "licence": "ODbL-1.0",
+    "note": "trimmed excerpt (routes among 8 countries, <=25 per pair; one synthetic unresolvable route); data page and countries.dat verbatim"
+  }
+]

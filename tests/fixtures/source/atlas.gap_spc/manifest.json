@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "6a48f51cc451a1fde1c34d194e6c3090385b8cc967175153a785faeb046c69e3",
+    "url": "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_POCKET,3.1/A.NU+TK+WF.",
+    "file": "6a48f51cc451a1fd.json",
+    "sha256": "d0a918bbf58181d9b3820bd8a915f2de40a3927ec2d9874e14ed3b1c8f191aca",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=both"
+    },
+    "retrieved_at": "2026-10-16T18:15:14.160549+00:00",
+    "licence": "Pacific Data Hub: 'Other (Open)' per the PDH catalogue entry of the dataflow; per-dataset licence, pending maintainer review",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "d7a490ffebbaac74328305ceca490aa69f0f7bba3874dd07efd3738b7aaff953",
+    "url": "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_KEYFACTS,1.0/A.NU+TK+PN+WF+CK.",
+    "file": "d7a490ffebbaac74.json",
+    "sha256": "c3dd32c81cec7c49e42e96cf5d5b1a3d79f8073da78eed14986ae7c3c692d0b2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=both"
+    },
+    "retrieved_at": "2026-10-16T18:15:16.275108+00:00",
+    "licence": "Pacific Data Hub: 'Other (Open)' per the PDH catalogue entry of the dataflow; per-dataset licence, pending maintainer review",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "f4e4625ba805ea7d6ce91e1928c72138ce6b4e77187871171eea045669b97442",
+    "url": "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_EMPRATES,1.0/A.NU+CK+TO.UNEMPRATE._T._T._T._T",
+    "file": "f4e4625ba805ea7d.json",
+    "sha256": "9ea6c91060e3e03b76cf5724b7264f03040ba59b84e710d8194c7e5ac7213fb1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=both"
+    },
+    "retrieved_at": "2026-10-16T18:15:17.841147+00:00",
+    "licence": "Pacific Data Hub: 'Other (Open)' per the PDH catalogue entry of the dataflow; per-dataset licence, pending maintainer review",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  },
+  {
+    "request_fingerprint": "6f556ef5591d018204548388d31d60112e07ea85124731220052cf81e134c27e",
+    "url": "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_DIGITAL_DEVELOPMENT,1.0/A.NU+TO+WF.DD024",
+    "file": "6f556ef5591d0182.json",
+    "sha256": "6909eecb0f8a4f3098bb52cde27579d1d61a218b86674973fd7645eba5fac3ed",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=both"
+    },
+    "retrieved_at": "2026-10-16T18:15:19.301050+00:00",
+    "licence": "Pacific Data Hub: 'Other (Open)' per the PDH catalogue entry of the dataflow; per-dataset licence, pending maintainer review",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  }
+]
