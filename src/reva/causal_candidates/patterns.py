@@ -312,7 +312,8 @@ HEDGE = {
         r"suggested|thought|believed|speculated|alleged|said|debated|disputed|theorized|theorised|hypothesized)\b|"
         r"\b(?:debate|debated|disputed|controvers\w*|speculat\w*|hypothes\w*|theor(?:y|ies|ized|ised)|unclear|"
         r"uncertain|contested|questionable)\b|\b(?:is|are|was|were)\s+(?:said|thought|believed|alleged|claimed|"
-        r"suspected)\s+to\b|\baccording\s+to\s+(?:some|one|several|certain|other)\b|\bwould\s+have\b|\bif\b",
+        r"suspected)\s+to\b|\baccording\s+to\b|\bwould\s+have\b|\bif\b|\b(?:said|says|stated|states|"
+        r"claimed|claims|argued|argues|alleged|alleges|asserted|asserts)\s+that\b|\bin\s+the\s+(?:view|opinion)\s+of\b",
         I,
     ),
     "fr": re.compile(
@@ -322,7 +323,8 @@ HEDGE = {
         r"\b(?:certains|plusieurs|de\s+nombreux|d['’]autres|les|des)\s+(?:historiens|chercheurs|spécialistes|"
         r"auteurs|économistes)\b|\b(?:débat\w*|controvers\w*|contest\w*|discut\w*|hypoth\w*|incertain\w*|théorie\w*|"
         r"spécul\w*)\b|\bil\s+est\s+possible\b|\bon\s+(?:pense|estime|suppose|considère|croit|attribue)\b|"
-        r"\bserait\s+(?:dû|due|dus|dues|la\s+conséquence)\b|\bsi\b",
+        r"\bserait\s+(?:dû|due|dus|dues|la\s+conséquence)\b|\bsi\b|\bselon\b|\b(?:affirme|affirment|affirmait|"
+        r"déclare|déclarent|déclarait|estime|estiment|estimait|soutient|soutiennent|juge|jugent)\s+que\b",
         I,
     ),
 }
@@ -361,7 +363,7 @@ RELATIVE = {
         I,
     ),
     "fr": re.compile(
-        r"^\s*,?\s*(?:qui|ce\s+qui)\s+(?:(?:à\s+son\s+tour|elle-même|lui-même|ensuite|aussi|alors)\s+)?$", I
+        r"^\s*,?\s*qui\s+(?:(?:à\s+son\s+tour|elle-même|lui-même|ensuite|aussi|alors)\s+)?$", I
     ),
 }
 
@@ -408,14 +410,15 @@ RIGHT_GAP_STOP = {
 #: ``(head) of (det)`` at the end of the gap before the link.
 MODIFIER_HEAD = {
     "en": re.compile(
-        r"\b([a-z][a-z-]{2,})\s+(?:of|in|on|against|between|from|over|with|to|for|during|after|before|under|at|within|"
-        r"through|into|across|amid|following|among)\s+"
-        r"(?:the\s+|a\s+|an\s+|its\s+|their\s+|his\s+|her\s+)?(?:[\w.’'-]+\s+){0,3}$"
+        r"\b([A-Za-z][a-z-]{2,})\s+(?:of|in|on|against|between|from|over|with|to|for|during|after|before|under|at|"
+        r"within|through|into|across|amid|following|among|(?:led|ruled|headed|commanded|organi[sz]ed|launched|"
+        r"carried\s+out|staged|instigated)\s+by)\s+"
+        r"(?:the\s+|a\s+|an\s+|its\s+|their\s+|his\s+|her\s+)?(?:[\w.’'-]+\s+){0,3}[\"“«]?$"
     ),
     "fr": re.compile(
         r"\b([a-zà-ÿ][a-zà-ÿ-]{2,})\s+(?:de|du|des|d['’]|en|contre|par|sur|entre|à|au|aux|avec|pour)\s*"
         r"(?:la\s+|le\s+|les\s+|l['’]|un\s+|une\s+|son\s+|sa\s+|ses\s+|leur\s+|leurs\s+)?"
-        r"(?:[\w.’'-]+\s+){0,3}$"
+        r"(?:[\w.’'-]+\s+){0,3}[\"“«]?\s*$"
     ),
 }
 NOT_HEADS = {
@@ -469,7 +472,7 @@ NOT_HEADS = {
         "cause",
         "raison",
         "suite",
-        "lors",
+        
         "face",
         "près",
         "loin",
@@ -528,3 +531,20 @@ led leads lead caused causes causing resulted results resulting triggered trigge
 precipitated precipitating contributed contributes contributing due because
 """.split()
 )
+
+#: Participial connectives after a comma ("..., causing ...", "..., provoquant ...") take the whole preceding
+#: clause as their cause: no linked noun phrase on the left is the cause.
+PARTICIPLE = {
+    "en": re.compile(r"^(?:causing|leading|resulting|triggering|sparking|precipitating|contributing)\b", I),
+    "fr": re.compile(r"^(?:provoquant|entra[îi]nant|déclenchant|contribuant|causant)\b", I),
+}
+
+#: "[[A]] and resulted in": the link closes the previous verb phrase (an object), the subject is earlier.
+VP_COORD_GAP = {
+    "en": re.compile(r"^\s*,?\s*and\s+(?:(?:\w+ly|also|then|thus|so|would|will|has|had|have|soon|later)\s+)*$", I),
+    "fr": re.compile(r"^\s*,?\s*et\s+(?:(?:\w+ment|aussi|ensuite|alors|ainsi|donc|a|ont|avait|va|vont)\s+)*$", I),
+}
+
+#: Left gaps allowed between the argument's link and the connective: an optional comma-enclosed
+#: parenthetical right after the link, then at most three words.
+LEFT_GAP_SHAPE = re.compile(r"^\s*(?:,[^,]{1,60},)?\s*(?:\S+\s*){0,3}$")

@@ -33,7 +33,7 @@ from reva.causal_candidates import patterns as P
 from reva.causal_candidates.wikitext import Paragraph, paragraphs, sentences
 
 EXTRACTOR_ID = "reva.causal_candidates.extract"
-EXTRACTOR_VERSION = "1.0.0"
+EXTRACTOR_VERSION = "1.1.0"
 SOURCE_KEY = "wikipedia.causal_text"
 TIER = "T5"
 LICENCE = "CC BY-SA 4.0"
@@ -234,6 +234,10 @@ def _left_args(
         return [], {"left": "no_link"}
     k = len(cands) - 1
     gap = text[cands[k].end : cs]
+    if P.PARTICIPLE[lang].match(text[cs:]) and re.search(r",\s*$", text[:cs]):
+        return [], {"left": "participial_clause"}
+    if P.VP_COORD_GAP[lang].match(gap):
+        return [], {"left": "coordinated_verb_phrase"}
     if P.RELATIVE[lang].match(gap):
         info["relative"] = True
     elif backward and not P.BACKWARD_LEFT_GAP[lang].match(gap):
@@ -242,7 +246,7 @@ def _left_args(
         return [], {"left": "anaphoric"}
     elif len(gap) > MAX_LEFT_GAP:
         return [], {"left": "gap_too_long"}
-    elif gap.count(",") % 2:  # "..., encountering little opposition due to": the link is in another clause
+    elif gap.count(",") % 2 or not P.LEFT_GAP_SHAPE.match(gap):  # "..., encountering little opposition due to"
         return [], {"left": "gap_crosses_clause"}
     while k > 0 and P.PP_GAP[lang].match(text[cands[k - 1].end : cands[k].start]):
         k -= 1
@@ -317,6 +321,10 @@ def _right_args(
         return [], {"right": "gap_too_long"}
     if P.RIGHT_GAP_STOP[lang].search(gap):
         return [], {"right": "gap_crosses_clause"}
+    if lang == "en" and re.search(r"\b[a-z]{3,}ing\b", gap) and not re.search(r"\b(?:during|following)\b", gap):
+        return [], {"right": "gerund_clause"}  # "resulted in the British occupying [[Java]]"
+    if lang == "en" and re.match(r"^\s+to\s+(?!the\b|a\b|an\b)[a-z]+", text[first.end :]):
+        return [], {"right": "infinitive_subject"}  # "caused [[LTCM]] to collapse": the effect is the collapse
     out = [
         Arg(
             first.target,

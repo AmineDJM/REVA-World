@@ -460,10 +460,10 @@ regenerated for 0010 by ATLASOPS.
 2. **WID is a 40-country subset in the dev DB.** The full run is about 470 requests and 660 MB, and fits
    the budget on its own day.
 3. **Query-file cost on open.** Verifying the sha256 of a 6.4 GB file takes about 15 s per process open.
-   Opening the file read-only and verifying in the background is possible, but the current choice favours
-   integrity. All uid-0 processes share the default cache directory, and `_evict` keeps the 2 newest
-   files: tests that do not set `REVA_ATLAS_CACHE_DIR` could evict the dev query file. Tests should always
-   set it.
+   All uid-0 processes share the default cache directory. On 2026-10-16 the dev query file was evicted
+   once by other agents' test builds; it was rebuilt in 817 s. The latest live snapshot is now pinned
+   (`live-snapshot.pin`, `pin_snapshot`) by API reads (review V3b) and by `reva atlas snapshot --warm`
+   (ATLASOPS), so `_evict` never removes it. Tests should still set `REVA_ATLAS_CACHE_DIR`.
 4. **Same-version code changes.** Several in-flight agents still edit their atlas modules without bumping
    versions; ATLASOPS bumped the finished ones. `run_atlas_ingest` refuses such sources until they are
    bumped, and the seed logs and skips them.
