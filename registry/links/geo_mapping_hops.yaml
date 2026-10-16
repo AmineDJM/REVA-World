@@ -1,0 +1,42 @@
+# REVA World V3 — explicit geography mapping hops for atlas link derivations (owner: LINKS3).
+#
+# An atlas row whose provider geography is not a crosswalk country (iso3 null, or a partner folded as
+# "|partner_code=<code>") never becomes a link — except through a hop listed here. A hop is applied ONLY when:
+#
+#   1. the row's (source, dataset) is listed in `applies_to`, and
+#   2. the knowledge graph holds the hop statement itself (`statement`: subject, property, object; current,
+#      rank not deprecated). That KG statement is added to the link's evidence, next to the atlas row, and the
+#      link's basis records `mapping_hop` (provider code, target country, statement id, why).
+#
+# Without the KG statement the hop is not applied: the rows stay unmapped and are counted
+# (`mapping_hop_without_kg_evidence` in the derivation report). Nothing is mapped silently.
+#
+# `citation` documents the statement as checked when the hop was written (Special:EntityData, one request);
+# it is documentation, never evidence: the evidence is the KG statement read at derivation time.
+version: 1
+owner: LINKS
+hops:
+  - provider_code: Q55
+    label: {fr: "Pays-Bas (pays constitutif, Q55)", en: "Netherlands (constituent country, Q55)"}
+    target: {iso3: NLD, qid: Q29999, label: {fr: "Royaume des Pays-Bas", en: "Kingdom of the Netherlands"}}
+    applies_to:
+      - {source: wikidata, dataset: submarine_cables}
+    statement: {subject: Q55, property: P17, object: Q29999}
+    why: >-
+      Wikidata cable items list P17 = Q55 (the Netherlands, constituent country of the Kingdom of the
+      Netherlands) for 10 cables (A-INFRA live run, 2026-10-16). Wikidata deprecated the ISO 3166 codes on Q55
+      (P297 "NL", P298 "NLD", rank deprecated, qualifier P8327 "intended subject of deprecated statement" =
+      Q29999) in favour of Q29999 (Kingdom of the Netherlands), which is the crosswalk QID of NLD
+      (registry/entities/country_qids.json). The hop "Q55 — country (P17) → Q29999" is the source's own
+      statement that the constituent country belongs to the Kingdom; the cable is attached to NLD through it.
+      A cable landing in the European Netherlands is a landing in the Kingdom's territory; this hop says
+      nothing about Aruba, Curaçao or Sint Maarten (separate items, not mapped here).
+    citation:
+      checked_on: "2026-10-16"
+      url: "https://www.wikidata.org/wiki/Special:EntityData/Q55.json"
+      raw_sha256: f190688c88e116a3adb9bf000a8e1000cf99e79f0dac855dd456cbc28a1170e7
+      entity_revision: 2556226405
+      hop_statement: "q55$3F58B793-57C8-4C66-87ED-403C7E298EBF"  # Q55 P17 Q29999, rank normal
+      deprecation_statements:
+        - "q55$6B5FDAF3-AB46-4E3C-A7B0-62DE008FC8C2"  # Q55 P298 "NLD", rank deprecated, P8327 = Q29999
+        - "Q55$05765181-4953-233d-5fae-82dd362b3254"  # Q55 P297 "NL", rank deprecated, P8327 = Q29999

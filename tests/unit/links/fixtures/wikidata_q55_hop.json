@@ -1,0 +1,53 @@
+{
+ "entities": {
+  "Q55": {
+   "descriptions": {
+    "en": "one of the four autonomous countries of the Kingdom of the Netherlands; with territories in the Caribbean",
+    "fr": "un des quatre pays autonomes du Royaume des Pays-Bas ; avec des territoires dans les Caraïbes"
+   },
+   "instance_of": [
+    "Q15304003",
+    "Q6256"
+   ],
+   "labels": {
+    "en": "Netherlands",
+    "fr": "Pays-Bas"
+   },
+   "lastrevid": 2556226405,
+   "modified": "2026-10-12T11:19:40Z",
+   "raw_sha256": "f190688c88e116a3adb9bf000a8e1000cf99e79f0dac855dd456cbc28a1170e7"
+  }
+ },
+ "meta": {
+  "captured_at": "2026-10-16T19:55:00+00:00",
+  "community_edited": true,
+  "description": "Real Wikidata statement copied for the LINKS3 mapping hop Q55 -> Q29999 (CC0): Netherlands (constituent country) — country (P17) → Kingdom of the Netherlands. Used by tests only.",
+  "endpoint": "https://www.wikidata.org/wiki/Special:EntityData/Q55.json",
+  "filter": "the P17 = Q29999 statement of Q55 only (the deprecated P297/P298 statements are cited in registry/links/geo_mapping_hops.yaml, not loaded: a deprecated ISO code must not reach the KG's ISO3 resolution)",
+  "rank_policy": "deprecated dropped; preferred/normal kept",
+  "raw_sha256s": [
+   "f190688c88e116a3adb9bf000a8e1000cf99e79f0dac855dd456cbc28a1170e7"
+  ],
+  "requests": 1
+ },
+ "origin": "test_fixture",
+ "statements": [
+  {
+   "end": null,
+   "object_qid": "Q29999",
+   "point_in_time": null,
+   "property_pid": "P17",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "f190688c88e116a3adb9bf000a8e1000cf99e79f0dac855dd456cbc28a1170e7",
+   "references": [],
+   "retrieved_at": "2026-10-16T19:55:00+00:00",
+   "source_key": "wikidata",
+   "source_revision": "2556226405",
+   "start": null,
+   "statement_id": "q55$3F58B793-57C8-4C66-87ED-403C7E298EBF",
+   "subject_qid": "Q55",
+   "value": null
+  }
+ ]
+}
