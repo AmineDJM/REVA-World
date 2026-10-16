@@ -123,7 +123,7 @@ describe('physical networks (LINKS3)', () => {
     const air = v.themes.find((x) => x.id === 'infrastructure')!.kinds.find((k) => k.kind === 'air_routes_2014')!;
     expect(air.series).toEqual([]);
     expect(air.items[0]!.sentence).toBe('Royaume-Uni — liaisons aériennes directes recensées en juin 2014 (OpenFlights, données figées) → Pays-Bas : 30 paire(s) d’aéroports ; 6 compagnie(s) ; réseau de juin 2014, données figées');
-    expect(physicalDetail(air.items.length ? d.kinds.air_routes_2014!.links[0]! : d.kinds.air_routes_2014!.links[0]!).since).toBeNull();
+    expect(physicalDetail(d.kinds.air_routes_2014!.links[0]!).since).toBeNull();
   });
 });
 
