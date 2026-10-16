@@ -2212,7 +2212,7 @@ def _xtext(cells: Mapping[int, Any], i: int) -> str:
 
 def n30_lines(body: bytes, f: DvFile, *, strict: bool = True) -> tuple[list[N30Line], dict[str, Any]]:
     """Coded action lines of the NAVCO 3.0 workbook (only the coded columns are read: the news lead, source
-    titles, localities, actor names and notes are never parsed into REVA)."""
+    titles, localities, actor names and notes are never used or stored)."""
     from datetime import timedelta
 
     from reva.adapters.connectors.atlas_xlsx import Workbook, XlsxError
@@ -2540,7 +2540,7 @@ async def _ingest_n30(run: Any, *, strict: bool) -> tuple[dict[str, Any], dict[s
         raw_sha256s=[sha],
         rights=RIGHTS_NAVCO,
         coverage_note="COMPUTED counts per country-year of NAVCO 3.0 coded action lines (26 countries, 1990-2012); "
-        "only country-years with >= 1 line are listed; text columns (news leads, actor names) are not read",
+        "only country-years with >= 1 line are listed; text columns (news leads, actor names) are not used",
     )
     return {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}, stats
 

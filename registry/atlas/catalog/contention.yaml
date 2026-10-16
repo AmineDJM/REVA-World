@@ -1,6 +1,7 @@
 # Contention: protests, resistance campaigns, episodes of contention (agent A-CONTENTION). Provider-declared concepts
 # (not human-reviewed). Atlas tables (all COMPUTED exact counts per country-year from expert-coded datasets, CC0):
-# mmp.protests_cy (Mass Mobilization v5.1), navco.n13_cy (NAVCO 1.3), navco.n21_cy (NAVCO 2.1), mec.episodes_cy (MEC v3.0).
+# mmp.protests_cy (Mass Mobilization v5.1), navco.n13_cy (NAVCO 1.3), navco.n21_cy (NAVCO 2.1), navco.n30_cy (NAVCO 3.0),
+# mec.episodes_cy (MEC v3.0).
 # Domain `contention` has no theme rule yet: every concept carries theme: politics. See docs/dev/v3_a_contention.md.
 domain: contention
 labels:
@@ -575,4 +576,53 @@ concepts:
   value_kind: numeric
   source_order:
   - mec.episodes_cy.episodes_ending|outcome=failure
+  provider_declared: true
+- id: contention.navco3_protest_actions
+  labels:
+    fr: Actions de protestation codées (lignes d'action NAVCO 3.0, verbe 14 PROTESTER)
+    en: Protest actions coded (NAVCO 3.0 action lines, verb 14 PROTEST)
+  definition: 'NAVCO 3.0 (Chenoweth, Pinckney & Lewis): country-day action data for 26 countries 1990-2012 coded with a modified
+    CAMEO ontology; COMPUTED count of coded action lines dated in the year. One news event can give several lines and reciprocal
+    actions are coded once per side (codebook): a count of coded actions, not of distinct events; it depends on news coverage.
+    Only the 26 NAVCO 3.0 countries and years with >= 1 line are listed. Only lines with verb_10 = 14 (PROTEST).'
+  unit: count
+  domain: contention
+  subdomain: protest
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n30_cy.action_lines|verb=14_protest
+  provider_declared: true
+- id: contention.navco3_repression_actions
+  labels:
+    fr: Actions de répression et d'abus codées (lignes d'action NAVCO 3.0, verbe 18)
+    en: Repression and abuse actions coded (NAVCO 3.0 action lines, verb 18)
+  definition: 'NAVCO 3.0 (Chenoweth, Pinckney & Lewis): country-day action data for 26 countries 1990-2012 coded with a modified
+    CAMEO ontology; COMPUTED count of coded action lines dated in the year. One news event can give several lines and reciprocal
+    actions are coded once per side (codebook): a count of coded actions, not of distinct events; it depends on news coverage.
+    Only the 26 NAVCO 3.0 countries and years with >= 1 line are listed. Only lines with verb_10 = 18 (REPRESS AND ABUSE).'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n30_cy.action_lines|verb=18_repress_and_abuse
+  provider_declared: true
+- id: contention.navco3_lethal_state_posture
+  labels:
+    fr: Actions de l'État visant à tuer (lignes d'action NAVCO 3.0, st_posture 7)
+    en: State actions intended to result in death (NAVCO 3.0 action lines, st_posture 7)
+  definition: 'NAVCO 3.0 (Chenoweth, Pinckney & Lewis): country-day action data for 26 countries 1990-2012 coded with a modified
+    CAMEO ontology; COMPUTED count of coded action lines dated in the year. One news event can give several lines and reciprocal
+    actions are coded once per side (codebook): a count of coded actions, not of distinct events; it depends on news coverage.
+    Only the 26 NAVCO 3.0 countries and years with >= 1 line are listed. Only lines with st_posture = 7 (material and/or physical
+    repression intended to result in death).'
+  unit: count
+  domain: contention
+  subdomain: repression
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - navco.n30_cy.action_lines|state_posture=7
   provider_declared: true
