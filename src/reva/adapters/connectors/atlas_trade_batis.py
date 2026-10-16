@@ -260,6 +260,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=SOURCE,
         provider="OECD and WTO - Balanced Trade in Services (BaTIS), OECD SDMX API",
         licence=f"{RIGHTS['licence']}; attribution: {RIGHTS['attribution']}",

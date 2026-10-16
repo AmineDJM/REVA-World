@@ -250,11 +250,14 @@ def parse_report(body: bytes, raw_sha: str, s: UnctadSet) -> tuple[pl.DataFrame,
         if any(v is None for v in fix.values()):
             raise ValidationProblem("UNCTADstat value column holds blanks after filtering", report=s.report)
         foot = pl.col(fcol) if fcol in df.columns else pl.lit(None, dtype=pl.String)
-        flags = pl.when(foot.is_null()).then(pl.lit("{}"))
-        flags = flags.when(foot.str.contains("(?i)estimated")).then(
-            pl.lit('{"footnote":"') + foot.str.replace_all('"', "'") + pl.lit('","unctad_estimate":true}')
+        quoted = foot.str.replace_all('"', "'")
+        flags: pl.Expr = (
+            pl.when(foot.is_null())
+            .then(pl.lit("{}"))
+            .when(foot.str.contains("(?i)estimated"))
+            .then(pl.lit('{"footnote":"') + quoted + pl.lit('","unctad_estimate":true}'))
+            .otherwise(pl.lit('{"footnote":"') + quoted + pl.lit('"}'))
         )
-        flags = flags.otherwise(pl.lit('{"footnote":"') + foot.str.replace_all('"', "'") + pl.lit('"}'))
         parts: list[pl.Expr] = [pl.lit(m.key)]
         for col, key in s.dims:
             parts += [pl.lit(f"|{key}="), pl.col(col)]
@@ -374,6 +377,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=SOURCE,
         provider="UNCTAD (United Nations Trade and Development) Data Hub - UNCTADstat bulk files",
         licence=f"{RIGHTS['licence']} ({RIGHTS['terms_url']}); attribution: {RIGHTS['attribution']}",

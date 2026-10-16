@@ -50,4 +50,4 @@ export type AskResponse = z.output<typeof AskResponse>;
 export const postAsk = (question: string, lang: 'fr' | 'en' = 'fr', s?: AbortSignal) => v3post('/v1/ask', AskResponse, { question, lang }, s);
 
 /** Sentences that state an absence or a refusal (rendered differently, never as a value). */
-export const NON_FACT_KINDS = new Set(['missing', 'unavailable', 'unsupported']);
+export const NON_FACT_KINDS = new Set(['missing', 'unavailable', 'unsupported', 'ambiguous']);

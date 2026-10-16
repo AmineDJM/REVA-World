@@ -169,6 +169,7 @@ COUNTRY_NOW_ISO3: dict[str, str] = {
     "Spain": "ESP",
     "Sweden": "SWE",
     "Switzerland": "CHE",
+    # Nobel API countryNow {"en": "Taiwan", sameAs Q865} (Yuan T. Lee, laureate 265); crosswalk 1.1.0 entity TWN
     "Taiwan": "TWN",
     "Trinidad and Tobago": "TTO",
     "Tunisia": "TUN",

@@ -75,6 +75,9 @@ class QueryPlan:
     warnings: list[str] = field(default_factory=list)
     llm_restatement: str = ""
     planner: str = "llm"  # llm | keyword_fallback
+    #: Several catalog concepts matching the question equally (keyword planner): the candidates and how
+    #: the tie was handled (``headline`` chose one, ``each_queried``, or ``unresolved`` → reported).
+    ambiguities: list[dict[str, Any]] = field(default_factory=list)
 
     def as_json(self) -> dict[str, Any]:
         return {
@@ -82,6 +85,7 @@ class QueryPlan:
             "language": self.language,
             "operations": [o.as_json() for o in self.operations],
             "rejected": self.rejected,
+            **({"ambiguities": self.ambiguities} if self.ambiguities else {}),
         }
 
     def op(self, op_id: str) -> PlanOp | None:
@@ -128,6 +132,29 @@ def _year(v: Any) -> int | None:
     return y
 
 
+_HEADLINE_ID_RE = re.compile(r"^reva\.[a-z0-9_]+\.[a-z0-9_.]{1,120}$")
+_RESOLUTIONS = ("headline", "each_queried", "unresolved")
+
+
+def _ambiguities(raw: Any, catalog: QaCatalog) -> list[dict[str, Any]]:
+    """Concept ambiguities of a plan, kept only with catalog candidates (identifiers never invented)."""
+    out: list[dict[str, Any]] = []
+    for a in raw if isinstance(raw, list) else []:
+        if not isinstance(a, Mapping) or a.get("resolution") not in _RESOLUTIONS:
+            continue
+        cands = [c for c in a.get("candidates") or [] if isinstance(c, str) and c in catalog.concepts][:12]
+        if len(cands) < 2:
+            continue
+        item: dict[str, Any] = {"candidates": cands, "resolution": a["resolution"]}
+        if a["resolution"] == "headline":
+            chosen, head = a.get("chosen"), a.get("headline")
+            if chosen not in cands or not isinstance(head, str) or not _HEADLINE_ID_RE.match(head):
+                continue
+            item.update(chosen=chosen, headline=head)
+        out.append(item)
+    return out[:3]
+
+
 class _Reject(Exception):
     def __init__(self, reason: str, **details: Any) -> None:
         super().__init__(reason)
@@ -154,6 +181,7 @@ def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str =
                     "in_question": in_question(text, question),
                 }
             )
+    plan.ambiguities = _ambiguities(raw.get("ambiguities"), catalog)
     ops = raw.get("operations") or []
     if not isinstance(ops, list):
         raise ValueError("operations is not a list")

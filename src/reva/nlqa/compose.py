@@ -42,7 +42,7 @@ class Sentence:
     id: str
     text: str
     citations: list[str]
-    kind: str  # fact | path | missing | unavailable | unsupported | note | identification
+    kind: str  # fact | path | missing | unavailable | unsupported | ambiguous | note | identification
     op_id: str | None = None
 
     def as_json(self, evidence: Mapping[str, Mapping[str, Any]] | None = None) -> dict[str, Any]:
@@ -248,6 +248,8 @@ class Composer:
         for op in self.x.plan.operations:
             if op.op == "entity_lookup":
                 self.identification(op.id, self.x.lookups[op.id])
+        for amb in self.x.plan.ambiguities:
+            self.ambiguity(amb)
         for res in self.x.results:
             getattr(self, f"op_{res.op.op}")(res) if res.status == "ok" else self.not_ok(res)
         instruction_said = False
@@ -315,6 +317,53 @@ class Composer:
                 "summary",
             )
         return self.out
+
+    # -- concept ambiguity (keyword planner)
+    def ambiguity(self, a: Mapping[str, Any]) -> None:
+        """Several catalog concepts match the question equally: say so and name the candidates (never
+        "not covered"); say which one REVA's headline layer chose, or that each is answered separately."""
+        fr = self.fr()
+        cands = [self.catalog.concepts[c] for c in a["candidates"] if c in self.catalog.concepts]
+        labels = "; ".join(f"{self.concept(c)} ({c.id})" for c in cands)
+        consulted = ["query plan", "catalog concept labels"]
+        if a["resolution"] == "headline":
+            consulted.append("registry/atlas/source_order")
+        eid = self.x.evidence.absence(
+            "concept_ambiguity", consulted, candidates=",".join(c.id for c in cands), resolution=a["resolution"]
+        )
+        n = len(cands)
+        if a["resolution"] == "headline":
+            chosen = self.catalog.concepts[a["chosen"]]
+            others = "; ".join(f"{self.concept(c)} ({c.id})" for c in cands if c.id != chosen.id)
+            text = (
+                f"La question correspond également à {n} concepts du catalogue ; REVA retient {self.concept(chosen)} "
+                f"({chosen.id}), le concept désigné par sa référence {a['headline']} (ordre des sources REVA). "
+                f"Autres concepts possibles, non interrogés (préciser pour les obtenir) : {others}."
+                if fr
+                else f"The question matches {n} catalog concepts equally; REVA uses {self.concept(chosen)} "
+                f"({chosen.id}), the concept designated by its headline {a['headline']} (REVA source order). "
+                f"Other possible concepts, not queried (ask for them explicitly): {others}."
+            )
+            kind = "note"
+        elif a["resolution"] == "each_queried":
+            text = (
+                f"La question correspond également à {n} concepts du catalogue ; chacun est interrogé et donné "
+                f"séparément, avec sa propre unité et sa source : {labels}."
+                if fr
+                else f"The question matches {n} catalog concepts equally; each is queried and answered separately, "
+                f"with its own unit and source: {labels}."
+            )
+            kind = "note"
+        else:
+            text = (
+                f"Question ambiguë : {n} concepts du catalogue correspondent également ({labels}) ; préciser "
+                f"lequel (et le pays) pour obtenir une valeur."
+                if fr
+                else f"Ambiguous question: {n} catalog concepts match equally ({labels}); say which one (and the "
+                f"country) to get a value."
+            )
+            kind = "ambiguous"
+        self.add(text, [eid], kind, "ambiguity")
 
     # -- identification
     def identification(self, op_id: str, r: Resolved) -> None:

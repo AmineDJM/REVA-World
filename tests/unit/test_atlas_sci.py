@@ -345,7 +345,7 @@ async def test_openalex_complement_queries_without_key():
     from reva.atlas.tables import geo_index
 
     codes = sorted(geo_index().maps[oa.GEO_SCHEME])
-    first = [c for c in codes if c not in ("US", "NR")][:199] + ["US"]
+    first = [*[c for c in codes if c not in ("US", "NR")][:199], "US"]
     calls: list[str] = []
 
     class Run:
@@ -378,6 +378,6 @@ async def test_openalex_complement_queries_without_key():
     assert all(vals[c] == "7" for c in rest)
     assert "TV" not in vals  # absent from a complete (< 200 groups) response: no work, no row (never a 0)
     assert "NR" not in vals
-    all_works = [r for r in rows if r["provider_geo"] == "_all_works"][0]
+    all_works = next(r for r in rows if r["provider_geo"] == "_all_works")
     assert json.loads(all_works["flags"])["unresolved_countries"] == ["NR"]
     assert not any("cursor" in u for u in calls)

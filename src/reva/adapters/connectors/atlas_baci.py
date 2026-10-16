@@ -332,7 +332,7 @@ def _frame(df: pl.DataFrame, *, dataset: str, year: int) -> pl.DataFrame:
     )
 
 
-def _sel(member: str, filt: list[tuple[str, pl.Expr | str]], n: pl.Expr | None) -> pl.Expr:
+def _sel(member: str, filt: Sequence[tuple[str, pl.Expr | str]], n: pl.Expr | None) -> pl.Expr:
     """Selector JSON ``{"aggregate":"sum(v)","filter":{...},"member":"...","rounded":r,"rows":n}``
     (``rounded``: inputs rounded from float noise, see :func:`thousandths`)."""
     parts: list[pl.Expr] = [pl.lit('{"aggregate":"sum(v)","filter":{')]
@@ -547,6 +547,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=SOURCE,
         provider="CEPII (Centre d'études prospectives et d'informations internationales) - BACI",
         licence=f"{RIGHTS['licence']} ({RIGHTS['terms_url']}); attribution: {RIGHTS['attribution']}",
