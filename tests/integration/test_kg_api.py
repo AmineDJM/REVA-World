@@ -73,6 +73,36 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
         origin="live",
     )
     assert rep.rejected_total == 0
+    # BCE-dated statements (astronomical years; -0043 = 44 BCE), one of them derived (KGBCE regression)
+    raw3 = db.store.put_bytes(b"kg api test synthetic graph v1 bce part", "raw", "application/json").sha256
+    rep = load_batch(
+        db.worker,
+        db.store,
+        entities=[KgEntity(f"syn:api{n}", "test_thing", {"en": f"Ancient {n}"}) for n in "uv"],
+        statements=[
+            KgStatement(
+                "syn:apiu",
+                "syn:linked",
+                "syn:apiv",
+                statement_id="uv",
+                start=KgTime("-0263", 9),
+                end=KgTime("-0145", 9),
+            ),
+            KgStatement(
+                "syn:apiu",
+                "syn:linked",
+                "syn:apiv",
+                statement_id="uv_derived",
+                point_in_time=KgTime("-0043-03-15", 11),
+                qualifiers={"derivation": "computed_spatial_overlay", "method": "reva.test.overlay/1"},
+            ),
+        ],
+        source_key=SRC + "bce",
+        raw_sha256s=[raw3],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
+    assert rep.rejected_total == 0
     tok, sha = new_api_token()
     with db.owner.begin() as c:
         c.execute(
@@ -274,3 +304,31 @@ def test_path_hub_limit_is_capped(api) -> None:  # type: ignore[no-untyped-def]
     q = {"from": "syn:apip", "to": "syn:apis"}
     assert get(api, "/v1/kg/path", **q, hub_limit=5_000).status_code == 200
     assert get(api, "/v1/kg/path", **q, hub_limit=5_001).status_code == 422
+
+
+def test_bce_dates_and_derived_statements(api) -> None:  # type: ignore[no-untyped-def]
+    """KGBCE: BCE-dated statements are served (astronomical ISO years) by neighbours, timeline and path; a
+    statement whose qualifiers declare a derivation is labelled derived and warned about."""
+    b = get(api, "/v1/kg/entities/syn:apiu/neighbours").json()
+    edges = {e["provenance"]["statement_key"]: e for e in b["data"]["edges"]}
+    uv, der = edges[f"{SRC}bce:uv"], edges[f"{SRC}bce:uv_derived"]
+    assert (uv["valid_from"], uv["valid_to"]) == ("-0263-01-01", "-0145-12-31")
+    assert der["valid_from"] == der["valid_to"] == "-0043-03-15"
+    assert uv["provenance"]["verification"] == "source_reported_not_verified"
+    assert der["provenance"]["verification"] == "derived"
+    assert der["provenance"]["derivation"] == "computed_spatial_overlay"
+    assert der["provenance"]["derivation_method"] == "reva.test.overlay/1"
+    assert "derived_statements" in _codes(b) and "community_edited" not in _codes(b)
+    b = get(api, "/v1/kg/entities/syn:apiu/neighbours", valid_from="-0050", valid_to="-0040", include_undated="false")
+    assert [e["provenance"]["statement_key"] for e in b.json()["data"]["edges"]] == [f"{SRC}bce:uv_derived"]
+    r = get(api, "/v1/kg/entities/syn:apiu/timeline")
+    assert r.status_code == 200, r.text
+    assert [e["sort_date"] for e in r.json()["data"]["events"]] == ["-0263-01-01", "-0043-03-15"]
+    r = get(api, "/v1/kg/path", **{"from": "syn:apiu", "to": "syn:apiv", "valid_from": "-0200", "valid_to": "-0150"})
+    assert r.status_code == 200, r.text
+    d = r.json()["data"]
+    assert d["found"] and d["paths"][0]["hops"][0]["valid_from"] == "-0263-01-01"
+    assert d["search"]["time_window"]["lo"] == "-0200-01-01"
+    assert "derived_statements" not in _codes(r.json())
+    # the other default checks still hold: no derived warning on ordinary statements
+    assert "derived_statements" not in _codes(get(api, "/v1/kg/entities/syn:apiq/neighbours").json())

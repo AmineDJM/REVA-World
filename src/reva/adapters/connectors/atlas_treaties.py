@@ -109,7 +109,7 @@ class Treaty:
     @property
     def url(self) -> str:
         page = f"ViewDetails{self.template}.aspx"
-        temp = f"&Temp=mtdsg{len(self.template) + 1}" if self.template else ""
+        temp = f"&Temp=mtdsg{len(self.template)}" if self.template else ""  # II -> mtdsg2, III -> mtdsg3
         return f"https://{HOST}/Pages/{page}?src=TREATY&mtdsg_no={self.mtdsg}&chapter={self.chapter}{temp}&clang=_en"
 
 

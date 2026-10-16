@@ -312,7 +312,9 @@ def test_bce_paths_and_derived_provenance(bce) -> None:  # type: ignore[no-untyp
     assert [h["valid_from"] for h in hops] == ["-0263-01-01", "-0026-01-01"]
     assert r["search"]["time_window"] == {"lo": "-0200-01-01", "hi": "0100-12-31", "include_undated": False}
     # the window of 44 BCE: carthage--rome ended in 145 BCE, so no connection
-    assert not kq.paths(bce, "bce:carthage", "bce:italy", time_window=kq.window("-0043", "-0043", include_undated=False))["found"]
+    assert not kq.paths(
+        bce, "bce:carthage", "bce:italy", time_window=kq.window("-0043", "-0043", include_undated=False)
+    )["found"]
     (hop,) = kq.paths(bce, "bce:rome", "bce:italy", allowed_properties=["syn:member"])["paths"][0]["hops"]
     prov = hop["provenance"]
     assert prov["verification"] == "derived" and prov["derivation"] == "computed_spatial_overlay"

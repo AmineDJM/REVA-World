@@ -12,7 +12,6 @@ from typing import Any
 
 import pytest
 from sqlalchemy import text
-from sqlalchemy.exc import DataError
 
 from reva.adapters.connectors import atlas_cliopatria as ac
 from reva.atlas.ingest import run_atlas_ingest
@@ -132,15 +131,25 @@ async def test_new_build_without_a_statement_retracts_it(db: Any) -> None:
     assert n1 == n0 - 1
 
 
-@pytest.mark.xfail(
-    reason="KGCORE bug (reported in docs/dev/v3_kgpolity.md): reva.kg.query selects kg.statement valid_lo/valid_hi as "
-    "SQL dates and psycopg cannot load BC dates into datetime.date ('date too small (before year 1)'), so a path, "
-    "neighbour or timeline query touching a BCE-dated statement fails",
-    raises=DataError,
-    strict=False,
-)
 async def test_path_across_bce_dated_overlay(db: Any) -> None:
+    """Regression (KGBCE): BCE-dated statements are read as text, so paths, neighbours and timelines touching
+    them work; the overlay hop is labelled derived, with its method."""
     await _run(db)
     with db.owner.connect() as c:
-        res = kq.paths(c, _node("ITA"), "Q12544", max_hops=2)  # Italy -- Roman Empire (-31..20) -- Q12544
-    assert res["paths"]
+        ita = _node("ITA")
+        res = kq.paths(c, ita, "Q12544", max_hops=2)  # Italy -- Roman Empire (-31..20) -- Q12544
+        assert res["paths"], res
+        hop = res["paths"][0]["hops"][0]
+        assert hop["property"]["pid"] == "geo:covered_territory_of"
+        prov = hop["provenance"]
+        assert prov["verification"] == "derived" and prov["derivation"] == "computed_spatial_overlay"
+        assert prov["derivation_method"] and prov["derivation_method"] == hop["qualifiers"]["method"]
+        bce = [e for e in kq.neighbours(c, ita, direction="in")["edges"] if (e["valid_from"] or "").startswith("-")]
+        assert bce and all(e["valid_from"][1:5].isdigit() for e in bce)  # astronomical, e.g. -0030-01-01
+        tl = kq.timeline(c, ita)["events"]
+        assert tl[0]["sort_date"].startswith("-")
+        keys = [tuple(int(x) for x in e["sort_date"].lstrip("-").split("-")) for e in tl]
+        signed = [
+            (-k[0] if e["sort_date"].startswith("-") else k[0], k[1], k[2]) for k, e in zip(keys, tl, strict=True)
+        ]
+        assert signed == sorted(signed)

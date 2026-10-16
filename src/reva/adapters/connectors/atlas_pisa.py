@@ -30,7 +30,7 @@ from reva.adapters.connectors.atlas_fiscal_common import Flow
 from reva.atlas.sources import AtlasSourceSpec
 
 CONNECTOR_NAME = "atlas.oecd.skills"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB
 PARSER_VERSION = "atlas_oecd_skills/1"
 SKILL_MEASURES = "6_1+6_2+6_3+6_1_DEP+6_1_VER+6_2_VER+6_3_VER+6_4+6_4_DEP+6_4_VER+6_5+6_5_VER"
 
