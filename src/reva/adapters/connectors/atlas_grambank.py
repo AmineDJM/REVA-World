@@ -14,7 +14,7 @@ What is loaded (``source_key`` ``grambank.cldf``; KG only, no atlas table)
 * One string-valued predicate per Grambank feature (195), generated from ``parameters.csv``
   (``grambank:gb020`` = "Are there definite or specific articles? (Grambank GB020)").
 * One statement per ``values.csv`` row whose value is coded (0/1/2/3): subject ``glottolog:<Language_ID>``
-  (Grambank language ids are Glottocodes), value = the CodeTable name (``absent``, ``present``, ...); qualifiers:
+  (Grambank language ids are Glottocodes), value = the CodeTable description (``absent``, ``present``, ``N-Num``, ...); qualifiers:
   code id, the value as coded, comment, sources, source comment, coders. Rows coded ``?`` (the sources consulted
   do not allow a decision) are not stored; they are counted in the run report (~80k). ~362k statements, loaded
   in two batches of at most 200k.
@@ -45,6 +45,7 @@ SRC = gl.FeatureSource(
     tag="Grambank",
     stated_in="Grambank (CLDF)",
     skip_values=frozenset({"?"}),
+    value_column="Description",
     keep=(("Comment", "comment"), ("Source", "sources"), ("Source_comment", "source_comment"), ("Coders", "coders")),
 )
 RIGHTS = {
@@ -98,7 +99,7 @@ def atlas_source() -> AtlasSourceSpec:
         field_mappings={
             "subject": "languages.csv ID (= Glottocode) -> glottolog:<id>",
             "predicate": "parameters.csv ID -> grambank:<id>",
-            "value": "codes.csv Name of values.csv Code_ID ('?' not stored)",
+            "value": "codes.csv Description of values.csv Code_ID ('?' not stored)",
         },
         notes="KG only (no atlas table): ~362k coded grammatical values as literal statements on Glottolog languoids.",
     )

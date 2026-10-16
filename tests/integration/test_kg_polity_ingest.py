@@ -120,3 +120,17 @@ async def test_new_build_without_a_statement_retracts_it(db: Any) -> None:
             {"k": ac.SOURCE_KEY},
         ).scalar_one()
     assert n1 == n0 - 1
+
+
+@pytest.mark.xfail(
+    reason="KGCORE bug (reported in docs/dev/v3_kgpolity.md): reva.kg.query selects kg.statement valid_lo/valid_hi as "
+    "SQL dates and psycopg cannot load BC dates into datetime.date ('date too small (before year 1)'), so a path, "
+    "neighbour or timeline query touching a BCE-dated statement fails",
+    raises=Exception,
+    strict=False,
+)
+async def test_path_across_bce_dated_overlay(db: Any) -> None:
+    await _run(db)
+    with db.owner.connect() as c:
+        res = kq.paths(c, "iso3:ITA", "Q12544", max_hops=2)  # Italy -- Roman Empire (-31..20) -- Q12544
+    assert res["paths"]

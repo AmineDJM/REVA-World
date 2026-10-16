@@ -59,9 +59,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   (factbook.json, fao.faostat, unsd.ama, worldbank.atlas); same caps, totals capped at 3 GiB.
 # * budgets.yaml -> budgets-1.3.4 (2026-10-15, ATLASOPS): merge of ssa.ssptw (A-LAW, 220/day) and of
 #   the KGGEOPOL sources cshapes.cran, harvard.dataverse.unvotes, ucdp.downloads (kggeopol.yaml).
+# * budgets.yaml -> budgets-1.3.5 (2026-10-16, ATLASOPS): merge of the requests filed by finished agents
+#   since 1.3.4 (A-SOCIETY, A-RESOURCES, KGGEOPOL, A-FACTBOOK, ...); same caps (<= 5000/source, 3 GiB/day).
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "838a05e3f74252f49a6917c6d1355e1d467797f4913c6a2f5ac4a60603ba0b7c",
+    "budgets.yaml": "3b826baca1ba485db351e319d0ed31a3381b32db0ea3c81e559057baa72d9e29",
 }
 
 

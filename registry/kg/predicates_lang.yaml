@@ -137,5 +137,5 @@ generated:
     source: "Grambank CLDF ParameterTable (parameters.csv): ID, Name"
     description: >-
       One predicate per Grambank feature. Subject: glottolog:<Language_ID> (Grambank language ids are
-      Glottocodes). Value: the CodeTable name (absent/present/...); "?" values (not knowable from the sources
+      Glottocodes). Value: the CodeTable description (absent/present/N-Num...); "?" values (not knowable from the sources
       consulted) are not stored and are counted in the run report. Qualifiers: code id, comment, coders, sources.

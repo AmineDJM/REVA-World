@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.4"
+policy_version: "budgets-1.3.5"
 daily:
-  http_requests_total: 10981
+  http_requests_total: 11206
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -19,27 +19,39 @@ per_source_daily_requests:
   bmr.dataverse: 6
   # ccp.data: requested by A-LAW (a_law.yaml)
   ccp.data: 10
+  # cdpd.dataverse: requested by A-SOCIETY (a_society.yaml)
+  cdpd.dataverse: 6
+  # cepii.baci: requested by A-TRADE (a_trade.yaml)
+  cepii.baci: 40
   # clio_infra.dataverse: requested by A-HISTECON (a_histecon.yaml)
   clio_infra.dataverse: 250
+  # cliopatria.github: requested by KGPOLITY (kgpolity.yaml)
+  cliopatria.github: 6
   # constitute.service: requested by A-LAW (a_law.yaml)
   constitute.service: 5
-  # cow.data: requested by A-HISTECON (a_histecon.yaml)
-  cow.data: 20
+  # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml)
+  cow.data: 26
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
   cshapes.cran: 8
+  # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml)
+  eia.opendata_bulk: 8
   # factbook.json: requested by A-FACTBOOK (a_factbook.yaml), A-LAW (a_law.yaml)
   factbook.json: 900
   # fao.faostat: requested by A-FAO (a_fao.yaml)
   fao.faostat: 45
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
+  # geonames.cities: requested by A-CITIES (a_cities.yaml)
+  geonames.cities: 6
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
   geonames.countryinfo: 2
   # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
   harvard.dataverse.unvotes: 12
+  # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
+  hief.dataverse: 6
   # hyde.dans: requested by A-HISTECON (a_histecon.yaml)
   hyde.dans: 10
-  # ilostat.rplumber: requested by A-ILO (a_ilo.yaml)
+  # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml)
   ilostat.rplumber: 60
   # imf.sdmx: requested by A-IMF (a_imf.yaml)
   imf.sdmx: 60
@@ -55,22 +67,34 @@ per_source_daily_requests:
   naturalearth.admin0_10m: 12
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
-  # oecd.sdmx: requested by A-ILO (a_ilo.yaml)
-  oecd.sdmx: 6
+  # oecd.sdmx: requested by A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)
+  oecd.sdmx: 56
   # openalex.api: requested by A-SCI (a_sci.yaml)
   openalex.api: 400
   # owid.compilations: requested by A-QOL (a_qol.yaml)
   owid.compilations: 50
+  # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
+  parlgov.dataverse: 6
+  # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)
+  rcs_dem.osf: 12
   # ssa.ssptw: requested by A-LAW (a_law.yaml)
   ssa.ssptw: 220
+  # sscp.dataverse: requested by A-SOCIETY (a_society.yaml)
+  sscp.dataverse: 9
+  # ti.cpi: requested by A-SOCIETY (a_society.yaml)
+  ti.cpi: 6
   # ucdp.downloads: requested by KGGEOPOL (kggeopol.yaml)
   ucdp.downloads: 16
   # un.desa_ims: requested by A-UN (a_un.yaml)
   un.desa_ims: 5
   # un.sdg: requested by A-UN (a_un.yaml)
   un.sdg: 400
-  # un.wpp: requested by A-UN (a_un.yaml)
-  un.wpp: 10
+  # un.wpp: requested by A-UN (a_un.yaml), SIMWORLD (simworld.yaml)
+  un.wpp: 20
+  # un.wup: requested by A-CITIES (a_cities.yaml)
+  un.wup: 10
+  # unctad.bulk: requested by A-TRADE (a_trade.yaml)
+  unctad.bulk: 15
   # undp.hdr: requested by A-QOL (a_qol.yaml)
   undp.hdr: 10
   # unesco.uis: requested by A-HEALTHEDU (a_healthedu.yaml)
@@ -83,10 +107,12 @@ per_source_daily_requests:
   unsd.ama: 20
   # unsd.syb: requested by A-UN (a_un.yaml)
   unsd.syb: 5
+  # usgs.sciencebase: requested by A-RESOURCES (a_resources.yaml)
+  usgs.sciencebase: 20
   # vdem.vdemdata: requested by A-POL (a_pol.yaml)
   vdem.vdemdata: 9
-  # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml)
-  who.gho: 120
+  # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml), A-SOCIETY (a_society.yaml)
+  who.gho: 129
   # whr.figure21: requested by A-QOL (a_qol.yaml)
   whr.figure21: 5
   # wid.bulk: requested by A-QOL (a_qol.yaml)

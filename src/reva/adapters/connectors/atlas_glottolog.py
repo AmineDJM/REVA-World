@@ -789,6 +789,8 @@ class FeatureSource:
     tag: str  # provider tag in labels ("WALS", "Grambank")
     stated_in: str
     skip_values: frozenset[str] = frozenset()
+    #: CodeTable column holding the human-readable value (WALS: Name "SOV"; Grambank: Description "absent")
+    value_column: str = "Name"
     #: extra ValueTable columns kept as qualifiers (column -> qualifier name)
     keep: tuple[tuple[str, str], ...] = (("Comment", "comment"), ("Source", "sources"))
 
@@ -834,7 +836,7 @@ def feature_statements(
 
     params = z.rows("cldf/parameters.csv", ("ID", "Name"))
     props = feature_properties(src, params)
-    codes = {r["ID"]: r for r in z.rows("cldf/codes.csv", ("ID", "Parameter_ID", "Name"))}
+    codes = {r["ID"]: r for r in z.rows("cldf/codes.csv", ("ID", "Parameter_ID", "Name", src.value_column))}
     cols = ("ID", "Language_ID", "Parameter_ID", "Value", "Code_ID")
     out: list[Any] = []
     counters: Counter[str] = Counter()
@@ -867,7 +869,7 @@ def feature_statements(
             KgStatement(
                 subject_qid=subject,
                 property_pid=prop.pid,
-                value={"type": "string", "value": code["Name"] if code is not None else val},
+                value={"type": "string", "value": ((code[src.value_column] or code["Name"]) if code is not None else val)},
                 qualifiers=q,
                 references=[{"stated_in": src.stated_in, "selector": {"table": "values.csv", "row_id": r["ID"]}}],
                 statement_id=f"value:{r['ID']}",
