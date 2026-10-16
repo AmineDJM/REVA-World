@@ -1,0 +1,946 @@
+# Dataset variable -> REVA relation (agent CAUSDATA). Owner: CAUSDATA. Read by the CAUSDATA connectors
+# (src/reva/adapters/connectors/atlas_icb.py, atlas_mid.py, atlas_ucdp_term.py): the `definitions` of a dataset are
+# the Codebook.definitions passed to reva.causal.load_dataset_claims, verbatim (see `conventions.quotes`).
+# Each mapping says whether a variable becomes a T1 causal claim (reva_kind: claim, closed vocabulary of
+# registry/causal/relations.yaml) or a non-causal context statement, and WHY, with the codebook's own words.
+# Generated from the pinned codebook PDFs (sha256 in `documents`); edit the mapping decisions, not the quotes.
+version: 1
+maintainer: CAUSDATA
+updated: '2026-10-16'
+conventions:
+  quotes: 'Codebook text quoted verbatim from the provider PDF (pdftotext -layout of the pinned file): whitespace normalised
+    to single spaces, page-number lines dropped, a hyphen at a line end joined to the next line (the hyphen is kept). pdf_page
+    is the 1-based physical page of the pinned PDF.'
+  claim: reva_kind 'claim' = a T1 causal claim delivered through reva.causal.load_dataset_claims (docs/dev/v3_causal_interface.md);
+    the codebook_term names the definitions entry passed in Codebook.definitions.
+  context: reva_kind 'context' = a KG statement (kg.statement) that is NOT causal (issue, participant, part_of, follows, attribute);
+    it is never shown with causal wording.
+  coded_issue: 'A dataset''s coded issue (MID revision type, UCDP incompatibility) is what is at stake / sought, not a cause:
+    context family, never a claim (roadmap principle 3).'
+  no_join_claims: 'REVA never creates a causal claim by joining two datasets: when one codebook says ''terminated by a peace
+    agreement'' and another lists agreements, the pairing is a context statement, not a claim.'
+documents:
+  icb1_codebook:
+    title: International Crisis Behavior Data Codebook, Version 16 - Dataset ICB 1 (System Level)
+    authors: Brecher, Wilkenfeld, Beardsley, James and Quinn
+    date: '2025-06-20'
+    url: https://duke.box.com/s/ravjtawv20aszptx3xhn43p7gd2q02dq
+    download_url: https://duke.box.com/shared/static/ravjtawv20aszptx3xhn43p7gd2q02dq.pdf
+    sha256: fd2f41be46aa61b77e9490515294e959112ecb91c5e5a3d2a59aa68fb0a81910
+  icb2_codebook:
+    title: International Crisis Behavior Data Codebook, Version 16 - Dataset ICB 2 (Actor Level)
+    authors: Brecher, Wilkenfeld, Beardsley, James and Quinn
+    date: '2025-06-20'
+    url: https://duke.box.com/s/d7zxijj57ukexpc08j1039vvw4cvrpzy
+    download_url: https://duke.box.com/shared/static/d7zxijj57ukexpc08j1039vvw4cvrpzy.pdf
+    sha256: 88063b614f10ad8c9d202a5b5e86ac1f0b68bee67f165d1490fae707ce094dac
+  mid_codebook:
+    title: Codebook for the Militarized Interstate Dispute Data, Versions 5.0 and 5.01
+    authors: Palmer, McManus, D'Orazio, Kenwick, Karstens, Bloch, Dietrich, Kahn, Ritter and Soules
+    date: '2020-11-03'
+    url: https://correlatesofwar.org/data-sets/mids/
+    container: https://correlatesofwar.org/wp-content/uploads/Incident_Level_5.01.zip
+    member: MID 5.0 Codebook.pdf
+    sha256: cf5629c4a7e1297552375313747213f82a57d1b09332d8743d98b22b8be77c77
+  mid_dispute_manual:
+    title: MID Dispute Coding Manual (MID 5 data and supporting materials)
+    authors: Correlates of War Project, MID project
+    url: https://correlatesofwar.org/data-sets/mids/
+    container: https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
+    member: Dispute Coding Manual.pdf
+    sha256: 5016fb92b3f1bc3ca24ca0ca7f77056c2d956db5575f424a83df44b93098edd8
+  mid_incident_manual:
+    title: MID Incident Coding Manual (MID 5 data and supporting materials)
+    authors: Correlates of War Project, MID project
+    url: https://correlatesofwar.org/data-sets/mids/
+    container: https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
+    member: Incident Coding Manual.pdf
+    sha256: 8e5be4d20188ebf3b891fe389289c0b5ae643ad7d34cfd8a41e33a45d158f4c3
+  term_codebook:
+    title: UCDP Conflict Termination Dataset Codebook v.4 2024
+    authors: Joakim Kreutz
+    date: '2025-06-24'
+    url: https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf
+    download_url: https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf
+    sha256: 648c1601f41796f1b565ab91616b4e8968ec7e84aca5434ddad8945b2079908d
+  pa_codebook:
+    title: UCDP Peace Agreement Dataset Codebook Version 22.1
+    authors: Stina Högbladh
+    date: '2022'
+    url: https://ucdp.uu.se/downloads/peace/ucdp-codebook-peace-agreements-221.pdf
+    download_url: https://ucdp.uu.se/downloads/peace/ucdp-codebook-peace-agreements-221.pdf
+    sha256: d46ca9768cc123f1054ffbbe7ddb12d14b8bfe86cfa86e6a74614b5bab5c9bd5
+datasets:
+  icb1:
+    source_key: icb.data
+    dataset: icb1
+    dataset_revision: v16
+    codebook_document: icb1_codebook
+    codebook_name: International Crisis Behavior Data Codebook, Version 16 - ICB1 (System Level)
+    citation: 'Brecher, Michael and Jonathan Wilkenfeld (1997). A Study of Crisis. Ann Arbor: University of Michigan Press.
+      Brecher, Wilkenfeld, Beardsley, James and Quinn (2025). International Crisis Behavior Data Codebook, Version 16. http://sites.duke.edu/icbdata/data-collections/'
+    definitions:
+      BREAK:
+        text: The breakpoint to an international crisis is that event, act or situational change which catalyzes a crisis
+          for the earliest actor, that is, which leads decision makers to perceive a threat to basic values, time pressure
+          for response and heightened probability of involvement in military hostilities. The date of the trigger for the
+          first crisis actor thus is also the initiation date for the entire international crisis. Breakpoint is an attribute
+          of an international crisis as a whole. However, it is based upon the coding of the trigger for a particular crisis
+          actor. Hence the user should refer to the treatment of this variable (TRIGGR) in the codebook for the Actor Level
+          Dataset.
+        document: icb1_codebook
+        pdf_page: 10
+      TRIGENT:
+        text: Which entity triggered an international crisis, i.e., initiated the act(s) which was (were) perceived by the
+          earliest crisis actor in the cluster as involving a threat to basic values, a heightened probability of military
+          hostilities and finite time for response? In addition to states, crises may be internally-generated or catalyzed
+          by more than one state or by non-state actors. In the case of a single state as the triggering entity, the country
+          code is assigned. If the trigger was internally generated, it was coded 995. If the triggering entity was a non-state
+          actor (UN, regional organization, OPEC, PLO, rebel forces), it was coded 996. If the trigger was an event involving
+          more than one state (military alliance or arms deal directed at a crisis actor; or a simultaneous trigger in which
+          the culpability in the start of hostilities cannot be assessed), it was coded 997.
+        document: icb1_codebook
+        pdf_page: 11
+      TRIGDATE:
+        text: When did the earliest actor in an international crisis perceive a crisis? This is identified from the decision
+          makers' indication - in diaries, memoirs, speeches, etc., of the act(s) or event(s) which they perceived as generating
+          threat, time pressure and the likelihood of military hostilities. If it was not possible to determine the exact
+          day of the perception of the trigger, only part of the date is coded, that is, year and month without day.
+        document: icb1_codebook
+        pdf_page: 12
+      TERMDATE:
+        text: What was the date of termination for the international crisis, that is, for the last actor to perceive a decline
+          toward the pre-crisis norm of threat, time pressure and probability of military hostilities? When it was not possible
+          to pinpoint the precise day of termination, the month and year were coded.
+        document: icb1_codebook
+        pdf_page: 12
+      FOROUT:
+        text: This variable refers to the form of the outcome of an international crisis at its termination point. Form of
+          outcome is determined by the configuration of forces operative during a crisis, and has an important bearing on
+          the subsequent relations among the parties to a crisis. In most cases the form of outcome was common to all crisis
+          actors. Where it was not, the form closest to consensus by the actors was coded for the entire crisis. Hence, the
+          user should consult the coding of this variable (OUTFOR) in the Actor Level Dataset.
+        document: icb1_codebook
+        pdf_page: 45
+      SUBOUT:
+        text: Content of outcome refers to whether or not the outcome of an international crisis was perceived by the actors
+          to have been definitive or ambiguous. A definitive outcome is one in which all actors perceive victory or defeat
+          in terms of the achievement of basic goals in the context of a specific crisis. An ambiguous outcome occurs when
+          at least one of the crisis actors perceives either stalemate or compromise at the termination point of a crisis.
+          This variable is based upon the coding for individual crisis actors. Hence the user should refer to OUTCOM in the
+          Actor-Level Codebook.
+        document: icb1_codebook
+        pdf_page: 44
+      EXSAT:
+        text: The extent of satisfaction with the outcome of an international crisis refers to the evaluation of the outcome
+          from the point of view of the individual crisis actors when a crisis terminates. Hence the user should refer to
+          the data on OUTEVL in the Actor-Level Dataset. For this variable, the distribution of satisfaction among crisis
+          actors should only be coded in international crises with two or more adversarial crisis actors. Single-actor cases
+          and multiple-actor cases in which the two or more crisis actors were not adversaries are coded as (6) and (7), respectively.
+        document: icb1_codebook
+        pdf_page: 46
+      OUTESR:
+        text: This variable assesses the effect of a crisis outcome on the tension level among the adversaries. The user should
+          consult the coding of this variable (OUTESR) in the Actor Level Dataset.
+        document: icb1_codebook
+        pdf_page: 47
+      GRAVCR:
+        text: This variable identifies the most salient object of threat identified by any of the actors in the crisis. Coding
+          is based on the mix of actor level coding for GRAVTY in Actor level Codebook. While some threats may be viewed as
+          more serious than others, the values for this variable should not be viewed as a true scale. In particular, territorial
+          threat can vary in its seriousness, depending on state, region, and other circumstances.
+        document: icb1_codebook
+        pdf_page: 13
+      VIOL:
+        text: This variable identifies the extent of violence in an international crisis as a whole, regardless of its use
+          or non-use by a specific actor as a crisis management technique. The user should refer to the treatment of this
+          variable (VIOL) in the Actor-Level Dataset.
+        document: icb1_codebook
+        pdf_page: 16
+      CRISMG:
+        text: A variety of crisis management techniques is used to cope with crises. This variable identifies the primary
+          technique used in an international crisis. The crisis management technique selected for the international crisis
+          as a whole is the highest technique used by any actor along a scale from pacific techniques to violence. Hence the
+          user should refer to the treatment of this variable (CRISMG) in the Codebook for the Actor Level Dataset.
+        document: icb1_codebook
+        pdf_page: 14
+      PCID:
+        text: Each actor case is identified by a protracted conflict number, according to the values below. The user should
+          consult the coding of this variable (PCID) in the Actor Level Dataset. At the system level, crises that are not
+          part of protracted conflicts are assigned a code between (40) and (44), depending on the region in which the crisis
+          occurs.
+        document: icb1_codebook
+        pdf_page: 55
+    values:
+      BREAK: &id001
+        1: Verbal act
+        2: Political act
+        3: Economic act
+        4: External change
+        5: Other non-violent act
+        6: Internal verbal or physical challenge to regime or elite
+        7: Non-violent military act
+        8: Indirect violent act
+        9: Violent act
+      TRIGENT:
+        995: internally generated
+        996: non-state actor
+        997: more than one state
+      GRAVCR:
+        0: Economic threat
+        1: Limited military damage
+        2: Political threat
+        3: Territorial threat
+        4: Threat to influence
+        5: Threat of grave damage
+        6: Threat to existence
+        7: Other
+      CRISMG:
+        1: Negotiation
+        2: Adjudication or arbitration
+        3: Mediation
+        4: Multiple not including violence
+        5: Non-military pressure
+        6: Non-violent military
+        7: Multiple including violence
+        8: Violence
+      VIOL:
+        1: No violence
+        2: Minor clashes
+        3: Serious clashes
+        4: Full-scale war
+      SUBOUT:
+        1: Ambiguous outcome
+        2: Definitive outcome
+      FOROUT:
+        1: Formal agreement
+        2: Semi-formal agreement
+        3: Tacit understanding
+        4: Unilateral act
+        5: Imposed agreement
+        6: Other
+        7: Crisis faded
+      EXSAT:
+        1: All satisfied
+        2: Mostly satisfied
+        3: Equally mixed
+        4: Mostly dissatisfied
+        5: All dissatisfied
+        6: Single-actor case
+        7: No adversarial actor
+      OUTESR:
+        1: Tension escalation
+        2: Tension reduction
+        3: Recent case
+    mappings:
+    - variables:
+      - BREAK
+      - TRIGENT
+      - YRTRIG
+      - MOTRIG
+      - DATRIG
+      reva_kind: claim
+      relation: coded_trigger
+      cause: 'icb:crisis:<crisno>:trigger (the breakpoint act: type BREAK, triggering entity TRIGENT, perceived on TRIGDATE)'
+      effect: icb:crisis:<crisno> (the international crisis)
+      codebook_term: BREAK
+      causal: true
+      why: 'The codebook defines the breakpoint as the act ''which catalyzes a crisis for the earliest actor'' and its date
+        as ''the initiation date for the entire international crisis'': an expert-coded trigger (cause) of the crisis.'
+    - variables:
+      - FOROUT
+      - SUBOUT
+      - EXSAT
+      - OUTESR
+      - YRTERM
+      - MOTERM
+      - DATERM
+      reva_kind: claim
+      relation: coded_outcome
+      cause: icb:crisis:<crisno>
+      effect: icb:crisis:<crisno>:outcome (termination on TERMDATE with form FOROUT, content SUBOUT, satisfaction EXSAT, tension
+        OUTESR)
+      codebook_term: FOROUT
+      causal: true
+      why: 'FOROUT is ''the form of the outcome of an international crisis at its termination point'': the dataset''s coded
+        outcome of the crisis. Only rows with a coded FOROUT become claims.'
+    - variables:
+      - OUTESR
+      reva_kind: context
+      predicate: icb:tension_after_outcome
+      causal: false
+      why: '''Tension escalation - crisis recurred among the principal adversaries during the subsequent five-year period''
+        names no later crisis: an attribute of the outcome, never a claim to a specific crisis.'
+    - variables:
+      - TRIGENT
+      reva_kind: context
+      predicate: icb:triggering_entity / icb:triggering_entity_kind
+      causal: false
+      why: Attribute of the trigger act (who initiated it); the claim is on the act, the entity is attached to it. 995/996/997
+        are kinds, not entities.
+    - variables:
+      - GRAVCR
+      - VIOL
+      - CRISMG
+      reva_kind: context
+      predicate: icb:gravity / icb:violence / icb:crisis_management
+      causal: false
+      why: Descriptive attributes of the crisis.
+    - variables:
+      - PCID
+      reva_kind: context
+      predicate: P361 part of icb:pc:<pcid>
+      causal: false
+      why: Membership in a protracted conflict is structure (part_of); codes 40-44 are regional buckets for crises that are
+        NOT part of a protracted conflict and get no part_of statement.
+  icb2:
+    source_key: icb.data
+    dataset: icb2
+    dataset_revision: v16
+    codebook_document: icb2_codebook
+    codebook_name: International Crisis Behavior Data Codebook, Version 16 - ICB2 (Actor Level)
+    citation: 'Brecher, Michael and Jonathan Wilkenfeld (1997). A Study of Crisis. Ann Arbor: University of Michigan Press.
+      Brecher, Wilkenfeld, Beardsley, James and Quinn (2025). International Crisis Behavior Data Codebook, Version 16. http://sites.duke.edu/icbdata/data-collections/'
+    definitions:
+      TRIGGR:
+        text: 'The trigger or precipitating cause of a foreign policy crisis refers to the specific act, event or situational
+          change which leads decision-makers to perceive a threat to basic values, time pressure for response and heightened
+          probability of involvement in military hostilities. A trigger may be initiated by: an adversary state; a non-state
+          actor; or a group of states (military alliance). It may be an environmental change; or it may be internally generated.'
+        document: icb2_codebook
+        pdf_page: 11
+      TRIGDATE:
+        text: When did the decision makers of the crisis actor perceive the trigger to the crisis period? This is identified
+          from the decision makers' indication - in diaries, memoirs, speeches, etc., of the act(s), event(s) or environmental
+          change(s) which they perceived as generating threat, time pressure and the likelihood of military hostilities. If
+          it was not possible to determine the exact day of the perception of the trigger, only part of the date was coded,
+          that is, year and month.
+        document: icb2_codebook
+        pdf_page: 12
+      TRIGENT:
+        text: Which entity triggered a foreign policy crisis, i.e., initiated the act which was perceived by a state as creating
+          a threat to basic values, time pressure and heightened probability of military hostilities? In addition to states,
+          crises may be internally generated or catalyzed by non-state actors. Crises can also be triggered by more than one
+          state (e.g., Germany and the USSR in the Entry to World War II Crisis, 1939). In the case of a single state as the
+          triggering entity, the country code was assigned. If the trigger was internally generated, it was coded 995. If
+          the triggering entity was a non-state actor (UN, regional organization, OPEC, PLO, rebel forces), it was coded 996.
+          If the trigger was an event involving more than one state - a military alliance or arms deal directed at crisis
+          actor) - it was coded 997.
+        document: icb2_codebook
+        pdf_page: 12
+      TRIGLOC:
+        text: Was the triggering entity external to the crisis actor, or internal?
+        document: icb2_codebook
+        pdf_page: 13
+      MAJRES:
+        text: Once the decision makers of a state perceive the act/event/change which triggers its crisis, they will decide
+          on an appropriate response. The major response is that specific action which captures the major thrust of its behavior
+          (the U.S. quarantine of Cuba in the 1962 Missile Crisis). Most of the categories of the major response variable
+          match those of the trigger variable (above).
+        document: icb2_codebook
+        pdf_page: 16
+      RESPDATE:
+        text: What was the date on which the major response to the trigger was formulated? In the cases of multiple responses,
+          this variable identifies the most important response, as perceived by the crisis actor. If the formulation date
+          was unknown, the date on which it was implemented was coded.
+        document: icb2_codebook
+        pdf_page: 17
+      OUTCOM:
+        text: This variable deals with the content of crisis termination. Did a crisis actor yield? Did it triumph? Was a
+          compromise reached? Was there a blurred outcome regarding goal achievement? The outcome is indicated from the perspective
+          of a specific actor. The values which fall under the categories listed below should be thought of in terms of achievement/non-achievement
+          of basic goals(s) by a crisis actor in the context of a specific crisis.
+        document: icb2_codebook
+        pdf_page: 33
+      OUTFOR:
+        text: This variable refers to the form of the outcome of a crisis at its termination point.
+        document: icb2_codebook
+        pdf_page: 33
+      OUTEVL:
+        text: This variable reports the extent of satisfaction with the outcome as perceived by the individual crisis actor,
+          as well as the extent of satisfaction perceived by the crisis actor’s adversary. In crises where there were several
+          adversaries with mixed reactions, the perceived evaluation of outcome of the principal adversary was coded.
+        document: icb2_codebook
+        pdf_page: 34
+      TERMDATE:
+        text: What was the date on which the crisis terminated? This is identified from the decision makers' indication -
+          in diaries, memoirs, speeches, etc. - of the date that their perception of threat, time pressure, and war likelihood
+          declined toward the pre-crisis norm. The variable attempts to identify decision makers' perception of decline in
+          tension. When it was not possible to pinpoint the precise day of termination, the month and year were coded.
+        document: icb2_codebook
+        pdf_page: 35
+      GRAVTY:
+        text: This variable identifies the object of gravest threat at any time during the crisis, as perceived by the principal
+          decision makers of the crisis actor. When two or more values were threatened, the most severe was coded. While some
+          threats may be viewed as more serious than others, the values for this variable should not be viewed as a true scale.
+          In particular, territorial threat can vary in its seriousness, depending on state, region, and other circumstances.
+        document: icb2_codebook
+        pdf_page: 51
+    values:
+      TRIGGR: *id001
+      TRIGENT:
+        995: internally generated
+        996: non-state actor
+        997: more than one state
+      TRIGLOC:
+        1: External entity
+        2: Internal entity
+      MAJRES:
+        1: No response-inaction
+        2: Verbal act
+        3: Political act
+        4: Economic act
+        5: Other non-violent act
+        6: Non-violent military act
+        7: Multiple including non-violent military act
+        8: Violent military act
+        9: Multiple including violent military act
+      OUTCOM:
+        1: Victory
+        2: Compromise
+        3: Stalemate
+        4: Defeat
+        5: Other
+      OUTFOR:
+        1: Formal agreement - voluntary
+        2: Semi-formal agreement - voluntary
+        3: Tacit understanding
+        4: Unilateral - self
+        5: Unilateral - ally
+        6: Unilateral - adversary
+        7: Compliance
+        8: Imposed - imposer
+        9: Imposed - imposee
+        10: Spillover
+        11: Other - global organization intervention
+        12: Other - ally
+        13: Other - internal or non-state actor
+        14: Other - misc.
+        15: Faded
+        99: Missing data
+      OUTEVL:
+        1: All parties satisfied with content of outcome
+        2: Crisis actor satisfied, adversaries dissatisfied
+        3: Adversaries satisfied, crisis actor dissatisfied
+        4: All parties dissatisfied
+      GRAVTY:
+        0: Economic threat
+        1: Limited military threat
+        2: Political threat
+        3: Territorial threat
+        4: Threat to influence in the international system or regional subsystem
+        5: Threat of grave damage
+        6: Threat to existence
+        7: Other
+    mappings:
+    - variables:
+      - TRIGGR
+      - TRIGENT
+      - TRIGLOC
+      - YRTRIG
+      - MOTRIG
+      - DATRIG
+      reva_kind: claim
+      relation: coded_trigger
+      cause: icb:crisis:<crisno>:actor:<cracno>:trigger (the trigger act for this actor)
+      effect: icb:crisis:<crisno>:actor:<cracno> (the actor's foreign policy crisis, part of icb:crisis:<crisno>)
+      codebook_term: TRIGGR
+      causal: true
+      why: 'The codebook defines TRIGGR as ''the trigger or precipitating cause of a foreign policy crisis'': an expert-coded
+        immediate cause. Kept as coded_trigger (not immediate_cause) so the source''s own category stays visible.'
+    - variables:
+      - MAJRES
+      - YERRES
+      - MONRES
+      - DAYRES
+      reva_kind: claim
+      relation: reaction_to
+      cause: icb:crisis:<crisno>:actor:<cracno>:trigger
+      effect: icb:crisis:<crisno>:actor:<cracno>:response (the major response, on RESPDATE)
+      codebook_term: MAJRES
+      causal: true
+      why: 'MAJOR RESPONSE TO CRISIS TRIGGER: ''Once the decision makers of a state perceive the act/event/change which triggers
+        its crisis, they will decide on an appropriate response.'' The response is coded as a reaction to the trigger. No
+        claim when MAJRES is missing; MAJRES=1 (no response-inaction) is kept (a coded reaction category).'
+    - variables:
+      - OUTCOM
+      - OUTFOR
+      - OUTEVL
+      - YRTERM
+      - MOTERM
+      - DATERM
+      reva_kind: claim
+      relation: coded_outcome
+      cause: icb:crisis:<crisno>:actor:<cracno>
+      effect: icb:crisis:<crisno>:actor:<cracno>:outcome (termination for the actor on TERMDATE)
+      codebook_term: OUTCOM
+      causal: true
+      why: 'OUTCOM is the ''content of crisis termination'' from the actor''s perspective: the coded outcome of the actor''s
+        crisis. Only rows with OUTCOM in 1-5 become claims.'
+    - variables:
+      - CRACID
+      - ACTOR
+      reva_kind: context
+      predicate: 'P710 participant (role: crisis actor)'
+      causal: false
+      why: Participation is context.
+    - variables:
+      - GRAVTY
+      reva_kind: context
+      predicate: icb:gravity
+      causal: false
+      why: 'Object of gravest threat perceived: an attribute, not a cause.'
+  mid5:
+    source_key: cow.data
+    dataset: mid5
+    dataset_revision: MIDA/MIDB 5.0, MIDI/MIDIP 5.01
+    codebook_document: mid_dispute_manual
+    codebook_name: 'COW Militarized Interstate Dispute data 5.0/5.01: codebook, Dispute and Incident Coding Manuals'
+    citation: 'Palmer, Glenn, Roseanne W. McManus, Vito D''Orazio, Michael R. Kenwick, Mikaela Karstens, Chase Bloch, Nick
+      Dietrich, Kayla Kahn, Kellan Ritter, Michael J. Soules (2022). The MID5 Dataset, 2011-2014: Procedures, coding rules,
+      and description. Conflict Management and Peace Science 39(4): 470-482.'
+    definitions:
+      dispute:
+        text: A militarized dispute (MID) is based on a sequence of related militarized incidents, each of which (except the
+          first) is an outgrowth of or a response to one or more previous incidents. To ensure that each MID is a unified
+          and recognized episode of militarized incidents, particular attention should be given to continuity of location
+          and issue, as well as the interpretations of observers.
+        document: mid_dispute_manual
+        pdf_page: 1
+      start_date:
+        text: The start date of a dispute is defined by the start date of the first militarized incident, but the end date
+          is determined in several ways, depending upon the context of the termination and on whether the dispute escalated
+          to war.
+        document: mid_dispute_manual
+        pdf_page: 2
+      outcome:
+        text: The outcome of a dispute is related to the operational demands, made prior to the dispute's onset, that constitute
+          a challenge to the pre-existing status quo. A dispute outcome then depends upon a comparison of the challenges made
+          against the status quo and any alteration of the status quo that occurred as a result of actions taken during the
+          dispute. Because the determination of dispute outcomes is directly related to an alteration of the status quo, a
+          state can only “win” a dispute when the status quo is changed in its favor. Although a status quo defender may gain
+          tangible benefits from its successful maintenance, such outcomes should be coded as a “stalemate” since no alteration
+          of the status quo took
+        document: mid_dispute_manual
+        pdf_page: 5
+      outcome.victory:
+        text: Victory — A victory is defined by the favorable alteration of the status quo by one state through the use of
+          militarized action which imposes defeat upon the opponent. It denotes the attainment of a tangible piece of territory,
+          the significant change in an adversary's foreign policy, or the successful downfall of another state's political
+          regime by force. A victory can be identified whenever one or more state(s) are able to secure a favorable change
+          through the application of successful military actions which directly leads to a forced alteration of the pre-dispute
+          status quo.
+        document: mid_dispute_manual
+        pdf_page: 5
+      outcome.yield:
+        text: Yield — A yield is defined by the coerced submission by one state to the demands made by another state but short
+          of any clear alteration of the status quo directly attributable to the threat, display, or use of military force.
+          Whenever a state offers concessions that alter the status quo in exchange for not being militarily threatened or
+          to stop further military attacks, the “losing” state has yielded to the pressure imposed by the “winning” state.
+          As an outcome of a MID, a yield can be identified whenever one state capitulates by offering concessions which appease
+          the demands of another state before the militarized forces of either state has secured any substantial tactical
+          gains on the battlefield.
+        document: mid_dispute_manual
+        pdf_page: 5
+      outcome.stalemate:
+        text: Stalemate — A stalemate is defined by the lack of any decisive changes in the pre-dispute status quo and is
+          identified when the outcome does not favor either side in the dispute. Stalemates usually are produced when there
+          was no alteration of the status quo. However, they can occur even if the status quo has changed so long as net balance
+          results in a draw.
+        document: mid_dispute_manual
+        pdf_page: 5
+      outcome.compromise:
+        text: Compromise — A compromise is defined as a situation in which each side in the dispute agrees to give up some
+          demands or make concessions with regard to the status quo. A compromise is identified whenever actors on both sides
+          of a dispute agree to divide the spoils roughly equally, and hence, redefine the status quo, or agree to amicably
+          settle their differences and accept the current status quo.
+        document: mid_dispute_manual
+        pdf_page: 5
+      outcome.released:
+        text: Released — A released outcome is applied only for situations in which a seizure of material or personnel defines
+          the context of the dispute. It is identified whenever the seizure of material or personnel culminates with their
+          release from captivity.
+        document: mid_dispute_manual
+        pdf_page: 6
+      outcome.unclear:
+        text: Unclear — An unclear outcome exists when sources provided either conflicting interpretations or ambiguous information
+          about post-dispute status quo.
+        document: mid_dispute_manual
+        pdf_page: 6
+      settlement:
+        text: 'Militarized interstate disputes are terminated by different formal and informal procedures. For each dispute,
+          close attention should be given to negotiations, formal and informal treaties, protocols and the like, as these
+          may relate to the type of settlement. However, many disputes end without any explicit agreement to stop or any resolution
+          of the issues. At the other end of the spectrum, some disputes may have multiple agreements, some or all of which
+          are honored by both sides. Only those agreements that both nations chose to observe for at least one year are considered
+          relevant to the settlement of a dispute. Finally, some settlement terms are mutually agreed upon while others are
+          forced upon a vanquished state. Hence, whether a settlement was amicably reached or forcibly coerced also enters
+          into the determination of the settlement type. The four different methods of dispute settlement are identified as
+          follows:'
+        document: mid_dispute_manual
+        pdf_page: 6
+      side_a:
+        text: 'The side designations are ultimately arbitrary, but the convention is as follows: side A is the side that contains
+          the state (or states) that first crossed the threat-display-use of force threshold. That is, the Actor(s) in the
+          first incident in the sequence of incidents upon which the dispute is based are assumed to be on side A.'
+        document: mid_dispute_manual
+        pdf_page: 8
+      revisionist:
+        text: Some of the participants in a dispute seek to change the status quo while others try to preserve it. The former
+          are referred to as revisionist states, and the Revisionist State(s) section of the dispute coding spreadsheet is
+          where such states are identified. Note that status quo-oriented states should not be listed in this section—only
+          revisionist states. The judgement as to whether or not a state is revisionist should be based on the behavior of
+          the state in the related incidents and not on some intuition about who was the "aggressor" in a dispute or the state
+          that "started it all." To be considered revisionist, a state must demonstrate, through its behavior, a desire to
+          change the status quo in a significant way.
+        document: mid_dispute_manual
+        pdf_page: 8
+      revision_type:
+        text: The identity (3-letter COW abbreviation) of each revisionist state in a dispute should be recorded. In addition,
+          the type of revisions sought by that state (territory, regime, policy, and/or other) should be indicated. An explanation
+          of the differences between these issue areas is contained in the Incident Coding Manual. If only one of the four
+          options are relevant, then a "1" should be placed in that cell. However, more than one of these objectives may be
+          relevant to a revisionist state in a dispute, and if this is so then the numbers 1,2,3... should be entered into
+          the cells where 1 is the most important, 2 the second
+        document: mid_dispute_manual
+        pdf_page: 8
+      issue_type:
+        text: 'In previous MID data collection efforts, the apparent issue(s) at stake in a dispute were related to the goals
+          of the so-called revisionist state, and these were coded only with respect to a dispute as a whole, not specific
+          incidents. In of the current version of the data set we will attempt to identify the main issue(s) that appear to
+          underlie each incident. For the sake of continuity, the revisionist state and issue(s) will be included and identified
+          in the MID construction phase. The issue information that is collected at the incident level will feed into this
+          later determination. There are four possible issue types: territorial issues, regime issues, policy issues, and
+          the ubiquitous “other.” If no issue can be identified, then the Issue Type fields should be left blank. Broadly
+          speaking, a territorial issue is at stake when the actor is attempting to gain control over a piece of territory
+          that it claims but does not possess. A policy issue is involved when the actor seeks to change the foreign policy
+          behavior of the target, while a regime issue centers on the desire by the actor to change the government of the
+          target.2 If any other major issue is involved, then this should be recorded as “other”. Territorial issues are coded
+          as “1,” policy issues as “2,” and regime issues as “3,” while identifiable issues that do not fall into these first
+          three categories are coded as “4.” It is possible that more than one issue type may be involved in an incident.
+          If this occurs, then the issue typed judged most important should be places in the category “Revision Type #1” and
+          the second most important in the category “Revision Type #2.”'
+        document: mid_incident_manual
+        pdf_page: 8
+    values:
+      Outcome:
+        1: Victory for side A
+        2: Victory for side B
+        3: Yield by side A
+        4: Yield by side B
+        5: Stalemate
+        6: Compromise
+        7: Released
+        8: Unclear
+        9: Joins ongoing war
+        -9: Missing
+      Settle:
+        1: Negotiated
+        2: Imposed
+        3: None
+        4: Unclear
+        -9: Missing
+      RevType:
+        0: Not applicable
+        1: Territory
+        2: Policy
+        3: Regime/government
+        4: Other
+        -9: Missing
+      HostLev:
+        1: No militarized action
+        2: Threat to use force
+        3: Display of force
+        4: Use of force
+        5: War
+      Fatality:
+        0: None
+        1: 1-25 deaths
+        2: 26-100 deaths
+        3: 101-250 deaths
+        4: 251-500 deaths
+        5: 501-999 deaths
+        6: '> 999 deaths'
+        -9: Missing
+    mappings:
+    - variables:
+      - Outcome
+      - Settle
+      - EndDay
+      - EndMon
+      - EndYear
+      reva_kind: claim
+      relation: coded_outcome
+      cause: mid:dispute:<dispnum>
+      effect: mid:dispute:<dispnum>:outcome (on the dispute end date)
+      codebook_term: outcome
+      causal: true
+      why: 'The Dispute Coding Manual defines the outcome as the ''alteration of the status quo that occurred as a result
+        of actions taken during the dispute'' (victory, yield, stalemate, compromise, released, unclear): the coded outcome
+        of the dispute. Outcome -9 (missing) gives no claim; 9 ''Joins ongoing war'' is a coded category (MID codebook) without
+        a manual definition and is kept with codebook_term ''outcome''.'
+    - variables:
+      - RevType1
+      - RevType2
+      - RevState
+      reva_kind: context
+      predicate: causdata:coded_issue
+      causal: false
+      why: 'Coded issue, NOT a cause: the manuals say revision types are ''the type of revisions sought by that state'' and
+        ''the apparent issue(s) at stake in a dispute ... related to the goals of the so-called revisionist state''; revisionism
+        is judged ''not on some intuition about who was the "aggressor" in a dispute or the state that "started it all."''
+        Stored as a context statement on the dispute (qualifiers: state, rank 1/2).'
+    - variables:
+      - SideA
+      - Orig
+      reva_kind: context
+      predicate: P710 participant (qualifiers side, originator)
+      causal: false
+      why: 'Side A = ''the side that contains the state (or states) that first crossed the threat-display-use of force threshold''
+        and the manual calls the designation ''ultimately arbitrary'': a sequence convention, not an initiator-as-cause claim.
+        Orig (originator: involved from the start) is a participation attribute.'
+    - variables:
+      - Ord_IncidNum
+      - DispNum
+      reva_kind: context
+      predicate: P361 part of (incident -> dispute); P155 follows (incident -> previous incident of the dispute, v5.01 temporal
+        order)
+      causal: false
+      why: 'The manual says each incident ''is an outgrowth of or a response to one or more previous incidents'' but does
+        not code which one: only the order (follows) and membership (part_of) are stored, never reaction_to.'
+    - variables:
+      - HostLev
+      - HiAct
+      - Fatality
+      - Recip
+      reva_kind: context
+      predicate: mid:hostility_level / mid:highest_action / mid:fatality_level / mid:reciprocated
+      causal: false
+      why: Descriptive attributes.
+  term_conflict:
+    source_key: ucdp.downloads
+    dataset: term_conflict
+    dataset_revision: v4-2024
+    codebook_document: term_codebook
+    codebook_name: UCDP Conflict Termination Dataset Codebook v.4 2024 (conflict level)
+    citation: 'Kreutz, Joakim (2010). How and When Armed Conflicts End: Introducing the UCDP Conflict Termination Dataset.
+      Journal of Peace Research 47(2): 243-250.'
+    definitions:
+      episode:
+        text: A conflict episode, thus, is defined as a continuous period of active conflict years in the UCDP-PRIO armed
+          conflict dataset. A conflict episode ends when an active year is followed by a year in which there are fewer than
+          25 battle-related deaths. In the event that armed activity over the same incompatibility (for conflicts) and involving
+          the same warring sides (dyadic), this is coded as a new episode.
+        document: term_codebook
+        pdf_page: 2
+      outcome_window:
+        text: The coding of outcomes are based on the final year of activity and first year of non-activity. While the dataset
+          include some information (i.e. ceasefires and peace agreements) outside this window, it does not follow warring
+          party development beyond this time period. For example, the Algerian rebel group GIA is coded as terminated by low
+          activity in 2003, even though it continued with occasional attacks in 2004 and 2005. By 2010, remaining members
+          of the group had joined AQIM who was still fighting, but since this occurred outside of the window coded in the
+          dataset, this doesn’t change the ”low activity” outcome.
+        document: term_codebook
+        pdf_page: 2
+      c_outcome=1:
+        text: 1 = Peace agreement A peace agreement, or the first or last in a series of agreements, concerned with resolving
+          or regulating the incompatibility – completely or a central part of – which is signed and/or accepted by all or
+          the main parties active in last year of conflict. The agreement is signed either during the last year of active
+          conflict or the first year of inactivity.
+        document: term_codebook
+        pdf_page: 3
+      c_outcome=2:
+        text: 2 = Ceasefire agreement Ceasefire agreements, or the first or last in a series of agreements, does not include
+          any resolution of the incompatibility. Typically, ceasefires are but con-cerned with ending the use of force by
+          the warring sides but they can also offer amnesty for participation in the conflict (”guns for peace”). The agreement
+          is signed and/or accepted either during the last year of active conflict or the first year of inactivity. In cases
+          when a ceasefire agreement is immediately followed by a more comprehensive agreement (peace agreement), the latter
+          is considered the main cause of termination.
+        document: term_codebook
+        pdf_page: 3
+      c_outcome=3:
+        text: 3 = Victory for Side A (government side) Side A (the government side) manages to comprehensively defeat or eliminate
+          the opposition, who may succumb to the power of the other through capitulation or public announcement.
+        document: term_codebook
+        pdf_page: 4
+      c_outcome=4:
+        text: 4 = Victory for Side B (non-state side) Side B (the rebel side) manages to oust the government, or comprehensively
+          defeat or eliminate the opposition, who may succumb to the power of the other through capitulation or public announcement.
+        document: term_codebook
+        pdf_page: 4
+      c_outcome=5:
+        text: 5 = Low activity Conflict activity continues but does not reach the UCDP threshold with regard to fatalities.
+          There is no information in this dataset regarding the group-specific circumstance for when fighting reduces to below
+          the UCDP battle-death thresh-old. In some cases it may be because of successful military operations by the counterpart
+          (similar to victory), but it could also be for a strategic reorientation towards the use of nonviolent or nonfatal
+          methods, to explore the possibility of negotiations, organizational reorganization, or intra-rebel fighting, or
+          a combi-nation of these factors.
+        document: term_codebook
+        pdf_page: 4
+      c_outcome=6:
+        text: 6 = Actor ceases to exist This means that conflict activity continues but at least one of the parties ceases
+          to exist or becomes another conflict actor. For states, this means for example when Hyderabad became incorporated
+          into India in 1948 (ending Hyderabad (government) conflict), when Soviet Union no longer included the territory
+          of subsequent Azerbaijan (ending Soviet Union (Nagorno-Karabakh) conflict), or when no central government could
+          be identified by UCDP (Somalia in 1996 and 2002). For rebel organizations, changing the party is not simply a name
+          change but an organizational change such as forming an alliance of many rebel groups (such as in El Salvador 1981)
+          or changing territorial aims (such as Russia (Chechnya) becoming Russia (Caucasus Emirate) in 2008.
+        document: term_codebook
+        pdf_page: 4
+      c_ependdate:
+        text: 'The date, as precise as possible, when the conflict is terminated. The variable is coded as: YEAR-MM-DD.'
+        document: term_codebook
+        pdf_page: 6
+    values:
+      c_outcome:
+        1: Peace agreement
+        2: Ceasefire
+        3: Victory for Side A /Government Side
+        4: Victory for Side B /Non-State Side
+        5: Low activity (some, but less than 25 battle-deaths in subsequent year(s))
+        6: Actor ceases to exist
+    mappings:
+    - variables:
+      - c_outcome
+      - c_ependdate
+      - c_ependprec
+      - c_epterm
+      reva_kind: claim
+      relation: coded_outcome
+      cause: ucdp:episode:<c_epid> (conflict episode, part of ucdp:conflict:<conflict_id>)
+      effect: ucdp:episode:<c_epid>:termination (on c_ependdate)
+      codebook_term: c_outcome=<value>
+      causal: true
+      why: 'c_outcome is the coded way the episode terminated. Values 1-4 name what ended it (agreement, victory); values
+        5 (low activity) and 6 (actor ceases to exist) are kept as coded outcomes but carry no mechanism: the codebook itself
+        says for 5 ''There is no information in this dataset regarding the group-specific circumstance'' (the quoted definition
+        travels with every claim). One claim per terminated episode (c_epterm = 1).'
+    - variables:
+      - incompatibility
+      - territory_name
+      reva_kind: context
+      predicate: causdata:coded_issue
+      causal: false
+      why: 'UCDP incompatibility (territory / government) is the contested issue of the conflict (UCDP definition of armed
+        conflict: ''a contested incompatibility that concerns government and/or territory''): coded issue, not a cause. Also
+        present as ucdp:incompatibility on ucdp:conflict:<id> (KGGEOPOL).'
+    - variables:
+      - c_epid
+      - conflict_id
+      reva_kind: context
+      predicate: P361 part of (episode -> conflict); P155 follows (episode n -> episode n-1 of the same conflict)
+      causal: false
+      why: Structure and order only.
+  peace_agreements:
+    source_key: ucdp.downloads
+    dataset: peace_agreements
+    dataset_revision: '22.2'
+    codebook_document: pa_codebook
+    codebook_name: 'UCDP Peace Agreement Dataset Codebook Version 22.1 (data version 22.2: updated full-text links)'
+    citation: 'Pettersson, Therese, Stina Högbladh & Magnus Öberg (2019). Organized violence, 1989-2018 and peace agreements.
+      Journal of Peace Research 56(4): 589-603. Högbladh, Stina (2022) UCDP Peace Agreement Dataset Codebook v 22.1.'
+    definitions:
+      peace_agreement:
+        text: A peace agreement is a formal agreement between at least two opposing primary warring parties, which addresses
+          the disputed incompatibility, either by settling all or part of it, or by clearly outlining a process for how the
+          warring parties plan to regulate the incompatibility.
+        document: pa_codebook
+        pdf_page: 2
+      peace_agreement_types:
+        text: 'All peace agreements, which concern, manage or regulate the stated incompatibility, are considered peace agreements,
+          including peace process agreements. There are various types of peace agreements: full, partial, and peace process
+          agreements. A full agreement is an agreement where one or several dyads agree to settle the whole incompatibility.
+          A partial peace agreement is an agreement where one or several dyads agree to settle a part of the incompatibility.
+          A peace process agreement is an agreement where one or several dyads agree to initiate a process that aims to settle
+          the incompatibility. The peace agreements are also categorised between comprehensive peace agreements which include
+          all conflict dyads, and dyadic agreements in which at least one of the warring parties in the conflict is excluded.'
+        document: pa_codebook
+        pdf_page: 2
+      conflict_id:
+        text: conflict_id Unique conflict identifiers for each individual conflicts related to the dyads signing the peace
+          agreement. For definition of conflict see appendix 1, same in all UCDP datasets.
+        document: pa_codebook
+        pdf_page: 3
+      pa_date:
+        text: pa_date The date of the last signature of the peace agreement. Date
+        document: pa_codebook
+        pdf_page: 3
+      ended:
+        text: ended Did the peace agreement end, i.e. did the implementation fail? The peace agreement is no longer considered
+          fully implemented if the validity of the agreement is contested by one or more of the warring parties that signed.
+          A peace agreement cannot, from the UCDP perspective, survive if the primary parties are no longer party to it. If
+          a party officially withdraws from a peace agreement, it is considered to have ended. 1. Yes 0. No
+        document: pa_codebook
+        pdf_page: 4
+      cease:
+        text: cease Ceasefire 1. The agreement included provisions for a ceasefire or the cessation on hostilities 0. The
+          agreement did not include provisions for a ceasefire.
+        document: pa_codebook
+        pdf_page: 4
+    values:
+      pa_type:
+        1: Full
+        2: Partial
+        3: Peace process
+      inclusive:
+        1: Comprehensive agreement
+        2: Dyadic agreement
+      ended:
+        1: 'Yes'
+        0: 'No'
+      cease:
+        1: 'Yes'
+        0: 'No'
+    mappings:
+    - variables:
+      - paid
+      - conflict_id
+      - pa_date
+      reva_kind: claim
+      relation: reaction_to
+      cause: ucdp:conflict:<conflict_id> (KGGEOPOL entity)
+      effect: ucdp:pa:<paid> (signature on pa_date)
+      codebook_term: peace_agreement
+      causal: true
+      why: 'The codebook defines a peace agreement as ''a formal agreement between at least two opposing primary warring parties,
+        which addresses the disputed incompatibility'' and conflict_id as the conflicts ''related to the dyads signing the
+        peace agreement'': each agreement is coded as a response to that armed conflict. One claim per (agreement, conflict_id).'
+    - variables:
+      - c_outcome=1 (termination dataset)
+      - pa_date
+      reva_kind: context
+      predicate: causdata:agreement_in_termination_window
+      causal: false
+      why: 'The termination codebook says outcome 1 is a peace agreement ''signed either during the last year of active conflict
+        or the first year of inactivity'', but the termination data do not name the agreement. REVA pairs termination and
+        agreement(s) of the same conflict_id dated in that window as a CONTEXT statement only (all candidates listed, rule
+        in qualifiers): a join by REVA is never a causal claim.'
+    - variables:
+      - ended
+      - duration
+      reva_kind: context
+      predicate: ucdppa:ended_on
+      causal: false
+      why: 'Agreement failure date: attribute; c_duration free text is not ingested (narrative).'
+    - variables:
+      - pa_type
+      - inclusive
+      - cease
+      - termdur
+      reva_kind: context
+      predicate: ucdppa:agreement_type / ucdppa:inclusive / ucdppa:ceasefire_provision
+      causal: false
+      why: Descriptive attributes.
+  ucdp_acd_incompatibility:
+    source_key: ucdp.downloads
+    dataset: acd (KGGEOPOL, atlas.ucdp)
+    dataset_revision: '26.1'
+    codebook_document: null
+    mappings:
+    - variables:
+      - incompatibility
+      reva_kind: context
+      predicate: ucdp:incompatibility (KGGEOPOL)
+      causal: false
+      why: Coded issue of the conflict (territory / government / both). Never a causal claim; listed here so every conflict-dataset
+        variable has an explicit REVA reading.

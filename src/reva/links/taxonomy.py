@@ -117,6 +117,17 @@ def validate_taxonomy(doc: Mapping[str, Any], kg_properties: set[str] | None = N
             problems.append(f"{d['id']}: an atlas_computed link must label its weight derived_index")
         if d["derivation"].get("atlas") and d["derivation"]["method"] != "atlas_dyadic":
             problems.append(f"{d['id']}: derivation.atlas is only for atlas_dyadic types")
+        spec = d["derivation"].get("atlas") or {}
+        if spec.get("union_selector_key") and d["directed"]:
+            problems.append(f"{d['id']}: union_selector_key combines the rows of an undirected pair only")
+        reserved = {"method", "source", "dataset", "indicator", "reported_by", "iso3", "facet", "caveat", "licence"}
+        for key in sorted(set(spec.get("companions") or {}) & (reserved | {"source_flags", "mapping_hop", "items"})):
+            problems.append(f"{d['id']}: companion key {key} would overwrite a basis member")
+        if spec.get("mapping_hops"):
+            from reva.links.geo_hops import load_hops
+
+            if not any(h.applies(spec["source"], spec["datasets"]) for h in load_hops()):
+                problems.append(f"{d['id']}: mapping_hops set but no hop of geo_mapping_hops.yaml applies to it")
         text = (d["labels"]["en"] + " " + d["honesty"]["en"]).lower()
         for word in (
             ("alliance", "friendship", "ally", "allies") if d["derivation"]["method"] == "atlas_computed" else ()

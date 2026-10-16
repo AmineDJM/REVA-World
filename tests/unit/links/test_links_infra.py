@@ -177,6 +177,20 @@ def test_taxonomy_declares_the_three_physical_network_kinds_honestly() -> None:
     assert "launched by" not in (ls.labels["en"] + ls.honesty["en"]) and "site" in ls.labels["en"]
 
 
+def test_taxonomy_refuses_misused_physical_network_options() -> None:
+    from reva.links.taxonomy import LINK_TYPES_FILE, validate_taxonomy
+
+    doc = yaml.safe_load(LINK_TYPES_FILE.read_text())
+    assert validate_taxonomy(doc) == []
+    air = next(d for d in doc["derived_links"] if d["id"] == "air_routes_2014")
+    air["derivation"]["atlas"]["union_selector_key"] = "where"
+    air["derivation"]["atlas"]["mapping_hops"] = True
+    air["derivation"]["atlas"]["companions"]["iso3"] = "ROUTE_AIRLINES"
+    probs = " | ".join(validate_taxonomy(doc))
+    assert "undirected pair only" in probs and "no hop of geo_mapping_hops.yaml" in probs
+    assert "companion key iso3" in probs
+
+
 def test_mapping_hop_registry_is_explicit_and_consistent() -> None:
     (h,) = [x for x in load_hops() if x.provider_code == "Q55"]
     qids = json.loads((REPO_ROOT / "registry/entities/country_qids.json").read_text())
@@ -372,4 +386,3 @@ def test_hop_evidence_ignores_deprecated_or_other_statements() -> None:
     assert hop_evidence_from_statements([Stmt("x2", "Q55", "P361", "Q29999")]) == {}
     ev = hop_evidence_from_statements([Stmt("x3", "Q55", "P17", "Q29999", rank="preferred")])
     assert ev["Q55"].statement_id == "x3"
-

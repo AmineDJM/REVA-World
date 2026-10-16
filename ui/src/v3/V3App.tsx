@@ -12,6 +12,7 @@ const AtlasPage = lazy(() => import('./pages/AtlasPage'));
 const DossierPage = lazy(() => import('./pages/DossierPage'));
 const DemanderPage = lazy(() => import('./pages/DemanderPage'));
 const RelationPage = lazy(() => import('./pages/RelationPage'));
+const CausesPage = lazy(() => import('./causal/CausesPage'));
 
 /** All V3 screens under /v3/* (one lazy chunk per screen), with their own sub-navigation. */
 export default function V3App() {
@@ -48,6 +49,7 @@ export default function V3App() {
           <Route path="pays" element={<Navigate to="/v3/pays/FRA" replace />} />
           <Route path="pays/:iso3" element={<DossierPage />} />
           <Route path="relation" element={<RelationPage />} />
+          <Route path="causes" element={<CausesPage />} />
           <Route path="demander" element={<DemanderPage />} />
           <Route path="*" element={<p>Écran inconnu. Choisissez un écran dans la navigation.</p>} />
         </Routes>

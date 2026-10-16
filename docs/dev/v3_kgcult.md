@@ -149,6 +149,14 @@ Defects the anchors caught (fixed in the specs, documented in their `notes`):
   designated World Heritage Site (buildings inside listed centres; 42 with a date) — worldwide this would
   have blown the bound. Now restricted to items carrying P757: 34 Brazilian items, 35 dated statements.
 * `culture.language_ancestors` unfiltered reached upper-ontology classes (see §1); now Glottocode-only.
+* **Rank-hidden classes and values (KGHIST finding, 2026-10-16).** Truthy `wdt:P31` keeps only the
+  best-ranked class; many historical states give preferred rank to "historical country" (Q3024240),
+  hiding their empire/colony class (Spanish, Russian, Aztec, Portuguese empires, Empire of Brazil).
+  `historical_state_languages` / `historical_state_currencies` now test class membership with
+  `p:P31/ps:P31/wdt:P279*` and a non-deprecated rank filter, as KGHIST's specs do; the same pattern
+  is used in `religions`, `cultural_movements`, `language_families`, `writing_systems`. Likewise the
+  country branches of `currencies` (P38) and `religions` (P140) read every non-deprecated statement:
+  truthy `wdt:P38` would keep only the preferred (current) currency and drop former ones.
 
 `culture.glottolog_items` in this directory belongs to KGLANG (Glottolog connector); the KGCULT tests
 accept that owner and the KGCULT entity budget counts only KGCULT specs.

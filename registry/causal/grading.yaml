@@ -1,0 +1,107 @@
+# Evidence grading of causal claims (agent CAUSCORE; spec docs/roadmap/v3_causality.md, principle 5).
+#
+# Deterministic, ordinal, no probabilities. Every grade row in kg.causal_grade records this file's `version`
+# and sha256 and the ids of the rules that produced it (the deciding grade rule plus the fact rules for tier,
+# temporal check, corroboration and contestation), so a grade can always be explained and re-derived.
+#
+# Changing any rule = bump `version`; the grader then writes new grade rows for every claim (new inputs).
+#
+# Inputs of a claim:
+#   tier            T1..T4 (T5/T6 never reach this table: candidates are not graded)
+#   temporal_check  consistent | overlapping | inconsistent | undetermined
+#   corroborated    corroboration >= corroborated_min (independent source groups, the claim's own included)
+#   contested       a denying claim, an explicit `contests`, or a source qualifier (P1310 statement disputed by)
+version: "1"
+corroborated_min: 2
+
+# Rules are evaluated in order; the first whose `when` matches decides the grade. Each condition key must
+# hold (lists = one of). Every combination of inputs must be decided (checked by the unit tests).
+rules:
+  - id: grade.E.temporal_inconsistent
+    grade: E
+    when: {temporal_check: [inconsistent]}
+    reason:
+      en: "The cause starts after the effect, beyond date precision: the claim is temporally inconsistent."
+      fr: "La cause commence après l'effet, au-delà de la précision des dates : l'affirmation est temporellement incohérente."
+  - id: grade.E.contested_uncorroborated
+    grade: E
+    when: {contested: true, corroborated: false}
+    reason:
+      en: "The claim is contested by a source and not corroborated by an independent one."
+      fr: "L'affirmation est contestée par une source et n'est pas corroborée par une source indépendante."
+  - id: grade.A.expert_consistent_corroborated
+    grade: A
+    when: {tier: [T1, T2], temporal_check: [consistent], corroborated: true}
+    reason:
+      en: "Expert-coded or scholarly source, consistent in time, corroborated by an independent source."
+      fr: "Source experte (jeu de données codé ou référence savante), cohérente dans le temps, corroborée par une source indépendante."
+  - id: grade.B.expert
+    grade: B
+    when: {tier: [T1, T2]}
+    reason:
+      en: "Expert-coded or scholarly source (not both corroborated and time-consistent)."
+      fr: "Source experte (jeu de données codé ou référence savante), sans être à la fois corroborée et cohérente dans le temps."
+  - id: grade.B.t3_corroborated
+    grade: B
+    when: {tier: [T3], corroborated: true}
+    reason:
+      en: "Referenced Wikidata statement corroborated by an independent source."
+      fr: "Déclaration Wikidata référencée, corroborée par une source indépendante."
+  - id: grade.C.t3_single
+    grade: C
+    when: {tier: [T3]}
+    reason:
+      en: "Referenced Wikidata statement, single independent source."
+      fr: "Déclaration Wikidata référencée, une seule source indépendante."
+  - id: grade.D.t4
+    grade: D
+    when: {tier: [T4]}
+    reason:
+      en: "Wikidata statement without references (community-edited, unsourced)."
+      fr: "Déclaration Wikidata sans référence (édition communautaire, non sourcée)."
+
+# Fact rules: attached to every grade to say what the grade rule saw.
+facts:
+  tier.T1:
+    en: "Tier T1: expert-coded research dataset with a codebook definition."
+    fr: "Niveau T1 : jeu de données de recherche codé par des experts, avec définition du codebook."
+  tier.T2:
+    en: "Tier T2: scholarly reference cited verbatim (DOI/ISBN) through the source's own references."
+    fr: "Niveau T2 : référence savante citée telle quelle (DOI/ISBN) via les références de la source."
+  tier.T3:
+    en: "Tier T3: Wikidata causal statement with references."
+    fr: "Niveau T3 : déclaration causale Wikidata avec références."
+  tier.T4:
+    en: "Tier T4: Wikidata causal statement without references."
+    fr: "Niveau T4 : déclaration causale Wikidata sans référence."
+  temporal.consistent:
+    en: "The cause starts before the effect, beyond date precision."
+    fr: "La cause commence avant l'effet, au-delà de la précision des dates."
+  temporal.overlapping:
+    en: "The start dates overlap at their precision: the order cannot be decided."
+    fr: "Les dates de début se chevauchent à leur précision : l'ordre ne peut pas être établi."
+  temporal.inconsistent:
+    en: "The cause starts after the effect, beyond date precision."
+    fr: "La cause commence après l'effet, au-delà de la précision des dates."
+  temporal.undetermined:
+    en: "A start date is missing (or outside the supported range): time was not checked."
+    fr: "Une date de début manque (ou hors de la plage prise en charge) : le temps n'a pas été vérifié."
+  corroboration.single:
+    en: "One independent source group asserts this link."
+    fr: "Un seul groupe de sources indépendantes affirme ce lien."
+  corroboration.corroborated:
+    en: "Several independent source groups assert this link (sources sharing an upstream count once)."
+    fr: "Plusieurs groupes de sources indépendantes affirment ce lien (les sources partageant une origine comptent une fois)."
+  contest.none:
+    en: "No source contests this claim."
+    fr: "Aucune source ne conteste cette affirmation."
+  contest.contested:
+    en: "A source contests or denies this claim; the dissent is kept and shown."
+    fr: "Une source conteste ou nie cette affirmation ; le désaccord est conservé et montré."
+
+# Temporal check (reva.causal.temporal): event start = P580 start time, else P585 point in time, else P571
+# inception; event end = P582, else P585, else P576. Each date is the window of its precision (year 1929 ->
+# 1929-01-01..1929-12-31; decade -> the decade; century and coarser widened one unit each side, as kg).
+temporal:
+  start_properties: [P580, P585, P571]
+  end_properties: [P582, P585, P576]

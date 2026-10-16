@@ -1,0 +1,337 @@
+/* "Causes & conséquences" (V3 causality). Scoped under .v3-causes. */
+.v3-causes {
+  --c-ok: #2b8a3e;
+  --c-ok-bg: #e6f4ea;
+  --c-warn: #a35d00;
+  --c-warn-bg: #fff3df;
+  --c-bad: #c92a2a;
+  --c-bad-bg: #fde8e7;
+  --c-none: #5c677d;
+  --c-none-bg: #eef1f5;
+}
+
+.v3-causes-top {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2.2fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .v3-causes-top {
+    grid-template-columns: 1fr;
+  }
+}
+.v3-causes-graph h2,
+.v3-causes h2 {
+  font-size: 1.15rem;
+  margin: 12px 0 6px;
+}
+.v3-causal-canvas {
+  width: 100%;
+  background: radial-gradient(ellipse at center, #1a2440 0%, var(--v3-ink) 75%);
+  border-radius: 10px;
+  border: 1px solid #22304f;
+}
+
+.v3-link-button {
+  border: none;
+  background: none;
+  padding: 0 2px;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.v3-plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.v3-plain > li {
+  margin: 3px 0;
+}
+
+/* claims */
+.v3-claim-line {
+  display: inline;
+  overflow-wrap: anywhere;
+}
+.v3-claim-arrow {
+  color: var(--muted);
+}
+.v3-selon {
+  font-style: italic;
+  color: var(--v3-causal);
+}
+.v3-fam-swatch {
+  vertical-align: middle;
+}
+.v3-grade {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #fff;
+  vertical-align: middle;
+}
+.v3-grade-A {
+  background: #1b4332;
+}
+.v3-grade-B {
+  background: #2d6a4f;
+}
+.v3-grade-C {
+  background: #52796f;
+}
+.v3-grade-D {
+  background: #84a98c;
+  color: #10231a;
+}
+.v3-grade-E {
+  background: #ced4da;
+  color: #343a40;
+  border: 1px dashed #868e96;
+}
+.v3-tier {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid #31506e;
+  color: #31506e;
+}
+.v3-tcheck {
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+.v3-tcheck-mini {
+  font-size: 0.7rem;
+  margin-left: 4px;
+}
+.v3-tcheck-ok {
+  color: var(--c-ok);
+  background: var(--c-ok-bg);
+}
+.v3-tcheck-warn {
+  color: var(--c-warn);
+  background: var(--c-warn-bg);
+}
+.v3-tcheck-bad {
+  color: var(--c-bad);
+  background: var(--c-bad-bg);
+}
+.v3-tcheck-none {
+  color: var(--c-none);
+  background: var(--c-none-bg);
+}
+.v3-contested-mini {
+  font-size: 0.7rem;
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1px solid #b08900;
+  color: #7a5d00;
+  background: #fff8db;
+}
+.v3-verbatim {
+  font-family: Georgia, 'Times New Roman', serif;
+  margin: 4px 0;
+}
+blockquote.v3-verbatim {
+  border-left: 3px solid var(--border);
+  padding-left: 10px;
+}
+.v3-why-quote {
+  display: block;
+  margin-left: 40px;
+  font-size: 0.9rem;
+  color: #334;
+}
+
+.v3-claim-panel {
+  margin: 12px 0;
+}
+.v3-claim-detail {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--v3-causal);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--panel);
+}
+.v3-claim-detail header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+.v3-claim-detail h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.v3-claim-assert {
+  margin: 6px 0;
+}
+.v3-claim-lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .v3-claim-lists {
+    grid-template-columns: 1fr;
+  }
+}
+.v3-claim-list h3 {
+  font-size: 1rem;
+}
+
+/* legend */
+.v3-causal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.v3-causal-legend h4 {
+  margin: 4px 0;
+  font-size: 0.85rem;
+}
+.v3-causal-legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* why */
+.v3-why-lane {
+  margin: 6px 0 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--border);
+}
+.v3-why-immediate {
+  border-color: #d9480f;
+}
+.v3-why-underlying {
+  border-color: #6741d9;
+}
+.v3-why-contributing {
+  border-color: #1971c2;
+}
+.v3-why-coded {
+  border-color: #c92a2a;
+}
+.v3-why-lane h3 {
+  font-size: 0.98rem;
+  margin: 4px 0;
+}
+
+/* dissent */
+.v3-dissent-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+@media (max-width: 700px) {
+  .v3-dissent-pair {
+    grid-template-columns: 1fr;
+  }
+}
+.v3-dissent-pair h4 {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.v3-dissent-against {
+  border-left: 2px dashed #b08900;
+  padding-left: 10px;
+}
+
+/* chain */
+.v3-banner-chain {
+  background: #eef3ff;
+  border-color: #4f7bd8;
+}
+.v3-chain-list {
+  padding-left: 18px;
+}
+.v3-causal-chain h3 {
+  font-size: 1rem;
+}
+
+/* timeline */
+.v3-ctl-svg {
+  width: 100%;
+  height: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.v3-ctl-tick line {
+  stroke: #d8dee8;
+  stroke-width: 1;
+}
+.v3-ctl-tick text,
+.v3-ctl-lane {
+  font-size: 11px;
+  fill: #5c677d;
+}
+.v3-ctl-label {
+  font-size: 11px;
+  fill: #1f2a3d;
+}
+.v3-ctl-focal rect {
+  fill: #ffd166;
+  stroke: #b58100;
+}
+.v3-ctl-focal-label {
+  font-weight: 700;
+}
+.v3-tcheck-fill-ok rect {
+  fill: var(--c-ok);
+}
+.v3-tcheck-fill-warn rect {
+  fill: #e08e0b;
+}
+.v3-tcheck-fill-bad rect {
+  fill: var(--c-bad);
+}
+.v3-tcheck-fill-none rect {
+  fill: #9aa5b8;
+}
+
+/* candidates: quarantined, visually distinct (hatched), never graded */
+.v3-candidates {
+  border: 2px dashed #8c6d1f;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: repeating-linear-gradient(135deg, #fffaf0 0 10px, #fbf1d9 10px 20px);
+}
+.v3-candidates-label {
+  color: #6b4e16;
+  text-transform: none;
+  margin-top: 0;
+}
+.v3-candidate {
+  border-top: 1px dotted #c9a74a;
+  padding-top: 6px;
+}
+.v3-candidate-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #6b4e16;
+  color: #fff;
+}

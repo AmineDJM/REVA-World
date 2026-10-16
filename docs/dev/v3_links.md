@@ -504,3 +504,107 @@ near-universal); BRA–PRT co-parties of the Rome Statute (since 2002-06-20) and
   without links listed as "aucun lien (≠ zéro)". Dossier pays links use `by_kind` groups (direction, period, top-N of
   total) and link each partner to the pair screen. Chemin has advanced options (ordered steps, via any/all,
   non-transit presets).
+
+
+# LINKS3 — physical networks between countries: cables, 2014 air routes, launch-site states (agent LINKS3, 2026-10-16)
+
+Input: A-INFRA's dyadic atlas rows (`docs/dev/v3_a_infra.md` §3, "Country-pair data for LINKS2": indicator
+`<NAME>|partner=<ISO3>` + `flags.partner_iso3`; a partner outside the crosswalk is folded as `|partner_code=<code>`).
+Three new `atlas_dyadic` types (taxonomy: 33 types), wired into the derivation, the materialised store, the
+on-demand country view, the pair view, the path engine (stored links are edges), NLQA and the Pays ↔ Pays screen.
+
+## L3.1 Link types
+
+| id | table / indicator | direction | weight | temporal | companions (basis + cited evidence rows) |
+|---|---|---|---|---|---|
+| `submarine_cable` | `wikidata.submarine_cables` `CABLES_SHARED\|partner=` | undirected: A-INFRA emits both directions, merged into one link (both rows are evidence; disagreeing rows → no link, counted) | cables (count of Wikidata cable items listing both) | retrieval-day snapshot | `first_service_year` ← `CABLE_FIRST_SERVICE_YEAR` (earliest P729, else P571) |
+| `air_routes_2014` | `openflights.routes_2014` `ROUTES_OPERATED\|partner=` | origin → destination | routes (airline × airport pair, codeshares excluded) | 2014 (June 2014 period; `year_from: period_start`, the month is not a year-view period) | `airport_pairs` ← `ROUTE_AIRPORT_PAIRS`, `airlines` ← `ROUTE_AIRLINES` |
+| `launch_service` | `gcat.payloads` `PAYLOADS_LAUNCHED_FROM\|partner=` | owner state → launch-site state (GCAT `flags.direction`) | payloads | launch year | – |
+
+Wording (fr/en labels, honesty) says only what the rows say: "câbles sous-marins listant les deux pays (Wikidata)",
+"liaisons aériennes directes recensées en juin 2014 (OpenFlights, données figées)", "charges utiles lancées depuis un
+site attribué à" (never "launched by": the site state is not the launcher's supplier; Kourou is French Guiana `GUF`
+per GCAT, so France → GUF is a link, France → France is not). NLQA: new user-level group `infrastructure`
+(`src/reva/nlqa/adapters.py` LINK_GROUPS + `src/reva/nlqa/catalog.py` LINK_KINDS, coverage test-enforced).
+
+**Caveat and licence on every link.** `derivation.atlas.caveat` (fr/en) and `licence` are stored in each link's
+`basis` (`basis.caveat`, `basis.licence`) — in the store row, the pair view, the country view and path hops:
+cables = community-edited Wikidata, partial coverage (~190 of ~600 systems), retired cables not excluded, no link ≠
+no cable, CC0; air = **frozen June 2014** (provider warning) and **ODbL 1.0** (attribute OpenFlights; share-alike for
+a published derived database); launches = one researcher's compilation (CC BY 4.0), site-state attribution, USSR and
+IGOs unmapped. The cables' evidence row carries an `Evidence.note` naming the cable items (label, QID, revision;
+`+N more` when A-INFRA capped the list — every QID stays in the selector); `basis.source_flags.cables` keeps them
+structured. The route's `community_edited` warning fires on cable evidence (source `wikidata`).
+
+**Stored in full** (`stored_in_full: true`): the three tables are small (live: 1,263 cable pairs, 4,558 directed
+air pairs, 1,413 owner→site pair-years), so the store keeps every link instead of the union of top-k.
+
+## L3.2 The Q55 → NLD mapping hop (explicit, cited, never silent)
+
+Wikidata cable items list P17 = `Q55` (Netherlands, constituent country) for 10 cables; Wikidata deprecated the ISO
+codes on Q55 (P297/P298 rank deprecated, qualifier P8327 "intended subject" = `Q29999`), and `Q29999` (Kingdom of the
+Netherlands) is the crosswalk QID of NLD. `registry/links/geo_mapping_hops.yaml` declares the hop: provider code
+`Q55` → NLD for `(wikidata, submarine_cables)` only, through the statement **`Q55 — country (P17) → Q29999`**
+(`q55$3F58B793-57C8-4C66-87ED-403C7E298EBF`, rank normal, entity revision 2556226405; the deprecation statements and
+the Special:EntityData sha256 checked on 2026-10-16 are cited there as documentation). Mechanics
+(`src/reva/links/geo_hops.py`, `AtlasLinkReader(hop_evidence=…)`):
+
+* the hop is applied **only when the KG holds that statement** (current, not deprecated): the materialiser reads it
+  from its KG statements (P17 is in `KG_LINK_PROPERTIES`), the pair view and the on-demand view with one bounded
+  `kg.statement_current` query; the statement becomes a `kg_statement` evidence of every link it produces (with a
+  note), and `basis.mapping_hop` records provider code, target ISO3/QID, statement id and the registry;
+* without the statement nothing is mapped: the rows stay unmapped and are counted as
+  `mapping_hop_without_kg_evidence` (report: `atlas.submarine_cable.skipped`); with it, `mapped_via_hop: {"Q55": n}`
+  and the materialisation report lists `mapping_hops: {"Q55": "<statement id>"}`;
+* the Q55 row side (`provider_geo = Q55`) and partner side (`|partner_code=Q55`) are both read; `Q55`–`Q29999` maps
+  onto one country and is never a self link;
+* when a direct NLD (`Q29999`) row and a hopped `Q55` row reach the same pair, the link counts the **union** of the
+  cable items their selectors list (`union_selector_key: wikidata_entities`; `basis.items`, `combined_from`,
+  `combination`), never the sum (a cable listing both Q55 and Q29999 counts once); an incomplete selector list gives
+  no link (`union_selector_list_incomplete`); `first_service_year` = the earliest of the rows'. Directed types
+  never combine: a collision is refused and counted (`mapping_hop_collides_with_direct_row`);
+* `taxonomy_sha256` (materialisation identity, `skip_unchanged`) now covers `geo_mapping_hops.yaml` too.
+
+Requested of WDHARVEST: harvest `Q55`'s P17 statement into the live KG (the production store applies the hop only
+then); until then the 10 live Q55 cables stay unmapped and counted.
+
+## L3.3 Generic `atlas_spec` options (schema `registry/links/link_types.schema.json`, semantic checks in `validate_taxonomy`)
+
+`year_from` (`attached` | `period_start`), `companions` ({basis key: indicator name}; joined on provider geo, dataset,
+period and the same partner dimension; reserved basis keys refused), `union_selector_key` (undirected types only),
+`stored_in_full`, `mapping_hops` (refused unless a registry hop applies), `caveat` (fr/en ≤ 600 chars), `licence`.
+Rows folded as `|partner_code=` are now read for every atlas type, so they are counted as `partner_unmapped`
+instead of being left out of the derivation report.
+
+## L3.4 UI (Pays ↔ Pays)
+
+New theme "Réseaux physiques (câbles sous-marins, vols de 2014, lancements spatiaux)" in `ui/src/v3/lib/relation.ts`:
+cables and air routes are items whose sentence carries the details (cable names, "mise en service la plus ancienne",
+the cited Q55 hop; airport pairs, airlines, "réseau de juin 2014, données figées"), the cable lane starts at the
+earliest service year; launches are per-direction yearly series; each kind shows its stored caveat and licence once
+(`KindView.notes`, rendered in `RelationPage.tsx`). zod schemas unchanged (loose: `basis`, `Evidence.note` pass
+through). `npm run typecheck`, vitest (190 passed) and `npm run build` pass.
+
+## L3.5 Tests and figures
+
+* `tests/unit/links/test_links_infra.py` (13): A-INFRA's own builders on its recorded fixtures → a DuckDB built like
+  `reva.atlas.query._build_db` → derivations. Fixture figures: cables 670 links (675 with the hop; 10 Q55 rows counted
+  `mapping_hop_without_kg_evidence` without it), GBR–USA 1 (Apollo, first service 2003), CAN–GBR first service 1956
+  (TAT-1), GBR–NLD 2 via Q55 (REMBRANDT-2, Concerto 1; 1999); union case (Q55, Q29999 and both listed) → 3 distinct
+  items, not 4; air 22 links (Netherlands Antilles unmapped, counted), GBR→MAR 25 routes / 14 airport pairs / 7
+  airlines and MAR→GBR 25 as a second link; launches 34 links (ESA, Intersputnik, NATO… owners counted unmapped),
+  e.g. USA→RUS 26 payloads (1999), USA→GUF 4, DEU→GUF 2 (2024).
+* `tests/integration/test_links_infra_store.py` (6, `db`, own throwaway database `reva_test_links3_*`): fixture ingest
+  of `atlas.wikidata_cables`, `atlas.openflights`, `atlas.gcat`; KG = links fixture + the real Q55 hop statement
+  (`tests/unit/links/fixtures/wikidata_q55_hop.json`, P17 only: the deprecated ISO statements are never loaded);
+  materialisation (stored in full, caveat + licence on every row, report `mapping_hops`), `/v1/links/GBR?kind=submarine_cable`
+  (NLD via the hop, cable-name notes, `community_edited` warning), `/v1/links/pair?a=GBR&b=MAR` (two 2014 air links
+  with the caveat), `/v1/links/USA?kind=launch_service`, the on-demand view of NOR (hop read from the KG), a stored
+  `air_routes_2014` path hop.
+* Green: `tests/unit/links` (120), `tests/review_v3`, the anchor chains, `tests/unit/nlqa`, `tests/unit/test_atlas_infra.py`,
+  `tests/integration/test_links_{store,db,ops}.py`, `test_api_contract.py`; `contracts/openapi.json` unchanged (route
+  models carry `data: dict`).
+
+Not done: no live materialisation (A-INFRA's live tables lived in a dropped throwaway database; a live run of
+`atlas.wikidata_cables` costs ~400 Wikidata requests); `scripts/e2e_stack.py --v3-fixtures` does not replay the
+A-INFRA fixtures yet (owner: lead / LINKWIRE).

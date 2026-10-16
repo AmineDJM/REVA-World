@@ -1,0 +1,556 @@
+# Provider location names of the contention datasets (agent A-CONTENTION) -> crosswalk entity keys.
+# Generated from the real Dataverse downloads of 2026-10-16 (raw sha256 per scheme below). Every name the
+# provider uses is listed: an exact (case-insensitive) match of a crosswalk label / ISO name / UN name / World
+# Bank name, or a decision with the provider's own evidence (its numeric ISO / COW / Polity code on the same
+# rows). Historical states and names spanning several entities are listed under `unmapped` (comments only:
+# the loader reads `aliases`); atlas rows for them keep iso3 = null and the provider name.
+# Connectors: src/reva/adapters/connectors/atlas_navco.py (navco_loc, mec_loc), atlas_massmob.py (mmp_loc).
+schemes:
+  navco_loc:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "exact match of crosswalk label 'Afghanistan'"}
+      - {code: "Albania", iso3: ALB, source: "exact match of crosswalk label 'Albania'"}
+      - {code: "Algeria", iso3: DZA, source: "exact match of crosswalk label 'Algeria'"}
+      - {code: "Angola", iso3: AGO, source: "exact match of crosswalk label 'Angola'"}
+      - {code: "Argentina", iso3: ARG, source: "exact match of crosswalk label 'Argentina'"}
+      - {code: "Armenia", iso3: ARM, source: "exact match of crosswalk label 'Armenia'"}
+      - {code: "Aruba", iso3: ABW, source: "exact match of crosswalk label 'Aruba'"}
+      - {code: "Austria", iso3: AUT, source: "exact match of crosswalk label 'Austria'"}
+      - {code: "Azerbaijan", iso3: AZE, source: "exact match of crosswalk label 'Azerbaijan'"}
+      - {code: "Bahrain", iso3: BHR, source: "exact match of crosswalk label 'Bahrain'"}
+      - {code: "Bangladesh", iso3: BGD, source: "exact match of crosswalk label 'Bangladesh'"}
+      - {code: "Belarus", iso3: BLR, source: "exact match of crosswalk label 'Belarus'"}
+      - {code: "Benin", iso3: BEN, source: "exact match of crosswalk label 'Benin'"}
+      - {code: "Bolivia", iso3: BOL, source: "exact match of crosswalk worldbank_name 'Bolivia'"}
+      - {code: "Bosnia-Herzegovina", iso3: BIH, source: "NAVCO 2.1 row(s) with this location carry loc_iso 70 (ISO 3166-1 numeric of BIH)"}
+      - {code: "Brazil", iso3: BRA, source: "exact match of crosswalk label 'Brazil'"}
+      - {code: "Brunei", iso3: BRN, source: "NAVCO 2.1 row(s) with this location carry loc_iso 96 (ISO 3166-1 numeric of BRN)"}
+      - {code: "Bulgaria", iso3: BGR, source: "exact match of crosswalk label 'Bulgaria'"}
+      - {code: "Burkina Faso", iso3: BFA, source: "exact match of crosswalk label 'Burkina Faso'"}
+      - {code: "Burma", iso3: MMR, source: "former English name of Myanmar; MEC v3.0 'Burma' ccode 775 (COW Myanmar); NAVCO 2.1 'Myanmar/Burma' loc_iso 104 (MMR)"}
+      - {code: "Burma/Myanmar", iso3: MMR, source: "NAVCO 2.1 'Myanmar/Burma' loc_iso 104 (ISO 3166-1 numeric of MMR)"}
+      - {code: "Burundi", iso3: BDI, source: "exact match of crosswalk label 'Burundi'"}
+      - {code: "Cambodia", iso3: KHM, source: "exact match of crosswalk label 'Cambodia'"}
+      - {code: "Cambodia (Kampuchea)", iso3: KHM, source: "NAVCO 2.1 row(s) with this location carry loc_iso 116 (ISO 3166-1 numeric of KHM)"}
+      - {code: "Cameroon", iso3: CMR, source: "exact match of crosswalk label 'Cameroon'"}
+      - {code: "Central African Republic", iso3: CAF, source: "exact match of crosswalk label 'Central African Republic'"}
+      - {code: "Chad", iso3: TCD, source: "exact match of crosswalk label 'Chad'"}
+      - {code: "Chile", iso3: CHL, source: "exact match of crosswalk label 'Chile'"}
+      - {code: "China", iso3: CHN, source: "exact match of crosswalk label 'China'"}
+      - {code: "Colombia", iso3: COL, source: "exact match of crosswalk label 'Colombia'"}
+      - {code: "Comoros", iso3: COM, source: "exact match of crosswalk label 'Comoros'"}
+      - {code: "Congo", iso3: COG, source: "exact match of crosswalk label 'Congo'"}
+      - {code: "Congo-Brazzaville (ROC)", iso3: COG, source: "Republic of the Congo (Brazzaville); MEC v3.0 'Republic of the Congo' ccode 484 (COW Congo)"}
+      - {code: "Costa Rica", iso3: CRI, source: "exact match of crosswalk label 'Costa Rica'"}
+      - {code: "Cote d'Ivoire", iso3: CIV, source: "exact match of crosswalk worldbank_name \"Cote d'Ivoire\""}
+      - {code: "Croatia", iso3: HRV, source: "exact match of crosswalk label 'Croatia'"}
+      - {code: "Cuba", iso3: CUB, source: "exact match of crosswalk label 'Cuba'"}
+      - {code: "Cyprus", iso3: CYP, source: "exact match of crosswalk label 'Cyprus'"}
+      - {code: "Democratic Republic of Congo", iso3: COD, source: "NAVCO 2.1 row(s) with this location carry loc_iso 180 (ISO 3166-1 numeric of COD)"}
+      - {code: "Denmark", iso3: DNK, source: "exact match of crosswalk label 'Denmark'"}
+      - {code: "Djibouti", iso3: DJI, source: "exact match of crosswalk label 'Djibouti'"}
+      - {code: "Dominican Republic", iso3: DOM, source: "exact match of crosswalk label 'Dominican Republic'"}
+      - {code: "East Timor", iso3: TLS, source: "NAVCO 2.1 row(s) with this location carry loc_iso 626 (ISO 3166-1 numeric of TLS)"}
+      - {code: "Ecuador", iso3: ECU, source: "exact match of crosswalk label 'Ecuador'"}
+      - {code: "Egypt", iso3: EGY, source: "exact match of crosswalk label 'Egypt'"}
+      - {code: "El Salvador", iso3: SLV, source: "exact match of crosswalk label 'El Salvador'"}
+      - {code: "Eritrea", iso3: ERI, source: "exact match of crosswalk label 'Eritrea'"}
+      - {code: "Estonia", iso3: EST, source: "exact match of crosswalk label 'Estonia'"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact match of crosswalk label 'Ethiopia'"}
+      - {code: "Fiji", iso3: FJI, source: "exact match of crosswalk label 'Fiji'"}
+      - {code: "Finland", iso3: FIN, source: "exact match of crosswalk label 'Finland'"}
+      - {code: "France", iso3: FRA, source: "exact match of crosswalk label 'France'"}
+      - {code: "Georgia", iso3: GEO, source: "exact match of crosswalk label 'Georgia'"}
+      - {code: "Germany", iso3: DEU, source: "exact match of crosswalk label 'Germany'"}
+      - {code: "Ghana", iso3: GHA, source: "exact match of crosswalk label 'Ghana'"}
+      - {code: "Greece", iso3: GRC, source: "exact match of crosswalk label 'Greece'"}
+      - {code: "Guatemala", iso3: GTM, source: "exact match of crosswalk label 'Guatemala'"}
+      - {code: "Guinea", iso3: GIN, source: "exact match of crosswalk label 'Guinea'"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "exact match of crosswalk label 'Guinea-Bissau'"}
+      - {code: "Guyana", iso3: GUY, source: "exact match of crosswalk label 'Guyana'"}
+      - {code: "Haiti", iso3: HTI, source: "exact match of crosswalk label 'Haiti'"}
+      - {code: "Honduras", iso3: HND, source: "exact match of crosswalk label 'Honduras'"}
+      - {code: "Hungary", iso3: HUN, source: "exact match of crosswalk label 'Hungary'"}
+      - {code: "Hyderabad", iso3: IND, source: "NAVCO 2.1 row(s) with this location carry loc_iso 356 (ISO 3166-1 numeric of IND) (princely state, 1948)"}
+      - {code: "Iceland", iso3: ISL, source: "exact match of crosswalk label 'Iceland'"}
+      - {code: "India", iso3: IND, source: "exact match of crosswalk label 'India'"}
+      - {code: "Indonesia", iso3: IDN, source: "exact match of crosswalk label 'Indonesia'"}
+      - {code: "Iran", iso3: IRN, source: "exact match of crosswalk comtrade_reporter_label 'Iran'"}
+      - {code: "Iraq", iso3: IRQ, source: "exact match of crosswalk label 'Iraq'"}
+      - {code: "Israel", iso3: ISR, source: "exact match of crosswalk label 'Israel'"}
+      - {code: "Italy", iso3: ITA, source: "exact match of crosswalk label 'Italy'"}
+      - {code: "Ivory Coast", iso3: CIV, source: "NAVCO 2.1 row(s) with this location carry loc_iso 384 (ISO 3166-1 numeric of CIV)"}
+      - {code: "Japan", iso3: JPN, source: "exact match of crosswalk label 'Japan'"}
+      - {code: "Jordan", iso3: JOR, source: "exact match of crosswalk label 'Jordan'"}
+      - {code: "Kenya", iso3: KEN, source: "exact match of crosswalk label 'Kenya'"}
+      - {code: "Kosovo", iso3: XKX, source: "exact match of crosswalk label 'Kosovo'"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "exact match of crosswalk label 'Kyrgyzstan'"}
+      - {code: "Laos", iso3: LAO, source: "NAVCO 2.1 row(s) with this location carry loc_iso 418 (ISO 3166-1 numeric of LAO)"}
+      - {code: "Latvia", iso3: LVA, source: "exact match of crosswalk label 'Latvia'"}
+      - {code: "Lebanon", iso3: LBN, source: "exact match of crosswalk label 'Lebanon'"}
+      - {code: "Lesotho", iso3: LSO, source: "exact match of crosswalk label 'Lesotho'"}
+      - {code: "Liberia", iso3: LBR, source: "exact match of crosswalk label 'Liberia'"}
+      - {code: "Libya", iso3: LBY, source: "exact match of crosswalk label 'Libya'"}
+      - {code: "Lithuania", iso3: LTU, source: "exact match of crosswalk label 'Lithuania'"}
+      - {code: "Macedonia", iso3: MKD, source: "NAVCO 2.1 row(s) with this location carry loc_iso 807 (ISO 3166-1 numeric of MKD)"}
+      - {code: "Madagascar", iso3: MDG, source: "exact match of crosswalk label 'Madagascar'"}
+      - {code: "Malawi", iso3: MWI, source: "exact match of crosswalk label 'Malawi'"}
+      - {code: "Malaysia", iso3: MYS, source: "exact match of crosswalk label 'Malaysia'"}
+      - {code: "Maldives", iso3: MDV, source: "exact match of crosswalk label 'Maldives'"}
+      - {code: "Mali", iso3: MLI, source: "exact match of crosswalk label 'Mali'"}
+      - {code: "Mauritania", iso3: MRT, source: "exact match of crosswalk label 'Mauritania'"}
+      - {code: "Mexico", iso3: MEX, source: "exact match of crosswalk label 'Mexico'"}
+      - {code: "Moldova", iso3: MDA, source: "exact match of crosswalk worldbank_name 'Moldova'"}
+      - {code: "Mongolia", iso3: MNG, source: "exact match of crosswalk label 'Mongolia'"}
+      - {code: "Montenegro", iso3: MNE, source: "exact match of crosswalk label 'Montenegro'"}
+      - {code: "Morocco", iso3: MAR, source: "exact match of crosswalk label 'Morocco'"}
+      - {code: "Mozambique", iso3: MOZ, source: "exact match of crosswalk label 'Mozambique'"}
+      - {code: "Myanmar", iso3: MMR, source: "exact match of crosswalk label 'Myanmar'"}
+      - {code: "Myanmar/Burma", iso3: MMR, source: "NAVCO 2.1 row(s) with this location carry loc_iso 104 (ISO 3166-1 numeric of MMR)"}
+      - {code: "Namibia", iso3: NAM, source: "exact match of crosswalk label 'Namibia'"}
+      - {code: "Namibia/South West Africa", iso3: NAM, source: "NAVCO 1.3 LOCATION = 'contemporary sovereign country name' (codebook): Namibia"}
+      - {code: "Nepal", iso3: NPL, source: "exact match of crosswalk label 'Nepal'"}
+      - {code: "Nicaragua", iso3: NIC, source: "exact match of crosswalk label 'Nicaragua'"}
+      - {code: "Niger", iso3: NER, source: "exact match of crosswalk label 'Niger'"}
+      - {code: "Nigeria", iso3: NGA, source: "exact match of crosswalk label 'Nigeria'"}
+      - {code: "Northern Ireland", iso3: GBR, source: "ISO 3166-2:GB-NIR is a subdivision of GBR; MEC v3.0 'Northern Ireland' ccode 200 (COW United Kingdom)"}
+      - {code: "Norway", iso3: NOR, source: "exact match of crosswalk label 'Norway'"}
+      - {code: "Oman", iso3: OMN, source: "exact match of crosswalk label 'Oman'"}
+      - {code: "Pakistan", iso3: PAK, source: "exact match of crosswalk label 'Pakistan'"}
+      - {code: "Palestine", iso3: PSE, source: "NAVCO 2.1 'Palestinian Territories' loc_iso 275 (ISO 3166-1 numeric of PSE); 'Palestine' rows carry no loc_iso"}
+      - {code: "Palestinian Territories", iso3: PSE, source: "NAVCO 2.1 row(s) with this location carry loc_iso 275 (ISO 3166-1 numeric of PSE)"}
+      - {code: "Panama", iso3: PAN, source: "exact match of crosswalk label 'Panama'"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "exact match of crosswalk label 'Papua New Guinea'"}
+      - {code: "Paraguay", iso3: PRY, source: "exact match of crosswalk label 'Paraguay'"}
+      - {code: "Peru", iso3: PER, source: "exact match of crosswalk label 'Peru'"}
+      - {code: "Philippines", iso3: PHL, source: "exact match of crosswalk label 'Philippines'"}
+      - {code: "Poland", iso3: POL, source: "exact match of crosswalk label 'Poland'"}
+      - {code: "Portugal", iso3: PRT, source: "exact match of crosswalk label 'Portugal'"}
+      - {code: "Princely State of Travencore", iso3: IND, source: "NAVCO 2.1 row(s) with this location carry loc_iso 356 (ISO 3166-1 numeric of IND) (princely state)"}
+      - {code: "Republic of Yemen", iso3: YEM, source: "MEC v3.0 'Republic of Yemen' ccode 679 (COW Yemen, unified 1990)"}
+      - {code: "Republic of the Congo", iso3: COG, source: "MEC v3.0 'Republic of the Congo' ccode 484 (COW Congo)"}
+      - {code: "Romania", iso3: ROU, source: "exact match of crosswalk label 'Romania'"}
+      - {code: "Russia", iso3: RUS, source: "name; NAVCO 2.1 'Russia' rows carry loc_iso 810 (withdrawn ISO numeric of the USSR, not used); NAVCO 1.3 LOCATION = contemporary sovereign country name (rows 1905-1921 are campaigns in the Russian Empire, flagged by year in the atlas)"}
+      - {code: "Rwanda", iso3: RWA, source: "exact match of crosswalk label 'Rwanda'"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "exact match of crosswalk label 'Saudi Arabia'"}
+      - {code: "Senegal", iso3: SEN, source: "exact match of crosswalk label 'Senegal'"}
+      - {code: "Serbia", iso3: SRB, source: "exact match of crosswalk label 'Serbia'"}
+      - {code: "Sierra Leone", iso3: SLE, source: "exact match of crosswalk label 'Sierra Leone'"}
+      - {code: "Slovakia", iso3: SVK, source: "exact match of crosswalk label 'Slovakia'"}
+      - {code: "Slovenia", iso3: SVN, source: "exact match of crosswalk label 'Slovenia'"}
+      - {code: "Somalia", iso3: SOM, source: "exact match of crosswalk label 'Somalia'"}
+      - {code: "South Africa", iso3: ZAF, source: "exact match of crosswalk label 'South Africa'"}
+      - {code: "South Korea", iso3: KOR, source: "NAVCO 2.1 row(s) with this location carry loc_iso 410 (ISO 3166-1 numeric of KOR)"}
+      - {code: "South Sudan", iso3: SSD, source: "exact match of crosswalk label 'South Sudan'"}
+      - {code: "Spain", iso3: ESP, source: "exact match of crosswalk label 'Spain'"}
+      - {code: "Sri Lanka", iso3: LKA, source: "exact match of crosswalk label 'Sri Lanka'"}
+      - {code: "Sudan", iso3: SDN, source: "exact match of crosswalk label 'Sudan'"}
+      - {code: "Suriname", iso3: SUR, source: "exact match of crosswalk label 'Suriname'"}
+      - {code: "Swaziland", iso3: SWZ, source: "NAVCO 2.1 row(s) with this location carry loc_iso 748 (ISO 3166-1 numeric of SWZ (Eswatini))"}
+      - {code: "Syria", iso3: SYR, source: "exact match of crosswalk comtrade_reporter_label 'Syria'"}
+      - {code: "Taiwan", iso3: TWN, source: "exact match of crosswalk label 'Taiwan'"}
+      - {code: "Tajikistan", iso3: TJK, source: "exact match of crosswalk label 'Tajikistan'"}
+      - {code: "Tanzania", iso3: TZA, source: "exact match of crosswalk worldbank_name 'Tanzania'"}
+      - {code: "Tanzania/German East Africa", iso3: TZA, source: "NAVCO 1.3 LOCATION = 'contemporary sovereign country name' (codebook): Tanzania"}
+      - {code: "Thailand", iso3: THA, source: "exact match of crosswalk label 'Thailand'"}
+      - {code: "Tibet", iso3: CHN, source: "NAVCO 2.1 row(s) with this location carry loc_iso 156 (ISO 3166-1 numeric of CHN); the provider places Tibet campaigns in China"}
+      - {code: "Togo", iso3: TGO, source: "exact match of crosswalk label 'Togo'"}
+      - {code: "Tonga", iso3: TON, source: "exact match of crosswalk label 'Tonga'"}
+      - {code: "Tunisia", iso3: TUN, source: "exact match of crosswalk label 'Tunisia'"}
+      - {code: "Turkey", iso3: TUR, source: "NAVCO 2.1 row(s) with this location carry loc_iso 792 (ISO 3166-1 numeric of TUR)"}
+      - {code: "UK", iso3: GBR, source: "NAVCO 2.1 row(s) with this location carry loc_iso 826 (ISO 3166-1 numeric of GBR)"}
+      - {code: "Uganda", iso3: UGA, source: "exact match of crosswalk label 'Uganda'"}
+      - {code: "Ukraine", iso3: UKR, source: "exact match of crosswalk label 'Ukraine'"}
+      - {code: "United States", iso3: USA, source: "exact match of crosswalk iso_name 'United States'"}
+      - {code: "Uruguay", iso3: URY, source: "exact match of crosswalk label 'Uruguay'"}
+      - {code: "Venezuela", iso3: VEN, source: "exact match of crosswalk comtrade_reporter_label 'Venezuela'"}
+      - {code: "Vietnam", iso3: VNM, source: "NAVCO 2.1 row(s) with this location carry loc_iso 704 (ISO 3166-1 numeric of VNM)"}
+      - {code: "Western Sahara", iso3: ESH, source: "exact match of crosswalk label 'Western Sahara'"}
+      - {code: "Yemen", iso3: YEM, source: "exact match of crosswalk label 'Yemen'"}
+      - {code: "Zaire/DRC", iso3: COD, source: "Zaire = former name of the Democratic Republic of the Congo; NAVCO 2.1 'Democratic Republic of Congo' loc_iso 180 (COD)"}
+      - {code: "Zambia", iso3: ZMB, source: "exact match of crosswalk label 'Zambia'"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "exact match of crosswalk label 'Zimbabwe'"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu
+      retrieved_at: "2026-10-16T20:18:00Z"
+      raw_sha256:
+        "NAVCO 1.2 Updated.tab": 81199a030aea3fa5904f7e4ad065592386abc7632f9246ff22bd9e18f5b8acdb
+        "NAVCO 1.3 List.tab": c59ab854ad36c3dd624c95e21bb8d6201ed79623279de51788ad66c38863259b
+        "NAVCO2-1_ForPublication.tab": a0e41f37955f78c11bf0ce24e1c6027fa6515de18139bf052c1b92fcf86b1ecb
+    # unmapped (kept with iso3 = null):
+    #   Czechoslovakia: historical state (ISO 3166-3 CSHH); kept unmapped
+    #   East Germany: historical state (ISO 3166-3 DDDE); kept unmapped
+    #   Natal: historical colony (now part of ZAF); kept unmapped: the provider names the colony
+    #   Ottoman Empire: historical state; kept unmapped
+    #   South Vietnam: historical state; kept unmapped
+    #   USSR: historical state (ISO 3166-3 SUHH); kept unmapped
+    #   West Papua: conflicting provider evidence: MEC v3.0 codes 'West Papua' ccode 910 (COW Papua New Guinea) while the territory is in Indonesia; kept unmapped rather than choose
+    #   Yemen (North Yemen): historical state (North Yemen, before 1990-05-22); kept unmapped
+    #   Yemen Arab Republic: historical state (North Yemen, before 1990-05-22); kept unmapped
+    #   Yemen People's Republic: historical state (South Yemen, before 1990-05-22); kept unmapped
+    #   Yugoslavia: historical state (ISO 3166-3 YUCS); kept unmapped
+  mec_loc:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "exact match of crosswalk label 'Afghanistan'"}
+      - {code: "Albania", iso3: ALB, source: "exact match of crosswalk label 'Albania'"}
+      - {code: "Algeria", iso3: DZA, source: "exact match of crosswalk label 'Algeria'"}
+      - {code: "Angola", iso3: AGO, source: "exact match of crosswalk label 'Angola'"}
+      - {code: "Argentina", iso3: ARG, source: "exact match of crosswalk label 'Argentina'"}
+      - {code: "Armenia", iso3: ARM, source: "exact match of crosswalk label 'Armenia'"}
+      - {code: "Aruba", iso3: ABW, source: "exact match of crosswalk label 'Aruba'"}
+      - {code: "Australia", iso3: AUS, source: "exact match of crosswalk label 'Australia'"}
+      - {code: "Austria", iso3: AUT, source: "exact match of crosswalk label 'Austria'"}
+      - {code: "Azerbaijan", iso3: AZE, source: "exact match of crosswalk label 'Azerbaijan'"}
+      - {code: "Bahrain", iso3: BHR, source: "exact match of crosswalk label 'Bahrain'"}
+      - {code: "Bangladesh", iso3: BGD, source: "exact match of crosswalk label 'Bangladesh'"}
+      - {code: "Belarus", iso3: BLR, source: "exact match of crosswalk label 'Belarus'"}
+      - {code: "Belgium", iso3: BEL, source: "exact match of crosswalk label 'Belgium'"}
+      - {code: "Benin", iso3: BEN, source: "exact match of crosswalk label 'Benin'"}
+      - {code: "Bolivia", iso3: BOL, source: "exact match of crosswalk worldbank_name 'Bolivia'"}
+      - {code: "Bosnia-Herzegovina", iso3: BIH, source: "MEC v3.0 row(s) with this location carry ccode 346 (COW code of Bosnia and Herzegovina)"}
+      - {code: "Botswana", iso3: BWA, source: "exact match of crosswalk label 'Botswana'"}
+      - {code: "Brazil", iso3: BRA, source: "exact match of crosswalk label 'Brazil'"}
+      - {code: "British Guiana", iso3: GUY, source: "MEC v3.0 row(s) with this location carry ccode 110 (COW code of Guyana); colonial name"}
+      - {code: "Brunei", iso3: BRN, source: "MEC v3.0 row(s) with this location carry ccode 835 (COW code of Brunei)"}
+      - {code: "Bulgaria", iso3: BGR, source: "exact match of crosswalk label 'Bulgaria'"}
+      - {code: "Burkina Faso", iso3: BFA, source: "exact match of crosswalk label 'Burkina Faso'"}
+      - {code: "Burma", iso3: MMR, source: "MEC v3.0 row(s) with this location carry ccode 775 (COW code of Myanmar)"}
+      - {code: "Burundi", iso3: BDI, source: "exact match of crosswalk label 'Burundi'"}
+      - {code: "Cambodia", iso3: KHM, source: "exact match of crosswalk label 'Cambodia'"}
+      - {code: "Cameroon", iso3: CMR, source: "exact match of crosswalk label 'Cameroon'"}
+      - {code: "Canada", iso3: CAN, source: "exact match of crosswalk label 'Canada'"}
+      - {code: "Central African Republic", iso3: CAF, source: "exact match of crosswalk label 'Central African Republic'"}
+      - {code: "Chad", iso3: TCD, source: "exact match of crosswalk label 'Chad'"}
+      - {code: "Chile", iso3: CHL, source: "exact match of crosswalk label 'Chile'"}
+      - {code: "China", iso3: CHN, source: "exact match of crosswalk label 'China'"}
+      - {code: "Colombia", iso3: COL, source: "exact match of crosswalk label 'Colombia'"}
+      - {code: "Comoros", iso3: COM, source: "exact match of crosswalk label 'Comoros'"}
+      - {code: "Costa Rica", iso3: CRI, source: "exact match of crosswalk label 'Costa Rica'"}
+      - {code: "Croatia", iso3: HRV, source: "exact match of crosswalk label 'Croatia'"}
+      - {code: "Cuba", iso3: CUB, source: "exact match of crosswalk label 'Cuba'"}
+      - {code: "Cyprus", iso3: CYP, source: "exact match of crosswalk label 'Cyprus'"}
+      - {code: "Czech Republic", iso3: CZE, source: "MEC v3.0 row(s) with this location carry ccode 316 (COW code of Czech Republic)"}
+      - {code: "Democratic Republic of Congo", iso3: COD, source: "MEC v3.0 row(s) with this location carry ccode 490 (COW code of DR Congo)"}
+      - {code: "Denmark", iso3: DNK, source: "exact match of crosswalk label 'Denmark'"}
+      - {code: "Djibouti", iso3: DJI, source: "exact match of crosswalk label 'Djibouti'"}
+      - {code: "Dominican Republic", iso3: DOM, source: "exact match of crosswalk label 'Dominican Republic'"}
+      - {code: "East Timor", iso3: TLS, source: "MEC v3.0 row(s) with this location carry ccode 860 (COW code of East Timor)"}
+      - {code: "Ecuador", iso3: ECU, source: "exact match of crosswalk label 'Ecuador'"}
+      - {code: "Egypt", iso3: EGY, source: "exact match of crosswalk label 'Egypt'"}
+      - {code: "El Salvador", iso3: SLV, source: "exact match of crosswalk label 'El Salvador'"}
+      - {code: "Estonia", iso3: EST, source: "exact match of crosswalk label 'Estonia'"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact match of crosswalk label 'Ethiopia'"}
+      - {code: "Fiji", iso3: FJI, source: "exact match of crosswalk label 'Fiji'"}
+      - {code: "Finland", iso3: FIN, source: "exact match of crosswalk label 'Finland'"}
+      - {code: "France", iso3: FRA, source: "exact match of crosswalk label 'France'"}
+      - {code: "French Guiana", iso3: GUF, source: "exact match of crosswalk label 'French Guiana'"}
+      - {code: "Gabon", iso3: GAB, source: "exact match of crosswalk label 'Gabon'"}
+      - {code: "Georgia", iso3: GEO, source: "exact match of crosswalk label 'Georgia'"}
+      - {code: "Germany", iso3: DEU, source: "exact match of crosswalk label 'Germany'"}
+      - {code: "Ghana", iso3: GHA, source: "exact match of crosswalk label 'Ghana'"}
+      - {code: "Greece", iso3: GRC, source: "exact match of crosswalk label 'Greece'"}
+      - {code: "Guatemala", iso3: GTM, source: "exact match of crosswalk label 'Guatemala'"}
+      - {code: "Guinea", iso3: GIN, source: "exact match of crosswalk label 'Guinea'"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "exact match of crosswalk label 'Guinea-Bissau'"}
+      - {code: "Guyana", iso3: GUY, source: "exact match of crosswalk label 'Guyana'"}
+      - {code: "Haiti", iso3: HTI, source: "exact match of crosswalk label 'Haiti'"}
+      - {code: "Honduras", iso3: HND, source: "exact match of crosswalk label 'Honduras'"}
+      - {code: "Hong Kong", iso3: HKG, source: "exact match of crosswalk iso_name 'Hong Kong'"}
+      - {code: "Hungary", iso3: HUN, source: "exact match of crosswalk label 'Hungary'"}
+      - {code: "Iceland", iso3: ISL, source: "exact match of crosswalk label 'Iceland'"}
+      - {code: "India", iso3: IND, source: "exact match of crosswalk label 'India'"}
+      - {code: "Indonesia", iso3: IDN, source: "exact match of crosswalk label 'Indonesia'"}
+      - {code: "Iran", iso3: IRN, source: "exact match of crosswalk comtrade_reporter_label 'Iran'"}
+      - {code: "Iraq", iso3: IRQ, source: "exact match of crosswalk label 'Iraq'"}
+      - {code: "Ireland", iso3: IRL, source: "exact match of crosswalk label 'Ireland'"}
+      - {code: "Israel", iso3: ISR, source: "exact match of crosswalk label 'Israel'"}
+      - {code: "Italy", iso3: ITA, source: "exact match of crosswalk label 'Italy'"}
+      - {code: "Ivory Coast", iso3: CIV, source: "MEC v3.0 row(s) with this location carry ccode 437 (COW code of Cote d'Ivoire)"}
+      - {code: "Jamaica", iso3: JAM, source: "exact match of crosswalk label 'Jamaica'"}
+      - {code: "Japan", iso3: JPN, source: "exact match of crosswalk label 'Japan'"}
+      - {code: "Jordan", iso3: JOR, source: "exact match of crosswalk label 'Jordan'"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "exact match of crosswalk label 'Kazakhstan'"}
+      - {code: "Kenya", iso3: KEN, source: "exact match of crosswalk label 'Kenya'"}
+      - {code: "Kosovo", iso3: XKX, source: "exact match of crosswalk label 'Kosovo'"}
+      - {code: "Kuwait", iso3: KWT, source: "exact match of crosswalk label 'Kuwait'"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "exact match of crosswalk label 'Kyrgyzstan'"}
+      - {code: "Laos", iso3: LAO, source: "MEC v3.0 row(s) with this location carry ccode 812 (COW code of Laos)"}
+      - {code: "Latvia", iso3: LVA, source: "exact match of crosswalk label 'Latvia'"}
+      - {code: "Lebanon", iso3: LBN, source: "exact match of crosswalk label 'Lebanon'"}
+      - {code: "Lesotho", iso3: LSO, source: "exact match of crosswalk label 'Lesotho'"}
+      - {code: "Liberia", iso3: LBR, source: "exact match of crosswalk label 'Liberia'"}
+      - {code: "Libya", iso3: LBY, source: "exact match of crosswalk label 'Libya'"}
+      - {code: "Lithuania", iso3: LTU, source: "exact match of crosswalk label 'Lithuania'"}
+      - {code: "Luxembourg", iso3: LUX, source: "exact match of crosswalk label 'Luxembourg'"}
+      - {code: "Macedonia", iso3: MKD, source: "MEC v3.0 row(s) with this location carry ccode 343 (COW code of Macedonia)"}
+      - {code: "Madagascar", iso3: MDG, source: "exact match of crosswalk label 'Madagascar'"}
+      - {code: "Malawi", iso3: MWI, source: "exact match of crosswalk label 'Malawi'"}
+      - {code: "Malaysia", iso3: MYS, source: "exact match of crosswalk label 'Malaysia'"}
+      - {code: "Maldives", iso3: MDV, source: "exact match of crosswalk label 'Maldives'"}
+      - {code: "Mali", iso3: MLI, source: "exact match of crosswalk label 'Mali'"}
+      - {code: "Malta", iso3: MLT, source: "exact match of crosswalk label 'Malta'"}
+      - {code: "Mauritania", iso3: MRT, source: "exact match of crosswalk label 'Mauritania'"}
+      - {code: "Mexico", iso3: MEX, source: "exact match of crosswalk label 'Mexico'"}
+      - {code: "Moldova", iso3: MDA, source: "exact match of crosswalk worldbank_name 'Moldova'"}
+      - {code: "Mongolia", iso3: MNG, source: "exact match of crosswalk label 'Mongolia'"}
+      - {code: "Montenegro", iso3: MNE, source: "exact match of crosswalk label 'Montenegro'"}
+      - {code: "Morocco", iso3: MAR, source: "exact match of crosswalk label 'Morocco'"}
+      - {code: "Mozambique", iso3: MOZ, source: "exact match of crosswalk label 'Mozambique'"}
+      - {code: "Myanmar", iso3: MMR, source: "exact match of crosswalk label 'Myanmar'"}
+      - {code: "Myanmar/Burma", iso3: MMR, source: "MEC v3.0 row(s) with this location carry ccode 775 (COW code of Myanmar)"}
+      - {code: "Namibia", iso3: NAM, source: "exact match of crosswalk label 'Namibia'"}
+      - {code: "Nepal", iso3: NPL, source: "exact match of crosswalk label 'Nepal'"}
+      - {code: "Netherlands", iso3: NLD, source: "exact match of crosswalk iso_name 'Netherlands'"}
+      - {code: "New Zealand", iso3: NZL, source: "exact match of crosswalk label 'New Zealand'"}
+      - {code: "Nicaragua", iso3: NIC, source: "exact match of crosswalk label 'Nicaragua'"}
+      - {code: "Niger", iso3: NER, source: "exact match of crosswalk label 'Niger'"}
+      - {code: "Nigeria", iso3: NGA, source: "exact match of crosswalk label 'Nigeria'"}
+      - {code: "North Korea", iso3: PRK, source: "MEC v3.0 row(s) with this location carry ccode 731 (COW code of North Korea)"}
+      - {code: "Northern Ireland", iso3: GBR, source: "MEC v3.0 row(s) with this location carry ccode 200 (COW code of United Kingdom)"}
+      - {code: "Norway", iso3: NOR, source: "exact match of crosswalk label 'Norway'"}
+      - {code: "Oman", iso3: OMN, source: "exact match of crosswalk label 'Oman'"}
+      - {code: "Pakistan", iso3: PAK, source: "exact match of crosswalk label 'Pakistan'"}
+      - {code: "Panama", iso3: PAN, source: "exact match of crosswalk label 'Panama'"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "exact match of crosswalk label 'Papua New Guinea'"}
+      - {code: "Paraguay", iso3: PRY, source: "exact match of crosswalk label 'Paraguay'"}
+      - {code: "Peru", iso3: PER, source: "exact match of crosswalk label 'Peru'"}
+      - {code: "Philippines", iso3: PHL, source: "exact match of crosswalk label 'Philippines'"}
+      - {code: "Poland", iso3: POL, source: "exact match of crosswalk label 'Poland'"}
+      - {code: "Portugal", iso3: PRT, source: "exact match of crosswalk label 'Portugal'"}
+      - {code: "Republic of Congo", iso3: COG, source: "MEC v3.0 row(s) with this location carry ccode 484 (COW code of Congo)"}
+      - {code: "Republic of Yemen", iso3: YEM, source: "MEC v3.0 row(s) with this location carry ccode 679 (COW code of Yemen)"}
+      - {code: "Republic of the Congo", iso3: COG, source: "MEC v3.0 row(s) with this location carry ccode 484 (COW code of Congo)"}
+      - {code: "Romania", iso3: ROU, source: "exact match of crosswalk label 'Romania'"}
+      - {code: "Russia", iso3: RUS, source: "MEC v3.0 row(s) with this location carry ccode 365 (COW code of Russia); MEC covers 1955-2018: Russia rows are after 1991 (checked in the atlas flags)"}
+      - {code: "Rwanda", iso3: RWA, source: "exact match of crosswalk label 'Rwanda'"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "exact match of crosswalk label 'Saudi Arabia'"}
+      - {code: "Senegal", iso3: SEN, source: "exact match of crosswalk label 'Senegal'"}
+      - {code: "Serbia", iso3: SRB, source: "exact match of crosswalk label 'Serbia'"}
+      - {code: "Sierra Leone", iso3: SLE, source: "exact match of crosswalk label 'Sierra Leone'"}
+      - {code: "Slovakia", iso3: SVK, source: "exact match of crosswalk label 'Slovakia'"}
+      - {code: "Slovenia", iso3: SVN, source: "exact match of crosswalk label 'Slovenia'"}
+      - {code: "Somalia", iso3: SOM, source: "exact match of crosswalk label 'Somalia'"}
+      - {code: "South Africa", iso3: ZAF, source: "exact match of crosswalk label 'South Africa'"}
+      - {code: "South Korea", iso3: KOR, source: "MEC v3.0 row(s) with this location carry ccode 732 (COW code of South Korea)"}
+      - {code: "South Sudan", iso3: SSD, source: "exact match of crosswalk label 'South Sudan'"}
+      - {code: "Spain", iso3: ESP, source: "exact match of crosswalk label 'Spain'"}
+      - {code: "Sri Lanka", iso3: LKA, source: "exact match of crosswalk label 'Sri Lanka'"}
+      - {code: "Sudan", iso3: SDN, source: "exact match of crosswalk label 'Sudan'"}
+      - {code: "Suriname", iso3: SUR, source: "exact match of crosswalk label 'Suriname'"}
+      - {code: "Swaziland", iso3: SWZ, source: "MEC v3.0 row(s) with this location carry ccode 572 (COW code of Swaziland)"}
+      - {code: "Sweden", iso3: SWE, source: "exact match of crosswalk label 'Sweden'"}
+      - {code: "Switzerland", iso3: CHE, source: "exact match of crosswalk label 'Switzerland'"}
+      - {code: "Syria", iso3: SYR, source: "exact match of crosswalk comtrade_reporter_label 'Syria'"}
+      - {code: "Taiwan", iso3: TWN, source: "exact match of crosswalk label 'Taiwan'"}
+      - {code: "Tajikistan", iso3: TJK, source: "exact match of crosswalk label 'Tajikistan'"}
+      - {code: "Tanzania", iso3: TZA, source: "exact match of crosswalk worldbank_name 'Tanzania'"}
+      - {code: "Thailand", iso3: THA, source: "exact match of crosswalk label 'Thailand'"}
+      - {code: "Tibet", iso3: CHN, source: "MEC v3.0 row(s) with this location carry ccode 710 (COW code of China); the provider places Tibet episodes in China"}
+      - {code: "Togo", iso3: TGO, source: "exact match of crosswalk label 'Togo'"}
+      - {code: "Tonga", iso3: TON, source: "exact match of crosswalk label 'Tonga'"}
+      - {code: "Tunisia", iso3: TUN, source: "exact match of crosswalk label 'Tunisia'"}
+      - {code: "Turkey", iso3: TUR, source: "MEC v3.0 row(s) with this location carry ccode 640 (COW code of Turkey)"}
+      - {code: "Uganda", iso3: UGA, source: "exact match of crosswalk label 'Uganda'"}
+      - {code: "Ukraine", iso3: UKR, source: "exact match of crosswalk label 'Ukraine'"}
+      - {code: "United Arab Emirates", iso3: ARE, source: "exact match of crosswalk label 'United Arab Emirates'"}
+      - {code: "United Kingdom", iso3: GBR, source: "exact match of crosswalk iso_name 'United Kingdom'"}
+      - {code: "United States", iso3: USA, source: "exact match of crosswalk iso_name 'United States'"}
+      - {code: "Uruguay", iso3: URY, source: "exact match of crosswalk label 'Uruguay'"}
+      - {code: "Uzbekistan", iso3: UZB, source: "exact match of crosswalk label 'Uzbekistan'"}
+      - {code: "Venezuela", iso3: VEN, source: "exact match of crosswalk comtrade_reporter_label 'Venezuela'"}
+      - {code: "Vietnam", iso3: VNM, source: "MEC v3.0 row(s) with this location carry ccode 816 (COW code of Vietnam)"}
+      - {code: "Western Sahara", iso3: ESH, source: "exact match of crosswalk label 'Western Sahara'"}
+      - {code: "Zaire", iso3: COD, source: "MEC v3.0 row(s) with this location carry ccode 490 (COW code of DR Congo); former name"}
+      - {code: "Zambia", iso3: ZMB, source: "exact match of crosswalk label 'Zambia'"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "exact match of crosswalk label 'Zimbabwe'"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu
+      retrieved_at: "2026-10-16T20:18:00Z"
+      raw_sha256:
+        "MEC Data Release.tab": 6fd1a0b96e46983133ace16f5562bb9f26b74fad63fea5b60f8e7cc2a7f60ac1
+    # unmapped (kept with iso3 = null):
+    #   Czechoslovakia: historical state; kept unmapped
+    #   East Germany: historical state; kept unmapped
+    #   Israel and Palestine: spans two crosswalk entities (ISR, PSE); kept unmapped
+    #   North Yemen: historical state; kept unmapped
+    #   South Vietnam: historical state; kept unmapped
+    #   South Yemen: historical state; kept unmapped
+    #   West Papua: conflicting provider evidence: ccode 910 (COW Papua New Guinea) for a territory in Indonesia; kept unmapped
+    #   Yugoslavia: historical state; kept unmapped
+  mmp_loc:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "exact match of crosswalk label 'Afghanistan'"}
+      - {code: "Albania", iso3: ALB, source: "exact match of crosswalk label 'Albania'"}
+      - {code: "Algeria", iso3: DZA, source: "exact match of crosswalk label 'Algeria'"}
+      - {code: "Angola", iso3: AGO, source: "exact match of crosswalk label 'Angola'"}
+      - {code: "Argentina", iso3: ARG, source: "exact match of crosswalk label 'Argentina'"}
+      - {code: "Armenia", iso3: ARM, source: "exact match of crosswalk label 'Armenia'"}
+      - {code: "Austria", iso3: AUT, source: "exact match of crosswalk label 'Austria'"}
+      - {code: "Azerbaijan", iso3: AZE, source: "exact match of crosswalk label 'Azerbaijan'"}
+      - {code: "Bahrain", iso3: BHR, source: "exact match of crosswalk label 'Bahrain'"}
+      - {code: "Bangladesh", iso3: BGD, source: "exact match of crosswalk label 'Bangladesh'"}
+      - {code: "Belarus", iso3: BLR, source: "exact match of crosswalk label 'Belarus'"}
+      - {code: "Belgium", iso3: BEL, source: "exact match of crosswalk label 'Belgium'"}
+      - {code: "Benin", iso3: BEN, source: "exact match of crosswalk label 'Benin'"}
+      - {code: "Bhutan", iso3: BTN, source: "exact match of crosswalk label 'Bhutan'"}
+      - {code: "Bolivia", iso3: BOL, source: "exact match of crosswalk worldbank_name 'Bolivia'"}
+      - {code: "Bosnia", iso3: BIH, source: "MMP v5.1 row(s) with this country carry ccode 346 (Polity code of Bosnia)"}
+      - {code: "Botswana", iso3: BWA, source: "exact match of crosswalk label 'Botswana'"}
+      - {code: "Brazil", iso3: BRA, source: "exact match of crosswalk label 'Brazil'"}
+      - {code: "Bulgaria", iso3: BGR, source: "exact match of crosswalk label 'Bulgaria'"}
+      - {code: "Burkina Faso", iso3: BFA, source: "exact match of crosswalk label 'Burkina Faso'"}
+      - {code: "Burundi", iso3: BDI, source: "exact match of crosswalk label 'Burundi'"}
+      - {code: "Cambodia", iso3: KHM, source: "exact match of crosswalk label 'Cambodia'"}
+      - {code: "Cameroon", iso3: CMR, source: "exact match of crosswalk label 'Cameroon'"}
+      - {code: "Canada", iso3: CAN, source: "exact match of crosswalk label 'Canada'"}
+      - {code: "Cape Verde", iso3: CPV, source: "MMP v5.1 row(s) with this country carry ccode 402 (Polity code of Cape Verde)"}
+      - {code: "Central African Republic", iso3: CAF, source: "exact match of crosswalk label 'Central African Republic'"}
+      - {code: "Chad", iso3: TCD, source: "exact match of crosswalk label 'Chad'"}
+      - {code: "Chile", iso3: CHL, source: "exact match of crosswalk label 'Chile'"}
+      - {code: "China", iso3: CHN, source: "exact match of crosswalk label 'China'"}
+      - {code: "Colombia", iso3: COL, source: "exact match of crosswalk label 'Colombia'"}
+      - {code: "Comoros", iso3: COM, source: "exact match of crosswalk label 'Comoros'"}
+      - {code: "Congo Brazzaville", iso3: COG, source: "MMP v5.1 row(s) with this country carry ccode 484 (Polity code of Congo-Brazzaville)"}
+      - {code: "Congo Kinshasa", iso3: COD, source: "MMP v5.1 row(s) with this country carry ccode 490 (Polity code of Congo-Kinshasa)"}
+      - {code: "Costa Rica", iso3: CRI, source: "exact match of crosswalk label 'Costa Rica'"}
+      - {code: "Croatia", iso3: HRV, source: "exact match of crosswalk label 'Croatia'"}
+      - {code: "Cuba", iso3: CUB, source: "exact match of crosswalk label 'Cuba'"}
+      - {code: "Cyprus", iso3: CYP, source: "exact match of crosswalk label 'Cyprus'"}
+      - {code: "Czech Republic", iso3: CZE, source: "MMP v5.1 row(s) with this country carry ccode 316 (Polity code of Czech Republic)"}
+      - {code: "Denmark", iso3: DNK, source: "exact match of crosswalk label 'Denmark'"}
+      - {code: "Djibouti", iso3: DJI, source: "exact match of crosswalk label 'Djibouti'"}
+      - {code: "Dominican Republic", iso3: DOM, source: "exact match of crosswalk label 'Dominican Republic'"}
+      - {code: "Ecuador", iso3: ECU, source: "exact match of crosswalk label 'Ecuador'"}
+      - {code: "Egypt", iso3: EGY, source: "exact match of crosswalk label 'Egypt'"}
+      - {code: "El Salvador", iso3: SLV, source: "exact match of crosswalk label 'El Salvador'"}
+      - {code: "Equatorial Guinea", iso3: GNQ, source: "exact match of crosswalk label 'Equatorial Guinea'"}
+      - {code: "Eritrea", iso3: ERI, source: "exact match of crosswalk label 'Eritrea'"}
+      - {code: "Estonia", iso3: EST, source: "exact match of crosswalk label 'Estonia'"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact match of crosswalk label 'Ethiopia'"}
+      - {code: "Finland", iso3: FIN, source: "exact match of crosswalk label 'Finland'"}
+      - {code: "France", iso3: FRA, source: "exact match of crosswalk label 'France'"}
+      - {code: "Gabon", iso3: GAB, source: "exact match of crosswalk label 'Gabon'"}
+      - {code: "Gambia", iso3: GMB, source: "exact match of crosswalk label 'Gambia'"}
+      - {code: "Georgia", iso3: GEO, source: "exact match of crosswalk label 'Georgia'"}
+      - {code: "Germany", iso3: DEU, source: "exact match of crosswalk label 'Germany'"}
+      - {code: "Ghana", iso3: GHA, source: "exact match of crosswalk label 'Ghana'"}
+      - {code: "Greece", iso3: GRC, source: "exact match of crosswalk label 'Greece'"}
+      - {code: "Guatemala", iso3: GTM, source: "exact match of crosswalk label 'Guatemala'"}
+      - {code: "Guinea", iso3: GIN, source: "exact match of crosswalk label 'Guinea'"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "exact match of crosswalk label 'Guinea-Bissau'"}
+      - {code: "Guyana", iso3: GUY, source: "exact match of crosswalk label 'Guyana'"}
+      - {code: "Haiti", iso3: HTI, source: "exact match of crosswalk label 'Haiti'"}
+      - {code: "Honduras", iso3: HND, source: "exact match of crosswalk label 'Honduras'"}
+      - {code: "Hungary", iso3: HUN, source: "exact match of crosswalk label 'Hungary'"}
+      - {code: "India", iso3: IND, source: "exact match of crosswalk label 'India'"}
+      - {code: "Indonesia", iso3: IDN, source: "exact match of crosswalk label 'Indonesia'"}
+      - {code: "Iran", iso3: IRN, source: "exact match of crosswalk comtrade_reporter_label 'Iran'"}
+      - {code: "Iraq", iso3: IRQ, source: "exact match of crosswalk label 'Iraq'"}
+      - {code: "Ireland", iso3: IRL, source: "exact match of crosswalk label 'Ireland'"}
+      - {code: "Italy", iso3: ITA, source: "exact match of crosswalk label 'Italy'"}
+      - {code: "Ivory Coast", iso3: CIV, source: "MMP v5.1 row(s) with this country carry ccode 437 (Polity code of Ivory Coast)"}
+      - {code: "Jamaica", iso3: JAM, source: "exact match of crosswalk label 'Jamaica'"}
+      - {code: "Japan", iso3: JPN, source: "exact match of crosswalk label 'Japan'"}
+      - {code: "Jordan", iso3: JOR, source: "exact match of crosswalk label 'Jordan'"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "exact match of crosswalk label 'Kazakhstan'"}
+      - {code: "Kenya", iso3: KEN, source: "exact match of crosswalk label 'Kenya'"}
+      - {code: "Kosovo", iso3: XKX, source: "exact match of crosswalk label 'Kosovo'"}
+      - {code: "Kuwait", iso3: KWT, source: "exact match of crosswalk label 'Kuwait'"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "exact match of crosswalk label 'Kyrgyzstan'"}
+      - {code: "Laos", iso3: LAO, source: "MMP v5.1 row(s) with this country carry ccode 812 (Polity code of Laos)"}
+      - {code: "Latvia", iso3: LVA, source: "exact match of crosswalk label 'Latvia'"}
+      - {code: "Lebanon", iso3: LBN, source: "exact match of crosswalk label 'Lebanon'"}
+      - {code: "Lesotho", iso3: LSO, source: "exact match of crosswalk label 'Lesotho'"}
+      - {code: "Liberia", iso3: LBR, source: "exact match of crosswalk label 'Liberia'"}
+      - {code: "Libya", iso3: LBY, source: "exact match of crosswalk label 'Libya'"}
+      - {code: "Lithuania", iso3: LTU, source: "exact match of crosswalk label 'Lithuania'"}
+      - {code: "Luxembourg", iso3: LUX, source: "exact match of crosswalk label 'Luxembourg'"}
+      - {code: "Macedonia", iso3: MKD, source: "MMP v5.1 row(s) with this country carry ccode 343 (Polity code of Macedonia)"}
+      - {code: "Madagascar", iso3: MDG, source: "exact match of crosswalk label 'Madagascar'"}
+      - {code: "Malawi", iso3: MWI, source: "exact match of crosswalk label 'Malawi'"}
+      - {code: "Malaysia", iso3: MYS, source: "exact match of crosswalk label 'Malaysia'"}
+      - {code: "Mali", iso3: MLI, source: "exact match of crosswalk label 'Mali'"}
+      - {code: "Mauritania", iso3: MRT, source: "exact match of crosswalk label 'Mauritania'"}
+      - {code: "Mauritius", iso3: MUS, source: "exact match of crosswalk label 'Mauritius'"}
+      - {code: "Mexico", iso3: MEX, source: "exact match of crosswalk label 'Mexico'"}
+      - {code: "Moldova", iso3: MDA, source: "exact match of crosswalk worldbank_name 'Moldova'"}
+      - {code: "Mongolia", iso3: MNG, source: "exact match of crosswalk label 'Mongolia'"}
+      - {code: "Montenegro", iso3: MNE, source: "exact match of crosswalk label 'Montenegro'"}
+      - {code: "Morocco", iso3: MAR, source: "exact match of crosswalk label 'Morocco'"}
+      - {code: "Mozambique", iso3: MOZ, source: "exact match of crosswalk label 'Mozambique'"}
+      - {code: "Myanmar", iso3: MMR, source: "exact match of crosswalk label 'Myanmar'"}
+      - {code: "Namibia", iso3: NAM, source: "exact match of crosswalk label 'Namibia'"}
+      - {code: "Nepal", iso3: NPL, source: "exact match of crosswalk label 'Nepal'"}
+      - {code: "Netherlands", iso3: NLD, source: "exact match of crosswalk iso_name 'Netherlands'"}
+      - {code: "Nicaragua", iso3: NIC, source: "exact match of crosswalk label 'Nicaragua'"}
+      - {code: "Niger", iso3: NER, source: "exact match of crosswalk label 'Niger'"}
+      - {code: "Nigeria", iso3: NGA, source: "exact match of crosswalk label 'Nigeria'"}
+      - {code: "North Korea", iso3: PRK, source: "MMP v5.1 row(s) with this country carry ccode 731 (Polity code of North Korea)"}
+      - {code: "Norway", iso3: NOR, source: "exact match of crosswalk label 'Norway'"}
+      - {code: "Oman", iso3: OMN, source: "exact match of crosswalk label 'Oman'"}
+      - {code: "Pakistan", iso3: PAK, source: "exact match of crosswalk label 'Pakistan'"}
+      - {code: "Panama", iso3: PAN, source: "exact match of crosswalk label 'Panama'"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "exact match of crosswalk label 'Papua New Guinea'"}
+      - {code: "Paraguay", iso3: PRY, source: "exact match of crosswalk label 'Paraguay'"}
+      - {code: "Peru", iso3: PER, source: "exact match of crosswalk label 'Peru'"}
+      - {code: "Philippines", iso3: PHL, source: "exact match of crosswalk label 'Philippines'"}
+      - {code: "Poland", iso3: POL, source: "exact match of crosswalk label 'Poland'"}
+      - {code: "Portugal", iso3: PRT, source: "exact match of crosswalk label 'Portugal'"}
+      - {code: "Qatar", iso3: QAT, source: "exact match of crosswalk label 'Qatar'"}
+      - {code: "Romania", iso3: ROU, source: "exact match of crosswalk label 'Romania'"}
+      - {code: "Russia", iso3: RUS, source: "MMP v5.1 row(s) with this country carry ccode 365 (Polity code of Russia); MMP rows 1992-2020 (USSR rows 1990-91 are a separate country, ccode 364)"}
+      - {code: "Rwanda", iso3: RWA, source: "exact match of crosswalk label 'Rwanda'"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "exact match of crosswalk label 'Saudi Arabia'"}
+      - {code: "Senegal", iso3: SEN, source: "exact match of crosswalk label 'Senegal'"}
+      - {code: "Serbia", iso3: SRB, source: "exact match of crosswalk label 'Serbia'"}
+      - {code: "Sierra Leone", iso3: SLE, source: "exact match of crosswalk label 'Sierra Leone'"}
+      - {code: "Singapore", iso3: SGP, source: "exact match of crosswalk label 'Singapore'"}
+      - {code: "Slovak Republic", iso3: SVK, source: "exact match of crosswalk worldbank_name 'Slovak Republic'"}
+      - {code: "Slovenia", iso3: SVN, source: "exact match of crosswalk label 'Slovenia'"}
+      - {code: "Somalia", iso3: SOM, source: "exact match of crosswalk label 'Somalia'"}
+      - {code: "South Africa", iso3: ZAF, source: "exact match of crosswalk label 'South Africa'"}
+      - {code: "South Korea", iso3: KOR, source: "MMP v5.1 row(s) with this country carry ccode 732 (Polity code of South Korea)"}
+      - {code: "South Sudan", iso3: SSD, source: "exact match of crosswalk label 'South Sudan'"}
+      - {code: "Spain", iso3: ESP, source: "exact match of crosswalk label 'Spain'"}
+      - {code: "Sri Lanka", iso3: LKA, source: "exact match of crosswalk label 'Sri Lanka'"}
+      - {code: "Sudan", iso3: SDN, source: "exact match of crosswalk label 'Sudan'"}
+      - {code: "Suriname", iso3: SUR, source: "exact match of crosswalk label 'Suriname'"}
+      - {code: "Swaziland", iso3: SWZ, source: "MMP v5.1 row(s) with this country carry ccode 572 (Polity code of Swaziland)"}
+      - {code: "Sweden", iso3: SWE, source: "exact match of crosswalk label 'Sweden'"}
+      - {code: "Switzerland", iso3: CHE, source: "exact match of crosswalk label 'Switzerland'"}
+      - {code: "Syria", iso3: SYR, source: "exact match of crosswalk comtrade_reporter_label 'Syria'"}
+      - {code: "Taiwan", iso3: TWN, source: "exact match of crosswalk label 'Taiwan'"}
+      - {code: "Tajikistan", iso3: TJK, source: "exact match of crosswalk label 'Tajikistan'"}
+      - {code: "Tanzania", iso3: TZA, source: "exact match of crosswalk worldbank_name 'Tanzania'"}
+      - {code: "Thailand", iso3: THA, source: "exact match of crosswalk label 'Thailand'"}
+      - {code: "Timor Leste", iso3: TLS, source: "MMP v5.1 row(s) with this country carry ccode 860 (Polity code of Timor-Leste)"}
+      - {code: "Togo", iso3: TGO, source: "exact match of crosswalk label 'Togo'"}
+      - {code: "Tunisia", iso3: TUN, source: "exact match of crosswalk label 'Tunisia'"}
+      - {code: "Turkey", iso3: TUR, source: "MMP v5.1 row(s) with this country carry ccode 640 (Polity code of Turkey)"}
+      - {code: "Turkmenistan", iso3: TKM, source: "exact match of crosswalk label 'Turkmenistan'"}
+      - {code: "Uganda", iso3: UGA, source: "exact match of crosswalk label 'Uganda'"}
+      - {code: "Ukraine", iso3: UKR, source: "exact match of crosswalk label 'Ukraine'"}
+      - {code: "United Arab Emirate", iso3: ARE, source: "MMP v5.1 row(s) with this country carry ccode 696 (Polity code of United Arab Emirates)"}
+      - {code: "United Kingdom", iso3: GBR, source: "exact match of crosswalk iso_name 'United Kingdom'"}
+      - {code: "Uruguay", iso3: URY, source: "exact match of crosswalk label 'Uruguay'"}
+      - {code: "Uzbekistan", iso3: UZB, source: "exact match of crosswalk label 'Uzbekistan'"}
+      - {code: "Venezuela", iso3: VEN, source: "exact match of crosswalk comtrade_reporter_label 'Venezuela'"}
+      - {code: "Vietnam", iso3: VNM, source: "MMP v5.1 row(s) with this country carry ccode 816 (Polity code of Vietnam)"}
+      - {code: "Yemen", iso3: YEM, source: "exact match of crosswalk label 'Yemen'"}
+      - {code: "Zambia", iso3: ZMB, source: "exact match of crosswalk label 'Zambia'"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "exact match of crosswalk label 'Zimbabwe'"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu
+      retrieved_at: "2026-10-16T20:18:00Z"
+      raw_sha256:
+        "mmALL_073120_csv.tab": e4a3285b5f39fcc0723d98135679189eef37a0987b26f5ad549aaf43db542189
+    # unmapped (kept with iso3 = null):
+    #   Czechoslovakia: historical state (1990-1992 rows); kept unmapped
+    #   Germany East: historical state (1990 rows); kept unmapped
+    #   Germany West: historical state (1990 rows); kept unmapped
+    #   Serbia and Montenegro: historical state (2003-2006 rows); kept unmapped
+    #   USSR: historical state (1990-1991 rows); kept unmapped
+    #   Yugoslavia: historical state (1990-2002 rows; ccode 345 and 347); kept unmapped

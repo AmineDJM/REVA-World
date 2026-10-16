@@ -1,0 +1,103 @@
+# Causal relation vocabulary (agent CAUSCORE; spec docs/roadmap/v3_causality.md).
+#
+# Closed vocabulary of the relation a SOURCE asserts between a cause and an effect. REVA never asserts any of
+# them. Every claim row stores cause_id and effect_id (direction normalised); `label` reads cause -> effect
+# ("<cause> <label> <effect>"), `inverse_label` reads effect -> cause ("<effect> <inverse_label> <cause>").
+#
+# family: corroboration is counted per (cause, effect, family). `cause` = the source says the cause brought
+#   about / contributed to the effect; `prevention` = the source says it prevented or delayed it.
+# lane: grouping of the "why" view (immediate vs underlying vs contributing ...).
+# wikidata: properties that map to the relation, with the side of the statement the cause is on.
+version: 1
+families:
+  cause:
+    label: {en: "causal (promoting)", fr: "causal (favorisant)"}
+  prevention:
+    label: {en: "prevention or delay", fr: "empêchement ou retard"}
+lanes:
+  immediate: {en: "immediate causes (triggers)", fr: "causes immédiates (déclencheurs)"}
+  underlying: {en: "underlying causes", fr: "causes profondes"}
+  contributing: {en: "contributing factors", fr: "facteurs contributifs"}
+  general: {en: "causes (unqualified)", fr: "causes (non qualifiées)"}
+  coded: {en: "dataset-coded triggers and outcomes", fr: "déclencheurs et issues codés par des jeux de données"}
+  reaction: {en: "reactions", fr: "réactions"}
+  prevention: {en: "prevented or delayed", fr: "empêché ou retardé"}
+relations:
+  has_cause:
+    family: cause
+    lane: general
+    label: {en: "caused", fr: "a causé"}
+    inverse_label: {en: "has cause", fr: "a pour cause"}
+    wikidata: [{pid: P828, cause_is: object}]
+  has_effect:
+    family: cause
+    lane: general
+    label: {en: "has effect", fr: "a pour effet"}
+    inverse_label: {en: "is an effect of", fr: "est un effet de"}
+    wikidata: [{pid: P1542, cause_is: subject}]
+  immediate_cause:
+    family: cause
+    lane: immediate
+    label: {en: "immediate cause of", fr: "cause immédiate de"}
+    inverse_label: {en: "has immediate cause", fr: "a pour cause immédiate"}
+    wikidata: [{pid: P1478, cause_is: object}, {pid: P1536, cause_is: subject}]
+  underlying_cause:
+    family: cause
+    lane: underlying
+    label: {en: "underlying cause of", fr: "cause profonde de"}
+    inverse_label: {en: "has underlying cause", fr: "a pour cause profonde"}
+    wikidata: []
+  contributing_factor:
+    family: cause
+    lane: contributing
+    label: {en: "contributing factor of", fr: "facteur contributif de"}
+    inverse_label: {en: "has contributing factor", fr: "a comme facteur contributif"}
+    wikidata: [{pid: P1479, cause_is: object}, {pid: P1537, cause_is: subject}]
+  enabled:
+    family: cause
+    lane: contributing
+    label: {en: "enabled", fr: "a rendu possible"}
+    inverse_label: {en: "was enabled by", fr: "a été rendu possible par"}
+    wikidata: []
+  precipitated:
+    family: cause
+    lane: immediate
+    label: {en: "precipitated", fr: "a précipité"}
+    inverse_label: {en: "was precipitated by", fr: "a été précipité par"}
+    wikidata: []
+  prevented_or_delayed:
+    family: prevention
+    lane: prevention
+    label: {en: "prevented or delayed", fr: "a empêché ou retardé"}
+    inverse_label: {en: "was prevented or delayed by", fr: "a été empêché ou retardé par"}
+    wikidata: []
+  reaction_to:
+    family: cause
+    lane: reaction
+    # stored as cause = what was reacted to, effect = the reaction
+    label: {en: "provoked the reaction", fr: "a provoqué la réaction"}
+    inverse_label: {en: "is a reaction to", fr: "est une réaction à"}
+    wikidata: []
+  coded_trigger:
+    family: cause
+    lane: coded
+    label: {en: "is the coded trigger of", fr: "est le déclencheur codé de"}
+    inverse_label: {en: "has coded trigger", fr: "a pour déclencheur codé"}
+    wikidata: []
+  coded_outcome:
+    family: cause
+    lane: coded
+    label: {en: "has coded outcome", fr: "a pour issue codée"}
+    inverse_label: {en: "is the coded outcome of", fr: "est l'issue codée de"}
+    wikidata: []
+# Context edges: shown alongside causal claims, never counted, never worded causally.
+context:
+  P361: {en: "part of", fr: "fait partie de"}
+  P527: {en: "has part", fr: "comprend"}
+  P155: {en: "follows", fr: "fait suite à"}
+  P156: {en: "followed by", fr: "suivi par"}
+  P710: {en: "participant", fr: "participant"}
+  P1344: {en: "participant in", fr: "participant à"}
+  P276: {en: "location", fr: "lieu"}
+  P17: {en: "country", fr: "pays"}
+  P793: {en: "significant event", fr: "événement clé"}

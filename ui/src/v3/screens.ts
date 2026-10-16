@@ -18,6 +18,7 @@ export const V3_SCREENS: V3Screen[] = [
   { to: '/v3/atlas', short: 'Atlas', label: 'Atlas — carte mondiale de toute variable', description: 'Choroplèthe par année, manques hachurés avec leur raison, classement.' },
   { to: '/v3/pays/FRA', short: 'Dossier pays', label: 'Dossier pays — tous les domaines d’un pays', description: 'Géographie, population, économie, travail, santé, droit, culture, histoire, liens.' },
   { to: '/v3/relation?a=BRA&b=PRT', short: 'Pays ↔ Pays', label: 'Pays ↔ Pays — tous les liens entre deux pays', description: 'Commerce, migrations, votes à l’ONU, colonisation, frontières, langues, traités, conflits — dans le temps, chaque lien cité.' },
+  { to: '/v3/causes', short: 'Causes', label: 'Causes & conséquences — qui affirme quelle cause ?', description: 'Affirmations causales sourcées et graduées, « pourquoi ? », chaînes, désaccords ; jamais une causalité établie par REVA.' },
   { to: '/v3/demander', short: 'Demander', label: 'Demander — question en langage naturel', description: 'Réponse construite uniquement à partir de sources citées.' },
 ];
 
@@ -30,4 +31,5 @@ export const V3_PALETTE = [
   { to: '/v3/pays/USA', label: 'Dossier pays — États-Unis' },
   { to: '/v3/relation?a=BRA&b=PRT', label: 'Pays ↔ Pays — Brésil et Portugal' },
   { to: '/v3/relation?a=DZA&b=FRA', label: 'Pays ↔ Pays — Algérie et France' },
+  { to: '/v3/causes?event=Q361', label: 'Causes & conséquences — Première Guerre mondiale' },
 ];

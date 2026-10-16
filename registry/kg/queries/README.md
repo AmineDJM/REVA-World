@@ -13,6 +13,7 @@ Owner of the format and of the executor: **WDHARVEST** (`src/reva/kg/harvest.py`
 | `society/` | A-LAW (legal ages: majority, consent, marriage, candidacy, retirement) |
 | `science/`, `economy/`, `nature/**` (domain `geography`) | KGSCIECO |
 | `places/**` (domain `geography`) | A-CITIES |
+| `causal/` (disabled for `run`; driven by `python -m reva.causal_harvest`, see `docs/dev/v3_causwd.md`) | CAUSWD |
 
 One YAML file = one spec. The machine-checkable contract is [`_schema.json`](_schema.json)
 (JSON Schema 2020-12); the harvester validates every spec against it before running anything.

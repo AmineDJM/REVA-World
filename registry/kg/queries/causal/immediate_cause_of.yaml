@@ -1,0 +1,23 @@
+id: causal.immediate_cause_of
+domain: causal
+owner: CAUSWD
+description: >-
+  Every non-deprecated Wikidata P1536 (immediate cause of) statement: subject, statement id, object, rank — the full
+  listing of this causal property (subject is the immediate cause (trigger) of object). Rows carry the statement id, so the CAUSWD driver re-reads
+  the claims of prioritised subjects from wbgetentities snapshots (revision, references, qualifiers); the other
+  rows are loaded as WDQS rows (revision explicitly unknown, references unknown — never "unreferenced").
+  Causal statements are "asserted by Wikidata" only. Disabled for the generic runner: the stock statements
+  path would snapshot every subject (tens of thousands of requests); run it with
+  `python -m reva.causal_harvest wdqs` (bounded enrichment, at most one WDQS attempt per hour).
+purpose: statements
+entity_kind: event
+enabled: false
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P1536 ?statement .
+    ?statement ps:P1536 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P1536, object: object, statement: statement, rank: rank}
+max_rows: 60000
+timeout_seconds: 55
