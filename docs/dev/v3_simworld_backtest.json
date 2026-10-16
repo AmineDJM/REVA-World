@@ -1,0 +1,4600 @@
+{
+ "base_period": [
+  2008,
+  2012
+ ],
+ "countries": {
+  "ABW": {
+   "constant_growth_total_ape": "4.611",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.312",
+    "age_15_64": "1.383",
+    "age_65_plus": "2.045",
+    "all_ages": "1.863"
+   },
+   "linear_trend_total_ape": "3.896",
+   "mape_single_age_avg_residual": "5.533",
+   "naive_no_change_total_ape": "5.297",
+   "observed_total_2023": "107868",
+   "open_age": 93,
+   "total_ape": {
+    "mig=average_residual": "1.863",
+    "mig=zero": "2.922"
+   }
+  },
+  "AFG": {
+   "constant_growth_total_ape": "9.451",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.612",
+    "age_15_64": "5.66",
+    "age_65_plus": "5.977",
+    "all_ages": "10.855"
+   },
+   "linear_trend_total_ape": "1.388",
+   "mape_single_age_avg_residual": "11.398",
+   "naive_no_change_total_ape": "23.903",
+   "observed_total_2023": "40864868",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "10.855",
+    "mig=zero": "8.284"
+   }
+  },
+  "AGO": {
+   "constant_growth_total_ape": "4.24",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.443",
+    "age_15_64": "1.451",
+    "age_65_plus": "2.364",
+    "all_ages": "2.681"
+   },
+   "linear_trend_total_ape": "4.232",
+   "mape_single_age_avg_residual": "7.458",
+   "naive_no_change_total_ape": "29.076",
+   "observed_total_2023": "36186956",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.681",
+    "mig=zero": "1.659"
+   }
+  },
+  "AIA": {
+   "constant_growth_total_ape": "4.13",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.438",
+    "age_15_64": "9.573",
+    "age_65_plus": "12.573",
+    "all_ages": "7.651"
+   },
+   "linear_trend_total_ape": "4.281",
+   "mape_single_age_avg_residual": "14.977",
+   "naive_no_change_total_ape": "8.505",
+   "observed_total_2023": "14297",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "7.651",
+    "mig=zero": "3.306"
+   }
+  },
+  "ALB": {
+   "constant_growth_total_ape": "3.598",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.943",
+    "age_15_64": "7.894",
+    "age_65_plus": "0.22",
+    "all_ages": "6.159"
+   },
+   "linear_trend_total_ape": "3.943",
+   "mape_single_age_avg_residual": "7.324",
+   "naive_no_change_total_ape": "3.096",
+   "observed_total_2023": "2821649",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.159",
+    "mig=zero": "9.141"
+   }
+  },
+  "AND": {
+   "constant_growth_total_ape": "20.643",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.842",
+    "age_15_64": "26.839",
+    "age_65_plus": "27.14",
+    "all_ages": "25.013"
+   },
+   "linear_trend_total_ape": "22.751",
+   "mape_single_age_avg_residual": "29.851",
+   "naive_no_change_total_ape": "5.477",
+   "observed_total_2023": "80294",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "25.013",
+    "mig=zero": "3.791"
+   }
+  },
+  "ARE": {
+   "constant_growth_total_ape": "18.533",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.857",
+    "age_15_64": "6.372",
+    "age_65_plus": "44.205",
+    "all_ages": "7.893"
+   },
+   "linear_trend_total_ape": "4.578",
+   "mape_single_age_avg_residual": "33.126",
+   "naive_no_change_total_ape": "26.76",
+   "observed_total_2023": "10445031",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "7.893",
+    "mig=zero": "20.014"
+   }
+  },
+  "ARG": {
+   "constant_growth_total_ape": "3.484",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.861",
+    "age_15_64": "0.334",
+    "age_65_plus": "0.509",
+    "all_ages": "2.51"
+   },
+   "linear_trend_total_ape": "2.705",
+   "mape_single_age_avg_residual": "3.012",
+   "naive_no_change_total_ape": "6.797",
+   "observed_total_2023": "45459024",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.51",
+    "mig=zero": "2.63"
+   }
+  },
+  "ARM": {
+   "constant_growth_total_ape": "2.325",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.894",
+    "age_15_64": "7.924",
+    "age_65_plus": "0.455",
+    "all_ages": "6.032"
+   },
+   "linear_trend_total_ape": "2.395",
+   "mape_single_age_avg_residual": "8.497",
+   "naive_no_change_total_ape": "0.691",
+   "observed_total_2023": "2902348",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.032",
+    "mig=zero": "3.325"
+   }
+  },
+  "ASM": {
+   "constant_growth_total_ape": "6.455",
+   "data_notes": [
+    "open age lowered from 100 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.928",
+    "age_15_64": "0.346",
+    "age_65_plus": "0.594",
+    "all_ages": "4.505"
+   },
+   "linear_trend_total_ape": "6.129",
+   "mape_single_age_avg_residual": "11.092",
+   "naive_no_change_total_ape": "13.286",
+   "observed_total_2023": "47901",
+   "open_age": 92,
+   "total_ape": {
+    "mig=average_residual": "4.505",
+    "mig=zero": "35.848"
+   }
+  },
+  "ATG": {
+   "constant_growth_total_ape": "7.04",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.437",
+    "age_15_64": "3.464",
+    "age_65_plus": "0.835",
+    "all_ages": "5.384"
+   },
+   "linear_trend_total_ape": "5.864",
+   "mape_single_age_avg_residual": "5.541",
+   "naive_no_change_total_ape": "5.784",
+   "observed_total_2023": "93082",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.384",
+    "mig=zero": "1.971"
+   }
+  },
+  "AUS": {
+   "constant_growth_total_ape": "3.965",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.455",
+    "age_15_64": "1.916",
+    "age_65_plus": "3.143",
+    "all_ages": "2.231"
+   },
+   "linear_trend_total_ape": "1.972",
+   "mape_single_age_avg_residual": "4.84",
+   "naive_no_change_total_ape": "12.428",
+   "observed_total_2023": "26320802",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.231",
+    "mig=zero": "7.437"
+   }
+  },
+  "AUT": {
+   "constant_growth_total_ape": "4.243",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.389",
+    "age_15_64": "5.591",
+    "age_65_plus": "4.593",
+    "all_ages": "5.65"
+   },
+   "linear_trend_total_ape": "4.325",
+   "mape_single_age_avg_residual": "6.888",
+   "naive_no_change_total_ape": "7.472",
+   "observed_total_2023": "9136103",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.65",
+    "mig=zero": "9.198"
+   }
+  },
+  "AZE": {
+   "constant_growth_total_ape": "3.114",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.261",
+    "age_15_64": "0.329",
+    "age_65_plus": "3.912",
+    "all_ages": "0.248"
+   },
+   "linear_trend_total_ape": "2.091",
+   "mape_single_age_avg_residual": "6.189",
+   "naive_no_change_total_ape": "8.629",
+   "observed_total_2023": "10331625",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.248",
+    "mig=zero": "0.692"
+   }
+  },
+  "BDI": {
+   "constant_growth_total_ape": "15.641",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.846",
+    "age_15_64": "10.125",
+    "age_65_plus": "2.385",
+    "all_ages": "12.089"
+   },
+   "linear_trend_total_ape": "4.761",
+   "mape_single_age_avg_residual": "46.244",
+   "naive_no_change_total_ape": "24.027",
+   "observed_total_2023": "13503998",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "12.089",
+    "mig=zero": "6.458"
+   }
+  },
+  "BEL": {
+   "constant_growth_total_ape": "3.848",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.272",
+    "age_15_64": "2.482",
+    "age_65_plus": "2.776",
+    "all_ages": "2.55"
+   },
+   "linear_trend_total_ape": "3.302",
+   "mape_single_age_avg_residual": "5.229",
+   "naive_no_change_total_ape": "4.782",
+   "observed_total_2023": "11698104",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.55",
+    "mig=zero": "4.519"
+   }
+  },
+  "BEN": {
+   "constant_growth_total_ape": "2.033",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.486",
+    "age_15_64": "0.046",
+    "age_65_plus": "0.201",
+    "all_ages": "1.915"
+   },
+   "linear_trend_total_ape": "3.298",
+   "mape_single_age_avg_residual": "2.01",
+   "naive_no_change_total_ape": "24.277",
+   "observed_total_2023": "13934166",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.915",
+    "mig=zero": "1.559"
+   }
+  },
+  "BES": {
+   "constant_growth_total_ape": "22.509",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.679",
+    "age_15_64": "10.105",
+    "age_65_plus": "11.049",
+    "all_ages": "9.52"
+   },
+   "linear_trend_total_ape": "10.192",
+   "mape_single_age_avg_residual": "11.46",
+   "naive_no_change_total_ape": "20.88",
+   "observed_total_2023": "29473",
+   "open_age": 95,
+   "total_ape": {
+    "mig=average_residual": "9.52",
+    "mig=zero": "19.049"
+   }
+  },
+  "BFA": {
+   "constant_growth_total_ape": "2.956",
+   "data_notes": [
+    "open age lowered from 100 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.841",
+    "age_15_64": "1.783",
+    "age_65_plus": "3.222",
+    "all_ages": "3.142"
+   },
+   "linear_trend_total_ape": "2.352",
+   "mape_single_age_avg_residual": "6.175",
+   "naive_no_change_total_ape": "23.42",
+   "observed_total_2023": "22765636",
+   "open_age": 98,
+   "total_ape": {
+    "mig=average_residual": "3.142",
+    "mig=zero": "5.016"
+   }
+  },
+  "BGD": {
+   "constant_growth_total_ape": "0.295",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.655",
+    "age_15_64": "0.021",
+    "age_65_plus": "6.741",
+    "all_ages": "0.246"
+   },
+   "linear_trend_total_ape": "0.302",
+   "mape_single_age_avg_residual": "15.25",
+   "naive_no_change_total_ape": "8.578",
+   "observed_total_2023": "170426512",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.246",
+    "mig=zero": "6.278"
+   }
+  },
+  "BGR": {
+   "constant_growth_total_ape": "0.766",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.52",
+    "age_15_64": "3.514",
+    "age_65_plus": "0.34",
+    "all_ages": "4.133"
+   },
+   "linear_trend_total_ape": "1.205",
+   "mape_single_age_avg_residual": "5.691",
+   "naive_no_change_total_ape": "6.907",
+   "observed_total_2023": "6813384",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.133",
+    "mig=zero": "0.58"
+   }
+  },
+  "BHR": {
+   "constant_growth_total_ape": "1.35",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.703",
+    "age_15_64": "1.275",
+    "age_65_plus": "11.294",
+    "all_ages": "2.828"
+   },
+   "linear_trend_total_ape": "2.379",
+   "mape_single_age_avg_residual": "15.917",
+   "naive_no_change_total_ape": "20.668",
+   "observed_total_2023": "1551527",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.828",
+    "mig=zero": "11.718"
+   }
+  },
+  "BHS": {
+   "constant_growth_total_ape": "6.396",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.292",
+    "age_15_64": "1.943",
+    "age_65_plus": "2.1",
+    "all_ages": "4.992"
+   },
+   "linear_trend_total_ape": "5.407",
+   "mape_single_age_avg_residual": "5.537",
+   "naive_no_change_total_ape": "5.34",
+   "observed_total_2023": "398515",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.992",
+    "mig=zero": "0.658"
+   }
+  },
+  "BIH": {
+   "constant_growth_total_ape": "5.269",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "24.38",
+    "age_15_64": "16.367",
+    "age_65_plus": "0.786",
+    "all_ages": "14.104"
+   },
+   "linear_trend_total_ape": "8.042",
+   "mape_single_age_avg_residual": "16.013",
+   "naive_no_change_total_ape": "13.745",
+   "observed_total_2023": "3194466",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "14.104",
+    "mig=zero": "8.654"
+   }
+  },
+  "BLM": {
+   "constant_growth_total_ape": "0.242",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "26.833",
+    "age_15_64": "15.048",
+    "age_65_plus": "33.193",
+    "all_ages": "1.873"
+   },
+   "linear_trend_total_ape": "2.11",
+   "mape_single_age_avg_residual": "38.369",
+   "naive_no_change_total_ape": "15.792",
+   "observed_total_2023": "10993",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "1.873",
+    "mig=zero": "12.253"
+   }
+  },
+  "BLR": {
+   "constant_growth_total_ape": "1.693",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.032",
+    "age_15_64": "0.399",
+    "age_65_plus": "3.622",
+    "all_ages": "0.685"
+   },
+   "linear_trend_total_ape": "1.67",
+   "mape_single_age_avg_residual": "8.002",
+   "naive_no_change_total_ape": "3.463",
+   "observed_total_2023": "9145462",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.685",
+    "mig=zero": "1.532"
+   }
+  },
+  "BLZ": {
+   "constant_growth_total_ape": "4.962",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.224",
+    "age_15_64": "0.183",
+    "age_65_plus": "3.548",
+    "all_ages": "3.916"
+   },
+   "linear_trend_total_ape": "1.324",
+   "mape_single_age_avg_residual": "7.148",
+   "naive_no_change_total_ape": "17.182",
+   "observed_total_2023": "408114",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.916",
+    "mig=zero": "1.411"
+   }
+  },
+  "BMU": {
+   "constant_growth_total_ape": "0.424",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.168",
+    "age_15_64": "2.517",
+    "age_65_plus": "6.403",
+    "all_ages": "2.658"
+   },
+   "linear_trend_total_ape": "0.437",
+   "mape_single_age_avg_residual": "11.479",
+   "naive_no_change_total_ape": "1.757",
+   "observed_total_2023": "64724",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.658",
+    "mig=zero": "1.431"
+   }
+  },
+  "BOL": {
+   "constant_growth_total_ape": "2.632",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.109",
+    "age_15_64": "0.229",
+    "age_65_plus": "6.178",
+    "all_ages": "2.955"
+   },
+   "linear_trend_total_ape": "0.838",
+   "mape_single_age_avg_residual": "4.79",
+   "naive_no_change_total_ape": "12.831",
+   "observed_total_2023": "12159495",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.955",
+    "mig=zero": "4.214"
+   }
+  },
+  "BRA": {
+   "constant_growth_total_ape": "2.105",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.121",
+    "age_15_64": "0.486",
+    "age_65_plus": "1.417",
+    "all_ages": "0.06"
+   },
+   "linear_trend_total_ape": "1.594",
+   "mape_single_age_avg_residual": "2.432",
+   "naive_no_change_total_ape": "6.184",
+   "observed_total_2023": "210707000",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.06",
+    "mig=zero": "1.049"
+   }
+  },
+  "BRB": {
+   "constant_growth_total_ape": "2.142",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.9",
+    "age_15_64": "0.472",
+    "age_65_plus": "1.844",
+    "all_ages": "0.667"
+   },
+   "linear_trend_total_ape": "2.029",
+   "mape_single_age_avg_residual": "3.082",
+   "naive_no_change_total_ape": "1.766",
+   "observed_total_2023": "282296",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.667",
+    "mig=zero": "0.255"
+   }
+  },
+  "BRN": {
+   "constant_growth_total_ape": "6.403",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.138",
+    "age_15_64": "3.1",
+    "age_65_plus": "13.875",
+    "all_ages": "5.201"
+   },
+   "linear_trend_total_ape": "4.297",
+   "mape_single_age_avg_residual": "16.282",
+   "naive_no_change_total_ape": "10.639",
+   "observed_total_2023": "457028",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.201",
+    "mig=zero": "0.259"
+   }
+  },
+  "BTN": {
+   "constant_growth_total_ape": "2.788",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "21.143",
+    "age_15_64": "3.453",
+    "age_65_plus": "1.676",
+    "all_ages": "2.218"
+   },
+   "linear_trend_total_ape": "1.93",
+   "mape_single_age_avg_residual": "8.804",
+   "naive_no_change_total_ape": "7.961",
+   "observed_total_2023": "783664",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.218",
+    "mig=zero": "4.134"
+   }
+  },
+  "BWA": {
+   "constant_growth_total_ape": "4.698",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.191",
+    "age_15_64": "0.312",
+    "age_65_plus": "3.316",
+    "all_ages": "2.655"
+   },
+   "linear_trend_total_ape": "2.219",
+   "mape_single_age_avg_residual": "9.649",
+   "naive_no_change_total_ape": "13.62",
+   "observed_total_2023": "2459937",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.655",
+    "mig=zero": "2.135"
+   }
+  },
+  "CAF": {
+   "constant_growth_total_ape": "3.718",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.127",
+    "age_15_64": "0.936",
+    "age_65_plus": "6.011",
+    "all_ages": "1.627"
+   },
+   "linear_trend_total_ape": "3.906",
+   "mape_single_age_avg_residual": "15.776",
+   "naive_no_change_total_ape": "8.613",
+   "observed_total_2023": "5064592",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.627",
+    "mig=zero": "12.62"
+   }
+  },
+  "CAN": {
+   "constant_growth_total_ape": "0.153",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.706",
+    "age_15_64": "2.749",
+    "age_65_plus": "2.463",
+    "all_ages": "1.544"
+   },
+   "linear_trend_total_ape": "0.65",
+   "mape_single_age_avg_residual": "4.282",
+   "naive_no_change_total_ape": "10.111",
+   "observed_total_2023": "39059725",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.544",
+    "mig=zero": "8.171"
+   }
+  },
+  "CHE": {
+   "constant_growth_total_ape": "2.129",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.635",
+    "age_15_64": "1.413",
+    "age_65_plus": "2.187",
+    "all_ages": "0.597"
+   },
+   "linear_trend_total_ape": "1.191",
+   "mape_single_age_avg_residual": "2.891",
+   "naive_no_change_total_ape": "9.068",
+   "observed_total_2023": "8843053",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.597",
+    "mig=zero": "8.915"
+   }
+  },
+  "CHL": {
+   "constant_growth_total_ape": "0.894",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.192",
+    "age_15_64": "5.318",
+    "age_65_plus": "2.213",
+    "all_ages": "2.699"
+   },
+   "linear_trend_total_ape": "1.561",
+   "mape_single_age_avg_residual": "5.868",
+   "naive_no_change_total_ape": "10.209",
+   "observed_total_2023": "19603239",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.699",
+    "mig=zero": "4.208"
+   }
+  },
+  "CHN": {
+   "constant_growth_total_ape": "3.137",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.577",
+    "age_15_64": "0.307",
+    "age_65_plus": "3.183",
+    "all_ages": "0.281"
+   },
+   "linear_trend_total_ape": "2.814",
+   "mape_single_age_avg_residual": "4.718",
+   "naive_no_change_total_ape": "3.489",
+   "observed_total_2023": "1424260946",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.281",
+    "mig=zero": "0.531"
+   }
+  },
+  "CIV": {
+   "constant_growth_total_ape": "4.39",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.649",
+    "age_15_64": "3.194",
+    "age_65_plus": "16.743",
+    "all_ages": "4.119"
+   },
+   "linear_trend_total_ape": "7.2",
+   "mape_single_age_avg_residual": "31.859",
+   "naive_no_change_total_ape": "22.994",
+   "observed_total_2023": "30783520",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.119",
+    "mig=zero": "2.808"
+   }
+  },
+  "CMR": {
+   "constant_growth_total_ape": "0.142",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.128",
+    "age_15_64": "1.908",
+    "age_65_plus": "1.9",
+    "all_ages": "0.203"
+   },
+   "linear_trend_total_ape": "4.662",
+   "mape_single_age_avg_residual": "3.496",
+   "naive_no_change_total_ape": "24.627",
+   "observed_total_2023": "27997833",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.203",
+    "mig=zero": "0.663"
+   }
+  },
+  "COD": {
+   "constant_growth_total_ape": "1.24",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.102",
+    "age_15_64": "1.401",
+    "age_65_plus": "2.673",
+    "all_ages": "0.747"
+   },
+   "linear_trend_total_ape": "7.14",
+   "mape_single_age_avg_residual": "6.172",
+   "naive_no_change_total_ape": "28.424",
+   "observed_total_2023": "104063312",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.747",
+    "mig=zero": "0.697"
+   }
+  },
+  "COG": {
+   "constant_growth_total_ape": "10.146",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.393",
+    "age_15_64": "6.18",
+    "age_65_plus": "3.218",
+    "all_ages": "7.005"
+   },
+   "linear_trend_total_ape": "2.986",
+   "mape_single_age_avg_residual": "27.885",
+   "naive_no_change_total_ape": "21.443",
+   "observed_total_2023": "6108142",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "7.005",
+    "mig=zero": "3.71"
+   }
+  },
+  "COK": {
+   "constant_growth_total_ape": "53.073",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "40.697",
+    "age_15_64": "51.123",
+    "age_65_plus": "45.595",
+    "all_ages": "47.833"
+   },
+   "linear_trend_total_ape": "48.118",
+   "mape_single_age_avg_residual": "47.642",
+   "naive_no_change_total_ape": "21.842",
+   "observed_total_2023": "14477",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "47.833",
+    "mig=zero": "34.734"
+   }
+  },
+  "COL": {
+   "constant_growth_total_ape": "1.54",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.57",
+    "age_15_64": "5.779",
+    "age_65_plus": "0.724",
+    "all_ages": "2.957"
+   },
+   "linear_trend_total_ape": "2.342",
+   "mape_single_age_avg_residual": "7.567",
+   "naive_no_change_total_ape": "11.71",
+   "observed_total_2023": "52032604",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.957",
+    "mig=zero": "1.807"
+   }
+  },
+  "COM": {
+   "constant_growth_total_ape": "0.184",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.735",
+    "age_15_64": "2.225",
+    "age_65_plus": "1.424",
+    "all_ages": "1.177"
+   },
+   "linear_trend_total_ape": "2.718",
+   "mape_single_age_avg_residual": "7.056",
+   "naive_no_change_total_ape": "18.258",
+   "observed_total_2023": "842267",
+   "open_age": 97,
+   "total_ape": {
+    "mig=average_residual": "1.177",
+    "mig=zero": "7.161"
+   }
+  },
+  "CPV": {
+   "constant_growth_total_ape": "3.593",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.946",
+    "age_15_64": "3.623",
+    "age_65_plus": "3.719",
+    "all_ages": "2.969"
+   },
+   "linear_trend_total_ape": "3.387",
+   "mape_single_age_avg_residual": "7.667",
+   "naive_no_change_total_ape": "1.708",
+   "observed_total_2023": "521047",
+   "open_age": 99,
+   "total_ape": {
+    "mig=average_residual": "2.969",
+    "mig=zero": "13.865"
+   }
+  },
+  "CRI": {
+   "constant_growth_total_ape": "4.206",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.57",
+    "age_15_64": "0.33",
+    "age_65_plus": "0.516",
+    "all_ages": "2.24"
+   },
+   "linear_trend_total_ape": "3.131",
+   "mape_single_age_avg_residual": "2.542",
+   "naive_no_change_total_ape": "7.898",
+   "observed_total_2023": "5092976",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.24",
+    "mig=zero": "1.655"
+   }
+  },
+  "CUB": {
+   "constant_growth_total_ape": "2.599",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.604",
+    "age_15_64": "0.344",
+    "age_65_plus": "3.192",
+    "all_ages": "0.526"
+   },
+   "linear_trend_total_ape": "2.598",
+   "mape_single_age_avg_residual": "5.16",
+   "naive_no_change_total_ape": "2.381",
+   "observed_total_2023": "11039268",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.526",
+    "mig=zero": "3.762"
+   }
+  },
+  "CUW": {
+   "constant_growth_total_ape": "3.469",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.721",
+    "age_15_64": "11.523",
+    "age_65_plus": "3.314",
+    "all_ages": "5.87"
+   },
+   "linear_trend_total_ape": "4.124",
+   "mape_single_age_avg_residual": "13.783",
+   "naive_no_change_total_ape": "12.58",
+   "observed_total_2023": "185394",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "5.87",
+    "mig=zero": "10.324"
+   }
+  },
+  "CYM": {
+   "constant_growth_total_ape": "5.573",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.388",
+    "age_15_64": "0.016",
+    "age_65_plus": "6.444",
+    "all_ages": "0.193"
+   },
+   "linear_trend_total_ape": "0.744",
+   "mape_single_age_avg_residual": "8.089",
+   "naive_no_change_total_ape": "19.939",
+   "observed_total_2023": "72320",
+   "open_age": 95,
+   "total_ape": {
+    "mig=average_residual": "0.193",
+    "mig=zero": "15.647"
+   }
+  },
+  "CYP": {
+   "constant_growth_total_ape": "3.547",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.025",
+    "age_15_64": "2.056",
+    "age_65_plus": "0.338",
+    "all_ages": "1.478"
+   },
+   "linear_trend_total_ape": "1.703",
+   "mape_single_age_avg_residual": "3.761",
+   "naive_no_change_total_ape": "12.199",
+   "observed_total_2023": "1338114",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.478",
+    "mig=zero": "8.437"
+   }
+  },
+  "CZE": {
+   "constant_growth_total_ape": "0.037",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.216",
+    "age_15_64": "2.531",
+    "age_65_plus": "2.346",
+    "all_ages": "3.076"
+   },
+   "linear_trend_total_ape": "0.101",
+   "mape_single_age_avg_residual": "4.869",
+   "naive_no_change_total_ape": "2.936",
+   "observed_total_2023": "10827878",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.076",
+    "mig=zero": "5.398"
+   }
+  },
+  "DEU": {
+   "constant_growth_total_ape": "4.805",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.366",
+    "age_15_64": "5.949",
+    "age_65_plus": "4.29",
+    "all_ages": "6.746"
+   },
+   "linear_trend_total_ape": "4.808",
+   "mape_single_age_avg_residual": "7.592",
+   "naive_no_change_total_ape": "4.124",
+   "observed_total_2023": "84400899",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.746",
+    "mig=zero": "8.471"
+   }
+  },
+  "DJI": {
+   "constant_growth_total_ape": "3.965",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.116",
+    "age_15_64": "0.043",
+    "age_65_plus": "2.458",
+    "all_ages": "3.168"
+   },
+   "linear_trend_total_ape": "1.349",
+   "mape_single_age_avg_residual": "3.452",
+   "naive_no_change_total_ape": "14.777",
+   "observed_total_2023": "1145015",
+   "open_age": 97,
+   "total_ape": {
+    "mig=average_residual": "3.168",
+    "mig=zero": "0.988"
+   }
+  },
+  "DMA": {
+   "constant_growth_total_ape": "3.791",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "15.466",
+    "age_15_64": "0.394",
+    "age_65_plus": "3.077",
+    "all_ages": "2.933"
+   },
+   "linear_trend_total_ape": "3.79",
+   "mape_single_age_avg_residual": "10.611",
+   "naive_no_change_total_ape": "3.451",
+   "observed_total_2023": "66668",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.933",
+    "mig=zero": "7.693"
+   }
+  },
+  "DNK": {
+   "constant_growth_total_ape": "1.117",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.403",
+    "age_15_64": "2.467",
+    "age_65_plus": "4.507",
+    "all_ages": "2.107"
+   },
+   "linear_trend_total_ape": "1.267",
+   "mape_single_age_avg_residual": "3.969",
+   "naive_no_change_total_ape": "5.551",
+   "observed_total_2023": "5932370",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.107",
+    "mig=zero": "5.569"
+   }
+  },
+  "DOM": {
+   "constant_growth_total_ape": "1.881",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.667",
+    "age_15_64": "0.874",
+    "age_65_plus": "0.542",
+    "all_ages": "0.65"
+   },
+   "linear_trend_total_ape": "0.786",
+   "mape_single_age_avg_residual": "4.253",
+   "naive_no_change_total_ape": "10.193",
+   "observed_total_2023": "11282543",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.65",
+    "mig=zero": "4.458"
+   }
+  },
+  "DZA": {
+   "constant_growth_total_ape": "0.888",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.04",
+    "age_15_64": "0.046",
+    "age_65_plus": "1.046",
+    "all_ages": "0.972"
+   },
+   "linear_trend_total_ape": "1.573",
+   "mape_single_age_avg_residual": "3.361",
+   "naive_no_change_total_ape": "17.026",
+   "observed_total_2023": "45831343",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.972",
+    "mig=zero": "0.662"
+   }
+  },
+  "ECU": {
+   "constant_growth_total_ape": "3.384",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.148",
+    "age_15_64": "2.133",
+    "age_65_plus": "1.164",
+    "all_ages": "2.244"
+   },
+   "linear_trend_total_ape": "1.543",
+   "mape_single_age_avg_residual": "4.186",
+   "naive_no_change_total_ape": "12.339",
+   "observed_total_2023": "17902009",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.244",
+    "mig=zero": "2.791"
+   }
+  },
+  "EGY": {
+   "constant_growth_total_ape": "1.753",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.404",
+    "age_15_64": "1.22",
+    "age_65_plus": "1.121",
+    "all_ages": "0.405"
+   },
+   "linear_trend_total_ape": "0.927",
+   "mape_single_age_avg_residual": "8.165",
+   "naive_no_change_total_ape": "17.008",
+   "observed_total_2023": "113493134",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.405",
+    "mig=zero": "1.28"
+   }
+  },
+  "ERI": {
+   "constant_growth_total_ape": "7.847",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "12.371",
+    "age_15_64": "6.295",
+    "age_65_plus": "0.446",
+    "all_ages": "8.383"
+   },
+   "linear_trend_total_ape": "5.242",
+   "mape_single_age_avg_residual": "8.715",
+   "naive_no_change_total_ape": "11.208",
+   "observed_total_2023": "3438999",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "8.383",
+    "mig=zero": "15.522"
+   }
+  },
+  "ESH": {
+   "constant_growth_total_ape": "12.849",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.469",
+    "age_15_64": "5.156",
+    "age_65_plus": "1.164",
+    "all_ages": "5.778"
+   },
+   "linear_trend_total_ape": "4.411",
+   "mape_single_age_avg_residual": "8.952",
+   "naive_no_change_total_ape": "21.79",
+   "observed_total_2023": "574275",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.778",
+    "mig=zero": "11.553"
+   }
+  },
+  "ESP": {
+   "constant_growth_total_ape": "2.405",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.318",
+    "age_15_64": "1.333",
+    "age_65_plus": "1.797",
+    "all_ages": "0.802"
+   },
+   "linear_trend_total_ape": "2.265",
+   "mape_single_age_avg_residual": "3.234",
+   "naive_no_change_total_ape": "1.963",
+   "observed_total_2023": "47907344",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.802",
+    "mig=zero": "3.29"
+   }
+  },
+  "EST": {
+   "constant_growth_total_ape": "6.067",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.766",
+    "age_15_64": "9.588",
+    "age_65_plus": "8.966",
+    "all_ages": "9.004"
+   },
+   "linear_trend_total_ape": "6.122",
+   "mape_single_age_avg_residual": "11.305",
+   "naive_no_change_total_ape": "3.443",
+   "observed_total_2023": "1367166",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "9.004",
+    "mig=zero": "6.457"
+   }
+  },
+  "ETH": {
+   "constant_growth_total_ape": "1.443",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.45",
+    "age_15_64": "1.125",
+    "age_65_plus": "5.58",
+    "all_ages": "3.311"
+   },
+   "linear_trend_total_ape": "3.381",
+   "mape_single_age_avg_residual": "5.873",
+   "naive_no_change_total_ape": "23.54",
+   "observed_total_2023": "127028360",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.311",
+    "mig=zero": "2.671"
+   }
+  },
+  "FIN": {
+   "constant_growth_total_ape": "1.753",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.867",
+    "age_15_64": "1.22",
+    "age_65_plus": "3.409",
+    "all_ages": "0.243"
+   },
+   "linear_trend_total_ape": "1.59",
+   "mape_single_age_avg_residual": "5.026",
+   "naive_no_change_total_ape": "2.926",
+   "observed_total_2023": "5590327",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.243",
+    "mig=zero": "2.869"
+   }
+  },
+  "FJI": {
+   "constant_growth_total_ape": "2.548",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.955",
+    "age_15_64": "0.99",
+    "age_65_plus": "1.076",
+    "all_ages": "1.052"
+   },
+   "linear_trend_total_ape": "2.473",
+   "mape_single_age_avg_residual": "5.875",
+   "naive_no_change_total_ape": "0.654",
+   "observed_total_2023": "921747",
+   "open_age": 98,
+   "total_ape": {
+    "mig=average_residual": "1.052",
+    "mig=zero": "13.317"
+   }
+  },
+  "FLK": {
+   "detail": "FLK: zero base-period exposure/deaths at age 85 below 85",
+   "refused": "capability_gap"
+  },
+  "FRA": {
+   "constant_growth_total_ape": "1.795",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.276",
+    "age_15_64": "0.649",
+    "age_65_plus": "3.013",
+    "all_ages": "0.155"
+   },
+   "linear_trend_total_ape": "1.605",
+   "mape_single_age_avg_residual": "2.964",
+   "naive_no_change_total_ape": "3.253",
+   "observed_total_2023": "66381485",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.155",
+    "mig=zero": "1.367"
+   }
+  },
+  "FRO": {
+   "constant_growth_total_ape": "12.526",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.168",
+    "age_15_64": "16.304",
+    "age_65_plus": "3.278",
+    "all_ages": "14.372"
+   },
+   "linear_trend_total_ape": "12.537",
+   "mape_single_age_avg_residual": "14.313",
+   "naive_no_change_total_ape": "11.36",
+   "observed_total_2023": "54350",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "14.372",
+    "mig=zero": "8.241"
+   }
+  },
+  "FSM": {
+   "constant_growth_total_ape": "6.385",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.992",
+    "age_15_64": "9.078",
+    "age_65_plus": "9.475",
+    "all_ages": "7.461"
+   },
+   "linear_trend_total_ape": "6.434",
+   "mape_single_age_avg_residual": "13.424",
+   "naive_no_change_total_ape": "3.891",
+   "observed_total_2023": "112368",
+   "open_age": 92,
+   "total_ape": {
+    "mig=average_residual": "7.461",
+    "mig=zero": "16.109"
+   }
+  },
+  "GAB": {
+   "constant_growth_total_ape": "8.142",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.983",
+    "age_15_64": "5.76",
+    "age_65_plus": "1.771",
+    "all_ages": "5.314"
+   },
+   "linear_trend_total_ape": "0.81",
+   "mape_single_age_avg_residual": "8.532",
+   "naive_no_change_total_ape": "23.512",
+   "observed_total_2023": "2457715",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.314",
+    "mig=zero": "2.668"
+   }
+  },
+  "GBR": {
+   "constant_growth_total_ape": "1.115",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.355",
+    "age_15_64": "0.639",
+    "age_65_plus": "2.605",
+    "all_ages": "0.139"
+   },
+   "linear_trend_total_ape": "0.708",
+   "mape_single_age_avg_residual": "3.112",
+   "naive_no_change_total_ape": "6.245",
+   "observed_total_2023": "68442882",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.139",
+    "mig=zero": "4.148"
+   }
+  },
+  "GEO": {
+   "constant_growth_total_ape": "6.024",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.147",
+    "age_15_64": "9.306",
+    "age_65_plus": "0.919",
+    "all_ages": "9.903"
+   },
+   "linear_trend_total_ape": "6.353",
+   "mape_single_age_avg_residual": "10.296",
+   "naive_no_change_total_ape": "0.442",
+   "observed_total_2023": "3807145",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "9.903",
+    "mig=zero": "0.571"
+   }
+  },
+  "GGY": {
+   "constant_growth_total_ape": "0.502",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.465",
+    "age_15_64": "2.941",
+    "age_65_plus": "3.78",
+    "all_ages": "2.201"
+   },
+   "linear_trend_total_ape": "0.55",
+   "mape_single_age_avg_residual": "5.091",
+   "naive_no_change_total_ape": "3.005",
+   "observed_total_2023": "63865",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.201",
+    "mig=zero": "3.342"
+   }
+  },
+  "GHA": {
+   "constant_growth_total_ape": "3.239",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.382",
+    "age_15_64": "0.229",
+    "age_65_plus": "1.798",
+    "all_ages": "2.393"
+   },
+   "linear_trend_total_ape": "0.546",
+   "mape_single_age_avg_residual": "4.621",
+   "naive_no_change_total_ape": "19.151",
+   "observed_total_2023": "33467371",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.393",
+    "mig=zero": "2.019"
+   }
+  },
+  "GIB": {
+   "constant_growth_total_ape": "3.807",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.388",
+    "age_15_64": "6.282",
+    "age_65_plus": "1.298",
+    "all_ages": "5.338"
+   },
+   "linear_trend_total_ape": "4.86",
+   "mape_single_age_avg_residual": "6.26",
+   "naive_no_change_total_ape": "15.312",
+   "observed_total_2023": "38022",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.338",
+    "mig=zero": "11.937"
+   }
+  },
+  "GIN": {
+   "constant_growth_total_ape": "0.715",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.625",
+    "age_15_64": "2.853",
+    "age_65_plus": "3.209",
+    "all_ages": "1.06"
+   },
+   "linear_trend_total_ape": "4.379",
+   "mape_single_age_avg_residual": "6.204",
+   "naive_no_change_total_ape": "22.314",
+   "observed_total_2023": "14229395",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.06",
+    "mig=zero": "3.711"
+   }
+  },
+  "GLP": {
+   "constant_growth_total_ape": "8.53",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.63",
+    "age_15_64": "4.747",
+    "age_65_plus": "4.762",
+    "all_ages": "4.714"
+   },
+   "linear_trend_total_ape": "8.53",
+   "mape_single_age_avg_residual": "7.689",
+   "naive_no_change_total_ape": "8.411",
+   "observed_total_2023": "377277",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.714",
+    "mig=zero": "12.922"
+   }
+  },
+  "GMB": {
+   "constant_growth_total_ape": "4.135",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "12.68",
+    "age_15_64": "0.087",
+    "age_65_plus": "1.272",
+    "all_ages": "5.108"
+   },
+   "linear_trend_total_ape": "1.116",
+   "mape_single_age_avg_residual": "4.688",
+   "naive_no_change_total_ape": "22.255",
+   "observed_total_2023": "2666786",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.108",
+    "mig=zero": "6.256"
+   }
+  },
+  "GNB": {
+   "constant_growth_total_ape": "1.946",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.305",
+    "age_15_64": "1.569",
+    "age_65_plus": "3.457",
+    "all_ages": "2.27"
+   },
+   "linear_trend_total_ape": "2.235",
+   "mape_single_age_avg_residual": "4.29",
+   "naive_no_change_total_ape": "21.409",
+   "observed_total_2023": "2129290",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.27",
+    "mig=zero": "3.517"
+   }
+  },
+  "GNQ": {
+   "constant_growth_total_ape": "12.112",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.859",
+    "age_15_64": "4.981",
+    "age_65_plus": "0.465",
+    "all_ages": "6.277"
+   },
+   "linear_trend_total_ape": "0.771",
+   "mape_single_age_avg_residual": "10.456",
+   "naive_no_change_total_ape": "27.713",
+   "observed_total_2023": "1825480",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.277",
+    "mig=zero": "6.42"
+   }
+  },
+  "GRC": {
+   "constant_growth_total_ape": "5.35",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.882",
+    "age_15_64": "2.196",
+    "age_65_plus": "0.408",
+    "all_ages": "1.873"
+   },
+   "linear_trend_total_ape": "5.343",
+   "mape_single_age_avg_residual": "4.537",
+   "naive_no_change_total_ape": "6.353",
+   "observed_total_2023": "10349296",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.873",
+    "mig=zero": "2.96"
+   }
+  },
+  "GRD": {
+   "constant_growth_total_ape": "0.965",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.604",
+    "age_15_64": "3.777",
+    "age_65_plus": "4.075",
+    "all_ages": "0.379"
+   },
+   "linear_trend_total_ape": "0.828",
+   "mape_single_age_avg_residual": "8.745",
+   "naive_no_change_total_ape": "3.31",
+   "observed_total_2023": "117007",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.379",
+    "mig=zero": "4.801"
+   }
+  },
+  "GRL": {
+   "constant_growth_total_ape": "1.051",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.183",
+    "age_15_64": "1.077",
+    "age_65_plus": "3.53",
+    "all_ages": "0.467"
+   },
+   "linear_trend_total_ape": "1.051",
+   "mape_single_age_avg_residual": "5.472",
+   "naive_no_change_total_ape": "1.262",
+   "observed_total_2023": "55962",
+   "open_age": 91,
+   "total_ape": {
+    "mig=average_residual": "0.467",
+    "mig=zero": "6.812"
+   }
+  },
+  "GTM": {
+   "constant_growth_total_ape": "3.414",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.861",
+    "age_15_64": "0.248",
+    "age_65_plus": "3.371",
+    "all_ages": "4.496"
+   },
+   "linear_trend_total_ape": "0.803",
+   "mape_single_age_avg_residual": "7.612",
+   "naive_no_change_total_ape": "15.263",
+   "observed_total_2023": "17984483",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.496",
+    "mig=zero": "7.047"
+   }
+  },
+  "GUF": {
+   "constant_growth_total_ape": "3.297",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.2",
+    "age_15_64": "0.323",
+    "age_65_plus": "6.186",
+    "all_ages": "2.032"
+   },
+   "linear_trend_total_ape": "0.151",
+   "mape_single_age_avg_residual": "11.258",
+   "naive_no_change_total_ape": "17.157",
+   "observed_total_2023": "300843",
+   "open_age": 97,
+   "total_ape": {
+    "mig=average_residual": "2.032",
+    "mig=zero": "2.228"
+   }
+  },
+  "GUM": {
+   "constant_growth_total_ape": "1.052",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.845",
+    "age_15_64": "0.539",
+    "age_65_plus": "6.551",
+    "all_ages": "0.923"
+   },
+   "linear_trend_total_ape": "1.047",
+   "mape_single_age_avg_residual": "7.223",
+   "naive_no_change_total_ape": "0.195",
+   "observed_total_2023": "165858",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.923",
+    "mig=zero": "15.321"
+   }
+  },
+  "GUY": {
+   "constant_growth_total_ape": "11.081",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.209",
+    "age_15_64": "13.72",
+    "age_65_plus": "1.638",
+    "all_ages": "11.921"
+   },
+   "linear_trend_total_ape": "11.11",
+   "mape_single_age_avg_residual": "10.748",
+   "naive_no_change_total_ape": "9.228",
+   "observed_total_2023": "824074",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "11.921",
+    "mig=zero": "4.816"
+   }
+  },
+  "HKG": {
+   "constant_growth_total_ape": "3.788",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "15.522",
+    "age_15_64": "1.219",
+    "age_65_plus": "3.258",
+    "all_ages": "1.817"
+   },
+   "linear_trend_total_ape": "3.459",
+   "mape_single_age_avg_residual": "9.625",
+   "naive_no_change_total_ape": "2.92",
+   "observed_total_2023": "7452391",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.817",
+    "mig=zero": "2.084"
+   }
+  },
+  "HND": {
+   "constant_growth_total_ape": "2.919",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.865",
+    "age_15_64": "0.206",
+    "age_65_plus": "1.322",
+    "all_ages": "2.888"
+   },
+   "linear_trend_total_ape": "0.048",
+   "mape_single_age_avg_residual": "10.086",
+   "naive_no_change_total_ape": "16.6",
+   "observed_total_2023": "10554310",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.888",
+    "mig=zero": "3.516"
+   }
+  },
+  "HRV": {
+   "constant_growth_total_ape": "5.739",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.341",
+    "age_15_64": "4.248",
+    "age_65_plus": "2.702",
+    "all_ages": "3.113"
+   },
+   "linear_trend_total_ape": "5.667",
+   "mape_single_age_avg_residual": "6.303",
+   "naive_no_change_total_ape": "8.942",
+   "observed_total_2023": "3902712",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.113",
+    "mig=zero": "4.084"
+   }
+  },
+  "HTI": {
+   "constant_growth_total_ape": "1.072",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.611",
+    "age_15_64": "1.381",
+    "age_65_plus": "4.053",
+    "all_ages": "1.67"
+   },
+   "linear_trend_total_ape": "0.285",
+   "mape_single_age_avg_residual": "4.485",
+   "naive_no_change_total_ape": "12.298",
+   "observed_total_2023": "11569602",
+   "open_age": 98,
+   "total_ape": {
+    "mig=average_residual": "1.67",
+    "mig=zero": "4.587"
+   }
+  },
+  "HUN": {
+   "constant_growth_total_ape": "0.125",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.726",
+    "age_15_64": "2.299",
+    "age_65_plus": "0.547",
+    "all_ages": "3.08"
+   },
+   "linear_trend_total_ape": "0.168",
+   "mape_single_age_avg_residual": "6.841",
+   "naive_no_change_total_ape": "2.289",
+   "observed_total_2023": "9683205",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.08",
+    "mig=zero": "3.956"
+   }
+  },
+  "IDN": {
+   "constant_growth_total_ape": "3.149",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.348",
+    "age_15_64": "0.28",
+    "age_65_plus": "0.245",
+    "all_ages": "1.135"
+   },
+   "linear_trend_total_ape": "2.02",
+   "mape_single_age_avg_residual": "3.177",
+   "naive_no_change_total_ape": "9.182",
+   "observed_total_2023": "280026489",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.135",
+    "mig=zero": "1.366"
+   }
+  },
+  "IMN": {
+   "constant_growth_total_ape": "6.769",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.323",
+    "age_15_64": "3.28",
+    "age_65_plus": "1.95",
+    "all_ages": "4.894"
+   },
+   "linear_trend_total_ape": "6.455",
+   "mape_single_age_avg_residual": "6.685",
+   "naive_no_change_total_ape": "0.109",
+   "observed_total_2023": "84158",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.894",
+    "mig=zero": "0.07"
+   }
+  },
+  "IND": {
+   "constant_growth_total_ape": "3.601",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.439",
+    "age_15_64": "0.25",
+    "age_65_plus": "1.197",
+    "all_ages": "2.64"
+   },
+   "linear_trend_total_ape": "2.214",
+   "mape_single_age_avg_residual": "3.948",
+   "naive_no_change_total_ape": "10.083",
+   "observed_total_2023": "1431702948",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.64",
+    "mig=zero": "2.942"
+   }
+  },
+  "IRL": {
+   "constant_growth_total_ape": "4.313",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.476",
+    "age_15_64": "10.447",
+    "age_65_plus": "5.914",
+    "all_ages": "7.456"
+   },
+   "linear_trend_total_ape": "4.642",
+   "mape_single_age_avg_residual": "9.621",
+   "naive_no_change_total_ape": "10.746",
+   "observed_total_2023": "5165835",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "7.456",
+    "mig=zero": "4.205"
+   }
+  },
+  "IRN": {
+   "constant_growth_total_ape": "0.428",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.241",
+    "age_15_64": "2.118",
+    "age_65_plus": "1.748",
+    "all_ages": "2.117"
+   },
+   "linear_trend_total_ape": "0.629",
+   "mape_single_age_avg_residual": "8.956",
+   "naive_no_change_total_ape": "11.347",
+   "observed_total_2023": "90102637",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.117",
+    "mig=zero": "1.619"
+   }
+  },
+  "IRQ": {
+   "constant_growth_total_ape": "14.724",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "20.306",
+    "age_15_64": "6.146",
+    "age_65_plus": "3.765",
+    "all_ages": "11.353"
+   },
+   "linear_trend_total_ape": "5.073",
+   "mape_single_age_avg_residual": "10.85",
+   "naive_no_change_total_ape": "22.557",
+   "observed_total_2023": "44590195",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "11.353",
+    "mig=zero": "2.91"
+   }
+  },
+  "ISL": {
+   "constant_growth_total_ape": "12.784",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.415",
+    "age_15_64": "19.912",
+    "age_65_plus": "3.775",
+    "all_ages": "13.904"
+   },
+   "linear_trend_total_ape": "12.887",
+   "mape_single_age_avg_residual": "12.192",
+   "naive_no_change_total_ape": "16.233",
+   "observed_total_2023": "384375",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "13.904",
+    "mig=zero": "9.994"
+   }
+  },
+  "ISR": {
+   "constant_growth_total_ape": "0.108",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.533",
+    "age_15_64": "2.074",
+    "age_65_plus": "2.006",
+    "all_ages": "1.916"
+   },
+   "linear_trend_total_ape": "2.174",
+   "mape_single_age_avg_residual": "2.682",
+   "naive_no_change_total_ape": "16.458",
+   "observed_total_2023": "9190811",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.916",
+    "mig=zero": "3.349"
+   }
+  },
+  "ITA": {
+   "constant_growth_total_ape": "6.158",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.217",
+    "age_15_64": "3.957",
+    "age_65_plus": "0.852",
+    "all_ages": "3.447"
+   },
+   "linear_trend_total_ape": "6.021",
+   "mape_single_age_avg_residual": "4.766",
+   "naive_no_change_total_ape": "1.771",
+   "observed_total_2023": "59563765",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.447",
+    "mig=zero": "1.83"
+   }
+  },
+  "JAM": {
+   "constant_growth_total_ape": "2.082",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.623",
+    "age_15_64": "1.762",
+    "age_65_plus": "1.356",
+    "all_ages": "1.455"
+   },
+   "linear_trend_total_ape": "1.949",
+   "mape_single_age_avg_residual": "4.245",
+   "naive_no_change_total_ape": "2.163",
+   "observed_total_2023": "2839750",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.455",
+    "mig=zero": "6.63"
+   }
+  },
+  "JEY": {
+   "constant_growth_total_ape": "5.557",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.188",
+    "age_15_64": "3.73",
+    "age_65_plus": "0.26",
+    "all_ages": "3.351"
+   },
+   "linear_trend_total_ape": "4.886",
+   "mape_single_age_avg_residual": "5.079",
+   "naive_no_change_total_ape": "4.089",
+   "observed_total_2023": "103583",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.351",
+    "mig=zero": "3.568"
+   }
+  },
+  "JOR": {
+   "constant_growth_total_ape": "18.736",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.146",
+    "age_15_64": "23.011",
+    "age_65_plus": "10.431",
+    "all_ages": "18.421"
+   },
+   "linear_trend_total_ape": "20.675",
+   "mape_single_age_avg_residual": "17.176",
+   "naive_no_change_total_ape": "33.009",
+   "observed_total_2023": "11347484",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "18.421",
+    "mig=zero": "14.776"
+   }
+  },
+  "JPN": {
+   "constant_growth_total_ape": "2.062",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.248",
+    "age_15_64": "1.004",
+    "age_65_plus": "2.495",
+    "all_ages": "1.589"
+   },
+   "linear_trend_total_ape": "2.061",
+   "mape_single_age_avg_residual": "2.742",
+   "naive_no_change_total_ape": "2.536",
+   "observed_total_2023": "124670714",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.589",
+    "mig=zero": "2.493"
+   }
+  },
+  "KAZ": {
+   "constant_growth_total_ape": "1.797",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.992",
+    "age_15_64": "2.482",
+    "age_65_plus": "7.42",
+    "all_ages": "4.219"
+   },
+   "linear_trend_total_ape": "2.902",
+   "mape_single_age_avg_residual": "6.704",
+   "naive_no_change_total_ape": "13.701",
+   "observed_total_2023": "20196000",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.219",
+    "mig=zero": "3.654"
+   }
+  },
+  "KEN": {
+   "constant_growth_total_ape": "7.535",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.568",
+    "age_15_64": "1.083",
+    "age_65_plus": "9.962",
+    "all_ages": "6.612"
+   },
+   "linear_trend_total_ape": "2.447",
+   "mape_single_age_avg_residual": "9.915",
+   "naive_no_change_total_ape": "18.882",
+   "observed_total_2023": "54793511",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.612",
+    "mig=zero": "7.093"
+   }
+  },
+  "KGZ": {
+   "constant_growth_total_ape": "4.738",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.174",
+    "age_15_64": "8.907",
+    "age_65_plus": "12.661",
+    "all_ages": "7.851"
+   },
+   "linear_trend_total_ape": "6.176",
+   "mape_single_age_avg_residual": "15.446",
+   "naive_no_change_total_ape": "18.089",
+   "observed_total_2023": "7016437",
+   "open_age": 99,
+   "total_ape": {
+    "mig=average_residual": "7.851",
+    "mig=zero": "2.629"
+   }
+  },
+  "KHM": {
+   "constant_growth_total_ape": "1.414",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.289",
+    "age_15_64": "1.254",
+    "age_65_plus": "1.787",
+    "all_ages": "0.393"
+   },
+   "linear_trend_total_ape": "0.17",
+   "mape_single_age_avg_residual": "2.916",
+   "naive_no_change_total_ape": "13.039",
+   "observed_total_2023": "17314678",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.393",
+    "mig=zero": "4.05"
+   }
+  },
+  "KIR": {
+   "constant_growth_total_ape": "3.367",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.19",
+    "age_15_64": "1.556",
+    "age_65_plus": "0.162",
+    "all_ages": "4.523"
+   },
+   "linear_trend_total_ape": "1.104",
+   "mape_single_age_avg_residual": "6.161",
+   "naive_no_change_total_ape": "14.034",
+   "observed_total_2023": "131534",
+   "open_age": 92,
+   "total_ape": {
+    "mig=average_residual": "4.523",
+    "mig=zero": "9.053"
+   }
+  },
+  "KNA": {
+   "constant_growth_total_ape": "1.942",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.168",
+    "age_15_64": "0.306",
+    "age_65_plus": "3.185",
+    "all_ages": "0.581"
+   },
+   "linear_trend_total_ape": "1.931",
+   "mape_single_age_avg_residual": "7.429",
+   "naive_no_change_total_ape": "0.728",
+   "observed_total_2023": "46713",
+   "open_age": 98,
+   "total_ape": {
+    "mig=average_residual": "0.581",
+    "mig=zero": "6.482"
+   }
+  },
+  "KOR": {
+   "constant_growth_total_ape": "2.66",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.776",
+    "age_15_64": "1.283",
+    "age_65_plus": "5.428",
+    "all_ages": "0.563"
+   },
+   "linear_trend_total_ape": "2.36",
+   "mape_single_age_avg_residual": "7.113",
+   "naive_no_change_total_ape": "3.714",
+   "observed_total_2023": "51759392",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.563",
+    "mig=zero": "2.908"
+   }
+  },
+  "KWT": {
+   "constant_growth_total_ape": "26.242",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.767",
+    "age_15_64": "5.659",
+    "age_65_plus": "38.646",
+    "all_ages": "8.687"
+   },
+   "linear_trend_total_ape": "6.885",
+   "mape_single_age_avg_residual": "29.411",
+   "naive_no_change_total_ape": "28.496",
+   "observed_total_2023": "4793420",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "8.687",
+    "mig=zero": "19.209"
+   }
+  },
+  "LAO": {
+   "constant_growth_total_ape": "0.185",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.352",
+    "age_15_64": "2.474",
+    "age_65_plus": "2.337",
+    "all_ages": "0.468"
+   },
+   "linear_trend_total_ape": "1.602",
+   "mape_single_age_avg_residual": "53.442",
+   "naive_no_change_total_ape": "13.755",
+   "observed_total_2023": "7612311",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.468",
+    "mig=zero": "4.673"
+   }
+  },
+  "LBN": {
+   "constant_growth_total_ape": "10.25",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.472",
+    "age_15_64": "14.185",
+    "age_65_plus": "0.229",
+    "all_ages": "8.302"
+   },
+   "linear_trend_total_ape": "8.078",
+   "mape_single_age_avg_residual": "17.505",
+   "naive_no_change_total_ape": "7.37",
+   "observed_total_2023": "5761194",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "8.302",
+    "mig=zero": "5.2"
+   }
+  },
+  "LBR": {
+   "constant_growth_total_ape": "12.741",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "15.546",
+    "age_15_64": "10.029",
+    "age_65_plus": "4.994",
+    "all_ages": "12.084"
+   },
+   "linear_trend_total_ape": "5.859",
+   "mape_single_age_avg_residual": "31.823",
+   "naive_no_change_total_ape": "18.619",
+   "observed_total_2023": "5432670",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "12.084",
+    "mig=zero": "7.968"
+   }
+  },
+  "LBY": {
+   "constant_growth_total_ape": "12.321",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.247",
+    "age_15_64": "19.411",
+    "age_65_plus": "5.275",
+    "all_ages": "17.273"
+   },
+   "linear_trend_total_ape": "12.352",
+   "mape_single_age_avg_residual": "13.108",
+   "naive_no_change_total_ape": "14.203",
+   "observed_total_2023": "7268778",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "17.273",
+    "mig=zero": "0.177"
+   }
+  },
+  "LCA": {
+   "constant_growth_total_ape": "2.073",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.11",
+    "age_15_64": "2.459",
+    "age_65_plus": "12.668",
+    "all_ages": "0.109"
+   },
+   "linear_trend_total_ape": "1.851",
+   "mape_single_age_avg_residual": "9.194",
+   "naive_no_change_total_ape": "3.39",
+   "observed_total_2023": "179046",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "0.109",
+    "mig=zero": "2.208"
+   }
+  },
+  "LIE": {
+   "constant_growth_total_ape": "0.908",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.6",
+    "age_15_64": "1.236",
+    "age_65_plus": "1.033",
+    "all_ages": "1.392"
+   },
+   "linear_trend_total_ape": "0.459",
+   "mape_single_age_avg_residual": "6.206",
+   "naive_no_change_total_ape": "6.82",
+   "observed_total_2023": "39460",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.392",
+    "mig=zero": "5.385"
+   }
+  },
+  "LKA": {
+   "constant_growth_total_ape": "0.728",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.03",
+    "age_15_64": "4.128",
+    "age_65_plus": "5.707",
+    "all_ages": "2.698"
+   },
+   "linear_trend_total_ape": "1.045",
+   "mape_single_age_avg_residual": "6.591",
+   "naive_no_change_total_ape": "7.168",
+   "observed_total_2023": "22904797",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.698",
+    "mig=zero": "1.208"
+   }
+  },
+  "LSO": {
+   "constant_growth_total_ape": "3.11",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.809",
+    "age_15_64": "5.572",
+    "age_65_plus": "11.265",
+    "all_ages": "2.494"
+   },
+   "linear_trend_total_ape": "3.603",
+   "mape_single_age_avg_residual": "7.301",
+   "naive_no_change_total_ape": "11.031",
+   "observed_total_2023": "2298496",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.494",
+    "mig=zero": "0.529"
+   }
+  },
+  "LTU": {
+   "constant_growth_total_ape": "10.452",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.044",
+    "age_15_64": "19.386",
+    "age_65_plus": "3.375",
+    "all_ages": "15.719"
+   },
+   "linear_trend_total_ape": "12.303",
+   "mape_single_age_avg_residual": "13.408",
+   "naive_no_change_total_ape": "4.613",
+   "observed_total_2023": "2841385",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "15.719",
+    "mig=zero": "1.096"
+   }
+  },
+  "LUX": {
+   "constant_growth_total_ape": "0.012",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.996",
+    "age_15_64": "3.244",
+    "age_65_plus": "3.611",
+    "all_ages": "2.627"
+   },
+   "linear_trend_total_ape": "2.735",
+   "mape_single_age_avg_residual": "5.574",
+   "naive_no_change_total_ape": "18.752",
+   "observed_total_2023": "660992",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.627",
+    "mig=zero": "17.493"
+   }
+  },
+  "LVA": {
+   "constant_growth_total_ape": "8.454",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "22.503",
+    "age_15_64": "14.695",
+    "age_65_plus": "6.084",
+    "all_ages": "14.112"
+   },
+   "linear_trend_total_ape": "10.452",
+   "mape_single_age_avg_residual": "14.236",
+   "naive_no_change_total_ape": "7.377",
+   "observed_total_2023": "1885099",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "14.112",
+    "mig=zero": "0.331"
+   }
+  },
+  "MAC": {
+   "constant_growth_total_ape": "5.093",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.767",
+    "age_15_64": "3.951",
+    "age_65_plus": "1.79",
+    "all_ages": "2.147"
+   },
+   "linear_trend_total_ape": "1.69",
+   "mape_single_age_avg_residual": "8.963",
+   "naive_no_change_total_ape": "16.35",
+   "observed_total_2023": "708956",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.147",
+    "mig=zero": "12.279"
+   }
+  },
+  "MAF": {
+   "constant_growth_total_ape": "45.26",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "66.189",
+    "age_15_64": "47.605",
+    "age_65_plus": "10.252",
+    "all_ages": "41.869"
+   },
+   "linear_trend_total_ape": "44.375",
+   "mape_single_age_avg_residual": "45.75",
+   "naive_no_change_total_ape": "32.265",
+   "observed_total_2023": "28257",
+   "open_age": 95,
+   "total_ape": {
+    "mig=average_residual": "41.869",
+    "mig=zero": "50.742"
+   }
+  },
+  "MAR": {
+   "constant_growth_total_ape": "2.325",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.449",
+    "age_15_64": "1.035",
+    "age_65_plus": "3.907",
+    "all_ages": "0.445"
+   },
+   "linear_trend_total_ape": "1.089",
+   "mape_single_age_avg_residual": "4.312",
+   "naive_no_change_total_ape": "10.523",
+   "observed_total_2023": "37523726",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.445",
+    "mig=zero": "3.022"
+   }
+  },
+  "MCO": {
+   "constant_growth_total_ape": "9.79",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.762",
+    "age_15_64": "3.236",
+    "age_65_plus": "0.942",
+    "all_ages": "1.521"
+   },
+   "linear_trend_total_ape": "6.932",
+   "mape_single_age_avg_residual": "5.827",
+   "naive_no_change_total_ape": "10.336",
+   "observed_total_2023": "39136",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.521",
+    "mig=zero": "15.067"
+   }
+  },
+  "MDA": {
+   "constant_growth_total_ape": "8.823",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "30.687",
+    "age_15_64": "12.568",
+    "age_65_plus": "10.72",
+    "all_ages": "15.923"
+   },
+   "linear_trend_total_ape": "12.212",
+   "mape_single_age_avg_residual": "17.334",
+   "naive_no_change_total_ape": "11.838",
+   "observed_total_2023": "3080724",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "15.923",
+    "mig=zero": "12.002"
+   }
+  },
+  "MDG": {
+   "constant_growth_total_ape": "2.717",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.474",
+    "age_15_64": "0.1",
+    "age_65_plus": "0.396",
+    "all_ages": "3.323"
+   },
+   "linear_trend_total_ape": "2.261",
+   "mape_single_age_avg_residual": "3.585",
+   "naive_no_change_total_ape": "22.815",
+   "observed_total_2023": "30813475",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.323",
+    "mig=zero": "3.394"
+   }
+  },
+  "MDV": {
+   "constant_growth_total_ape": "6.35",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.537",
+    "age_15_64": "2.874",
+    "age_65_plus": "3.238",
+    "all_ages": "0.174"
+   },
+   "linear_trend_total_ape": "1.004",
+   "mape_single_age_avg_residual": "9.999",
+   "naive_no_change_total_ape": "25.08",
+   "observed_total_2023": "525144",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.174",
+    "mig=zero": "12.498"
+   }
+  },
+  "MEX": {
+   "constant_growth_total_ape": "4.839",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.977",
+    "age_15_64": "1.696",
+    "age_65_plus": "2.246",
+    "all_ages": "3.568"
+   },
+   "linear_trend_total_ape": "3.443",
+   "mape_single_age_avg_residual": "4.616",
+   "naive_no_change_total_ape": "8.972",
+   "observed_total_2023": "129171119",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.568",
+    "mig=zero": "4.081"
+   }
+  },
+  "MHL": {
+   "constant_growth_total_ape": "24.773",
+   "data_notes": [
+    "open age lowered from 100 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 93 to 92: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "22.737",
+    "age_15_64": "17.246",
+    "age_65_plus": "13.609",
+    "all_ages": "18.996"
+   },
+   "linear_trend_total_ape": "24.643",
+   "mape_single_age_avg_residual": "18.818",
+   "naive_no_change_total_ape": "29.441",
+   "observed_total_2023": "39472",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "18.996",
+    "mig=zero": "62.026"
+   }
+  },
+  "MKD": {
+   "constant_growth_total_ape": "4.171",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.443",
+    "age_15_64": "1.237",
+    "age_65_plus": "3.28",
+    "all_ages": "0.322"
+   },
+   "linear_trend_total_ape": "3.925",
+   "mape_single_age_avg_residual": "7.388",
+   "naive_no_change_total_ape": "10.043",
+   "observed_total_2023": "1836091",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.322",
+    "mig=zero": "10.97"
+   }
+  },
+  "MLI": {
+   "constant_growth_total_ape": "0.292",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.502",
+    "age_15_64": "1.751",
+    "age_65_plus": "2.495",
+    "all_ages": "0.214"
+   },
+   "linear_trend_total_ape": "5.397",
+   "mape_single_age_avg_residual": "4.162",
+   "naive_no_change_total_ape": "26.626",
+   "observed_total_2023": "23415909",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "0.214",
+    "mig=zero": "3.407"
+   }
+  },
+  "MLT": {
+   "constant_growth_total_ape": "15.547",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.105",
+    "age_15_64": "21.822",
+    "age_65_plus": "5.983",
+    "all_ages": "17.312"
+   },
+   "linear_trend_total_ape": "15.67",
+   "mape_single_age_avg_residual": "15.04",
+   "naive_no_change_total_ape": "19.256",
+   "observed_total_2023": "529518",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "17.312",
+    "mig=zero": "19.171"
+   }
+  },
+  "MMR": {
+   "constant_growth_total_ape": "0.355",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.382",
+    "age_15_64": "1.971",
+    "age_65_plus": "2.968",
+    "all_ages": "1.462"
+   },
+   "linear_trend_total_ape": "0.714",
+   "mape_single_age_avg_residual": "6.534",
+   "naive_no_change_total_ape": "7.223",
+   "observed_total_2023": "53947114",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.462",
+    "mig=zero": "1.047"
+   }
+  },
+  "MNE": {
+   "constant_growth_total_ape": "1.123",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.621",
+    "age_15_64": "0.244",
+    "age_65_plus": "3.494",
+    "all_ages": "1.483"
+   },
+   "linear_trend_total_ape": "1.123",
+   "mape_single_age_avg_residual": "4.008",
+   "naive_no_change_total_ape": "0.948",
+   "observed_total_2023": "627669",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.483",
+    "mig=zero": "2.386"
+   }
+  },
+  "MNG": {
+   "constant_growth_total_ape": "3.996",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.98",
+    "age_15_64": "2.465",
+    "age_65_plus": "7.583",
+    "all_ages": "6.485"
+   },
+   "linear_trend_total_ape": "5.398",
+   "mape_single_age_avg_residual": "7.68",
+   "naive_no_change_total_ape": "17.234",
+   "observed_total_2023": "3409595",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.485",
+    "mig=zero": "3.739"
+   }
+  },
+  "MNP": {
+   "constant_growth_total_ape": "3.036",
+   "data_notes": [
+    "open age lowered from 100 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.172",
+    "age_15_64": "18.204",
+    "age_65_plus": "14.752",
+    "all_ages": "14.57"
+   },
+   "linear_trend_total_ape": "5.82",
+   "mape_single_age_avg_residual": "27.129",
+   "naive_no_change_total_ape": "16.237",
+   "observed_total_2023": "45618",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "14.57",
+    "mig=zero": "34.743"
+   }
+  },
+  "MOZ": {
+   "constant_growth_total_ape": "2.168",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.6",
+    "age_15_64": "4.111",
+    "age_65_plus": "4.351",
+    "all_ages": "1.106"
+   },
+   "linear_trend_total_ape": "6.526",
+   "mape_single_age_avg_residual": "5.551",
+   "naive_no_change_total_ape": "25.506",
+   "observed_total_2023": "33140626",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.106",
+    "mig=zero": "1.969"
+   }
+  },
+  "MRT": {
+   "constant_growth_total_ape": "2.375",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.462",
+    "age_15_64": "3.555",
+    "age_65_plus": "22.42",
+    "all_ages": "1.607"
+   },
+   "linear_trend_total_ape": "3.683",
+   "mape_single_age_avg_residual": "55.648",
+   "naive_no_change_total_ape": "25.672",
+   "observed_total_2023": "4948362",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.607",
+    "mig=zero": "2.153"
+   }
+  },
+  "MSR": {
+   "constant_growth_total_ape": "13.56",
+   "data_notes": [
+    "open age lowered from 100 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "22.545",
+    "age_15_64": "15.698",
+    "age_65_plus": "5.46",
+    "all_ages": "12.816"
+   },
+   "linear_trend_total_ape": "13.323",
+   "mape_single_age_avg_residual": "22.357",
+   "naive_no_change_total_ape": "7.597",
+   "observed_total_2023": "4436",
+   "open_age": 91,
+   "total_ape": {
+    "mig=average_residual": "12.816",
+    "mig=zero": "6.478"
+   }
+  },
+  "MTQ": {
+   "constant_growth_total_ape": "6.585",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "10.13",
+    "age_15_64": "0.475",
+    "age_65_plus": "0.725",
+    "all_ages": "1.414"
+   },
+   "linear_trend_total_ape": "6.35",
+   "mape_single_age_avg_residual": "7.639",
+   "naive_no_change_total_ape": "12.391",
+   "observed_total_2023": "347427",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.414",
+    "mig=zero": "15.496"
+   }
+  },
+  "MUS": {
+   "constant_growth_total_ape": "4.114",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.369",
+    "age_15_64": "0.616",
+    "age_65_plus": "0.824",
+    "all_ages": "2.078"
+   },
+   "linear_trend_total_ape": "4.054",
+   "mape_single_age_avg_residual": "7.075",
+   "naive_no_change_total_ape": "1.226",
+   "observed_total_2023": "1274659",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.078",
+    "mig=zero": "4.316"
+   }
+  },
+  "MWI": {
+   "constant_growth_total_ape": "2.395",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.156",
+    "age_15_64": "2.441",
+    "age_65_plus": "5.706",
+    "all_ages": "3.967"
+   },
+   "linear_trend_total_ape": "2.754",
+   "mape_single_age_avg_residual": "5.068",
+   "naive_no_change_total_ape": "23.519",
+   "observed_total_2023": "20832833",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.967",
+    "mig=zero": "4.619"
+   }
+  },
+  "MYS": {
+   "constant_growth_total_ape": "3.004",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.926",
+    "age_15_64": "0.272",
+    "age_65_plus": "0.144",
+    "all_ages": "2.059"
+   },
+   "linear_trend_total_ape": "0.758",
+   "mape_single_age_avg_residual": "7.266",
+   "naive_no_change_total_ape": "14.301",
+   "observed_total_2023": "34908354",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.059",
+    "mig=zero": "2.966"
+   }
+  },
+  "MYT": {
+   "constant_growth_total_ape": "5.85",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.995",
+    "age_15_64": "5.522",
+    "age_65_plus": "18.878",
+    "all_ages": "6.838"
+   },
+   "linear_trend_total_ape": "10.115",
+   "mape_single_age_avg_residual": "19.61",
+   "naive_no_change_total_ape": "28.494",
+   "observed_total_2023": "310779",
+   "open_age": 95,
+   "total_ape": {
+    "mig=average_residual": "6.838",
+    "mig=zero": "1.547"
+   }
+  },
+  "NAM": {
+   "constant_growth_total_ape": "9.139",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.652",
+    "age_15_64": "9.578",
+    "age_65_plus": "3.491",
+    "all_ages": "9.391"
+   },
+   "linear_trend_total_ape": "11.033",
+   "mape_single_age_avg_residual": "9.24",
+   "naive_no_change_total_ape": "24.071",
+   "observed_total_2023": "2928037",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "9.391",
+    "mig=zero": "7.66"
+   }
+  },
+  "NCL": {
+   "constant_growth_total_ape": "12.287",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.816",
+    "age_15_64": "8.477",
+    "age_65_plus": "1.869",
+    "all_ages": "9.776"
+   },
+   "linear_trend_total_ape": "10.25",
+   "mape_single_age_avg_residual": "10.375",
+   "naive_no_change_total_ape": "4.945",
+   "observed_total_2023": "288470",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "9.776",
+    "mig=zero": "4.841"
+   }
+  },
+  "NER": {
+   "constant_growth_total_ape": "2.713",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.784",
+    "age_15_64": "0.816",
+    "age_65_plus": "2.594",
+    "all_ages": "3.193"
+   },
+   "linear_trend_total_ape": "5.235",
+   "mape_single_age_avg_residual": "5.463",
+   "naive_no_change_total_ape": "29.343",
+   "observed_total_2023": "25727295",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "3.193",
+    "mig=zero": "3.346"
+   }
+  },
+  "NGA": {
+   "constant_growth_total_ape": "4.665",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.963",
+    "age_15_64": "0.173",
+    "age_65_plus": "0.546",
+    "all_ages": "4.237"
+   },
+   "linear_trend_total_ape": "0.184",
+   "mape_single_age_avg_residual": "2.164",
+   "naive_no_change_total_ape": "20.786",
+   "observed_total_2023": "225494749",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.237",
+    "mig=zero": "4.046"
+   }
+  },
+  "NIC": {
+   "constant_growth_total_ape": "1.014",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.047",
+    "age_15_64": "2.279",
+    "age_65_plus": "1.258",
+    "all_ages": "0.065"
+   },
+   "linear_trend_total_ape": "0.336",
+   "mape_single_age_avg_residual": "12.552",
+   "naive_no_change_total_ape": "12.314",
+   "observed_total_2023": "6777156",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.065",
+    "mig=zero": "5.04"
+   }
+  },
+  "NIU": {
+   "detail": "NIU: zero base-period exposure/deaths at age 85 below 85",
+   "refused": "capability_gap"
+  },
+  "NLD": {
+   "constant_growth_total_ape": "1.563",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.452",
+    "age_15_64": "4.449",
+    "age_65_plus": "2.307",
+    "all_ages": "2.967"
+   },
+   "linear_trend_total_ape": "1.713",
+   "mape_single_age_avg_residual": "4.058",
+   "naive_no_change_total_ape": "5.985",
+   "observed_total_2023": "18019495",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.967",
+    "mig=zero": "4.996"
+   }
+  },
+  "NOR": {
+   "constant_growth_total_ape": "4.641",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "14.468",
+    "age_15_64": "3.493",
+    "age_65_plus": "3.424",
+    "all_ages": "4.05"
+   },
+   "linear_trend_total_ape": "3.477",
+   "mape_single_age_avg_residual": "6.593",
+   "naive_no_change_total_ape": "7.969",
+   "observed_total_2023": "5488555",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.05",
+    "mig=zero": "5.116"
+   }
+  },
+  "NPL": {
+   "constant_growth_total_ape": "2.563",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.697",
+    "age_15_64": "6.579",
+    "age_65_plus": "0.907",
+    "all_ages": "1.533"
+   },
+   "linear_trend_total_ape": "2.733",
+   "mape_single_age_avg_residual": "6.357",
+   "naive_no_change_total_ape": "7.239",
+   "observed_total_2023": "29715279",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.533",
+    "mig=zero": "9.788"
+   }
+  },
+  "NRU": {
+   "detail": "NRU: zero base-period exposure/deaths at age 85 below 85",
+   "refused": "capability_gap"
+  },
+  "NZL": {
+   "constant_growth_total_ape": "6.451",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.468",
+    "age_15_64": "11.448",
+    "age_65_plus": "3.594",
+    "all_ages": "7.938"
+   },
+   "linear_trend_total_ape": "6.923",
+   "mape_single_age_avg_residual": "8.331",
+   "naive_no_change_total_ape": "14.074",
+   "observed_total_2023": "5151357",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "7.938",
+    "mig=zero": "8.863"
+   }
+  },
+  "OMN": {
+   "constant_growth_total_ape": "57.267",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.322",
+    "age_15_64": "35.361",
+    "age_65_plus": "49.122",
+    "all_ages": "26.371"
+   },
+   "linear_trend_total_ape": "22.185",
+   "mape_single_age_avg_residual": "39.666",
+   "naive_no_change_total_ape": "24.164",
+   "observed_total_2023": "4933394",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "26.371",
+    "mig=zero": "10.442"
+   }
+  },
+  "PAK": {
+   "constant_growth_total_ape": "6.793",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.557",
+    "age_15_64": "5.054",
+    "age_65_plus": "1.93",
+    "all_ages": "7.342"
+   },
+   "linear_trend_total_ape": "3.415",
+   "mape_single_age_avg_residual": "9.102",
+   "naive_no_change_total_ape": "14.749",
+   "observed_total_2023": "245673401",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "7.342",
+    "mig=zero": "10.602"
+   }
+  },
+  "PAN": {
+   "constant_growth_total_ape": "2.304",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.434",
+    "age_15_64": "1.234",
+    "age_65_plus": "2.381",
+    "all_ages": "0.363"
+   },
+   "linear_trend_total_ape": "0.2",
+   "mape_single_age_avg_residual": "4.181",
+   "naive_no_change_total_ape": "14.397",
+   "observed_total_2023": "4430030",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.363",
+    "mig=zero": "0.945"
+   }
+  },
+  "PER": {
+   "constant_growth_total_ape": "5.235",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.97",
+    "age_15_64": "10.882",
+    "age_65_plus": "7.68",
+    "all_ages": "6.8"
+   },
+   "linear_trend_total_ape": "5.582",
+   "mape_single_age_avg_residual": "13.774",
+   "naive_no_change_total_ape": "11.817",
+   "observed_total_2023": "33656344",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.8",
+    "mig=zero": "0.146"
+   }
+  },
+  "PHL": {
+   "constant_growth_total_ape": "7.199",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "22.499",
+    "age_15_64": "0.67",
+    "age_65_plus": "3.248",
+    "all_ages": "6.795"
+   },
+   "linear_trend_total_ape": "4.667",
+   "mape_single_age_avg_residual": "23.169",
+   "naive_no_change_total_ape": "11.536",
+   "observed_total_2023": "114411351",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.795",
+    "mig=zero": "8.437"
+   }
+  },
+  "PLW": {
+   "constant_growth_total_ape": "16.063",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.618",
+    "age_15_64": "24.273",
+    "age_65_plus": "2.908",
+    "all_ages": "20.764"
+   },
+   "linear_trend_total_ape": "18.098",
+   "mape_single_age_avg_residual": "24.302",
+   "naive_no_change_total_ape": "0.755",
+   "observed_total_2023": "17748",
+   "open_age": 93,
+   "total_ape": {
+    "mig=average_residual": "20.764",
+    "mig=zero": "2.566"
+   }
+  },
+  "PNG": {
+   "constant_growth_total_ape": "6.763",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.976",
+    "age_15_64": "2.675",
+    "age_65_plus": "1.074",
+    "all_ages": "5.032"
+   },
+   "linear_trend_total_ape": "1.322",
+   "mape_single_age_avg_residual": "11.423",
+   "naive_no_change_total_ape": "20.435",
+   "observed_total_2023": "10296209",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "5.032",
+    "mig=zero": "0.579"
+   }
+  },
+  "POL": {
+   "constant_growth_total_ape": "0.122",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.051",
+    "age_15_64": "2.391",
+    "age_65_plus": "4.871",
+    "all_ages": "2.665"
+   },
+   "linear_trend_total_ape": "0.135",
+   "mape_single_age_avg_residual": "4.23",
+   "naive_no_change_total_ape": "1.44",
+   "observed_total_2023": "38813949",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.665",
+    "mig=zero": "3.245"
+   }
+  },
+  "PRI": {
+   "constant_growth_total_ape": "4.364",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "20.736",
+    "age_15_64": "1.232",
+    "age_65_plus": "3.936",
+    "all_ages": "0.793"
+   },
+   "linear_trend_total_ape": "3.956",
+   "mape_single_age_avg_residual": "12.989",
+   "naive_no_change_total_ape": "11.943",
+   "observed_total_2023": "3240012",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.793",
+    "mig=zero": "12.04"
+   }
+  },
+  "PRK": {
+   "constant_growth_total_ape": "0.234",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.114",
+    "age_15_64": "0.506",
+    "age_65_plus": "7.913",
+    "all_ages": "1.072"
+   },
+   "linear_trend_total_ape": "0.086",
+   "mape_single_age_avg_residual": "4.053",
+   "naive_no_change_total_ape": "4.195",
+   "observed_total_2023": "26376094",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.072",
+    "mig=zero": "0.942"
+   }
+  },
+  "PRT": {
+   "constant_growth_total_ape": "0.814",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.959",
+    "age_15_64": "2.503",
+    "age_65_plus": "7.014",
+    "all_ages": "4.028"
+   },
+   "linear_trend_total_ape": "0.828",
+   "mape_single_age_avg_residual": "5.349",
+   "naive_no_change_total_ape": "0.538",
+   "observed_total_2023": "10430825",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.028",
+    "mig=zero": "3.002"
+   }
+  },
+  "PRY": {
+   "constant_growth_total_ape": "1.278",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.571",
+    "age_15_64": "2.549",
+    "age_65_plus": "2.291",
+    "all_ages": "1.344"
+   },
+   "linear_trend_total_ape": "2.285",
+   "mape_single_age_avg_residual": "4.086",
+   "naive_no_change_total_ape": "12.676",
+   "observed_total_2023": "6801526",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.344",
+    "mig=zero": "3.723"
+   }
+  },
+  "PSE": {
+   "constant_growth_total_ape": "0.973",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.293",
+    "age_15_64": "0.266",
+    "age_65_plus": "2.491",
+    "all_ages": "2.946"
+   },
+   "linear_trend_total_ape": "2.6",
+   "mape_single_age_avg_residual": "4.431",
+   "naive_no_change_total_ape": "20.548",
+   "observed_total_2023": "5367977",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.946",
+    "mig=zero": "8.587"
+   }
+  },
+  "PYF": {
+   "constant_growth_total_ape": "1.972",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "16.459",
+    "age_15_64": "2.931",
+    "age_65_plus": "6.273",
+    "all_ages": "0.604"
+   },
+   "linear_trend_total_ape": "1.826",
+   "mape_single_age_avg_residual": "13.609",
+   "naive_no_change_total_ape": "2.466",
+   "observed_total_2023": "280771",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.604",
+    "mig=zero": "10.62"
+   }
+  },
+  "QAT": {
+   "constant_growth_total_ape": "41.973",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.173",
+    "age_15_64": "10.964",
+    "age_65_plus": "47.238",
+    "all_ages": "11.835"
+   },
+   "linear_trend_total_ape": "8.364",
+   "mape_single_age_avg_residual": "32.262",
+   "naive_no_change_total_ape": "33.617",
+   "observed_total_2023": "2945712",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "11.835",
+    "mig=zero": "27.645"
+   }
+  },
+  "REU": {
+   "constant_growth_total_ape": "0.866",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.148",
+    "age_15_64": "1.19",
+    "age_65_plus": "5.433",
+    "all_ages": "1.131"
+   },
+   "linear_trend_total_ape": "0.732",
+   "mape_single_age_avg_residual": "8.554",
+   "naive_no_change_total_ape": "3.365",
+   "observed_total_2023": "873091",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.131",
+    "mig=zero": "7.437"
+   }
+  },
+  "ROU": {
+   "constant_growth_total_ape": "1.845",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.512",
+    "age_15_64": "6.297",
+    "age_65_plus": "0.533",
+    "all_ages": "6.317"
+   },
+   "linear_trend_total_ape": "2.19",
+   "mape_single_age_avg_residual": "9.319",
+   "naive_no_change_total_ape": "4.911",
+   "observed_total_2023": "19169119",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.317",
+    "mig=zero": "0.4"
+   }
+  },
+  "RUS": {
+   "constant_growth_total_ape": "0.023",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.311",
+    "age_15_64": "1.1",
+    "age_65_plus": "5.14",
+    "all_ages": "2.678"
+   },
+   "linear_trend_total_ape": "0.017",
+   "mape_single_age_avg_residual": "7.114",
+   "naive_no_change_total_ape": "0.848",
+   "observed_total_2023": "145675420",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.678",
+    "mig=zero": "4.996"
+   }
+  },
+  "RWA": {
+   "constant_growth_total_ape": "1.826",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.516",
+    "age_15_64": "0.833",
+    "age_65_plus": "5.599",
+    "all_ages": "1.395"
+   },
+   "linear_trend_total_ape": "2.029",
+   "mape_single_age_avg_residual": "4.658",
+   "naive_no_change_total_ape": "20.605",
+   "observed_total_2023": "13802596",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.395",
+    "mig=zero": "4.49"
+   }
+  },
+  "SAU": {
+   "constant_growth_total_ape": "22.017",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.227",
+    "age_15_64": "15.547",
+    "age_65_plus": "10.262",
+    "all_ages": "16.053"
+   },
+   "linear_trend_total_ape": "12.505",
+   "mape_single_age_avg_residual": "24.654",
+   "naive_no_change_total_ape": "16.2",
+   "observed_total_2023": "32867343",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "16.053",
+    "mig=zero": "0.36"
+   }
+  },
+  "SDN": {
+   "constant_growth_total_ape": "5.346",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.044",
+    "age_15_64": "8.595",
+    "age_65_plus": "4.625",
+    "all_ages": "4.946"
+   },
+   "linear_trend_total_ape": "8.645",
+   "mape_single_age_avg_residual": "10.332",
+   "naive_no_change_total_ape": "25.368",
+   "observed_total_2023": "50037008",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.946",
+    "mig=zero": "0.647"
+   }
+  },
+  "SEN": {
+   "constant_growth_total_ape": "3.086",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.523",
+    "age_15_64": "8.878",
+    "age_65_plus": "2.428",
+    "all_ages": "3.051"
+   },
+   "linear_trend_total_ape": "6.777",
+   "mape_single_age_avg_residual": "27.7",
+   "naive_no_change_total_ape": "24.497",
+   "observed_total_2023": "17867073",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.051",
+    "mig=zero": "1.375"
+   }
+  },
+  "SGP": {
+   "constant_growth_total_ape": "19.74",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.353",
+    "age_15_64": "17.132",
+    "age_65_plus": "0.99",
+    "all_ages": "15.09"
+   },
+   "linear_trend_total_ape": "14.985",
+   "mape_single_age_avg_residual": "11.518",
+   "naive_no_change_total_ape": "7.263",
+   "observed_total_2023": "5765718",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "15.09",
+    "mig=zero": "3.825"
+   }
+  },
+  "SHN": {
+   "constant_growth_total_ape": "8.086",
+   "data_notes": [
+    "open age lowered from 100 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 94 to 93: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 93 to 92: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.689",
+    "age_15_64": "14.282",
+    "age_65_plus": "10.681",
+    "all_ages": "5.671"
+   },
+   "linear_trend_total_ape": "7.822",
+   "mape_single_age_avg_residual": "26.891",
+   "naive_no_change_total_ape": "1.956",
+   "observed_total_2023": "5318",
+   "open_age": 88,
+   "total_ape": {
+    "mig=average_residual": "5.671",
+    "mig=zero": "1.977"
+   }
+  },
+  "SLB": {
+   "constant_growth_total_ape": "0.925",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.895",
+    "age_15_64": "4.464",
+    "age_65_plus": "3.145",
+    "all_ages": "2.027"
+   },
+   "linear_trend_total_ape": "5.951",
+   "mape_single_age_avg_residual": "9.606",
+   "naive_no_change_total_ape": "26.106",
+   "observed_total_2023": "790472",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.027",
+    "mig=zero": "3.585"
+   }
+  },
+  "SLE": {
+   "constant_growth_total_ape": "2.94",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "11.119",
+    "age_15_64": "1.021",
+    "age_65_plus": "4.136",
+    "all_ages": "3.585"
+   },
+   "linear_trend_total_ape": "1.32",
+   "mape_single_age_avg_residual": "4.076",
+   "naive_no_change_total_ape": "20.746",
+   "observed_total_2023": "8368119",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.585",
+    "mig=zero": "2.617"
+   }
+  },
+  "SLV": {
+   "constant_growth_total_ape": "0.798",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.126",
+    "age_15_64": "2.291",
+    "age_65_plus": "1.604",
+    "all_ages": "0.918"
+   },
+   "linear_trend_total_ape": "0.707",
+   "mape_single_age_avg_residual": "4.161",
+   "naive_no_change_total_ape": "2.682",
+   "observed_total_2023": "6295263",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.918",
+    "mig=zero": "10.642"
+   }
+  },
+  "SMR": {
+   "constant_growth_total_ape": "28.217",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "23.096",
+    "age_15_64": "21.042",
+    "age_65_plus": "14.208",
+    "all_ages": "19.848"
+   },
+   "linear_trend_total_ape": "23.058",
+   "mape_single_age_avg_residual": "24.188",
+   "naive_no_change_total_ape": "0.883",
+   "observed_total_2023": "33858",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "19.848",
+    "mig=zero": "2.138"
+   }
+  },
+  "SOM": {
+   "constant_growth_total_ape": "15.663",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "13.308",
+    "age_15_64": "12.426",
+    "age_65_plus": "18.528",
+    "all_ages": "12.994"
+   },
+   "linear_trend_total_ape": "17.527",
+   "mape_single_age_avg_residual": "17.932",
+   "naive_no_change_total_ape": "29.928",
+   "observed_total_2023": "18031404",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "12.994",
+    "mig=zero": "4.394"
+   }
+  },
+  "SPM": {
+   "constant_growth_total_ape": "2.695",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "17.413",
+    "age_15_64": "3.979",
+    "age_65_plus": "5.775",
+    "all_ages": "1.18"
+   },
+   "linear_trend_total_ape": "2.662",
+   "mape_single_age_avg_residual": "15.474",
+   "naive_no_change_total_ape": "4.799",
+   "observed_total_2023": "5709",
+   "open_age": 88,
+   "total_ape": {
+    "mig=average_residual": "1.18",
+    "mig=zero": "2.944"
+   }
+  },
+  "SRB": {
+   "constant_growth_total_ape": "2.758",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "4.192",
+    "age_15_64": "1.401",
+    "age_65_plus": "0.378",
+    "all_ages": "0.203"
+   },
+   "linear_trend_total_ape": "2.592",
+   "mape_single_age_avg_residual": "4.367",
+   "naive_no_change_total_ape": "7.548",
+   "observed_total_2023": "6788068",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.203",
+    "mig=zero": "0.397"
+   }
+  },
+  "SSD": {
+   "constant_growth_total_ape": "60.347",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "52.385",
+    "age_15_64": "51.403",
+    "age_65_plus": "38.552",
+    "all_ages": "51.43"
+   },
+   "linear_trend_total_ape": "41.074",
+   "mape_single_age_avg_residual": "200.054",
+   "naive_no_change_total_ape": "1.537",
+   "observed_total_2023": "11146895",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "51.43",
+    "mig=zero": "30.263"
+   }
+  },
+  "STP": {
+   "constant_growth_total_ape": "3.874",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.374",
+    "age_15_64": "1.063",
+    "age_65_plus": "7.121",
+    "all_ages": "3.949"
+   },
+   "linear_trend_total_ape": "0.835",
+   "mape_single_age_avg_residual": "5.721",
+   "naive_no_change_total_ape": "16.293",
+   "observed_total_2023": "228558",
+   "open_age": 94,
+   "total_ape": {
+    "mig=average_residual": "3.949",
+    "mig=zero": "12.021"
+   }
+  },
+  "SUR": {
+   "constant_growth_total_ape": "1.442",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.508",
+    "age_15_64": "1.243",
+    "age_65_plus": "3.726",
+    "all_ages": "0.594"
+   },
+   "linear_trend_total_ape": "0.521",
+   "mape_single_age_avg_residual": "5.286",
+   "naive_no_change_total_ape": "9.616",
+   "observed_total_2023": "626028",
+   "open_age": 98,
+   "total_ape": {
+    "mig=average_residual": "0.594",
+    "mig=zero": "2.725"
+   }
+  },
+  "SVK": {
+   "constant_growth_total_ape": "0.825",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.737",
+    "age_15_64": "2.231",
+    "age_65_plus": "4.258",
+    "all_ages": "3.471"
+   },
+   "linear_trend_total_ape": "0.835",
+   "mape_single_age_avg_residual": "6.269",
+   "naive_no_change_total_ape": "1.963",
+   "observed_total_2023": "5516536",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.471",
+    "mig=zero": "3.242"
+   }
+  },
+  "SVN": {
+   "constant_growth_total_ape": "0.274",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.11",
+    "age_15_64": "3.288",
+    "age_65_plus": "2.862",
+    "all_ages": "2.871"
+   },
+   "linear_trend_total_ape": "0.196",
+   "mape_single_age_avg_residual": "4.22",
+   "naive_no_change_total_ape": "2.944",
+   "observed_total_2023": "2117568",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.871",
+    "mig=zero": "4.725"
+   }
+  },
+  "SWE": {
+   "constant_growth_total_ape": "1.654",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.362",
+    "age_15_64": "2.921",
+    "age_65_plus": "2.783",
+    "all_ages": "1.975"
+   },
+   "linear_trend_total_ape": "2.092",
+   "mape_single_age_avg_residual": "4.342",
+   "naive_no_change_total_ape": "9.179",
+   "observed_total_2023": "10521910",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.975",
+    "mig=zero": "7.772"
+   }
+  },
+  "SWZ": {
+   "constant_growth_total_ape": "2.441",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.094",
+    "age_15_64": "6.235",
+    "age_65_plus": "10.596",
+    "all_ages": "4.337"
+   },
+   "linear_trend_total_ape": "2.68",
+   "mape_single_age_avg_residual": "7.002",
+   "naive_no_change_total_ape": "7.988",
+   "observed_total_2023": "1224706",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "4.337",
+    "mig=zero": "7.108"
+   }
+  },
+  "SXM": {
+   "constant_growth_total_ape": "3.506",
+   "data_notes": [
+    "open age lowered from 100 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 95 to 94: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.707",
+    "age_15_64": "8.717",
+    "age_65_plus": "12.221",
+    "all_ages": "6.267"
+   },
+   "linear_trend_total_ape": "4.849",
+   "mape_single_age_avg_residual": "17.413",
+   "naive_no_change_total_ape": "16.498",
+   "observed_total_2023": "42442",
+   "open_age": 94,
+   "total_ape": {
+    "mig=average_residual": "6.267",
+    "mig=zero": "10.983"
+   }
+  },
+  "SYC": {
+   "constant_growth_total_ape": "4.485",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.026",
+    "age_15_64": "7.295",
+    "age_65_plus": "6.927",
+    "all_ages": "7.21"
+   },
+   "linear_trend_total_ape": "6.541",
+   "mape_single_age_avg_residual": "8.773",
+   "naive_no_change_total_ape": "20.431",
+   "observed_total_2023": "126694",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "7.21",
+    "mig=zero": "13.637"
+   }
+  },
+  "SYR": {
+   "constant_growth_total_ape": "6.549",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "18.52",
+    "age_15_64": "4.645",
+    "age_65_plus": "3.776",
+    "all_ages": "2.959"
+   },
+   "linear_trend_total_ape": "5.997",
+   "mape_single_age_avg_residual": "10.73",
+   "naive_no_change_total_ape": "2.245",
+   "observed_total_2023": "23014618",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.959",
+    "mig=zero": "21.902"
+   }
+  },
+  "TCA": {
+   "constant_growth_total_ape": "7.082",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.374",
+    "age_15_64": "4.855",
+    "age_65_plus": "0.729",
+    "all_ages": "3.403"
+   },
+   "linear_trend_total_ape": "2.394",
+   "mape_single_age_avg_residual": "6.013",
+   "naive_no_change_total_ape": "28.579",
+   "observed_total_2023": "46026",
+   "open_age": 95,
+   "total_ape": {
+    "mig=average_residual": "3.403",
+    "mig=zero": "23.821"
+   }
+  },
+  "TCD": {
+   "constant_growth_total_ape": "1.899",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.846",
+    "age_15_64": "0.635",
+    "age_65_plus": "1.071",
+    "all_ages": "1.475"
+   },
+   "linear_trend_total_ape": "5.236",
+   "mape_single_age_avg_residual": "2.841",
+   "naive_no_change_total_ape": "28.399",
+   "observed_total_2023": "18767684",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.475",
+    "mig=zero": "0.09"
+   }
+  },
+  "TGO": {
+   "constant_growth_total_ape": "2.772",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.075",
+    "age_15_64": "0.386",
+    "age_65_plus": "3.64",
+    "all_ages": "1.7"
+   },
+   "linear_trend_total_ape": "1.822",
+   "mape_single_age_avg_residual": "4.015",
+   "naive_no_change_total_ape": "21.786",
+   "observed_total_2023": "9196283",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.7",
+    "mig=zero": "1.515"
+   }
+  },
+  "THA": {
+   "constant_growth_total_ape": "3.814",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.585",
+    "age_15_64": "0.667",
+    "age_65_plus": "4.927",
+    "all_ages": "1.223"
+   },
+   "linear_trend_total_ape": "3.486",
+   "mape_single_age_avg_residual": "6.163",
+   "naive_no_change_total_ape": "2.882",
+   "observed_total_2023": "71715662",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.223",
+    "mig=zero": "0.037"
+   }
+  },
+  "TJK": {
+   "constant_growth_total_ape": "1.59",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.145",
+    "age_15_64": "3.202",
+    "age_65_plus": "3.309",
+    "all_ages": "2.453"
+   },
+   "linear_trend_total_ape": "4.603",
+   "mape_single_age_avg_residual": "5.648",
+   "naive_no_change_total_ape": "21.125",
+   "observed_total_2023": "10287891",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.453",
+    "mig=zero": "1.181"
+   }
+  },
+  "TKL": {
+   "detail": "TKL: zero base-period exposure/deaths at age 85 below 85",
+   "refused": "capability_gap"
+  },
+  "TKM": {
+   "constant_growth_total_ape": "0.956",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "6.024",
+    "age_15_64": "0.375",
+    "age_65_plus": "4.33",
+    "all_ages": "1.972"
+   },
+   "linear_trend_total_ape": "3.657",
+   "mape_single_age_avg_residual": "8.215",
+   "naive_no_change_total_ape": "19.533",
+   "observed_total_2023": "7298173",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.972",
+    "mig=zero": "3.253"
+   }
+  },
+  "TLS": {
+   "constant_growth_total_ape": "5.56",
+   "data_notes": [
+    "open age lowered from 100 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "19.811",
+    "age_15_64": "1.114",
+    "age_65_plus": "17.663",
+    "all_ages": "7.116"
+   },
+   "linear_trend_total_ape": "1.908",
+   "mape_single_age_avg_residual": "11.919",
+   "naive_no_change_total_ape": "16.692",
+   "observed_total_2023": "1376847",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "7.116",
+    "mig=zero": "7.522"
+   }
+  },
+  "TON": {
+   "constant_growth_total_ape": "3.11",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.468",
+    "age_15_64": "2.857",
+    "age_65_plus": "0.126",
+    "all_ages": "2.88"
+   },
+   "linear_trend_total_ape": "3.106",
+   "mape_single_age_avg_residual": "10.788",
+   "naive_no_change_total_ape": "2.37",
+   "observed_total_2023": "104816",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.88",
+    "mig=zero": "27.703"
+   }
+  },
+  "TTO": {
+   "constant_growth_total_ape": "0.614",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.743",
+    "age_15_64": "3.829",
+    "age_65_plus": "4.009",
+    "all_ages": "3.471"
+   },
+   "linear_trend_total_ape": "0.845",
+   "mape_single_age_avg_residual": "5.008",
+   "naive_no_change_total_ape": "6.121",
+   "observed_total_2023": "1500110",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.471",
+    "mig=zero": "1.926"
+   }
+  },
+  "TUN": {
+   "constant_growth_total_ape": "1.435",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.595",
+    "age_15_64": "1.081",
+    "age_65_plus": "0.126",
+    "all_ages": "0.337"
+   },
+   "linear_trend_total_ape": "0.624",
+   "mape_single_age_avg_residual": "4.287",
+   "naive_no_change_total_ape": "8.948",
+   "observed_total_2023": "12160602",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.337",
+    "mig=zero": "1.547"
+   }
+  },
+  "TUR": {
+   "constant_growth_total_ape": "1.367",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.336",
+    "age_15_64": "2.825",
+    "age_65_plus": "8.174",
+    "all_ages": "3.024"
+   },
+   "linear_trend_total_ape": "2.436",
+   "mape_single_age_avg_residual": "8.507",
+   "naive_no_change_total_ape": "13.1",
+   "observed_total_2023": "87169328",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.024",
+    "mig=zero": "4.209"
+   }
+  },
+  "TUV": {
+   "constant_growth_total_ape": "28.159",
+   "data_notes": [
+    "open age lowered from 100 to 92: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 92 to 91: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 91 to 90: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "37.46",
+    "age_15_64": "25.77",
+    "age_65_plus": "30.338",
+    "all_ages": "29.824"
+   },
+   "linear_trend_total_ape": "26.424",
+   "mape_single_age_avg_residual": "29.479",
+   "naive_no_change_total_ape": "11.137",
+   "observed_total_2023": "9904",
+   "open_age": 85,
+   "total_ape": {
+    "mig=average_residual": "29.824",
+    "mig=zero": "30.325"
+   }
+  },
+  "TWN": {
+   "constant_growth_total_ape": "3.069",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.358",
+    "age_15_64": "1.451",
+    "age_65_plus": "2.061",
+    "all_ages": "0.604"
+   },
+   "linear_trend_total_ape": "3.003",
+   "mape_single_age_avg_residual": "3.522",
+   "naive_no_change_total_ape": "0.083",
+   "observed_total_2023": "23370002",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.604",
+    "mig=zero": "0.667"
+   }
+  },
+  "TZA": {
+   "constant_growth_total_ape": "4.152",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "0.055",
+    "age_15_64": "5.704",
+    "age_65_plus": "5.322",
+    "all_ages": "3.274"
+   },
+   "linear_trend_total_ape": "8.335",
+   "mape_single_age_avg_residual": "5.177",
+   "naive_no_change_total_ape": "26.788",
+   "observed_total_2023": "65657004",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.274",
+    "mig=zero": "0.461"
+   }
+  },
+  "UGA": {
+   "constant_growth_total_ape": "2.717",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.138",
+    "age_15_64": "7.129",
+    "age_65_plus": "8.619",
+    "all_ages": "0.425"
+   },
+   "linear_trend_total_ape": "7.635",
+   "mape_single_age_avg_residual": "11.108",
+   "naive_no_change_total_ape": "27.402",
+   "observed_total_2023": "47981110",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.425",
+    "mig=zero": "4.298"
+   }
+  },
+  "UKR": {
+   "constant_growth_total_ape": "17.589",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "24.536",
+    "age_15_64": "15.042",
+    "age_65_plus": "5.231",
+    "all_ages": "14.633"
+   },
+   "linear_trend_total_ape": "17.494",
+   "mape_single_age_avg_residual": "19.144",
+   "naive_no_change_total_ape": "21.444",
+   "observed_total_2023": "38024411",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "14.633",
+    "mig=zero": "13.914"
+   }
+  },
+  "URY": {
+   "constant_growth_total_ape": "1.06",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.163",
+    "age_15_64": "1.895",
+    "age_65_plus": "1.73",
+    "all_ages": "0.03"
+   },
+   "linear_trend_total_ape": "1.014",
+   "mape_single_age_avg_residual": "4.974",
+   "naive_no_change_total_ape": "1.437",
+   "observed_total_2023": "3388682",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.03",
+    "mig=zero": "2.64"
+   }
+  },
+  "USA": {
+   "constant_growth_total_ape": "2.588",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "7.089",
+    "age_15_64": "0.321",
+    "age_65_plus": "0.098",
+    "all_ages": "1.45"
+   },
+   "linear_trend_total_ape": "1.91",
+   "mape_single_age_avg_residual": "2.324",
+   "naive_no_change_total_ape": "6.966",
+   "observed_total_2023": "342475098",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.45",
+    "mig=zero": "3.464"
+   }
+  },
+  "UZB": {
+   "constant_growth_total_ape": "2.396",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.767",
+    "age_15_64": "0.582",
+    "age_65_plus": "3.017",
+    "all_ages": "3.542"
+   },
+   "linear_trend_total_ape": "3.955",
+   "mape_single_age_avg_residual": "5.263",
+   "naive_no_change_total_ape": "16.464",
+   "observed_total_2023": "35294160",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.542",
+    "mig=zero": "2.844"
+   }
+  },
+  "VAT": {
+   "detail": "VAT: zero base-period exposure/deaths at age 85 below 85",
+   "refused": "capability_gap"
+  },
+  "VCT": {
+   "constant_growth_total_ape": "1.295",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.351",
+    "age_15_64": "5.461",
+    "age_65_plus": "8.508",
+    "all_ages": "2.973"
+   },
+   "linear_trend_total_ape": "1.084",
+   "mape_single_age_avg_residual": "11.488",
+   "naive_no_change_total_ape": "6.658",
+   "observed_total_2023": "101679",
+   "open_age": 99,
+   "total_ape": {
+    "mig=average_residual": "2.973",
+    "mig=zero": "13.753"
+   }
+  },
+  "VEN": {
+   "constant_growth_total_ape": "19.939",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "19.09",
+    "age_15_64": "19.713",
+    "age_65_plus": "5.543",
+    "all_ages": "18.25"
+   },
+   "linear_trend_total_ape": "18.562",
+   "mape_single_age_avg_residual": "86.73",
+   "naive_no_change_total_ape": "5.26",
+   "observed_total_2023": "28250783",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "18.25",
+    "mig=zero": "20.323"
+   }
+  },
+  "VGB": {
+   "constant_growth_total_ape": "15.151",
+   "data_notes": [
+    "open age lowered from 100 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "25.25",
+    "age_15_64": "3.53",
+    "age_65_plus": "2.887",
+    "all_ages": "6.849"
+   },
+   "linear_trend_total_ape": "6.684",
+   "mape_single_age_avg_residual": "13.595",
+   "naive_no_change_total_ape": "19.908",
+   "observed_total_2023": "38643",
+   "open_age": 96,
+   "total_ape": {
+    "mig=average_residual": "6.849",
+    "mig=zero": "17.073"
+   }
+  },
+  "VIR": {
+   "constant_growth_total_ape": "13.007",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "19.862",
+    "age_15_64": "4.112",
+    "age_65_plus": "3.794",
+    "all_ages": "6.644"
+   },
+   "linear_trend_total_ape": "12.64",
+   "mape_single_age_avg_residual": "11.088",
+   "naive_no_change_total_ape": "20.48",
+   "observed_total_2023": "86099",
+   "open_age": 97,
+   "total_ape": {
+    "mig=average_residual": "6.644",
+    "mig=zero": "23.052"
+   }
+  },
+  "VNM": {
+   "constant_growth_total_ape": "2.479",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.616",
+    "age_15_64": "1.785",
+    "age_65_plus": "0.412",
+    "all_ages": "0.316"
+   },
+   "linear_trend_total_ape": "1.318",
+   "mape_single_age_avg_residual": "4.246",
+   "naive_no_change_total_ape": "9.986",
+   "observed_total_2023": "100029091",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.316",
+    "mig=zero": "0.749"
+   }
+  },
+  "VUT": {
+   "constant_growth_total_ape": "0.258",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "3.625",
+    "age_15_64": "1.34",
+    "age_65_plus": "5.107",
+    "all_ages": "0.854"
+   },
+   "linear_trend_total_ape": "3.103",
+   "mape_single_age_avg_residual": "10.597",
+   "naive_no_change_total_ape": "20.551",
+   "observed_total_2023": "316732",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "0.854",
+    "mig=zero": "4.24"
+   }
+  },
+  "WLF": {
+   "constant_growth_total_ape": "9.042",
+   "data_notes": [
+    "open age lowered from 100 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 97 to 96: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 96 to 95: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "8.331",
+    "age_15_64": "24.171",
+    "age_65_plus": "5.903",
+    "all_ages": "18.233"
+   },
+   "linear_trend_total_ape": "11.969",
+   "mape_single_age_avg_residual": "19.546",
+   "naive_no_change_total_ape": "10.113",
+   "observed_total_2023": "11421",
+   "open_age": 90,
+   "total_ape": {
+    "mig=average_residual": "18.233",
+    "mig=zero": "19.613"
+   }
+  },
+  "WSM": {
+   "constant_growth_total_ape": "0.758",
+   "data_notes": [
+    "open age lowered from 100 to 99: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 99 to 98: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)",
+    "open age lowered from 98 to 97: zero base-period exposure, no open-group deaths or a death rate >= 2 (small numbers)"
+   ],
+   "group_ape_avg_residual": {
+    "age_0_14": "1.24",
+    "age_15_64": "0.17",
+    "age_65_plus": "3.374",
+    "all_ages": "0.197"
+   },
+   "linear_trend_total_ape": "1.231",
+   "mape_single_age_avg_residual": "8.496",
+   "naive_no_change_total_ape": "8.611",
+   "observed_total_2023": "215984",
+   "open_age": 97,
+   "total_ape": {
+    "mig=average_residual": "0.197",
+    "mig=zero": "17.437"
+   }
+  },
+  "XKX": {
+   "constant_growth_total_ape": "7.501",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "23.004",
+    "age_15_64": "3.874",
+    "age_65_plus": "12.346",
+    "all_ages": "6.463"
+   },
+   "linear_trend_total_ape": "7.49",
+   "mape_single_age_avg_residual": "20.445",
+   "naive_no_change_total_ape": "6.196",
+   "observed_total_2023": "1709140",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "6.463",
+    "mig=zero": "20.242"
+   }
+  },
+  "YEM": {
+   "constant_growth_total_ape": "1.551",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.721",
+    "age_15_64": "2.343",
+    "age_65_plus": "2.384",
+    "all_ages": "2.5"
+   },
+   "linear_trend_total_ape": "4.159",
+   "mape_single_age_avg_residual": "44.919",
+   "naive_no_change_total_ape": "25.588",
+   "observed_total_2023": "38794337",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "2.5",
+    "mig=zero": "1.734"
+   }
+  },
+  "ZAF": {
+   "constant_growth_total_ape": "1.546",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "5.979",
+    "age_15_64": "6.48",
+    "age_65_plus": "8.942",
+    "all_ages": "3.374"
+   },
+   "linear_trend_total_ape": "2.682",
+   "mape_single_age_avg_residual": "9.687",
+   "naive_no_change_total_ape": "13.632",
+   "observed_total_2023": "62796883",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.374",
+    "mig=zero": "4.977"
+   }
+  },
+  "ZMB": {
+   "constant_growth_total_ape": "4.071",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "9.379",
+    "age_15_64": "1.317",
+    "age_65_plus": "3.909",
+    "all_ages": "3.15"
+   },
+   "linear_trend_total_ape": "2.72",
+   "mape_single_age_avg_residual": "6.16",
+   "naive_no_change_total_ape": "25.832",
+   "observed_total_2023": "20430382",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "3.15",
+    "mig=zero": "1.628"
+   }
+  },
+  "ZWE": {
+   "constant_growth_total_ape": "0.298",
+   "data_notes": [],
+   "group_ape_avg_residual": {
+    "age_0_14": "2.205",
+    "age_15_64": "3.958",
+    "age_65_plus": "8.105",
+    "all_ages": "1.551"
+   },
+   "linear_trend_total_ape": "1.297",
+   "mape_single_age_avg_residual": "6.366",
+   "naive_no_change_total_ape": "14.123",
+   "observed_total_2023": "16203259",
+   "open_age": 100,
+   "total_ape": {
+    "mig=average_residual": "1.551",
+    "mig=zero": "7.623"
+   }
+  }
+ },
+ "jump_off": 2013,
+ "note": "WPP 2024 estimates are model-based; this checks consistency with WPP, not truth",
+ "source": "live run 2026-10-16, throwaway DB reva_live_simworld_1c79ee35cd, release 780faddf-1123-4922-a3d8-0b9964fcd36a",
+ "target_year": 2023
+}

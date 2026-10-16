@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "ab8a6d33f8c3883b5d90e13bfd7dc21a8254b1c571d457dc83bcafc95c6821ea",
+    "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=revisions%7Cpageprops&ppprop=wikibase_item&rvprop=ids%7Ctimestamp%7Ccontent&rvslots=main&titles=1912+Summer+Olympics+medal+table%7C1960+Summer+Olympics+medal+table%7C2020+Summer+Olympics+medal+table%7C2024+Summer+Olympics+medal+table",
+    "file": "ab8a6d33f8c3883b.json",
+    "sha256": "e14da5235023f174b5e145bd2afb6d0731dcd6c63adc80603d85898f438a55c4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T18:23:02.163286+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "real live capture (fixture subset: 1912 Summer, 1960 Summer, 2020 Summer, 2024 Summer)"
+  },
+  {
+    "request_fingerprint": "8d0e28ec3004336e94e4a60cc10687e5ceed0abb8fdd65e59ed4ae2cc23016e3",
+    "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=pageprops&ppprop=wikibase_item&titles=1912+Summer+Olympics%7C1960+Summer+Olympics%7C2020+Summer+Olympics%7C2024+Summer+Olympics",
+    "file": "8d0e28ec3004336e.json",
+    "sha256": "390c66abf727b481d6cd2ab44e4bad01cc0496a1d4c91748fe3ae9258a0e2e3a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-16T18:24:04.006546+00:00",
+    "licence": "CC BY-SA 4.0",
+    "note": "real live capture (fixture subset: 1912 Summer, 1960 Summer, 2020 Summer, 2024 Summer)"
+  }
+]

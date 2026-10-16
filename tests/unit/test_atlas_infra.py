@@ -235,10 +235,11 @@ def test_gcat_aliases_have_evidence_and_skip_historical_states() -> None:
     doc = yaml.safe_load((REPO / "registry/atlas/geo_aliases/a_infra.yaml").read_text())
     al = doc["schemes"]["gcat"]["aliases"]
     assert all(a["source"].startswith("GCAT orgs.tsv row Code=" + a["code"] + " ") for a in al)
-    for code in ("SU", "CSSR", "CSFR", "HKUK", "TTPI", "EARTH", "I-ESA", "DD"):
+    for code in ("SU", "CSSR", "CSFR", "HKUK", "TTPI", "EARTH", "I-ESA", "DD", "ESIB"):
         assert country_iso3(code, "gcat") is None
     assert country_iso3("F", "gcat") == "FRA" and country_iso3("GUF", "gcat") == "GUF"
     assert country_iso3("UK", "gcat") == "GBR" and country_iso3("TW", "gcat") == "TWN"
+    assert country_iso3("ESCN", "gcat") is None  # Canary Islands: part of Spain (E), not merged
 
 
 # --------------------------------------------------------------------------- WPI
@@ -250,8 +251,8 @@ def test_wpi_counts() -> None:
     )
     rows = list(csv.DictReader(io.StringIO(raw.body.decode("utf-8-sig"))))
     assert int(_one(frame, "FR", "PORTS_LISTED")["value"]) == sum(r["countryCode"] == "FR" for r in rows)  # type: ignore[index]
-    assert set(frame.filter(pl.col("provider_geo").is_in(["QM", "XU"]))["iso3"].to_list()) == {"UMI"}
-    assert unmapped == [] and rep["unmapped"] == []
+    # parts of ISO UM (UMI) stay unmapped: three provider geographies are never merged into one country
+    assert {u["provider_geo"] for u in unmapped} == {"QM", "XU"} == set(rep["unmapped"])
     assert _flags(_one(frame, "FR", "PORTS_LISTED"))["coverage"].startswith("WPI lists ports")  # type: ignore[arg-type]
 
 

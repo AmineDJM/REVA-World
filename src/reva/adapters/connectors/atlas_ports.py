@@ -12,8 +12,8 @@ What the counts mean
 The WPI lists ports chosen for navigation (sailing directions); it is **not a census** of a country's ports
 and its coverage is uneven (the United States and Canada are listed in far more detail than, e.g., India or
 China). Every row is a derived count of WPI records (``derived: count`` with its formula), per
-``countryCode`` (ISO 3166-1 alpha-2, except ``QM`` Midway, ``QW`` Wake, ``XU`` Johnston Atoll -> ``UMI`` via
-scheme ``nga_wpi`` of ``registry/atlas/geo_aliases/a_infra.yaml``):
+``countryCode`` (ISO 3166-1 alpha-2, scheme ``nga_wpi``). ``QM`` (Midway), ``QW`` (Wake) and ``XU`` (Johnston
+Atoll) are parts of ISO ``UM`` (UMI): they stay unmapped (kept, listed) rather than being merged into one country.
 
 * ``PORTS_LISTED``: records of the country;
 * ``PORTS_LISTED|harbor_size=<L|M|S|V>``: by the WPI harbour size code (Large, Medium, Small, Very small);
