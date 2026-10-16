@@ -427,7 +427,38 @@ def _all_keys() -> list[str]:
 
 
 # ---------------------------------------------------------------------------------------- matrix
-def matrix(cov: dict[str, dict[str, Any]], head_snapshot: dict[str, list[str]] | None = None) -> dict[str, Any]:
+PROPOSALS = REPO / "registry" / "atlas" / "source_order" / "_proposals_gaphunt.yaml"
+#: GAPHUNT's proposed new headline concepts -> the matrix concept they would answer
+PROPOSED_NEW = {
+    "reva.population.total_1_january": "population",
+    "reva.health.life_expectancy_national_tables": "life_expectancy",
+}
+
+
+def proposal_series() -> dict[str, list[str]]:
+    """Matrix concept -> series GAPHUNT proposes to ATLASOPS (``_proposals_gaphunt.yaml``), for ``--with-proposals``."""
+    import yaml
+
+    doc = yaml.safe_load(PROPOSALS.read_text())
+    by_head: dict[str, list[str]] = {}
+    for p in doc.get("add_series", []):
+        by_head.setdefault(p["concept"], []).append(p["entry"]["series"])
+    out: dict[str, list[str]] = {}
+    for key, spec in CONCEPTS.items():
+        for cid in spec["headline"]:
+            out.setdefault(key, []).extend(by_head.get(cid, []))
+    for c in doc.get("new_concepts", []):
+        key = PROPOSED_NEW.get(c["concept"]["id"])
+        if key:
+            out.setdefault(key, []).extend(s["series"] for s in c["concept"]["series"])
+    return out
+
+
+def matrix(
+    cov: dict[str, dict[str, Any]],
+    head_snapshot: dict[str, list[str]] | None = None,
+    proposals: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
     from reva.atlas.source_order import load_headlines
 
     reg = load_headlines()
@@ -438,6 +469,7 @@ def matrix(cov: dict[str, dict[str, Any]], head_snapshot: dict[str, list[str]] |
         head_series: list[str] = []
         for cid in spec["headline"]:
             head_series += [s.series.key for s in reg.concepts[cid].series]
+        head_series += (proposals or {}).get(key, [])
 
         def covered(pats: Iterable[str]) -> tuple[set[str], dict[str, int]]:
             got: set[str] = set()
@@ -487,6 +519,9 @@ def to_markdown(res: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--static", action="store_true", help="include report-derived coverage")
+    ap.add_argument(
+        "--with-proposals", action="store_true", help="count GAPHUNT's proposed headline series as headline"
+    )
     ap.add_argument("--tables", action="store_true", help="read the latest atlas tables of --db from --objects")
     ap.add_argument("--snapshot", action="store_true", help="use the latest atlas snapshot of --db")
     ap.add_argument("--origin", default=None)
@@ -523,7 +558,8 @@ def main(argv: list[str] | None = None) -> None:
         ap.error("no coverage input: give --static, --tables, --snapshot or --coverage")
     if a.save_coverage:
         a.save_coverage.write_text(json.dumps(cov, indent=0, sort_keys=True))
-    res = matrix(cov, head)
+    res = matrix(cov, head, proposal_series() if a.with_proposals else None)
+    res["with_proposals"] = bool(a.with_proposals)
     res["inputs"] = sorted({o.strip() for v in cov.values() for o in v["origin"].split(";")})
     if a.out_json:
         a.out_json.write_text(json.dumps(res, indent=1, ensure_ascii=False))
