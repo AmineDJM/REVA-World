@@ -4,7 +4,7 @@ agents' REAL fixtures (fixture-mode ingests, no network) loaded together into th
 Sources: CAUSDATA (ICB, COW MID, UCDP termination + peace agreements, with KGGEOPOL's UCDP conflicts), A-COUPS
 (Powell & Thyne, Archigos, REIGN-format list), A-HAZARDS (NOAA NCEI 2018 window), A-SANCTIONS (TIES, EUSANCT, EU
 sanctions map, OFAC), A-CONTENTION (NAVCO, MEC, Mass Mobilization), A-ECRISES (Laeven-Valencia, Reinhart-Rogoff,
-JST, ESRB). Asserts: no record of an event kind is left untyped, coded outcomes / places / regimes / persons are
+JST, ESRB), A-COLONIAL (COLDAT, ICOW colonial history + claims, COW territorial change + entities). Asserts: no record of an event kind is left untyped, coded outcomes / places / regimes / persons are
 never typed as events, and every causal claim's cause or effect is a typed event (the other end being a typed
 event or a known non-event record such as a coded outcome).
 """
@@ -19,6 +19,7 @@ import pytest
 from sqlalchemy import text
 
 from reva.adapters.connectors import (
+    atlas_colonial,
     atlas_coups,
     atlas_ecrises,
     atlas_icb,
@@ -28,6 +29,7 @@ from reva.adapters.connectors import (
     atlas_navco,
     atlas_noaa_hazards,
     atlas_sanctions,
+    atlas_terrchange,
     atlas_ucdp,
     atlas_ucdp_term,
 )
@@ -51,12 +53,15 @@ SOURCES: list[tuple[Any, tuple[str, ...] | None, dict[str, Any]]] = [
     (atlas_navco, None, {}),
     (atlas_massmob, None, {}),
     (atlas_ecrises, None, {}),
+    (atlas_colonial, None, {}),
+    (atlas_terrchange, None, {}),
 ]
 
 #: Namespaces of the dataset records checked here.
 PREFIXES = (
     "icb:", "mid:", "ucdp:", "ptcoup:", "archigos:", "reign:", "ncei_hazards:", "ties:", "eusanct:",
-    "eusanctionsmap:", "ofac:", "sanctions:", "navco", "mec:", "mmp:", "ecrises:",
+    "eusanctionsmap:", "ofac:", "sanctions:", "navco", "mec:", "mmp:", "ecrises:", "icowcol:", "icowclaim:", "cowtc:",
+    "cowent:", "coldat:",
 )  # fmt: skip
 
 #: KG entity kinds of event records (each must be typed with a type more specific than the root ``event``).
@@ -191,7 +196,12 @@ def test_causal_claims_attach_to_typed_events(
             text("SELECT source_key, cause_id, effect_id FROM kg.causal_claim_current WHERE origin = 'test_fixture'")
         ).all()
         extra = {e for _, a, b in rows for e in (a, b) if e not in classified}
-        kinds = dict(c.execute(text("SELECT qid, kind FROM kg.entity_current WHERE qid = ANY(:q)"), {"q": list(extra)}))
+        kinds = {
+            q: k
+            for q, k in c.execute(
+                text("SELECT qid, kind FROM kg.entity_current WHERE qid = ANY(:q)"), {"q": sorted(extra)}
+            ).all()
+        }
         for e in extra:
             classified[e] = (kinds.get(e, "?"), ev.classify(c, e, origin="test_fixture", tax=tax))
     assert len(rows) > 500
