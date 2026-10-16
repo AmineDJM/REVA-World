@@ -32,6 +32,7 @@ roles:
   - {id: winner, label_en: winner, label_fr: vainqueur}
   - {id: contributor, label_en: personnel contributor, label_fr: contributeur en personnel}
   - {id: former_ruler, label_en: former ruling state, label_fr: ancien État souverain}
+  - {id: sender, label_en: sender (sanctions), label_fr: émetteur (sanctions)}
 
 types:
   - id: event
@@ -162,6 +163,16 @@ types:
     parent: event
     wikidata_classes: [Q45382]
     roles: [perpetrator, target, actor]
+  - id: leader_removal
+    label_en: irregular or foreign removal of a leader (Archigos)
+    label_fr: éviction irrégulière ou étrangère d'un dirigeant (Archigos)
+    parent: event
+    wikidata_classes: []
+    roles: [target]
+    description: >-
+      Archigos 4.1 exits coded Irregular (removal by domestic actors in contravention of the explicit rules and
+      established conventions) or Foreign (removal by another state). A dataset type: the end of a leader's spell
+      as Archigos codes it, not a Wikidata class. Coups Archigos codes as the cause are separate coup records.
   - id: assassination
     label_en: assassination
     label_fr: assassinat
@@ -345,8 +356,10 @@ types:
     label_fr: épisode de sanctions
     parent: event
     wikidata_classes: []
-    roles: [actor, target]
-    description: No Wikidata class verified (KGGEOPOL found none); reserved for sanctions datasets.
+    roles: [sender, target]
+    description: >-
+      No Wikidata class verified (KGGEOPOL found none). TIES / EUSANCT cases (threat and/or imposition of sanctions
+      by a sender against a target); EU sanctions-map regimes and OFAC programs are regimes, not episodes.
 
   # -------------------------------------------------------------- diplomacy
   - id: treaty
@@ -424,6 +437,44 @@ types:
     parent: economic_crisis
     wikidata_classes: [Q185565]
     roles: [participant]
+  # dataset types of the crisis chronologies (A-ECRISES: Laeven-Valencia, Reinhart-Rogoff, JST, ESRB). The connector
+  # also writes P31 Q806729 / Q1417912 / Q1092023 / Q1364290, classes without a recorded EVENTS verification, so the
+  # type comes from the coded `ecrises:crisis_type` (dataset kind below), never from an unverified class.
+  - id: banking_crisis
+    label_en: banking crisis (dataset coding)
+    label_fr: crise bancaire (codage des jeux de données)
+    parent: financial_crisis
+    wikidata_classes: []
+    roles: [participant]
+    description: Laeven-Valencia systemic banking crises, Reinhart-Rogoff banking crises, JST systemic banking crises.
+  - id: currency_crisis
+    label_en: currency crisis (dataset coding)
+    label_fr: crise de change (codage des jeux de données)
+    parent: financial_crisis
+    wikidata_classes: []
+    roles: [participant]
+    description: Laeven-Valencia and Reinhart-Rogoff currency crises (each dataset's own threshold definition).
+  - id: sovereign_debt_crisis
+    label_en: sovereign debt crisis (default or restructuring; dataset coding)
+    label_fr: crise de la dette souveraine (défaut ou restructuration ; codage des jeux de données)
+    parent: financial_crisis
+    wikidata_classes: []
+    roles: [participant]
+    description: Laeven-Valencia sovereign debt crises and restructurings, Reinhart-Rogoff external / domestic defaults.
+  - id: inflation_crisis
+    label_en: inflation crisis (Reinhart-Rogoff coding)
+    label_fr: crise d'inflation (codage Reinhart-Rogoff)
+    parent: economic_crisis
+    wikidata_classes: []
+    roles: [participant]
+    description: Reinhart-Rogoff inflation crises (annual inflation above their threshold); not hyperinflation.
+  - id: financial_stress_episode
+    label_en: episode of elevated financial stress, not systemic (ESRB residual event)
+    label_fr: épisode de tensions financières non systémique (événement résiduel ESRB)
+    parent: event
+    wikidata_classes: []
+    roles: [participant]
+    description: ESRB financial crises database residual events — stress that the ESRB does not code as a systemic crisis.
 
   # -------------------------------------------------------------- disasters and health
   - id: disaster
@@ -519,6 +570,11 @@ properties:
   - {pid: "ucdp:location", family: place, role: country, note: "UCDP location: government(s) whose territory is disputed"}
   - {pid: "unpk:mission_country", family: place, role: country}
   - {pid: "unpk:hq_location", family: place, role: location}
+  - {pid: "ncei:country", family: place, role: country, note: "NOAA NCEI: country of the hazard record (QID when mapped)"}
+  - {pid: "ncei:runup_country", family: place, role: location, note: "NOAA NCEI: a country where tsunami runups were observed"}
+  - {pid: "coup:against_state", family: place, role: country, note: "A-COUPS: the state whose executive the coup targeted"}
+  - {pid: "archigos:removed_from", family: place, role: country, note: "Archigos: the state the leader was removed from"}
+  - {pid: "contention:location", family: place, role: location, note: "NAVCO / MEC / MMP location (country QID or provider place)"}
   # participants (out: the event is the subject; in: the event is the object)
   - {pid: P710, family: participant, role: participant}
   - {pid: P1344, family: participant, role: participant, direction: in, note: "X participant in event"}
@@ -534,6 +590,12 @@ properties:
   - {pid: "ucdp:secondary_party", family: participant, role: supporting_party}
   - {pid: "ucdp:nonstate_side", family: participant, role: belligerent}
   - {pid: "unpk:contributed_personnel_to", family: participant, role: contributor, direction: in}
+  - {pid: "ties:sender", family: participant, role: sender}
+  - {pid: "ties:target", family: participant, role: target}
+  - {pid: "eusanct:sender", family: participant, role: sender}
+  - {pid: "eusanct:target", family: participant, role: target}
+  - {pid: "coup:leader_removed", family: participant, role: target, note: "Archigos: the leader the coup removed"}
+  - {pid: "archigos:removal_of", family: participant, role: target, note: "Archigos: the leader removed"}
   # structure (context, never causal)
   - {pid: P361, family: structure, role: part_of}
   - {pid: P527, family: structure, role: has_part}
@@ -578,31 +640,75 @@ dataset_kinds:
     note: Treaties A-TREATIES mapped to their Wikidata item (registry/entities/treaty_qids.json); recognised by UNTC's MTDSG number statement even when no Wikidata snapshot is loaded.
 
   # dataset agents of the causality work split (prefixes and kinds as documented in their docs/dev pages)
+  # Verified by EVMAP on the agents' real fixtures loaded together (tests/integration/test_events_dataset_kinds.py).
+  # Records of these namespaces that are NOT events (never typed): `ncei_hazards:volcano:*` (a place),
+  # `archigos:leader:*` / `reign:leader:*` (persons), `ties:outcome:*` / `eusanct:outcome:*` /
+  # `eusanct:policy_result:*` and `<campaign>:outcome` (coded outcomes), `eusanctionsmap:regime:*` and
+  # `ofac:program:*` (regimes / programs), `sanctions:org:*` (organisations), `ecrises:condition:*` (conditions),
+  # `icb:pc:*` (protracted-conflict groupings).
   - id_prefix: "ptcoup:"
-    source_key: null
+    source_key: powell_thyne.coups
     type: coup
     label_en: coup (Powell & Thyne)
+    coded_properties: ["coup:outcome", "coup:event_type"]
     note: A-COUPS (docs/dev/v3_a_coups.md); successful and failed attempts, outcome coded verbatim.
+  - id_prefix: "archigos:coup:"
+    source_key: archigos.leaders
+    type: coup
+    label_en: coup (Archigos 4.1 irregular removal by the military or other government actors)
+    coded_properties: ["coup:event_type", "coup:perpetrator_type"]
+    note: >-
+      A-COUPS; the coup Archigos codes behind an irregular exit. A successful Powell & Thyne coup of the same state
+      and day is linked by `coup:same_state_and_day_as` (context), not by `same_as`.
+  - id_prefix: "archigos:exit:"
+    source_key: archigos.leaders
+    type: leader_removal
+    label_en: removal of a leader (Archigos 4.1 exit Irregular or Foreign)
+    coded_properties: ["archigos:exit_manner"]
+    note: A-COUPS; the effect end of Archigos' coded coup -> removal claims.
   - id_prefix: "ncei_hazards:earthquake:"
-    source_key: null
+    source_key: noaa.ncei_hazards
     type: earthquake
     label_en: earthquake (NOAA NCEI)
+    coded_properties: ["ncei:magnitude"]
   - id_prefix: "ncei_hazards:tsunami:"
-    source_key: null
+    source_key: noaa.ncei_hazards
     type: tsunami
     label_en: tsunami event (NOAA NCEI)
+    coded_properties: ["ncei:tsunami_cause", "ncei:tsunami_validity"]
   - id_prefix: "ncei_hazards:eruption:"
-    source_key: null
+    source_key: noaa.ncei_hazards
     type: volcanic_eruption
     label_en: volcanic eruption (NOAA NCEI)
+    coded_properties: ["ncei:vei"]
   - id_prefix: "ties:case:"
-    source_key: null
+    source_key: ties.unc
     type: sanction_episode
     label_en: sanction case (TIES)
+    coded_properties: ["ties:issue", "ties:final_outcome"]
   - id_prefix: "eusanct:case:"
-    source_key: null
+    source_key: eusanct.kondata
     type: sanction_episode
     label_en: sanction case (EUSANCT)
+    coded_properties: ["eusanct:issue", "eusanct:final_outcome"]
+  - id_prefix: ""
+    marker_property: "ecrises:crisis_type"
+    source_key: null
+    type: event
+    label_en: crisis chronology record (Laeven-Valencia, Reinhart-Rogoff, JST, ESRB; A-ECRISES)
+    coded_type_property: "ecrises:crisis_type"
+    coded_type_map: {"banking crisis": banking_crisis, "systemic banking crisis": banking_crisis,
+                     "currency crisis": currency_crisis,
+                     "sovereign debt crisis (default or restructuring)": sovereign_debt_crisis,
+                     "sovereign debt restructuring": sovereign_debt_crisis,
+                     "sovereign domestic debt default": sovereign_debt_crisis,
+                     "sovereign external debt default or restructuring": sovereign_debt_crisis,
+                     "inflation crisis": inflation_crisis, "systemic financial crisis": financial_crisis,
+                     "episode of elevated financial stress (not systemic)": financial_stress_episode}
+    coded_properties: ["ecrises:crisis_type"]
+    note: >-
+      A-ECRISES (docs/dev/v3_a_ecrises.md); coded values verbatim from the connector. An unmapped new value falls
+      back to the generic `event` type (the integration test refuses that on the fixtures).
   - id_prefix: ""
     marker_property: "causdata:event_type"
     source_key: null
@@ -619,7 +725,7 @@ dataset_kinds:
   - id_prefix: ""
     marker_property: "contention:event_type"
     source_key: null
-    type: protest
+    type: event
     label_en: contention record (NAVCO, MEC, Mass Mobilization; A-CONTENTION)
     coded_type_property: "contention:event_type"
     coded_type_map: {resistance_campaign: resistance_campaign, contentious_episode: protest, protest: protest,

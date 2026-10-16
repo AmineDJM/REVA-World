@@ -65,9 +65,10 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   A-FISCAL bis.stats + oecd.sdmx raise, KGLANG glottolog/wals/grambank, ...); same caps.
 # * budgets.yaml -> budgets-1.3.7 (2026-10-16, lead): merge of the causality-wave requests (CAUSDATA icb.data,
 #   A-ECRISES, A-COUPS, A-SANCTIONS, A-CONTENTION, A-HAZARDS, CAUSCAND, ...); same caps (<= 5000/source, 3 GiB/day).
+# * budgets.yaml -> budgets-1.3.8 (2026-10-16, lead): merge of A-COLONIAL (coldat, icow, cow terrchange); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "3f70de16739ee883cfbfdd40d286c490f335b3dfafaa6db418e86a421fb44956",
+    "budgets.yaml": "b0e253ab9b68412748c26a88328d3aa68951334402ba07b954689ae9df4a85c9",
 }
 
 
