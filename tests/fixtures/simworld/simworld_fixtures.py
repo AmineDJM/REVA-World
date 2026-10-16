@@ -32,7 +32,10 @@ def wpp_fixture_spec() -> dict[str, Any]:
 def wpp_connector() -> W.UnWppDemographyConnector:
     spec = wpp_fixture_spec()
     pinned = {f.key: f for f in W.FILES}
-    files = [W.WppFile(e["key"], e["file"], e["size"], None, pinned[e["key"]].last_modified, pinned[e["key"]].header) for e in spec["files"]]
+    files = [
+        W.WppFile(e["key"], e["file"], e["size"], None, pinned[e["key"]].last_modified, pinned[e["key"]].header)
+        for e in spec["files"]
+    ]
     return W.UnWppDemographyConnector(files, chunk_bytes=spec["chunk_bytes"], first_year=spec["first_year"])
 
 

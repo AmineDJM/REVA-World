@@ -26,7 +26,7 @@ async def test_nobel_atlas_and_kg(db):
     rep = out["summary"]
     atlas = rep["atlas"]
     assert atlas["dataset_key"] == "atlas.nobel.laureates" and atlas["created"] is True
-    assert [u["provider_geo"] for u in atlas["unmapped_provider_geo"]] == ["Taiwan"]
+    assert atlas["unmapped_provider_geo"] == []
     frame = read_atlas_table(db.store, atlas["artifact_sha256"])
     pol = frame.filter((pl.col("iso3") == "POL") & (pl.col("indicator") == "born_total|category=all"))
     assert pol["value"].to_list() and int(pol["value"][0]) >= 2  # Marie Curie twice

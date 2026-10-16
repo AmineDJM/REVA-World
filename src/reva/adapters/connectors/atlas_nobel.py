@@ -58,8 +58,8 @@ from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_d
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.nobel"
-CONNECTOR_VERSION = "1.0.0"
-PARSER_VERSION = "atlas-nobel-parse-1"
+CONNECTOR_VERSION = "1.1.0"
+PARSER_VERSION = "atlas-nobel-parse-2"
 SOURCE_KEY = "nobelprize.api"
 ATLAS_SOURCE = "nobel"
 ATLAS_DATASET = "laureates"
@@ -325,6 +325,8 @@ def load_kg_statements(
         )
     except RevaError as e:
         return {"status": "failed", "error": e.message, "details": e.details}
+    except DBAPIError as e:  # e.g. a database migrated before the current KG schema
+        return {"status": "failed", "error": f"{type(e.orig).__name__}: {str(e.orig)[:300]}"}
     d = rep.as_dict()
     d.update(
         status="loaded",

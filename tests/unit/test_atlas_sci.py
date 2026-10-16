@@ -74,8 +74,9 @@ def test_nobel_atlas_counts(nobel_records):
     recs, _ = nobel_records
     f = nobel.frame(recs, raw_sha256=SHA, retrieved_at=T0)
     v, unmapped = validate_atlas_frame(f, source="nobel", dataset="laureates", raw_sha256s=[SHA], geo_scheme="iso3")
-    # Taiwan is not a crosswalk entity: kept, unmapped, never merged into CHN
-    assert {u["provider_geo"] for u in unmapped} == {"Taiwan"}
+    # Taiwan (Yuan T. Lee) maps to its own crosswalk entity, never merged into CHN
+    assert unmapped == []
+    assert v.filter((pl.col("iso3") == "TWN") & (pl.col("indicator") == "born_total|category=all")).height == 1
     # Marie Curie: born in present-day Poland, counted in 1903 (physics) and 1911 (chemistry)
     pol = v.filter((pl.col("iso3") == "POL") & (pl.col("indicator") == "born|category=all"))
     years = {r["period_start"].year: r["value"] for r in pol.to_dicts()}
@@ -334,15 +335,16 @@ def test_science_catalog_series_match_parsers(nobel_records, gii):
 
 
 async def test_openalex_complement_queries_without_key():
-    """Without an API key OpenAlex refuses cursor paging: the countries beyond the first 200 groups come from
-    complement queries; co-author countries in those responses are ignored (counted from page 1)."""
+    """Without an API key OpenAlex refuses cursor paging: the countries beyond the 200 largest groups come
+    from complement queries; co-author countries in those responses are ignored (counted from the first
+    page); a country cut off by a full complement response is re-queried alone, then reported unresolved."""
     from types import SimpleNamespace
     from urllib.parse import parse_qs, urlsplit
 
     from reva.atlas.tables import geo_index
 
     codes = sorted(geo_index().maps[oa.GEO_SCHEME])
-    first = [c for c in codes if c != "US"][:199] + ["US"]
+    first = [c for c in codes if c not in ("US", "NR")][:199] + ["US"]
     calls: list[str] = []
 
     class Run:
@@ -353,9 +355,12 @@ async def test_openalex_complement_queries_without_key():
             flt = parse_qs(urlsplit(url).query)["filter"][0]
             if "authorships.countries:" not in flt:
                 groups = [(f"https://openalex.org/countries/{c}", c, 1000) for c in first]
-                return SimpleNamespace(body=_group_doc(groups, count=5000, next_cursor="abc"))
+                return SimpleNamespace(body=_group_doc(groups, count=5000))
             chunk = flt.split("authorships.countries:")[1].split("|")
-            groups = [(f"https://openalex.org/countries/{c}", c, 7) for c in chunk] + [
+            if "NR" in chunk:  # NR's co-authors fill a full response that never shows NR
+                filler = [(f"https://openalex.org/countries/{c}", c, 9) for c in first]
+                return SimpleNamespace(body=_group_doc(filler, count=99))
+            groups = [(f"https://openalex.org/countries/{c}", c, 7) for c in chunk if c != "TV"] + [
                 ("https://openalex.org/countries/US", "United States", 3)
             ]
             return SimpleNamespace(body=_group_doc(groups, count=99))
@@ -367,7 +372,11 @@ async def test_openalex_complement_queries_without_key():
     fetched = await oa.fetch_query(Run(), q, api_key=None, limit=100, state={"requests": 0})
     rows = oa.atlas_rows(q, fetched, retrieved_at=T0)
     vals = {r["provider_geo"]: r["value"] for r in rows}
-    assert set(codes) <= set(vals) and vals["US"] == "1000" and vals["_all_works"] == "5000"
-    rest = sorted(set(codes) - set(first))
+    assert vals["US"] == "1000" and vals["_all_works"] == "5000"
+    rest = sorted(set(codes) - set(first) - {"NR", "TV"})
     assert all(vals[c] == "7" for c in rest)
-    assert len(calls) == 1 + -(-len(rest) // oa.CHUNK) and not any("cursor=abc" in u for u in calls)
+    assert "TV" not in vals  # absent from a complete (< 200 groups) response: no work, no row (never a 0)
+    assert "NR" not in vals
+    all_works = [r for r in rows if r["provider_geo"] == "_all_works"][0]
+    assert json.loads(all_works["flags"])["unresolved_countries"] == ["NR"]
+    assert not any("cursor" in u for u in calls)

@@ -1,0 +1,19 @@
+id: geography.nature.epidemics
+domain: geography
+owner: KGSCIECO
+description: >-
+  Epidemics and pandemics: instances of disease outbreak (Q3241045), epidemic (Q44512) or pandemic (Q12184),
+  or of a subclass, with at least 3 sitelinks: Plague of Justinian, Black Death, 1918 flu pandemic, HIV/AIDS,
+  COVID-19 and its national outbreaks ... Snapshots keep country (P17), location (P276), start/end, number of
+  deaths (P1120), the disease via has cause / has immediate cause (P828/P1478, asserted by Wikidata), part of
+  (P361, national outbreak -> pandemic); number of cases (P1603) is requested.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q3241045 wd:Q44512 wd:Q12184 }
+    ?item wdt:P31/wdt:P279* ?root ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 10000
+expand_hops: 1

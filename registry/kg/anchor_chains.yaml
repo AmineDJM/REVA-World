@@ -171,6 +171,14 @@ entities:
   spanish_conquest_of_aztec_empire: {qid: Q828435, label_en: "Spanish conquest of the Aztec Empire", verified: enwiki_title_lookup}
   aztec_empire: {qid: Q2608489, label_en: "Aztec Empire", verified: enwiki_title_lookup}
   nigeria: {qid: Q1033, label_en: "Nigeria", verified: enwiki_title_lookup}
+  colonial_nigeria: {qid: Q2046345, label_en: "Colonial Nigeria", verified: enwiki_title_lookup}
+  federation_of_nigeria: {qid: Q5440850, label_en: "Federation of Nigeria", verified: enwiki_title_lookup}
+  commonwealth_of_the_philippines: {qid: Q146328, label_en: "Commonwealth of the Philippines", verified: enwiki_title_lookup}
+  first_philippine_republic: {qid: Q1361989, label_en: "First Philippine Republic", verified: enwiki_title_lookup}
+  insular_government_philippines: {qid: Q6042084, label_en: "Insular Government of the Philippine Islands", verified: enwiki_title_lookup}
+  philippine_revolution: {qid: Q422082, label_en: "Philippine Revolution", verified: enwiki_title_lookup}
+  spanish_american_war: {qid: Q12583, label_en: "Spanish–American War", verified: enwiki_title_lookup}
+  treaty_of_paris_1898: {qid: Q847137, label_en: "Treaty of Paris (1898)", verified: enwiki_title_lookup}
   voyages_of_columbus: {qid: Q18578423, label_en: "Voyages of Christopher Columbus", verified: enwiki_title_lookup}
   catholic_monarchs: {qid: Q186851, label_en: "Catholic Monarchs of Spain", verified: enwiki_title_lookup}
   third_treaty_of_san_ildefonso: {qid: Q1259275, label_en: "Third Treaty of San Ildefonso", verified: enwiki_title_lookup}

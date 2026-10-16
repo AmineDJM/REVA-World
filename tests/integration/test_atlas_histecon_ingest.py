@@ -53,7 +53,7 @@ async def test_maddison_clio_gapminder_hyde_ingest_idempotent(db: Any) -> None:
     (t,) = _summary(await _run(db, atlas_gapminder))["tables"]
     assert t["coverage"]["period_max"] == "2025-01-01"
     (t,) = _summary(await _run(db, atlas_hyde))["tables"]
-    assert t["dataset_key"] == "atlas.hyde.hyde321" and t["coverage"]["period_min"] == "0100-01-01"
+    assert t["dataset_key"] == "atlas.hyde.hyde321" and t["coverage"]["period_min"] == "-10000-01-01"  # BCE steps, astronomical
     with db.owner.connect() as c:
         n = c.execute(
             text(

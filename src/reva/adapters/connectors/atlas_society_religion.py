@@ -225,9 +225,11 @@ RCS_CODE_VARS = {
     "MAJID": "ID code of religion of majority of population (50% plus one)",
     "SUPID": "ID code of religion of supermajority of population (66 2/3% or greater)",
 }
-#: RCS units without an ISO3 in the file that denote a crosswalk entity (evidence: RCS codebook Appendix A /
-#: the ABBREV field; COW state number 347 = Kosovo).
-RCS_ALIASES: dict[str, str] = {"347": "XKX"}
+#: RCS units whose ISO3 field is empty or not an ISO code but which denote a crosswalk entity. Evidence from
+#: the RCS file's own fields: 347 ``KOS`` (COW state number 347 = Kosovo, no ISO3 given); 984 ``NMR`` has
+#: ISO3 "NMP" (not an ISO code) but NUMISO/UNCODE 580 = Northern Mariana Islands (MNP); 2020 ``CNL`` has
+#: no ISO3 but NUMISO/UNCODE 830 = Channel Islands (crosswalk CHI).
+RCS_ALIASES: dict[str, str] = {"347": "XKX", "984": "MNP", "2020": "CHI"}
 RCS_REQUIRED = ("CCODE", "ABBREV", "YEAR", "ISO3", "INDEP", *RCS_CODE_VARS, *RCS_EXTRA)
 
 

@@ -534,18 +534,18 @@ class Executor:
                 )
                 return OpResult(op, "empty", data=data, consulted=consulted)
             src, cells = groups[0]
-            year = a["year"] if a["year"] is not None else latest_actual_year(cells)
-            if year is None:  # only projections and no year asked: the latest year is never a projection
+            all_year: int | None = a["year"] if a["year"] is not None else latest_actual_year(cells)
+            if all_year is None:  # only projections and no year asked: the latest year is never a projection
                 data["absence"] = ev.absence(
                     "atlas_value", consulted, concept=concept.id, iso3="ALL", year="latest", only_projections=True
                 )
                 data["only_projections"] = True
                 return OpResult(op, "empty", data=data, consulted=consulted)
-            chosen = sorted((c for c in cells if c.year == year), key=lambda c: c.iso3)
+            chosen = sorted((c for c in cells if c.year == all_year), key=lambda c: c.iso3)
             data.update(
                 all_countries=True,
                 source=src,
-                year=year,
+                year=all_year,
                 year_asked=a["year"] is not None,
                 n=len({c.iso3 for c in chosen}),
                 units=sorted({c.unit or "" for c in chosen}),

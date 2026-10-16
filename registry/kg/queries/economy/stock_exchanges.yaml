@@ -1,0 +1,18 @@
+id: economy.stock_exchanges
+domain: economy
+owner: KGSCIECO
+description: >-
+  Stock exchanges: instances of stock exchange (Q11691) or of a subclass, with at least 3 sitelinks (New
+  York, London, Tokyo, Shanghai, Bombay, Amsterdam -- the oldest -- ...). Snapshots keep country (P17),
+  location (P131), inception (P571), owner (P127, e.g. Euronext / ICE), parent organisation (P749),
+  replaces/replaced by. Company -> exchange (P414 stock exchange) is a requested property, picked up by the
+  economy.major_companies snapshots once allow-listed.
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q11691 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 2000
+expand_hops: 1

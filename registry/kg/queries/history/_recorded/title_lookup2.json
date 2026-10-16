@@ -1,0 +1,30 @@
+{
+  "kind": "title_lookup",
+  "endpoint": "https://www.wikidata.org/w/api.php",
+  "requests": [
+    {
+      "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=Colonial+Nigeria|Commonwealth+of+the+Philippines|First+Philippine+Republic|Insular+Government+of+the+Philippine+Islands|Republic+of+the+Congo+%28L%C3%A9opoldville%29|Congo-L%C3%A9opoldville|Nigeria+%281960%E2%80%931963%29|Federation+of+Nigeria|Dutch+colonial+empire|1961+Indian+annexation+of+Goa|Indian+annexation+of+Goa|Philippine+Revolution|Philippine%E2%80%93American+War|Treaty+of+Paris+%281898%29&props=info|sitelinks&sitefilter=enwiki&format=json&maxlag=5",
+      "raw_file": "title_lookup2_0.json.raw",
+      "body_sha256": "c7f4c4b3daf6e919721fe81c8fb6cfc5ff58d83b1ff23d4877c7e66012fb97c2",
+      "archive_sha256": "0612d4f172de544c2b526571a798296b23fbbc1dfbc36427f8d0b1efcbfdbdf2",
+      "retrieved_at": "2026-10-16T00:02:58.360548+00:00",
+      "titles": [
+        "Colonial Nigeria",
+        "Commonwealth of the Philippines",
+        "First Philippine Republic",
+        "Insular Government of the Philippine Islands",
+        "Republic of the Congo (Léopoldville)",
+        "Congo-Léopoldville",
+        "Nigeria (1960–1963)",
+        "Federation of Nigeria",
+        "Dutch colonial empire",
+        "1961 Indian annexation of Goa",
+        "Indian annexation of Goa",
+        "Philippine Revolution",
+        "Philippine–American War",
+        "Treaty of Paris (1898)"
+      ]
+    }
+  ],
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)"
+}

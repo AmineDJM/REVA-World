@@ -1,0 +1,16 @@
+id: geography.nature.deserts
+domain: geography
+owner: KGSCIECO
+description: >-
+  Deserts: direct instances of desert (Q8514) with at least 5 sitelinks (Sahara, Gobi, Atacama, Kalahari,
+  Arabian Desert, ...). Snapshots keep the countries they extend over (P17), continent (P30), area (P2046),
+  located in terrain feature (P706), coordinates.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31 wd:Q8514 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 5)
+  }
+max_rows: 1500
+expand_hops: 0

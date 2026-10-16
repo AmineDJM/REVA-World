@@ -1,0 +1,15 @@
+id: geography.nature.famines
+domain: geography
+owner: KGSCIECO
+description: >-
+  Famines: instances of famine (Q168247) or of a subclass: Great Irish Famine, Holodomor, Great Chinese
+  Famine, Bengal famine of 1943 ... Snapshots keep country (P17), location (P276), start/end, number of
+  deaths (P1120), has cause / has effect (asserted by Wikidata -- famines often carry policy causes),
+  part of (P361).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q168247 . }
+max_rows: 2000
+expand_hops: 1
+api_search: {instance_of: [Q168247], subclass_depth: 2}

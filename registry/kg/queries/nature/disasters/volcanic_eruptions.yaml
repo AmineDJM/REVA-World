@@ -1,0 +1,15 @@
+id: geography.nature.volcanic_eruptions
+domain: geography
+owner: KGSCIECO
+description: >-
+  Volcanic eruptions: instances of volcanic eruption (Q7692360) or of a subclass (Plinian eruption, ...):
+  Vesuvius 79, Tambora 1815, Krakatoa 1883, Pinatubo 1991 ... Snapshots keep the volcano (P706 located in
+  terrain feature / P276 location), country (P17), point in time / start / end, number of deaths (P1120),
+  has effect (e.g. Tambora 1815 -> Year Without a Summer, asserted by Wikidata).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q7692360 . }
+max_rows: 4000
+expand_hops: 1
+api_search: {instance_of: [Q7692360], subclass_depth: 2}

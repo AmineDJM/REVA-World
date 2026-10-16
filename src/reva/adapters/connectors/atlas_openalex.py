@@ -47,8 +47,8 @@ from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_d
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.openalex"
-CONNECTOR_VERSION = "1.0.0"
-PARSER_VERSION = "atlas-openalex-parse-1"
+CONNECTOR_VERSION = "1.2.0"
+PARSER_VERSION = "atlas-openalex-parse-2"
 SOURCE_KEY = "openalex.api"
 ATLAS_SOURCE = "openalex"
 HOST = "api.openalex.org"
@@ -160,14 +160,17 @@ def query_filter(q: Query, countries: Sequence[str] | None = None) -> str:
 
 
 def query_url(
-    q: Query, *, cursor: str = "*", api_key: str | None = None, countries: Sequence[str] | None = None
+    q: Query, *, cursor: str | None = None, api_key: str | None = None, countries: Sequence[str] | None = None
 ) -> str:
+    """Without ``cursor`` OpenAlex returns the 200 largest groups (count descending); with one (``*`` to
+    start, API key required past the first page) it pages through every group in key order."""
     params: dict[str, str] = {
         "filter": query_filter(q, countries),
         "group_by": "authorships.countries",
         "per_page": str(PER_PAGE),
-        "cursor": cursor,
     }
+    if cursor is not None:
+        params["cursor"] = cursor
     if api_key:
         params["api_key"] = api_key
     return f"https://{HOST}/works?" + urlencode(params, safe=":,|*", quote_via=quote)
@@ -296,55 +299,72 @@ class Fetched:
     pno: int
     filter: str
     keep: frozenset[str] | None = None  # complement queries: only these groups are taken from the page
+    unresolved: tuple[str, ...] = ()  # countries whose count could not be established (first page only)
 
 
-def _complete(page: GroupPage) -> bool:
-    return not (page.next_cursor and len(page.groups) >= PER_PAGE)
+def _maybe_truncated(page: GroupPage) -> bool:
+    # OpenAlex caps a group_by page at 200 groups and (without a cursor) gives no truncation signal.
+    return len(page.groups) >= PER_PAGE
 
 
 async def fetch_query(run: Any, q: Query, *, api_key: str | None, limit: int, state: dict[str, int]) -> list[Fetched]:
-    """All groups of one query. The first page holds the 200 largest groups; the rest comes from cursor
-    pages when an API key is set (OpenAlex refuses cursor paging without one: HTTP 401), else from
-    *complement* queries restricted to works with an author in a chunk of the crosswalk countries absent
-    from the first page — a country's count is the same under that restriction (every work counted for
-    it has an author there), and only groups of the chunk are taken from a response that is complete
-    (fewer than 200 groups); an incomplete one is split in halves."""
+    """All country groups of one query.
+
+    The first request returns the 200 largest groups (count descending). If it holds fewer, it is
+    complete. Otherwise: with an API key, cursor paging (key order) lists every group; without one
+    (OpenAlex refuses cursor paging: HTTP 401) the remaining crosswalk countries come from
+    *complement* queries restricted to works with an author in a chunk of them. A country's count is
+    the same under that restriction (every work counted for it has an author there), so a chunk
+    country present in a response is exact; one absent from a response with fewer than 200 groups
+    has no work; one absent from a full (possibly truncated) response is re-queried in smaller
+    chunks, and alone it is reported ``unresolved`` (flagged on the ``_all_works`` row)."""
     from reva.atlas.tables import geo_index
 
-    async def get(url: str, key: str) -> GroupPage | Any:
+    async def get(url: str, key: str) -> tuple[GroupPage, str]:
         if state["requests"] >= limit:
             raise _StopRun
         state["requests"] += 1
         raw = await run.get(url, key=key, max_bytes=MAX_BYTES)
         return parse_group_page(raw.body), run.archive(raw)
 
-    page, sha = await get(query_url(q, api_key=api_key), f"{q.key}:p1")
-    out = [Fetched(page, sha, 1, q.filter)]
-    if _complete(page):
-        return out
+    page, sha = await get(query_url(q, api_key=api_key), f"{q.key}:top")
+    if not _maybe_truncated(page):
+        return [Fetched(page, sha, 1, q.filter)]
     if api_key:
-        pno = 1
-        while not _complete(page):
+        out: list[Fetched] = []
+        cursor: str | None = "*"
+        pno = 0
+        while cursor:
             if pno >= MAX_PAGES:
                 raise _err(f"{q.key}: more group pages than {MAX_PAGES}", kind="too_many_pages")
             pno += 1
-            page, sha = await get(query_url(q, cursor=str(page.next_cursor), api_key=api_key), f"{q.key}:p{pno}")
-            out.append(Fetched(page, sha, pno, q.filter))
+            pg, sh = await get(query_url(q, cursor=cursor, api_key=api_key), f"{q.key}:p{pno}")
+            out.append(Fetched(pg, sh, pno, q.filter))
+            cursor = pg.next_cursor if pg.groups else None
+        # meta.count (all works) is the same on every page; the first cursor page carries it
         return out
+    first = Fetched(page, sha, 1, q.filter)
+    out = [first]
     seen = {c for c, *_ in page.groups}
     todo = sorted(set(geo_index().maps[GEO_SCHEME]) - seen)
     queue = [todo[i : i + CHUNK] for i in range(0, len(todo), CHUNK)]
+    unresolved: list[str] = []
     n = 0
     while queue:
         chunk = queue.pop(0)
         n += 1
-        page, sha = await get(query_url(q, countries=chunk), f"{q.key}:c{n}")
-        if not _complete(page):
-            if len(chunk) == 1:
-                raise _err(f"{q.key}: complement query for {chunk[0]} is not complete", kind="incomplete")
-            queue[:0] = [chunk[: len(chunk) // 2], chunk[len(chunk) // 2 :]]
-            continue
-        out.append(Fetched(page, sha, n, query_filter(q, chunk), frozenset(chunk)))
+        pg, sh = await get(query_url(q, countries=chunk), f"{q.key}:c{n}")
+        present = {c for c, *_ in pg.groups} & set(chunk)
+        out.append(Fetched(pg, sh, n + 1, query_filter(q, chunk), frozenset(present)))
+        missing = [c for c in chunk if c not in present]
+        if missing and _maybe_truncated(pg):
+            if len(missing) == 1 and len(chunk) == 1:
+                unresolved.append(missing[0])
+            else:
+                half = max(1, len(missing) // 2)
+                queue[:0] = [missing[:half], missing[half:]] if len(missing) > 1 else [missing]
+    if unresolved:
+        out[0] = Fetched(first.page, first.sha, 1, first.filter, None, tuple(unresolved))
     return out
 
 
@@ -394,6 +414,8 @@ def atlas_rows(q: Query, pages: Sequence[Fetched], *, retrieved_at: datetime) ->
     ``iso3`` is left null and filled by ``register_atlas_table(..., geo_scheme=GEO_SCHEME)``."""
     if not pages:
         return []
+    if pages[0].keep is not None:
+        raise _err(f"{q.key}: the first fetched page must be the unrestricted query")
     period = (date(q.year, 1, 1), date(q.year + 1, 1, 1))
     flags = {
         "counting": "full counting by affiliation country (a work counts once per country)",
@@ -420,7 +442,11 @@ def atlas_rows(q: Query, pages: Sequence[Fetched], *, retrieved_at: datetime) ->
             first.total_count,
             first_sha,
             {"filter": q.filter, "page": 1, "path": "meta.count"},
-            {**flags, "meaning": "all works matching the filter (any country or none)"},
+            {
+                **flags,
+                "meaning": "all works matching the filter (any country or none)",
+                **({"unresolved_countries": list(pages[0].unresolved)} if pages[0].unresolved else {}),
+            },
         )
     )
     for fp in pages:

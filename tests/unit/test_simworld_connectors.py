@@ -15,14 +15,14 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "fixtures" / "simworld"))
 
-import simworld_fixtures as SF  # noqa: E402
+import simworld_fixtures as SF
 
-from reva.adapters.connectors import ilostat_labour as IL  # noqa: E402
-from reva.adapters.connectors import un_wpp_demography as W  # noqa: E402
-from reva.adapters.connectors.registry import builtin_connectors  # noqa: E402
-from reva.evidence.runner import FixtureHttp  # noqa: E402
-from reva.kernel.errors import SourceResponseError  # noqa: E402
-from reva.ports.connectors import FetchBudget  # noqa: E402
+from reva.adapters.connectors import ilostat_labour as IL
+from reva.adapters.connectors import un_wpp_demography as W
+from reva.adapters.connectors.registry import builtin_connectors
+from reva.evidence.runner import FixtureHttp
+from reva.kernel.errors import SourceResponseError
+from reva.ports.connectors import FetchBudget
 
 
 # --------------------------------------------------------------------------- WPP

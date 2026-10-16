@@ -1,0 +1,18 @@
+id: economy.central_banks
+domain: economy
+owner: KGSCIECO
+description: >-
+  Central banks of all periods: instances of central bank (Q66344) or of a subclass (national central bank,
+  ...): Federal Reserve, European Central Bank, Bank of England, Banque de France, Reichsbank, ... Snapshots
+  keep country (P17), jurisdiction (P1001), inception/dissolution (P571/P576), replaces/replaced by
+  (P1365/P1366, e.g. Reichsbank -> Bank deutscher Länder -> Bundesbank), parent organisation (P749, e.g. a
+  national central bank -> Eurosystem), headquarters (P159), chairperson (P488). The country -> central bank
+  (P1304) and currency -> issuer (P562) hops are requested properties (core.countries / culture.currencies
+  snapshots pick them up once allow-listed).
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q66344 . }
+max_rows: 3000
+expand_hops: 1
+api_search: {instance_of: [Q66344], subclass_depth: 2}

@@ -646,6 +646,98 @@ _BASE: tuple[Capability, ...] = (
             "offsetting errors; see docs/dev/v2_pen_backtest.md."
         ),
     ),
+    # --- V3 SIMWORLD: the V2 simulations for every country (second registered model versions) ---
+    Capability(
+        "simulation.platform.model_versions",
+        "Several registered versions of one model key (1.0.0 stays the default; later versions by name)",
+        "implemented",
+        "V2",
+        "reva.simulation.plugins",
+        (
+            "a spec naming model_version runs exactly that version; unknown versions are capability gaps",
+            "single-version keys keep their exported scenario-schema branch unchanged",
+        ),
+        interface="reva.simulation.plugins",
+        tests=(
+            "tests/unit/test_simworld_models.py::test_registry_keeps_1_0_0_as_default_and_serves_1_1_0_by_version",
+            "tests/unit/test_simworld_models.py::test_spec_validation_routes_by_version",
+        ),
+        docs=("docs/dev/v3_simworld.md",),
+        notes="Agent SIMWORLD (V3). plugins.get(key, version); the scenario schema gets a '<key>@<version>' branch.",
+    ),
+    Capability(
+        "demography.cohort_component.world",
+        "Cohort-component projection for every UN WPP 2024 country (demography.cohort_component@1.1.0)",
+        "implemented",
+        "V2",
+        "reva.models.population.cohort_world",
+        (
+            "UN WPP 2024 single-age inputs as pinned dataset inputs derived from archived raw bytes",
+            "Eurostat path of 1.1.0 identical to 1.0.0",
+            "2013 -> 2023 back-test against WPP estimates for every country, published including bad results",
+        ),
+        interface="reva.simulation.plugins",
+        tests=(
+            "tests/unit/test_simworld_connectors.py::test_wpp_tables_are_exact_complete_and_filtered",
+            "tests/unit/test_simworld_models.py::test_wpp_projection_rows_are_labelled_and_exact",
+            "tests/unit/test_simworld_models.py::test_eurostat_path_of_1_1_0_equals_1_0_0_exactly",
+            "tests/unit/test_simworld_models.py::test_wpp_refusals_are_typed",
+            "tests/integration/test_simworld_pipeline.py::test_cohort_1_1_0_runs_for_non_eu_countries",
+            "tests/integration/test_simworld_pipeline.py::test_cohort_all_countries_resolves_from_pinned_datasets",
+        ),
+        docs=("docs/dev/v3_simworld.md",),
+        notes=(
+            "Experimental (maintainer review pending). WPP estimates are model-based: the back-test checks "
+            "consistency with WPP, not truth. Small territories whose open age would fall below 85 are refused "
+            "(capability_gap). EUROPOP2023 assumptions remain EU/EFTA only."
+        ),
+    ),
+    Capability(
+        "social.retirement_age.world",
+        "Retirement-age module outside the Eurostat LFS (social.retirement_age@1.1.0, ages 55-64)",
+        "implemented",
+        "V2",
+        "reva.models.social.retirement_world",
+        (
+            "rule tables with per-row citations checked against an archived excerpt (WBL 2026 transcription, "
+            "maintainer review pending) or archived law text",
+            "ILOSTAT rates and WPP population as pinned dataset inputs",
+            "typed refusals for missing inputs, ages outside 55-64 and outputs without data",
+        ),
+        interface="reva.simulation.plugins",
+        tests=(
+            "tests/unit/test_simworld_models.py::test_wbl_tables_are_separate_cited_and_1_0_0_is_unchanged",
+            "tests/unit/test_simworld_models.py::test_retirement_world_rows_and_signs",
+            "tests/unit/test_simworld_models.py::test_retirement_world_l2_range_and_refusals",
+            "tests/integration/test_simworld_pipeline.py::test_retirement_1_1_0_runs_for_non_eu_countries",
+            "tests/integration/test_simworld_pipeline.py::test_retirement_refusals_are_typed",
+        ),
+        docs=("docs/dev/v3_simworld.md",),
+        notes=(
+            "Experimental (maintainer review pending); no back-test outside France. WBL ages are held constant "
+            "as a labelled counterfactual reference; the employment response is a transferred European estimate; "
+            "pension recipient levels and expenditure are not computed on this path."
+        ),
+    ),
+    Capability(
+        "economic.io_price.world",
+        "Input-output price model beyond the FIGARO economies (a global multi-region IO table)",
+        "reserved",
+        "unscheduled",
+        "reva.models.economic.io_price",
+        (
+            "an open global MRIO with an archivable bulk download and a licence allowing redistribution of "
+            "derived tables",
+            "accounting identities verified on the archived table",
+        ),
+        reason=(
+            "No usable open global table (checked 2026-10-15): OECD ICIO bulk files on oecd.org answer HTTP 403 "
+            "to this environment's clients and are not in the OECD SDMX API; EXIOBASE >= 3.9 is licensed "
+            "non-commercial (customised CC BY-NC-SA) and covers 44 countries + 5 rest-of-world regions only; "
+            "Eora is not open. economic.io_price stays limited to the 49 FIGARO economies + rest of world."
+        ),
+        docs=("docs/dev/v3_simworld.md",),
+    ),
     Capability(
         "population.household_margins",
         "Weighted representative households from public composition x children cells (no person linkage)",

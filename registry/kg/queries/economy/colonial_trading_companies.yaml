@@ -1,0 +1,22 @@
+id: economy.colonial_trading_companies
+domain: economy
+owner: KGSCIECO
+description: >-
+  Chartered / colonial trading companies: instances of chartered company (Q1700154) or of a subclass, plus
+  the main companies by id when typed only as business (Dutch East India Company, East India Company,
+  Hudson's Bay Company, Royal African Company, Muscovy Company, Imperial British East Africa Company,
+  Dutch West India Company, Virginia Company, Levant Company). Snapshots keep country (P17), inception and
+  dissolution (P571/P576), founders (P112), headquarters (P159), significant events (P793), replaced by
+  (P1366), owner (P127); operating area (P2541, company -> territory) is requested. Colonies they ran are
+  reached from history.colonies (P17/P361/P1365 statements) and KGHIST's voyages (P137 operator).
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { ?item wdt:P31/wdt:P279* wd:Q1700154 . }
+    UNION
+    { VALUES ?item { wd:Q159766 wd:Q83164 wd:Q76039 wd:Q769519 wd:Q1765656 wd:Q926921 wd:Q617066
+                     wd:Q1152507 wd:Q3557480 } }
+  }
+max_rows: 1500
+expand_hops: 1

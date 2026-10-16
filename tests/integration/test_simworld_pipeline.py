@@ -22,21 +22,21 @@ from sqlalchemy import Engine, create_engine, text
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "fixtures" / "simworld"))
 
-import simworld_fixtures as SF  # noqa: E402
+import simworld_fixtures as SF
 
-from reva.adapters.connectors import ilostat_labour as IL  # noqa: E402
-from reva.adapters.connectors import un_wpp_demography as W  # noqa: E402
-from reva.adapters.connectors.registry import builtin_connectors  # noqa: E402
-from reva.adapters.objects.filesystem import FilesystemArtifactStore  # noqa: E402
-from reva.adapters.postgres.engine import make_engine  # noqa: E402
-from reva.belief.publication import publish_release  # noqa: E402
-from reva.evidence.runner import FixtureHttp, run_connector  # noqa: E402
-from reva.kernel.context import Origin  # noqa: E402
-from reva.kernel.time import utc_now  # noqa: E402
-from reva.operations.context import JobContext  # noqa: E402
-from reva.settings import Settings  # noqa: E402
-from reva.simulation.jobs import handle_simulation  # noqa: E402
-from reva.simulation.spec import validate_scenario_spec  # noqa: E402
+from reva.adapters.connectors import ilostat_labour as IL
+from reva.adapters.connectors import un_wpp_demography as W
+from reva.adapters.connectors.registry import builtin_connectors
+from reva.adapters.objects.filesystem import FilesystemArtifactStore
+from reva.adapters.postgres.engine import make_engine
+from reva.belief.publication import publish_release
+from reva.evidence.runner import FixtureHttp, run_connector
+from reva.kernel.context import Origin
+from reva.kernel.time import utc_now
+from reva.operations.context import JobContext
+from reva.settings import Settings
+from reva.simulation.jobs import handle_simulation
+from reva.simulation.spec import validate_scenario_spec
 
 pytestmark = pytest.mark.db
 
@@ -89,12 +89,19 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         ilo_c = IL.IlostatLabourConnector()
         reports["ilo"] = asyncio.run(
             run_connector(
-                ilo_c, FixtureHttp(IL.NAME), store, engines["worker"], persist_cursor=False, post_publish=IL.post_publish_datasets
+                ilo_c,
+                FixtureHttp(IL.NAME),
+                store,
+                engines["worker"],
+                persist_cursor=False,
+                post_publish=IL.post_publish_datasets,
             )
         ).as_dict()
         wb = builtin_connectors()["worldbank.wdi.indicators"]  # a release needs one selected estimate
         asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), store, engines["worker"], persist_cursor=False))
-        rel = publish_release(engines["worker"], store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
+        rel = publish_release(
+            engines["worker"], store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test"
+        )
         try:
             yield Env(
                 settings,
@@ -166,7 +173,12 @@ def retirement_doc(env: Env, **over: Any) -> dict[str, Any]:
         "assumptions": {"employment_response": {"central": "rabate_rochut_2020_fra"}},
         "fidelity": "L2",
         "missing_input_policy": "fail",
-        "outputs": ["employed_persons_55_64", "employment_change_55_64", "pension_recipients_change_55_64", "old_age_dependency_ratio"],
+        "outputs": [
+            "employed_persons_55_64",
+            "employment_change_55_64",
+            "pension_recipients_change_55_64",
+            "old_age_dependency_ratio",
+        ],
         "seed": 0,
     }
     doc.update(over)
@@ -224,7 +236,10 @@ def test_ingest_archives_parts_and_registers_dataset_inputs(env: Env) -> None:
     wpp = env.reports["wpp"]
     assert wpp["errors"] == [] and {o["status"] for o in wpp["outcomes"]} == {"published"}
     assert len(wpp["outcomes"]) == len(SF.wpp_connector().all_items()) > 4  # several byte-range parts
-    rows = q(env.owner, "SELECT concept_id, subject_key, dataset_key, source_acquisition_ids, parser_version FROM evidence.dataset")
+    rows = q(
+        env.owner,
+        "SELECT concept_id, subject_key, dataset_key, source_acquisition_ids, parser_version FROM evidence.dataset",
+    )
     got = {(r["concept_id"], r["subject_key"]) for r in rows}
     for d in W.DATASETS.values():
         assert {(d.concept_id, c) for c in SF.COUNTRIES} <= got
@@ -242,14 +257,20 @@ def test_ingest_archives_parts_and_registers_dataset_inputs(env: Env) -> None:
            ON v.id = o.connector_version_id WHERE v.name IN ('un.wpp', 'ilostat.labour_age5')""",
     )
     assert obs[0]["n"] == 0  # dataset inputs only, never scalar observations
-    pins = q(env.owner, "SELECT concept_id, subject_key FROM belief.release_dataset WHERE release_id=:r", r=env.release_id)
+    pins = q(
+        env.owner, "SELECT concept_id, subject_key FROM belief.release_dataset WHERE release_id=:r", r=env.release_id
+    )
     assert ("demography.wpp.population.jan1_age_sex", "SEN") in {(p["concept_id"], p["subject_key"]) for p in pins}
 
 
 def test_cohort_1_1_0_runs_for_non_eu_countries(env: Env) -> None:
     ref = run(env, create(env, cohort_doc(env)), "L1")
     assert ref["status"] == "succeeded", ref
-    rows = q(env.owner, "SELECT output_key, value, applicability, period_start FROM sim.result WHERE run_id=:r", r=ref["run_id"])
+    rows = q(
+        env.owner,
+        "SELECT output_key, value, applicability, period_start FROM sim.result WHERE run_id=:r",
+        r=ref["run_id"],
+    )
     pop = [r for r in rows if r["output_key"] == "population.total.all_ages"]
     assert {r["applicability"]["country"] for r in pop} == set(SF.COUNTRIES) and len(pop) == 3 * 13
     assert all(r["applicability"]["model"] == "demography.cohort_component@1.1.0" for r in rows)
@@ -265,14 +286,20 @@ def test_cohort_1_1_0_runs_for_non_eu_countries(env: Env) -> None:
 def test_cohort_all_countries_resolves_from_pinned_datasets(env: Env) -> None:
     ref = run(env, create(env, cohort_doc(env, countries=["ALL"], missing_input_policy="skip_missing_countries")), "L1")
     assert ref["status"] == "succeeded", ref
-    rows = q(env.owner, "SELECT DISTINCT applicability->>'country' AS c FROM sim.result WHERE run_id=:r", r=ref["run_id"])
+    rows = q(
+        env.owner, "SELECT DISTINCT applicability->>'country' AS c FROM sim.result WHERE run_id=:r", r=ref["run_id"]
+    )
     assert {r["c"] for r in rows} == set(SF.COUNTRIES)
 
 
 def test_retirement_1_1_0_runs_for_non_eu_countries(env: Env) -> None:
     ref = run(env, create(env, retirement_doc(env)), "L2")
     assert ref["status"] == "succeeded", ref
-    rows = q(env.owner, "SELECT output_key, variant, value, applicability, period_start FROM sim.result WHERE run_id=:r", r=ref["run_id"])
+    rows = q(
+        env.owner,
+        "SELECT output_key, variant, value, applicability, period_start FROM sim.result WHERE run_id=:r",
+        r=ref["run_id"],
+    )
     l2 = {
         (r["applicability"]["country"], r["period_start"].year): Decimal(r["value"]["value"])
         for r in rows

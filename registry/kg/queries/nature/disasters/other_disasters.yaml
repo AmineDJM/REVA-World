@@ -1,0 +1,33 @@
+id: geography.nature.other_disasters
+domain: geography
+owner: KGSCIECO
+description: >-
+  Other natural disasters -- floods, tropical cyclones, droughts, landslides, heat waves, avalanches,
+  wildfires ...: instances of natural disaster (Q8065), flood (Q8068) or tropical cyclone (Q8092), or of a
+  subclass, that either record at least 100 deaths (P1120) or have at least 15 sitelinks (1931 China floods,
+  1970 Bhola cyclone, Hurricane Katrina ...), by year of occurrence plus the undated ones. Earthquakes,
+  tsunamis, eruptions, famines and epidemics have their own specs (overlap is de-duplicated by QID).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q8065 wd:Q8068 wd:Q8092 }
+    ?item wdt:P31/wdt:P279* ?root .
+    ?item (wdt:P585|wdt:P580) ?d .
+    FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}})
+    OPTIONAL { ?item wdt:P1120 ?deaths }
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 15 || (BOUND(?deaths) && ?deaths >= 100))
+  }
+sparql_undated: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q8065 wd:Q8068 wd:Q8092 }
+    ?item wdt:P31/wdt:P279* ?root .
+    FILTER NOT EXISTS { ?item (wdt:P585|wdt:P580) ?d . }
+    OPTIONAL { ?item wdt:P1120 ?deaths }
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 15 || (BOUND(?deaths) && ?deaths >= 100))
+  }
+split: {by: year, from: -1000, to: 2029, step: 100, include_undated: true}
+max_rows: 12000
+expand_hops: 1

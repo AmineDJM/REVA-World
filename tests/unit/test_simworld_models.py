@@ -18,20 +18,20 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "fixtures" / "simworld"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import simworld_fixtures as SF  # noqa: E402
+import simworld_fixtures as SF
 
-from reva.kernel.errors import CapabilityGap, ValidationProblem  # noqa: E402
-from reva.models.population import cohort as C  # noqa: E402
-from reva.models.population import cohort_component as CC  # noqa: E402
-from reva.models.population import cohort_world as CW  # noqa: E402
-from reva.models.population import wpp  # noqa: E402
-from reva.models.social import retirement_age as ra  # noqa: E402
-from reva.models.social import retirement_world as rw  # noqa: E402
-from reva.models.social import rules as rl  # noqa: E402
-from reva.simulation import plugins  # noqa: E402
-from reva.simulation.plugins import ResolvedInputs  # noqa: E402
-from reva.simulation.scenario_schema import build_schema  # noqa: E402
-from reva.simulation.spec import validate_scenario_spec  # noqa: E402
+from reva.kernel.errors import CapabilityGap, ValidationProblem
+from reva.models.population import cohort as C
+from reva.models.population import cohort_component as CC
+from reva.models.population import cohort_world as CW
+from reva.models.population import wpp
+from reva.models.social import retirement_age as ra
+from reva.models.social import retirement_world as rw
+from reva.models.social import rules as rl
+from reva.simulation import plugins
+from reva.simulation.plugins import ResolvedInputs
+from reva.simulation.scenario_schema import build_schema
+from reva.simulation.spec import validate_scenario_spec
 
 RELEASE = "3f1c2b4a-5d6e-4f70-8a91-b2c3d4e5f607"
 
@@ -70,11 +70,16 @@ def wpp_inputs(model: Any, spec: dict[str, Any], drop: tuple[tuple[str, str], ..
     for r in reqs:
         if (r.name, r.subject) in drop or r.subject not in SF.COUNTRIES:
             continue
-        ds[(r.name, r.subject)] = (SF.wpp_table(SF.WPP_INPUTS[r.name], r.subject), {"dataset_id": f"{r.name}:{r.subject}"})
+        ds[(r.name, r.subject)] = (
+            SF.wpp_table(SF.WPP_INPUTS[r.name], r.subject),
+            {"dataset_id": f"{r.name}:{r.subject}"},
+        )
     return ResolvedInputs.from_values(reqs, datasets=ds)
 
 
-def run_cohort(spec: dict[str, Any], fidelity: str = "L1", drop: tuple[tuple[str, str], ...] = ()) -> tuple[Any, list[Any]]:
+def run_cohort(
+    spec: dict[str, Any], fidelity: str = "L1", drop: tuple[tuple[str, str], ...] = ()
+) -> tuple[Any, list[Any]]:
     m = plugins.get("demography.cohort_component", "1.1.0")
     m.validate(spec)
     compiled = m.compile(wpp_inputs(m, spec, drop), spec)
@@ -147,7 +152,11 @@ def test_eurostat_path_of_1_1_0_equals_1_0_0_exactly() -> None:
     out = []
     for spec, model in ((spec10, CC.MODEL), (spec11, plugins.get("demography.cohort_component", "1.1.0"))):
         reqs = model.requirements(spec)
-        ds = {(r.name, r.subject): (TPC.table(r.name, r.subject), {}) for r in reqs if TPC.table(r.name, r.subject) is not None}
+        ds = {
+            (r.name, r.subject): (TPC.table(r.name, r.subject), {})
+            for r in reqs
+            if TPC.table(r.name, r.subject) is not None
+        }
         compiled = model.compile(ResolvedInputs.from_values(reqs, datasets=ds), spec)
         out.append(model.compute(compiled, "L1"))
     a, b = out
@@ -230,7 +239,11 @@ def run_ret(spec: dict[str, Any], fidelity: str = "L1", drop: tuple[str, ...] = 
     for r in reqs:
         if r.subject in drop:
             continue
-        t = SF.ilo_table(r.name, r.subject) if r.name in ("employment_rate", "activity_rate") else SF.wpp_table(SF.WPP_INPUTS[r.name], r.subject)
+        t = (
+            SF.ilo_table(r.name, r.subject)
+            if r.name in ("employment_rate", "activity_rate")
+            else SF.wpp_table(SF.WPP_INPUTS[r.name], r.subject)
+        )
         if t is not None:
             ds[(r.name, r.subject)] = (t, {})
     compiled = m.compile(ResolvedInputs.from_values(reqs, datasets=ds), spec)
@@ -245,7 +258,9 @@ def test_wbl_tables_are_separate_cited_and_1_0_0_is_unchanged() -> None:
     assert t.transcription == "transcribed by agent SIMWORLD from WBL 2026, maintainer review pending"
     assert t.review_status == "maintainer_review_pending" and t.sources["wbl2026"]["kind"] == "secondary_legal_dataset"
     for r in t.rows:
-        assert rl.normalise_text(r.citation["locator"]) in rl.source_text("WBL2026_pension_full_benefit_ages_excerpt.txt")
+        assert rl.normalise_text(r.citation["locator"]) in rl.source_text(
+            "WBL2026_pension_full_benefit_ages_excerpt.txt"
+        )
         assert r.derivation == "verbatim" or (r.derivation == "counterfactual_extension" and r.note)
     assert {p.status for p in t.paths.values()} == {"in_force", "counterfactual"}
     with pytest.raises(CapabilityGap) as e:  # 66.8 years: the month is not in WBL
@@ -267,7 +282,8 @@ def test_retirement_world_rows_and_signs() -> None:
     for iso in SF.COUNTRIES:
         for t in range(2023, 2031):
             assert by[(iso, "employment_change_55_64", t)] == ra.CTX.quantize(
-                by[(iso, "employed_persons_55_64", t)] - by[(iso, "employed_persons_55_64_reference", t)], Decimal("0.001")
+                by[(iso, "employed_persons_55_64", t)] - by[(iso, "employed_persons_55_64_reference", t)],
+                Decimal("0.001"),
             ) or abs(
                 by[(iso, "employment_change_55_64", t)]
                 - (by[(iso, "employed_persons_55_64", t)] - by[(iso, "employed_persons_55_64_reference", t)])
@@ -281,11 +297,19 @@ def test_retirement_world_rows_and_signs() -> None:
 def test_retirement_world_l2_range_and_refusals() -> None:
     _, rows = run_ret(ret_spec(countries=["SEN"], fidelity="L2"), fidelity="L2")
     rng = [r for r in rows if r.variant == "L2:sensitivity_range" and r.output_key == "employment_change_55_64"]
-    pts = [r for r in rows if r.variant.startswith("L2:") and r.variant != "L2:sensitivity_range" and r.output_key == "employment_change_55_64"]
+    pts = [
+        r
+        for r in rows
+        if r.variant.startswith("L2:")
+        and r.variant != "L2:sensitivity_range"
+        and r.output_key == "employment_change_55_64"
+    ]
     for r in rng:
         vals = [Decimal(p.value["value"]) for p in pts if p.period == r.period]
         assert Decimal(r.value["lower"]) == min(vals) and Decimal(r.value["upper"]) == max(vals)
-    assert any("pension_drop=Y55-59" in p.variant for p in pts) and any(p.variant.endswith("reference_no_employment_response") for p in pts)
+    assert any("pension_drop=Y55-59" in p.variant for p in pts) and any(
+        p.variant.endswith("reference_no_employment_response") for p in pts
+    )
     with pytest.raises(CapabilityGap) as e:  # a 65+ eligibility change: ILOSTAT has no 65-69 band
         plugins.get("social.retirement_age", "1.1.0").validate(
             ret_spec(countries=["JPN"], intervention={**ret_spec()["intervention"], "target_age_months": 804})
@@ -297,7 +321,9 @@ def test_retirement_world_l2_range_and_refusals() -> None:
         plugins.get("social.retirement_age", "1.1.0").validate(ret_spec(countries=["USA"]))
     with pytest.raises(CapabilityGap, match="WPP 2024"):
         plugins.get("social.retirement_age", "1.1.0").validate(ret_spec(reference_year=2023))
-    compiled, rows = run_ret(ret_spec(countries=["SEN", "USA", "BRA"], missing_input_policy="skip_missing_countries"), drop=("BRA",))
+    compiled, rows = run_ret(
+        ret_spec(countries=["SEN", "USA", "BRA"], missing_input_policy="skip_missing_countries"), drop=("BRA",)
+    )
     st = {p.iso3: p.status for p in compiled.countries}
     assert st == {"SEN": "ready", "USA": "unsupported", "BRA": "missing_input"} and {r.iso3 for r in rows} == {"SEN"}
 

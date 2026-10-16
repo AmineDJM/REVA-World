@@ -1,0 +1,18 @@
+id: geography.nature.rivers
+domain: geography
+owner: KGSCIECO
+description: >-
+  Major rivers: direct instances of river (Q4022) with at least 25 sitelinks (Nile, Amazon, Danube, Rhine,
+  Mekong, Ganges, Yangtze, Mississippi, Congo, Niger, ...). Snapshots keep every country crossed (P17),
+  continent (P30), located next to / flows into body of water (P206), part of (P361); mouth (P403), origin
+  (P885), tributaries (P974), length (P2043), drainage basin (P4614) and basin countries (P205) are
+  requested properties and arrive with the snapshot once allow-listed.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31 wd:Q4022 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 25)
+  }
+max_rows: 6000
+expand_hops: 0

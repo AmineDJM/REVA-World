@@ -1,0 +1,17 @@
+id: geography.nature.national_parks
+domain: geography
+owner: KGSCIECO
+description: >-
+  National parks: instances of national park (Q46169) or of a subclass (national park of South Africa,
+  national park of Tanzania, ...) with at least 5 sitelinks (Yellowstone, Kruger, Serengeti, Galapagos ...).
+  Snapshots keep country (P17), location (P131), area (P2046), inception (P571), heritage designation
+  (P1435, e.g. World Heritage Site), operator (P137); IUCN category (P814) is requested.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q46169 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 5)
+  }
+max_rows: 6000
+expand_hops: 0

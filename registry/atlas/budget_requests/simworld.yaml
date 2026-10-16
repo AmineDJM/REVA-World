@@ -1,0 +1,18 @@
+# Budget request from agent SIMWORLD (V3: the V2 simulations for every country). ATLASCORE merges it
+# into registry/policies/budgets.yaml (max of the requests per registered source). No new source key:
+# both built-in connectors use already registered sources.
+agent: SIMWORLD
+requests:
+  - source_key: un.wpp
+    daily_requests: 20
+    expected_bytes_per_day: 230000000
+    reason: >-
+      built-in connector un.wpp: four WPP 2024 bulk files fetched in byte-range parts of <= 48 MiB
+      (62.1 MB -> 2, 45.2 MB -> 1, 82.9 MB -> 2, 16.6 MB -> 1 = 6 requests, 207 MB) on top of A-UN's 3 atlas
+      requests (10/day today); 20 leaves room for one retry of every part. Refreshes are rare (WPP biennial).
+  - source_key: ilostat.rplumber
+    daily_requests: 60
+    expected_bytes_per_day: 6000000
+    reason: >-
+      built-in connector ilostat.labour_age5: 2 bulk indicator files (EMP_DWAP_SEX_AGE_RT_A 2.1 MB,
+      EAP_DWAP_SEX_AGE_RT_A 2.8 MB) per refresh; fits in A-ILO's 60/day, stated for the record.

@@ -1,0 +1,30 @@
+id: geography.nature.earthquakes
+domain: geography
+owner: KGSCIECO
+description: >-
+  Earthquakes and tsunamis: instances of earthquake (Q7944) or tsunami (Q8070), or of a subclass (megathrust
+  earthquake, ...), with at least 3 sitelinks, by year of occurrence (P585 point in time / P580 start) plus
+  the undated ones once. 1755 Lisbon, 1906 San Francisco, 2004 Indian Ocean, 2010 Haiti, 2011 Tohoku...
+  Snapshots keep country (P17), location (P276), point in time (P585), number of deaths (P1120), coordinates,
+  has effect / has cause (asserted by Wikidata, e.g. earthquake -> tsunami); magnitude (P2527/P2528) is
+  requested.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q7944 wd:Q8070 }
+    ?item wdt:P31/wdt:P279* ?root ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+    ?item (wdt:P585|wdt:P580) ?d .
+    FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}})
+  }
+sparql_undated: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q7944 wd:Q8070 }
+    ?item wdt:P31/wdt:P279* ?root ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+    FILTER NOT EXISTS { ?item (wdt:P585|wdt:P580) ?d . }
+  }
+split: {by: year, from: -2000, to: 2029, step: 500, include_undated: true}
+max_rows: 12000
+expand_hops: 1

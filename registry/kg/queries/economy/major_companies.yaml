@@ -1,0 +1,20 @@
+id: economy.major_companies
+domain: economy
+owner: KGSCIECO
+description: >-
+  Largest / most notable companies, bounded by Wikipedia reach: items with an industry (P452) or listed on a
+  stock exchange (P414) and at least 40 sitelinks (Apple, Toyota, Saudi Aramco, Siemens, Samsung, Tata ...;
+  sitelinks are a notability bound, not a size ranking -- revenue/market capitalisation are atlas data).
+  Snapshots keep country (P17), headquarters (P159), inception (P571), founders (P112), industry (P452),
+  owner (P127) / parent (P749) / subsidiaries (P355), employees (P1128), location of formation (P740).
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { ?item wdt:P452 ?industry . } UNION { ?item wdt:P414 ?exchange . }
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 40)
+    FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 . }
+  }
+max_rows: 8000
+expand_hops: 0

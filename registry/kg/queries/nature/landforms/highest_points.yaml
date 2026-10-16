@@ -1,0 +1,22 @@
+id: geography.nature.highest_points
+domain: geography
+owner: KGSCIECO
+description: >-
+  Highest and lowest points of the 250 crosswalk countries: every object of a non-deprecated "highest point"
+  (P610) or "lowest point" (P1589) statement of a country (Nepal/China -> Mount Everest, Tanzania ->
+  Kilimanjaro, Argentina -> Aconcagua, Israel/Jordan -> Dead Sea). Seeds the mountains/places themselves
+  (country, elevation P2044 once allow-listed, mountain range P4552 once allow-listed, coordinates); the
+  country -> highest point edge itself is P610 on the country, picked up by core.countries once P610/P1589
+  are allow-listed (requested).
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?country { {{values}} }
+    ?country (p:P610|p:P1589) ?st .
+    ?st (ps:P610|ps:P1589) ?item ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+split: {by: values, source: countries, chunk_size: 250}
+max_rows: 600
+expand_hops: 1

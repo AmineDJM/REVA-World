@@ -1,0 +1,7418 @@
+{
+ "bytes": 4031313,
+ "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)",
+ "derivation": "wbgetentities props=info|claims|sitelinks; claims reduced to the listed properties, deprecated rank dropped, values compacted (entity id / time / amount / text); the raw responses are archived content-addressed in var/kg/objects under archive_sha256 (not committed: several MB)",
+ "endpoint": "https://www.wikidata.org/w/api.php",
+ "entities": {
+  "Q1006311": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q21994376",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q1006311$1c4d01f9-4715-81f4-a520-1ab808efa630"
+    },
+    {
+     "o": "Q209225",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q1006311$e125afcb-4041-f4e3-8add-bd0889f69418"
+    },
+    {
+     "o": "Q21994376",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q1006311$a64b40be-4fff-83cc-63b7-1c895f11ecc4"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2497961493,
+   "sitelinks": 19
+  },
+  "Q1048835": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q56061",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1048835$29e5d065-434e-7ebd-31c5-6384e869ae7e"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2554586513,
+   "sitelinks": 5
+  },
+  "Q10711424": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q10711424$dba65dac-43fa-12e3-e395-057186c5786f"
+    },
+    {
+     "o": "Q5589178",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q10711424$A74F53D7-2023-462D-9EB7-D0AEEC4C0DDF"
+    },
+    {
+     "o": "Q15239622",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q10711424$03479721-E04B-45AB-8D83-D52315049622"
+    },
+    {
+     "o": "Q1063239",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q10711424$24E725D5-32AA-430D-B642-B72E3B8691F1"
+    }
+   ],
+   "enwiki": "State with limited recognition",
+   "lastrevid": 2550468178,
+   "sitelinks": 20
+  },
+  "Q10931": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1510761",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q10931$56324863-4d05-d29e-f36f-6a9e4f944e51"
+    },
+    {
+     "o": "Q1673271",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q10931$cefed58c-429d-11ee-4c11-12746a170ba6"
+    },
+    {
+     "o": "Q180684",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q10931$9cdd5583-4aa2-220c-f594-2636ab66fb4f"
+    },
+    {
+     "o": "Q5431887",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q10931$a928757e-4d2a-2652-3c57-3690f56c0fc3"
+    },
+    {
+     "o": "Q116505632",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q10931$c2c00aa2-484c-be81-178b-bb15bb6e817a"
+    }
+   ],
+   "enwiki": "Revolution",
+   "lastrevid": 2556243380,
+   "sitelinks": 155
+  },
+  "Q1097949": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1097949$fb804e9c-4aee-a061-4297-f343f5136243"
+    },
+    {
+     "o": "Q1047050",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1097949$955ef90a-4d22-419a-3d0f-6bf0c4e9e6ff"
+    },
+    {
+     "o": "Q1149626",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1097949$f443a35a-4dae-223c-e451-05c6c334ecfa"
+    },
+    {
+     "o": "Q3329375",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1097949$c5910197-40ef-1b5f-9933-e322dfc442ee"
+    }
+   ],
+   "enwiki": "Literary language",
+   "lastrevid": 2504550896,
+   "sitelinks": 37
+  },
+  "Q112099": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q112099$6eb82601-4569-514c-e2c3-a5cd3405a8c0"
+    },
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q112099$aa8f373d-4dda-ab66-afc1-2cc6c962d09f"
+    },
+    {
+     "o": "Q111018943",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q112099$f3e3c510-40ff-c3b8-4b1a-7ceea1dcb016"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q112099$593a8523-4118-97b5-07c0-3cb5a16c4a1e"
+    },
+    {
+     "o": "Q23442",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q112099$89631653-4ff8-633c-2d08-b0bb7bf96c07"
+    }
+   ],
+   "enwiki": "Island country",
+   "lastrevid": 2555302862,
+   "sitelinks": 100
+  },
+  "Q1131971": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q4164871",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1131971$6dfcc931-4f13-fc73-cfd5-1918640bfc2a"
+    },
+    {
+     "o": "Q58296",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q1131971$75a3ed2a-4a3b-c416-93fb-e5c76aa9891a"
+    },
+    {
+     "o": "Q2285706",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1131971$7359a781-45f0-f77e-d33d-3a1e924457f8"
+    },
+    {
+     "o": "Q877619",
+     "p": "P1001",
+     "rank": "normal",
+     "statement": "Q1131971$c1deb2e9-4066-b706-9462-e206b1beff78"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2158415236,
+   "sitelinks": 2
+  },
+  "Q113393649": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q11420631",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q113393649$8f911a82-4689-9d85-7af6-e49664c79e7d"
+    },
+    {
+     "o": "Q134599141",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q113393649$c8aba402-4e3e-ed9d-4177-558cfa69457c"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2488849414,
+   "sitelinks": 0
+  },
+  "Q11514315": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q186081",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q11514315$685917F0-7967-43EA-9F49-DAC5092196D8"
+    },
+    {
+     "o": "Q17524420",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q11514315$4BBBB7F8-4D2D-45D6-9F10-E1FF23AA9A56"
+    }
+   ],
+   "enwiki": "Historical period",
+   "lastrevid": 2557291470,
+   "sitelinks": 8
+  },
+  "Q1155622": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q124734",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1155622$0e21c9da-48fe-f13a-ca39-8e14204d546b"
+    }
+   ],
+   "enwiki": "Slave rebellion",
+   "lastrevid": 2535120053,
+   "sitelinks": 15
+  },
+  "Q11815167": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q112099",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q11815167$16EA2E02-4F83-419F-95B9-7E77A4E4F2D7"
+    },
+    {
+     "o": "Q33837",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q11815167$bed0a697-4b1c-d84c-9295-6c7be219e74d"
+    }
+   ],
+   "enwiki": "Archipelagic state",
+   "lastrevid": 2552156427,
+   "sitelinks": 14
+  },
+  "Q1190554": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q67518978",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1190554$a62dbba3-4693-65b6-b88b-69c1f64453f4"
+    },
+    {
+     "o": "Q140451665",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1190554$46703972-47ee-8438-a2cd-0d62eddfb6cb"
+    },
+    {
+     "o": "Q2574811",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q1190554$7394062a-46bf-5f92-8814-3b1041045a44"
+    },
+    {
+     "o": "Q3505845",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q1190554$1187d842-45d6-759d-e1ee-e1de2561d37b"
+    },
+    {
+     "o": "Q3249551",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q1190554$895d2eca-4764-c63c-2568-137760a89c00"
+    },
+    {
+     "o": "Q25557036",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q1190554$76D0D6CD-EA10-4B41-8CEE-63CA793E4F6B"
+    },
+    {
+     "o": "Q926230",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q1190554$8b084030-44bc-6cee-5a6f-4d6ca3541a05"
+    },
+    {
+     "o": "Q3249551",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q1190554$b4f1b64e-4d3b-b875-e070-ec377e7c846d"
+    },
+    {
+     "o": "Q108586636",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1190554$562fb2cb-4b54-489d-8121-f9b42ff4a458"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2554972772,
+   "sitelinks": 39
+  },
+  "Q1211369": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q19202067",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1211369$a6ab0682-4275-4c1f-e28e-2d577d69ca13"
+    },
+    {
+     "o": "Q1323642",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1211369$6bcb71d4-4ed4-98b9-04c6-8edf2ddaa627"
+    },
+    {
+     "o": "Q1790360",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1211369$38410fe8-4e00-7e98-090b-86e883dd830e"
+    },
+    {
+     "o": "Q3026787",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1211369$07bea93b-4577-ac20-3b05-dd6db8f68378"
+    },
+    {
+     "o": "Q184511",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1211369$690c0724-4317-be71-e9a5-280ca2d27f16"
+    }
+   ],
+   "enwiki": "The empire on which the sun never sets",
+   "lastrevid": 2437222316,
+   "sitelinks": 19
+  },
+  "Q12356456": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12356456$D5EA142C-83C5-4586-9785-F7EFC641B04B"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12356456$51d8d8da-4054-23b3-c5ca-cf5611bd7564"
+    }
+   ],
+   "enwiki": "Viceroyalty",
+   "lastrevid": 2555112013,
+   "sitelinks": 17
+  },
+  "Q12443800": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q131541",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12443800$0468693D-2751-4D76-8630-B1EEA5233E36"
+    },
+    {
+     "o": "Q107390",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12443800$31244F6B-D1B5-4DFC-A110-7C63B0680646"
+    },
+    {
+     "o": "Q106458883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12443800$8431e0b6-4392-1b3e-d3f6-5b8eb1a5e317"
+    },
+    {
+     "o": "Q668",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q12443800$64C728A8-F712-40DE-A8D3-ED01D2D6C587"
+    },
+    {
+     "o": "Q28872924",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q12443800$9654BFD9-41E5-4CE7-8380-A2AE434FEB9E"
+    },
+    {
+     "o": "Q27612211",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q12443800$489C4612-B138-4C57-AED2-AFF0A5905224"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2520355728,
+   "sitelinks": 5
+  },
+  "Q1250464": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1250464$ac6c7982-4485-1d16-3381-52fdab39c6bc"
+    },
+    {
+     "o": "Q183366",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1250464$b92b1ac1-4510-d0a0-4f1a-44b54d8b013c"
+    }
+   ],
+   "enwiki": "Realm",
+   "lastrevid": 2550456768,
+   "sitelinks": 36
+  },
+  "Q12759805": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1250464",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12759805$E5EAC798-627B-4FDB-8443-968051D31365"
+    },
+    {
+     "o": "Q4204060",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12759805$60680069-290A-40B7-A8DD-3F18D73567CF"
+    }
+   ],
+   "enwiki": "Sultanate",
+   "lastrevid": 2536230812,
+   "sitelinks": 28
+  },
+  "Q127693126": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q127693126$863c392e-4cf5-8d6c-7022-5647a70667bd"
+    },
+    {
+     "o": "Q104481692",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q127693126$60b29f15-4c35-cddf-a2f1-15b328c350d1"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2509327333,
+   "sitelinks": 0
+  },
+  "Q12772819": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q37112258",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q12772819$17901121-B52B-49CE-B035-32FB072590DF"
+    },
+    {
+     "o": "Q77468620",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q12772819$669D50AE-2D83-4F81-ACDF-4C8D1DD9FFD1"
+    },
+    {
+     "o": "Q116505632",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q12772819$60ab7ef9-4a12-ec18-abb2-22b1f5dfa88f"
+    },
+    {
+     "o": "Q41172303",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q12772819$C9B2309E-BE58-433C-9966-87DA7E828377"
+    }
+   ],
+   "enwiki": "Discovery (observation)",
+   "lastrevid": 2528440191,
+   "sitelinks": 50
+  },
+  "Q12860": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q5",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q12860$BCD4B5D9-F5A8-41C0-ACD9-43B798E54999"
+    },
+    {
+     "o": "Q204920",
+     "p": "P27",
+     "rank": "normal",
+     "statement": "Q12860$ABB31CC3-C5D9-4154-89AF-646C75A0560F"
+    },
+    {
+     "o": "Q209715",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1506-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$7b3a9d7c-4d72-d1b7-bb66-2e2d85018c90"
+    },
+    {
+     "o": "Q111512452",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1476-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$4be2e2cc-4ea0-8464-e185-02b4240060a5"
+    },
+    {
+     "o": "Q111512493",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1469-10-19T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$ee647548-41fb-e684-2f4f-c8cee4c9f258"
+    },
+    {
+     "o": "Q112844317",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q12860$a622ab86-4f92-3b45-6479-27d96b3a371b"
+    },
+    {
+     "o": "Q60827183",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q12860$2426e4b7-43d8-0247-e234-34d0b02f06cb"
+    },
+    {
+     "o": "Q58631963",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1479-01-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1516-01-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$61ed7439-4db9-0a18-20ae-a6d654dac467"
+    },
+    {
+     "o": "Q477406",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1504-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1516-01-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$65044ee1-4c22-af35-3ab0-bb66d908d013"
+    },
+    {
+     "o": "Q67220948",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1476-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1477-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$f071a61f-4b0e-37cc-0980-cc5607fb185b"
+    },
+    {
+     "o": "Q58806386",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1476-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1504-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$3dcbd156-4f38-47eb-3cba-e2ef810e809d"
+    },
+    {
+     "o": "Q58002672",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1458-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1469-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$ee1555e4-4ca5-707d-6a27-922306a4bb23"
+    },
+    {
+     "o": "Q58006791",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1479-01-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1516-01-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q12860$a80d2259-46c6-4111-8953-410fc42e3b97"
+    },
+    {
+     "o": "Q112061791",
+     "p": "P39",
+     "rank": "normal",
+     "statement": "Q12860$37bffdb0-408e-3267-05fe-1fd780f6750c"
+    }
+   ],
+   "enwiki": "Ferdinand II of Aragon",
+   "lastrevid": 2554877301,
+   "sitelinks": 90
+  },
+  "Q1288568": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q20162172",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1288568$aaf493df-4ad8-6f74-d3b9-54047722f94d"
+    },
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1288568$68bc96cf-476a-e8af-7d3c-0d2a15c75ad7"
+    }
+   ],
+   "enwiki": "Modern language",
+   "lastrevid": 2527964002,
+   "sitelinks": 31
+  },
+  "Q131569": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q2635077",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$97d3cf6d-40e4-d6d4-e790-0bf58c09ee0e"
+    },
+    {
+     "o": "Q321839",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$3143a56d-4eb0-8e20-2262-607c73120846"
+    },
+    {
+     "o": "Q49848",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$e48bcc3b-499f-bcc8-5468-38a2bb6756bb"
+    },
+    {
+     "o": "Q1151067",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$5905f1cb-4089-b213-4240-73f235720ff4"
+    },
+    {
+     "o": "Q820655",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$bf8fb3cd-492b-4202-9789-131e12b3c7d5"
+    },
+    {
+     "o": "Q68619446",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q131569$33d1bfdf-46cc-58b5-d2ff-5ac26b6af0e3"
+    },
+    {
+     "o": "Q4394526",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "q131569$63a2a3b4-477d-98ce-6bab-7249fc31e645"
+    }
+   ],
+   "enwiki": "Treaty",
+   "lastrevid": 2548851037,
+   "sitelinks": 90
+  },
+  "Q1322198": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q34770",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1322198$d4b2c385-4447-ae60-6a05-0892c4003ffe"
+    },
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1322198$3ede8c0c-4830-97c9-5c70-d088b6ce3ab3"
+    }
+   ],
+   "enwiki": "Spoken language",
+   "lastrevid": 2556561486,
+   "sitelinks": 50
+  },
+  "Q1323642": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q1323642$142aa129-49df-72a8-f832-a0991077772a"
+    },
+    {
+     "o": "Q66747521",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1323642$c900dd45-4631-f204-0f31-f35b4909d379"
+    }
+   ],
+   "enwiki": "Transcontinental country",
+   "lastrevid": 2556682868,
+   "sitelinks": 26
+  },
+  "Q133156": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q161243",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q133156$eb1a28d4-41ac-aead-a65d-c0a81e108cde"
+    },
+    {
+     "o": "Q82794",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q133156$7533dbd3-44bd-f2f4-250f-c975e807018c"
+    },
+    {
+     "o": "Q815962",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q133156$b75fca05-4620-5b89-53b7-a06db3aa5763"
+    }
+   ],
+   "enwiki": "Colony",
+   "lastrevid": 2550568354,
+   "sitelinks": 100
+  },
+  "Q1331783": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q484652",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1331783$dfeb76fe-4234-2aa0-e23b-21a2f8e53f88"
+    },
+    {
+     "o": "Q1037",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q1331783$F1C4130A-E926-466E-9798-1E33B2BD14DD"
+    },
+    {
+     "o": "Q974",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q1331783$D685CEF3-4A03-4B3F-B445-7B4510589001"
+    },
+    {
+     "o": "Q967",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q1331783$75A370C4-F2CA-4C41-A338-D643CE38CE17"
+    },
+    {
+     "o": "+1976-09-20T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q1331783$c2637a63-438e-2c04-5365-71f2ceb1f343"
+    }
+   ],
+   "enwiki": "Economic Community of the Great Lakes Countries",
+   "lastrevid": 2515901804,
+   "sitelinks": 8
+  },
+  "Q1335818": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1335818$3f3e5607-4f26-b05a-a55c-660c4ea64b67"
+    },
+    {
+     "o": "Q49773",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1335818$951a7d94-4350-29df-ef40-3eaa267cf627"
+    },
+    {
+     "o": "Q151885",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1335818$7cc3690b-41f2-703c-ace9-81ff8a83e196"
+    },
+    {
+     "o": "Q484652",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1335818$66d1f111-48ad-c3ab-f65f-da7dca3c23d5"
+    }
+   ],
+   "enwiki": "Supranational union",
+   "lastrevid": 2554836494,
+   "sitelinks": 31
+  },
+  "Q13406463": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q12139612",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q13406463$30c7e1b2-47cb-05d8-d856-235d09df38bf"
+    },
+    {
+     "o": "Q15138389",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q13406463$2a6ac723-4683-2eda-f26a-b1fe534adc0a"
+    },
+    {
+     "o": "Q17442446",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q13406463$e5bfd562-41b9-745b-3c24-11696424d131"
+    },
+    {
+     "o": "Q14204246",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13406463$f4126103-9d0f-4cd3-9987-f19dd747b571"
+    }
+   ],
+   "enwiki": "Wikipedia:Lists",
+   "lastrevid": 2527537695,
+   "sitelinks": 32
+  },
+  "Q1351282": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q145",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q1351282$4e6d7594-4470-2499-33f9-b2926e03f815"
+    },
+    {
+     "o": "Q717478",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1351282$2fd80b05-47fa-9192-3602-6c330c6f430e"
+    },
+    {
+     "o": "Q788176",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1351282$283c2e42-41be-b5ec-b4ae-edc1e0277dc5"
+    },
+    {
+     "o": "Q2577883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1351282$d60b1055-4d8e-94eb-c75d-10e4397f5271"
+    },
+    {
+     "o": "Q133156",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1351282$ce920e78-48a2-b269-6caa-5c3d323a0927"
+    },
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1351282$75e48da7-4793-543d-f585-1a3a9b3e855f"
+    }
+   ],
+   "enwiki": "Crown colony",
+   "lastrevid": 2549725888,
+   "sitelinks": 40
+  },
+  "Q1361229": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q219087",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1361229$ba171139-4897-80c9-b17e-56a61063c2ac"
+    },
+    {
+     "o": "Q645883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1361229$2307e559-46e7-5b2f-8075-700302f64086"
+    },
+    {
+     "o": "Q24233595",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1361229$dbb960cb-4821-5d53-c845-c778854b354c"
+    },
+    {
+     "o": "Q85249348",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1361229$722e52ee-4c16-b70f-c70b-c4ab97e1d71a"
+    },
+    {
+     "o": "Q17768966",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1361229$89b2baac-45e1-7e1c-c716-76e26fa1fc74"
+    },
+    {
+     "o": "Q188686",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q1361229$7026e718-4d98-9285-9112-7686405df5dd"
+    },
+    {
+     "o": "Q194465",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q1361229$bb6fdcdd-4125-a55a-7895-f71a9445dc29"
+    },
+    {
+     "o": "Q130249379",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q1361229$f421967f-4782-c014-1eac-ac9daf911847"
+    }
+   ],
+   "enwiki": "Conquest",
+   "lastrevid": 2551027427,
+   "sitelinks": 21
+  },
+  "Q1377300": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7167",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1377300$b3a383a4-415e-4e65-4616-29d20603e608"
+    },
+    {
+     "o": "Q5308718",
+     "p": "P2348",
+     "rank": "normal",
+     "statement": "Q1377300$ffeffb4e-4a1d-5573-2682-d8ba7b53c4be"
+    }
+   ],
+   "enwiki": "First wave of European colonization",
+   "lastrevid": 2485798184,
+   "sitelinks": 6
+  },
+  "Q1384277": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q645883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1384277$8c055ed0-40d2-5f25-fa08-6ebc28185293"
+    },
+    {
+     "o": "Q2401485",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1384277$A29500EC-551F-49CE-A574-373E0C637670"
+    },
+    {
+     "o": "Q831663",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1384277$972C92DB-D105-41A7-BFCD-322169F14886"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2552189558,
+   "sitelinks": 1
+  },
+  "Q13955": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q34049",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q13955$e607602b-49d6-437e-b0a3-35948a54c4c4"
+    },
+    {
+     "o": "Q34770",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$23420EE4-1C33-4A03-B3BB-EE47181172A2"
+    },
+    {
+     "o": "Q152559",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$0d8884f7-467b-a81b-d514-a907fe4c5ce0"
+    },
+    {
+     "o": "Q1288568",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$74EEF68A-00B0-4E5A-8CD4-3E5FDD590207"
+    },
+    {
+     "o": "Q20162172",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$9feb29f2-4146-e594-5f4c-0bbb17004fde"
+    },
+    {
+     "o": "Q1097949",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$539b1912-40a9-e6fa-e3d3-1f42f31ef4c2"
+    },
+    {
+     "o": "Q399495",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$e39208bd-44b9-876a-4e99-61c1a256853f"
+    },
+    {
+     "o": "Q33742",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q13955$57da2ab6-4fad-ea54-7e54-aa45b184ebef"
+    },
+    {
+     "o": "Q79",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$218ea732-4c46-96da-eab5-9ef90c4cd99d"
+    },
+    {
+     "o": "Q262",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$4e7eafcc-461b-c0c7-6433-c3d75523bd84"
+    },
+    {
+     "o": "Q1049",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$1566861d-4e8b-cb06-8a2c-5a25677a0072"
+    },
+    {
+     "o": "Q796",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$3e5c5c13-4e2b-e8ef-2a0b-939a7b9d2514"
+    },
+    {
+     "o": "Q1028",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$4066a457-4516-1043-9b22-97063bbdd577"
+    },
+    {
+     "o": "Q851",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$1d676135-465f-66b7-2a23-495e433d4aea"
+    },
+    {
+     "o": "Q805",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$ac3eeeba-484d-7c8c-0993-d6740ab6d9e2"
+    },
+    {
+     "o": "Q858",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$97e83408-418e-4aa5-4144-70143d1360c3"
+    },
+    {
+     "o": "Q948",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$1c114e89-4e10-2c32-66e0-aa7b7bbf4198"
+    },
+    {
+     "o": "Q1045",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$cf025fb9-41a9-004e-6164-6e2ac3dc7353"
+    },
+    {
+     "o": "Q657",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$650f199a-40a4-aae5-a455-33f391f52abb"
+    },
+    {
+     "o": "Q878",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$6a0f95bb-4d3e-04cd-7c9a-594950e9b625"
+    },
+    {
+     "o": "Q810",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$dc2b7c77-43a5-7bda-4747-1aff1183b6c7"
+    },
+    {
+     "o": "Q986",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$a35de2c8-4bb3-c22e-5587-3da24c70abf7"
+    },
+    {
+     "o": "Q1016",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$cef74fb0-4560-8a46-df77-01e67db0fea5"
+    },
+    {
+     "o": "Q822",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$82727d18-47fc-b26a-b027-90fec894d844"
+    },
+    {
+     "o": "Q219060",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$8cca7ed1-4869-1c82-5a47-5e4f8c7725fb"
+    },
+    {
+     "o": "Q842",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$b98f2fad-4c67-eaaf-6ce0-1375adffc3f6"
+    },
+    {
+     "o": "Q1025",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$a7e27157-41e3-dd94-dd9f-8e5ae14d07cc"
+    },
+    {
+     "o": "Q817",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$e7ebc8b9-4ea6-625d-72fc-444951af029c"
+    },
+    {
+     "o": "Q846",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$f033ba2c-4618-b2d1-5d76-49e0596b6a79"
+    },
+    {
+     "o": "Q398",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$98f7e25b-4268-df0a-7054-288086cdf067"
+    },
+    {
+     "o": "Q977",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$2a455062-45c5-8ce5-3a20-7bb414319d85"
+    },
+    {
+     "o": "Q970",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$cebdd4a4-4cce-d16f-794d-ff82fa639452"
+    },
+    {
+     "o": "Q801",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$b71739b7-45a4-d26a-c215-095602005003"
+    },
+    {
+     "o": "Q958",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$b378cfc1-4c30-8a27-b55b-1aba87e316bb"
+    },
+    {
+     "o": "Q912",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$75ab21c3-464a-7c78-ed73-4fbbf9706a79"
+    },
+    {
+     "o": "Q1032",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$c5ae89f7-4545-54a2-5c2d-afdde2d02a05"
+    },
+    {
+     "o": "Q794",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$6b94c686-4bb0-b5ea-fed8-1bdc5545c5b3"
+    },
+    {
+     "o": "Q29",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$5e209aed-4208-b57c-4ba5-0d739b631053"
+    },
+    {
+     "o": "Q114",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$05085d22-49be-6954-fd33-e0d9d34c2ffd"
+    },
+    {
+     "o": "Q1041",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$3a6aa37f-4451-d65a-d05f-dfd367aefda2"
+    },
+    {
+     "o": "Q924",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$7d43a950-4211-c859-c94d-01be071de85a"
+    },
+    {
+     "o": "Q43",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$79f54d87-4ef7-1aae-90a8-a9679b305682"
+    },
+    {
+     "o": "Q218",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$571a421d-4323-5049-8660-5f975a387b01"
+    },
+    {
+     "o": "Q45",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$b79d019f-4037-1a27-2422-9e9ac0f99cd3"
+    },
+    {
+     "o": "Q833",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$db4fa1af-4e2d-b902-5131-a9f8ddea645f"
+    },
+    {
+     "o": "Q252",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q13955$92810232-4138-cd9c-2ef5-acda2630ccaf"
+    },
+    {
+     "o": "Q56467",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$ed7daa7e-421a-323f-3ecc-5bdfa410a075"
+    },
+    {
+     "o": "Q56231",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$a4be734a-4c83-fe87-dab8-47ff6e597c22"
+    },
+    {
+     "o": "Q56426",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$fc7f2365-4c11-c989-7feb-b0f4d4acebf6"
+    },
+    {
+     "o": "Q56725",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$2e838327-431c-f53d-141d-56ab5f7abe28"
+    },
+    {
+     "o": "Q56499",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$c24c6a01-4531-f3a2-fd07-176b5adc1619"
+    },
+    {
+     "o": "Q56240",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$3f57f2fd-4846-b7d8-da0a-598405e194cd"
+    },
+    {
+     "o": "Q56503",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$39c1b48f-4671-a7ef-638a-87da592dbd88"
+    },
+    {
+     "o": "Q29919",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$ef8b98fc-4457-fda9-2bc8-73e4289012d9"
+    },
+    {
+     "o": "Q56714",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$51d39ed2-4c61-16fd-76c1-0c19b84e4472"
+    },
+    {
+     "o": "Q56592",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$e005403c-4c00-c6ae-b721-e6722336a0f9"
+    },
+    {
+     "o": "Q56497",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$723e3d08-4e25-ce27-7d86-a67f6ede669f"
+    },
+    {
+     "o": "Q56573",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$6d29f491-4a0c-2869-c1ae-4a8028c5c007"
+    },
+    {
+     "o": "Q1262143",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$ee002ae9-478a-f6b6-cf3a-400e3f4a9c00"
+    },
+    {
+     "o": "Q56574",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$39d99d8e-474b-8b73-e074-c548e4d66989"
+    },
+    {
+     "o": "Q56593",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$2e0b2f86-429a-3be3-3ad9-82e96b4e567b"
+    },
+    {
+     "o": "Q56577",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$3fb9717a-4ee9-b75f-67ac-e1a0989d33f5"
+    },
+    {
+     "o": "Q56232",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$c4585cb2-43ac-00f9-3a99-1385bf14eebc"
+    },
+    {
+     "o": "Q56385",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$763afb97-45bd-0df5-8f5b-f638df526f62"
+    },
+    {
+     "o": "Q56576",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$8baed77f-4dd9-2a7a-bc82-5077b788e370"
+    },
+    {
+     "o": "Q56608",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$1e5f82d1-4d53-75f4-966b-6e8e596b7fee"
+    },
+    {
+     "o": "Q56571",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$b7c83621-4d5f-977c-ba74-32ce7c4753d1"
+    },
+    {
+     "o": "Q56630",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$5c0e4f02-4720-9c22-743b-7111f11cc1dc"
+    },
+    {
+     "o": "Q56565",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$52330f81-4dc7-3108-0f6b-82244e0ae31f"
+    },
+    {
+     "o": "Q56578",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$d48e5d7a-4c73-3593-4d29-31a2fd26439f"
+    },
+    {
+     "o": "Q56579",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$7a1169a6-4919-0737-d449-fbe939139a1d"
+    },
+    {
+     "o": "Q3510366",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$090aa9dc-48a6-2d17-4050-de300a7f42f1"
+    },
+    {
+     "o": "Q3399507",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$9081d16e-45a8-07b1-15e8-b4e9e83ec91f"
+    },
+    {
+     "o": "Q56833",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$8ee297b7-42b7-2465-285b-db3bbe4bb054"
+    },
+    {
+     "o": "Q56416",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$a5fa94ab-4685-a74a-cd7f-553b084db5da"
+    },
+    {
+     "o": "Q9166",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$61b674c6-46ce-84fa-55ea-9e1cf88b682c"
+    },
+    {
+     "o": "Q36388",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$1f557542-457b-1f54-790e-8a7d9aad13ab"
+    },
+    {
+     "o": "Q846157",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$46e87ce7-43fa-489b-9509-f993afed8945"
+    },
+    {
+     "o": "Q50948445",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$80ac55b4-43f2-4f0c-a777-f2c5b522a29b"
+    },
+    {
+     "o": "Q37733",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$cd394d41-4b77-2aaa-3222-27c21fbf9e58"
+    },
+    {
+     "o": "Q1034036",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q13955$bd9136ff-418c-20d7-1380-46423be10574"
+    }
+   ],
+   "enwiki": "Arabic",
+   "lastrevid": 2556431588,
+   "sitelinks": 310
+  },
+  "Q140892892": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q140892892$3ecd8d48-451e-cdd4-a985-9866440edb41"
+    },
+    {
+     "o": "Q66747521",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q140892892$faa01688-471e-c0b9-8659-aa4cfc6db213"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2555343009,
+   "sitelinks": 1
+  },
+  "Q1469686": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q198",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q1469686$d5463896-4fee-495c-b658-615c72ba2555"
+    },
+    {
+     "o": "Q181648",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q1469686$cc55c2cb-4b32-23f6-ee8e-6aa8162e10f1"
+    },
+    {
+     "o": "Q100348214",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1469686$c92450d3-497b-099a-6c1c-b2ffe2a046c1"
+    },
+    {
+     "o": "Q124867660",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1469686$b8bd2ed2-4088-9e65-d810-118c45893538"
+    }
+   ],
+   "enwiki": "Perpetual war",
+   "lastrevid": 2535681319,
+   "sitelinks": 11
+  },
+  "Q1489259": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q6266",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1489259$9fb9ee8d-4304-e13c-c9f0-1af6d7ee73be"
+    },
+    {
+     "o": "Q109038778",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q1489259$c934f74f-478a-f6c6-68f3-1516b34d1ca7"
+    }
+   ],
+   "enwiki": "Superpower",
+   "lastrevid": 2549204999,
+   "sitelinks": 75
+  },
+  "Q150": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q142",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$17612e11-490a-239a-abb7-55baf4c7cec9"
+    },
+    {
+     "o": "Q39",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$11836104-41a3-ea8e-5296-f747cca928ea"
+    },
+    {
+     "o": "Q16",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$8a4fefb0-41aa-9494-5956-761a2f9b3370"
+    },
+    {
+     "o": "Q962",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$8520c219-4cf9-9be9-94c4-0638c54ccb7e"
+    },
+    {
+     "o": "Q965",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$60c14aec-4092-3a05-2066-06e12a011ce7"
+    },
+    {
+     "o": "Q971",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$1caa6cf3-4ba3-2dc2-4ca2-c260dd1558fd"
+    },
+    {
+     "o": "Q974",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$bd317293-4f34-71ad-c370-a2508d872360"
+    },
+    {
+     "o": "Q1008",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$cff4a1de-4094-bc1b-9cff-0dccd0c01d0b"
+    },
+    {
+     "o": "Q1000",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$2307db51-4f8d-23f2-7eed-629930ad1f4a"
+    },
+    {
+     "o": "Q1006",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$9ad6cbdb-4d1f-dc48-511a-3bd4611656ca"
+    },
+    {
+     "o": "Q912",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$c4abf702-4f11-dc1b-e9b7-98b5479f4ecc"
+    },
+    {
+     "o": "Q235",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$b05035c1-47a5-044e-1c14-02d86c53f5a9"
+    },
+    {
+     "o": "Q1032",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$6bf108ff-4a4e-ea94-b77c-373158fab054"
+    },
+    {
+     "o": "Q1041",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$990f4d2c-4096-6349-339d-4d973a0c4a82"
+    },
+    {
+     "o": "Q945",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$24386340-43c2-42c0-dbcb-85671c05a6dc"
+    },
+    {
+     "o": "Q967",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$5d8d582b-4206-eafa-ff1e-d3a77df0fbf3"
+    },
+    {
+     "o": "Q1009",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$cf99b189-4268-23a0-b601-f6c9a1d0925b"
+    },
+    {
+     "o": "Q929",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$6435a0ea-415b-e7cb-69e5-ae71fee4d809"
+    },
+    {
+     "o": "Q970",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$e7731518-4dd1-1a39-11c9-74fce2de9a38"
+    },
+    {
+     "o": "Q977",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$13119cfd-491b-02c6-3b54-fdf806b08e13"
+    },
+    {
+     "o": "Q983",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$99770535-4a35-29c8-0d18-eb8d6f83d7a2"
+    },
+    {
+     "o": "Q790",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$b2e78378-4342-9007-ecb7-7d736f5dbd7b"
+    },
+    {
+     "o": "Q32",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$2a8f26aa-46ae-d542-df6b-d10c7a6e6c65"
+    },
+    {
+     "o": "Q1019",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$878f8eaf-42c7-5189-5c0c-e4eef1f89008"
+    },
+    {
+     "o": "Q1037",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$33847a90-4a1e-a15c-3745-226b253603aa"
+    },
+    {
+     "o": "Q1042",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$c33c875e-48fd-2126-e88f-d7677f10ce0a"
+    },
+    {
+     "o": "Q657",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$becc3b64-4b4a-807b-e2fa-a463a6aa0ade"
+    },
+    {
+     "o": "Q686",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$8087b5c2-4e93-d411-8a25-8bb74e40d668"
+    },
+    {
+     "o": "Q262",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$3B69F4F1-3547-4CEA-95CD-F639960F4C99"
+    },
+    {
+     "o": "Q228",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$5E7D0EC1-1073-4473-A575-4FDD184A5DA6"
+    },
+    {
+     "o": "Q424",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$EFD1E836-7586-4488-A156-323AD839A918"
+    },
+    {
+     "o": "Q25230",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$FE40799C-0FEA-46B4-BA44-AC80FDBAEF5D"
+    },
+    {
+     "o": "Q668",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$C0442939-599B-4F79-9DA3-AC5FA00E1596"
+    },
+    {
+     "o": "Q38",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$BE9FF755-91E0-4C09-9DC5-69DC3D2383D8"
+    },
+    {
+     "o": "Q785",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$2C057156-1AD3-4AF6-B8F8-1F29FC3595BA"
+    },
+    {
+     "o": "Q822",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$568452E7-E176-4464-A00E-0B7B2AA28A48"
+    },
+    {
+     "o": "Q1025",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$EE82F6E2-193F-4385-8395-8E80C2EC1059"
+    },
+    {
+     "o": "Q1027",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$1DB655DC-5716-4711-97D1-C990304088F1"
+    },
+    {
+     "o": "Q1028",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$F86453CB-83B7-41F3-B918-4C114DFBB9FB"
+    },
+    {
+     "o": "Q881",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$eaa341e4-4d97-3299-34ce-3f7904cd63a2"
+    },
+    {
+     "o": "Q31",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$54967ef5-4fc8-b360-4617-ce8a2aa66226"
+    },
+    {
+     "o": "Q948",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$4bb52f64-4044-36b2-8cd6-31d80b03ef59"
+    },
+    {
+     "o": "Q819",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$1473902f-4332-785b-a836-3e089b8de598"
+    },
+    {
+     "o": "Q30",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q150$5b735b44-44c8-fc86-f6a7-54ff69907228"
+    },
+    {
+     "o": "Q1288568",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "q150$F77EC7B3-02C2-4A76-B552-956DFFD18EA4"
+    },
+    {
+     "o": "Q33742",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q150$3e9a2ffe-4acd-6842-10c5-b42f07bbb3f8"
+    },
+    {
+     "o": "Q34770",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q150$1DE04AAA-7B28-435D-9EA3-C11F54F6CFD1"
+    },
+    {
+     "o": "Q37351",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q150$cf83376b-4e66-ed7a-1177-e14e056c40be"
+    },
+    {
+     "o": "Q85380120",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q150$4aac4e40-4b3f-c237-decc-493994380e75"
+    },
+    {
+     "o": "Q500394",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q150$70b4b584-4abb-9727-33ca-2a42a85d512c"
+    },
+    {
+     "o": "Q19814",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q150$d6c39558-4616-b594-0bdd-e818c941a62d"
+    },
+    {
+     "o": "Q3100376",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q150$367FF933-F670-4DDA-AE1A-B408383F865E"
+    },
+    {
+     "o": "Q37351",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q150$777ad0cd-f071-42e8-b7f2-8a7e645cb2fd"
+    }
+   ],
+   "enwiki": "French language",
+   "lastrevid": 2552134625,
+   "sitelinks": 352
+  },
+  "Q1507074": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q43229",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1507074$21783198-4e88-54ca-eac4-8f8bf05049dd"
+    },
+    {
+     "o": "Q8683",
+     "p": "P607",
+     "rank": "normal",
+     "statement": "Q1507074$3c2e4e7a-454f-9fbe-b5ba-0eac92b18488"
+    },
+    {
+     "o": "Q8683",
+     "p": "P1344",
+     "rank": "normal",
+     "statement": "Q1507074$62968D1F-5404-458A-8E32-600603CFD672"
+    }
+   ],
+   "enwiki": "Western Bloc",
+   "lastrevid": 2491758618,
+   "sitelinks": 41
+  },
+  "Q1520223": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7270",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1520223$4c55be42-47a4-1116-b56f-8cd2cc289a6b"
+    },
+    {
+     "o": "Q183039",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1520223$32622acd-49d9-1889-eb2f-44d50be89926"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q1520223$12f4c439-4575-1d49-db62-04e40acb4ece"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2544609247,
+   "sitelinks": 15
+  },
+  "Q152559": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q28923954",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q152559$70B71E3C-E762-4AB9-A1FA-C8FC46BF5642"
+    },
+    {
+     "o": "Q2092812",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q152559$6b932a5b-42f4-e041-9c6b-1aa74dcdcdbb"
+    },
+    {
+     "o": "Q14793",
+     "p": "P137",
+     "rank": "normal",
+     "statement": "Q152559$5ed2dce2-4770-f8c7-1c11-c51aad5c9e08"
+    }
+   ],
+   "enwiki": "ISO 639 macrolanguage",
+   "lastrevid": 2484737156,
+   "sitelinks": 32
+  },
+  "Q15304003": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1763527",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q15304003$3209772e-4ca3-9a4f-d81c-237a2a467e9a"
+    },
+    {
+     "o": "Q161243",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q15304003$9137d446-43ed-81a5-2622-c179c56efa92"
+    },
+    {
+     "o": "Q29999",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q15304003$b4047a04-4a39-d3cf-cea4-dbc6f5ad212d"
+    },
+    {
+     "o": "Q55",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$51dfbae5-4415-f73e-f43c-3292d1f7fd2c"
+    },
+    {
+     "o": "Q25279",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$b53b65e2-4869-886d-7699-2f6f2e7c4220"
+    },
+    {
+     "o": "Q21203",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$52232b88-4aa3-e6f6-ce3a-670ffcf8abe7"
+    },
+    {
+     "o": "Q26273",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$68302e6c-47e4-de2b-758c-f8817831f35b"
+    },
+    {
+     "o": "Q19901436",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$049dcfdb-4ff0-0b17-8771-365a55a9f0f3"
+    },
+    {
+     "o": "Q25227",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q15304003$44f1c17d-475c-9155-612c-dc9463757547"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2546723016,
+   "sitelinks": 0
+  },
+  "Q15893266": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q35120",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q15893266$43ed0939-4bde-50ef-6d34-0c97b4d07a56"
+    },
+    {
+     "o": "Q192630",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q15893266$8862b0e2-4f13-7b61-4a3a-c6a32a06cde1"
+    },
+    {
+     "o": "Q86098365",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q15893266$ae9f642c-40bf-4093-5d93-d68ab3af077e"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2552192060,
+   "sitelinks": 0
+  },
+  "Q160016": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1646605",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q160016$578f4345-4ddf-8509-357f-6fccd0c2c364"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q160016$25d72214-4cd5-38a1-3ddf-a2d287c39f2b"
+    },
+    {
+     "o": "Q13473501",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q160016$5dc2eeb2-41ba-3ad8-7910-924971871fa5"
+    }
+   ],
+   "enwiki": "Member states of the United Nations",
+   "lastrevid": 2533255984,
+   "sitelinks": 73
+  },
+  "Q161243": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q161243$e27afa1d-4ecd-b368-d2c7-5cf93f8a183d"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q161243$1b79462f-4928-2c57-514f-508e276228ae"
+    },
+    {
+     "o": "Q618123",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q161243$BA546B85-ADC8-4789-BA86-C66451C47CFB"
+    }
+   ],
+   "enwiki": "Dependent territory",
+   "lastrevid": 2555301221,
+   "sitelinks": 78
+  },
+  "Q164142": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q161243",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q164142$c770b054-47e3-2dd1-82b0-7af53542cc62"
+    },
+    {
+     "o": "Q1151405",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q164142$e7fa6d59-450d-cc86-e960-58319c4b6d45"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q164142$8f296303-4dcc-6e51-228d-b77936aa9881"
+    }
+   ],
+   "enwiki": "Protectorate",
+   "lastrevid": 2547834275,
+   "sitelinks": 79
+  },
+  "Q170072": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q46",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "q170072$836c2146-4067-5383-2cb0-8e9a86844da1"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1581-07-26T00:00:00Z"
+      ],
+      "P582": [
+       "+1795-01-19T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q170072$fec41d08-4bac-efbf-6e50-9416e6f0568a"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1795-01-19T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q170072$0731B21B-93E0-42FF-B3DE-6F910D601264"
+    },
+    {
+     "o": "Q20181813",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q170072$d942cd71-4f25-4ba4-6a2f-d4b958ed863e"
+    },
+    {
+     "o": "Q170156",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q170072$e04ccd87-4ba3-1cb8-83eb-cd6fe86fcb32"
+    },
+    {
+     "o": "Q1031430",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q170072$d568b9fa-46bb-2bfa-5977-d70b760cb14a"
+    },
+    {
+     "o": "Q188553",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q170072$a1839877-43d9-0882-db85-1d3d780a33cf"
+    },
+    {
+     "o": "+1581-07-26T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q170072$9d2626f0-4b87-17b9-264f-3e0370a9722e"
+    },
+    {
+     "o": "+1795-01-19T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q170072$208d6c92-4588-74dd-954d-c9789d0ae175"
+    },
+    {
+     "o": "Q7411",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "Q170072$b5c32aaa-411c-0413-2800-c5ff8eec8d7b"
+    },
+    {
+     "o": "Q36600",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q170072$78f370f9-4dd6-4f10-716b-0a6fe77ddf79"
+    },
+    {
+     "o": "Q330533",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q170072$be4bd19d-4b62-c78b-16c0-69aa897b82fa"
+    },
+    {
+     "o": "Q188553",
+     "p": "P1366",
+     "rank": "normal",
+     "statement": "Q170072$98798278-418e-f001-08e6-a442af3bae57"
+    },
+    {
+     "o": "Q7411",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q170072$72cb7b9e-45ee-e747-da52-fc7f2fb09348"
+    },
+    {
+     "o": "Q170072",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q170072$2593510d-434b-3603-9dcb-03d9756d3fd2"
+    },
+    {
+     "o": "Q1366757",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$0ddf6921-40cc-5c3f-4041-18dbaaef914e"
+    },
+    {
+     "o": "Q2751716",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$b3054f09-4af7-399a-1a9e-9e373209fa92"
+    },
+    {
+     "o": "Q152420",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$acd129ec-4df0-ba6e-95d9-f1401dbab272"
+    },
+    {
+     "o": "Q762943",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$2aab193c-4e51-1c77-9463-6abe8b716fd8"
+    },
+    {
+     "o": "Q2679365",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$604ef87f-4302-caaf-ca73-297377d189b8"
+    },
+    {
+     "o": "Q2039165",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$06e59c5d-4a33-c4cf-faa9-5c130724aa6d"
+    },
+    {
+     "o": "Q1945565",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$8528c7d4-44dc-5316-61f9-025631918f00"
+    },
+    {
+     "o": "Q770862",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$87efaefd-41f1-264c-2016-31c349ee2e67"
+    },
+    {
+     "o": "Q14378682",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$a47fdc49-4e60-10b5-eab5-0dc08548a75b"
+    },
+    {
+     "o": "Q1440712",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$ffa0cf98-4c64-f69d-7446-1e2022a3f638"
+    },
+    {
+     "o": "Q974174",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$d8decff4-4250-09ec-351c-8c12130d2ee1"
+    },
+    {
+     "o": "Q1758227",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q170072$b2d7442f-4ee0-06cd-4706-39a5b99913ba"
+    }
+   ],
+   "enwiki": "Dutch Republic",
+   "lastrevid": 2546624890,
+   "sitelinks": 82
+  },
+  "Q17007978": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17007978$F35938AE-591B-4AF3-A46C-D7A140EB982F"
+    },
+    {
+     "o": "Q3238445",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q17007978$DC3203AD-68C7-4CDA-A572-616B06626910"
+    }
+   ],
+   "enwiki": "Counterintelligence state",
+   "lastrevid": 2542710664,
+   "sitelinks": 3
+  },
+  "Q170541": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q52110228",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q170541$8966006a-4805-8270-4ccf-ecfeb7bb0c65"
+    },
+    {
+     "o": "Q46",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q170541$fb992c3a-4222-8fa3-536e-14c8b4e417af"
+    },
+    {
+     "o": "+1944-00-00T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q170541$1A5D6494-20E0-4080-9B93-FF26C4D148A2"
+    },
+    {
+     "o": "Q8683",
+     "p": "P607",
+     "rank": "normal",
+     "statement": "Q170541$ef396211-4496-89bb-9bc9-68ccf48b1877"
+    },
+    {
+     "o": "Q8683",
+     "p": "P1344",
+     "rank": "normal",
+     "statement": "Q170541$514507E0-3DE9-449A-88A7-C519FC607219"
+    },
+    {
+     "o": "+1990-00-00T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q170541$8c491f6f-483f-df05-23ff-0eae6f08b204"
+    },
+    {
+     "o": "Q6138528",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q170541$694385bd-405e-e24f-580b-c877afd7a94e"
+    }
+   ],
+   "enwiki": "Eastern Bloc",
+   "lastrevid": 2549270904,
+   "sitelinks": 72
+  },
+  "Q17152708": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q5589178",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17152708$8dd476fc-45de-9d3f-5ea4-bfd70c343d0f"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17152708$bc99e1d1-4b0e-9d8a-65cb-8faac6b2e6da"
+    },
+    {
+     "o": "Q7270",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17152708$35b65e9d-48a5-3247-71de-430406a20a53"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q17152708$7aa2bf16-434b-e667-f0d0-5d93608f4df6"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2412277012,
+   "sitelinks": 3
+  },
+  "Q17259945": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q17147964",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17259945$9762a758-4fa8-3915-b9d1-6f1bca0a72c4"
+    },
+    {
+     "o": "Q34876",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q17259945$51cc4dfe-4531-900b-b82e-ee561af57d9b"
+    },
+    {
+     "o": "Q80702",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q17259945$04193951-4df7-5e97-0421-17857b9d00dc"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2517497668,
+   "sitelinks": 0
+  },
+  "Q174306": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q79751",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1005-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1797-06-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q174306$05d8be49-46f3-7d96-c779-09f63e0392a1"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1797-06-00T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q174306$F8B7AE8A-C051-4E41-87C8-4A1FF930B6A5"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1005-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1797-06-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q174306$3e4d34dc-4e86-02f6-12f8-ba582928e6d4"
+    },
+    {
+     "o": "Q62825",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q174306$59e76c73-4e7a-939f-45ee-f8cbd5bcb855"
+    },
+    {
+     "o": "Q838931",
+     "p": "P155",
+     "q": {
+      "P585": [
+       "+1096-01-01T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q174306$09cce42e-40f1-34a8-cb94-00d93d13220f"
+    },
+    {
+     "o": "+1005-01-01T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q174306$3EF3FF1F-453E-42F2-80C4-A6432B26BD10"
+    },
+    {
+     "o": "+1797-06-14T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q174306$b72fa952-4192-f93b-d35d-26ba7d69ae95"
+    },
+    {
+     "o": "Q1449",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q174306$083718AE-1456-4264-B798-5E5537CBDD11"
+    },
+    {
+     "o": "Q38",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q174306$5AD0BC63-8580-4B83-B9F1-D41B9B106D58"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1284-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1768-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q174306$cd94208e-4a3a-ea2f-425f-579f2783bf1a"
+    },
+    {
+     "o": "Q46",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q174306$04910C55-E1AC-419C-AE3A-62C3018F2BB7"
+    },
+    {
+     "o": "Q36106",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q174306$323582c3-43ef-801c-9e68-b1b88a5f0e20"
+    },
+    {
+     "o": "Q397",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q174306$d8dc3259-4252-9c53-ffc1-244247230a09"
+    },
+    {
+     "o": "Q652",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q174306$081e979f-4da7-a3cc-2606-0fedb7f899e5"
+    },
+    {
+     "o": "Q659312",
+     "p": "P1366",
+     "q": {
+      "P585": [
+       "+1797-06-14T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q174306$df028d92-452a-d651-c61e-b585e6410bbf"
+    }
+   ],
+   "enwiki": "Republic of Genoa",
+   "lastrevid": 2548151251,
+   "sitelinks": 77
+  },
+  "Q178561": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q198",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "q178561$60c1ab85-4dfb-91b6-b862-45b352ae9032"
+    },
+    {
+     "o": "Q650711",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q178561$e5ffddb5-425f-f20d-3171-eb3e255fff4c"
+    },
+    {
+     "o": "Q13418847",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q178561$23a9c10e-4ed7-b5cb-2ada-339f6d990a22"
+    },
+    {
+     "o": "Q645883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q178561$049fd577-4a45-b4e5-ab09-953752528ef9"
+    },
+    {
+     "o": "Q123349687",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q178561$ad7bcd7d-45cf-f43f-ddeb-f354fe3844fd"
+    },
+    {
+     "o": "Q350604",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q178561$8c2c4a0e-46ad-e8e5-6898-a0a44c202106"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q178561$e492b7e0-4847-99e1-0412-2e3d8062d3e4"
+    }
+   ],
+   "enwiki": "Battle",
+   "lastrevid": 2545342398,
+   "sitelinks": 94
+  },
+  "Q1790360": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q48349",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q1790360$dcd2065e-4c23-194d-b88b-df6c531fa880"
+    }
+   ],
+   "enwiki": "Colonial empire",
+   "lastrevid": 2519977856,
+   "sitelinks": 30
+  },
+  "Q179164": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q179164$aeb9a34e-4b34-3dad-8b89-ef1b3d22da8d"
+    },
+    {
+     "o": "Q22909549",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q179164$499f910c-41f2-a382-39bc-f11051b73ff3"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q179164$104170dc-48e4-d47d-610c-0da400525012"
+    }
+   ],
+   "enwiki": "Unitary state",
+   "lastrevid": 2556680727,
+   "sitelinks": 91
+  },
+  "Q179671": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q3624078",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q179671$89801D92-8452-4043-B1A2-B4F55E9F78BB"
+    },
+    {
+     "o": "Q2325086",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q179671$d2ca2586-4e4f-2bcd-5315-adae7a0a79fb"
+    },
+    {
+     "o": "Q6534",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1789-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q179671$ec8d0619-409b-e447-b92c-cbf490471783"
+    }
+   ],
+   "enwiki": "Nation state",
+   "lastrevid": 2545432523,
+   "sitelinks": 77
+  },
+  "Q180684": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1255828",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q180684$a02a67c0-49a7-8d71-88ce-c56a75480442"
+    },
+    {
+     "o": "Q2447975",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q180684$5484fb77-4468-ab5b-d7ff-c2f3be65437e"
+    },
+    {
+     "o": "Q65089988",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q180684$a9d15ca8-482d-0678-2e9e-269d26015ef6"
+    },
+    {
+     "o": "Q124490",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q180684$93de141c-4f7c-f123-a4c3-22a833f20a63"
+    },
+    {
+     "o": "Q839578",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q180684$5bc5f20d-4cc2-ff81-ae79-bf0698ee5a55"
+    },
+    {
+     "o": "Q86923152",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q180684$2d4abb91-4410-50e0-2459-9a9ab46e4c71"
+    },
+    {
+     "o": "Q116505632",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q180684$79275550-4bc1-9043-b498-d6d1a4d86d96"
+    },
+    {
+     "o": "Q123345464",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q180684$E1D128AF-7D60-4192-B276-7D0721BD51E3"
+    }
+   ],
+   "enwiki": "Conflict (process)",
+   "lastrevid": 2555585214,
+   "sitelinks": 96
+  },
+  "Q183366": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q56061",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q183366$abbc5ad7-4d27-0cc1-fa9b-ff39f1cbf702"
+    },
+    {
+     "o": "Q82794",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q183366$e60c409c-4d1a-dee3-f551-3e2625400767"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q183366$72a8bd9b-41b7-2cb9-9653-8d195cf166e7"
+    }
+   ],
+   "enwiki": "Territory",
+   "lastrevid": 2556874757,
+   "sitelinks": 83
+  },
+  "Q18564543": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q625994",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q18564543$8e89f018-4636-c21d-a41e-df9a277de5a6"
+    },
+    {
+     "o": "Q13418847",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q18564543$b7a3d8a0-402b-fab4-68f9-5a2b948a4828"
+    },
+    {
+     "o": "Q17195514",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q18564543$4acdc694-4572-e357-be96-986ca3968949"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2517800253,
+   "sitelinks": 1
+  },
+  "Q186081": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q11235244",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q186081$60a111f3-4090-bbc2-9a87-6ec5d34e35de"
+    },
+    {
+     "o": "Q185148",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q186081$1c82fe61-4a7e-3e30-406b-d3f19f978d10"
+    },
+    {
+     "o": "Q26907166",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q186081$cb44df87-4a73-5c4e-0f9b-9759f7c509e2"
+    },
+    {
+     "o": "Q135524362",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q186081$b8e17ecf-489a-d367-985e-8143ee161efe"
+    },
+    {
+     "o": "Q11471",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q186081$c7ccf2f5-4d8f-db9f-c111-ccebeea9cc58"
+    },
+    {
+     "o": "Q2199864",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q186081$c61c6e11-42ce-b40b-ee3e-59ce48dfdcd8"
+    },
+    {
+     "o": "Q24575110",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q186081$a0a1fcaa-4cf8-617c-f92e-84a9efb881f5"
+    },
+    {
+     "o": "Q24575125",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q186081$0d4cc1c6-4e17-a1d1-87df-7a9fca1c808f"
+    },
+    {
+     "o": "Q124711104",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q186081$3934c1d0-4ea1-33ff-6c41-3aed0c8c3561"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2556944482,
+   "sitelinks": 6
+  },
+  "Q189524": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q11446",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q189524$d1aa66bf-4e18-fa62-d03d-a8e03ac42d54"
+    },
+    {
+     "o": "Q955920",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q189524$e5e964bb-4de5-0d35-42e7-bad102fa8b78"
+    },
+    {
+     "o": "Q549276",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q189524$1007b254-4860-6077-3dbd-71c193d34d25"
+    },
+    {
+     "o": "Q4161250",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q189524$6a0bec35-48be-c39c-aa24-d8a7c22c9a2c"
+    },
+    {
+     "o": "Q4508",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q189524$48a72a17-48a8-f611-e579-b87a1c7b2932"
+    },
+    {
+     "o": "Q20749395",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q189524$fe5deddb-4666-017d-2ae0-f336865903dd"
+    },
+    {
+     "o": "Q47311934",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q189524$4bbc655d-4c74-0969-50c9-59082a09b1c1"
+    },
+    {
+     "o": "Q62934264",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q189524$21ba4008-4120-bf86-a7ea-72a973c894b1"
+    }
+   ],
+   "enwiki": "Naval fleet",
+   "lastrevid": 2522616891,
+   "sitelinks": 57
+  },
+  "Q194465": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q194465$2298b210-4726-0f09-beee-4de4c5142303"
+    },
+    {
+     "o": "Q85249348",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q194465$52db972f-42cd-0081-e82c-943f008ac8b6"
+    },
+    {
+     "o": "Q180684",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q194465$091e794d-4051-063c-3857-32e39d41dbf0"
+    }
+   ],
+   "enwiki": "Annexation",
+   "lastrevid": 2513261031,
+   "sitelinks": 68
+  },
+  "Q198": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q350604",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q198$465c06f2-4c17-9107-533a-9f7293bc1841"
+    },
+    {
+     "o": "Q1920219",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q198$2ec185a2-400e-e86e-8904-b3e28c1c4f85"
+    },
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q198$c85bb6fa-458f-f18c-e8cf-8edf649d8137"
+    },
+    {
+     "o": "Q15835236",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q198$9e72fd7d-4ff4-00fc-2f9e-5831c608a739"
+    },
+    {
+     "o": "Q17091170",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q198$a7f4b493-4609-4001-e572-797b5eb71b27"
+    },
+    {
+     "o": "Q178561",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q198$34530dbe-45d6-9def-f98b-9b1b3e27d1db"
+    },
+    {
+     "o": "Q105370834",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q198$dcf53931-4c26-3e67-2255-3279dbaac3fb"
+    },
+    {
+     "o": "Q12786121",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q198$6b2831fd-48d9-d87a-ea6a-0b2c57d713f7"
+    },
+    {
+     "o": "Q45635",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q198$d33cba47-403a-aa39-be79-57ad0b180dd7"
+    },
+    {
+     "o": "Q5160184",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q198$1a2ecad5-467a-1df4-08b8-28304c931522"
+    },
+    {
+     "o": "Q3511052",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q198$30cdfe0c-4e18-b5f2-66c5-2c05f57dc4a7"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q198$ee14c54d-424f-294e-0c37-b468c1249a34"
+    },
+    {
+     "o": "Q17524420",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q198$94635ca5-401e-e836-542d-4279393b55c9"
+    },
+    {
+     "o": "Q7275",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q198$54850e92-4019-9720-6bd8-acb067349411"
+    },
+    {
+     "o": "Q15627509",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q198$dfc48549-4ff3-be19-1a6f-8351d35cf564"
+    }
+   ],
+   "enwiki": "War",
+   "lastrevid": 2557410737,
+   "sitelinks": 267
+  },
+  "Q19953632": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q96088545",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q19953632$7826298f-4079-37b7-5812-c3ef83af290a"
+    },
+    {
+     "o": "Q56061",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q19953632$0bbb52bb-4b05-46e2-eb87-70b09a2be0c8"
+    },
+    {
+     "o": "Q19832712",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q19953632$CF9CDCA4-2318-4A15-8CEC-537A9304DFB0"
+    },
+    {
+     "o": "Q52551684",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q19953632$13724318-49b4-3e84-b563-9aeeac4cd1a4"
+    },
+    {
+     "o": "somevalue",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q19953632$e4bfc019-4256-5d2a-8a6c-38e63ef5ea74"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2556218256,
+   "sitelinks": 0
+  },
+  "Q2001676": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q645883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q2001676$80d0dce1-48b5-fe5c-6bfd-bfea874695f1"
+    },
+    {
+     "o": "Q1174599",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q2001676$31b4ca0f-43eb-2c1d-cded-c7761159da2f"
+    },
+    {
+     "o": "Q350604",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q2001676$5f216b7f-40a6-90df-f3e0-7ba57357b78e"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q2001676$020b30ce-473f-be16-7c74-8b7af6c3337f"
+    }
+   ],
+   "enwiki": "Offensive (military)",
+   "lastrevid": 2556468351,
+   "sitelinks": 48
+  },
+  "Q20162172": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q20162172$1d67a3fe-4bf7-57cc-47a2-2cb0e27bc47d"
+    },
+    {
+     "o": "Q34770",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q20162172$238c2b0d-4b71-8a0a-eee7-989be7800e66"
+    }
+   ],
+   "enwiki": "Human language",
+   "lastrevid": 2552502910,
+   "sitelinks": 7
+  },
+  "Q20181813": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3624078",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q20181813$04972037-41bf-d59e-8d22-db91caca012f"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2556682770,
+   "sitelinks": 5
+  },
+  "Q20203507": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q12356456",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q20203507$b595c654-4620-9fb8-0c09-cdcf0c41428d"
+    },
+    {
+     "o": "Q17147964",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q20203507$01ee46f9-46ed-d7fc-4fc7-be4da1f6a2aa"
+    },
+    {
+     "o": "Q80702",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q20203507$f92c242e-4c0d-a95c-13ce-f5ae0969c656"
+    },
+    {
+     "o": "Q43229",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q20203507$08BB2D0C-50A4-4CCF-8407-906321FFC8F4"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2536697420,
+   "sitelinks": 0
+  },
+  "Q207318": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "+1792-04-20T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q207318$3a91dee2-4032-911d-0d99-b385115fe154"
+    },
+    {
+     "o": "Q6534",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q207318$e00c4be3-42ab-e51c-12e7-26647158e7bb"
+    },
+    {
+     "o": "+1802-03-25T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q207318$cb9c94dc-4b3b-587e-d762-bf7c0e26b2fd"
+    },
+    {
+     "o": "Q78994",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q207318$dc53a7fd-43c5-a017-47f5-6ae727cacae4"
+    },
+    {
+     "o": "Q198",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q207318$B485D203-23D7-4674-BDD1-B5A1FF4EA7A0"
+    },
+    {
+     "o": "Q46",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q207318$6A28D665-1695-4690-88C6-22B2A1DF3A7B"
+    },
+    {
+     "o": "Q12548",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$80c084d2-4b6f-0fe5-34eb-7298f3358fe6"
+    },
+    {
+     "o": "Q27306",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$e21c5234-4bce-dabd-59fd-2be2703f14b7"
+    },
+    {
+     "o": "Q161885",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$ea18b51c-4a4e-7a70-773e-097e5c62cd3b"
+    },
+    {
+     "o": "Q34266",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$afe9b6ba-4226-b787-5af7-60791af600df"
+    },
+    {
+     "o": "Q1405556",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$e557acf8-445f-2058-3a47-d03d45f0815a"
+    },
+    {
+     "o": "Q2290419",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$8eba7810-4771-8095-ade8-cffe11a151c3"
+    },
+    {
+     "o": "Q80702",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$47081ef7-4cf7-4053-1544-f429a6a959b4"
+    },
+    {
+     "o": "Q45670",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$1d1074fa-4d6b-484e-7306-1df09d0109f2"
+    },
+    {
+     "o": "Q165154",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$5b2a38a9-4ac0-0f1a-7edd-4597c5e7f9a4"
+    },
+    {
+     "o": "Q173065",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$85780b5f-4f6e-1661-27cc-8f75ae64cf5b"
+    },
+    {
+     "o": "Q206696",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$dcb7f089-4e67-d0de-7c02-02c1ec37cb96"
+    },
+    {
+     "o": "Q150058",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$1c7f9d2e-497f-d947-9c89-54d3ec7fa8d1"
+    },
+    {
+     "o": "Q12560",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$e8226941-4cd7-0506-5a77-186869dcab84"
+    },
+    {
+     "o": "Q107230986",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$3e1d5273-4345-a6f6-33c5-e41b271045d8"
+    },
+    {
+     "o": "Q170072",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$b9dc2683-4cf0-a377-b1bf-0346bfc8b2d1"
+    },
+    {
+     "o": "Q2984260",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$b8549e29-4a3c-25a8-c222-4613b483eb0f"
+    },
+    {
+     "o": "Q187549",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$d0edab59-4522-d817-15d1-2aa7e0c43e83"
+    },
+    {
+     "o": "Q233",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$018013dd-490c-0d25-6484-506c2f129366"
+    },
+    {
+     "o": "Q861551",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$59734dd8-4ef9-2002-09d5-830f601ffa6f"
+    },
+    {
+     "o": "Q30",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$ed48f4d8-4d33-afb8-b82d-bd6825567639"
+    },
+    {
+     "o": "Q70972",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$bc6f4510-4f93-8587-5f49-660fc0708bbd"
+    },
+    {
+     "o": "Q58296",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$10faef1d-470a-5097-0834-32cbbd1f9f0f"
+    },
+    {
+     "o": "Q62651",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$f91f6917-42d4-5219-d4e0-8c84b67ae9eb"
+    },
+    {
+     "o": "Q266923",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q207318$19eccd11-43ec-ddbd-7495-68bd82ebaa66"
+    },
+    {
+     "o": "Q15053704",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q207318$C8E7E60D-283C-4338-8841-D50C29BE1DD3"
+    }
+   ],
+   "enwiki": "French Revolutionary Wars",
+   "lastrevid": 2550115536,
+   "sitelinks": 58
+  },
+  "Q210272": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q2434238",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q210272$10d07af5-46f9-ee52-a755-a99d710bec0f"
+    },
+    {
+     "o": "Q11042",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q210272$1a862b64-4024-3a3e-0b9a-3fcaa966e7d9"
+    }
+   ],
+   "enwiki": "Cultural heritage",
+   "lastrevid": 2549062113,
+   "sitelinks": 74
+  },
+  "Q217637": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q5",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q217637$9A31A627-B4F0-4966-B305-6F7530CAAEF9"
+    },
+    {
+     "o": "Q58800860",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1481-08-28T00:00:00Z"
+      ],
+      "P582": [
+       "+1495-10-25T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q217637$b06955d3-4f44-eaa4-97b9-e155a5118105"
+    },
+    {
+     "o": "Q66771585",
+     "p": "P39",
+     "rank": "normal",
+     "statement": "Q217637$030FCE5A-D5BC-43F6-9251-E74E83F4C19A"
+    },
+    {
+     "o": "Q67049334",
+     "p": "P39",
+     "rank": "normal",
+     "statement": "Q217637$3ac1f8db-4a6e-177f-2e8b-3ef780bf7d35"
+    },
+    {
+     "o": "Q58800860",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1477-11-10T00:00:00Z"
+      ],
+      "P582": [
+       "+1477-11-14T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q217637$601db6ca-4bb7-31ee-18b5-0c8b8ed8f4c9"
+    },
+    {
+     "o": "Q45670",
+     "p": "P27",
+     "rank": "normal",
+     "statement": "Q217637$0D1CC632-D0DC-4903-9AF0-9CA32D8C1D7F"
+    }
+   ],
+   "enwiki": "John II of Portugal",
+   "lastrevid": 2557401944,
+   "sitelinks": 58
+  },
+  "Q21994376": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q198",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q21994376$6bb059b0-4ff8-9e27-c37e-f9c1502533d6"
+    },
+    {
+     "o": "Q124867660",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q21994376$9504e54a-427b-ddf2-3b16-4c6e889a7e1b"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q21994376$3d6aae06-45d8-dd2c-50f9-62ed93d188b1"
+    },
+    {
+     "o": "Q1006311",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q21994376$0e4f0185-4883-fa87-a8b2-e2e2aec96069"
+    }
+   ],
+   "enwiki": "War of independence",
+   "lastrevid": 2544534170,
+   "sitelinks": 18
+  },
+  "Q221474": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q828",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q221474$EE80FCB9-561B-452E-84B5-C2827240E7B0"
+    },
+    {
+     "o": "+1492-10-12T00:00:00Z",
+     "p": "P585",
+     "rank": "normal",
+     "statement": "Q221474$14f0a085-487e-5979-23ce-f1957cdba309"
+    },
+    {
+     "o": "Q3771259",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q221474$340f32ff-4a51-5ca0-adc8-5e776686befc"
+    },
+    {
+     "o": "Q184716",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q221474$3e88f5c0-443c-87e7-2830-d047e7ba966a"
+    },
+    {
+     "o": "Q767253",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q221474$f3c7218f-4b1e-b462-5d2d-d0982c1d90d7"
+    },
+    {
+     "o": "Q778483",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q221474$0165415a-4e44-e1db-2084-b3dcb351fb2c"
+    },
+    {
+     "o": "Q12772819",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q221474$36bcdb11-4eaa-7f36-ce37-5a8ee4458578"
+    },
+    {
+     "o": "Q7322",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q221474$bb474160-4541-b7b0-b813-98dff7abfe58"
+    }
+   ],
+   "enwiki": "Discovery of the Americas",
+   "lastrevid": 2551062880,
+   "sitelinks": 48
+  },
+  "Q223832": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q161243",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q223832$b3e165c5-4b54-ca46-606c-05195e1f5ed8"
+    },
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q223832$8cbed4e2-4a5f-363e-367f-8b2bd90232a2"
+    },
+    {
+     "o": "Q8680",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q223832$fb1bfd79-4a3d-05af-ef28-9333766fba66"
+    },
+    {
+     "o": "Q202686",
+     "p": "P1366",
+     "rank": "normal",
+     "statement": "Q223832$8428b281-4f38-a4f6-d501-0bef479f4ad8"
+    }
+   ],
+   "enwiki": "Dominion",
+   "lastrevid": 2539764789,
+   "sitelinks": 64
+  },
+  "Q236036": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1763527",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q236036$99cfdc8c-4dba-9a5e-dc48-7dd3993997ee"
+    },
+    {
+     "o": "Q4204491",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q236036$4705c2b9-41e5-ddd8-0d1c-7633d2964758"
+    },
+    {
+     "o": "Q10864048",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q236036$297a519e-4b36-04c1-3b65-8bdf60e79e71"
+    },
+    {
+     "o": "Q23037160",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q236036$14b07aa7-430d-5938-fab0-9b4293bd80a7"
+    },
+    {
+     "o": "Q107390",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q236036$b77bad15-4f7e-a6ea-e230-e694482ea5b5"
+    },
+    {
+     "o": "Q15180",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "q236036$836eca2a-412b-890b-f5cf-74faa3ba4496"
+    },
+    {
+     "o": "Q15180",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q236036$f9ad7707-44b4-262c-b78b-7f4240093771"
+    },
+    {
+     "o": "Q93465928",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q236036$7EF4B4E4-218E-4964-B9DF-09F1FFB55A12"
+    }
+   ],
+   "enwiki": "Republics of the Soviet Union",
+   "lastrevid": 2546521491,
+   "sitelinks": 54
+  },
+  "Q2401485": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q6502154",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q2401485$aad34063-489a-3efe-4a84-99d7f92f9d1f"
+    },
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q2401485$d4b044a6-4c6f-5bd3-862d-add5e04e9795"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2553139561,
+   "sitelinks": 9
+  },
+  "Q25929224": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q25929224$a6c8e9c0-4340-3806-92d4-e9a2cb38e694"
+    },
+    {
+     "o": "Q3534219",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q25929224$43790b4f-43e9-b39d-1dbb-5b797566b375"
+    },
+    {
+     "o": "Q22087155",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q25929224$ac73c7f3-4d60-f18d-2a68-eeab9802f49c"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2527779414,
+   "sitelinks": 0
+  },
+  "Q2843133": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q3337280",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q2843133$706fb527-408f-8710-94a4-2337e99ad052"
+    },
+    {
+     "o": "Q2401485",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q2843133$2b9da5df-47f1-9ee8-132a-c1663b2292ee"
+    },
+    {
+     "o": "Q12896923",
+     "p": "P1427",
+     "rank": "normal",
+     "statement": "Q2843133$75b09c0c-4a0a-c945-f506-038cbcca8a35"
+    },
+    {
+     "o": "Q978906",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q2843133$38e60c3d-4209-ca51-eb52-0c8bba97d46d"
+    },
+    {
+     "o": "Q6123903",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q2843133$6fa2ff66-4b9f-c178-79a8-5f42bfa25a67"
+    },
+    {
+     "o": "Q15682",
+     "p": "P1444",
+     "rank": "normal",
+     "statement": "Q2843133$70a491fd-4adb-abab-ea74-214c0f4aaccc"
+    },
+    {
+     "o": "+1500-11-25T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q2843133$7a7e6d11-4c95-d471-cc37-e98691a30bce"
+    },
+    {
+     "o": "Q5793320",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q2843133$bfc63819-42d6-6ec0-c7e1-924be5d03c30"
+    },
+    {
+     "o": "+1498-05-30T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q2843133$e43d4ab0-4161-109a-d313-a0132ef222ca"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2555388888,
+   "sitelinks": 7
+  },
+  "Q29431432": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q99527517",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q29431432$551b74b8-47f4-4aa6-369b-f1e0da38b768"
+    },
+    {
+     "o": "Q4025884",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q29431432$A0F75E21-8440-4B44-8077-8162172DC038"
+    },
+    {
+     "o": "Q29430681",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q29431432$89969773-4642-b770-f148-b238560f961a"
+    },
+    {
+     "o": "Q39604065",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q29431432$316c65f3-47c3-8698-1719-f242a5320d53"
+    },
+    {
+     "o": "Q99469810",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29431432$6cc11b5a-47e1-5fb1-0245-1f270b12ab04"
+    },
+    {
+     "o": "Q24034552",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29431432$25B789A9-685C-47FE-90EF-694BBB782240"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2508967653,
+   "sitelinks": 1
+  },
+  "Q29999": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q3624078",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1815-03-16T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "q29999$54EE3159-4EE0-4048-A5F8-2B5B1062DFBF"
+    },
+    {
+     "o": "Q417175",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29999$6ca6d72c-4e0e-a853-feb2-bfcf032304c8"
+    },
+    {
+     "o": "Q20181813",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29999$94ad1c6c-469d-7be0-36ed-541e72d5ca93"
+    },
+    {
+     "o": "Q1250464",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29999$8ea2ebdc-4a6a-fbf2-41a5-56cabfffbeca"
+    },
+    {
+     "o": "Q6256",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q29999$15685D07-7C4B-4203-9B03-C76A628A0C67"
+    },
+    {
+     "o": "Q727",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "q29999$D0DC9952-EE79-433A-8487-1AF89BB1CCC4"
+    },
+    {
+     "o": "Q21203",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+1986-01-01T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "q29999$D31187D9-1C22-4C9D-9F02-B6A39B6459AB"
+    },
+    {
+     "o": "Q25279",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+2010-10-10T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "q29999$6BE4D2E5-EA52-4678-A381-C06034A32EF6"
+    },
+    {
+     "o": "Q55",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+1954-12-29T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "q29999$4DC6C215-FF68-4F34-801C-FD9BDC2E8CED"
+    },
+    {
+     "o": "Q26273",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+2010-10-10T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "q29999$D7C4F940-BAE3-4980-AB41-B9479442D9CA"
+    },
+    {
+     "o": "Q25227",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+1954-12-29T00:00:00Z"
+      ],
+      "P582": [
+       "+2010-10-10T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$9d8e6278-4af7-ed45-969e-0803dbf90f51"
+    },
+    {
+     "o": "Q19901436",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+1954-12-29T00:00:00Z"
+      ],
+      "P582": [
+       "+1975-11-25T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$4712d93e-4b97-fcbd-27d8-2c44237ff44a"
+    },
+    {
+     "o": "Q941881",
+     "p": "P150",
+     "q": {
+      "P580": [
+       "+1949-12-27T00:00:00Z"
+      ],
+      "P582": [
+       "+1962-10-01T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$d7624e4d-449e-8bc7-1a1f-346da94c80ad"
+    },
+    {
+     "o": "Q7411",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "q29999$754BE77F-7F01-4F87-96E1-A27C475032DC"
+    },
+    {
+     "o": "Q154952",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+2013-04-30T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "q29999$DC9D14ED-6CE4-4D16-BA94-3C4A49E1398C"
+    },
+    {
+     "o": "Q29574",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1980-04-30T00:00:00Z"
+      ],
+      "P582": [
+       "+2013-04-30T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$c8d36c03-48dd-14ee-cfda-dfd3e0ecc092"
+    },
+    {
+     "o": "Q154946",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1948-09-06T00:00:00Z"
+      ],
+      "P582": [
+       "+1980-04-30T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$a63a10eb-42ec-a336-ef55-71a797e383de"
+    },
+    {
+     "o": "Q150747",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1898-09-06T00:00:00Z"
+      ],
+      "P582": [
+       "+1948-09-06T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$0a647558-44fc-dde2-954a-a180cf4e045a"
+    },
+    {
+     "o": "Q57664",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1890-11-23T00:00:00Z"
+      ],
+      "P582": [
+       "+1898-09-06T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$45227d24-4859-4e39-7e79-e411b40a9da8"
+    },
+    {
+     "o": "Q125649",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1849-03-17T00:00:00Z"
+      ],
+      "P582": [
+       "+1890-11-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$0129fcee-4fb5-1986-63d0-daffa139ac5e"
+    },
+    {
+     "o": "Q154287",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1840-10-07T00:00:00Z"
+      ],
+      "P582": [
+       "+1849-03-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$ad2c77fd-42bd-c47e-26cc-604d4b7eea11"
+    },
+    {
+     "o": "Q2079957",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1815-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1840-10-07T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$3ae2e9af-4232-5488-9647-4e2baa1a1f1f"
+    },
+    {
+     "o": "Q57792",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2010-10-14T00:00:00Z"
+      ],
+      "P582": [
+       "+2024-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "q29999$1916d9dd-4178-68ea-b7ca-23d190c861ed"
+    },
+    {
+     "o": "Q22338116",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2024-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+2026-02-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$6c91986c-46d5-f0a5-ad46-ab3662418a96"
+    },
+    {
+     "o": "Q28860866",
+     "p": "P6",
+     "q": {
+      "P580": [
+       "+2026-02-23T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q29999$c2311f9b-40aa-94d7-cad6-c5e62b9e652b"
+    },
+    {
+     "o": "+1815-03-16T00:00:00Z",
+     "p": "P571",
+     "rank": "preferred",
+     "statement": "q29999$ac717c84-4786-d299-7e72-ff35bbf5a2c1"
+    },
+    {
+     "o": "+1954-12-29T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q29999$4D416824-DD38-49C0-920B-1D8CE348A86A"
+    },
+    {
+     "o": "Q2045066",
+     "p": "P1906",
+     "rank": "normal",
+     "statement": "Q29999$80e2c6f1-4d55-a544-4070-0e567940264e"
+    },
+    {
+     "o": "Q100103",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$1469FA2D-FE41-4FDC-9FDD-09974332F46B"
+    },
+    {
+     "o": "Q506010",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$352256B7-7E4E-4840-893F-C82028BF7DA9"
+    },
+    {
+     "o": "Q497363",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$7D1BBC1D-44E4-493A-A3C8-B166498BB355"
+    },
+    {
+     "o": "Q237409",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$81B878C3-9AC8-4860-9603-65266F1ABA8C"
+    },
+    {
+     "o": "Q153627",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$08D240B1-43BB-4709-ACA0-E88A58E607CC"
+    },
+    {
+     "o": "Q102172",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$61B90774-B26B-41F6-BEF5-80BE5D012103"
+    },
+    {
+     "o": "Q508854",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$8526D996-357F-4015-8AD9-0E37F76C969F"
+    },
+    {
+     "o": "Q2484810",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$C8D98C3C-AA43-4CD8-BB25-38F2DC141E6E"
+    },
+    {
+     "o": "Q3436668",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$E8B7566F-657F-42C8-A510-205408612B99"
+    },
+    {
+     "o": "Q2201099",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$1B3824FB-A20C-4DA2-B88C-AF5AC3DB48D4"
+    },
+    {
+     "o": "Q2736709",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$E1D00FBB-EDE2-4855-968C-A2CF3F3502B9"
+    },
+    {
+     "o": "Q7411",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$83DE226E-5C95-48D6-8BAD-19EAF26A1CDB"
+    },
+    {
+     "o": "Q27175",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q29999$11DCE9B5-385B-4FD1-9D5F-392E3897439D"
+    },
+    {
+     "o": "Q3058109",
+     "p": "P1313",
+     "rank": "normal",
+     "statement": "Q29999$e4721147-4612-d245-aff6-c954460e603b"
+    },
+    {
+     "o": "Q8932",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q29999$4024C72B-EC57-48DD-8218-015AF23CE499"
+    },
+    {
+     "o": "Q46",
+     "p": "P30",
+     "q": {
+      "P580": [
+       "+1813-11-20T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q29999$a990a5f3-415c-181e-b304-85736ca7648e"
+    },
+    {
+     "o": "Q49",
+     "p": "P30",
+     "q": {
+      "P580": [
+       "+1813-11-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$cb007d58-4ec1-fb9c-f7e1-236d992b0145"
+    },
+    {
+     "o": "Q15",
+     "p": "P30",
+     "q": {
+      "P580": [
+       "+1598-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1872-04-06T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$94df352e-4846-2c9d-4744-c3ac2cbb9f37"
+    },
+    {
+     "o": "Q48",
+     "p": "P30",
+     "q": {
+      "P580": [
+       "+1949-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1962-10-01T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$8038ae36-406b-1399-ac61-4fd9423d3912"
+    },
+    {
+     "o": "Q18",
+     "p": "P30",
+     "q": {
+      "P582": [
+       "+1975-11-25T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q29999$173e167f-4b4b-53ef-0dcd-44748d88ed7c"
+    },
+    {
+     "o": "Q29999",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q29999$051145c4-4bac-745c-d5da-9421695b8a7c"
+    }
+   ],
+   "enwiki": "Kingdom of the Netherlands",
+   "lastrevid": 2557056449,
+   "sitelinks": 107
+  },
+  "Q3024240": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q19953632",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q3024240$3552d740-4649-3cd9-7e3b-bd3e3b053d0b"
+    },
+    {
+     "o": "Q96196009",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q3024240$292ec11b-4428-ee87-8403-d6229f6ce75c"
+    },
+    {
+     "o": "Q19832712",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q3024240$B8E91614-7A45-48BD-87A6-2425F519062A"
+    },
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3024240$1a8e68db-4b75-eafa-f483-81957ed0e9b4"
+    },
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3024240$e7b5ca4d-4ed7-89ed-1dac-2c746c6ed78a"
+    }
+   ],
+   "enwiki": "Historical country",
+   "lastrevid": 2551380038,
+   "sitelinks": 7
+  },
+  "Q3046146": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q1196129",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3046146$89c3b169-410e-51b9-ffd6-2e3e471aa335"
+    },
+    {
+     "o": "Q219160",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3046146$E1775751-E35B-4AD1-A5E7-728BC05D5D58"
+    },
+    {
+     "o": "Q8436",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3046146$70b35eae-435f-5f6f-b7d7-e8a4aaba034b"
+    },
+    {
+     "o": "Q1767348",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3046146$becb5f01-4c74-dca0-4d11-de7542485e5a"
+    },
+    {
+     "o": "Q16661132",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q3046146$e0c7a9b9-49ec-9a51-3578-473171d840a6"
+    }
+   ],
+   "enwiki": "Married couple",
+   "lastrevid": 2537652460,
+   "sitelinks": 15
+  },
+  "Q3318733": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q12909644",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3318733$af6c60de-4569-d6d1-ccb5-cbd85699783d"
+    },
+    {
+     "o": "Q2738074",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3318733$F13C0A56-D517-425E-803C-46EFE4316562"
+    },
+    {
+     "o": "Q3533467",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3318733$3764ACCA-C93B-4A8E-916A-8939B0008067"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2544005556,
+   "sitelinks": 11
+  },
+  "Q333542": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q380230",
+     "p": "P279",
+     "q": {
+      "P582": [
+       "+1975-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q333542$4fb06250-433c-b55c-7ce2-9c6e6edf0e29"
+    },
+    {
+     "o": "Q45",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q333542$A9E84B28-4F61-419F-9615-14117E051726"
+    },
+    {
+     "o": "Q86098365",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1975-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q333542$b56f77b6-48c2-9009-b9fe-a0bf401bc58d"
+    }
+   ],
+   "enwiki": "Overseas province",
+   "lastrevid": 2398127803,
+   "sitelinks": 9
+  },
+  "Q3337280": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q102066",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3337280$ac05f017-4c81-2c0d-f1c6-bff1891c1b44"
+    },
+    {
+     "o": "Q351363",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q3337280$dcff8e27-414d-7adf-f228-579f97778b7e"
+    },
+    {
+     "o": "Q1443672",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3337280$80db47c4-4f33-12d3-fdd4-5c7c18e797a8"
+    },
+    {
+     "o": "Q6038993",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3337280$db59ff63-4f98-6cf0-153a-805d732b09a8"
+    },
+    {
+     "o": "Q39715",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3337280$4bbd5a23-c896-4fd1-94ea-84aa195ac9a6"
+    }
+   ],
+   "enwiki": "Marine navigation",
+   "lastrevid": 2553489949,
+   "sitelinks": 20
+  },
+  "Q33742": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q20162172",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q33742$ba92785a-43cb-b3df-a974-b9e34efb4e92"
+    },
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q33742$374c8308-4b8d-3d33-d9d8-62a030443ee3"
+    },
+    {
+     "o": "Q1047113",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q33742$42D22229-EF58-452C-A2E0-3188AF74591C"
+    },
+    {
+     "o": "Q2267705",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q33742$0564F86F-CEEE-47F4-BDAC-F903C493AD19"
+    }
+   ],
+   "enwiki": "Natural language",
+   "lastrevid": 2554919659,
+   "sitelinks": 72
+  },
+  "Q339834": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1345203",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q339834$949e4462-4ea2-532a-afb2-c1700e1a9e7b"
+    },
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q339834$7d12741e-4be7-2a8d-39d7-4547e14f1b8e"
+    }
+   ],
+   "enwiki": "Regional power",
+   "lastrevid": 2484686861,
+   "sitelinks": 30
+  },
+  "Q34770": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q315",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q34770$e2c03e31-452a-16de-cd68-f70996006701"
+    },
+    {
+     "o": "Q17376908",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q34770$984877c0-4a62-2115-615e-9ad9c670d783"
+    },
+    {
+     "o": "Q3622126",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q34770$308c7988-4bd6-f71d-1621-0cb5de110f03"
+    },
+    {
+     "o": "Q28923954",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q34770$a324a50d-4e46-37da-db3f-4581deac0343"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2556597399,
+   "sitelinks": 36
+  },
+  "Q34876": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q56061",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q34876$79cfb191-435f-7f19-cb01-73dac5760c01"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q34876$cd38e014-43a5-d3aa-a9af-47f43e2a1271"
+    }
+   ],
+   "enwiki": "Province",
+   "lastrevid": 2556560881,
+   "sitelinks": 153
+  },
+  "Q350604": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q71266556",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q350604$451DF796-237E-44DB-8491-32E77D268F33"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q350604$0d59fa2a-418b-476e-c728-73b7d8ffb5e3"
+    }
+   ],
+   "enwiki": "Kinetic warfare",
+   "lastrevid": 2549691631,
+   "sitelinks": 25
+  },
+  "Q3533809": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q1135885",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3533809$f97de64e-4ae7-81e8-004b-58a67a3cc08e"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2533984925,
+   "sitelinks": 1
+  },
+  "Q3624078": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q3624078$AF1935CD-0903-40E3-8E21-66E698853620"
+    },
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q3624078$22c459f3-4673-e0df-a281-1093a4b329f7"
+    },
+    {
+     "o": "Q7275",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3624078$282bc951-46c0-de52-fad2-d648fe77cf6f"
+    },
+    {
+     "o": "Q2472587",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q3624078$eb913906-4cce-4be9-ce05-ca45f5e9368f"
+    }
+   ],
+   "enwiki": "Sovereign state",
+   "lastrevid": 2550971497,
+   "sitelinks": 92
+  },
+  "Q3771259": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q2401485",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3771259$7235c5e0-4d6b-d8e2-c237-072a79f7a3fd"
+    },
+    {
+     "o": "Q107011650",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3771259$c0d3d98f-4390-5bde-312c-ff6228a727d9"
+    },
+    {
+     "o": "+1492-08-03T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q3771259$db0629e1-4e19-6520-df4f-c748032b5d3f"
+    },
+    {
+     "o": "Q622030",
+     "p": "P1427",
+     "q": {
+      "P585": [
+       "+1492-08-03T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3771259$c60e2a3f-49a6-b137-8da7-6741ce4f35eb"
+    },
+    {
+     "o": "Q505653",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q3771259$a44aa5e3-4b2b-798f-d91d-1d73a401c1e2"
+    },
+    {
+     "o": "Q312765",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q3771259$d8634906-4070-ceb9-3771-29acca402d11"
+    },
+    {
+     "o": "Q552774",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q3771259$a8be90d5-49cc-949c-dc25-4a60a00960f7"
+    },
+    {
+     "o": "Q345620",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q3771259$d74eff24-4110-a265-72e1-ff5e20e71232"
+    },
+    {
+     "o": "Q10922379",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q3771259$95fa3a6d-4cc6-6d6f-113c-e5b4e2e252b1"
+    },
+    {
+     "o": "+1493-03-15T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q3771259$29853630-4567-431e-beaf-cea1c32c3f19"
+    },
+    {
+     "o": "Q6123903",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q3771259$5ecdd0e2-445e-40f8-5418-206e2a0b4616"
+    },
+    {
+     "o": "Q221474",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1492-10-12T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3771259$b1ffffce-450e-d5a3-652b-e1d190c06998"
+    },
+    {
+     "o": "Q217196",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q3771259$e1327682-42f7-fc3e-cbb5-2f17d89ce9c7"
+    },
+    {
+     "o": "Q622030",
+     "p": "P1444",
+     "q": {
+      "P585": [
+       "+1493-03-15T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3771259$ea96d7e3-4a71-570c-e2e3-f639a5a08c11"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2541412664,
+   "sitelinks": 14
+  },
+  "Q3932042": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "+1815-01-01T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q3932042$6A2CBE34-7B4D-40D3-8EE9-4D8286817E9A"
+    },
+    {
+     "o": "+1825-01-01T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q3932042$C80D0F85-A629-4634-86FF-BDC2220279B2"
+    },
+    {
+     "o": "Q41614",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3932042$a025a832-4540-96b3-9b72-a648a0817df0"
+    },
+    {
+     "o": "Q1250464",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q3932042$a57646a1-4fca-4b94-a1d7-0de3cedb4aae"
+    },
+    {
+     "o": "Q5146",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "Q3932042$3A886828-7AB3-4052-862D-9D24CFEADFBB"
+    },
+    {
+     "o": "Q8678",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q3932042$747304DF-17CD-4353-9691-8EF382A081B8"
+    },
+    {
+     "o": "Q903779",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q3932042$55401e4b-4c9c-1bdd-32e9-d33a47ea990d"
+    },
+    {
+     "o": "Q903779",
+     "p": "P1366",
+     "q": {
+      "P585": [
+       "+1815-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3932042$4252b56a-4b83-967c-ddf2-e93b1faf7f8c"
+    },
+    {
+     "o": "Q9068570",
+     "p": "P1906",
+     "rank": "normal",
+     "statement": "Q3932042$9b4f1fad-4182-9e38-1591-bfef17bcc5e2"
+    },
+    {
+     "o": "Q11876909",
+     "p": "P1365",
+     "q": {
+      "P585": [
+       "+1815-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3932042$35207280-4989-52cb-de07-6cfb1a1117b0"
+    },
+    {
+     "o": "Q616965",
+     "p": "P1365",
+     "q": {
+      "P585": [
+       "+1815-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q3932042$791072e3-46be-29d3-2e61-19e468930248"
+    },
+    {
+     "o": "Q903779",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q3932042$C572E0C0-D0A6-404F-A9A8-ACE93C1DE4C7"
+    }
+   ],
+   "enwiki": "Kingdom of Brazil",
+   "lastrevid": 2477493803,
+   "sitelinks": 17
+  },
+  "Q399495": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q3329375",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q399495$c84fa571-4bbc-3637-e90b-3e7ecc5a3248"
+    },
+    {
+     "o": "Q34770",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q399495$7fa00911-49c4-4f5f-dbc1-258d3a929c61"
+    },
+    {
+     "o": "Q20825842",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q399495$db5ea9f5-4365-1a05-af2b-74867282c2b7"
+    },
+    {
+     "o": "Q63302202",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q399495$458108d7-4915-f07f-f5a3-f46035b59b4f"
+    },
+    {
+     "o": "Q20829075",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q399495$925ab1c7-4d1d-3110-b3c7-9a71b0fe8807"
+    }
+   ],
+   "enwiki": "Standard language",
+   "lastrevid": 2557158201,
+   "sitelinks": 79
+  },
+  "Q417175": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q1250464",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q417175$F022B3B1-95EE-4E5B-B089-8920D592E948"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2534627831,
+   "sitelinks": 27
+  },
+  "Q4176199": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q180684",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q4176199$5cef5a6b-42af-bad1-f2e5-d1bf17c5ce26"
+    },
+    {
+     "o": "Q159385",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q4176199$9610fb1c-4b8a-545f-93fd-2eb9ef2e10c5"
+    },
+    {
+     "o": "Q8683",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q4176199$7b8f3ee5-4aa6-ff1b-f944-4b7a622494d7"
+    },
+    {
+     "o": "Q17510383",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q4176199$d3535984-4d84-b1bd-288e-58ff10b7505f"
+    },
+    {
+     "o": "Q125092269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q4176199$3fe62b7c-4310-3643-f64b-687fb1aa3268"
+    }
+   ],
+   "enwiki": "Cold war (term)",
+   "lastrevid": 2547891510,
+   "sitelinks": 15
+  },
+  "Q4384581": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "+1804-03-10T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q4384581$C4EF8A00-DB57-4B4B-BA5D-621DDC62FCA0"
+    },
+    {
+     "o": "+1805-07-04T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q4384581$6CBD97B4-3FEF-48D3-9ED4-523EA6A4F975"
+    },
+    {
+     "o": "Q658054",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q4384581$5AF39D58-9904-4A04-B252-E38C4B90AA50"
+    },
+    {
+     "o": "Q1500063",
+     "p": "P1366",
+     "rank": "normal",
+     "statement": "Q4384581$0D5594F6-A498-4D3C-8A2E-4EE1031E0B46"
+    },
+    {
+     "o": "Q183366",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q4384581$835f2eb2-498a-11ae-1cf0-cbdba6ca3ffd"
+    },
+    {
+     "o": "Q30",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q4384581$43f1cf48-4b9a-f4aa-47db-f307fab5542a"
+    }
+   ],
+   "enwiki": "District of Louisiana",
+   "lastrevid": 2486901384,
+   "sitelinks": 14
+  },
+  "Q45382": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1673271",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q45382$6dfd888a-471a-61fb-3644-9ddc85ac9fc8"
+    },
+    {
+     "o": "Q180684",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q45382$caf29478-47b6-5abf-301f-120f895f711e"
+    }
+   ],
+   "enwiki": "Coup d'état",
+   "lastrevid": 2540463642,
+   "sitelinks": 119
+  },
+  "Q45859": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q5",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q45859$EEC4FB4E-D3F6-4ADA-A74A-D7ACC0D32EB5"
+    },
+    {
+     "o": "Q217196",
+     "p": "P27",
+     "rank": "normal",
+     "statement": "Q45859$714CF718-257C-4DDD-BE92-C785A236B5F9"
+    },
+    {
+     "o": "Q58005590",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1474-12-13T00:00:00Z"
+      ],
+      "P582": [
+       "+1504-11-26T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q45859$6d217928-4933-f423-032b-0186118eccda"
+    },
+    {
+     "o": "Q58332250",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1479-01-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1504-11-26T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q45859$c893c27c-405f-5260-765f-c023baee83e9"
+    },
+    {
+     "o": "Q122851750",
+     "p": "P39",
+     "q": {
+      "P580": [
+       "+1488-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q45859$3b202b58-4002-ab38-8b2d-14f36a40c11b"
+    },
+    {
+     "o": "Q111512452",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q45859$10ad7313-4c2b-a52a-f80c-0417fb9faac5"
+    }
+   ],
+   "enwiki": "Isabella I of Castile",
+   "lastrevid": 2550331379,
+   "sitelinks": 104
+  },
+  "Q48349": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q1250464",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q48349$49f4b356-48aa-3a02-b9ca-8c94c610202e"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q48349$29b59c77-4d09-2fa5-d04a-c8e7b68fc2b7"
+    },
+    {
+     "o": "Q7269",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q48349$60A2E65D-9CE3-427D-90A3-A98B2F1E5509"
+    },
+    {
+     "o": "Q39018",
+     "p": "P35",
+     "rank": "normal",
+     "statement": "Q48349$D06F5646-0215-480B-8AF3-167C49387069"
+    }
+   ],
+   "enwiki": "Empire",
+   "lastrevid": 2555870664,
+   "sitelinks": 125
+  },
+  "Q5": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q23852",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q5$1bbe2872-4dd6-0a71-7faf-c3ceff34bb4e"
+    },
+    {
+     "o": "Q8425",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q5$1b8740d3-4e6c-29a9-9501-da22673cb5ac"
+    },
+    {
+     "o": "Q1156970",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "q5$3ff6552a-41f7-0650-dbf3-8b6be2d8dc9a"
+    },
+    {
+     "o": "Q42762",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q5$01816e31-49be-7b06-b89e-15cedd897872"
+    },
+    {
+     "o": "Q16334295",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q5$299464df-49a9-e486-d231-8447662b70db"
+    },
+    {
+     "o": "Q2250224",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5$768dc56e-4291-c3a7-654c-f137d70034ea"
+    },
+    {
+     "o": "Q164509",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5$e5807c96-4857-459d-0c4b-aa192f7cd303"
+    },
+    {
+     "o": "Q154954",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5$d68ce771-4858-4666-377f-2fa9b70f18b7"
+    },
+    {
+     "o": "Q5891007",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5$8f1dde99-4ab8-69f9-bea6-7eb37c3215c9"
+    },
+    {
+     "o": "Q16686448",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q5$63539e2f-48e9-e524-06bd-d9459a0b05d5"
+    },
+    {
+     "o": "Q24902509",
+     "p": "P1344",
+     "rank": "normal",
+     "statement": "Q5$983b3e28-411c-2435-34b9-e85090700055"
+    },
+    {
+     "o": "Q55983715",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5$82b80d5f-4353-c7cb-1a3c-c0c8f4f5f237"
+    }
+   ],
+   "enwiki": "Human",
+   "lastrevid": 2557407838,
+   "sitelinks": 278
+  },
+  "Q502009": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "+1621-01-01T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q502009$EA7DE19E-6D79-475D-8FF7-BBA0E89AD293"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q502009$e4ff56bd-4323-6f11-6d1e-357241014322"
+    },
+    {
+     "o": "Q200464",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q502009$cf5c6c37-4587-82b8-5609-21ea6cf69551"
+    },
+    {
+     "o": "Q28441",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q502009$A2331207-1E61-4848-AEF9-DF7B42E44DAD"
+    },
+    {
+     "o": "Q18",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q502009$DC07A1A8-E476-4353-87A6-6CAF66DCAAD5"
+    },
+    {
+     "o": "+1654-00-00T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q502009$D247570A-143E-47C9-85FB-6A8A87BD4D9F"
+    },
+    {
+     "o": "Q2088324",
+     "p": "P1365",
+     "q": {
+      "P585": [
+       "+1621-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q502009$bd00bd19-473e-260f-7937-3621a0e577fd"
+    },
+    {
+     "o": "Q616965",
+     "p": "P1366",
+     "q": {
+      "P585": [
+       "+1751-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q502009$3935aa44-4986-fa79-3d86-ff4bbbbbaa20"
+    }
+   ],
+   "enwiki": "State of Maranhão (colonial)",
+   "lastrevid": 2485689028,
+   "sitelinks": 6
+  },
+  "Q5035794": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5035794$c4c38182-4c19-9829-f998-8f5d34651d76"
+    },
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5035794$4cd6e5cc-48c4-52c4-a355-90afb6b75a3f"
+    }
+   ],
+   "enwiki": "Capitalist state",
+   "lastrevid": 2512121121,
+   "sitelinks": 9
+  },
+  "Q5036886": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q2577883",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5036886$cfdb411c-4d38-573d-323b-880406d4559c"
+    },
+    {
+     "o": "Q3183364",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5036886$ee8816a0-4e45-43e4-f316-2e2ffed23a49"
+    },
+    {
+     "o": "Q1323389",
+     "p": "P279",
+     "rank": "preferred",
+     "statement": "Q5036886$10ed1bab-4d87-6eb8-c173-e0e68f42479f"
+    },
+    {
+     "o": "Q17147964",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5036886$9b204ff9-47dd-c32f-813b-f78781fcef7b"
+    }
+   ],
+   "enwiki": "Captaincies of the Spanish Empire",
+   "lastrevid": 2348263648,
+   "sitelinks": 2
+  },
+  "Q512187": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q43702",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q512187$d0c91c68-435a-cc54-190e-e435aadbc080"
+    },
+    {
+     "o": "Q7270",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q512187$7aefc7e2-41b1-7eed-7c38-2cefb35afdad"
+    },
+    {
+     "o": "Q5440547",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q512187$22ff2f6f-4fc8-cc32-1d59-3002a68ab2ea"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q512187$f91b61cf-446f-f2bb-a19c-be9506053d4c"
+    }
+   ],
+   "enwiki": "Federal republic",
+   "lastrevid": 2546192147,
+   "sitelinks": 53
+  },
+  "Q5156764": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q7269",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5156764$b43b8669-432b-55f0-4de6-e612e029ca2e"
+    },
+    {
+     "o": "Q204886",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5156764$5e1ef99f-45cb-938a-b766-3adc1d913b50"
+    },
+    {
+     "o": "Q3208952",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5156764$1ee91893-43b6-f391-d0bd-0ebe79eb7afc"
+    },
+    {
+     "o": "Q15858642",
+     "p": "P61",
+     "rank": "normal",
+     "statement": "Q5156764$808cc320-460c-6694-153b-db340f1aadb6"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5156764$17aabb0e-4a30-5821-698f-975e0f2e0a46"
+    },
+    {
+     "o": "Q483247",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5156764$707B6C92-62A0-4587-8DD8-37C4D17F4E8F"
+    }
+   ],
+   "enwiki": "Composite monarchy",
+   "lastrevid": 2550846930,
+   "sitelinks": 8
+  },
+  "Q51576574": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q6256",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q51576574$de850a21-416d-e0e8-19f1-21ff908bfa83"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q51576574$7a77e891-474b-a84c-8e05-b486a9797601"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2551502860,
+   "sitelinks": 0
+  },
+  "Q518554": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q1150070",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q518554$4d7c6c4c-4d5a-56d6-f0a3-3a6be7a2e425"
+    },
+    {
+     "o": "Q3182649",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q518554$02ed6d04-4925-376e-b401-30f2dfb026a6"
+    },
+    {
+     "o": "Q139831852",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q518554$8dc59238-4d8d-0d8d-3e26-c1c331c07ab0"
+    },
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q518554$ec4bfb77-4086-5003-d33f-60e0d46cf66c"
+    },
+    {
+     "o": "Q116505632",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q518554$8910319c-4315-3fcb-8bfa-194ceb4653f7"
+    }
+   ],
+   "enwiki": "Partition (politics)",
+   "lastrevid": 2543585812,
+   "sitelinks": 13
+  },
+  "Q5373953": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3320743",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5373953$b9f0ca60-4bd0-1f8d-6c3d-a293c3896d7d"
+    },
+    {
+     "o": "Q114962596",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5373953$9ff292cc-484c-baf4-6d08-417f6ad0fcb1"
+    },
+    {
+     "o": "Q39018",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5373953$fb24a525-4f67-de5c-8afb-41b42aa98635"
+    },
+    {
+     "o": "Q111840950",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5373953$404961bc-40b2-cb69-6733-ba3cd0a07d17"
+    },
+    {
+     "o": "Q111842705",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5373953$55cb96e4-4ea2-c7b6-7175-2fc4867a1ccf"
+    },
+    {
+     "o": "Q71084",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q5373953$b55f432e-4713-1588-1987-026ae073b045"
+    },
+    {
+     "o": "Q71092",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q5373953$808a3aff-4733-38b9-f181-e2ac4e4bdfe5"
+    }
+   ],
+   "enwiki": "Emperor of the French",
+   "lastrevid": 2544009140,
+   "sitelinks": 32
+  },
+  "Q5473816": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q12554",
+     "p": "P2348",
+     "rank": "normal",
+     "statement": "Q5473816$CD869057-4036-4A0C-AAB0-1E5579C6FB45"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5473816$dc2c2e90-46e9-02aa-1269-630c59a2caa2"
+    },
+    {
+     "o": "Q19832712",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5473816$64f72cca-4818-2288-d0ef-daf16cce665b"
+    }
+   ],
+   "enwiki": "Crown land",
+   "lastrevid": 2499369512,
+   "sitelinks": 20
+  },
+  "Q5589178": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q36442",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q5589178$EA34B29E-AB0D-40EA-964E-2DACB62E7E82"
+    },
+    {
+     "o": "Q28108",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5589178$B018A18E-CCC8-4DF6-BE1D-C6A7413A3DD2"
+    },
+    {
+     "o": "Q183039",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q5589178$a144f2a2-45eb-d2c3-ab53-f815b6d62057"
+    }
+   ],
+   "enwiki": "Regime",
+   "lastrevid": 2545281800,
+   "sitelinks": 45
+  },
+  "Q56061": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q141104744",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q56061$6619e39d-4740-54ba-3f61-eb5656315293"
+    },
+    {
+     "o": "Q4057633",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q56061$72f55a8a-4941-95ed-3b6c-0c6f33e220ea"
+    }
+   ],
+   "enwiki": "Administrative division",
+   "lastrevid": 2550480752,
+   "sitelinks": 80
+  },
+  "Q5793320": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3337280",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5793320$90557a52-4da7-ff5f-6553-061f64e3afd4"
+    },
+    {
+     "o": "Q2401485",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q5793320$83e816b6-4b0a-c12d-d81a-80125141e05c"
+    },
+    {
+     "o": "Q2843133",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q5793320$35dc267a-4178-e55a-eaca-d51479874851"
+    },
+    {
+     "o": "Q217196",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q5793320$8f52fc0f-4ba1-a3de-3809-fc607ff29102"
+    },
+    {
+     "o": "Q1406718",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q5793320$7bd1b5c0-49df-8a69-a498-0a53cc2cc763"
+    },
+    {
+     "o": "Q186138",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q5793320$62c3030a-458e-e475-c948-352c3522ae16"
+    },
+    {
+     "o": "+1502-05-09T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q5793320$0212a0ba-4c5e-b512-1422-e3843b1bda41"
+    },
+    {
+     "o": "Q15682",
+     "p": "P1427",
+     "rank": "normal",
+     "statement": "Q5793320$40b8c89e-43e4-b1e4-4a6f-58666d0a7687"
+    },
+    {
+     "o": "+1504-11-07T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q5793320$dde9cf34-4635-bca9-b937-13c03e67b784"
+    }
+   ],
+   "enwiki": "Fourth voyage of Columbus",
+   "lastrevid": 2557390071,
+   "sitelinks": 7
+  },
+  "Q59858687": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q1197685",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q59858687$F2A3A0B0-516E-4ADE-94F5-670AD283911B"
+    },
+    {
+     "o": "Q134485872",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q59858687$8f2ab864-4f1b-4166-92cf-e5580aa5f89d"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2349439526,
+   "sitelinks": 0
+  },
+  "Q60775599": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q60775599$E5FB9D85-DA58-4C28-BB73-C5027C0737E3"
+    },
+    {
+     "o": "+1860-00-00T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q60775599$7B365FAF-50E8-4670-99E7-FCFD169F1538"
+    },
+    {
+     "o": "+1887-00-00T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q60775599$b67a9b9c-4847-3560-582d-22b6f14b68a3"
+    },
+    {
+     "o": "Q13955",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q60775599$aa96138e-4e41-2e4f-365b-3cf9401140bd"
+    },
+    {
+     "o": "Q7838",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q60775599$b28e7bf4-45f8-2a53-a831-7a8ad0dd8528"
+    },
+    {
+     "o": "Q76048",
+     "p": "P1366",
+     "rank": "normal",
+     "statement": "Q60775599$eeb036e8-48c9-acbf-da6d-ee14b83a7c06"
+    },
+    {
+     "o": "Q458421",
+     "p": "P112",
+     "rank": "normal",
+     "statement": "Q60775599$e7e8bff1-4742-466c-5cd2-6be265d92460"
+    }
+   ],
+   "enwiki": "Tippu Tip's state",
+   "lastrevid": 2279403403,
+   "sitelinks": 3
+  },
+  "Q6123903": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3337280",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6123903$77a5a796-4d02-591b-7b88-5d1c17030ac6"
+    },
+    {
+     "o": "+1493-09-24T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q6123903$f3ccd057-44eb-1c96-2cad-81db49d785c7"
+    },
+    {
+     "o": "+1496-06-11T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q6123903$e4147aa4-4c38-e281-3db7-6c03eb5619c0"
+    },
+    {
+     "o": "Q66580069",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6123903$0891bc10-4eff-39a9-d9b8-b81930d3f4b4"
+    },
+    {
+     "o": "Q66606390",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6123903$0c6c0e72-4859-b34f-242b-31ae07f4b26e"
+    },
+    {
+     "o": "Q66618614",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6123903$e3043354-4de5-f6f5-9cce-51741eb7c987"
+    },
+    {
+     "o": "Q2843133",
+     "p": "P156",
+     "rank": "normal",
+     "statement": "Q6123903$35f7eb0a-4b3d-4cbb-3be1-3d0d416502fa"
+    },
+    {
+     "o": "Q453058",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q6123903$2b58eb7e-4d2e-e8c0-f98e-182a3874ed74"
+    },
+    {
+     "o": "Q345620",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q6123903$a0271137-4e43-0779-f7b6-503312e93870"
+    },
+    {
+     "o": "Q313369",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q6123903$9d42a02d-40fc-72c4-d98a-130892961a32"
+    },
+    {
+     "o": "Q9066469",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q6123903$3a7d8cd1-49f0-77d5-68b4-cf91d14a1985"
+    },
+    {
+     "o": "Q3771259",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q6123903$e68cb433-488d-ea9d-d3bc-aa5ec81fe6eb"
+    },
+    {
+     "o": "Q217196",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q6123903$b2238bd8-41e8-1427-888c-b80e70c6f9d3"
+    },
+    {
+     "o": "Q15682",
+     "p": "P1427",
+     "rank": "normal",
+     "statement": "Q6123903$5634570c-464f-27ba-c889-e1682433ef3e"
+    },
+    {
+     "o": "Q15682",
+     "p": "P1444",
+     "rank": "normal",
+     "statement": "Q6123903$b794c4e0-4015-0d44-c398-6632eb8a8f94"
+    }
+   ],
+   "enwiki": "The second voyage of Cristopher Colombus",
+   "lastrevid": 2554984499,
+   "sitelinks": 9
+  },
+  "Q619610": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q619610$AF430E2D-5408-4975-A473-9AB6730DFD4B"
+    },
+    {
+     "o": "Q4950170",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q619610$5997D661-1BFB-4157-86C8-45116F75E142"
+    }
+   ],
+   "enwiki": "Social state",
+   "lastrevid": 2548195675,
+   "sitelinks": 19
+  },
+  "Q620965": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q45382",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q620965$3873C362-AD71-45B1-9CE1-A6344B2C4EE9"
+    },
+    {
+     "o": "Q58296",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q620965$6A37C076-B098-41F1-9E48-41968978DD34"
+    },
+    {
+     "o": "+1799-11-00T00:00:00Z",
+     "p": "P585",
+     "rank": "normal",
+     "statement": "Q620965$10d8fc76-4224-d464-efb8-bad7062e5f53"
+    },
+    {
+     "o": "Q517",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q620965$0c40ad9c-4bf7-dcc7-1cb1-88e59813201f"
+    },
+    {
+     "o": "Q6534",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q620965$d241cc5a-41d1-22f9-8a80-9b6a1e381adf"
+    },
+    {
+     "o": "Q877619",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q620965$2fc62cd0-464a-5c9f-de65-7f5ae45c58d4"
+    },
+    {
+     "o": "Q662491",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q620965$287d2c6c-42be-8ff6-8c38-56cfae0598ac"
+    },
+    {
+     "o": "+1799-11-09T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q620965$9f5834d9-4cc9-1208-c3f6-8f9cdeed6e1c"
+    },
+    {
+     "o": "+1799-11-10T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q620965$285746d7-4be6-8bb6-dd40-9db5f65713a4"
+    }
+   ],
+   "enwiki": "Coup of 18 Brumaire",
+   "lastrevid": 2557040196,
+   "sitelinks": 50
+  },
+  "Q625298": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q131569",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q625298$284188e2-4e15-4eb7-63d0-a55215eb61c4"
+    },
+    {
+     "o": "Q12769393",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q625298$01e636f7-4a17-b765-3491-02dd7584ae72"
+    },
+    {
+     "o": "Q454",
+     "p": "P1542",
+     "rank": "normal",
+     "statement": "Q625298$750533a1-4a42-154a-ab4d-ac0f584128b8"
+    },
+    {
+     "o": "Q1456892",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q625298$c0041181-444c-14a5-75f5-91da1d1c85a4"
+    },
+    {
+     "o": "Q625298",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q625298$490062e7-4c9c-42bd-f378-94a304cff4df"
+    },
+    {
+     "o": "Q217901",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q625298$634dd03a-46c0-7a65-c9d0-652debe54571"
+    }
+   ],
+   "enwiki": "Peace treaty",
+   "lastrevid": 2548151016,
+   "sitelinks": 53
+  },
+  "Q6256": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q4835091",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6256$a9a6fd15-4a3d-6091-0336-5838f383c827"
+    },
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6256$0a293322-411a-e651-50f7-b12f614f77aa"
+    },
+    {
+     "o": "Q10864048",
+     "p": "P150",
+     "rank": "normal",
+     "statement": "Q6256$d2189e71-44b8-95c3-0c97-edb165eeacd6"
+    },
+    {
+     "o": "Q183366",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6256$e2ac079f-4202-97f4-bb80-11d00952cd91"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6256$8841022c-4cd2-96fc-22e5-e63faf0e427f"
+    }
+   ],
+   "enwiki": "Country",
+   "lastrevid": 2557305482,
+   "sitelinks": 200
+  },
+  "Q6266": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q659390",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6266$1c50dfbb-4f08-2a02-4331-22f8c9c2ad9d"
+    },
+    {
+     "o": "Q33104069",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6266$ad45a83e-4f7e-38be-791b-7dbe3bba88a8"
+    },
+    {
+     "o": "Q16334295",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6266$bc8beb33-459a-7924-1c1d-43161dc9939e"
+    },
+    {
+     "o": "Q1156970",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q6266$f47c8bd9-484c-ebfb-b217-214f027b1b27"
+    },
+    {
+     "o": "Q179671",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q6266$6cda107e-4930-5441-b458-c670f043f9f0"
+    }
+   ],
+   "enwiki": "Nation",
+   "lastrevid": 2555227181,
+   "sitelinks": 155
+  },
+  "Q645883": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q12786121",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q645883$bc9f854e-48a0-cc49-5787-46d505ffc438"
+    },
+    {
+     "o": "Q15835236",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q645883$a81eb3d0-4490-4c97-eb7e-941d7d6567fb"
+    },
+    {
+     "o": "Q1190554",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q645883$2c4cd908-472b-f115-f8ce-011afe3984df"
+    }
+   ],
+   "enwiki": "Military operation",
+   "lastrevid": 2542918510,
+   "sitelinks": 53
+  },
+  "Q6500954": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q3838",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q6500954$f9aae98b-4967-b98b-ae7b-c9a59b2b4cd6"
+    },
+    {
+     "o": "+1971-10-27T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q6500954$D9826D6B-4FC9-4FC4-BD3E-D9AA86468E9C"
+    },
+    {
+     "o": "+1997-05-16T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q6500954$EAC7B52C-9DDD-47B4-8098-E7125E5C6C0F"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1997-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "preferred",
+     "statement": "Q6500954$B383546A-8951-42B0-9579-99BB33B1A6EA"
+    },
+    {
+     "o": "Q3624078",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1971-10-21T00:00:00Z"
+      ],
+      "P582": [
+       "+1997-05-21T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6500954$b7aad123-4ebc-d402-7d11-a3f090aa9c76"
+    },
+    {
+     "o": "Q17524420",
+     "p": "P31",
+     "rank": "preferred",
+     "statement": "Q6500954$133c9c7c-4e83-d69a-07ef-e7c554d6dc55"
+    },
+    {
+     "o": "Q6256",
+     "p": "P31",
+     "q": {
+      "P580": [
+       "+1971-10-27T00:00:00Z"
+      ],
+      "P582": [
+       "+1997-05-21T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6500954$c4e2508d-428d-01b3-1a12-d2e63c0cd2b9"
+    },
+    {
+     "o": "Q150",
+     "p": "P37",
+     "rank": "normal",
+     "statement": "Q6500954$847c0a84-4282-d5ec-3fc5-6c95976f8a1c"
+    },
+    {
+     "o": "Q164535",
+     "p": "P35",
+     "rank": "normal",
+     "statement": "Q6500954$58d3441c-41bf-5935-8a2a-701c7b86a970"
+    },
+    {
+     "o": "Q15",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q6500954$BB0B786A-5B96-48F6-BD8D-A78FB0C7F6A5"
+    },
+    {
+     "o": "Q974",
+     "p": "P1365",
+     "q": {
+      "P585": [
+       "+1971-10-27T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6500954$2656fd8a-40f7-ec4e-c8ec-42e790845137"
+    },
+    {
+     "o": "Q974",
+     "p": "P1366",
+     "q": {
+      "P585": [
+       "+1997-05-16T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6500954$044d9d83-4e82-5767-c616-7ede2aa04835"
+    },
+    {
+     "o": "Q6500954",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q6500954$cee87aac-4ba8-3cac-35eb-265c2abecd61"
+    },
+    {
+     "o": "Q150",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q6500954$85fec89f-442e-262b-0e3e-043fb2d0736f"
+    }
+   ],
+   "enwiki": "Zaire",
+   "lastrevid": 2526480826,
+   "sitelinks": 69
+  },
+  "Q6534": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q13418847",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6534$b933b0f5-4a87-b6e5-1bcb-5c6c132a78f6"
+    },
+    {
+     "o": "Q10931",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q6534$c8c6f16d-4099-6d17-dec9-396872b668e2"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "q6534$0DAC2AE5-007B-45BF-AA6B-C2EA0744465E"
+    },
+    {
+     "o": "+1789-07-14T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q6534$a941afd3-4fd0-71b8-4f21-a8ff818e63a3"
+    },
+    {
+     "o": "+1799-11-09T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "Q6534$c884db14-4c67-d611-0ac8-c978a179f605"
+    },
+    {
+     "o": "Q6539",
+     "p": "P793",
+     "q": {
+      "P585": [
+       "+1789-07-14T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6534$de3112e6-43ff-7e79-7f96-f93f762bcd0c"
+    },
+    {
+     "o": "Q862586",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$1699ebcb-4eda-b27f-695d-e739b9a590ec"
+    },
+    {
+     "o": "Q3062714",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$e2a09586-4259-ab92-5abd-5a008d9fcd5e"
+    },
+    {
+     "o": "Q474757",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$1c6d9fda-4823-990c-4a8c-4699bddce14d"
+    },
+    {
+     "o": "Q248033",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$0bb29adc-4deb-f969-e09a-eed0a1f87a18"
+    },
+    {
+     "o": "Q2998928",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$94b25c53-4b46-b531-faee-7eb2fbe39884"
+    },
+    {
+     "o": "Q620965",
+     "p": "P793",
+     "rank": "normal",
+     "statement": "Q6534$78c47b57-4f4d-376b-af1c-8197bcf87947"
+    },
+    {
+     "o": "Q142",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q6534$BF13C400-4372-466A-8195-9FEAC6E52F20"
+    },
+    {
+     "o": "Q193547",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6534$63ef253f-4619-4741-b0eb-9026b179d08b"
+    },
+    {
+     "o": "Q2264242",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6534$8ba3e90f-48c6-1634-8118-98040af24cd3"
+    },
+    {
+     "o": "Q60022",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6534$22F7057E-EFB2-4D0F-BD81-CBEA8C50256C"
+    },
+    {
+     "o": "Q1151917",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q6534$01B1C5ED-D034-4325-B737-E229E101CD9E"
+    },
+    {
+     "o": "Q27764",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q6534$C8A6648F-BE34-4960-90F3-246698FB1DAA"
+    },
+    {
+     "o": "+1789-05-05T00:00:00Z",
+     "p": "P585",
+     "rank": "normal",
+     "statement": "Q6534$B72ED822-A677-4921-814F-5F4E9FE2E25F"
+    }
+   ],
+   "enwiki": "French Revolution",
+   "lastrevid": 2556487552,
+   "sitelinks": 196
+  },
+  "Q66555529": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q7167",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q66555529$9b3485c3-43b8-457a-52d6-f1df1e9f4671"
+    },
+    {
+     "o": "Q198",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q66555529$14bb1116-4828-c226-5e7f-eba73d815739"
+    },
+    {
+     "o": "Q28710139",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q66555529$8464370b-41df-4a7b-b46b-b8ae31f82a78"
+    },
+    {
+     "o": "Q1047607",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q66555529$d17a47b3-4776-1467-ae17-9e054ecb3209"
+    },
+    {
+     "o": "Q6159472",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$f8745502-46a2-44fe-59fe-6e3bc013eb86"
+    },
+    {
+     "o": "Q66580069",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$f9f240c7-4900-85df-7d76-fcb330c56289"
+    },
+    {
+     "o": "Q66577626",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$ae9ee8fc-4971-4886-7aab-801f444d0390"
+    },
+    {
+     "o": "Q66606231",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$18758443-4404-8aa0-524e-4f597fca2661"
+    },
+    {
+     "o": "Q66768686",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$09255d4d-4b00-96c1-7056-45a59754cb09"
+    },
+    {
+     "o": "Q67012374",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$3256554f-4c2d-0297-c163-0d6722b7ebd6"
+    },
+    {
+     "o": "Q66628423",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$4d132679-487a-e378-3b57-5ba259f19851"
+    },
+    {
+     "o": "Q66658511",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$c4bb2039-43f2-0029-d234-2f74f7ef5552"
+    },
+    {
+     "o": "Q66626507",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$66b3ca30-4f5c-f626-98ef-07354e080aca"
+    },
+    {
+     "o": "Q66618614",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$d4bf5338-4d4a-098f-e2f4-6e79cdf8d6c5"
+    },
+    {
+     "o": "Q66788922",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$b19e57d8-4efa-5ef8-97f6-d18b13d3e221"
+    },
+    {
+     "o": "Q66606300",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$e621ca69-4e6f-521e-3c50-dfcdfad7af87"
+    },
+    {
+     "o": "Q66717961",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$20b4b225-4212-825c-f1b8-6895ec058acb"
+    },
+    {
+     "o": "Q67174853",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q66555529$2878674a-4284-642f-6190-d4254370228c"
+    },
+    {
+     "o": "+1493-11-22T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q66555529$65e4ca5a-4216-aa96-3591-2b182ce472a2"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2393603436,
+   "sitelinks": 0
+  },
+  "Q6688521": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q61964031",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6688521$f5a01d02-4b3f-1460-2e3b-a6e3090a1011"
+    },
+    {
+     "o": "Q13341593",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6688521$b4a74880-407f-3bff-670a-37b0cca96a1c"
+    },
+    {
+     "o": "Q37470",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q6688521$f052e92a-487c-6b81-1f06-2270b89e791e"
+    },
+    {
+     "o": "Q159",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1991-12-24T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$2fb3c4f4-4dfd-9df7-bce7-7ccb898f2522"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1945-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$716d1631-4479-f75a-1f72-6fcd60594183"
+    },
+    {
+     "o": "Q145",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1945-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$46fe82ea-4db3-dab9-7351-32bfdf34316b"
+    },
+    {
+     "o": "Q148",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1971-11-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$ce0ce7a8-4cc5-dd29-7b77-2d57542096d5"
+    },
+    {
+     "o": "Q30",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1945-00-00T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$5d06f94b-47cc-7bf5-b15e-bd6eac398e9e"
+    },
+    {
+     "o": "Q865",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1945-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1971-11-22T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$b6f82aab-4cb9-f43a-bbee-e45f10ff2b31"
+    },
+    {
+     "o": "Q15180",
+     "p": "P17",
+     "q": {
+      "P580": [
+       "+1945-00-00T00:00:00Z"
+      ],
+      "P582": [
+       "+1991-12-23T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q6688521$a9e9a837-41ae-fca0-f90a-0619fa087a66"
+    }
+   ],
+   "enwiki": "Permanent members of the United Nations Security Council",
+   "lastrevid": 2552751687,
+   "sitelinks": 31
+  },
+  "Q6944158": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q131569",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6944158$c80d0ad5-447c-a63c-65b9-85a00fbdd05a"
+    },
+    {
+     "o": "Q878249",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q6944158$0BF172B6-6B0C-4EEA-993A-11AFE47BD230"
+    }
+   ],
+   "enwiki": "Defense pact",
+   "lastrevid": 2550325227,
+   "sitelinks": 12
+  },
+  "Q7270": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q5589178",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q7270$9f8af2c5-4746-641c-2fe8-1ed80829f983"
+    },
+    {
+     "o": "Q183039",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q7270$4a8408a9-4d61-3df7-4588-ce1143cb06f7"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q7270$1408dede-4542-8719-8aef-b563b77bf7ba"
+    }
+   ],
+   "enwiki": "Republic",
+   "lastrevid": 2548242515,
+   "sitelinks": 209
+  },
+  "Q7275": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q155076",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q7275$03443054-4ec3-637e-7d5a-645c3b95d2c7"
+    },
+    {
+     "o": "Q1048835",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q7275$50B11759-E49F-4975-98DE-E0C09BB219D0"
+    },
+    {
+     "o": "Q1896989",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q7275$40782a85-4945-a066-e084-6ffc6ea85b78"
+    },
+    {
+     "o": "Q96196009",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q7275$4e59debe-4c16-018d-9feb-1b4654f6c628"
+    },
+    {
+     "o": "Q3917681",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q7275$599853BB-0A2D-4493-8738-911283B84198"
+    },
+    {
+     "o": "Q179671",
+     "p": "P361",
+     "rank": "normal",
+     "statement": "Q7275$ae5323bf-4b30-7b01-3a2e-bf3c3ecff53c"
+    },
+    {
+     "o": "Q211606",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q7275$6cada070-41c5-65b1-3a3d-0b137a695131"
+    },
+    {
+     "o": "Q15617994",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q7275$e0d248c7-4726-1801-f923-629ded8d821e"
+    }
+   ],
+   "enwiki": "State (polity)",
+   "lastrevid": 2556346912,
+   "sitelinks": 224
+  },
+  "Q7411": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q55",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$EC6E7A81-BA72-4E47-8C2A-EF601713BF4F"
+    },
+    {
+     "o": "Q31",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$A0F74C24-D950-4502-A077-CCF81D8AEF2A"
+    },
+    {
+     "o": "Q730",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$E05C3B2F-C5B1-4614-BCF6-5460B941C66D"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$1f07ad98-4acf-dac4-7c2d-069dc863f059"
+    },
+    {
+     "o": "Q183",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$f6b26c1c-4c1a-72c9-1e9f-22e6057530b9"
+    },
+    {
+     "o": "Q21203",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$3F3124D0-217D-4890-8CD6-427844D6055F"
+    },
+    {
+     "o": "Q27561",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$ED04817B-8FED-4EB2-9EE0-C7CE87A0F292"
+    },
+    {
+     "o": "Q25279",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$A217D988-F728-4779-9EB2-42423E35B721"
+    },
+    {
+     "o": "Q29999",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$AAEE6F0C-E2EF-46B7-8F13-187FC3659109"
+    },
+    {
+     "o": "Q26273",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q7411$FD22CEC9-190C-4A1F-A437-977815EE8405"
+    },
+    {
+     "o": "Q138638548",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q7411$05575020-B973-496B-9130-2F3402CDBA7D"
+    },
+    {
+     "o": "Q23305089",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q7411$58b14f96-43da-18e0-9f91-72fe280f71b0"
+    },
+    {
+     "o": "Q178806",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q7411$eff1337e-4311-82b8-6d29-c42b371902a4"
+    },
+    {
+     "o": "Q153050",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q7411$18A65C76-74C4-487D-95D1-CF0F912DF839"
+    }
+   ],
+   "enwiki": "Dutch language",
+   "lastrevid": 2548091849,
+   "sitelinks": 257
+  },
+  "Q78994": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q207318",
+     "p": "P155",
+     "rank": "normal",
+     "statement": "Q78994$e491cba3-4d1e-dac9-6004-e6c461fe4901"
+    },
+    {
+     "o": "+1803-00-00T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "q78994$68c602ff-4d52-3503-cd58-617089a1eb43"
+    },
+    {
+     "o": "+1815-00-00T00:00:00Z",
+     "p": "P582",
+     "rank": "normal",
+     "statement": "q78994$b4b0084b-43bd-b559-c0de-e328b7f5b3b8"
+    },
+    {
+     "o": "Q104212151",
+     "p": "P31",
+     "rank": "preferred",
+     "statement": "Q78994$053E44B5-3E38-48E0-BA29-0DF4B9AEF6D6"
+    },
+    {
+     "o": "Q198",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q78994$78d15069-4540-ac15-e724-4ed92d20bdac"
+    },
+    {
+     "o": "Q46",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q78994$F8D4D2E6-81B2-4EFD-B03C-BD3923DE636D"
+    },
+    {
+     "o": "Q249232",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$091dd9b7-4f1d-dd99-19de-e52ff4f6aba8"
+    },
+    {
+     "o": "Q605977",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$85051398-4e17-7d42-b443-6e4770346324"
+    },
+    {
+     "o": "Q684324",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$5931f65d-4c10-052f-cc1a-ecfe1603d0f6"
+    },
+    {
+     "o": "Q138107",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$13aeb2c2-41fb-525d-4f51-62270fe172e0"
+    },
+    {
+     "o": "Q2724511",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$e4d04c27-4001-768e-9534-2f8a0d7b86bb"
+    },
+    {
+     "o": "Q3286965",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$F4BC0577-6059-4D97-9301-A5FCEEC76AD1"
+    },
+    {
+     "o": "Q104858453",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q78994$2BF9B5A9-64F1-47D6-A47A-1C194C961BC8"
+    }
+   ],
+   "enwiki": "Napoleonic Wars",
+   "lastrevid": 2551137154,
+   "sitelinks": 101
+  },
+  "Q815524": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q31",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q815524$647614B0-755F-40F1-9FE0-E7FB52DB000C"
+    },
+    {
+     "o": "Q1790360",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q815524$60f516e4-43f7-a7c3-0021-52f3c9ea2df9"
+    },
+    {
+     "o": "+1962-07-01T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q815524$cec0cbde-4a65-edc2-a6da-f7c660e356b5"
+    },
+    {
+     "o": "+1841-01-30T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q815524$24c6d09a-4a4c-6f15-0717-381da111b8da"
+    },
+    {
+     "o": "Q15",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q815524$5b8ab928-4e4d-58af-4ae2-07a0eff0698c"
+    },
+    {
+     "o": "Q48",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q815524$287da4c5-4873-ecd8-c202-c51449e26725"
+    },
+    {
+     "o": "Q46",
+     "p": "P30",
+     "rank": "preferred",
+     "statement": "Q815524$fcaa4fdf-476e-2219-44f4-61e69370fd0d"
+    },
+    {
+     "o": "Q18",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q815524$2cad8eb9-4090-db40-047c-cb393f5a9b8e"
+    },
+    {
+     "o": "Q239",
+     "p": "P36",
+     "rank": "normal",
+     "statement": "Q815524$10b1ddb4-4d96-2c22-ed6d-b4d1d9b267ab"
+    },
+    {
+     "o": "Q150",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q815524$f99cb0c5-4200-603e-81bc-0e316e705a2d"
+    },
+    {
+     "o": "Q7411",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q815524$a9d91fb4-4b0a-c889-20d0-d85c8faba90a"
+    },
+    {
+     "o": "Q188",
+     "p": "P2936",
+     "rank": "normal",
+     "statement": "Q815524$24482695-4896-f052-9cc9-40c8c8276d36"
+    },
+    {
+     "o": "Q13592862",
+     "p": "P1906",
+     "rank": "normal",
+     "statement": "Q815524$2be267b6-477b-d523-f367-3c49465acda9"
+    },
+    {
+     "o": "Q12971",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1841-01-30T00:00:00Z"
+      ],
+      "P582": [
+       "+1865-12-10T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$2EA0AF99-036E-4B84-B34B-5AC476F474CA"
+    },
+    {
+     "o": "Q12967",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1865-12-17T00:00:00Z"
+      ],
+      "P582": [
+       "+1909-12-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$16ADD4DA-3DCA-4C52-950D-B6DA39BEEE53"
+    },
+    {
+     "o": "Q55008046",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1909-12-23T00:00:00Z"
+      ],
+      "P582": [
+       "+1934-02-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$83771C05-9EB8-4B1B-A103-AC040EE9A977"
+    },
+    {
+     "o": "Q12973",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1934-02-23T00:00:00Z"
+      ],
+      "P582": [
+       "+1944-09-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$8373E9EC-6544-4E18-9233-BA9105FDA2D5"
+    },
+    {
+     "o": "Q445553",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1944-09-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1950-07-20T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$58A9FBA3-6293-4C14-9A0E-8E79888CC465"
+    },
+    {
+     "o": "Q12973",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1950-07-20T00:00:00Z"
+      ],
+      "P582": [
+       "+1950-08-11T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$A6AD388B-19C7-49BF-9F7C-44463733AA89"
+    },
+    {
+     "o": "Q12976",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1950-08-11T00:00:00Z"
+      ],
+      "P582": [
+       "+1951-07-17T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$5C850EC9-0045-4537-85C7-FBEAB82B8203"
+    },
+    {
+     "o": "Q12976",
+     "p": "P35",
+     "q": {
+      "P580": [
+       "+1951-07-17T00:00:00Z"
+      ],
+      "P582": [
+       "+1962-07-01T00:00:00Z"
+      ]
+     },
+     "rank": "normal",
+     "statement": "Q815524$AC8CA4B0-CE6F-42EB-8FC6-04670DDD97BD"
+    },
+    {
+     "o": "Q12971",
+     "p": "P112",
+     "rank": "normal",
+     "statement": "Q815524$970C4314-2ECB-4B9C-A1BE-62F4A0C399EF"
+    }
+   ],
+   "enwiki": "Belgian colonial empire",
+   "lastrevid": 2538768486,
+   "sitelinks": 40
+  },
+  "Q82794": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q3622002",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q82794$73b59eea-44f7-c3cb-403a-38f93210b8f6"
+    },
+    {
+     "o": "Q98929991",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q82794$c77d7066-457a-87ce-7c26-fa736a1415ad"
+    },
+    {
+     "o": "Q124711484",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q82794$ac52bb8c-441d-cd03-6df1-a945ada41829"
+    },
+    {
+     "o": "Q1299906",
+     "p": "P828",
+     "rank": "normal",
+     "statement": "Q82794$019b7b19-4e2f-6165-f4c5-ed1615f4a486"
+    },
+    {
+     "o": "Q137022846",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q82794$1e39b56c-4e96-0896-c7b0-d976cd94f5d6"
+    }
+   ],
+   "enwiki": "Region",
+   "lastrevid": 2557349732,
+   "sitelinks": 107
+  },
+  "Q838416": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "+1879-11-17T00:00:00Z",
+     "p": "P571",
+     "rank": "normal",
+     "statement": "Q838416$098A0BC3-1E29-44AF-A6B1-AD5FD4F05DD0"
+    },
+    {
+     "o": "+1885-05-29T00:00:00Z",
+     "p": "P576",
+     "rank": "normal",
+     "statement": "Q838416$47188427-CB9B-408A-BB59-3BE36FC3DE09"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q838416$c0bde528-4e5c-1e35-99d7-c29f9ba377bf"
+    },
+    {
+     "o": "Q12967",
+     "p": "P112",
+     "rank": "normal",
+     "statement": "Q838416$4a8f27ef-4a3e-f498-015a-743086b702ff"
+    },
+    {
+     "o": "Q15824050",
+     "p": "P1365",
+     "rank": "normal",
+     "statement": "Q838416$2f366384-4a6c-da99-c423-8b1d672dd20b"
+    },
+    {
+     "o": "Q76048",
+     "p": "P1366",
+     "rank": "normal",
+     "statement": "Q838416$2f2b136e-48e6-5474-557e-66a01d51811b"
+    }
+   ],
+   "enwiki": "International Association of the Congo",
+   "lastrevid": 2488631755,
+   "sitelinks": 20
+  },
+  "Q842112": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q842112$d6d441b6-4bb9-1299-6b11-3f0e5163c4d9"
+    },
+    {
+     "o": "Q1307214",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q842112$d3a9ddef-463c-9185-4775-efdc3edeb127"
+    },
+    {
+     "o": "Q15180",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q842112$2dc4264a-42fa-baa5-b380-a4dda277017c"
+    },
+    {
+     "o": "Q148",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q842112$8dcaf6a6-4666-988e-7498-11bc37d7bf76"
+    },
+    {
+     "o": "Q5401",
+     "p": "P30",
+     "rank": "normal",
+     "statement": "Q842112$5814676b-465b-97cc-023d-2492f46a9ca4"
+    }
+   ],
+   "enwiki": "Socialist state",
+   "lastrevid": 2509944898,
+   "sitelinks": 56
+  },
+  "Q8465": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q198",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q8465$44256105-4349-9bb6-f6c9-535b5a60b59e"
+    },
+    {
+     "o": "Q5153967",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q8465$9f44c00a-4513-fe68-898e-72535a8e49dd"
+    },
+    {
+     "o": "Q124867660",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q8465$4f9e7442-4adc-838e-30b7-273224daead7"
+    }
+   ],
+   "enwiki": "Civil war",
+   "lastrevid": 2548154832,
+   "sitelinks": 153
+  },
+  "Q849866": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q849866$dcde9f1a-48c8-4968-88b6-93b92cd73356"
+    },
+    {
+     "o": "Q117405807",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q849866$bf196b42-4ac8-9acd-0396-71bfead3b31d"
+    }
+   ],
+   "enwiki": "Communist state",
+   "lastrevid": 2549206860,
+   "sitelinks": 46
+  },
+  "Q859563": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q183039",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q859563$e37251e5-4570-da6d-4c40-d274f5c9d279"
+    },
+    {
+     "o": "Q7275",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q859563$12975c66-4b06-b6ae-de1b-0bb40d76c9dc"
+    }
+   ],
+   "enwiki": "Secular state",
+   "lastrevid": 2530603472,
+   "sitelinks": 57
+  },
+  "Q864113": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q198",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "q864113$8937c935-45c8-135d-9a6e-8b14a2454c19"
+    },
+    {
+     "o": "Q124867660",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q864113$605e768e-4f2c-1f2c-bc47-85a22398077e"
+    }
+   ],
+   "enwiki": "Proxy war",
+   "lastrevid": 2556321182,
+   "sitelinks": 59
+  },
+  "Q8669": {
+   "archive_sha256": "d2fea9f648121eb5748e39bc6ad28e666233002bf250a508d8b2859a483efe2e",
+   "claims": [
+    {
+     "o": "Q151622",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$f1694cb6-4845-52a4-f880-7e8804a621ba"
+    },
+    {
+     "o": "Q3241199",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$58b9fe55-4312-e833-0b74-51bdf68f8fcf"
+    },
+    {
+     "o": "Q322607",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$9F1682D1-BE8F-4BFB-86EA-AACFF3408E68"
+    },
+    {
+     "o": "Q49092",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$7b292e00-431e-f956-fcbd-cba19cd12895"
+    },
+    {
+     "o": "Q49101",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$3f6e351a-4e27-49be-95e7-5b8296db5e6f"
+    },
+    {
+     "o": "Q49077",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$dd188cf9-4e41-5df2-9794-4ed395e34ffb"
+    },
+    {
+     "o": "Q49100",
+     "p": "P527",
+     "rank": "normal",
+     "statement": "Q8669$cec2b392-4efe-d135-cac4-498647c55778"
+    },
+    {
+     "o": "Q766875",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q8669$98ebdb77-4a9f-e4d3-fb22-9d3c7c2a764b"
+    },
+    {
+     "o": "Q11422542",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q8669$9db1226a-4687-7e87-90f9-5348d3312cbe"
+    },
+    {
+     "o": "Q7204",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q8669$E431E384-2479-49AE-801E-71A8653B4D6F"
+    },
+    {
+     "o": "+1948-05-15T00:00:00Z",
+     "p": "P580",
+     "rank": "normal",
+     "statement": "Q8669$dcb91569-4b5c-cd3d-bbc0-626c92c96270"
+    }
+   ],
+   "enwiki": "Arab–Israeli conflict",
+   "lastrevid": 2555327157,
+   "sitelinks": 120
+  },
+  "Q973118": {
+   "archive_sha256": "68917950c81e0fe4855e1613350d26fb76ff27ad25f4776bd9ac2e0fe5c9f12e",
+   "claims": [
+    {
+     "o": "Q209715",
+     "p": "P31",
+     "rank": "normal",
+     "statement": "Q973118$e04aae17-4bf8-fe08-a5b3-ccdf75f139c3"
+    },
+    {
+     "o": "+1804-12-02T00:00:00Z",
+     "p": "P585",
+     "rank": "normal",
+     "statement": "Q973118$e65cc82c-4f7f-de4e-86f3-f7f71f97ad1d"
+    },
+    {
+     "o": "Q2981",
+     "p": "P276",
+     "rank": "normal",
+     "statement": "Q973118$614b30d2-4c13-99c0-a7e8-f13e389b2728"
+    },
+    {
+     "o": "Q142",
+     "p": "P17",
+     "rank": "normal",
+     "statement": "Q973118$983f3a1b-4648-80ea-306c-b4859559eeff"
+    },
+    {
+     "o": "Q12402070",
+     "p": "P710",
+     "rank": "normal",
+     "statement": "Q973118$fcd47f66-4d57-e941-9bff-8a7e011f8359"
+    }
+   ],
+   "enwiki": "Coronation of Napoleon",
+   "lastrevid": 2532319606,
+   "sitelinks": 18
+  },
+  "Q99541706": {
+   "archive_sha256": "6439de538b88c7060375b94162eb67247671be55ce205be36e5ee8cbe258e6a2",
+   "claims": [
+    {
+     "o": "Q10711424",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q99541706$37b94cda-47e7-795d-eb36-e8f456c7afc4"
+    },
+    {
+     "o": "Q3024240",
+     "p": "P279",
+     "rank": "normal",
+     "statement": "Q99541706$178c3f0a-49a4-79d9-a55f-8f50e8c97221"
+    }
+   ],
+   "enwiki": null,
+   "lastrevid": 2540332894,
+   "sitelinks": 0
+  }
+ },
+ "kind": "snapshot_claims",
+ "missing": [],
+ "properties_kept": [
+  "P1001",
+  "P108",
+  "P112",
+  "P127",
+  "P131",
+  "P1313",
+  "P1336",
+  "P1344",
+  "P1365",
+  "P1366",
+  "P137",
+  "P1427",
+  "P1444",
+  "P1478",
+  "P1479",
+  "P150",
+  "P1536",
+  "P1537",
+  "P1542",
+  "P155",
+  "P156",
+  "P17",
+  "P1891",
+  "P1906",
+  "P2348",
+  "P27",
+  "P276",
+  "P279",
+  "P2936",
+  "P30",
+  "P3005",
+  "P31",
+  "P35",
+  "P36",
+  "P361",
+  "P37",
+  "P39",
+  "P527",
+  "P571",
+  "P576",
+  "P580",
+  "P582",
+  "P585",
+  "P6",
+  "P607",
+  "P61",
+  "P710",
+  "P790",
+  "P793",
+  "P828",
+  "P945"
+ ],
+ "redirects": {},
+ "requests": 3,
+ "retrieved_at": "2026-10-16T00:05:33.201387+00:00"
+}

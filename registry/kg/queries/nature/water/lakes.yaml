@@ -1,0 +1,19 @@
+id: geography.nature.lakes
+domain: geography
+owner: KGSCIECO
+description: >-
+  Major lakes and reservoirs: direct instances of lake (Q23397), salt lake (Q188025), endorheic lake
+  (Q9019918) or reservoir (Q131681) with at least 25 sitelinks (Lake Victoria, Baikal, Titicaca, Tanganyika,
+  Superior, Caspian Sea, Dead Sea, ...). Snapshots keep countries (P17), continent (P30), area (P2046),
+  located in terrain feature (P706); basin countries (P205), drainage basin (P4614) and elevation (P2044)
+  are requested.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q23397 wd:Q188025 wd:Q9019918 wd:Q131681 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 25)
+  }
+max_rows: 5000
+expand_hops: 0

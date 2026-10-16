@@ -1,0 +1,26 @@
+id: geography.nature.mountains
+domain: geography
+owner: KGSCIECO
+description: >-
+  Notable mountains, volcanoes and mountain ranges: direct instances of mountain (Q8502), volcano (Q8072),
+  stratovolcano (Q169358) or massif (Q1061151) with at least 30 sitelinks, and of mountain range (Q46831)
+  with at least 20 sitelinks (Everest, Mont Blanc, Kilimanjaro, Vesuvius, Pinatubo, Himalayas, Andes, Alps).
+  Snapshots keep country (P17, several for border peaks), continent (P30), located in terrain feature
+  (P706), coordinates, part of (P361); elevation (P2044) and mountain range (P4552) are requested.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?class { wd:Q8502 wd:Q8072 wd:Q169358 wd:Q1061151 }
+      ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+      FILTER(?links >= 30)
+    }
+    UNION
+    {
+      ?item wdt:P31 wd:Q46831 ; wikibase:sitelinks ?links .
+      FILTER(?links >= 20)
+    }
+  }
+max_rows: 6000
+expand_hops: 0

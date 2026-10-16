@@ -1,0 +1,19 @@
+id: geography.nature.seas_oceans
+domain: geography
+owner: KGSCIECO
+description: >-
+  Oceans, seas, gulfs, bays and straits: direct instances of ocean (Q9430), sea (Q165), marginal sea
+  (Q166620 / Q204894), mediterranean sea (Q1973404), gulf (Q1322134), bay (Q39594) or strait (Q37901) with
+  at least 15 sitelinks. Countries already state which seas they border (P206 "located in or next to body
+  of water", harvested with core.countries); the reverse "basin country" (P205) is requested. Snapshots
+  keep part of (P361, e.g. a sea -> ocean), countries (P17), area (P2046).
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q9430 wd:Q165 wd:Q166620 wd:Q204894 wd:Q1973404 wd:Q1322134 wd:Q39594 wd:Q37901 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 15)
+  }
+max_rows: 3000
+expand_hops: 0
