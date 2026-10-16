@@ -14,7 +14,8 @@ sparql: |
     FILTER(?rank != wikibase:DeprecatedRank)
     FILTER EXISTS {
       VALUES ?class { wd:Q3024240 wd:Q48349 wd:Q133156 wd:Q164142 wd:Q161243 }
-      ?state wdt:P31/wdt:P279* ?class .
+      ?state p:P31 ?state_p31 . ?state_p31 ps:P31/wdt:P279* ?class ; wikibase:rank ?state_p31r .
+      FILTER(?state_p31r != wikibase:DeprecatedRank)
     }
     OPTIONAL { ?statement pq:P580 ?start }
     OPTIONAL { ?statement pq:P582 ?end }
@@ -23,3 +24,5 @@ columns: {subject: state, property: P38, object: currency, statement: statement,
           start: start, end: end}
 max_rows: 8000
 expand_hops: 1
+notes: >-
+  Class membership uses every non-deprecated P31 statement (p:P31/ps:P31, rank filter), not truthy wdt:P31: many historical items give preferred rank to one class (e.g. historical country Q3024240), which hides their other classes (empire, colony) from wdt:P31 (KGHIST finding, 2026-10-16).

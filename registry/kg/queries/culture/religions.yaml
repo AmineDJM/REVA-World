@@ -13,17 +13,21 @@ sparql: |
   SELECT DISTINCT ?item WHERE {
     {
       VALUES ?class { wd:Q9174 wd:Q13414953 wd:Q71966963 }
-      ?item wdt:P31/wdt:P279? ?class ; wikibase:sitelinks ?links .
+      ?item p:P31 ?item_p31 . ?item_p31 ps:P31/wdt:P279? ?class ; wikibase:rank ?item_p31r .
+      FILTER(?item_p31r != wikibase:DeprecatedRank)
+      ?item wikibase:sitelinks ?links .
       FILTER(?links >= 5)
     }
     UNION
-    { VALUES ?country { {{values}} } ?country wdt:P140 ?item . }
+    { VALUES ?country { {{values}} } ?country p:P140 ?c_st . ?c_st ps:P140 ?item ; wikibase:rank ?c_r .
+      FILTER(?c_r != wikibase:DeprecatedRank) }
   }
 split: {by: values, source: countries, chunk_size: 250}
 max_rows: 8000
 expand_hops: 1
 properties: [P31, P279, P361, P112, P571, P576, P159, P749, P140, P17, P495, P737, P1365, P1366, P155, P156]
 notes: >-
+  Class membership uses every non-deprecated P31 statement (p:P31/ps:P31, rank filter), not truthy wdt:P31: many historical items give preferred rank to one class (e.g. historical country Q3024240), which hides their other classes (empire, colony) from wdt:P31 (KGHIST finding, 2026-10-16).
   One subclass step is needed: Islam is an instance of "major religious group" (Q6957341, subclass of
   religion), the Catholic Church of "Christian denomination" (Q879146, subclass of religious
   denomination), Catholicism directly of "religion or world view" (checked 2026-10-16); with direct P31

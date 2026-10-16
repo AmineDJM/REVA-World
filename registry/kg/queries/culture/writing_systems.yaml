@@ -10,8 +10,11 @@ sparql: |
   SELECT DISTINCT ?item WHERE {
     { ?lang wdt:P220 ?iso ; wdt:P282 ?item . }
     UNION
-    { ?item wdt:P31 wd:Q8192 . }
+    { ?item p:P31 ?item_p31 . ?item_p31 ps:P31 wd:Q8192 ; wikibase:rank ?item_p31r .
+      FILTER(?item_p31r != wikibase:DeprecatedRank) }
   }
 max_rows: 4000
 expand_hops: 0
 properties: [P31, P279, P361, P506, P571, P282, P144]
+notes: >-
+  Class membership uses every non-deprecated P31 statement (p:P31/ps:P31, rank filter), not truthy wdt:P31: many historical items give preferred rank to one class (e.g. historical country Q3024240), which hides their other classes (empire, colony) from wdt:P31 (KGHIST finding, 2026-10-16).

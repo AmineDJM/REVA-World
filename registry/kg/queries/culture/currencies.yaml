@@ -10,12 +10,15 @@ sparql: |
   SELECT DISTINCT ?item WHERE {
     { ?item wdt:P498 ?code . }
     UNION
-    { VALUES ?country { {{values}} } ?country wdt:P38 ?item . }
+    { VALUES ?country { {{values}} } ?country p:P38 ?c_st . ?c_st ps:P38 ?item ; wikibase:rank ?c_r .
+      FILTER(?c_r != wikibase:DeprecatedRank) }
   }
 split: {by: values, source: countries, chunk_size: 250}
 max_rows: 3000
 expand_hops: 0
 properties: [P31, P279, P498, P17, P571, P576, P580, P582, P1365, P1366, P155, P156]
 notes: >-
+  Every non-deprecated P38 statement (not truthy wdt:P38, which keeps only the preferred - usually current -
+  currency and would drop former currencies such as the cruzeiro).
   With chunk_size 250 the whole country list fits in one request (250 entities); the ISO 4217 branch
   is repeated in each chunk and de-duplicated by the harvester.
