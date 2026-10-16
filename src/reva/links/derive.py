@@ -59,6 +59,10 @@ SUCCESSION_BACKWARD = ("P1366", "P156")  # P replaced by/followed by S: object i
 CONFLICT_SIDE_QUALIFIERS = ("ucdp:side", "side")
 MAX_SKIP_SAMPLES = 200
 MAX_SHARED_SUBJECT_PAIRS = 200_000
+#: language genealogy: Wikidata subclass / part of, and KGLANG's Glottolog classification (Glottocode-keyed)
+GENEALOGY_PROPERTIES = ("P279", "P361", "glottolog:parent", "glottolog:in_group", "glottolog:family")
+GLOTTOLOG_XREF = "glottolog:wikidata_item"
+GLOTTOLOG_SPOKEN_IN = "glottolog:spoken_in"
 COVERED_TERRITORY = "geo:covered_territory_of"
 
 
@@ -356,13 +360,19 @@ def _ancestors(index: KgIndex, lang: str, max_depth: int) -> dict[str, tuple[int
         depth, chain = out[cur]
         if depth >= max_depth:
             continue
-        for prop in ("P279", "P361"):
+        for prop in GENEALOGY_PROPERTIES:
             for s in index.objects(cur, prop):
                 assert s.object is not None
                 if s.object in NON_GENEALOGICAL or s.object in out:
                     continue
                 out[s.object] = (depth + 1, (*chain, s))
                 q.append(s.object)
+        # a Wikidata language item -> its Glottolog languoid (glottolog:wikidata_item, Wikidata P1394): the
+        # crossing is a step with its own evidence, not a genealogical level
+        for s in index.inc.get((cur, GLOTTOLOG_XREF), ()):
+            if s.subject not in out:
+                out[s.subject] = (depth, (*chain, s))
+                q.append(s.subject)
     return out
 
 
@@ -901,6 +911,9 @@ def derive_all(
     out["co_signatory"] = derive_co_signatory(index, focus=fset)
     out["conflict_co_participant"] = derive_conflict_co_participants(index, None, focus=fset)
     out["conflict_same_side"], out["conflict_opposing_sides"] = derive_conflict_sides(index, focus=fset)
+    out["shared_language_glottolog"] = derive_shared_subject(
+        index, GLOTTOLOG_SPOKEN_IN, "shared_language_glottolog", focus=fset, max_members=max_members
+    )
     out["shared_polity_territory"] = derive_shared_subject(
         index, COVERED_TERRITORY, "shared_polity_territory", focus=fset, max_members=max_members
     )

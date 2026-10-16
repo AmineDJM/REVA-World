@@ -195,11 +195,11 @@ series (they answer only cells nobody else reports):
 
 | headline concept | proposed series | fills |
 |---|---|---|
-| `reva.economy.inflation_cpi` | `insee.ipc_dom.CPI_ANNUAL_CHANGE|…` (annual-average change) | GLP MTQ GUF REU MYT |
+| `reva.economy.inflation_cpi` | `insee.ipc_dom.CPI_ANNUAL_CHANGE\|…` (annual-average change) | GLP MTQ GUF REU MYT |
 | `reva.economy.gdp_usd` | `cbs.bes_gdp.gdp_current_prices` (×1,000,000; USD is BES's currency), `spc.pocket.GDPCUSD` (×1000; SPC conversion) | BES; COK NIU PCN TKL WLF |
 | `reva.economy.gdp_per_capita_usd` | `cbs.bes_gdp.gdp_per_capita`, `spc.pocket.GDPCPCUSD` | BES; COK NIU TKL WLF |
 | `reva.economy.gdp_real_growth` | `cbs.bes_gdp.gdp_volume_change` | BES |
-| `reva.science.internet_users` | `spc.digital.DD024` (ITU), Eurostat `I_IU3` (ITU definition, 16-74) | Pacific territories; DOMs |
+| `reva.science.internet_users` | `spc.digital.DD024` (ITU), Eurostat `I_IU3` (ITU definition, 16-74) | none new (second source for Pacific territories and DOMs already in SDG/ITU) |
 | `reva.geography.land_area` / `surface_area` | Eurostat `reg_area3` L0008 / TOTAL | GLP MTQ GUF REU MYT ALA SJM |
 | new `reva.population.total_1_january` | Eurostat `demo_r_d2jan`, CBS `population_1_january` | ALA SJM (+ DOMs, BES as a second view) |
 | new `reva.health.life_expectancy_national_tables` | Eurostat `demo_r_mlifexp` | ALA (+ DOMs) |

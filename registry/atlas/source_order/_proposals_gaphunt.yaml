@@ -29,7 +29,7 @@ add_series:
         involved: GDP at purchasers' prices in current US dollars, this definition.
       caveats: "Published in whole millions (rounding of the provider)."
   - concept: reva.economy.gdp_usd
-    fills: [NIU, TKL, WLF, COK, PCN]
+    fills: [COK, NIU, PCN, TKL, WLF]
     entry:
       series: "spc.pocket.GDPCUSD"
       reported_unit: "thousand USD"
@@ -50,7 +50,7 @@ add_series:
         current US dollars divided by the population, this definition (no currency conversion, see gdp_usd).
       caveats: "CBS divides by its own population figure; rounded to hundreds of dollars by the provider."
   - concept: reva.economy.gdp_per_capita_usd
-    fills: [NIU, TKL, WLF, COK, PCN]
+    fills: [COK, NIU, TKL, WLF]
     entry:
       series: "spc.pocket.GDPCPCUSD"
       reported_unit: "USD per person"
@@ -65,7 +65,7 @@ add_series:
       reported_unit: "% change"
       justification: "CBS 'GDP, volume changes' (%): annual change of GDP at constant prices, this definition."
   - concept: reva.science.internet_users
-    fills: [NIU, TKL, WLF]
+    fills: []  # second source: these territories already have the SDG/ITU series
     entry:
       series: "spc.digital.DD024"
       reported_unit: "percent"
@@ -74,7 +74,7 @@ add_series:
         series the UN SDG database publishes as IT_USE_ii99), re-published by SPC for Pacific territories.
       caveats: "Same lineage as the SDG/ITU series ranked first (not independent evidence)."
   - concept: reva.science.internet_users
-    fills: [GLP, MTQ, GUF, REU]
+    fills: []  # second source for GLP MTQ GUF REU (already in SDG/ITU)
     entry:
       series: "eurostat.nuts2_gapfill.isoc_r_iuse_i|unit=PC_IND|indic_is=I_IU3"
       reported_unit: "% of individuals"
