@@ -9,7 +9,11 @@
  *  - vote agreement is a computed "part de votes identiques" with its counts and caveat — never an
  *    alliance, friendship or alignment;
  *  - a kind without links is "aucun lien dans les données consultées", never zero;
- *  - a link with a predecessor state is shown with the succession chain that makes it relevant.
+ *  - a link with a predecessor state is shown with the succession chain that makes it relevant;
+ *  - physical networks (LINKS3) keep their caveats in view: cables are Wikidata's community-edited list (cable
+ *    names, earliest service year, and the cited Q55 → Royaume des Pays-Bas hop when it was used), air routes
+ *    are OpenFlights' network frozen in June 2014 (ODbL), launch links name the site state per GCAT — never
+ *    the launcher's supplier.
  */
 import { linkNodeLabel, linkTypeLabel, type PairKind, type PairLink, type PairLinksData } from '../api/links';
 import { citeLinkEvidence, type Citation } from './citations';
@@ -17,7 +21,7 @@ import { frDecimal, frValue } from './format';
 import { linkDates } from './paths';
 import { yearOfPartial } from './time';
 
-export type ThemeId = 'trade' | 'migration' | 'votes' | 'colonial' | 'border' | 'language' | 'treaty' | 'conflict' | 'peacekeeping' | 'diplomatic' | 'history' | 'other';
+export type ThemeId = 'trade' | 'migration' | 'votes' | 'colonial' | 'border' | 'language' | 'treaty' | 'conflict' | 'peacekeeping' | 'infrastructure' | 'diplomatic' | 'history' | 'other';
 
 export const THEMES: { id: ThemeId; label: string; kinds: string[] }[] = [
   { id: 'trade', label: 'Commerce de biens', kinds: ['bilateral_trade', 'bilateral_trade_imports', 'bilateral_trade_baci'] },
@@ -29,6 +33,7 @@ export const THEMES: { id: ThemeId; label: string; kinds: string[] }[] = [
   { id: 'treaty', label: 'Traités et organisations', kinds: ['co_party', 'co_signatory', 'co_member', 'alliance_co_member'] },
   { id: 'conflict', label: 'Conflits armés (UCDP, Wikidata)', kinds: ['conflict_same_side', 'conflict_opposing_sides', 'conflict_co_participant'] },
   { id: 'peacekeeping', label: 'Maintien de la paix (ONU)', kinds: ['peacekeeping_contributor_to_host'] },
+  { id: 'infrastructure', label: 'Réseaux physiques (câbles sous-marins, vols de 2014, lancements spatiaux)', kinds: ['submarine_cable', 'air_routes_2014', 'launch_service'] },
   { id: 'diplomatic', label: 'Relations diplomatiques', kinds: ['diplomatic_relation', 'shared_head_of_state', 'shared_currency', 'shared_legal_family'] },
   { id: 'history', label: 'Histoire partagée', kinds: ['successor_of', 'shared_polity_territory'] },
 ];
@@ -108,6 +113,8 @@ export interface KindView {
   votes: VoteRow[];
   items: LinkItem[];
   honesty: string | null;
+  /** Caveats and licence the server stores on every link of the kind (basis.caveat.fr, basis.licence). */
+  notes: string[];
 }
 
 export interface PredecessorView {
@@ -152,12 +159,13 @@ function linkItem(l: PairLink, kindLabel: string, labels: PairLinksData['labels'
   const via = l.via.length ? ` (via ${l.via.map((v) => nodeName(labels, v, names)).join(', ')})` : '';
   const dates = linkDates(l.temporal);
   const t = l.temporal;
-  const yearFrom = t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.start);
+  const phys = physicalDetail(l);
+  const yearFrom = phys.since ?? (t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.start));
   const yearTo = t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.end);
   return {
     key: `${l.link_type}-${l.subject}-${l.object}-${i}`,
     kind: l.link_type,
-    sentence: `${from} — ${kindLabel}${via} ${directed ? '→' : '—'} ${to}`,
+    sentence: `${from} — ${kindLabel}${via} ${directed ? '→' : '—'} ${to}${phys.text ? ` : ${phys.text}` : ''}`,
     from,
     to,
     dates: dates.text,
@@ -168,6 +176,55 @@ function linkItem(l: PairLink, kindLabel: string, labels: PairLinksData['labels'
     citations: l.evidence.map(citeLinkEvidence),
     serverText: l.text?.fr ?? null,
   };
+}
+
+const PHYSICAL_ITEMS = new Set(['submarine_cable', 'air_routes_2014']);
+
+const rec = (v: unknown): Record<string, unknown> => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
+const int = (v: unknown): number | null => (typeof v === 'number' && Number.isInteger(v) ? v : typeof v === 'string' && /^-?\d+$/.test(v) ? Number(v) : null);
+
+/**
+ * Details of a physical-network link read from its basis (LINKS3): the cables Wikidata lists (names, earliest
+ * service year — the lane starts there), the cited mapping hop (Q55 → Royaume des Pays-Bas), the 2014 route
+ * counts. Nothing is invented: a missing basis member is simply not mentioned.
+ */
+export function physicalDetail(l: PairLink): { text: string; since: number | null } {
+  const b = rec(l.basis);
+  const parts: string[] = [];
+  let since: number | null = null;
+  if (l.link_type === 'submarine_cable') {
+    const cables = Array.isArray(rec(b.source_flags).cables) ? (rec(b.source_flags).cables as unknown[]) : [];
+    const names = cables.map((c) => String(rec(c).label ?? rec(c).qid ?? '')).filter(Boolean);
+    const total = int(rec(b.source_flags).cables_total);
+    if (Array.isArray(b.items)) parts.push(`${b.items.length} élément(s) Wikidata distinct(s) (union des listes, jamais additionnées)`);
+    else if (names.length) parts.push(`${names.join(', ')}${total !== null && total > names.length ? ` (+${total - names.length})` : ''}`);
+    since = int(b.first_service_year);
+    if (since !== null) parts.push(`mise en service la plus ancienne : ${since}`);
+    const hop = rec(b.mapping_hop);
+    if (hop.statement_id) {
+      const pl = rec(hop.provider_label);
+      parts.push(`rattaché à ${String(hop.iso3 ?? '')} via ${String(pl.fr ?? hop.provider_code ?? '')} — pays (P17) → ${String(hop.target_qid ?? '')} [${String(hop.statement_id)}]`);
+    }
+  } else if (l.link_type === 'air_routes_2014') {
+    const ap = int(b.airport_pairs);
+    const al = int(b.airlines);
+    if (ap !== null) parts.push(`${ap} paire(s) d’aéroports`);
+    if (al !== null) parts.push(`${al} compagnie(s)`);
+    parts.push('réseau de juin 2014, données figées');
+  }
+  return { text: parts.join(' ; '), since };
+}
+
+/** The caveat (fr) and licence stored on the links of a kind, once each. */
+function notesOf(k: PairKind): string[] {
+  const out = new Set<string>();
+  for (const l of k.links) {
+    const b = rec(l.basis);
+    const c = rec(b.caveat);
+    if (typeof c.fr === 'string' && c.fr) out.add(c.fr);
+    if (typeof b.licence === 'string' && b.licence) out.add(`Licence : ${b.licence}`);
+  }
+  return [...out];
 }
 
 function seriesOf(k: PairKind, kind: string, label: string, labels: PairLinksData['labels'], names: Record<string, string>): Series[] {
@@ -241,8 +298,10 @@ export function buildRelation(d: PairLinksData, names: Record<string, string> = 
       votes: [],
       items: [],
       honesty: k.honesty?.fr ?? null,
+      notes: notesOf(k),
     };
     if (kind === 'unga_vote_agreement') return { ...base, votes: voteRows(k) };
+    if (PHYSICAL_ITEMS.has(kind)) return { ...base, items: k.links.map((l, i) => linkItem(l, label, d.labels, nm, directed, i)) };
     if (isSeries(k)) return { ...base, series: seriesOf(k, kind, label, d.labels, nm) };
     return { ...base, items: k.links.map((l, i) => linkItem(l, label, d.labels, nm, directed, i)) };
   });

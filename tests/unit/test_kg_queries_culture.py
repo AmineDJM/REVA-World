@@ -147,6 +147,8 @@ def test_entity_budget():
     open_subjects = sum(
         s["max_rows"] for s in specs.values()
         if s["purpose"] == "statements" and (s.get("split") or {}).get("source") != "countries"
+        # subjects restricted to items with a WH Site ID = the culture.world_heritage_sites seeds
+        and s["id"] != "culture.world_heritage_designations"
     )
     assert seeded + open_subjects <= ENTITY_BUDGET, (seeded, open_subjects)
 

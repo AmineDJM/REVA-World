@@ -69,7 +69,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "c713e4a3ab29b4337602c6e84085836b849b41629c302042bfe2b495c2d1cfb4",
@@ -81,7 +82,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "03bb2fd32abe669e19be7394830cfb94377ad456f407f5bba5e098836f9d47f8",
@@ -93,7 +95,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "a96f20033271296b45230e6a7c67774d686e4484938560f6a60a0e1172bcabe7",
@@ -105,7 +108,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "dfde8688f1262144af14d8c6668af107af1e9f7648da59871e098444e6f8bef7",
@@ -117,7 +121,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "60e9640b60d15b9c7b09e972d1e439848f6e31291d55a59e320db145bd3679cb",
@@ -129,7 +134,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "ae6e3743fcaa5ba3d381b5cc9959b5a32d202f6c37da5663e6776eef5fafbb94",
@@ -141,6 +147,7 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   }
 ]

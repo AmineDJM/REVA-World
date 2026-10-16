@@ -219,6 +219,13 @@ function KindBlock({ k }: { k: KindView }) {
       <h3 id={`k-${k.kind}`}>
         {k.label} <span className="muted">· {k.count} lien(s){years ? ` · ${years}` : ''}</span>
       </h3>
+      {k.notes.length > 0 && (
+        <ul className="field-hint" data-testid="relation-kind-notes">
+          {k.notes.map((n, i) => (
+            <li key={i}>{n}</li>
+          ))}
+        </ul>
+      )}
       {k.series.map((s) => (
         <SeriesTable key={s.key} s={s} />
       ))}

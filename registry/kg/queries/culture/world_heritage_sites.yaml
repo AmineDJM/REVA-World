@@ -15,6 +15,6 @@ sparql: |
     ?st wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)
   }
-max_rows: 6000
+max_rows: 10000
 expand_hops: 1
 properties: [P31, P757, P1435, P2614, P17, P131, P625, P361, P527, P571, P1448]

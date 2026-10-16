@@ -9,7 +9,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of mirror commit b1e7065"
+    "note": "blob bytes of mirror commit b1e7065",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "53f3b27e705991c7a042ce0099933f9be1189dd9474728e3fa01c9cb417ca4da",
@@ -21,7 +22,8 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of mirror commit b1e7065"
+    "note": "blob bytes of mirror commit b1e7065",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   },
   {
     "request_fingerprint": "72a2d7da5e822348af4fdc7413938d87aae58cec06bb70989205eacbea83eada",
@@ -33,6 +35,7 @@
       "content-type": "text/plain; charset=utf-8"
     },
     "retrieved_at": "2026-10-15T23:10:00+00:00",
-    "note": "blob bytes of mirror commit b1e7065"
+    "note": "blob bytes of mirror commit b1e7065",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
   }
 ]

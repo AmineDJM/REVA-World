@@ -3,13 +3,14 @@ domain: culture
 owner: KGCULT
 description: >-
   Heritage designation (P1435) = World Heritage Site (Q9259) statements with start time (inscription)
-  and end time (removal from the list, e.g. Dresden Elbe Valley 2009), plus the site's country (P17)
-  so site -> country paths exist even when the site item was not seeded.
+  and end time (removal from the list, e.g. Dresden Elbe Valley 2009), restricted to items that carry a
+  WH Site ID (P757), i.e. the items seeded by culture.world_heritage_sites.
 purpose: statements
 entity_kind: heritage_site
 sparql: |
   SELECT ?site ?statement ?designation ?rank ?start ?end ?pit WHERE {
     VALUES ?designation { wd:Q9259 }
+    ?site wdt:P757 ?whs_id .
     ?site p:P1435 ?statement .
     ?statement ps:P1435 ?designation ; wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)
@@ -19,9 +20,11 @@ sparql: |
   }
 columns: {subject: site, property: P1435, object: designation, statement: statement, rank: rank,
           start: start, end: end, point_in_time: pit}
-max_rows: 6000
+max_rows: 10000
 expand_hops: 0
 notes: >-
-  The designation is fixed with VALUES, not BIND: with a leading BIND(wd:Q9259 AS ?designation) WDQS
-  (Blazegraph) did not constrain ps:P1435 and the Brazil anchor returned 1,471 rows of every heritage
-  designation, each projected as Q9259 (captured 2026-10-16) - a silent mislabelling the anchor test caught.
+  Restricted to items with P757: without it the Brazil anchor returned 1,471 items designated World
+  Heritage Site (individual buildings and monuments inside listed historic centres; only 42 with an
+  inscription date), against 77 Brazilian items with a WH Site ID and 26 properties on UNESCO's List
+  (captured 2026-10-16). Building-level designations stay reachable through those items' own snapshots
+  if another spec seeds them.

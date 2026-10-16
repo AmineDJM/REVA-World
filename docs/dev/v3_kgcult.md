@@ -15,21 +15,21 @@ UNESCO World Heritage atlas connector implemented and tested (fixture + throwawa
 | `culture.country_languages_used` | statements | P2936 of the 250 countries, speakers (P1098) / proportion (P1107) qualifiers (Brazil alone: 222) | 40 000 |
 | `culture.historical_state_languages` | statements | P37 + P2936 of historical countries, empires, colonies, protectorates, dependent territories (P31/P279*, FILTER EXISTS: no duplicate rows) | 20 000 |
 | `culture.country_religions` | statements | P140 of the 250 countries with proportion/dates | 3 000 |
-| `culture.religions` | seed | religions (Q9174) and denominations (Q13414953) with ≥ 5 sitelinks + every P140 object of a country; founders (P112), branches (P279/P361), inception | 8 000 |
+| `culture.religions` | seed | instances (directly or via one P279 step) of religion (Q9174), religious denomination (Q13414953) or religion or world view (Q71966963) with ≥ 5 sitelinks + every P140 object of a country; founders (P112), branches (P279/P361), inception | 8 000 |
 | `culture.religion_ancestors` | seed | P279 closure above `culture.religions` (depends_on) | 6 000 |
 | `culture.country_currencies` | statements | P38 of the 250 countries with start/end | 3 000 |
 | `culture.historical_state_currencies` | statements | P38 of historical states/empires/colonies/protectorates/dependencies with dates | 8 000 |
 | `culture.currencies` | seed | items with ISO 4217 (P498) + every P38 object of a country; succession (P1365/P1366/P155/P156) | 3 000 |
-| `culture.world_heritage_sites` | seed | items with a WH Site ID (P757); P1435 with start/end, criteria (P2614), country, location | 6 000 |
-| `culture.world_heritage_designations` | statements | P1435 = World Heritage Site (Q9259) with start (inscription) / end (removal) | 6 000 |
+| `culture.world_heritage_sites` | seed | items with a WH Site ID (P757) (Brazil: 77 items for 26 properties — components); P1435 with start/end, criteria (P2614), country, location | 10 000 |
+| `culture.world_heritage_designations` | statements | P1435 = World Heritage Site (Q9259) with start (inscription) / end (removal), on items with P757 only | 10 000 |
 | `culture.cultural_movements` | seed | cultural/art/literary movements (Q2198855/Q968159/Q3326717) with ≥ 3 sitelinks; periods, origin, influences | 8 000 |
 | `culture.movement_members` | statements | P135 of humans with ≥ 20 sitelinks (split by QID prefix) | 40 000 |
 | `culture.country_cuisines` | statements | P2012 (cuisine) of the 250 countries | 1 000 |
 
-Entity budget, **bounded by construction**: seeded entities ≤ 70 000 (sum of seed `max_rows`,
-overlapping) + subjects of the statement specs whose subjects are not the 250 countries
-(`historical_state_*`, `movement_members`, `world_heritage_designations`) ≤ 74 000 rows ⇒ ≤ 144 000
-entities ≤ 150 000 target (`test_entity_budget`). A spec that would exceed its bound fails with
+Entity budget, **bounded by construction**: seeded entities ≤ 74 000 (sum of seed `max_rows`,
+overlapping) + subjects of the statement specs whose subjects are neither the 250 countries nor seeded
+items (`historical_state_*`, `movement_members`) ≤ 68 000 rows ⇒ ≤ 142 000 entities ≤ 150 000 target
+(`test_entity_budget`; KGLANG's `glottolog_items` is budgeted by KGLANG). A spec that would exceed its bound fails with
 `row_bound_exceeded` (never truncated). Full-size COUNT queries were not run: WDQS throttled this
 machine's shared IP for most of the session (HTTP 429, Retry-After up to 900 s), so bounds are
 upper estimates checked only by the anchors and by WDHARVEST's runs.
@@ -138,6 +138,20 @@ WDHARVEST's locked `WikidataClient` (`tests/fixtures/kg/culture/`):
   2026-10-16 failed under wbapi HTTP 429/maxlag throttling, so the earlier capture was kept and only
   trimmed (upper-ontology items carrying nothing but P31/P279/P361 removed: 139 → 52 entities).
 
+
+Defects the anchors caught (fixed in the specs, documented in their `notes`):
+
+* `culture.religions` with direct `P31 ∈ {religion, religious denomination}` selected **none** of Islam,
+  Catholicism, the Catholic Church (Islam is an instance of "major religious group" Q6957341 ⊂ religion;
+  the Catholic Church of "Christian denomination" Q879146 ⊂ religious denomination). Now
+  `P31/P279?` over three classes: the anchor returns all three.
+* `culture.world_heritage_designations` without restriction returned 1 471 Brazilian items
+  designated World Heritage Site (buildings inside listed centres; 42 with a date) — worldwide this would
+  have blown the bound. Now restricted to items carrying P757: 34 Brazilian items, 35 dated statements.
+* `culture.language_ancestors` unfiltered reached upper-ontology classes (see §1); now Glottocode-only.
+
+`culture.glottolog_items` in this directory belongs to KGLANG (Glottolog connector); the KGCULT tests
+accept that owner and the KGCULT entity budget counts only KGCULT specs.
 
 ## 4. Requests to other agents / lead
 
