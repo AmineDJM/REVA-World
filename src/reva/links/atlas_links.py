@@ -172,7 +172,9 @@ class AtlasLinkReader:
         s AS (SELECT sid, dataset, indicator FROM series
                WHERE source = {_sql_str(spec["source"])} AND dataset IN ({datasets})
                  AND starts_with(indicator, {_sql_str(spec["indicator_prefix"])}){req}),
-        r AS (SELECT c.iso3 AS row_iso3, json_extract_string(c.flags, '$.{partner_key}') AS partner, c.year,
+        r AS (SELECT c.iso3 AS row_iso3, json_extract_string(c.flags, '$.{partner_key}') AS partner,
+                     coalesce(c.year, CASE WHEN datediff('day', c.period_start, c.period_end) <= 1
+                                           THEN CAST(year(c.period_start) AS INTEGER) END) AS year,
                      c.value, c.unit, c.flags, c.raw_sha256, c.selector, c.table_sha, s.dataset, s.indicator,
                      {facet} AS facet, TRY_CAST(c.value AS DOUBLE) AS v
                 FROM cells_s c JOIN s USING (sid))"""

@@ -128,9 +128,12 @@ def get(env: Env, path: str, **params: Any) -> Any:
 def test_materialisation_records_snapshot_watermark_and_counts(env: Env) -> None:
     assert set(env.ingests.values()) == {"completed"}, env.ingests
     counts = env.materialisation.report["counts"]
-    for kind in ("bilateral_trade", "migrant_stock", "land_border", "unga_vote_agreement", "land_border_cshapes",
-                 "colonial_rule_cshapes", "shared_official_language"):  # fmt: skip
+    for kind in ("bilateral_trade", "bilateral_trade_imports", "bilateral_trade_baci", "migrant_stock", "land_border",
+                 "land_border_cshapes", "colonial_rule_cshapes", "shared_official_language"):  # fmt: skip
         assert counts.get(kind, 0) > 0, (kind, counts)
+    # the UNGA fixture slice is tiny: pairs below 10 common roll calls give no link, and are counted
+    votes = env.materialisation.report["atlas"]["unga_vote_agreement"]
+    assert counts.get("unga_vote_agreement", 0) > 0 or votes["skipped"].get("fewer_than_min_common_rollcalls", 0) > 0
     with env.api.connect() as c:
         m = c.execute(text("SELECT * FROM kg.link_materialisation ORDER BY id DESC LIMIT 1")).mappings().one()
         assert m["atlas_snapshot_sha256"] == env.snapshot.sha256 and m["atlas_origin"] == "test_fixture"
