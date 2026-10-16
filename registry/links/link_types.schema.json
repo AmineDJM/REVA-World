@@ -350,6 +350,44 @@
         "flow": {
           "type": "string",
           "maxLength": 200
+        },
+        "year_from": {
+          "enum": [
+            "attached",
+            "period_start"
+          ],
+          "description": "attached (default): the atlas year view (calendar years, 1-day snapshots); period_start: the year of the period start (a sub-annual reference period such as OpenFlights June 2014)"
+        },
+        "companions": {
+          "type": "object",
+          "description": "basis key -> indicator name of a companion row (same provider geo, partner dimension and period), cited as evidence (e.g. first_service_year -> CABLE_FIRST_SERVICE_YEAR)",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_]{0,31}$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+          }
+        },
+        "union_selector_key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$",
+          "description": "undirected rows that map to the same pair from different provider geographies (a mapping hop) are combined by the union of the items their selector lists under this key"
+        },
+        "stored_in_full": {
+          "type": "boolean",
+          "description": "store every link (small tables) instead of the union of both endpoints' top-k"
+        },
+        "mapping_hops": {
+          "type": "boolean",
+          "description": "apply registry/links/geo_mapping_hops.yaml (only with the hop statement in the KG, cited)"
+        },
+        "caveat": {
+          "$ref": "#/$defs/labels"
+        },
+        "licence": {
+          "type": "string",
+          "maxLength": 200
         }
       }
     }

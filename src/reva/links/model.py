@@ -441,6 +441,9 @@ class Evidence:
     selector: str | None = None
     retrieved_at: str | None = None
     origin: str | None = None
+    #: short human-readable gloss of what the evidence names (LINKS3: the cable items of a cable row, the
+    #: mapping hop a statement supports); never a substitute for the statement id / raw sha + selector
+    note: str | None = None
 
     def __post_init__(self) -> None:
         if self.kind == "kg_statement" and not self.statement_id:
