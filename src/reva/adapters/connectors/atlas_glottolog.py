@@ -676,7 +676,7 @@ def chain(data: GlottologData, gc: str) -> list[tuple[str, str]]:
 # ============================================================================================== atlas counts
 def atlas_rows(data: GlottologData, *, raw_sha256: str, release: Release) -> list[dict[str, Any]]:
     """Exact counts of language-level languoids per country code of ``Countries`` (see module doc)."""
-    L, codes = data.languoids, data.codes
+    L = data.languoids
     by_geo: dict[str, list[Languoid]] = defaultdict(list)
     for lg in L.values():
         if lg.level == "language":
@@ -753,7 +753,6 @@ def atlas_rows(data: GlottologData, *, raw_sha256: str, release: Release) -> lis
                     "selector": _canon(selector),
                 }
             )
-    _ = codes
     return rows
 
 
@@ -779,6 +778,159 @@ def atlas_frame(rows: Sequence[Mapping[str, Any]]) -> Any:
     from reva.atlas.tables import ATLAS_SCHEMA
 
     return pl.DataFrame(list(rows), schema=ATLAS_SCHEMA)
+
+
+# ============================================================================================== CLDF feature datasets
+@dataclass(frozen=True)
+class FeatureSource:
+    """A CLDF StructureDataset whose values become per-feature literal statements on Glottolog entities."""
+
+    ns: str  # predicate namespace (wals, grambank)
+    tag: str  # provider tag in labels ("WALS", "Grambank")
+    stated_in: str
+    skip_values: frozenset[str] = frozenset()
+    #: extra ValueTable columns kept as qualifiers (column -> qualifier name)
+    keep: tuple[tuple[str, str], ...] = (("Comment", "comment"), ("Source", "sources"))
+
+
+def feature_pid(ns: str, feature_id: str) -> str:
+    fid = feature_id.lower()
+    return f"{ns}:{fid}" if fid[:1].isalpha() else f"{ns}:f{fid}"
+
+
+def feature_properties(src: FeatureSource, params: Sequence[Mapping[str, str]]) -> dict[str, Any]:
+    """One string-valued predicate per ParameterTable row, labelled with the provider's feature name."""
+    from reva.kg.model import KgProperty
+
+    out: dict[str, Any] = {}
+    for p in params:
+        fid = p["ID"].strip()
+        if not re.match(r"^[A-Za-z0-9]{1,20}$", fid):
+            raise _err(f"{src.tag}: unexpected feature id {fid[:30]!r}")
+        pid = feature_pid(src.ns, fid)
+        suffix = f" ({src.tag} {fid})"
+        name = re.sub(r"\s+", " ", p.get("Name", "").strip()) or fid
+        out[fid] = KgProperty(
+            pid=pid,
+            value_kind="string",
+            reva_predicate=pid.replace(":", "_"),
+            label_en=(name[: 200 - len(suffix)] + suffix),
+        )
+    return out
+
+
+def feature_statements(
+    src: FeatureSource,
+    z: CldfZip,
+    *,
+    subject_of: Mapping[str, str],
+    language_names: Mapping[str, str],
+    raw_sha256: str,
+    source_revision: str,
+) -> tuple[list[Any], dict[str, Any], dict[str, Any]]:
+    """ValueTable rows -> statements ``subject --<ns>:<feature>--> "<code name>"``; returns
+    (statements, properties by feature id, report). ``subject_of``: provider language id -> KG node."""
+    from reva.kg.model import KgStatement
+
+    params = z.rows("cldf/parameters.csv", ("ID", "Name"))
+    props = feature_properties(src, params)
+    codes = {r["ID"]: r for r in z.rows("cldf/codes.csv", ("ID", "Parameter_ID", "Name"))}
+    cols = ("ID", "Language_ID", "Parameter_ID", "Value", "Code_ID")
+    out: list[Any] = []
+    counters: Counter[str] = Counter()
+    for r in z.rows("cldf/values.csv", cols):
+        fid, lid, val = r["Parameter_ID"], r["Language_ID"], r["Value"].strip()
+        if val in src.skip_values:
+            counters[f"skipped_value:{val}"] += 1
+            continue
+        prop = props.get(fid)
+        subject = subject_of.get(lid)
+        if prop is None:
+            counters["unknown_feature"] += 1
+            continue
+        if subject is None:
+            counters["unknown_language"] += 1
+            continue
+        code = codes.get(r["Code_ID"]) if r["Code_ID"] else None
+        if code is not None and code["Parameter_ID"] != fid:
+            counters["code_of_other_feature"] += 1
+            continue
+        q: dict[str, Any] = {"language_id": lid, "language_name": language_names.get(lid, "")}
+        if code is not None:
+            q["code_id"] = code["ID"]
+        q["value_as_coded"] = val
+        for col, name in src.keep:
+            v = (r.get(col) or "").strip()
+            if v:
+                q[name] = v[:1000]
+        out.append(
+            KgStatement(
+                subject_qid=subject,
+                property_pid=prop.pid,
+                value={"type": "string", "value": code["Name"] if code is not None else val},
+                qualifiers=q,
+                references=[{"stated_in": src.stated_in, "selector": {"table": "values.csv", "row_id": r["ID"]}}],
+                statement_id=f"value:{r['ID']}",
+                source_revision=source_revision,
+                raw_sha256=raw_sha256,
+            )
+        )
+        counters["statements"] += 1
+    report = {
+        "features": len(props),
+        "values_rows": sum(counters.values()),
+        "counters": dict(counters),
+        "subjects": len({s.subject_qid for s in out}),
+    }
+    return out, props, report
+
+
+async def ingest_feature_dataset(
+    run: Any,
+    *,
+    src: FeatureSource,
+    concept_recid: str,
+    title_marker: str,
+    dataset: str,
+    source_key: str,
+    connector: str,
+    parser_version: str,
+    max_zip_bytes: int,
+    subjects: Callable[[CldfZip], tuple[dict[str, str], dict[str, str], list[Any], dict[str, Any]]],
+) -> dict[str, Any]:
+    """Fetch the release, build entity/statement records and load them (KG only, no atlas table)."""
+    if not run.wants(dataset):
+        return {"skipped": True}
+    f = await fetch_release(run, concept_recid=concept_recid, title_marker=title_marker, max_zip_bytes=max_zip_bytes)
+    z = CldfZip(f.body, src.tag)
+    subject_of, names, entities, srep = subjects(z)
+    sts, props, frep = feature_statements(
+        src, z, subject_of=subject_of, language_names=names, raw_sha256=f.zip_sha, source_revision=f.release.revision
+    )
+    known = _known_glottocodes(run.engine, run.origin)
+    gl_subjects = {s.subject_qid for s in sts if s.subject_qid.startswith("glottolog:")}
+    if known:
+        missing = sorted(gl_subjects - known)
+        frep["glottocodes_not_in_loaded_glottolog"] = {"count": len(missing), "sample": missing[:50]}
+    kg = load_kg(
+        run.engine,
+        run.store,
+        entities=entities,
+        statements=sts,
+        source_key=source_key,
+        raw_sha256s=[f.zip_sha],
+        retrieved_at=f.retrieved_at,
+        origin=run.origin,
+        parameters={"connector": connector, "parser": parser_version, "release": f.release.as_dict()},
+        extra_properties=list(props.values()),
+    )
+    return {
+        "release": f.release.as_dict(),
+        "raw": {"record_sha256": f.record_sha, "zip_sha256": f.zip_sha, "zip_bytes": len(f.body)},
+        "languages": srep,
+        "build": frep,
+        "kg": kg,
+    }
 
 
 # ============================================================================================== country QIDs
