@@ -7,7 +7,7 @@ models that run against a pinned release. It is not a world model and makes no
 causal, welfare or forecast claims about the economy. Unsupported questions get a
 typed `capability_gap` or `missing_input`, never a made-up number.
 
-**Status (2026-10-15): not deployed.** Nothing runs in production yet (see
+**Status (2026-10-16): not deployed.** Nothing runs in production yet (see
 "Blocked on credentials" below). The phase/gate ledger is
 [docs/implementation_status.md](docs/implementation_status.md).
 
@@ -99,6 +99,34 @@ Checks:
 * V2 suites: `uv run python scripts/e2e_stack.py --recorded-drafter --v2-fixtures --run`.
   This replays recorded LLM responses (no live LLM call) and ingests the V2 fixtures.
 * `make test-live`: live provider smoke tests (network).
+
+### V3 quick start (atlas, graph, links, causality)
+
+Run these after `make bootstrap` (migrations to head `0016_causal_ops`). Ingests are
+budget-metered: the daily cap is 3 GiB in all, so run big sources one at a time and
+keep at least 5 GB of disk free. Resume notes are in
+[docs/dev/HANDOFF_V3.md](docs/dev/HANDOFF_V3.md).
+
+```sh
+uv run reva atlas list                             # every atlas source (discovered from atlas_*.py)
+uv run reva atlas ingest atlas.worldbank           # one source at a time; --fixture replays recorded responses
+uv run reva atlas snapshot --skip-unchanged --warm # pin the tables, build the query file
+uv run reva links materialise                      # country–country link store (worker job links_materialise)
+uv run reva causal refresh                         # KG causal statements -> claims, then A–E grades
+uv run python -m reva.kg.harvest status            # Wikidata harvest (resumable per spec)
+uv run python -m reva.kg.harvest run registry/kg/queries/history --via api
+make api                                           # then open http://localhost:8000/v3 ("Planète")
+```
+
+The worker schedules the same jobs (monthly atlas sources, daily snapshot, then
+links, then the causal refresh). Example reads with a `read` token:
+`GET /v1/atlas/headline/series?concept=reva.population.total&iso3=FRA`,
+`GET /v1/links/pair?a=DZA&b=FRA`, `GET /v1/causal/events/Q361/why`,
+`POST /v1/ask {"question": "Liens entre le Brésil et le Portugal"}`.
+
+V3 end-to-end suite on a disposable stack (KG/links fixture, 12 atlas sources and
+the causal fixture replayed offline):
+`uv run python scripts/e2e_stack.py --v3-fixtures --run`.
 
 ## Documentation
 
