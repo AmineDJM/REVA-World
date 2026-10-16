@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import itertools
 from collections import Counter, defaultdict
-from datetime import date
 from typing import Any
 
 from reva.causal_harvest import core
@@ -35,8 +34,8 @@ def load_graph(engine: Any) -> dict[str, Any]:
         )
         times = c.execute(
             text(
-                "SELECT subject_qid, property_pid, value_time_lo, value_time_hi FROM kg.statement_current "
-                "WHERE property_pid = ANY(:p) AND value_time_lo IS NOT NULL"
+                "SELECT subject_qid, property_pid, value FROM kg.statement_current "
+                "WHERE property_pid = ANY(:p) AND value IS NOT NULL"
             ),
             {"p": list(START_PIDS)},
         ).all()
@@ -52,12 +51,15 @@ def load_graph(engine: Any) -> dict[str, Any]:
             r[0]: {"sitelinks": r[1], "revision": r[2]}
             for r in c.execute(text("SELECT qid, sitelinks, source_revision FROM kg.entity_current")).all()
         }
-    start: dict[str, tuple[date, date, str]] = {}
-    for q, p, lo, hi in times:
+    # start of an item: P580 start time, else P585 point in time, else P571 inception (earliest of that kind)
+    start: dict[str, tuple[core.YMD, core.YMD, str]] = {}
+    for q, p, v in times:
+        b = core.time_bounds((v or {}).get("time"), (v or {}).get("precision"))
+        if b is None:
+            continue
         cur = start.get(q)
-        rank = START_PIDS.index(p)
-        if cur is None or (rank, lo) < (START_PIDS.index(cur[2]), cur[0]):
-            start[q] = (lo, hi, p)
+        if cur is None or (START_PIDS.index(p), b[0]) < (START_PIDS.index(cur[2]), cur[0]):
+            start[q] = (b[0], b[1], p)
     return {"rows": rows, "start": start, "labels": labels, "entities": ents}
 
 
@@ -143,8 +145,8 @@ def analyse(g: dict[str, Any], *, top: int = 25) -> dict[str, Any]:
             "pid": x["pid"],
             "statement_id": x["statement_id"],
             "revision": x["revision"],
-            "cause_start": [str(d) for d in start[x["cause"]][:2]] + [start[x["cause"]][2]],
-            "effect_start": [str(d) for d in start[x["effect"]][:2]] + [start[x["effect"]][2]],
+            "cause_start": list(start[x["cause"]]),
+            "effect_start": list(start[x["effect"]]),
         }
         for x in edges
         if x["temporal"] == "inconsistent"

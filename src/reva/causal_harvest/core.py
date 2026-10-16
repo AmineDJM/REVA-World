@@ -14,13 +14,11 @@ REVA asserts nothing here: an edge is "Wikidata asserts that <cause> → <effect
 
 from __future__ import annotations
 
-import calendar
 import dataclasses
 import json
 import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -272,9 +270,13 @@ def prioritise(frontier: Mapping[str, Mapping[str, Any]]) -> list[str]:
 
 
 # --------------------------------------------------------------------------- time
-def time_bounds(time: str | None, precision: int | None) -> tuple[date, date] | None:
-    """[lo, hi] dates covered by a Wikibase time at its precision (proleptic Gregorian, years clamped to
-    1..9999 — BCE dates sort before every CE date, which is all a precedence check needs)."""
+YMD = tuple[int, int, int]
+
+
+def time_bounds(time: str | None, precision: int | None) -> tuple[YMD, YMD] | None:
+    """[lo, hi] (year, month, day) covered by a Wikibase time at its precision. Years are astronomical
+    (BCE negative) and kept as integers, so BCE precedence is compared exactly; the calendar model is ignored
+    (Julian/Gregorian differ by days, below the precision of almost every causal check)."""
     if not time or precision is None:
         return None
     m = re.match(r"^([+-]?)(\d+)-(\d\d)-(\d\d)", time)
@@ -282,34 +284,23 @@ def time_bounds(time: str | None, precision: int | None) -> tuple[date, date] | 
         return None
     year = int(m.group(2)) * (-1 if m.group(1) == "-" else 1)
     month, day = min(12, max(1, int(m.group(3)))), max(1, int(m.group(4)))
-
-    def ymd(y: int, mo: int, d: int) -> date:
-        if y < 1:
-            return date(1, 1, 1)
-        if y > 9999:
-            return date(9999, 12, 31)
-        return date(y, mo, min(d, calendar.monthrange(y, mo)[1]))
-
     if precision >= 11:
-        d = ymd(year, month, day)
-        return d, d
+        return (year, month, day), (year, month, day)
     if precision == 10:
-        return ymd(year, month, 1), ymd(year, month, 31)
-    span = {9: 1, 8: 10, 7: 100, 6: 1000, 5: 10_000, 4: 100_000}.get(precision)
+        return (year, month, 1), (year, month, 31)
+    span = {9: 1, 8: 10, 7: 100, 6: 1000, 5: 10_000, 4: 100_000, 3: 1_000_000}.get(precision)
     if span is None:
         return None
     if span == 1:
         start = year
     elif precision == 8:
         start = year - year % 10
-    elif year > 0:  # century/millennium: Wikidata stores e.g. 1901 or 2000 for the 20th century
+    else:  # century/millennium as Wikibase renders it: 1901..2000 = 20th century (year 2000 or 1901 stored)
         start = ((year - 1) // span) * span + 1
-    else:
-        start = year - span + 1
-    return ymd(start, 1, 1), ymd(start + span - 1, 12, 31)
+    return (start, 1, 1), (start + span - 1, 12, 31)
 
 
-def temporal_check(cause_start: tuple[date, date] | None, effect_start: tuple[date, date] | None) -> str:
+def temporal_check(cause_start: tuple[YMD, YMD] | None, effect_start: tuple[YMD, YMD] | None) -> str:
     """``consistent`` (cause surely starts no later than the effect), ``inconsistent`` (cause surely starts
     after the effect), ``overlapping`` (precision does not decide), ``undetermined`` (a start is missing)."""
     if cause_start is None or effect_start is None:

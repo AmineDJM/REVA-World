@@ -232,6 +232,51 @@ datasets:
         1: Tension escalation
         2: Tension reduction
         3: Recent case
+      PCID:
+        1: Angola
+        2: Chad/Libya
+        3: Ethiopia/Somalia
+        4: Rhodesia
+        5: Western Sahara
+        35: DRC (Zaire)-Rwanda
+        37: Chad/Sudan
+        6: Costa Rica/Nicaragua
+        7: Ecuador/Peru
+        8: Honduras/Nicaragua
+        9: Afghanistan/Pakistan
+        10: China/Japan
+        11: China/Vietnam
+        12: India/Pakistan
+        13: Indochina
+        14: Indonesia
+        15: Korea
+        34: North Korea Nuclear
+        16: Czechoslovakia/Germany
+        17: Finland/Russia
+        18: France/Germany
+        19: Italy/Albania/Yugoslavia
+        20: Lithuania/Poland
+        21: Poland/Russia
+        33: Yugoslavia
+        36: Georgia/Russia
+        23: Arab/Israel
+        24: Iran/Iraq
+        25: Iraq/Kuwait
+        26: Yemen
+        50: Israel/Palestinian groups
+        51: Hezbollah/Israel
+        52: Iran/Israel
+        27: East/West
+        28: Greece/Turkey
+        29: Iran/USSR
+        30: Taiwan Strait
+        31: World War II
+        32: Iraq Regime
+        40: Africa non-protracted conflicts
+        41: Americas non-protracted conflicts
+        42: Asia non-protracted conflicts
+        43: Europe non-protracted conflicts
+        44: Middle East non-protracted conflicts
     mappings:
     - variables:
       - BREAK

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { EntityPicker, type PickedEntity } from '../components/EntityPicker';
 import { V3Empty, V3Error, V3Loading } from '../components/States';
 import { getCausalChain, type CausalClaim, type ChainResult } from './api';
-import { weakestGrade } from './model';
+import { chainGrade, hopGrade, weakestGrade } from './model';
 import { CHAIN_BANNER, ClaimLine, GradeBadge } from './parts';
 
 export const MAX_CHAIN_HOPS = 6;
@@ -106,29 +106,42 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
       {r.note && <p className="field-hint">{r.note}</p>}
       <ol className="v3-chain-list">
         {r.chains.map((ch, i) => {
-          const weakest = weakestGrade(ch.hops.map((h) => h.grade));
-          // the chain is never stronger than its weakest hop, whatever a summary field says
-          const grade = weakestGrade([weakest, ch.serverGrade].filter((g): g is NonNullable<typeof g> => g !== null));
+          const grade = chainGrade(ch);
+          const hopsWeakest = weakestGrade(ch.hops.map(hopGrade).filter((g): g is NonNullable<typeof g> => g !== null));
           return (
             <li key={i} className="v3-causal-chain" data-testid="causal-chain">
               <h3>
-                Chaîne {i + 1} <span className="muted">· {ch.hops.length} maillon{ch.hops.length > 1 ? 's' : ''}</span> · force (maillon le plus faible) :{' '}
-                {grade ? <GradeBadge grade={grade} /> : <span className="muted">non calculable</span>}
-                {ch.serverGrade && weakest && ch.serverGrade !== weakest && (
+                Chaîne {i + 1} <span className="muted">· {ch.hops.length} maillon{ch.hops.length > 1 ? 's' : ''}</span> · force (maillon le plus faible) : <GradeBadge grade={grade} />
+                {ch.serverGrade && hopsWeakest && ch.serverGrade !== hopsWeakest && (
                   <span className="v3-notice">
                     {' '}
-                    grade de chaîne du serveur {ch.serverGrade}, maillon le plus faible {weakest} : la valeur la plus faible est retenue
+                    grade de chaîne du serveur {ch.serverGrade}, maillon le plus faible {hopsWeakest} : la valeur la plus faible est retenue
                   </span>
                 )}
               </h3>
               <ol className="v3-hops">
                 {ch.hops.map((h, j) => (
-                  <li key={`${h.id}-${j}`} className="v3-hop" data-testid="chain-hop">
-                    <span className="muted">Maillon {j + 1} : </span>
-                    <ClaimLine c={h} onOpen={() => onOpen(h)} />
+                  <li key={`${h.from.id}-${h.to.id}-${j}`} className="v3-hop" data-testid="chain-hop">
+                    <p className="v3-hop-sentence">
+                      <span className="muted">Maillon {j + 1} :</span> {h.from.label} <span className="v3-claim-arrow">→</span> {h.to.label} · grade du maillon (meilleure affirmation) :{' '}
+                      <GradeBadge grade={hopGrade(h)} /> <span className="muted">· {h.claims.length} affirmation(s), chacune avec sa source</span>
+                    </p>
+                    <ul className="v3-plain">
+                      {h.claims.map((c) => (
+                        <li key={c.id}>
+                          <ClaimLine c={c} onOpen={() => onOpen(c)} />
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ol>
+              {ch.wording && (
+                <details className="v3-hop-server">
+                  <summary>Formulation du serveur</summary>
+                  <p>{ch.wording}</p>
+                </details>
+              )}
             </li>
           );
         })}

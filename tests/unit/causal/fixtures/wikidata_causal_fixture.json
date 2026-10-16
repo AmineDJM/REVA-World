@@ -1,0 +1,2613 @@
+{
+ "entities": {
+  "Q12560": {
+   "descriptions": {
+    "en": "empire with the monarchs from the Ottoman dynasty (1299–1922)",
+    "fr": "État multi-ethnique transcontinental ayant existé de 1299 à 1922"
+   },
+   "instance_of": [
+    "Q48349",
+    "Q3024240",
+    "Q12759805"
+   ],
+   "labels": {
+    "en": "Ottoman Empire",
+    "fr": "Empire ottoman"
+   },
+   "lastrevid": 2548845726,
+   "raw_sha256": "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
+   "seed": false
+  },
+  "Q15180": {
+   "descriptions": {
+    "en": "former country in Eurasia (1922–1991)",
+    "fr": "ancien État d'Eurasie (1922–1991)"
+   },
+   "instance_of": [
+    "Q512187",
+    "Q842112",
+    "Q3024240",
+    "Q3624078",
+    "Q849866",
+    "Q1323642",
+    "Q1335818",
+    "Q160016",
+    "Q6688521",
+    "Q113393649",
+    "Q7275",
+    "Q17007978",
+    "Q6256"
+   ],
+   "labels": {
+    "en": "Soviet Union",
+    "fr": "Union soviétique"
+   },
+   "lastrevid": 2557284772,
+   "raw_sha256": "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
+   "seed": false
+  },
+  "Q153867": {
+   "descriptions": {
+    "en": "defensive alliance between Germany, Austria–Hungary and Italy (1882-1915)",
+    "fr": "Alliance entre l'Allemagne, l'Autriche-Hongrie et l'Italie avant la Première Guerre mondiale"
+   },
+   "instance_of": [
+    "Q1127126",
+    "Q19953632",
+    "Q29430681"
+   ],
+   "labels": {
+    "en": "Triple Alliance",
+    "fr": "Triplice"
+   },
+   "lastrevid": 2519805375,
+   "raw_sha256": "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "seed": false
+  },
+  "Q155144": {
+   "descriptions": {
+    "en": "1871–1918 territory of the German Empire",
+    "fr": "territoires cédés par la France à l'Empire allemand en 1871, et jusqu'en 1919"
+   },
+   "instance_of": [
+    "Q183366",
+    "Q56061",
+    "Q1620908"
+   ],
+   "labels": {
+    "en": "Alsace–Lorraine",
+    "fr": "Alsace-Lorraine"
+   },
+   "lastrevid": 2556713269,
+   "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "seed": false
+  },
+  "Q160649": {
+   "descriptions": {
+    "en": "group of infectious diseases",
+    "fr": "groupe de maladies"
+   },
+   "instance_of": [
+    "Q112193867",
+    "Q16521"
+   ],
+   "labels": {
+    "en": "typhus",
+    "fr": "typhus"
+   },
+   "lastrevid": 2555586364,
+   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
+   "seed": true
+  },
+  "Q177859": {
+   "descriptions": {
+    "en": "early 20th century alliance between France, Russia and the United Kingdom",
+    "fr": "Alliance entre la France, la Russie et le Royaume-Uni au début du 20e siècle"
+   },
+   "instance_of": [
+    "Q131569",
+    "Q100906234",
+    "Q29430681"
+   ],
+   "labels": {
+    "en": "Triple Entente",
+    "fr": "Triple-Entente"
+   },
+   "lastrevid": 2538334021,
+   "raw_sha256": "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
+   "seed": false
+  },
+  "Q179848": {
+   "descriptions": {
+    "en": "1880s–1900s Western European colonisation of Africa",
+    "fr": "partage du continent africain entre les différentes puissances européennes"
+   },
+   "instance_of": [
+    "Q518554"
+   ],
+   "labels": {
+    "en": "Scramble for Africa",
+    "fr": "partage de l'Afrique"
+   },
+   "lastrevid": 2535426105,
+   "raw_sha256": "15be74076c8069f435ecbaf4e15da7f5fb5ad9ca4ab492092ab05d82788db16c",
+   "seed": false
+  },
+  "Q18121382": {
+   "descriptions": {
+    "en": "can be used as claim with P828"
+   },
+   "instance_of": [],
+   "labels": {
+    "en": "multiple causes",
+    "fr": "causes multiples"
+   },
+   "lastrevid": 2466151091,
+   "raw_sha256": "5aeed275dffeb59e9b3172cdd2c5823348b7217c3ab68175873bab3c60985336",
+   "seed": false
+  },
+  "Q192050": {
+   "descriptions": {
+    "en": "1914 murder in Sarajevo, Austria-Hungary",
+    "fr": "assassinat de l’archiduc François-Ferdinand"
+   },
+   "instance_of": [
+    "Q3882219",
+    "Q1139665",
+    "Q891854",
+    "Q5510053",
+    "Q45635",
+    "Q132821"
+   ],
+   "labels": {
+    "en": "assassination of Archduke Franz Ferdinand",
+    "fr": "attentat de Sarajevo"
+   },
+   "lastrevid": 2555974503,
+   "raw_sha256": "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
+   "seed": false
+  },
+  "Q1975198": {
+   "descriptions": {
+    "en": "family of bacteria"
+   },
+   "instance_of": [
+    "Q16521"
+   ],
+   "labels": {
+    "en": "Rickettsiaceae",
+    "fr": "Rickettsiaceae"
+   },
+   "lastrevid": 2498508177,
+   "raw_sha256": "fc0569b59ad1f262589a781bc1d5a424e5175a6731226476972fbb8a1f600402",
+   "seed": false
+  },
+  "Q199820": {
+   "descriptions": {
+    "en": "meeting of the Allied Powers after World War I",
+    "fr": "conférence internationale organisée afin de négocier les traités de paix à la fin de la Première Guerre mondiale"
+   },
+   "instance_of": [
+    "Q7157512"
+   ],
+   "labels": {
+    "en": "Paris Peace Conference",
+    "fr": "conférence de paix de Paris"
+   },
+   "lastrevid": 2556749430,
+   "raw_sha256": "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "seed": false
+  },
+  "Q201684": {
+   "descriptions": {
+    "en": "major American stock market crash",
+    "fr": "krach boursier"
+   },
+   "instance_of": [
+    "Q1020018"
+   ],
+   "labels": {
+    "en": "Wall Street crash of 1929",
+    "fr": "krach de 1929"
+   },
+   "lastrevid": 2526486888,
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "seed": false
+  },
+  "Q215669": {
+   "descriptions": {
+    "en": "opposing side to the Central Powers in World War I",
+    "fr": "ensemble de pays alliés victorieux de la Première guerre mondiale"
+   },
+   "instance_of": [
+    "Q1127126",
+    "Q19953632"
+   ],
+   "labels": {
+    "en": "Allies of the First World War",
+    "fr": "Alliés de la Première Guerre mondiale"
+   },
+   "lastrevid": 2557233496,
+   "raw_sha256": "36169c5c000f57c09a0567b0336601cc97384954ac2c0b7d52a1dfdf54f23356",
+   "seed": false
+  },
+  "Q234738": {
+   "descriptions": {
+    "en": "war fought between the Turkish National Movement and the Entente and their proxies",
+    "fr": "guerre révolutionnaire du mouvement national turc de 1919 à 1923"
+   },
+   "instance_of": [
+    "Q1006311",
+    "Q21994376"
+   ],
+   "labels": {
+    "en": "Turkish War of Independence",
+    "fr": "guerre d'indépendance turque"
+   },
+   "lastrevid": 2527188695,
+   "raw_sha256": "4df89d40940d7852a20b6dafd873779a835b9e6e25a04f6f9ee5a7fbdf826e9a",
+   "seed": false
+  },
+  "Q28513": {
+   "descriptions": {
+    "en": "1867–1918 empire in Central Europe",
+    "fr": "ancien État d'Europe centrale, de 1867 à 1918"
+   },
+   "instance_of": [
+    "Q3624078",
+    "Q3024240",
+    "Q48349",
+    "Q1093720",
+    "Q6256"
+   ],
+   "labels": {
+    "en": "Austria–Hungary",
+    "fr": "Autriche-Hongrie"
+   },
+   "lastrevid": 2540319047,
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "seed": false
+  },
+  "Q2910703": {
+   "descriptions": {
+    "en": "overview about the possible causes of the Great Depression"
+   },
+   "instance_of": [],
+   "labels": {
+    "en": "causes of the Great Depression",
+    "fr": "causes de la Grande Dépression"
+   },
+   "lastrevid": 2556091480,
+   "raw_sha256": "09b65eb45bed5030e964ab7736a3ff40410850c5a47184a5c17dadc822df437e",
+   "seed": false
+  },
+  "Q34266": {
+   "descriptions": {
+    "en": "former empire in Eurasia and North America (1721–1917)",
+    "fr": "État multi-ethnique principalement russe, de 1721 à 1917"
+   },
+   "instance_of": [
+    "Q48349",
+    "Q3624078",
+    "Q3024240",
+    "Q1323642",
+    "Q6256"
+   ],
+   "labels": {
+    "en": "Russian Empire",
+    "fr": "Empire russe"
+   },
+   "lastrevid": 2556359046,
+   "raw_sha256": "9d0dbf3f752f2dbae87cbbceffd4a25c24dc0aefb91752a33daa6745d6ff3c56",
+   "seed": false
+  },
+  "Q361": {
+   "descriptions": {
+    "en": "1914–1918 global conflict",
+    "fr": "conflit armé à l'échelle planétaire, de juillet 1914 à novembre 1918"
+   },
+   "instance_of": [
+    "Q103495",
+    "Q11514315"
+   ],
+   "labels": {
+    "en": "World War I",
+    "fr": "Première Guerre mondiale"
+   },
+   "lastrevid": 2556293116,
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "seed": true
+  },
+  "Q38130": {
+   "descriptions": {
+    "en": "20th-century international organisation, predecessor to the United Nations",
+    "fr": "organisation intergouvernementale, prédécesseur des Nations Unies"
+   },
+   "instance_of": [
+    "Q245065",
+    "Q484652"
+   ],
+   "labels": {
+    "en": "League of Nations",
+    "fr": "Société des Nations"
+   },
+   "lastrevid": 2554368699,
+   "raw_sha256": "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
+   "seed": false
+  },
+  "Q41304": {
+   "descriptions": {
+    "en": "Germany in the years 1918/1919–1933",
+    "fr": "régime politique de l’Allemagne entre 1918/1919 et 1933"
+   },
+   "instance_of": [
+    "Q11514315",
+    "Q3024240",
+    "Q859563"
+   ],
+   "labels": {
+    "en": "Weimar Republic",
+    "fr": "république de Weimar"
+   },
+   "lastrevid": 2556858531,
+   "raw_sha256": "07df9800045fa26008b96a0d80381831dd70b05bd08b0c0eb56c2bbb840f23a8",
+   "seed": false
+  },
+  "Q43287": {
+   "descriptions": {
+    "en": "German nation-state in Central Europe from 1871 to 1918",
+    "fr": "État-nation historique de l'Allemagne de 1871 à 1918"
+   },
+   "instance_of": [
+    "Q11514315",
+    "Q3024240",
+    "Q3624078",
+    "Q48349"
+   ],
+   "labels": {
+    "en": "German Empire",
+    "fr": "Empire allemand"
+   },
+   "lastrevid": 2527937211,
+   "raw_sha256": "38d1a9b298c19887cabb0f87942a34f333a2276dd52849a436805d9e51d3ac7f",
+   "seed": false
+  },
+  "Q46": {
+   "descriptions": {
+    "en": "terrestrial continent located in north-western Eurasia",
+    "fr": "continent terrestre situé au nord-ouest de l'Eurasie"
+   },
+   "instance_of": [
+    "Q2418896",
+    "Q5107",
+    "Q82794",
+    "Q2221906"
+   ],
+   "labels": {
+    "en": "Europe",
+    "fr": "Europe"
+   },
+   "lastrevid": 2556302537,
+   "raw_sha256": "4ddf59703d237da00a6a1fd8e51edd85315626f3c66cc2ba99b8ee198a036c5d",
+   "seed": false
+  },
+  "Q462740": {
+   "descriptions": {
+    "en": "Germany's federal elections in 1912"
+   },
+   "instance_of": [
+    "Q14276938"
+   ],
+   "labels": {
+    "en": "1912 German federal election",
+    "fr": "élections législatives allemandes de 1912"
+   },
+   "lastrevid": 2550454193,
+   "raw_sha256": "218e5f52bac5766328714cfc313ba356818bd14ca96a05a07c0deb8fb85d273a",
+   "seed": false
+  },
+  "Q4763720": {
+   "descriptions": {
+    "en": "early 20th-century arms race between the United Kingdom and Germany",
+    "fr": "rivalité qui opposa l'Empire allemand et le Royaume-Uni pour s'assurer la suprématie navale au début du XXe siècle"
+   },
+   "instance_of": [
+    "Q322348"
+   ],
+   "labels": {
+    "en": "Anglo–German naval arms race",
+    "fr": "course germano-britannique aux armements navals"
+   },
+   "lastrevid": 2532245015,
+   "raw_sha256": "0c01bf77e397f59b808b87a83dbb2b79c5ee347daed6cd305e10a017beb7e704",
+   "seed": false
+  },
+  "Q48": {
+   "descriptions": {
+    "en": "part of terrestrial continent, mainly in the northeastern quadrant",
+    "fr": "continent terrestre, principalement dans le quadrant nord-est"
+   },
+   "instance_of": [
+    "Q5107",
+    "Q2418896",
+    "Q82794"
+   ],
+   "labels": {
+    "en": "Asia",
+    "fr": "Asie"
+   },
+   "lastrevid": 2556990411,
+   "raw_sha256": "6754969a08d285bc8b02761c5351d2c235c4f4f1beb6d0549fd683b9d5e59daa",
+   "seed": false
+  },
+  "Q79911": {
+   "descriptions": {
+    "en": "multi-sided civil war in the former Russian Empire, November 1917-October 1922",
+    "fr": "guerre multi-parties dans l'ancien Empire russe de 1917 à 1923"
+   },
+   "instance_of": [
+    "Q8465",
+    "Q350604"
+   ],
+   "labels": {
+    "en": "Russian Civil War",
+    "fr": "guerre civile russe"
+   },
+   "lastrevid": 2551012780,
+   "raw_sha256": "710feb723f704f13ad4be16d5c56b967b5a11ec1a13b1f6852096ae22cd02e48",
+   "seed": false
+  },
+  "Q8698": {
+   "descriptions": {
+    "en": "worldwide economic depression (1929–1939)",
+    "fr": "crise économique mondiale majeure de 1929 à 1939"
+   },
+   "instance_of": [
+    "Q290178",
+    "Q176494",
+    "Q11514315",
+    "Q6428674"
+   ],
+   "labels": {
+    "en": "Great Depression",
+    "fr": "Grande Dépression"
+   },
+   "lastrevid": 2553658571,
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "seed": true
+  },
+  "Q8729": {
+   "descriptions": {
+    "en": "1917-1922 political change in Russia",
+    "fr": "processus révolutionnaire ayant conduit en 1917 au renversement du régime tsariste de Russie (révolution de Février), puis à la prise du pouvoir par les bolchéviques (révolution d'Octobre)"
+   },
+   "instance_of": [
+    "Q10931"
+   ],
+   "labels": {
+    "en": "Russian Revolution",
+    "fr": "révolution russe"
+   },
+   "lastrevid": 2556342729,
+   "raw_sha256": "0252d15608d1105ee8cea054d805449fb4c757b5c5b9c823d24d5747e4c0afde",
+   "seed": false
+  }
+ },
+ "meta": {
+  "captured_at": "2026-10-16T20:30:32+00:00",
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine-wide lock, linked_data mode)",
+  "community_edited": true,
+  "description": "Real Wikidata causal statements (CC0, community-edited) for offline CAUSCORE tests.",
+  "endpoint": "https://www.wikidata.org/wiki/Special:EntityData/<Q>.json",
+  "filter": "causal properties with both ends in the fixture; dates P580/P582/P585/P571/P576; P31 of seeds; deprecated rank dropped; references and qualifiers as extracted by WDHARVEST",
+  "one_hop": [
+   "Q2910703",
+   "Q201684",
+   "Q1975198",
+   "Q18121382",
+   "Q199820",
+   "Q215669",
+   "Q43287",
+   "Q34266",
+   "Q12560",
+   "Q28513",
+   "Q8729",
+   "Q79911",
+   "Q15180",
+   "Q41304",
+   "Q234738",
+   "Q46",
+   "Q48",
+   "Q38130",
+   "Q192050",
+   "Q4763720",
+   "Q462740",
+   "Q155144",
+   "Q179848",
+   "Q153867",
+   "Q177859"
+  ],
+  "raw_sha256s": [
+   "0252d15608d1105ee8cea054d805449fb4c757b5c5b9c823d24d5747e4c0afde",
+   "07df9800045fa26008b96a0d80381831dd70b05bd08b0c0eb56c2bbb840f23a8",
+   "09b65eb45bed5030e964ab7736a3ff40410850c5a47184a5c17dadc822df437e",
+   "0c01bf77e397f59b808b87a83dbb2b79c5ee347daed6cd305e10a017beb7e704",
+   "15be74076c8069f435ecbaf4e15da7f5fb5ad9ca4ab492092ab05d82788db16c",
+   "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
+   "218e5f52bac5766328714cfc313ba356818bd14ca96a05a07c0deb8fb85d273a",
+   "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
+   "36169c5c000f57c09a0567b0336601cc97384954ac2c0b7d52a1dfdf54f23356",
+   "38d1a9b298c19887cabb0f87942a34f333a2276dd52849a436805d9e51d3ac7f",
+   "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
+   "4ddf59703d237da00a6a1fd8e51edd85315626f3c66cc2ba99b8ee198a036c5d",
+   "4df89d40940d7852a20b6dafd873779a835b9e6e25a04f6f9ee5a7fbdf826e9a",
+   "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "5aeed275dffeb59e9b3172cdd2c5823348b7217c3ab68175873bab3c60985336",
+   "6754969a08d285bc8b02761c5351d2c235c4f4f1beb6d0549fd683b9d5e59daa",
+   "710feb723f704f13ad4be16d5c56b967b5a11ec1a13b1f6852096ae22cd02e48",
+   "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "9d0dbf3f752f2dbae87cbbceffd4a25c24dc0aefb91752a33daa6745d6ff3c56",
+   "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
+   "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
+   "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
+   "fc0569b59ad1f262589a781bc1d5a424e5175a6731226476972fbb8a1f600402"
+  ],
+  "retrieved_at": "2026-10-16T20:28:09.561536+00:00",
+  "seeds": [
+   "Q8698",
+   "Q160649",
+   "Q361"
+  ],
+  "user_agent": "REVA-World/0.3 (research world knowledge graph; https://github.com/AmineDJM/REVA-World) reva-kg-harvest/0.3"
+ },
+ "origin": "test_fixture",
+ "statements": [
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "preferred",
+   "raw_sha256": "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
+   "references": [],
+   "source_revision": "2548845726",
+   "start": null,
+   "statement_id": "Q12560$1d88cd8a-49ff-ea0b-5fef-18a0d82fe71b",
+   "subject_qid": "Q12560",
+   "value": {
+    "calendar": "julian",
+    "precision": 11,
+    "time": "+1299-07-29T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {
+    "P1480": [
+     "Q5727902"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
+   "references": [],
+   "source_revision": "2548845726",
+   "start": null,
+   "statement_id": "Q12560$a7a285ae-4751-a89c-cf69-4300a0c74a66",
+   "subject_qid": "Q12560",
+   "value": {
+    "calendar": "julian",
+    "precision": 9,
+    "time": "+1300-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "c45e7f55bf86c81095e5b92106bba39cdeee2a4cf4063b4d836a2d3652054996",
+   "references": [],
+   "source_revision": "2548845726",
+   "start": null,
+   "statement_id": "Q12560$022C6BA1-9602-478B-9153-2BFF7D4763B6",
+   "subject_qid": "Q12560",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1922-11-17T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {
+    "P1310": [
+     "Q12165151",
+     "Q85996442"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
+   "references": [
+    {
+     "P248": [
+      "Q5249463",
+      "Q1443926"
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2024-04-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://novynarnia.com/2022/12/26/100r-srsr/"
+     ]
+    }
+   ],
+   "source_revision": "2557284772",
+   "start": null,
+   "statement_id": "q15180$513dcf0b-4d74-6cb0-e0a9-9dc355e3972e",
+   "subject_qid": "Q15180",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1922-12-30T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "a9446352f176c8776651f6cba3a968b8eff97d9928075984463f1e56452ba5c5",
+   "references": [],
+   "source_revision": "2557284772",
+   "start": null,
+   "statement_id": "q15180$e1e805ae-4700-35da-1a76-29c42fb212d7",
+   "subject_qid": "Q15180",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1991-12-26T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "references": [],
+   "source_revision": "2519805375",
+   "start": null,
+   "statement_id": "Q153867$331f649b-4a51-058f-ae23-21e0260be3a4",
+   "subject_qid": "Q153867",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "references": [
+    {
+     "P143": [
+      "Q48183"
+     ]
+    }
+   ],
+   "source_revision": "2519805375",
+   "start": null,
+   "statement_id": "Q153867$EDF7C7E8-EA26-4950-972C-FBC846D8AF74",
+   "subject_qid": "Q153867",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1882-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "references": [
+    {
+     "P143": [
+      "Q48183"
+     ]
+    }
+   ],
+   "source_revision": "2519805375",
+   "start": null,
+   "statement_id": "Q153867$38F6C91C-6365-476E-A8EE-6981F44A4689",
+   "subject_qid": "Q153867",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1915-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b7e28a64b17e344d6a21670e9f63bd0670bfbb9d48a1e1077281fb4fc7288ca7",
+   "references": [
+    {
+     "P143": [
+      "Q11920"
+     ]
+    }
+   ],
+   "source_revision": "2519805375",
+   "start": null,
+   "statement_id": "Q153867$F2A3EC6D-C497-4654-B9BD-45600FBB56E0",
+   "subject_qid": "Q153867",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1882-05-20T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "references": [
+    {
+     "P248": [
+      "Q87327689"
+     ]
+    }
+   ],
+   "source_revision": "2556713269",
+   "start": null,
+   "statement_id": "Q155144$2efc7361-42ea-7bf4-dd48-0d4098a62d1f",
+   "subject_qid": "Q155144",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2556713269",
+   "start": null,
+   "statement_id": "Q155144$27FDDFA0-2299-4675-BE3E-3D12D3CA5F36",
+   "subject_qid": "Q155144",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1871-05-20T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "references": [],
+   "source_revision": "2556713269",
+   "start": null,
+   "statement_id": "Q155144$1608fb90-4b6b-550e-76ce-fd6e915efe41",
+   "subject_qid": "Q155144",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1919-06-28T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "2cce50c3e93efb0872bac592219be8bfc4759989252ed366e3f3f164b6f0c202",
+   "references": [
+    {
+     "P143": [
+      "Q48183"
+     ]
+    }
+   ],
+   "source_revision": "2556713269",
+   "start": null,
+   "statement_id": "Q155144$3C692555-1DC8-485E-B626-040F603BDD1D",
+   "subject_qid": "Q155144",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-11T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q112193867",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
+   "references": [],
+   "source_revision": "2555586364",
+   "start": null,
+   "statement_id": "Q160649$1ACA9F15-53BC-49E3-B9D9-C932315F7105",
+   "subject_qid": "Q160649",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q16521",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
+   "references": [],
+   "source_revision": "2555586364",
+   "start": null,
+   "statement_id": "Q160649$8AE75B62-29CB-4FFD-96F2-A906CB09764D",
+   "subject_qid": "Q160649",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q1975198",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "35d3eec98513e4402713069fca993853f2731eb602c3122b1b8ea2ead7bab12e",
+   "references": [],
+   "source_revision": "2555586364",
+   "start": null,
+   "statement_id": "Q160649$5121e945-41fe-f840-42f9-92486811b96d",
+   "subject_qid": "Q160649",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
+   "references": [],
+   "source_revision": "2538334021",
+   "start": null,
+   "statement_id": "Q177859$17f0a988-4a4e-b2f0-5a6e-8a5df70f1403",
+   "subject_qid": "Q177859",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "208676dfc9405e2b9be9b3b4f1f817c4055b00e36bf3a8667d1106d0668244b2",
+   "references": [],
+   "source_revision": "2538334021",
+   "start": null,
+   "statement_id": "Q177859$fdc203ce-43ef-fc47-a00c-c75884033ec7",
+   "subject_qid": "Q177859",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1892-08-17T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "15be74076c8069f435ecbaf4e15da7f5fb5ad9ca4ab492092ab05d82788db16c",
+   "references": [],
+   "source_revision": "2535426105",
+   "start": null,
+   "statement_id": "Q179848$b68eeaf3-4281-e6d7-85ed-a0c43571048d",
+   "subject_qid": "Q179848",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "15be74076c8069f435ecbaf4e15da7f5fb5ad9ca4ab492092ab05d82788db16c",
+   "references": [],
+   "source_revision": "2535426105",
+   "start": null,
+   "statement_id": "Q179848$8a6f38f3-4103-19de-a10f-f504057c8919",
+   "subject_qid": "Q179848",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1885-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "15be74076c8069f435ecbaf4e15da7f5fb5ad9ca4ab492092ab05d82788db16c",
+   "references": [],
+   "source_revision": "2535426105",
+   "start": null,
+   "statement_id": "Q179848$ba614287-4358-2538-bc66-0f1a15439068",
+   "subject_qid": "Q179848",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1914-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1536",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
+   "references": [],
+   "source_revision": "2555974503",
+   "start": null,
+   "statement_id": "Q192050$11fe2652-43dd-c34d-4ad0-17f8b0b9b4a3",
+   "subject_qid": "Q192050",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "4708cde97f75906879fb8afa67709bb8d183910675a3a379c405ebd770e53f3c",
+   "references": [],
+   "source_revision": "2555974503",
+   "start": null,
+   "statement_id": "Q192050$10d67c1e-488b-4a9f-cd62-682ec736e3f9",
+   "subject_qid": "Q192050",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1914-06-28T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "references": [],
+   "source_revision": "2556749430",
+   "start": null,
+   "statement_id": "Q199820$adaeb1df-4db6-892d-e028-41922cc4f915",
+   "subject_qid": "Q199820",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1919-01-18T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "references": [],
+   "source_revision": "2556749430",
+   "start": null,
+   "statement_id": "Q199820$451058f0-40bd-33df-c94b-3f29376fc7f3",
+   "subject_qid": "Q199820",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1920-01-21T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "references": [],
+   "source_revision": "2556749430",
+   "start": null,
+   "statement_id": "Q199820$D941E8CF-3EA7-4CDC-AB27-B1E15593FC50",
+   "subject_qid": "Q199820",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1919-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "b39c74ef803da3fa3b80d9ad60020ab089b46252cc2f745a6e6fbe58950c5ea9",
+   "references": [],
+   "source_revision": "2556749430",
+   "start": null,
+   "statement_id": "Q199820$30ef3178-4aee-cb11-547e-df0394e45982",
+   "subject_qid": "Q199820",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q8698",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {
+    "P2868": [
+     "Q20204892"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$35074256-4023-dd59-b841-50b8ea01390c",
+   "subject_qid": "Q201684",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$c4eb1a89-49a2-b82a-4ce3-46681e7b9585",
+   "subject_qid": "Q201684",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1929-10-24T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$c46de44d-48ce-3a58-4431-addece3caa34",
+   "subject_qid": "Q201684",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1929-10-29T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "references": [],
+   "source_revision": "2526486888",
+   "start": null,
+   "statement_id": "Q201684$71F9CC8B-DA5A-401A-A445-E69EA4BD4CAE",
+   "subject_qid": "Q201684",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1929-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "36169c5c000f57c09a0567b0336601cc97384954ac2c0b7d52a1dfdf54f23356",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2557233496",
+   "start": null,
+   "statement_id": "Q215669$B7A3F105-ECA8-407D-964C-F9FE9F89AE38",
+   "subject_qid": "Q215669",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1914-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "36169c5c000f57c09a0567b0336601cc97384954ac2c0b7d52a1dfdf54f23356",
+   "references": [],
+   "source_revision": "2557233496",
+   "start": null,
+   "statement_id": "Q215669$613f266d-478a-f28a-b9e6-a8b81bd714b6",
+   "subject_qid": "Q215669",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1918-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "4df89d40940d7852a20b6dafd873779a835b9e6e25a04f6f9ee5a7fbdf826e9a",
+   "references": [],
+   "source_revision": "2527188695",
+   "start": null,
+   "statement_id": "Q234738$8af0c820-40f8-4c99-749c-4543c481448f",
+   "subject_qid": "Q234738",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1919-05-19T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "4df89d40940d7852a20b6dafd873779a835b9e6e25a04f6f9ee5a7fbdf826e9a",
+   "references": [],
+   "source_revision": "2527188695",
+   "start": null,
+   "statement_id": "Q234738$0edfafb7-4cde-3003-60cf-a81745b873d4",
+   "subject_qid": "Q234738",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1923-07-24T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "4df89d40940d7852a20b6dafd873779a835b9e6e25a04f6f9ee5a7fbdf826e9a",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2527188695",
+   "start": null,
+   "statement_id": "Q234738$FC7FB94D-E277-4994-9707-84AE0AEECB7A",
+   "subject_qid": "Q234738",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1922-10-11T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {
+    "P805": [
+     "Q209601"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2540319047",
+   "start": null,
+   "statement_id": "Q28513$EAF9F37D-501F-4B94-A98E-D8DCCEF74459",
+   "subject_qid": "Q28513",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1867-03-01T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {
+    "P805": [
+     "Q718374"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "references": [],
+   "source_revision": "2540319047",
+   "start": null,
+   "statement_id": "Q28513$0d421158-41cc-f43e-500c-ca04dae7d1bb",
+   "subject_qid": "Q28513",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-10-29T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {
+    "P805": [
+     "Q33946"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "references": [],
+   "source_revision": "2540319047",
+   "start": null,
+   "statement_id": "Q28513$5bf99b28-42ba-9c79-8d51-c6e195082475",
+   "subject_qid": "Q28513",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-10-28T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "preferred",
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2540319047",
+   "start": null,
+   "statement_id": "Q28513$65B0B177-1382-4F15-B47E-EE27682BDA56",
+   "subject_qid": "Q28513",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-11T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {
+    "P805": [
+     "Q44749"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "b55f3fac2de580bc77dc691b7e5179bb45759fda9538796e1fd8e21612e84512",
+   "references": [],
+   "source_revision": "2540319047",
+   "start": null,
+   "statement_id": "Q28513$ce7d6ea4-4161-389f-cce5-f5619cc5af0d",
+   "subject_qid": "Q28513",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-25T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "9d0dbf3f752f2dbae87cbbceffd4a25c24dc0aefb91752a33daa6745d6ff3c56",
+   "references": [],
+   "source_revision": "2556359046",
+   "start": null,
+   "statement_id": "q34266$6375cf6a-47ce-4e07-0fdf-496e1c3fd18e",
+   "subject_qid": "Q34266",
+   "value": {
+    "calendar": "julian",
+    "precision": 11,
+    "time": "+1721-10-22T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "9d0dbf3f752f2dbae87cbbceffd4a25c24dc0aefb91752a33daa6745d6ff3c56",
+   "references": [],
+   "source_revision": "2556359046",
+   "start": null,
+   "statement_id": "q34266$554b67fe-49ae-e0f8-5753-13772ff261bc",
+   "subject_qid": "Q34266",
+   "value": {
+    "calendar": "julian",
+    "precision": 11,
+    "time": "+1917-09-01T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q192050",
+   "point_in_time": null,
+   "property_pid": "P1478",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$91cbeb80-471b-bb7f-fbd8-81c03626b5ac",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q4763720",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$0543bb30-4741-205e-802c-ee6f6802fd3c",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q462740",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$4130d351-4323-9492-fa5f-cf9fb47b95b0",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q177859",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$524fa581-4843-4f97-bd9d-5205e18c595d",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q179848",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$57616ae3-44c9-ea45-f8ce-618da174578e",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q155144",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$73b7be0e-4096-dba5-8c87-5134f1874eca",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q153867",
+   "point_in_time": null,
+   "property_pid": "P1479",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$982b94e8-48d5-e171-fd7e-db1e08892214",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q234738",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$004c4d16-403e-1ec0-e27e-cb09d8c84904",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q46",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$18636e70-46fe-33e5-01bd-3900c91f32a7",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q48",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$26709b70-4287-5a0e-4183-817149d8e34d",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q41304",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$337229e1-4a2f-553a-8bc8-7e200ca5fb45",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q8729",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$3550a097-4b7c-f6ec-f01b-e9bf8688e238",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q38130",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$3791b826-4e8b-971e-1ed9-c63f6531c92d",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q28513",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$45c77a0f-48f7-0883-6b62-0751312b4514",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q79911",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$5183ac3f-47d6-d7cc-c755-6d22d341e3a8",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q199820",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$9141D705-C64E-4913-AF8C-F94E2860222E",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q12560",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$91f761e4-49af-0e8a-457d-c0ef13de21c9",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q215669",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$c78b8b09-4653-efee-a250-e9df312ae652",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q43287",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q15180",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$e028cb1c-41c1-0d1d-08b1-84be7939dc35",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q34266",
+   "point_in_time": null,
+   "property_pid": "P1542",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$f5d97f5c-4971-f43a-c0e4-ff77c8023c45",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q103495",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {
+    "P1545": [
+     "1"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$3e079251-415d-41a5-58ea-429b19103733",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q11514315",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$ac160af9-4639-bb44-be78-c2eb7800a87f",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$6aab1f04-4242-5106-d86f-57b5745fb42e",
+   "subject_qid": "Q361",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1914-07-28T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$b050a6ed-41e4-f518-430d-6ac3e944902c",
+   "subject_qid": "Q361",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-11T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ]
+    }
+   ],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$c86ef204-41c7-a9ab-2bf7-cf0c4741a5c9",
+   "subject_qid": "Q361",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-11T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q18121382",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {
+    "P805": [
+     "Q310802"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [],
+   "source_revision": "2556293116",
+   "start": null,
+   "statement_id": "Q361$c066e556-4edd-bc55-b7b4-becd80acf4d7",
+   "subject_qid": "Q361",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
+   "references": [
+    {
+     "P143": [
+      "Q48183"
+     ]
+    },
+    {
+     "P248": [
+      "Q455"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-09-14T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://www.britannica.com/topic/League-of-Nations"
+     ]
+    }
+   ],
+   "source_revision": "2554368699",
+   "start": null,
+   "statement_id": "Q38130$B05CC5DF-8D72-4550-840B-E24B8C9F2D7E",
+   "subject_qid": "Q38130",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1919-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
+   "references": [],
+   "source_revision": "2554368699",
+   "start": null,
+   "statement_id": "Q38130$39E1859A-F873-482C-AF2E-BF524C76EC24",
+   "subject_qid": "Q38130",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1946-04-18T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "preferred",
+   "raw_sha256": "e55510ad864448748b8a60d8f96b898de0521eb20c763965ecaa1769a7d5b660",
+   "references": [],
+   "source_revision": "2554368699",
+   "start": null,
+   "statement_id": "Q38130$cc432812-4424-7bb9-7ad0-28e63769a73b",
+   "subject_qid": "Q38130",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1946-04-20T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "07df9800045fa26008b96a0d80381831dd70b05bd08b0c0eb56c2bbb840f23a8",
+   "references": [
+    {
+     "P854": [
+      "https://books.google.de/books?id=RcKNDwAAQBAJ&pg=PA104"
+     ]
+    }
+   ],
+   "source_revision": "2556858531",
+   "start": null,
+   "statement_id": "Q41304$0E78DCD4-2BF5-43A6-B75B-692717DA9103",
+   "subject_qid": "Q41304",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-09T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "07df9800045fa26008b96a0d80381831dd70b05bd08b0c0eb56c2bbb840f23a8",
+   "references": [
+    {
+     "P143": [
+      "Q328"
+     ]
+    }
+   ],
+   "source_revision": "2556858531",
+   "start": null,
+   "statement_id": "Q41304$0821C958-5DE0-4933-8944-A305EAD6AD05",
+   "subject_qid": "Q41304",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1933-01-01T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P571",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "38d1a9b298c19887cabb0f87942a34f333a2276dd52849a436805d9e51d3ac7f",
+   "references": [
+    {
+     "P248": [
+      "Q21890513"
+     ]
+    }
+   ],
+   "source_revision": "2527937211",
+   "start": null,
+   "statement_id": "Q43287$46A64278-BF81-4A02-8815-CDEA4110BFFB",
+   "subject_qid": "Q43287",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1871-01-01T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P576",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "38d1a9b298c19887cabb0f87942a34f333a2276dd52849a436805d9e51d3ac7f",
+   "references": [],
+   "source_revision": "2527937211",
+   "start": null,
+   "statement_id": "Q43287$AF826F3B-D2CE-4735-83AC-A0496CD6B8CF",
+   "subject_qid": "Q43287",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1918-11-09T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "218e5f52bac5766328714cfc313ba356818bd14ca96a05a07c0deb8fb85d273a",
+   "references": [],
+   "source_revision": "2550454193",
+   "start": null,
+   "statement_id": "Q462740$28131836-4ab5-fbf3-9685-1e42bcf0e9ca",
+   "subject_qid": "Q462740",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "218e5f52bac5766328714cfc313ba356818bd14ca96a05a07c0deb8fb85d273a",
+   "references": [],
+   "source_revision": "2550454193",
+   "start": null,
+   "statement_id": "Q462740$01099595-221C-4A41-ABCD-F16EA8573A0F",
+   "subject_qid": "Q462740",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1912-01-12T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q361",
+   "point_in_time": null,
+   "property_pid": "P1537",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "0c01bf77e397f59b808b87a83dbb2b79c5ee347daed6cd305e10a017beb7e704",
+   "references": [],
+   "source_revision": "2532245015",
+   "start": null,
+   "statement_id": "Q4763720$decca35a-4b42-ca56-ae7e-d14320cc8efa",
+   "subject_qid": "Q4763720",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "710feb723f704f13ad4be16d5c56b967b5a11ec1a13b1f6852096ae22cd02e48",
+   "references": [],
+   "source_revision": "2551012780",
+   "start": null,
+   "statement_id": "Q79911$31dde1e4-475a-a957-adc2-e3f24dc9a114",
+   "subject_qid": "Q79911",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1917-11-07T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "710feb723f704f13ad4be16d5c56b967b5a11ec1a13b1f6852096ae22cd02e48",
+   "references": [],
+   "source_revision": "2551012780",
+   "start": null,
+   "statement_id": "Q79911$CC40A262-095D-4CCF-AE55-2A5A23E837F6",
+   "subject_qid": "Q79911",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1922-10-25T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q290178",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [
+    {
+     "P248": [
+      "Q2467479"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P248": [
+      "Q26903352"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P248": [
+      "Q13421502"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://lib-thesaurus.un.org/LIB/DHLUNBISThesaurus.nsf/fee3fb01c865ac5d85256cf400648b1f/da9f303466558ad685256aa00060368d"
+     ]
+    },
+    {
+     "P248": [
+      "Q50358336"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    }
+   ],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$05273a89-41e4-0518-3246-36e1450ec3ad",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q6428674",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "http://sites.austincc.edu/history/depression-era/"
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://www.history.com/news/life-for-the-average-family-during-the-great-depression"
+     ]
+    }
+   ],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$2745aab6-4067-715a-0ebe-66d5ae141f02",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q176494",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [
+    {
+     "P248": [
+      "Q2467479"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://lib-thesaurus.un.org/LIB/DHLUNBISThesaurus.nsf/fee3fb01c865ac5d85256cf400648b1f/9a68b7f9a3f38bfa85256aa0005f8e97"
+     ]
+    }
+   ],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$70030fb8-4039-81e4-ee89-7ea37e7eb99c",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q11514315",
+   "point_in_time": null,
+   "property_pid": "P31",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://www.thebalance.com/great-depression-timeline-1929-1941-4048064"
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "https://courses.lumenlearning.com/boundless-ushistory/chapter/the-great-depression/"
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "http://www.loc.gov/teachers/classroommaterials/presentationsandactivities/presentations/timeline/depwwii/"
+     ]
+    },
+    {
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2020-07-16T00:00:00Z"
+      }
+     ],
+     "P854": [
+      "http://sites.austincc.edu/history/depression-era/"
+     ]
+    }
+   ],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$bda3bb60-425c-7f06-9613-81a96bff0f64",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P580",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [
+    {
+     "P248": [
+      "Q19938912"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    },
+    {
+     "P248": [
+      "Q50358336"
+     ],
+     "P813": [
+      {
+       "calendar": "gregorian",
+       "precision": 11,
+       "time": "+2018-12-26T00:00:00Z"
+      }
+     ]
+    }
+   ],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$baf616b4-4ed5-a944-3dfa-32f134bd347e",
+   "subject_qid": "Q8698",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 11,
+    "time": "+1929-10-29T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P582",
+   "qualifiers": {
+    "P1480": [
+     "Q5727902"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$7935071b-43f4-5446-1ed1-e601dfcdc8c6",
+   "subject_qid": "Q8698",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1941-00-00T00:00:00Z",
+    "type": "time"
+   }
+  },
+  {
+   "end": null,
+   "object_qid": "Q201684",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {
+    "P3831": [
+     "Q20204892"
+    ]
+   },
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$2d3e4107-4d1b-b343-6f93-a76055caa805",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": "Q2910703",
+   "point_in_time": null,
+   "property_pid": "P828",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "5ab30c3faada7cb590a2734124af92858e138aed7cb43f05c36e16cd32ef2a4a",
+   "references": [],
+   "source_revision": "2553658571",
+   "start": null,
+   "statement_id": "Q8698$73208004-4ed0-001e-1273-083e8ef95c3c",
+   "subject_qid": "Q8698",
+   "value": null
+  },
+  {
+   "end": null,
+   "object_qid": null,
+   "point_in_time": null,
+   "property_pid": "P585",
+   "qualifiers": {},
+   "rank": "normal",
+   "raw_sha256": "0252d15608d1105ee8cea054d805449fb4c757b5c5b9c823d24d5747e4c0afde",
+   "references": [],
+   "source_revision": "2556342729",
+   "start": null,
+   "statement_id": "Q8729$687fb4f0-4452-b9b9-09c9-bad7ce7f0083",
+   "subject_qid": "Q8729",
+   "value": {
+    "calendar": "gregorian",
+    "precision": 9,
+    "time": "+1917-00-00T00:00:00Z",
+    "type": "time"
+   }
+  }
+ ]
+}

@@ -335,3 +335,19 @@ blockquote.v3-verbatim {
   background: #6b4e16;
   color: #fff;
 }
+
+.v3-grade-none {
+  background: transparent;
+  color: #5c677d;
+  border: 1px dotted #5c677d;
+}
+.v3-denies {
+  color: #7a5d00;
+  font-weight: 600;
+}
+.v3-grade-reasons {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
