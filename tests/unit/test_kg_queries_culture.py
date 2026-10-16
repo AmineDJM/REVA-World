@@ -174,8 +174,8 @@ def test_anchor_brazil_official_language_is_portuguese():
     brazil = {x["language"] for x in r if x["country"] == BRAZIL}
     portugal = {x["language"] for x in r if x["country"] == PORTUGAL}
     assert PORTUGUESE in brazil and PORTUGUESE in portugal
-    assert all(x["statement"].startswith("http://www.wikidata.org/entity/statement/") or "$" in x["statement"]
-               for x in r)
+    # rows() strips the entity namespace: statement nodes read "statement/Q155-<uuid>"
+    assert all(x["statement"].startswith("statement/") for x in r)
 
 
 def test_anchor_religions_are_seeded():

@@ -1,7 +1,7 @@
 {
  "anchor": "religions",
- "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?item { wd:Q1841 wd:Q9592 wd:Q432 }\n  {\n    VALUES ?class { wd:Q9174 wd:Q13414953 }\n    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .\n    FILTER(?links >= 5)\n  }\n  UNION\n  { VALUES ?country { wd:Q155 } ?country wdt:P140 ?item . }\n}",
- "raw_sha256": "4b20914c2b776a4dc3e4d4377cda86d9da822787252efebb26537858abeb66a7",
+ "query": "SELECT DISTINCT ?item WHERE {\n  VALUES ?item { wd:Q1841 wd:Q9592 wd:Q432 }\n  {\n    VALUES ?class { wd:Q9174 wd:Q13414953 wd:Q71966963 }\n    ?item wdt:P31/wdt:P279? ?class ; wikibase:sitelinks ?links .\n    FILTER(?links >= 5)\n  }\n  UNION\n  { VALUES ?country { wd:Q155 } ?country wdt:P140 ?item . }\n}",
+ "raw_sha256": "9e69891228f5467e0f5fa399ef1acec32159cab4c343df47df89a7fc4b4fb6d1",
  "response": {
   "head": {
    "vars": [
@@ -9,11 +9,30 @@
    ]
   },
   "results": {
-   "bindings": []
+   "bindings": [
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q432"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q1841"
+     }
+    },
+    {
+     "item": {
+      "type": "uri",
+      "value": "http://www.wikidata.org/entity/Q9592"
+     }
+    }
+   ]
   }
  },
- "response_sha256": "0aa90f449b5e58abebafc13bcf9a97ef9d407f4424fed4acef757dcc922dbb14",
- "retrieved_at": "2026-10-16T19:58:29.051069+00:00",
+ "response_sha256": "91649b9e8d070683e720b58b0b474003b1ae3a8d6711eed0be7292374c67538f",
+ "retrieved_at": "2026-10-16T20:08:57.040580+00:00",
  "source": "Wikidata Query Service (CC0), via reva.adapters.connectors.wikidata.WikidataClient",
  "spec": "religions.yaml"
 }

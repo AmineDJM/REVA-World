@@ -148,7 +148,9 @@ def test_captured_fixture_manifests_contain_no_secrets() -> None:
     manifests = sorted((FIXTURES / "source").glob("*/manifest.json"))
     assert manifests, "expected captured fixtures"
     for m in manifests:
-        for e in json.loads(m.read_text()):
+        doc = json.loads(m.read_text())
+        # byte-range fixtures (atlas BACI, WID) describe one archive as a single object
+        for e in doc if isinstance(doc, list) else [doc]:
             assert not SECRET_QUERY.search(e["url"]), (m, e["url"])
             assert not (SECRET_HEADERS & {h.lower() for h in e.get("headers", {})}), (m, e["headers"])
             assert e.get("licence"), f"{m}: captured fixture without licence"

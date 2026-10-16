@@ -9,7 +9,7 @@ purpose: statements
 entity_kind: heritage_site
 sparql: |
   SELECT ?site ?statement ?designation ?rank ?start ?end ?pit WHERE {
-    BIND(wd:Q9259 AS ?designation)
+    VALUES ?designation { wd:Q9259 }
     ?site p:P1435 ?statement .
     ?statement ps:P1435 ?designation ; wikibase:rank ?rank .
     FILTER(?rank != wikibase:DeprecatedRank)
@@ -21,3 +21,7 @@ columns: {subject: site, property: P1435, object: designation, statement: statem
           start: start, end: end, point_in_time: pit}
 max_rows: 6000
 expand_hops: 0
+notes: >-
+  The designation is fixed with VALUES, not BIND: with a leading BIND(wd:Q9259 AS ?designation) WDQS
+  (Blazegraph) did not constrain ps:P1435 and the Brazil anchor returned 1,471 rows of every heritage
+  designation, each projected as Q9259 (captured 2026-10-16) - a silent mislabelling the anchor test caught.

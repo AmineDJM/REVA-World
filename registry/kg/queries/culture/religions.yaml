@@ -2,8 +2,9 @@ id: culture.religions
 domain: culture
 owner: KGCULT
 description: >-
-  Religions and their branches: direct instances of religion (Q9174) or religious denomination
-  (Q13414953) with at least 5 sitelinks, plus every object of a religion (P140) statement on a
+  Religions and their branches: instances of religion (Q9174), religious denomination (Q13414953) or
+  religion or world view (Q71966963), directly or through one subclass step, with at least 5
+  sitelinks, plus every object of a religion (P140) statement on a
   crosswalk country. Snapshots keep branch genealogy (subclass of / part of), founders (P112),
   inception/dissolution, headquarters and parent organisation.
 purpose: seed_entities
@@ -11,8 +12,8 @@ entity_kind: religion
 sparql: |
   SELECT DISTINCT ?item WHERE {
     {
-      VALUES ?class { wd:Q9174 wd:Q13414953 }
-      ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+      VALUES ?class { wd:Q9174 wd:Q13414953 wd:Q71966963 }
+      ?item wdt:P31/wdt:P279? ?class ; wikibase:sitelinks ?links .
       FILTER(?links >= 5)
     }
     UNION
@@ -23,5 +24,8 @@ max_rows: 8000
 expand_hops: 1
 properties: [P31, P279, P361, P112, P571, P576, P159, P749, P140, P17, P495, P737, P1365, P1366, P155, P156]
 notes: >-
-  expand_hops 1 gives label snapshots of founders (P112) and parent branches; their full claims come
+  One subclass step is needed: Islam is an instance of "major religious group" (Q6957341, subclass of
+  religion), the Catholic Church of "Christian denomination" (Q879146, subclass of religious
+  denomination), Catholicism directly of "religion or world view" (checked 2026-10-16); with direct P31
+  only, the anchor query returned none of the three. expand_hops 1 gives label snapshots of founders (P112) and parent branches; their full claims come
   from KGPEOPLE / this spec's ancestor closure (culture.religion_ancestors).

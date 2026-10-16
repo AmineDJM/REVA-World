@@ -108,17 +108,17 @@ def snapshot_reader(tmp: Path, tables: Iterable[pl.DataFrame], **kw: Any) -> Atl
         files.append(p)
     con = duckdb.connect(str(tmp / "atlas.duckdb"))
     con.execute(DDL)
-    listing = "[" + ",".join(f"'{f}'" for f in files) + "]"
+    listing = "[" + ",".join(f"'{fp}'" for fp in files) + "]"
     con.execute(
         f"""INSERT INTO series SELECT CAST(row_number() OVER (ORDER BY source, dataset, indicator) AS INTEGER),
                    source, dataset, indicator
               FROM (SELECT DISTINCT source, dataset, indicator FROM read_parquet({listing}))"""
     )
-    for f in files:
+    for fp in files:
         con.execute(
             f"""CREATE OR REPLACE TEMP VIEW raw AS SELECT *,
                 regexp_extract(filename, '([0-9a-f]{{64}})\\.parquet$', 1) AS table_sha
-                FROM read_parquet('{f}', filename = true)"""
+                FROM read_parquet('{fp}', filename = true)"""
         )
         con.execute(f"CREATE OR REPLACE TEMP TABLE t AS {CELLS_SELECT}")
         con.execute("INSERT INTO cells SELECT * FROM t")
