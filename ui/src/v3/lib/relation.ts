@@ -13,7 +13,11 @@
  *  - physical networks (LINKS3) keep their caveats in view: cables are Wikidata's community-edited list (cable
  *    names, earliest service year, and the cited Q55 → Royaume des Pays-Bas hop when it was used), air routes
  *    are OpenFlights' network frozen in June 2014 (ODbL), launch links name the site state per GCAT — never
- *    the launcher's supplier.
+ *    the launcher's supplier;
+ *  - EVMAP: sanctions episodes are coded cases (TIES / EUSANCT, one series per dataset — they overlap and are never
+ *    added) and active OFAC programs, sender → target, a threat or imposition, never an effect; COLDAT and COW
+ *    entities colonial rule sit next to CShapes in the colonial lane; a tsunami observed in two countries is
+ *    "même événement naturel observé", never a cause.
  */
 import { linkNodeLabel, linkTypeLabel, type PairKind, type PairLink, type PairLinksData } from '../api/links';
 import { citeLinkEvidence, type Citation } from './citations';
@@ -21,19 +25,21 @@ import { frDecimal, frValue } from './format';
 import { linkDates } from './paths';
 import { yearOfPartial } from './time';
 
-export type ThemeId = 'trade' | 'migration' | 'votes' | 'colonial' | 'border' | 'language' | 'treaty' | 'conflict' | 'peacekeeping' | 'infrastructure' | 'diplomatic' | 'history' | 'other';
+export type ThemeId = 'trade' | 'migration' | 'votes' | 'colonial' | 'border' | 'language' | 'treaty' | 'conflict' | 'peacekeeping' | 'sanctions' | 'infrastructure' | 'hazard' | 'diplomatic' | 'history' | 'other';
 
 export const THEMES: { id: ThemeId; label: string; kinds: string[] }[] = [
   { id: 'trade', label: 'Commerce de biens', kinds: ['bilateral_trade', 'bilateral_trade_imports', 'bilateral_trade_baci'] },
   { id: 'migration', label: 'Migrations (stocks de migrants)', kinds: ['migrant_stock'] },
   { id: 'votes', label: 'Votes à l’Assemblée générale de l’ONU', kinds: ['unga_vote_agreement'] },
-  { id: 'colonial', label: 'Domination coloniale', kinds: ['colony_of', 'former_colony_of', 'colonial_rule_cshapes'] },
+  { id: 'colonial', label: 'Domination coloniale', kinds: ['colony_of', 'former_colony_of', 'colonial_rule_cshapes', 'colonial_rule_cow', 'colonised_by_coldat'] },
   { id: 'border', label: 'Frontières', kinds: ['land_border', 'land_border_cshapes', 'border_wikidata', 'maritime_neighbour'] },
   { id: 'language', label: 'Langues', kinds: ['shared_official_language', 'shared_language_used', 'shared_language_family', 'shared_language_glottolog'] },
   { id: 'treaty', label: 'Traités et organisations', kinds: ['co_party', 'co_signatory', 'co_member', 'alliance_co_member'] },
   { id: 'conflict', label: 'Conflits armés (UCDP, Wikidata)', kinds: ['conflict_same_side', 'conflict_opposing_sides', 'conflict_co_participant'] },
   { id: 'peacekeeping', label: 'Maintien de la paix (ONU)', kinds: ['peacekeeping_contributor_to_host'] },
+  { id: 'sanctions', label: 'Sanctions (épisodes codés TIES / EUSANCT, programmes OFAC)', kinds: ['sanction_episode', 'us_sanctions_program'] },
   { id: 'infrastructure', label: 'Réseaux physiques (câbles sous-marins, vols de 2014, lancements spatiaux)', kinds: ['submarine_cable', 'air_routes_2014', 'launch_service'] },
+  { id: 'hazard', label: 'Catastrophes naturelles (même événement observé dans les deux pays)', kinds: ['hazard_shared_event'] },
   { id: 'diplomatic', label: 'Relations diplomatiques', kinds: ['diplomatic_relation', 'shared_head_of_state', 'shared_currency', 'shared_legal_family'] },
   { id: 'history', label: 'Histoire partagée', kinds: ['successor_of', 'shared_polity_territory'] },
 ];
@@ -160,6 +166,7 @@ function linkItem(l: PairLink, kindLabel: string, labels: PairLinksData['labels'
   const t = l.temporal;
   const dates = censoredDates(l, linkDates(t));
   const phys = physicalDetail(l);
+  if (!phys.text) phys.text = datasetDetail(l);
   const yearFrom = phys.since ?? (t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.start));
   const yearTo = t.kind === 'snapshot' ? (t.year ?? null) : t.kind === 'point' ? yearOfPartial(t.point) : yearOfPartial(t.end);
   return {
@@ -229,6 +236,39 @@ export function physicalDetail(l: PairLink): { text: string; since: number | nul
   return { text: parts.join(' ; '), since };
 }
 
+/** Dataset names of a `source=` facet (one link type fed by several datasets: their values are never added). */
+export const SOURCE_FACET_LABEL: Record<string, string> = {
+  'source=ties': 'jeu de données TIES (1945-2005)',
+  'source=eusanct': 'jeu de données EUSANCT (1989-2015)',
+};
+
+/** Facet shown next to a series: a dataset name for `source=` facets, else the facet as served. */
+export function facetLabel(facet: string | null): string | null {
+  if (!facet) return null;
+  if (facet.startsWith('source=')) return SOURCE_FACET_LABEL[facet] ?? `jeu de données ${facet.slice(7)}`;
+  return facet;
+}
+
+/**
+ * EVMAP details read from the basis of dataset links (nothing invented: a missing member is not mentioned):
+ * the runup records of a tsunami observed in the other country, COLDAT's date aggregation(s), the COW status.
+ */
+export function datasetDetail(l: PairLink): string {
+  const b = rec(l.basis);
+  if (l.link_type === 'hazard_shared_event') {
+    const parts = ['même événement naturel observé : source dans le premier pays, vagues relevées dans le second'];
+    const n = int(b.runup_records);
+    if (n !== null) parts.push(`${n} relevé(s) de vagues (NCEI)`);
+    const deaths = int(b.runup_deaths_published_sum);
+    if (deaths !== null) parts.push(`${deaths} décès publiés pour ces relevés`);
+    return parts.join(' ; ');
+  }
+  if (l.link_type === 'colonised_by_coldat' && Array.isArray(b.aggregations) && b.aggregations.length)
+    return `COLDAT, agrégation des dates : ${(b.aggregations as unknown[]).map(String).join(' et ')}`;
+  if (l.link_type === 'colonial_rule_cow' && typeof b.status === 'string') return `statut : ${b.status} (liste des entités COW)`;
+  return '';
+}
+
 /** The caveat (fr) and licence stored on the links of a kind, once each. */
 function notesOf(k: PairKind): string[] {
   const out = new Set<string>();
@@ -248,7 +288,7 @@ function seriesOf(k: PairKind, kind: string, label: string, labels: PairLinksDat
     const key = `${l.subject}>${l.object}|${facet ?? ''}`;
     let s = by.get(key);
     if (!s) {
-      s = { key: `${kind}-${key}`, kind, label, from: nodeName(labels, l.subject, names), to: nodeName(labels, l.object, names), facet, unit: l.unit ?? null, points: [] };
+      s = { key: `${kind}-${key}`, kind, label, from: nodeName(labels, l.subject, names), to: nodeName(labels, l.object, names), facet: facetLabel(facet), unit: l.unit ?? null, points: [] };
       by.set(key, s);
     }
     s.points.push({ year: l.temporal.year as number, value: l.weight!, shown: frValue(l.weight!, l.unit), citations: l.evidence.map(citeLinkEvidence) });

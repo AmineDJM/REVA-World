@@ -3,7 +3,7 @@ import { PairLinksData } from '../api/links';
 import * as F from '../test/fixtures';
 import { NODE_RE, parseList, parseSteps, PROP_RE } from './pathOptions';
 import { licenceTermsFr, restrictedLicences } from './licence';
-import { buildRelation, censoredDates, laneMarks, physicalDetail, themeOf } from './relation';
+import { buildRelation, censoredDates, datasetDetail, facetLabel, laneMarks, physicalDetail, themeOf } from './relation';
 
 describe('relation view model', () => {
   const d = PairLinksData.parse(F.PAIR_BRA_PRT.data);
@@ -169,5 +169,57 @@ describe('review V3b: partial decades, left-censored periods, licences', () => {
       { source: 'ipu', licence: 'CC-BY-NC-SA-4.0', restricted: true },
     ];
     expect(restrictedLicences(ls).map((l) => l.source)).toEqual(['ipu']);
+  });
+});
+
+describe('EVMAP: sanctions, colonial datasets, natural hazards', () => {
+  const ev = (source: string, pid: string) => ({ kind: 'atlas_row', source, raw_sha256: 'b'.repeat(64), selector: '{"row":1}', pid, origin: 'test_fixture' });
+  const meta = (fr: string, temporal: string) => ({ labels: { fr, en: fr }, inverse_labels: { fr, en: fr }, honesty: { fr: `relié via : ${fr}`, en: fr }, directed: true, status: 'derivable', temporal, weight: { kind: 'none', unit: null }, sources: [] });
+  const sanction = (source: string, year: number, weight: string) => ({
+    subject: 'Q30', object: 'Q241', link_type: 'sanction_episode', directed: true, temporal: { kind: 'snapshot', year }, weight, unit: 'cases', via: [],
+    evidence: [ev(source, 'CASES_ACTIVE|partner=CUB')], basis: { source, facet: `source=${source}`, licence: source === 'ties' ? 'TIES: cite-only' : 'CC BY 4.0' }, facet: `source=${source}`, iso3: ['USA', 'CUB'],
+  });
+  const d = PairLinksData.parse({
+    a: 'USA',
+    b: 'CUB',
+    store: { materialisation_id: 9 },
+    kinds: {
+      sanction_episode: { ...meta('épisodes de sanctions (menace ou imposition) visant', 'snapshot'), count: 3, first_year: 1960, last_year: 1990, links: [sanction('ties', 1960, '1'), sanction('ties', 1990, '2'), sanction('eusanct', 1990, '1')] },
+      hazard_shared_event: {
+        ...meta('même événement naturel observé', 'point'), count: 1, first_year: 2004, last_year: 2004,
+        links: [{ subject: 'Q30', object: 'Q241', link_type: 'hazard_shared_event', directed: true, temporal: { kind: 'point', point: '2004-12-26' }, weight: null, unit: null, via: ['ncei_hazards:tsunami:1'], evidence: [ev('noaa.ncei_hazards', 'ncei:runup_country')], basis: { runup_records: 12 }, facet: '', iso3: ['USA', 'CUB'] }],
+      },
+    },
+    kinds_without_links: ['us_sanctions_program', 'colonial_rule_cow'],
+    predecessor_links: [],
+    labels: { Q30: { fr: 'États-Unis' }, Q241: { fr: 'Cuba' }, 'ncei_hazards:tsunami:1': { fr: 'tsunami (NCEI 1)' } },
+    truncated: [],
+    notes: [],
+  });
+  const v = buildRelation(d);
+
+  it('groups the new kinds into their themes', () => {
+    expect(v.themes.map((t) => t.id)).toEqual(['sanctions', 'hazard']);
+    expect(themeOf('colonised_by_coldat')).toBe('colonial');
+    expect(themeOf('colonial_rule_cow')).toBe('colonial');
+    expect(themeOf('us_sanctions_program')).toBe('sanctions');
+  });
+
+  it('keeps TIES and EUSANCT counts as separate series named by dataset (never added)', () => {
+    const k = v.themes[0]!.kinds[0]!;
+    expect(k.series.map((s) => `${s.facet}:${s.points.map((p) => `${p.year}=${p.value}`).join(',')}`)).toEqual([
+      'jeu de données EUSANCT (1989-2015):1990=1',
+      'jeu de données TIES (1945-2005):1960=1,1990=2',
+    ]);
+    expect(k.notes).toEqual(['Licence : TIES: cite-only', 'Licence : CC BY 4.0']);
+    expect(facetLabel('section=XVI')).toBe('section=XVI');
+  });
+
+  it('says a shared tsunami is the same natural event observed, never a cause', () => {
+    const it0 = v.themes[1]!.kinds[0]!.items[0]!;
+    expect(it0.sentence).toContain('même événement naturel observé');
+    expect(it0.sentence).toContain('12 relevé(s) de vagues');
+    expect(it0.sentence).not.toMatch(/cause|parce que|provoqu/);
+    expect(datasetDetail({ ...d.kinds.hazard_shared_event!.links[0]!, link_type: 'colonial_rule_cow', basis: { status: 'colony' } })).toBe('statut : colony (liste des entités COW)');
   });
 });
