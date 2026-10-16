@@ -521,6 +521,10 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
         86400,
     ),
     # --- end LINKWIRE
+    # --- CAUSOPS (V3): daily causal refresh (KG causal statements -> claims, then grades) two hours after the
+    # link store slot, live origin only (production serves live claims); writes nothing when unchanged.
+    ("causal_refresh:live", "causal_refresh", {"origin": "live"}, 86400),
+    # --- end CAUSOPS
 )
 
 #: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Heavy downloads get a day of
@@ -529,6 +533,7 @@ ATLAS_FIRST_SLOT_HOURS: dict[str, int] = {
     **{f"atlas_ingest:{name}": hours for name, hours in ATLAS_SCHEDULE_SLOTS},
     "atlas_snapshot:live": 8,
     "links_materialise:live": 10,  # LINKWIRE: after the daily atlas snapshot slot
+    "causal_refresh:live": 12,  # CAUSOPS: after the daily link store slot
 }
 
 

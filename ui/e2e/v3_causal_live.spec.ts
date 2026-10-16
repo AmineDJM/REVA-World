@@ -43,6 +43,7 @@ test('Première Guerre mondiale (Q361): real claims on the graph, every line att
   const effects = (await apiGet(page.request, '/v1/causal/events/Q361/effects?limit=200')).data.claims as Claim[];
   const edges = new Set([...causes, ...effects].filter((c) => c.stance === 'asserts').map((c) => c.claim_key));
   expect(edges.size).toBeGreaterThan(5);
+  await page.setViewportSize({ width: 1400, height: 1400 }); // the whole canvas on screen: clicks land on edges
   await page.goto('/v3/causes?event=Q361');
   await expect(page.getByTestId('event-card').getByRole('heading', { name: 'Première Guerre mondiale' })).toBeVisible(SLOW);
   await expect(page.getByTestId('event-dates')).toContainText('1914');
@@ -55,8 +56,8 @@ test('Première Guerre mondiale (Q361): real claims on the graph, every line att
     const cy = (el as HTMLDivElement & { __cy?: { $id: (i: string) => { renderedMidpoint: () => { x: number; y: number } } } }).__cy!;
     return cy.$id(id).renderedMidpoint();
   }, pick.claim_key);
-  const box = (await canvas.boundingBox())!;
-  await page.mouse.click(box.x + pt.x, box.y + pt.y);
+  await canvas.scrollIntoViewIfNeeded();
+  await canvas.click({ position: pt });
   const detail = page.getByTestId('claim-detail');
   await expect(detail.getByTestId('claim-statement')).toContainText(pick.source.statement_id!, SLOW);
   await expect(detail.getByTestId('claim-attribution')).toContainText(`selon Wikidata (${pick.source.tier})`);

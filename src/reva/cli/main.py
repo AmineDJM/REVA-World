@@ -24,6 +24,8 @@ atlas_app = typer.Typer(no_args_is_help=True, help="V3 atlas: budget-metered sou
 app.add_typer(atlas_app, name="atlas")
 links_app = typer.Typer(no_args_is_help=True, help="V3 links: materialised link store (country-country neurons)")
 app.add_typer(links_app, name="links")
+causal_app = typer.Typer(no_args_is_help=True, help="V3 causality: sourced causal claims and their grades")
+app.add_typer(causal_app, name="causal")
 
 
 def _out(obj: Any) -> None:
@@ -558,6 +560,29 @@ def links_materialise_cmd(
         raise typer.Exit(2) from e
     if code:
         raise typer.Exit(code)
+
+
+# --------------------------------------------------------------------------- causal (V3, CAUSOPS)
+@causal_app.command("refresh")
+def causal_refresh_cmd(
+    origin: str = typer.Option("live", help="live, test_fixture or any (every origin)"),
+) -> None:
+    """Load causal claims from the KG current view, then grade every current claim (worker credentials).
+
+    Same code path as the `causal_refresh` job kind; idempotent (nothing is written when nothing changed)."""
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.causal import refresh
+    from reva.operations.jobs import parse_causal_refresh_payload
+    from reva.settings import get_settings
+
+    if origin not in ("live", "test_fixture", "any"):
+        typer.echo("--origin must be live, test_fixture or any", err=True)
+        raise typer.Exit(2)
+    p = parse_causal_refresh_payload({"origin": None if origin == "any" else origin})
+    settings = get_settings()
+    out = refresh(make_engine("worker", settings), get_store(), origin=p["origin"])
+    _out({"status": "completed", "origin": p["origin"], **out})
 
 
 def main() -> None:  # pragma: no cover

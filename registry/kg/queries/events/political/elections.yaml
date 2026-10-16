@@ -1,0 +1,28 @@
+id: history.events.national_elections
+domain: history
+owner: EVENTS
+description: >-
+  National elections and referendums, bounded: instances of general election (Q1076105), presidential election
+  (Q858439) or referendum (Q43109), or of a direct subclass, that state a country (P17) and have at least 8
+  sitelinks (Wikidata holds several hundred thousand election items, most of them local; this spec keeps the
+  nationally prominent ones). Snapshots keep country, date, winner (P1346), applies to jurisdiction (P1001),
+  follows/followed by (the previous/next election) and asserted causal statements; candidates (P726/P991) are
+  requested from WDHARVEST.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q1076105 wd:Q858439 wd:Q43109 }
+    ?item p:P31 ?st . ?st ps:P31 ?cls ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+    ?cls wdt:P279? ?root .
+    ?item wdt:P17 ?country ; wikibase:sitelinks ?links . FILTER(?links >= 8)
+  }
+max_rows: 15000
+expand_hops: 1
+# Rank-aware selection (p:P31/ps:P31, deprecated excluded; never the truthy wdt:P31 subset). The snapshot
+# properties include every causal property (P828/P1542/P1478/P1479/P1536/P1537): Wikidata's causal claims
+# arrive with the events (CAUSCORE loads them as T3/T4 claims; REVA asserts none).
+properties: [P31, P17, P276, P131, P585, P580, P582, P571, P576, P361, P527, P155, P156, P793, P710, P664, P137, P1120, P828, P1542, P1478, P1479, P1536, P1537, P1346, P1001]
+# WDQS-free selection (run --via api): same classes, CirrusSearch semantics (every non-deprecated P31 is
+# indexed; no sitelink bound is expressible, the 10,000-result window per query is reported if exceeded).
+api_search: {extra: 'haswbstatement:P17', instance_of: [Q1076105, Q858439, Q43109], subclass_depth: 1}

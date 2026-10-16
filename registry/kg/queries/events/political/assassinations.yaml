@@ -1,0 +1,27 @@
+id: history.events.assassinations
+domain: history
+owner: EVENTS
+description: >-
+  Assassinations: instances of assassination (Q3882219, 'magnicide' in French) or of a subclass, with at least 3
+  sitelinks: Assassination of Archduke Franz Ferdinand, of Julius Caesar, of John F. Kennedy ... Snapshots keep
+  place, date, participants and the causal statements Wikidata asserts (e.g. Franz Ferdinand's assassination ->
+  immediate cause of the July Crisis, when stated). Perpetrator/victim (P8031/P8032) are requested from WDHARVEST
+  (registry/kg/property_requests/events.yaml).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q3882219 }
+    ?item p:P31 ?st . ?st ps:P31 ?cls ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+    ?cls wdt:P279* ?root .
+    ?item wikibase:sitelinks ?links . FILTER(?links >= 3)
+  }
+max_rows: 4000
+expand_hops: 1
+# Rank-aware selection (p:P31/ps:P31, deprecated excluded; never the truthy wdt:P31 subset). The snapshot
+# properties include every causal property (P828/P1542/P1478/P1479/P1536/P1537): Wikidata's causal claims
+# arrive with the events (CAUSCORE loads them as T3/T4 claims; REVA asserts none).
+properties: [P31, P17, P276, P131, P585, P580, P582, P571, P576, P361, P527, P155, P156, P793, P710, P664, P137, P1120, P828, P1542, P1478, P1479, P1536, P1537]
+# WDQS-free selection (run --via api): same classes, CirrusSearch semantics (every non-deprecated P31 is
+# indexed; no sitelink bound is expressible, the 10,000-result window per query is reported if exceeded).
+api_search: {instance_of: [Q3882219], subclass_depth: 2}

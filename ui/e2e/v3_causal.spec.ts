@@ -69,6 +69,7 @@ test.beforeEach(async ({ page }) => {
 
 test('graded causal graph: event card, legend, edges on the canvas; a clicked edge opens its sourced claim', async ({ page }) => {
   await installFixtures(page);
+  await page.setViewportSize({ width: 1400, height: 1400 }); // the whole canvas on screen: clicks land on edges
   await page.goto('/v3/causes?event=Q361');
   await expect(page.getByRole('heading', { level: 1, name: 'Causes & conséquences' })).toBeVisible();
   const card = page.getByTestId('event-card');
@@ -86,8 +87,8 @@ test('graded causal graph: event card, legend, edges on the canvas; a clicked ed
     const cy = (el as HTMLDivElement & { __cy?: { $id: (id: string) => { renderedMidpoint: () => { x: number; y: number } } } }).__cy!;
     return cy.$id('ds:icb.data:icb2:2:trigger').renderedMidpoint();
   });
-  const box = (await canvas.boundingBox())!;
-  await page.mouse.click(box.x + pt.x, box.y + pt.y);
+  await canvas.scrollIntoViewIfNeeded();
+  await canvas.click({ position: pt });
   const detail = page.getByTestId('claim-detail');
   await expect(detail.getByTestId('claim-attribution')).toContainText('Affirmé selon icb.data (T1)');
   await expect(detail.getByTestId('claim-statement')).toContainText('révision v16-FIXTURE');

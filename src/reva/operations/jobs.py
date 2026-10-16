@@ -74,6 +74,9 @@ HANDLERS: dict[str, str] = {
     # --- LINKWIRE (V3): materialised link store of (atlas snapshot, KG watermark); reused when unchanged
     "links_materialise": "reva.links.jobs:handle_links_materialise",
     # --- end LINKWIRE
+    # --- CAUSOPS (V3): causal claims from the KG current view (loader) + grades (grader), worker credentials
+    "causal_refresh": "reva.operations.jobs:handle_causal_refresh",
+    # --- end CAUSOPS
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation
@@ -586,6 +589,36 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
         "origin": origin.value,
         "dirty_nodes_before": dirty,
     }
+
+
+# --------------------------------------------------------------------------- causal (V3, CAUSOPS)
+CAUSAL_REFRESH_ORIGINS = ("live", "test_fixture")
+
+
+def parse_causal_refresh_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    """Payload ``{"origin": "live" | "test_fixture" | null}`` (null: every origin). Default ``live``."""
+    unknown = set(payload) - {"origin"}
+    if unknown:
+        raise ValidationProblem("unknown causal_refresh payload keys", keys=sorted(str(k)[:64] for k in unknown)[:10])
+    origin = payload.get("origin", "live")
+    if origin is not None and origin not in CAUSAL_REFRESH_ORIGINS:
+        raise ValidationProblem("origin must be live, test_fixture or null", origin=str(origin)[:32])
+    return {"origin": origin}
+
+
+def handle_causal_refresh(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
+    """Job kind ``causal_refresh``: :func:`reva.causal.refresh` (KG causal statements -> claims, then grades).
+
+    Both steps are idempotent: an unchanged KG writes no claim row and an unchanged grade input writes no grade
+    row (no load row either), so the daily schedule records nothing when nothing changed. Dataset (T1/T2)
+    claims are delivered by their connectors; this job regrades them with the KG claims (corroboration and
+    contestation span sources).
+    """
+    from reva.causal import refresh
+
+    p = parse_causal_refresh_payload(payload)
+    out = refresh(ctx.worker_engine, ctx.store, origin=p["origin"])
+    return {"status": "completed", "origin": p["origin"], **out}
 
 
 # --------------------------------------------------------------------------- health

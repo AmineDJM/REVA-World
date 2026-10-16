@@ -1,0 +1,27 @@
+id: history.events.migration_waves
+domain: history
+owner: EVENTS
+description: >-
+  Migration waves: instances of human migration (Q177626) or of a subclass (exodus, population transfer, refugee
+  crisis ... where Wikidata classes them so), with at least 2 sitelinks: Great Migration, Partition-era migration,
+  2015 European migrant crisis ... Human migration is a general process class: the event view shows each item's
+  class chain. Snapshots keep place (origin/destination when stated as P276), dates and asserted causal statements
+  (migrations often carry has cause: famine, war).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q177626 }
+    ?item p:P31 ?st . ?st ps:P31 ?cls ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+    ?cls wdt:P279* ?root .
+    ?item wikibase:sitelinks ?links . FILTER(?links >= 2)
+  }
+max_rows: 3000
+expand_hops: 1
+# Rank-aware selection (p:P31/ps:P31, deprecated excluded; never the truthy wdt:P31 subset). The snapshot
+# properties include every causal property (P828/P1542/P1478/P1479/P1536/P1537): Wikidata's causal claims
+# arrive with the events (CAUSCORE loads them as T3/T4 claims; REVA asserts none).
+properties: [P31, P17, P276, P131, P585, P580, P582, P571, P576, P361, P527, P155, P156, P793, P710, P664, P137, P1120, P828, P1542, P1478, P1479, P1536, P1537]
+# WDQS-free selection (run --via api): same classes, CirrusSearch semantics (every non-deprecated P31 is
+# indexed; no sitelink bound is expressible, the 10,000-result window per query is reported if exceeded).
+api_search: {instance_of: [Q177626], subclass_depth: 2}

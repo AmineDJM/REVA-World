@@ -1,0 +1,26 @@
+id: history.events.protests
+domain: history
+owner: EVENTS
+description: >-
+  Protests, demonstrations, riots, strikes and rebellions: instances of protest (Q273120; riot Q124757 and strike
+  Q49776 are subclasses), demonstration (Q175331) or rebellion (Q124734), or of a subclass, with at least 3
+  sitelinks: May 1968 events in France, Tiananmen Square protests, Salt March, Haymarket affair ... Snapshots keep
+  organizer (P664), participants, place, dates and asserted causal statements.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q273120 wd:Q175331 wd:Q124734 }
+    ?item p:P31 ?st . ?st ps:P31 ?cls ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+    ?cls wdt:P279* ?root .
+    ?item wikibase:sitelinks ?links . FILTER(?links >= 3)
+  }
+max_rows: 12000
+expand_hops: 1
+# Rank-aware selection (p:P31/ps:P31, deprecated excluded; never the truthy wdt:P31 subset). The snapshot
+# properties include every causal property (P828/P1542/P1478/P1479/P1536/P1537): Wikidata's causal claims
+# arrive with the events (CAUSCORE loads them as T3/T4 claims; REVA asserts none).
+properties: [P31, P17, P276, P131, P585, P580, P582, P571, P576, P361, P527, P155, P156, P793, P710, P664, P137, P1120, P828, P1542, P1478, P1479, P1536, P1537]
+# WDQS-free selection (run --via api): same classes, CirrusSearch semantics (every non-deprecated P31 is
+# indexed; no sitelink bound is expressible, the 10,000-result window per query is reported if exceeded).
+api_search: {instance_of: [Q273120, Q175331, Q124734], subclass_depth: 2}

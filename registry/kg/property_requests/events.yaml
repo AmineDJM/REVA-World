@@ -1,0 +1,58 @@
+# Property requests from EVENTS (event view participants and casualties). WDHARVEST merges them into
+# registry/kg/properties.yaml (`python -m reva.kg.harvest merge-property-requests`). Every id, datatype and label
+# below was checked against Wikidata on 2026-10-16 (registry/events/_recorded/wikidata_verification.json).
+# Until merged, the event specs cannot keep these claims; the taxonomy maps them only once they are allow-listed.
+- property: P1923
+  why: >-
+    participating team (event -> team/side), e.g. the coalitions of a war or the teams of a contest; a
+    participant role of the event view next to participant (P710).
+  reva_predicate: participating_team
+  inverse: participating_team_in
+  kind: entity
+  label_fr: équipes participantes
+  label_en: participating team
+- property: P8031
+  why: >-
+    perpetrator (event -> person/group that carried it out), e.g. the assassin of an assassination or the
+    organisers of a massacre; role 'perpetrator' of the event view.
+  reva_predicate: perpetrator
+  inverse: perpetrator_of
+  kind: entity
+  label_fr: perpétrateur ou perpétratrice
+  label_en: perpetrator
+- property: P8032
+  why: >-
+    victim(s) (event -> person/group harmed), e.g. the target of an assassination; role 'victim'.
+  reva_predicate: victim
+  inverse: victim_of
+  kind: entity
+  label_fr: victime
+  label_en: victim(s)
+- property: P726
+  why: candidate (election -> candidate person/party); role 'candidate' of election events.
+  reva_predicate: candidate
+  inverse: candidate_in
+  kind: entity
+  label_fr: candidat ou candidate
+  label_en: candidate
+- property: P991
+  why: successful candidate (election -> elected person/party); role 'winner' of election events.
+  reva_predicate: successful_candidate
+  inverse: elected_in
+  kind: entity
+  label_fr: élu ou élue
+  label_en: successful candidate
+- property: P1590
+  why: number of casualties (event -> quantity), next to number of deaths (P1120) for disasters and attacks.
+  reva_predicate: number_of_casualties
+  inverse: null
+  kind: quantity
+  label_fr: nombre de victimes
+  label_en: number of casualties
+- property: P1339
+  why: number of injured (event -> quantity), for attacks, riots and disasters.
+  reva_predicate: number_of_injured
+  inverse: null
+  kind: quantity
+  label_fr: nombre de blessés
+  label_en: number of injured

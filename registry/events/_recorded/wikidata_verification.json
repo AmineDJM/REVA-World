@@ -2,8 +2,78 @@
  "schema": "reva-events-wikidata-verification/1",
  "built_by": "reva.events.verify/1",
  "note": "Compact records of Wikidata entity snapshots (Special:EntityData through WDHARVEST's locked, budget-metered client): labels en/fr, non-deprecated P31/P279 claims with rank and statement id, property datatype, lastrevid. Raw bodies are archived content-addressed in var/kg/objects (raw_sha256, gzip; var/kg/archive_index.jsonl). Wikidata is community-edited (CC0).",
- "updated_at": "2026-10-16T21:13:00.645151+00:00",
- "titles": {},
+ "updated_at": "2026-10-16T21:13:39.070142+00:00",
+ "titles": {
+  "Declaration of independence": {
+   "id": "Q1464916",
+   "labels": {
+    "en": "declaration of independence",
+    "fr": "déclaration d'indépendance"
+   },
+   "lastrevid": 2547426055,
+   "lookup": "enwiki_title",
+   "raw_sha256": "bec5985aea683b5fa29870bf525fedbfe813fa5eba0c24066ca9429282b1af28",
+   "retrieved_at": "2026-10-16T21:13:16.298592+00:00",
+   "P279": [
+    {
+     "o": "Q62662439",
+     "rank": "normal",
+     "statement": "Q1464916$2c110734-4240-d398-eac5-39d9d976912d",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2620826",
+     "rank": "normal",
+     "statement": "Q1464916$bdf411f8-450b-325d-79ae-deaa91bfa94c",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Declaration of independence",
+   "item_by_title_sha256": "6d71b180fadb0db86c046b77aae66c42f310baf07a94004d09252386351094f7"
+  },
+  "Independence": {
+   "id": "Q37055",
+   "labels": {
+    "fr": "indépendance",
+    "en": "independence"
+   },
+   "lastrevid": 2555878197,
+   "lookup": "enwiki_title",
+   "raw_sha256": "303717f5497724e25ab58cccfddadcb98d39f034c8f5b146a470270684abe594",
+   "retrieved_at": "2026-10-16T21:13:39.003523+00:00",
+   "P279": [
+    {
+     "o": "Q417633",
+     "rank": "normal",
+     "statement": "Q37055$96f7a9ea-470e-4171-c6d3-bb7905de6cf7",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Independence",
+   "item_by_title_sha256": "825128b96412aac88dfd767027e47a7cdc32970e026a84c0465b4885ff7d7056"
+  },
+  "Wall Street crash of 1929": {
+   "id": "Q201684",
+   "labels": {
+    "fr": "krach de 1929",
+    "en": "Wall Street crash of 1929"
+   },
+   "lastrevid": 2526486888,
+   "lookup": "enwiki_title",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "retrieved_at": "2026-10-16T21:13:27.526426+00:00",
+   "P31": [
+    {
+     "o": "Q1020018",
+     "rank": "normal",
+     "statement": "Q201684$34addc4e-402d-025f-4bc6-26a69081c28e",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Wall Street crash of 1929",
+   "item_by_title_sha256": "94c82e2d21cadeabb09226cb5385755b384080ea45e769b5001c486cf56ae7ab"
+  }
+ },
  "entities": {
   "P17": {
    "id": "P17",
@@ -1539,6 +1609,27 @@
     }
    ]
   },
+  "Q37055": {
+   "id": "Q37055",
+   "labels": {
+    "fr": "indépendance",
+    "en": "independence"
+   },
+   "lastrevid": 2555878197,
+   "lookup": "enwiki_title",
+   "raw_sha256": "303717f5497724e25ab58cccfddadcb98d39f034c8f5b146a470270684abe594",
+   "retrieved_at": "2026-10-16T21:13:39.003523+00:00",
+   "P279": [
+    {
+     "o": "Q417633",
+     "rank": "normal",
+     "statement": "Q37055$96f7a9ea-470e-4171-c6d3-bb7905de6cf7",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Independence",
+   "item_by_title_sha256": "825128b96412aac88dfd767027e47a7cdc32970e026a84c0465b4885ff7d7056"
+  },
   "Q40231": {
    "id": "Q40231",
    "labels": {
@@ -2294,6 +2385,27 @@
     }
    ]
   },
+  "Q201684": {
+   "id": "Q201684",
+   "labels": {
+    "fr": "krach de 1929",
+    "en": "Wall Street crash of 1929"
+   },
+   "lastrevid": 2526486888,
+   "lookup": "enwiki_title",
+   "raw_sha256": "8cc1a0f1cb49d2e62e0925b1bb28ed0dff4dd7b7e02bb1eef92e5a5d3c7821b4",
+   "retrieved_at": "2026-10-16T21:13:27.526426+00:00",
+   "P31": [
+    {
+     "o": "Q1020018",
+     "rank": "normal",
+     "statement": "Q201684$34addc4e-402d-025f-4bc6-26a69081c28e",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Wall Street crash of 1929",
+   "item_by_title_sha256": "94c82e2d21cadeabb09226cb5385755b384080ea45e769b5001c486cf56ae7ab"
+  },
   "Q207781": {
    "id": "Q207781",
    "labels": {
@@ -2856,6 +2968,33 @@
      "snaktype": "value"
     }
    ]
+  },
+  "Q1464916": {
+   "id": "Q1464916",
+   "labels": {
+    "en": "declaration of independence",
+    "fr": "déclaration d'indépendance"
+   },
+   "lastrevid": 2547426055,
+   "lookup": "enwiki_title",
+   "raw_sha256": "bec5985aea683b5fa29870bf525fedbfe813fa5eba0c24066ca9429282b1af28",
+   "retrieved_at": "2026-10-16T21:13:16.298592+00:00",
+   "P279": [
+    {
+     "o": "Q62662439",
+     "rank": "normal",
+     "statement": "Q1464916$2c110734-4240-d398-eac5-39d9d976912d",
+     "snaktype": "value"
+    },
+    {
+     "o": "Q2620826",
+     "rank": "normal",
+     "statement": "Q1464916$bdf411f8-450b-325d-79ae-deaa91bfa94c",
+     "snaktype": "value"
+    }
+   ],
+   "enwiki_title": "Declaration of independence",
+   "item_by_title_sha256": "6d71b180fadb0db86c046b77aae66c42f310baf07a94004d09252386351094f7"
   },
   "Q1752346": {
    "id": "Q1752346",

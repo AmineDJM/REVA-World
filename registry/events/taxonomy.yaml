@@ -222,7 +222,15 @@ types:
     parent: event
     wikidata_classes: []
     roles: [actor, former_ruler, participant]
-    description: Accession to independence; CShapes status changes are derived events of this type.
+    description: >-
+      Accession to independence. Wikidata's 'independence' (Q37055) is a concept, not an event class (recorded
+      lookup); CShapes status changes are derived events of this type; declarations are a sub-type.
+  - id: declaration_of_independence
+    label_en: declaration of independence
+    label_fr: déclaration d'indépendance
+    parent: independence
+    wikidata_classes: [Q1464916]
+    roles: [actor, signatory, former_ruler]
   - id: annexation
     label_en: annexation
     label_fr: annexion

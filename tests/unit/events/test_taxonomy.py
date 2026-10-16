@@ -106,7 +106,7 @@ def test_recorded_classes_index() -> None:
     # every recorded parent edge is non-deprecated and names its statement
     for c, ps in rec.parents.items():
         for parent, rank, sid in ps:
-            assert rank in ("preferred", "normal") and parent.startswith("Q") and sid.startswith(c), (c, parent)
+            assert rank in ("preferred", "normal") and parent.startswith("Q") and sid.lower().startswith(c.lower() + "$"), (c, parent)
 
 
 def test_recorded_verification_is_compact_and_has_no_personal_data() -> None:

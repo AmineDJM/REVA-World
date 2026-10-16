@@ -327,6 +327,25 @@ async def run(
     return {"entities": len(records), "titles": len(title_records), "usage": usage.get("budget")}
 
 
+async def probe_specs(paths: Sequence[Path], *, max_specs: int = 11) -> dict[str, Any]:
+    """Small API-mode probe of event specs: one search per spec root class (``haswbstatement:P31=<root>``,
+    REST search in ``linked_data`` mode: at most 100 hits, no paging) -> hit counts and a few QIDs. Nothing is
+    loaded; the probe only shows that each ``api_search`` block selects real items."""
+    from reva.kg.harvest import discover_specs
+
+    specs = [sp for sp in discover_specs(list(paths)) if sp.get("api_search")][:max_specs]
+    out: dict[str, Any] = {}
+    async with wbapi_client(purpose="eventsprobe", planned_wbapi=len(specs), mode="linked_data") as sess:
+        for sp in specs:
+            root = sp.get("api_search")["instance_of"][0]
+            hits, total, sha = await sess.client.search_page(f"haswbstatement:P31={root}", limit=100,
+                                                             meta={"purpose": "events_spec_probe", "spec": sp.id})
+            out[sp.id] = {"root": root, "hits": len(hits), "total_reported": total, "first": hits[:5],
+                          "raw_sha256": sha}
+        out["_usage"] = sess.usage.get("budget")
+    return out
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m reva.events.verify")
     ap.add_argument("--classes", action="store_true", help="look up CLASS_IDS")
@@ -334,7 +353,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--ids", nargs="*", default=[], help="extra Q/P ids")
     ap.add_argument("--titles", nargs="*", default=[], help="enwiki titles (Special:ItemByTitle)")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--probe-specs", nargs="*", type=Path, help="API-mode probe of event specs (no KG writes)")
     a = ap.parse_args(argv)
+    if a.probe_specs is not None:
+        res = asyncio.run(probe_specs(a.probe_specs or [REPO_ROOT / "registry" / "kg" / "queries" / "events"]))
+        print(json.dumps(res, indent=1, default=str))
+        return 0
     ids = list(a.ids) + (list(CLASS_IDS) if a.classes else []) + (list(PROPERTY_IDS) if a.properties else [])
     res = asyncio.run(run(titles=a.titles, ids=list(dict.fromkeys(ids)), out=a.out))
     print(json.dumps(res, indent=1, default=str))
