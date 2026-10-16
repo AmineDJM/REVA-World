@@ -153,8 +153,8 @@ def _reuse(run: Any, url: str) -> ic.Fetched | None:
     """Run option ``reuse_archived_hours=N``: serve a live response this source already archived (same request
     fingerprint, origin live, retrieved < N hours ago) instead of asking Wikidata again. The raw keeps its own
     sha256 and original retrieval time; nothing is re-archived. Used to resume a long run without re-fetching."""
-    hours = float((run.options or {}).get("reuse_archived_hours") or 0)
-    if hours <= 0 or run.engine is None:
+    hours = float((getattr(run, "options", None) or {}).get("reuse_archived_hours") or 0)
+    if hours <= 0 or getattr(run, "engine", None) is None:
         return None
     from sqlalchemy import text
 
@@ -276,9 +276,8 @@ def build(cables: list[dict[str, Any]], raws: dict[str, str], day: date) -> tupl
         cs = sorted(cs, key=lambda c: int(c["qid"][1:]))
         listed, used = [], 0
         for c in cs:
-            item = {"qid": c["qid"], "label": str(c["label"])[:60], "year": c["year"], "rev": c["revision"]}
-            if c["year_property"] and c["year_property"] != "P729":
-                item["year_property"] = c["year_property"]
+            item = {"qid": c["qid"], "label": str(c["label"])[:60], "year": c["year"],
+                    "year_property": c["year_property"], "rev": c["revision"]}  # fmt: skip
             n = len(json.dumps(item, ensure_ascii=False)) + 1
             if used + n > CABLE_LIST_CHARS:
                 break
