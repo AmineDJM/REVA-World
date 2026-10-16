@@ -148,7 +148,7 @@ work, then merged on the lead's instruction:
 | table | rows | crosswalk entities | provider geos | indicators | periods |
 |---|---|---|---|---|---|
 | `atlas.factbook.legal_2026_01` | 2,372 | 240 | 252 | 11 | as published 2026-01-22 (WI 2021-01-01) |
-| `atlas.factbook.figures_2026_01` | 30,946 | 240 | 261 | 1,731 (94 fields + 6 list families) | stated years 1990–2025 (93 % in 2020–2025); 2,766 as-published rows |
+| `atlas.factbook.figures_2026_01` | 30,946 | 240 | 261 | 1,731 (94 fields + 6 list families) | stated years 1990–2025 (87 % in 2020–2025); 2,766 as-published rows |
 | `atlas.factbook.texts_2026_01` | 73,924 | 240 | 261 | 742 paths | as published 2026-01-21/22 (older for 21 stale files) |
 | `atlas.factbook.disputes_2024_04` | 259 | 240 | 259 | 1 | edition 2024-04-18 |
 | `atlas.unsd.ama` | 794,323 | 210 | 220 | 73 | 1970–2024 |
@@ -194,8 +194,8 @@ uninhabited areas and dependencies (see below), and TWN, TZA (only the two Tanza
 
 List families: religion shares 218 entities (1,171 rows), ethnic groups 199 (1,208), languages 114
 (673; many profiles list languages without %), export/import partners 230 each (~1,140 rows),
-land borders 162 entities (660 neighbour rows, `partner_iso3` resolved for all but Taiwan's
-partners before TWN, French DOMs, West Bank/Gaza and Guantanamo). Texts: median 323 text fields per
+land borders 162 entities (660 neighbour rows, `partner_iso3` resolved for all but French DOMs, West Bank/Gaza and
+Guantanamo). Texts: median 323 text fields per
 entity (climate, terrain, natural resources, government type, capital, independence, constitution,
 legal system, suffrage, executive/legislative/judicial branches, currency, flag, anthem, economic
 overview, transnational issues …).

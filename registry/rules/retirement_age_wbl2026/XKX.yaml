@@ -1,14 +1,14 @@
-# KSV: retirement-age rule table transcribed by agent SIMWORLD from World Bank WBL 2026
+# XKX: retirement-age rule table transcribed by agent SIMWORLD from World Bank WBL 2026
 # (src/reva/cli/build_wbl_rule_tables.py); maintainer review pending.
 schema: reva-retirement-age-rules/1
 version: 1.0.0
 review_status: maintainer_review_pending
 transcription: transcribed by agent SIMWORLD from WBL 2026, maintainer review pending
-country: KSV
+country: XKX
 notes: 'Kosovo: full-benefit retirement age for women and men from World Bank WBL 2026 (law as of 1 October 2025),
-  legal basis as cited by WBL: Law No. 04/L-101 on Pension Funds, Art. 1. The legal text itself was not archived
-  by REVA. WBL states one age at one date: the in-force path covers claim year 2025 only; the held-constant path
-  is an explicitly labelled counterfactual.'
+  legal basis as cited by WBL: Law No. 04/L-101 on Pension Funds, Art. 1. WBL economy code KSV = crosswalk key XKX.
+  The legal text itself was not archived by REVA. WBL states one age at one date: the in-force path covers claim
+  year 2025 only; the held-constant path is an explicitly labelled counterfactual.'
 model_lever:
   age_kind: normal_pension_age
   sex_tracks:
@@ -40,7 +40,7 @@ paths:
   status: counterfactual
   description: 'The reference path for scenarios: the stated age, as if it applied in every year.'
 rows:
-- row_id: KSV.wbl2026.women.2025
+- row_id: XKX.wbl2026.women.2025
   paths:
   - wbl2026_in_force_2025
   - wbl2026_held_constant
@@ -56,7 +56,7 @@ rows:
     source_id: wbl2026
     legal_reference: Law No. 04/L-101 on Pension Funds, Art. 1 (legal basis cited by WBL 2026, question 10.1.1)
     locator: '[10. Pension!O93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
-- row_id: KSV.wbl2026.women.before
+- row_id: XKX.wbl2026.women.before
   paths:
   - wbl2026_held_constant
   age_kind: normal_pension_age
@@ -74,7 +74,7 @@ rows:
     source_id: wbl2026
     legal_reference: Law No. 04/L-101 on Pension Funds, Art. 1 (legal basis cited by WBL 2026, question 10.1.1)
     locator: '[10. Pension!O93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
-- row_id: KSV.wbl2026.women.after
+- row_id: XKX.wbl2026.women.after
   paths:
   - wbl2026_held_constant
   age_kind: normal_pension_age
@@ -92,7 +92,7 @@ rows:
     source_id: wbl2026
     legal_reference: Law No. 04/L-101 on Pension Funds, Art. 1 (legal basis cited by WBL 2026, question 10.1.1)
     locator: '[10. Pension!O93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.2 Ages women (full benefits)=65'
-- row_id: KSV.wbl2026.men.2025
+- row_id: XKX.wbl2026.men.2025
   paths:
   - wbl2026_in_force_2025
   - wbl2026_held_constant
@@ -108,7 +108,7 @@ rows:
     source_id: wbl2026
     legal_reference: Law No. 04/L-101 on Pension Funds, Art. 1 (legal basis cited by WBL 2026, question 10.1.1)
     locator: '[10. Pension!N93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65'
-- row_id: KSV.wbl2026.men.before
+- row_id: XKX.wbl2026.men.before
   paths:
   - wbl2026_held_constant
   age_kind: normal_pension_age
@@ -126,7 +126,7 @@ rows:
     source_id: wbl2026
     legal_reference: Law No. 04/L-101 on Pension Funds, Art. 1 (legal basis cited by WBL 2026, question 10.1.1)
     locator: '[10. Pension!N93] ISO Code=KSV | Economy=Kosovo | Report Year=2026 | 10.1.1.1 Ages men (full benefits)=65'
-- row_id: KSV.wbl2026.men.after
+- row_id: XKX.wbl2026.men.after
   paths:
   - wbl2026_held_constant
   age_kind: normal_pension_age
