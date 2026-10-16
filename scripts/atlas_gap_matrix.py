@@ -675,7 +675,7 @@ def static_coverage() -> dict[str, dict[str, Any]]:
         }
     out["ssa.ssptw_2018_2019.old_age.pension_age.men"] = {
         "iso3": SSPTW_FILLS,
-        "origin": "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks; other SSPTW economies not listed)",
+        "origin": "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks, other SSPTW economies not listed)",
     }
     return out
 

@@ -59,7 +59,10 @@ import networkx as nx
 from reva.links.model import Evidence, Link, LinkError, NoEvidence, Stmt, Temporal, is_wikidata
 from reva.links.taxonomy import Hubs, Taxonomy, load_hubs, load_taxonomy
 
-MAX_HOPS_LIMIT = 6
+MAX_HOPS_LIMIT = 8
+#: DFS steps of one constrained search (ordered hop types, via_any / via_all, non-transit nodes)
+MAX_CONSTRAINED_STEPS = 2_000_000
+MAX_STEPS = 8
 MAX_K = 10
 DEFAULT_MAX_EXPANSIONS = 200_000
 MAX_YEN_CANDIDATES = 200
@@ -125,6 +128,15 @@ class PathQuery:
     include_undated: bool = True
     include_blocked_hubs: bool = False
     max_expansions: int = DEFAULT_MAX_EXPANSIONS
+    #: ordered hop-type constraints: each step is a set of kinds (``P945``, ``link:co_member``); the path must
+    #: match the steps in order, each by a distinct hop (other hops may come between them)
+    steps: tuple[frozenset[str], ...] = ()
+    #: the path must pass through at least one of these nodes / through all of them (any order)
+    via_any: frozenset[str] = frozenset()
+    via_all: frozenset[str] = frozenset()
+    #: objects of these properties (languages, continents, eras) may end a path but are never passed through
+    non_transit_props: frozenset[str] = frozenset()
+    max_constrained_steps: int = MAX_CONSTRAINED_STEPS
 
     def __post_init__(self) -> None:
         if not 1 <= self.max_hops <= MAX_HOPS_LIMIT:
@@ -137,6 +149,18 @@ class PathQuery:
             raise PathQueryError("window must be (from_year, to_year) with from <= to")
         if self.source == self.target:
             raise PathQueryError("source and target are the same node")
+        if len(self.steps) > MAX_STEPS or len(self.steps) > self.max_hops:
+            raise PathQueryError(f"at most {MAX_STEPS} ordered steps, and no more than max_hops")
+        if not 1 <= self.max_constrained_steps <= MAX_CONSTRAINED_STEPS:
+            raise PathQueryError(f"max_constrained_steps must be within 1..{MAX_CONSTRAINED_STEPS}")
+
+    @property
+    def constrained(self) -> bool:
+        return bool(self.steps or self.via_any or self.via_all)
+
+    @property
+    def step_sets(self) -> tuple[set[str], ...]:
+        return tuple(self._norm(st) for st in self.steps)
 
     def _norm(self, kinds: Iterable[str]) -> set[str]:
         out = set()
@@ -144,7 +168,9 @@ class PathQuery:
             if ":" in k and k.split(":", 1)[0] in ("statement", "link"):
                 out.add(k)
             elif (k.startswith("P") and k[1:].isdigit()) or NS_PID_RE.match(k):
-                out.add(f"statement:{k}")  # Wikidata property or namespaced dataset predicate (geo:covered_territory_of)
+                out.add(
+                    f"statement:{k}"
+                )  # Wikidata property or namespaced dataset predicate (geo:covered_territory_of)
             else:
                 out.add(f"link:{k}")
         return out
@@ -169,6 +195,10 @@ class PathQuery:
             "exclude_kinds": sorted(self.exclude_set),
             "include_undated": self.include_undated,
             "include_blocked_hubs": self.include_blocked_hubs,
+            "steps": [sorted(x) for x in self.step_sets],
+            "via_any": sorted(self.via_any),
+            "via_all": sorted(self.via_all),
+            "non_transit_props": sorted(self.non_transit_props),
         }
 
 
@@ -203,6 +233,7 @@ class PathGraph:
         self._seen: set[tuple[str, ...]] = set()
         #: nodes whose neighbourhood was truncated when read from the database (degree is a lower bound)
         self.truncated_nodes: set[str] = set()
+        self._non_transit: tuple[frozenset[str], set[str]] | None = None
 
     # -- building -------------------------------------------------------------------------------------
     def add_statement(self, s: Stmt) -> bool:
@@ -302,7 +333,24 @@ class PathGraph:
         return e.cost + sum(self.node_penalty(v) for v in e.link.via)
 
     def passable(self, node: str, q: PathQuery) -> bool:
-        return node in (q.source, q.target) or q.include_blocked_hubs or node not in self.hubs.blocked
+        if node in (q.source, q.target):
+            return True
+        if q.non_transit_props and node in self.non_transit(q.non_transit_props):
+            return False
+        return q.include_blocked_hubs or node not in self.hubs.blocked
+
+    def non_transit(self, props: frozenset[str]) -> set[str]:
+        """Objects of statements with these properties (languages of P37, continents of P30...): such nodes
+        may end a path but are never passed through."""
+        if self._non_transit is None or self._non_transit[0] != props:
+            objs = {
+                e.v
+                for es in self.adj.values()
+                for e in es
+                if e.kind == "statement" and e.forward and e.type_id in props
+            }
+            self._non_transit = (props, objs)
+        return self._non_transit[1]
 
 
 # ---------------------------------------------------------------------------------------------- results
@@ -553,6 +601,9 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
         best = _best_edge(graph, es)
         pen = 0.0 if v == q.target else graph.node_penalty(v)
         g.add_edge(u, v, weight=graph.edge_cost(best) + pen)
+    if q.constrained:
+        _constrained_search(graph, q, g, parallel, dt, res, deadline)
+        return _finish(graph, q, res)
     seen_candidates = 0
     try:
         for nodes in nx.shortest_simple_paths(g, q.source, q.target, weight="weight"):
@@ -579,8 +630,12 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
                 break
     except nx.NetworkXNoPath:
         pass
-    if not res.paths:
-        res.reason = "no_path_within_max_hops"
+    return _finish(graph, q, res)
+
+
+def _finish(graph: PathGraph, q: PathQuery, res: PathResult) -> PathResult:
+    if not res.paths and res.reason is None:
+        res.reason = "no_path_satisfying_constraints" if q.constrained else "no_path_within_max_hops"
     nodes_used = {n for p in res.paths for n in p.nodes} | {q.source, q.target}
     for p in res.paths:
         for h in p.hops:
@@ -590,6 +645,103 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
                 nodes_used |= {h.edge.stmt.subject, h.edge.stmt.object}
     res.labels = {n: dict(graph.labels.get(n, {})) for n in sorted(nodes_used)}
     return res
+
+
+def _choose_edges(
+    graph: PathGraph,
+    nodes: Sequence[str],
+    parallel: Mapping[tuple[str, str], list[Edge]],
+    steps: Sequence[set[str]],
+    q: PathQuery,
+) -> list[Edge] | None:
+    """One edge per hop such that the ordered ``steps`` are matched by distinct hops (greedy subsequence
+    matching is exact: advancing on the earliest matching hop never prevents a later match)."""
+    out: list[Edge] = []
+    i = 0
+    for u, v in itertools.pairwise(nodes):
+        es = parallel[(u, v)]
+        if i < len(steps):
+            match = [e for e in es if e.kind_key in steps[i]]
+            if match:
+                out.append(_best_edge(graph, match))
+                i += 1
+                continue
+        out.append(_best_edge(graph, es))
+    return out if i == len(steps) else None
+
+
+def _constrained_search(
+    graph: PathGraph,
+    q: PathQuery,
+    g: Any,
+    parallel: Mapping[tuple[str, str], list[Edge]],
+    dt: Mapping[str, int],
+    res: PathResult,
+    deadline: float | None,
+) -> None:
+    """Simple paths of the pruned graph satisfying ordered hop-type steps and waypoint sets, by iterative
+    deepening (shortest admissible first), bounded by ``q.max_constrained_steps`` DFS steps and the deadline;
+    up to ``max(q.k, 10)`` admissible candidates are ranked by cost and the best ``q.k`` kept."""
+    steps = list(q.step_sets)
+    want = max(q.k, 10)
+    succ: dict[str, list[str]] = defaultdict(list)
+    for u, v in g.edges:
+        succ[u].append(v)
+    for u in succ:
+        succ[u].sort(key=lambda v: (g[u][v]["weight"], v))
+    work = [0]
+    found: list[tuple[float, list[str], list[Edge]]] = []
+    seen: set[tuple[str, ...]] = set()
+
+    def dfs(node: str, nodes: list[str], limit: int) -> bool:
+        work[0] += 1
+        if work[0] > q.max_constrained_steps or (work[0] % 4096 == 0 and _late(deadline)):
+            return False
+        if node == q.target:
+            ns = set(nodes)
+            key = tuple(nodes)
+            if key not in seen and (not q.via_any or q.via_any & ns) and q.via_all <= ns:
+                edges = _choose_edges(graph, nodes, parallel, steps, q)
+                if edges is not None:
+                    seen.add(key)
+                    cost = sum(g[u][v]["weight"] for u, v in itertools.pairwise(nodes))
+                    found.append((cost, list(nodes), edges))
+            return len(found) < want
+        if len(nodes) - 1 >= limit:
+            return True
+        for v in succ.get(node, ()):
+            if v in nodes:
+                continue
+            dv = dt.get(v)
+            if dv is None or len(nodes) + dv > limit:
+                continue
+            nodes.append(v)
+            go = dfs(v, nodes, limit)
+            nodes.pop()
+            if not go:
+                return False
+        return True
+
+    start = dt.get(q.source, q.max_hops)
+    for limit in range(max(start, len(steps), 1), q.max_hops + 1):
+        if not dfs(q.source, [q.source], limit):
+            break
+    if work[0] > q.max_constrained_steps:
+        res.cut(f"constrained search budget of {q.max_constrained_steps} steps exhausted")
+    elif _late(deadline):
+        res.cut("time budget exhausted during the constrained search")
+    found.sort(key=lambda x: (x[0], len(x[1]), x[1]))
+    for cost, nodes, edges in found[: q.k]:
+        hops = [
+            Hop(
+                e,
+                len(parallel[(e.u, e.v)]) - 1,
+                {lang: render_hop(e, graph, lang) for lang in LANGS},
+                hop_label(e, graph),
+            )
+            for e in edges
+        ]
+        res.paths.append(Path(nodes, hops, cost))
 
 
 MAX_WAYPOINTS = 4

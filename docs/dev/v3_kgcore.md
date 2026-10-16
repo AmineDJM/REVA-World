@@ -68,6 +68,7 @@ Agent KGCORE, 2026-10-15. Spec: `docs/roadmap/v3_world_graph.md` (KG storage, AP
 * Julian dates (precision ≥ year) are converted to proleptic Gregorian through the Julian day number: 1582-10-04 Julian → 1582-10-14. The raw string is kept.
 * Dates outside PostgreSQL's range (before 4713 BCE, e.g. geological time) are kept raw and count as undated for filters.
 * Validity: start (or point in time) .. end (or point in time). A missing side is open.
+* Output (KGBCE fix): the derived bounds (`valid_from`, `valid_to`, timeline `sort_date`, path `search.time_window`) are ISO 8601 with astronomical years, rendered like the atlas `period_text` (`-0043-03-15` = 15 March 44 BCE, `0000` = 1 BCE). Queries select the `date` columns through `to_char(…, 'YYYY-MM-DD BC')` (psycopg cannot load BC `date`s) and convert them in Python (`astro_iso`); filtering and ordering stay in SQL on the dates.
 
 ### Queries and API
 
@@ -84,7 +85,7 @@ Every statement carries its provenance:
 * source key, statement id/key, source revision, raw sha256;
 * retrieval and recording times, load id, origin;
 * rank and its own references;
-* `verification`: `community_edited_not_verified` for Wikidata, `source_reported_not_verified` for other sources.
+* `verification`: `community_edited_not_verified` for Wikidata (`wikidata`/`wikidata.*` keys); `derived` (with `derivation` and `derivation_method`) when the statement's qualifiers declare a `derivation` (e.g. the Cliopatria overlay `geo:covered_territory_of`, `computed_spatial_overlay`, `reva.kg.overlay/1`; envelope warning `derived_statements`); `source_reported_not_verified` for other sources.
 
 Errors are RFC 9457 problems: 404 for an unknown entity, 422 for invalid ids, time bounds, hop counts or property ids. A missing token is 401.
 

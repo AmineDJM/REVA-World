@@ -1142,11 +1142,12 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
 
     if not run.wants(WD_DATASET):
         return {"skipped": True}
-    lock = None
-    if run.origin != "live":  # fixture replay: never wait on the machine-wide Wikidata cool-down
-        lock = MachineLock(Path(tempfile.mkdtemp(prefix="reva-kglang-lock-")), min_interval=0.0)
-    client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
-    res = await client.sparql(WD_QUERY, meta={"purpose": "glottolog_xref", "connector": WD_NAME})
+    with tempfile.TemporaryDirectory(prefix="reva-kglang-lock-") as tmp:
+        lock = None
+        if run.origin != "live":  # fixture replay: never wait on the machine-wide Wikidata cool-down
+            lock = MachineLock(Path(tmp), min_interval=0.0)
+        client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
+        res = await client.sparql(WD_QUERY, meta={"purpose": "glottolog_xref", "connector": WD_NAME})
     sts, report = wikidata_statements(
         res.bindings, raw_sha256=res.raw_sha256, retrieved_at=res.retrieved_at, query_sha256=res.query_sha256
     )

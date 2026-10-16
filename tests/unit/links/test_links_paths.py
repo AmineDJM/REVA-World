@@ -39,7 +39,7 @@ def st(s: str, p: str, o: str, *, start=None, end=None, point=None, source: str 
 
 def test_query_bounds() -> None:
     with pytest.raises(PathQueryError):
-        PathQuery(S, T, max_hops=7)
+        PathQuery(S, T, max_hops=9)
     with pytest.raises(PathQueryError):
         PathQuery(S, S)
     with pytest.raises(PathQueryError):

@@ -9100,7 +9100,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive start date used for filtering (null: open)",
+            "description": "Derived inclusive start date used for filtering, ISO 8601 with astronomical years (-0043-03-15 = 15 March 44 BCE; null: open)",
             "title": "Valid From"
           },
           "valid_to": {
@@ -9112,7 +9112,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive end date used for filtering (null: open)",
+            "description": "Derived inclusive end date used for filtering, astronomical years (null: open)",
             "title": "Valid To"
           },
           "value": {
@@ -9988,6 +9988,30 @@
       "KgProvenance": {
         "additionalProperties": false,
         "properties": {
+          "derivation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For derived statements: the declared derivation",
+            "title": "Derivation"
+          },
+          "derivation_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For derived statements: the method id and version",
+            "title": "Derivation Method"
+          },
           "load_id": {
             "title": "Load Id",
             "type": "integer"
@@ -10068,9 +10092,11 @@
             "type": "string"
           },
           "verification": {
+            "description": "community_edited_not_verified: Wikidata; derived: computed from sourced inputs (the qualifiers declare the derivation, its inputs and caveats), not reported by a source; else source_reported_not_verified. Nothing is verified by REVA",
             "enum": [
               "community_edited_not_verified",
-              "source_reported_not_verified"
+              "source_reported_not_verified",
+              "derived"
             ],
             "title": "Verification",
             "type": "string"
@@ -10088,7 +10114,9 @@
           "origin",
           "rank",
           "references",
-          "verification"
+          "verification",
+          "derivation",
+          "derivation_method"
         ],
         "title": "KgProvenance",
         "type": "object"
@@ -10656,7 +10684,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive start date used for filtering (null: open)",
+            "description": "Derived inclusive start date used for filtering, ISO 8601 with astronomical years (-0043-03-15 = 15 March 44 BCE; null: open)",
             "title": "Valid From"
           },
           "valid_to": {
@@ -10668,7 +10696,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive end date used for filtering (null: open)",
+            "description": "Derived inclusive end date used for filtering, astronomical years (null: open)",
             "title": "Valid To"
           },
           "value": {
@@ -10837,6 +10865,7 @@
                 "type": "null"
               }
             ],
+            "description": "Date the event is sorted by, ISO 8601 with astronomical years",
             "title": "Sort Date"
           },
           "start": {
@@ -10875,7 +10904,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive start date used for filtering (null: open)",
+            "description": "Derived inclusive start date used for filtering, ISO 8601 with astronomical years (-0043-03-15 = 15 March 44 BCE; null: open)",
             "title": "Valid From"
           },
           "valid_to": {
@@ -10887,7 +10916,7 @@
                 "type": "null"
               }
             ],
-            "description": "Derived inclusive end date used for filtering (null: open)",
+            "description": "Derived inclusive end date used for filtering, astronomical years (null: open)",
             "title": "Valid To"
           },
           "value": {
@@ -13778,6 +13807,264 @@
           "kind"
         ],
         "title": "OtherValue",
+        "type": "object"
+      },
+      "PairLinksResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "PairLinksResponse",
         "type": "object"
       },
       "Participant": {
@@ -21753,6 +22040,181 @@
         ]
       }
     },
+    "/v1/links/pair": {
+      "get": {
+        "description": "Every link between two countries over time (KG, datasets, atlas flows, vote agreement by year and decade),\neach with its evidence. Bounded: rows per kind, total time budget (truncation is reported).",
+        "operationId": "get_pair_links_v1_links_pair_get",
+        "parameters": [
+          {
+            "description": "ISO 3166 alpha-3 (crosswalk entity)",
+            "in": "query",
+            "name": "a",
+            "required": true,
+            "schema": {
+              "description": "ISO 3166 alpha-3 (crosswalk entity)",
+              "pattern": "^[A-Z]{3}$",
+              "title": "A",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ISO 3166 alpha-3 (crosswalk entity)",
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "description": "ISO 3166 alpha-3 (crosswalk entity)",
+              "pattern": "^[A-Z]{3}$",
+              "title": "B",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Link types (default: all)",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Link types (default: all)",
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To Year"
+            }
+          },
+          {
+            "description": "With votes_detail_to: per roll call positions of a and b (<= 200)",
+            "in": "query",
+            "name": "votes_detail_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2100,
+                  "minimum": 1945,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "With votes_detail_to: per roll call positions of a and b (<= 200)",
+              "title": "Votes Detail From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "votes_detail_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 2100,
+                  "minimum": 1945,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Votes Detail To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "votes_detail_issue",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(all|co|hr|me|nu|di|ec)$",
+              "title": "Votes Detail Issue",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairLinksResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Pair Links",
+        "tags": [
+          "links"
+        ]
+      }
+    },
     "/v1/links/path": {
       "get": {
         "operationId": "get_links_path_v1_links_path_get",
@@ -21990,6 +22452,7 @@
     },
     "/v1/links/{ref}": {
       "get": {
+        "description": "Top-N links per kind of one country (latest period per kind unless ``year``), from the materialised\nlink store of the latest atlas snapshot + KG watermark; derived on demand when no store exists.",
         "operationId": "get_country_links_v1_links__ref__get",
         "parameters": [
           {
@@ -22006,6 +22469,7 @@
             }
           },
           {
+            "description": "Link types (alias of kind)",
             "in": "query",
             "name": "link_type",
             "required": false,
@@ -22022,7 +22486,30 @@
                   "type": "null"
                 }
               ],
+              "description": "Link types (alias of kind)",
               "title": "Link Type"
+            }
+          },
+          {
+            "description": "Link types (default: all)",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Link types (default: all)",
+              "title": "Kind"
             }
           },
           {
@@ -22043,6 +22530,39 @@
               ],
               "description": "Only links valid in that year",
               "title": "Year"
+            }
+          },
+          {
+            "description": "issue=co (vote agreement), section=XVI (BACI); defaults all/TOTAL",
+            "in": "query",
+            "name": "facet",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,31}=[A-Za-z0-9_.-]{1,32}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "issue=co (vote agreement), section=XVI (BACI); defaults all/TOTAL",
+              "title": "Facet"
+            }
+          },
+          {
+            "description": "Top-N per kind, direction and facet",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 5,
+              "description": "Top-N per kind, direction and facet",
+              "maximum": 10,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
             }
           }
         ],

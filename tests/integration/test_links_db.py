@@ -136,7 +136,7 @@ def test_links_http_api(kg, db) -> None:  # type: ignore[no-untyped-def]
             assert {w["code"] for w in body["warnings"]} >= {"community_edited", "fixture_data"}
             hop = body["data"]["paths"][0]["hops"][0]
             assert hop["evidence"] and hop["text"]["fr"] and hop["text"]["en"]
-            r = client.get("/v1/links/path", params={"from": "Q155", "to": "Q45", "max_hops": 7}, headers=auth)
+            r = client.get("/v1/links/path", params={"from": "Q155", "to": "Q45", "max_hops": 9}, headers=auth)
             assert r.status_code == 422
             r = client.get("/v1/links/ZZZ", headers=auth)
             assert r.status_code == 404

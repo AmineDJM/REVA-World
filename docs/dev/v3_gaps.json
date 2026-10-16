@@ -8629,12 +8629,11 @@
   }
  ],
  "inputs": [
-  "other SSPTW economies not listed)",
   "parsed: full atlas.gap_cbs_bes live response 2026-10-16 (not ingested: budget key pending)",
   "parsed: full atlas.gap_insee live response 2026-10-16 (not ingested: budget key pending)",
   "parsed: full atlas.gap_jersey live response 2026-10-16 (not ingested: budget key pending)",
   "parsed: full atlas.gap_spc live response 2026-10-16 (not ingested: budget key pending)",
-  "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks",
+  "static: docs/dev/v3_a_law.md (SSPTW ages for economies WBL lacks, other SSPTW economies not listed)",
   "static: docs/dev/v3_a_wb.md (live ingest 2026-10-15)",
   "tables: db reva, atlas.ccp.characteristics_v5 recorded 2026-10-16",
   "tables: db reva, atlas.eurostat.earn_mw_cur recorded 2026-10-16",
