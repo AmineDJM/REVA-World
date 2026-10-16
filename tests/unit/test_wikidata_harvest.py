@@ -668,3 +668,95 @@ def test_whatlinkshere_page_parsing() -> None:
     assert _re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html) == ["Q30", "Q327"]
     m = _re.search(r'<a href="[^"]*[?&;]from=([0-9]+)[^"]*"[^>]*class="mw-nextlink"', html)
     assert m and m.group(1) == "12345"
+
+
+# --------------------------------------------------------------------------- budget ledger attribution
+class _LedgerEngine:
+    """In-memory stand-in for ``ops.budget_ledger`` that speaks the few statements ``reva.operations.budgets``
+    issues (advisory lock, daily usage, ``INSERT .. ON CONFLICT (operation_id) DO NOTHING``, reserved/consumed
+    updates), so the real reserve -> meter -> settle path runs offline."""
+
+    def __init__(self) -> None:
+        self.rows: dict[str, dict[str, Any]] = {}
+
+    def begin(self) -> Any:
+        import contextlib
+
+        return contextlib.nullcontext(self)
+
+    def dispose(self) -> None:
+        pass
+
+    def execute(self, stmt: Any, params: dict[str, Any]) -> Any:
+        from types import SimpleNamespace
+
+        sql = " ".join(str(stmt).split())
+        if "pg_advisory_xact_lock" in sql:
+            return None
+        if sql.startswith("SELECT") and "ops.budget_ledger" in sql:
+            def used(pred: Any) -> int:
+                return sum(r["consumed"] if r["consumed"] is not None else r["reserved"]
+                           for r in self.rows.values() if pred(r))
+            row = SimpleNamespace(src=used(lambda r: r["account_key"] in params["src"]),
+                                  req=used(lambda r: r["unit"] == "requests"),
+                                  byt=used(lambda r: r["unit"] == "bytes"))
+            return SimpleNamespace(one=lambda: row)
+        if sql.startswith("INSERT INTO ops.budget_ledger") and "ON CONFLICT (operation_id) DO NOTHING" in sql:
+            if params["o"] not in self.rows:
+                self.rows[params["o"]] = {"account_key": params["a"], "operation_id": params["o"],
+                                          "unit": params["u"], "reserved": params["r"], "consumed": None}
+            return SimpleNamespace(rowcount=1)
+        if sql.startswith("UPDATE ops.budget_ledger SET reserved"):
+            r = self.rows.get(params["o"])
+            if r is None or r["consumed"] is not None:
+                return SimpleNamespace(rowcount=0)
+            r["reserved"] += params["g"]
+            return SimpleNamespace(rowcount=1)
+        if sql.startswith("UPDATE ops.budget_ledger SET consumed"):
+            r = self.rows.get(params["o"])
+            if r is not None:
+                r["consumed"] = params["c"]
+            return SimpleNamespace(rowcount=int(r is not None))
+        raise AssertionError(f"unexpected ledger statement: {sql}")
+
+
+async def test_budgeted_client_books_wdqs_and_wbapi_on_distinct_ledger_rows(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Regression (2026-10-16): both reservations shared one job id, so ``ON CONFLICT DO NOTHING`` dropped the
+    wbapi row and all Wikidata traffic was booked (and settled, last write wins) on ``source:wikidata.wdqs``."""
+    from types import SimpleNamespace
+
+    import reva.adapters.postgres.engine as pg_engine
+    from reva.operations import budgets
+
+    ledger = _LedgerEngine()
+    class _LiveHttp(ScriptedHttp):
+        origin = "live"  # fixture clients are never charged; this one must go through the meter
+
+        async def aclose(self) -> None:
+            pass
+
+    inner = _LiveHttp(router=lambda url: (200, b"{}", {}))
+    budget = budgets.IngestBudget("test", "", total_requests=10**6, total_bytes=10**12,
+                                  per_source_requests={wd.SOURCE_WDQS: 1_500, wd.SOURCE_WBAPI: 4_000})
+    monkeypatch.setattr(hv, "ensure_database", lambda db: SimpleNamespace(reva_s3_prefix="test"))
+    monkeypatch.setattr(hv, "OBJECT_ROOT", tmp_path / "objects")
+    monkeypatch.setattr(hv, "live_http", lambda: inner)
+    monkeypatch.setattr(pg_engine, "make_engine", lambda role, settings: ledger)
+    monkeypatch.setattr(budgets, "load_budget", lambda: budget)
+
+    async with hv.budgeted_client(purpose="test", db_name="reva_kg_test", planned_wdqs=2,
+                                  planned_wbapi=5) as sess:
+        await sess.client.wdqs_http.get("https://query.wikidata.org/sparql?query=x")
+        for i in range(3):
+            await sess.client.wbapi_http.get(f"https://www.wikidata.org/wiki/Special:EntityData/Q{i}.json")
+
+    req = {r["account_key"]: r for r in ledger.rows.values() if r["unit"] == "requests"}
+    assert set(req) == {budgets.account_key(wd.SOURCE_WDQS, "requests"),
+                        budgets.account_key(wd.SOURCE_WBAPI, "requests")}
+    assert len({r["operation_id"] for r in req.values()}) == 2
+    assert req[budgets.account_key(wd.SOURCE_WDQS, "requests")]["consumed"] == 1
+    assert req[budgets.account_key(wd.SOURCE_WBAPI, "requests")]["consumed"] == 3
+    byt = {r["account_key"] for r in ledger.rows.values() if r["unit"] == "bytes"}
+    assert byt == {budgets.account_key(wd.SOURCE_WDQS, "bytes"), budgets.account_key(wd.SOURCE_WBAPI, "bytes")}
+    assert sorted(u["source_key"] for u in sess.usage["budget"]) == sorted([wd.SOURCE_WDQS, wd.SOURCE_WBAPI])

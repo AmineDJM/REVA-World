@@ -1122,7 +1122,7 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
     The ledger lives in the throwaway harvest database. ``reserve_ingest`` refuses a run that does not fit the
     per-source/total daily budget (``BudgetExhausted``, nothing requested); ``metered`` tops the reservation up
     per request or refuses it before the transport is called; ``settle_metered`` records actual usage whatever
-    happened. One reservation per source key (``wikidata.wdqs``, ``wikidata.wbapi``).
+    happened. One reservation per source key (``wikidata.wdqs``, ``wikidata.wbapi``), each under its own job id.
     """
     import uuid
 
@@ -1139,9 +1139,12 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
     session: BudgetedSession | None = None
     try:
         budget = load_budget()
-        res_q = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WDQS,
+        # One job id per source key: the ledger operation id is ``ingest:{job_id}:{attempt}:{unit}`` and inserts
+        # are ``ON CONFLICT DO NOTHING``, so a shared id would silently drop the second reservation and book all
+        # traffic on the first source (2026-10-16 incident, docs/dev/v3_wdharvest.md).
+        res_q = reserve_ingest(engine, job_id=f"{run_id}-wdqs", attempt=1, source_key=SOURCE_WDQS,
                                planned_requests=planned_wdqs, budget=budget)
-        res_a = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WBAPI,
+        res_a = reserve_ingest(engine, job_id=f"{run_id}-wbapi", attempt=1, source_key=SOURCE_WBAPI,
                                planned_requests=planned_wbapi, budget=budget)
         wdqs = metered(inner, engine, res_q, budget=budget)
         wbapi = metered(inner, engine, res_a, budget=budget)

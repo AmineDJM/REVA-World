@@ -57,6 +57,31 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
    kept renewing (diagnosed by KGPEOPLE; patched by the lead: cap 3,600 s + 30 s margin; regression test
    `test_long_retry_after_is_honoured_in_full_with_margin`).
 
+### Incident 2026-10-16: wbapi traffic booked on `wikidata.wdqs` (budget ledger, now fixed)
+
+`budgeted_client()` reserved both source keys under the same job id (`reserve_ingest(job_id=run_id,
+attempt=1, ...)` for `wikidata.wdqs`, then for `wikidata.wbapi`). The ledger operation id is
+`ingest:{job_id}:{attempt}:requests|bytes` and the insert is `ON CONFLICT (operation_id) DO NOTHING`, so the
+wbapi reservation was silently dropped: both `MeteredHttp` handles topped up and settled the one row booked on
+`source:wikidata.wdqs:*`, and since both called `settle_metered` on the same op id the last write won (the wdqs
+handle's own count was overwritten by the wbapi count).
+
+Observed in `reva_kg_wdharvest.ops.budget_ledger` on 2026-10-16: zero `source:wikidata.wbapi` rows and 2,174
+requests booked on `source:wikidata.wdqs` (limit 1,500), although nearly all of it was `Special:EntityData` /
+`wbgetentities` traffic (the WDQS endpoint was throttled all day, see Throughput below). Consequences for that
+UTC day: every new `wikidata.wdqs` reservation is refused (`BudgetExhausted`, `source_limit`), while
+`wikidata.wbapi` looks unused even though it carried the traffic. The total request/byte sums were not
+inflated (the traffic was counted once, on the wrong account).
+
+* **Fix:** one job id per source key, `f"{run_id}-wdqs"` / `f"{run_id}-wbapi"`, as the CAUSWD driver
+  (`reva.causal_harvest.live.causal_session`) already did. Regression test
+  `test_budgeted_client_books_wdqs_and_wbapi_on_distinct_ledger_rows` (two ledger rows per unit, each on its own
+  account, each settled with its own handle's count).
+* **Historical rows are not edited** (the ledger is append-only). Affected rows are the `source:wikidata.wdqs:*` rows whose
+  operation id is `ingest:kg<purpose>-<timestamp>-<hex>:1:*` with no `-wdqs`/`-wbapi` suffix on the job id
+  (CAUSWD rows always carried the suffix); they hold the combined wdqs + wbapi traffic of the run and must be
+  read as mostly Wikidata API traffic. The per-source counts of that day are misattributed, the totals are right. The wdqs refusal clears at the next UTC midnight (DB clock).
+
 ### Alternative endpoints
 
 * **CirrusSearch on the API host** (`haswbstatement:`) is used when WDQS is throttled: `map-countries`
