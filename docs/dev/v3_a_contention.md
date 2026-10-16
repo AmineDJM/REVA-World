@@ -2,8 +2,8 @@
 
 Agent A-CONTENTION, 2026-10-16. Specs: `docs/roadmap/v3_causality.md`, `docs/dev/v3_atlas_interface.md` §7,
 `docs/dev/v3_causal_interface.md` (CAUSCORE). Status: three atlas sources on the source platform, fixtures, offline
-and throwaway-DB tests, full-scale load of the real files into a throwaway DB (§7); budgets requested (not merged
-yet, so no live run); claims delivered through CAUSCORE's interface shape (staged until `load_dataset_claims` ships).
+and throwaway-DB tests, full-scale load of the real files into a throwaway DB with all 14,993 T1 claims loaded and
+graded by CAUSCORE's `load_dataset_claims` / `grade_claims` (§7); budgets requested (not merged yet, so no live run).
 
 ## 1. What exists
 
@@ -86,7 +86,7 @@ Soviet Union existed, stays `navco:place:ussr`).
 |---|---|---|
 | `navco.n13_cy` | `campaigns_active` (BYEAR ≤ y ≤ EYEAR; EYEAR = peak year, or end year when the peak is unknown), by `method=` nonviolent/violent and `goal=`; `campaign_onsets` (+ method); `campaigns_eyear` and `|outcome=success/limited/failure/ongoing` | 40,590 |
 | `navco.n21_cy` | `campaign_years` and by `prim_method=`, `repression=none/mild/moderate/extreme/unknown`, `progress=0..5`, `goal=0..5`, `sec_defect=1`, `success=1` | 46,838 |
-| `navco.n30_cy` | `action_lines` (NAVCO 3.0 coded lines dated in the year; one news event can give several lines and reciprocal actions are coded once per side — a count of coded actions, not of events), by `actor=` (state, non_state, international, nonaligned, local_state), `tactic=` (violent, nonviolent, mixed), `verb=` (the 21 root verbs, e.g. `14_protest`, `18_repress_and_abuse`), `state_posture=1..7` | N30_ROWS |
+| `navco.n30_cy` | `action_lines` (NAVCO 3.0 coded lines dated in the year; one news event can give several lines and reciprocal actions are coded once per side — a count of coded actions, not of events), by `actor=` (state, non_state, international, nonaligned, local_state), `tactic=` (violent, nonviolent, mixed), `verb=` (the 21 root verbs, e.g. `14_protest`, `18_repress_and_abuse`), `state_posture=1..7` | 16,650 |
 | `mec.episodes_cy` | `episodes_active` ([bdate, edate] overlaps y), by `category=` reformist/maximalist, `tactics=`, `regviol=1`; `episode_onsets` (+ category); `episodes_ending` and `|outcome=success/limited/failure/ongoing/unknown` | 56,144 |
 | `mmp.protests_cy` | `protests` (MMP year = start year), `protester_violence=0/1`, `demand=` (7), `response=` (7 incl. `ignore`), `participants_category=` (6) | 112,148 |
 
@@ -153,11 +153,34 @@ overlapping (responses dated by their campaign/protest) — never invented as "c
 
 ## 7. Full-scale load (real 2026-10-16 bytes, throwaway DB, dropped afterwards)
 
-FULLSCALE_PLACEHOLDER
+Script: the three atlas sources run through `AtlasRun` on a fresh bootstrapped + seeded database
+(`reva_acontention_*`), with a `FixtureHttp` root holding the unmodified real downloads (origin `test_fixture`:
+these bytes were not fetched through the budget meter, the budgets are not merged), then `reva.causal.grade_claims`.
+
+| Source | Time | Peak RSS | Atlas rows | KG entities / statements (rejected) | Claims loaded (rejected, unknown entities) |
+|---|---|---|---|---|---|
+| `atlas.navco` (1.2, 1.3, 2.1, 3.0) | 74 s (NAVCO 3.0 workbook ≈ 40 s) | 0.73 GB | n13_cy 40,590 · n21_cy 46,838 · n30_cy 16,650 | 5,667 / 56,979 (0) | 4,268 (0, 0) |
+| `atlas.mec` | 18 s | 0.73 GB | episodes_cy 56,144 | 6,240 / 64,090 (0) | 3,504 (0, 0) |
+| `atlas.massmob` | 53 s | 1.0 GB | protests_cy 112,148 | 22,460 / 216,256 (0) | 7,221 (0, 0) |
+
+`kg.statement` after the three loads: 327 MB (337,325 statements); database 434 MB. CAUSCORE's loader was present:
+all 14,993 claims loaded through `load_dataset_claims` (no rejection, every cause/effect a loaded KG entity), then
+graded in 10 s: **14,991 B** (T1, single dataset) and **2 E** (`temporal.inconsistent`): two NAVCO 2.1 provider
+anomalies, shown not corrected — *Anya Nya* (Sudan) has a 1962 campaign-year row with repression coded while its
+start_date is 1963-10-01; *Carnation Revolution* (Portugal) has a 1973 row and a start_date (1974-09-09) after its
+end_date (1974-04-25). Temporal checks: `coded_outcome` consistent 1,699 / overlapping 1,977; `reaction_to`
+consistent 2,277 (NAVCO 2.1 repression in later campaign years) / overlapping 9,038 (same-period responses) /
+inconsistent 2. No claim is A: no second independent source asserts the same (cause, effect) — the event ids are
+dataset-scoped until EVENTS links them.
+
+Spot checks (KG): NAVCO 1.3 campaigns starting 2011 include *Protest for Constitutional Reform* (Jordan, 2011-2013),
+*Libyan Civil War* (2011), *Anti-al-Bashir Government* (Sudan, 2011-2013); `navco21:282` (Syria) has repression
+claims for 2011, 2012, 2013 (`repression = 3 (extreme)`, `NAVCO2-1_ForPublication.tab` lines 1905-1907);
+MMP France: 27 protests in 1990, 49 in 2016; Canada 1998 is a provider-reported zero.
 
 ## 8. Requests to other agents / lead (not edited by me)
 
-* **ATLASCORE**: merge `registry/atlas/budget_requests/a_contention.yaml` (`harvard.dataverse.navco` 16/day 4 MB,
+* **ATLASCORE**: merge `registry/atlas/budget_requests/a_contention.yaml` (`harvard.dataverse.navco` 20/day 45 MB,
   `.mec` 6/day 3 MB, `.massmob` 6/day 33 MB). Until then invariant 30's "budget keys = registered sources" test
   fails for the three new `registry/sources/*.yaml` and live runs are refused. Optional: a theme rule
   `{domain: contention, theme: politics}` (the catalog sets `theme: politics` per concept meanwhile).

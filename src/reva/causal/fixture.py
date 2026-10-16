@@ -145,7 +145,7 @@ def _t(t: Any) -> dict[str, Any] | None:
 
 
 def load_fixture(path: Path = FIXTURE_FILE) -> dict[str, Any]:
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     if doc.get("origin") != "test_fixture":
         raise ValueError("causal fixture must be marked origin=test_fixture")
     return doc

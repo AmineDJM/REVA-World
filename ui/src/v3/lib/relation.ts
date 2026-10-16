@@ -43,7 +43,7 @@ export function themeOf(kind: string): ThemeId {
 }
 
 export const VOTE_CAVEAT =
-  'Indice calculé par REVA à partir des votes nominaux (Voeten et al.) : part des votes où les deux pays ont voté pareil (oui, non ou abstention) parmi ceux où les deux ont voté. C’est une part stricte de votes identiques (une abstention face à un oui ou un non compte 0) — ce n’est pas l’indice « agree » de Voeten et Bailey, qui compte une abstention pour moitié : les valeurs ne sont pas comparables à celles de la littérature. Elle ne mesure ni une amitié ni une convergence d’intérêts ; le choix des votes et le codage par thème l’influencent. La période affichée est celle des votes réellement utilisés (décennie partielle signalée).';
+  'Indice calculé par REVA à partir des votes nominaux (Voeten et al.) : part des votes où les deux pays ont voté pareil (oui, non ou abstention) parmi ceux où les deux ont voté. C’est une part de votes identiques au sens strict (une abstention face à un oui ou un non compte 0) — ce n’est pas l’indice « agree » de Voeten et Bailey, qui compte une abstention pour moitié : les valeurs ne sont pas comparables à celles de la littérature. Elle ne mesure ni une amitié ni une convergence d’intérêts ; le choix des votes et le codage par thème l’influencent. La période affichée est celle des votes réellement utilisés (décennie partielle signalée).';
 
 export const ISSUE_LABEL: Record<string, string> = {
   all: 'tous les votes',

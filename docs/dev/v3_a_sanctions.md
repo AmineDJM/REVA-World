@@ -25,7 +25,7 @@ any output (unit test `test_no_free_text_or_personal_fields`).
 
 The TIES workbook is legacy Excel (BIFF8 `.xls`) and no xls reader is a dependency: the module carries a bounded
 reader (OLE2 + BIFF8 records, first sheet, cell text, formulas never evaluated, size/cell caps), validated cell for
-cell against `xlrd` on TIES 4.1 and on the EUSANCT case-level workbook (0 differences in 92k + 26k cells).
+cell against `xlrd` on TIES 4.1 and on the EUSANCT case-level workbook (0 differences over every cell of both).
 
 ## 2. Events (KG, `kind = sanction_episode`)
 
@@ -170,8 +170,9 @@ proposed here.
 3. **EVENTS**: `dataset_kinds` for `ties:case:*`, `eusanct:case:*` -> `sanction_episode` (type id of the
    roadmap list); `eusanctionsmap:regime:*`, `ofac:program:*` are regimes/programs (not episodes);
    `eusanct:same_case_as` is evidence-based `same_as` material.
-4. **CAUSCORE**: `reva/causal/__init__.py` re-exports nothing yet (this connector imports `reva.causal.model`
-   as a fallback); `grade_claims` was not exported when tested.
+4. **CAUSCORE**: the grader reads only `P580`/`P585`/`P571` dates, so this connector writes `P580`/`P582` on cases
+   and `P585` on outcome records; the undated sender-goals records (`eusanct:policy_result:*`) leave 133 HSE claims
+   `undetermined`. `reva.causal.model` is used as a fallback import if the package stops re-exporting the loader.
 5. **A-ECRISES**: `registry/sources/esrb_fcdb.yaml` (untracked, in progress) is invalid YAML (line 30: an
    unquoted `:` in `cadence`) and makes `load_registry` — hence the seed and every `db` test session — fail;
    the integration tests here were run in an isolated copy without that file.

@@ -59,7 +59,9 @@ Option for the V3 suite (``ui/e2e/v3_live_stack.spec.ts``):
     atlas snapshot (``reva.atlas.snapshot.take_snapshot``) and one materialisation of the link store
     (``reva.links.store.materialise``; the link-bearing sources of ``V3_LINK_ATLAS_SOURCES`` are replayed
     too). A source whose fixture run fails is recorded with its error in ``stack.json`` (``v3.atlas``,
-    ``v3.links``), never hidden; the stack still starts.
+    ``v3.links``), never hidden; the stack still starts. CAUSUI: CAUSCORE's real-Wikidata causal fixture
+    (``tests/unit/causal/fixtures/wikidata_causal_fixture.json``) is loaded into ``kg.*`` and turned into
+    graded claims (``reva.causal.refresh``) for ``ui/e2e/v3_causal_live.spec.ts`` (``v3.causal``).
     ``POST /v1/ask`` stays on the deterministic keyword planner (no LLM planner is wired).
 
 The release cutoff is taken after every ingest has finished, so the release pins all ingested
@@ -326,6 +328,7 @@ class Stack:
     def load_v3(self, settings: Any, store: Any, worker: Any) -> dict[str, Any]:
         """KG + links fixture, atlas sources in fixture mode, a test_fixture atlas snapshot."""
         out: dict[str, Any] = {"kg": with_connection_retry("kg fixture", lambda: self.load_kg_fixture(store, worker))}
+        out["causal"] = self.load_causal_fixture(store, worker)
         atlas: dict[str, Any] = {}
         for name in self.args.v3_atlas_sources or (*V3_ATLAS_SOURCES, *V3_LINK_ATLAS_SOURCES):
             atlas[name] = self.ingest_atlas_fixture(settings, store, worker, name)
@@ -428,6 +431,25 @@ class Stack:
             "rejected": rep.rejected_total,
             "raw_sha256": raw,
         }
+
+    @staticmethod
+    def load_causal_fixture(store: Any, worker: Any) -> dict[str, Any]:
+        """CAUSUI: CAUSCORE's real-Wikidata causal fixture (First World War, Great Depression, 1918 flu) into
+        kg.* through load_batch (origin test_fixture, ``reva.causal.fixture.load_into_kg``), then claims and
+        grades through ``reva.causal.refresh``. A failure is recorded in ``stack.json`` (``v3.causal``)."""
+        t0 = time.monotonic()
+        try:
+            from reva.causal import refresh
+            from reva.causal.fixture import load_into_kg
+
+            rep = with_connection_retry("causal kg fixture", lambda: load_into_kg(worker, store))
+            res = with_connection_retry("causal refresh", lambda: refresh(worker, store, origin="test_fixture"))
+        except Exception as e:
+            log.warning("V3 causal fixture failed: %s", e)
+            return {"status": "failed", "error": f"{type(e).__name__}: {str(e)[:500]}"}
+        out = json.loads(json.dumps({"loaded": res.get("loaded"), "graded": res.get("graded")}, default=str))
+        log.info("V3 causal fixture: %s (%.1fs)", out, time.monotonic() - t0)
+        return {"status": "completed", "kg_rejected": int(getattr(rep, "rejected_total", 0) or 0), **out}
 
     @staticmethod
     def ingest_atlas_fixture(settings: Any, store: Any, worker: Any, name: str) -> dict[str, Any]:

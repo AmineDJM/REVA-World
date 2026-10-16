@@ -537,7 +537,7 @@ def get_candidates(
         res = cg.candidates(
             conn, event_id=event, origin=_origin(request, origin), limit=limit, after_id=cur[0] if cur else None
         )
-    org = origin_of(c["origin"] for c in res["candidates"])
+    org: Any = origin_of(c["origin"] for c in res["candidates"])
     nxt = encode_cursor([res["next_after_id"]]) if res["next_after_id"] is not None else None
     return CausalCandidatesResponse(
         data=CausalCandidates(event=res["event"], candidates=res["candidates"], note=res["note"]),

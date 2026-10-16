@@ -49,8 +49,7 @@ def fetch_event_dates(conn: Connection, ids: Iterable[str], origin: str | None) 
     for i in range(0, len(qs), ENTITY_CHUNK):
         rows += [
             dict(r)
-            for r in
-            conn.execute(
+            for r in conn.execute(
                 text(f"""SELECT s.subject_qid, s.property_pid, s.rank, s.value->>'time' AS time,
                                (s.value->>'precision')::int AS precision,
                                to_char(s.value_time_lo, 'YYYY-MM-DD BC') AS lo,
@@ -63,7 +62,7 @@ def fetch_event_dates(conn: Connection, ids: Iterable[str], origin: str | None) 
             )
             .mappings()
             .all()
-        )
+        ]
     return dates_from_rows(rows)
 
 

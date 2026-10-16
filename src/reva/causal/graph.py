@@ -602,7 +602,7 @@ def chain(
         .mappings()
         .all()
     )
-    rendered = _render(conn, rows, labels_ids)
+    rendered = _render(conn, [dict(r) for r in rows], labels_ids)
     by_pair: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for c in rendered:
         by_pair[(c["cause"]["id"], c["effect"]["id"])].append(c)
@@ -630,14 +630,14 @@ def chain(
             (
                 (gr.GRADES.index(cg), sum(gr.GRADES.index(g) for g in grades), p),
                 {
-                "length": len(hops),
-                "chain_grade": cg,
-                "weakest_hop": grades.index(cg),
-                "hops": hops,
-                "wording": f"Composition by REVA of {len(hops)} separately asserted claim(s); chain grade = "
-                f"weakest hop ({cg}). Each hop is asserted by its own source; REVA does not assert the chain.",
-                "wording_fr": f"Composition par REVA de {len(hops)} affirmation(s) énoncée(s) séparément ; note de "
-                f"la chaîne = maillon le plus faible ({cg}). REVA n'affirme pas la chaîne.",
+                    "length": len(hops),
+                    "chain_grade": cg,
+                    "weakest_hop": grades.index(cg),
+                    "hops": hops,
+                    "wording": f"Composition by REVA of {len(hops)} separately asserted claim(s); chain grade = "
+                    f"weakest hop ({cg}). Each hop is asserted by its own source; REVA does not assert the chain.",
+                    "wording_fr": f"Composition par REVA de {len(hops)} affirmation(s) énoncée(s) séparément ; note de "
+                    f"la chaîne = maillon le plus faible ({cg}). REVA n'affirme pas la chaîne.",
                 },
             )
         )

@@ -123,7 +123,7 @@ export function claim(o: ClaimOpts) {
             graded_at: REC,
           },
     review_status: 'unreviewed',
-    wording_fr: `Selon ${wd ? 'Wikidata' : o.dataset!.source_key} (donnée de test), ${o.effect.label} — ${o.labelFr} — ${o.cause.label} ; REVA n’établit pas de causalité.`,
+    wording_fr: `Selon ${wd ? 'Wikidata' : o.dataset!.source_key} (donnée de test), ${o.cause.label} ${o.labelFr} ${o.effect.label} ; REVA n’établit pas de causalité.`,
     origin: 'test_fixture',
     recorded_at: REC,
   };
