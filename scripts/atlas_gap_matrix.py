@@ -410,7 +410,7 @@ SEARCHED: list[dict[str, Any]] = [
         "licence": "not verified",
         "targets": ["XKX"],
         "result": "skipped",
-        "note": "PxWeb v1 data queries need POST; XKX gaps are literacy (no recent census literacy series) and HDI",
+        "note": "PxWeb v1 data queries need POST; XKX gaps are minimum wage, literacy and HDI",
     },
     {
         "id": "ssb.no",
@@ -527,7 +527,7 @@ SEARCHED: list[dict[str, Any]] = [
         "licence": "HK Government data terms",
         "targets": ["HKG"],
         "result": "no_data",
-        "note": "API works; HKG has no gap in the 22 concepts except constitutional voting age (Factbook covers it)",
+        "note": "API works; HKG has no remaining gap in the 22 concepts (every concept has at least one source)",
     },
     {
         "id": "dsec.mo",
@@ -572,7 +572,7 @@ SEARCHED: list[dict[str, Any]] = [
         "licence": "not verified",
         "targets": ["AND"],
         "result": "skipped",
-        "note": "HTML/PxWeb (POST); AND has no gap in the concepts measured here except WDI-level unemployment",
+        "note": "HTML/PxWeb (POST); AND has no remaining any-source gap (WDI/ILO modelled unemployment missing, Factbook has it)",
     },
     {
         "id": "vatican",
@@ -638,7 +638,6 @@ SEARCHED: list[dict[str, Any]] = [
         "note": "no resident population: no economy, labour, price, health or legal statistics exist; area (and GeoNames/Factbook texts) only",
     },
 ]
-#: The World Bank aggregate CHI (Channel Islands = GGY + JEY): only WB/UN aggregate series exist; the parts are entities.
 
 # ------------------------------------------------------------------------------------- static inputs
 #: World Bank series coverage from docs/dev/v3_a_wb.md (live ingest 2026-10-15): the 217 WB economies minus the

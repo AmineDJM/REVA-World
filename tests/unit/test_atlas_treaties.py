@@ -156,7 +156,9 @@ def test_atlas_rows_validate(pages: dict[str, T.Page]) -> None:
     assert {u["provider_geo"] for u in unmapped} == {"European Union"}
     ind = Counter(r["indicator"].split("|", 1)[1].split("=")[0] for r in rows)
     assert ind["status"] == sum(len(p.participants) for p in pages.values())
-    us = [r for r in rows if r["provider_geo"] == "United States of America" and r["indicator"].startswith("XXVII-7-d|")]
+    us = [
+        r for r in rows if r["provider_geo"] == "United States of America" and r["indicator"].startswith("XXVII-7-d|")
+    ]
     got = {r["indicator"].split("|", 1)[1]: (r["period_start"], r["value_text"]) for r in us}
     assert got["action=consent"] == (date(2021, 1, 20), "acceptance")
     assert got["action=withdrawal_effect"][0] == date(2026, 1, 27) and got["status"][1] == "withdrawn"
@@ -212,7 +214,9 @@ async def test_fixture_subset_is_selected_offline() -> None:
 # ------------------------------------------------------------------------------------------------ OHCHR
 @pytest.fixture(scope="module")
 def ohchr() -> tuple[list[dict[str, Any]], dict[int, dict[str, Any]]]:
-    return O.parse_treaties(_body("atlas.ohchr", O.URL_TREATIES)), O.parse_countries(_body("atlas.ohchr", O.URL_COUNTRIES))
+    return O.parse_treaties(_body("atlas.ohchr", O.URL_TREATIES)), O.parse_countries(
+        _body("atlas.ohchr", O.URL_COUNTRIES)
+    )
 
 
 def test_ohchr_instruments_and_dates(ohchr: Any) -> None:

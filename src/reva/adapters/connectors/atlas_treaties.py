@@ -316,7 +316,7 @@ class Page:
 
 
 def _div(s: str, idn: str) -> str | None:
-    m = re.search(r'id="%s%s"[^>]*>(.*?)</div>' % (_P, re.escape(idn)), s, re.S)
+    m = re.search(r'id="' + _P + re.escape(idn) + r'"[^>]*>(.*?)</div>', s, re.S)
     return text_of(m.group(1)) if m else None
 
 
@@ -477,7 +477,7 @@ def parse_page(body: bytes, treaty: Treaty) -> Page:
     consent_header = hdr[i_con]
     # title / metadata
     title = ""
-    m = re.search(r'id="%srptTreaty_ctl00_tcTreaty"[^>]*>(.*?)</div>' % _P, s, re.S)
+    m = re.search(r'id="' + _P + r'rptTreaty_ctl00_tcTreaty"[^>]*>(.*?)</div>', s, re.S)
     if m:
         title = re.sub(r"^\d+\s*\.\s*(?:[a-z]\b\s*)?", "", text_of(_NOTE_REF_RE.sub(" ", m.group(1))))
     status = _div(s, "rptStatus_ctl00_tcText") or ""
@@ -577,7 +577,9 @@ def atlas_rows(pages: Sequence[Page], raws: Mapping[str, str], asof: date) -> li
 
     rows: list[dict[str, Any]] = []
 
-    def add(page: Page, p: Participant, ind: str, d: date, text_: str, flags: dict[str, Any], sel: dict[str, Any]) -> None:
+    def add(
+        page: Page, p: Participant, ind: str, d: date, text_: str, flags: dict[str, Any], sel: dict[str, Any]
+    ) -> None:
         a, b = _day(d)
         rows.append(
             {
@@ -609,8 +611,11 @@ def atlas_rows(pages: Sequence[Page], raws: Mapping[str, str], asof: date) -> li
                 page.problems.append(f"participant listed {seen[p.name]} times: {p.name}")
                 continue
             base = {"notes": p.notes, "declarations_or_reservations_link": p.declarations_link}
-            for col, cell, ind in (("Signature", p.signature, "action=signature"), ("Consent", p.consent, "action=consent"),
-                                   ("Provisional application", p.provisional, "action=provisional_application")):
+            for col, cell, ind in (
+                ("Signature", p.signature, "action=signature"),
+                ("Consent", p.consent, "action=consent"),
+                ("Provisional application", p.provisional, "action=provisional_application"),
+            ):
                 if cell is None or cell.date is None:
                     continue
                 add(
@@ -633,7 +638,9 @@ def atlas_rows(pages: Sequence[Page], raws: Mapping[str, str], asof: date) -> li
                     if d is None or (kind, d) in used:
                         continue
                     used.add((kind, d))
-                    txt = "withdrawal_notification_revoked" if (e.revoked and kind == "withdrawal_notification") else kind
+                    txt = (
+                        "withdrawal_notification_revoked" if (e.revoked and kind == "withdrawal_notification") else kind
+                    )
                     add(page, p, f"action={kind}", d, txt, ev_flags, {"notes_section": "divNotesAll", "note": e.note})
             st = participant_status(p, events.get(p.name, []), asof)
             add(
@@ -712,7 +719,11 @@ def resolve_country_qids(engine: Any, origin: str) -> tuple[dict[str, str], dict
         if code:
             claims[code].add(s)
     out = {k: next(iter(v)) for k, v in claims.items() if len(v) == 1}
-    return out, {"basis": "kg P298 statements", "resolved": len(out), "ambiguous": sorted(k for k, v in claims.items() if len(v) > 1)}
+    return out, {
+        "basis": "kg P298 statements",
+        "resolved": len(out),
+        "ambiguous": sorted(k for k, v in claims.items() if len(v) > 1),
+    }
 
 
 @dataclass
@@ -821,7 +832,11 @@ def kg_records(
                     references=[{**ref, "selector": {"table": "tblgrid", "row": p.row, "column": "Consent"}}],
                     statement_id=f"party:{t.mtdsg}:{pid_slug}", source_revision=revision, raw_sha256=raw,
                 ))  # fmt: skip
-    report = {"entities": len(ents), "statements": dict(Counter(s.property_pid for s in sts)), "object_nodes": dict(nodes)}
+    report = {
+        "entities": len(ents),
+        "statements": dict(Counter(s.property_pid for s in sts)),
+        "object_nodes": dict(nodes),
+    }
     return KgBuild(list(ents.values()), sts, report)
 
 
@@ -926,9 +941,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         try:
             page = parse_page(raw.body, t)
         except (UntcParseError, UnicodeDecodeError) as e:
-            raise SourceResponseError(f"UNTC page {t.mtdsg} not parseable: {e}", retryable=False, kind="schema_drift") from e
+            raise SourceResponseError(
+                f"UNTC page {t.mtdsg} not parseable: {e}", retryable=False, kind="schema_drift"
+            ) from e
         if run.origin == "live" and len(page.participants) < MIN_PARTICIPANTS_LIVE:
-            raise SourceResponseError(f"UNTC page {t.mtdsg}: only {len(page.participants)} participants", retryable=False)
+            raise SourceResponseError(
+                f"UNTC page {t.mtdsg}: only {len(page.participants)} participants", retryable=False
+            )
         fetched.append((t, raw, page))
     terms_sha = run.archive(terms_raw)
     raws = {t.mtdsg: run.archive(raw) for t, raw, _ in fetched}
@@ -948,7 +967,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     )  # fmt: skip
     out: dict[str, Any] = {
         "terms": terms,
-        "atlas": {k: reg[k] for k in ("dataset_key", "row_count", "created")} | {"unmapped": reg.get("unmapped_provider_geo")},
+        "atlas": {k: reg[k] for k in ("dataset_key", "row_count", "created")}
+        | {"unmapped": reg.get("unmapped_provider_geo")},
         "treaties": {t.mtdsg: page_summary(p) for t, _, p in fetched},
         "unmapped_participants": sorted(n for n, v in iso3_of.items() if v is None),
     }

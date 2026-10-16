@@ -167,7 +167,9 @@ def rows_for_treaty(
     rows: list[dict[str, Any]] = []
     stats: Counter[str] = Counter()
 
-    def add(i: int, area: str, name: str, field: str, d: date, text_: str, flags: dict[str, Any], keys: Sequence[str]) -> None:
+    def add(
+        i: int, area: str, name: str, field: str, d: date, text_: str, flags: dict[str, Any], keys: Sequence[str]
+    ) -> None:
         rows.append(
             {
                 "source": ATLAS_SOURCE, "dataset": DATASET, "indicator": f"{acr}|field={field}", "concept_id": None,
@@ -269,7 +271,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             rows += r
             summaries.append(s)
     except OhchrParseError as e:
-        raise SourceResponseError(f"OHCHR dashboard data not parseable: {e}", retryable=False, kind="schema_drift") from e
+        raise SourceResponseError(
+            f"OHCHR dashboard data not parseable: {e}", retryable=False, kind="schema_drift"
+        ) from e
     shas = {"t": run.archive(t_raw), "c": run.archive(c_raw)}
     for _, _, raw in fetched:
         if run.archive(raw) != hashlib.sha256(raw.body).hexdigest():
@@ -282,7 +286,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         rights={"licence": LICENCE, "open_licence": False, "provider": "OHCHR", "source_key": SOURCE_KEY},
     )  # fmt: skip
     return {
-        "atlas": {k: reg[k] for k in ("dataset_key", "row_count", "created")} | {"unmapped": reg.get("unmapped_provider_geo")},
+        "atlas": {k: reg[k] for k in ("dataset_key", "row_count", "created")}
+        | {"unmapped": reg.get("unmapped_provider_geo")},
         "areas": len(countries),
         "treaties": summaries,
     }
