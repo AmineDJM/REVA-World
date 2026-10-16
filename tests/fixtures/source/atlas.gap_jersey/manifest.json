@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "22ea08d554b56276218eaf34ee6e6f40dc2cb5f4558abfe2a015f93ece2a093b",
+    "url": "https://opendata.gov.je/dataset/8a23152e-e04a-4d43-9081-06817e8d881d/resource/47246565-a300-4d7c-b273-4eb55be82615/download/earnings_by_sector.csv",
+    "file": "22ea08d554b56276.json",
+    "sha256": "cb430b7afe13d871bebef92e2c081aa2341fc3c838f6dceefc0fefcf7e81c535",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-16T18:31:15.777701+00:00",
+    "licence": "Open Government Licence - Jersey v1.0 (OGL-J-1.0, CKAN licence of dataset 'earnings-in-jersey')",
+    "note": "complete provider response captured by agent GAPHUNT (restricted request where the module's fixture URL says so)"
+  }
+]

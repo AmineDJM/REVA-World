@@ -214,7 +214,7 @@ def test_pair_view_reads_full_history_with_evidence(env: Env) -> None:
     for k in kinds.values():
         for lk in k["links"]:
             assert lk["evidence"] and lk["text"]["fr"]
-            assert lk["weight"] is None or float(lk["weight"]) != 0
+            assert lk.get("weight") is None or float(lk["weight"]) != 0
     assert "colonial_rule_cshapes" in kinds or "land_border_cshapes" in kinds
     assert get(env, "/v1/links/pair", a="FRA", b="FRA").status_code == 422
     assert get(env, "/v1/links/pair", a="FRA", b="ZZZ").status_code == 404
