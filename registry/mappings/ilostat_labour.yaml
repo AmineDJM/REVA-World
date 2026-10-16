@@ -1,7 +1,7 @@
 # Exact mappings of the reviewed connector ilostat.labour_age5 (V3 agent SIMWORLD): ILOSTAT bulk files ->
 # dataset-input concepts (registry/concepts/labour_ilostat.yaml); no scalar observations. Subjects: every
 # crosswalk country (ILOSTAT covers a subset; a country without rows simply has no dataset input).
-connector: {name: ilostat.labour_age5, version: 1.0.0}
+connector: {name: ilostat.labour_age5, version: 1.0.1}
 mappings:
 - mapping_key: ilostat.labour_age5.EMP_DWAP_SEX_AGE_RT_A
   source_ref:

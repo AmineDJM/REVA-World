@@ -51,7 +51,7 @@ from reva.ports.connectors import (
 )
 
 NAME = "ilostat.labour_age5"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB while the code was still in flux (never reuse)
 PARSER_VERSION = "ilostat-bulk-csv-age5-1"
 TEMPLATE = "eurostat_sdmx_csv"  # V2 built-in template value (see un_wpp_demography.TEMPLATE)
 SOURCE_KEY = "ilostat.rplumber"

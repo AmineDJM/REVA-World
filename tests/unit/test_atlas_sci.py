@@ -259,7 +259,8 @@ def test_openalex_query_urls():
     q = oa.Query("works_country_domain", 2020, "domain", "3")
     url = oa.query_url(q, api_key="SECRET")
     assert url.startswith("https://api.openalex.org/works?filter=publication_year:2020,type:article|review,")
-    assert "primary_topic.domain.id:3" in url and "group_by=authorships.countries" in url and "cursor=*" in url
+    assert "primary_topic.domain.id:3" in url and "group_by=authorships.countries" in url and "cursor" not in url
+    assert "cursor=*" in oa.query_url(q, cursor="*")
     from reva.adapters.http.safe_client import redact_url
 
     assert "SECRET" not in redact_url(url) and "mailto" not in url

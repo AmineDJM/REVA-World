@@ -6,7 +6,12 @@ territories. This agent adds two sources whose coverage is near-universal by des
 
 Status: connectors, catalogs, geo aliases, fixtures and tests done. A-LAW's Factbook legal
 connector is merged into the same module (lead decision 2026-10-15; see "Merge with A-LAW").
-LIVE_SUMMARY
+One live ingest into a throwaway database (`reva_afactbook_live_d2f4564c`, dropped afterwards) on
+2026-10-16 00:00–00:06 UTC through `run_atlas_ingest(mode="live")` (budget-metered, policy
+budgets-1.3.4): `atlas.factbook` 261 requests / 9.8 MB / 143 s, `atlas.factbook_disputes` 259 / 11.8 MB
+/ 131 s, `atlas.unsd_ama` 10 / 13.3 MB / 71 s; 0 refused, 0 failed, 530 raw artifacts archived,
+5 atlas tables registered. (A first live run on 2026-10-15, before the merge with A-LAW, gave the
+same Factbook counts; that database was dropped too.)
 The dev database `reva` was never touched. Nothing is committed.
 
 ## Sources researched (2026-10-15)
@@ -138,7 +143,126 @@ work, then merged on the lead's instruction:
 * A-LAW's tests adjusted: 261 planned requests, two sources discovered, `factbook_gec` scheme,
   249 fixture_missing items, three tables.
 
-COVERAGE_SECTIONS
+## Live tables (2026-10-16)
+
+| table | rows | crosswalk entities | provider geos | indicators | periods |
+|---|---|---|---|---|---|
+| `atlas.factbook.legal_2026_01` | 2,372 | 240 | 252 | 11 | as published 2026-01-22 (WI 2021-01-01) |
+| `atlas.factbook.figures_2026_01` | 30,946 | 240 | 261 | 1,731 (94 fields + 6 list families) | stated years 1990–2025 (93 % in 2020–2025); 2,766 as-published rows |
+| `atlas.factbook.texts_2026_01` | 73,924 | 240 | 261 | 742 paths | as published 2026-01-21/22 (older for 21 stale files) |
+| `atlas.factbook.disputes_2024_04` | 259 | 240 | 259 | 1 | edition 2024-04-18 |
+| `atlas.unsd.ama` | 794,323 | 210 | 220 | 73 | 1970–2024 |
+
+Factbook: 261 entities → 240 crosswalk entities; unmapped and kept (21): AT, AX, BQ, CR, DX, EE, GZ,
+IP, JN, OO, PF, PG, SV, UM, WE, WQ, XO, XQ, XX, ZH, ZN. Crosswalk entities **without** a Factbook
+profile (11): ALA Åland, BES Caribbean Netherlands, GLP, GUF, MTQ, MYT, REU (French overseas
+departments, inside the France profile), CHI (WB aggregate; GGY and JEY are separate profiles),
+PSE (only West Bank + Gaza Strip, partial, unmapped), SJM (only Svalbard + Jan Mayen, partial),
+UMI (only partial profiles). 2,089 figure rows took their year from a dated sibling. 248 text rows
+mention a dispute or claim.
+
+AMA: 220 areas → 210 crosswalk entities; unmapped (10): former Czechoslovakia 200, Ethiopia 230,
+Netherlands Antilles 530, Democratic Yemen 720, Sudan 736, USSR 810, Yemen Arab Republic 886,
+Yugoslavia 890, Tanzania Mainland 835, Zanzibar 836. Not in AMA (41 crosswalk entities): mostly
+uninhabited areas and dependencies (see below), and TWN, TZA (only the two Tanzanian parts).
+
+### Factbook figures: entities per field (crosswalk entities; stated years)
+
+| field | entities | years | field | entities | years |
+|---|---|---|---|---|---|
+| area.total | 239 | as published | gdp.real_ppp | 219 | 2014–2024 |
+| land_boundaries.total | 239 | as published | gdp.real_per_capita_ppp | 217 | 2014–2024 |
+| coastline | 238 | as published | gdp.real_growth | 215 | 2015–2024 |
+| elevation highest/lowest | 240 | as published | gdp.official_exchange_rate | 224 | 2014–2024 |
+| land use (6 shares) | 225–238 | 2011–2023 | inflation | 211 | 2015–2024 |
+| population.total | 234 | 2020–2025 | exports / imports | 211 / 210 | 2009–2024 |
+| population male/female | 231 | 2021–2025 | current_account_balance | 192 | 2013–2024 |
+| age structure (3) | 227–228 | 2020–2024 | budget revenues/expenditures | 210 | 2014–2024 |
+| median age | 228 | 2020–2025 | public_debt_gdp | 200 | 2013–2023 |
+| birth / death rate | 227 / 228 | 2012–2025 | taxes_revenues_gdp | 151 | 2015–2023 |
+| net_migration_rate | 227 | 2020–2025 | unemployment_rate | 188 | 2019–2024 |
+| population_growth_rate | 233 | 2014–2025 | youth_unemployment.total | 187 | 2021–2024 |
+| urban_population / rate | 227 | 2015–2023 | labor_force | 189 | 2010–2024 |
+| life expectancy (3) | 226–227 | 2016–2024 | gini / income shares | 147 / 145 | 2015–2024 |
+| infant mortality | 226 | 2020–2025 | poverty_line_population | 136 | 2015–2024 |
+| total fertility rate | 226 | 2020–2025 | remittances_gdp | 198 | 2013–2024 |
+| maternal mortality | 194 | 2023 | reserves / external_debt | 176 / 122 | 2015–2024 |
+| literacy total / female | 120 / 128 | 2015–2024 | exchange_rate | 220 | 2013–2024 |
+| health / education exp. (% GDP) | 190 / 190 | 2015–2024 | military_expenditure_gdp | 166 | 2015–2025 |
+| physicians / hospital beds | 203 / 156 | 2012–2023 | refugees / IDPs / stateless | 172 / 117 / 95 | 2023–2024 |
+| internet users / mobile per 100 | 232 / 223 | 2004–2024 | CO2 emissions | 211 | 2023 |
+
+List families: religion shares 218 entities (1,171 rows), ethnic groups 199 (1,208), languages 114
+(673; many profiles list languages without %), export/import partners 230 each (~1,140 rows),
+land borders 162 entities (660 neighbour rows, `partner_iso3` resolved for all but Taiwan's
+partners before TWN, French DOMs, West Bank/Gaza and Guantanamo). Texts: median 323 text fields per
+entity (climate, terrain, natural resources, government type, capital, independence, constitution,
+legal system, suffrage, executive/legislative/judicial branches, currency, flag, anthem, economic
+overview, transnational issues …).
+
+## Gaps filled: entities other sources miss
+
+Legend: Factbook figures present (pop = population, area, GDP = real GDP PPP, life exp., unemp.);
+"texts" = number of Factbook text fields; AMA = GDP current US$ series.
+
+### Crosswalk entities without a World Bank code (34)
+
+| ISO3 | entity | Factbook figures | texts | AMA |
+|---|---|---|---|---|
+| AIA | Anguilla | pop, area, GDP, life exp. | 174 | 1970–2024 |
+| COK | Cook Islands | pop, area, GDP, life exp. | 222 | 1970–2024 |
+| MSR | Montserrat | pop, area, GDP, life exp. | 189 | 1970–2024 |
+| TWN | Taiwan | pop, area, GDP, life exp., unemp. | 277 | — |
+| JEY | Jersey | pop, area, GDP, life exp., unemp. | 187 | — |
+| GGY | Guernsey | pop, area, life exp., unemp. | 190 | — |
+| NIU | Niue | pop, area, GDP | 172 | — |
+| TKL | Tokelau | pop, area, GDP | 148 | — |
+| SPM | Saint Pierre and Miquelon | pop, area, GDP, life exp. | 170 | — |
+| WLF | Wallis and Futuna | pop, area, life exp. | 171 | — |
+| BLM | Saint Barthélemy | pop, area, life exp. | 132 | — |
+| SHN | Saint Helena, Ascension and Tristan da Cunha | pop, area, life exp. | 167 | — |
+| ESH | Western Sahara (stale 2021 profile, disputed) | pop, area, life exp. | 153 | — |
+| FLK | Falkland Islands (disputed) | pop, area | 165 | — |
+| VAT | Holy See | pop, area | 108 | — |
+| NFK | Norfolk Island | pop, area | 119 | — |
+| CXR | Christmas Island | pop, area | 113 | — |
+| CCK | Cocos (Keeling) Islands | pop, area | 99 | — |
+| PCN | Pitcairn | pop, area | 103 | — |
+| ATA | Antarctica | area | 49 | — |
+| IOT | British Indian Ocean Territory | area | 79 | — |
+| SGS | South Georgia and South Sandwich | area | 43 | — |
+| BVT | Bouvet Island | area | 41 | — |
+| HMD | Heard and McDonald Islands | area | 38 | — |
+| ATF | French Southern Territories | — (texts only) | 54 | — |
+| ALA, BES, GLP, GUF, MTQ, MYT, REU, SJM, UMI | no own Factbook profile (see above) | — | 0 | — |
+
+### World Bank economies missing from IMF WEO (21, from `docs/dev/v3_a_imf.md`)
+
+All but CHI are filled by the Factbook with population and area, 16 with GDP (ASM, BMU, CUB,
+CUW, CYM, FRO, GRL, MCO, MNP, NCL, PRK, PYF, SXM, TCA, VGB, VIR); AMA adds 1970–2024 GDP, GNI and
+population for 12 of them (BMU, CUB, CUW, CYM, GRL, MCO, NCL, PRK, PYF, SXM, TCA, VGB) — notably
+**North Korea and Cuba**, for which IMF has only IMTS merchandise trade.
+
+### Crosswalk entities in no IMF table (37)
+
+Factbook fills 26 with at least area/population (GDP for COK, JEY, MCO, MNP, NIU, PRI, SPM, TKL,
+VGB, VIR); AMA fills COK, MCO, PRI, VGB with official 1970–2024 national accounts. Still empty:
+ALA, BES, CHI, GLP, GUF, MTQ, MYT, REU, SJM, UMI (no own profile) and ATF (texts only).
+
+### Entities in no UN table (13, from `docs/dev/v3_a_un.md`)
+
+Factbook gives population for CCK, CXR, NFK, PCN; area for ATA, BVT, HMD, IOT, SGS (uninhabited);
+texts for ATF. ALA, SJM, UMI remain without any figure (Åland is inside Finland's profile;
+Svalbard/Jan Mayen and the US minor islands are profiled only as parts, kept unmapped).
+
+### Remaining gaps and where else to look
+
+* French overseas departments (GLP, GUF, MTQ, MYT, REU): inside the France profile and the WB/IMF
+  France aggregates; INSEE / Eurostat (NUTS2 FRY*) have them separately (not open-ended here).
+* Åland (ALA): Statistics Åland (ÅSUB) / Statistics Finland; BES: CBS Netherlands (Caribbean
+  Netherlands); SJM: Statistics Norway (Svalbard population).
+* Taiwan: Factbook only (+ IMF WEO "Taiwan Province of China" with A-IMF; now mapped to TWN).
+* Tanzania in AMA: only Mainland/Zanzibar parts (unmapped) — TZA from WB/IMF.
 
 ## Cross-owner notes / requests
 

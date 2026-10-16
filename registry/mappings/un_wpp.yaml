@@ -2,7 +2,7 @@
 # dataset-input concepts (registry/concepts/demography_wpp.yaml). The connector publishes no scalar
 # observations; the mappings record what each dataset input means and for which subjects (the 237 WPP
 # countries/areas, crosswalk keys) and years the dataset inputs are eligible for belief releases.
-connector: {name: un.wpp, version: 1.0.0}
+connector: {name: un.wpp, version: 1.0.1}
 mappings:
 - mapping_key: un.wpp.wpp2024_pop_jan1
   source_ref:

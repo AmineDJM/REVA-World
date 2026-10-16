@@ -86,7 +86,7 @@ from reva.ports.connectors import (
 )
 
 NAME = "un.wpp"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB while the code was still in flux (never reuse)
 PARSER_VERSION = "un-wpp2024-csv-1"
 #: The connector contract's template literal (src/reva/ports/connectors.py, digest-pinned) has no
 #: neutral "bulk file" value; reviewed V2 built-ins that are never autonomy-generated use

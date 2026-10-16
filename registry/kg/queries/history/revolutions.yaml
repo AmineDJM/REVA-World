@@ -14,3 +14,5 @@ sparql: |
   }
 max_rows: 5000
 expand_hops: 1
+# WDQS-free selection (run --via api) when WDQS is throttled; same classes, CirrusSearch semantics.
+api_search: {instance_of: [Q10931], subclass_depth: 3}

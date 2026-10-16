@@ -1,0 +1,1736 @@
+{
+  "head" : {
+    "vars" : [ "part", "a_l", "a_item", "a_sl", "c_item", "c_l", "lk_l", "lk_item", "lk_sl" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "essayist"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11774202"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "22"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "admiral"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q132851"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "85"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "missionary"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q219477"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "80"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "admiral"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2916006"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "trade unionist"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15627169"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "admiral"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4057849"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "10"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "head of government"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2285706"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "74"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "navigator"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q254651"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "35"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "cartographer"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1734662"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "17"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "monarch"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q116"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "98"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "viceroy"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q244741"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "54"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "governor-general"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q382844"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "55"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "conquistador"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q126236"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "77"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "head of state"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q48352"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "114"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "caliph"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65997"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "88"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "prophet"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42857"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "126"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "lk_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "sailor"
+      },
+      "lk_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45199"
+      },
+      "lk_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "74"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "lookup"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Isabella I of Castile"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45859"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "104"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gamal Abdel Nasser"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12205892"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q174432"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "82"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11815406"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ho Chi Minh"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36014"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "153"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gamal Abdel Nasser"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39524"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "128"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kwame Nkrumah"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8620"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "159"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "John II of Portugal"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q217637"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "58"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dwight D. Eisenhower"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9916"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "191"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "287"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "John F. Kennedy"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q28836957"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jawaharlal Nehru"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1047"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "192"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q117349992"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "John F. Kennedy"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9696"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "249"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q135475830"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2394507"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3534639"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "13"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q64706221"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7328"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "184"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Albert Einstein"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q937"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "322"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Simón Bolívar"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q140888658"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro I of Brazil"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q939"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "83"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q110880142"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Charles de Gaulle"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2042"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "222"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19948474"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Patrice Lumumba"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161672"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "114"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Simón Bolívar"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8605"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "175"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19949500"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "244"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "a_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Charles de Gaulle"
+      },
+      "a_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2960591"
+      },
+      "a_sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "8"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "anchor"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q80061"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nobel Prize in Physiology or Medicine"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1763527"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "constituent country"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7275"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "state"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36180"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "writer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q42973"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "architect"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9174"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "religion"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q901"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "scientist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q116"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "monarch"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6256"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "country"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q49757"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "poet"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q39631"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "physician"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "human"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11063"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "astronomer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q48349"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "empire"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47064"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "military personnel"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36834"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "composer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18805"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "naturalist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15634554"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19546"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pope"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q37922"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nobel Prize in Literature"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q35637"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nobel Peace Prize"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q38104"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nobel Prize in Physics"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q44585"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nobel Prize in Chemistry"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47170"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Prize in Economic Sciences in Memory of Alfred Nobel"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q82955"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "politician"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q133156"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "colony"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q164142"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "protectorate"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q170790"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "mathematician"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q193391"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "diplomat"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q205375"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "inventor"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q81096"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "engineer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q188094"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "economist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q417175"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "kingdom"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q201788"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "historian"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q212980"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "psychologist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q214917"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "playwright"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1028181"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "painter"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q169470"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "physicist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1281618"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "sculptor"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q82594"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "computer scientist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q901402"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "geographer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q189290"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "military officer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q593644"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "chemist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q864503"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "biologist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1234713"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "theologian"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2306091"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "sociologist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2401485"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "expedition"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2526255"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "film director"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2374149"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "botanist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3242115"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "revolutionary"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3624078"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "sovereign state"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3024240"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "historical country"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4964182"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "philosopher"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1402561"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "military leader"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6625963"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "novelist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11900058"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "explorer"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15253558"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "activist"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15995642"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "religious leader"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q161243"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "dependent territory"
+      }
+    }, {
+      "c_item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q372436"
+      },
+      "part" : {
+        "type" : "literal",
+        "value" : "class"
+      },
+      "c_l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "statesperson"
+      }
+    } ]
+  }
+}

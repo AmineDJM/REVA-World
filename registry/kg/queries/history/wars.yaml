@@ -23,3 +23,5 @@ sparql_undated: |
 split: {by: year, from: -3000, to: 2029, step: 500, include_undated: true}
 max_rows: 25000
 expand_hops: 1
+# WDQS-free selection (run --via api) when WDQS is throttled; same classes, CirrusSearch semantics.
+api_search: {instance_of: [Q198], subclass_depth: 3}

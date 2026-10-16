@@ -57,6 +57,9 @@ HEAD = {
     "basis": "Legal basis",
 }
 TRACKS = {"F": "women", "M": "men"}
+#: WBL economy codes that are not country-crosswalk keys (registry/entities/country_crosswalk.json):
+#: WBL "KSV" (Economy "Kosovo") is the crosswalk/WPP key "XKX". The excerpt keeps WBL's own code.
+WBL_TO_CROSSWALK = {"KSV": "XKX"}
 
 
 def _yaml_dump(doc: Any) -> str:
@@ -131,7 +134,7 @@ def excerpt(rows: list[dict[str, Any]], sha: str, retrieved_at: str) -> str:
 
 
 def table(r: dict[str, Any], retrieved_at: str, sha: str) -> dict[str, Any]:
-    iso = r["iso"]
+    iso = WBL_TO_CROSSWALK.get(r["iso"], r["iso"])
     ages = {s: months(r["men"] if s == "M" else r["women"]) for s in ("F", "M")}
     rows: list[dict[str, Any]] = []
     for s, track in TRACKS.items():
@@ -186,7 +189,8 @@ def table(r: dict[str, Any], retrieved_at: str, sha: str) -> dict[str, Any]:
         "notes": (
             f"{r['economy']}: full-benefit retirement age {'for women and men ' if same else 'for men / women '}from "
             f"World Bank WBL 2026 (law as of 1 October {AS_OF_YEAR}), legal basis as cited by WBL: {r['basis']}. "
-            "The legal text itself was not archived by REVA. WBL states one age at one date: the in-force path "
+            + (f"WBL economy code {r['iso']} = crosswalk key {iso}. " if r["iso"] != iso else "")
+            + "The legal text itself was not archived by REVA. WBL states one age at one date: the in-force path "
             f"covers claim year {AS_OF_YEAR} only; the held-constant path is an explicitly labelled counterfactual."
         ),
         "model_lever": {
@@ -249,7 +253,7 @@ def build(xlsx: Path, retrieved_at: str, root: Path) -> dict[str, Any]:
     tables: dict[str, dict[str, Any]] = {}
     gaps: list[dict[str, Any]] = []
     for r in rows:
-        iso = r["iso"]
+        iso = WBL_TO_CROSSWALK.get(r["iso"], r["iso"])
         if r["year"] != REPORT_YEAR:
             raise SystemExit(f"{iso}: report year {r['year']} != {REPORT_YEAR}")
         if iso in KEEP:

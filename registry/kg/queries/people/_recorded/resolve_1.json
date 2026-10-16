@@ -1,0 +1,13 @@
+{
+  "kind": "resolve",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "query": "SELECT DISTINCT ?part ?a_l ?a_item ?a_sl ?c_item ?c_l ?lk_l ?lk_item ?lk_sl WHERE { { VALUES ?a_l { \"Christopher Columbus\"@en \"Pedro Álvares Cabral\"@en \"Vasco da Gama\"@en \"Isabella I of Castile\"@en \"John II of Portugal\"@en \"Pedro I of Brazil\"@en \"Dwight D. Eisenhower\"@en \"John F. Kennedy\"@en \"Charles de Gaulle\"@en \"Kwame Nkrumah\"@en \"Patrice Lumumba\"@en \"Ho Chi Minh\"@en \"Gamal Abdel Nasser\"@en \"Jawaharlal Nehru\"@en \"Simón Bolívar\"@en \"Napoleon\"@en \"Marie Curie\"@en \"Albert Einstein\"@en } ?a_item rdfs:label ?a_l ; wdt:P31 wd:Q5 ; wikibase:sitelinks ?a_sl . BIND(\"anchor\" AS ?part) } UNION { VALUES ?c_item { wd:Q5 wd:Q116 wd:Q901 wd:Q6256 wd:Q7275 wd:Q9174 wd:Q11063 wd:Q18805 wd:Q19546 wd:Q35637 wd:Q36180 wd:Q36834 wd:Q37922 wd:Q38104 wd:Q39631 wd:Q42973 wd:Q44585 wd:Q47064 wd:Q47170 wd:Q48349 wd:Q49757 wd:Q80061 wd:Q81096 wd:Q82594 wd:Q82955 wd:Q133156 wd:Q161243 wd:Q164142 wd:Q169470 wd:Q170790 wd:Q188094 wd:Q189290 wd:Q193391 wd:Q201788 wd:Q205375 wd:Q212980 wd:Q214917 wd:Q372436 wd:Q417175 wd:Q593644 wd:Q864503 wd:Q901402 wd:Q1028181 wd:Q1234713 wd:Q1281618 wd:Q1402561 wd:Q1763527 wd:Q2306091 wd:Q2374149 wd:Q2401485 wd:Q2526255 wd:Q3024240 wd:Q3242115 wd:Q3624078 wd:Q4964182 wd:Q6625963 wd:Q11900058 wd:Q15253558 wd:Q15634554 wd:Q15995642 } OPTIONAL { ?c_item rdfs:label ?c_l . FILTER(LANG(?c_l) = \"en\") } BIND(\"class\" AS ?part) } UNION { VALUES ?lk_l { \"navigator\"@en \"conquistador\"@en \"viceroy\"@en \"governor-general\"@en \"colonial governor\"@en \"colonial administrator\"@en \"religious leader\"@en \"prophet\"@en \"trade unionist\"@en \"independence activist\"@en \"essayist\"@en \"polar explorer\"@en \"sailor\"@en \"military commander\"@en \"general officer\"@en \"admiral\"@en \"head of state\"@en \"head of government\"@en \"monarch\"@en \"pope\"@en \"caliph\"@en \"missionary\"@en \"cartographer\"@en } ?lk_item rdfs:label ?lk_l ; wikibase:sitelinks ?lk_sl . FILTER(?lk_sl >= 10) BIND(\"lookup\" AS ?part) } }\nLIMIT 3000",
+  "query_sha256": "56173c3e679cd797e2feb0bd047459f3434ec5b7e92d9129e8ce2670b8917248",
+  "raw_file": "resolve_1.srj",
+  "body_sha256": "20a002a5f0de7fb51cf1969d63c3e43df4e5102b747676ebcf27162d7d0a7820",
+  "archive_sha256": "4396007952077e021ce71dbef3a68f51ce60df165ad2841a766f869568d5f623",
+  "retrieved_at": "2026-10-16T00:06:55.503807+00:00",
+  "rows": 107,
+  "elapsed_seconds": 2103.25,
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)"
+}
