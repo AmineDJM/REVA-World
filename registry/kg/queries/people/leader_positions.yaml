@@ -12,10 +12,11 @@ entity_kind: position
 sparql: |
   SELECT DISTINCT ?item WHERE {
     {
-      VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+      VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q417175 wd:Q1763527
                     wd:Q133156 wd:Q161243 wd:Q164142 }
       ?state wdt:P31 ?cls ; p:P1906|p:P1313 ?os .
-      ?os ps:P1906|ps:P1313 ?item .
+      ?os ps:P1906|ps:P1313 ?item ; wikibase:rank ?or .
+      FILTER(?or != wikibase:DeprecatedRank)
     } UNION {
       ?item (wdt:P31|wdt:P279)/wdt:P279* wd:Q116 .
     }

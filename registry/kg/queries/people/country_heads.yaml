@@ -10,7 +10,7 @@ purpose: statements
 entity_kind: country
 sparql: |
   SELECT DISTINCT ?state ?prop ?statement ?person ?rank ?start ?end ?pit ?replaces ?replaced_by ?ordinal WHERE {
-    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q417175 wd:Q1763527
                   wd:Q133156 wd:Q161243 wd:Q164142 }
     VALUES (?p ?prop) { (p:P35 wd:P35) (p:P6 wd:P6) }
     ?state wdt:P31 ?cls ; ?p ?statement .

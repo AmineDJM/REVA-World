@@ -2,7 +2,7 @@ id: people.writers_artists
 domain: people
 owner: KGPEOPLE
 description: >-
-  Writers, poets, playwrights, painters, sculptors, composers, architects and film directors of global reach:
+  Writers, poets, novelists, playwrights, essayists, painters, sculptors, composers, architects and film directors of global reach:
   occupation (P106) in that list and at least 40 sitelinks (articles in 40+ Wikipedias and other Wikimedia
   projects is the bound used for "global influence"; it is a coverage choice, not a value judgement).
 purpose: seed_entities
@@ -17,7 +17,7 @@ sparql: |
 split:
   by: values
   source: list
-  qids: [Q36180, Q49757, Q6625963, Q214917, Q1028181, Q1281618, Q36834, Q42973, Q2526255]
+  qids: [Q36180, Q49757, Q6625963, Q214917, Q11774202, Q1028181, Q1281618, Q36834, Q42973, Q2526255]
   chunk_size: 1
 max_rows: 35000
 timeout_seconds: 55

@@ -5,14 +5,21 @@ description: >-
   Colonial governors, viceroys, governors-general and residents: holders (P39, non-deprecated) of a position
   that a colony / dependent territory / protectorate (or a subclass of those) declares as its head-of-state or
   head-of-government office (P1906/P1313), or of a position whose "applies to jurisdiction" (P1001) is such a
-  territory (e.g. "Governor-General of India", "Viceroy of Peru", "Governor of the Gold Coast").
+  territory (e.g. "Governor of the Gold Coast"), or of any position whose P31/P279 chain reaches viceroy (Q244741) or
+  governor-general (Q382844) (e.g. "Viceroy of Peru", "Governor-General of India"; dominion governors-general
+  are included, as vice-regal offices).
 purpose: seed_entities
 entity_kind: person
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    VALUES ?tcls { wd:Q133156 wd:Q161243 wd:Q164142 }
-    ?territory wdt:P31/wdt:P279* ?tcls .
-    { ?territory wdt:P1906|wdt:P1313 ?position . } UNION { ?position wdt:P1001 ?territory . }
+    {
+      VALUES ?tcls { wd:Q133156 wd:Q161243 wd:Q164142 }
+      ?territory wdt:P31/wdt:P279* ?tcls .
+      { ?territory wdt:P1906|wdt:P1313 ?position . } UNION { ?position wdt:P1001 ?territory . }
+    } UNION {
+      VALUES ?office { wd:Q244741 wd:Q382844 }
+      ?position (wdt:P31|wdt:P279)/wdt:P279* ?office .
+    }
     ?item p:P39 ?ps .
     ?ps ps:P39 ?position ; wikibase:rank ?pr .
     FILTER(?pr != wikibase:DeprecatedRank)

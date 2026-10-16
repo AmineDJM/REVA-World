@@ -24,19 +24,19 @@ the harvester); preferred and normal ranks are both kept, so *historical* leader
 
 | Spec | Purpose | Selection | Notability bound | `max_rows` |
 |---|---|---|---|---|
-| `people.country_heads` | statements (subject = state) | P35 head of state / P6 head of government of current & historical states, empires, colonies, dependencies (classes Q6256, Q3624078, Q3024240, Q7275, Q48349, Q15634554, Q417175, Q1763527, Q133156, Q161243, Q164142), all non-deprecated ranks, start/end/point in time, replaces/replaced by, ordinal | none | 40 000 |
+| `people.country_heads` | statements (subject = state) | P35 head of state / P6 head of government of current & historical states, empires, colonies, dependencies (classes country Q6256, sovereign state Q3624078, historical country Q3024240, state Q7275, empire Q48349, kingdom Q417175, constituent country Q1763527, colony Q133156, dependent territory Q161243, protectorate Q164142), all non-deprecated ranks, start/end/point in time, replaces/replaced by, ordinal | none | 40 000 |
 | `people.state_leaders` | seed | humans who are P35/P6 objects of those states, or hold (P39) the office a state declares as head-of-state (P1906) / head-of-government (P1313) office | none | 40 000 |
 | `people.monarchs` | seed | holders (P39) of any position whose P31/P279 chain reaches monarch (Q116): kings, queens regnant, emperors, sultans, tsars, pharaohs, "King of Portugal", "Emperor of Brazil" …; plus occupation monarch | none | 35 000 |
-| `people.colonial_officials` | seed | holders of the P1906/P1313 office of a colony / dependent territory / protectorate (or subclass), or of a position whose jurisdiction (P1001) is such a territory: governors, governors-general, viceroys, residents | none | 25 000 |
-| `people.explorers_navigators` | seed | occupation explorer (Q11900058), or participant (P1344 / the expedition's P710) in an expedition (Q2401485 or subclass) | ≥ 3 sitelinks | 25 000 |
+| `people.colonial_officials` | seed | holders of the P1906/P1313 office of a colony / dependent territory / protectorate (or subclass), or of a position whose jurisdiction (P1001) is such a territory, or of any position whose P31/P279 chain reaches viceroy (Q244741) or governor-general (Q382844) | none | 25 000 |
+| `people.explorers_navigators` | seed | occupation explorer (Q11900058), navigator (Q254651) or conquistador (Q126236), or participant (P1344 / the expedition's P710) in an expedition (Q2401485 or subclass) | ≥ 3 sitelinks | 25 000 |
 | `people.military_leaders` | seed | occupation military leader / officer / personnel ≥ 30 sitelinks; or any human with a conflict (P607) ≥ 40 sitelinks | 30 / 40 | 15 000 |
 | `people.founders` | seed | object of "founded by" (P112) of any item (states, organisations, parties, companies, religions, cities) | ≥ 15 | 25 000 |
 | `people.political_figures` | seed | occupation politician / statesperson / diplomat (split: one occupation per request) | ≥ 40 | 25 000 |
-| `people.revolutionaries_activists` | seed | occupation revolutionary / activist (one per request) | ≥ 12 | 20 000 |
+| `people.revolutionaries_activists` | seed | occupation revolutionary / activist / trade unionist (one per request) | ≥ 12 | 20 000 |
 | `people.nobel_laureates` | seed | P166 Nobel Prize in Physics, Chemistry, Physiology or Medicine, Literature, Peace; Riksbank Prize in Economics | none | 2 000 |
 | `people.scientists_scholars` | seed | 18 scientific/scholarly occupations (two per request) | ≥ 25 | 35 000 |
-| `people.writers_artists` | seed | writer, poet, novelist, playwright, painter, sculptor, composer, architect, film director (one per request) | ≥ 40 | 35 000 |
-| `people.religious_figures` | seed | founders (P112) of religions (Q9174 or subclass), every pope (P39 Q19546), occupation religious leader / theologian | ≥ 20 for occupations | 15 000 |
+| `people.writers_artists` | seed | writer, poet, novelist, playwright, essayist, painter, sculptor, composer, architect, film director (one per request) | ≥ 40 | 35 000 |
+| `people.religious_figures` | seed | founders (P112) of religions (Q9174 or subclass), every pope (P39 Q19546) and caliph (Q65997), occupation religious leader / theologian / prophet / missionary | ≥ 20 for occupations | 15 000 |
 | `people.leader_positions` | seed, `entity_kind: position` | the offices themselves (P1906/P1313 offices of the state classes above + every monarch position), kept with P1001 jurisdiction, P17, P361, inception/dissolution, replaces/replaced by | none | 25 000 |
 
 **People budget.** The person seeds' `max_rows` sum to **297 000** (asserted ≤ 300 000 by the tests). This is an
@@ -58,7 +58,7 @@ matters more there than notability. Thresholds are only used for open-ended occu
 * State/position/monarch/colonial specs are single requests: they start from a small set of classes or
   positions. Birth-century splitting was considered and rejected for these: a `YEAR(?birth)` filter scans every
   P569 triple per window and silently drops people without a birth date (many medieval and ancient rulers).
-* Total WDQS requests for a full people harvest: 3 + 2 + 9 + 9 occupation chunks + 10 single requests = **33 WDQS
+* Total WDQS requests for a full people harvest: 3 + 3 + 9 + 10 occupation chunks + 10 single requests = **35 WDQS
   requests**; entity snapshots: about `distinct people / 50` `wbgetentities` calls.
 
 ## 3. Anchor people (tests)

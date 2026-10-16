@@ -358,3 +358,23 @@ identity checks. OECD ICIO is not implemented.
 * **Not claimed.** Inflation forecast, CPI, GDP, welfare, wage, exchange-rate or monetary responses,
   substitution, demand response, dynamics. `B` is all of mining and quarrying, broader than crude
   petroleum (FIGARO has no crude-only split).
+
+## Every-country versions (V3, `demography.cohort_component` 1.1.0, `social.retirement_age` 1.1.0)
+
+Agent SIMWORLD; experimental, maintainer review pending; details and back-test in `docs/dev/v3_simworld.md`.
+Both are second registered versions of the V2 models: a spec naming `model_version: "1.0.0"` runs the
+unchanged 1.0.0 code (the platform keeps 1.0.0 as the default version of each key).
+
+* **Cohort component 1.1.0.** Same numerics as 1.0.0. `assumptions.data_source` is required:
+  `eurostat_demography` reproduces 1.0.0 exactly (tested); `un_wpp2024` reads UN World Population Prospects
+  2024 estimates (1 January population and deaths by single age 0-99/100+ and sex, births by five-year
+  mother's age group, births by sex derived from WPP births and sex ratio at birth) for the 237 WPP
+  countries/areas, `countries: ["ALL"]` accepted. WPP estimates are model-based reconstructions, so the
+  "residual migration" is the migration implied by WPP's reconstruction, and the 2013 -> 2023 back-test
+  measures consistency with WPP, not accuracy against registered populations.
+* **Retirement age 1.1.0.** Legal ages from rule tables (law text for FRA, DEU, ESP, NLD; World Bank WBL
+  2026 full-benefit ages by sex for 163 more economies, held constant as a labelled counterfactual
+  reference path), population from the WPP-based projection, employment and participation rates from
+  ILOSTAT five-year bands of the latest complete year (held constant). Single ages 55-64 only (ILOSTAT has
+  no 65-69 band); eligibility changes elsewhere, pension recipient levels and expenditure are refused.
+  The employment response is a cited European estimate, transferred (and labelled) outside its country.

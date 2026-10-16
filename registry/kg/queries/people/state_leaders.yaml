@@ -11,7 +11,7 @@ purpose: seed_entities
 entity_kind: person
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q417175 wd:Q1763527
                   wd:Q133156 wd:Q161243 wd:Q164142 }
     {
       ?state wdt:P31 ?cls ; p:P35|p:P6 ?hs .
@@ -19,7 +19,8 @@ sparql: |
       FILTER(?hr != wikibase:DeprecatedRank)
     } UNION {
       ?state wdt:P31 ?cls ; p:P1906|p:P1313 ?os .
-      ?os ps:P1906|ps:P1313 ?position .
+      ?os ps:P1906|ps:P1313 ?position ; wikibase:rank ?or .
+      FILTER(?or != wikibase:DeprecatedRank)
       ?item p:P39 ?ps .
       ?ps ps:P39 ?position ; wikibase:rank ?pr .
       FILTER(?pr != wikibase:DeprecatedRank)

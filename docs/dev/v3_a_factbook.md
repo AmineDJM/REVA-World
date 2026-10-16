@@ -47,7 +47,7 @@ nothing, with an official multilateral provenance.
   `unsd.ama` (9 bulk files + the file list).
 * `registry/sources/factbook.yaml` (rewritten for the merged connector), `registry/sources/unsd_ama.yaml`
   (new), `registry/atlas/geo_aliases/a_factbook.yaml` (schemes `factbook_gec` and `unsd_ama`),
-  `registry/atlas/catalog/factbook.yaml` (123 concepts: 94 numeric, 29 text; domain `factbook`),
+  `registry/atlas/catalog/factbook.yaml` (123 concepts: 93 numeric, 30 text; domain `factbook`),
   `registry/atlas/catalog/unsd_ama.yaml` (17 concepts; domain `unsd_ama`),
   `registry/atlas/budget_requests/a_factbook.yaml` (merged by ATLASCORE: `factbook.json` 900/day,
   `unsd.ama` 20/day).
@@ -148,7 +148,7 @@ work, then merged on the lead's instruction:
 | table | rows | crosswalk entities | provider geos | indicators | periods |
 |---|---|---|---|---|---|
 | `atlas.factbook.legal_2026_01` | 2,372 | 240 | 252 | 11 | as published 2026-01-22 (WI 2021-01-01) |
-| `atlas.factbook.figures_2026_01` | 30,946 | 240 | 261 | 1,731 (94 fields + 6 list families) | stated years 1990–2025 (87 % in 2020–2025); 2,766 as-published rows |
+| `atlas.factbook.figures_2026_01` | 30,946 | 240 | 261 | 1,731 (93 fields + 6 list families) | stated years 1990–2025 (87 % in 2020–2025); 2,766 as-published rows |
 | `atlas.factbook.texts_2026_01` | 73,924 | 240 | 261 | 742 paths | as published 2026-01-21/22 (older for 21 stale files) |
 | `atlas.factbook.disputes_2024_04` | 259 | 240 | 259 | 1 | edition 2024-04-18 |
 | `atlas.unsd.ama` | 794,323 | 210 | 220 | 73 | 1970–2024 |

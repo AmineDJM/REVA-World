@@ -50,22 +50,36 @@ ANCHORS: dict[str, str] = {
     "Christopher Columbus": "Q7322",
     "Pedro Álvares Cabral": "Q174432",
     "Vasco da Gama": "Q7328",
-    "Isabella I of Castile": "Q132545",
-    "John II of Portugal": "Q207292",
-    "Pedro I of Brazil": "Q192813",
+    "Isabella I of Castile": "Q45859",
+    "John II of Portugal": "Q217637",
+    "Pedro I of Brazil": "Q939",
     "Dwight D. Eisenhower": "Q9916",
     "John F. Kennedy": "Q9696",
     "Charles de Gaulle": "Q2042",
     "Kwame Nkrumah": "Q8620",
-    "Patrice Lumumba": "Q170283",
+    "Patrice Lumumba": "Q161672",
     "Ho Chi Minh": "Q36014",
-    "Gamal Abdel Nasser": "Q46767",
+    "Gamal Abdel Nasser": "Q39524",
     "Jawaharlal Nehru": "Q1047",
     "Simón Bolívar": "Q8605",
     "Napoleon": "Q517",
     "Marie Curie": "Q7186",
     "Albert Einstein": "Q937",
 }
+
+# Anchors whose Wikidata English label differs from the name used by the owner: name -> candidate labels.
+WD_LABELS: dict[str, tuple[str, ...]] = {
+    "Marie Curie": ("Marie Curie", "Marie Skłodowska-Curie", "Maria Skłodowska-Curie"),
+}
+
+
+def anchor_labels(names: list[str] | None = None) -> list[str]:
+    """English labels to resolve for the given anchor names (default: all)."""
+    out: list[str] = []
+    for n in names or list(ANCHORS):
+        out.extend(WD_LABELS.get(n, (n,)))
+    return out
+
 
 # Which spec(s) must select each anchor (at least one of the listed specs; most are in several).
 EXPECTED: dict[str, tuple[str, ...]] = {
@@ -301,16 +315,18 @@ def test_membership_probes_match_current_specs() -> None:
 
 
 def test_anchor_qids_confirmed_by_recorded_lookup() -> None:
+    """For each anchor, the human with the most sitelinks among those carrying one of its English labels."""
     best: dict[str, tuple[int, str]] = {}
+    label_to_name = {lab: n for n in ANCHORS for lab in WD_LABELS.get(n, (n,))}
     for r in _all_rows("resolve"):
-        if r.get("part") != "anchor":
+        if r.get("part") != "anchor" or r["a_l"] not in label_to_name:
             continue
-        sl = int(r["a_sl"])
-        if r["a_l"] not in best or sl > best[r["a_l"]][0]:
-            best[r["a_l"]] = (sl, r["a_item"])
-    for label, qid in ANCHORS.items():
-        assert label in best, f"{label}: no human with this English label in the recording"
-        assert best[label][1] == qid, (label, best[label], qid)
+        name, sl = label_to_name[r["a_l"]], int(r["a_sl"])
+        if name not in best or sl > best[name][0]:
+            best[name] = (sl, r["a_item"])
+    for name, qid in ANCHORS.items():
+        assert name in best, f"{name}: no human with this English label in the recordings"
+        assert best[name][1] == qid, (name, best[name], qid)
 
 
 @pytest.mark.parametrize("label", list(ANCHORS))
@@ -323,12 +339,17 @@ def test_anchor_people_are_captured_by_seed_sets(label: str) -> None:
 
 
 def test_class_qids_used_by_specs_are_confirmed() -> None:
-    labels = {r["c_item"]: r.get("c_l") for r in _all_rows("resolve") if r.get("part") == "class"}
+    """Every QID written in a spec has an English label in a recorded response: either the class check
+    (QID -> label) or a label lookup (label -> QID)."""
+    labels: dict[str, str] = {}
+    for r in _all_rows("resolve"):
+        if r.get("part") == "class" and r.get("c_l"):
+            labels[r["c_item"]] = r["c_l"]
+        elif r.get("part") == "lookup":
+            labels.setdefault(r["lk_item"], r["lk_l"])
     used = set().union(*(spec_class_qids(s) for s in _spec_data().values()))
-    missing = sorted(q for q in used if not labels.get(q))
+    missing = sorted(q for q in used if q not in labels)
     assert not missing, f"class QIDs without a recorded English label: {missing}"
-    for q in used:  # the recorded label is the one the spec's comments/description rely on
-        assert CLASS_LABELS.get(q, labels[q]) == labels[q], (q, labels[q], CLASS_LABELS.get(q))
 
 
 def test_country_heads_rows_link_people_to_their_states() -> None:

@@ -37,6 +37,13 @@
         "properties": {
           "model_key": {
             "const": "demography.cohort_component"
+          },
+          "model_version": {
+            "not": {
+              "enum": [
+                "1.1.0"
+              ]
+            }
           }
         },
         "required": [
@@ -45,6 +52,25 @@
       },
       "then": {
         "$ref": "#/$defs/demography.cohort_component"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "model_key": {
+            "const": "demography.cohort_component"
+          },
+          "model_version": {
+            "const": "1.1.0"
+          }
+        },
+        "required": [
+          "model_key",
+          "model_version"
+        ]
+      },
+      "then": {
+        "$ref": "#/$defs/demography.cohort_component@1.1.0"
       }
     },
     {
@@ -82,6 +108,13 @@
         "properties": {
           "model_key": {
             "const": "social.retirement_age"
+          },
+          "model_version": {
+            "not": {
+              "enum": [
+                "1.1.0"
+              ]
+            }
           }
         },
         "required": [
@@ -90,6 +123,25 @@
       },
       "then": {
         "$ref": "#/$defs/social.retirement_age"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "model_key": {
+            "const": "social.retirement_age"
+          },
+          "model_version": {
+            "const": "1.1.0"
+          }
+        },
+        "required": [
+          "model_key",
+          "model_version"
+        ]
+      },
+      "then": {
+        "$ref": "#/$defs/social.retirement_age@1.1.0"
       }
     }
   ],
@@ -1189,6 +1241,781 @@
               "pension_expenditure_change_approx_eur",
               "pension_recipients",
               "pension_recipients_change"
+            ]
+          }
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "schema_version",
+        "title",
+        "baseline_release_id",
+        "knowledge_cutoff",
+        "model_key",
+        "model_version",
+        "countries",
+        "reference_year",
+        "horizon",
+        "intervention",
+        "assumptions",
+        "fidelity",
+        "missing_input_policy",
+        "outputs",
+        "seed"
+      ]
+    },
+    "demography.cohort_component@1.1.0": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2.0.0"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "baseline_release_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "knowledge_cutoff": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "model_key": {
+          "const": "demography.cohort_component"
+        },
+        "model_version": {
+          "const": "1.1.0"
+        },
+        "countries": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ABW",
+              "AFG",
+              "AGO",
+              "AIA",
+              "ALB",
+              "AND",
+              "ARE",
+              "ARG",
+              "ARM",
+              "ASM",
+              "ATG",
+              "AUS",
+              "AUT",
+              "AZE",
+              "BDI",
+              "BEL",
+              "BEN",
+              "BES",
+              "BFA",
+              "BGD",
+              "BGR",
+              "BHR",
+              "BHS",
+              "BIH",
+              "BLM",
+              "BLR",
+              "BLZ",
+              "BMU",
+              "BOL",
+              "BRA",
+              "BRB",
+              "BRN",
+              "BTN",
+              "BWA",
+              "CAF",
+              "CAN",
+              "CHE",
+              "CHL",
+              "CHN",
+              "CIV",
+              "CMR",
+              "COD",
+              "COG",
+              "COK",
+              "COL",
+              "COM",
+              "CPV",
+              "CRI",
+              "CUB",
+              "CUW",
+              "CYM",
+              "CYP",
+              "CZE",
+              "DEU",
+              "DJI",
+              "DMA",
+              "DNK",
+              "DOM",
+              "DZA",
+              "ECU",
+              "EGY",
+              "ERI",
+              "ESH",
+              "ESP",
+              "EST",
+              "ETH",
+              "FIN",
+              "FJI",
+              "FLK",
+              "FRA",
+              "FRO",
+              "FSM",
+              "GAB",
+              "GBR",
+              "GEO",
+              "GGY",
+              "GHA",
+              "GIB",
+              "GIN",
+              "GLP",
+              "GMB",
+              "GNB",
+              "GNQ",
+              "GRC",
+              "GRD",
+              "GRL",
+              "GTM",
+              "GUF",
+              "GUM",
+              "GUY",
+              "HKG",
+              "HND",
+              "HRV",
+              "HTI",
+              "HUN",
+              "IDN",
+              "IMN",
+              "IND",
+              "IRL",
+              "IRN",
+              "IRQ",
+              "ISL",
+              "ISR",
+              "ITA",
+              "JAM",
+              "JEY",
+              "JOR",
+              "JPN",
+              "KAZ",
+              "KEN",
+              "KGZ",
+              "KHM",
+              "KIR",
+              "KNA",
+              "KOR",
+              "KWT",
+              "LAO",
+              "LBN",
+              "LBR",
+              "LBY",
+              "LCA",
+              "LIE",
+              "LKA",
+              "LSO",
+              "LTU",
+              "LUX",
+              "LVA",
+              "MAC",
+              "MAF",
+              "MAR",
+              "MCO",
+              "MDA",
+              "MDG",
+              "MDV",
+              "MEX",
+              "MHL",
+              "MKD",
+              "MLI",
+              "MLT",
+              "MMR",
+              "MNE",
+              "MNG",
+              "MNP",
+              "MOZ",
+              "MRT",
+              "MSR",
+              "MTQ",
+              "MUS",
+              "MWI",
+              "MYS",
+              "MYT",
+              "NAM",
+              "NCL",
+              "NER",
+              "NGA",
+              "NIC",
+              "NIU",
+              "NLD",
+              "NOR",
+              "NPL",
+              "NRU",
+              "NZL",
+              "OMN",
+              "PAK",
+              "PAN",
+              "PER",
+              "PHL",
+              "PLW",
+              "PNG",
+              "POL",
+              "PRI",
+              "PRK",
+              "PRT",
+              "PRY",
+              "PSE",
+              "PYF",
+              "QAT",
+              "REU",
+              "ROU",
+              "RUS",
+              "RWA",
+              "SAU",
+              "SDN",
+              "SEN",
+              "SGP",
+              "SHN",
+              "SLB",
+              "SLE",
+              "SLV",
+              "SMR",
+              "SOM",
+              "SPM",
+              "SRB",
+              "SSD",
+              "STP",
+              "SUR",
+              "SVK",
+              "SVN",
+              "SWE",
+              "SWZ",
+              "SXM",
+              "SYC",
+              "SYR",
+              "TCA",
+              "TCD",
+              "TGO",
+              "THA",
+              "TJK",
+              "TKL",
+              "TKM",
+              "TLS",
+              "TON",
+              "TTO",
+              "TUN",
+              "TUR",
+              "TUV",
+              "TWN",
+              "TZA",
+              "UGA",
+              "UKR",
+              "URY",
+              "USA",
+              "UZB",
+              "VAT",
+              "VCT",
+              "VEN",
+              "VGB",
+              "VIR",
+              "VNM",
+              "VUT",
+              "WLF",
+              "WSM",
+              "XKX",
+              "YEM",
+              "ZAF",
+              "ZMB",
+              "ZWE",
+              "ALL"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 237,
+          "uniqueItems": true
+        },
+        "reference_year": {
+          "type": "integer",
+          "minimum": 2001,
+          "maximum": 2100
+        },
+        "horizon": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "periods",
+            "unit"
+          ],
+          "properties": {
+            "periods": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "unit": {
+              "const": "calendar_year"
+            }
+          }
+        },
+        "intervention": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "baseline_projection"
+            }
+          }
+        },
+        "assumptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mortality",
+            "fertility",
+            "migration",
+            "base_period",
+            "data_source"
+          ],
+          "properties": {
+            "mortality": {
+              "enum": [
+                "constant_base_period_rates"
+              ]
+            },
+            "fertility": {
+              "enum": [
+                "constant_base_period_rates",
+                "europop2023_bsl"
+              ]
+            },
+            "migration": {
+              "enum": [
+                "zero",
+                "average_residual",
+                "europop2023_bsl"
+              ]
+            },
+            "base_period": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "first_year",
+                "last_year"
+              ],
+              "properties": {
+                "first_year": {
+                  "type": "integer",
+                  "minimum": 1990,
+                  "maximum": 2100
+                },
+                "last_year": {
+                  "type": "integer",
+                  "minimum": 1990,
+                  "maximum": 2100
+                }
+              }
+            },
+            "migration_window": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "first_year",
+                "last_year"
+              ],
+              "properties": {
+                "first_year": {
+                  "type": "integer",
+                  "minimum": 1990,
+                  "maximum": 2100
+                },
+                "last_year": {
+                  "type": "integer",
+                  "minimum": 1990,
+                  "maximum": 2100
+                }
+              }
+            },
+            "migration_breaks": {
+              "enum": [
+                "exclude",
+                "include"
+              ]
+            },
+            "allow_single_year_migration": {
+              "type": "boolean"
+            },
+            "sensitivity": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "migration",
+                "fertility"
+              ],
+              "properties": {
+                "migration": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "zero",
+                      "average_residual",
+                      "europop2023_bsl"
+                    ]
+                  }
+                },
+                "fertility": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "constant_base_period_rates",
+                      "europop2023_bsl"
+                    ]
+                  }
+                }
+              }
+            },
+            "data_source": {
+              "enum": [
+                "eurostat_demography",
+                "un_wpp2024"
+              ]
+            }
+          }
+        },
+        "fidelity": {
+          "enum": [
+            "L0",
+            "L1",
+            "L2"
+          ]
+        },
+        "missing_input_policy": {
+          "enum": [
+            "fail",
+            "skip_missing_countries"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "population.total.all_ages",
+              "population.total.age_0_14",
+              "population.total.age_15_64",
+              "population.total.age_65_plus",
+              "population.total.age_80_plus",
+              "population.total.age_20_66",
+              "population.total.age_67_plus",
+              "population.female.all_ages",
+              "population.female.age_0_14",
+              "population.female.age_15_64",
+              "population.female.age_65_plus",
+              "population.female.age_80_plus",
+              "population.female.age_20_66",
+              "population.female.age_67_plus",
+              "population.male.all_ages",
+              "population.male.age_0_14",
+              "population.male.age_15_64",
+              "population.male.age_65_plus",
+              "population.male.age_80_plus",
+              "population.male.age_20_66",
+              "population.male.age_67_plus",
+              "old_age_dependency_ratio_65plus_per_15_64",
+              "old_age_dependency_ratio_67plus_per_20_66",
+              "births.total",
+              "births.female",
+              "births.male",
+              "deaths.total",
+              "deaths.female",
+              "deaths.male",
+              "net_migration.total",
+              "net_migration.female",
+              "net_migration.male",
+              "population_by_single_age"
+            ]
+          }
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "schema_version",
+        "title",
+        "baseline_release_id",
+        "knowledge_cutoff",
+        "model_key",
+        "model_version",
+        "countries",
+        "reference_year",
+        "horizon",
+        "intervention",
+        "assumptions",
+        "fidelity",
+        "missing_input_policy",
+        "outputs",
+        "seed"
+      ]
+    },
+    "social.retirement_age@1.1.0": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2.0.0"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "baseline_release_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "knowledge_cutoff": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "model_key": {
+          "const": "social.retirement_age"
+        },
+        "model_version": {
+          "const": "1.1.0"
+        },
+        "countries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "reference_year": {
+          "type": "integer",
+          "minimum": 2000,
+          "maximum": 2022
+        },
+        "horizon": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "periods": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40
+            },
+            "unit": {
+              "const": "calendar_year"
+            }
+          },
+          "required": [
+            "periods",
+            "unit"
+          ]
+        },
+        "intervention": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "retirement_age_rule_path"
+                },
+                "scenario_path": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{1,80}$"
+                },
+                "reference_path": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{1,80}$"
+                }
+              },
+              "required": [
+                "kind",
+                "scenario_path",
+                "reference_path"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "retirement_age_shift"
+                },
+                "reference_path": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{1,80}$"
+                },
+                "shift_months": {
+                  "type": "integer",
+                  "minimum": -60,
+                  "maximum": 60
+                },
+                "first_birth_year": {
+                  "type": "integer",
+                  "minimum": 1900,
+                  "maximum": 2100
+                },
+                "phase_in_months_per_cohort": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 24
+                }
+              },
+              "required": [
+                "kind",
+                "reference_path",
+                "shift_months",
+                "first_birth_year"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Target statutory age LEVEL (months of age, e.g. 780 = 65 years) of the rule table's lever age for cohorts born in first_birth_year or later; earlier cohorts keep the reference path. Use this, not a shift, when the request states an age level.",
+              "properties": {
+                "kind": {
+                  "const": "retirement_age_target"
+                },
+                "reference_path": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{1,80}$"
+                },
+                "target_age_months": {
+                  "type": "integer",
+                  "minimum": 480,
+                  "maximum": 960
+                },
+                "first_birth_year": {
+                  "type": "integer",
+                  "minimum": 1900,
+                  "maximum": 2100
+                },
+                "phase_in_months_per_cohort": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 24
+                }
+              },
+              "required": [
+                "kind",
+                "reference_path",
+                "target_age_months",
+                "first_birth_year"
+              ]
+            }
+          ]
+        },
+        "assumptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "observed_path": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]{1,80}$"
+            },
+            "employment_response": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "central": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{3,80}$"
+                },
+                "grid": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_]{3,80}$"
+                  },
+                  "maxItems": 50,
+                  "uniqueItems": true
+                }
+              }
+            },
+            "population": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "migration": {
+                  "enum": [
+                    "zero",
+                    "average_residual"
+                  ]
+                },
+                "fertility": {
+                  "enum": [
+                    "constant_base_period_rates"
+                  ]
+                },
+                "base_period_years": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                },
+                "migration_breaks": {
+                  "enum": [
+                    "exclude",
+                    "include"
+                  ]
+                },
+                "allow_single_year_migration": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "fidelity": {
+          "enum": [
+            "L0",
+            "L1",
+            "L2"
+          ]
+        },
+        "missing_input_policy": {
+          "enum": [
+            "fail",
+            "skip_missing_countries"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "employed_persons_55_64",
+              "employed_persons_55_64_reference",
+              "employment_change_55_64",
+              "employment_rate.F.Y55-59",
+              "employment_rate.F.Y60-64",
+              "employment_rate.M.Y55-59",
+              "employment_rate.M.Y60-64",
+              "old_age_dependency_ratio",
+              "pension_recipients_change_55_64"
             ]
           }
         },

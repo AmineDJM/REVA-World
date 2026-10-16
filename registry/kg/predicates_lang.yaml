@@ -1,0 +1,141 @@
+# Dataset predicates of the language layer (owner: KGLANG). Not Wikidata properties: they are registered in the
+# KG allow-list (kg.property / kg.property_version) by the connectors themselves through
+# reva.kg.model.register_properties, like atlas_cow registers cow:code_denotes and atlas_cliopatria registers the
+# predicates of registry/kg/predicates_polity.yaml. WDHARVEST's registry/kg/properties.yaml (Wikidata only) is not
+# touched.
+#
+# Honesty:
+# * glottolog:* statements are what Glottolog (CLDF release, CC BY 4.0) states, row by row: the classification is
+#   Glottolog's (genealogical units it accepts; creoles, pidgins and mixed languages sit where Glottolog places
+#   them, never where REVA would), countries are Glottolog's `Countries` column, endangerment is Glottolog's
+#   Agglomerated Endangerment Status (AES). Nothing is inferred from names.
+# * glottolog:wikidata_item is a Wikidata statement (P1394 "Glottolog code", community-edited, source key
+#   wikidata.wdqs), re-expressed as an edge from the Glottolog languoid to the Wikidata item that carries the code.
+# * WALS / Grambank feature predicates (namespaces `wals:` and `grambank:`) are generated from the release's own
+#   ParameterTable (one predicate per feature, labelled with the provider's feature name); see `generated` below.
+#   Their values are literals (the provider's code name): typological similarity is not a link between peoples and
+#   must not create path-engine edges.
+# * A connection through these statements is a connection, not a cause (KGCORE path wording).
+
+version: 1
+owner: KGLANG
+predicates:
+  - pid: "glottolog:parent"
+    value_kind: item
+    reva_predicate: glottolog_parent
+    label_en: "is a subgroup of (Glottolog classification)"
+    label_fr: "est un sous-groupe de (classification Glottolog)"
+    inverse_name: glottolog_child
+    inverse_label_en: "has subgroup (Glottolog classification)"
+    inverse_label_fr: "a pour sous-groupe (classification Glottolog)"
+    derived: false
+    description: >-
+      Immediate parent of a languoid (dialect -> language, language -> subfamily, subfamily -> family): the last
+      Glottocode of the `classification` value (ValueTable, Parameter_ID classification; path from the root of the
+      family). A top-level family or an isolate has no parent statement.
+  - pid: "glottolog:family"
+    value_kind: item
+    reva_predicate: glottolog_top_family
+    label_en: "belongs to the language family (Glottolog top-level family)"
+    label_fr: "appartient à la famille de langues (famille de premier niveau, Glottolog)"
+    inverse_name: glottolog_family_member
+    inverse_label_en: "language family of (Glottolog)"
+    inverse_label_fr: "famille de langues de (Glottolog)"
+    derived: false
+    description: >-
+      The languoid's top-level genealogical unit (LanguageTable column Family_ID), e.g. Portuguese -> Indo-European,
+      so that language -> family is one hop even when the classification path is ten levels deep. Absent for
+      isolates and for top-level families themselves. Some top-level units are Glottolog pseudo-families
+      (Pidgin, Mixed Language, Sign Language, Unclassifiable, Bookkeeping, ...): the family entity's category says so.
+  - pid: "glottolog:spoken_in"
+    value_kind: item
+    reva_predicate: glottolog_spoken_in
+    label_en: "spoken in (Glottolog countries)"
+    label_fr: "parlée dans (pays selon Glottolog)"
+    inverse_name: glottolog_language_spoken
+    inverse_label_en: "country of the languoid (Glottolog)"
+    inverse_label_fr: "pays où est parlé le languoïde (Glottolog)"
+    derived: false
+    description: >-
+      One statement per ISO 3166-1 alpha-2 code in the languoid's `Countries` column (LanguageTable). Object = the
+      country's Wikidata QID when the ISO3 -> QID mapping is available at load time (registry/entities/
+      country_qids.json, else unambiguous P298 statements already in the KG), else the REVA node iso3:<KEY>.
+      Qualifiers keep iso2/iso3 always. Glottolog lists countries where a languoid is spoken (by communities of any
+      size, including diaspora where Glottolog records it); it is not a statement on official status or speaker
+      numbers.
+  - pid: "glottolog:endangerment"
+    value_kind: string
+    reva_predicate: glottolog_endangerment_status
+    label_en: "endangerment status (Glottolog AES)"
+    label_fr: "statut de vitalité (AES de Glottolog)"
+    derived: false
+    description: >-
+      Agglomerated Endangerment Status (ValueTable, Parameter_ID aes): not endangered, threatened, shifting,
+      moribund, nearly extinct, extinct (CodeTable; EGIDS/UNESCO/ElCat equivalences in the qualifiers). Glottolog
+      compiles it from several sources (comment and source ids kept).
+  - pid: "glottolog:iso639_3"
+    value_kind: external_id
+    reva_predicate: glottolog_iso639_3
+    label_en: "ISO 639-3 code (as given by Glottolog)"
+    label_fr: "code ISO 639-3 (selon Glottolog)"
+    derived: false
+    description: "LanguageTable column ISO639P3code."
+  - pid: "glottolog:macroarea"
+    value_kind: string
+    reva_predicate: glottolog_macroarea
+    label_en: "macroarea (Glottolog)"
+    label_fr: "macro-aire (Glottolog)"
+    derived: false
+    description: >-
+      Glottolog macroarea (Africa, Australia, Eurasia, North America, Papunesia, South America); one statement per
+      macroarea of the LanguageTable column Macroarea. Families and languages only (dialects inherit).
+  - pid: "glottolog:coordinates"
+    value_kind: globe_coordinate
+    reva_predicate: glottolog_coordinates
+    label_en: "representative location (Glottolog)"
+    label_fr: "localisation représentative (Glottolog)"
+    derived: false
+    description: >-
+      LanguageTable Latitude/Longitude of language-level languoids (decimal strings as published). A single point
+      standing for the language; not a territory.
+  - pid: "glottolog:category"
+    value_kind: string
+    reva_predicate: glottolog_category
+    label_en: "languoid category (Glottolog)"
+    label_fr: "catégorie de languoïde (Glottolog)"
+    derived: false
+    description: >-
+      ValueTable Parameter_ID category for families and languages: Family, Pseudo Family, Spoken L1 Language, Sign
+      Language, Pidgin, Mixed Language, Artificial Language, Speech Register, Unattested, Unclassifiable,
+      Bookkeeping.
+  - pid: "glottolog:wikidata_item"
+    value_kind: item
+    reva_predicate: glottolog_wikidata_item
+    label_en: "Glottolog languoid is described by Wikidata item (Wikidata P1394)"
+    label_fr: "le languoïde Glottolog est décrit par l'élément Wikidata (Wikidata P1394)"
+    inverse_name: glottolog_languoid
+    inverse_label_en: "Glottolog languoid of the Wikidata item (Wikidata P1394)"
+    inverse_label_fr: "languoïde Glottolog de l'élément Wikidata (Wikidata P1394)"
+    derived: false
+    description: >-
+      Source key wikidata.wdqs (community-edited): every non-deprecated Wikidata statement "Glottolog code" (P1394)
+      becomes glottolog:<code> -> the item, with the Wikidata statement id, rank and the code as stated. A code held
+      by several items, or several codes on one item, give several statements (counted in the run report).
+
+generated:
+  - namespace: "wals"
+    pid_pattern: "wals:f<feature id lower-case>"   # e.g. wals:f81a "Order of Subject, Object and Verb (WALS 81A)"
+    value_kind: string
+    source: "WALS Online CLDF ParameterTable (parameters.csv): ID, Name"
+    description: >-
+      One predicate per WALS feature. Subject: glottolog:<Glottocode> given by WALS for the WALS language
+      (LanguageTable column Glottocode), or wals:language:<WALS id> when WALS gives none. Value: the CodeTable name
+      of the value (e.g. "SOV"); qualifiers: code id and number, WALS language id/name, comment, WALS source refs.
+  - namespace: "grambank"
+    pid_pattern: "grambank:<feature id lower-case>"   # e.g. grambank:gb020 "Are there definite or specific articles?"
+    value_kind: string
+    source: "Grambank CLDF ParameterTable (parameters.csv): ID, Name"
+    description: >-
+      One predicate per Grambank feature. Subject: glottolog:<Language_ID> (Grambank language ids are
+      Glottocodes). Value: the CodeTable name (absent/present/...); "?" values (not knowable from the sources
+      consulted) are not stored and are counted in the run report. Qualifiers: code id, comment, coders, sources.
