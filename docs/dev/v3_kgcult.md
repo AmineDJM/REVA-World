@@ -117,8 +117,27 @@ P144, P498, P2012, P2614 (main) and P1107, P1098, P1114 (qualifiers) — merged 
 
 ## 3. Anchors
 
-See `tests/unit/test_kg_queries_culture.py` (offline; fixtures `tests/fixtures/kg/culture/*.json`
-captured through the locked `WikidataClient`).
+`tests/unit/test_kg_queries_culture.py` (offline). Two kinds of fixtures, both captured live through
+WDHARVEST's locked `WikidataClient` (`tests/fixtures/kg/culture/`):
+
+* **SPARQL anchors** — each spec's own query restricted to the anchor entities (restriction inserted
+  after `WHERE {`); the fixture stores the exact query and the test fails if the spec changed since.
+  Results (2026-10-15/16): the 7 anchor languages (Portuguese, Spanish, English, French, Arabic,
+  Swahili, Latin) are all selected by `culture.languages`; Glottocoded ancestors — Portuguese 10
+  (… Romance, Italic, Indo-European), Spanish 10, French 9, English 7 (Anglic, Anglo-Frisian, Northwest
+  Germanic, West Germanic, Germanic, Indo-European, …), Latin 3 (Latino-Faliscan, Italic,
+  Indo-European), Arabic 2 (Semitic, Afroasiatic), Swahili 11 (Sabaki, … Bantu, … Niger–Congo);
+  Brazil P37 = Portuguese and Brazilian Sign Language (Q3436689), Portugal P37 = Portuguese.
+* **Entity anchors** (`anchor_entities.json`, wbgetentities, claims trimmed to the properties the
+  tests read; run through WDHARVEST's `extract_entity` with the real allow-list): ISO 639-1/3 codes,
+  dated speaker figures (P1098 with P585), writing systems, P279 genealogy, Brazil P37 with statement
+  ids, Islam/Catholicism, and the **colonial path**: Brazil –P1365/P155→ Kingdom of Brazil / United
+  Kingdom of Portugal, Brazil and the Algarves / Empire of Brazil; Colonial Brazil (Q2088324)
+  –P361→ Portuguese Empire (Q200464) –P37→ Portuguese. Captured 2026-10-15 23:19 UTC without
+  `props=info` (no lastrevid in that fixture; the harvester itself requests `info`); a re-capture on
+  2026-10-16 failed under wbapi HTTP 429/maxlag throttling, so the earlier capture was kept and only
+  trimmed (upper-ontology items carrying nothing but P31/P279/P361 removed: 139 → 52 entities).
+
 
 ## 4. Requests to other agents / lead
 
