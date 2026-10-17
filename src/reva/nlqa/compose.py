@@ -128,15 +128,15 @@ TEMPORAL_TEXT = {
 }
 #: ``undetermined`` by its reason (CAUSCORE ``grade.temporal``): an entity dated by inception (a state, a polity) is
 #: compared through its existence span — its dates are not missing; an undated side is named.
-TEMPORAL_UNDETERMINED_TEXT = {
+TEMPORAL_UNDETERMINED_TEXT: dict[str, dict[str, Any]] = {
     "fr": {
-        "entity": "{who} datée par sa création (P571) : une entité, pas un événement ; sa période d'existence est "
+        "entity": "{who} : entité datée par sa création (P571), pas un événement ; sa période d'existence est "
         "comparée, antériorité non établie",
         "undated": "pas de date de début dans le graphe pour {who}, antériorité non vérifiable",
         "who": {"cause": "la cause", "effect": "l'effet", "both": "la cause et l'effet"},
     },
     "en": {
-        "entity": "{who} dated by its inception (P571): an entity, not an event; its existence span is compared, "
+        "entity": "{who}: an entity dated by its inception (P571), not an event; its existence span is compared, "
         "precedence not established",
         "undated": "no start date in the knowledge graph for {who}, precedence not checkable",
         "who": {"cause": "the cause", "effect": "the effect", "both": "the cause and the effect"},
@@ -154,7 +154,9 @@ def temporal_text(c: Any, lang: str) -> str:
             if sides:
                 who = u["who"]["both"] if len(set(sides)) > 1 else u["who"].get(sides[0], sides[0])
                 return str(u[key]).format(who=who)
-    return TEMPORAL_TEXT[lang].get(check, "vérification temporelle non calculée" if fr else "temporal check not computed")
+    return TEMPORAL_TEXT[lang].get(
+        check, "vérification temporelle non calculée" if fr else "temporal check not computed"
+    )
 
 
 LANE_ORDER = ("immediate", "underlying", "contributing", "coded", "general", "reaction", "prevention", "outcome")

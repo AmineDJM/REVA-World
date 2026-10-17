@@ -933,14 +933,83 @@ class WikidataSearchAdapter:
 
 
 # --------------------------------------------------------------------------- wiring
+#: A failed atlas open is retried after this many seconds (the API's backends cache uses the same order).
+ATLAS_RETRY_SECONDS = 300.0
+
+
+class LazyAtlasAdapter:
+    """:class:`~reva.nlqa.ports.AtlasPort` that opens the atlas on first use (APIFIX).
+
+    Opening the latest snapshot's query file verifies it byte for byte against its recorded sha256 (ATLAS-1): on
+    the dev DB a 6.9 GB DuckDB file, ~20 s of hashing on a cold process. It was done when the backends were built,
+    so *every* first question of a process waited for it — causal and KG questions included, which never read the
+    atlas. Now only an atlas operation waits (or nobody, when :meth:`warm` ran at startup); the verification itself
+    is unchanged. A failed open raises :class:`CapabilityUnavailable` (said in the answer) and is retried after
+    :data:`ATLAS_RETRY_SECONDS`."""
+
+    def __init__(self, factory: Callable[[], Any]) -> None:
+        self._factory = factory
+        self._lock = threading.Lock()
+        self._real: Any = None
+        self._failed: tuple[float, CapabilityUnavailable] | None = None
+        #: the opened atlas's name once loaded (``reva.atlas snapshot <sha>``)
+        self.name = "reva.atlas"
+
+    def _get(self) -> Any:
+        with self._lock:
+            if self._real is not None:
+                return self._real
+            if self._failed is not None and time.monotonic() - self._failed[0] < ATLAS_RETRY_SECONDS:
+                raise self._failed[1]
+            try:
+                real = self._factory()
+            except CapabilityUnavailable as err:
+                self._failed = (time.monotonic(), err)
+                raise
+            if real is None:
+                absent = CapabilityUnavailable("atlas module absent", backend="atlas")
+                self._failed = (time.monotonic(), absent)
+                raise absent
+            self._real, self._failed = real, None
+            self.name = str(getattr(real, "name", "reva.atlas"))
+            return real
+
+    @property
+    def loaded(self) -> bool:
+        return self._real is not None
+
+    @property
+    def snapshot(self) -> str | None:
+        return getattr(self._real, "snapshot", None)
+
+    def warm(self) -> bool:
+        """Open (and verify) the atlas now; ``False`` when it is not available (the reason is kept)."""
+        try:
+            self._get()
+        except CapabilityUnavailable:
+            return False
+        return True
+
+    def concepts(self) -> list[Concept]:
+        return list(self._get().concepts())
+
+    def values(self, concept_id: str, iso3s: Sequence[str] | None, year: int | None) -> AtlasResult:
+        return self._get().values(concept_id, iso3s, year)  # type: ignore[no-any-return]
+
+    def series(self, concept_id: str, iso3: str, from_year: int | None, to_year: int | None) -> AtlasResult:
+        return self._get().series(concept_id, iso3, from_year, to_year)  # type: ignore[no-any-return]
+
+
 def build_backends(
     engine: Engine | None,
     settings: Any = None,
     *,
     atlas_store: Any = None,
     search_get: Callable[[str], Awaitable[Any]] | None = None,
+    lazy_atlas: bool = True,
 ) -> Backends:
-    """Real backends for the API process; each one absent → ``None`` with a note (never a fake)."""
+    """Real backends for the API process; each one absent → ``None`` with a note (never a fake). The atlas is
+    opened on first use (:class:`LazyAtlasAdapter`) unless ``lazy_atlas=False``."""
     b = Backends()
     if engine is not None:
         try:
@@ -961,10 +1030,14 @@ def build_backends(
                 )
             except ImportError:
                 b.paths = KgPathAdapter(b.kg)
-        try:
-            b.atlas = _atlas(engine, settings, atlas_store)
-        except CapabilityUnavailable as e:
-            b.notes.append(f"capability_unavailable: atlas ({e.message})")
+        if lazy_atlas:
+            eng = engine
+            b.atlas = LazyAtlasAdapter(lambda: _atlas(eng, settings, atlas_store))
+        else:
+            try:
+                b.atlas = _atlas(engine, settings, atlas_store)
+            except CapabilityUnavailable as e:
+                b.notes.append(f"capability_unavailable: atlas ({e.message})")
     if b.links is None:
         b.notes.append("capability_unavailable: interconnection layer (LINKS) not wired")
     if engine is not None:

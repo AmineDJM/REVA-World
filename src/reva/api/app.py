@@ -182,6 +182,10 @@ def create_app(
         # Refuse to serve against a schema that differs from the committed contract (SchemaDriftError, a
         # ConfigurationError): enforced in production, a logged warning under REVA_ENV=test.
         await asyncio.to_thread(_check_schema_contract, engine, settings)
+        # APIFIX: open the atlas query file in the background (its ATLAS-1 verification hashes the whole file)
+        from reva.api.routes.ask import start_warm_up
+
+        start_warm_up(_.state)
         yield
         engine.dispose()  # type: ignore[attr-defined]
 

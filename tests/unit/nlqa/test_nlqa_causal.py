@@ -372,7 +372,7 @@ def test_causal_evidence_carries_attribution_and_temporal_reason() -> None:
     assert e["temporal"]["entity_dated_by_inception"] == ["effect"] and "inception" in e["temporal"]["reason"]
     s = next(s.text for s in out.sentences if s.kind == "causal")
     assert "qui attribue cette affirmation à party one (Wikidata ne l'affirme pas lui-même)" in s
-    assert "l'effet datée par sa création (P571) : une entité, pas un événement" in s
+    assert "l'effet : entité datée par sa création (P571), pas un événement" in s
     assert "dates manquantes" not in s and "date absente" not in s
 
 
@@ -406,3 +406,21 @@ def test_coded_outcomes_are_not_counted_as_causes() -> None:
     assert "s'y ajoutent 1 issue(s) codée(s) par des jeux de données (comment l'événement s'est terminé)" in note
     causal = [s.text for s in out.sentences if s.kind == "causal"]
     assert "a pour cause immédiate" in causal[0] and "est l'issue codée de" in causal[-1]  # outcome lane last
+
+
+@pytest.mark.parametrize(
+    ("q", "phrase"),
+    [
+        ("Pourquoi la guerre russo-ukrainienne ?", "guerre russo-ukrainienne"),  # event noun + qualifier
+        ("Pourquoi la dissolution de l'URSS ?", "dissolution de l'URSS"),  # capital after an elided article
+        ("Pourquoi la dislocation de l URSS ?", "dislocation de l URSS"),
+        ("Pourquoi la Grande Dépression ?", "Grande Dépression"),
+        ("Pourquoi le ciel est-il bleu ?", None),  # no event named
+        ("Why did the war start?", None),  # an event noun alone names no event
+    ],
+)
+def test_keyword_planner_finds_named_events(q: str, phrase: str | None) -> None:
+    p = causal_plan(q)
+    assert (p[0]["text"] if p else None) == phrase
+    if p:
+        assert p[1]["op"] == "why"

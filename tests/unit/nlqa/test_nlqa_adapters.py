@@ -231,3 +231,60 @@ def test_build_backends_without_engine_reports_what_is_missing() -> None:
     b = build_backends(None)
     assert b.kg is None and b.atlas is None and b.search is None
     assert any("LINKS" in n for n in b.notes)
+
+
+def test_atlas_is_opened_on_first_use_only() -> None:
+    """APIFIX: building the backends no longer opens (and hashes, ATLAS-1) the atlas query file; the first atlas
+    operation does, a failure is CapabilityUnavailable and is remembered (not retried on every question)."""
+    from reva.nlqa.adapters import LazyAtlasAdapter
+    from reva.nlqa.ports import CapabilityUnavailable
+
+    calls: list[int] = []
+
+    class Real:
+        name = "reva.atlas snapshot abc"
+        snapshot = "abc"
+
+        def concepts(self) -> list[Any]:
+            return []
+
+    def factory() -> Any:
+        calls.append(1)
+        return Real()
+
+    lazy = LazyAtlasAdapter(factory)
+    assert calls == [] and lazy.name == "reva.atlas" and not lazy.loaded
+    assert lazy.concepts() == [] and lazy.name == "reva.atlas snapshot abc" and lazy.snapshot == "abc"
+    lazy.concepts()
+    assert calls == [1]
+
+    def broken() -> Any:
+        calls.append(2)
+        raise CapabilityUnavailable("no atlas snapshot: SnapshotMissing", backend="atlas")
+
+    bad = LazyAtlasAdapter(broken)
+    assert bad.warm() is False
+    with pytest.raises(CapabilityUnavailable):
+        bad.values("x", None, None)
+    assert calls.count(2) == 1  # remembered for ATLAS_RETRY_SECONDS
+
+
+def test_api_warm_up_opens_the_atlas_in_the_background(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from reva.api.routes import ask
+    from reva.nlqa.adapters import LazyAtlasAdapter
+    from reva.nlqa.ports import Backends
+
+    opened: list[int] = []
+    b = Backends()
+    b.atlas = LazyAtlasAdapter(lambda: opened.append(1) or SimpleNamespace(name="reva.atlas snapshot x"))
+    state = SimpleNamespace(settings=SimpleNamespace(reva_env="local"), nlqa_backends=b, engine=lambda: None)
+    monkeypatch.delenv(ask.WARMUP_ENV, raising=False)
+    t = ask.start_warm_up(state)
+    assert t is not None
+    t.join(5)
+    assert opened == [1] and state.nlqa_warmup["atlas_ready"] is True
+    assert not ask.warmup_enabled(SimpleNamespace(reva_env="test"))
+    monkeypatch.setenv(ask.WARMUP_ENV, "0")
+    assert ask.start_warm_up(state) is None

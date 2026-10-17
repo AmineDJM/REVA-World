@@ -182,6 +182,8 @@ def env(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
     _load_graph(worker, store)
     app = create_app(_settings(base))
     real = build_backends(app.state.engine(), app.state.settings, atlas_store=store)
+    # the real atlas is opened on first use (APIFIX): warm it here to learn whether a snapshot exists
+    app.state.nlqa_real_atlas_ready = real.atlas.warm()  # type: ignore[union-attr]
     real.atlas = F.FakeAtlas()
     app.state.nlqa_backends = real
     app.state.nlqa_catalog = F.catalog()
@@ -331,8 +333,9 @@ def test_links_between_two_countries_keyword_planner(env: Env) -> None:
 
 
 def test_real_wiring_reports_missing_atlas_snapshot(env: Env) -> None:
-    notes = env.app.state.nlqa_real_notes
-    assert any(n.startswith("capability_unavailable: atlas") for n in notes), notes
+    # no atlas snapshot in this database: the lazily opened atlas says it is unavailable (an atlas operation of
+    # an answer then reports capability_unavailable), and building the backends did not try to open it
+    assert env.app.state.nlqa_real_atlas_ready is False
     assert env.app.state.nlqa_backends.paths.name == "reva.links.paths"
 
 

@@ -24,7 +24,7 @@
   },
   "restatement": "Question interprétée comme : les causes de « Première Guerre mondiale » affirmées par des sources. (plan par mots-clés, sans LLM)",
   "llm_restatement": "",
-  "answer_text": "Entité retenue pour « Première Guerre mondiale » : Première Guerre mondiale (Q361 ; graphe REVA ; libellé exact).\n\n6 affirmation(s) de sources sur les causes de Première Guerre mondiale (Q361) ; REVA n'établit aucune causalité : chaque lien ci-dessous est attribué à la source qui l'affirme, avec son niveau de source et son grade de preuve (ordinal, pas une probabilité). Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause immédiate attentat de Sarajevo (la cause précède l'effet, à la précision des dates ; 2 groupe(s) de sources indépendant(s) affirment ce lien ; preuve B ; règles tier.T3, temporal.consistent, grade.B). Selon fixture.refs/refs (T2, référence savante citée), il est faux que « Première Guerre mondiale a pour cause profonde rivalités impériales » (la source conteste ce lien) (la cause précède l'effet, à la précision des dates ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve B ; règles tier.T2, temporal.consistent, grade.B). Selon Wikidata (T4, déclaration Wikidata sans référence ; donnée communautaire), Première Guerre mondiale a pour cause profonde système d'alliances (la cause précède l'effet, à la précision des dates ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve D ; règles tier.T4, temporal.consistent, grade.D). Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause profonde rivalités impériales (dates manquantes, antériorité non vérifiable ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; contestée par 1 autre(s) affirmation(s) ; preuve E ; règles tier.T3, temporal.undetermined, grade.E). Selon icb.data/icb2 (T1, jeu de données codé par des experts), Première Guerre mondiale a pour déclencheur codé crise de juillet ; mécanisme cité par la source : « FIXTURE codebook definition of a crisis trigger » (la cause précède l'effet, à la précision des dates ; 2 groupe(s) de sources indépendant(s) affirment ce lien ; preuve A ; règles tier.T1, temporal.consistent, grade.A). Selon Wikidata (T4, déclaration Wikidata sans référence ; donnée communautaire), Première Guerre mondiale a pour cause traité de Versailles (incohérence temporelle signalée : la cause commence après l'effet ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve E ; règles tier.T4, temporal.inconsistent, grade.E).",
+  "answer_text": "Entité retenue pour « Première Guerre mondiale » : Première Guerre mondiale (Q361 ; graphe REVA ; libellé exact).\n\n6 affirmation(s) de sources sur les causes de Première Guerre mondiale (Q361) ; REVA n'établit aucune causalité : chaque lien ci-dessous est attribué à la source qui l'affirme, avec son niveau de source et son grade de preuve (ordinal, pas une probabilité). Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause immédiate attentat de Sarajevo (la cause précède l'effet, à la précision des dates ; 2 groupe(s) de sources indépendant(s) affirment ce lien ; preuve B ; règles tier.T3, temporal.consistent, grade.B). Selon fixture.refs/refs (T2, référence savante citée), il est faux que « Première Guerre mondiale a pour cause profonde rivalités impériales » (la source conteste ce lien) (la cause précède l'effet, à la précision des dates ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve B ; règles tier.T2, temporal.consistent, grade.B). Selon Wikidata (T4, déclaration Wikidata sans référence ; donnée communautaire), Première Guerre mondiale a pour cause profonde système d'alliances (la cause précède l'effet, à la précision des dates ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve D ; règles tier.T4, temporal.consistent, grade.D). Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause profonde rivalités impériales (antériorité non vérifiable : date absente ou hors de la plage prise en charge ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; contestée par 1 autre(s) affirmation(s) ; preuve E ; règles tier.T3, temporal.undetermined, grade.E). Selon icb.data/icb2 (T1, jeu de données codé par des experts), Première Guerre mondiale a pour déclencheur codé crise de juillet ; mécanisme cité par la source : « FIXTURE codebook definition of a crisis trigger » (la cause précède l'effet, à la précision des dates ; 2 groupe(s) de sources indépendant(s) affirment ce lien ; preuve A ; règles tier.T1, temporal.consistent, grade.A). Selon Wikidata (T4, déclaration Wikidata sans référence ; donnée communautaire), Première Guerre mondiale a pour cause traité de Versailles (incohérence temporelle signalée : la cause commence après l'effet ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; preuve E ; règles tier.T4, temporal.inconsistent, grade.E).",
   "sentences": [
    {
     "id": "S1",
@@ -93,7 +93,7 @@
    },
    {
     "id": "S6",
-    "text": "Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause profonde rivalités impériales (dates manquantes, antériorité non vérifiable ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; contestée par 1 autre(s) affirmation(s) ; preuve E ; règles tier.T3, temporal.undetermined, grade.E).",
+    "text": "Selon Wikidata (T3, déclaration Wikidata avec références ; donnée communautaire), Première Guerre mondiale a pour cause profonde rivalités impériales (antériorité non vérifiable : date absente ou hors de la plage prise en charge ; 1 groupe(s) de sources indépendant(s) affirment ce lien ; contestée par 1 autre(s) affirmation(s) ; preuve E ; règles tier.T3, temporal.undetermined, grade.E).",
     "kind": "causal",
     "citations": [
      "E5"
@@ -179,10 +179,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 2,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -241,10 +249,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 2,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "icb.data",
      "tier": "T1",
@@ -297,10 +313,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 1,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T4",
@@ -353,12 +377,20 @@
     ],
     "rules_version": "1",
     "temporal_check": "undetermined",
+    "temporal": {
+     "check": "undetermined",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 1,
     "contested_by": [
      "ds:fixture.refs:FIXTURE-0005"
     ],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -417,10 +449,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 1,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "fixture.refs",
      "tier": "T2",
@@ -473,10 +513,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "inconsistent",
+    "temporal": {
+     "check": "inconsistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 1,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T4",
@@ -506,7 +554,7 @@
   "model_requested": null,
   "prompt_version": "nlqa-plan-1.2.0",
   "prompt_sha256": null,
-  "catalog_digest": "93744e1d29eca75cf8f74da97710c9579aeaec17888dffd116a1a6014b3bd99e",
+  "catalog_digest": "075790e69fad4ece1ec8a6e9285ed7e1409b1784c4da9ad2a53d52a6c6bc9974",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
@@ -687,10 +735,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 2,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -749,10 +805,18 @@
     ],
     "rules_version": "1",
     "temporal_check": "consistent",
+    "temporal": {
+     "check": "consistent",
+     "reason": null,
+     "entity_dated_by_inception": [],
+     "undated": []
+    },
     "corroboration": 1,
     "contested_by": [],
     "review_status": "unreviewed",
     "origin": "test_fixture",
+    "supported_by": [],
+    "attribution": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -788,7 +852,7 @@
   "model_requested": null,
   "prompt_version": "nlqa-plan-1.2.0",
   "prompt_sha256": null,
-  "catalog_digest": "93744e1d29eca75cf8f74da97710c9579aeaec17888dffd116a1a6014b3bd99e",
+  "catalog_digest": "075790e69fad4ece1ec8a6e9285ed7e1409b1784c4da9ad2a53d52a6c6bc9974",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,

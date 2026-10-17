@@ -137,7 +137,10 @@ def default_planners(settings: Any) -> list[ScenarioDrafter]:
 
 
 def _backends(request: Request) -> Any:
-    state = request.app.state
+    return _backends_of(request.app.state, lambda: get_engine(request))
+
+
+def _backends_of(state: Any, engine: Callable[[], Any]) -> Any:
     fixed = getattr(state, "nlqa_backends", None)
     if fixed is not None:
         return fixed
@@ -146,9 +149,44 @@ def _backends(request: Request) -> Any:
         return cached[1]
     from reva.nlqa.adapters import build_backends
 
-    b = build_backends(get_engine(request), state.settings, atlas_store=getattr(state, "atlas_store", None))
+    b = build_backends(engine(), state.settings, atlas_store=getattr(state, "atlas_store", None))
     state.nlqa_backends_cache = (time.monotonic(), b)
     return b
+
+
+#: ``REVA_NLQA_WARMUP`` (``1`` / ``0``): open the atlas query file in the background when the API starts, so
+#: the first atlas question does not wait for its ATLAS-1 verification (default: on, except ``REVA_ENV=test``).
+WARMUP_ENV = "REVA_NLQA_WARMUP"
+
+
+def warmup_enabled(settings: Any) -> bool:
+    v = os.environ.get(WARMUP_ENV)
+    if v is not None:
+        return v.strip().lower() in ("1", "true", "yes")
+    return getattr(settings, "reva_env", "") != "test"
+
+
+def warm_up(state: Any) -> dict[str, Any]:
+    """Build the question backends and open the atlas (APIFIX). Returns what it did, for the log; never raises."""
+    t0 = time.monotonic()
+    out: dict[str, Any]
+    try:
+        b = _backends_of(state, state.engine)
+        atlas: Any = getattr(b, "atlas", None)
+        ready = atlas.warm() if hasattr(atlas, "warm") else atlas is not None
+        out = {"atlas_ready": bool(ready), "seconds": round(time.monotonic() - t0, 2)}
+    except Exception as e:  # a warm-up failure only means the first question pays the cost
+        out = {"error": type(e).__name__, "seconds": round(time.monotonic() - t0, 2)}
+    state.nlqa_warmup = out
+    return out
+
+
+def start_warm_up(state: Any) -> threading.Thread | None:
+    if not warmup_enabled(getattr(state, "settings", None)):
+        return None
+    t = threading.Thread(target=warm_up, args=(state,), name="reva-nlqa-warmup", daemon=True)
+    t.start()
+    return t
 
 
 def _catalog(request: Request) -> Any:
