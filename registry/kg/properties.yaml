@@ -1869,6 +1869,117 @@ properties:
     wikidata_datatype: quantity
     requested_by: EVENTS
     why: "number of injured (event -> quantity), for attacks, riots and disasters."
+# merged property requests (wbgetentities labels|datatype 2026-10-17T13:54:36.726677+00:00 raw 30489b24d889,5d1a5b66c8fe,bebf0f5b0607,2981abb5f2d5,94ce9af1931b,b440ef11f740,aca5dcbc22a6,61479dc52da6,7ecf88c2ac1e,ba32075cc6ca)
+  - property: P186
+    reva_predicate: made_from_material
+    inverse: "material_of"
+    kind: entity
+    group: structure
+    expected_en: "made from material"
+    label_en: "made from material"
+    label_fr: "matériau"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "made from material (object -> material), e.g. bronze -> copper, tin; composition with proportion (P1107)."
+  - property: P927
+    reva_predicate: anatomical_location
+    inverse: "anatomical_location_of"
+    kind: entity
+    group: health
+    expected_en: "anatomical location"
+    label_en: "anatomical location"
+    label_fr: "région anatomique"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "anatomical location (anatomical structure / disease -> body part), e.g. hepatitis -> liver."
+  - property: P183
+    reva_predicate: endemic_to
+    inverse: "has_endemic_taxon"
+    kind: entity
+    group: nature
+    expected_en: "endemic to"
+    label_en: "endemic to"
+    label_fr: "endémique de"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "endemic to (taxon -> place), e.g. a lemur species -> Madagascar."
+  - property: P9714
+    reva_predicate: taxon_range
+    inverse: "range_of_taxon"
+    kind: entity
+    group: nature
+    expected_en: "taxon range"
+    label_en: "taxon range"
+    label_fr: "aire de répartition"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "taxon range (taxon -> geographic area where it occurs)."
+  - property: P1582
+    reva_predicate: natural_product_of_taxon
+    inverse: "taxon_produces_natural_product"
+    kind: entity
+    group: nature
+    expected_en: "natural product of taxon"
+    label_en: "natural product of taxon"
+    label_fr: "produit par le taxon"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "natural product of taxon (substance -> producing taxon), e.g. caffeine -> Coffea arabica."
+  - property: P1034
+    reva_predicate: main_food_source
+    inverse: "main_food_source_of"
+    kind: entity
+    group: nature
+    expected_en: "main food source"
+    label_en: "main food source"
+    label_fr: "source principale de nourriture"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "main food source (taxon -> food taxon or material), e.g. koala -> Eucalyptus."
+  - property: P2293
+    reva_predicate: genetic_association
+    inverse: "genetically_associated_with"
+    kind: entity
+    group: health
+    expected_en: "genetic association"
+    label_en: "genetic association"
+    label_fr: "association génétique"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "genetic association (disease -> gene); an association reported by Wikidata, never a cause."
+  - property: P780
+    reva_predicate: symptoms_and_signs
+    inverse: "symptom_of"
+    kind: entity
+    group: health
+    expected_en: "symptoms and signs"
+    label_en: "symptoms and signs"
+    label_fr: "symptômes"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "symptoms and signs (disease -> symptom); association, not a causal claim."
+  - property: P2283
+    reva_predicate: uses
+    inverse: "used_by"
+    kind: entity
+    group: structure
+    expected_en: "uses"
+    label_en: "uses"
+    label_fr: "utilise"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "uses (item -> item it uses), e.g. a process -> a catalyst, a power plant -> a fuel."
+  - property: P128
+    reva_predicate: regulates_molecular_biology
+    inverse: "regulated_by_molecular_biology"
+    kind: entity
+    group: science
+    expected_en: "regulates (molecular biology)"
+    label_en: "regulates (molecular biology)"
+    label_fr: "mécanisme biologique"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CORE
+    why: "regulates (molecular biology) (gene product -> biological process)."
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:
