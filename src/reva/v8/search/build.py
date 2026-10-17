@@ -831,6 +831,14 @@ def build_index(
         run("effects", lambda: effects(conn, origin))
         run("sources", lambda: sources(conn, origin))
         run("kg_entities", lambda: kg_entities(conn, origin, merged_qids))
+        t = time.perf_counter()
+        try:
+            write_load_counts(conn, path.parent)
+            conn.execute(text("RELEASE SAVEPOINT v8_build"))
+        except Exception as e:  # reported like a failed collector
+            errors.append({"collector": "load_counts", "error": f"{type(e).__name__}: {str(e)[:300]}"})
+            conn.execute(text("ROLLBACK TO SAVEPOINT v8_build"))
+        timings["load_counts"] = round(time.perf_counter() - t, 2)
         meta = {
             "version": INDEX_VERSION,
             "built_at": datetime.now(UTC).isoformat(),
@@ -850,3 +858,26 @@ def build_index(
     meta["bytes"] = path.stat().st_size
     meta["seconds"] = round(time.perf_counter() - t0, 1)
     return meta
+
+
+def write_load_counts(conn: Connection, directory: Path) -> dict[str, Any]:
+    """Rows per KG load and per causal load (immutable, append-only tables without a load index): one scan here
+    so that the change feed reports counts without scanning per request. Written next to the index."""
+    kg: dict[str, dict[str, int]] = {}
+    for lid, n in conn.execute(text("SELECT load_id, count(*) FROM kg.entity GROUP BY load_id")):
+        kg.setdefault(str(lid), {})["entities"] = int(n)
+    for lid, n in conn.execute(text("SELECT load_id, count(*) FROM kg.statement GROUP BY load_id")):
+        kg.setdefault(str(lid), {})["statements"] = int(n)
+    for v in kg.values():
+        v.setdefault("entities", 0)
+        v.setdefault("statements", 0)
+    causal = {
+        str(lid): int(n)
+        for lid, n in conn.execute(text("SELECT load_id, count(*) FROM kg.causal_claim GROUP BY load_id"))
+    }
+    doc = {"computed_at": datetime.now(UTC).isoformat(), "kg": kg, "causal": causal}
+    directory.mkdir(parents=True, exist_ok=True)
+    tmp = directory / f"load_counts.json.tmp{os.getpid()}"
+    tmp.write_text(json.dumps(doc), encoding="utf-8")
+    os.replace(tmp, directory / "load_counts.json")
+    return doc

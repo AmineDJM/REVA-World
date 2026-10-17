@@ -162,3 +162,12 @@ export function matchItem(q: string, hay: string[]): boolean {
   const h = hay.join(' ').toLowerCase();
   return n.split(/\s+/).every((w) => h.includes(w));
 }
+
+/** Domain labels (filled by the page from the matrix rows) for chips and lists outside the matrix. */
+const DOMAIN_FR = new Map<string, string>();
+export function setDomainLabels(rows: { id: string; label: string }[]): void {
+  for (const r of rows) DOMAIN_FR.set(r.id, r.label);
+}
+export function domainLabel(id: string): string {
+  return DOMAIN_FR.get(id) ?? (id === 'other' ? 'Non classé' : id);
+}

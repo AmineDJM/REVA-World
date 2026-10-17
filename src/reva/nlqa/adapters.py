@@ -213,7 +213,7 @@ class KgDbAdapter:
         for h in hits:
             matched = h.get("matched") or []
             alias_only = bool(matched) and all(m.get("alias") for m in matched)
-            match = _MATCH.get((h.get("match"), alias_only), "fuzzy")
+            match = _MATCH.get((str(h.get("match")), alias_only), "fuzzy")
             out.append(
                 EntityMatch(
                     Entity(

@@ -1,0 +1,151 @@
+"""V8 « Demander » service: one question → the NLQA answer (:func:`reva.nlqa.service.answer_question`, keyword
+planner unless the API enables the LLM planner) → the V8 answer bundle (:mod:`reva.v8.ask.bundle`).
+
+The time series shown under an answer is re-read from the source the answer cited (same atlas snapshot or the
+same registered table version), point by point with its period and projection flag; nothing is interpolated.
+Answers are cached for :data:`CACHE_TTL_S` per (question, language) in this process (an answer is a read of
+immutable snapshots; the cache only spares recomputation when a page is reloaded).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import threading
+import time
+from collections import OrderedDict
+from collections.abc import Mapping, Sequence
+from typing import Any
+
+from reva.nlqa.ports import cell_is_projection
+from reva.v8.ask import bundle as B
+from reva.v8.ask.brainstorm import Brainstormer
+
+CACHE_TTL_S = 300.0
+CACHE_SIZE = 128
+MAX_SERIES_POINTS = 600
+
+
+class _Cache:
+    def __init__(self) -> None:
+        self._d: OrderedDict[str, tuple[float, dict[str, Any]]] = OrderedDict()
+        self._lock = threading.Lock()
+
+    def get(self, key: str) -> dict[str, Any] | None:
+        with self._lock:
+            hit = self._d.get(key)
+            if hit is None or time.monotonic() - hit[0] > CACHE_TTL_S:
+                return None
+            self._d.move_to_end(key)
+            return hit[1]
+
+    def put(self, key: str, value: dict[str, Any]) -> None:
+        with self._lock:
+            self._d[key] = (time.monotonic(), value)
+            while len(self._d) > CACHE_SIZE:
+                self._d.popitem(last=False)
+
+
+def _cell_point(c: Any) -> dict[str, Any]:
+    return {
+        "t": str(c.period_start)[:10],
+        "t_end": str(c.period_end)[:10],
+        "v": c.value,
+        "projection": bool(cell_is_projection(c)),
+        "source": f"{c.source}/{c.dataset}",
+    }
+
+
+class SeriesReader:
+    """Re-reads the cited series for the evidence chart (atlas snapshot, or the registered table version)."""
+
+    def __init__(self, backends: Any, catalog: Any) -> None:
+        self.b = backends
+        self.catalog = catalog
+
+    def __call__(self, ans: Mapping[str, Any], cells: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
+        ops = list((ans.get("plan") or {}).get("operations") or [])
+        if len(ops) != 1:
+            return None
+        op = ops[0]
+        c0 = cells[0]
+        cit = c0.get("citation") or {}
+        key = (cit.get("source"), cit.get("dataset"), cit.get("indicator"))
+        try:
+            if op.get("op") == "atlas_period":
+                if cit.get("outside_snapshot") and getattr(self.b, "tables", None) is not None:
+                    got, _ = self.b.tables.period_cells(op["concept"], [key], op.get("from_year"), op.get("to_year"))
+                else:
+                    got = list(self.b.atlas.period_cells(op["concept"], op.get("from_year"), op.get("to_year")).cells)
+            elif op.get("op") in ("atlas_value", "atlas_series") and op.get("country") and len(cells) <= 2:
+                iso3 = c0.get("iso3") or op.get("country")
+                got = list(self.b.atlas.series(op["concept"], iso3, None, None).cells)
+            else:
+                return None
+        except Exception:
+            return None
+        pts = [_cell_point(c) for c in got if (c.source, c.dataset, c.indicator) == key and c.value is not None]
+        pts.sort(key=lambda p: (p["t"], p["t_end"]))
+        if len(pts) < 3:
+            return None
+        cited = {str(c.get("period_start"))[:10] for c in cells}
+        for p in pts:
+            p["cited"] = p["t"] in cited
+        concept = self.catalog.concepts.get(op.get("concept") or "")
+        return {
+            "type": "timeseries",
+            "series": [
+                {
+                    "label": concept.label(ans.get("language") or "fr") if concept else op.get("concept"),
+                    "concept": op.get("concept"),
+                    "unit": c0.get("unit"),
+                    "iso3": c0.get("iso3") or None,
+                    "source": f"{cit.get('source')}/{cit.get('dataset')}",
+                    "indicator": cit.get("indicator"),
+                    "licence": B._rights_text(cit),
+                    "outside_snapshot": bool(cit.get("outside_snapshot")),
+                    "points": pts[-MAX_SERIES_POINTS:],
+                    "truncated": len(pts) > MAX_SERIES_POINTS,
+                }
+            ],
+            "note": "série relue à la source citée ; points non interpolés",
+        }
+
+
+class AskService:
+    def __init__(
+        self, backends: Any, catalog: Any, *, drafters: Any = None, ledger: Any = None, budget: Any = None
+    ) -> None:
+        self.backends = backends
+        self.catalog = catalog
+        self.drafters = drafters
+        self.ledger = ledger
+        self.budget = budget
+        self.cache = _Cache()
+        self.reader = SeriesReader(backends, catalog)
+
+    async def answer(self, question: str, *, lang: str | None = None) -> dict[str, Any]:
+        from reva.nlqa.service import AskInput, answer_question, clean_question
+
+        q = clean_question(question)
+        key = hashlib.sha256(f"{lang or ''}\x00{q}".encode()).hexdigest()
+        hit = self.cache.get(key)
+        if hit is not None:
+            return {**hit, "cached": True}
+        t0 = time.perf_counter()
+        r = await answer_question(
+            AskInput(q, key, lang=lang),
+            catalog=self.catalog,
+            backends=self.backends,
+            drafters=self.drafters,
+            ledger=self.ledger,
+            budget=self.budget,
+        )
+        ans = r.as_json()
+        out = B.build(ans, q, series_reader=self.reader)
+        out["latency_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+        out["cached"] = False
+        self.cache.put(key, out)
+        return out
+
+    def brainstorm(self, target: str) -> dict[str, Any]:
+        return Brainstormer(self.backends, self.catalog).run(target)

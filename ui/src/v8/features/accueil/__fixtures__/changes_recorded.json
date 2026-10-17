@@ -1,0 +1,552 @@
+{
+ "_note": "Recorded 2026-10-17 from reva.v8.changes.feed.read_changes on the dev DB (route /v1/v8/changes not yet deployed); items trimmed.",
+ "data": {
+  "since": "2026-10-15T22:50:32.442413Z",
+  "until": "2026-10-17T22:50:32.442449Z",
+  "items": [
+   {
+    "id": "ingest:ctgov:live:2026-10-17T22:40:00Z",
+    "kind": "ingest",
+    "at": "2026-10-17T22:47:39.593940Z",
+    "title": "ClinicalTrials.gov API v2 (U.S. National Library of Medicine), aggregate counts : 38 lignes (1 table nouvelle)",
+    "summary": "ctgov.registry_counts",
+    "source": "ctgov",
+    "severity": "info",
+    "counts": {
+     "rows": 38,
+     "tables": 1,
+     "revisions": 0
+    },
+    "refs": [
+     {
+      "type": "table",
+      "id": "ctgov.registry_counts"
+     },
+     {
+      "type": "source",
+      "id": "ctgov"
+     }
+    ],
+    "links": [
+     {
+      "label": "Voir ctgov.registry_counts",
+      "href": "/v8/monde?table=ctgov.registry_counts"
+     },
+     {
+      "label": "Source",
+      "href": "/v8/fiche/source/ctgov"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "tables": [
+      "ctgov.registry_counts"
+     ],
+     "revised_tables": [],
+     "geos": []
+    }
+   },
+   {
+    "id": "kg_batch:ucdp.downloads:live:1270-1271",
+    "kind": "kg_batch",
+    "at": "2026-10-17T22:46:54.686470Z",
+    "title": "Graphe : 2 lots ucdp.downloads",
+    "summary": null,
+    "source": "ucdp.downloads",
+    "severity": "info",
+    "counts": {
+     "loads": 2,
+     "retractions": 0
+    },
+    "refs": [
+     {
+      "type": "source",
+      "id": "ucdp.downloads"
+     },
+     {
+      "type": "kg_load",
+      "id": "1270"
+     },
+     {
+      "type": "kg_load",
+      "id": "1271"
+     }
+    ],
+    "links": [
+     {
+      "label": "Source",
+      "href": "/v8/fiche/source/ucdp.downloads"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "load_ids": [
+      1270,
+      1271
+     ],
+     "loader_versions": [
+      "reva.kg.model/1"
+     ],
+     "raw_artifacts": 7,
+     "counts": "not computed yet for every load (run `uv run reva v8 index build`)",
+     "bucket": "2026-10-17T22:40:00Z"
+    }
+   },
+   {
+    "id": "ingest:ucdp:live:2026-10-17T22:40:00Z",
+    "kind": "ingest",
+    "at": "2026-10-17T22:46:53.840122Z",
+    "title": "Uppsala Conflict Data Program (Uppsala University) : 192 267 lignes (2 révisions)",
+    "summary": "ucdp.acd_cy, ucdp.orgvio_cy",
+    "source": "ucdp",
+    "severity": "info",
+    "counts": {
+     "rows": 192267,
+     "tables": 2,
+     "revisions": 2
+    },
+    "refs": [
+     {
+      "type": "table",
+      "id": "ucdp.acd_cy"
+     },
+     {
+      "type": "table",
+      "id": "ucdp.orgvio_cy"
+     },
+     {
+      "type": "source",
+      "id": "ucdp"
+     }
+    ],
+    "links": [
+     {
+      "label": "Voir ucdp.acd_cy",
+      "href": "/v8/monde?table=ucdp.acd_cy"
+     },
+     {
+      "label": "Voir ucdp.orgvio_cy",
+      "href": "/v8/monde?table=ucdp.orgvio_cy"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "tables": [
+      "ucdp.acd_cy",
+      "ucdp.orgvio_cy"
+     ],
+     "revised_tables": [
+      "ucdp.acd_cy",
+      "ucdp.orgvio_cy"
+     ],
+     "geos": []
+    }
+   },
+   {
+    "id": "forecast_batch:df82d49e2aaa2ec9",
+    "kind": "forecast_batch",
+    "at": "2026-10-17T22:44:58.906215Z",
+    "title": "Prévisions scellées (2026-Q4) : 7 questions",
+    "summary": null,
+    "source": "reva.forecast_registry",
+    "severity": "notable",
+    "counts": {
+     "questions": 7,
+     "models": 1
+    },
+    "refs": [
+     {
+      "type": "batch",
+      "id": "df82d49e2aaa2ec98bbcc20067746cc4b784c25c4bf9f5de301bbdc60c1a1061"
+     }
+    ],
+    "links": [
+     {
+      "label": "Scores",
+      "href": "/v8/scores"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "batch_sha256": "df82d49e2aaa2ec98bbcc20067746cc4b784c25c4bf9f5de301bbdc60c1a1061",
+     "cycle": "2026-Q4",
+     "registry": "forecast",
+     "models": [
+      "forecast.bm_stack@1.0.0"
+     ],
+     "supplement_of": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5"
+    }
+   },
+   {
+    "id": "kg_batch:ucdp.ged:live:1269-1269",
+    "kind": "kg_batch",
+    "at": "2026-10-17T22:40:04.103567Z",
+    "title": "Graphe : 1 lot ucdp.ged — 215 retraits",
+    "summary": "GED statistics no longer derived (FIX6: ADM1 border rule, AUDIT4 M1)",
+    "source": "ucdp.ged",
+    "severity": "info",
+    "counts": {
+     "loads": 1,
+     "retractions": 215
+    },
+    "refs": [
+     {
+      "type": "source",
+      "id": "ucdp.ged"
+     },
+     {
+      "type": "kg_load",
+      "id": "1269"
+     }
+    ],
+    "links": [
+     {
+      "label": "Source",
+      "href": "/v8/fiche/source/ucdp.ged"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "load_ids": [
+      1269
+     ],
+     "loader_versions": [
+      "reva.kg.model/1"
+     ],
+     "raw_artifacts": 1,
+     "counts": "not computed yet for every load (run `uv run reva v8 index build`)",
+     "bucket": "2026-10-17T22:40:00Z"
+    }
+   },
+   {
+    "id": "ingest:ucdp_ged:live:2026-10-17T22:30:00Z",
+    "kind": "ingest",
+    "at": "2026-10-17T22:39:30.781178Z",
+    "title": "Uppsala Conflict Data Program (Uppsala University): GED 26.1, Candidate, Non-State, One-Sided; Natural Earth admin-1 polygons for REVA's ADM1 placement : 1 353 517 lignes (6 révisions)",
+    "summary": "ucdp_ged.adm1_month, ucdp_ged.cand_adm1_month, ucdp_ged.cand_country_month, ucdp_ged.cand_events, ucdp_ged.country_month, ucdp_ged.events",
+    "source": "ucdp_ged",
+    "severity": "info",
+    "counts": {
+     "rows": 1353517,
+     "tables": 6,
+     "revisions": 6
+    },
+    "refs": [
+     {
+      "type": "table",
+      "id": "ucdp_ged.adm1_month"
+     },
+     {
+      "type": "table",
+      "id": "ucdp_ged.cand_adm1_month"
+     },
+     {
+      "type": "table",
+      "id": "ucdp_ged.cand_country_month"
+     }
+    ],
+    "links": [
+     {
+      "label": "Voir ucdp_ged.adm1_month",
+      "href": "/v8/monde?table=ucdp_ged.adm1_month"
+     },
+     {
+      "label": "Voir ucdp_ged.cand_adm1_month",
+      "href": "/v8/monde?table=ucdp_ged.cand_adm1_month"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "tables": [
+      "ucdp_ged.adm1_month",
+      "ucdp_ged.cand_adm1_month",
+      "ucdp_ged.cand_country_month"
+     ],
+     "revised_tables": [
+      "ucdp_ged.adm1_month",
+      "ucdp_ged.cand_adm1_month",
+      "ucdp_ged.cand_country_month"
+     ],
+     "geos": []
+    }
+   },
+   {
+    "id": "causal_claims:73",
+    "kind": "causal_claims",
+    "at": "2026-10-17T22:33:05.103319Z",
+    "title": "Causalité : notation reva.causal.grader — 63 022 affirmations notées",
+    "summary": null,
+    "source": "reva.causal.grader",
+    "severity": "info",
+    "counts": {
+     "retracted": 0,
+     "graded": 63022
+    },
+    "refs": [
+     {
+      "type": "source",
+      "id": "reva.causal.grader"
+     },
+     {
+      "type": "claim_load",
+      "id": "73"
+     }
+    ],
+    "links": [],
+    "origin": "live",
+    "detail": {
+     "load_kind": "grading",
+     "dataset": null
+    }
+   },
+   {
+    "id": "ingest:eia:live:2026-10-17T22:30:00Z",
+    "kind": "ingest",
+    "at": "2026-10-17T22:30:32.032366Z",
+    "title": "U.S. Energy Information Administration (EIA), International Energy Data (bulk download) : 13 392 lignes (1 table nouvelle)",
+    "summary": "eia.wpsr_w",
+    "source": "eia",
+    "severity": "info",
+    "counts": {
+     "rows": 13392,
+     "tables": 1,
+     "revisions": 0
+    },
+    "refs": [
+     {
+      "type": "table",
+      "id": "eia.wpsr_w"
+     },
+     {
+      "type": "source",
+      "id": "eia"
+     }
+    ],
+    "links": [
+     {
+      "label": "Voir eia.wpsr_w",
+      "href": "/v8/monde?table=eia.wpsr_w"
+     },
+     {
+      "label": "Source",
+      "href": "/v8/fiche/source/eia"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "tables": [
+      "eia.wpsr_w"
+     ],
+     "revised_tables": [],
+     "geos": []
+    }
+   },
+   {
+    "id": "evaluation:ecb5668d-8dff-4226-a922-aa1309805372",
+    "kind": "evaluation",
+    "at": "2026-10-17T21:58:17.939945Z",
+    "title": "Annotation du registre de prévisions : final_vintage_admission",
+    "summary": null,
+    "source": "reva.evaluation",
+    "severity": "info",
+    "counts": {},
+    "refs": [],
+    "links": [],
+    "origin": "live",
+    "detail": {
+     "activity_kind": "evaluation.forecast_registry_annotate"
+    }
+   },
+   {
+    "id": "question_resolved:fq_ce2ce06b59d841b5091a9d62:39b404b01f57",
+    "kind": "question_resolved",
+    "at": "2026-10-17T20:49:31.366840Z",
+    "title": "Question annulée — Inflation (IPC, moyenne annuelle) (India 2026)",
+    "summary": "fiscal_year_basis_mismatch",
+    "source": "reva.forecast_registry",
+    "severity": "notable",
+    "counts": {
+     "forecasters_scored": 0
+    },
+    "refs": [
+     {
+      "type": "question",
+      "id": "fq_ce2ce06b59d841b5091a9d62"
+     },
+     {
+      "type": "family",
+      "id": "weo.cpi_inflation"
+     }
+    ],
+    "links": [
+     {
+      "label": "Question",
+      "href": "/v8/fiche/question/fq_ce2ce06b59d841b5091a9d62"
+     },
+     {
+      "label": "Scores",
+      "href": "/v8/scores?track=weo.cpi_inflation"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "status": "void",
+     "outcome": null,
+     "scores": {},
+     "official": "absent",
+     "resolution_sha256": "39b404b01f576b549c5b08ddd3b4b224d831d01adf03087f3e5d8d0fd4afc2df",
+     "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5"
+    }
+   },
+   {
+    "id": "question_resolved:fq_c1f49d578e1d3333dacee22e:39b404b01f57",
+    "kind": "question_resolved",
+    "at": "2026-10-17T20:49:31.366840Z",
+    "title": "Question annulée — Inflation (IPC, moyenne annuelle) (Egypt 2027)",
+    "summary": "fiscal_year_basis_mismatch",
+    "source": "reva.forecast_registry",
+    "severity": "notable",
+    "counts": {
+     "forecasters_scored": 0
+    },
+    "refs": [
+     {
+      "type": "question",
+      "id": "fq_c1f49d578e1d3333dacee22e"
+     },
+     {
+      "type": "family",
+      "id": "weo.cpi_inflation"
+     }
+    ],
+    "links": [
+     {
+      "label": "Question",
+      "href": "/v8/fiche/question/fq_c1f49d578e1d3333dacee22e"
+     },
+     {
+      "label": "Scores",
+      "href": "/v8/scores?track=weo.cpi_inflation"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "status": "void",
+     "outcome": null,
+     "scores": {},
+     "official": "absent",
+     "resolution_sha256": "39b404b01f576b549c5b08ddd3b4b224d831d01adf03087f3e5d8d0fd4afc2df",
+     "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5"
+    }
+   },
+   {
+    "id": "effects:38",
+    "kind": "effects",
+    "at": "2026-10-17T20:47:35.677315Z",
+    "title": "Estimations d'effet (van_els_locarno_morgan_villetelle_2001) : 42 ajoutées",
+    "summary": "Nombres attribués à leur source ; REVA n'établit pas ces effets.",
+    "source": "effects.literature",
+    "severity": "notable",
+    "counts": {
+     "added": 42,
+     "retired": 0
+    },
+    "refs": [
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:van_els_locarno_morgan_villetelle_2001:consumption_deflator_aut"
+     },
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:van_els_locarno_morgan_villetelle_2001:consumption_deflator_bel"
+     },
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:van_els_locarno_morgan_villetelle_2001:consumption_deflator_deu"
+     }
+    ],
+    "links": [
+     {
+      "label": "pub:effects.literature:van_els_locarno_morgan_villetelle_2001:consumption_deflator_aut",
+      "href": "/v8/fiche/effect/pub%3Aeffects.literature%3Avan_els_locarno_morgan_villetelle_2001%3Aconsumption_deflator_aut"
+     },
+     {
+      "label": "pub:effects.literature:van_els_locarno_morgan_villetelle_2001:consumption_deflator_bel",
+      "href": "/v8/fiche/effect/pub%3Aeffects.literature%3Avan_els_locarno_morgan_villetelle_2001%3Aconsumption_deflator_bel"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "load_kind": "publication",
+     "retired": []
+    }
+   },
+   {
+    "id": "effects:37",
+    "kind": "effects",
+    "at": "2026-10-17T20:47:33.640349Z",
+    "title": "Estimations d'effet (romer_romer_2004) : 4 ajoutées",
+    "summary": "Nombres attribués à leur source ; REVA n'établit pas ces effets.",
+    "source": "effects.literature",
+    "severity": "notable",
+    "counts": {
+     "added": 4,
+     "retired": 0
+    },
+    "refs": [
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:romer_romer_2004:industrial_production_month22_peak"
+     },
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:romer_romer_2004:industrial_production_month48"
+     },
+     {
+      "type": "estimate",
+      "id": "pub:effects.literature:romer_romer_2004:price_level_month30"
+     }
+    ],
+    "links": [
+     {
+      "label": "pub:effects.literature:romer_romer_2004:industrial_production_month22_peak",
+      "href": "/v8/fiche/effect/pub%3Aeffects.literature%3Aromer_romer_2004%3Aindustrial_production_month22_peak"
+     },
+     {
+      "label": "pub:effects.literature:romer_romer_2004:industrial_production_month48",
+      "href": "/v8/fiche/effect/pub%3Aeffects.literature%3Aromer_romer_2004%3Aindustrial_production_month48"
+     }
+    ],
+    "origin": "live",
+    "detail": {
+     "load_kind": "publication",
+     "retired": []
+    }
+   }
+  ],
+  "counts": {
+   "ingest": 169,
+   "atlas_snapshot": 3,
+   "kg_batch": 119,
+   "causal_claims": 73,
+   "effects": 38,
+   "forecast_batch": 25,
+   "question_resolved": 5,
+   "evaluation": 13,
+   "owner_decision": 65
+  },
+  "kind_labels": {
+   "ingest": "Nouvelles données",
+   "atlas_snapshot": "Instantané de l'atlas",
+   "kg_batch": "Graphe de connaissances",
+   "causal_claims": "Affirmations causales",
+   "effects": "Estimations d'effet",
+   "forecast_batch": "Prévisions scellées",
+   "question_resolved": "Questions résolues",
+   "evaluation": "Évaluations",
+   "owner_decision": "Décisions du propriétaire"
+  },
+  "next_cursor": null
+ },
+ "warnings": []
+}

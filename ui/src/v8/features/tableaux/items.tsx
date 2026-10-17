@@ -15,7 +15,7 @@ import { Badge, MissingValue, Skeleton as ShellSkeleton, SourceChip } from '../.
 import { isKgId, latestObserved, readSeries, referenceDecisions } from './live';
 import { Markdown } from './Markdown';
 import { MiniSeries } from './MiniSeries';
-import type { BoardItem } from './model';
+import { noteParts, type BoardItem } from './model';
 
 /** True once the element has been near the viewport (IntersectionObserver; always true where unsupported). */
 export function useInView<T extends Element>(): [React.RefObject<T | null>, boolean] {
@@ -148,14 +148,30 @@ function str(x: unknown): string | null {
   return typeof x === 'string' ? x : typeof x === 'number' ? String(x) : null;
 }
 
+const MODEL_FR: Record<string, string> = {
+  'forecast.registry_persistence': 'Persistance',
+  'forecast.registry_seasonal_naive': 'Saisonnier naïf',
+  'forecast.registry_ar': 'AR(p)',
+  'forecast.registry_hist_quantile': 'Quantiles historiques',
+  'forecast.reference_imf_weo': 'FMI — WEO',
+  'reva.ensemble': 'Combinaison REVA',
+};
+
+export function modelLabel(f: Pick<ForecastRecord, 'model'> & { model_version?: unknown }): string {
+  const base = MODEL_FR[f.model] ?? f.model.replace(/^forecast\./, '');
+  return typeof f.model_version === 'string' ? `${base} v${f.model_version}` : base;
+}
+
 function ForecastValue({ f, unit }: { f: ForecastRecord; unit: string }) {
   if (f.status === 'abstained') return <span className="muted">abstention{f.reason ? ` (${f.reason})` : ''}</span>;
   const parts: ReactNode[] = [];
   if (f.point) parts.push(<span key="p" className="v8-num">{frValue(f.point, unit)}</span>);
-  if (f.interval && f.interval.length === 2)
+  const qs = (f as { quantiles?: Record<string, string> }).quantiles;
+  const iv = f.interval && f.interval.length === 2 ? f.interval : qs && qs['0.05'] && qs['0.95'] ? [qs['0.05'], qs['0.95']] : null;
+  if (iv)
     parts.push(
-      <span key="i" className="v8-num muted">
-        [{frValue(f.interval[0]!, unit)} ; {frValue(f.interval[1]!, unit)}]
+      <span key="i" className="v8-num muted" title={f.interval ? 'Intervalle publié' : 'Quantiles 5 % – 95 % de la distribution scellée'}>
+        [{frValue(iv[0]!, unit)} ; {frValue(iv[1]!, unit)}]
       </span>,
     );
   if (f.prob_above) parts.push(<span key="b" className="v8-num">P = {frDecimal(f.prob_above, 2)}</span>);
@@ -175,7 +191,8 @@ export function ForecastBody({ item, visible, compact = false }: { item: Extract
   const lastObs = (q.last_observed ?? null) as { period?: string; value?: string } | null;
   const outcome = d.outcome as Record<string, unknown> | null;
   const issued = d.forecasts.filter((f) => f.status === 'issued');
-  const shown = compact ? issued.slice(0, 4) : d.forecasts;
+  const official = issued.filter((f) => f.attribution);
+  const shown = compact ? [...official, ...issued.filter((f) => !f.attribution)].slice(0, 5) : d.forecasts;
   return (
     <div className="v8b-forecast">
       <p className="v8b-qtext">{str(q.text_fr) ?? item.label}</p>
@@ -212,11 +229,18 @@ export function ForecastBody({ item, visible, compact = false }: { item: Extract
           </tr>
         </thead>
         <tbody>
-          {shown.map((f) => (
-            <tr key={f.model}>
-              <th scope="row" title={f.attribution ?? undefined}>
-                <code>{f.model}</code>
-                {f.attribution && <span className="v8b-attr"> · attribuée</span>}
+          {shown.map((f, i) => (
+            <tr key={`${f.model}-${i}`} className={f.attribution ? 'v8b-fc-official' : undefined}>
+              <th scope="row" title={f.attribution ? `${f.model} — ${f.attribution}` : f.model}>
+                {modelLabel(f)}
+                {f.attribution && (
+                  <>
+                    {' '}
+                    <Badge kind="info" size="xs" title={f.attribution}>
+                      officiel · attribué
+                    </Badge>
+                  </>
+                )}
               </th>
               <td>
                 <ForecastValue f={f} unit={unit} />
@@ -344,7 +368,10 @@ export function NoteBody({ item, editable, onSave }: { item: Extract<BoardItem, 
     );
   return (
     <div className="v8b-note">
-      {item.markdown.trim() ? <Markdown source={item.markdown} /> : <p className="muted">Note vide.</p>}
+      {(() => {
+        const { body } = noteParts(item);
+        return body.trim() ? <Markdown source={body} /> : item.markdown.trim() ? null : <p className="muted">Note vide.</p>;
+      })()}
       {editable && (
         <button type="button" className="v8-btn v8-btn-ghost v8-btn-sm" onClick={() => setEditing(true)}>
           Modifier la note

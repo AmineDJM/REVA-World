@@ -143,7 +143,7 @@ export default function MondePage() {
             {v.p !== xd.period ? `période ${v.ps} → ${v.pe}` : xd.period_label}
             {v.basis && v.basis !== 'calendar_year' ? ` · ${v.basis.replace(/_/g, ' ')}` : ''}
           </span>
-          <span className="v8-muted">source {v.series}</span>
+          <span className="v8-muted">source {v.series ?? xd.meta.series}</span>
           {lic && (
             <span className="v8-muted">
               licence {lic.licence}

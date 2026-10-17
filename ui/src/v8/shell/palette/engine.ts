@@ -36,6 +36,8 @@ export const GROUP_NAV = 'Aller à';
 export const GROUP_COMMANDS = 'Commandes';
 export const GROUP_RECENT = 'Récents';
 export const HITS_PER_GROUP = 8;
+/** Commands/navigation need a word-start match (or a strong subsequence) once something is typed. */
+export const MIN_SCORE = 460;
 
 /** Navigation items ("Monde", g m) for every linkable feature. */
 export function navItems(features: readonly DiscoveredFeature[], query: string): PaletteItem[] {
@@ -43,7 +45,7 @@ export function navItems(features: readonly DiscoveredFeature[], query: string):
   for (const f of features) {
     if (f.navHidden || !f.navTo) continue;
     const s = bestScore(query, [f.title, f.id, f.route]);
-    if (s === null || (query.trim() && s < 300)) continue;
+    if (s === null || (query.trim() && s < MIN_SCORE)) continue;
     out.push({ key: `nav:${f.id}`, label: f.title, sublabel: f.navTo, href: f.navTo, group: GROUP_NAV, hint: f.goKey ? `g ${f.goKey}` : undefined, score: s });
   }
   return query.trim() ? out.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)) : out;
@@ -61,7 +63,7 @@ export function commandItems(features: readonly DiscoveredFeature[], builtins: r
     for (const c of f.commands ?? []) {
       let s = bestScore(q, [c.label, ...(c.keywords ?? [])]);
       if (q && c.keywords?.some((k) => k.toLowerCase() === first || (first.length >= 3 && k.toLowerCase().startsWith(first)))) s = Math.max(s ?? 0, 1500);
-      if (s === null || (q && s < 300)) continue;
+      if (s === null || (q && s < MIN_SCORE)) continue;
       let href: string | null = null;
       try {
         href = c.run(q);
@@ -74,7 +76,7 @@ export function commandItems(features: readonly DiscoveredFeature[], builtins: r
   }
   for (const b of builtins) {
     const s = bestScore(q, [b.label, ...(b.keywords ?? [])]);
-    if (s === null || (q && s < 300)) continue;
+    if (s === null || (q && s < MIN_SCORE)) continue;
     out.push({ key: `act:${b.id}`, label: b.label, href: null, action: b.run, group: GROUP_COMMANDS, hint: b.hint, score: s });
   }
   return q ? out.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)) : out;

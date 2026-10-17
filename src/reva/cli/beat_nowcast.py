@@ -169,5 +169,37 @@ def holdout_cmd(source: str = typer.Option("db"), raw_dir: Path | None = typer.O
                    f"cov80={r['cov80_candidate']} confirmed={r['confirmed']}")  # fmt: skip
 
 
+@app.command("seal")
+def seal_cmd(
+    source: str = typer.Option("db"),
+    raw_dir: Path | None = typer.Option(None),
+    as_of: str = typer.Option("", help="YYYY-MM-DD (default: today UTC)"),
+) -> None:
+    """Seals REVA's prospective nowcasts (2026Q4, 2027Q1 GDP; 2026-10..2027-03 CPI) after the holdout was opened:
+    sealed/<as_of>.json (canonical sha256) + an append-only line in sealed.yaml (commit both)."""
+    _protocol_ok()
+    led = S.load_yaml(S.REGISTRY_DIR / "holdout_ledger.yaml")
+    if not any(o.get("status") == "scored" for o in led.get("openings", []) or []):
+        raise SystemExit("prospective sealing follows the holdout opening (protocol)")
+    day = datetime.fromisoformat(as_of).date() if as_of else datetime.now(UTC).date()
+    doc = S.prospective(load_inputs(source, raw_dir), day)
+    doc["sealed_at"] = datetime.now(UTC).isoformat()
+    sha = S.canonical_sha256(doc)
+    (S.REGISTRY_DIR / "sealed").mkdir(exist_ok=True)
+    out = S.REGISTRY_DIR / "sealed" / f"{day.isoformat()}.json"
+    if out.exists():
+        raise SystemExit(f"{out} exists: sealed records are never overwritten")
+    S.write_json(out, {**doc, "canonical_sha256": sha})
+    path = S.REGISTRY_DIR / "sealed.yaml"
+    reg = S.load_yaml(path) or {"schema": "reva-beat-nowcast-sealed-index/1",
+                                "statement": "Append-only index of sealed prospective records (canonical sha256 of "
+                                "the record without this field)."}  # fmt: skip
+    reg.setdefault("records", []).append({"as_of": day.isoformat(), "file": f"sealed/{day.isoformat()}.json",
+                                          "canonical_sha256": sha, "sealed_at": doc["sealed_at"],
+                                          "n_records": len(doc["records"])})  # fmt: skip
+    path.write_text(yaml.safe_dump(reg, sort_keys=False))
+    typer.echo(f"sealed {len(doc['records'])} records, sha256 {sha}")
+
+
 if __name__ == "__main__":
     app()

@@ -877,3 +877,17 @@ main.v8-main {
     gap: 0;
   }
 }
+
+/* touch screens: keyboard hints in lists are noise */
+@media (max-width: 760px), (pointer: coarse) {
+  .v8-pal-item .v8-keys,
+  .v8-pal-esc .v8-keys {
+    display: none;
+  }
+  .v8-pal-esc::after {
+    content: '✕';
+    color: var(--v8-fg-muted);
+    font-size: 15px;
+    padding: 0 4px;
+  }
+}

@@ -94,7 +94,9 @@ export function App() {
     return (
       <ProvenanceProvider>
         <Suspense fallback={<div className="v8-boot" aria-busy="true" />}>
-          <V8Root username={state.session.username} onLogout={doLogout} />
+          <Routes>
+            <Route path="/v8/*" element={<V8Root username={state.session.username} onLogout={doLogout} />} />
+          </Routes>
         </Suspense>
       </ProvenanceProvider>
     );

@@ -165,7 +165,7 @@ def summarise(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 async def run(
-    questions: Sequence[str], *, catalog: Any, backends: Any, ask: Any = None
+    questions: Sequence[str], *, catalog: Any, backends: Any, ask: Any = None, progress: bool = False
 ) -> list[dict[str, Any]]:
     """Answer every question with the keyword planner (no LLM) and classify it."""
     from reva.nlqa.service import AskInput, answer_question
@@ -182,6 +182,8 @@ async def run(
             ans = r.as_json()
         ms = (time.perf_counter() - t0) * 1000
         c = classify(ans)
+        if progress:
+            print(f"{c['status']:9s} {ms:8.0f} ms  {q}", file=sys.stderr, flush=True)
         out.append(
             {
                 "question": q,
@@ -208,11 +210,14 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - live t
     s = get_settings()
     b = build_backends(make_engine("api", s), s)
     cat = build_catalog()
-    if hasattr(b.atlas, "warm"):
-        b.atlas.warm()
+    warm = getattr(b.atlas, "warm", None)
+    t0 = time.perf_counter()
+    if callable(warm):
+        warm()
+    print(f"atlas warm-up {time.perf_counter() - t0:.1f} s", file=sys.stderr, flush=True)
     rows: list[dict[str, Any]] = []
     for _ in range(max(1, args.repeat)):
-        rows = asyncio.run(run(GOLDEN, catalog=cat, backends=b))
+        rows = asyncio.run(run(GOLDEN, catalog=cat, backends=b, progress=True))
     summ = summarise(rows)
     for r in rows:
         print(f"{r['status']:9s} {r['latency_ms']:8.0f} ms  {r['question']}  {'; '.join(r['missing'])}")

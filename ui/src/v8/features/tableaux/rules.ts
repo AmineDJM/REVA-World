@@ -81,9 +81,10 @@ function touches(ch: AlertChange, item: BoardItem): boolean {
  * Evaluate a local board's rules on change-feed items. Decidable here: `resolution` (question ref), `new_data`
  * when the change names the item's table/concept/entity. Not decidable here (server needed): `revision`
  * (needs the table's version history), `threshold` (needs the latest observed value on the server side), and
- * `new_data` on a series pinned without a table.
+ * `new_data` on a series pinned without a table. `changes === null`: the feed could not be read — every rule is
+ * reported not evaluable (nothing fires, nothing is assumed).
  */
-export function evaluateLocal(board: Board, changes: readonly AlertChange[]): LocalAlert[] {
+export function evaluateLocal(board: Board, changes: readonly AlertChange[] | null, feedProblem = 'fil des changements indisponible'): LocalAlert[] {
   const out: LocalAlert[] = [];
   const byUid = new Map(board.items.map((i) => [i.uid, i] as const));
   const notEval = (r: WatchRule, reason: string): LocalAlert => ({
@@ -107,6 +108,10 @@ export function evaluateLocal(board: Board, changes: readonly AlertChange[]): Lo
     }
     if (r.kind === 'threshold') {
       out.push(notEval(r, 'Seuil : évalué seulement par le serveur sur la dernière valeur observée.'));
+      continue;
+    }
+    if (changes === null) {
+      out.push(notEval(r, `Non évaluée : ${feedProblem}.`));
       continue;
     }
     const wanted = r.kind === 'resolution' ? ['question_resolved'] : ['ingest', 'kg_batch'];

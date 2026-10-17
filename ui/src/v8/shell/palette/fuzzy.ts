@@ -16,7 +16,9 @@ export function fuzzyScore(query: string, text: string): number | null {
   const idx = t.indexOf(q);
   if (idx >= 0) {
     const wordStart = idx === 0 || SEP.test(t[idx - 1]!);
-    return 1000 + (wordStart ? 200 : 0) + (idx === 0 ? 100 : 0) - idx - Math.max(0, t.length - q.length) * 0.5;
+    // Mid-word substrings ("bre" in "sombre") rank below word starts and typed words.
+    if (!wordStart) return 450 - idx - Math.max(0, t.length - q.length) * 0.2;
+    return 1200 + (idx === 0 ? 100 : 0) - idx - Math.max(0, t.length - q.length) * 0.5;
   }
   const words = q.split(/\s+/).filter(Boolean);
   if (words.length > 1 && words.every((w) => t.includes(w))) return 700 - t.length * 0.5;
@@ -31,7 +33,7 @@ export function fuzzyScore(query: string, text: string): number | null {
     prev = j;
     from = j + 1;
   }
-  return Math.min(600, score * 3 - t.length * 0.3);
+  return Math.min(440, score * 3 - t.length * 0.3);
 }
 
 /** Best score of a query over several texts (label, keywords…). */

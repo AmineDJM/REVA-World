@@ -16,7 +16,7 @@ standalone too. In vitest CSS is ignored (`css: false`).
 ## Tokens (`tokens.css`)
 
 All tokens are CSS custom properties on `:root`, light by default, dark from `prefers-color-scheme`, forced with
-`<html data-theme="light|dark">` (the shell's theme toggle; `T` key or the top-bar button).
+`<html data-theme="light|dark">` (the top-bar toggle, or « Thème : … » in the palette).
 
 | Group | Tokens |
 |---|---|

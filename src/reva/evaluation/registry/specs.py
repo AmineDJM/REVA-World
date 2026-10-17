@@ -138,7 +138,9 @@ def _family(doc: dict[str, Any], panels: dict[str, list[str]]) -> Family:
         if t not in TYPES:
             _fail("unknown question type", family=key, type=t)
         hs = tuple(int(h) for h in q.get("horizons") or [])
-        if not hs or any(h < MIN_HORIZON[freq] or h > MAX_HORIZON[freq] for h in hs):
+        # V7 BEAT-ENERGY: a family declared ``nowcast: true`` may ask the current period (h = 0, FIX7 nowcast rule)
+        min_h = 0 if doc.get("nowcast") else MIN_HORIZON[freq]
+        if not hs or any(h < min_h or h > MAX_HORIZON[freq] for h in hs):
             _fail("horizons outside the registry's range", family=key, horizons=list(hs))
         tr = q.get("threshold_rule")
         if (t == "binary") != (tr is not None) or (tr is not None and tr not in THRESHOLD_RULES):

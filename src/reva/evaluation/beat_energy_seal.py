@@ -42,6 +42,9 @@ KEY_OF = {
     "steo_fair_ln": "forecast.eia_steo_fair_ln",
     "steo": "forecast.reference_eia_steo",
 }
+LICENCE_REVIEW = "input daily prices are Refinitiv (LSEG) data republished by EIA (atlas.eia.spot_d licence_review)"
+REDISTRIBUTION = "internal only: redistribution pending licence review (owner decision, Refinitiv/LSEG via EIA)"
+NOWCAST_FAMILIES = {"BREPUUS": "eia.brent_monthly_nowcast", "WTIPUUS": "eia.wti_monthly_nowcast"}
 CLAIM = (
     "timeliness: REVA nowcast of the current month's mean price from daily spot prices published after the STEO "
     "issue in force; pre-registered W1 winner (registry/forecasts/beat_energy/protocol.yaml); the reference month "
@@ -151,9 +154,9 @@ def build_batch(
                 if m == "combo_steo_daily":
                     rec["attribution"] = "REVA combination of the EIA STEO projection and REVA's daily nowcast"
                     rec["weights"] = {"steo": r.get("w_steo")}
-                rec["licence_review"] = (
-                    "input daily prices are Refinitiv (LSEG) data republished by EIA (atlas.eia.spot_d licence_review)"
-                )
+            if m != "steo":
+                rec["licence_review"] = LICENCE_REVIEW
+                rec["redistribution"] = REDISTRIBUTION
             forecasts.append(rec)
     return {
         "schema": BATCH_SCHEMA,
@@ -181,4 +184,72 @@ def build_batch(
     }
 
 
-__all__ = ["KEY_OF", "MODELS", "WIN_CODES", "build_batch", "find_questions", "seal_records"]
+def nowcast_questions(
+    fam_docs: Mapping[str, Mapping[str, Any]],
+    series_by_family: Mapping[str, Any],
+    pin: Mapping[str, Any],
+    *,
+    now: datetime,
+    cycle: str,
+) -> dict[str, dict[str, Any]]:
+    """Questions of the h = 0 nowcast families (one per series) for the cycle anchor month at ``now``."""
+    from reva.evaluation.registry.questions import generate_questions
+    from reva.evaluation.registry.service import _family_of
+
+    out: dict[str, dict[str, Any]] = {}
+    for fam_key in NOWCAST_FAMILIES.values():
+        fam = _family_of(fam_docs[fam_key])
+        if not fam.raw.get("nowcast"):
+            raise ValueError(f"{fam_key} is not declared a nowcast family")
+        qs, skipped = generate_questions(
+            fam, series_by_family[fam_key], cycle=cycle, interval_level=0.8, source_pin=pin, issued_on=now.date()
+        )
+        if len(qs) != 1:
+            raise LookupError(f"{fam_key}: expected one question, got {len(qs)} ({skipped})")
+        out[fam_key] = qs[0]
+    return out
+
+
+def nowcast_batch(
+    fam_docs: Mapping[str, Mapping[str, Any]],
+    questions: Mapping[str, Mapping[str, Any]],
+    recs: Mapping[str, Mapping[str, Any]],
+    steo_cells: Mapping[str, Mapping[str, Any]],
+    *,
+    now: datetime,
+    cycle: str,
+    specs: Mapping[str, Any],
+    tables: Mapping[str, Mapping[str, Any]],
+    code_digest: str | None,
+) -> dict[str, Any]:
+    """An ORIGINAL sealed batch of the nowcast families: questions + winners + pre-registered benchmarks."""
+    by_fam = {NOWCAST_FAMILIES[c]: q for c, q in ((c, questions[f]) for c, f in NOWCAST_FAMILIES.items())}
+    orig = {"origin": "live", "cycle": cycle, "specs": specs, "families": fam_docs,
+            "data": {"selection_rule": "per dataset_key: latest evidence.dataset version at issued_at",
+                     "tables": dict(tables)}, "code_digest": code_digest}  # fmt: skip
+    # same forecasts as a supplement, keyed on the nowcast families' questions
+    remap = {code: by_fam[f] for code, f in NOWCAST_FAMILIES.items()}
+    b = build_batch(orig, {WIN_CODES[c]: q for c, q in remap.items()}, recs, steo_cells, now=now)
+    b["families"] = dict(fam_docs)
+    b.pop("supplement_of", None)
+    b["statement"] = (
+        "Original sealed batch of the V7 BEAT-ENERGY current-month nowcast families (declared nowcasts, h = 0): only "
+        "the Holm winners of registry/forecasts/beat_energy/protocol.yaml (W1 h0 Brent, WTI) with the "
+        "pre-registered benchmarks (EIA STEO point, STEO fair log-normal), issued inside the registered window "
+        "(7-35 days after the STEO issue in force, same month). The reference month is partly elapsed at issue. "
+        + REDISTRIBUTION
+    )
+    return b
+
+
+__all__ = [
+    "KEY_OF",
+    "MODELS",
+    "NOWCAST_FAMILIES",
+    "WIN_CODES",
+    "build_batch",
+    "find_questions",
+    "nowcast_batch",
+    "nowcast_questions",
+    "seal_records",
+]

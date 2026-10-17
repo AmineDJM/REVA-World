@@ -210,11 +210,10 @@ def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:b
     from reva.adapters.connectors.atlas_vintage_steo import PAGE_URL, parse_archive_page
     from reva.adapters.postgres import repositories as repo
     from reva.atlas.tables import read_atlas_table
-    from reva.evaluation.beat_energy_seal import MODELS, WIN_CODES, build_batch, find_questions, seal_records
+    from reva.evaluation.beat_energy_seal import MODELS, WIN_CODES, seal_records
     from reva.evaluation.energy_backtests import VINTAGE_TABLE, origins_from_cells
-    from reva.evaluation.ledger import load_frozen_manifest
     from reva.evaluation.registry.data import latest_version
-    from reva.evaluation.registry.service import ISSUE_KIND, ISSUE_LOCK, SCOPE_KIND, _batches, _insert_eval
+    from reva.evaluation.registry.service import ISSUE_KIND, ISSUE_LOCK, SCOPE_KIND, _insert_eval
     from reva.evaluation.vintages import cells_from_atlas_frame
     from reva.models.forecasting.energy_models import Pred
 
@@ -230,7 +229,6 @@ def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:b
         }
         if set(mv) != set(MODELS):
             return {"status": "models_not_seeded", "missing": sorted(set(MODELS) - set(mv))}
-        batches = _batches(conn, origin)
         page = conn.execute(
             text(
                 "SELECT raw_sha256 FROM evidence.acquisition WHERE origin = :o AND "
@@ -278,68 +276,74 @@ def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:b
         for c, r in recs.items()
         if c in WIN_CODES
     }
-    mans = []
-    for b in batches:
-        man = dict(load_frozen_manifest(store, b["sha"]))
-        man["_sha256"] = b["sha"]
-        mans.append(man)
-    found = find_questions(mans, f"{y:04d}-{m:02d}")
-    if not found:
-        return {
-            "status": "no_registry_question",
-            "reason": f"no sealed quantity question on {vint} for {sorted(WIN_CODES.values())} (the registry asks "
-            "monthly questions from h = 1 of a cycle; the next STEO issue month with questions is the next quarter's)",
-            "issued_at": now.isoformat(),
-            "inforce": recs["_inforce"],
-            "inputs": pins,
-            "nowcast": nowcast,
-        }
-    groups: dict[str, tuple[Any, dict[str, Any]]] = {}
-    for fam_key, (orig_man, q) in found.items():
-        groups.setdefault(orig_man["_sha256"], (orig_man, {}))[1][fam_key] = q
-    sealed = []
-    for original, questions in groups.values():
-        batch = build_batch(original, questions, recs, steo_cells, now=now)
-        qids = sorted(q["question_id"] for q in batch["questions"])
-        with engine.begin() as conn:
-            dup = conn.execute(
-                text(
-                    "SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = :k AND metrics->>'label' LIKE "
-                    "'V7 BEAT-ENERGY%' AND task_scope->'question_ids' ?| :q"
-                ),
-                {"k": ISSUE_KIND, "q": qids},
-            ).scalar_one()
-            if dup:
-                sealed.append({"status": "already_sealed", "question_ids": qids})
-                continue
-            conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": ISSUE_LOCK})
-            sha = repo.store_json_artifact(
-                conn, store, batch, "evaluation", schema_version="forecast-registry-batch/1",
-                rights={"licence": "internal-derived; STEO values: U.S. public domain (EIA, attributed); daily spot "
-                        "prices Refinitiv (LSEG) via EIA: licence_review"},
-            )  # fmt: skip
-            act = repo.simple_activity(
-                "evaluation.forecast_registry_issue", "evaluation", actor,
-                {"cycle": batch["cycle"], "origin": origin, "batch_sha256": sha,
-                 "supplement_of": original["_sha256"]},
-            )  # fmt: skip
-            repo.record_activity(conn, act, inputs=[(original["_sha256"], {"role": "original_batch"})], outputs=[sha])
-            ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=now)
-            scope = {
-                "kind": SCOPE_KIND, "origin": origin, "cycle": batch["cycle"], "batch_sha256": sha,
-                "supplement_of": original["_sha256"],
-                "question_keys": sorted(q["question_key"] for q in batch["questions"]), "question_ids": qids,
-            }  # fmt: skip
-            for mk, (ver, _d) in MODELS.items():
-                mine = [f for f in batch["forecasts"] if f["model"] == mk]
-                _insert_eval(conn, mv[mk], ctx, sha, "operational_as_known", scope,
-                             {"kind": ISSUE_KIND, "status": "sealed", "label": batch["label"], "model": f"{mk}@{ver}",
-                              "issued_at": now.isoformat(), "batch_sha256": sha,
-                              "supplement_of": original["_sha256"], "n_questions": len(qids),
-                              "n_issued": sum(1 for f in mine if f["status"] == "issued"),
-                              "n_abstained": sum(1 for f in mine if f["status"] == "abstained")}, act.id)  # fmt: skip
-        sealed.append({"status": "sealed", "batch_sha256": sha, "question_ids": qids})
-    return {"status": "sealed", "issued_at": now.isoformat(), "batches": sealed, "nowcast": nowcast}
+    import shutil
+
+    from reva.evaluation.beat_energy_seal import NOWCAST_FAMILIES, REDISTRIBUTION, nowcast_batch, nowcast_questions
+    from reva.evaluation.registry import periods as P
+    from reva.evaluation.registry.questions import extract_series
+    from reva.evaluation.registry.service import _code_digest, _frozen_family
+    from reva.evaluation.registry.specs import load_specs
+
+    specs = load_specs()
+    fams = {f.key: f for f in specs.families if f.key in NOWCAST_FAMILIES.values()}
+    if len(fams) != len(NOWCAST_FAMILIES):
+        return {"status": "nowcast_families_missing", "nowcast": nowcast}
+    fam_docs = {k: _frozen_family(f) for k, f in fams.items()}
+    with engine.connect() as conn:
+        opin = latest_version(conn, "atlas.eia_steo.steo_observed", origin=origin, cutoff=now)
+    if opin is None:
+        return {"status": "table_missing", "table": "atlas.eia_steo.steo_observed"}
+    obs = read_atlas_table(store, opin["artifact_sha256"])
+    series_by_family = {k: extract_series(obs, f, opin.get("recorded_at"))[0] for k, f in fams.items()}
+    cycle = P.cycle_of(now.date())
+    try:
+        questions = nowcast_questions(fam_docs, series_by_family, dict(opin), now=now, cycle=cycle)
+    except (LookupError, ValueError) as e:
+        return {"status": "no_nowcast_question", "reason": str(e), "nowcast": nowcast}
+    tables = {"atlas.eia_steo.steo_observed": dict(opin), **pins}
+    batch = nowcast_batch(fam_docs, questions, recs, steo_cells, now=now, cycle=cycle,
+                          specs={"version": specs.version, "sha256": specs.sha256, "interval_level": specs.interval_level},
+                          tables=tables, code_digest=_code_digest())  # fmt: skip
+    qids = sorted(q["question_id"] for q in batch["questions"])
+    free_gb = shutil.disk_usage("/").free / 1e9
+    if free_gb < 5.0:
+        return {"status": "queued_low_disk", "free_gb": round(free_gb, 2), "question_ids": qids, "nowcast": nowcast}
+    with engine.begin() as conn:
+        conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": ISSUE_LOCK})
+        dup = conn.execute(
+            text(
+                "SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = :k AND metrics->>'label' LIKE "
+                "'V7 BEAT-ENERGY%' AND task_scope->'question_ids' ?| :q"
+            ),
+            {"k": ISSUE_KIND, "q": qids},
+        ).scalar_one()
+        if dup:
+            return {"status": "already_sealed", "question_ids": qids}
+        sha = repo.store_json_artifact(
+            conn, store, batch, "evaluation", schema_version="forecast-registry-batch/1",
+            rights={"licence": "internal-derived; STEO values: U.S. public domain (EIA, attributed); daily spot "
+                    "prices Refinitiv (LSEG) via EIA: licence_review", "redistribution": REDISTRIBUTION},
+        )  # fmt: skip
+        act = repo.simple_activity(
+            "evaluation.forecast_registry_issue", "evaluation", actor,
+            {"cycle": cycle, "origin": origin, "batch_sha256": sha},
+        )  # fmt: skip
+        repo.record_activity(conn, act, inputs=[], outputs=[sha])
+        ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=now)
+        scope = {
+            "kind": SCOPE_KIND, "origin": origin, "cycle": cycle, "batch_sha256": sha,
+            "question_keys": sorted(q["question_key"] for q in batch["questions"]), "question_ids": qids,
+        }  # fmt: skip
+        for mk, (ver, _d) in MODELS.items():
+            mine = [f for f in batch["forecasts"] if f["model"] == mk]
+            _insert_eval(conn, mv[mk], ctx, sha, "operational_as_known", scope,
+                         {"kind": ISSUE_KIND, "status": "sealed", "label": batch["label"], "model": f"{mk}@{ver}",
+                          "issued_at": now.isoformat(), "batch_sha256": sha, "n_questions": len(qids),
+                          "n_issued": sum(1 for f in mine if f["status"] == "issued"),
+                          "n_abstained": sum(1 for f in mine if f["status"] == "abstained"),
+                          "redistribution": REDISTRIBUTION}, act.id)  # fmt: skip
+    return {"status": "sealed", "issued_at": now.isoformat(), "batch_sha256": sha, "question_ids": qids,
+            "free_gb_before_write": round(free_gb, 2), "nowcast": nowcast}  # fmt: skip
 
 
 if __name__ == "__main__":

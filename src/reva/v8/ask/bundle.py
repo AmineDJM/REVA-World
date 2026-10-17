@@ -94,7 +94,8 @@ def sources(ans: Mapping[str, Any]) -> list[dict[str, Any]]:
         lic = _rights_text(c)
         if lic and not row["licence"]:
             row["licence"] = lic
-        rights = c.get("rights") if isinstance(c.get("rights"), Mapping) else {}
+        raw_rights = c.get("rights")
+        rights: Mapping[str, Any] = raw_rights if isinstance(raw_rights, Mapping) else {}
         row["restricted"] = row["restricted"] or bool(rights.get("restricted"))
         row["non_commercial"] = row["non_commercial"] or bool(lic and NC_RE.search(lic))
         row["community"] = row["community"] or c.get("status") == "community_edited" or "wikidata" in src
@@ -223,7 +224,7 @@ def viz(ans: Mapping[str, Any], series_reader: Any = None) -> dict[str, Any] | N
         return _path_viz(ev)
     if cells:
         ts = series_reader(ans, cells) if series_reader is not None else None
-        if ts:
+        if isinstance(ts, dict):
             return ts
         by_series = Counter((e["citation"].get("source"), e["citation"].get("dataset"), e["citation"].get("indicator"),
                              e.get("iso3")) for e in cells)  # fmt: skip
@@ -271,7 +272,11 @@ def _timeseries_from_cells(cells: Sequence[Mapping[str, Any]]) -> dict[str, Any]
 def _bars_viz(cells: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
     units = {c.get("unit") for c in cells}
     if len(units) != 1:
-        return {"type": "table", "rows": [_bar_row(c) for c in cells][:MAX_BARS], "note": "unités différentes : pas de barres"}
+        return {
+            "type": "table",
+            "rows": [_bar_row(c) for c in cells][:MAX_BARS],
+            "note": "unités différentes : pas de barres",
+        }
     rows = [_bar_row(c) for c in cells if _dec(c.get("value")) is not None]
     rows.sort(key=lambda r: _dec(r["value"]) or Decimal(0), reverse=True)
     return {"type": "bars", "unit": next(iter(units)), "rows": rows[:MAX_BARS]}
@@ -399,7 +404,11 @@ def _path_viz(ev: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
                 "source": cit.get("source"),
             }
         )
-    return {"type": "path", "hops": hops[:MAX_GRAPH], "note": "affirmations attribuées à leurs sources ; REVA n'établit aucune causalité"}
+    return {
+        "type": "path",
+        "hops": hops[:MAX_GRAPH],
+        "note": "affirmations attribuées à leurs sources ; REVA n'établit aucune causalité",
+    }
 
 
 def _lab(x: Any) -> str:
@@ -538,7 +547,14 @@ def targets(ans: Mapping[str, Any]) -> list[dict[str, Any]]:
         elif k == "causal_claim":
             ca, ef = (e.get("cause") or {}).get("id"), (e.get("effect") or {}).get("id")
             if ca and ef:
-                add({"kind": "liens", "from": ca, "to": ef, "label": f"{_lab(e.get('cause'))} → {_lab(e.get('effect'))}"})
+                add(
+                    {
+                        "kind": "liens",
+                        "from": ca,
+                        "to": ef,
+                        "label": f"{_lab(e.get('cause'))} → {_lab(e.get('effect'))}",
+                    }
+                )
     return out
 
 
@@ -561,7 +577,12 @@ def followups(ans: Mapping[str, Any], status: str) -> list[dict[str, Any]]:
             out.append({"label": "Prévisions scellées sur cette série", "q": f"Prévision {o['concept']}"})
     for e in ev.values():
         if e["kind"] == "sealed_forecast" and e.get("family"):
-            out.append({"label": "Ces prévisions battent-elles les prévisionnistes officiels ?", "target": {"kind": "scores", "track": e["family"]}})
+            out.append(
+                {
+                    "label": "Ces prévisions battent-elles les prévisionnistes officiels ?",
+                    "target": {"kind": "scores", "track": e["family"]},
+                }
+            )
             break
     if status != "answered":
         out.append({"label": "Brainstormer : que manque-t-il pour répondre ?", "brainstorm": ans.get("question") or ""})

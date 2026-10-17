@@ -145,13 +145,25 @@ export const KIND_LABEL_FR: Record<PinKind, string> = {
 };
 
 export function itemTitle(it: PinItem): string {
-  if (it.kind === 'note') return it.label?.trim() || firstLine(it.markdown) || 'Note';
+  if (it.kind === 'note') return noteParts(it).title;
   return it.label || ('id' in it ? it.id : it.kind === 'series' ? `${it.concept} · ${it.geo}` : it.kind === 'forecast' ? it.questionId : it.ref);
 }
 
 function firstLine(md: string): string {
   const l = md.split('\n').find((x) => x.trim());
   return (l ?? '').replace(/^#+\s*/, '').slice(0, 80);
+}
+
+/**
+ * A note's card title and the Markdown left to render: an unlabelled note whose first line is a heading uses
+ * that heading as its title (not repeated in the body).
+ */
+export function noteParts(it: { markdown: string; label?: string | undefined }): { title: string; body: string } {
+  if (it.label?.trim()) return { title: it.label.trim(), body: it.markdown };
+  const lines = it.markdown.split('\n');
+  const i = lines.findIndex((x) => x.trim());
+  if (i >= 0 && /^#{1,3}\s+\S/.test(lines[i]!)) return { title: lines[i]!.replace(/^#+\s*/, '').slice(0, 120), body: lines.slice(i + 1).join('\n') };
+  return { title: firstLine(it.markdown) || 'Note', body: it.markdown };
 }
 
 /** Identity of a pin (two pins of the same thing are the same item: pinning twice is a no-op). */

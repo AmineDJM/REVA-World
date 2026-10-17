@@ -475,6 +475,10 @@ def map_slice(
     nums = [float(v["v"]) for v in values if v["v"] is not None and not v["proj"]] or [
         float(v["v"]) for v in values if v["v"] is not None
     ]
+    for v in values:  # one series per slice: its key and table artifact are in meta (smaller payload)
+        v.pop("table_sha", None)
+        if v.get("series") == meta["series"]:
+            v["series"] = None
     out["values"] = sorted(values, key=lambda v: v["iso3"] or "")
     out["scale_hint"] = scale_hint(nums)
     out["counts"] = {

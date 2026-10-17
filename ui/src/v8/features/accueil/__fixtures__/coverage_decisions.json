@@ -1,0 +1,525 @@
+{
+ "type": "decision",
+ "updated": "2026-10-17",
+ "note": "Statuses are those of the reports at transcription time; the live check of each load is computed by the API.",
+ "checked_at": null,
+ "counts": {
+  "items": 65,
+  "open": 65,
+  "observed_done": 0
+ },
+ "disk_mb_open_loads": 0,
+ "disk_mb_unknown": 0,
+ "groups": [
+  {
+   "kind": "licence",
+   "label": "Licences",
+   "items": [
+    {
+     "id": "licence.nc_sources",
+     "type": "decision",
+     "kind": "licence",
+     "title": "Sources non commerciales chargées et signalées (IPU, CShapes, JST, Constitute/CCP, Berkeley Earth, Carbon Brief, FAO FFPI, GBIF NC)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "politics",
+       "history",
+       "finance",
+       "climate",
+       "prices",
+       "environment"
+      ],
+      "atlas_sources": [
+       "ipu",
+       "cshapes",
+       "jst",
+       "constitute",
+       "ccp",
+       "attribution_cb",
+       "fao_ffpi"
+      ],
+      "tables": [],
+      "tracks": [],
+      "text": "Toute réutilisation commerciale ou publication des valeurs ; aujourd’hui chaque cellule porte « licence non commerciale »."
+     },
+     "action": "Décider de l’usage (interne / publication non commerciale) ou retirer ces tables des exports.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/HANDOFF_V3.md",
+      "docs/dev/v4_v4climate.md",
+      "docs/dev/v4_v4econ.md",
+      "docs/dev/v4_v4eco.md"
+     ],
+     "check": [],
+     "kind_label": "Licences",
+     "observed": null
+    },
+    {
+     "id": "licence.un_terms",
+     "type": "decision",
+     "kind": "licence",
+     "title": "Conditions ONU / sans redistribution (ICOW, UN Treaty Collection, HCDH, UN/LOCODE)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "history",
+       "politics",
+       "infrastructure"
+      ],
+      "atlas_sources": [
+       "icow",
+       "untc",
+       "ohchr",
+       "unlocode"
+      ],
+      "tables": [],
+      "tracks": [],
+      "text": "Garder et exposer ces tables (sinon rétracter unece.unlocode et retirer unlocode.locations)."
+     },
+     "action": "Décider de les garder (usage interne) ou de les retirer.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/HANDOFF_V3.md",
+      "docs/dev/v6_infra.md"
+     ],
+     "check": [],
+     "kind_label": "Licences",
+     "observed": null
+    },
+    {
+     "id": "licence.unclear",
+     "type": "decision",
+     "kind": "licence",
+     "title": "Licences peu claires (WHR, BaTIS, SPC, INFORM, Laeven-Valencia, Reinhart-Rogoff, ICB, Archigos, COW)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "society",
+       "trade",
+       "population",
+       "hazards",
+       "finance",
+       "conflict",
+       "politics"
+      ],
+      "atlas_sources": [
+       "whr",
+       "oecd",
+       "spc",
+       "inform",
+       "laeven_valencia",
+       "reinhart_rogoff",
+       "icb",
+       "archigos",
+       "cow"
+      ],
+      "tables": [],
+      "tracks": [],
+      "text": "Lever le drapeau « licence non ouverte / à revoir » sur ces cellules."
+     },
+     "action": "Revue de licence par un mainteneur.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/HANDOFF_V3.md",
+      "docs/dev/v5_pred_eventstudy.md"
+     ],
+     "check": [],
+     "kind_label": "Licences",
+     "observed": null
+    }
+   ]
+  },
+  {
+   "kind": "account_key",
+   "label": "Comptes et clés",
+   "items": [
+    {
+     "id": "key.openfda",
+     "type": "decision",
+     "kind": "account_key",
+     "title": "Clé API openFDA",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "drugs"
+      ],
+      "atlas_sources": [
+       "openfda"
+      ],
+      "tables": [],
+      "tracks": [],
+      "text": "Comptes FAERS des 1 000 premières substances et de toutes les substances approuvées (au lieu du top 100)."
+     },
+     "action": "Créer une clé openFDA (inscription avec une adresse du projet, pas une adresse personnelle) et la fournir comme secret d’environnement.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_drugs.md",
+      "lead:final4_todo"
+     ],
+     "check": [],
+     "kind_label": "Comptes et clés",
+     "observed": null
+    },
+    {
+     "id": "key.fred",
+     "type": "decision",
+     "kind": "account_key",
+     "title": "Clé API FRED / ALFRED",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "macro"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [
+       "pred-models:nowcast",
+       "pred-vintage"
+      ],
+      "text": "Millésimes exacts des séries FRED (ALFRED) — panel mensuel temps réel plus riche pour battre l’AR en prévision immédiate."
+     },
+     "action": "Fournir une clé FRED (ou autoriser un autre chemin réseau).",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v5_pred_vintage.md",
+      "docs/dev/v6_pred_models.md"
+     ],
+     "check": [],
+     "kind_label": "Comptes et clés",
+     "observed": null
+    },
+    {
+     "id": "key.comtrade",
+     "type": "decision",
+     "kind": "account_key",
+     "title": "Clé d’abonnement UN Comtrade",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "trade"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [],
+      "text": "Commerce bilatéral mensuel par code SH au-delà de l’aperçu public de 500 lignes."
+     },
+     "action": "Souscrire et fournir la clé.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_trade_hf.md",
+      "docs/dev/HANDOFF_V3.md"
+     ],
+     "check": [],
+     "kind_label": "Comptes et clés",
+     "observed": null
+    }
+   ]
+  },
+  {
+   "kind": "permission",
+   "label": "Autorisations",
+   "items": [
+    {
+     "id": "perm.sipri",
+     "type": "decision",
+     "kind": "permission",
+     "title": "Autorisation SIPRI (dépenses militaires, transferts d’armes)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "conflict"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [],
+      "text": "Servir MS.MIL.XPND.* et MS.MIL.XPRT/MPRT.KD (copies WDI sous conditions SIPRI) au-delà de l’usage équitable ; une demande nominative est requise."
+     },
+     "action": "Demander l’autorisation à SIPRI, ou restreindre ces séries (non commercial, < 10 %) ; marquer la licence par valeur dans les lignes WDI.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_conflict.md",
+      "docs/dev/HANDOFF_V3.md"
+     ],
+     "check": [],
+     "kind_label": "Autorisations",
+     "observed": null
+    },
+    {
+     "id": "perm.gem",
+     "type": "decision",
+     "kind": "permission",
+     "title": "Global Energy Monitor — formulaire de téléchargement (CC BY)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "energy",
+       "industry"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [],
+      "text": "Trackers extraction pétrole et gaz, mines de charbon, centrales intégrées, avec identifiants d’unités et de propriétaires."
+     },
+     "action": "Accepter le formulaire (coordonnées du projet) ou demander une URL stable ; convenir de l’encodage des clés gem_wiki.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v4_v4energy.md",
+      "docs/dev/v4_v4link.md"
+     ],
+     "check": [],
+     "kind_label": "Autorisations",
+     "observed": null
+    },
+    {
+     "id": "perm.energy_institute",
+     "type": "decision",
+     "kind": "permission",
+     "title": "Energy Institute Statistical Review (site bloqué aux clients non navigateurs)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "energy"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [],
+      "text": "Unités physiques, capacité de raffinage, uranium, minerais critiques (aujourd’hui seulement la redistribution OWID en TWh)."
+     },
+     "action": "Obtenir une URL autorisée / une permission, ou garder OWID.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v4_v4energy.md"
+     ],
+     "check": [],
+     "kind_label": "Autorisations",
+     "observed": null
+    }
+   ]
+  },
+  {
+   "kind": "attribution_contact",
+   "label": "Contacts d’attribution",
+   "items": [
+    {
+     "id": "contact.sec_edgar",
+     "type": "decision",
+     "kind": "attribution_contact",
+     "title": "Adresse de contact du projet pour SEC EDGAR (User-Agent)",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "industry"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [],
+      "text": "Comptes des entreprises cotées aux États-Unis (chiffre d’affaires, actifs, effectifs) par CIK."
+     },
+     "action": "Créer une boîte de rôle du projet et la mettre dans REVA_HTTP_CONTACT_EMAIL (jamais l’adresse personnelle du propriétaire).",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v4_v4industry.md"
+     ],
+     "check": [],
+     "kind_label": "Contacts d’attribution",
+     "observed": null
+    },
+    {
+     "id": "contact.cdc_hubs",
+     "type": "decision",
+     "kind": "attribution_contact",
+     "title": "Demande d’attribution des hubs CDC avant publication des comparaisons",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "health"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [
+       "beat-health",
+       "v8:scores"
+      ],
+      "text": "Publier les comparaisons REVA vs ensembles FluSight / COVID (aujourd’hui : 0 victoire en développement)."
+     },
+     "action": "Contacter les hubs FluSight et COVID (adresses dans les dépôts des hubs) ; décider de la ligne « REVA ne bat pas les ensembles CDC ».",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_pred_health.md",
+      "docs/dev/v7_beat_health.md",
+      "lead:final4_todo"
+     ],
+     "check": [],
+     "kind_label": "Contacts d’attribution",
+     "observed": null
+    },
+    {
+     "id": "contact.views",
+     "type": "decision",
+     "kind": "attribution_contact",
+     "title": "Licence ViEWS non déclarée — confirmer avant tout affichage public",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "conflict"
+      ],
+      "atlas_sources": [
+       "views"
+      ],
+      "tables": [],
+      "tracks": [
+       "pred-conflict"
+      ],
+      "text": "Montrer les prévisions ViEWS hors de REVA (tout est marqué licence_review)."
+     },
+     "action": "Écrire à ViEWS pour confirmer la licence.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_pred_conflict.md"
+     ],
+     "check": [],
+     "kind_label": "Contacts d’attribution",
+     "observed": null
+    }
+   ]
+  },
+  {
+   "kind": "policy_choice",
+   "label": "Choix de méthode ou de publication",
+   "items": [
+    {
+     "id": "policy.publish_registry",
+     "type": "decision",
+     "kind": "policy_choice",
+     "title": "Publier le registre de prévisions (pré-enregistrement public) ou le garder privé",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "other"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [
+       "pred-registry",
+       "v8:scores"
+      ],
+      "text": "Crédibilité par pré-enregistrement public ; publication éventuelle des scores agrégés seulement (finance)."
+     },
+     "action": "Décider pour les registres V5, santé et finance.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v5_pred_registry.md",
+      "docs/dev/v6_pred_health.md",
+      "docs/dev/v6_pred_fin.md"
+     ],
+     "check": [],
+     "kind_label": "Choix de méthode ou de publication",
+     "observed": null
+    },
+    {
+     "id": "policy.territories",
+     "type": "decision",
+     "kind": "policy_choice",
+     "title": "Exceptions territoriales des conflits (ISR→PSE…) et publication d’une part PSE",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "conflict"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [
+       "pred-conflict"
+      ],
+      "text": "Placement ADM1 des événements de Gaza / Cisjordanie et liste registry/conflict/territory_exceptions.yaml (revue en attente)."
+     },
+     "action": "Revoir la liste et la règle de placement.",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_fix6.md",
+      "docs/dev/v6_conflict.md",
+      "lead:final4_todo"
+     ],
+     "check": [],
+     "kind_label": "Choix de méthode ou de publication",
+     "observed": null
+    },
+    {
+     "id": "policy.forecast_gates",
+     "type": "decision",
+     "kind": "policy_choice",
+     "title": "Seuils du juge (30 questions, α 0,05, grappes pays), une famille Holm finance+santé, classement sur ensembles communs",
+     "detail": null,
+     "unlocks": {
+      "domains": [
+       "other"
+      ],
+      "atlas_sources": [],
+      "tables": [],
+      "tracks": [
+       "v8:scores",
+       "beat-*"
+      ],
+      "text": "Règles de décision avant la première admission d’un modèle REVA."
+     },
+     "action": "Confirmer ou modifier les seuils FIX7 ; relancer run_backtest des conflits (grappes bidirectionnelles).",
+     "commands": [],
+     "who": "owner",
+     "status": "open",
+     "disk_mb": null,
+     "source_docs": [
+      "docs/dev/v6_fix7.md",
+      "lead:final4_todo"
+     ],
+     "check": [],
+     "kind_label": "Choix de méthode ou de publication",
+     "observed": null
+    }
+   ]
+  }
+ ],
+ "_note": "Built 2026-10-17 by reva.v8.coverage.service.pending_view (decision) without the live DB check; groups trimmed to 3 items."
+}

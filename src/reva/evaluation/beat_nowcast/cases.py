@@ -128,7 +128,17 @@ class _GdpPure:
         return out, refs
 
 
-def gdp_cases(inp: Inputs, cell: str, first_qi: int, last_qi: int, log: BuildLog) -> list[Case]:
+def gdp_cases(
+    inp: Inputs,
+    cell: str,
+    first_qi: int,
+    last_qi: int,
+    log: BuildLog,
+    open_targets: frozenset[date] = frozenset(),
+    as_of: date | None = None,
+) -> list[Case]:
+    """Cases of every official update of targets in [first_qi, last_qi] published before the truth's release day;
+    ``open_targets`` (prospective, truth not yet published): updates published on/before ``as_of``, outcome None."""
     off = CELL_OFFICIAL[cell]
     book, other = (inp.gdpnow, inp.nyfed) if off == "gdpnow" else (inp.nyfed, inp.gdpnow)
     pure = _GdpPure(inp)
@@ -138,13 +148,14 @@ def gdp_cases(inp: Inputs, cell: str, first_qi: int, last_qi: int, log: BuildLog
         if not first_qi <= qi <= last_qi:
             continue
         truth = inp.gdp_first.get(target)
-        if truth is None:
+        is_open = truth is None and target in open_targets and as_of is not None
+        if truth is None and not is_open:
             log.skipped[f"{cell}:no_truth_yet"] += len(ups)
             continue
         third = inp.gdp_third.get(target)
         for pub, st in ups:
-            if pub >= truth.release_day:
-                log.skipped[f"{cell}:published_on_or_after_release"] += 1
+            if (truth is not None and pub >= truth.release_day) or (is_open and as_of is not None and pub > as_of):
+                log.skipped[f"{cell}:published_on_or_after_release_or_after_as_of"] += 1
                 continue
             cut = D.midnight(pub)
             ocut = cut + timedelta(days=1)
@@ -154,8 +165,8 @@ def gdp_cases(inp: Inputs, cell: str, first_qi: int, last_qi: int, log: BuildLog
             log.guard_checks += D.guard_refs(ocut, [D.stamp_ref(st), D.stamp_ref(oth[1]) if oth else None])
             c = Case(
                 task=cell, variable=CELL_VARIABLE[cell], geo="USA", origin=D.midnight(target),
-                horizon=bucket_gdp(pub, target), target=D.qlabel(qi), outcome=truth.value,
-                outcome_known_at=truth.known_at, scale=1.0,
+                horizon=bucket_gdp(pub, target), target=D.qlabel(qi), outcome=truth.value if truth else None,
+                outcome_known_at=truth.known_at if truth else None, scale=1.0,
                 preds={OFFICIAL[off]: Predictive("point", st.value)},
                 info={"date": pub.isoformat(), "reva_cut": _ts(cut), "raw": dict(raw),
                       "other": oth[1].value if oth else None, "third": third.value if third else None,
@@ -179,7 +190,15 @@ def _gas_month_change(gas: D.DailySeries, mi: int, cut: datetime) -> float | Non
     return 100.0 * math.log(cur[0] / prev[0])
 
 
-def cpi_cases(inp: Inputs, cell: str, first_mi: int, last_mi: int, log: BuildLog) -> list[Case]:
+def cpi_cases(
+    inp: Inputs,
+    cell: str,
+    first_mi: int,
+    last_mi: int,
+    log: BuildLog,
+    open_targets: frozenset[date] = frozenset(),
+    as_of: date | None = None,
+) -> list[Case]:
     book = inp.clev_cpi if cell == "cpi_clev" else inp.clev_core
     truths = inp.cpi_actual if cell == "cpi_clev" else inp.core_actual
     cache: dict[tuple[Any, ...], tuple[dict[str, float], list[Any]]] = {}
@@ -189,12 +208,13 @@ def cpi_cases(inp: Inputs, cell: str, first_mi: int, last_mi: int, log: BuildLog
         if not first_mi <= mi <= last_mi:
             continue
         truth = truths.get(target)
-        if truth is None:
+        is_open = truth is None and target in open_targets and as_of is not None
+        if truth is None and not is_open:
             log.skipped[f"{cell}:no_truth_yet"] += len(ups)
             continue
         for pub, st in ups:
-            if pub >= truth.release_day:
-                log.skipped[f"{cell}:published_on_or_after_release"] += 1
+            if (truth is not None and pub >= truth.release_day) or (is_open and as_of is not None and pub > as_of):
+                log.skipped[f"{cell}:published_on_or_after_release_or_after_as_of"] += 1
                 continue
             cut = D.midnight(pub)
             ocut = cut + timedelta(days=1)
@@ -224,8 +244,8 @@ def cpi_cases(inp: Inputs, cell: str, first_mi: int, last_mi: int, log: BuildLog
             log.guard_checks += D.guard_refs(ocut, [D.stamp_ref(st)])
             c = Case(
                 task=cell, variable=CELL_VARIABLE[cell], geo="USA", origin=D.midnight(target),
-                horizon=bucket_cpi(pub, target), target=D.mlabel(mi), outcome=truth.value,
-                outcome_known_at=truth.known_at, scale=1.0,
+                horizon=bucket_cpi(pub, target), target=D.mlabel(mi), outcome=truth.value if truth else None,
+                outcome_known_at=truth.known_at if truth else None, scale=1.0,
                 preds={OFFICIAL["clev"]: Predictive("point", st.value)},
                 info={"date": pub.isoformat(), "reva_cut": _ts(cut), "raw": dict(raw), "official_ref": st.ref},
             )  # fmt: skip

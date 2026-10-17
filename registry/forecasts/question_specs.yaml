@@ -394,6 +394,60 @@ families:
       historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
     energy: {code: WTIPUUS, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
 
+  # V7 BEAT-ENERGY: current-month nowcast families (h = 0), issued ONLY by reva.cli.beat_energy --seal at the
+  # pre-registered W1 offsets (7..28 days after a STEO release, while that STEO is the latest; quarterly STEO issue
+  # months), never by the weekly job (issued_by). Declared nowcasts (FIX7 rule): the reference month is partly
+  # elapsed at issue; resolution on EIA's monthly average as first published as history in a later STEO.
+  - key: eia.brent_monthly_nowcast
+    concept_id: null
+    labels: {fr: "Prix du Brent (moyenne du mois en cours, $/baril)", en: "Brent crude oil spot price (current-month average, $/barrel)"}
+    definition: "EIA Short-Term Energy Outlook series BREPUUS (monthly average of daily spot prices), the month of the STEO issue in force (nowcast), historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.BREPUUS.M
+    owner_agent: BEAT-ENERGY
+    geos: [{provider_geo: USA, key: BRENT-STEO, label_fr: "Brent (série STEO de l'EIA)", label_en: "Brent (EIA STEO series)"}]
+    frequency: M
+    value_rule: cell
+    unit: "dollars per barrel"
+    nowcast: true
+    issued_by: reva.cli.beat_energy --seal (registry/forecasts/beat_energy/protocol.yaml, W1 h0 winners)
+    questions:
+      - {type: quantity, horizons: [0]}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period; STEO forecast cells are never an outcome.
+
+  # V7 BEAT-ENERGY: current-month nowcast families (h = 0), issued ONLY by reva.cli.beat_energy --seal at the
+  # pre-registered W1 offsets (7..28 days after a STEO release, while that STEO is the latest; quarterly STEO issue
+  # months), never by the weekly job (issued_by). Declared nowcasts (FIX7 rule): the reference month is partly
+  # elapsed at issue; resolution on EIA's monthly average as first published as history in a later STEO.
+  - key: eia.wti_monthly_nowcast
+    concept_id: null
+    labels: {fr: "Prix du WTI (moyenne du mois en cours, $/baril)", en: "WTI crude oil spot price (current-month average, $/barrel)"}
+    definition: "EIA Short-Term Energy Outlook series WTIPUUS (monthly average of daily spot prices), the month of the STEO issue in force (nowcast), historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.WTIPUUS.M
+    owner_agent: BEAT-ENERGY
+    geos: [{provider_geo: USA, key: WTI-STEO, label_fr: "WTI (série STEO de l'EIA)", label_en: "WTI (EIA STEO series)"}]
+    frequency: M
+    value_rule: cell
+    unit: "dollars per barrel"
+    nowcast: true
+    issued_by: reva.cli.beat_energy --seal (registry/forecasts/beat_energy/protocol.yaml, W1 h0 winners)
+    questions:
+      - {type: quantity, horizons: [0]}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period; STEO forecast cells are never an outcome.
+
   - key: eia.henry_hub_monthly
     concept_id: null
     labels: {fr: "Prix du gaz naturel Henry Hub (moyenne mensuelle, $/MMBtu)", en: "Henry Hub natural gas spot price (monthly average, $/MMBtu)"}

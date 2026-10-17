@@ -259,9 +259,11 @@ def domain_detail(c: Coverage, domain: str, pending: PendingRegistry | None, obs
     for iso3, p in sorted(c.places.items(), key=lambda kv: _label(kv[1])):
         cell = _cell_country(c, domain, iso3)
         if cell:
-            countries.append({"iso3": iso3, "label": _label(p), "region": p["region"], **cell})
+            countries.append(
+                {"iso3": iso3, "label": _label(p), "region": p["region"], "subregion": p["subregion"], **cell}
+            )
         else:
-            without.append({"iso3": iso3, "label": _label(p), "region": p["region"]})
+            without.append({"iso3": iso3, "label": _label(p), "region": p["region"], "subregion": p["subregion"]})
     kinds = []
     for k in (c.doc.get("kg") or {}).get("kinds", []):
         n = k.get("by_domain", {}).get(domain, 0)

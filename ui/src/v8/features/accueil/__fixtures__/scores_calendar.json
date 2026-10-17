@@ -1,0 +1,65 @@
+{
+ "data": {
+  "scoreboard": [
+   {
+    "kind": "event",
+    "track": null,
+    "date": "2026-10-22",
+    "month": null,
+    "not_before": null,
+    "sort": "2026-10-22",
+    "note_fr": "Premières résolutions prospectives (NHSN)",
+    "rows": [],
+    "n_rows": 0,
+    "forecasters": [],
+    "sealed": null,
+    "id": "event.first_prospective_nhsn"
+   },
+   {
+    "kind": "event",
+    "track": null,
+    "date": null,
+    "month": "2026-11",
+    "not_before": null,
+    "sort": "2026-11",
+    "note_fr": "Nowcast Brent/WTI d'octobre 2026 (enregistrement git, non scellé) : se résout avec le STEO de novembre",
+    "rows": [],
+    "n_rows": 0,
+    "forecasters": [],
+    "sealed": null,
+    "id": "event.energy_git_record"
+   },
+   {
+    "kind": "event",
+    "track": null,
+    "date": null,
+    "month": "2026-12",
+    "not_before": null,
+    "sort": "2026-12",
+    "note_fr": "Mi-décembre : FFPI, IPCH, Brent",
+    "rows": [],
+    "n_rows": 0,
+    "forecasters": [],
+    "sealed": null,
+    "id": "event.first_prospective_dec"
+   },
+   {
+    "kind": "track",
+    "track": "fix7_fair",
+    "date": null,
+    "not_before": null,
+    "month": "2027-04",
+    "sort": "2027-04",
+    "note_fr": "premières issues weo.gdp_growth h0 avec le WEO d'avril 2027",
+    "rows": [],
+    "forecasters": [
+     "imf_weo"
+    ],
+    "sealed": true,
+    "n_rows": 2
+   }
+  ],
+  "registry": null
+ },
+ "warnings": []
+}

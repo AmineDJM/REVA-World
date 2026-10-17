@@ -1,0 +1,167 @@
+[
+ {
+  "request_fingerprint": "f2d55ea541322e44c07890f1d32e8d188eef8e8f0cea1a6e39d1d52065cee91a",
+  "url": "https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/research-and-data/data/gdpnow/GDPTrackingModelDataAndForecasts.xlsx",
+  "file": "8ab3dbfc7a87febf.xlsx",
+  "sha256": "8ab3dbfc7a87febf3297197a4517805cd15801ec35244568f31be2e8225efa67",
+  "live_sha256": "dbe57ba14c6bf3057622a03bdc7fce3dbf8119d10463305565b29d83014ff134",
+  "live_bytes": 10902279,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Atlanta: non-commercial reproduction with attribution",
+  "excerpt": "re-saved excerpt of gdpnow.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "3e22e0de486f7f46a1ae72b4bcfe282becf914cb5e309f7c2012b050852fa78a",
+  "url": "https://www.newyorkfed.org/medialibrary/media/research/policy/nowcast/new-york-fed-staff-nowcast_data_2002-present.xlsx",
+  "file": "53498879ba7fefce.xlsx",
+  "sha256": "53498879ba7fefcefb9514814e38a82cbf6b8db00bfa75847bee112fea9d4caa",
+  "live_sha256": "b0ce3db1592672375e3bd43d827da6cf512fbbb602252abb927e6b6d577c234f",
+  "live_bytes": 210018,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of New York Terms of Use (licence to use, copy, distribute)",
+  "excerpt": "re-saved excerpt of nyfed_2016.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "9637bb027d7545fa5c6a4ae13e9fc2ca5298005b08989e281dd0a6a1109bbde4",
+  "url": "https://www.newyorkfed.org/medialibrary/Research/Interactives/Data/NowCast/downloads/New-York-Fed-Staff-Nowcast_download_data.xlsx",
+  "file": "370dfea861b3c61d.xlsx",
+  "sha256": "370dfea861b3c61d375e43ff6db17181d37878445914ca38ae5cea5cf2b2ffad",
+  "live_sha256": "c2b56ee33528155bca3c6e42f92645f303267f1ec1b3b13200b83b72f5a91db9",
+  "live_bytes": 77736,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of New York Terms of Use (licence to use, copy, distribute)",
+  "excerpt": "re-saved excerpt of nyfed_2023.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "0a6306ab9a23d04654971e318f8528b4056899f2b67e2a92a4beff2eb467bb04",
+  "url": "https://www.clevelandfed.org/-/media/files/webcharts/inflationnowcasting/nowcast_month.json?sc_lang=en",
+  "file": "ec34c9f62567e9ff.json",
+  "sha256": "ec34c9f62567e9ff0370215251cfe086974a1dea29dca6ed6fe7c07920b5fa8d",
+  "live_sha256": "096ca033781c1fe03c39ec6056744c147f3ebb9015edd674553053523e9501d5",
+  "live_bytes": 7649711,
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Cleveland: noncommercial use with credit",
+  "excerpt": "re-saved excerpt of clev_month.json downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "5b0f140b0b6055b87d5c711b07a30f2fba4294a7abeb0d68715ac85635db7b02",
+  "url": "https://www.clevelandfed.org/-/media/files/webcharts/inflationnowcasting/nowcast_quarter.json?sc_lang=en",
+  "file": "edacbfc2fd601983.json",
+  "sha256": "edacbfc2fd601983a0917e823d080ada76b50b34e92f8027bed7186b5847836e",
+  "live_sha256": "fcfc4a4b0068b3785774110e84a03d43ce29928996ca467afb563e87bfd98074",
+  "live_bytes": 5001772,
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Cleveland: noncommercial use with credit",
+  "excerpt": "re-saved excerpt of clev_quarter.json downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "eba77fefa7527e97cb01105a5b1995ceb565ca6ca427f538c995f0edb45746f1",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/employMvMd.xlsx",
+  "file": "675495f0976de179.xlsx",
+  "sha256": "675495f0976de1791817d8b24820d96be12d47c4dc040de4b7b53e34d3849b99",
+  "live_sha256": "a5cab543e1dcd135a2339b10ce0d6d920d23ad5a43c35cc97eca678914dd4fef",
+  "live_bytes": 2233651,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of employMvMd.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "eb4a292b5a9761851e2cccf788b8d5e7c1a06eed65a31bec1fceed499af2760d",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/iptMvMd.xlsx",
+  "file": "717ca0c34f5280fa.xlsx",
+  "sha256": "717ca0c34f5280fa4ab5a2210689446d4d96757c5531a062fef07a16ec9286c6",
+  "live_sha256": "89ac73de4144749bf8ef2ce47314da8448ecb235f7f369c32465be1588ea5a97",
+  "live_bytes": 2863459,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of iptMvMd.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "76b6a40e3e803e5c9ffb0fada456bfd9d853e00db393333b967b340fff3216ab",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/hMvMd.xlsx",
+  "file": "acb9458061a2e8e8.xlsx",
+  "sha256": "acb9458061a2e8e870cabf36dcf2ee2ac7f8581caf8346f30f76b409510ec4a4",
+  "live_sha256": "3249636394de9c451bb5f64275484eec524425a660c549e98e39ec71524140fe",
+  "live_bytes": 1707301,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of hMvMd.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "9962261a0927cb1c4dcd492d45148aaf51e2e271e361e737229ca202c1f6b735",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/hstartsMvMd.xlsx",
+  "file": "2fa8f8864fb9f017.xlsx",
+  "sha256": "2fa8f8864fb9f0175872a11c19f7a4098e8a7d7290db482582b69087ff303ed1",
+  "live_sha256": "73ea7cbbb00a763f42d80a587c3786ab4f7e564274d8ba0d3dcc90f9a9148a8a",
+  "live_bytes": 1757713,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of hstartsMvMd.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "e26feb5953d1c60b15be9feeebe3804fcbacb30d331f1226bb596040e27ad7e1",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/rconmMvMd.xlsx",
+  "file": "cecd704589e396c6.xlsx",
+  "sha256": "cecd704589e396c6dd41d87ba9820a8c011d7fc8fe49a611cb83742da0f82503",
+  "live_sha256": "cd72205227572417c2ef257224be45412f53f410df53173430131bd1d7d14403",
+  "live_bytes": 851441,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of rconmMvMd.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ },
+ {
+  "request_fingerprint": "071d5d58e16d10cd2e139979e71a6b1c87e27160b40bc3a5faea590043dead68",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routput_first_second_third.xlsx",
+  "file": "d542c9dc9bf6f389.xlsx",
+  "sha256": "d542c9dc9bf6f3898c4625bbacdb0ce9eeb071f78bed718acc5378d7a9021892",
+  "live_sha256": "2bffa7a68ad43a950a04cb378a368b5e59192b1febcfe22d2a0e110132bfc9c5",
+  "live_bytes": 16435,
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T23:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia: no stated licence (all rights reserved); test excerpt only",
+  "excerpt": "re-saved excerpt of routput_first_second_third.xlsx downloaded 2026-10-17: a few rows/columns/charts kept with values copied verbatim (fixture for parser tests)"
+ }
+]

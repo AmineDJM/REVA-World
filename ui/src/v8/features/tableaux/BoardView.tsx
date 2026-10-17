@@ -226,8 +226,14 @@ function useBoardAlerts(board: StoredBoard | null, origin: ViewOrigin, tick: num
     async (s) => {
       if (!board) return { alerts: [] as Alert[], note: null as string | null };
       if (origin === 'server') return { alerts: (await getBoardAlerts(board.id, undefined, s)).alerts, note: null };
-      const changes = await getChangesFor({ since, kinds: 'ingest,kg_batch,question_resolved', limit: 200 }, s);
-      return { alerts: evaluateLocal(board, changes), note: 'évaluées dans ce navigateur sur le fil des changements des 30 derniers jours' };
+      try {
+        const changes = await getChangesFor({ since, kinds: 'ingest,kg_batch,question_resolved', limit: 200 }, s);
+        return { alerts: evaluateLocal(board, changes), note: 'évaluées dans ce navigateur sur le fil des changements des 30 derniers jours' };
+      } catch (err) {
+        if (s.aborted) throw err;
+        const why = `fil des changements ${classifyV3Error(err).title.toLowerCase()} (/v1/v8/changes)`;
+        return { alerts: evaluateLocal(board, null, why), note: why };
+      }
     },
     [board?.id, board?.rules.length, origin, tick],
     enabled,

@@ -302,6 +302,72 @@ def holdout(inp: C.Inputs, hyp_doc: Mapping[str, Any]) -> dict[str, Any]:
             "cross_checks": cross_checks(inp)}  # fmt: skip
 
 
+# ------------------------------------------------------------------------------------------------ prospective
+PROSPECTIVE_GDP = (date(2026, 10, 1), date(2027, 1, 1))  # 2026Q4, 2027Q1 (truth: BEA advance estimate)
+PROSPECTIVE_CPI = tuple(date(2026 + (m > 12), (m - 1) % 12 + 1, 1) for m in range(10, 16))  # 2026-10 .. 2027-03
+ATTRIBUTION = {
+    C.OFFICIAL["gdpnow"]: "Federal Reserve Bank of Atlanta, GDPNow (non-commercial reproduction with attribution)",
+    C.OFFICIAL["nyfed"]: "Federal Reserve Bank of New York, Staff Nowcast",
+    C.OFFICIAL["clev"]: "Federal Reserve Bank of Cleveland, Inflation Nowcasting (noncommercial use with credit)",
+}
+
+
+def _pred_doc(p: Any) -> dict[str, Any] | None:
+    if not hasattr(p, "point"):
+        return None
+    out: dict[str, Any] = {"family": p.family, "point": round(float(p.point), 6)}
+    if p.distributional:
+        iv = p.interval(0.8)
+        if iv is not None:
+            out["interval80"] = [round(float(iv[0]), 6), round(float(iv[1]), 6)]
+    return out
+
+
+def prospective(inp: C.Inputs, as_of: date) -> dict[str, Any]:
+    """Sealable record: for each cell and open target, REVA's candidates at the latest official publication on/before
+    ``as_of`` (official cutoff = that day), or the pure-REVA points at ``as_of`` 00:00 UTC when no official
+    nowcast of the target exists yet. History (burn-in to the holdout end) feeds the second pass."""
+    log = C.BuildLog()
+    recs: list[dict[str, Any]] = []
+    gdp_open, cpi_open = frozenset(PROSPECTIVE_GDP), frozenset(PROSPECTIVE_CPI)
+    for cell in C.CELLS:
+        gdp = kind(cell) == "gdp"
+        if gdp:
+            cs = C.gdp_cases(inp, cell, GDP_BURN_IN, max(D.qi_of(t) for t in gdp_open), log, gdp_open, as_of)
+        else:
+            cs = C.cpi_cases(inp, cell, CPI_BURN_IN, max(D.mi_of(t) for t in cpi_open), log, cpi_open, as_of)
+        off = C.RULES[cell].official
+        for target in sorted(gdp_open if gdp else cpi_open):
+            mine = [c for c in cs if c.origin.date() == target and c.outcome is None]
+            label = D.qlabel(D.qi_of(target)) if gdp else D.mlabel(D.mi_of(target))
+            rec: dict[str, Any] = {"cell": cell, "target": label, "variable": C.CELL_VARIABLE[cell]}
+            if mine:
+                c = max(mine, key=lambda x: x.info["date"])
+                rec.update({"official_publication_date": c.info["date"], "bucket": c.horizon,
+                            "reva_cutoff": datetime.fromtimestamp(c.info["reva_cut"], UTC).isoformat(),
+                            "official": {"model": off, **(_pred_doc(c.preds.get(off)) or {}),
+                                         "attribution": ATTRIBUTION[off], "ref": c.info.get("official_ref")},
+                            "fair_benchmark": _pred_doc(c.preds.get(M.fan_key(off))),
+                            "candidates": {m: _pred_doc(c.preds.get(m)) for m in candidates(cell)},
+                            "uses_official_forecast": {m: uses_official(m) for m in candidates(cell)}})  # fmt: skip
+            else:
+                cut = D.midnight(as_of)
+                pts: dict[str, Any] = {}
+                if gdp:
+                    raw, _refs = C._GdpPure(inp)(target, cut, log)
+                    pts = {M.key(k): {"family": "point", "point": round(v, 6)} for k, v in raw.items()}
+                rec.update({"official_publication_date": None, "reva_cutoff": cut.isoformat(),
+                            "note": "no official nowcast of this target published yet: pure REVA points only",
+                            "candidates": pts})  # fmt: skip
+            recs.append(rec)
+    return {"schema": "reva-beat-nowcast-sealed/1", "as_of": as_of.isoformat(), "code_sha256": code_sha256(),
+            "model_version": MODEL_VERSION, "pins": inp.pins, "records": recs,
+            "resolution": {"gdp": "Philadelphia Fed first release (BEA advance/initial estimate) of the quarter",
+                           "cpi": "first-release month-over-month CPI (BLS) as recorded by the Cleveland Fed on the release day"},
+            "claims": "only holdout-confirmed scopes (holdout.json) may be scored as claims; other records are kept "
+                      "sealed for the prospective scoreboard"}  # fmt: skip
+
+
 def write_json(path: Path, doc: Mapping[str, Any]) -> str:
     text = json.dumps(doc, indent=1, sort_keys=True, default=str) + "\n"
     path.write_text(text)
@@ -355,6 +421,7 @@ __all__ = [
     "hyp_key",
     "inputs_from_cells",
     "load_yaml",
+    "prospective",
     "select_hypotheses",
     "write_json",
 ]

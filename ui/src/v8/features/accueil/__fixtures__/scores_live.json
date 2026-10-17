@@ -1,0 +1,103 @@
+{
+ "data": {
+  "computed_at": "2026-10-17T22:35:20.775220+00:00",
+  "compute_ms": 24824.5,
+  "origin": null,
+  "totals": {
+   "sealed_batches": 24,
+   "questions": 5950,
+   "forecasts": 28592,
+   "pending": 5945,
+   "resolved": 0,
+   "void": 5,
+   "not_prospective": 0
+  },
+  "next_resolution": "2026-10-18",
+  "upcoming": [
+   {
+    "date": "2025-01-01",
+    "family": "ghe.deaths",
+    "label_fr": "Décès par cause (WHO GHE, estimation)",
+    "n_questions": 168,
+    "officials": [],
+    "registry": "health",
+    "overdue": true
+   },
+   {
+    "date": "2026-01-01",
+    "family": "ghe.deaths",
+    "label_fr": "Décès par cause (WHO GHE, estimation)",
+    "n_questions": 168,
+    "officials": [],
+    "registry": "health",
+    "overdue": true
+   },
+   {
+    "date": "2026-10-18",
+    "family": "nhsn.covid_hosp",
+    "label_fr": "Hospitalisations COVID-19 confirmées (NHSN, par semaine)",
+    "n_questions": 53,
+    "officials": [
+     "cdc_covidhub"
+    ],
+    "registry": "health",
+    "overdue": false
+   },
+   {
+    "date": "2026-10-18",
+    "family": "nhsn.flu_hosp",
+    "label_fr": "Hospitalisations grippe confirmées (NHSN, par semaine)",
+    "n_questions": 53,
+    "officials": [
+     "cdc_flusight"
+    ],
+    "registry": "health",
+    "overdue": false
+   },
+   {
+    "date": "2026-10-25",
+    "family": "nhsn.covid_hosp",
+    "label_fr": "Hospitalisations COVID-19 confirmées (NHSN, par semaine)",
+    "n_questions": 53,
+    "officials": [
+     "cdc_covidhub"
+    ],
+    "registry": "health",
+    "overdue": false
+   },
+   {
+    "date": "2026-10-25",
+    "family": "nhsn.flu_hosp",
+    "label_fr": "Hospitalisations grippe confirmées (NHSN, par semaine)",
+    "n_questions": 53,
+    "officials": [
+     "cdc_flusight"
+    ],
+    "registry": "health",
+    "overdue": false
+   },
+   {
+    "date": "2026-10-26",
+    "family": "erviss.flu_positivity_sentinel",
+    "label_fr": "Positivité grippe, médecine sentinelle (ERVISS)",
+    "n_questions": 22,
+    "officials": [],
+    "registry": "health",
+    "overdue": false
+   },
+   {
+    "date": "2026-10-26",
+    "family": "erviss.ili_rate",
+    "label_fr": "Taux de consultation pour syndrome grippal (ERVISS)",
+    "n_questions": 22,
+    "officials": [],
+    "registry": "health",
+    "overdue": false
+   }
+  ],
+  "upcoming_total": 217,
+  "overdue_groups": 2,
+  "refreshing": false
+ },
+ "warnings": []
+}

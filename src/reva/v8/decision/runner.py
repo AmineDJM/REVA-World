@@ -32,6 +32,7 @@ from typing import Any
 import numpy as np
 from sqlalchemy import Connection, text
 
+from reva.predict import db as pdb
 from reva.predict import engine as pe
 from reva.predict.context import PluginData
 from reva.predict.decision import Decision, VarRef
@@ -196,8 +197,6 @@ def data_fingerprint(conn: Connection) -> str:
     except Exception:
         parts.append("fx-absent")
     try:
-        from reva.predict import db as pdb
-
         with conn.begin_nested():
             rel = pdb.latest_release(conn)
         parts.append(f"rel{(rel or {}).get('id')}")
@@ -206,17 +205,70 @@ def data_fingerprint(conn: Connection) -> str:
     return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
 
 
+#: Cross-request caches of what is expensive and identical between runs on the same data (keyed by the data
+#: fingerprint / atlas snapshot / release; 15-minute time-to-live): the forecast-registry index (loading it
+#: re-hashes every sealed batch manifest), per-(variable, country) baselines, the FIGARO IO arrays or their gap.
+class SharedRegistryBaseline(pdb.RegistryBaseline):
+    """``RegistryBaseline`` whose question index is shared between requests (15 min), read-only as before."""
+
+    def _load(self) -> dict[tuple[str, str], list[dict[str, Any]]]:
+        if self._index is None:
+            hit = _shared().get("registry_index")
+            if hit is not None:
+                self._index = hit
+            else:
+                idx = super()._load()
+                if self.gap is None:
+                    _shared().put("registry_index", idx)
+                return idx
+        return self._index
+
+
+class SharedBaseline:
+    """Baselines memoised across requests for one data fingerprint and atlas snapshot."""
+
+    def __init__(self, inner: Any, stamp: str):
+        self.inner = inner
+        self.stamp = stamp
+
+    def baseline(self, ref: VarRef, geo: str) -> dict[str, Any] | None:
+        key = f"baseline|{self.stamp}|{ref.key}|{geo}"
+        hit = _shared().get(key)
+        if hit is not None:
+            return hit[0]  # type: ignore[no-any-return]
+        val = self.inner.baseline(ref, geo)
+        if getattr(self.inner, "gap", None) is None:
+            _shared().put(key, (val,))
+        return val  # type: ignore[no-any-return]
+
+
+def _io_for(conn: Connection, store: Any) -> tuple[Any, dict[str, Any], str | None]:
+    rel = pdb.latest_release(conn)
+    if rel is None:
+        return None, {}, "no published live belief release on this database"
+    key = f"io|{rel['id']}"
+    hit = _shared().get(key)
+    if hit is None:
+        hit = pdb.io_arrays(conn, store, rel)
+        _shared().put(key, hit)
+    return hit
+
+
 def db_contexts(
     conn: Connection, store: Any, decision: Decision, *, origin: str = "any", as_of_max: str | None = None
 ) -> Contexts:
-    """The engine's ports on one read-only connection (same construction as ``run_on_connection``)."""
-    from reva.predict import db as pdb
-
+    """The engine's ports on one read-only connection (same construction as ``run_on_connection``; the registry
+    index, baselines and IO table are shared between requests on the same data)."""
+    fp = data_fingerprint(conn)
     effects = pdb.DbEffectSource(conn, origin=origin, as_of_max=as_of_max)
     claims = pdb.DbClaimSource(conn, origin=None if origin == "any" else origin)
     atlas, baseline_gap = pdb.atlas_baseline(conn, store, effects)
-    baseline = pdb.RegistryBaseline(conn, store, atlas, effects)
-    data = pdb.plugin_data(conn, store, decision, with_io=True)
+    baseline = SharedBaseline(
+        SharedRegistryBaseline(conn, store, atlas, effects), f"{fp}|{getattr(atlas, 'snapshot', None)}"
+    )
+    data = pdb.plugin_data(conn, store, decision, with_io=False)
+    if data.crude_provenance:  # a live release exists: IO arrays (or their typed gap) from the shared cache
+        data.io_arrays, data.io_provenance, data.io_gap = _io_for(conn, store)
     data.retirement_runner = memo_runner(data.retirement_runner)
     extra = [{"code": "baseline_unavailable", "message": baseline_gap}] if baseline_gap else []
     prov = {
@@ -270,7 +322,7 @@ def db_contexts(
         provenance=prov,
         lookup=lookup,
         near=near,
-        fingerprint=data_fingerprint(conn),
+        fingerprint=fp,
     )
 
 
@@ -587,6 +639,13 @@ class LruCache:
 
 
 RUNS = LruCache(24, 1800.0)
+SHARED = LruCache(4096, 900.0)
+
+
+def _shared() -> LruCache:
+    return SHARED
+
+
 SENSITIVITY = LruCache(48, 1800.0)
 
 
@@ -605,9 +664,9 @@ def mark_warm() -> None:
 
 
 def start_warmup(engine_getter: Callable[[], Any], store: Any) -> bool:
-    """Load the atlas catalog and the live snapshot's query file once, in a background thread (read-only).
-
-    The first engine run of a process otherwise spends ~1 min on them (integrity hash of the query file)."""
+    """Load the atlas catalog, the live snapshot's query file and the forecast-registry index once, in a
+    background thread (read-only). The first engine run of a process otherwise spends 1-2 min on them (integrity
+    hash of the query file, re-hash of every sealed registry manifest)."""
     with _WARM_LOCK:
         if _WARM["state"] in ("warming", "warm"):
             return False
@@ -616,12 +675,11 @@ def start_warmup(engine_getter: Callable[[], Any], store: Any) -> bool:
     def work() -> None:
         t0 = time.perf_counter()
         try:
-            from reva.predict import db as pdb
-
             pe._atlas_catalog()
             with engine_getter().connect() as conn, conn.begin():
                 conn.execute(text("SET TRANSACTION READ ONLY"))
                 pdb.atlas_baseline(conn, store, None)
+                SharedRegistryBaseline(conn, store, None, None)._load()
             _WARM.update(state="warm", detail=None, seconds=round(time.perf_counter() - t0, 1))
         except Exception as e:  # never fatal: the first run will pay the cost instead
             _WARM.update(state="failed", detail=f"{type(e).__name__}: {str(e)[:200]}")

@@ -1,0 +1,452 @@
+{
+ "data": {
+  "question": {
+   "concept_id": "imf.inflation_cpi_avg",
+   "cycle": "2026-Q4",
+   "cycle_horizon": 0,
+   "definition": "Annual percent change of the period-average consumer price index (IMF WEO PCPIPCH).",
+   "definition_source": "registry/atlas/catalog/imf.yaml (imf.inflation_cpi_avg)",
+   "family": "weo.cpi_inflation",
+   "frequency": "A",
+   "geo": "FRA",
+   "geo_label_en": "France",
+   "geo_label_fr": "France",
+   "interval_level": null,
+   "iso3": "FRA",
+   "label_en": "Inflation (CPI, annual average)",
+   "label_fr": "Inflation (IPC, moyenne annuelle)",
+   "last_observed": {
+    "period": "2025",
+    "value": "0.926027"
+   },
+   "period_end": "2027-01-01",
+   "period_start": "2026-01-01",
+   "question_id": "fq_455b1860c774831e20563f8c",
+   "question_key": "2026-Q4|weo.cpi_inflation|FRA|2026|quantity",
+   "reference_period": "2026",
+   "resolution": {
+    "expected_date": "2027-05-01",
+    "geo_match": "iso3",
+    "indicator": "PCPIPCH",
+    "indicator_parts": null,
+    "issue_table": {
+     "artifact_sha256": "708ea329d56dd520572231888645647ca477820a5fdfc9ff5ac577a4646d746e",
+     "dataset_id": "c739bd14-a35e-4d5f-ba37-c3943e88ea07",
+     "dataset_key": "atlas.imf.weo",
+     "recorded_at": "2026-10-16T00:26:49.452743+00:00"
+    },
+    "note": "Resolved by the first IMF World Economic Outlook vintage (atlas.imf.weo) in which the year is an actual (after the WEO's LATEST_ACTUAL_ANNUAL_DATA boundary), normally the April WEO of the following year.",
+    "provider_geo": null,
+    "rule": "first_observed_release_after_seal",
+    "source": "atlas.imf.weo",
+    "value_rule": "cell",
+    "void_after": "2029-01-30"
+   },
+   "schema": "reva-forecast-question/1",
+   "text_en": "What will the published value of 'Inflation (CPI, annual average)' be for France (FRA), period 2026? (% change (CPI, period average))",
+   "text_fr": "Quelle sera la valeur publiée de « Inflation (IPC, moyenne annuelle) » pour France (FRA), période 2026 ? (% change (CPI, period average))",
+   "threshold": null,
+   "threshold_basis": null,
+   "threshold_rule": null,
+   "training": {
+    "digest": "64d7547e178b74812ebc44d6709a147e4352b9ca31945393dd30067343d3ba28",
+    "first_period": "1980",
+    "last_period": "2025",
+    "n": 46
+   },
+   "type": "quantity",
+   "unit": "% change (CPI, period average)"
+  },
+  "forecasts": [
+   {
+    "detail": {
+     "h": "1",
+     "n_changes": "45"
+    },
+    "horizon_periods": 1,
+    "model": "forecast.registry_persistence",
+    "n_train": 46,
+    "origin_period": "2025",
+    "point": "0.926027",
+    "predictive": {
+     "family": "normal",
+     "mu": "0.926027",
+     "sigma": "1.79045024"
+    },
+    "quantiles": {
+     "0.05": "-2.01900157",
+     "0.1": "-1.368527308",
+     "0.25": "-0.2816133348",
+     "0.5": "0.926027",
+     "0.75": "2.133667335",
+     "0.9": "3.220581308",
+     "0.95": "3.87105557"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "status": "issued",
+    "train_digest": "64d7547e178b74812ebc44d6709a147e4352b9ca31945393dd30067343d3ba28",
+    "score": null
+   },
+   {
+    "model": "forecast.registry_seasonal_naive",
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "reason": "seasonal naive needs a monthly or quarterly series",
+    "schema": "reva-forecast-record/1",
+    "status": "abstained",
+    "score": null
+   },
+   {
+    "detail": {
+     "h": "1",
+     "n_fit": "39",
+     "p": "1"
+    },
+    "horizon_periods": 1,
+    "model": "forecast.registry_ar",
+    "n_train": 46,
+    "origin_period": "2025",
+    "point": "1.703199144",
+    "predictive": {
+     "family": "normal",
+     "mu": "1.703199144",
+     "sigma": "1.426341815"
+    },
+    "quantiles": {
+     "0.05": "-0.6429243634",
+     "0.1": "-0.1247314418",
+     "0.25": "0.7411462095",
+     "0.5": "1.703199144",
+     "0.75": "2.665252078",
+     "0.9": "3.531129729",
+     "0.95": "4.049322651"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "status": "issued",
+    "train_digest": "64d7547e178b74812ebc44d6709a147e4352b9ca31945393dd30067343d3ba28",
+    "score": null
+   },
+   {
+    "detail": {
+     "h": "1",
+     "n_changes": "45"
+    },
+    "horizon_periods": 1,
+    "model": "forecast.registry_hist_quantile",
+    "n_train": 46,
+    "origin_period": "2025",
+    "point": "0.713378",
+    "predictive": {
+     "family": "empirical",
+     "sample": [
+      "-5.320311",
+      "-2.418521",
+      "-2.366546",
+      "-2.127267",
+      "-1.592901"
+     ]
+    },
+    "quantiles": {
+     "0.05": "-2.3186902",
+     "0.1": "-1.3224114",
+     "0.25": "0.111106",
+     "0.5": "0.713378",
+     "0.75": "1.244204",
+     "0.9": "2.4743252",
+     "0.95": "3.7179226"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "status": "issued",
+    "train_digest": "64d7547e178b74812ebc44d6709a147e4352b9ca31945393dd30067343d3ba28",
+    "score": null
+   },
+   {
+    "attribution": "International Monetary Fund, World Economic Outlook (projection), as pinned at issue",
+    "detail": {},
+    "model": "forecast.reference_imf_weo",
+    "point": "2.409226",
+    "predictive": {
+     "family": "point"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "source_cell": {
+     "flags": {
+      "display_scale": "0",
+      "estimate_kind": "projection",
+      "latest_actual": "2025",
+      "vintage": "2026-10"
+     },
+     "raw_sha256": "a5b8f62b26f71d4ee33d17c290f56e52ae1d4b6b3e609d3ff45a34c9bced1bcb",
+     "selector": {
+      "flow": "IMF.RES:WEO(9.0.0)",
+      "item": "weo",
+      "series": "FRA.PCPIPCH.A",
+      "time_period": "2026"
+     }
+    },
+    "status": "issued",
+    "score": null
+   },
+   {
+    "detail": {
+     "n_components": "4"
+    },
+    "ensemble": {
+     "components": [
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.reference_imf_weo"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_ar"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_hist_quantile"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_persistence"
+      }
+     ],
+     "method": "hedge_relative_loss_shrunk_by_source/2",
+     "sources": {
+      "forecast.reference_imf_weo": "imf.weo.point",
+      "forecast.registry_ar": "forecast.registry_ar",
+      "forecast.registry_hist_quantile": "forecast.registry_hist_quantile",
+      "forecast.registry_persistence": "forecast.registry_persistence"
+     },
+     "tasks": {
+      "location": "weo.cpi_inflation|quantity|location",
+      "shape": "weo.cpi_inflation|quantity|shape"
+     },
+     "weight_status": {
+      "location": "equal_weights_insufficient_history",
+      "shape": "equal_weights_insufficient_history"
+     },
+     "weights": {
+      "location": {
+       "forecast.reference_imf_weo": "0.25",
+       "forecast.registry_ar": "0.25",
+       "forecast.registry_hist_quantile": "0.25",
+       "forecast.registry_persistence": "0.25"
+      },
+      "shape": {
+       "forecast.registry_ar": "0.3333333333",
+       "forecast.registry_hist_quantile": "0.3333333333",
+       "forecast.registry_persistence": "0.3333333333"
+      }
+     }
+    },
+    "model": "reva.ensemble",
+    "model_version": "2.0.0",
+    "point": "1.437957536",
+    "predictive": {
+     "family": "empirical",
+     "sample": [
+      "-2.642135383",
+      "-1.617172109",
+      "-1.336449224",
+      "-1.077111989",
+      "-0.7755703907"
+     ]
+    },
+    "quantiles": {
+     "0.05": "-1.336449224",
+     "0.1": "-0.614800562",
+     "0.25": "0.5139691128",
+     "0.5": "1.437957536",
+     "0.75": "2.338130626",
+     "0.9": "3.399101567",
+     "0.95": "4.203189762"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "status": "issued",
+    "supplement_batch_sha256": "b532f2888292c86b07d2e8978abb8b642c703966d5560e679ccfd95be26ed9c8",
+    "score": null
+   },
+   {
+    "detail": {
+     "n_components": "4"
+    },
+    "ensemble": {
+     "components": [
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.reference_imf_weo"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_ar"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_hist_quantile"
+      },
+      {
+       "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+       "model": "forecast.registry_persistence"
+      }
+     ],
+     "method": "hedge_relative_loss_shrunk/1",
+     "tasks": {
+      "location": "weo.cpi_inflation|quantity|location",
+      "shape": "weo.cpi_inflation|quantity|shape"
+     },
+     "weight_status": {
+      "location": "equal_weights_insufficient_history",
+      "shape": "equal_weights_insufficient_history"
+     },
+     "weights": {
+      "location": {
+       "forecast.reference_imf_weo": "0.25",
+       "forecast.registry_ar": "0.25",
+       "forecast.registry_hist_quantile": "0.25",
+       "forecast.registry_persistence": "0.25"
+      },
+      "shape": {
+       "forecast.registry_ar": "0.3333333333",
+       "forecast.registry_hist_quantile": "0.3333333333",
+       "forecast.registry_persistence": "0.3333333333"
+      }
+     }
+    },
+    "model": "reva.ensemble",
+    "point": "1.437957536",
+    "predictive": {
+     "family": "empirical",
+     "sample": [
+      "-2.642135383",
+      "-1.617172109",
+      "-1.336449224",
+      "-1.077111989",
+      "-0.7755703907"
+     ]
+    },
+    "quantiles": {
+     "0.05": "-1.336449224",
+     "0.1": "-0.614800562",
+     "0.25": "0.5139691128",
+     "0.5": "1.437957536",
+     "0.75": "2.338130626",
+     "0.9": "3.399101567",
+     "0.95": "4.203189762"
+    },
+    "question_id": "fq_455b1860c774831e20563f8c",
+    "schema": "reva-forecast-record/1",
+    "status": "issued",
+    "supplement_batch_sha256": "e3b567f6fa58f2bbe871e98721977a458606d8c37087486841fed07ea5f5c1f9",
+    "score": null
+   }
+  ],
+  "outcome": null,
+  "status": "pending",
+  "seal": {
+   "batch_sha256": "96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5",
+   "issued_at": "2026-10-17T14:02:32.058444+00:00",
+   "cycle": "2026-Q4",
+   "origin": "live",
+   "context_id": "76e2b39c-0702-46ea-83b2-7525e4a66dfd",
+   "verified": true,
+   "label": "BASELINE forecasts only (persistence / random walk, seasonal naive, AR(p) fitted as of issue, historical quantiles) plus the attributed IMF WEO projection where declared: prospective, frozen and sealed before resolution; not validated models, not advice",
+   "data_tables": {
+    "atlas.bis.spp": {
+     "artifact_sha256": "9291d6d5ff1304a7199352705ce577c91298e19b44643554c50d62ebd44e60fe",
+     "dataset_id": "732a1bc7-c8d3-428f-a4e1-2606690e750e",
+     "dataset_key": "atlas.bis.spp",
+     "manifest_sha256": "be5b263c9fc124d46b4878bbae9d32d708fc0c6d91d3cd19eb7c3527f6ca8957",
+     "parser_version": "atlas_bis/1",
+     "recorded_at": "2026-10-16T19:08:30.176582+00:00",
+     "rights": {
+      "attribution": "Source: Bank for International Settlements (BIS) statistics",
+      "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+      "licence_checked": "2026-10-16",
+      "licence_url": "https://data.bis.org/help/legal#terms-of-permitted-use-of-bis-statistics",
+      "source_key": "bis.stats",
+      "terms_quote": "The use of the statistics is unrestricted, provided that: if the statistics are reproduced, the BIS must be cited in your publication or product as the source of the statistics; ..."
+     },
+     "row_count": 35780
+    },
+    "atlas.fao.cp": {
+     "artifact_sha256": "8dcf69e11d761fd2b3cc0d6409459d3b5a68fd6c5c9f07523f98ff63d9e1ef9a",
+     "dataset_id": "c918f56a-77e9-4afc-8934-1cd21ed35477",
+     "dataset_key": "atlas.fao.cp",
+     "manifest_sha256": "cfc5f46b04ff7f4b02ab1dbbcae6a1b09bd18d40700fa3cf89881a9cdda6a4fd",
+     "parser_version": "atlas_fao/1",
+     "recorded_at": "2026-10-16T18:33:38.462179+00:00",
+     "rights": {
+      "attribution": "FAO. FAOSTAT: Consumer Price Indices (monthly). Licence: CC-BY-4.0.",
+      "licence": "CC-BY-4.0",
+      "licence_checked": "2026-10-15",
+      "licence_url": "https://www.fao.org/contact-us/terms/db-terms-of-use/en",
+      "provider": "FAO (FAOSTAT)",
+      "source_key": "fao.faostat",
+      "third_party_series": "ILO / IMF national CPI series compiled by FAO"
+     },
+     "row_count": 261810
+    },
+    "atlas.imf.er": {
+     "artifact_sha256": "cc7a9fc4ddaea31473a99c2e33ddffa96accf493c925dd0583d2bc08793ee07e",
+     "dataset_id": "c13802a6-53c4-4bea-8573-ed5b7b957cc7",
+     "dataset_key": "atlas.imf.er",
+     "manifest_sha256": "9bc8182935715d15d0f83f2a61182d8e605eb6cc95b4d20662d2d9aae87c6e90",
+     "parser_version": "atlas_imf/2",
+     "recorded_at": "2026-10-16T00:27:42.898002+00:00",
+     "rights": {
+      "attribution": "International Monetary Fund",
+      "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+      "review": "pending_maintainer_review",
+      "source_key": "imf.sdmx"
+     },
+     "row_count": 28420
+    },
+    "atlas.imf.mfs_ir": {
+     "artifact_sha256": "e1661d1b9ab2b2bf85298376d58b0fb58cadfec9d9794945470f30d9edc048c3",
+     "dataset_id": "0d3cba8e-7704-4283-b224-5132d37b6212",
+     "dataset_key": "atlas.imf.mfs_ir",
+     "manifest_sha256": "b05e415a4f3eb9da54cb1aa5183ac2fe0b40e42af09930685ee650fcf081b46e",
+     "parser_version": "atlas_imf/2",
+     "recorded_at": "2026-10-16T00:27:44.372446+00:00",
+     "rights": {
+      "attribution": "International Monetary Fund",
+      "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+      "review": "pending_maintainer_review",
+      "source_key": "imf.sdmx"
+     },
+     "row_count": 16522
+    },
+    "atlas.imf.weo": {
+     "artifact_sha256": "708ea329d56dd520572231888645647ca477820a5fdfc9ff5ac577a4646d746e",
+     "dataset_id": "c739bd14-a35e-4d5f-ba37-c3943e88ea07",
+     "dataset_key": "atlas.imf.weo",
+     "manifest_sha256": "9ea49ef6acb26ff6920aeab1e0576fe1cc13921a8b702a8a59db49756082b939",
+     "parser_version": "atlas_imf/2",
+     "recorded_at": "2026-10-16T00:26:49.452743+00:00",
+     "rights": {
+      "attribution": "International Monetary Fund",
+      "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+      "review": "pending_maintainer_review",
+      "source_key": "imf.sdmx"
+     },
+     "row_count": 237117
+    }
+   },
+   "code_digest": "src-sha256:0031b28393a3d8c5825cc8b4e8123de508b64908957c46743a7c194048097734"
+  }
+ },
+ "warnings": [
+  {
+   "code": "baseline_forecasts_only",
+   "message": "BASELINE forecasts only (persistence / random walk, seasonal naive, AR(p) fitted as of issue, historical quantiles) plus the attributed IMF WEO projection where declared: prospective, frozen and sealed before resolution; not validated models, not advice"
+  },
+  {
+   "code": "not_advice",
+   "message": "Statistical baseline forecasts for measuring skill; not financial or investment advice."
+  }
+ ]
+}

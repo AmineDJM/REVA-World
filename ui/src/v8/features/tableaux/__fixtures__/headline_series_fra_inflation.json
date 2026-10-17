@@ -1,0 +1,564 @@
+{
+ "data": {
+  "concept": {
+   "id": "reva.economy.inflation_cpi",
+   "theme": "economy",
+   "labels": {
+    "fr": "Inflation (prix à la consommation, moyenne annuelle)",
+    "en": "Inflation, consumer prices (annual average)"
+   },
+   "unit": "% change"
+  },
+  "iso3": "FRA",
+  "best": [
+   {
+    "year": 2000,
+    "value": "1.817936",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2001,
+    "value": "1.782827",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2002,
+    "value": "1.940433",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2003,
+    "value": "2.167942",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2004,
+    "value": "2.33951",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2005,
+    "value": "1.882827",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2006,
+    "value": "1.892404",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2007,
+    "value": "1.606563",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2008,
+    "value": "3.158846",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2009,
+    "value": "0.105552",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2010,
+    "value": "1.735278",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2011,
+    "value": "2.28894",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2012,
+    "value": "2.21724",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2013,
+    "value": "0.990193",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2014,
+    "value": "0.610845",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2015,
+    "value": "0.084065",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2016,
+    "value": "0.31109",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2017,
+    "value": "1.158836",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2018,
+    "value": "2.10309",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2019,
+    "value": "1.298116",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2020,
+    "value": "0.525635",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2021,
+    "value": "2.067956",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2022,
+    "value": "5.902915",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2023,
+    "value": "5.661184",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2024,
+    "value": "2.316636",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2025,
+    "value": "0.926027",
+    "unit": "% change",
+    "projection": false,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2026,
+    "value": "2.409226",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2027,
+    "value": "2.243378",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2028,
+    "value": "1.878741",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2029,
+    "value": "1.866168",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2030,
+    "value": "1.910438",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   },
+   {
+    "year": 2031,
+    "value": "1.813523",
+    "unit": "% change",
+    "projection": true,
+    "answered_by": {
+     "series": "imf.weo.PCPIPCH",
+     "source": "imf"
+    },
+    "flags": {
+     "display_scale": "0",
+     "estimate_kind": "projection",
+     "latest_actual": "2025",
+     "vintage": "2026-10"
+    }
+   }
+  ],
+  "sources_without_data": [
+   "insee.ipc_dom.CPI_ANNUAL_CHANGE|coicop=00|households=ENSEMBLE|base=2025"
+  ],
+  "projections": "include",
+  "source_breaks": [
+   {
+    "from": "wb.wdi_econ.FP.CPI.TOTL.ZG",
+    "to": "imf.weo.PCPIPCH",
+    "from_year": 1979,
+    "year": 1980,
+    "overlap": null,
+    "note": "the answering series changes here: values on either side come from different sources (and possibly definitions); compare them only through the overlap year"
+   }
+  ],
+  "projection_years": [
+   2026,
+   2027,
+   2028,
+   2029,
+   2030,
+   2031
+  ],
+  "licences": [
+   {
+    "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+    "licence_url": null,
+    "attribution": "International Monetary Fund",
+    "commercial_use": "unknown",
+    "non_commercial": false,
+    "share_alike": false,
+    "no_derivatives": false,
+    "open_licence": null,
+    "restricted": false,
+    "basis": "table_artifact",
+    "restriction": null,
+    "required_notice": null,
+    "source": "imf"
+   },
+   {
+    "licence": "CC-BY-4.0 (per-series licence in the provider metadata; exceptions listed in the catalog)",
+    "licence_url": null,
+    "attribution": null,
+    "commercial_use": "permitted",
+    "non_commercial": false,
+    "share_alike": false,
+    "no_derivatives": false,
+    "open_licence": true,
+    "restricted": false,
+    "basis": "table_artifact",
+    "restriction": null,
+    "required_notice": null,
+    "source": "wb"
+   }
+  ]
+ },
+ "snapshot": {
+  "snapshot_sha256": "717e8452dc07da895570b0b46f5aa6e731b5320efdc29d2f711dbbabf8fcecfa",
+  "origin": "live",
+  "knowledge_cutoff": "2026-10-17T01:52:03.033222Z",
+  "tables": 221,
+  "rows": 93495663
+ },
+ "warnings": []
+}
