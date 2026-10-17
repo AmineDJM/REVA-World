@@ -31,7 +31,7 @@ from reva.effects import model as effects_model
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.effects_lit"
-CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (V6 EFFECTS-MORE): more publication hosts; 1.0.3: a refused document no longer aborts the run
+CONNECTOR_VERSION = "1.1.1"  # 1.1.1: re-registered after the FIX4B consistency rules changed reva.effects.model; 1.1.0 (V6 EFFECTS-MORE): more publication hosts; 1.0.3: a refused document no longer aborts the run
 PARSER_VERSION = "atlas_effects_lit/1"
 SOURCE_KEY = "effects.literature"
 ATLAS_SOURCE = "effects"

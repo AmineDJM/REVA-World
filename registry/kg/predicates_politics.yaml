@@ -1,0 +1,32 @@
+# Dataset predicates of the V6 politics layer (owner: V6POLITICS; connectors
+# src/reva/adapters/connectors/atlas_parlgov_kg.py and atlas_nelda.py register them through
+# reva.kg.model.register_properties, reading this file). Family mappings: registry/kg/relations_v4.d/v6politics.yaml.
+# Event types: registry/events/taxonomy.yaml (dataset kinds parlgov:election:, parlgov:cabinet:, nelda:election:).
+# Report: docs/dev/v6_politics.md.
+#
+# Entity keys: parlgov:party:<party_id> (kind political_party), parlgov:election:<election_id> (kind event),
+# parlgov:cabinet:<cabinet_id> (kind cabinet; its P580 is the day the cabinet took office) -- ParlGov 2024 ids;
+# nelda:election:<electionID> (kind event; NELDA's own 16-character id XXX-YYYY-MMDD-TR, one entity per round).
+# Countries: P17 -> the country QID (ISO3 -> registry/entities/country_qids.json for ParlGov; Gleditsch-Ward code
+# -> date-aware KGGEOPOL crosswalk for NELDA, else the gw:<code> entity). Dates: P585 (election day), P580 (cabinet
+# start). Values are the providers' own; nothing is causal; party results are not "wins" unless the source says so.
+predicates:
+  - {pid: "parlgov:party_result", value_kind: item, reva_predicate: parlgov_party_result, label_en: "result of a party in this election (ParlGov vote share and seats in qualifiers)", label_fr: "résultat d'un parti à cette élection (part des voix et sièges ParlGov en qualificatifs)"}
+  - {pid: "parlgov:cabinet_party", value_kind: item, reva_predicate: parlgov_cabinet_party, label_en: "party in the cabinet (ParlGov cabinet_party = 1)", label_fr: "parti membre du cabinet (ParlGov cabinet_party = 1)"}
+  - {pid: "parlgov:prime_minister_party", value_kind: item, reva_predicate: parlgov_prime_minister_party, label_en: "party of the prime minister (ParlGov prime_minister = 1)", label_fr: "parti du Premier ministre (ParlGov prime_minister = 1)"}
+  - {pid: "parlgov:after_election", value_kind: item, reva_predicate: parlgov_after_election, label_en: "cabinet formed in the parliament of this election (ParlGov election_id)", label_fr: "cabinet formé dans le parlement issu de cette élection (ParlGov election_id)"}
+  - {pid: "parlgov:previous_cabinet", value_kind: item, reva_predicate: parlgov_previous_cabinet, label_en: "previous cabinet (ParlGov previous_cabinet_id)", label_fr: "cabinet précédent (ParlGov previous_cabinet_id)"}
+  - {pid: "parlgov:previous_election", value_kind: item, reva_predicate: parlgov_previous_election, label_en: "previous national parliament election (ParlGov previous_parliament_election_id)", label_fr: "élection législative nationale précédente (ParlGov previous_parliament_election_id)"}
+  - {pid: "parlgov:election_type", value_kind: string, reva_predicate: parlgov_election_type, label_en: "ParlGov election type (parliament = national parliament, ep = European Parliament)", label_fr: "type d'élection ParlGov (parliament = parlement national, ep = Parlement européen)"}
+  - {pid: "parlgov:seats_total", value_kind: quantity, reva_predicate: parlgov_seats_total, label_en: "seats in the chamber at this election (ParlGov seats_total)", label_fr: "sièges de la chambre à cette élection (ParlGov seats_total)"}
+  - {pid: "parlgov:caretaker", value_kind: string, reva_predicate: parlgov_caretaker, label_en: "caretaker cabinet (ParlGov caretaker, 1 = yes, 0 = no)", label_fr: "cabinet intérimaire (ParlGov caretaker, 1 = oui, 0 = non)"}
+  - {pid: "parlgov:cabinet_name", value_kind: string, reva_predicate: parlgov_cabinet_name, label_en: "cabinet name as given by ParlGov", label_fr: "nom du cabinet selon ParlGov"}
+  - {pid: "parlgov:party_family", value_kind: string, reva_predicate: parlgov_party_family, label_en: "ParlGov party family (family_name, verbatim)", label_fr: "famille de partis ParlGov (family_name, tel quel)"}
+  - {pid: "parlgov:left_right", value_kind: quantity, reva_predicate: parlgov_left_right, label_en: "ParlGov left-right position (0 = left, 10 = right; mean of expert surveys per ParlGov)", label_fr: "position gauche-droite ParlGov (0 = gauche, 10 = droite ; moyenne d'enquêtes d'experts selon ParlGov)"}
+  - {pid: "parlgov:party_short_name", value_kind: string, reva_predicate: parlgov_party_short_name, label_en: "party short name (ParlGov party_name_short)", label_fr: "sigle du parti (ParlGov party_name_short)"}
+  - {pid: "parlgov:party_id", value_kind: external_id, reva_predicate: parlgov_party_id, label_en: "ParlGov party id", label_fr: "identifiant de parti ParlGov"}
+  - {pid: "parlgov:cmp_id", value_kind: external_id, reva_predicate: parlgov_cmp_id, label_en: "Manifesto Project (CMP) party id as given by ParlGov", label_fr: "identifiant de parti du Manifesto Project (CMP) selon ParlGov"}
+  - {pid: "nelda:election_type", value_kind: string, reva_predicate: nelda_election_type, label_en: "NELDA election type (Legislative/Parliamentary, Executive, Constituent Assembly; verbatim)", label_fr: "type d'élection NELDA (législative, exécutive, assemblée constituante ; tel quel)"}
+  - {pid: "nelda:round", value_kind: quantity, reva_predicate: nelda_round, label_en: "round of the election (last digit of the NELDA electionID)", label_fr: "tour de l'élection (dernier chiffre de l'electionID NELDA)"}
+  - {pid: "nelda:coded_answer", value_kind: string, reva_predicate: nelda_coded_answer, label_en: "NELDA coded answer (yes / no / unclear / N/A) to the question named in the qualifiers", label_fr: "réponse codée NELDA (yes / no / unclear / N/A) à la question nommée en qualificatif"}
+  - {pid: "nelda:gw_code", value_kind: external_id, reva_predicate: nelda_gw_code, label_en: "Gleditsch-Ward state code NELDA gives for the election (ccode)", label_fr: "code d'État Gleditsch-Ward donné par NELDA (ccode)"}

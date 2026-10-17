@@ -43,7 +43,12 @@ Honesty rules implemented here:
   series states its mapping (``FY(t/t+1) = CY(t)`` or ``FY(t-1/t) = CY(t)``) the cell keeps its true
   12-month window (e.g. India 2024 = ``[2024-04-01, 2025-04-01)``) with ``flags.period_basis =
   "fiscal_year"`` and ``flags.label_year`` = the WEO label (the atlas year view uses it); otherwise the
-  calendar label is kept and flagged ``fiscal_year_labelled_as_calendar`` (parser ``atlas_imf/2``).
+  calendar label is kept and flagged ``fiscal_year_labelled_as_calendar`` (parser ``atlas_imf/2``). A series
+  whose ``LATEST_ACTUAL_ANNUAL_DATA`` is a fiscal year (``FY…``) but whose group declares no reporting months
+  (WEO CPI, unemployment, current account, trade volumes of fiscal-year economies) takes the months the same
+  country's GDP series declares (``flags.reporting_year_from``), else is flagged
+  ``fiscal_year_labelled_as_calendar``: a fiscal year is never presented as a calendar year (parser
+  ``atlas_imf/3``, FIX4B, audit AUDIT3 M7).
 * Non-WEO datasets: ``DERIVATION_TYPE`` (SP = staff projection, SE* = staff estimate…) and ``STATUS``
   (F forecast, E/e estimate, P provisional, B break…) are carried in flags; SP/F become
   ``estimate_kind = "projection"``, staff estimates/E ``"estimate"``.
@@ -82,8 +87,8 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.imf"
-CONNECTOR_VERSION = "1.2.0"  # 1.1.0: atlas source platform (metered run.get); 1.2.0: WEO fiscal-year windows
-PARSER_VERSION = "atlas_imf/2"  # /2: WEO fiscal-year cells keep their true window (ATLAS-4)
+CONNECTOR_VERSION = "1.3.0"  # 1.1.0: atlas source platform (metered run.get); 1.2.0: WEO fiscal-year windows; 1.3.0: FY series without reporting months (FIX4B)
+PARSER_VERSION = "atlas_imf/3"  # /2: WEO fiscal-year cells keep their true window (ATLAS-4); /3: FIX4B (M7)
 SOURCE = "imf"
 SOURCE_KEY = "imf.sdmx"
 HOST = "api.imf.org"
@@ -519,6 +524,27 @@ def weo_fiscal_window(months: str | None, methodology_notes: str | None) -> tupl
     return 1, 0, "fiscal_year_labelled_as_calendar"
 
 
+#: Series whose ``START_END_MONTHS_OF_REPORTING_YEAR`` stands for the country's WEO reporting year, in order.
+_REPORTING_YEAR_PREFERENCE = ("NGDP_RPCH", "NGDP_R", "NGDP", "NGDPD")
+
+
+def weo_country_reporting_years(
+    cgroups: Mapping[tuple[str | None, str | None], Mapping[str, str]],
+) -> dict[str, tuple[str, str]]:
+    """Country -> (reporting months, ``"<COUNTRY>.<INDICATOR>"`` they were read from), from the WEO groups that
+    declare a non-calendar ``START_END_MONTHS_OF_REPORTING_YEAR`` (GDP series first, then any other)."""
+    out: dict[str, tuple[str, str]] = {}
+    by_country: dict[str, dict[str, str]] = {}
+    for (geo, code), g in cgroups.items():
+        m = g.get("START_END_MONTHS_OF_REPORTING_YEAR")
+        if geo and code and m and m != "January/December":
+            by_country.setdefault(geo, {})[code] = m
+    for geo, codes in by_country.items():
+        pick = next((c for c in _REPORTING_YEAR_PREFERENCE if c in codes), None) or sorted(codes)[0]
+        out[geo] = (codes[pick], f"{geo}.{pick}")
+    return out
+
+
 def _year(tp: str | None) -> int | None:
     if tp and re.fullmatch(r"\d{4}", tp):
         return int(tp)
@@ -641,6 +667,7 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
         if (unit == "PT" and not want.startswith("%")) or (unit == "USD" and "US dollars" not in want):
             raise SdmxError(f"WEO {code}: declared UNIT {unit} does not match the catalogued unit {want!r}")
     cgroups = {(g.get("COUNTRY"), g.get("INDICATOR")): g for g in msg.groups if "COUNTRY" in g}
+    country_months = weo_country_reporting_years(cgroups)
     cols = _Columns()
     boundary_rules: dict[str, int] = {}
     for sattrs, obs in msg.series:
@@ -664,6 +691,14 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
             rule = f"{rule}_ngdp_inherited" if fallback is not None else f"{rule}_publication_year"
         boundary_rules[rule] = boundary_rules.get(rule, 0) + 1
         months = g.get("START_END_MONTHS_OF_REPORTING_YEAR")
+        months_from: str | None = None
+        if not months and str(latest or "").startswith("FY"):
+            # FIX4B (audit AUDIT3 M7): the series' own LATEST_ACTUAL_ANNUAL_DATA says it is on a fiscal-year
+            # basis but its group carries no reporting months; take them from the same country's series that
+            # declares them (the WEO's own metadata, by country code) -- never present a fiscal year as calendar.
+            months, months_from = country_months.get(geo, (None, None))
+            if not months:
+                months = "unknown"
         fy_month, fy_offset, basis = weo_fiscal_window(months, g.get("METHODOLOGY_NOTES"))
         skey = f"{geo}.{code}.A"
         for o in obs:
@@ -696,6 +731,7 @@ def parse_weo(msg: SdmxMessage, raw_sha256: str, item_key: str = "weo") -> tuple
                     "estimate_kind": kind,
                     "display_scale": sattrs.get("SCALE"),
                     "reporting_year": months if months and months != "January/December" else None,
+                    "reporting_year_from": months_from,
                     "period_basis": basis,
                     "label_year": y if basis else None,  # the WEO's own year label (the atlas year view)
                 }

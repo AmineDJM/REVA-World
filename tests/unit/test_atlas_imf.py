@@ -330,3 +330,29 @@ def test_fixture_manifest_is_complete_and_offline():
     run = AtlasRun.offline(m.atlas_source(), FixtureHttp(m.CONNECTOR_NAME))
     with pytest.raises(SourceResponseError):  # an unrecorded request never reaches the network
         asyncio.run(m.fetch(m.flow_queries(("ZZZ",))[0].fetch_item(), run))
+
+
+def test_weo_fiscal_series_without_reporting_months_keep_the_fiscal_basis(weo):
+    """FIX4B (audit AUDIT3 M7): a fiscal-year (FY…) series never ends up on calendar years."""
+    df, _, _ = weo
+    fy = df.filter(pl.col("flags").str.json_path_match("$.latest_actual").str.starts_with("FY"))
+    assert fy.height > 0
+    basis = fy["flags"].str.json_path_match("$.period_basis")
+    assert basis.null_count() == 0  # fiscal_year (true window) or fiscal_year_labelled_as_calendar, never plain
+    inherited = fy.filter(pl.col("flags").str.json_path_match("$.reporting_year_from").is_not_null())
+    for r in inherited.iter_rows(named=True):
+        f = json.loads(r["flags"])
+        assert f["reporting_year_from"].startswith(r["provider_geo"] + ".")
+        if f["period_basis"] == "fiscal_year":
+            assert r["period_start"].month != 1
+
+
+def test_weo_country_reporting_years_prefer_gdp_series():
+    groups = {
+        ("EGY", "PCPIPCH"): {"LATEST_ACTUAL_ANNUAL_DATA": "FY2025/26"},
+        ("EGY", "BCA"): {"START_END_MONTHS_OF_REPORTING_YEAR": "July/June"},
+        ("EGY", "NGDP_RPCH"): {"START_END_MONTHS_OF_REPORTING_YEAR": "July/June"},
+        ("FRA", "NGDP_RPCH"): {"START_END_MONTHS_OF_REPORTING_YEAR": "January/December"},
+    }
+    assert m.weo_country_reporting_years(groups) == {"EGY": ("July/June", "EGY.NGDP_RPCH")}
+    assert m.weo_fiscal_window("unknown", "FY(t/t+1) = CY(t)")[2] == "fiscal_year_labelled_as_calendar"
