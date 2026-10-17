@@ -6,6 +6,7 @@ table version -> resolution and WIS scores.
 
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import date, timedelta
 from typing import Any
@@ -37,8 +38,8 @@ def _rows(db: Any, sql: str, **kw: Any) -> list[Any]:
         return list(c.execute(text(sql), kw).all())
 
 
-async def test_health_registry_end_to_end(db: Any) -> None:
-    out = {n: await _ingest(db, n) for n in SOURCES}
+def test_health_registry_end_to_end(db: Any) -> None:
+    out = {n: asyncio.run(_ingest(db, n)) for n in SOURCES}
     hub = out["atlas.cdc_flusight"]["summary"]
     assert set(hub) == {"flusight_target", "flusight_vintages", "flusight_ensemble"}
     assert hub["flusight_target"]["atlas"]["unmapped_provider_geo"]  # states stay unmapped; US -> USA
