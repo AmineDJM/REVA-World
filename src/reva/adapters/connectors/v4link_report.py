@@ -54,7 +54,7 @@ EXAMPLES: tuple[tuple[str, str, tuple[str, ...] | None, int, str], ...] = (
     ("iso3166_2:DE-BY", "nuts:DE2", (P_WIKIDATA_ITEM,), 2, "Bavaria: ISO 3166-2 DE-BY = item = NUTS DE2"),
     ("iso3166_2:DE-BY", "Q183", (P_WIKIDATA_ITEM, "P17"), 2, "ADM1 Bavaria located in Germany (best-rank P17)"),
     ("iso3166_2:SA-04", "Q851", (P_WIKIDATA_ITEM, "P17"), 2, "ADM1 (Eastern Province) located in Saudi Arabia"),
-    ("chebi:15377", "pubchem_cid:962", (P_WIKIDATA_ITEM,), 2, "water: ChEBI = Wikidata item = PubChem CID"),
+    ("chebi:15377", "pubchem:cid:962", (P_WIKIDATA_ITEM,), 2, "water: ChEBI = Wikidata item = PubChem CID"),
     ("gbif:2436436", "ncbitaxon:9606", (P_WIKIDATA_ITEM,), 2, "Homo sapiens: GBIF key = item = NCBI taxon"),
     ("icd10:E11", "mondo:0005148", (P_WIKIDATA_ITEM,), 2, "type 2 diabetes: ICD-10 = item = MONDO"),
     ("lei:HWUPKR0MPOU8FGXBT394", "sec_cik:320193", (P_WIKIDATA_ITEM,), 2, "Apple Inc.: LEI = item = SEC CIK"),

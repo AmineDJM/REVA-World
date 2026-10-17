@@ -44,7 +44,7 @@ from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.v4link_wikidata"
 QL_NAME = "atlas.v4link_qlever"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 PARSER_VERSION = "atlas_v4link_wikidata/1"
 SOURCE_KEY = "wikidata.wdqs"
 ATLAS_SOURCE = "v4link"

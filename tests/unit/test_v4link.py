@@ -122,9 +122,9 @@ def test_derive_bridges_ambiguity_rank_and_format() -> None:
         _h("Q5", "P683", "abc"),  # malformed
         _h("Q6", "P662", "777"),
     ]
-    br = common.derive_bridges(rows, rules, global_duplicates={"P662": {"pubchem_cid:777"}})
+    br = common.derive_bridges(rows, rules, global_duplicates={"P662": {"pubchem:cid:777"}})
     linked = {(h.item, k) for h, k in br.links}
-    assert linked == {("Q283", "chebi:15377"), ("Q283", "pubchem_cid:962"), ("Q4", "chebi:300")}
+    assert linked == {("Q283", "chebi:15377"), ("Q283", "pubchem:cid:962"), ("Q4", "chebi:300")}
     p683 = br.report["by_property"]["P683"]
     assert p683["ambiguous_value"] == 2 and p683["ambiguous_holder"] == 2 and p683["malformed"] == 1
     assert br.report["by_property"]["P662"]["ambiguous_value"] == 1  # held elsewhere in Wikidata

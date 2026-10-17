@@ -259,8 +259,8 @@ def load_rules(path: Path = RULES_PATH) -> Rules:
             raise ValueError(f"{path}: {pid}: relation must be one of {RELATIONS}")
         if r.get("normalize") and r["normalize"] not in NORMALIZERS:
             raise ValueError(f"{path}: {pid}: unknown normalizer {r['normalize']}")
-        if not re.match(r"^[a-z][a-z0-9_]{1,31}:$", str(r["prefix"])):
-            raise ValueError(f"{path}: {pid}: prefix must look like 'scheme:'")
+        if not re.match(r"^[a-z][a-z0-9_]{1,31}:([a-z][a-z0-9_]{0,31}:)?$", str(r["prefix"])):
+            raise ValueError(f"{path}: {pid}: prefix must look like 'scheme:' or 'scheme:sub:'")
         if r["relation"] == "identity" and not (r.get("one_value_per_holder", True) and r.get("max_items_per_value")):
             raise ValueError(f"{path}: {pid}: an identity rule needs one_value_per_holder and max_items_per_value")
         rules[pid] = Rule(

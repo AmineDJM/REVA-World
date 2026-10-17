@@ -5,7 +5,7 @@
 # community-edited): an item holding identifier A (e.g. ChEBI 15377) is linked to that identifier by the statement
 #     chebi:15377 --v4link:wikidata_item--> Q283
 # and an item holding two identifiers (ChEBI 15377 and PubChem CID 962) is the evidence that the two
-# identifiers name the same thing: chebi:15377 -> Q283 <- pubchem_cid:962 (two identity hops through the item).
+# identifiers name the same thing: chebi:15377 -> Q283 <- pubchem:cid:962 (two identity hops through the item).
 # Never by name or label similarity, never by date. Same machinery as the event same_as rules
 # (registry/events/same_as_rules.yaml), applied to non-event entities:
 #   * `max_items_per_value: 1` -- a value held by several Wikidata items is AMBIGUOUS (reported, never linked):
@@ -24,7 +24,7 @@
 # they load it. If an owner keys its entities differently, change `prefix`/`normalize` here (one place) and
 # re-run `uv run reva atlas ingest atlas.v4link_wikidata`: the old statements are retracted, the new ones loaded.
 #
-# Changelog: 1 (2026-10-17, V4LINK) first rules.
+# Changelog: 1 (2026-10-17, V4LINK) first rules; PubChem prefix aligned on V4CHEM's entity keys (pubchem:cid:<CID>).
 version: 1
 packs:
   # One WDQS query per pack (budget key wikidata.wdqs). `require_two` = the item must hold values of at least two
@@ -100,7 +100,7 @@ rules:
      normalize: strip_prefix_uberon, value_re: "^[0-9]{7}$", one_value_per_holder: true, max_items_per_value: 1}
   - {property: P683, label: "ChEBI ID", prefix: "chebi:", relation: identity, kind_hint: compound,
      normalize: strip_prefix_chebi, value_re: "^[0-9]{1,7}$", one_value_per_holder: true, max_items_per_value: 1}
-  - {property: P662, label: "PubChem CID", prefix: "pubchem_cid:", relation: identity, kind_hint: compound,
+  - {property: P662, label: "PubChem CID", prefix: "pubchem:cid:", relation: identity, kind_hint: compound,
      value_re: "^[1-9][0-9]{0,11}$", one_value_per_holder: true, max_items_per_value: 1}
   - property: P846
     label: "GBIF taxon key (legacy backbone, Wikidata 'GBIF-species-ID (before 2026 update)')"
