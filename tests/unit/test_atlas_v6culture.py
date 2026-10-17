@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
@@ -209,13 +210,17 @@ def test_wikidata_specs_valid_and_pending_properties_requested() -> None:
     allow = load_allowlist()
     specs = hv.discover_specs([REPO / "registry/kg/queries/culture/v6"])
     known = [s.id for s in hv.discover_specs()]
-    assert len(specs) == 6 and len(known) == len(set(known))
+    assert len(specs) == 5 and len(known) == len(set(known))
     for s in specs:
         assert s.data["owner"] == "V6CULTURE" and s.id.startswith("culture.v6_")
         assert not list(validator.iter_errors(s.data)), s.id
-        for msg in hv.validate_spec(s, allow, known_ids=known):
-            assert "allow-listed" in msg, (s.id, msg)
-            assert any(t in requested for t in msg.replace(":", " ").split()), (s.id, msg)
+        assert hv.validate_spec(s, allow, known_ids=known) == [], s.id
+        pending = (
+            re.findall(r"P[0-9]+", s.path.read_text().split("# Pending allow-listing", 1)[-1])
+            if "# Pending" in s.path.read_text()
+            else []
+        )
+        assert set(pending) <= requested, (s.id, pending)
         assert "LIMIT" not in s.data["sparql"].upper() and "wikibase:label" not in s.data["sparql"]
     # bounded by construction: seeds + open-subject statement specs stay well under 100k entities
     assert sum(s.data["max_rows"] for s in specs) <= 100_000

@@ -25,4 +25,6 @@ split:
 max_rows: 20000
 timeout_seconds: 55
 expand_hops: 1
-properties: [P31, P27, P19, P20, P569, P570, P106, P136, P264, P166, P1411, P1412, P434, P463, P135, P737, P800]
+properties: [P31, P27, P19, P20, P569, P570, P106, P166, P1412, P463, P135, P737, P800]
+# Pending allow-listing (registry/kg/property_requests/v6culture.yaml); add back to `properties` after the
+# WDOPS merge: [P136, P264, P1411, P434]

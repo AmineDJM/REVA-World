@@ -17,7 +17,9 @@ sparql: |
   }
 max_rows: 8000
 expand_hops: 1
-properties: [P31, P17, P131, P625, P571, P1174, P1435, P127, P112]
+properties: [P31, P17, P131, P625, P571, P1435, P127, P112]
 notes: >-
   Visitors per year (P1174) are reported figures with a point-in-time qualifier; values from different years or
   references are never compared silently.
+# Pending allow-listing (registry/kg/property_requests/v6culture.yaml); add back to `properties` after the
+# WDOPS merge: [P1174]

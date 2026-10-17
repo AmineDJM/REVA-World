@@ -17,4 +17,6 @@ sparql: |
   }
 max_rows: 6000
 expand_hops: 1
-properties: [P31, P495, P740, P571, P576, P136, P264, P166, P1411, P434, P527, P737]
+properties: [P31, P495, P740, P571, P576, P166, P527, P737]
+# Pending allow-listing (registry/kg/property_requests/v6culture.yaml); add back to `properties` after the
+# WDOPS merge: [P136, P264, P1411, P434]

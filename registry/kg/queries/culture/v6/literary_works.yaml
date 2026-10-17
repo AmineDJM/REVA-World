@@ -20,4 +20,6 @@ sparql: |
 split: {by: qid_prefix, variable: item}
 max_rows: 10000
 expand_hops: 1
-properties: [P31, P50, P577, P571, P495, P407, P136, P166, P648, P921, P840, P144, P135]
+properties: [P31, P50, P577, P571, P495, P407, P166, P921, P144, P135]
+# Pending allow-listing (registry/kg/property_requests/v6culture.yaml); add back to `properties` after the
+# WDOPS merge: [P136, P648, P840]

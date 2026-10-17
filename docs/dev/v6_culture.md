@@ -12,7 +12,7 @@ specs + property requests + relation families handed to WDOPS; live runs queued 
 | `registry/sources/musicbrainz_stats.yaml`, `registry/sources/openlibrary.yaml` | source entries (rights, hosts, definitions, what is not used) |
 | `registry/atlas/catalog/culture_media.yaml` | 5 provider-declared concepts (theme `culture`) for the MusicBrainz per-country counts |
 | `registry/atlas/budget_requests/v6culture.yaml` | `musicbrainz.stats` 4/day, `openlibrary.api` 500/day (merged: `budgets-1.3.29`, digest pinned in `policy.py`) |
-| `registry/kg/queries/culture/v6/*.yaml` | 6 Wikidata specs (owner V6CULTURE, ids `culture.v6_*`) for WDOPS |
+| `registry/kg/queries/culture/v6/*.yaml` | 5 Wikidata specs (owner V6CULTURE, ids `culture.v6_*`) for WDOPS |
 | `registry/kg/property_requests/v6culture.yaml` | 16 properties to allow-list (P57, P58, P86, P136, P364, P1411, P2047, P2130, P2142, P272, P840, P345, P434, P648, P264, P1174) |
 | `registry/kg/relations_v4.d/v6culture.yaml` | relation families of the culture predicates (none causal) |
 | `tests/unit/test_atlas_v6culture.py` (14), `tests/integration/test_atlas_v6culture_ingest.py` (2, `db`) | parsers, flags, layout drift, KG records, specs, families; fixture ingest + idempotent re-run |
@@ -91,7 +91,7 @@ never parsed). Redirect records are not entities. Biographies, photos and covers
 Examples (fixture, throwaway DB): `openlibrary:OL28294A` "Publius Vergilius Maro" —has_works_in_subject (335)→
 `openlibrary:subject.poetry`; OL28294A —wikidata_id→ "Q1398" (Virgil), viaf 8194433, birth "15 October 70 BCE".
 `openlibrary:OL79796A` "Brazil" (a corporate author: 1,730 works in place:Brazil) —wikidata_id→ "Q155" — the
-identifier Open Library publishes; REVA merges nothing. With WDOPS's `culture.v6_openlibrary_author_ids` (P648 on
+identifier Open Library publishes; REVA merges nothing. With a P648 statements spec (held back until P648 is allow-listed; P648 on
 Wikidata people) the two directions of the bridge are both source statements; V4LINK's identity rules can then
 link them (never by name).
 
@@ -103,14 +103,16 @@ link them (never by name).
 | `culture.v6_literary_works` | seed | literary work, novel, poem, play, short story, epic poem; ≥ 30 sitelinks | 10,000 |
 | `culture.v6_music_artists` | seed | humans, P106 ∈ 10 music occupations, with P434 (MusicBrainz id), ≥ 40 sitelinks | 20,000 |
 | `culture.v6_musical_groups` | seed | musical group / rock band / ensemble / duo with P434, ≥ 30 sitelinks | 6,000 |
-| `culture.v6_openlibrary_author_ids` | statements (P648) | humans ≥ 40 sitelinks carrying an Open Library id | 30,000 |
 | `culture.v6_museums` | seed | museum / art / science / national / history museum, art gallery; ≥ 20 sitelinks | 8,000 |
 
 Properties kept: films P495 P577 P57 P58 P86 P136 P364 P166 P1411 P2047 P2130 P2142 P272 P840 P921 P144 P345;
 works P50 P577 P571 P495 P407 P136 P166 P648 P921 P840 P144 P135; artists P27 P19 P20 P569 P570 P106 P136 P264
 P166 P1411 P1412 P434 P463 P135 P737 P800; groups P495 P740 P571 P576 P136 P264 P166 P1411 P434 P527 P737; museums
-P17 P131 P625 P571 P1174 P1435 P127 P112. 16 of them await allow-listing (`property_requests/v6culture.yaml`); the
-harvester validator reports only those (test `test_wikidata_specs_valid_and_pending_properties_requested`).
+P17 P131 P625 P571 P1174 P1435 P127 P112. 16 of them await allow-listing (`property_requests/v6culture.yaml`): until WDOPS merges them, each spec's
+`properties` keeps only allow-listed ids and lists the pending ones in a trailing comment, so `python -m reva.kg.harvest
+validate registry/kg/queries/culture/v6` passes (5/5). The P648 statements spec (Open Library ids of humans ≥ 40
+sitelinks, `max_rows` 30,000) is held back until P648 is allow-listed; its SPARQL is in git history (commit before
+this one) for WDOPS to restore.
 Box office / cost / visitors are reported figures with units and point-in-time qualifiers: never converted, summed
 or compared across dates by the harvest.
 
@@ -122,7 +124,7 @@ formation. `context`: P136 genre, P364 original language, P407 language of work,
 the story is set — never a production place), P144 based on, P166 award, P1411 nomination, P264 record label,
 `openlibrary:has_works_in_subject`. None is causal.
 
-Path shapes once WDOPS has harvested (shapes only, no harvested example yet): film —P495→ country; film —P57→ director —P27→ country; film —P364→ language ←P37— country (KGCULT); film —P272→ company (V4INDUSTRY). Book side, already loadable: `openlibrary:OL28294A` —`openlibrary:wikidata_id`→ "Q1398" and (spec 5) Q1398 —P648→ "OL28294A": two published identifiers, one hop each.
+Path shapes once WDOPS has harvested (shapes only, no harvested example yet): film —P495→ country; film —P57→ director —P27→ country; film —P364→ language ←P37— country (KGCULT); film —P272→ company (V4INDUSTRY). Book side, already loadable: `openlibrary:OL28294A` —`openlibrary:wikidata_id`→ "Q1398" and, once P648 is allow-listed, Q1398 —P648→ "OL28294A": two published identifiers, one hop each.
 
 ## 4. Missing, and why
 

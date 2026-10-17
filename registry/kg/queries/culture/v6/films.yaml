@@ -21,9 +21,11 @@ sparql: |
 split: {by: qid_prefix, variable: item}
 max_rows: 15000
 expand_hops: 1
-properties: [P31, P495, P577, P57, P58, P86, P136, P364, P166, P1411, P2047, P2130, P2142, P272, P840, P921, P144, P345]
+properties: [P31, P495, P577, P166, P921, P144]
 notes: >-
   Box office (P2142) and cost (P2130) are figures with currency units and point-in-time / place qualifiers: kept as
   stated, never converted or summed by the harvest. IMDb ID (P345) is a join key only; IMDb data itself is not
   loaded (non-commercial terms). Counts of films per country of origin and year would be a REVA aggregation over
   community-edited data: not an atlas table here (see docs/dev/v6_culture.md, hand-off to WDOPS).
+# Pending allow-listing (registry/kg/property_requests/v6culture.yaml); add back to `properties` after the
+# WDOPS merge: [P57, P58, P86, P136, P364, P1411, P2047, P2130, P2142, P272, P840, P345]
