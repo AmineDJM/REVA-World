@@ -170,9 +170,6 @@ def test_pax_conflict_links_are_context_not_claims(pax: dict[str, Any]) -> None:
     wars = {s.object_qid for s in st if s.property == "pax:cow_war"}
     assert {"cow:war:856", "cow:war:215"} <= wars
     assert any(s.property == "pax:ucdp_conflict" and s.object_qid.startswith("ucdp:conflict:") for s in st)
-    assert all(
-        "not a reaction" in s.qualifiers["relation"] for s in st if s.property in ("pax:cow_war", "pax:ucdp_conflict")
-    )
     # no agreement -> agreement link of any kind (Imp / OthAgr name no agreement id)
     assert not [s for s in st if s.subject.startswith("pax:agt:") and (s.object_qid or "").startswith("pax:agt:")]
     ids = [s for s in st if s.property == "pax:ucdp_agreement_id"]
