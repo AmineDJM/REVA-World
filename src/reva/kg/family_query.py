@@ -90,14 +90,38 @@ def rights_for(conn: Connection, rows: Iterable[Mapping[str, Any]]) -> dict[str,
             ).mappings()
         }
         for sha in need:
-            out[sha] = normalise_rights(got.get(sha), basis="raw_artifact_rights") if got.get(sha) else None
+            raw = got.get(sha)
+            out[sha] = normalise_rights(raw, basis="raw_artifact_rights") if raw else None
+            if out[sha] is not None and isinstance(raw, Mapping) and raw.get("source_key"):
+                out[sha] = {**out[sha], "recorded_for_source_key": str(raw["source_key"])}  # type: ignore[dict-item]
     return out
 
 
+def _statement_licence(r: Mapping[str, Any]) -> str | None:
+    refs = r.get("refs")
+    for ref in refs if isinstance(refs, list) else []:
+        if isinstance(ref, Mapping) and isinstance(ref.get("licence"), str) and ref["licence"].strip():
+            if not ref.get("raw_sha256") or ref.get("raw_sha256") == r.get("raw_sha256"):
+                return str(ref["licence"])
+    return None
+
+
 def _rights(r: Mapping[str, Any], by_sha: Mapping[str, dict[str, Any] | None]) -> dict[str, Any] | None:
+    """Rights of one statement: the raw artifact's recorded rights, except when that artifact was recorded for
+    *another* source (one connector run fetched two providers' files, e.g. Natural Earth admin-1 polygons archived
+    by the GHCN-M run under NOAA's terms, AUDIT3 L2): then the licence the statement's own reference states."""
     if kq.is_community_edited(r.get("source_key")):
         return dict(WIKIDATA_RIGHTS)
-    return by_sha.get(str(r.get("raw_sha256")))
+    art = by_sha.get(str(r.get("raw_sha256")))
+    rec = (art or {}).get("recorded_for_source_key")
+    own = _statement_licence(r)
+    if own and rec and r.get("source_key") and rec != r.get("source_key"):
+        from reva.atlas.snapshot import normalise_rights
+
+        fixed = normalise_rights({"licence": own}, basis="statement_reference")
+        if fixed is not None:
+            return {**fixed, "artifact_recorded_for_source_key": rec}
+    return art
 
 
 # ---------------------------------------------------------------------------------------------- families
