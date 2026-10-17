@@ -56,7 +56,36 @@ next run).
 
 ## Results per spec
 
-RESULTS_TABLE
+### Priority 1 — causal queue (`reva_kg_causwd`)
+
+| | |
+|---|---|
+| session | `kgcauswd-20261017T164718-de8df9`, 16:47–18:25 UTC, `--share 0.7` (cap 1,806 of the day's 2,581 remaining wbapi) |
+| stop | `budget:in_run_requests_limit` — the shared ledger reached the 4,000/day `wikidata.wbapi` budget (1,090 CAUSWD requests + spec runs + other agents earlier in the day) |
+| entities fetched | 1,406 → **3,086** (+1,680); the whole APIFIX queue (tiers 1–3: 659 claim endpoints incl. **Q8698 Great Depression**, 15 qualifier items, 467 places) is fetched; 10,172 discovery/listing items (tiers 4–8) remain |
+| causal statements seen | 1,675 → **2,997** |
+| import into `reva` (22:14 UTC) | 1,055 loads seen, 772 imported (260 already imported, 23 `wikidata.wdqs` row loads skipped by design); 1,652 raw objects copied; entities 1,662 inserted / 676 unchanged / 461 conflicting (same revision, other kind) / 25 stale; statements **10,678 inserted**, 7,159 unchanged; verification 24,528 identical / 3 differing (newer allow-list adds ISBN refs, as before) / 0 missing |
+| `reva causal refresh --origin live` | 2,986 Wikidata claims scanned, **1,314 new**, 1,672 unchanged; 352 endpoints still without a KG entity (385 claims); grading over all 62,994 live claims: B 59,198 · C 221 · D 3,502 · E 73 |
+| example | Great Depression `Q8698` → P828 *has cause* → Wall Street crash of 1929 `Q201684` (statement on Q8698, rev 2553658571, unreferenced) |
+
+### Priority 3 — V4 specs
+
+| spec / pack | path | rows | entities | statements | imported into `reva` | throttled / notes |
+|---|---|---:|---:|---:|---|---|
+| `science.chemical_elements` | harvest (EntityData) | 174 seeds | 274 (+ labels) | 3,562 | yes: 3,562 identical, harvest DB dropped | stopped by the wbapi day budget before the last batches (resumes) |
+| `science.chem_petroleum_composition` | WDQS | — | — | — | — | WDQS `wdqs_timeout` (the `?prop wikibase:claim` join over `P279*`): moved to QLever pack `chem_petroleum` |
+| `science.chem_element_discovery`, `chem_compound_identifiers` | harvest | — | — | — | — | not reached (dependency / budget) |
+| `geography.ecology.main_food_source` → pack `eco_food` | QLever | 2,372 | 1,516 new | **2,326** P1034 (783 taxa → 891 food items; 2 deprecated, 1 non-item dropped) | yes (direct atlas load) | — |
+| packs `eco_host, chem_petroleum, chem_elements, chem_materials, health_treat` | QLever | — | — | — | — | **HTTP 429 from qlever.dev** (22:10 UTC); queued again after 00:05 UTC |
+
+### V4LINK bridge packs via QLever (`atlas.v4link_qlever`)
+
+| pack | rows | items | statements inserted | entities new | ambiguity (never linked) |
+|---|---:|---:|---:|---:|---|
+| companies (P1278 LEI + P5531 CIK) | 4,510 | 2,164 | 4,078 | 2,134 | P1278: 2,018 linked, 203 ambiguous holders, 47 ambiguous values |
+| health (ICD-10/11, MONDO, DOID) | 43,896 | 16,951 | 36,250 | 16,774 | P494: 1,577 linked, 1,344 ambiguous values, 913 ambiguous holders, 52 malformed (e.g. `C83.783.7`) |
+| anatomy (P1554 UBERON) | 6,462 | 6,370 | 6,142 | 4,873 | 140 ambiguous values, 177 ambiguous holders, 2 malformed |
+| chemistry, genes, taxa | — | — | — | — | refused by the `qlever.wikidata` budget (43 requests reserved per run, 18 used + 43 > 60): queued after 00:05 UTC |
 
 ## Conditions (throttling, budget, disk)
 
