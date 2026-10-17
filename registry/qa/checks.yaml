@@ -141,9 +141,11 @@ time:
     _q: [90, 92]
     _a: [365, 366]
   # Tables of scheduled future events (dates announced in advance, no value observed): not future observations.
-  future_ok_tables: [cbcal.meetings]
+  # untc.treaty_status: the date a notified withdrawal / entry into force takes effect (FIX5; also exempt from the
+  # period-after-record rule in registry/atlas/projection_kinds.yaml).
+  future_ok_tables: [cbcal.meetings, untc.treaty_status]
   # estimate_kind / flag words that mean "not observed" but are not in the atlas projection rule
-  # (reva.atlas.query.PROJECTION_SQL): such cells escape every observation filter.
+  # (reva.atlas.projection, registry/atlas/projection_kinds.yaml): such cells escape every observation filter.
   projection_word_regex: '(?i)(forecast|project|predict|outlook|scenario|nowcast)'
   # KG predicates whose values are legitimately future dates (scheduled expiries, planned end dates).
   kg_future_ok_predicates: [eusanctionsmap:expires, P582, P3001]
