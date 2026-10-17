@@ -389,8 +389,8 @@ def kg_records(
             if v[col]:
                 add(col.lower(), prop, value=_s(v[col]))
         if v["Description"]:
-            q = {"truncated": True} if len(v["Description"]) > 4000 else {}
-            add("description", "ifpri_er:description", value=_s(v["Description"]), qualifiers=q)
+            dq: dict[str, Any] = {"truncated": True} if len(v["Description"]) > 4000 else {}
+            add("description", "ifpri_er:description", value=_s(v["Description"]), qualifiers=dq)
         for col in ("Source", "Source2"):
             for i, url in enumerate(u.strip() for u in v[col].split(";") if u.strip()):
                 add(f"{col.lower()}:{i}", "ifpri_er:source_url", value=_s(url), qualifiers={"column": col})
@@ -399,14 +399,14 @@ def kg_records(
             ok, bad = hs_codes(m)
             stats["hs_malformed"] += len(bad)
             for code, pad in ok:
-                q: dict[str, Any] = {
+                hq: dict[str, Any] = {
                     "hs_code_as_stated": code if pad is None else code[1:],
                     "hs_version_basis": HS_VERSION_BASIS,
                 }
                 if pad:
-                    q["hs_code_repair"] = pad
+                    hq["hs_code_repair"] = pad
                     stats["hs_zero_padded"] += 1
-                add(f"hs:{code}", "ifpri_er:covers_hs_heading", object_qid=f"hs2017:{code}", qualifiers=q)
+                add(f"hs:{code}", "ifpri_er:covers_hs_heading", object_qid=f"hs2017:{code}", qualifiers=hq)
                 stats["hs_links"] += 1
     stats["entities"] = len(ents)
     stats["statements"] = len(sts)

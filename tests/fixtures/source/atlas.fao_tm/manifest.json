@@ -1,0 +1,10 @@
+{
+ "kind": "byte_range_archive",
+ "url": "https://bulks-faostat.fao.org/production/Trade_DetailedTradeMatrix_E_Asia.zip",
+ "file": "Trade_DetailedTradeMatrix_E_Asia_excerpt.zip",
+ "sha256": "bf080dbd5f5862409a2c643bc986c6e7992c766fb237516c6040bf3047d251ab",
+ "etag": "\"5b3d2d1901bf634a1fcf25202a45e774-14\"",
+ "retrieved_at": "2026-10-17T20:30:00+00:00",
+ "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+ "excerpt": "A small zip REBUILT for tests: member Trade_DetailedTradeMatrix_E_Asia.csv = the header and the first 1,500 data lines (verbatim bytes, CRLF kept) of the real wide member, inflated from the first 1,000,001 bytes of the 112,506,471-byte regional archive retrieved 2026-10-17 by byte range (ETag 5b3d2d1901bf634a1fcf25202a45e774-14, Last-Modified 23 Dec 2025); the five code-list members are the real ones from the archive tail (CRC-checked). The _NOFLAG member is not included. Served by byte range (reva.atlas.ingest.ArchiveRangeFixtureHttp)."
+}
