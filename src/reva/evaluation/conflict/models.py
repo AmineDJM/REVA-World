@@ -72,18 +72,7 @@ BASELINE_KEYS = ("forecast.conflict_persistence", "forecast.conflict_base_rate",
 CANDIDATE_KEYS = ("forecast.conflict_kg_logit",)
 VIEWS_KEY = "forecast.reference_views"
 HIST_FEATURES = ("d0", "d1", "dh", "inc0", "war0", "decay", "frac10")
-KG_FEATURES = HIST_FEATURES + (
-    "nb_ln",
-    "nb_inc",
-    "poly",
-    "dpoly",
-    "clphy",
-    "lgdppc",
-    "growth",
-    "shock",
-    "lpop",
-    "imr",
-)
+KG_FEATURES = (*HIST_FEATURES, "nb_ln", "nb_inc", "poly", "dpoly", "clphy", "lgdppc", "growth", "shock", "lpop", "imr")
 BINS = ((0.0, 0.0), (1.0, 24.0), (25.0, 99.0), (100.0, 999.0), (1000.0, 9999.0), (10000.0, math.inf))
 N_QUANTILES = 100
 RIDGE = 1.0

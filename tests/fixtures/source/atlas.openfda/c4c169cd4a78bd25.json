@@ -1,0 +1,410 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2026-07-30"
+  },
+  "results": [
+    {
+      "term": "362O9ITL9D",
+      "count": 606869
+    },
+    {
+      "term": "OP401G7OJC",
+      "count": 595128
+    },
+    {
+      "term": "R16CO5Y76E",
+      "count": 560851
+    },
+    {
+      "term": "WK2XYI10QM",
+      "count": 507361
+    },
+    {
+      "term": "VB0R961HZT",
+      "count": 499951
+    },
+    {
+      "term": "3IG1E710ZN",
+      "count": 487719
+    },
+    {
+      "term": "420K487FSG",
+      "count": 478975
+    },
+    {
+      "term": "786Z46389E",
+      "count": 439165
+    },
+    {
+      "term": "426QFE7XLK",
+      "count": 438084
+    },
+    {
+      "term": "F0P408N6V4",
+      "count": 420076
+    },
+    {
+      "term": "YL5FZ2Y5U1",
+      "count": 413695
+    },
+    {
+      "term": "PQ6CK8PD0R",
+      "count": 411699
+    },
+    {
+      "term": "7LXU5N7ZO5",
+      "count": 398374
+    },
+    {
+      "term": "25X51I8RD4",
+      "count": 394245
+    },
+    {
+      "term": "TC2D6JAD40",
+      "count": 392142
+    },
+    {
+      "term": "VS041H42XC",
+      "count": 382601
+    },
+    {
+      "term": "8MDF5V39QO",
+      "count": 366457
+    },
+    {
+      "term": "6CW7F3G59X",
+      "count": 362648
+    },
+    {
+      "term": "H0G9379FGK",
+      "count": 354933
+    },
+    {
+      "term": "KG60484QX9",
+      "count": 343047
+    },
+    {
+      "term": "3A3U0GI71G",
+      "count": 332596
+    },
+    {
+      "term": "W5S57Y3A5L",
+      "count": 331475
+    },
+    {
+      "term": "6871619Q5X",
+      "count": 330178
+    },
+    {
+      "term": "C1ENJ2TE6C",
+      "count": 329502
+    },
+    {
+      "term": "68Y4CF58BV",
+      "count": 325347
+    },
+    {
+      "term": "P6YC3EG204",
+      "count": 321756
+    },
+    {
+      "term": "E7199S1YWR",
+      "count": 313747
+    },
+    {
+      "term": "9D2RTI9KYH",
+      "count": 308266
+    },
+    {
+      "term": "H6241UJ22B",
+      "count": 301816
+    },
+    {
+      "term": "2ZM8CX04RZ",
+      "count": 301046
+    },
+    {
+      "term": "SOI2LOH54Z",
+      "count": 300901
+    },
+    {
+      "term": "9J765S329G",
+      "count": 300438
+    },
+    {
+      "term": "935E97BOY8",
+      "count": 299831
+    },
+    {
+      "term": "1C6V77QF41",
+      "count": 299446
+    },
+    {
+      "term": "7S5I7G3JQL",
+      "count": 299245
+    },
+    {
+      "term": "8K0I04919X",
+      "count": 297546
+    },
+    {
+      "term": "021SEF3731",
+      "count": 296546
+    },
+    {
+      "term": "TLM2976OFR",
+      "count": 295378
+    },
+    {
+      "term": "WR1WPI7EW8",
+      "count": 294435
+    },
+    {
+      "term": "81AH48963U",
+      "count": 293743
+    },
+    {
+      "term": "W00LYS4T26",
+      "count": 293443
+    },
+    {
+      "term": "3LE3D9D6OY",
+      "count": 293376
+    },
+    {
+      "term": "A150AY412V",
+      "count": 293312
+    },
+    {
+      "term": "55JG375S6M",
+      "count": 270622
+    },
+    {
+      "term": "1J444QC288",
+      "count": 268106
+    },
+    {
+      "term": "XD75TQ8A2P",
+      "count": 267976
+    },
+    {
+      "term": "04JA59TNSJ",
+      "count": 264198
+    },
+    {
+      "term": "AGG2FN16EV",
+      "count": 262994
+    },
+    {
+      "term": "V9BI9B5YI2",
+      "count": 260407
+    },
+    {
+      "term": "059QF0KO0R",
+      "count": 255967
+    },
+    {
+      "term": "48A5M73Z4Q",
+      "count": 249621
+    },
+    {
+      "term": "80M03YXJ7I",
+      "count": 244896
+    },
+    {
+      "term": "B72HH48FLU",
+      "count": 243741
+    },
+    {
+      "term": "R6DXU4WAY9",
+      "count": 232697
+    },
+    {
+      "term": "BK76465IHM",
+      "count": 230802
+    },
+    {
+      "term": "O2GMZ0LF5W",
+      "count": 224060
+    },
+    {
+      "term": "4F4X42SYQ6",
+      "count": 219892
+    },
+    {
+      "term": "UTI8907Y6X",
+      "count": 218312
+    },
+    {
+      "term": "3ST302B24A",
+      "count": 211345
+    },
+    {
+      "term": "08I79HTP27",
+      "count": 210998
+    },
+    {
+      "term": "0J48LPH2TH",
+      "count": 209383
+    },
+    {
+      "term": "9NDF7JZ4M3",
+      "count": 206938
+    },
+    {
+      "term": "YU55MQ3IZY",
+      "count": 204907
+    },
+    {
+      "term": "495W7451VQ",
+      "count": 204794
+    },
+    {
+      "term": "5W7SIA7YZW",
+      "count": 203914
+    },
+    {
+      "term": "4EQZ6YO2HI",
+      "count": 201378
+    },
+    {
+      "term": "884KT10YB7",
+      "count": 197703
+    },
+    {
+      "term": "XRO4566Q4R",
+      "count": 192069
+    },
+    {
+      "term": "2S3PL1B6UJ",
+      "count": 191481
+    },
+    {
+      "term": "O1FF4DIV0D",
+      "count": 186746
+    },
+    {
+      "term": "1L4806J2QF",
+      "count": 181522
+    },
+    {
+      "term": "3JB47N2Q2P",
+      "count": 180842
+    },
+    {
+      "term": "9PHQ9Y1OLM",
+      "count": 179404
+    },
+    {
+      "term": "O26FZP769L",
+      "count": 178708
+    },
+    {
+      "term": "0K5C5T2QPG",
+      "count": 177056
+    },
+    {
+      "term": "8N3DW7272P",
+      "count": 176004
+    },
+    {
+      "term": "6UXW23996M",
+      "count": 176002
+    },
+    {
+      "term": "U1O3J18SFL",
+      "count": 174993
+    },
+    {
+      "term": "64O047KTOA",
+      "count": 174018
+    },
+    {
+      "term": "864V2Q084H",
+      "count": 168296
+    },
+    {
+      "term": "9TN87S3A3C",
+      "count": 165065
+    },
+    {
+      "term": "Q3OKS62Q6X",
+      "count": 164265
+    },
+    {
+      "term": "LKC0U3A8NJ",
+      "count": 161222
+    },
+    {
+      "term": "OYN3CCI6QE",
+      "count": 160663
+    },
+    {
+      "term": "DLG4EML025",
+      "count": 160421
+    },
+    {
+      "term": "5PE9FDE8GB",
+      "count": 159280
+    },
+    {
+      "term": "WM0HAQ4WNM",
+      "count": 156018
+    },
+    {
+      "term": "428673RC2Z",
+      "count": 155999
+    },
+    {
+      "term": "QTG126297Q",
+      "count": 155965
+    },
+    {
+      "term": "63CZ7GJN5I",
+      "count": 155455
+    },
+    {
+      "term": "ZG7E5POY8O",
+      "count": 151766
+    },
+    {
+      "term": "8Q2869CNVH",
+      "count": 151391
+    },
+    {
+      "term": "LEC9GKY20K",
+      "count": 147890
+    },
+    {
+      "term": "SY7Q814VUP",
+      "count": 147727
+    },
+    {
+      "term": "UP7QBP99PN",
+      "count": 145481
+    },
+    {
+      "term": "L64SXO195N",
+      "count": 140964
+    },
+    {
+      "term": "27O7W4T232",
+      "count": 140411
+    },
+    {
+      "term": "GFX7QIS1II",
+      "count": 140189
+    },
+    {
+      "term": "5U85DBW7LO",
+      "count": 139521
+    },
+    {
+      "term": "451W47IQ8X",
+      "count": 138585
+    }
+  ]
+}

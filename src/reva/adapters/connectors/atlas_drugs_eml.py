@@ -216,7 +216,9 @@ def parse_medicine(body: bytes, mid: str) -> Medicine:
 def parse_recommendation(body: bytes, rid: str) -> Recommendation:
     root = dc.parse_html(body, f"eEML recommendation {rid}")
     title = root.find("div", "medicine-title")
-    mids = [m.group(1) for a in (title.find_all("a") if title else []) if (m := MED_LINK_RE.match(a.attrs.get("href", "")))]
+    mids = [
+        m.group(1) for a in (title.find_all("a") if title else []) if (m := MED_LINK_RE.match(a.attrs.get("href", "")))
+    ]
     if len(mids) != 1:
         raise dc.err(f"eEML recommendation {rid}: medicine link not found")
     sections: list[tuple[str, str]] = []
@@ -244,8 +246,18 @@ def parse_recommendation(body: bytes, rid: str) -> Recommendation:
             uri = m.group(1) if m else None
     fields = {
         k: rows[k].text()[:1000]
-        for k in ("INN", "Medicine type", "List type", "Additional notes", "Formulations", "Sex", "Age",
-                  "Age restriction", "Weight restriction", "Patent information")
+        for k in (
+            "INN",
+            "Medicine type",
+            "List type",
+            "Additional notes",
+            "Formulations",
+            "Sex",
+            "Age",
+            "Age restriction",
+            "Weight restriction",
+            "Patent information",
+        )
         if k in rows and rows[k].text()
     }
     alts: list[str] = []
@@ -286,11 +298,25 @@ def build(
 
     def ent(qid: str, kind: str, label: str, desc: str) -> None:
         if qid not in ents:
-            ents[qid] = KgEntity(qid=qid, kind=kind, labels={"en": label} if label else {},
-                                 descriptions={"en": desc}, source_revision=revision)
+            ents[qid] = KgEntity(
+                qid=qid,
+                kind=kind,
+                labels={"en": label} if label else {},
+                descriptions={"en": desc},
+                source_revision=revision,
+            )
 
-    def st(subject: str, pid: str, raw: str, sel: Mapping[str, Any], *, obj: str | None = None, value: Any = None,
-           quals: Mapping[str, Any] | None = None, sid: str | None = None) -> None:
+    def st(
+        subject: str,
+        pid: str,
+        raw: str,
+        sel: Mapping[str, Any],
+        *,
+        obj: str | None = None,
+        value: Any = None,
+        quals: Mapping[str, Any] | None = None,
+        sid: str | None = None,
+    ) -> None:
         sts.append(
             KgStatement(
                 subject_qid=subject,
@@ -305,10 +331,18 @@ def build(
             )
         )
 
-    ent(LIST_EML, "essential_medicines_list", "WHO Model List of Essential Medicines (as served by the eEML)",
-        "REVA-composed key for the WHO Model List(s) of Essential Medicines published in the eEML")
-    ent(LIST_EMLC, "essential_medicines_list", "WHO Model List of Essential Medicines for Children (EMLc)",
-        "REVA-composed key; a recommendation is linked to it only when its eEML page shows the 'EMLc' badge")
+    ent(
+        LIST_EML,
+        "essential_medicines_list",
+        "WHO Model List of Essential Medicines (as served by the eEML)",
+        "REVA-composed key for the WHO Model List(s) of Essential Medicines published in the eEML",
+    )
+    ent(
+        LIST_EMLC,
+        "essential_medicines_list",
+        "WHO Model List of Essential Medicines for Children (EMLc)",
+        "REVA-composed key; a recommendation is linked to it only when its eEML page shows the 'EMLc' badge",
+    )
     for med in medicines:
         q = f"eml:medicine:{med.id}"
         raw = raws[f"medicine:{med.id}"]
@@ -320,30 +354,64 @@ def build(
         if med.medicine_type:
             st(q, "eml:medicine_type", raw, sel, value=dc.string_value(med.medicine_type))
         if med.drugbank:
-            st(q, "eml:drugbank_id", raw, sel, value=dc.external_id(med.drugbank),
-               quals={"note": "accession of the DrugBank link on the eEML page (DrugBank content not fetched)"})
+            st(
+                q,
+                "eml:drugbank_id",
+                raw,
+                sel,
+                value=dc.external_id(med.drugbank),
+                quals={"note": "accession of the DrugBank link on the eEML page (DrugBank content not fetched)"},
+            )
             rep["medicines_with_drugbank"] += 1
             if drugbank_to_chembl is not None:
                 hits = sorted(set(drugbank_to_chembl.get(med.drugbank) or ()))
                 if len(hits) == 1:
-                    st(q, "eml:chembl_molecule", raw, sel, obj=hits[0],
-                       quals={"via_drugbank": med.drugbank,
-                              "basis": "eEML DrugBank link = UniChem DrugBank accession of this approved ChEMBL drug "
-                                       "(same standard InChI); identifier bridge (statement unichem:drugbank_id)"})
+                    st(
+                        q,
+                        "eml:chembl_molecule",
+                        raw,
+                        sel,
+                        obj=hits[0],
+                        quals={
+                            "via_drugbank": med.drugbank,
+                            "basis": "eEML DrugBank link = UniChem DrugBank accession of this approved ChEMBL drug "
+                            "(same standard InChI); identifier bridge (statement unichem:drugbank_id)",
+                        },
+                    )
                     rep["linked_to_chembl"] += 1
                 elif hits:
                     rep["drugbank_maps_to_several_chembl_ids"] += 1
                 else:
                     rep["drugbank_without_approved_chembl_drug"] += 1
         for i, h in enumerate(med.history):
-            st(q, "eml:status_history", raw, sel, value=dc.year_value(h["year"]),
-               quals={"event": h["event"], "trs": h["trs"], "recommendation": h["recommendation"],
-                      "text_as_written": h["text"]}, sid=f"med:{med.id}:hist:{i}")
+            st(
+                q,
+                "eml:status_history",
+                raw,
+                sel,
+                value=dc.year_value(h["year"]),
+                quals={
+                    "event": h["event"],
+                    "trs": h["trs"],
+                    "recommendation": h["recommendation"],
+                    "text_as_written": h["text"],
+                },
+                sid=f"med:{med.id}:hist:{i}",
+            )
         for other, rid in med.equivalent_for:
-            st(f"eml:medicine:{other}", "eml:therapeutic_alternative", raw, sel, obj=q,
-               quals={"recommendation": rid, "reading": f"medicine {med.id} is a therapeutic equivalent for "
-                      f"medicine {other} (eEML 'Therapeutic equivalent for')"},
-               sid=f"med:{med.id}:equiv:{other}:{rid}")
+            st(
+                f"eml:medicine:{other}",
+                "eml:therapeutic_alternative",
+                raw,
+                sel,
+                obj=q,
+                quals={
+                    "recommendation": rid,
+                    "reading": f"medicine {med.id} is a therapeutic equivalent for "
+                    f"medicine {other} (eEML 'Therapeutic equivalent for')",
+                },
+                sid=f"med:{med.id}:equiv:{other}:{rid}",
+            )
     for r in recommendations:
         q = f"eml:medicine:{r.medicine_id}"
         raw = raws[f"recommendation:{r.id}"]
@@ -360,16 +428,38 @@ def build(
         }
         if r.icd_code:
             iq = f"icd11mms:{r.icd_code}"
-            ent(iq, "icd11_category", r.indication or r.icd_code,
-                f"ICD-11 MMS {r.icd_code}, labelled with the eEML indication text of recommendation {r.id}")
-            st(q, "eml:recommended_for", raw, sel, obj=iq, quals={**base, "note": "WHO essential-medicine listing "
-               "for this indication: an association, not an efficacy or causal statement"}, sid=f"rec:{r.id}")
+            ent(
+                iq,
+                "icd11_category",
+                r.indication or r.icd_code,
+                f"ICD-11 MMS {r.icd_code}, labelled with the eEML indication text of recommendation {r.id}",
+            )
+            st(
+                q,
+                "eml:recommended_for",
+                raw,
+                sel,
+                obj=iq,
+                quals={
+                    **base,
+                    "note": "WHO essential-medicine listing "
+                    "for this indication: an association, not an efficacy or causal statement",
+                },
+                sid=f"rec:{r.id}",
+            )
             if r.icd_uri:
                 st(iq, "eml:icd11_uri", raw, sel, value=dc.url_value(r.icd_uri), sid=f"rec:{r.id}:icd11uri")
             rep["recommendations_with_icd11"] += 1
         elif r.indication:
-            st(q, "eml:indication_text", raw, sel, value=dc.string_value(r.indication), quals=base,
-               sid=f"rec:{r.id}:text")
+            st(
+                q,
+                "eml:indication_text",
+                raw,
+                sel,
+                value=dc.string_value(r.indication),
+                quals=base,
+                sid=f"rec:{r.id}:text",
+            )
             rep["recommendations_without_icd11"] += 1
         st(q, "eml:on_list", raw, sel, obj=LIST_EML, quals=base, sid=f"rec:{r.id}:list")
         if any(b.strip() == "EMLc" for b in r.badges):
@@ -385,9 +475,18 @@ def build(
         if parent is not None:
             st(q, "eml:in_section", raw, sel, obj=parent, quals={"recommendation": r.id}, sid=f"rec:{r.id}:section")
         for alt in r.alternatives:
-            st(q, "eml:therapeutic_alternative", raw, sel, obj=f"eml:medicine:{alt}",
-               quals={"recommendation": r.id, "reading": "therapeutic alternative listed on the recommendation "
-                      "(square box)"}, sid=f"rec:{r.id}:alt:{alt}")
+            st(
+                q,
+                "eml:therapeutic_alternative",
+                raw,
+                sel,
+                obj=f"eml:medicine:{alt}",
+                quals={
+                    "recommendation": r.id,
+                    "reading": "therapeutic alternative listed on the recommendation (square box)",
+                },
+                sid=f"rec:{r.id}:alt:{alt}",
+            )
     # deduplicate (a section parent edge is stated by every recommendation of the section: keep the first)
     seen: set[tuple[str, str | None, str | None]] = set()
     uniq = []
@@ -434,10 +533,26 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"medicine": ["ATC codes", "Medicine type", "EML status history", "DrugBank",
-                                     "Therapeutic equivalent for", "recommendations"],
-                        "recommendation": ["section-link", "decision-data-item", "Indication (ICD11)", "List type",
-                                           "Formulations", "Sex", "Age", "Therapeutic alternatives"]},
+        field_mappings={
+            "medicine": [
+                "ATC codes",
+                "Medicine type",
+                "EML status history",
+                "DrugBank",
+                "Therapeutic equivalent for",
+                "recommendations",
+            ],
+            "recommendation": [
+                "section-link",
+                "decision-data-item",
+                "Indication (ICD11)",
+                "List type",
+                "Formulations",
+                "Sex",
+                "Age",
+                "Therapeutic alternatives",
+            ],
+        },
         notes="KG only: eEML medicines, recommendations (indication with ICD-11 code), sections, DrugBank bridge.",
     )
 
@@ -486,8 +601,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             recs.append(rec)
     retrieved: datetime = lraw.retrieved_at
     revision = f"eEML {retrieved.date().isoformat()} list {list_sha[:12]}"
-    out: dict[str, Any] = {"revision": revision, "stated_on_list_page": stated, "medicines_listed": len(listed),
-                           "partial": partial}
+    out: dict[str, Any] = {
+        "revision": revision,
+        "stated_on_list_page": stated,
+        "medicines_listed": len(listed),
+        "partial": partial,
+    }
     if not dc.kg_available(run.engine):
         ents, sts, rep = build(meds, recs, raws, revision=revision, drugbank_to_chembl=None)
         out.update(build=rep, kg={"status": "kg_unavailable"})

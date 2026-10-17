@@ -37,7 +37,7 @@ def quantile_sample(p: Predictive, n: int = POOL_QUANTILES) -> np.ndarray:
         raise ValueError("a point forecast has no quantiles")
     probs = (np.arange(n) + 0.5) / n
     if p.family == "empirical":
-        return np.quantile(np.asarray(p.sample), probs)
+        return np.asarray(np.quantile(np.asarray(p.sample), probs), dtype=float)
     return np.asarray([p.quantile(float(u)) for u in probs], dtype=float)
 
 

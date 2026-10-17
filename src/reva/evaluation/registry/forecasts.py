@@ -132,8 +132,16 @@ def finance_models() -> dict[str, tuple[str, str]]:
     return {k: (v, f"{kind}: {d}") for k, (v, kind, d) in FIN_MODELS.items()}
 
 
+def conflict_models() -> dict[str, tuple[str, str]]:
+    """Conflict-risk baselines, candidate and the attributed VIEWS reference (V6 PRED-CONFLICT,
+    ``reva.evaluation.conflict``); registered like the finance models."""
+    from reva.evaluation.conflict.models import CONFLICT_MODELS
+
+    return {k: (v, f"{kind}: {d}") for k, (v, kind, d) in CONFLICT_MODELS.items()}
+
+
 def all_models() -> dict[str, tuple[str, str]]:
-    return {**BASELINES, **REFERENCE_MODELS, **finance_models()}
+    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models()}
 
 
 __all__ = [
@@ -143,6 +151,7 @@ __all__ = [
     "REFERENCE_WEO",
     "abstention",
     "all_models",
+    "conflict_models",
     "finance_models",
     "forecast_baseline",
     "forecast_reference",

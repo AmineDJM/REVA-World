@@ -48,8 +48,12 @@ class FakeRun:
     def register(self, *, dataset: str, frame: pl.DataFrame, **kw: Any) -> dict[str, Any]:
         self.frames[dataset] = frame
         self.regs.append(kw)
-        return {"dataset_key": f"atlas.views.{dataset}", "row_count": frame.height, "coverage": {"countries": 3},
-                "created": True}
+        return {
+            "dataset_key": f"atlas.views.{dataset}",
+            "row_count": frame.height,
+            "coverage": {"countries": 3},
+            "created": True,
+        }
 
 
 @pytest.fixture(scope="module")

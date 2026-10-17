@@ -231,13 +231,25 @@ def build_kg(
     def unii_ent(u: str) -> str:
         q = f"unii:{u}"
         if q not in ents:
-            ents[q] = KgEntity(qid=q, kind=dc.KIND_SUBSTANCE, labels={"en": f"UNII {u}"},
-                               descriptions={"en": "FDA Unique Ingredient Identifier (label composed by REVA from "
-                                             "the code)"}, source_revision=revision)
+            ents[q] = KgEntity(
+                qid=q,
+                kind=dc.KIND_SUBSTANCE,
+                labels={"en": f"UNII {u}"},
+                descriptions={"en": "FDA Unique Ingredient Identifier (label composed by REVA from the code)"},
+                source_revision=revision,
+            )
         return q
 
-    def add(u: str, pid: str, n: int, unit: str, raw: str, meta: Mapping[str, Any], quals: Mapping[str, Any],
-            sel: Mapping[str, Any]) -> None:
+    def add(
+        u: str,
+        pid: str,
+        n: int,
+        unit: str,
+        raw: str,
+        meta: Mapping[str, Any],
+        quals: Mapping[str, Any],
+        sel: Mapping[str, Any],
+    ) -> None:
         q = unii_ent(u)
         sts.append(
             KgStatement(
@@ -246,20 +258,43 @@ def build_kg(
                 value=dc.count_value(n, unit),
                 point_in_time=dc.day_time(str(meta["last_updated"])),
                 qualifiers={"as_of": meta.get("last_updated"), **quals},
-                references=[{"stated_in": "openFDA API", "selector": dict(sel),
-                             "disclaimer": str(meta.get("disclaimer") or "")[:400]}],
+                references=[
+                    {
+                        "stated_in": "openFDA API",
+                        "selector": dict(sel),
+                        "disclaimer": str(meta.get("disclaimer") or "")[:400],
+                    }
+                ],
                 source_revision=revision,
                 raw_sha256=raw,
             )
         )
 
     for name, (rows, meta, raw), pid, unit, scope, url in (
-        ("events", top_events, "openfda:faers_reports", "reports",
-         "top 100 substances by FAERS report count (openFDA count limit without API key)", TOP_EVENT_URL),
-        ("labels", labels, "openfda:label_count", "labels",
-         "top 1,000 substances by number of SPL labels listing them", LABEL_COUNT_URL),
-        ("recalls", recalls, "openfda:recall_count", "enforcement reports",
-         "substances listed in drug recall enforcement reports (top 1,000)", RECALL_COUNT_URL),
+        (
+            "events",
+            top_events,
+            "openfda:faers_reports",
+            "reports",
+            "top 100 substances by FAERS report count (openFDA count limit without API key)",
+            TOP_EVENT_URL,
+        ),
+        (
+            "labels",
+            labels,
+            "openfda:label_count",
+            "labels",
+            "top 1,000 substances by number of SPL labels listing them",
+            LABEL_COUNT_URL,
+        ),
+        (
+            "recalls",
+            recalls,
+            "openfda:recall_count",
+            "enforcement reports",
+            "substances listed in drug recall enforcement reports (top 1,000)",
+            RECALL_COUNT_URL,
+        ),
     ):
         for rank, r in enumerate(rows, start=1):
             u = str(r["term"]).strip()
@@ -276,11 +311,23 @@ def build_kg(
             if kind is None:
                 skipped["serious_term_unknown"] += 1
                 continue
-            add(u, "openfda:faers_reports", r["count"], "reports", raw, meta,
-                {"seriousness": kind, "query": serious_url(u).split("?", 1)[1],
-                 "matching": "reports listing the substance in any drug of the report (suspect or concomitant), "
-                 "through openFDA harmonised fields", "caveat": FDA_CAVEAT, "reports_not_causation": True},
-                {"url": serious_url(u), "term": r["term"]})
+            add(
+                u,
+                "openfda:faers_reports",
+                r["count"],
+                "reports",
+                raw,
+                meta,
+                {
+                    "seriousness": kind,
+                    "query": serious_url(u).split("?", 1)[1],
+                    "matching": "reports listing the substance in any drug of the report (suspect or concomitant), "
+                    "through openFDA harmonised fields",
+                    "caveat": FDA_CAVEAT,
+                    "reports_not_causation": True,
+                },
+                {"url": serious_url(u), "term": r["term"]},
+            )
     rep = {
         "substances": len(ents),
         "statements": len(sts),
@@ -315,9 +362,11 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=0.5,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"faers_country": "count=occurcountry.exact per receivedate year",
-                        "recalls": "count=classification.exact per report_date year",
-                        "substances": "count=patient.drug.openfda.unii.exact / openfda.unii.exact / serious"},
+        field_mappings={
+            "faers_country": "count=occurcountry.exact per receivedate year",
+            "recalls": "count=classification.exact per report_date year",
+            "substances": "count=patient.drug.openfda.unii.exact / openfda.unii.exact / serious",
+        },
         notes="Aggregated counts only (no individual report). Adverse-event REPORTS, never causation.",
     )
 
@@ -347,9 +396,18 @@ def _scope_substances(run: Any) -> tuple[list[str], str]:
     if not dc.kg_available(run.engine):
         return [], "kg_unavailable"
     eml = {o for _, o in dc.current_edges(run.engine, run.origin, "eml:chembl_molecule")}
-    uniis = sorted({o.split(":", 1)[1] for s, o in dc.current_edges(run.engine, run.origin, "unichem:fda_unii")
-                    if s in eml})
-    return uniis, "eml_linked_chembl_drugs"
+    # openFDA harmonises a product to the UNII of its active ingredient as marketed (often a salt: imatinib
+    # mesylate, metformin hydrochloride), so the salts / forms ChEMBL attaches to an eEML-linked parent molecule
+    # (chembl:parent_molecule, ChEMBL's own hierarchy) are in scope too.
+    forms = {s for s, parent in dc.current_edges(run.engine, run.origin, "chembl:parent_molecule") if parent in eml}
+    uniis = sorted(
+        {
+            o.split(":", 1)[1]
+            for s, o in dc.current_edges(run.engine, run.origin, "unichem:fda_unii")
+            if s in eml or s in forms
+        }
+    )
+    return uniis, "eml_linked_chembl_drugs_and_their_salts"
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
@@ -423,10 +481,20 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             serious[u] = (res, meta, sha)
         lu = "/".join(str(lists[k][1].get("last_updated")) for k in ("events", "labels", "recalls"))
         revision = f"openFDA last_updated event/label/enforcement {lu}"
-        ents, sts, rep = build_kg(top_events=lists["events"], labels=lists["labels"], recalls=lists["recalls"],
-                                  serious=serious, revision=revision)
-        rep.update(scope=scope_kind, scope_size=len(scope), scope_capped_at=cap if len(scope) > cap else None,
-                   serious_not_found=not_found[:50], serious_not_found_count=len(not_found))
+        ents, sts, rep = build_kg(
+            top_events=lists["events"],
+            labels=lists["labels"],
+            recalls=lists["recalls"],
+            serious=serious,
+            revision=revision,
+        )
+        rep.update(
+            scope=scope_kind,
+            scope_size=len(scope),
+            scope_capped_at=cap if len(scope) > cap else None,
+            serious_not_found=not_found[:50],
+            serious_not_found_count=len(not_found),
+        )
         out["kg_build"] = rep
         if dc.kg_available(run.engine):
             assert retrieved is not None

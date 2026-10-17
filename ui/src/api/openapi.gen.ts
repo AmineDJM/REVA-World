@@ -7325,6 +7325,19 @@ export interface components {
         FamilyNeighbour: {
             /** @description measured_by only: the atlas series to read */
             atlas: components["schemas"]["AtlasHint"] | null;
+            /**
+             * Flags
+             * @description corresponds_to: the concordance table's own flags (table, partial, 1:n)
+             */
+            flags: {
+                [key: string]: string;
+            };
+            /**
+             * Identity
+             * @description same_as: an identity step (an item holds both identifiers), not a relation; never merged
+             * @default false
+             */
+            identity: boolean;
             mapping: components["schemas"]["FamilyMappingRef"];
             neighbour: components["schemas"]["KgRef"];
             reading: components["schemas"]["FamilyReading"];

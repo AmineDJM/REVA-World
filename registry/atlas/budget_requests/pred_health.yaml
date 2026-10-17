@@ -1,0 +1,26 @@
+# Budget request from agent PRED-HEALTH (V6: health/disease forecasting benchmarks). Merged into
+# registry/policies/budgets.yaml by python -m reva.atlas.budget_merge --write.
+agent: PRED-HEALTH
+requests:
+  - source_key: who.flunet
+    # xmart-api-public.who.int FLUMART VIW_FNT: one slice per panel country (30 x 0.2-0.4 MB). CC BY 4.0.
+    daily_requests: 80
+    expected_bytes_per_day: 20000000
+    reason: "WHO FluNet: 30 country slices per run; 80/day allows one retried run"
+  - source_key: cdc.resp_hubs
+    # S3 hubverse mirrors: listings + target CSVs (0.6 MB) + FluSight archive vintages (~0.5 MB each, ~45) + COVID
+    # time-series.parquet (3.5 MB) + ensemble parquet files (~0.1 MB each, ~140). MIT / CC0, attribution requested.
+    daily_requests: 600
+    expected_bytes_per_day: 70000000
+    reason: "CDC FluSight + COVID-19 hubs: ~240 requests per pair of runs (back-test window from 2024-11); 600/day allows retries"
+  - source_key: ecdc.erviss
+    # raw.githubusercontent.com: ILIARIRates.csv (2.5 MB) + sentinelTestsDetectionsPositivity.csv (4.1 MB).
+    daily_requests: 10
+    expected_bytes_per_day: 30000000
+    reason: "ERVISS: 2 bulk files per run"
+daily_totals_increase:
+  http_requests_total: "+690"
+  http_bytes_total: "+120_000_000"
+notes: >-
+  All sources are open (no account, no key). ERVISS reuse terms could not be archived (licence_review flag on every
+  cell). The CDC hubs request attribution contact before research use or publication (owner decision).

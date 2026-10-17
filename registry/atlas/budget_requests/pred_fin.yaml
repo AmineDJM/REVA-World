@@ -1,0 +1,9 @@
+# Budget request from agent PRED-FIN (V6, 2026-10-17). Merged by `python -m reva.atlas.budget_merge --write`.
+# Central-bank meeting calendars (docs/dev/v6_pred_fin.md); one run per week is enough, budget allows a daily run.
+agent: PRED-FIN
+requests:
+  - source_key: cbcal.calendars
+    # atlas.cb_calendars: FOMC, ECB and BoE calendar pages (~0.35 MB) + three terms pages (~0.25 MB) = 6
+    daily_requests: 14
+    expected_bytes_per_day: 2000000
+    reason: "6 requests (~0.6 MB) per full run plus one retry; Federal Reserve Board, ECB, Bank of England, no key"

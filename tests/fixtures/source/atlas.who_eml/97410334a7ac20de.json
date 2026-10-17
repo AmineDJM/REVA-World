@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </header>
+  <div id="container">
+      <aside>
+    <div class="search-filters">
+  <input id="filters-toggle-state" type="checkbox">
+  <h1>
+    <label for="filters-toggle-state">FILTERS</label>
+  </h1>
+  <form id="search-filters" method="GET" action="/" autocomplete="off">
+    <button class="filters-reset" type="reset">clear</button>
+<button class="btn apply-small" type="submit">Apply</button>
+<div class="filters">
+  <div class="filter-container section">
+    <h4>EML section</h4>
+    <div class="select-wrapper">
+<select name="section"  data-with-filter >
+    <option value=""  selected >
+      Any
+    </option>
+          <option value="316"         >
+        1. Anaesthetics, preoperative medicines and medical gases (17)
+      </option>
+          <option value="317"         >
+        1.1. General anaesthetics and oxygen (9)
+      </option>
+          <option value="318"         >
+        1.1.1. General anaesthetics and oxygen &gt; Inhalational medicines (6)
+      </option>
+          <option value="319"         >
+        1.1.2. General anaesthetics and oxygen &gt; Injectable medicines (3)
+      </option>
+          <option value="320"         >
+        1.2. Local anaesthetics (4)
+      </option>
+          <option value="321"         >
+        1.3. Preoperative medication and sedation for short-term procedures (3)
+      </option>
+          <option value="322"         >
+        1.4. Medical gases (1)
+      </option>
+          <option value="323"         >
+        2. Medicines for pain and palliative care (31)
+      </option>
+          <option value="324"         >
+        2.1. Non-opioids and non-steroidal anti-inflammatory medicines (NSAIMs) (4)
+      </option>
+          <option value="325"         >
+        2.2. Opioid analgesics (8)
+      </option>
+          <option value="326"         >
+        2.3. Medicines for other common symptoms in palliative care (19)
+      </option>
+          <option value="327"         >
+        3. Antiallergics and medicines used in anaphylaxis (8)
+      </option>
+          <option value="328"         >
+        4. Antidotes and other substances used in poisonings (19)
+      </option>
+          <option value="329"         >
+        4.1. Antidotes and other substances used in poisonings &gt; Non-specific (2)
+      </option>
+          <option value="330"         >
+        4.2. Antidotes and other substances used in poisonings &gt; Specific (17)
+      </option>
+          <option value="331"         >
+        5. Medicines for neurological disorders (73)
+      </option>
+          <option value="332"         >
+        6. Anti-infective medicines (511)
+      </option>
+          <option value="333"         >
+        6.1. Anthelminthics (47)
+      </option>
+          <option value="334"         >
+        6.1.1. Intestinal anthelminthics (28)
+      </option>
+          <option value="335"         >
+        6.1.2. Antifilarials (7)
+      </option>
+          <option value="336"         >
+        6.1.3. Antischistosomals and other antitrematode medicines (8)
+      </option>
+          <option value="337"         >
+        6.2. Antibacterials (295)
+      </option>
+          <option value="338"         >
+        6.2.1. Access group antibiotics (120)
+      </option>
+          <option value="339"         >
+        6.2.2. Watch group antibiotics (79)
+      </option>
+          <option value="340"         >
+        6.2.4. Antileprosy medicines (3)
+      </option>
+          <option value="341"         >
+        6.2.5. Antituberculosis medicines (40)
+      </option>
+          <option value="342"         >
+        6.3. Antifungal medicines (25)
+      </option>
+          <option value="343"         >
+        6.4. Antiviral medicines (62)
+      </option>
+          <option value="344"         >
+        6.4.1. Antiherpes medicines (3)
+      </option>
+          <option value="345"         >
+        6.4.2. Antiretrovirals (39)
+      </option>
+          <option value="346"         >
+        6.4.2.1. Antiretrovirals &gt; Nucleoside/Nucleotide reverse transcriptase inhibitors (8)
+      </option>
+          <option value="347"         >
+        6.4.2.2. Antiretrovirals &gt; Non-nucleoside reverse transcriptase inhibitors (2)
+      </option>
+          <option value="348"         >
+        6.4.2.3. Antiretrovirals &gt; Protease inhibitors (8)
+      </option>
+          <option value="349"         >
+        6.4.2.4. Antiretrovirals &gt; Integrase inhibitors (2)
+      </option>
+          <option value="350"         >
+        6.4.2.6. Medicines for prevention of HIV-related opportunistic infections (1)
+      </option>
+          <option value="351"         >
+        6.4.3. Other antivirals (3)
+      </option>
+          <option value="352"         >
+        6.4.4. Antihepatitis medicines (17)
+      </option>
+          <option value="353"         >
+        6.4.4.1.  Medicines for hepatitis B (3)
+      </option>
+          <option value="354"         >
+        6.4.4.1.1. Medicines for hepatitis B &gt; Nucleoside/Nucleotide reverse transcriptase inhibitors (3)
+      </option>
+          <option value="355"         >
+        6.4.4.2.  Medicines for hepatitis C  (14)
+      </option>
+          <option value="356"         >
+        6.4.4.2.1. Medicines for hepatitis C &gt; Pangenotypic direct-acting antiviral combinations (6)
+      </option>
+          <option value="357"         >
+        6.4.4.2.2. Medicines for hepatitis C &gt; Non-pangenotypic direct-acting antiviral combinations (5)
+      </option>
+          <option value="358"         >
+        6.4.4.2.3. Medicines for hepatitis C &gt; Other antivirals for hepatitis C (3)
+      </option>
+          <option value="361"         >
+        6.5. Antiprotozoal medicines (75)
+      </option>
+          <option value="362"         >
+        6.5.1. Antiamoebic and antigiardiasis medicines (4)
+      </option>
+          <option value="363"         >
+        6.5.2. Antileishmaniasis medicines (12)
+      </option>
+          <option value="364"         >
+        6.5.4. Antipneumocystosis and antitoxoplasmosis medicines (4)
+      </option>
+          <option value="365"         >
+        6.5.3. Antimalarial medicines (43)
+      </option>
+          <option value="366"         >
+        6.5.3.1. Antimalarial medicines &gt; Medicines for curative treatment (29)
+      </option>
+          <option value="367"         >
+        6.5.3.2. Antimalarial medicines &gt; Medicines for chemoprevention (11)
+      </option>
+          <option value="368"         >
+        6.5.5. Antitrypanosomal medicines (12)
+      </option>
+          <option value="369"         >
+        6.5.5.1. African trypanosomiasis (10)
+      </option>
+          <option value="370"         >
+        6.5.5.2. American trypanosomiasis (2)
+      </option>
+          <option value="371"         >
+        7. Medicines for cystic fibrosis (3)
+      </option>
+          <option value="374"         >
+        8. Immunomodulators and antineoplastics (386)
+      </option>
+          <option value="375"         >
+        8.1. Immunomodulators for non-malignant disease (22)
+      </option>
+          <option value="376"         >
+        8.2. Antineoplastics and supportive medicines (364)
+      </option>
+          <option value="378"         >
+        9. Therapeutic foods (1)
+      </option>
+          <option value="379"         >
+        10. Medicines affecting the blood (57)
+      </option>
+          <option value="380"         >
+        10.1. Antianaemia medicines (18)
+      </option>
+          <option value="381"         >
+        10.2. Medicines affecting coagulation (32)
+      </option>
+          <option value="382"         >
+        10.3. Medicines for haemoglobinopathies (7)
+      </option>
+          <option value="383"         >
+        11. Blood products, coagulation factors, and plasma substitutes (31)
+      </option>
+          <option value="384"         >
+        11.1. Blood and blood components (12)
+      </option>
+          <option value="386"         >
+        11.2. Human immunoglobulins (8)
+      </option>
+          <option value="389"         >
+        12. Cardiovascular medicines (92)
+      </option>
+          <option value="390"         >
+        12.1. Antianginal medicines (9)
+      </option>
+          <option value="391"         >
+        12.2. Antiarrhythmic medicines (13)
+      </option>
+          <option value="392"         >
+        12.3. Antihypertensive medicines (25)
+      </option>
+          <option value="393"         >
+        12.4. Medicines used in heart failure (18)
+      </option>
+          <option value="394"         >
+        12.6. Lipid-lowering agents (10)
+      </option>
+          <option value="395"         >
+        12.5. Antithrombotic medicines (8)
+      </option>
+          <option value="396"         >
+        12.5.1. Anti-platelet medicines (6)
+      </option>
+          <option value="397"         >
+        12.5.2. Thrombolytic medicines (2)
+      </option>
+          <option value="398"         >
+        13. Dermatological medicines (59)
+      </option>
+          <option value="399"         >
+        13.1. Dermatological medicines &gt; Antifungal medicines (7)
+      </option>
+          <option value="400"         >
+        13.2. Dermatological medicines &gt; Anti-infective medicines (7)
+      </option>
+          <option value="401"         >
+        13.3. Dermatological medicines &gt; Anti-inflammatory and antipruritic medicines (9)
+      </option>
+          <option value="402"         >
+        13.4. Dermatological medicines &gt; Medicines affecting skin differentiation and proliferation (20)
+      </option>
+          <option value="403"         >
+        13.5. Dermatological medicines &gt; Scabicides and pediculicides (12)
+      </option>
+          <option value="404"         >
+        14. Diagnostic agents (8)
+      </option>
+          <option value="405"         >
+        14.1. Diagnostic agents &gt; Ophthalmic medicines (4)
+      </option>
+          <option value="406"         >
+        14.2. Diagnostic agents &gt; Radiocontrast media (4)
+      </option>
+          <option value="407"         >
+        15. Antiseptics and disinfectants (11)
+      </option>
+          <option value="408"         >
+        15.1. Antiseptics (6)
+      </option>
+          <option value="409"         >
+        15.2. Disinfectants (5)
+      </option>
+          <option value="410"         >
+        16. Diuretics (13)
+      </option>
+          <option value="411"         >
+        17. Gastrointestinal medicines (32)
+      </option>
+          <option value="412"         >
+        17.1. Antiulcer medicines (7)
+      </option>
+          <option value="413"         >
+        17.2. Antiemetic medicines (9)
+      </option>
+          <option value="414"         >
+        17.3. Anti-inflammatory medicines (9)
+      </option>
+          <option value="415"         >
+        17.4. Laxatives (2)
+      </option>
+          <option value="416"         >
+        17.5. Medicines used in diarrhoea (4)
+      </option>
+          <option value="417"         >
+        17.5.1. Oral rehydration (1)
+      </option>
+          <option value="418"         >
+        17.5.2. Medicines for diarrhoea (2)
+      </option>
+          <option value="419"         >
+        18. Medicines for endocrine disorders (74)
+      </option>
+          <option value="420"         >
+        18.1. Adrenal hormones and synthetic substitutes (4)
+      </option>
+          <option value="421"         >
+        18.2. Androgens (1)
+      </option>
+          <option value="422"         >
+        18.3. Estrogens  (3)
+      </option>
+          <option value="423"         >
+        18.5. Medicines for diabetes (42)
+      </option>
+          <option value="425"         >
+        18.4. Progestogens (3)
+      </option>
+          <option value="426"         >
+        18.7. Thyroid hormones and antithyroid medicines (6)
+      </option>
+          <option value="434"         >
+        19. Immunologicals (41)
+      </option>
+          <option value="435"         >
+        19.1. Immunologicals &gt; Diagnostic agents (1)
+      </option>
+          <option value="436"         >
+        19.2. Immunologicals &gt; Sera, immunoglobulins and monoclonal antibodies (8)
+      </option>
+          <option value="437"         >
+        19.3. Immunologicals &gt; Vaccines (32)
+      </option>
+          <option value="438"         >
+        20. Muscle relaxants (peripherally-acting) and cholinesterase inhibitors (10)
+      </option>
+          <option value="439"         >
+        21. Ophthalmological preparations (61)
+      </option>
+          <option value="440"         >
+        21.1. Ophthalmological preparations &gt; Anti-infective agents (33)
+      </option>
+          <option value="441"         >
+        21.2. Ophthalmological preparations &gt; Anti-inflammatory agents (4)
+      </option>
+          <option value="442"         >
+        21.3. Ophthalmological preparations &gt; Local anaesthetics (1)
+      </option>
+          <option value="443"         >
+        21.4. Ophthalmological preparations &gt; Miotics and antiglaucoma medicines (10)
+      </option>
+          <option value="444"         >
+        21.5. Ophthalmological preparations &gt; Mydriatics (5)
+      </option>
+          <option value="445"         >
+        21.6. Ophthalmological preparations &gt; Anti-vascular endothelial growth factor (VEGF) preparations (5)
+      </option>
+          <option value="446"         >
+        22. Medicines for reproductive health and perinatal care (43)
+      </option>
+          <option value="447"         >
+        22.3. Uterotonics (6)
+      </option>
+          <option value="448"         >
+        22.5. Antioxytocics (tocolytics) (1)
+      </option>
+          <option value="449"         >
+        23. Peritoneal dialysis solution (1)
+      </option>
+          <option value="450"         >
+        24. Medicines for mental and behavioural disorders (45)
+      </option>
+          <option value="451"         >
+        24.1. Medicines for psychotic disorders (16)
+      </option>
+          <option value="452"         >
+        24.3. Medicines for anxiety disorders  (10)
+      </option>
+          <option value="453"         >
+        24.4. Medicines for obsessive compulsive disorders (2)
+      </option>
+          <option value="454"         >
+        24.5. Medicines for disorders due to psychoactive substance use (8)
+      </option>
+          <option value="455"         >
+        24.2. Medicines for mood disorders (8)
+      </option>
+          <option value="456"         >
+        24.2.1. Medicines for depressive disorders (4)
+      </option>
+          <option value="457"         >
+        24.2.2. Medicines for bipolar disorders (4)
+      </option>
+          <option value="458"         >
+        25. Medicines acting on the respiratory tract (25)
+      </option>
+          <option value="459"         >
+        25.1. Antiasthmatic and medicines for chronic obstructive pulmonary disease (24)
+      </option>
+          <option value="460"         >
+        26. Solutions correcting water, electrolyte and acid–base disturbances (11)
+      </option>
+          <option value="461"         >
+        26.1. Solutions correcting water, electrolyte and acid-base disturbances &gt; Oral (2)
+      </option>
+          <option value="462"         >
+        26.2. Solutions correcting water, electrolyte and acid-base disturbances &gt; Parenteral (8)
+      </option>
+          <option value="463"         >
+        26.3. Solutions correcting water, electrolyte and acid-base disturbances &gt; Miscellaneous (1)
+      </option>
+          <option value="464"         >
+        27. Vitamins and minerals (20)
+      </option>
+          <option value="465"         >
+        28. Ear, nose and throat medicines [c] (5)
+      </option>
+          <option value="466"         >
+        29. Medicines for diseases of joints (23)
+      </option>
+          <option value="474"         >
+        6.5.5.1.1. Medicines for the treatment of 1st stage African trypanosomiasis (4)
+      </option>
+          <option value="475"         >
+        6.5.5.1.2. Medicines for the treatment of 2nd stage African trypanosomiasis (6)
+      </option>
+          <option value="476"         >
+        6.4.2.5. Fixed-dose combinations of antiretrovirals (18)
+      </option>
+          <option value="478"         >
+        25.2. Antitussives (1)
+      </option>
+          <option value="479"         >
+        6.2.3. Reserve group antibiotics (53)
+      </option>
+          <option value="480"         >
+        8.2.1. Cytotoxic medicines (206)
+      </option>
+          <option value="481"         >
+        8.2.2. Targeted therapies (37)
+      </option>
+          <option value="482"         >
+        8.2.3. Immunomodulators (54)
+      </option>
+          <option value="483"         >
+        8.2.4. Hormones and antihormones (49)
+      </option>
+          <option value="484"         >
+        8.2.5. Supportive medicines (15)
+      </option>
+          <option value="485"         >
+        6.6. Medicines for ectoparasitic infections (1)
+      </option>
+          <option value="486"         >
+        18.5.1. Insulins (25)
+      </option>
+          <option value="487"         >
+        18.5.2. Hypoglycaemic agents (17)
+      </option>
+          <option value="488"         >
+        18.6. Medicines for hypoglycaemia (2)
+      </option>
+          <option value="490"         >
+        22.1. Contraceptives (18)
+      </option>
+          <option value="491"         >
+        22.2. Ovulation inducers (3)
+      </option>
+          <option value="492"         >
+        22.6. Other medicines administered to the mother (3)
+      </option>
+          <option value="493"         >
+        22.7. Medicines administered to the neonate [c] (9)
+      </option>
+          <option value="494"         >
+        22.1.1. Oral hormonal contraceptives (7)
+      </option>
+          <option value="495"         >
+        22.1.2. Injectable hormonal contraceptives (3)
+      </option>
+          <option value="496"         >
+        22.1.3. Intrauterine devices (2)
+      </option>
+          <option value="497"         >
+        22.1.4. Barrier methods (2)
+      </option>
+          <option value="498"         >
+        22.1.5. Implantable contraceptives (2)
+      </option>
+          <option value="499"         >
+        22.1.6. Intravaginal contraceptives (2)
+      </option>
+          <option value="500"         >
+        29.1. Medicines used to treat gout (3)
+      </option>
+          <option value="501"         >
+        29.2. Disease-modifying anti-rheumatic drugs (DMARDs) (8)
+      </option>
+          <option value="502"         >
+        29.3. Medicines for juvenile joint diseases (12)
+      </option>
+          <option value="508"         >
+        6.1.4. Cysticidal medicines (4)
+      </option>
+          <option value="509"         >
+        30. Dental medicines and preparations (5)
+      </option>
+          <option value="515"         >
+        6.7. Medicines for Ebola virus disease (2)
+      </option>
+          <option value="516"         >
+        5.1. Medicines for central nervous system disorders (67)
+      </option>
+          <option value="519"         >
+        6.8. Medicines for COVID-19 (1)
+      </option>
+          <option value="520"         >
+        24.5.1. Medicines for alcohol use disorders (2)
+      </option>
+          <option value="521"         >
+        24.5.2. Medicines for nicotine use disorders (4)
+      </option>
+          <option value="522"         >
+        24.5.3. Medicines for opioid use disorders (2)
+      </option>
+          <option value="523"         >
+        12.7. Fixed-dose combinations for prevention of atherosclerotic cardiovascular disease (9)
+      </option>
+          <option value="524"         >
+        18.8. Medicines for disorders of the pituitary hormone system (3)
+      </option>
+          <option value="525"         >
+        5.1.1. Antiseizure medicines (18)
+      </option>
+          <option value="526"         >
+        5.1.2. Medicines for multiple sclerosis (6)
+      </option>
+          <option value="527"         >
+        5.1.3. Medicines for parkinsonism (5)
+      </option>
+          <option value="528"         >
+        5.1.4. Medicines for cerebral palsy (1)
+      </option>
+          <option value="529"         >
+        5.1.5. Medicines for headache disorders (16)
+      </option>
+          <option value="530"         >
+        5.1.6. Medicines for central nervous system infections (14)
+      </option>
+          <option value="531"         >
+        5.1.5.1. Medicines for acute migraine attacks (6)
+      </option>
+          <option value="532"         >
+        5.1.5.2. Medicines for migraine prophylaxis (7)
+      </option>
+          <option value="533"         >
+        5.1.5.3. Medicines for cluster headache (3)
+      </option>
+          <option value="534"         >
+        5.1.6.1. Medicines for bacterial central nervous system infections (8)
+      </option>
+          <option value="535"         >
+        5.1.6.2. Medicines for viral central nervous system infections (6)
+      </option>
+          <option value="536"         >
+        11.4. Plasma substitutes (4)
+      </option>
+          <option value="537"         >
+        11.3. Coagulation factors (7)
+      </option>
+          <option value="538"         >
+        13.6. Dermatological medicines &gt; Moisturizers (2)
+      </option>
+          <option value="539"         >
+        5.2. Medicines for peripheral nervous system disorders (3)
+      </option>
+          <option value="540"         >
+        5.2.1. Medicines for Guillain-Barré syndrome (1)
+      </option>
+          <option value="541"         >
+        5.2.2. Medicines for myasthenia gravis (2)
+      </option>
+          <option value="542"         >
+        6.5.3.3. Antimalarial medicines &gt; Medicines for chemoprophylaxis in travellers (3)
+      </option>
+          <option value="545"         >
+        13.7. Dermatological medicines &gt; Sunscreens (1)
+      </option>
+          <option value="546"         >
+        22.4. Medicines for medical abortion (3)
+      </option>
+      </select>
+</div>
+  </div>
+  <div class="filter-container">
+    <h4>Indication</h4>
+          <input type="text" name="indication" placeholder="Indication..." pattern="\d+"
+        title="Indication should be a numeric value. Enable JavaScript for suggestions."/>
+      </div>
+  <div class="filter-container">
+    <h4>First added</h4>
+    <div class="select-wrapper">
+<select name="year"  data-with-filter >
+    <option value=""  selected >
+      Any
+    </option>
+          <option value="1977"         >
+        1977 (283)
+      </option>
+          <option value="1979"         >
+        1979 (72)
+      </option>
+          <option value="1982"         >
+        1982 (23)
+      </option>
+          <option value="1984"         >
+        1984 (41)
+      </option>
+          <option value="1987"         >
+        1987 (38)
+      </option>
+          <option value="1989"         >
+        1989 (34)
+      </option>
+          <option value="1991"         >
+        1991 (23)
+      </option>
+          <option value="1993"         >
+        1993 (9)
+      </option>
+          <option value="1995"         >
+        1995 (16)
+      </option>
+          <option value="1997"         >
+        1997 (36)
+      </option>
+          <option value="1999"         >
+        1999 (25)
+      </option>
+          <option value="2002"         >
+        2002 (13)
+      </option>
+          <option value="2003"         >
+        2003 (13)
+      </option>
+          <option value="2005"         >
+        2005 (12)
+      </option>
+          <option value="2007"         >
+        2007 (54)
+      </option>
+          <option value="2009"         >
+        2009 (55)
+      </option>
+          <option value="2011"         >
+        2011 (62)
+      </option>
+          <option value="2013"         >
+        2013 (31)
+      </option>
+          <option value="2015"         >
+        2015 (128)
+      </option>
+          <option value="2017"         >
+        2017 (203)
+      </option>
+          <option value="2019"         >
+        2019 (123)
+      </option>
+          <option value="2021"         >
+        2021 (93)
+      </option>
+          <option value="2023"         >
+        2023 (95)
+      </option>
+          <option value="2025"         >
+        2025 (73)
+      </option>
+      </select>
+</div>
+  </div>
+  <div class="filter-container target-group-filter">
+    <h4>Target population</h4>
+    <fieldset name="target-group">
+      <div>
+        <span>Age</span>
+        <div class="select-wrapper">
+<select name="age" >
+    <option value=""  selected >
+      Any
+    </option>
+          <option value="adult"         >
+        Adolescents and adults (1642)
+      </option>
+          <option value="children"         >
+        Children (1 month - 12 years) (58)
+      </option>
+          <option value="newborn"         >
+        Newborn (&amp;lt; 1 month) (16)
+      </option>
+      </select>
+</div>
+      </div>
+      <div>
+        <span>Sex</span>
+        <div class="select-wrapper">
+<select name="sex" >
+    <option value=""  selected >
+      Any
+    </option>
+          <option value="all"         >
+        All (1663)
+      </option>
+          <option value="female"         >
+        Female (41)
+      </option>
+          <option value="male"         >
+        Male (12)
+      </option>
+      </select>
+</div>
+      </div>
+    </fieldset>
+  </div>
+  <div class="filter-container tags-filter">
+    <h4>Tags</h4>
+    <fieldset>
+          <div class="tag">
+        <input id="tag-11" type="checkbox" name="tags[]" value="11"
+          >
+        <label for="tag-11" class="tag-label l-2">
+          Cancer (312)
+        </label>
+      </div>
+          <div class="tag">
+        <input id="tag-16" type="checkbox" name="tags[]" value="16"
+          >
+        <label for="tag-16" class="tag-label l-3">
+          Cancer supportive care (10)
+        </label>
+      </div>
+          <div class="tag">
+        <input id="tag-9" type="checkbox" name="tags[]" value="9"
+          >
+        <label for="tag-9" class="tag-label l-4">
+          Biological (171)
+        </label>
+      </div>
+        </fieldset>
+  </div>
+</div>
+<div class="world-map">
+  <img src="https://list.essentialmeds.org/images/map.svg" alt="World Map">
+</div>
+<div class="btn-container">
+  <button class="btn" type="submit">
+    Apply filter
+  </button>
+</div>
+  </form>
+</div>
+  </aside>
+  <div class="main-content">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export ">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/print?" target="_blank">
+        <div class="export-option">
+      <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+    </div>
+    <div class="export-option">
+      <input class="custom-input" id="format-xlsx" type="radio" name="format" value="xlsx"  >
+<label class="custom-input-label" for="format-xlsx">
+  <span class="radio-mark"></span>
+      Excel (XLSX)
+  </label>
+    </div>
+    <div class="export-option">
+      <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+      <div class="sections">
+        <div class="caption">
+          <span>You can select particular sections to be included in the output file.</span>
+          <div class="presets">
+            <div class="preset">
+              <input class="custom-input" id="preset-all" type="radio" name="preset" value="all"  disabled   checked >
+<label class="custom-input-label" for="preset-all">
+  <span class="radio-mark"></span>
+      Select all
+  </label>
+            </div>
+            <div class="preset">
+              <input class="custom-input" id="preset-classic-layout" type="radio" name="preset" value="classic-layout"  disabled  >
+<label class="custom-input-label" for="preset-classic-layout">
+  <span class="radio-mark"></span>
+      Select classic EML layout
+  </label>
+            </div>
+          </div>
+        </div>
+        <div class="section-groups">
+          <div class="classic-layout-sections">
+            <input class="custom-input" id="fields[]-indication" type="checkbox" name="fields[]" value="indication"   checked >
+<label class="custom-input-label" for="fields[]-indication">
+  <span class="checkbox-mark"></span>
+      Indication
+  </label>
+            <input class="custom-input" id="fields[]-icd-11" type="checkbox" name="fields[]" value="icd-11"   checked >
+<label class="custom-input-label" for="fields[]-icd-11">
+  <span class="checkbox-mark"></span>
+      ICD-11
+  </label>
+            <input class="custom-input" id="fields[]-atc-codes" type="checkbox" name="fields[]" value="atc-codes"   checked >
+<label class="custom-input-label" for="fields[]-atc-codes">
+  <span class="checkbox-mark"></span>
+      ATC codes
+  </label>
+            <input class="custom-input" id="fields[]-list-type" type="checkbox" name="fields[]" value="list-type"   checked >
+<label class="custom-input-label" for="fields[]-list-type">
+  <span class="checkbox-mark"></span>
+      List type
+  </label>
+            <input class="custom-input" id="fields[]-formulations" type="checkbox" name="fields[]" value="formulations"   checked >
+<label class="custom-input-label" for="fields[]-formulations">
+  <span class="checkbox-mark"></span>
+      Formulations
+  </label>
+            <input class="custom-input" id="fields[]-therapeutic-equivalence" type="checkbox" name="fields[]" value="therapeutic-equivalence"   checked >
+<label class="custom-input-label" for="fields[]-therapeutic-equivalence">
+  <span class="checkbox-mark"></span>
+      Therapeutic alternatives
+  </label>
+            <input class="custom-input" id="fields[]-footnote" type="checkbox" name="fields[]" value="footnote"   checked >
+<label class="custom-input-label" for="fields[]-footnote">
+  <span class="checkbox-mark"></span>
+      Footnote
+  </label>
+          </div>
+          <div class="other-sections">
+            <input class="custom-input" id="fields[]-inn" type="checkbox" name="fields[]" value="inn"   checked >
+<label class="custom-input-label" for="fields[]-inn">
+  <span class="checkbox-mark"></span>
+      INN
+  </label>
+            <input class="custom-input" id="fields[]-medicine-type" type="checkbox" name="fields[]" value="medicine-type"   checked >
+<label class="custom-input-label" for="fields[]-medicine-type">
+  <span class="checkbox-mark"></span>
+      Medicine type
+  </label>
+            <input class="custom-input" id="fields[]-antibiotic-groups" type="checkbox" name="fields[]" value="antibiotic-groups"   checked >
+<label class="custom-input-label" for="fields[]-antibiotic-groups">
+  <span class="checkbox-mark"></span>
+      Antibiotic groups
+  </label>
+            <input class="custom-input" id="fields[]-sex" type="checkbox" name="fields[]" value="sex"   checked >
+<label class="custom-input-label" for="fields[]-sex">
+  <span class="checkbox-mark"></span>
+      Sex
+  </label>
+            <input class="custom-input" id="fields[]-age" type="checkbox" name="fields[]" value="age"   checked >
+<label class="custom-input-label" for="fields[]-age">
+  <span class="checkbox-mark"></span>
+      Age
+  </label>
+            <input class="custom-input" id="fields[]-age-restriction" type="checkbox" name="fields[]" value="age-restriction"   checked >
+<label class="custom-input-label" for="fields[]-age-restriction">
+  <span class="checkbox-mark"></span>
+      Age restriction
+  </label>
+            <input class="custom-input" id="fields[]-weight-restriction" type="checkbox" name="fields[]" value="weight-restriction"   checked >
+<label class="custom-input-label" for="fields[]-weight-restriction">
+  <span class="checkbox-mark"></span>
+      Weight restriction
+  </label>
+            <input class="custom-input" id="fields[]-patent-information" type="checkbox" name="fields[]" value="patent-information"   checked >
+<label class="custom-input-label" for="fields[]-patent-information">
+  <span class="checkbox-mark"></span>
+      Patent information
+  </label>
+            <input class="custom-input" id="fields[]-justification" type="checkbox" name="fields[]" value="justification"   checked >
+<label class="custom-input-label" for="fields[]-justification">
+  <span class="checkbox-mark"></span>
+      Expert Committee decision justification
+  </label>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>    <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org?ln=FR">FR</a>
+    </div>
+  </div>    <h1>
+      <img src="images/pill.svg" />Model List of Essential Medicines
+    </h1>
+    <div class="medicines-list-container">
+      <div class="search-results-header no-filters">
+    <span class="found-text">
+    Found 1430 recommendations for 667 medicines and 162 therapeutic equivalents
+
+          <div>
+        Removed medicines and rejected applications are not shown. <a
+          href="https://list.essentialmeds.org?showRemoved=1">Show them</a>.
+      </div>
+              </span>
+  <div class="applied-filters">
+                                                                  </div>
+</div>
+<ol><li>
+      <div>
+  <input class="expand-toggle" id="toggle-13" type="checkbox">
+  <h5 class="medicine-name" title="Acetylsalicylic acid">
+    <label class="expand-label" for="toggle-13"></label>
+    <span>Acetylsalicylic acid</span>
+    <a href="https://list.essentialmeds.org/medicines/13">
+      General information
+    </a>
+  </h5>
+  <div class="medicine-details  multiple-sections ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Medicines for acute migraine attacks</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>
+      <div>
+  <input class="expand-toggle" id="toggle-10" type="checkbox">
+  <h5 class="medicine-name" title="Atropine">
+    <label class="expand-label" for="toggle-10"></label>
+    <span>Atropine</span>
+    <a href="https://list.essentialmeds.org/medicines/10">
+      General information
+    </a>
+  </h5>
+  <div class="medicine-details  multiple-sections ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Diagnostic agents &gt; Ophthalmic medicines</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                    </ul>
+        </div>
+      </div>
+    </div>
+    <div class="indications-data">
+      <div class="title">
+        Indications
+      </div>
+            <div class="indications-details">
+                                <span class="equivalent">
+              Therapeutic equivalent to <a href=https://list.essentialmeds.org/medicines/165>
+                tropicamide
+              </a> for
+            </span>
+                    <a class="indication-name "
+            href="https://list.essentialmeds.org/recommendations/204">
+            <span class="indication-text">Cycloplegic drug</span>
+          </a>
+                </div>
+    </div>
+  </div>
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Ophthalmological preparations &gt; Mydriatics</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>
+      <div>
+  <input class="expand-toggle" id="toggle-95" type="checkbox">
+  <h5 class="medicine-name" title="Imatinib">
+    <label class="expand-label" for="toggle-95"></label>
+    <span>Imatinib</span>
+    <a href="https://list.essentialmeds.org/medicines/95">
+      General information
+    </a>
+  </h5>
+  <div class="medicine-details ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Targeted therapies</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>
+      <div>
+  <input class="expand-toggle" id="toggle-191" type="checkbox">
+  <h5 class="medicine-name" title="Metformin">
+    <label class="expand-label" for="toggle-191"></label>
+    <span>Metformin</span>
+    <a href="https://list.essentialmeds.org/medicines/191">
+      General information
+    </a>
+  </h5>
+  <div class="medicine-details ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Hypoglycaemic agents</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>
+      <div>
+  <input class="expand-toggle" id="toggle-530" type="checkbox">
+  <h5 class="medicine-name" title="Nicotine replacement therapy">
+    <label class="expand-label" for="toggle-530"></label>
+    <span>Nicotine replacement therapy</span>
+    <a href="https://list.essentialmeds.org/medicines/530">
+      General information
+    </a>
+  </h5>
+  <div class="medicine-details ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Medicines for nicotine use disorders</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      </ol>    </div>
+    <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+  </div>
+  </div>
+</body>
+
+</html>

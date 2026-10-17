@@ -177,9 +177,7 @@ def run_backtest(
     return evaluate(scored, abstained, views_scored, views_missing, views_used, families, horizons, last)
 
 
-def _pair(
-    a: Sequence[Mapping[str, Any]], b: Sequence[Mapping[str, Any]], metric: str
-) -> tuple[list[float], list[str]]:
+def _pair(a: Sequence[Mapping[str, Any]], b: Sequence[Mapping[str, Any]], metric: str) -> tuple[list[float], list[str]]:
     ib = {(r["geo"], r["origin"]): r for r in b}
     d, cl = [], []
     for r in a:
@@ -224,14 +222,21 @@ def evaluate(
                 for base in BASELINE_KEYS:
                     d, cl = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), prim)
                     k = f"{fam.key}|h{h}|{cand}|vs|{base}|{prim}"
-                    tests[k] = {"family": fam.key, "horizon": h, "candidate": cand, "baseline": base, "metric": prim,
-                                **dm_test(d, cl)}
+                    tests[k] = {
+                        "family": fam.key,
+                        "horizon": h,
+                        "candidate": cand,
+                        "baseline": base,
+                        "metric": prim,
+                        **dm_test(d, cl),
+                    }
                     pvals[k] = tests[k]["p_one_sided"]
                     for m2 in SECONDARY[fam.kind]:
                         d2, cl2 = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), m2)
                         secondary[f"{fam.key}|h{h}|{cand}|vs|{base}|{m2}"] = {"metric": m2, **dm_test(d2, cl2)}
-            fam_out.append({"family": fam.key, "horizon": h, "kind": fam.kind, "primary_metric": prim,
-                            "results": results})
+            fam_out.append(
+                {"family": fam.key, "horizon": h, "kind": fam.kind, "primary_metric": prim, "results": results}
+            )
     adj = holm(pvals)
     for k, t in tests.items():
         t["p_holm"] = adj.get(k)
@@ -239,9 +244,14 @@ def evaluate(
     for fam in families:
         for h in horizons:
             for cand in CANDIDATE_KEYS:
-                ts = [t for t in tests.values() if t["family"] == fam.key and t["horizon"] == h and t["candidate"] == cand]
+                ts = [
+                    t for t in tests.values() if t["family"] == fam.key and t["horizon"] == h and t["candidate"] == cand
+                ]
                 ok = bool(ts) and all(
-                    t["mean_diff"] is not None and t["mean_diff"] < 0 and t["p_holm"] is not None and t["p_holm"] < ALPHA
+                    t["mean_diff"] is not None
+                    and t["mean_diff"] < 0
+                    and t["p_holm"] is not None
+                    and t["p_holm"] < ALPHA
                     for t in ts
                 )
                 if ok:
@@ -253,8 +263,16 @@ def evaluate(
     for (fk, h), vrows in sorted(views_scored.items()):
         fam = next(f for f in families if f.key == fk)
         vs = _summary(fam, vrows)
-        vsum.append({"family": fk, "horizon": h, "model": VIEWS_KEY, **vs, "n_missing": views_missing.get((fk, h), 0),
-                     "runs": sorted({r["run"] for r in vrows})})
+        vsum.append(
+            {
+                "family": fk,
+                "horizon": h,
+                "model": VIEWS_KEY,
+                **vs,
+                "n_missing": views_missing.get((fk, h), 0),
+                "runs": sorted({r["run"] for r in vrows}),
+            }
+        )
         for mk in (*BASELINE_KEYS, *CANDIDATE_KEYS):
             rows = scored.get((fk, h, mk), [])
             for metric in ("crps", "msle"):

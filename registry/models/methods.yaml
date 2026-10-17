@@ -401,3 +401,254 @@ models:
     output_ports: [{name: point_forecast}]
     applicability: {families: [weo.cpi_inflation, weo.gdp_growth, weo.unemployment], question_types: [quantity]}
     assumptions: [IMF staff projection as published; no distribution]
+  # --- PRED-FIN (V6): finance benchmarks and candidates of the forecast registry
+  # (reva.models.forecasting.finance_models). Research forecasts only: not investment advice, not trading signals.
+  # Benchmarks are issued as baselines; candidates issue only on (family, horizon) cells where the finance back-test
+  # (reva.evaluation.finance_backtest) shows them significantly better than every benchmark (DM-HLN, Holm).
+  - model_key: fin.rw_histvol
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Random walk / martingale benchmark on a daily series: point = latest published value; spread from the
+      historical volatility of the last 250 daily changes (log changes for FX and oil, changes for yields), aggregated
+      exactly over the weekdays of the target (month end or monthly mean). Log-normal (quantile grid) or Gaussian.
+    input_ports: [{name: daily_series, kind: daily_market_series}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: predictive_normal}]
+    applicability: {min_daily_changes: 60, finance_kinds: [fx, yield, spread, oil]}
+    assumptions: [martingale point; zero-mean independent daily changes; volatility of the last 250 published days]
+  - model_key: fin.fx_forward_cip
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      UIP / covered-interest-parity forward proxy benchmark: expected log change of the rate = (policy rate of the
+      quote currency - policy rate of the euro) x time, BIS daily policy rates published at the origin (7-day lag);
+      random-walk spread. Market forward points are licensed (not open), hence a proxy.
+    input_ports: [{name: daily_series, kind: daily_market_series}, {name: policy_rates, kind: daily_market_series}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {finance_kinds: [fx]}
+    assumptions: [uncovered interest parity; policy rates stand in for money-market rates of the horizon]
+  - model_key: fin.ust_eh_forward
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Expectations-hypothesis benchmark: the forward yield (or spread) implied by the Treasury par curve of the origin
+      day, par yields read as zero-coupon yields with linear interpolation in maturity (approximation); random-walk
+      spread.
+    input_ports: [{name: par_curve, kind: daily_yield_curve}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {finance_kinds: [yield, spread]}
+    assumptions: [no term premium; par yields approximately zero-coupon yields]
+  - model_key: fin.meeting_base_rate
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Policy-meeting benchmark: share of historical windows of the same length (starting at month ends over the last
+      25 years, ending by the origin) in which the policy rate ended higher (lower); rule of succession.
+    input_ports: [{name: policy_rate_history, kind: daily_market_series}]
+    output_ports: [{name: probability}]
+    applicability: {finance_kinds: [meeting], min_windows: 24}
+    assumptions: [stationary frequency of moves over the last 25 years]
+  - model_key: fin.meeting_momentum
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Policy-meeting benchmark: as fin.meeting_base_rate but only over windows that started in the same state (last
+      move in the previous 365 days up, down, or none); rule of succession.
+    input_ports: [{name: policy_rate_history, kind: daily_market_series}]
+    output_ports: [{name: probability}]
+    applicability: {finance_kinds: [meeting], min_windows_in_state: 12}
+    assumptions: [rate cycles persist (first-order Markov in the direction of the last move)]
+  - model_key: fin.garch11
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Candidate: random-walk point with a Gaussian GARCH(1,1) daily variance (QMLE, variance targeting, last 2,500
+      daily changes) aggregated over the target's weekdays. Issued only on back-test winner cells.
+    input_ports: [{name: daily_series, kind: daily_market_series}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: predictive_normal}]
+    applicability: {min_daily_changes: 500, finance_kinds: [fx, yield, spread, oil]}
+    assumptions: [GARCH(1,1) conditional variance; Gaussian quasi-likelihood; martingale point]
+  - model_key: fin.ns_dl
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Candidate: dynamic Nelson-Siegel (Diebold-Li, lambda 0.0609 per month): factors by OLS on month-end par curves,
+      AR(1) per factor over the last 120 months, forecast change of the fitted yield/spread added to the latest value;
+      random-walk spread. Issued only on back-test winner cells.
+    input_ports: [{name: par_curve, kind: daily_yield_curve}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {finance_kinds: [yield, spread], min_month_curves: 36}
+    assumptions: [three-factor Nelson-Siegel curve; independent AR(1) factors]
+  - model_key: fin.ppp_reversion
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Candidate: PPP real-exchange-rate mean reversion (AR(1) over the last 240 months of published CPI) plus the
+      trailing 12-month inflation differential; random-walk spread. Issued only on back-test winner cells.
+    input_ports: [{name: daily_series, kind: daily_market_series}, {name: cpi, kind: monthly_index}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {finance_kinds: [fx], min_months: 120}
+    assumptions: [relative PPP with slow mean reversion; CPI published with its lag]
+  - model_key: fin.taylor_logit
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Candidate: Taylor-rule fundamentals for policy meetings: logistic regressions of a move up / down over the
+      window on 1.5 x published CPI inflation - policy rate (inflation-only Taylor gap) and the last-move state.
+      Issued only on back-test winner cells.
+    input_ports: [{name: policy_rate_history, kind: daily_market_series}, {name: inflation, kind: monthly_rate}]
+    output_ports: [{name: probability}]
+    applicability: {finance_kinds: [meeting], min_windows: 48}
+    assumptions: [Taylor (1993) inflation coefficient; no output gap; stable reaction function over 25 years]
+  # --- PRED-HEALTH (V6): health forecast registry (reva.models.forecasting.health_quantile, reva.evaluation.health_registry).
+  # Quantile forecasts at the 23 US CDC hub levels, scored by WIS. Baselines are always issued; candidates only when the
+  # stored back-test flags them as significant winners; the hub ensembles are attributed references, not REVA models.
+  - model_key: health.persistence
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Persistence baseline for weekly/annual health series: median = last observed value; other quantiles = last value
+      plus the empirical quantiles of the symmetrised h-step changes of the trailing window (156 weeks / 25 years),
+      clipped to the family bounds.
+    input_ports: [{name: series, kind: weekly_or_annual_nonnegative}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {min_h_step_changes: {W: 20, A: 8}, frequencies: [W, A]}
+    assumptions: [random-walk median; symmetric h-step changes exchangeable over the trailing window]
+  - model_key: health.climatology
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Seasonal climatology baseline (weekly): empirical quantiles of the values in the same season week (+/- 2 weeks)
+      of earlier seasons (observed >= 26 weeks before the target, >= 3 distinct years).
+    input_ports: [{name: series, kind: weekly_nonnegative}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {min_years: 3, frequencies: [W]}
+    assumptions: [stable seasonality across seasons; current-season level ignored]
+  - model_key: health.log_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      AR(2) with intercept on weekly differences of log(y + 1), OLS on the trailing 104 weeks (>= 52 consecutive),
+      h-step distribution by residual bootstrap (2000 paths, seed = hash of the training data); abstains outside the
+      AR(2) stationarity triangle.
+    input_ports: [{name: series, kind: weekly_nonnegative}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {min_consecutive_weeks: 52, frequencies: [W]}
+    assumptions: [log-growth momentum; exchangeable residuals]
+  - model_key: health.log_drift
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Random walk with drift on log values (annual): drift = mean log change of the last 10 years; quantiles from the
+      symmetrised empirical h-step deviations around the drift (trailing 25 years).
+    input_ports: [{name: series, kind: annual_strictly_positive}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {min_years: 10, frequencies: [A]}
+    assumptions: [constant log drift over the horizon]
+  - model_key: health.blend
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: Quantile average (Vincentisation) of the other health models that did not abstain (>= 2).
+    input_ports: [{name: component_quantiles, kind: quantiles_hub23}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {min_components: 2, frequencies: [W, A]}
+    assumptions: [equal weights]
+  - model_key: forecast.reference_flusight_ensemble
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference, attributed to the US CDC FluSight forecast hub: the FluSight-ensemble quantiles of the round
+      (atlas.cdc.flusight_ensemble) as published. REVA does not produce it.
+    input_ports: [{name: ensemble_cells, kind: atlas_cell}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {families: [nhsn.flu_hosp]}
+    assumptions: [hub ensemble as published; attribution requested by CDC (flusight@cdc.gov)]
+  - model_key: forecast.reference_covidhub_ensemble
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference, attributed to the US CDC COVID-19 Forecast Hub: the CovidHub-ensemble quantiles of the round
+      (atlas.cdc.covidhub_ensemble) as published. REVA does not produce it.
+    input_ports: [{name: ensemble_cells, kind: atlas_cell}]
+    output_ports: [{name: quantiles_hub23}]
+    applicability: {families: [nhsn.covid_hosp]}
+    assumptions: [hub ensemble as published; attribution requested by CDC (covidhub@cdc.gov)]
+  # --- PRED-CONFLICT (V6): conflict-risk forecasters (reva.evaluation.conflict.models). Country-year RISK ESTIMATES on
+  # UCDP state-based fatalities; never predictions of specific attacks, actors or persons. Candidates: judged by the
+  # registry; the KG candidate is issued only on as-of back-test winner (family, horizon) pairs.
+  - model_key: forecast.conflict_persistence
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Conflict baseline: no-change point (last published UCDP country-year state-based deaths); predictive = last value
+      moved by pooled historical log-changes ln(1+y[s+h]) - ln(1+y[s]) of country-years in the same intensity bin;
+      probabilities by the rule of succession.
+    input_ports: [{name: country_year_deaths, kind: ucdp_orgvio_cy}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: probability}]
+    applicability: {frequencies: [A], min_changes: 30}
+    assumptions: [no-change point; intensity-bin log-changes exchangeable across countries and years]
+  - model_key: forecast.conflict_base_rate
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Conflict baseline: the country's own history up to the origin -- (k+1)/(n+2) frequency of the family's event
+      (onset / escalation: among past years meeting the condition) or the empirical distribution of its annual deaths.
+    input_ports: [{name: country_year_deaths, kind: ucdp_orgvio_cy}]
+    output_ports: [{name: probability}, {name: predictive_empirical}]
+    applicability: {frequencies: [A], min_years: 5}
+    assumptions: [stationary country-specific risk]
+  - model_key: forecast.conflict_history_logit
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Conflict baseline: pooled ridge logistic regression on conflict history only (log deaths last year and last
+      five, UCDP/PRIO armed-conflict recency and 10-year share since 1946, conflict / war level); counts by a hurdle
+      model (logit for > 0, ridge log-normal for the positive part).
+    input_ports: [{name: country_year_deaths, kind: ucdp_orgvio_cy}, {name: conflict_years, kind: ucdp_acd_cy}]
+    output_ports: [{name: probability}, {name: predictive_empirical}]
+    applicability: {frequencies: [A], min_train: 50}
+    assumptions: [pooled coefficients across countries; ridge lambda 1 on standardised features]
+  - model_key: forecast.conflict_kg_logit
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Conflict candidate: history features plus REVA KG/atlas covariates (CShapes neighbours' fatalities and conflict
+      level, V-Dem polyarchy and its change, V-Dem physical violence index, WDI GDP per capita, growth and a < -3 %
+      shock, population, infant mortality); ridge logit / hurdle. Associations used for prediction, not causal
+      claims. Issued only on back-test winner (family, horizon) pairs.
+    input_ports: [{name: country_year_deaths, kind: ucdp_orgvio_cy}, {name: covariates, kind: atlas_country_year}]
+    output_ports: [{name: probability}, {name: predictive_empirical}]
+    applicability: {frequencies: [A], min_train: 50}
+    assumptions: [pooled coefficients; missing covariates mean-imputed with missing indicators; CShapes borders of 2019 carried forward]
+  - model_key: forecast.reference_views
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference: VIEWS country-month state-based fatality forecasts (Uppsala University / PRIO), attributed
+      to VIEWS; REVA sums the 12 monthly point predictions of one run for a calendar-year question (point only;
+      abstains on binary country-year questions).
+    input_ports: [{name: views_forecasts, kind: atlas_views_cm_sb}]
+    output_ports: [{name: point_forecast}]
+    applicability: {frequencies: [A]}
+    assumptions: [sum of monthly point predictions is not an expected annual total (VIEWS fits on the log scale)]

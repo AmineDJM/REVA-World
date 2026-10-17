@@ -1,0 +1,178 @@
+# Temperature shocks and economic growth, 1950-2003 (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: dell_jones_olken_2008
+source_key: effects.literature
+citation:
+  text: "Melissa Dell, Benjamin F. Jones, and Benjamin A. Olken. Climate Change and Economic Growth: Evidence from the Last Half Century. NBER Working Paper No. 14132, June 2008."
+  text_basis: assembled from the title page of the version read (NBER working paper; a later journal version may print different numbers)
+  short: "Dell, Jones & Olken (2008), NBER WP 14132"
+  authors: [Melissa Dell, Benjamin F. Jones, Benjamin A. Olken]
+  title: "Climate Change and Economic Growth: Evidence from the Last Half Century"
+  year: 2008
+  series: NBER Working Paper No. 14132
+  doi: null
+  url: http://www.nber.org/papers/w14132
+document:
+  url: https://www.nber.org/system/files/working_papers/w14132/w14132.pdf
+  media_type: application/pdf
+  sha256: 7647c7e5699a5eafe2781db0f6dd447b7dd10cb4f305fb2624699298047a44dd
+  bytes: 321387
+  version_read: "NBER Working Paper 14132, June 2008"
+as_of: "2008-06-01"
+rights:
+  licence: "© 2008 by Melissa Dell, Benjamin F. Jones, and Benjamin A. Olken. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: one_time_impulse
+  cause: {kind: variable, id: climate.country_temperature, transform: level_change,
+          definition: "a one-time 1ºC temperature increase (country annual average temperature)"}
+  measure: response
+  unit: percentage_points
+  shock: {size: 1, unit: degree Celsius}
+  method: panel_regression
+  point_kind: point
+  scope: {period: {from: "1950", to: "2003"}, frequency: annual, n_countries: 136,
+          sample_note: "Panel of 136 countries with at least 20 years of GDP data in the Penn World Tables 6.2"}
+  identification: "Year-to-year temperature fluctuations within countries: panel regressions with country fixed effects, region × year and poor × year fixed effects; robust standard errors clustered at the parent-country level"
+estimates:
+- id: growth_poor_temperature_0_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; contemporaneous effect'}
+  point: -1.087
+  as_printed: '-1.087'
+  sign: negative
+  uncertainty: {se: 0.442, se_as_printed: '0.442', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Sum of all temp. coeff. in poor countries', column (1) 'No lags' (printed p.38)
+  quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
+- id: growth_poor_temperature_1_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 1 lag(s) (cumulated effect)'}
+  point: -1.304
+  as_printed: '-1.304'
+  sign: negative
+  uncertainty: {se: 0.677, se_as_printed: '0.677', status: reported}
+  horizon: {kind: cumulative, value: 1, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Sum of all temp. coeff. in poor countries', column (2) '1 lag' (printed p.38)
+  quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
+- id: growth_poor_temperature_3_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 3 lag(s) (cumulated effect)'}
+  point: -1.605
+  as_printed: '-1.605'
+  sign: negative
+  uncertainty: {se: 0.641, se_as_printed: '0.641', status: reported}
+  horizon: {kind: cumulative, value: 3, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Sum of all temp. coeff. in poor countries', column (3) '3 lags' (printed p.38)
+  quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
+- id: growth_poor_temperature_5_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 5 lag(s) (cumulated effect)'}
+  point: -1.718
+  as_printed: '-1.718'
+  sign: negative
+  uncertainty: {se: 0.72, se_as_printed: '0.720', status: reported}
+  horizon: {kind: cumulative, value: 5, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Sum of all temp. coeff. in poor countries', column (4) '5 lags' (printed p.38)
+  quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
+- id: growth_poor_temperature_10_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 10 lag(s) (cumulated effect)'}
+  point: -2.006
+  as_printed: '-2.006'
+  sign: negative
+  uncertainty: {se: 0.866, se_as_printed: '0.866', status: reported}
+  horizon: {kind: cumulative, value: 10, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Sum of all temp. coeff. in poor countries', column (5) '10 lags' (printed p.38)
+  quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
+- id: growth_rich_temperature_no_lags
+  pdf_page: 40
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), rich countries; contemporaneous effect (Temperature × Rich)'}
+  point: 0.219
+  as_printed: '0.219'
+  sign: positive
+  uncertainty: {se: 0.21, se_as_printed: '0.210', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: rich countries (above-median PPP GDP per capita in the first year in the data)}
+  locator: Table 3 'Models with lags', row 'Temperature × Rich', column (1) 'No lags' (printed p.38)
+  quote: Temperature × Rich 0.219 0.202 0.243 0.293 0.392 0.208 0.197 0.237 0.272 0.383 (0.210)
+  applicability: 'REVA note: not statistically different from zero (no significance stars).'
+- id: agricultural_value_added_growth_poor_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: output.agricultural_value_added, transform: growth_rate, definition: 'growth in agriculture value added (annual growth rate), poor countries; immediate effect'}
+  point: -2.367
+  as_printed: '-2.367'
+  sign: negative
+  uncertainty: {se: 0.816, se_as_printed: '0.816', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Poor' (temperature), column (1) 'Growth in Agriculture Value Added' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189)'
+- id: agricultural_value_added_growth_rich_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: output.agricultural_value_added, transform: growth_rate, definition: 'growth in agriculture value added (annual growth rate), rich countries; immediate effect'}
+  point: -0.34
+  as_printed: '-0.340'
+  sign: negative
+  uncertainty: {se: 0.512, se_as_printed: '0.512', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: rich countries (above-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Rich' (temperature), column (1) 'Growth in Agriculture Value Added' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189) Immediate effect - Rich -0.340 0.410 -0.103 (0.512) (0.376) (0.470)'
+  applicability: 'REVA note: not statistically different from zero (no significance stars).'
+- id: industrial_value_added_growth_poor_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: output.industrial_value_added, transform: growth_rate, definition: 'growth in industrial value added (annual growth rate), poor countries; immediate effect'}
+  point: -2.443
+  as_printed: '-2.443'
+  sign: negative
+  uncertainty: {se: 0.958, se_as_printed: '0.958', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Poor' (temperature), column (2) 'Growth in Industrial Value Added' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189)'
+- id: industrial_value_added_growth_rich_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: output.industrial_value_added, transform: growth_rate, definition: 'growth in industrial value added (annual growth rate), rich countries; immediate effect'}
+  point: 0.41
+  as_printed: '0.410'
+  sign: positive
+  uncertainty: {se: 0.376, se_as_printed: '0.376', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: rich countries (above-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Rich' (temperature), column (2) 'Growth in Industrial Value Added' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189) Immediate effect - Rich -0.340 0.410 -0.103 (0.512) (0.376) (0.470)'
+  applicability: 'REVA note: not statistically different from zero (no significance stars).'
+- id: investment_growth_poor_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: investment.real_investment, transform: growth_rate, definition: 'growth in investment (annual growth rate), poor countries; immediate effect'}
+  point: -2.991
+  as_printed: '-2.991'
+  sign: negative
+  uncertainty: {se: 1.189, se_as_printed: '1.189', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: poor countries (below-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Poor' (temperature), column (3) 'Growth in Investment' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189)'
+- id: investment_growth_rich_temperature_no_lags
+  pdf_page: 42
+  effect: {kind: variable, id: investment.real_investment, transform: growth_rate, definition: 'growth in investment (annual growth rate), rich countries; immediate effect'}
+  point: -0.103
+  as_printed: '-0.103'
+  sign: negative
+  uncertainty: {se: 0.47, se_as_printed: '0.470', status: reported}
+  horizon: {kind: impact, value: 0, unit: year}
+  scope: {country_group: rich countries (above-median PPP GDP per capita in the first year in the data), sample_note: 'WDI value added (columns 1-2, 3812 observations) or PWT investment (column 3)'}
+  locator: Table 5 'Components of Output Growth', Panel A 'Models with no lags', row 'Immediate effect – Rich' (temperature), column (3) 'Growth in Investment' (printed p.40)
+  quote: 'Table 5: Components of Output Growth Panel A: Models with no lags Dependent variable is: (1) (2) (3) Growth in Growth in Growth in Agriculture Industrial Value Investment Value Added Added Temperature No lags No lags No lags Immediate effect - Poor -2.367*** -2.443** -2.991** (0.816) (0.958) (1.189) Immediate effect - Rich -0.340 0.410 -0.103 (0.512) (0.376) (0.470)'
+  applicability: 'REVA note: not statistically different from zero (no significance stars).'

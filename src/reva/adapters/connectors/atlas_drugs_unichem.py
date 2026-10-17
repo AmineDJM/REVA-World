@@ -199,9 +199,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     raws: dict[int, str] = {}
     retrieved: datetime | None = None
     for src in PAIRS:
-        raw = await run.get(url(src), key=f"unichem:src1src{src}",
-                            media_types=("application/x-gzip", "application/gzip", "application/octet-stream"),
-                            max_bytes=MAX_BYTES)
+        raw = await run.get(
+            url(src),
+            key=f"unichem:src1src{src}",
+            media_types=("application/x-gzip", "application/gzip", "application/octet-stream"),
+            max_bytes=MAX_BYTES,
+        )
         sha = run.archive(raw)
         retrieved = retrieved or raw.retrieved_at
         raws[src] = sha
@@ -213,8 +216,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         out["kg"] = {"status": "kg_unavailable"}
         return out
     drugs = {
-        q.split(":", 1)[1]
-        for q in dc.current_entities(run.engine, run.origin, "chembl:CHEMBL%", kind=dc.KIND_DRUG)
+        q.split(":", 1)[1] for q in dc.current_entities(run.engine, run.origin, "chembl:CHEMBL%", kind=dc.KIND_DRUG)
     }
     if not drugs:
         raise dc.err("no ChEMBL drug entity in the KG: run atlas.chembl_drugs first", kind="dependency_missing")

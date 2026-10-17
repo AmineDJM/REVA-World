@@ -16575,6 +16575,20 @@
             ],
             "description": "measured_by only: the atlas series to read"
           },
+          "flags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "corresponds_to: the concordance table's own flags (table, partial, 1:n)",
+            "title": "Flags",
+            "type": "object"
+          },
+          "identity": {
+            "default": false,
+            "description": "same_as: an identity step (an item holds both identifiers), not a relation; never merged",
+            "title": "Identity",
+            "type": "boolean"
+          },
           "mapping": {
             "$ref": "#/components/schemas/FamilyMappingRef"
           },
@@ -16628,6 +16642,8 @@
           "mapping",
           "share",
           "atlas",
+          "identity",
+          "flags",
           "rights",
           "statement"
         ],

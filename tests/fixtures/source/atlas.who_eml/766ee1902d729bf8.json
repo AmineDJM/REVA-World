@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/medicines/10.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/medicines/10?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/medicines/10?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/medicines/10/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content medicine">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export ">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/medicines/10/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/medicines/10?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/medicines/10?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+      <div class="medicine-title-status active ">
+  <div class="medicine-title" title="atropine">
+          Atropine
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  </div>
+  <div class="page-content">
+            <div class="medicine-data">
+    <div class="medicine-section">
+  <div class="label">General description</div>
+  <div class="content"><div data-contents="true"><div class="" data-block="true" data-editor="936ph" data-offset-key="7c9a0-0-0"><div data-offset-key="7c9a0-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="7c9a0-0-0"><span data-text="true">Atropine is a muscarinic antagonist with multiple therapeutic indications including reduction of salivary and bronchial secretions during surgical procedures, treatment of organophosphate poisoning, and as a cycloplegic and mydriatic agent following topical administration into the eye. </span></span></div></div></div></div>
+</div>
+  <div class="medicine-header add ">
+        <div class="header-data">
+            <div class="header-row">
+  <div class="label-cell">ATC codes</div>
+  <div class="content-cell"><a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=A03BA01" target="_blank">A03BA01</a>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=S01FA01" target="_blank">S01FA01</a></div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 1977
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/sC1L9Ib4I8o8cDqlyfhnKyoa8MGm7XUFDffFVNUc.pdf">TRS
+            615</a>)
+                            for <a href="https://list.essentialmeds.org/recommendations/41"
+          title="Exposure to or harmful effects of undetermined intent of pesticides">
+          Exposure to or harmful effects of undetermined intent of pesticides
+        </a>
+          </div>
+      <div>
+      Added in 1987
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/VuU8HlIuFAXkONC96CYA2B0g8uxAKiRS8Zxe1V6y.pdf">TRS
+            770</a>)
+                            for <a href="https://list.essentialmeds.org/recommendations/10"
+          title="Parasympatholytics [anticholinergics and antimuscarinics] and spasmolytics">
+          Parasympatholytics [anticholinergics and antimuscarinics] and spasmolytics
+        </a>
+          </div>
+      <div>
+      Added in 1989
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/1xATtMTBlrQ1t9bmc1hhSkegiN3sTr9KXskOoK8w.pdf">TRS
+            796</a>)
+                            for <a href="https://list.essentialmeds.org/recommendations/298"
+          title="Anterior uveitis">
+          Anterior uveitis
+        </a>
+          </div>
+      <div>
+      Changed in 2021
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/hHDQtV59PtnnPEJQ5mVfaUuDMfCQzSoduRDvWWxq.pdf">TRS
+            1035</a>)
+                            for <a href="https://list.essentialmeds.org/recommendations/204"
+          title="Cycloplegic drug">
+          Cycloplegic drug
+        </a>
+          </div>
+  </div></div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">Therapeutic equivalent for</div>
+  <div class="content-cell"><div class="equivalents">
+                                          <a href="https://list.essentialmeds.org/medicines/165">
+                  tropicamide
+                </a> for <a href="https://list.essentialmeds.org/recommendations/204">
+                  Cycloplegic drug
+                </a><br>
+                                    </div></div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Atropine" target="_blank">
+          <span>
+            Atropine
+          </span>
+        </a></div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00572" target="_blank">
+              <span>
+                Atropine
+                              </span>
+            </a></div>
+</div>
+    </div>
+  </div>
+        <div class="medicine-section recommendations">
+  <div class="label">Recommendations</div>
+  <div class="content"><div class="medicine-details  multiple-sections ">
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Preoperative medication and sedation for short-term procedures</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>Parenteral &gt; General injections &gt; unspecified: 1 mg in 1 mL ampoule or vial (sulfate); 400 µg per  mL in 1 mL ampoule or vial (sulfate)</li>
+                    </ul>
+        </div>
+      </div>
+    </div>
+    <div class="indications-data">
+      <div class="title">
+        Indications
+      </div>
+            <div class="indications-details">
+                              <a class="indication-name "
+            href="https://list.essentialmeds.org/recommendations/10">
+            <span class="indication-text">Parasympatholytics [anticholinergics and antimuscarinics] and spasmolytics</span>
+          </a>
+                </div>
+    </div>
+  </div>
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Antidotes and other substances used in poisonings &gt; Specific</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>Parenteral &gt; General injections &gt; unspecified: 1 mg in 1 mL ampoule or vial (sulfate)</li>
+                    </ul>
+        </div>
+      </div>
+    </div>
+    <div class="indications-data">
+      <div class="title">
+        Indications
+      </div>
+            <div class="indications-details">
+                              <a class="indication-name "
+            href="https://list.essentialmeds.org/recommendations/41">
+            <span class="indication-text">Exposure to or harmful effects of undetermined intent of pesticides</span>
+          </a>
+                </div>
+    </div>
+  </div>
+    <div class="section-container">
+    <div class="section-data">
+      <div class="section-data__header">
+        <div class="title">
+          Section
+        </div>
+        <div class="section-name">Ophthalmological preparations &gt; Mydriatics</div>
+      </div>
+      <div class="section-data__body">
+        <div class="formulations">
+          <ul>
+                      <li>Local &gt; Ophthalmological &gt; Solution (eye drops): 0.1% (sulfate); 0.5% (sulfate); 1% (sulfate)</li>
+                    </ul>
+        </div>
+      </div>
+    </div>
+    <div class="indications-data">
+      <div class="title">
+        Indications
+      </div>
+            <div class="indications-details">
+                              <a class="indication-name "
+            href="https://list.essentialmeds.org/recommendations/298">
+            <span class="indication-text">Anterior uveitis</span>
+          </a>
+                </div>
+    </div>
+  </div>
+  </div></div>
+</div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

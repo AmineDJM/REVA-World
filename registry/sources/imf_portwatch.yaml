@@ -1,0 +1,22 @@
+# V6 (agent V6INFRA): IMF PortWatch (ArcGIS Online organisation IMF-portwatch_imf_dataviz).
+# Connector: src/reva/adapters/connectors/atlas_portwatch.py (atlas.imf_portwatch -> portwatch.chokepoints_daily,
+# portwatch.country_monthly; KG ports and chokepoints).
+source_key: imf.portwatch
+title: IMF PortWatch - daily chokepoint transits, daily port calls and trade estimates, ports and chokepoints
+provider_url: https://portwatch.imf.org
+lineage_family: imf_portwatch
+rights:
+  licence: "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm), named in every PortWatch item's licence field"
+  licence_status: terms_named_not_quoted
+  licence_review: "pending owner decision: the IMF terms page answers HTTP 403 to the container (also for A-IMF)"
+  attribution: "IMF PortWatch (portwatch.imf.org); Arslanalp, Koepke & Verschuur (2021), IMF Working Paper 2021/225"
+metadata:
+  allowed_hosts: [services9.arcgis.com, www.arcgis.com, hub.arcgis.com, naciscdn.org]
+  items:
+    - "3da2b9ca97684916b75c4013f95d18ab Daily_Chokepoints_Data (CSV download from the ArcGIS Hub)"
+    - "83b1bbc7b3354c5fb1f40673bb8f852e Daily_Ports_Data (monthly sums per country by the provider's query service)"
+    - "acc668d199d1472abaaf2467133d4ca4 PortWatch_ports_database"
+    - "fa9a5800b0ee4855af8b2944ab1e07af PortWatch_chokepoints_database"
+  authentication: none
+  editorial_status: AIS-derived counts; cargo volumes are IMF model estimates (flagged per row)
+  cadence: weekly provider updates; weekly re-download

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/77.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/77?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/77?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/77/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/77/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/77?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/77?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="acetylsalicylic acid">
+          <a title="acetylsalicylic acid" href="https://list.essentialmeds.org/medicines/13">
+        Acetylsalicylic acid
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=331">
+      <span>5. Medicines for neurological disorders</span>
+    </a>
+      <a class="section-link" href="/?section=516">
+      <span>5.1. Medicines for central nervous system disorders</span>
+    </a>
+      <a class="section-link" href="/?section=529">
+      <span>5.1.5. Medicines for headache disorders</span>
+    </a>
+      <a class="section-link" href="/?section=531">
+      <span>5.1.5.1. Medicines for acute migraine attacks</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=N02BA01" target="_blank">N02BA01</a>
+              </div>
+    </div>
+
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>Migraine </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/669367341/mms/unspecified" target="_blank">
+            8A80.Z
+          </a>
+        </span>
+      </div></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Core</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Oral &gt; Solid: </strong>
+                      <span>
+              300 to 500 mg             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 1987
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/VuU8HlIuFAXkONC96CYA2B0g8uxAKiRS8Zxe1V6y.pdf">TRS
+            770</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Adolescents and adults</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Patents have expired in most jurisdictions
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+        <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Acetylsalicylic_acid" target="_blank">
+        <span>
+          Acetylsalicylic acid
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00945" target="_blank">
+          <span>
+            Acetylsalicylic acid
+                      </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification ">
+      <div class="simple-justification">
+  <div class="justification-section">
+  <div class="label">Summary of evidence and Expert Committee recommendations</div>
+  <div class="content"><input id="text-toggle-simple" type="checkbox">
+    <div class="justification-text">Acetylsalicylic acid tablets 300 mg to 500 mg were added to the core list of the EML in 1987 for the treatment of acute migraine attacks.</div>
+    <label class="toggle-label" for="text-toggle-simple"></label></div>
+</div>
+</div>                  </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

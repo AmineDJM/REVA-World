@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/1036.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/1036?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/1036?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/1036/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/1036/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/1036?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/1036?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="metformin">
+          <a title="metformin" href="https://list.essentialmeds.org/medicines/191">
+        Metformin
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=419">
+      <span>18. Medicines for endocrine disorders</span>
+    </a>
+      <a class="section-link" href="/?section=423">
+      <span>18.5. Medicines for diabetes</span>
+    </a>
+      <a class="section-link" href="/?section=487">
+      <span>18.5.2. Hypoglycaemic agents</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=A10BA02" target="_blank">A10BA02</a>
+              </div>
+    </div>
+
+          <div class="decision-data-item emlc">EMLc</div>
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>Type 2 diabetes mellitus </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/119724091" target="_blank">
+            5A11
+          </a>
+        </span>
+      </div></div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">INN</div>
+  <div class="content-cell">Metformin</div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Core
+         (EML)<br>
+          Complementary
+          (EMLc)<br></div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Oral &gt; Solid: </strong>
+                      <span>
+              500 mg (hydrochloride)             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 1997
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/3ORLBfcefdAlKkxo8YWPILefl4PAWoZ4Gl1AMkj5.pdf">TRS
+            882</a>)
+                        </div>
+      <div>
+      Changed in 2007
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/MYIhv7kaenC7Fp1Eu10KnMhY7l99jHjW57GOjFeJ.pdf">TRS
+            950</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Also recommended for children</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Patents have expired in most jurisdictions
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+        <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Metformin" target="_blank">
+        <span>
+          Metformin
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00331" target="_blank">
+          <span>
+            Metformin
+                      </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification ">
+      <div class="simple-justification">
+  <div class="justification-section">
+  <div class="label">Summary of evidence and Expert Committee recommendations</div>
+  <div class="content"><input id="text-toggle-simple" type="checkbox">
+    <div class="justification-text">The EMLc Subcommittee noted that there is an emerging need for oral anti diabetic drugs suitable for children due to the increasing obesity epidemic and increasing Type II diabetes in children. The Subcommittee noted that glibenclamide and metformin were still primarily used in adult populations for Type II diabetes. The potential need of these medicines in adolescents and children was recognized. The Subcommittee decided not to include glibenclamide in the EMLc at present. The Subcommittee decided to include metformin in the EMLc on the complementary list. This area should be reviewed at a subsequent meeting taking into account available medicines and the changing epidemiology of Type II diabetes in children under 12 years.</div>
+    <label class="toggle-label" for="text-toggle-simple"></label></div>
+</div>
+</div>                  </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

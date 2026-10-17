@@ -144,19 +144,35 @@ def global_rows(stats: Mapping[str, Mapping[str, Any]], *, ts: str, raw: str) ->
     out = []
     for piece in ("Phase", "OverallStatus", "StudyType", "InterventionType"):
         s = stats[piece]
-        flags = {"measure": f"registered studies by {piece} (ClinicalTrials.gov field {s['field']})",
-                 "stock_as_of": ts, "unique_values": s["unique"]}
+        flags = {
+            "measure": f"registered studies by {piece} (ClinicalTrials.gov field {s['field']})",
+            "stock_as_of": ts,
+            "unique_values": s["unique"],
+        }
         items = [*s["values"], ("__field_missing__", s["missing"])]
         for i, (val, n) in enumerate(items):
-            out.append({
-                "source": "ctgov", "dataset": DS_GLOBAL,
-                "indicator": f"studies.registered|field={piece}|value={val}"[:200],
-                "concept_id": None, "iso3": None, "provider_geo": "WORLD", "entity_qid": None,
-                "period_start": start, "period_end": end, "value": str(n), "value_text": None, "unit": "studies",
-                "flags": json_obj(flags, **({"meaning": "studies without a value for this field"}
-                                            if val == "__field_missing__" else {})),
-                "raw_sha256": raw, "selector": json_obj({"url": STATS_URL, "piece": piece, "index": i}),
-            })
+            out.append(
+                {
+                    "source": "ctgov",
+                    "dataset": DS_GLOBAL,
+                    "indicator": f"studies.registered|field={piece}|value={val}"[:200],
+                    "concept_id": None,
+                    "iso3": None,
+                    "provider_geo": "WORLD",
+                    "entity_qid": None,
+                    "period_start": start,
+                    "period_end": end,
+                    "value": str(n),
+                    "value_text": None,
+                    "unit": "studies",
+                    "flags": json_obj(
+                        flags,
+                        **({"meaning": "studies without a value for this field"} if val == "__field_missing__" else {}),
+                    ),
+                    "raw_sha256": raw,
+                    "selector": json_obj({"url": STATS_URL, "piece": piece, "index": i}),
+                }
+            )
     return out
 
 
@@ -170,27 +186,59 @@ def country_rows(
     from reva.atlas.tables import json_obj
 
     start, end = _stock_period(ts)
-    base = {"measure": "registered studies with at least one location in the country (all statuses)",
-            "stock_as_of": ts, "country_name_as_published": None}
+    base = {
+        "measure": "registered studies with at least one location in the country (all statuses)",
+        "stock_as_of": ts,
+        "country_name_as_published": None,
+    }
     out = []
     for i, (name, n) in enumerate(stats["LocationCountry"]["values"]):
-        out.append({
-            "source": "ctgov", "dataset": DS_COUNTRY, "indicator": "studies.registered|phase=ALL",
-            "concept_id": None, "iso3": None, "provider_geo": name[:64], "entity_qid": None,
-            "period_start": start, "period_end": end, "value": str(n), "value_text": None, "unit": "studies",
-            "flags": json_obj({**base, "country_name_as_published": name}), "raw_sha256": stats_raw,
-            "selector": json_obj({"url": STATS_URL, "piece": "LocationCountry", "index": i}),
-        })
+        out.append(
+            {
+                "source": "ctgov",
+                "dataset": DS_COUNTRY,
+                "indicator": "studies.registered|phase=ALL",
+                "concept_id": None,
+                "iso3": None,
+                "provider_geo": name[:64],
+                "entity_qid": None,
+                "period_start": start,
+                "period_end": end,
+                "value": str(n),
+                "value_text": None,
+                "unit": "studies",
+                "flags": json_obj({**base, "country_name_as_published": name}),
+                "raw_sha256": stats_raw,
+                "selector": json_obj({"url": STATS_URL, "piece": "LocationCountry", "index": i}),
+            }
+        )
     for (name, phase), (n, raw) in sorted(phase_counts.items()):
         url = count_url(country_term(name, phase))
-        out.append({
-            "source": "ctgov", "dataset": DS_COUNTRY, "indicator": f"studies.registered|phase={phase}",
-            "concept_id": None, "iso3": None, "provider_geo": name[:64], "entity_qid": None,
-            "period_start": start, "period_end": end, "value": str(n), "value_text": None, "unit": "studies",
-            "flags": json_obj({**base, "country_name_as_published": name,
-                               "phase_note": "a study listing several phases (e.g. PHASE2|PHASE3) counts in each"}),
-            "raw_sha256": raw, "selector": json_obj({"url": url}),
-        })
+        out.append(
+            {
+                "source": "ctgov",
+                "dataset": DS_COUNTRY,
+                "indicator": f"studies.registered|phase={phase}",
+                "concept_id": None,
+                "iso3": None,
+                "provider_geo": name[:64],
+                "entity_qid": None,
+                "period_start": start,
+                "period_end": end,
+                "value": str(n),
+                "value_text": None,
+                "unit": "studies",
+                "flags": json_obj(
+                    {
+                        **base,
+                        "country_name_as_published": name,
+                        "phase_note": "a study listing several phases (e.g. PHASE2|PHASE3) counts in each",
+                    }
+                ),
+                "raw_sha256": raw,
+                "selector": json_obj({"url": url}),
+            }
+        )
     return out
 
 
@@ -209,38 +257,82 @@ def build_kg(
     ents: list[Any] = []
     sts: list[Any] = []
     skipped: Counter[str] = Counter()
-    for piece, kind, pid in (("ConditionMeshId", "condition", "ctgov:condition_mesh"),
-                             ("InterventionMeshId", "intervention", "ctgov:intervention_mesh")):
+    for piece, kind, pid in (
+        ("ConditionMeshId", "condition", "ctgov:condition_mesh"),
+        ("InterventionMeshId", "intervention", "ctgov:intervention_mesh"),
+    ):
         for rank, (mesh, n) in enumerate(stats[piece]["values"], start=1):
             if not MESH_RE.match(mesh):
                 skipped[f"{kind}_not_mesh_id"] += 1
                 continue
             q = f"ctgov:{kind}_mesh:{mesh}"
-            ents.append(KgEntity(
-                qid=q, kind=dc.KIND_TRIAL_AGG,
-                labels={"en": f"ClinicalTrials.gov studies with {kind} MeSH {mesh}"},
-                descriptions={"en": f"REVA-composed aggregate: studies registered on ClinicalTrials.gov whose "
-                              f"NLM-derived {kind} MeSH terms include {mesh} (counts only, no trial record)"},
-                source_revision=revision))
-            ref = [{"stated_in": "ClinicalTrials.gov API v2 /stats/field/values",
-                    "selector": {"url": STATS_URL, "piece": piece, "rank": rank}}]
-            sts.append(KgStatement(subject_qid=q, property_pid=pid, object_qid=f"mesh:{mesh}",
-                                   references=ref, source_revision=revision, raw_sha256=stats_raw))
-            sts.append(KgStatement(
-                subject_qid=q, property_pid="ctgov:studies_count", value=dc.count_value(n, "studies"),
-                point_in_time=when,
-                qualifiers={"phase": "ALL", "rank_in_top_250": rank, "stock_as_of": ts,
-                            "note": "registered studies (any status); not results, not efficacy"},
-                references=ref, source_revision=revision, raw_sha256=stats_raw))
+            ents.append(
+                KgEntity(
+                    qid=q,
+                    kind=dc.KIND_TRIAL_AGG,
+                    labels={"en": f"ClinicalTrials.gov studies with {kind} MeSH {mesh}"},
+                    descriptions={
+                        "en": f"REVA-composed aggregate: studies registered on ClinicalTrials.gov whose "
+                        f"NLM-derived {kind} MeSH terms include {mesh} (counts only, no trial record)"
+                    },
+                    source_revision=revision,
+                )
+            )
+            ref = [
+                {
+                    "stated_in": "ClinicalTrials.gov API v2 /stats/field/values",
+                    "selector": {"url": STATS_URL, "piece": piece, "rank": rank},
+                }
+            ]
+            sts.append(
+                KgStatement(
+                    subject_qid=q,
+                    property_pid=pid,
+                    object_qid=f"mesh:{mesh}",
+                    references=ref,
+                    source_revision=revision,
+                    raw_sha256=stats_raw,
+                )
+            )
+            sts.append(
+                KgStatement(
+                    subject_qid=q,
+                    property_pid="ctgov:studies_count",
+                    value=dc.count_value(n, "studies"),
+                    point_in_time=when,
+                    qualifiers={
+                        "phase": "ALL",
+                        "rank_in_top_250": rank,
+                        "stock_as_of": ts,
+                        "note": "registered studies (any status); not results, not efficacy",
+                    },
+                    references=ref,
+                    source_revision=revision,
+                    raw_sha256=stats_raw,
+                )
+            )
     for (mesh, phase), (n, raw) in sorted(phase_counts.items()):
-        sts.append(KgStatement(
-            subject_qid=f"ctgov:condition_mesh:{mesh}", property_pid="ctgov:studies_count",
-            value=dc.count_value(n, "studies"), point_in_time=when,
-            qualifiers={"phase": phase, "stock_as_of": ts,
-                        "phase_note": "a study listing several phases (e.g. PHASE2|PHASE3) counts in each"},
-            references=[{"stated_in": "ClinicalTrials.gov API v2 /studies countTotal",
-                         "selector": {"url": count_url(condition_term(mesh, phase))}}],
-            source_revision=revision, raw_sha256=raw))
+        sts.append(
+            KgStatement(
+                subject_qid=f"ctgov:condition_mesh:{mesh}",
+                property_pid="ctgov:studies_count",
+                value=dc.count_value(n, "studies"),
+                point_in_time=when,
+                qualifiers={
+                    "phase": phase,
+                    "stock_as_of": ts,
+                    "phase_note": "a study listing several phases (e.g. PHASE2|PHASE3) counts in each",
+                },
+                references=[
+                    {
+                        "stated_in": "ClinicalTrials.gov API v2 /studies countTotal",
+                        "selector": {"url": count_url(condition_term(mesh, phase))},
+                    }
+                ],
+                source_revision=revision,
+                raw_sha256=raw,
+            )
+        )
     rep = {"aggregates": len(ents), "statements": len(sts), "skipped": dict(skipped)}
     return ents, sts, rep
 
@@ -293,10 +385,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     fixture = run.origin == "test_fixture"
     out: dict[str, Any] = {"data_timestamp": ts, "stats": {k: len(v["values"]) for k, v in stats.items()}}
     if run.wants(DS_GLOBAL):
-        out[DS_GLOBAL] = run.register(dataset=DS_GLOBAL, frame=pl.DataFrame(global_rows(stats, ts=ts, raw=ssha),
-                                      schema=ATLAS_SCHEMA), raw_sha256s=[ssha],
-                                      coverage_note=f"ClinicalTrials.gov registered studies by field value as of {ts}",
-                                      rights=dict(RIGHTS))
+        out[DS_GLOBAL] = run.register(
+            dataset=DS_GLOBAL,
+            frame=pl.DataFrame(global_rows(stats, ts=ts, raw=ssha), schema=ATLAS_SCHEMA),
+            raw_sha256s=[ssha],
+            coverage_note=f"ClinicalTrials.gov registered studies by field value as of {ts}",
+            rights=dict(RIGHTS),
+        )
     if run.wants(DS_COUNTRY):
         names = [n for n, _ in stats["LocationCountry"]["values"]]
         if fixture:
@@ -311,11 +406,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 pc[(name, ph)] = (parse_total(b, f"ctgov count {name} {ph}"), sha)
         rows = country_rows(stats, pc, ts=ts, stats_raw=ssha)
         out[DS_COUNTRY] = run.register(
-            dataset=DS_COUNTRY, frame=pl.DataFrame(rows, schema=ATLAS_SCHEMA),
+            dataset=DS_COUNTRY,
+            frame=pl.DataFrame(rows, schema=ATLAS_SCHEMA),
             raw_sha256s=sorted({ssha, *[v[1] for v in pc.values()]}),
             coverage_note=f"ClinicalTrials.gov studies with a site in the country, all phases ({len(stats['LocationCountry']['values'])} "
             f"countries) and phases 1-4 ({len(names)} countries), as of {ts}",
-            geo_scheme=GEO_SCHEME, rights=dict(RIGHTS))
+            geo_scheme=GEO_SCHEME,
+            rights=dict(RIGHTS),
+        )
     if run.wants(DS_KG):
         conds = [m for m, _ in stats["ConditionMeshId"]["values"] if MESH_RE.match(m)]
         if fixture:
@@ -333,15 +431,33 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         if dc.kg_available(run.engine):
             retrieved: datetime = vraw.retrieved_at
             out["kg"] = dc.load_kg(
-                run.engine, run.store, entities=ents, statements=sts, source_key=SOURCE_KEY,
-                raw_sha256s=sorted({ssha, *[v[1] for v in cc.values()]}), retrieved_at=retrieved, origin=run.origin,
+                run.engine,
+                run.store,
+                entities=ents,
+                statements=sts,
+                source_key=SOURCE_KEY,
+                raw_sha256s=sorted({ssha, *[v[1] for v in cc.values()]}),
+                retrieved_at=retrieved,
+                origin=run.origin,
                 parameters={"connector": NAME, "parser": PARSER_VERSION, "conditions_with_phases": len(conds)},
-                prefixes=("ctgov:",), retract=cap is None)
+                prefixes=("ctgov:",),
+                retract=cap is None,
+            )
         else:
             out["kg"] = {"status": "kg_unavailable"}
     _ = vsha
     return out
 
 
-__all__ = ["NAME", "SOURCE_KEY", "atlas_ingest", "atlas_source", "build_kg", "country_rows", "global_rows",
-           "parse_stats", "parse_total", "parse_version"]
+__all__ = [
+    "NAME",
+    "SOURCE_KEY",
+    "atlas_ingest",
+    "atlas_source",
+    "build_kg",
+    "country_rows",
+    "global_rows",
+    "parse_stats",
+    "parse_total",
+    "parse_version",
+]

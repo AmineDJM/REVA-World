@@ -164,7 +164,9 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
 DAILY_FAMILY_RULES = ("month_end_of_daily", "month_end_spread_of_daily", "meeting_change")
 
 
-def family_daily_cells(frame: pl.DataFrame, family: Family, provider_geo: str) -> list[tuple[date, str, dict[str, Any]]]:
+def family_daily_cells(
+    frame: pl.DataFrame, family: Family, provider_geo: str
+) -> list[tuple[date, str, dict[str, Any]]]:
     """Published day cells of a daily-sourced family for one provider geography (spread families: the day-by-day
     difference of ``indicator`` and ``indicator_minus`` on the days both are published)."""
     from reva.evaluation.registry import finance as FN

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/1097.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/1097?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/1097?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/1097/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/1097/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/1097?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/1097?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="nicotine replacement therapy">
+          <a title="nicotine replacement therapy" href="https://list.essentialmeds.org/medicines/530">
+        Nicotine replacement therapy
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=450">
+      <span>24. Medicines for mental and behavioural disorders</span>
+    </a>
+      <a class="section-link" href="/?section=454">
+      <span>24.5. Medicines for disorders due to psychoactive substance use</span>
+    </a>
+      <a class="section-link" href="/?section=521">
+      <span>24.5.2. Medicines for nicotine use disorders</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=N07BA01" target="_blank">N07BA01</a>
+              </div>
+    </div>
+
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>Nicotine dependence </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/1699574100/mms/unspecified" target="_blank">
+            6C4A.2Z
+          </a>
+        </span>
+      </div></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Core</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Local &gt; Topical &gt; Transdermal patch: </strong>
+                      <span>
+              5 to 30 mg per 16 hour ;             </span>
+                      <span>
+              7 to 21 mg per 24 hour             </span>
+                    <br>
+                  <strong>Oral &gt; Solid &gt; lozenge: </strong>
+                      <span>
+              2 mg ;             </span>
+                      <span>
+              4 mg lozenge             </span>
+                    <br>
+                  <strong>Local &gt; Buccal &gt; Oral spray: </strong>
+                      <span>
+              1 mg per  actuation             </span>
+                    <br>
+                  <strong>Local &gt; Buccal &gt; Chewing gum: </strong>
+                      <span>
+              2 mg ;             </span>
+                      <span>
+              4 mg             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 2009
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/Ny8eU2gkJAmi85MnjL3R9naY4LWvnpKREcroWn6m.pdf">TRS
+            958</a>)
+                        </div>
+      <div>
+      Changed in 2023
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/ntOzhQ9IStmS0AojLfKt8wtb06mhzvcIyaLQn7EG.pdf">TRS
+            1049</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Adolescents and adults</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Patents have expired in most jurisdictions
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+        <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Nicotine_replacement_therapy" target="_blank">
+        <span>
+          Nicotine replacement therapy
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00184" target="_blank">
+          <span>
+            Nicotine replacement therapy
+                          (Nicotine)          </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification pre-ws">
+            <div>
+  <div class="justification-section">
+  <div class="label">Expert Committee recommendation</div>
+  <div class="content"><input id="text-toggle-justification" type="checkbox">
+    <div class="justification-text">The Expert Committee acknowledged the substantial public health burden posed by smoking and the need for effective smoking cessation treatments. Smoking is the most important modifiable risk factor of morbidity and mortality and is associated with negative outcomes in a range of diseases. The Committee considered that adding additional smoking cessation options to the EML could be an important step in increasing access to smoking cessation treatment.
+
+The Committee considered that the evidence presented in the application supported the effectiveness of all forms of NRT in increasing abstinence and cessation rates. The Committee also noted that there did not appear to be significant differences in efficacy between different NRT formulations. With regard to safety, the Committee noted that the adverse effects associated with NRT were well known and generally acceptable. The Committee considered that the benefits of treatment in helping users to achieve abstinence and cessation were sufficient to outweigh the risks, and that the balance of benefits and harms was favourable.
+
+The Committee recognized that smoking cessation interventions were among the most cost-effective public health interventions. The Committee recalled that NRT was considered to be cost-effective by the 2009 Expert Committee when NRT as gum and transdermal patches were recommended for addition to the EML. The Committee considered that the availability of different forms of NRT would provide options and choice for patients and clinicians, and could facilitate increased market competition, reduce costs and improve affordable access for health systems.
+
+The Committee also welcomed the information from the WHO Department of Health Promotion that WHO guidelines for tobacco cessation were in development.
+
+Based on these considerations, the Expert Committee recommended the inclusion of nicotine lozenges and mouth spray on the core list of the EML as additional forms of NRT for tobacco and smoking cessation.</div>
+    <label class="toggle-label" for="text-toggle-justification"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Background</div>
+  <div class="content"><input id="text-toggle-background" type="checkbox">
+    <div class="justification-text">NRT as chewing gum and transdermal patch has been included on the EML since 2009. The Expert Committee recommended listing on the basis of public health need, high-quality evidence of effectiveness, and acceptable safety and cost–effectiveness. Other formulations were not recommended for inclusion at the time because less evidence was available on comparative safety, effectiveness and cost in different populations (1).</div>
+    <label class="toggle-label" for="text-toggle-background"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Public health relevance</div>
+  <div class="content"><input id="text-toggle-publicHealthRelevance" type="checkbox">
+    <div class="justification-text">The public health relevance of smoking cessation interventions is well established and accepted. The tobacco epidemic is a major public health threat, killing more than 8 million people a year. In 2020, 22.3% of the world population used tobacco. More than 80% of global tobacco users live in low- and middle-income countries (2).</div>
+    <label class="toggle-label" for="text-toggle-publicHealthRelevance"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Benefits</div>
+  <div class="content"><input id="text-toggle-benefits" type="checkbox">
+    <div class="justification-text">NRT – all forms
+
+A 2018 Cochrane systematic review of 133 randomized controlled trials (64 640 participants) evaluated the effectiveness and safety of different NRT preparations compared with placebo or no NRT interventions for achieving long-term smoking cessation (3). The review included eight randomized controlled trials (4439 participants) on nicotine oral tablets/lozenges and one randomized controlled trial (542 participants) on nicotine mouth spray. The outcome measure evaluated was abstinence from smoking after at least 6 months of follow-up. The risk ratio (RR) of abstinence for any form of NRT compared with control was 1.55 (95% confidence interval (CI) 1.49 to 1.61). From a pooled analysis of the trials for oral tablets/lozenges, the RR for abstinence was 1.52 (95% CI 1.32 to 1.74). The RR for abstinence for mouth spray was 2.48 (95% CI 1.24 to 4.94). In comparison, the RRs for abstinence for the NRT forms currently included on the EML were 1.49 (95% CI 1.40 to 1.60) for nicotine gum (56 randomized controlled trials, 22 581 participants) and 1.64 (95% CI 1.53 to 1.75) for nicotine transdermal patch (51 randomized controlled trials, 25 754 participants). The authors concluded that there was high-quality evidence that NRT increased quit rates at 6 months or longer in adult smokers who were motivated to quit. Furthermore, the delivery form of NRT was unrelated to effectiveness, therefore preference, availability and cost might determine the form chosen. The quality of evidence was rated as high, based on Grading of Recommendations, Assessment, Development, and Evaluations (GRADE).
+
+NRT mouth spray
+
+A randomized controlled trial in the United States compared nicotine mouth spray with placebo in 1198 smokers motivated to quit (4). For the primary study endpoint of self-reported, objectively verified continuous abstinence from smoking from week 2 until week 6, 5.0% of participants in the intervention group had quit smoking compared with 2.5% in the placebo group (RR 2.0, 95% CI 1.1 to 3.7). For the secondary study endpoint of self-reported, objectively verified continuous abstinence from smoking from week 2 until and including week 26, 3.4% of participants in the intervention group had quit smoking compared with 1.2% in the placebo group (RR 2.87, 95% CI 1.23 to 6.71).
+
+A multicentre, randomized, double-blind efficacy and safety study compared nicotine mouth spray with placebo and evaluated self-reported, carbon monoxide-verified continuous abstinence from smoking in 479 smokers at clinics in Denmark and Germany (5). Study participants also received low-intensity counselling. Treatment with nicotine mouth spray was associated with significantly higher continuous abstinence rates than placebo at all time points: week 6 (26.1% versus 16.1%; RR 1.62, 95% CI 1.09 to 2.41), week 24 (15.7% versus 6.8%; RR 2.30, 95% CI 1.23 to 4.30) and week 52 (13.8% versus 5.6%; RR 2.48, 95% CI 1.24 to 4.94).
+
+A 2010 randomized, within-subject, crossover trial compared the effects on craving, user satisfaction and consumption patterns of nicotine mouth spray 1 mg/dose, lozenge 2.5 mg, gum 4 mg, and placebo used for 8 hours after overnight tobacco abstinence (6). The study included 47 dependent adult smokers, and rated craving, irritability, concentration and restlessness before and during the first 60 minutes of product use on a 100-point visual analogue scale. Mean reductions in craving scores from baseline to 60 minutes were 28.6, 25.8, 24.7 and 8.9 points for mouth spray, gum, lozenge and placebo, respectively. Compared with placebo, nicotine mouth spray was associated with a significant reduction in craving scores within 5 minutes. Compared with nicotine gum, nicotine mouth spray was associated with a significant reduction in craving scores at time points up to 15 minutes. No significant differences were seen between active products. The authors concluded that the mouth spray may be particularly useful for acute craving relief.
+
+A 2007 randomized study evaluated patient preference, safety and efficacy of nicotine mouth spray 1 mg/dose, nicotine gum 2 mg and nicotine inhaler 10 mg for 12 weeks in 100 adult smokers motivated to quit (7). The results of the efficacy analysis for continuous abstinence at 12 weeks were 16% for the mouth spray, 20% for the gum and 8% for the inhaler. At 12 months, continuous abstinence rates were 12%, 8% and 4% for the mouth spray, gum and inhaler, respectively. Point-prevalence abstinence rates at 12 months were 16%, 8% and 4% for the mouth spray, gum and inhaler, respectively. Results for patient preference showed that 54% of participants preferred the mouth spray, 28% preferred the inhaler and 18% preferred gum. Direct comparisons significantly favoured mouth spray over gum and mouth spray over inhaler.</div>
+    <label class="toggle-label" for="text-toggle-benefits"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Harms</div>
+  <div class="content"><input id="text-toggle-harms" type="checkbox">
+    <div class="justification-text">A number of adverse effects are commonly associated with NRT use, however serious adverse effects are rare. The adverse effects associated with NRT are due to the pharmacological action of nicotine as well as the mode and site of the NRT application.
+
+A 2010 systematic review and meta-analysis of 92 randomized clinical trials of NRT versus inert controls (32 185 participants) and 28 observational studies (145 205 participants) evaluated the magnitude of reported adverse effects with NRT (8). Pooled evidence from the randomized controlled trials of various formulations of NRT found that NRT was associated with a significantly increased risk of heart palpitations and chest pain (odds ratio (OR) 2.06, 95% CI 1.51 to 2.82), nausea and vomiting (OR 1.67, 95% CI 1.37 to 2.04), gastrointestinal complaints (OR 1.54, 95% CI 1.25 to 1.89) and insomnia (OR 1.42, 95% CI 1.21 to 1.66). Orally administered NRT formulations were associated with significantly increased risk of hiccups (OR 7.68, 95% CI 4.59 to 12.85), cough (OR 2.89, 95% CI 1.92 to 4.33), mouth and throat soreness (OR 1.87, 95% CI 1.36 to 2.57), and mouth ulcers (OR 1.49, 95% CI 1.05 to 2.20). NRT transdermal patches were associated with a significant increase in skin irritations (OR 2.80, 95% CI 2.28 to 3.24). No significantly increased risk in anxiety or depressive symptoms was observed for NRT use.
+
+The 2018 Cochrane review supported these earlier safety findings, stating that adverse events from using NRT were related to the type of product and included skin irritation from patches and irritation to the inside of the mouth from gum and tablets (3). Attempts to quantitatively synthesize the incidence of various adverse effects were hindered because of the wide variation in reporting the nature, timing and duration of symptoms. The OR of chest pains or palpitations for any form of NRT relative to control was 1.88 (95% CI 1.37 to 2.57; 15 trials, 11 074 participants). However, chest pains and palpitations were rare in both groups and serious adverse events were extremely rare.
+
+The 2018 Cochrane review described the most common adverse events associated with nicotine gum to be hiccups, gastrointestinal disturbances, jaw pain and orodental problems. For nicotine patches, skin sensitivity and local irritation was common, affecting up to 54% of users, but it was usually mild and rarely led to treatment discontinuation. The main adverse events associated with nicotine inhaler and oral or nasal sprays were local irritation at the site of administration (e.g. throat irritation, coughing, burning in the mouth and hiccups).
+
+These findings are supported by data synthesized by the applicants from randomized clinical trials of oromucosal nicotine formulations (gum and lozenges) for smoking cessation.</div>
+    <label class="toggle-label" for="text-toggle-harms"></label></div>
+</div>
+    <div class="justification-section">
+  <div class="label">Cost / cost effectiveness</div>
+  <div class="content"><input id="text-toggle-cost" type="checkbox">
+    <div class="justification-text">Evidence for the comparative cost–effectiveness of nicotine lozenges and mouth spray was not presented in the application.
+
+From pricing data purchased and reported by the applicants, available globally representative pricing data show that NRT lozenge is sold at an average cost of US$ 0.42 per piece (22% less than gum) and a weighted average daily cost of US$ 3.41 a day (9% less than gum), while NRT mouth spray is sold at an average cost of US$ 0.37 per spray and an estimated daily cost of US$ 6.06 (based on 30 sprays a day, which is consistent with dosage for a moderate cigarette smoker).</div>
+    <label class="toggle-label" for="text-toggle-cost"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">WHO guidelines</div>
+  <div class="content"><input id="text-toggle-whoGuidelines" type="checkbox">
+    <div class="justification-text">WHO guidelines for tobacco cessation in adults to guide proper use of tobacco cessation medications including NRT are currently in development and are expected to be published in late 2023.</div>
+    <label class="toggle-label" for="text-toggle-whoGuidelines"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Availability</div>
+  <div class="content"><input id="text-toggle-availability" type="checkbox">
+    <div class="justification-text">The Johnson & Johnson brand of nicotine lozenge has regulatory approval in 26 (predominantly high-income) countries. Generic brands of nicotine lozenge are available in some countries.
+
+The Johnson & Johnson brand of nicotine mouth spray has regulatory approval in 54 (predominantly high- and upper middle-income) countries. Generic brands of nicotine mouth spray are available in some countries.</div>
+    <label class="toggle-label" for="text-toggle-availability"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Other considerations</div>
+  <div class="content"><input id="text-toggle-otherConsiderations" type="checkbox">
+    <div class="justification-text">The WHO Department of Health Promotion reviewed and provided comments on the application. The technical department supported the inclusion of nicotine lozenges and mouth spray on the EML and considered that their inclusion could help tobacco users to quit by providing a wider choice of NRT options. The technical department highlighted that the proposal was supported by great need among populations and the evidence of efficacy and comparative cost-effectiveness. 
+
+In August 2023, WHO issued the first invitation to manufacturers of medicinal products for treatment of disorders caused by the use of tobacco to submit an expression of interest for WHO prequalification. Medicinal products in the invitation included NRT such as chewing gum 2 mg and 4 mg, and transdermal patches 5 mg to 25 mg/16 hours and 7 mg to 21 mg/24 hours (9).</div>
+    <label class="toggle-label" for="text-toggle-otherConsiderations"></label></div>
+</div>
+        <div class="justification-section references">
+      <div class="content">
+        <input id="references-toggle" type="checkbox">
+        <label for="references-toggle" class="references-toggle-label visible">
+          Show references
+        </label>
+        <label for="references-toggle" class="references-toggle-label hidden">
+          Hide references
+        </label>
+        <div class="references-content">1.	The selection and use of essential medicines. Report of the WHO Expert Committee, 2009 (including the 16th WHO Model List of Essential Medicines and the 2nd WHO Model List of Essential Medicines for Children). Geneva: World Health Organization; 2009 (WHO Technical Report Series, No. 958; https://apps.who.int/iris/handle/10665/44287, accessed 6 October 2023).
+2.	Tobacco – fact sheet [internet]. Geneva: World Health Organization; 2022 (https://www.who.int/news-room/fact-sheets/detail/tobacco, accessed 6 October 2023).
+3.	Hartmann-Boyce J, Chepkin SC, Ye W, Bullen C, Lancaster T. Nicotine replacement therapy versus control for smoking cessation. Cochrane Database Syst Rev. 2018;5(5):CD000146.
+4.	Nides M, Danielsson T, Saunders F, Perfekt R, Kapikian R, Solla J, et al. Efficacy and safety of a nicotine mouth spray for smoking cessation: a randomized, multicenter, controlled study in a naturalistic setting. Nicotine Tob Res. 2020;22(3):339–45.
+5.	Tonnesen P, Lauri H, Perfekt R, Mann K, Batra A. Efficacy of a nicotine mouth spray in smoking cessation: a randomised, double-blind trial. Eur Respir J. 2012;40(3):548–54.
+6.	McRobbie H, Thornley S, Bullen C, Lin RB, Senior H, Laugesen M, et al. A randomized trial of the effects of two novel nicotine replacement therapies on tobacco withdrawal symptoms and user satisfaction. Addiction. 2010;105(7):1290–8.
+7.	Bolliger CT, van Biljon X, Axelsson A. A nicotine mouth spray for smoking cessation: a pilot study of preference, safety and efficacy. Respiration. 2007;74(2):196–201.
+8.	Mills EJ, Wu P, Lockhart I, Wilson K, Ebbert JO. Adverse events associated with nicotine replacement therapy (NRT) for smoking cessation. A systematic review and meta-analysis of one hundred and twenty studies involving 177,390 individuals. Tob Induc Dis. 2010;8(1):8.
+9.	1st Invitation to manufacturers of medicinal products for treatment of disorders caused by use of tobacco, to submit an Expression of Interest (EOI) for product evaluation to the WHO Prequalification Unit. Geneva: World Health Organization; 2023 (https://extranet.who.int/prequal/sites/default/files/document_files/EOI_Tobacco_v2_14August2023.pdf, accessed 6 October 2023).</div>
+      </div>
+    </div>
+  </div>            </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

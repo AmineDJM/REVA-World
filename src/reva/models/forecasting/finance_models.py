@@ -244,7 +244,7 @@ class Garch:
 def _garch_filter(x2: np.ndarray, omega: float, alpha: float, beta: float, s0: float) -> np.ndarray:
     """Conditional variances ``s2[t]`` (variance of day t given days < t), ``s2[0] = s0``; length ``n + 1`` (the
     last entry is the one-step-ahead variance). Linear recursion evaluated with ``scipy.signal.lfilter``."""
-    from scipy.signal import lfilter
+    from scipy.signal import lfilter  # type: ignore[import-untyped]
 
     u = np.empty(x2.size + 1)
     u[0] = s0
@@ -256,7 +256,7 @@ def _garch_filter(x2: np.ndarray, omega: float, alpha: float, beta: float, s0: f
 
 def garch11_fit(r: Sequence[float] | np.ndarray) -> Garch | Abstain:
     """Gaussian QMLE of a zero-mean GARCH(1,1) with variance targeting (omega = (1 - a - b) * sample variance)."""
-    from scipy.optimize import minimize
+    from scipy.optimize import minimize  # type: ignore[import-untyped]
 
     x = np.asarray(r, dtype=float)
     if x.size < GARCH_MIN:

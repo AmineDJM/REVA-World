@@ -1,0 +1,33 @@
+# V6 (agent PRED-FIN): central-bank monetary-policy meeting calendars. Connector
+# src/reva/adapters/connectors/atlas_cb_calendars.py (atlas table cbcal.meetings). Used by the forecast registry's
+# policy-meeting question families (registry/forecasts/question_specs.yaml, fin.*_hike / fin.*_cut).
+source_key: cbcal.calendars
+title: Central-bank meeting calendars — FOMC, ECB Governing Council, Bank of England MPC (scheduled decision days)
+provider_url: https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm
+lineage_family: cbcal
+rights:
+  licence: >-
+    Per row: Federal Reserve Board website public domain (cite the Board); ECB website copyright (free use, cite the
+    ECB); Bank of England website content for personal or internal non-commercial use unless the Bank grants
+    permission (rows flagged licence_restriction = non_commercial_internal)
+  licence_url: https://www.federalreserve.gov/disclaimer.htm
+  attribution: "Sources: Board of Governors of the Federal Reserve System; European Central Bank; Bank of England"
+  terms_quote: >-
+    Unless otherwise indicated, information on Board's website is in the public domain and may be copied and
+    distributed without permission. Please cite to the Board as the source of the information. [ECB] users of this
+    website may make free use of the information obtained directly from it subject to the following conditions:
+    When such information is distributed or reproduced, it must appear accurately and the ECB must be cited as the
+    source. [Bank of England] download, display or print the Resources for personal use or internal use within an
+    individual organisation for non-commercial purposes.
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [www.federalreserve.gov, www.ecb.europa.eu, www.bankofengland.co.uk]
+  files:
+    fomc: https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm
+    ecb: https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html
+    boe: https://www.bankofengland.co.uk/monetary-policy/upcoming-mpc-dates
+  authentication: none
+  cadence: weekly (calendars change rarely; a changed calendar is a new table version)
+  publication: >-
+    Announced schedules: the decision day of each scheduled meeting as published on the fetch date
+    (flags.as_of); unscheduled meetings are never listed in advance.

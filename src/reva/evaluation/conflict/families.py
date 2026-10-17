@@ -164,7 +164,9 @@ def family_doc(fam: ConflictFamily, countries: list[str]) -> dict[str, Any]:
     return doc
 
 
-def question_texts(fam: ConflictFamily, geo_fr: str, geo_en: str, iso3: str, year: str, last: dict[str, str]) -> tuple[str, str]:
+def question_texts(
+    fam: ConflictFamily, geo_fr: str, geo_en: str, iso3: str, year: str, last: dict[str, str]
+) -> tuple[str, str]:
     lp, lv = last["period"], last["value"]
     if fam.kind == "quantity":
         return (

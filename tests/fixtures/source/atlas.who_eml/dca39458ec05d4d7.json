@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/372.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/372?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/372?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/372/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/372/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/372?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/372?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="acetylsalicylic acid">
+          <a title="acetylsalicylic acid" href="https://list.essentialmeds.org/medicines/13">
+        Acetylsalicylic acid
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=466">
+      <span>29. Medicines for diseases of joints</span>
+    </a>
+      <a class="section-link" href="/?section=502">
+      <span>29.3. Medicines for juvenile joint diseases</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=N02BA01" target="_blank">N02BA01</a>
+              </div>
+    </div>
+
+          <div class="decision-data-item emlc">EMLc</div>
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>Mucocutaneous lymph node syndrome </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/540285662" target="_blank">
+            4A44.5
+          </a>
+        </span>
+      </div></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Complementary</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Additional notes</div>
+  <div class="content-cell">Acute or chronic use for rheumatic fever, juvenile arthritis , Kawasaki disease</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Local &gt; Rectal &gt; Suppository: </strong>
+                      <span>
+              150 mg ;             </span>
+                      <span>
+              300 mg             </span>
+                    <br>
+                  <strong>Oral &gt; Solid &gt; dispersible tablet: </strong>
+                      <span>
+              75 mg ;             </span>
+                      <span>
+              300 mg ;             </span>
+                      <span>
+              500 mg             </span>
+                    <br>
+                  <strong>Oral &gt; Solid &gt; tablet: </strong>
+                      <span>
+              75 to 500 mg             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 2007
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/MYIhv7kaenC7Fp1Eu10KnMhY7l99jHjW57GOjFeJ.pdf">TRS
+            950</a>)
+                        </div>
+      <div>
+      Changed in 2013
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/PXjEBzgbrMCpEHRGYEuB56NGdqGSBShvFrSzvRTL.pdf">TRS
+            985</a>)
+                        </div>
+      <div>
+      Changed in 2025
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/PVghq4UEIFj1jlSjrQE1BcP6fkPX0qQLLvzXcpV9.pdf">TRS
+            1064</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Also recommended for children</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Patents have expired in most jurisdictions
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+        <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Acetylsalicylic_acid" target="_blank">
+        <span>
+          Acetylsalicylic acid
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00945" target="_blank">
+          <span>
+            Acetylsalicylic acid
+                      </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification pre-ws">
+      <div class="simple-justification">
+  <div class="justification-section">
+  <div class="label">Summary of evidence and Expert Committee recommendations</div>
+  <div class="content"><input id="text-toggle-simple" type="checkbox">
+    <div class="justification-text">Following the review of the age-appropriateness of formulations of essential medicines for children, the Expert Committee recommended the following changes to the listing of acetylsalicylic acid:
+
+- the lower strength of the range of strengths for acetylsalicylic acid tablets be changed from 100 mg to 75 mg;
+- removal of the 50 mg strength of suppositories, and addition of 300 mg strength of suppositories;
+- addition of dispersible tablets (75 g, 300 mg and 500 mg) to facilitate dosing in children unable to swallow solid tablets.</div>
+    <label class="toggle-label" for="text-toggle-simple"></label></div>
+</div>
+</div>                  </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

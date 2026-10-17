@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/1280.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/1280?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/1280?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/1280/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/1280/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/1280?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/1280?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="imatinib">
+          <a title="imatinib" href="https://list.essentialmeds.org/medicines/95">
+        Imatinib
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=374">
+      <span>8. Immunomodulators and antineoplastics</span>
+    </a>
+      <a class="section-link" href="/?section=376">
+      <span>8.2. Antineoplastics and supportive medicines</span>
+    </a>
+      <a class="section-link" href="/?section=481">
+      <span>8.2.2. Targeted therapies</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=L01EA01" target="_blank">L01EA01</a>
+              </div>
+    </div>
+
+          <div class="decision-data-item emlc">EMLc</div>
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>B lymphoblastic leukaemia or lymphoma with t(9:22) (q34;q11.2); BCR-ABL1 </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/381281608" target="_blank">
+            2A70.1
+          </a>
+        </span>
+      </div></div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">INN</div>
+  <div class="content-cell">Imatinib</div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Complementary</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Oral &gt; Solid: </strong>
+                      <span>
+              100 mg ;             </span>
+                      <span>
+              400 mg             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 2021
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/hHDQtV59PtnnPEJQ5mVfaUuDMfCQzSoduRDvWWxq.pdf">TRS
+            1035</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Also recommended for children</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Patents have expired in most jurisdictions
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+    <div class="header-row">
+  <div class="label-cell">Tags</div>
+  <div class="content-cell"><label class="tag-label l-2">
+          Cancer
+        </label></div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Imatinib" target="_blank">
+        <span>
+          Imatinib
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00619" target="_blank">
+          <span>
+            Imatinib
+                      </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification ">
+            <div>
+  <div class="justification-section">
+  <div class="label">Expert Committee recommendation</div>
+  <div class="content"><input id="text-toggle-justification" type="checkbox">
+    <div class="justification-text">The Expert Committee noted that Philadelphia chromosome positive (Ph+) acute lymphoblastic leukaemia is the most frequent genetic subtype of acute lymphoblastic leukaemia in adults and historically has been associated with poor outcomes. The Committee acknowledged that the 5-year survival of adult patients with Ph+ acute lymphoblastic leukaemia with conventional chemotherapy was 10–20%, with a median survival of about 16 months. The addition of imatinib to conventional chemotherapy has halved the risk of premature death to around 50% and is now considered the standard of care for first-line treatment of Ph+ acute lymphoblastic leukaemia.
+The Committee considered the results of the meta-analysis of comparative cohort studies included in the application, which indicated a difference in median survival of 12 months with the addition of imatinib to standard chemotherapy in the treatment of acute lymphoblastic leukaemia, based on low-quality evidence. The Committee considered this to represent a highly relevant improvement in clinical benefit. The Committee considered that the safety profile of imatinib is well known and generally acceptable, and that imatinib is already listed in the EML for chronic myeloid leukaemia and gastrointestinal stromal tumour.
+The Committee took into account that accurate identification of the presence of the predictive biomarker (Ph+ or BCR/ABL fusion gene) requires complex tests and is central to the appropriate use of any tyrosine kinase inhibitor in acute lymphoblastic leukaemia.
+The Expert Committee therefore recommended the inclusion of imatinib on the EML for the treatment of adults with Ph+ acute lymphoblastic leukaemia, considering the overall survival benefit, acceptable safety profile, and that imatinib is off-patent and generic brands are becoming widely available. Noting the benefits of imatinib for paediatric patients with Ph+ acute lymphoblastic leukaemia, the Committee also extended the recommendation to inclusion on EMLc. The Committee considered that other tyrosine kinase inhibitors (e.g. dasatinib, ponatinib) might have also have a place in the treatment of Ph+ acute lymphoblastic leukaemia but that currently, data were less mature. The Committee therefore did not support the inclusion of other tyrosine kinase inhibitors within the therapeutic class at this time but would welcome a future application when mature data are available.</div>
+    <label class="toggle-label" for="text-toggle-justification"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Background</div>
+  <div class="content"><input id="text-toggle-background" type="checkbox">
+    <div class="justification-text">Imatinib was added to the EML in 2015 for the treatment of chronic myeloid leukaemia and gastrointestinal stromal tumour (1). It was added to the EMLc for the same indications in 2019 (2). Imatinib has not previously been considered for inclusion on the EML or EMLc for the treatment of Ph+ acute lymphoblastic leukaemia.</div>
+    <label class="toggle-label" for="text-toggle-background"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Public health relevance</div>
+  <div class="content"><input id="text-toggle-publicHealthRelevance" type="checkbox">
+    <div class="justification-text">Acute lymphoblastic leukaemia accounts for about 15% of all leukaemias (3). While it is the most common cancer in children, it is a relatively infrequent disease in adults. Excluding the paediatric population, its incidence increases with age and most new cases are diagnosed in individuals older than 65 years (4). Before the introduction of targeted therapies, the prognosis was particularly poor, with a 5-year survival of around 10–20% (5–7). 
+The Philadelphia chromosome is the most frequent cytogenetic abnormality in adults with acute lymphoblastic leukaemia. It is seen in about 30–40% of all cases (8). It corresponds to a translocation between the ABL-1 oncogene on chromosome 9 and a breakpoint cluster region (BCR) on chromosome 22, resulting in a fusion gene, BCR-ABL, that encodes a constitutively active tyrosine kinase (9). Before the introduction of tyrosine kinase inhibitors, the presence of the Philadelphia chromosome was associated with a significantly lower probability of remission and survival at 5 years (10).</div>
+    <label class="toggle-label" for="text-toggle-publicHealthRelevance"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Benefits</div>
+  <div class="content"><input id="text-toggle-benefits" type="checkbox">
+    <div class="justification-text">The applicants performed a literature search for randomized trials and systematic reviews of tyrosine kinase inhibitors in Ph+ acute lymphoblastic leukaemia, and conducted a meta-analysis of the results. Two systematic reviews (11,12) (used to identify relevant studies) and two small randomized trials (13,14) involving imatinib were identified. No data for other tyrosine kinase inhibitors were included in the application.
+
+Randomized controlled trials
+A small randomized trial in 32 centres in Germany between 2002 and 2005 randomly assigned 55 elderly participants (median age 68 years) with Ph+ acute lymphoblastic leukaemia to induction therapy with either imatinib (n = 28) or age-adapted chemotherapy (n = 27) (13). However, both groups later received imatinib during the consolidation chemotherapy, making it impossible to assess the effect of imatinib treatment on clinical outcomes. 
+
+Another German multicentre randomized trial conducted between 2004 and 2010 assessed the use of imatinib in Ph+ acute lymphoblastic leukaemia or lymphoid blast crisis of chronic myeloid leukaemia after allogeneic haematopoietic stem-cell transplantation (14). The trial included 57 participants who were randomized to either prophylactic imatinib after haematopoietic stem-cell transplantation (n = 26) or imatinib treatment based on detection of minimal residual disease (n = 29), again making it difficult to assess the effect of imatinib treatment. 
+
+Meta-analysis of cohort studies
+The applicants performed a meta-analysis of eight comparative cohort studies identified from two published systematic reviews (15–22). All studies included individuals with Ph+ acute lymphoblastic leukaemia, and assessed the survival of individuals who received imatinib in addition to chemotherapy versus those who received chemotherapy alone. Typically, a proportion of participants also received an allogenic stem-cell transplantation with imatinib being used before and/or after the transplantation. Two of the studies evaluated a concurrent group (15–17) while six used data from historical patients (18–22).
+
+The meta-analysis suggested that the use imatinib may significantly reduce mortality (risk ratio (RR) 0.50, 95% confidence interval (CI) 0.38 to 0.66); with 38 fewer deaths per 100 patients treated with imatinib. Four studies reported the median survival with and without imatinib (15,18–20). From these data, it was estimated that imatinib may increase overall survival by a median of 12 months compared with chemotherapy. Despite the large effect observed, there were concerns about: the risk of bias as most studies compared imatinib with historical data; and inconsistency, given that the magnitude of effect varied, with a proportion of studies showing a modest effect. Weighting these factors, the certainty of the evidence was therefore judged as low.</div>
+    <label class="toggle-label" for="text-toggle-benefits"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Harms</div>
+  <div class="content"><input id="text-toggle-harms" type="checkbox">
+    <div class="justification-text">Cardiac toxicity, notably congestive heart failure, is a well known, albeit rare, adverse effect of treatment with tyrosine kinase inhibitors.
+Data on potential toxicity of tyrosine kinase inhibitors when used for the treatment of Ph+ acute lymphoblastic leukaemia were limited. Only two of the studies included in the meta-analysis for the application reported adverse events (15,16). Meta-analysis of data from these studies indicated that the use of imatinib might increase the risk of adverse events, mainly due to cardiac toxicity (RR 1.31, 95% CI 0.73 to 2.36). In absolute terms, this would translate in eight more adverse events per 100 patients treated. The certainty of the evidence was judged as very low.</div>
+    <label class="toggle-label" for="text-toggle-harms"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Additional evidence</div>
+  <div class="content"><input id="text-toggle-additionalEvidence" type="checkbox">
+    <div class="justification-text">In a separate application to the meeting of the Expert Committee, imatinib was also proposed for inclusion on the EMLc for treatment of acute lymphoblastic leukaemia in children, for which it is considered standard of care. Imatinib is included in the ALLTogether trial regimen for children and young adults with acute lymphoblastic leukaemia (23) and the EsPhALL trial regimen for children with Ph+ acute lymphoblastic leukaemia (24).
+
+Several other trials studies have shown relevant benefits of imatinib in the paediatric population, with about 20% more participants alive at 5 years compared with before the introduction of imatinib for children with Ph+ acute lymphoblastic leukaemia (25–28).</div>
+    <label class="toggle-label" for="text-toggle-additionalEvidence"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Cost / cost effectiveness</div>
+  <div class="content"><input id="text-toggle-cost" type="checkbox">
+    <div class="justification-text">Evidence on the cost–effectiveness of tyrosine kinase inhibitors in adults with acute lymphoblastic leukaemia is limited and does not include first-generation agents such as imatinib, which are generally more available and affordable. However, even second-generation tyrosine kinase inhibitors seem to be cost-effective (30). 
+
+Importantly, the patent of imatinib expired in 2016. However, this has not led to the expected rapid introduction of generic alternatives (31) nor to a substantial price reduction: generic imatinib was introduced to the market only 8% below the price of the original and even today remains a costly medicine (32).</div>
+    <label class="toggle-label" for="text-toggle-cost"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">WHO guidelines</div>
+  <div class="content"><input id="text-toggle-whoGuidelines" type="checkbox">
+    <div class="justification-text">WHO guidelines for the treatment of acute lymphoblastic leukaemia are not available.
+Clinical practice guidelines from the European Society of Medical Oncology recommend that all adults with Ph+ acute lymphoblastic leukaemia receive first-line treatment with imatinib or a second-generation tyrosine kinase inhibitor, in combination with chemotherapy (12). The National Comprehensive Cancer Network Guidelines also recommend treatment with a tyrosine kinase inhibitor in combination with multiagent chemotherapy or corticosteroids as induction treatment for Ph+ acute lymphoblastic leukaemia in adults, young adults and adolescents (29).</div>
+    <label class="toggle-label" for="text-toggle-whoGuidelines"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Availability</div>
+  <div class="content"><input id="text-toggle-availability" type="checkbox">
+    <div class="justification-text">Imatinib has marketing approval from multiple national regulatory agencies, including the Australian Therapeutic Goods Administration, the European Medicines Agency, Health Canada, the Japanese Pharmaceuticals and Medical Devices Agency and the United States Food and Drug Administration. It is available in branded and generic forms.</div>
+    <label class="toggle-label" for="text-toggle-availability"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Other considerations</div>
+  <div class="content"><input id="text-toggle-otherConsiderations" type="checkbox">
+    <div class="justification-text">The EML Cancer Medicines Working Group supported the inclusion of imatinib on both the EML and EMLc for the treatment of adults and children with Ph+ acute lymphoblastic leukaemia based on evidence of relevant improvement in survival and acceptable safety. Despite also being associated relevant survival benefit, the available data for other tyrosine kinase inhibitors (dasatinib, ponatinib) are less mature. There is little evidence supporting their use in children and their global availability (including generics) is more limited. Therefore, the Working Group did not support the inclusion of tyrosine kinase inhibitors as a therapeutic class at this time.
+
+Comments were received from the WHO Department of Noncommunicable Diseases. The technical unit considered that there is sufficient evidence to justify the inclusion of imatinib on the EML for the treatment of Ph+ acute lymphoblastic leukaemia given its clinical impact and the feasibility of its appropriate use, noting its increasing availability for other cancer-related indications. Imatinib treatment for Ph+ acute lymphoblastic leukaemia is known to reduce mortality, improve quality of life and it has a favourable safety profile. Data for other tyrosine kinase inhibitors (e.g. dasatinib, ponatinib) are less mature.</div>
+    <label class="toggle-label" for="text-toggle-otherConsiderations"></label></div>
+</div>
+        <div class="justification-section references">
+      <div class="content">
+        <input id="references-toggle" type="checkbox">
+        <label for="references-toggle" class="references-toggle-label visible">
+          Show references
+        </label>
+        <label for="references-toggle" class="references-toggle-label hidden">
+          Hide references
+        </label>
+        <div class="references-content">1.	The selection and use of essential medicines. Report of the WHO Expert Committee, 2015 (including the 19th WHO Model List of Essential Medicines and the 5th WHO Model List of Essential Medicines for Children). Geneva: World Health Organization; 2015 (WHO Technical Report Series, No. 994; https://apps.who.int/iris/handle/10665/189763, accessed 16 May 2021) 
+2.	The selection and use of essential medicines. Report of the WHO Expert Committee, 2019 (including the 21st WHO Model List of Essential Medicines and the 7th WHO Model List of Essential Medicines for Children). Geneva: World Health Organization; 2019 (WHO Technical Report Series, No. 1021; https://apps.who.int/iris/handle/10665/330668, accessed 16 May 2021). 
+3.	Bassan R, Gatta G, Tondini C, Willemze R. Adult acute lymphoblastic leukaemia. Crit Rev Oncol Hematol. 2004;50(3):223–61.
+4.	Redaelli A, Laskin BL, Stephens JM, Botteman MF, Pashos CL. A systematic literature review of the clinical and epidemiological burden of acute lymphoblastic leukaemia (ALL). Eur J Cancer Care (Engl). 2005;14(1):53–62.
+5.	El Fakih R, Jabbour E, Ravandi F, Hassanein M, Anjum F, Ahmed S, et al. Current paradigms in the management of Philadelphia chromosome positive acute lymphoblastic leukemia in adults. Am J Hematol. 2018;93(2):286–95.
+6.	Bassan R, Rohatiner AZ, Lerede T, Di Bona E, Rambaldi A, Pogliani E, et al. Role of early anthracycline dose-intensity according to expression of Philadelphia chromosome/BCR-ABL rearrangements in B-precursor adult acute lymphoblastic leukemia. Hematol J. 2000;1(4):226–34.
+7.	Carli PM, Coebergh JW, Verdecchia A. Variation in survival of adult patients with haematological malignancies in Europe since 1978. EUROCARE Working Group. Eur J Cancer. 1998;34(14 Spec No):2253–63.
+8.	Burmeister T, Schwartz S, Bartram CR, Gökbuget N, Hoelzer D, Thiel E. Patients’ age and BCR-ABL frequency in adult B-precursor ALL: a retrospective analysis from the GMALL study group. Blood. 2008;112(3):918–9.
+9.	Ravandi F. How I treat Philadelphia chromosome-positive acute lymphoblastic leukemia. Blood. 2019;133(2):130–6.
+10.	Wetzler M, Dodge RK, Mrózek K, Carroll AJ, Tantravahi R, Block AW, et al. Prospective karyotype analysis in adult acute lymphoblastic leukemia: the cancer and leukemia Group B experience. Blood. 1999;93(11):3983–93.
+11.	Couban S, Savoie L, Mourad YA, Leber B, Minden M, Turner R, et al. Evidence-based guidelines for the use of tyrosine kinase inhibitors in adults with Philadelphia chromosome-positive or BCR-ABL-positive acute lymphoblastic leukemia: a Canadian consensus. Curr Oncol. 2014;21(2):e265–309.
+12.	Hoelzer D, Bassan R, Dombret H, Fielding A, Ribera JM, Buske C. Acute lymphoblastic leukaemia in adult patients: ESMO Clinical Practice Guidelines for diagnosis, treatment and follow-up. Ann Oncol. 2016;27(suppl 5):v69–v82.
+13.	Ottmann OG, Wassmann B, Pfeifer H, Giagounidis A, Stelljes M, Dührsen U, et al. Imatinib compared with chemotherapy as front-line treatment of elderly patients with Philadelphia chromosome-positive acute lymphoblastic leukemia (Ph+ALL). Cancer. 2007;109(10):2068–76.
+14.	Pfeifer H, Wassmann B, Bethge W, Dengler J, Bornhäuser M, Stadler M, et al. Randomized comparison of prophylactic and minimal residual disease-triggered imatinib after allogeneic stem cell transplantation for BCR-ABL1-positive acute lymphoblastic leukemia. Leukemia. 2013;27(6):1254–62.
+15.	Bassan R, Rossi G, Pogliani EM, Di Bona E, Angelucci E, Cavattoni I, et al. Chemotherapy-phased imatinib pulses improve long-term outcome of adult patients with Philadelphia chromosome-positive acute lymphoblastic leukemia: Northern Italy Leukemia Group protocol 09/00. J Clin Oncol. 2010;28(22):3644–52.
+16.	Burke MJ, Trotz B, Luo X, Baker KS, Weisdorf DJ, Wagner JE, et al. Allo-hematopoietic cell transplantation for Ph chromosome-positive ALL: impact of imatinib on relapse and survival. Bone Marrow Transplant. 2009;43(2):107–13.
+17.	Chen H, Liu KY, Xu LP, Liu DH, Chen YH, Zhao XY, et al. Administration of imatinib after allogeneic hematopoietic stem cell transplantation may improve disease-free survival for patients with Philadelphia chromosome-positive acute lymphobla stic leukemia. J Hematol Oncol. 2012;5:29.
+18.	Delannoy A, Delabesse E, Lhéritier V, Castaigne S, Rigal-Huguet F, Raffoux E, et al. Imatinib and methylprednisolone alternated with chemotherapy improve the outcome of elderly patients with Philadelphia-positive acute lymphoblastic leukemia: results of the GRAALL AFR09 study. Leukemia. 2006;20(9):1526–32.
+19.	Lee KH, Lee JH, Choi SJ, Lee JH, Seol M, Lee YS, et al. Clinical effect of imatinib added to intensive combination chemotherapy for newly diagnosed Philadelphia chromosome-positive acute lymphoblastic leukemia. Leukemia. 2005;19(9):1509–16.
+20.	Li Y, Zou D, Zhao Y, Mi Y, Wang J, Qiu L. Clinical characteristics and outcomes of adults with Philadelphia chromosome positive and/or BCR-ABL positive acute lymphoblastic leukemia: a single center study from China. Leuk Lymphoma. 2010;51(3):488–96.
+21.	Mizuta S, Matsuo K, Yagasaki F, Yujiri T, Hatta Y, Kimura Y, et al. Pre-transplant imatinib-based therapy improves the outcome of allogeneic hematopoietic stem cell transplantation for BCR-ABL-positive acute lymphoblastic leukemia. Leukemia. 2011;25(1):41–7.
+22.	Thomas DA, Faderl S, Cortes J, O’Brien S, Giles FJ, Kornblau SM, et al. Treatment of Philadelphia chromosome-positive acute lymphocytic leukemia with hyper-CVAD and imatinib mesylate. Blood. 2004;103(12):4396–407.
+23.	A treatment study protocol of the ALLTogether Consortium for Children and Young Adults (1–45 Years of Age) With Newly Diagnosed Acute Lymphoblastic Leukaemia (ALL): a pilot study. Bethesda, MD: U.S. National Library of Medicine; 2019 (ClinicalTrials.gov Identifier: NCT03911128; https://clinicaltrials.gov/ct2/show/NCT03911128, accessed 31 July 2021).
+24.	Safety and Efficacy of Imatinib Added to Chemotherapy in Treatment of Ph+ Acute Lymphoblastic Leukemia in Children (ESPHALL). Bethesda, MD: U.S. National Library of Medicine; 2006 (ClinicalTrials.gov Identifier: NCT00287105; https://clinicaltrials.gov/ct2/show/NCT00287105, accessed 31 July 2021).
+25.	Ottmann O. Tyrosine kinase inhibitor therapy or transplant in children with Philadelphia chromosome-positive acute lymphoblastic leukaemia: striking the balance. Lancet Haematol. 2018;5(12):e606–e7.
+26.	Schultz KR, Carroll A, Heerema NA, Bowman WP, Aledo A, Slayton WB, et al. Long-term follow-up of imatinib in pediatric Philadelphia chromosome-positive acute lymphoblastic leukemia: Children’s Oncology Group study AALL0031. Leukemia. 2014;28(7):1467–71.
+27.	Rives S, Camós M, Estella J, Gómez P, Moreno MJ, Vivanco JL, et al. Longer follow-up confirms major improvement in outcome in children and adolescents with Philadelphia chromosome acute lymphoblastic leukaemia treated with continuous imatinib and haematopoietic stem cell transplantation. Results from the Spanish Cooperative Study SHOP/ALL-2005. Br J Haematol. 2013;162(3):419–21.
+28.	Biondi A, Gandemer V, De Lorenzo P, Cario G, Campbell M, Castor A, et al. Imatinib treatment of paediatric Philadelphia chromosome-positive acute lymphoblastic leukaemia (EsPhALL2010): a prospective, intergroup, open-label, single-arm clinical trial. Lancet Haematol. 2018;5(12):e641–e52.
+29.	NCCN Clinical Practice Guidelines in Oncology. Acute lymphoblastic leukemia. Version 2.2021. Plymouth Meeting, PA: National Comprehensive Cancer Network; 2021 (https://www.nccn.org/guidelines/guidelines-detail?category=1&id=1410, accessed 31 July 2021).
+30.	Stevenson M, Pandor A, Hamilton J, Stevens J, Rowntree C, Martyn-St James M, et al. Ponatinib for treating acute lymphoblastic leukaemia: an evidence review group perspective of a NICE single technology appraisal. Pharmacoeconomics. 2018;36(7):759–68.
+31.	Chen CT, Kesselheim AS. Journey of generic imatinib: a case study in oncology drug pricing. J Oncol Pract. 2017;13(6):352–5.
+32.	Cole AL, Dusetzina SB. Generic price competition for specialty drugs: too little, too late? Health Aff (Millwood). 2018;37(5):738–42. </div>
+      </div>
+    </div>
+  </div>            </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

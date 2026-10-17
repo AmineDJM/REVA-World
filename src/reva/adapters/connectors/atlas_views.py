@@ -473,9 +473,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 sha = run.archive(raw)
                 raw_shas.append(sha)
                 res = parse_page(raw.body, v)
-                cells = rows_to_cells(
-                    res.rows, run=r, variable=v, info=info, raw_sha=sha, page_url=url, rep=rep
-                )
+                cells = rows_to_cells(res.rows, run=r, variable=v, info=info, raw_sha=sha, page_url=url, rep=rep)
                 chunks.append((cells, sha))
                 n_cells += len(cells["ind"])
                 seen += len(res.rows)

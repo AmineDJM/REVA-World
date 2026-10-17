@@ -1,0 +1,25 @@
+# V6 (agent V6INFRA): UN/LOCODE, official release package (UNECE; hosted on the UN ICC GitLab).
+# Connector: src/reva/adapters/connectors/atlas_unlocode.py (atlas.unlocode -> atlas table unlocode.locations; KG
+# trade_location entities unlocode:<code>).
+source_key: unece.unlocode
+title: UN/LOCODE - United Nations Code for Trade and Transport Locations (official release)
+provider_url: https://unlocode.unece.org/publications/
+lineage_family: unece_unlocode
+rights:
+  licence: "conflicting statements: site footer 'All UN/CEFACT standards are free to use under CC By 4.0 license'; site terms: personal, non-commercial use, no redistribution, no derivative works"
+  licence_status: conflicting_statements
+  licence_review: pending owner decision (docs/dev/v6_infra.md)
+  terms_url: https://unlocode.unece.org/terms
+  attribution: "UN/LOCODE, United Nations Economic Commission for Europe (UNECE), https://unlocode.unece.org"
+metadata:
+  allowed_hosts: [unlocode.unece.org, opensource.unicc.org, naciscdn.org]
+  files:
+    - https://unlocode.unece.org/publications/
+    - https://unlocode.unece.org/terms
+    - https://opensource.unicc.org/un/unece/uncefact/vocab-locode/-/jobs/artifacts/<release>/download?job=package-release
+  authentication: none
+  notes: >-
+    The release tag is read from the publications page on every run (2025-1 on 2026-10-17). The legacy
+    unece.org download pages answer 403 (Cloudflare) to non-browser clients; the new unlocode.unece.org site does
+    not. The Pre-Release ("may change before official release") is not used.
+  cadence: biannual release; checked every 180 days

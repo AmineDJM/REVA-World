@@ -50,9 +50,9 @@ class ViewsRun:
 def runs_from_frame(frame: pl.DataFrame) -> dict[str, ViewsRun]:
     out: dict[str, ViewsRun] = {}
     f = frame.filter(pl.col("indicator").str.split("|").list.get(1).is_in(list(FATALITY_VARS)))
-    for r in f.select("indicator", "provider_geo", "period_start", "value", "flags", "raw_sha256", "selector").iter_rows(
-        named=True
-    ):
+    for r in f.select(
+        "indicator", "provider_geo", "period_start", "value", "flags", "raw_sha256", "selector"
+    ).iter_rows(named=True):
         run, var = r["indicator"].split("|", 1)
         fl = json.loads(r["flags"]) if r["flags"] else {}
         up = fl.get("projection_upstream") or {}
@@ -109,4 +109,12 @@ def annual_table(vr: ViewsRun) -> dict[tuple[str, int], float]:
     return out
 
 
-__all__ = ["FATALITY_VARS", "PROB_VARS", "ViewsRun", "annual_table", "december_runs", "latest_covering", "runs_from_frame"]
+__all__ = [
+    "FATALITY_VARS",
+    "PROB_VARS",
+    "ViewsRun",
+    "annual_table",
+    "december_runs",
+    "latest_covering",
+    "runs_from_frame",
+]

@@ -1,0 +1,143 @@
+# Tropical cyclones and long-run growth; comparison table of other shocks to income (agent EFFECTS-MORE, V6).
+# Rows marked evidence: secondary are other studies' numbers as summarised in the paper's Table 1.
+schema: reva-effects-literature/1
+id: hsiang_jina_2014
+source_key: effects.literature
+citation:
+  text: "Solomon M. Hsiang and Amir S. Jina. The Causal Effect of Environmental Catastrophe on Long-Run Economic Growth: Evidence From 6,700 Cyclones. NBER Working Paper No. 20352, July 2014."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Hsiang & Jina (2014), NBER WP 20352"
+  authors: [Solomon M. Hsiang, Amir S. Jina]
+  title: "The Causal Effect of Environmental Catastrophe on Long-Run Economic Growth: Evidence From 6,700 Cyclones"
+  year: 2014
+  series: NBER Working Paper No. 20352
+  doi: null
+  url: http://www.nber.org/papers/w20352
+document:
+  url: https://www.nber.org/system/files/working_papers/w20352/w20352.pdf
+  media_type: application/pdf
+  sha256: 2f5e6c356b10774917288d77895debd4ea189bdd595ecb624e2aafa5f556c755
+  bytes: 3464291
+  version_read: "NBER Working Paper 20352, July 2014"
+as_of: "2014-07-01"
+rights:
+  licence: "© 2014 by Solomon M. Hsiang and Amir S. Jina. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  pdf_page: 4
+  shock_profile: one_time_impulse
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: log_level, definition: "income per capita (GDP per capita), relative to the pre-event trend"}
+  measure: response
+  unit: percent
+  method: panel_regression
+  point_kind: point
+  uncertainty: {status: not_reported}
+  quote: "Table 1: Effects of cyclones and other shocks to income per capita Event Type Effect on Observed In-Sample Income After Probability Temperature increase (+1◦ C)*1 -1.0% 10 yrs 6.4% Civil war2 -3.0% 10 yrs 6.3% Tax increase (+1% GDP)**3 -3.1% 4 yrs † 16.8% 1 standard deviation cyclone -3.6% 20 yrs 14.4% Currency crisis2 -4.0% 10 yrs 34.7% Weakening executive constraints 2 -4.0% 10 yrs 3.7% 90th percentile cyclone -7.4% 20 yrs 5.8% Banking crisis2 -7.5% 10 yrs 15.7% Financial crisis4 -9.0% 2 yrs <0.1% 99th percentile cyclone -14.9% 20 yrs 0.6% *Poor countries only. **USA only. † Number of quarters with any tax change. 1 Dell, Jones & Olken (AEJ: Macro, 2012), 2 Cerra & Saxena (AER, 2008), 3 Romer & Romer (AER, 2010), 4 Reinhart & Rogoff (AER, 2009)"
+estimates:
+  - id: gdp_pc_per_ms_wind_20y
+    pdf_page: 3
+    cause: {kind: variable, id: disaster.cyclone_wind_exposure, transform: level_change,
+            definition: "each additional meter per second of annual nationally-averaged wind exposure (tropical cyclones)"}
+    shock: {size: 1, unit: m/s}
+    method: did
+    sign: negative
+    point: -0.37
+    as_printed: "0.37"
+    printed_transform: negated
+    horizon: {kind: at_horizon, value: 20, unit: year}
+    scope: {countries: [WLD], period: {from: "1950", to: "2008"}, frequency: annual, sample_note: "Every country's exposure to tropical cyclones 1950-2008 (country-year panel)"}
+    identification: "Within-country year-to-year variation in cyclone exposure (distributed-lag difference-in-differences relative to the country's pre-disaster trend)"
+    locator: "Section 1 (introduction), main result (printed p.2)"
+    quote: "each additional meter per second1 of annual nationally-averaged wind exposure lowers per capita economic output 0.37% twenty years later."
+    applicability: "REVA note: printed as a decline of 0.37%; stored as -0.37 (printed_transform: negated); section 5 prints 0.38 percentage points fifteen years after a strike."
+  - id: gdp_pc_1sd_cyclone_20y
+    cause: {kind: variable, id: disaster.cyclone_wind_exposure, transform: std_dev_shock,
+            definition: "1 standard deviation cyclone (9.4 m/s of wind exposure among countries ever hit)"}
+    shock: {size: 1, unit: std_dev}
+    method: did
+    sign: negative
+    point: -3.6
+    as_printed: "-3.6"
+    horizon: {kind: at_horizon, value: 20, unit: year}
+    scope: {countries: [WLD], period: {from: "1950", to: "2008"}, frequency: annual, sample_note: "Countries ever hit by cyclones (58% of countries)"}
+    identification: "Within-country year-to-year variation in cyclone exposure (distributed-lag difference-in-differences)"
+    locator: "Table 1 'Effects of cyclones and other shocks to income per capita', row '1 standard deviation cyclone' (printed p.3)"
+  - id: civil_war_gdp_pc_10y_cerra_saxena
+    evidence: secondary
+    cause: {kind: event_type, id: civil_war, transform: occurrence, definition: "Civil war (as coded by Cerra & Saxena 2008)"}
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -3.0
+    as_printed: "-3.0"
+    horizon: {kind: at_horizon, value: 10, unit: year}
+    scope: {countries: [WLD], sample_note: "Cerra & Saxena (AER, 2008) panel"}
+    identification: "As cited by Hsiang and Jina: Cerra & Saxena (AER, 2008)"
+    locator: "Table 1, row 'Civil war' (source note 2: Cerra & Saxena, AER 2008) (printed p.3)"
+    applicability: "REVA note: number of Cerra & Saxena (2008) as summarised by Hsiang and Jina (secondary evidence, not read in the original)."
+  - id: currency_crisis_gdp_pc_10y_cerra_saxena
+    evidence: secondary
+    cause: {kind: event_type, id: currency_crisis, transform: occurrence, definition: "Currency crisis (as coded by Cerra & Saxena 2008)"}
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -4.0
+    as_printed: "-4.0"
+    horizon: {kind: at_horizon, value: 10, unit: year}
+    scope: {countries: [WLD], sample_note: "Cerra & Saxena (AER, 2008) panel"}
+    identification: "As cited by Hsiang and Jina: Cerra & Saxena (AER, 2008)"
+    locator: "Table 1, row 'Currency crisis' (source note 2: Cerra & Saxena, AER 2008) (printed p.3)"
+    applicability: "REVA note: number of Cerra & Saxena (2008) as summarised by Hsiang and Jina (secondary evidence)."
+  - id: banking_crisis_gdp_pc_10y_cerra_saxena
+    evidence: secondary
+    cause: {kind: event_type, id: banking_crisis, transform: occurrence, definition: "Banking crisis (as coded by Cerra & Saxena 2008)"}
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -7.5
+    as_printed: "-7.5"
+    horizon: {kind: at_horizon, value: 10, unit: year}
+    scope: {countries: [WLD], sample_note: "Cerra & Saxena (AER, 2008) panel"}
+    identification: "As cited by Hsiang and Jina: Cerra & Saxena (AER, 2008)"
+    locator: "Table 1, row 'Banking crisis' (source note 2: Cerra & Saxena, AER 2008) (printed p.3)"
+    applicability: "REVA note: number of Cerra & Saxena (2008) as summarised by Hsiang and Jina (secondary evidence)."
+  - id: financial_crisis_gdp_pc_2y_reinhart_rogoff
+    evidence: secondary
+    cause: {kind: event_type, id: financial_crisis, transform: occurrence, definition: "Financial crisis (as in Reinhart & Rogoff 2009)"}
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -9.0
+    as_printed: "-9.0"
+    horizon: {kind: at_horizon, value: 2, unit: year}
+    scope: {countries: [WLD], sample_note: "Reinhart & Rogoff (AER, 2009)"}
+    method: other
+    identification: "As cited by Hsiang and Jina: Reinhart & Rogoff (AER, 2009)"
+    locator: "Table 1, row 'Financial crisis' (source note 4: Reinhart & Rogoff, AER 2009) (printed p.3)"
+    applicability: "REVA note: number of Reinhart & Rogoff (2009) as summarised by Hsiang and Jina (secondary evidence; an average decline around crisis episodes, not an identified causal effect)."
+  - id: tax_increase_gdp_pc_4y_romer_romer
+    evidence: secondary
+    cause: {kind: variable, id: fiscal.tax_revenue, transform: share_of_gdp_change, definition: "Tax increase (+1% GDP), USA (Romer & Romer 2010)"}
+    shock: {size: 1, unit: percent_of_gdp}
+    sign: negative
+    point: -3.1
+    as_printed: "-3.1"
+    horizon: {kind: at_horizon, value: 4, unit: year}
+    scope: {countries: [USA], sample_note: "Romer & Romer (AER, 2010), USA only"}
+    method: time_series_regression
+    identification: "As cited by Hsiang and Jina: Romer & Romer (AER, 2010), narrative tax changes"
+    locator: "Table 1, row 'Tax increase (+1% GDP)' (note 3: Romer & Romer, AER 2010; USA only) (printed p.3)"
+    applicability: "REVA note: number of Romer & Romer (2010) as summarised by Hsiang and Jina (secondary evidence)."
+  - id: temperature_gdp_pc_10y_poor_dell_jones_olken
+    evidence: secondary
+    cause: {kind: variable, id: climate.country_temperature, transform: level_change, definition: "Temperature increase (+1◦ C), poor countries only (Dell, Jones & Olken 2012)"}
+    shock: {size: 1, unit: degree Celsius}
+    sign: negative
+    point: -1.0
+    as_printed: "-1.0"
+    horizon: {kind: at_horizon, value: 10, unit: year}
+    scope: {country_group: "poor countries (Dell, Jones & Olken)", sample_note: "Dell, Jones & Olken (AEJ: Macro, 2012)"}
+    identification: "As cited by Hsiang and Jina: Dell, Jones & Olken (AEJ: Macro, 2012)"
+    locator: "Table 1, row 'Temperature increase (+1◦ C)' (poor countries only; note 1: Dell, Jones & Olken, AEJ Macro 2012) (printed p.3)"
+    applicability: "REVA note: number of Dell, Jones & Olken (2012) as summarised by Hsiang and Jina (secondary evidence)."

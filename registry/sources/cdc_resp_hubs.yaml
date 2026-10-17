@@ -1,0 +1,19 @@
+# V6 (agent PRED-HEALTH): US CDC respiratory forecast hubs (FluSight, COVID-19 Forecast Hub) via their public
+# hubverse S3 mirrors. Connector: src/reva/adapters/connectors/atlas_cdc_resp_hubs.py -> atlas tables
+# cdc.{flusight,covidhub}_{target,vintages,ensemble}. Two atlas sources (atlas.cdc_flusight, atlas.cdc_covidhub) share
+# this source key and budget.
+source_key: cdc.resp_hubs
+title: US CDC FluSight and COVID-19 forecast hubs (NHSN target data, data vintages, hub ensembles)
+provider_url: https://github.com/cdcepi/FluSight-forecast-hub
+lineage_family: cdc
+rights:
+  licence: "FluSight: MIT (repository), attribution requested (flusight@cdc.gov); COVID-19 hub: CC0 1.0 / US public domain, attribution requested (covidhub@cdc.gov)"
+  licence_url: https://github.com/CDCgov/covid19-forecast-hub/blob/main/README.md
+  attribution: US CDC FluSight forecast hub (cdcepi/FluSight-forecast-hub); US CDC COVID-19 Forecast Hub (CDCgov/covid19-forecast-hub)
+  attribution_request: hubs ask users to contact them about attribution of the source forecasts before research use or publication
+metadata:
+  allowed_hosts: [cdcepi-flusight-forecast-hub.s3.amazonaws.com, covid19-forecast-hub.s3.amazonaws.com]
+  files: target-data CSVs, FluSight auxiliary-data/target-data-archive (dated vintages), COVID hub target-data/time-series.parquet (as_of vintages), model-output/<ensemble>/*.parquet
+  window: reference dates >= 2024-11-01 (back-test seasons 2024-25, 2025-26 and the current season)
+  authentication: none (anonymous S3 ListObjectsV2 + GET)
+  cadence: weekly (Wednesday data release, Saturday reference date)

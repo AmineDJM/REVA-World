@@ -1,0 +1,47 @@
+[
+  {
+    "request_fingerprint": "fdec53ab87035937cc138fd02ded3f150e1c4c46057680207b16715618ff91db",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src14.txt.gz",
+    "file": "fdec53ab87035937.json",
+    "sha256": "79a3e7cf671ca2567746cfeef1d39f07d83ae0d4e59e01f0699709f3ca6d1ecc",
+    "status": 200,
+    "headers": {
+      "last-modified": "Sat, 10 Oct 2026 13:44:56 GMT",
+      "etag": "\"77fb5-65d7cab9794d5\"",
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T16:47:03.729137+00:00",
+    "licence": "EMBL-EBI terms of use (no licence file published with the UniChem mapping files); https://www.ebi.ac.uk/about/terms-of-use/ (licence review)",
+    "fixture_note": "trimmed: header + rows of the fixture ChEMBL ids (re-gzipped); full response sha256 e5e4cbc3f553544c59b918a2faa63c4191e952b90c260d7bd234edf6d4716fa6 (491445 bytes)"
+  },
+  {
+    "request_fingerprint": "abba9b055957484b984dd7a0321753095b28afb253bc26273dcaa29fc7d0dc3b",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src2.txt.gz",
+    "file": "abba9b055957484b.json",
+    "sha256": "54fa55346925a8ce58bf9b2b6149628d8a7e0c5dc2cb2678f94d0fe45d554571",
+    "status": 200,
+    "headers": {
+      "last-modified": "Sat, 10 Oct 2026 13:44:28 GMT",
+      "etag": "\"1247a-65d7ca9efd1f1\"",
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T16:47:01.798999+00:00",
+    "licence": "EMBL-EBI terms of use (no licence file published with the UniChem mapping files); https://www.ebi.ac.uk/about/terms-of-use/ (licence review)",
+    "fixture_note": "trimmed: header + rows of the fixture ChEMBL ids (re-gzipped); full response sha256 64018eac7827ea5b8d8954fd9096ee149800c30e9b18ca5a72d56692e97ca844 (74874 bytes)"
+  },
+  {
+    "request_fingerprint": "078126eca9192ea13c0359f2bf4528da78b3a86d74d70b2a488fe9acf855654e",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src7.txt.gz",
+    "file": "078126eca9192ea1.json",
+    "sha256": "26f90ea9590dd0895131cf7e969a0ef0a49b17a1da0b5c0aa3dbc6a71bd26fab",
+    "status": 200,
+    "headers": {
+      "last-modified": "Sat, 10 Oct 2026 13:44:34 GMT",
+      "etag": "\"567ee-65d7caa4fc6e3\"",
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T16:47:01.442926+00:00",
+    "licence": "EMBL-EBI terms of use (no licence file published with the UniChem mapping files); https://www.ebi.ac.uk/about/terms-of-use/ (licence review)",
+    "fixture_note": "trimmed: header + rows of the fixture ChEMBL ids (re-gzipped); full response sha256 2b08e543932bd2eaad022c72a153b0d03c8b7e49d3f4396615f6d0ef81caac29 (354286 bytes)"
+  }
+]

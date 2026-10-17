@@ -1,0 +1,236 @@
+[
+  {
+    "request_fingerprint": "bb81bf4fc0686a4e06546b26f00581ba0d3594912dd4807ca7525573ce43eb4a",
+    "url": "https://clinicaltrials.gov/api/v2/stats/field/values?fields=Phase,OverallStatus,StudyType,InterventionType,LocationCountry,ConditionMeshId,InterventionMeshId",
+    "file": "bb81bf4fc0686a4e.json",
+    "sha256": "2c5bbb9b936102b928517eebc809ab093262ce9fac417ebaf771a40a1d4525d4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:50:54.324680+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "8a59271119ec3eaaf7caaf363eb28151a6d03a3832febf7fb65342566f1621b7",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD003924%20AND%20AREA%5BPhase%5DPHASE1&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "8a59271119ec3eaa.json",
+    "sha256": "353c48db2b2dbde3060d48dccd446a2c7710951ade54c8b917a41e2dfaabfe27",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:09.211481+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "00b696b02b10ba4ef18728292dc269a0c1cd143d5c05ccba174949463be5a009",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD003924%20AND%20AREA%5BPhase%5DPHASE2&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "00b696b02b10ba4e.json",
+    "sha256": "c7f9732d50f49c468ccb38d50be490a84986be41c90a9b8ba267f0bb37819052",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:10.915558+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "aabf639a74d900712fb2f9b47c27100941f5444eccc00abfddd1f0bff0474a3f",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD003924%20AND%20AREA%5BPhase%5DPHASE3&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "aabf639a74d90071.json",
+    "sha256": "45c9e9195730db257cfdc6cff32f815d81bb3820e18ec48ab1e8918b5fe8d6d4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:11.900224+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "8eb9f0e5c713be3a17e004258d8f47dabe1eff6b2ead3ce61bec68020ae51103",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD003924%20AND%20AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "8eb9f0e5c713be3a.json",
+    "sha256": "ab7536944eedd793194730093badee83aad650560b4eda3a254f8bbaabaa4d56",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:13.095246+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "8f1ebd2facc8cbb28946cbfd4c44bc6860c0f0efb84cc0b25a5060bc24aaca69",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD008288%20AND%20AREA%5BPhase%5DPHASE1&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "8f1ebd2facc8cbb2.json",
+    "sha256": "1c20eac7ea7d050ae6bab4299377e725d02f4ad8067dbf8c429fd81608dcb221",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:14.505853+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "b285443f575908052a645477f612eed0802549ed20b99a756ba5c58b418421d2",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD008288%20AND%20AREA%5BPhase%5DPHASE2&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "b285443f57590805.json",
+    "sha256": "4326015fa418e5ca466d4d30e0bb8724fbede7636fc4cae45bb3f4b1117cf315",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:15.982640+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "e36d3f9d34446974aed9e0d7f19031345b85d62829fefdc5f9148efe703dd342",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD008288%20AND%20AREA%5BPhase%5DPHASE3&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "e36d3f9d34446974.json",
+    "sha256": "f2b639877e618f4c3a61be8cdad3d24a59b77c8bb20664e686a33df49918c1b5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:17.019259+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "562c23c626fdaa58722745186bcdffe00e3c6ac67e999bb232a74e6258f58e34",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionMeshId%5DD008288%20AND%20AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "562c23c626fdaa58.json",
+    "sha256": "39f938d9b198f2951a6b96fc57a906b5ff1c05bef6e37fb87fb3c0f7983c4620",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:18.767155+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "e5cacaf1aabf3a6b69a38ea010c3a204a92d94cef56e012da48e74ccb7a9a3a4",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22France%22%20AND%20AREA%5BPhase%5DPHASE1&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "e5cacaf1aabf3a6b.json",
+    "sha256": "a102b52e6d3066e8596b95b6519b51ffde5368da579c995500aa2151e07a7ff0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:50:58.368266+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "0349344a5134d5addf7bd3b4d0b205dc9fcf6a51a27fa3be5b492a38e39e75d5",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22France%22%20AND%20AREA%5BPhase%5DPHASE2&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "0349344a5134d5ad.json",
+    "sha256": "52d680f9ddcca862bbacff89464396fef1e5de19dc3591426e1bd57d1cc15dab",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:50:59.661411+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "ef9192c152899e5211120ad7913273f96d4c6189687ea060aaebb3fd4a4b4da9",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22France%22%20AND%20AREA%5BPhase%5DPHASE3&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "ef9192c152899e52.json",
+    "sha256": "46db17ee94010701dfc677b95f5e60cac80b2407c899b785d25eb8d975d78975",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:00.566835+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "f579fe7a48f3bfaaed6bbf85604eb462bae526ad7844b450d465d86255c22554",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22France%22%20AND%20AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "f579fe7a48f3bfaa.json",
+    "sha256": "f74ab565bb4ea3f212e741c9059677b9295a574ca73b2bfc6c63ea7201e39f89",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:02.535492+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "09f3ac544493c0b8f5d64c2bcd250fb034232795c4f2ba1402f5ae93e76a43b1",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22Nigeria%22%20AND%20AREA%5BPhase%5DPHASE1&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "09f3ac544493c0b8.json",
+    "sha256": "1d65731b20900036ec8b390e17582a9818f577d751aa3fb7d724685e992f5bd0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:03.997718+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "7dc4178bd5c4fd864d1b456b470af7f7fafda76da188209dd223a485eaa6f7c2",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22Nigeria%22%20AND%20AREA%5BPhase%5DPHASE2&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "7dc4178bd5c4fd86.json",
+    "sha256": "5cf0631625511a947f7345b88864139d2291ca5a534b7a74b84ac5930ea99b33",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:06.492353+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "aba6858fcb382d4d45f69cf1a4b6b587d1b542dd4a61057fda843f39570f7c81",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22Nigeria%22%20AND%20AREA%5BPhase%5DPHASE3&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "aba6858fcb382d4d.json",
+    "sha256": "bdbc5554ed523637bdc69d76c8991e6e7bcdc2f0b02cbff8ddbe01191aa75b05",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:06.843579+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "86a83f56b88d5dc67be480d00bf332651847d34eb44933f1600feca4f87ee54d",
+    "url": "https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BLocationCountry%5DCOVERAGE%5BFullMatch%5D%22Nigeria%22%20AND%20AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=1&fields=NCTId",
+    "file": "86a83f56b88d5dc6.json",
+    "sha256": "dc7e47a822912876f813b1de71e3b52f4707807e481e29458e012959601b7332",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:51:07.915429+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  },
+  {
+    "request_fingerprint": "de45a81308cf42d4c6faa9a18d9490ad06e2b1843a73d9e8e1a236c52910931b",
+    "url": "https://clinicaltrials.gov/api/v2/version",
+    "file": "de45a81308cf42d4.json",
+    "sha256": "b80f81f8aae129e19f45ceb128e50fc0a5f4671bd3cd412511e93073dff87e63",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "\"0/0.34.1/mvaqlnuw-gzip\""
+    },
+    "retrieved_at": "2026-10-17T16:50:53.289814+00:00",
+    "licence": "public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions (https://clinicaltrials.gov/about-site/terms-conditions); ClinicalTrials.gov, U.S. National Library of Medicine (da"
+  }
+]

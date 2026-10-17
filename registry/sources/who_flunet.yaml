@@ -1,0 +1,18 @@
+# V6 (agent PRED-HEALTH): WHO FluNet, weekly influenza laboratory surveillance by country (WHO xMart FLUMART).
+# Connector: src/reva/adapters/connectors/atlas_who_flunet.py -> atlas table who.flunet.
+source_key: who.flunet
+title: WHO FluNet (GISRS) weekly influenza surveillance (xMart FLUMART VIW_FNT)
+provider_url: https://www.who.int/tools/flunet
+lineage_family: who
+rights:
+  licence: CC BY 4.0 (WHO additional terms)
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  terms_url: https://data.who.int/redirect-pages/footer/learn-more/terms-and-conditions
+  attribution: World Health Organization, Global Influenza Surveillance and Response System (GISRS), FluNet
+metadata:
+  allowed_hosts: [xmart-api-public.who.int]
+  endpoint: https://xmart-api-public.who.int/FLUMART/VIW_FNT
+  slice: 30-country panel, ISO_YEAR >= 2015, columns SPEC_PROCESSED_NB SPEC_RECEIVED_NB INF_A INF_B INF_ALL INF_NEGATIVE per ORIGIN_SOURCE
+  release_checked: "2026-10-17: latest ISO week start 2026-10-05 (AUS, CHN, ZAF), 2026-09-21 (FRA)"
+  authentication: none
+  cadence: weekly

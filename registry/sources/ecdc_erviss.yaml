@@ -1,0 +1,15 @@
+# V6 (agent PRED-HEALTH): ECDC European Respiratory Virus Surveillance Summary (ERVISS) weekly data.
+# Connector: src/reva/adapters/connectors/atlas_ecdc_erviss.py -> atlas tables ecdc.erviss_ili, ecdc.erviss_sentinel.
+source_key: ecdc.erviss
+title: ECDC ERVISS weekly respiratory virus data (GitHub EU-ECDC/Respiratory_viruses_weekly_data)
+provider_url: https://erviss.org
+lineage_family: ecdc
+rights:
+  licence: "licence_review: ECDC reuse terms not archived (no LICENSE/README reachable; ecdc.europa.eu blocks non-browser clients)"
+  attribution: European Centre for Disease Prevention and Control (ECDC), ERVISS
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  files: [data/ILIARIRates.csv, data/sentinelTestsDetectionsPositivity.csv]
+  release_checked: "2026-10-17: weeks 2022-W25 .. 2026-W41"
+  authentication: none
+  cadence: weekly

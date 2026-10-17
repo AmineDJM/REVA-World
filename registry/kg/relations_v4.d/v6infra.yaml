@@ -1,0 +1,32 @@
+version: 1
+agent: V6INFRA
+note: >-
+  Transport & logistics facilities (docs/dev/v6_infra.md): UN/LOCODE trade locations, NGA World Port Index ports,
+  IMF PortWatch ports and chokepoints, OurAirports airports. Country edges use Wikidata P17 (mapped by V4CORE).
+  ADM1 edges point to the Natural Earth / ISO 3166-2 region_adm1 entities (iso3166_2:<code>) loaded by V4CLIMATE;
+  their qualifier `basis` says how: published_code (the provider publishes the ISO 3166-2 code), point_in_polygon or
+  nearest_polygon (REVA computations, labelled `derived`). UN/LOCODE edges are identifiers published by the WPI /
+  PortWatch: a port and the UN/LOCODE location stay distinct entities (never merged). Literals (codes, types,
+  status) are not mapped. No family is causal.
+mappings:
+  - {property: "unlocode:in_adm1", family: located_in, subtype: trade_location_in_subdivision, source: unece.unlocode,
+     subject_kinds: [trade_location], object_kinds: [region_adm1],
+     note: "UN/LOCODE Subdivision column (published code) when it names a Natural Earth admin-1 subdivision, else REVA point in polygon (qualifier basis)"}
+  - {property: "wpi:in_adm1", family: located_in, subtype: port_in_subdivision, source: nga.wpi,
+     subject_kinds: [port], object_kinds: [region_adm1],
+     note: "REVA point in polygon of the WPI coordinates (nearest coastal polygon within 0.05 degrees, labelled)"}
+  - {property: "wpi:at_unlocode", family: located_in, subtype: port_at_trade_location, source: nga.wpi,
+     subject_kinds: [port], object_kinds: [trade_location],
+     note: "UN/LOCODE published by the WPI for the port (unloCode column); identifiers only, not an identity merge"}
+  - {property: "portwatch:in_adm1", family: located_in, subtype: port_in_subdivision, source: imf.portwatch,
+     subject_kinds: [port], object_kinds: [region_adm1],
+     note: "REVA point in polygon of the PortWatch coordinates (nearest coastal polygon within 0.05 degrees, labelled)"}
+  - {property: "portwatch:at_unlocode", family: located_in, subtype: port_at_trade_location, source: imf.portwatch,
+     subject_kinds: [port], object_kinds: [trade_location],
+     note: "UN/LOCODE published in the PortWatch ports database (LOCODE field); identifiers only"}
+  - {property: "ourairports:in_adm1", family: located_in, subtype: airport_in_subdivision, source: ourairports.data,
+     subject_kinds: [airport], object_kinds: [region_adm1],
+     note: "OurAirports iso_region (published code) when it names a Natural Earth admin-1 subdivision, else REVA point in polygon"}
+  - {property: "infra:measured_by", family: measured_by, subtype: atlas_table, source: v6infra,
+     subject_kinds: [maritime_chokepoint], object_kinds: [data_series],
+     note: "the atlas table holding the facility's series (atlas:<source>.<dataset>, kind data_series; values in the atlas)"}

@@ -232,7 +232,7 @@ def _by_vintage(df: pl.DataFrame) -> dict[str, list[tuple[date, float]]]:
 
 
 def _consecutive_tail(series: dict[int, float], last: int, maxlen: int) -> list[tuple[int, float]]:
-    out = []
+    out: list[tuple[int, float]] = []
     q = last
     while q in series and len(out) < maxlen:
         out.append((q, series[q]))
@@ -271,10 +271,10 @@ def us_cases(
         series: dict[str, dict[int, float]] = {}
         vin = None
         for tv, (_s, rv, tr) in US_VARIABLES.items():
-            rows = acc.latest(family="philfed_rtdsm", variable=rv).rows
-            if rows.height == 0:
+            lrows = acc.latest(family="philfed_rtdsm", variable=rv).rows
+            if lrows.height == 0:
                 break
-            byv = _by_vintage(rows)
+            byv = _by_vintage(lrows)
             vin = max(byv, key=lambda v: len(byv[v]))
             series[tv] = _quarterly_from_vintage(byv[vin], tr)  # one vintage: never mix vintages in a transform
         if len(series) < 3:

@@ -137,6 +137,20 @@ def seed_cmd(profile: str = typer.Option("mvp", help="registry profile")) -> Non
     )
 
 
+def _figaro_dataset(name: str, cursor: dict[str, Any], live: bool) -> dict[str, Any] | None:
+    """V6 INTEG: a complete FIGARO year becomes a verified dataset input on the CLI path too (the worker ``ingest``
+    job did it, ``reva ingest --connector eurostat.figaro.iciot_ii`` did not, so no belief release could pin the
+    IO table). Identity checks refuse an incomplete or inconsistent table (nothing registered)."""
+    if name != "eurostat.figaro.iciot_ii" or not cursor.get("complete") or not cursor.get("year"):
+        return None
+    from reva.adapters.connectors.io_tables import publish_io_dataset
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import get_engine
+
+    origin = "live" if live else "test_fixture"
+    return publish_io_dataset(get_engine("worker"), get_store(), year=int(cursor["year"]), origin=origin)
+
+
 def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, Any]]:
     from reva.adapters.connectors.registry import builtin_connectors
     from reva.adapters.objects.factory import get_store
@@ -214,6 +228,7 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
                 budget_info = settle_metered(get_engine("worker"), http)  # actual requests/bytes made
             d = rep.as_dict()
             d["budget"] = budget_info
+            d["dataset"] = _figaro_dataset(spec.name, rep.cursor, live)
             d.pop("quality", None)
             d["mode"] = "live" if live else "fixture"
             reports.append(d)

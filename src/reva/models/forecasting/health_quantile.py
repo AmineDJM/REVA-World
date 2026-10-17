@@ -80,7 +80,7 @@ Result = QuantileForecast | Abstain
 
 
 def _finish(
-    qs: Sequence[float], lower: float | None, upper: float | None, detail: Mapping[str, Any]
+    qs: Sequence[float] | np.ndarray, lower: float | None, upper: float | None, detail: Mapping[str, Any]
 ) -> QuantileForecast:
     arr = np.asarray(qs, dtype=float)
     if lower is not None:
@@ -257,7 +257,7 @@ def dm_test(diffs: Sequence[float], lag: int) -> dict[str, Any]:
     """Diebold-Mariano test of mean(d) = 0 with a Newey-West long-run variance (Bartlett, ``lag``) and the
     Harvey-Leybourne-Newbold small-sample correction; two-sided p-value from Student t with T-1 df.
     ``d`` = loss(model) - loss(benchmark): negative mean = model better."""
-    from scipy import stats
+    from scipy import stats  # type: ignore[import-untyped]
 
     d = np.asarray(diffs, dtype=float)
     n = len(d)

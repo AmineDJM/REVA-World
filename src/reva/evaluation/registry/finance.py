@@ -82,9 +82,7 @@ def to_floats(cells: Sequence[tuple[date, str, Ref]]) -> list[tuple[date, float]
     return [(d, float(Decimal(v))) for d, v, _ in cells]
 
 
-def spread_cells(
-    a: Sequence[tuple[date, str, Ref]], b: Sequence[tuple[date, str, Ref]]
-) -> list[tuple[date, str, Ref]]:
+def spread_cells(a: Sequence[tuple[date, str, Ref]], b: Sequence[tuple[date, str, Ref]]) -> list[tuple[date, str, Ref]]:
     """Day-by-day ``a - b`` (decimal arithmetic) on the days both are published; refs of both cells kept."""
     bb = {d: (v, r) for d, v, r in b}
     out = []
@@ -98,7 +96,9 @@ def spread_cells(
 def curve_frame(frame: pl.DataFrame, prefix: str, provider_geo: str) -> dict[date, dict[float, float]]:
     """Daily par curves ``{day: {maturity_years: yield}}`` from the ``<prefix><tenor>`` indicators."""
     f = frame.filter(
-        pl.col("indicator").str.starts_with(prefix) & (pl.col("provider_geo") == provider_geo) & pl.col("value").is_not_null()
+        pl.col("indicator").str.starts_with(prefix)
+        & (pl.col("provider_geo") == provider_geo)
+        & pl.col("value").is_not_null()
     )
     out: dict[date, dict[float, float]] = {}
     for ind, d, v in f.select("indicator", "period_start", "value").iter_rows():
@@ -171,8 +171,9 @@ def load_inputs(fin: Mapping[str, Any], frames: Mapping[str, pl.DataFrame]) -> d
 
 def target_of(q: Mapping[str, Any]) -> F.Target:
     idx = P.parse_label("M", str(q["reference_period"]))
-    kind = "month_mean" if q["resolution"]["value_rule"] == "monthly_mean_of_daily" else "month_end"
-    return F.Target(kind, idx // 12, idx % 12 + 1)
+    if q["resolution"]["value_rule"] == "monthly_mean_of_daily":
+        return F.Target("month_mean", idx // 12, idx % 12 + 1)
+    return F.Target("month_end", idx // 12, idx % 12 + 1)
 
 
 def _lag(fin: Mapping[str, Any], name: str) -> int:
@@ -270,9 +271,9 @@ def meeting_prob(
 
 def meeting_days(frame: pl.DataFrame, cal: Mapping[str, Any]) -> list[tuple[date, str, Ref]]:
     """Decision days of one body from the calendar table: ``(day, verbatim text, ref)``."""
-    f = frame.filter(
-        (pl.col("indicator") == cal["indicator"]) & (pl.col("provider_geo") == cal["provider_geo"])
-    ).sort("period_start")
+    f = frame.filter((pl.col("indicator") == cal["indicator"]) & (pl.col("provider_geo") == cal["provider_geo"])).sort(
+        "period_start"
+    )
     return [
         (s, str(t or ""), {"raw_sha256": h, "selector": _json(sel)})
         for s, t, h, sel in f.select("period_start", "value_text", "raw_sha256", "selector").iter_rows()

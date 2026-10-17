@@ -1,0 +1,97 @@
+# Global temperature shocks and world GDP per capita (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: bilal_kanzig_2024
+source_key: effects.literature
+citation:
+  text: "Adrien Bilal and Diego R. Känzig. The Macroeconomic Impact of Climate Change: Global vs. Local Temperature. NBER Working Paper No. 32450, May 2024, revised January 2026."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Bilal & Känzig (2024, rev. 2026), NBER WP 32450"
+  authors: [Adrien Bilal, Diego R. Känzig]
+  title: "The Macroeconomic Impact of Climate Change: Global vs. Local Temperature"
+  year: 2026
+  series: NBER Working Paper No. 32450
+  doi: null
+  url: http://www.nber.org/papers/w32450
+document:
+  url: https://www.nber.org/system/files/working_papers/w32450/w32450.pdf
+  media_type: application/pdf
+  sha256: 7c8aa14b850d2a688c5e9851173e43a3741039b953e9aa6732d258da49834fd1
+  bytes: 1618325
+  version_read: "NBER Working Paper 32450, May 2024, revised January 2026 (earlier revisions print other numbers)"
+as_of: "2026-01-01"
+rights:
+  licence: "© 2024 by Adrien Bilal and Diego R. Känzig. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  cause: {kind: variable, id: climate.global_mean_temperature, transform: level_change,
+          definition: "a global temperature shock scaled to 1°C (innovation to global mean temperature extracted as a quasi-experimental shock; temperature remains elevated near 0.5°C for several years)"}
+  effect: {kind: variable, id: output.real_gdp_per_capita, transform: log_level, definition: "world GDP per capita"}
+  measure: response
+  unit: percent
+  shock: {size: 1, unit: degree Celsius}
+  method: local_projection
+  point_kind: point
+  scope: {countries: [WLD]}
+  identification: "Global temperature shocks (forecast errors of global mean temperature) as the impulse in local projections of world GDP per capita on country panels; 95% confidence intervals"
+estimates:
+  - id: world_gdp_pc_peak_pwt
+    pdf_page: 4
+    shock_profile: one_time_impulse
+    sign: negative
+    point: -14
+    as_printed: "14"
+    printed_transform: negated
+    uncertainty: {ci_low: -22, ci_high: -6, ci_level: 0.95, interval_kind: confidence, status: reported}
+    horizon: {kind: peak, value: 6, unit: year}
+    scope: {countries: [WLD], period: {from: "1960", to: "2019"}, frequency: annual, n_countries: 173, sample_note: "PWT sample: Penn World Tables, 173 countries, 1960-2019"}
+    locator: "Introduction, summary of the local-projection results (printed p.2); same numbers in section 3 (pdf p.20)"
+    quote: "In the broader PWT sample, a global temperature shock scaled to 1°C leads to a gradual decline in world GDP per capita that peaks at 14% after 6 years with a 95% confidence interval of (6%, 22%), and is statistically significant at the 5% level in years 2 to 8."
+    applicability: "REVA note: response to a partially persistent temperature shock (temperature stays elevated for years), printed as a decline of 14%; stored as -14 (printed_transform: negated)."
+  - id: world_gdp_pc_peak_bu
+    pdf_page: 4
+    shock_profile: one_time_impulse
+    sign: negative
+    point: -18
+    as_printed: "18"
+    printed_transform: negated
+    uncertainty: {ci_low: -30, ci_high: -6, ci_level: 0.95, interval_kind: confidence, status: reported}
+    horizon: {kind: peak, value: 5, unit: year}
+    scope: {countries: [WLD], period: {from: "1860", to: "2019"}, frequency: annual, n_countries: 43, sample_note: "BU sample: Barro-Ursúa activity data, 43 countries, 1860-2019"}
+    locator: "Introduction, summary of the local-projection results (printed p.2)"
+    quote: "In the longer BU sample, the same temperature shock leads to a peak effect at 18% after 5 years with a 95% confidence interval of (6%, 30%), and is statistically significant at the 5% level in years 0 to 6."
+    applicability: "REVA note: peak effect printed as an 18% decline; stored as -18 (printed_transform: negated)."
+  - id: world_gdp_pc_permanent_1c_pwt
+    pdf_page: 17
+    shock_profile: permanent_level_shift
+    cause: {kind: variable, id: climate.global_mean_temperature, transform: level_change, definition: "a permanent 1°C rise in global temperature"}
+    sign: negative
+    point: -20
+    as_printed: "20"
+    printed_transform: negated
+    uncertainty: {status: not_reported}
+    horizon: {kind: long_run}
+    scope: {countries: [WLD], period: {from: "1960", to: "2019"}, frequency: annual, n_countries: 173, sample_note: "PWT sample"}
+    locator: "Section 3, conversion to a permanent temperature increase (ratio of cumulative impulse responses) (printed p.15)"
+    quote: "We find that a permanent 1°C rise in global temperature leads to a 20% long-run reduction in world GDP per capita in the PWT dataset, and 29% in the BU dataset."
+    source_caveats: "The introduction of the same version prints: 'a permanent 1°C rise in global temperature leads to a 22-34% reduction in world GDP per capita in the PWT and BU samples, respectively.'"
+    applicability: "REVA note: the authors' conversion of the shock response into a permanent 1°C rise (ratio of cumulative impulse responses), a reduced-form extrapolation; the same version prints 22-34% in its introduction and 20%/29% in section 3 (the section 3 numbers are recorded)."
+  - id: world_gdp_pc_permanent_1c_bu
+    pdf_page: 17
+    shock_profile: permanent_level_shift
+    cause: {kind: variable, id: climate.global_mean_temperature, transform: level_change, definition: "a permanent 1°C rise in global temperature"}
+    sign: negative
+    point: -29
+    as_printed: "29"
+    printed_transform: negated
+    uncertainty: {status: not_reported}
+    horizon: {kind: long_run}
+    scope: {countries: [WLD], period: {from: "1860", to: "2019"}, frequency: annual, n_countries: 43, sample_note: "BU sample"}
+    locator: "Section 3, conversion to a permanent temperature increase (printed p.15)"
+    quote: "We find that a permanent 1°C rise in global temperature leads to a 20% long-run reduction in world GDP per capita in the PWT dataset, and 29% in the BU dataset."
+    source_caveats: "The introduction of the same version prints: 'a permanent 1°C rise in global temperature leads to a 22-34% reduction in world GDP per capita in the PWT and BU samples, respectively.'"
+    applicability: "REVA note: see world_gdp_pc_permanent_1c_pwt."

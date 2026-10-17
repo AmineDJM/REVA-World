@@ -98,7 +98,7 @@ def build_cases(specs: SpecSet, frames: Mapping[str, pl.DataFrame]) -> tuple[lis
         if fam.finance["kind"] == "meeting":
             meetings.append(
                 MeetingCase(fam.key, fam.finance, inputs.get("history") or [], inputs.get("inflation") or {},
-                            _models(fam))  # fmt: skip
+                            _models(fam))
             )
             continue
         g = fam.geos[0]
@@ -223,8 +223,8 @@ def run_level_case(case: LevelCase, start_year: int = 2000) -> list[dict[str, An
                 p = _forecast(mk, case, ctx, hist, target, garch)
                 if isinstance(p, Abstain):
                     continue
-                rows.append({"family": case.family, "model": mk, "h": h, "origin": om, "y": y,
-                             **_scores(p, y, threshold)})  # fmt: skip
+                rows.append({"family": case.family, "pool": f"{case.fin['kind']}_{case.target_kind}", "model": mk,
+                             "h": h, "origin": om, "y": y, **_scores(p, y, threshold)})  # fmt: skip
     return rows
 
 
@@ -268,7 +268,8 @@ def run_meeting_case(case: MeetingCase, start_year: int = 2000, window_days: int
                     if isinstance(pr, Abstain):
                         continue
                     q = pr if ev else 1.0 - pr
-                    rows.append({"family": case.family, "model": mk, "h": 1, "origin": P.index_of("M", o),
+                    rows.append({"family": case.family, "pool": f"meeting_{direction}", "model": mk, "h": 1,
+                                 "origin": P.index_of("M", o),
                                  "event": float(ev), "prob": pr, "brier": (pr - ev) ** 2,
                                  "logs": -math.log(q) if q > 0 else None})  # fmt: skip
         m += 1
@@ -330,6 +331,44 @@ def compare(
             "p_better": t.p_less,
             "p_worse": t.p_greater,
         }
+    return out
+
+
+def compare_pooled(
+    rows: Sequence[Mapping[str, Any]], ref: str, metric: str, *, dm_horizon: int | None = None
+) -> list[dict[str, Any]]:
+    """Informational panel test per (pool, model, h): at each origin, the mean over the pool's families of the
+    loss differential model − ``ref`` scaled by the reference's mean loss in that (family, h) (scale-free), then
+    DM-HLN on that series. Never used to admit a candidate (winners are per family cell)."""
+    by: dict[tuple[str, str, str, int], dict[int, float]] = defaultdict(dict)
+    for r in rows:
+        v = r.get(metric)
+        if v is not None:
+            by[(str(r.get("pool")), r["family"], r["model"], int(r["h"]))][int(r["origin"])] = float(v)
+    scale: dict[tuple[str, int], float] = {}
+    for (_pool, fam, mk, h), vals in by.items():
+        if mk == ref and vals:
+            scale[(fam, h)] = math.fsum(vals.values()) / len(vals)
+    acc: dict[tuple[str, str, int], dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+    fams: dict[tuple[str, str, int], set[str]] = defaultdict(set)
+    for (pool, fam, mk, h), vals in by.items():
+        if mk == ref or not scale.get((fam, h)):
+            continue
+        base = by.get((pool, fam, ref, h), {})
+        for o in set(vals) & set(base):
+            acc[(pool, mk, h)][o].append((vals[o] - base[o]) / scale[(fam, h)])
+        fams[(pool, mk, h)].add(fam)
+    out: list[dict[str, Any]] = []
+    for (pool, mk, h), per in sorted(acc.items()):
+        origins = sorted(per)
+        if len(origins) < 12:
+            continue
+        d = [math.fsum(per[o]) / len(per[o]) for o in origins]
+        t = dm_hln_test(d, dm_horizon if dm_horizon is not None else h)
+        out.append({"pool": pool, "model": mk, "h": h, "metric": metric, "reference": ref,
+                    "families": sorted(fams[(pool, mk, h)]), "n_origins": len(origins),
+                    "mean_scaled_diff": math.fsum(d) / len(d), "dm_stat": t.statistic, "p_better": t.p_less,
+                    "p_worse": t.p_greater})  # fmt: skip
     return out
 
 
@@ -399,8 +438,12 @@ def evaluate(level_rows: Sequence[Mapping[str, Any]], meeting_rows: Sequence[Map
                     "vs": {ref: {"ratio": x["ratio"], "p_better": x["p_better"], "n": x["n"]} for ref, x in refs.items()},
                 }
             )
+    pooled = compare_pooled(level_rows, LEVEL_REF, "crps") + compare_pooled(
+        meeting_rows, MEETING_REF, "brier", dm_horizon=2
+    )
     return {
         "summary": summary,
+        "pooled_informational": pooled,
         "tests_primary": list(primary.values()),
         "tests_vs_other_benchmarks": others,
         "tests_secondary": secondary,
@@ -444,7 +487,7 @@ def run(
                        "first_day": c.history[0][0].isoformat() if c.history else None,
                        "last_day": c.history[-1][0].isoformat() if c.history else None}
             for c in meetings
-        },  # fmt: skip
+        },
         "n_level_replays": len(lrows),
         "n_meeting_replays": len(mrows),
         **ev,
@@ -531,7 +574,7 @@ def run_recorded(
             conn,
             act,
             inputs=[(t["artifact_sha256"], {"role": "atlas_table", "dataset_key": k})
-                    for k, t in sorted(manifest["data"]["tables"].items())],  # fmt: skip
+                    for k, t in sorted(manifest["data"]["tables"].items())],
             outputs=[sha],
         )
         ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=cutoff)

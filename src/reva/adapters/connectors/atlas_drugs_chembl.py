@@ -235,9 +235,18 @@ def build(
     skipped: Counter[str] = Counter()
     ref = {"stated_in": f"ChEMBL web services, release {release}"}
 
-    def st(subject: str, pid: str, *, raw: str, obj: str | None = None, value: Any = None,
-           quals: Mapping[str, Any] | None = None, sid: str | None = None, sel: Mapping[str, Any] | None = None,
-           point: Any = None) -> None:
+    def st(
+        subject: str,
+        pid: str,
+        *,
+        raw: str,
+        obj: str | None = None,
+        value: Any = None,
+        quals: Mapping[str, Any] | None = None,
+        sid: str | None = None,
+        sel: Mapping[str, Any] | None = None,
+        point: Any = None,
+    ) -> None:
         sts.append(
             KgStatement(
                 subject_qid=subject,
@@ -279,8 +288,13 @@ def build(
             st(qid, "chembl:first_approval", raw=raw, value=dc.year_value(fa), sel=sel)
         mp = m.get("max_phase")
         if mp is not None and re.match(r"^[0-9](\.[0-9])?$", str(mp)):
-            st(qid, "chembl:max_phase", raw=raw, value={"type": "quantity", "amount": str(mp), "unit": "phase"},
-               sel=sel)
+            st(
+                qid,
+                "chembl:max_phase",
+                raw=raw,
+                value={"type": "quantity", "amount": str(mp), "unit": "phase"},
+                sel=sel,
+            )
         for code in m.get("atc_classifications") or []:
             if isinstance(code, str) and ATC_RE.match(code):
                 st(qid, "chembl:atc_code", raw=raw, value=dc.external_id(code), quals=dc.ATC_FLAGS, sel=sel)
@@ -290,11 +304,23 @@ def build(
             if m.get(route) is True:
                 st(qid, "chembl:route", raw=raw, value=dc.string_value(route), sel={**sel, "field": route})
         if m.get("black_box_warning") == 1:
-            st(qid, "chembl:black_box_warning", raw=raw, value=dc.string_value("yes"), sel=sel,
-               quals={"definition": "ChEMBL black_box_warning = 1: the drug has a black box warning on its label"})
+            st(
+                qid,
+                "chembl:black_box_warning",
+                raw=raw,
+                value=dc.string_value("yes"),
+                sel=sel,
+                quals={"definition": "ChEMBL black_box_warning = 1: the drug has a black box warning on its label"},
+            )
         if m.get("withdrawn_flag") is True:
-            st(qid, "chembl:withdrawn", raw=raw, value=dc.string_value("yes"), sel=sel,
-               quals={"definition": "ChEMBL withdrawn_flag: withdrawn in at least one country (not necessarily US)"})
+            st(
+                qid,
+                "chembl:withdrawn",
+                raw=raw,
+                value=dc.string_value("yes"),
+                sel=sel,
+                quals={"definition": "ChEMBL withdrawn_flag: withdrawn in at least one country (not necessarily US)"},
+            )
         h = m.get("molecule_hierarchy") or {}
         parent = h.get("parent_chembl_id") if isinstance(h, dict) else None
         if isinstance(parent, str) and CHEMBL_ID_RE.match(parent) and parent != mid:
@@ -324,9 +350,15 @@ def build(
             "references": _refs(r.get("mechanism_refs")),
             "note": "ChEMBL-curated mode of action of the drug; not a causal claim about any disease",
         }
-        st(f"chembl:{mid}", "chembl:mechanism_target", raw=str(r.get("_raw") or raws["mechanisms"]),
-           obj=f"chembl:{tid}", quals=quals, sid=f"mec:{r.get('mec_id')}",
-           sel={"endpoint": "mechanism", "mec_id": r.get("mec_id")})
+        st(
+            f"chembl:{mid}",
+            "chembl:mechanism_target",
+            raw=str(r.get("_raw") or raws["mechanisms"]),
+            obj=f"chembl:{tid}",
+            quals=quals,
+            sid=f"mec:{r.get('mec_id')}",
+            sel={"endpoint": "mechanism", "mec_id": r.get("mec_id")},
+        )
 
     # ---------------------------------------------------------------- targets (+ UniProt components)
     seen_t: set[str] = set()
@@ -350,8 +382,14 @@ def build(
             st(qid, "chembl:target_type", raw=raw, value=dc.string_value(str(t["target_type"])), sel=sel)
         tax = t.get("tax_id")
         if isinstance(tax, int) and not isinstance(tax, bool) and tax > 0:
-            st(qid, "chembl:target_organism", raw=raw, obj=f"ncbitaxon:{tax}", sel=sel,
-               quals={"organism_as_written": t.get("organism")})
+            st(
+                qid,
+                "chembl:target_organism",
+                raw=raw,
+                obj=f"ncbitaxon:{tax}",
+                sel=sel,
+                quals={"organism_as_written": t.get("organism")},
+            )
     missing_targets = sorted(target_ids - seen_t)
     components = 0
     if mapping is not None:
@@ -362,9 +400,14 @@ def build(
                 skipped["component_not_uniprot_accession"] += 1
                 continue
             components += 1
-            st(f"chembl:{tid}", "chembl:target_component", raw=raws["mapping"], obj=f"uniprot:{acc}",
-               quals={"target_name_as_written": name, "target_type_as_written": ttype},
-               sel={"file": "chembl_uniprot_mapping.txt", "line": line})
+            st(
+                f"chembl:{tid}",
+                "chembl:target_component",
+                raw=raws["mapping"],
+                obj=f"uniprot:{acc}",
+                quals={"target_name_as_written": name, "target_type_as_written": ttype},
+                sel={"file": "chembl_uniprot_mapping.txt", "line": line},
+            )
 
     # ---------------------------------------------------------------- indications
     mesh_labels: dict[str, str] = {}
@@ -418,8 +461,15 @@ def build(
                 )
             elif heading and mesh_labels.get(mq) != heading:
                 mesh_conflicts += 1
-            st(f"chembl:{mid}", "chembl:indication_mesh", raw=raw, obj=mq, quals=base, sid=f"drugind:{did}:mesh",
-               sel=sel)
+            st(
+                f"chembl:{mid}",
+                "chembl:indication_mesh",
+                raw=raw,
+                obj=mq,
+                quals=base,
+                sid=f"drugind:{did}:mesh",
+                sel=sel,
+            )
         elif mesh:
             skipped["indication_mesh_not_descriptor"] += 1
 
@@ -448,7 +498,9 @@ async def _fetch(run: Any, url: str, key: str, *, media: tuple[str, ...] = ("app
     return run.store.get("raw", sha), sha
 
 
-async def _paged(run: Any, first_url: Any, key: str, list_key: str, what: str) -> tuple[list[dict[str, Any]], list[str]]:
+async def _paged(
+    run: Any, first_url: Any, key: str, list_key: str, what: str
+) -> tuple[list[dict[str, Any]], list[str]]:
     """All pages of an offset-paginated list (``first_url(offset)``); the total must stay the same."""
     rows: list[dict[str, Any]] = []
     shas: list[str] = []
@@ -468,9 +520,9 @@ async def _paged(run: Any, first_url: Any, key: str, list_key: str, what: str) -
     return rows, shas
 
 
-async def _by_ids(run: Any, url_of: Any, ids: Sequence[str], key: str, list_key: str, what: str) -> tuple[
-    list[dict[str, Any]], list[str]
-]:
+async def _by_ids(
+    run: Any, url_of: Any, ids: Sequence[str], key: str, list_key: str, what: str
+) -> tuple[list[dict[str, Any]], list[str]]:
     rows: list[dict[str, Any]] = []
     shas: list[str] = []
     for i, chunk in enumerate(dc.chunks(sorted(ids), TARGET_CHUNK)):
@@ -500,16 +552,24 @@ def atlas_source() -> AtlasSourceSpec:
         licence=f"{RIGHTS['licence']} ({RIGHTS['licence_url']}); ShareAlike; {RIGHTS['attribution']}",
         allowed_hosts=(API_HOST, FTP_HOST),
         datasets=(DATASET,),
-        dataset_ids=(f"{API}/molecule.json?max_phase=4", f"{API}/mechanism.json?max_phase=4",
-                     f"{API}/drug_indication.json?max_phase_for_ind=4", MAPPING_URL),
+        dataset_ids=(
+            f"{API}/molecule.json?max_phase=4",
+            f"{API}/mechanism.json?max_phase=4",
+            f"{API}/drug_indication.json?max_phase_for_ind=4",
+            MAPPING_URL,
+        ),
         cadence_seconds=90 * 86400,
         planned_requests=60,
         max_response_bytes=MAX_BYTES,
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"molecule": list(MOL_FIELDS), "target": list(TARGET_FIELDS),
-                        "mechanism": "all fields", "drug_indication": "all fields"},
+        field_mappings={
+            "molecule": list(MOL_FIELDS),
+            "target": list(TARGET_FIELDS),
+            "mechanism": "all fields",
+            "drug_indication": "all fields",
+        },
         notes="KG only: approved drugs, mechanisms -> targets -> UniProt, approved indications (associations).",
     )
 
@@ -531,19 +591,22 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     raws: dict[str, list[str]] = {}
     if ids is None:
         molecules, raws["molecules"] = await _paged(run, molecules_url, "chembl:molecules", "molecules", "molecules")
-        mechs, raws["mechanisms"] = await _paged(run, mechanisms_url, "chembl:mechanisms", "mechanisms",
-                                                 "mechanisms")
-        inds, raws["indications"] = await _paged(run, indications_url, "chembl:indications", "drug_indications",
-                                                 "drug indications")
+        mechs, raws["mechanisms"] = await _paged(run, mechanisms_url, "chembl:mechanisms", "mechanisms", "mechanisms")
+        inds, raws["indications"] = await _paged(
+            run, indications_url, "chembl:indications", "drug_indications", "drug indications"
+        )
         if run.origin == "live" and len(molecules) < MIN_MOLECULES_LIVE:
             raise dc.err(f"only {len(molecules)} approved molecules: truncated?", kind="truncated")
     else:
-        molecules, raws["molecules"] = await _by_ids(run, molecules_ids_url, ids, "chembl:molecules", "molecules",
-                                                     "molecules")
-        mechs, raws["mechanisms"] = await _by_ids(run, mechanisms_ids_url, ids, "chembl:mechanisms", "mechanisms",
-                                                  "mechanisms")
-        inds, raws["indications"] = await _by_ids(run, indications_ids_url, ids, "chembl:indications",
-                                                  "drug_indications", "drug indications")
+        molecules, raws["molecules"] = await _by_ids(
+            run, molecules_ids_url, ids, "chembl:molecules", "molecules", "molecules"
+        )
+        mechs, raws["mechanisms"] = await _by_ids(
+            run, mechanisms_ids_url, ids, "chembl:mechanisms", "mechanisms", "mechanisms"
+        )
+        inds, raws["indications"] = await _by_ids(
+            run, indications_ids_url, ids, "chembl:indications", "drug_indications", "drug indications"
+        )
     tids = sorted({str(r["target_chembl_id"]) for r in mechs if isinstance(r.get("target_chembl_id"), str)})
     targets, raws["targets"] = await _by_ids(run, targets_url, tids, "chembl:targets", "targets", "targets")
     mbody, msha = await _fetch(run, MAPPING_URL, "chembl:uniprot_mapping", media=("text/plain",))
@@ -559,11 +622,23 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     all_raws = sorted({status_sha, status_sha2, msha, *[s for v in raws.values() for s in v]})
     part_raw = {k: v[0] if v else status_sha for k, v in raws.items()}
     part_raw["mapping"] = msha
-    ents, sts, rep = build(release=release, molecules=molecules, mechanisms=mechs, targets=targets,
-                           indications=inds, mapping=mapping_used, raws=part_raw)
-    out: dict[str, Any] = {"release": release, "status": {k: status.get(k) for k in ("chembl_release_date",
-                           "targets", "disinct_compounds")}, "partial": partial, "build": rep,
-                           "mapping_note": note, "raw_count": len(all_raws)}
+    ents, sts, rep = build(
+        release=release,
+        molecules=molecules,
+        mechanisms=mechs,
+        targets=targets,
+        indications=inds,
+        mapping=mapping_used,
+        raws=part_raw,
+    )
+    out: dict[str, Any] = {
+        "release": release,
+        "status": {k: status.get(k) for k in ("chembl_release_date", "targets", "disinct_compounds")},
+        "partial": partial,
+        "build": rep,
+        "mapping_note": note,
+        "raw_count": len(all_raws),
+    }
     if not dc.kg_available(run.engine):
         out["kg"] = {"status": "kg_unavailable"}
         return out

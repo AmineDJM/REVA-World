@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!--  -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149019844-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-149019844-3');
+  </script>
+  <base href="https://list.essentialmeds.org">
+  <!--  -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="RRrt3Bdn12kpMR8zDygZUJAzUzu7kiOzzCqeUqIk">
+  <title>eEML - Electronic Essential Medicines List</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="alternate" href="https://list.essentialmeds.org/recommendations/108.jsonld" type="application/ld+json">
+  <link rel="preload" as="style" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><link rel="modulepreload" as="script" href="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js" /><link rel="stylesheet" href="https://list.essentialmeds.org/build/assets/app-CYHvG-1g.css" /><script type="module" src="https://list.essentialmeds.org/build/assets/app-CimemzdQ.js"></script></head>
+
+<body>
+  <header>
+      <div class="inner-page-header">
+    <div class="header-container">
+  <a href="/">
+    <img class="logo logo-default" src="https://list.essentialmeds.org/images/who_logo.svg">
+    <img class="logo logo-small" src="https://list.essentialmeds.org/images/who_logo_small.svg">
+  </a>
+  <form class="search-form" action="/" autocomplete="off">
+  <input name="query" type="text" placeholder="Search by name/indication" autofocus
+    value=""/>
+  <button class="icon search" type="submit">
+  </button>
+</form>
+  <div class="header-menu">
+    <input type="checkbox" id="header-menu-state">
+    <label for="header-menu-state" class="header-menu-toggle icon menu"></label>
+    <label for="header-menu-state" class="header-menu-toggle-overlay"></label>
+    <div class="menu-container">
+      <ul class="menu-list">
+                  <li>
+            <label class="locale-label  active ">
+              <a href="http://list.essentialmeds.org/recommendations/108?ln=EN">EN</a>
+            </label>
+          </li>
+                  <li>
+            <label class="locale-label ">
+              <a href="http://list.essentialmeds.org/recommendations/108?ln=FR">FR</a>
+            </label>
+          </li>
+                        <li>
+          <a class="export" href="https://list.essentialmeds.org/recommendations/108/print?format=pdf" target=" _blank">
+            <span>Export</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>  </div>
+  </header>
+  <div id="container">
+    <div class="main-content ip-content recommendation">
+    <div class="export-container">
+  <input type="checkbox" id="export-form-trigger" />
+  <label for="export-form-trigger">
+    <span class="icon export export--recommendation">
+      <span>export</span>
+    </span>
+  </label>
+  <div class="export-form">
+    <div>
+      <h2>Export</h2>
+      <form class="eml-export" method="POST" action="https://list.essentialmeds.org/recommendations/108/print?" target="_blank">
+        <div class="export-option">
+    <input class="custom-input" id="format-pdf" type="radio" name="format" value="pdf"   checked >
+<label class="custom-input-label" for="format-pdf">
+  <span class="radio-mark"></span>
+      PDF
+  </label>
+  </div>
+  <div class="export-option">
+    <input class="custom-input" id="format-docx" type="radio" name="format" value="docx"  >
+<label class="custom-input-label" for="format-docx">
+  <span class="radio-mark"></span>
+      Word (DOCX)
+  </label>
+  </div>
+        <div class="buttons">
+          <label for="export-form-trigger" class="btn btn-cancel">Cancel</label>
+          <button class="btn btn-submit" onclick="document.getElementById('export-form-trigger').checked = false;"
+            type="submit">Export</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>      <div class="locales">
+      <div class="locale  active ">
+      <a href="http://list.essentialmeds.org/recommendations/108?ln=EN">EN</a>
+    </div>
+      <div class="locale ">
+      <a href="http://list.essentialmeds.org/recommendations/108?ln=FR">FR</a>
+    </div>
+  </div>    <div class="page-title">
+        <div class="medicine-title-status active ">
+  <div class="medicine-title" title="imatinib">
+          <a title="imatinib" href="https://list.essentialmeds.org/medicines/95">
+        Imatinib
+      </a>
+      </div>
+  <div class="description">
+      </div>
+  <div class="medicine-status" title="Essential medicine status">
+          Essential medicine status
+      </div>
+</div>  <div class="meta-details">
+  <div class="meta-prop-title">Section:</div>
+  <div class="meta-prop-value">
+      <a class="section-link" href="/?section=374">
+      <span>8. Immunomodulators and antineoplastics</span>
+    </a>
+      <a class="section-link" href="/?section=376">
+      <span>8.2. Antineoplastics and supportive medicines</span>
+    </a>
+      <a class="section-link" href="/?section=481">
+      <span>8.2.2. Targeted therapies</span>
+    </a>
+    </div>
+</div>
+  </div>
+  <div class="page-content">
+          <div class="recommendation-data">
+    <div class="recommendation-header add">
+  <div class="decision-data">
+    <div class="decision-data-item atc-code-container">
+      <div class="atc-code">
+        <span>ATC codes:</span>
+                  <a href="https://www.whocc.no/atc_ddd_index/?showdescription=yes&amp;code=L01EA01" target="_blank">L01EA01</a>
+              </div>
+    </div>
+
+          <div class="decision-data-item emlc">EMLc</div>
+      </div>
+
+  <div class="header-data">
+    <div class="header-row">
+  <div class="label-cell">Indication</div>
+  <div class="content-cell"><div class="inidication-text">
+        <span>Chronic myeloid leukaemia, not elsewhere classified </span>
+        <span class="icd-label">
+          ICD11 code: 
+          <a class="icd-link" href="https://icd.who.int/browse11/l-m/en#http://id.who.int/icd/entity/596808334/mms" target="_blank">
+            2B33.2
+          </a>
+        </span>
+      </div></div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">INN</div>
+  <div class="content-cell">Imatinib</div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">Medicine type</div>
+  <div class="content-cell">Chemical agent</div>
+</div>
+              <div class="header-row">
+  <div class="label-cell">List type</div>
+  <div class="content-cell">Complementary</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Formulations</div>
+  <div class="content-cell"><strong>Oral &gt; Solid: </strong>
+                      <span>
+              100 mg ;             </span>
+                      <span>
+              400 mg             </span>
+                    <br></div>
+</div>
+        <div class="header-row">
+  <div class="label-cell">EML status history</div>
+  <div class="content-cell"><div class="status-history">
+      <div>
+      First added in 2015
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/NYoeKtlFYadb2HI1fdNfOyiluryY0W3EHufAfotP.pdf">TRS
+            994</a>)
+                        </div>
+      <div>
+      Changed in 2019
+                                (<a target="_blank" rel="noopener noreferrer" href="https://list.essentialmeds.org/files/trs/upzppOSPYB9uERmSypnQpurE1E4KB2E2nUpxTYDh.pdf">TRS
+            1021</a>)
+                        </div>
+  </div></div>
+</div>
+          <div class="header-row">
+  <div class="label-cell">Sex</div>
+  <div class="content-cell">All</div>
+</div>
+      <div class="header-row">
+  <div class="label-cell">Age</div>
+  <div class="content-cell">Also recommended for children</div>
+</div>
+                  <div class="header-row">
+  <div class="label-cell">Therapeutic alternatives</div>
+  <div class="content-cell">The recommendation is for this specific medicine</div>
+</div>
+            <div class="header-row">
+  <div class="label-cell">Patent information</div>
+  <div class="content-cell">Main patents have expired but secondary patents might remain active in some jurisdictions. For more
+information on specific patents and license status for developing countries visit <a class="external-link" href="http://www.medspal.org" target="_blank">www.MedsPal.org</a>
+        <div>
+          Read more 
+          <a class="external-link" href="/patents" target="_blank">
+            about patents.
+          </a>
+        </div></div>
+</div>
+      </div>
+
+  <div class="header-data secondary">
+    <div class="header-row">
+  <div class="label-cell">Tags</div>
+  <div class="content-cell"><label class="tag-label l-2">
+          Cancer
+        </label></div>
+</div>
+    <div class="header-row">
+  <div class="label-cell">Wikipedia</div>
+  <div class="content-cell"><a class="external-link wiki" href="https://en.wikipedia.org/wiki/Imatinib" target="_blank">
+        <span>
+          Imatinib
+        </span>
+      </a></div>
+</div>
+
+    <div class="header-row">
+  <div class="label-cell">DrugBank</div>
+  <div class="content-cell"><a class="external-link" href="https://www.drugbank.ca/drugs/DB00619" target="_blank">
+          <span>
+            Imatinib
+                      </span>
+        </a></div>
+</div>
+  </div>
+</div>
+      <div class="recommendation-justification ">
+            <div>
+  <div class="justification-section">
+  <div class="label">Expert Committee recommendation</div>
+  <div class="content"><input id="text-toggle-justification" type="checkbox">
+    <div class="justification-text">The Expert Committee recommended the addition to the complementary list
+of the EMLc of ATRA, dasatinib, fluorouracil, imatinib, irinotecan, nilotinib,
+oxaliplatin, procarbazine and rituximab for the paediatric cancer indications
+outlined in the table below.
+The Committee also recommended the extension of the current listings
+on the EMLc of bleomycin, doxorubicin, vincristine, cisplatin, cyclophosphamide,
+prednisolone, cytarabine, daunorubicin, mercaptopurine, methotrexate, cytarabine
+and hydroxycarbamide to include the indications outlined in the table below.
+The Committee also recommended the addition to the core list of the
+EMLc of enoxaparin with a square box for use as an anticoagulant in children.
+The Expert Committee did not recommend the addition of zoledronic acid
+to the complementary list of the EMLc for the treatment of malignancy-related
+bone disease. The Committee noted that data for its use in children are scant and
+fragmented. The Committee was also concerned that the effects of zoledronic acid
+in some paediatric cancers (e.g. osteosarcoma) were largely negative, and that
+there are insufficient long-term safety data of bisphosphonate use in paediatric
+cancer patients to be reassured of an acceptable benefit–to–harm ratio.
+Furthermore, the Committee noted that although use of bisphosphonates
+in paediatric patients has been reported to be well tolerated, the impact of use in
+the context of patients with actively growing skeleton is not yet fully known.
+
+New medicines for EMLc
+All-trans retinoic acid: Acute promyelocytic leukaemia
+Dasatinib: Imatinib-resistant chronic myeloid leukaemia
+Fluorouracil: Nasopharyngeal carcinoma, early-stage colon cancer, early-stage rectal cancer, metastatic colorectal cancer
+Imatinib: Chronic myeloid leukaemia, gastrointestinal stromal tumour
+Irinotecan: Metastatic colorectal cancer
+Nilotinib: Imatinib-resistant chronic myeloid leukaemia
+Oxaliplatin: Early stage colon cancer, metastatic colorectal cancer
+Procarbazine: Hodgkin lymphoma
+Rituximab: Diffuse large B-cell lymphoma
+ Enoxaparin: Anticoagulant (core list)
+
+Extension of indications for currently listed medicines
+BleomycinL: Kaposi sarcoma
+Doxorubicin: Kaposi sarcoma
+Vincristine: Kaposi sarcoma
+Cisplatin: Nasopharyngeal carcinoma
+Cyclophosphamide: Diffuse large B-cell lymphoma
+Prednisolone: Diffuse large B-cell lymphoma
+Cytarabine: Acute promyelocytic leukaemia, acute myelogenous leukaemia
+Daunorubicin: Acute promyelocytic leukaemia
+Mercaptopurine: Acute promyelocytic leukaemia
+Methotrexate: Acute promyelocytic leukaemia
+Hydroxycarbamide: Chronic myeloid leukaemia</div>
+    <label class="toggle-label" for="text-toggle-justification"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Background</div>
+  <div class="content"><input id="text-toggle-background" type="checkbox">
+    <div class="justification-text">The application proposed an extension of adult cancer indications to paediatrics
+and corresponding inclusion on the EMLc. The proposal involves both the
+inclusion of new indications for some cancer medicines currently on the EMLc
+and the addition of selected new cancer and supportive care medicines to the
+EMLc. (Refer to TRS 1021 for the proposed listing extensions).
+
+The proposed medicines and corresponding indications had not previously been
+considered for inclusion on the EMLc.
+The application applied the following rationale in proposing the medicines
+and indications for inclusion on the EMLc:
+■ The medicine must already be listed on the EML or EMLc.
+■ The indications listed for adults are also diagnosed in children aged
+12 years and under.
+■ The medicines have been reported for treatment in children aged
+12 years and under for the same indication as listed on the EML for
+treatment in adults.
+■ Published literature supports the extension of the indication to
+children, including clinical studies, peer-reviewed consensus
+documents and/or clinical guidelines support the medicine’s role as
+standard of care.</div>
+    <label class="toggle-label" for="text-toggle-background"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Public health relevance</div>
+  <div class="content"><input id="text-toggle-publicHealthRelevance" type="checkbox">
+    <div class="justification-text">Cancer is a leading cause of death for children globally with the most common
+cancer types occurring in children being leukaemias, lymphomas and central
+nervous system tumours (1). Childhood cancers generally cannot be prevented
+nor screened for, so improving outcomes for children with cancer relies on early
+and accurate diagnosis and access to effective treatments.
+In 2018, WHO launched the Global Initiative for Childhood Cancer,
+to provide leadership and technical assistance to Member States to build and
+sustain high quality childhood cancer programmes. The goal of this initiative is
+to achieve at least 60% survival for all children with cancer globally by 2030 (2).</div>
+    <label class="toggle-label" for="text-toggle-publicHealthRelevance"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Benefits</div>
+  <div class="content"><input id="text-toggle-benefits" type="checkbox">
+    <div class="justification-text">Acute promyelocytic leukaemia (APML)
+New medicine: all-trans retinoic acid (ATRA)
+New indication: cytarabine, daunorubicin, mercaptopurine, methotrexate
+The median age of children with APML has been reported as 10 years (3).
+Standard regimens used for children with APML include ATRA (3, 4), with
+prior randomized trial data demonstrating significant disease-free survival
+improvement for children randomized to receive ATRA vs not (48% at 5 years,
+vs 0%, p<0.0001), with overall survival rates sustained at 10 years (5). The use
+of ATRA is acknowledged in standard guidelines for the treatment of APML,
+and is considered to be a paradigm for a targeted approach to the treatment of
+leukaemia (6–10). The treatment of APML is typically provided in the context
+of poly-chemotherapy, involving cytarabine, daunorubicin, mercaptopurine and
+methotrexate (3–5).
+
+Acute myeloid leukaemia (AML)
+New indication: cytarabine
+The safety and effectiveness of cytarabine for the treatment of childhood AML
+have been evaluated in controlled clinical trials (11–13). It is considered the
+standard of care, used internationally for children with AML, as in adults (14, 15).
+
+Chronic myeloid leukaemia (CML)
+New medicines: imatinib, dasatinib, nilotinib, hydroxycarbamide
+CML is a very rare disease in children, estimated to be responsible for 2% of all
+leukaemias in children less than 15 years of age with an annual incidence of one
+case per million children in that age range (16). The tyrosine kinase inhibitors
+introduced a chance of cure for CML, with long lasting disease control and
+significantly improved outcomes (17).
+Imatinib has shown clinical benefit in children with CML, with results
+comparable to those seen in adults (18). In particular, a clinical study of the
+use  of imatinib in patients aged less than 18 years with CML in the chronic
+phase demonstrated the efficacy, safety and long-term benefit of imatinib in
+children (19).
+Dasatinib and nilotinib have been used in children with CML including
+(but not limited to) imatinib-resistant cases. A Phase II trial of dasatinib in 113
+paediatric patients with CML demonstrated a complete cytogenetic response was
+achieved in 76% of imatinib-resistant patients, with an acceptable safety profile
+that did not include pleural or pericardial effusion, commonly seen in dasatinibtreated adults (20). The effectiveness and safety of nilotinib in children with CML
+has also been reported (21). Nilotinib has been approved by the United States
+FDA for treatment of paediatric patients with newly diagnosed or resistant CML
+on the basis of the results from two open-label, single-arm trials involving 69
+patients (22, 23). For imatinib-resistant patients, the major molecular response
+rate was 40.9%. No new safety concerns were reported, noting transient and
+manageable laboratory abnormalities: hyperbilirubinaemia and moderate to
+severe transaminitis.
+Hydroxycarbamide has a recognized debulking/cytoreductive role for
+myeloid malignancies and for palliative purpose in all settings. In addition,
+hydroxycarbamide can have an important role in settings where resource
+limitations affect access to imatinib or other tyrosine kinase inhibitors, to allow
+commencement of antineoplastic therapy (24). A general expert consensus
+recommendation for childhood CML includes hydroxycarbamide as standard
+initial therapy in all settings, while awaiting confirmatory diagnostic testing
+results as well as initial clinical response (25).
+
+Gastrointestinal stromal tumour (GIST)
+New medicine: imatinib
+Imatinib is the preferred treatment for molecularly-selected GIST in adults and
+children, where c-KIT sensitive mutations are demonstrated. Paediatric GISTs
+represent a distinct entity, and may be associated with genetic syndromes (such
+as Carney Triad, Carney-Stratakis syndrome or neurofibromatosis 1 (NF1)/
+Von Recklinghausen disease). It is also less common for paediatric patients
+with GIST to have the activating mutations in KIT and platelet-derived growth
+factor receptor alpha (PDGFRA) seen in adults. Data on the effectiveness and
+activity of imatinib in paediatric GIST is scarce, as it is a very rare entity (1–2%
+of all the cases). Children less than 18 years of age typically have more indolent
+disease with more favourable prognosis than in adults (approximating 100%
+five-year overall survival), as reported in a long-term retrospective analysis of
+a large observational study, that included a sub-group of 28 patients in this age
+group (26).
+
+Diffuse large B-cell lymphoma (DLBCL)
+New medicine: rituximab
+New indication: cyclophosphamide, doxorubicin, prednisolone, vincristine
+Different studies of DLBCL have established a role for rituximab in paediatric
+populations, with studies often spanning all age groups including adults and
+children starting at age 9 years (27), and confirming efficacy and safety in children
+(28). Rituximab is administrated in the context of a combination regimen with
+CHOP (cyclophosphamide, doxorubicin, vincristine, prednisolone) (27, 28).
+CHOP alone may be administered in settings where rituximab is not available.
+
+Kaposi sarcoma
+New indication: bleomycin, doxorubicin, vincristine
+Kaposi sarcoma in children primarily occurs as either endemic (HIV-unrelated)
+or epidemic (HIV-related) disease. According to the data known from registries
+and literature, Kaposi’s sarcoma primarily occurs in the elderly population of the
+Mediterranean region, while the occurrence in children is restricted to smaller
+series (29). Data from paediatric cohorts and clinical trials showed a median age
+of diagnosis at 8 years old. Chemotherapy indicated for Kaposi sarcoma includes
+bleomycin, vincristine and doxorubicin (30–34). One of the regimens combining
+doxorubicin, bleomycin and vincristine (ABV) has reported 80% remission for
+stage I HIV-positive patients treated in South Africa (32). Bleomycin, vincristine
+and doxorubicin have also been included as standard treatment agents in
+international expert consensus recommendations (35).
+
+Nasopharyngeal cancer
+New indication: cisplatin, fluorouracil
+Nasopharyngeal carcinoma (NPC) is the most commonly diagnosed head
+and neck malignant neoplasm in China and South-East Asian countries, but
+is considered relatively rare among children. Treatment schemes are typically
+adapted for children from adult-based regimens. Cisplatin-based regimens are
+the standard of care for children with NPC. Together with cisplatin, fluorouracil
+(5-FU) is included in standard regimens for children with NPC, with standard
+administration of two courses 21 days apart (36–39). The use of cisplatin
+including as a radiosensitizer (with concomitant cisplatin and radiation therapy)
+following cisplatin/5-FU in the systemic treatment of NPC in children is
+recognized as standard across different institutions and countries, extrapolating
+from the adult treatment experience (40–43).
+
+Colon and rectal cancers
+New medicine: irinotecan, oxaliplatin
+New indication: cisplatin, fluorouracil
+While very rare, colorectal cancers can occur in children (reported in as young
+as nine months old) and typically utilize the same chemotherapy agents as in
+adults, including 5-FU for the neoadjuvant treatment of rectal cancer, 5-FU and
+oxaliplatin for the adjuvant treatment of colon and rectal tumours, and 5-FU,
+oxaliplatin and irinotecan for advanced or metastatic colorectal cancer (44–47).
+
+Hodgkin lymphoma
+New medicine: procarbazine
+Procarbazine is commonly included as a drug of choice in children for the
+treatment of Hodgkin lymphoma. According to clinical guidelines and literature,
+procarbazine is a standard inclusion in multi-agent chemotherapy regimens
+for Hodgkin lymphoma in children (48, 49). For the paediatric population,
+multiple regimens containing procarbazine are used, in particular BEACOPP
+that contains bleomycin, etoposide, doxorubicin, cyclophosphamide, vincristine,
+procarbazine, and prednisone. It is often used in more resource-limited settings.
+Local selection and use should consider known gonadotoxicity and effects on
+male fertility (50).
+
+Malignancy-related bone disease
+New medicine: zoledronic acid
+Although certain malignancy-related bone diseases, such as osteonecrosis, occur
+more often in older children, patients as young as age 4 to 6 years have been
+affected and required treatment (51–53). The administration of zoledronic acid
+in paediatric oncology appears safe, and may result in improved bone strength
+and pain control. In a retrospective chart review of inpatients and outpatients
+less than 21 years old who received zoledronic acid at the Children's Hospital of
+Philadelphia, safety of the bisphosphonate was assessed. The safety profile was
+consistent with the known experience in adults, including preventable alterations
+in calcium levels, with no major side-effects reported (51).
+
+Anti-coagulation
+New medicines: enoxaparin
+The use of low molecular weight heparin (LMWH) as an anticoagulant is
+considered standard of care for prophylaxis and treatment in children, including
+but not limited to children with cancer. Malignancy as well as treatment-related
+factors such as immobilization and central venous access can increase risk for
+thrombosis (54). Enoxaparin as standard antithrombotic therapy is used as a first
+option in routine practice in many settings (55–57).</div>
+    <label class="toggle-label" for="text-toggle-benefits"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Harms</div>
+  <div class="content"><input id="text-toggle-harms" type="checkbox">
+    <div class="justification-text">Not reported separately in the application.</div>
+    <label class="toggle-label" for="text-toggle-harms"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Additional evidence</div>
+  <div class="content"><input id="text-toggle-additionalEvidence" type="checkbox">
+    <div class="justification-text">A randomized, multicentre, open-label Phase III trial (OS2006) compared
+standard chemotherapy with or without zoledronic acid in 318 patients aged
+between 5 years and 50 years (median 15.5 years) with newly diagnosed highgrade osteosarcoma (58). The trial results indicated that zoledronic acid did not
+improve event-free survival, percentage of good histological response or overall
+survival. No significant differences in toxicity or orthopaedic complications
+were observed between treatment groups. The trial was stopped after the second
+interim analysis for futility and the authors concluded that the use of zoledronic
+acid in osteosarcoma patients was not recommended.
+A retrospective analysis of the use of zoledronic acid for treatment
+of chemotherapy related osteonecrosis in 20 children and adolescents with
+osteonecrosis found that zoledronic acid was well tolerated and improved joint
+pain in the majority of patients (53). However, among patients with osteonecrosis
+of the hip, the majority had progressive joint destruction requiring arthroplasty,
+despite treatment with zoledronic acid.</div>
+    <label class="toggle-label" for="text-toggle-additionalEvidence"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Cost / cost effectiveness</div>
+  <div class="content"><input id="text-toggle-cost" type="checkbox">
+    <div class="justification-text">Not reported in the application.</div>
+    <label class="toggle-label" for="text-toggle-cost"></label></div>
+</div>
+    <div class="justification-section">
+  <div class="label">Availability</div>
+  <div class="content"><input id="text-toggle-availability" type="checkbox">
+    <div class="justification-text">The proposed medicines are already included on the EML and/or EMLc.</div>
+    <label class="toggle-label" for="text-toggle-availability"></label></div>
+</div>
+  <div class="justification-section">
+  <div class="label">Other considerations</div>
+  <div class="content"><input id="text-toggle-otherConsiderations" type="checkbox">
+    <div class="justification-text">The Expert Committee recognized the public health need for access to cancer
+therapies for children. The Committee acknowledged that there is limited clinical
+trial evidence available for the use of many cancer medicines in children, and
+that it is often necessary to rely on extrapolated data from trials in adults, clinical
+consensus and/or clinical practice guidelines, that lend support to a medicine’s
+role as the standard of care in paediatric patients.
+
+Comments on the application were received from the WHO Department of
+Management of NCDs, Disability, Violence & Injury Prevention. The technical
+unit advised that it supports the proposal to extend the listing of specified cancer
+medicines and indications on the EML to the EMLc.</div>
+    <label class="toggle-label" for="text-toggle-otherConsiderations"></label></div>
+</div>
+        <div class="justification-section references">
+      <div class="content">
+        <input id="references-toggle" type="checkbox">
+        <label for="references-toggle" class="references-toggle-label visible">
+          Show references
+        </label>
+        <label for="references-toggle" class="references-toggle-label hidden">
+          Hide references
+        </label>
+        <div class="references-content">1. Steliarova-Foucher E, Colombet M, Ries LAG, Moreno F, Dolya A, Bray F et al. International
+incidence of childhood cancer, 2001-10: a population-based registry study. Lancet Oncol.
+2017;18(6):719–31.
+2. Cancer in children. Fact Sheet [website]. Geneva: World Health Organization; 2018. (https://www.
+who.int/news-room/fact-sheets/detail/cancer-in-children, accessed 29 September 2019).
+3. Testi AM, Pession A, Diverio D, Grimwade D, Gibson B, de Azevedo AC et al. Risk-adapted treatment
+of acute promyelocytic leukemia: results from the International Consortium for Childhood APL.
+Blood. 2018;132(4):405–12.
+4. Zhang L, Zou Y, Chen Y, Guo Y, Yang W, Chen X et al. Role of cytarabine in paediatric acute
+promyelocytic leukemia treated with the combination of all-trans retinoic acid and arsenic
+trioxide: a randomized controlled trial. BMC Cancer. 2018;18(1):374.
+5. Gregory J, Kim H, Alonzo T, Gerbing R, Woods W, Weinstein H et al. Treatment of children with
+acute promyelocytic leukemia: results of the first North American Intergroup trial INT0129. Pediatr
+Blood Cancer. 2009;53(6):1005–10.
+6. Fenaux P, Chastang C, Chevret S, Sanz M, Dombret H, Archimbaud E et al. A randomized comparison
+of all transretinoic acid (ATRA) followed by chemotherapy and ATRA plus chemotherapy and the
+role of maintenance therapy in newly diagnosed acute promyelocytic leukemia. The European
+APL Group. Blood. 1999;94(4):1192–200.
+7. Tallman MS, Andersen JW, Schiffer CA, Appelbaum FR, Feusner JH, Ogden A et al. All-trans-retinoic
+acid in acute promyelocytic leukemia. N Engl J Med. 1997;337(15):1021–8.
+8. Imaizumi M, Tawa A, Hanada R, Tsuchida M, Tabuchi K, Kigasawa H et al. Prospective study of a
+therapeutic regimen with all-trans retinoic acid and anthracyclines in combination of cytarabine
+in children with acute promyelocytic leukaemia: the Japanese childhood acute myeloid leukaemia
+cooperative study. Br J Haematol. 2011;152(1):89–98.
+9. Sanz MA, Grimwade D, Tallman MS, Lowenberg B, Fenaux P, Estey EH et al. Management of acute
+promyelocytic leukemia: recommendations from an expert panel on behalf of the European
+LeukemiaNet. Blood. 2009;113(9):1875–91.
+10. Lo-Coco F, Avvisati G, Vignetti M, Thiede C, Orlando SM, Iacobelli S, et al. Retinoic acid and arsenic
+trioxide for acute promyelocytic leukemia. N Engl J Med. 2013;369(2):111-21.
+11. Creutzig U, Ritter J, Zimmermann M, Reinhardt D, Hermann J, Berthold F et al. Improved treatment
+results in high-risk pediatric acute myeloid leukemia patients after intensification with high-dose
+cytarabine and mitoxantrone: results of Study Acute Myeloid Leukemia-Berlin-Frankfurt-Munster
+93. J Clin Oncol. 2001;19(10):2705–13.
+12. Bishop JF, Matthews JP, Young GA, Szer J, Gillett A, Joshua D et al. A randomized study of highdose cytarabine in induction in acute myeloid leukemia. Blood. 1996;87(5):1710–7.
+13. Wells RJ, Woods WG, Lampkin BC, Nesbit ME, Lee JW, Buckley JD et al. Impact of high-dose
+cytarabine and asparaginase intensification on childhood acute myeloid leukemia: a report
+from the Childrens Cancer Group. J Clin Oncol. 1993;11(3):538–45.
+14. De Moerloose B, Reedijk A, de Bock GH, Lammens T, de Haas V, Denys B et al. Responseguided chemotherapy for pediatric acute myeloid leukemia without hematopoietic stem cell
+transplantation in first complete remission: Results from protocol DB AML-01. Pediatr Blood
+Cancer. 2019;66(5):e27605.
+15. Rasche M, Zimmermann M, Borschel L, Bourquin JP, Dworzak M, Klingebiel T et al. Successes and
+challenges in the treatment of pediatric acute myeloid leukemia: a retrospective analysis of the
+AML-BFM trials from 1987 to 2012. Leukemia. 2018;32(10):2167–77.
+16. Ries LAG, Smith MA, Gurney JG, Linet M, Tamra T, Young JL et al. Cancer Incidence and Survival
+among Children and Adolescents: United States SEER Program 1975-1995 (NIH Pub. No. 99-4649).
+Bethesda: National Cancer Institute; 1999.
+17. Druker BJ, Talpaz M, Resta DJ, Peng B, Buchdunger E, Ford JM et al. Efficacy and safety of a
+specific inhibitor of the BCR-ABL tyrosine kinase in chronic myeloid leukemia. N Engl J Med.
+2001;344(14):1031–7.
+18. Suttorp M, Schulze P, Glauche I, Gohring G, von Neuhoff N, Metzler M et al. Front-line imatinib
+treatment in children and adolescents with chronic myeloid leukemia: results from a phase III
+trial. Leukemia. 2018;32(7):1657–69.
+19. Giona F, Santopietro M, Menna G, Putti MC, Micalizzi C, Santoro N et al. Real-Life Management of
+Children and Adolescents with Chronic Myeloid Leukemia: The Italian Experience. Acta Haematol.
+2018;140(2):105–11.
+20. Gore L, Kearns PR, de Martino ML, Lee, De Souza CA, Bertrand Y et al. Dasatinib in Pediatric Patients
+With Chronic Myeloid Leukemia in Chronic Phase: Results From a Phase II Trial. J Clin Oncol.
+2018;36(13):1330–8.
+21. Kurosawa H, Tanizawa A, Muramatsu H, Tono C, Watanabe A, Shima H et al. Sequential use of
+second-generation tyrosine kinase inhibitors following imatinib therapy in pediatric chronic
+myeloid leukemia: A report from the Japanese Pediatric Leukemia/Lymphoma Study Group.
+Pediatr Blood Cancer. 2018;65(12):e27368.
+22. A Pharmacokinetic (PK) Study of Nilotinib in Pediatric Patients With Philadelphia Chromosomepositive (Ph+) Chronic Myelogenous Leukemia (CML) or Acute Lymphoblastic Leukemia (ALL)
+(ClinicalTrials.gov Identifier NCT01077544). Bethesda: U.S. National Library of Medicines; 2016.
+Available from https://clinicaltrials.gov/ct2/show/study/NCT01077544, accessed 29 September
+2019.
+23. Open Label, Phase II Study to Evaluate Efficacy and Safety of Oral Nilotinib in Philadelphia
+Positive (Ph+) Chronic Myelogenous Leukemia (CML) Pediatric Patients (Dialog) (ClinicalTrials.
+gov Identifier: NCT01844765). Bethesda: U.S. National Library of Medicine; 2018. Available from
+https://clinicaltrials.gov/ct2/show/NCT01844765, accessed 29 September 2019.
+24. Kiarie GW, Othieno-Abinya NA, Riyat MS. The GLIVEC international patient assistance programme:
+the Nairobi experience. East Afr Med J. 2009;86(12 Suppl):S106–7.
+25. Andolina JR, Neudorf SM, Corey SJ. How I treat childhood CML. Blood. 2012;119(8):1821–30.
+26. Call J, Walentas CD, Eickhoff JC, Scherzer N. Survival of gastrointestinal stromal tumor patients in
+the imatinib era: life raft group observational registry. BMC Cancer. 2012;12:90.
+27. Giulino-Roth L, O'Donohue T, Chen Z, Bartlett NL, LaCasce A, Martin-Doyle W et al. Outcomes
+of adults and children with primary mediastinal B-cell lymphoma treated with dose-adjusted
+EPOCH-R. Br J Haematol. 2017;179(5):739–47.
+28. Egan G, Goldman S, Alexander S. Mature B-NHL in children, adolescents and young adults: current
+therapeutic approach and emerging treatment strategies. Br J Haematol. 2019;185(6):1071–85.
+29. El-Mallawany NK, McAtee CL, Campbell LR, Kazembe PN. Pediatric Kaposi sarcoma in context
+of the HIV epidemic in sub-Saharan Africa: current perspectives. Pediatric Health Med Ther.
+2018;9:35–46.
+30. Chagaluka G, Stanley C, Banda K, Depani S, Nijram’madzi J, Katangwe T et al. Kaposi’s sarcoma in
+children: an open randomised trial of vincristine, oral etoposide and a combination of vincristine
+and bleomycin. Eur J Cancer. 2014;50(8):1472–81.
+31. Macken M, Dale H, Moyo D, Chakmata E, Depani S, Israels T et al. Triple therapy of vincristine,
+bleomycin and etoposide for children with Kaposi sarcoma: Results of a study in Malawian
+children. Pediatr Blood Cancer. 2018;65(2).
+32. Hesseling PB, Katayi E, Wharin P, Bardin R, Kouya F, Palmer D et al. Kaposi’s sarcoma: Good
+outcome with doxorubicin, bleomycin and vincristine sulphate (ABV) chemotherapy and highly
+active antiretroviral therapy. S Afr Med J. 2017;107(11):952–3.
+33. Cox CM, El-Mallawany NK, Kabue M, Kovarik C, Schutze GE, Kazembe PN et al. Clinical characteristics
+and outcomes of HIV-infected children diagnosed with Kaposi sarcoma in Malawi and Botswana.
+Pediatr Blood Cancer. 2013;60(8):1274–80.
+34. Stefan DC, Stones DK, Wainwright L, Newton R. Kaposi sarcoma in South African children. Pediatr
+Blood Cancer. 2011;56(3):392–6.
+35. Molyneux E, Davidson A, Orem J, Hesseling P, Balagadde-Kambugu J, Githanga J et al. The
+management of children with Kaposi sarcoma in resource limited settings. Pediatr Blood Cancer.
+2013;60(4):538–42.
+36. Casanova M, Bisogno G, Gandola L, Cecchetto G, Di Cataldo A, Basso E et al. A prospective protocol
+for nasopharyngeal carcinoma in children and adolescents: the Italian Rare Tumors in Pediatric
+Age (TREP) project. Cancer. 2012;118(10):2718–25.
+37. Casanova M, Ozyar E, Patte C, Orbach D, Ferrari A, Veyrat-Follet C et al. International randomized
+phase 2 study on the addition of docetaxel to the combination of cisplatin and 5-fluorouracil
+in the induction treatment for nasopharyngeal carcinoma in children and adolescents. Cancer
+Chemother Pharmacol. 2016;77(2):289–98.
+38. Buehrlen M, Zwaan CM, Granzen B, Lassay L, Deutz P, Vorwerk P et al. Multimodal treatment,
+including interferon beta, of nasopharyngeal carcinoma in children and young adults:
+preliminary results from the prospective, multicenter study NPC-2003-GPOH/DCOG. Cancer.
+2012;118(19):4892–900.
+39. Mertens R, Granzen B, Lassay L, Bucsky P, Hundgen M, Stetter G et al. Treatment of nasopharyngeal
+carcinoma in children and adolescents: definitive results of a multicenter study (NPC-91-GPOH).
+Cancer. 2005;104(5):1083–9.
+40. Radhakrishnan V, Kumar P, Totadri S, Ganesan P, Selvaluxmy G, Ganesan T et al. Pediatric
+nasopharyngeal carcinoma: Experience from a tertiary cancer center in India. Indian J Cancer.
+2016;53(3):377–80.
+41. Khalil EM, Anwar MM. Treatment results of pediatric nasopharyngeal carcinoma, NCI, Cairo
+University experience. J Egypt Natl Canc Inst. 2015;27(3):119–28.
+42. Liu W, Tang Y, Gao L, Huang X, Luo J, Zhang S et al. Nasopharyngeal carcinoma in children and
+adolescents - a single institution experience of 158 patients. Radiat Oncol. 2014;9:274.
+43. Gonzalez-Motta A, Gonzalez G, Bermudez Y, Maldonado MC, Castaneda JM, Lopez D et al. Pediatric
+Nasopharyngeal Cancer: Case Report and Review of the Literature. Cureus. 2016;8(2):e497.
+44. Saab R, Furman WL. Epidemiology and management options for colorectal cancer in children.
+Paediatr Drugs. 2008;10(3):177–92.
+45. Hill DA, Furman WL, Billups CA, Riedley SE, Cain AM, Rao BN et al. Colorectal carcinoma in
+childhood and adolescence: a clinicopathologic review. J Clin Oncol. 2007;25(36):5808–14.
+46. Kim ST, Choi YJ, Park KH, Oh SC, Seo JH, Shin SW et al. Capecitabine monotherapy as salvage
+treatment after failure of chemotherapy containing oxaliplatin and irinotecan in patients with
+metastatic colorectal cancer. Asia Pac J Clin Oncol. 2011;7(1):82–7.
+47. Goldberg J, Furman WL. Management of colorectal carcinoma in children and young adults.
+J Pediatr Hematol Oncol. 2012;34 Suppl 2:S76–9.
+48. Geel JA, Chirwa TC, Rowe B, Eyal KC, Omar F, Stones DK et al. Treatment outcomes of children
+with Hodgkin lymphoma between 2000 and 2010: First report by the South African Children’s
+Cancer Study Group. Pediatr Blood Cancer. 2017;64(10).
+49. Radhakrishnan V, Dhanushkodi M, Ganesan TS, Ganesan P, Sundersingh S, Selvaluxmy G et al.
+Pediatric Hodgkin Lymphoma Treated at Cancer Institute, Chennai, India: Long-Term Outcome.
+J Glob Oncol. 2017;3(5):545–54.
+50. Dorffel W, Riepenhausen M, Luders H, Bramswig J. Late Effects Following Treatment of Hodgkin
+Lymphoma During Childhood and Adolescence. Results of the Hodgkin Lymphoma Late Effects
+Research Project. Klin Padiatr. 2016;228(6-07):286–93.
+51. Bowden SA, Mahan JD. Zoledronic acid in pediatric metabolic bone disorders. Transl Pediatr.
+2017;6(4):256–68.
+52. Padhye B, Dalla-Pozza L, Little D, Munns C. Incidence and outcome of osteonecrosis in children
+and adolescents after intensive therapy for acute lymphoblastic leukemia (ALL). Cancer Med.
+2016;5(5):960–7.
+53. Padhye B, Dalla-Pozza L, Little DG, Munns CF. Use of zoledronic acid for treatment of chemotherapy
+related osteonecrosis in children and adolescents: a retrospective analysis. Pediatr Blood Cancer.
+2013;60(9):1539–45.
+54. Monagle P, Chan AKC, Goldenberg NA, Ichord RN, Journeycake JM, Nowak-Gottl U et al.
+Antithrombotic therapy in neonates and children: Antithrombotic Therapy and Prevention of
+Thrombosis, 9th ed: American College of Chest Physicians Evidence-Based Clinical Practice
+Guidelines. Chest. 2012;141(2 Suppl):e737S–e801S.
+55. Malhotra P, Jain S, Kapoor G. Symptomatic Cerebral Sinovenous Thrombosis Associated With
+L-Asparaginase In Children With Acute Lymphoblastic Leukemia: A Single Institution Experience
+Over 17 Years. J Pediatr Hematol Oncol. 2018;40(7):e450–e3.
+56. Fan JL, Roberts LE, Scheurer ME, Yee DL, Shah MD, Lee-Kim YJ. Association of outcomes and anti-Xa
+levels in the treatment of pediatric venous thromboembolism. Pediatr Blood Cancer. 2017;64(11).
+57. Goldenberg NA, Takemoto CM, Yee DL, Kittelson JM, Massicotte MP. Improving evidence
+on anticoagulant therapies for venous thromboembolism in children: key challenges and
+opportunities. Blood. 2015;126(24):2541–7.
+58. Piperno-Neumann S, Le Deley MC, Redini F, Pacquement H, Marec-Berard P, Petit P et al.
+Zoledronate in combination with chemotherapy and surgery to treat osteosarcoma (OS2006): a
+randomised, multicentre, open-label, phase 3 trial. Lancet Oncol. 2016;17(8):1070–80.</div>
+      </div>
+    </div>
+  </div>            </div>
+  </div>
+  </div>
+        <footer>
+  <span class="links-group group1">
+    <a class="internal" href="/caveats">Caveats</a>
+    <a class="internal" href="/about">About the eEML</a>
+    <a class="internal" href="/licencing">Licensing WHO eEML</a>
+  </span>
+  <span class="links-group group2">
+    <a class="internal" href="/contact">Contact Us</a>
+    <a class="internal" href="http://who.int/about/privacy/en/">Privacy Policy</a>
+  </span>
+</footer>
+          </div>
+    </div>
+</body>
+
+</html>

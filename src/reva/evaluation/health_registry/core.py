@@ -133,7 +133,9 @@ def _family(doc: Mapping[str, Any], panels: Mapping[str, Sequence[str]]) -> Fami
         causes = dict(doc.get("causes") or {})
         if not causes:
             _fail("indicator_template needs causes", family=key)
-        inds = tuple((str(doc["indicator_template"]).format(cause=c), str(c)) for c in causes)
+        inds: tuple[tuple[str, str | None], ...] = tuple(
+            (str(doc["indicator_template"]).format(cause=c), str(c)) for c in causes
+        )
     elif rule == "flunet_positivity":
         inds = (("flunet.*", None),)
     else:

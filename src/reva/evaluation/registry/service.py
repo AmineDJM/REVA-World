@@ -30,6 +30,7 @@ from uuid import UUID
 from sqlalchemy import Engine, text
 
 from reva.evaluation.ledger import load_frozen_manifest, manifest_sha256
+from reva.evaluation.registry import finance as FN
 from reva.evaluation.registry import periods as P
 from reva.evaluation.registry.data import FrameCache, latest_version, versions_between
 from reva.evaluation.registry.forecasts import (
@@ -44,6 +45,8 @@ from reva.evaluation.registry.forecasts import (
 from reva.evaluation.registry.questions import (
     Series,
     extract_series,
+    family_daily_cells,
+    generate_meeting_questions,
     generate_questions,
     period_ended,
     resolution_value,
@@ -201,20 +204,46 @@ def build_batch(
                 }
             )
             continue
-        series, n = extract_series(frames[pin["artifact_sha256"]], fam)
+        frame = frames[pin["artifact_sha256"]]
+        series, n = extract_series(frame, fam)
         notes.extend(n)
-        qs, sk = generate_questions(
-            fam, series, cycle=cycle, interval_level=specs.interval_level, source_pin=_short_pin(pin)
-        )
+        extra_pins: dict[str, dict[str, Any]] = {}
+        if fam.value_rule == "meeting_change":
+            assert fam.finance is not None
+            cal = fam.finance["calendar"]
+            cpin = pins.get(cal["dataset_key"])
+            if cpin is None:
+                pending.append({"family": fam.key, "reason": f"calendar table {cal['dataset_key']} not registered yet"})
+                continue
+            extra_pins[cal["dataset_key"]] = dict(cpin)
+            qs, sk = generate_meeting_questions(
+                fam,
+                series,
+                FN.meeting_days(frames[cpin["artifact_sha256"]], cal),
+                cycle=cycle,
+                today=issued_at.date(),
+                source_pin=_short_pin(pin),
+                calendar_pin=_short_pin(cpin),
+            )
+        else:
+            qs, sk = generate_questions(
+                fam, series, cycle=cycle, interval_level=specs.interval_level, source_pin=_short_pin(pin)
+            )
         skipped.extend(sk)
         fam_used = False
+        fin_ctx: tuple[dict[str, Any], dict[str, list[tuple[date, float]]]] | None = None
         for q in qs:
             if q["question_key"] in already:
                 continue
             s = series[q["geo"]]
             hist = s.history()
-            fcs = [forecast_baseline(q, mk, hist) for mk in BASELINES]
-            if all(f["status"] == "abstained" for f in fcs):
+            fcs = [forecast_baseline(q, mk, hist) for mk in BASELINES] if fam.runs_generic_baselines else []
+            if fam.finance is not None:
+                if fin_ctx is None:
+                    fin_ctx = _finance_context(fam, frame, pins, frames, extra_pins)
+                own = fin_ctx[1].get(q["geo"], [])
+                fcs.extend(FN.finance_forecasts(q, fam.finance, own, fin_ctx[0]))
+            if not fcs or all(f["status"] == "abstained" for f in fcs):
                 skipped.append(
                     {
                         "family": fam.key,
@@ -228,17 +257,27 @@ def build_batch(
                 target = P.parse_label(fam.frequency, q["reference_period"])
                 cell = s.projections.get(target)
                 fcs.append(forecast_reference(q, REFERENCE_WEO, (cell.value, cell.refs[0]) if cell else None))
-            q["training"] = {
-                "n": len(hist),
-                "first_period": P.label_of(fam.frequency, hist[0][0]),
-                "last_period": P.label_of(fam.frequency, hist[-1][0]),
-                "digest": train_digest(hist),
-            }
+            if fam.value_rule == "meeting_change":
+                q["training"] = {
+                    "n": len(hist),
+                    "first_day": date.fromordinal(hist[0][0]).isoformat(),
+                    "last_day": date.fromordinal(hist[-1][0]).isoformat(),
+                    "digest": train_digest(hist),
+                }
+            else:
+                q["training"] = {
+                    "n": len(hist),
+                    "first_period": P.label_of(fam.frequency, hist[0][0]),
+                    "last_period": P.label_of(fam.frequency, hist[-1][0]),
+                    "digest": train_digest(hist),
+                }
             questions.append(q)
             forecasts.extend(fcs)
             fam_used = True
         if fam_used:
             used[fam.dataset_key] = dict(pin)
+            for k, p in extra_pins.items():
+                used[k] = dict(p)
             fams_doc[fam.key] = _frozen_family(fam)
     models = all_models()
     return {
@@ -260,6 +299,45 @@ def build_batch(
         "forecasts": forecasts,
         "generation": {"skipped": skipped, "pending_families": pending, "notes": notes},
     }
+
+
+def _finance_context(
+    fam: Family,
+    frame: Any,
+    pins: Mapping[str, Mapping[str, Any] | None],
+    frames: Mapping[str, Any],
+    extra_pins: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any], dict[str, list[tuple[date, float]]]]:
+    """Inputs of a finance family from its pinned input tables (recorded in ``extra_pins``) and the family's own
+    daily series per geography (a missing input table leaves that input empty: its forecasters abstain)."""
+    assert fam.finance is not None
+    by_key: dict[str, Any] = {}
+    for inp in (fam.finance.get("inputs") or {}).values():
+        p = pins.get(inp["dataset_key"])
+        if p is not None:
+            by_key[inp["dataset_key"]] = frames[p["artifact_sha256"]]
+            extra_pins[inp["dataset_key"]] = dict(p)
+    inputs = FN.load_inputs(fam.finance, by_key)
+    own: dict[str, list[tuple[date, float]]] = {}
+    if fam.finance["kind"] != "meeting":
+        for g in fam.geos:
+            if fam.value_rule == "monthly_mean_of_daily":
+                assert fam.indicator is not None
+                cells = FN.daily_cells(frame, fam.indicator, g.provider_geo)
+            else:
+                cells = family_daily_cells(frame, fam, g.provider_geo)
+            own[g.key] = FN.to_floats(cells)
+    return inputs, own
+
+
+def finance_input_keys(fam: Family) -> list[str]:
+    """Tables a finance family reads besides its own (inputs and the meeting calendar)."""
+    if fam.finance is None:
+        return []
+    keys = [inp["dataset_key"] for inp in (fam.finance.get("inputs") or {}).values()]
+    if fam.finance.get("calendar"):
+        keys.append(fam.finance["calendar"]["dataset_key"])
+    return keys
 
 
 def _short_pin(pin: Mapping[str, Any]) -> dict[str, Any]:
@@ -287,8 +365,11 @@ def issue_cycle(
         already = issued_question_keys(conn, origin, cycle)
         pins: dict[str, dict[str, Any] | None] = {}
         for fam in specs.families:
-            if fam.dataset_key and fam.dataset_key not in pins and (not families or fam.key in families):
-                pins[fam.dataset_key] = latest_version(conn, fam.dataset_key, origin=origin, cutoff=issued_at)
+            if not fam.dataset_key or (families and fam.key not in families):
+                continue
+            for dk in (fam.dataset_key, *finance_input_keys(fam)):
+                if dk not in pins:
+                    pins[dk] = latest_version(conn, dk, origin=origin, cutoff=issued_at)
     cache = FrameCache(store, size=len(pins) + 1)
     frames = {p["artifact_sha256"]: cache.get(p["artifact_sha256"]) for p in pins.values() if p}
     manifest = build_batch(
@@ -692,6 +773,8 @@ def run_backtest(
     for fam in specs.families:
         if not fam.dataset_key or (families and fam.key not in families):
             continue
+        if not fam.runs_generic_baselines:
+            continue  # finance meeting families: back-tested by reva.evaluation.finance_backtest
         pin = pins.get(fam.dataset_key)
         if pin is None:
             continue

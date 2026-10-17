@@ -1,0 +1,145 @@
+[
+  {
+    "request_fingerprint": "dfc8b4df6be295ac22c4215b6f0b4a6dcfce139fab673bd71410b51b2a674b3c",
+    "url": "https://api.fda.gov/drug/enforcement.json?count=openfda.unii.exact&limit=1000",
+    "file": "dfc8b4df6be295ac.json",
+    "sha256": "d22baf2dafd54d80e3bdc990404f910faca25ebab274f542b8b0c327f7f7df53",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"c447-l2ui+OlSdu5YNuD4LgEeOXk19CU\""
+    },
+    "retrieved_at": "2026-10-17T16:49:21.584039+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "107e96626f82ae7c206e879d8a2ea01247408311d088a677b2d619c75a23cdaf",
+    "url": "https://api.fda.gov/drug/enforcement.json?search=report_date:%5B20230101+TO+20231231%5D&count=classification.exact",
+    "file": "107e96626f82ae7c.json",
+    "sha256": "b1f1712940a55c05c3cdda8a3d65338f79a75a429a5e97974f26fdf7eb0d50e7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"26e-W271MSAveMNzxIXVeV3tv6xdalY\""
+    },
+    "retrieved_at": "2026-10-17T16:49:17.108724+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "51fb1337138f8540aa2876cce8f1bd7dbf53fcbd2756c341ce65cff82b84321b",
+    "url": "https://api.fda.gov/drug/enforcement.json?search=report_date:%5B20240101+TO+20241231%5D&count=classification.exact",
+    "file": "51fb1337138f8540.json",
+    "sha256": "ef24c6d90e3f670201114e93657ba1f292cf47e660e864fe808e1a47d76f9e16",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"26e-rXs1X23dwMBEJpGaplSBUF7qxjI\""
+    },
+    "retrieved_at": "2026-10-17T16:49:17.367416+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "c4c169cd4a78bd25a31df3cc954abb03cdf3caa6286a79b45ee1fb5525aa4b96",
+    "url": "https://api.fda.gov/drug/event.json?count=patient.drug.openfda.unii.exact&limit=100",
+    "file": "c4c169cd4a78bd25.json",
+    "sha256": "1fab81a064a6f9709124e48e3171552a4ecb61839057c7c5d151df2edb274444",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"1a5d-K7jeVubvDXf9njnjBlaVHk6g4oY\""
+    },
+    "retrieved_at": "2026-10-17T16:49:20.127503+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "75a67c0675db27f12f0fc3f8c6e6e3a08134a698ada3124edb415fc1faccfe84",
+    "url": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.unii:%228A1O1M485B%22&count=serious",
+    "file": "75a67c0675db27f1.json",
+    "sha256": "29500ff0906f9a9ab49af6cb78334ae0d36c677a4838ed7b11c94c9a228df3e0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"226-adLpBn/FiQzCXnc9K+XnU9tpnss\""
+    },
+    "retrieved_at": "2026-10-17T16:49:23.658653+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "74745d3c075225b994cbfe46fb10a8cc39ad27ad7c57a9acaa7eeca4c3c41688",
+    "url": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.unii:%229100L32L2N%22&count=serious",
+    "file": "nf_9100L32L2N.json",
+    "sha256": "57b1e7534d003e4246182162fd2469cdf038de39405056f44fc006715e5496da",
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:50:00+00:00",
+    "licence": "CC0 1.0 (openFDA)",
+    "fixture_note": "openFDA answers HTTP 404 NOT_FOUND when no harmonised report matches (captured with curl; the live client raises on 404 and the connector records the substance as not found, never as zero)"
+  },
+  {
+    "request_fingerprint": "59c36de32e016c8f2b62a90408ef454bbadbac7c47d2c3577184cfa51b42dd14",
+    "url": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.unii:%22BKJ8M8G5HI%22&count=serious",
+    "file": "nf_BKJ8M8G5HI.json",
+    "sha256": "57b1e7534d003e4246182162fd2469cdf038de39405056f44fc006715e5496da",
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:50:00+00:00",
+    "licence": "CC0 1.0 (openFDA)",
+    "fixture_note": "openFDA answers HTTP 404 NOT_FOUND when no harmonised report matches (captured with curl; the live client raises on 404 and the connector records the substance as not found, never as zero)"
+  },
+  {
+    "request_fingerprint": "266d1bbf8b54f81c68813b1e8962d1bbf941175b92ee1b2886445f7f2817053f",
+    "url": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.unii:%22R16CO5Y76E%22&count=serious",
+    "file": "266d1bbf8b54f81c.json",
+    "sha256": "6aff8023223bbb13b147eaca17d9d87a0a780373ff750727c7d3a22a74c01a65",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"229-oSyY2YyyApzgO8ug9HQeDuqifCU\""
+    },
+    "retrieved_at": "2026-10-17T16:49:21.871302+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "402807f106f52c20ec12fa7be6b6fd49a2affcbf7b0a0da5461d65bd714890a6",
+    "url": "https://api.fda.gov/drug/event.json?search=receivedate:%5B20230101+TO+20231231%5D&count=occurcountry.exact&limit=300",
+    "file": "402807f106f52c20.json",
+    "sha256": "b1045b55e67ee0be3b0c8026b02a984aa19431f0e4ff9b71ef7fcb916d7cde96",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"2816-/VplVNH+w8viHJ49Rfjldaddb0o\""
+    },
+    "retrieved_at": "2026-10-17T16:49:08.266486+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "3851d4d47dc1e070707514afae46330aa95a72de5475fc516eaf2588b115b707",
+    "url": "https://api.fda.gov/drug/event.json?search=receivedate:%5B20240101+TO+20241231%5D&count=occurcountry.exact&limit=300",
+    "file": "3851d4d47dc1e070.json",
+    "sha256": "89c0dee03630e793df39580b25153d4c92f2a8b37f44799f753ca9efd7a48461",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"2844-4Ma0++o/hd2BAfyF72qaJg6lN6g\""
+    },
+    "retrieved_at": "2026-10-17T16:49:08.849096+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  },
+  {
+    "request_fingerprint": "f0fe7816e160ba94c4206079745358776f7ba5e905515e8f72f2291247581bf1",
+    "url": "https://api.fda.gov/drug/label.json?count=openfda.unii.exact&limit=1000",
+    "file": "f0fe7816e160ba94.json",
+    "sha256": "fd2e6a4aa096418453ada405aff0a714c0dd10dbbb805bc2a2c11f669ce721ad",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"e981-K5Ib0JGjh5tvCpd45Hi2q9FQyfc\""
+    },
+    "retrieved_at": "2026-10-17T16:49:20.916932+00:00",
+    "licence": "CC0 1.0 (openFDA) (https://open.fda.gov/license/); U.S. Food and Drug Administration, openFDA (https://open.fda.gov)"
+  }
+]

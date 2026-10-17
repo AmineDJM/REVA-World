@@ -356,7 +356,7 @@ def build_kg(ports: list[dict[str, Any]], chokes: list[dict[str, Any]], port_raw
     for a in ports:
         pid = str(a.get("portid") or "")
         sha = str(a.get("_raw_sha256"))
-        if not re.match(r"^port\d+$", pid):
+        if not re.match(r"^(port|fso)\d+$", pid):  # fso<n>: offshore units listed in the ports database
             kb.counts["port_bad_id"] += 1
             continue
         f = by_sha[sha]

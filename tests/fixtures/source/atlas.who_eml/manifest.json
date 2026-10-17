@@ -1,0 +1,255 @@
+[
+  {
+    "request_fingerprint": "97410334a7ac20de2703c7b2d600f24aade9f052fc858fe751803d2fadb88b0e",
+    "url": "https://list.essentialmeds.org/",
+    "file": "97410334a7ac20de.json",
+    "sha256": "60b712a012509f61f7c0e4ea219fe016bcd3e902f0d1d63d4d84af850758b4ea",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:24.623610+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L",
+    "fixture_note": "trimmed: page head and tail + the <li> entries of the fixture medicines; full response sha256 e9b8028d28a33778161a4bf643e08b57d2d74f764fbf609183aa11c06cee9f05 (1295185 bytes)"
+  },
+  {
+    "request_fingerprint": "766ee1902d729bf88aec1bef1ed2f2b26145f63050324b8be2b7e394bae018c0",
+    "url": "https://list.essentialmeds.org/medicines/10",
+    "file": "766ee1902d729bf8.json",
+    "sha256": "ee2d68b25ae0a7790d56fc7b022b9ca557f6f6472d6cc3a21551d35b080b2694",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:26.072639+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "0d83d94222d1d3c7067c973e43481cbc1e08fb8f63da2d6ed90d54908a6147bf",
+    "url": "https://list.essentialmeds.org/medicines/13",
+    "file": "0d83d94222d1d3c7.json",
+    "sha256": "9c34e42d9cfd2e62248ce2b5b1259c99b8ad656214f80eaf827932dcd81ff024",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:27.336035+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "10e7e2a53066f6aa6e62829f6e1973c147467f14f3b366f642c5bac1e7de3a21",
+    "url": "https://list.essentialmeds.org/medicines/191",
+    "file": "10e7e2a53066f6aa.json",
+    "sha256": "c4225a9a1e0295744ef715c8885838a37490fdf8371102bf1147247bd9b48670",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:28.900247+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "eb10254cb76bd7f02ed8ac411808d0b8882f8e9be5ad29177e607e81fe186974",
+    "url": "https://list.essentialmeds.org/medicines/530",
+    "file": "eb10254cb76bd7f0.json",
+    "sha256": "d74743862c10155ff74ba5cf1b7d22a6008187347698c5e7e049ec993621fd4b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:29.997724+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "c304e50b4cc1db41072c055fc92a7ffd3158d55a65c6b90be98dcc7e5cc8d2e2",
+    "url": "https://list.essentialmeds.org/medicines/95",
+    "file": "c304e50b4cc1db41.json",
+    "sha256": "f430d11bebbc975f5ce77762b9fae8b0c329b463554e68d54ec15f6f832ad3bc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:28.059484+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "5537d9ed5f1fba77a3c48c520ebba00c679517143f6884e8df0ec47396bc3529",
+    "url": "https://list.essentialmeds.org/recommendations/10",
+    "file": "5537d9ed5f1fba77.json",
+    "sha256": "99396fa325d32e7e04d75c8c0ae51ea942f50d1520cf9bbb15a7b78791955560",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:30.912191+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "34b4b06279737aaf8499f5ee47091eb393739b2740c44d9b06ae66998fad9aab",
+    "url": "https://list.essentialmeds.org/recommendations/1036",
+    "file": "34b4b06279737aaf.json",
+    "sha256": "003196d761937dbd144e45199532ee4de8efaf47fcb0645db390fe4a416791fd",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:44.175515+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "17612d783c16128a398ebcafba1bd0e440ca3cc0b88cc4000afeba8a966e3744",
+    "url": "https://list.essentialmeds.org/recommendations/108",
+    "file": "17612d783c16128a.json",
+    "sha256": "15ae1f1104e0e3b8293b14af7456085edd5dd79a7e28a8d072157bba0cdf6300",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:41.107512+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "632cddaf2095e6978338a6a0be5397af478110ab79609e2c036fb5f6ee752dae",
+    "url": "https://list.essentialmeds.org/recommendations/1097",
+    "file": "632cddaf2095e697.json",
+    "sha256": "1cc74278900bc161531068b80e06287e7418e53f54e84e4b8c84498f5e3d1012",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:45.206926+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "9f44df1b53d88cf863267c1aa7b28c69dac6d7aba05be253475e938313062ca8",
+    "url": "https://list.essentialmeds.org/recommendations/1104",
+    "file": "9f44df1b53d88cf8.json",
+    "sha256": "72b21947fa4ab0bcdaa50bd0486f2d373ba4097e880e45698aa703883810f3d8",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:37.194636+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "4505b6d4566016c58e99d00a995ba9ea48426f332df5470dcb76a475a21c44b1",
+    "url": "https://list.essentialmeds.org/recommendations/1280",
+    "file": "4505b6d4566016c5.json",
+    "sha256": "36f8527b76e4de4b98dafaaf5899ab0709d3f91f78aac37179508f7c99330f45",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:43.114025+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "b00fb40383203f1362cb3b730bc5d585cfd39636521ddb266c2606a4de7ea783",
+    "url": "https://list.essentialmeds.org/recommendations/14",
+    "file": "b00fb40383203f13.json",
+    "sha256": "69a3f9507b651fcd9d6e7ca9832f2ce677f680de9acbaf0a503ca408ac20ac5b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:33.983475+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "5f827f84e18429c40fa0c4da28c38902703efb2fec826c87e9e515c1155e3199",
+    "url": "https://list.essentialmeds.org/recommendations/181",
+    "file": "5f827f84e18429c4.json",
+    "sha256": "cbe131fb787d7889d2cc8aa1b0f774eb6dc9e50ef82e6b1d85cbfeea52f65e94",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:35.908548+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "6b96892b8505b5cfa3607568d55f98027643cd130b05b8048b7340880402573e",
+    "url": "https://list.essentialmeds.org/recommendations/298",
+    "file": "6b96892b8505b5cf.json",
+    "sha256": "87199480466c15084cb7db03569631d9c708dfaaa0fa084c926fb25119093297",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:33.096013+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "c0467c3ef49f5b4bea9fd7c55f32d368c62d84d730285de219647d24c1ce2dfc",
+    "url": "https://list.essentialmeds.org/recommendations/370",
+    "file": "c0467c3ef49f5b4b.json",
+    "sha256": "6e55f6233c6072d375bcc02ab93082541ff33252ba9f5a588852f5834360bd8f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:38.191151+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "14172530e47826cf2d9c6fbe509c1827a9b746f768cd8b4685d8d862912012df",
+    "url": "https://list.essentialmeds.org/recommendations/371",
+    "file": "14172530e47826cf.json",
+    "sha256": "789e74636bcd85b372a2f70e4e41e26a990a3aa04fe3ff44ddc995fa27a9bf10",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:38.987341+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "dca39458ec05d4d790c350ee2da5b963e16605149c19617f5d6124e57f340f0f",
+    "url": "https://list.essentialmeds.org/recommendations/372",
+    "file": "dca39458ec05d4d7.json",
+    "sha256": "f004cf41dc45d00dcca841f494199b9b8d1ed1f3dbbd27653de041f9cf6ffbec",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:40.107378+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "10ea165cda720c28ef412780367623310315ca8aa411b348cc0ded3e1ecde244",
+    "url": "https://list.essentialmeds.org/recommendations/41",
+    "file": "10ea165cda720c28.json",
+    "sha256": "051bbdc6cdbaa8e229119f4ce977795747fd8a3773744631241fd9cc817b69ee",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:31.924268+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "2926a7ef603bcba82910e36504df3a921ac8ffda1c8495edfb0f7cdf38e43ccd",
+    "url": "https://list.essentialmeds.org/recommendations/415",
+    "file": "2926a7ef603bcba8.json",
+    "sha256": "e5feeaa33d64ba2de5b7a300c6ae819c4c1bf9dd9799816640928410c5dfa4a1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:42.122923+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  },
+  {
+    "request_fingerprint": "d252e97436b46e2e4b409b7651673f926d8280e398d4f5ad7422f6536562ca1a",
+    "url": "https://list.essentialmeds.org/recommendations/77",
+    "file": "d252e97436b46e2e.json",
+    "sha256": "518b95c37a6224ea763e622e7246a1bcb8332fc36677fdf71844cb12079bc36f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T16:47:34.967333+00:00",
+    "licence": "CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/); WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/ (beta version 1.0). L"
+  }
+]
