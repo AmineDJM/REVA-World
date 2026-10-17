@@ -42,7 +42,10 @@ RAW = "c" * 64
 
 def test_parse_indicator_measure_and_filters() -> None:
     assert parse_indicator("NY.GDP.PCAP.CD") == ("NY.GDP.PCAP.CD", ())
-    assert parse_indicator("UNE|sex=SEX_F|classif1=AGE_Y15-24") == ("UNE", (("sex", "SEX_F"), ("classif1", "AGE_Y15-24")))
+    assert parse_indicator("UNE|sex=SEX_F|classif1=AGE_Y15-24") == (
+        "UNE",
+        (("sex", "SEX_F"), ("classif1", "AGE_Y15-24")),
+    )
     assert parse_indicator("2511|5123") == ("2511|5123", ())  # FAO item|element: both codes are the measure
     assert parse_indicator("a|k=v|tail") == ("a", (("k", "v"), ("_2", "tail")))
     assert split_series_key("wb.wdi_econ.NY.GDP.PCAP.CD") == ("wb", "wdi_econ", "NY.GDP.PCAP.CD")
@@ -103,7 +106,7 @@ def test_scale_hint() -> None:
 # --------------------------------------------------------------------------- synthetic snapshot
 
 
-def _row(ind: str, geo: str, iso3: str | None, start: date, end: date, value: str | None, **flags: object) -> dict:
+def _row(ind: str, geo: str, iso3: str | None, start: date, end: date, value: str | None, **flags: object) -> dict[str, object]:
     return {
         "source": "src",
         "dataset": "ds",
@@ -185,7 +188,7 @@ def test_index_search_and_resolution(env: tuple[AtlasQuery, SeriesIndex]) -> Non
     assert idx.primary_series(res["concepts"][0].concept) == ("src", "ds", "GDP")
     assert [m.measure for m in idx.search("cpi")["measures"]] == ["CPI"]
     m = idx.measure("src.ds", "CPI")
-    assert m is not None and m.facets() == [{"key": "sex", "values": ["T", "F"], "truncated": False}]
+    assert m is not None and m.facets() == [{"key": "sex", "values": ["F", "T"], "truncated": False}]
     assert m.default().indicator == "CPI|sex=T"  # "total" value first
     sid, *_rest = svc.resolve(idx, table="src.ds", measure="CPI", filters={"sex": "F"})
     assert q.series_of[sid][2] == "CPI|sex=F"

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 
@@ -274,7 +275,7 @@ def transform_rules(
 # --------------------------------------------------------------------------- choropleth scale hint
 
 
-def scale_hint(values: list[float]) -> str:
+def scale_hint(values: Sequence[float]) -> str:
     """``diverging`` (both signs), ``log`` (strictly positive, right-skewed and spanning >= 2 orders of magnitude),
     ``linear`` (few distinct values, or a near-symmetric spread) or ``quantile`` (other skewed distributions).
     The UI may override it."""

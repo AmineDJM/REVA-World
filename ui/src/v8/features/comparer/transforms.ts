@@ -86,7 +86,7 @@ export function transformPlace(
       const b = ctx.base ? by.get(ctx.base) : undefined;
       const bv = b?.v !== null && b?.v !== undefined ? Number(b.v) : null;
       if (bv === null || bv === 0) return { ...base, miss: 'pas de valeur de base' };
-      return { ...base, y: (v / bv) * 100, note: `base ${ctx.base} = ${b!.v}` };
+      return { ...base, y: (v * 100) / bv, note: `base ${ctx.base} = ${b!.v}` };
     }
     if (t === 'yoy') {
       const prevCode = previousYearCode(p.p);

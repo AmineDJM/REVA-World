@@ -43,6 +43,14 @@ from reva.v8.series.index import SeriesIndex
 #: Provider geography codes that are sub-national units (NUTS 1-3, ISO 3166-2, GeoNames admin1 codes).
 SUBNATIONAL_RE = re.compile(r"^(?:[A-Z]{2}[0-9A-Z]{1,3}|[A-Z]{2}-[A-Z0-9]{1,3}|[A-Z]{2}\.[0-9A-Z]{1,3})$")
 
+
+def is_subnational(geo: str | None, iso3: str | None) -> bool:
+    """A provider geography inside a country (NUTS, ISO 3166-2, GeoNames admin1) — never the country's own code."""
+    if not geo or not iso3 or geo == iso3 or geo in known_country_keys():
+        return False
+    return SUBNATIONAL_RE.match(geo) is not None
+
+
 MISSING_FR = {
     "provider": "la source publie une cellule sans valeur",
     "projection_hidden": "seule une projection existe pour cette période (masquée : jamais mêlée aux observations)",
@@ -194,7 +202,7 @@ def series_meta(q: AtlasQuery, idx: SeriesIndex, sid: int) -> dict[str, Any]:
     geo_rows = q._rows("SELECT DISTINCT x.iso3, x.provider_geo FROM cells_s x WHERE x.sid = ? AND x.has_value", [sid])
     shas = q._rows("SELECT DISTINCT x.table_sha FROM cells_s x WHERE x.sid = ? LIMIT 20", [sid])
     countries = sorted({r["iso3"] for r in geo_rows if r["iso3"]})
-    subnational = sorted({r["provider_geo"] for r in geo_rows if r["iso3"] and SUBNATIONAL_RE.match(r["provider_geo"])})
+    subnational = sorted({r["provider_geo"] for r in geo_rows if is_subnational(r["provider_geo"], r["iso3"])})
     aggregates = sorted({r["provider_geo"] for r in geo_rows if not r["iso3"]})
     concept = idx.concept_for(skey)
     unit = units[0]["unit"] if units else None
@@ -356,7 +364,13 @@ def _point(cell: dict[str, Any], precision: str, lic: _Lic) -> dict[str, Any]:
 
 def _period_where(sel: PeriodSel) -> tuple[str, list[Any]]:
     if sel.precision == "year":
-        return "x.year = ?", [sel.year]
+        # the atlas year view (one attached cell per country and year) plus the calendar-year cells it did not
+        # attach because another provider geography of the same country took the slot (sub-national rows)
+        return (
+            "(x.year = ? OR (x.year IS NULL AND x.period_start = make_date(?, 1, 1) "
+            "AND x.period_end = make_date(?, 1, 1)))",
+            [sel.year, sel.year, (sel.year or 0) + 1],
+        )
     cond = f"x.period_start = ? AND {SPAN_SQL} = ?"
     if sel.precision == "day":
         cond += " AND x.year IS NULL"
@@ -429,7 +443,7 @@ def map_slice(
     hidden: set[str] = set()
     provider_missing: dict[str, str] = {}
     if level == "adm1":
-        chosen = _choose([r for r in rows if r["iso3"] and SUBNATIONAL_RE.match(r["provider_geo"])], "provider_geo")
+        chosen = _choose([r for r in rows if is_subnational(r["provider_geo"], r["iso3"])], "provider_geo")
     else:
         chosen = _choose([r for r in rows if r["iso3"]], "iso3")
     for r in chosen.values():

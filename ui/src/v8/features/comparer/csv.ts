@@ -72,7 +72,7 @@ export function buildCsv(panels: CsvPanel[], geos: string[], nameOf: (g: string)
             x.p,
             src?.ps ?? '',
             src?.pe ?? '',
-            x.y === null ? '' : String(x.y),
+            x.y === null ? '' : String(Number(x.y.toPrecision(12))),
             pnl.unit,
             pnl.transform,
             src?.v ?? src?.t ?? '',
