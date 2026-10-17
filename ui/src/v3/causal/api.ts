@@ -99,6 +99,70 @@ export const gradeOf = (v: unknown): Grade | null => {
 export const TEMPORAL = ['consistent', 'overlapping', 'inconsistent', 'undetermined'] as const;
 export type TemporalCheck = (typeof TEMPORAL)[number] | 'unknown';
 
+/** The time an endpoint was compared by (grading v2): an event start window, or an entity's whole existence span. */
+export interface ComparedTime {
+  kind: 'event_start' | 'entity_existence' | string;
+  from: string | null;
+  to: string | null;
+  /** entity existence: inception (P571) start and dissolution end (null = still exists / not stated) */
+  inception: string | null;
+  end: string | null;
+  basis: string | null;
+}
+
+function comparedTimeOf(v: unknown): ComparedTime | null {
+  if (!isRec(v)) return null;
+  const inc = isRec(v.inception) ? v.inception : null;
+  const end = isRec(v.end) ? v.end : null;
+  return {
+    kind: optStr(v.kind) ?? 'event_start',
+    from: optStr(v.from),
+    to: optStr(v.to),
+    inception: inc ? optStr(inc.from) : null,
+    end: end ? (optStr(end.to) ?? optStr(end.from)) : null,
+    basis: optStr(v.basis) ?? (inc ? optStr(inc.basis) : null),
+  };
+}
+
+/** Known server reasons of a temporal check, in French (the server's text is kept when unknown). */
+const TEMPORAL_REASON_FR: [RegExp, string][] = [
+  [/entity dated by inception/i, 'entité datée par sa création (P571), pas un événement : toute sa durée d’existence est comparée, pas sa date de fondation'],
+  [/claim time qualifier|claim'?s own time/i, 'date portée par la déclaration elle-même (qualificatif temporel)'],
+  [/no start date in the KG for the cause and the effect/i, 'ni la cause ni l’effet n’ont de date de début dans le graphe de connaissances'],
+  [/no start date in the KG for the cause/i, 'la cause n’a pas de date de début dans le graphe de connaissances'],
+  [/no start date in the KG for the effect/i, 'l’effet n’a pas de date de début dans le graphe de connaissances'],
+];
+const reasonFr = (r: string | null) => (r ? (TEMPORAL_REASON_FR.find(([re]) => re.test(r))?.[1] ?? r) : null);
+
+/**
+ * Who the source says makes the claim (grading v2, CAUSFIX H3): Wikidata P3680 "statement supported by" (Wikidata
+ * records that a party asserts it; Wikidata does not assert it itself), P5102 "nature of statement" (shown
+ * verbatim), and a source's own doubtful coding (`scope.source_validity[].certainty = doubtful`).
+ */
+export interface Attribution {
+  supportedBy: NodeRef[];
+  nature: NodeRef[];
+  doubtful: { code: string | null; label: string | null; field: string | null }[];
+  note: string | null;
+}
+
+function attributionOf(o: Rec): Attribution | null {
+  const a = isRec(o.attribution) ? o.attribution : {};
+  const refs = (v: unknown) => (Array.isArray(v) ? v.map(nodeRefOf).filter((r) => r.id) : []);
+  const scope = isRec(o.scope) ? o.scope : {};
+  const sv = [...(Array.isArray(a.source_validity) ? a.source_validity : []), ...(Array.isArray(scope.source_validity) ? scope.source_validity : [])].filter(isRec);
+  const seen = new Set<string>();
+  const doubtful = sv
+    .filter((x) => String(x.certainty ?? '').toLowerCase() === 'doubtful')
+    .map((x) => ({ code: optStr(x.code) ?? optStr(x.value), label: optStr(x.label_fr) ?? optStr(x.label) ?? optStr(x.label_en), field: optStr(x.field) ?? optStr(x.variable) }))
+    .filter((x) => {
+      const k = JSON.stringify(x);
+      return seen.has(k) ? false : (seen.add(k), true);
+    });
+  const out = { supportedBy: refs(a.supported_by), nature: refs(a.nature_of_statement), doubtful, note: optStr(a.note_fr) ?? optStr(a.note_en) };
+  return out.supportedBy.length || out.nature.length || out.doubtful.length || out.note ? out : null;
+}
+
 /** The asserting source of a claim (nested `source` / `asserting_source` object, or flat fields of the claim). */
 export interface AssertingSource {
   key: string;
@@ -113,6 +177,8 @@ export interface AssertingSource {
   url: string | null;
   references: number | null;
   verification: string | null;
+  /** Wikidata property the statement was made with (P828, P1542, P1478, P1536 …), from the selector */
+  property: string | null;
 }
 
 /** {"doi": "10.1/x"} → "doi: 10.1/x"; {"file": "a.csv", "row": 4} → "file: a.csv · row: 4". */
@@ -155,6 +221,7 @@ function sourceOf(o: Rec): AssertingSource | null {
     url: pick('url', 'href'),
     references: Array.isArray(refs) ? refs.length : typeof refs === 'number' ? refs : null,
     verification: pick('verification'),
+    property: isRec(s.selector) ? optStr(s.selector.property) : null,
   };
 }
 
@@ -218,7 +285,7 @@ export const CausalClaim = JsonRecord.transform((o, ctx) => {
   if (gradeRaw !== null && gradeRaw !== undefined && grade === null) ctx.addIssue({ code: 'custom', message: `grade de preuve A–E attendu (reçu ${JSON.stringify(gradeRaw)})` });
   const tRaw = gr.temporal_check ?? o.temporal_check ?? (typeof o.temporal === 'string' ? o.temporal : undefined);
   const tStatus = typeof tRaw === 'string' && (TEMPORAL as readonly string[]).includes(tRaw.toLowerCase()) ? (tRaw.toLowerCase() as TemporalCheck) : 'unknown';
-  const tw = isRec(gr.temporal) ? gr.temporal : isRec(o.temporal) ? o.temporal : {};
+  const tw: Rec = isRec(gr.temporal) ? gr.temporal : isRec(o.temporal) ? o.temporal : {};
   // date windows the check used fill in the dates of cause/effect when the refs carry none
   const cause = base.cause.start ? base.cause : { ...base.cause, start: timeOf(tw.cause_start) };
   const effect = base.effect.start ? base.effect : { ...base.effect, start: timeOf(tw.effect_start) };
@@ -231,6 +298,9 @@ export const CausalClaim = JsonRecord.transform((o, ctx) => {
   const reasons = Array.isArray(gr.reasons)
     ? gr.reasons.filter(isRec).map((r) => ({ rule: optStr(r.rule_id) ?? '', text: optStr(r.fr) ?? optStr(r.en) ?? '' }))
     : [];
+  const entityDated = (Array.isArray(tw.entity_dated_by_inception) ? tw.entity_dated_by_inception : []).map(String).filter((x) => x === 'cause' || x === 'effect') as ('cause' | 'effect')[];
+  const inceptionReason = reasons.find((r) => r.rule === 'temporal.entity_dated_by_inception')?.text ?? null;
+  const rl = o.relation_inverse_label;
   return {
     ...base,
     cause,
@@ -241,7 +311,18 @@ export const CausalClaim = JsonRecord.transform((o, ctx) => {
     gradeRules: idList(gr.rule_ids ?? gr.rules ?? o.grade_rules),
     gradeReasons: reasons,
     gradeVersion: optStr(gr.rules_version),
-    temporal: { status: tStatus, detail: optStr(gr.temporal_detail) },
+    temporal: {
+      status: tStatus,
+      // the server's reason (e.g. an entity dated by its inception, compared through its existence span)
+      detail: reasonFr(optStr(tw.reason) ?? optStr(gr.temporal_detail)) ?? (entityDated.length ? inceptionReason : null),
+      rule: optStr(tw.rule),
+      entityDated,
+      causeTime: comparedTimeOf(tw.cause_time),
+      effectTime: comparedTimeOf(tw.effect_time),
+    },
+    attribution: attributionOf(o),
+    assertedOn: o.asserted_on === 'cause' || o.asserted_on === 'effect' ? (o.asserted_on as 'cause' | 'effect') : null,
+    inverseLabel: isRec(rl) ? (optStr(rl.fr) ?? optStr(rl.en)) : optStr(rl),
     corroboration,
     contestedBy: idList(gr.contested_by ?? o.contested_by),
     contests: idList(o.contests),
@@ -476,7 +557,7 @@ export async function getCausalClaims(id: string, direction: 'causes' | 'effects
 
 // ------------------------------------------------------------------ why
 
-export const WHY_GROUPS = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention'] as const;
+export const WHY_GROUPS = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention', 'outcome'] as const;
 export type WhyGroup = (typeof WHY_GROUPS)[number];
 
 const WHY_KEYS: Record<WhyGroup, string[]> = {
@@ -487,7 +568,15 @@ const WHY_KEYS: Record<WhyGroup, string[]> = {
   general: ['general', 'other', 'has_cause'],
   reaction: ['reaction', 'reaction_to'],
   prevention: ['prevention', 'prevented_or_delayed'],
+  outcome: ['outcome', 'coded_outcome'],
 };
+
+/**
+ * A dataset's coded outcome (relations.yaml `coded_outcome`, chain_excluded) codes HOW an event ended: it is an
+ * outcome, never a cause. The server files it in the "coded" lane of /why (for the outcome record); the screen
+ * shows it apart, worded as an outcome.
+ */
+export const isOutcomeClaim = (c: { relation: string }) => c.relation === 'coded_outcome';
 
 export interface WhyResult {
   groups: Record<WhyGroup, CausalClaim[]>;
@@ -512,6 +601,12 @@ export async function getCausalWhy(id: string, signal?: AbortSignal): Promise<Wh
     const v = k ? src[k] : [];
     groups[g] = parseWith(ClaimList, isRec(v) ? v.claims : v, `${path} (${k ?? g})`);
   }
+  // coded outcomes are not causes: out of every causal lane, into their own group
+  for (const g of WHY_GROUPS) {
+    if (g === 'outcome') continue;
+    groups.outcome.push(...groups[g].filter(isOutcomeClaim));
+    groups[g] = groups[g].filter((c) => !isOutcomeClaim(c));
+  }
   const dis = isRec(d.dissent) ? (d.dissent.claims ?? []) : (d.dissent ?? []);
   const dissent = Array.isArray(dis) ? parseWith(ClaimList, dis, `${path} (dissent)`) : [];
   return { groups, dissent, note: optStr(d.summary_fr) ?? optStr(d.note), warnings };
@@ -528,6 +623,8 @@ export interface SameAsEvidence {
   independentSources: boolean | null;
   evidenceType: string | null;
   evidence: Record<string, unknown>;
+  /** the identity rule's own explanation (registry/events/same_as_rules.yaml), when the server sends it */
+  note?: string | null;
 }
 
 /**
@@ -559,14 +656,36 @@ export interface ChainResult {
   notFoundReason: string | null;
   truncated: boolean;
   warnings: string[];
+  /** identical paths the server returned more than once, merged here (counted, never hidden) */
+  duplicatesMerged: number;
+  /** what the search skipped, as the server reports it (class items, quarantined claims, low grades…) */
+  skipped: { classNodes: number; quarantined: number; belowMinGrade: number; ungraded: number; classSample: string[] };
+  minGrade: Grade | null;
 }
+
+/** Known server "not found" reasons in French (the server text is kept when unknown). */
+const NOT_FOUND_FR: [RegExp, (m: RegExpExecArray) => string][] = [
+  [/^no causal chain within max_hops among claims graded at least ([A-E])/i, (m) => `aucune chaîne d’affirmations causales dans la limite de maillons parmi les affirmations de grade ${m[1]} ou mieux`],
+  [/records of the same event/i, () => 'les deux extrémités sont deux enregistrements du même événement (lien same_as fondé sur une preuve) : il n’y a pas de chaîne causale à chercher'],
+  [/unknown (event|entity|id)/i, () => 'identifiant inconnu des affirmations causales chargées'],
+];
+export function notFoundReasonFr(r: string | null): string | null {
+  if (!r) return null;
+  for (const [re, f] of NOT_FOUND_FR) {
+    const m = re.exec(r);
+    if (m) return f(m);
+  }
+  return r;
+}
+
+const hopSignature = (h: ChainHop) => `${h.from.id}>${h.to.id}:${h.identity ? `id:${h.identity.map((x) => x.statementKey).join(',')}` : h.claims.map((c) => c.id).join(',')}`;
 
 export async function getCausalChain(from: string, to: string, opts: { max_hops?: number } = {}, signal?: AbortSignal): Promise<ChainResult> {
   const path = '/v1/causal/chain';
   const { data, warnings } = await get(path, { from, to, max_hops: opts.max_hops }, signal);
   const d: Rec = isRec(data) ? data : {};
   const rawChains = Array.isArray(d.paths) ? d.paths : Array.isArray(d.chains) ? d.chains : [];
-  const chains: ChainView[] = rawChains.map((c, i) => {
+  const allChains: ChainView[] = rawChains.map((c, i) => {
     const co: Rec = isRec(c) ? c : {};
     const hopsRaw = (Array.isArray(c) ? c : Array.isArray(co.hops) ? co.hops : Array.isArray(co.claims) ? co.claims : []) as unknown[];
     const hops: ChainHop[] = hopsRaw.map((h, j) => {
@@ -583,6 +702,7 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
             independentSources: typeof x.independent_sources === 'boolean' ? x.independent_sources : null,
             evidenceType: optStr(ev.type),
             evidence: ev,
+            note: optStr(ev.rule_note),
           };
         });
         return { from: nodeRefOf(hr.from), to: nodeRefOf(hr.to), claims: [], serverGrade: null, identity };
@@ -599,17 +719,33 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
     });
     return { hops, serverGrade: gradeOf(co.chain_grade ?? co.grade ?? co.weakest_grade), wording: optStr(co.wording_fr) ?? optStr(co.wording) };
   });
+  // the server may list the same path twice (same hops, same claims, same identity links): show it once, say so
+  const seen = new Set<string>();
+  const chains = allChains.filter((ch) => {
+    const sig = ch.hops.map(hopSignature).join('|');
+    return seen.has(sig) ? false : (seen.add(sig), true);
+  });
   const search: Rec = isRec(d.search) ? d.search : {};
+  const num = (v: unknown) => (typeof v === 'number' ? v : 0);
   return {
     from: d.from === undefined || d.from === null ? null : nodeRefOf(d.from),
     to: d.to === undefined || d.to === null ? null : nodeRefOf(d.to),
     found: typeof d.found === 'boolean' ? d.found : chains.length > 0,
     chains,
-    maxHops: typeof d.max_hops === 'number' ? d.max_hops : null,
+    maxHops: typeof d.max_hops === 'number' ? d.max_hops : typeof search.max_hops === 'number' ? search.max_hops : null,
     note: optStr(d.note_fr) ?? optStr(d.note),
-    notFoundReason: optStr(d.not_found_reason),
+    notFoundReason: notFoundReasonFr(optStr(d.not_found_reason)),
     truncated: d.truncated === true || search.truncated === true,
     warnings,
+    duplicatesMerged: allChains.length - chains.length,
+    skipped: {
+      classNodes: num(search.class_nodes_skipped),
+      quarantined: num(search.quarantined_skipped),
+      belowMinGrade: num(search.below_min_grade_skipped),
+      ungraded: num(search.ungraded_skipped),
+      classSample: Array.isArray(search.class_nodes_sample) ? search.class_nodes_sample.map((x) => (isRec(x) ? String(x.label ?? x.id ?? '') : String(x))).filter(Boolean) : [],
+    },
+    minGrade: gradeOf(search.min_grade),
   };
 }
 

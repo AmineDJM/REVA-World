@@ -41,7 +41,7 @@ export const FAMILY_STYLE: Record<Family, { label: string; short: string; color:
   underlying: { label: 'cause profonde', short: 'profonde', color: '#6741d9', line: 'dashed', arrow: 'triangle' },
   contributing: { label: 'facteur contributif', short: 'contributif', color: '#1971c2', line: 'dotted', arrow: 'triangle' },
   coded_trigger: { label: 'déclencheur codé (jeu de données expert)', short: 'déclencheur codé', color: '#c92a2a', line: 'solid', arrow: 'triangle-tee' },
-  coded_outcome: { label: 'issue codée (jeu de données expert)', short: 'issue codée', color: '#2b8a3e', line: 'solid', arrow: 'triangle-backcurve' },
+  coded_outcome: { label: 'issue codée (jeu de données expert) — comment l’événement s’est terminé, pas une cause', short: 'issue codée', color: '#2b8a3e', line: 'solid', arrow: 'triangle-backcurve' },
   general: { label: 'relation causale affirmée', short: 'affirmée', color: '#5c677d', line: 'solid', arrow: 'triangle' },
 };
 
@@ -65,6 +65,8 @@ export function relationFr(c: Pick<CausalClaim, 'relation' | 'relationLabel'>): 
 }
 
 /** "A — cause immédiate → B" style sentence, cause first (the source's direction, not REVA's). */
+export { isOutcomeClaim } from './api';
+
 export function claimSentence(c: CausalClaim): string {
   const inhibits = c.polarity === 'inhibits' ? ' (effet inhibiteur selon la source)' : '';
   const denies = c.stance === 'denies' ? 'lien nié : ' : '';
@@ -83,10 +85,10 @@ export const TIER_FR: Record<Tier, string> = {
 };
 
 export const GRADE_STYLE: Record<Grade, { width: number; opacity: number; rule: string }> = {
-  A: { width: 6, opacity: 1, rule: 'source T1/T2, chronologie cohérente et corroborée' },
-  B: { width: 4.5, opacity: 0.85, rule: 'source T1/T2, ou T3 corroborée' },
+  A: { width: 6, opacity: 1, rule: 'source T1/T2, chronologie cohérente et corroborée par une source indépendante' },
+  B: { width: 4.5, opacity: 0.85, rule: 'source T1/T2 (sans être à la fois corroborée et cohérente dans le temps), ou T3 corroborée' },
   C: { width: 3, opacity: 0.7, rule: 'déclaration Wikidata référencée (T3), source unique' },
-  D: { width: 2, opacity: 0.5, rule: 'déclaration Wikidata sans référence (T4)' },
+  D: { width: 2, opacity: 0.5, rule: 'déclaration Wikidata sans référence (T4), ou plafonnée à D : attribuée à un tiers, nature qualifiée, ou événement codé douteux par la source' },
   E: { width: 1.2, opacity: 0.35, rule: 'incohérence temporelle, ou contestée sans corroboration' },
 };
 
@@ -129,7 +131,7 @@ export const TEMPORAL_FR: Record<string, { label: string; tone: 'ok' | 'warn' | 
   consistent: { label: 'chronologie cohérente (la cause précède l’effet, à la précision des dates)', tone: 'ok' },
   overlapping: { label: 'périodes qui se chevauchent (antériorité non établie)', tone: 'warn' },
   inconsistent: { label: 'incohérence temporelle : la cause commence après l’effet', tone: 'bad' },
-  undetermined: { label: 'dates manquantes : antériorité non vérifiable', tone: 'none' },
+  undetermined: { label: 'antériorité non établie (date manquante, ou entité datée par sa création)', tone: 'none' },
   unknown: { label: 'vérification temporelle non fournie par le serveur', tone: 'none' },
 };
 
@@ -150,6 +152,23 @@ export function sourceName(c: Pick<CausalClaim, 'source'>): string {
 /** "selon ICB (T1)" — the attribution every causal sentence carries. */
 export function selon(c: Pick<CausalClaim, 'source' | 'tier'>): string {
   return `selon ${sourceName(c)} (${c.tier})`;
+}
+
+/** "Q7747 et Q1140115" — the parties a source records as making the claim (labels when the KG has them). */
+export function partiesFr(refs: { id: string; label: string }[]): string {
+  const names = refs.map((r) => (r.label && r.label !== r.id ? `${r.label} (${r.id})` : r.id));
+  return names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}`;
+}
+
+/**
+ * The attribution of a claim the source itself attributes to someone else (Wikidata P3680) — never "selon Wikidata"
+ * alone: "Wikidata indique que <partie> affirme ce lien ; Wikidata ne l'affirme pas lui-même".
+ */
+export function attributedTo(c: Pick<CausalClaim, 'source' | 'attribution'>): string | null {
+  const a = c.attribution;
+  if (!a || a.supportedBy.length === 0) return null;
+  const n = a.supportedBy.length;
+  return `${sourceName(c)} indique que ${partiesFr(a.supportedBy)} ${n > 1 ? 'affirment' : 'affirme'} ce lien ; ${sourceName(c)} ne l’affirme pas lui-même`;
 }
 
 const shortSha = (s: string | null) => (s ? `${s.slice(0, 12)}…` : '');
@@ -192,6 +211,7 @@ export const WHY_FR: Record<WhyGroup, string> = {
   general: 'Autres causes affirmées',
   reaction: 'Réaction à (selon la source)',
   prevention: 'Ce qui l’a empêché ou retardé (selon la source)',
+  outcome: 'Issue codée de… (comment un événement s’est terminé selon un jeu de données — pas une cause)',
 };
 
 const RELATION_LANE: Record<string, WhyGroup> = {
@@ -201,7 +221,7 @@ const RELATION_LANE: Record<string, WhyGroup> = {
   contributing_factor: 'contributing',
   enabled: 'contributing',
   coded_trigger: 'coded',
-  coded_outcome: 'coded',
+  coded_outcome: 'outcome',
   reaction_to: 'reaction',
   prevented_or_delayed: 'prevention',
 };
@@ -209,10 +229,11 @@ const RELATION_LANE: Record<string, WhyGroup> = {
 /** Group causes by why-lane (the server's `lane`, else the relation) — used when /why is not deployed.
  *  A source *denying* a link is not a cause: it goes to the dissent panel, never into a lane. */
 export function groupWhy(claims: CausalClaim[]): Record<WhyGroup, CausalClaim[]> {
-  const out: Record<WhyGroup, CausalClaim[]> = { immediate: [], underlying: [], contributing: [], coded: [], general: [], reaction: [], prevention: [] };
+  const out: Record<WhyGroup, CausalClaim[]> = { immediate: [], underlying: [], contributing: [], coded: [], general: [], reaction: [], prevention: [], outcome: [] };
   for (const c of claims) {
     if (c.stance === 'denies') continue;
-    const lane = c.lane && c.lane in out ? (c.lane as WhyGroup) : (RELATION_LANE[c.relation] ?? 'general');
+    // a coded outcome is never a cause, whatever lane the server filed it in
+    const lane = c.relation === 'coded_outcome' ? 'outcome' : c.lane && c.lane in out ? (c.lane as WhyGroup) : (RELATION_LANE[c.relation] ?? 'general');
     out[lane].push(c);
   }
   for (const g of Object.keys(out) as WhyGroup[]) out[g].sort(byGrade);
@@ -281,7 +302,7 @@ export function precisionFr(p: number | null | undefined): string {
 export interface GraphNode {
   id: string;
   label: string;
-  side: 'focal' | 'cause' | 'effect' | 'both';
+  side: 'focal' | 'cause' | 'effect' | 'both' | 'outcome';
   x: number;
   y: number;
 }
@@ -296,7 +317,12 @@ export interface GraphEdge {
 export interface CausalGraphModel {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  /** claims not drawn because a column would be unreadable (they stay in the lists below the graph) */
+  hidden: number;
 }
+
+/** Most nodes drawn per column; the rest stay listed (a graph of 300 boxes is not readable, nor fast). */
+export const GRAPH_MAX_PER_SIDE = 40;
 
 const COL = 360;
 const ROW = 74;
@@ -317,8 +343,13 @@ export function buildGraph(focal: { id: string; label: string }, causes: CausalC
     }
     return ends;
   };
-  const causeEnds = endsOf(causes, 'cause');
-  const effectEnds = endsOf(effects, 'effect');
+  // a dataset's coded outcome of the event (how it ended) is not a consequence: drawn under the event, apart
+  const outcomeEnds = endsOf(effects.filter((c) => c.relation === 'coded_outcome'), 'effect');
+  const causeEnds = endsOf(causes, 'cause').slice(0, GRAPH_MAX_PER_SIDE);
+  const effectEnds = endsOf(effects.filter((c) => c.relation !== 'coded_outcome'), 'effect')
+    .filter((n) => !outcomeEnds.some((o) => o.id === n.id))
+    .slice(0, GRAPH_MAX_PER_SIDE);
+  const outcomesDrawn = outcomeEnds.slice(0, GRAPH_MAX_PER_SIDE);
   // a node asserted both as a cause and as an effect of the event sits under it, in the middle column
   const both = causeEnds.filter((n) => effectEnds.some((e) => e.id === n.id));
   const only = (ends: NodeRef[]) => ends.filter((n) => !both.some((b) => b.id === n.id));
@@ -327,14 +358,25 @@ export function buildGraph(focal: { id: string; label: string }, causes: CausalC
   place(only(causeEnds), 'cause', -COL);
   place(only(effectEnds), 'effect', COL);
   both.forEach((n, i) => nodes.set(n.id, { id: n.id, label: n.label, side: 'both', x: 0, y: 2 * ROW + i * ROW }));
+  // outcomes in rows of 4 under the event (below the "both" nodes)
+  const oy = 2 * ROW + both.length * ROW + ROW;
+  outcomesDrawn.forEach((n, i) => {
+    if (!nodes.has(n.id)) nodes.set(n.id, { id: n.id, label: n.label, side: 'outcome', x: ((i % 4) - 1.5) * (COL / 2), y: oy + Math.floor(i / 4) * ROW });
+  });
   const edges: GraphEdge[] = [];
+  const seen = new Set<string>();
+  let hidden = 0;
   for (const c of [...causes, ...effects]) {
     // a denial is not a causal edge: it is listed and shown in the dissent panel, never drawn as a cause
-    if (c.stance === 'denies' || edges.some((e) => e.id === c.id)) continue;
-    for (const n of [c.cause, c.effect]) if (!nodes.has(n.id)) nodes.set(n.id, { id: n.id, label: n.label, side: 'cause', x: -COL, y: nodes.size * ROW });
+    if (c.stance === 'denies' || seen.has(c.id)) continue;
+    seen.add(c.id);
+    if (!nodes.has(c.cause.id) || !nodes.has(c.effect.id)) {
+      hidden += 1;
+      continue;
+    }
     edges.push({ id: c.id, source: c.cause.id, target: c.effect.id, family: familyOf(c), grade: c.grade, claim: c });
   }
-  return { nodes: [...nodes.values()], edges };
+  return { nodes: [...nodes.values()], edges, hidden };
 }
 
 // ------------------------------------------------------------------ timeline
@@ -387,7 +429,7 @@ export function buildTimeline(focal: { id: string; label: string; start: TimePoi
       g.claims.push(c);
       m.set(n.id, g);
     }
-    for (const g of m.values()) add(g.node, end, g.claims);
+    for (const g of m.values()) add(g.claims.every((c) => c.relation === 'coded_outcome') ? { ...g.node, label: `issue codée : ${g.node.label}` } : g.node, end, g.claims);
   };
   group(causes, 'cause');
   group(effects, 'effect');
@@ -419,7 +461,8 @@ export function ticks(min: number, max: number, n = 6): number[] {
   const range = Math.max(1, max - min);
   const raw = range / n;
   const mag = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 5, 10].map((k) => k * mag).find((s) => s >= raw) ?? 10 * mag;
+  // whole years only: "1961.5" is not a year
+  const step = Math.max(1, [1, 2, 5, 10].map((k) => k * mag).find((s) => s >= raw) ?? 10 * mag);
   const out: number[] = [];
   for (let y = Math.ceil(min / step) * step; y <= max; y += step) out.push(y);
   return out;

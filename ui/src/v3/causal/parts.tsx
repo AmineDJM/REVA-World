@@ -1,17 +1,22 @@
+import { useContext } from 'react';
 import { Link } from 'react-router';
 import { CitationChip } from '../components/CitationChip';
 import { FixtureBadge } from '../components/Honesty';
+import { LicenceBadge } from '../components/Licence';
 import { wikidataItemUrl } from '../lib/citations';
 import { kindLabel } from '../lib/kinds';
-import type { CausalCandidate, CausalClaim, CausalEvent, EventsCard, Grade, Tier, WhyGroup } from './api';
-import { GRADES } from './api';
+import type { CausalCandidate, CausalClaim, CausalEvent, ComparedTime, EventsCard, Grade, Tier, WhyGroup } from './api';
+import { GRADES, isOutcomeClaim } from './api';
+import { RightsContext } from './rights';
 import {
+  attributedTo,
   citeClaim,
   FAMILIES,
   FAMILY_STYLE,
   familyOf,
   GRADE_STYLE,
   intervalText,
+  partiesFr,
   precisionFr,
   relationFr,
   REVIEW_FR,
@@ -19,6 +24,7 @@ import {
   sourceName,
   TEMPORAL_FR,
   TIER_FR,
+  timeText,
   UNGRADED_STYLE,
   WHY_FR,
   type DissentPair,
@@ -26,7 +32,7 @@ import {
 
 export const causesHref = (id: string) => `/v3/causes?event=${encodeURIComponent(id)}`;
 
-export const CANDIDATE_LABEL = 'candidats extraits de textes — non sourcés, non vérifiés';
+export const CANDIDATE_LABEL = 'non sourcé — candidats (extraits de textes ou proposés par un modèle, non vérifiés)';
 export const CHAIN_BANNER = 'chaîne composée par REVA à partir d’affirmations distinctes — force = maillon le plus faible';
 
 // ------------------------------------------------------------------ badges
@@ -115,20 +121,61 @@ function NodeLink({ id, label }: { id: string; label: string }) {
   );
 }
 
-/** One-line attributed claim: "cause → effet : relation — selon <source> (T1) · preuve B". */
+/** The focal event's side of a one-line claim: plain text (it is the event on screen), never a link. */
+function Focal({ label }: { label: string }) {
+  return <span className="v3-claim-focal">{label}</span>;
+}
+
+/** Licence of the claim's source, when the registry marks it restrictive (non-commercial, not open…). */
+function ClaimLicence({ c }: { c: Pick<CausalClaim, 'source'> }) {
+  const rights = useContext(RightsContext);
+  const r = rights?.get(c.source.key);
+  return r ? <LicenceBadge rights={r} /> : null;
+}
+
+/** Attribution / nature / doubtful-coding notes of a claim (grading v2), as short badges. */
+function AttributionBadges({ c }: { c: CausalClaim }) {
+  const a = c.attribution;
+  if (!a) return null;
+  return (
+    <>
+      {a.supportedBy.length > 0 && (
+        <span className="v3-attrib" data-testid="claim-attributed" title={attributedTo(c) ?? undefined}>
+          attribuée à {partiesFr(a.supportedBy)} — {sourceName(c)} ne l’affirme pas lui-même
+        </span>
+      )}
+      {a.nature.length > 0 && (
+        <span className="v3-attrib" data-testid="claim-nature">
+          nature qualifiée par la source : {partiesFr(a.nature)}
+        </span>
+      )}
+      {a.doubtful.length > 0 && (
+        <span className="v3-attrib" data-testid="claim-doubtful">
+          codé douteux par la source
+        </span>
+      )}
+    </>
+  );
+}
+
+/**
+ * One-line attributed claim, always in the source's direction: "cause — relation → effet · selon <source> (T1) ·
+ * preuve B". The event on screen (`show` names the *other* end) is plain text, the other end a link.
+ */
 export function ClaimLine({ c, onOpen, show = 'both' }: { c: CausalClaim; onOpen?: (id: string) => void; show?: 'cause' | 'effect' | 'both' }) {
   const fam = familyOf(c);
+  const outcome = isOutcomeClaim(c);
   return (
-    <span className="v3-claim-line" data-testid="claim-line" data-claim={c.id}>
-      <FamilySwatch family={fam} />{' '}
-      {show !== 'effect' && <NodeLink id={c.cause.id} label={c.cause.label} />}
-      {show === 'both' && <span className="v3-claim-arrow"> → </span>}
-      {show !== 'cause' && <NodeLink id={c.effect.id} label={c.effect.label} />}
-      {c.stance === 'denies' ? <span className="v3-denies"> · lien nié ({relationFr(c)})</span> : <span className="muted"> · {relationFr(c)}</span>}{' '}
+    <span className={`v3-claim-line${outcome ? ' v3-claim-outcome' : ''}`} data-testid="claim-line" data-claim={c.id} data-relation={c.relation}>
+      <FamilySwatch family={fam} /> {show === 'effect' ? <Focal label={c.cause.label} /> : <NodeLink id={c.cause.id} label={c.cause.label} />}
+      {c.stance === 'denies' ? <span className="v3-denies"> — lien nié ({relationFr(c)}) → </span> : <span className="muted"> — {relationFr(c)} → </span>}
+      {show === 'cause' ? <Focal label={c.effect.label} /> : <NodeLink id={c.effect.id} label={c.effect.label} />}
+      {outcome && <span className="v3-outcome-tag"> issue, pas une cause</span>}{' '}
       <span className="v3-selon" data-testid="selon">
         {selon(c)}
-      </span>{' '}
-      <GradeBadge grade={c.grade} rules={c.gradeRules} />
+      </span>
+      {c.source.property && <span className="muted"> · {c.source.property}</span>} <AttributionBadges c={c} />
+      <GradeBadge grade={c.grade} rules={c.gradeRules} /> <ClaimLicence c={c} />
       {c.temporal.status === 'inconsistent' && <span className="v3-tcheck v3-tcheck-bad v3-tcheck-mini">incohérence temporelle</span>}
       {(c.contestedBy.length > 0 || c.contests.length > 0) && <span className="v3-contested-mini">contestée</span>}
       {onOpen && (
@@ -140,9 +187,26 @@ export function ClaimLine({ c, onOpen, show = 'both' }: { c: CausalClaim; onOpen
   );
 }
 
+const shortDay = (iso: string | null) => (iso ? timeText({ time: iso, precision: 11 }) : null);
+
+/** The time an endpoint was compared by: an event start (with precision), or an entity's existence span. */
+function comparedText(n: CausalClaim['cause'], t: ComparedTime | null, entity: boolean): string {
+  if (entity && t && t.kind === 'entity_existence') {
+    const a = shortDay(t.inception ?? t.from);
+    const b = t.end ? shortDay(t.end) : null;
+    return `entité existant ${b ? `de ${a} à ${b}` : `depuis ${a} (fin non indiquée)`} — datée par sa création (P571), pas un événement`;
+  }
+  const when = intervalText(n);
+  return when ? `${when}${n.start?.precision != null ? ` (${precisionFr(n.start.precision)})` : ''}` : 'non daté';
+}
+
 /** Full claim card: everything a reader needs to judge it, and nothing REVA asserts itself. */
 export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: Map<string, CausalClaim>; onOpen: (id: string) => void; onClose?: () => void }) {
   const fam = familyOf(c);
+  const outcome = isOutcomeClaim(c);
+  const attributed = attributedTo(c);
+  const rights = useContext(RightsContext);
+  const licence = rights?.get(c.source.key) ?? null;
   return (
     <article className="v3-claim-detail" data-testid="claim-detail" aria-label={`Affirmation ${c.cause.label} → ${c.effect.label}`}>
       <header>
@@ -158,13 +222,25 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
       <p className="v3-claim-assert" data-testid="claim-attribution">
         {c.stance === 'denies' ? (
           <strong>Lien nié {selon(c)}</strong>
+        ) : attributed ? (
+          <strong>
+            {selon(c).replace(/^selon/, 'Selon')}, affirmation attribuée à {partiesFr(c.attribution!.supportedBy)}
+          </strong>
+        ) : outcome ? (
+          <strong>Issue codée {selon(c)}</strong>
         ) : (
           <strong>Affirmé {selon(c)}</strong>
         )}{' '}
         : {relationFr(c)}
         {!FAMILY_STYLE[fam].label.startsWith(relationFr(c)) && <span className="muted"> ({FAMILY_STYLE[fam].label})</span>}
-        {c.polarity && <span className="muted"> · polarité : {c.polarity === 'inhibits' ? 'inhibe' : c.polarity === 'promotes' ? 'favorise' : c.polarity}</span>}. REVA n’affirme
-        aucune causalité : il rapporte cette affirmation.
+        {c.polarity && <span className="muted"> · polarité : {c.polarity === 'inhibits' ? 'inhibe' : c.polarity === 'promotes' ? 'favorise' : c.polarity}</span>}.{' '}
+        {attributed && <span data-testid="claim-attributed-text">{attributed}. </span>}
+        {outcome && (
+          <span data-testid="claim-outcome-text">
+            Le jeu de données code ici comment l’événement s’est terminé (son issue) : ce n’est ni une cause ni une conséquence, et ce lien n’est jamais composé dans une chaîne causale.{' '}
+          </span>
+        )}
+        REVA n’affirme aucune causalité : il rapporte cette affirmation.
       </p>
       <dl className="v3-dl v3-claim-dl">
         <dt>Niveau de source</dt>
@@ -175,9 +251,28 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         <dd>
           {sourceName(c)} <CitationChip c={citeClaim(c)} />
         </dd>
+        <dt>Licence de la source</dt>
+        <dd data-testid="claim-licence">
+          {licence ? (
+            <>
+              {licence.licence_url && /^https:\/\//.test(licence.licence_url) ? (
+                <a href={licence.licence_url} target="_blank" rel="noreferrer noopener">
+                  {licence.licence}
+                </a>
+              ) : (
+                licence.licence
+              )}{' '}
+              <LicenceBadge rights={licence} />
+            </>
+          ) : (
+            <span className="muted">{rights ? 'non indiquée dans le registre des sources' : 'registre des sources non consulté'}</span>
+          )}
+        </dd>
         <dt>Déclaration / ligne</dt>
         <dd data-testid="claim-statement">
           {c.source.statementId ? <code>{c.source.statementId}</code> : c.source.rowSelector ? <code>{c.source.rowSelector}</code> : <span className="v3-missing">non fournie par le serveur</span>}
+          {c.source.property && <span className="muted"> · propriété {c.source.property}</span>}
+          {c.assertedOn && <span className="muted"> · écrite sur {c.assertedOn === 'cause' ? 'la cause' : 'l’effet'} ({c.assertedOn === 'cause' ? c.cause.label : c.effect.label})</span>}
           {c.source.revision ? (
             <span>
               {' '}
@@ -201,6 +296,24 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
             </dd>
           </>
         )}
+        {c.attribution && (c.attribution.nature.length > 0 || c.attribution.doubtful.length > 0 || c.attribution.note) && (
+          <>
+            <dt>Qualification par la source</dt>
+            <dd data-testid="claim-qualification">
+              {c.attribution.nature.length > 0 && <span>Nature de la déclaration selon {sourceName(c)} (citée telle quelle, non interprétée) : {partiesFr(c.attribution.nature)}. </span>}
+              {c.attribution.doubtful.map((d, i) => (
+                <span key={i}>
+                  La source code cet enregistrement comme douteux{d.field ? ` (${d.field}` : ''}
+                  {d.code ? `${d.field ? ' = ' : ' ('}${d.code}` : ''}
+                  {d.field || d.code ? ')' : ''}
+                  {d.label ? ` : « ${d.label} »` : ''}.{' '}
+                </span>
+              ))}
+              {c.attribution.note && c.attribution.nature.length === 0 && <span className="muted">{c.attribution.note}</span>}
+              {c.gradeRules.some((r) => /^grade\.D\.(attributed|nature_qualified|source_doubtful)$/.test(r)) && <span className="muted"> Grade plafonné à D par la grille de notation.</span>}
+            </dd>
+          </>
+        )}
         <dt>Mécanisme</dt>
         <dd data-testid="claim-mechanism">
           {c.mechanism ? (
@@ -211,24 +324,30 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
             <span className="muted">aucun mécanisme énoncé par la source</span>
           )}
         </dd>
-        {c.scope && Object.keys(c.scope).length > 0 && (
+        {c.scope && Object.keys(c.scope).filter((k) => k !== 'source_validity').length > 0 && (
           <>
             <dt>Portée (selon la source)</dt>
             <dd>
               {Object.entries(c.scope)
+                .filter(([k]) => k !== 'source_validity')
                 .map(([k, v]) => `${k} : ${typeof v === 'string' ? v : JSON.stringify(v)}`)
                 .join(' · ')}
             </dd>
           </>
         )}
         <dt>Vérification temporelle</dt>
-        <dd>
+        <dd data-testid="claim-temporal">
           <TemporalBadge status={c.temporal.status} detail={c.temporal.detail} />
+          {c.temporal.detail && (
+            <span className="v3-temporal-reason" data-testid="temporal-reason">
+              {' '}
+              — {c.temporal.detail}
+            </span>
+          )}
           <span className="muted">
             {' '}
-            cause : {intervalText(c.cause) || 'non datée'}
-            {c.cause.start?.precision != null ? ` (${precisionFr(c.cause.start.precision)})` : ''} · effet : {intervalText(c.effect) || 'non daté'}
-            {c.effect.start?.precision != null ? ` (${precisionFr(c.effect.start.precision)})` : ''}
+            · cause : {comparedText(c.cause, c.temporal.causeTime, c.temporal.entityDated.includes('cause'))} · effet :{' '}
+            {comparedText(c.effect, c.temporal.effectTime, c.temporal.entityDated.includes('effect'))}
           </span>
         </dd>
         <dt>Corroboration</dt>
@@ -278,8 +397,8 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
           {c.gradeVersion && <span className="muted"> · grille version {c.gradeVersion}</span>}
           {c.gradeReasons.length > 0 && (
             <ul className="v3-grade-reasons">
-              {c.gradeReasons.map((r) => (
-                <li key={r.rule}>
+              {c.gradeReasons.map((r, i) => (
+                <li key={`${r.rule}-${i}`}>
                   <code>{r.rule}</code> {r.text}
                 </li>
               ))}
@@ -290,10 +409,10 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
         <dd>{c.reviewStatus ? (REVIEW_FR[c.reviewStatus] ?? c.reviewStatus) : 'non indiquée'}</dd>
       </dl>
       {c.serverWording && (
-        <details className="v3-hop-server">
-          <summary>Formulation du serveur</summary>
-          <p>{c.serverWording}</p>
-        </details>
+        <p className="v3-server-wording" data-testid="claim-wording">
+          <span className="muted">Formulation du serveur : </span>
+          {c.serverWording}
+        </p>
       )}
     </article>
   );
@@ -306,9 +425,18 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
  * (/v1/events/{id}, each fact from a cited statement) when deployed, else from the causal event view — plus the
  * counts of claims and the non-causal context of /v1/causal/events/{id}.
  */
-export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard | null }) {
+export interface LoadedCounts {
+  causes: number;
+  effects: number;
+  outcomes: number;
+}
+
+export function EventCard({ e, card, loaded, fallbackLabel }: { e: CausalEvent | null; card: EventsCard | null; loaded?: LoadedCounts | null; fallbackLabel?: string | null }) {
   const id = card?.id ?? e?.id ?? '';
   const wd = wikidataItemUrl(id);
+  // the KG has no entity for this id (only claims cite it): say so instead of showing a bare id as a name
+  const unknownToKg = !card && !!e && e.label === e.id && !e.type && !e.start && !e.end;
+  const title = card?.label ?? (e && e.label !== e.id ? e.label : null) ?? fallbackLabel ?? id;
   const dated = card?.start || card?.end ? card : e;
   const when = dated ? intervalText(dated) : '';
   const typeText = card?.types.length ? card.types.join(' · ') : e ? (e.typeLabel ?? (e.type ? kindLabel(e.type) : null)) : null;
@@ -320,7 +448,7 @@ export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard
   const peopleGiven = card ? true : !!e?.participantsGiven;
   return (
     <div className="v3-entity-card v3-event-card" data-testid="event-card">
-      <h2 className="v3-entity-title">{card?.label ?? e?.label ?? id}</h2>
+      <h2 className="v3-entity-title">{title}</h2>
       <p className="v3-entity-sub">
         <span className="v3-chip" data-testid="event-type">
           {typeText ?? 'type non indiqué'}
@@ -335,6 +463,11 @@ export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard
         {e?.origin === 'test_fixture' && <FixtureBadge />}
       </p>
       {(card?.description ?? e?.description) && <p className="v3-entity-desc">{card?.description ?? e?.description}</p>}
+      {unknownToKg && (
+        <p className="v3-missing" data-testid="event-not-in-kg">
+          Cet identifiant n’est pas une entité du graphe de connaissances chargé : seules des affirmations causales le citent. Ni type, ni dates, ni lieux ne sont disponibles ici.
+        </p>
+      )}
       <dl className="v3-dl">
         <dt>Dates</dt>
         <dd data-testid="event-dates">
@@ -363,8 +496,8 @@ export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard
         <dd data-testid="event-participants">
           {people.length ? (
             <ul className="v3-plain">
-              {people.slice(0, 16).map((p) => (
-                <li key={`${p.key}-${p.note}`}>
+              {people.slice(0, 16).map((p, i) => (
+                <li key={`${p.key}-${p.note}-${i}`}>
                   {p.label}
                   {p.note && <span className="muted"> — {p.note}</span>}
                 </li>
@@ -384,9 +517,21 @@ export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard
         {e && (e.nCauses !== null || e.nEffects !== null) && (
           <>
             <dt>Affirmations</dt>
-            <dd>
-              {e.nCauses ?? '?'} cause(s) · {e.nEffects ?? '?'} conséquence(s) affirmées
+            <dd data-testid="event-counts">
+              {loaded ? (
+                <>
+                  {loaded.causes} cause(s) · {loaded.effects} conséquence(s) affirmées
+                  {loaded.outcomes > 0 ? ` · ${loaded.outcomes} issue(s) codée(s) (comment l’événement s’est terminé, pas des conséquences)` : ''}
+                </>
+              ) : (
+                <>
+                  {e.nCauses ?? '?'} cause(s) · {e.nEffects ?? '?'} conséquence(s) affirmées
+                </>
+              )}
               {e.nCandidates !== null ? ` · ${e.nCandidates} candidat(s) en quarantaine` : ''}
+              {loaded && e.nEffects !== null && e.nEffects !== loaded.effects + loaded.outcomes && (
+                <span className="muted"> (décompte du serveur : {e.nCauses ?? '?'} / {e.nEffects} ; les listes ci-dessous sont bornées)</span>
+              )}
             </dd>
           </>
         )}
@@ -416,6 +561,7 @@ export function EventCard({ e, card }: { e: CausalEvent | null; card: EventsCard
 export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup, CausalClaim[]>; derived: boolean; onOpen: (id: string) => void }) {
   const order: WhyGroup[] = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention'];
   const total = order.reduce((n, g) => n + groups[g].length, 0);
+  const outcomes = groups.outcome ?? [];
   return (
     <section className="v3-why" aria-labelledby="why-title" data-testid="why-panel">
       <h2 id="why-title">Pourquoi ?</h2>
@@ -425,7 +571,7 @@ export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup,
       </p>
       {total === 0 ? (
         <p className="v3-missing" data-testid="why-empty">
-          Aucune cause sourcée dans les données consultées — ce n’est pas une absence de cause, c’est une absence d’affirmation.
+          Aucune source chargée n’affirme de cause pour cet événement — ce n’est pas une absence de cause, c’est une absence d’affirmation.
         </p>
       ) : (
         order
@@ -445,6 +591,21 @@ export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup,
               </ul>
             </div>
           ))
+      )}
+      {outcomes.length > 0 && (
+        <div className="v3-why-lane v3-why-outcome" data-testid="why-outcome">
+          <h3>
+            {WHY_FR.outcome} <span className="muted">({outcomes.length})</span>
+          </h3>
+          <p className="field-hint">Cet enregistrement est l’issue codée d’un événement : il dit comment cet événement s’est terminé selon le jeu de données. Ce n’est pas une cause, et ce n’est pas compté parmi les causes.</p>
+          <ul className="v3-plain">
+            {outcomes.map((c) => (
+              <li key={c.id}>
+                <ClaimLine c={c} show="cause" onOpen={onOpen} />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </section>
   );
@@ -492,7 +653,7 @@ export function DissentPanel({ pairs, onOpen }: { pairs: DissentPair[]; onOpen: 
 // ------------------------------------------------------------------ candidates
 
 export function CandidateList({ items }: { items: CausalCandidate[] }) {
-  if (items.length === 0) return <p className="muted">Aucun candidat extrait pour cet événement.</p>;
+  if (items.length === 0) return <p className="muted">Aucun candidat (non sourcé) n’a été extrait pour cet événement.</p>;
   return (
     <ul className="v3-plain v3-candidate-list">
       {items.map((c) => (

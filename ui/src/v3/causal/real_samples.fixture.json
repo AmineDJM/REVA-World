@@ -1,0 +1,1215 @@
+{
+ "_note": "Recorded from the dev database `reva` (origin live) through the running API on 2026-10-17 by agent UICHECK (docs/dev/v3_uicheck.md). Responses trimmed to the claims the tests use; field contents unchanged. Wikidata data is CC0; ICB / EUSANCT / TIES records are cited with their source; source rights are the registry's recorded licence metadata.",
+ "attributed_claim": {
+  "claim_key": "kg:wikidata.wbapi:Q15860072$5683e19c-4076-424b-1a77-28f7692d3264",
+  "row_id": 27009,
+  "cause": {
+   "id": "Q112127201",
+   "label": "eastward expansion of NATO",
+   "label_fr": "expansion de l'OTAN vers l'Est",
+   "kind": "unclassified"
+  },
+  "effect": {
+   "id": "Q15860072",
+   "label": "Russo-Ukrainian war",
+   "label_fr": "guerre russo-ukrainienne",
+   "kind": "unclassified"
+  },
+  "relation": "has_cause",
+  "relation_label": {
+   "en": "caused",
+   "fr": "a causé"
+  },
+  "relation_inverse_label": {
+   "en": "has cause",
+   "fr": "a pour cause"
+  },
+  "family": "cause",
+  "lane": "general",
+  "polarity": null,
+  "stance": "asserts",
+  "asserted_on": "effect",
+  "source": {
+   "source_key": "wikidata.wbapi",
+   "tier": "T4",
+   "dataset": null,
+   "source_revision": "2556162208",
+   "statement_key": "wikidata.wbapi:Q15860072$5683e19c-4076-424b-1a77-28f7692d3264",
+   "statement_id": "Q15860072$5683e19c-4076-424b-1a77-28f7692d3264",
+   "statement_row_id": 1069513,
+   "selector": {
+    "rank": "normal",
+    "entity": "Q15860072",
+    "property": "P828",
+    "statement_id": "Q15860072$5683e19c-4076-424b-1a77-28f7692d3264"
+   },
+   "raw_sha256": "34d298a83c6f03b31b63af85bd1b8cb10411da5f2e1a74eb4062247a0c6fa437",
+   "references": [],
+   "citation": null,
+   "codebook": null,
+   "verification": "community_edited_not_verified",
+   "retrieved_at": "2026-10-16T20:58:57.812255Z"
+  },
+  "mechanism": null,
+  "scope": {},
+  "qualifiers": {
+   "P3680": [
+    "Q7747",
+    "Q1140115"
+   ]
+  },
+  "contests": [],
+  "disputed_by": [],
+  "attribution": {
+   "supported_by": [
+    {
+     "id": "Q7747",
+     "label": "Q7747",
+     "label_fr": null,
+     "kind": null
+    },
+    {
+     "id": "Q1140115",
+     "label": "Q1140115",
+     "label_fr": null,
+     "kind": null
+    }
+   ],
+   "nature_of_statement": [],
+   "source_validity": [],
+   "note_en": null,
+   "note_fr": null
+  },
+  "grade": {
+   "grade": "D",
+   "rules_version": "2",
+   "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+   "rules_current": true,
+   "rule_ids": [
+    "tier.T4",
+    "temporal.undetermined",
+    "corroboration.single",
+    "contest.none",
+    "attribution.supported_by",
+    "grade.D.attributed"
+   ],
+   "reasons": [
+    {
+     "rule_id": "tier.T4",
+     "en": "Tier T4: Wikidata causal statement without a source reference.",
+     "fr": "Niveau T4 : déclaration causale Wikidata sans référence à une source."
+    },
+    {
+     "rule_id": "temporal.undetermined",
+     "en": "The order in time cannot be established (a start date is missing or out of range, or an entity's existence span does not decide it).",
+     "fr": "L'ordre dans le temps ne peut pas être établi (date de début manquante ou hors plage, ou durée d'existence d'une entité non décisive)."
+    },
+    {
+     "rule_id": "corroboration.single",
+     "en": "One independent source group asserts this link.",
+     "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+    },
+    {
+     "rule_id": "contest.none",
+     "en": "No source contests this claim.",
+     "fr": "Aucune source ne conteste cette affirmation."
+    },
+    {
+     "rule_id": "attribution.supported_by",
+     "en": "Wikidata names who makes this claim (P3680 statement supported by); Wikidata does not assert it itself.",
+     "fr": "Wikidata nomme l'auteur de cette affirmation (P3680 déclaration soutenue par) ; Wikidata ne l'affirme pas lui-même."
+    },
+    {
+     "rule_id": "grade.D.attributed",
+     "en": "Wikidata records this claim as made by a named party (P3680 statement supported by): it is that party's assertion, not a sourced finding.",
+     "fr": "Wikidata indique que cette affirmation est le fait d'une partie nommée (P3680 déclaration soutenue par) : c'est l'affirmation de cette partie, pas un constat sourcé."
+    }
+   ],
+   "temporal_check": "undetermined",
+   "temporal": {
+    "rule": "cause start window vs effect start window, at date precision",
+    "check": "undetermined",
+    "cause_start": null,
+    "effect_start": {
+     "to": "2014-02-20",
+     "from": "2014-02-20",
+     "basis": "P580",
+     "times": [
+      "+2014-02-20T00:00:00Z"
+     ],
+     "precision": 11
+    }
+   },
+   "corroboration": 1,
+   "corroborating_claim_keys": [
+    "kg:wikidata.wbapi:Q112127201$E9D79978-1E29-4A12-A40F-84A76F26D5FF"
+   ],
+   "upstream_groups": [
+    [
+     "community:wikidata"
+    ]
+   ],
+   "contested_by": [],
+   "graded_at": "2026-10-17T02:22:32.343885Z"
+  },
+  "review_status": "unreviewed",
+  "wording": "Wikidata (statement Q15860072$5683e19c-4076-424b-1a77-28f7692d3264, revision 2556162208, community-edited) records that Q7747 and Q1140115 assert that Russo-Ukrainian war has cause eastward expansion of NATO; Wikidata does not assert it itself, and REVA does not establish causation.",
+  "wording_fr": "Wikidata (déclaration Q15860072$5683e19c-4076-424b-1a77-28f7692d3264, révision 2556162208, édition communautaire) indique que Q7747 et Q1140115 affirment que : guerre russo-ukrainienne a pour cause expansion de l'OTAN vers l'Est ; Wikidata ne l'affirme pas lui-même et REVA n'établit pas de causalité.",
+  "origin": "live",
+  "recorded_at": "2026-10-17T00:45:04.492379Z",
+  "load_id": 20
+ },
+ "inception_claim": {
+  "claim_key": "kg:wikidata.wbapi:Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f",
+  "row_id": 54800,
+  "cause": {
+   "id": "Q361",
+   "label": "World War I",
+   "label_fr": "Première Guerre mondiale",
+   "kind": "unclassified"
+  },
+  "effect": {
+   "id": "Q43287",
+   "label": "German Empire",
+   "label_fr": "Empire allemand",
+   "kind": "country"
+  },
+  "relation": "has_effect",
+  "relation_label": {
+   "en": "has effect",
+   "fr": "a pour effet"
+  },
+  "relation_inverse_label": {
+   "en": "is an effect of",
+   "fr": "est un effet de"
+  },
+  "family": "cause",
+  "lane": "general",
+  "polarity": null,
+  "stance": "asserts",
+  "asserted_on": "cause",
+  "source": {
+   "source_key": "wikidata.wbapi",
+   "tier": "T4",
+   "dataset": null,
+   "source_revision": "2556293116",
+   "statement_key": "wikidata.wbapi:Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f",
+   "statement_id": "Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f",
+   "statement_row_id": 1068652,
+   "selector": {
+    "rank": "normal",
+    "entity": "Q361",
+    "property": "P1542",
+    "statement_id": "Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f"
+   },
+   "raw_sha256": "83c8beb86aefb867d3e1771debd44037ed5e61f77f47d1e609a35a58d987141b",
+   "references": [
+    {
+     "P143": [
+      "Q58251"
+     ],
+     "P4656": [
+      "https://az.wikipedia.org/?oldid=7446971"
+     ]
+    }
+   ],
+   "citation": null,
+   "codebook": null,
+   "verification": "community_edited_not_verified",
+   "retrieved_at": "2026-10-16T20:43:04.740590Z"
+  },
+  "mechanism": null,
+  "scope": {},
+  "qualifiers": {},
+  "contests": [],
+  "disputed_by": [],
+  "attribution": null,
+  "grade": {
+   "grade": "D",
+   "rules_version": "2",
+   "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+   "rules_current": true,
+   "rule_ids": [
+    "tier.T4",
+    "temporal.undetermined",
+    "corroboration.single",
+    "contest.none",
+    "tier.T4.non_source_references_only",
+    "temporal.entity_dated_by_inception",
+    "grade.D.t4"
+   ],
+   "reasons": [
+    {
+     "rule_id": "tier.T4",
+     "en": "Tier T4: Wikidata causal statement without a source reference.",
+     "fr": "Niveau T4 : déclaration causale Wikidata sans référence à une source."
+    },
+    {
+     "rule_id": "temporal.undetermined",
+     "en": "The order in time cannot be established (a start date is missing or out of range, or an entity's existence span does not decide it).",
+     "fr": "L'ordre dans le temps ne peut pas être établi (date de début manquante ou hors plage, ou durée d'existence d'une entité non décisive)."
+    },
+    {
+     "rule_id": "corroboration.single",
+     "en": "One independent source group asserts this link.",
+     "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+    },
+    {
+     "rule_id": "contest.none",
+     "en": "No source contests this claim.",
+     "fr": "Aucune source ne conteste cette affirmation."
+    },
+    {
+     "rule_id": "tier.T4.non_source_references_only",
+     "en": "Its only references are pointers, not sources: imported from a Wikimedia project (P143 / P4656), inferred from another item (P3452) or based on a heuristic (P887).",
+     "fr": "Ses seules références sont des renvois, pas des sources : importation depuis un projet Wikimedia (P143 / P4656), inférence depuis un autre élément (P3452) ou heuristique (P887)."
+    },
+    {
+     "rule_id": "temporal.entity_dated_by_inception",
+     "en": "The cause or effect is an entity dated by its inception (P571), not an event: its whole existence span was compared, not its founding date.",
+     "fr": "La cause ou l'effet est une entité datée par sa création (P571), pas un événement : toute sa durée d'existence a été comparée, pas sa date de fondation."
+    },
+    {
+     "rule_id": "grade.D.t4",
+     "en": "Wikidata statement without a source reference (community-edited, unsourced).",
+     "fr": "Déclaration Wikidata sans référence à une source (édition communautaire, non sourcée)."
+    }
+   ],
+   "temporal_check": "undetermined",
+   "temporal": {
+    "rule": "existence span of the entity dated by inception vs the other endpoint's time",
+    "check": "undetermined",
+    "reason": "entity dated by inception (P571), not an event: its existence span is compared, not its founding",
+    "cause_time": {
+     "to": "1914-07-28",
+     "from": "1914-07-28",
+     "kind": "event_start",
+     "basis": "P580",
+     "times": [
+      "+1914-07-28T00:00:00Z"
+     ],
+     "precision": 11
+    },
+    "cause_start": {
+     "to": "1914-07-28",
+     "from": "1914-07-28",
+     "basis": "P580",
+     "times": [
+      "+1914-07-28T00:00:00Z"
+     ],
+     "precision": 11
+    },
+    "effect_time": {
+     "to": "1918-11-09",
+     "end": {
+      "to": "1918-11-09",
+      "from": "1918-11-09",
+      "basis": "P576",
+      "times": [
+       "+1918-11-09T00:00:00Z"
+      ],
+      "precision": 11
+     },
+     "from": "1871-01-01",
+     "kind": "entity_existence",
+     "inception": {
+      "to": "1871-01-01",
+      "from": "1871-01-01",
+      "basis": "P571",
+      "times": [
+       "+1871-01-01T00:00:00Z"
+      ],
+      "precision": 11
+     }
+    },
+    "effect_start": {
+     "to": "1871-01-01",
+     "from": "1871-01-01",
+     "basis": "P571",
+     "times": [
+      "+1871-01-01T00:00:00Z"
+     ],
+     "precision": 11
+    },
+    "entity_dated_by_inception": [
+     "effect"
+    ]
+   },
+   "corroboration": 1,
+   "corroborating_claim_keys": [],
+   "upstream_groups": [
+    [
+     "community:wikidata"
+    ]
+   ],
+   "contested_by": [],
+   "graded_at": "2026-10-17T02:22:32.343885Z"
+  },
+  "review_status": "unreviewed",
+  "wording": "According to Wikidata (statement Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f, revision 2556293116, community-edited), World War I has effect German Empire; REVA does not establish causation.",
+  "wording_fr": "Selon Wikidata (déclaration Q361$d5cdf34b-4652-4ac2-6d48-b3bccc68b08f, révision 2556293116, édition communautaire), Première Guerre mondiale a pour effet Empire allemand ; REVA n'établit pas de causalité.",
+  "origin": "live",
+  "recorded_at": "2026-10-17T02:05:58.808551Z",
+  "load_id": 30
+ },
+ "nature_claim": {
+  "claim_key": "kg:wikidata.wbapi:Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b",
+  "row_id": 27569,
+  "cause": {
+   "id": "Q221382",
+   "label": "1991 Soviet coup d'état attempt",
+   "label_fr": "putsch de Moscou",
+   "kind": "unclassified"
+  },
+  "effect": {
+   "id": "Q5167679",
+   "label": "dissolution of the Soviet Union",
+   "label_fr": "dislocation de l'URSS",
+   "kind": "unclassified"
+  },
+  "relation": "has_effect",
+  "relation_label": {
+   "en": "has effect",
+   "fr": "a pour effet"
+  },
+  "relation_inverse_label": {
+   "en": "is an effect of",
+   "fr": "est un effet de"
+  },
+  "family": "cause",
+  "lane": "general",
+  "polarity": null,
+  "stance": "asserts",
+  "asserted_on": "cause",
+  "source": {
+   "source_key": "wikidata.wbapi",
+   "tier": "T3",
+   "dataset": null,
+   "source_revision": "2552379105",
+   "statement_key": "wikidata.wbapi:Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b",
+   "statement_id": "Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b",
+   "statement_row_id": 2445949,
+   "selector": {
+    "rank": "normal",
+    "entity": "Q221382",
+    "property": "P1542",
+    "statement_id": "Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b"
+   },
+   "raw_sha256": "f50fd1bdfcff17b088a59b462da69f5f49451945a49605cf9f9a7bfa18d46c52",
+   "references": [
+    {
+     "P577": [
+      {
+       "time": "+2021-09-03T00:00:00Z",
+       "calendar": "gregorian",
+       "precision": 11
+      }
+     ],
+     "P854": [
+      "https://svpressa.ru/online/sptv/308798/"
+     ]
+    }
+   ],
+   "citation": null,
+   "codebook": null,
+   "verification": "community_edited_not_verified",
+   "retrieved_at": "2026-10-17T00:26:56.962119Z"
+  },
+  "mechanism": null,
+  "scope": {},
+  "qualifiers": {
+   "P5102": [
+    "Q20820099"
+   ]
+  },
+  "contests": [],
+  "disputed_by": [],
+  "attribution": {
+   "supported_by": [],
+   "nature_of_statement": [
+    {
+     "id": "Q20820099",
+     "label": "Q20820099",
+     "label_fr": null,
+     "kind": null
+    }
+   ],
+   "source_validity": [],
+   "note_en": "Wikidata qualifies the nature of this statement as: Q20820099",
+   "note_fr": "Wikidata qualifie la nature de cette déclaration : Q20820099"
+  },
+  "grade": {
+   "grade": "D",
+   "rules_version": "2",
+   "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+   "rules_current": true,
+   "rule_ids": [
+    "tier.T3",
+    "temporal.consistent",
+    "corroboration.single",
+    "contest.none",
+    "nature.qualified",
+    "grade.D.nature_qualified"
+   ],
+   "reasons": [
+    {
+     "rule_id": "tier.T3",
+     "en": "Tier T3: Wikidata causal statement with references.",
+     "fr": "Niveau T3 : déclaration causale Wikidata avec références."
+    },
+    {
+     "rule_id": "temporal.consistent",
+     "en": "The cause starts before the effect, beyond date precision.",
+     "fr": "La cause commence avant l'effet, au-delà de la précision des dates."
+    },
+    {
+     "rule_id": "corroboration.single",
+     "en": "One independent source group asserts this link.",
+     "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+    },
+    {
+     "rule_id": "contest.none",
+     "en": "No source contests this claim.",
+     "fr": "Aucune source ne conteste cette affirmation."
+    },
+    {
+     "rule_id": "nature.qualified",
+     "en": "Wikidata qualifies the nature of this statement (P5102); the qualifier is shown verbatim.",
+     "fr": "Wikidata qualifie la nature de cette déclaration (P5102) ; le qualificatif est montré tel quel."
+    },
+    {
+     "rule_id": "grade.D.nature_qualified",
+     "en": "Wikidata qualifies the nature of this statement (P5102: e.g. alleged, hypothetical, rare); REVA does not grade it above D.",
+     "fr": "Wikidata qualifie la nature de cette déclaration (P5102 : par ex. allégation, hypothèse, rareté) ; REVA ne la note pas au-dessus de D."
+    }
+   ],
+   "temporal_check": "consistent",
+   "temporal": {
+    "rule": "cause start window vs effect start window, at date precision",
+    "check": "consistent",
+    "cause_start": {
+     "to": "1991-08-19",
+     "from": "1991-08-19",
+     "basis": "P580",
+     "times": [
+      "+1991-08-19T00:00:00Z"
+     ],
+     "precision": 11
+    },
+    "effect_start": {
+     "to": "1991-12-26",
+     "from": "1991-12-26",
+     "basis": "P585",
+     "times": [
+      "+1991-12-26T00:00:00Z"
+     ],
+     "precision": 11
+    }
+   },
+   "corroboration": 1,
+   "corroborating_claim_keys": [],
+   "upstream_groups": [
+    [
+     "url:https://svpressa.ru/online/sptv/308798"
+    ]
+   ],
+   "contested_by": [],
+   "graded_at": "2026-10-17T02:22:32.343885Z"
+  },
+  "review_status": "unreviewed",
+  "wording": "According to Wikidata (statement Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b, revision 2552379105, community-edited), 1991 Soviet coup d'état attempt has effect dissolution of the Soviet Union (Wikidata qualifies the nature of this statement as: Q20820099); REVA does not establish causation.",
+  "wording_fr": "Selon Wikidata (déclaration Q221382$72bfcc6c-40db-f02a-f1eb-aa6eec22531b, révision 2552379105, édition communautaire), putsch de Moscou a pour effet dislocation de l'URSS (Wikidata qualifie la nature de cette déclaration : Q20820099) ; REVA n'établit pas de causalité.",
+  "origin": "live",
+  "recorded_at": "2026-10-17T00:45:04.492379Z",
+  "load_id": 20
+ },
+ "outcome_claim": {
+  "claim_key": "ds:icb.data:icb1:196:forout",
+  "row_id": 392,
+  "cause": {
+   "id": "icb:crisis:196",
+   "label": "CUBAN MISSILES",
+   "label_fr": null,
+   "kind": "international_crisis"
+  },
+  "effect": {
+   "id": "icb:crisis:196:outcome",
+   "label": "Outcome of CUBAN MISSILES: Semi-formal agreement",
+   "label_fr": null,
+   "kind": "crisis_outcome"
+  },
+  "relation": "coded_outcome",
+  "relation_label": {
+   "en": "has coded outcome",
+   "fr": "a pour issue codée"
+  },
+  "relation_inverse_label": {
+   "en": "is the coded outcome of",
+   "fr": "est l'issue codée de"
+  },
+  "family": "cause",
+  "lane": "coded",
+  "polarity": null,
+  "stance": "asserts",
+  "asserted_on": null,
+  "source": {
+   "source_key": "icb.data",
+   "tier": "T1",
+   "dataset": "icb1",
+   "source_revision": "v16",
+   "statement_key": null,
+   "statement_id": null,
+   "statement_row_id": null,
+   "selector": {
+    "row": 197,
+    "file": "icb1v16.csv",
+    "crisno": 196,
+    "columns": [
+     "forout",
+     "subout",
+     "exsat",
+     "outesr",
+     "yrterm",
+     "moterm",
+     "daterm"
+    ]
+   },
+   "raw_sha256": "69757d1315c3d25a352fbe4ef22e0ea4bb5c230b91a809a7304ff1896dbb1ba5",
+   "references": [],
+   "citation": null,
+   "codebook": {
+    "url": "https://duke.box.com/s/ravjtawv20aszptx3xhn43p7gd2q02dq",
+    "name": "International Crisis Behavior Data Codebook, Version 16 - ICB1 (System Level)",
+    "term": "FOROUT",
+    "version": "v16 (icb1_codebook sha256 fd2f41be46aa)",
+    "definition": "This variable refers to the form of the outcome of an international crisis at its termination point. Form of outcome is determined by the configuration of forces operative during a crisis, and has an important bearing on the subsequent relations among the parties to a crisis. In most cases the form of outcome was common to all crisis actors. Where it was not, the form closest to consensus by the actors was coded for the entire crisis. Hence, the user should consult the coding of this variable (OUTFOR) in the Actor Level Dataset."
+   },
+   "verification": "source_reported_not_verified",
+   "retrieved_at": "2026-10-17T00:01:37.012076Z"
+  },
+  "mechanism": null,
+  "scope": {},
+  "qualifiers": {},
+  "contests": [],
+  "disputed_by": [],
+  "attribution": null,
+  "grade": {
+   "grade": "B",
+   "rules_version": "2",
+   "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+   "rules_current": true,
+   "rule_ids": [
+    "tier.T1",
+    "temporal.consistent",
+    "corroboration.single",
+    "contest.none",
+    "grade.B.expert"
+   ],
+   "reasons": [
+    {
+     "rule_id": "tier.T1",
+     "en": "Tier T1: expert-coded research dataset with a codebook definition.",
+     "fr": "Niveau T1 : jeu de données de recherche codé par des experts, avec définition du codebook."
+    },
+    {
+     "rule_id": "temporal.consistent",
+     "en": "The cause starts before the effect, beyond date precision.",
+     "fr": "La cause commence avant l'effet, au-delà de la précision des dates."
+    },
+    {
+     "rule_id": "corroboration.single",
+     "en": "One independent source group asserts this link.",
+     "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+    },
+    {
+     "rule_id": "contest.none",
+     "en": "No source contests this claim.",
+     "fr": "Aucune source ne conteste cette affirmation."
+    },
+    {
+     "rule_id": "grade.B.expert",
+     "en": "Expert-coded or scholarly source (not both corroborated and time-consistent).",
+     "fr": "Source experte (jeu de données codé ou référence savante), sans être à la fois corroborée et cohérente dans le temps."
+    }
+   ],
+   "temporal_check": "consistent",
+   "temporal": {
+    "rule": "cause start window vs effect start window, at date precision",
+    "check": "consistent",
+    "cause_start": {
+     "to": "1962-10-16",
+     "from": "1962-10-16",
+     "basis": "P580",
+     "times": [
+      "1962-10-16"
+     ],
+     "precision": 11
+    },
+    "effect_start": {
+     "to": "1962-11-20",
+     "from": "1962-11-20",
+     "basis": "P585",
+     "times": [
+      "1962-11-20"
+     ],
+     "precision": 11
+    }
+   },
+   "corroboration": 1,
+   "corroborating_claim_keys": [],
+   "upstream_groups": [
+    [
+     "dataset:icb.data/icb1"
+    ]
+   ],
+   "contested_by": [],
+   "graded_at": "2026-10-17T02:22:32.343885Z"
+  },
+  "review_status": "unreviewed",
+  "wording": "According to icb.data (dataset icb1, version v16, row {\"columns\":[\"forout\",\"subout\",\"exsat\",\"outesr\",\"yrterm\",\"moterm\",\"daterm\"],\"crisno\":196,\"file\":\"icb1v16.csv\",\"row\":197}), CUBAN MISSILES has coded outcome Outcome of CUBAN MISSILES: Semi-formal agreement; REVA does not establish causation.",
+  "wording_fr": "Selon icb.data (jeu de données icb1, version v16, ligne {\"columns\":[\"forout\",\"subout\",\"exsat\",\"outesr\",\"yrterm\",\"moterm\",\"daterm\"],\"crisno\":196,\"file\":\"icb1v16.csv\",\"row\":197}), CUBAN MISSILES a pour issue codée Outcome of CUBAN MISSILES: Semi-formal agreement ; REVA n'établit pas de causalité.",
+  "origin": "live",
+  "recorded_at": "2026-10-17T00:01:51.079776Z",
+  "load_id": 1
+ },
+ "chain_duplicated_paths": {
+  "data": {
+   "from": {
+    "id": "ties:case:1990122101",
+    "label": "Sanctions case 1990122101 (TIES): target Guatemala (COW 90), from 1990",
+    "label_fr": null,
+    "kind": "sanction_episode"
+   },
+   "to": {
+    "id": "eusanct:policy_result:1990122101",
+    "label": "Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome",
+    "label_fr": null,
+    "kind": "coded_outcome"
+   },
+   "found": true,
+   "paths": [
+    {
+     "length": 1,
+     "identity_hops": 1,
+     "cross_source": false,
+     "chain_grade": "B",
+     "weakest_hop": 1,
+     "hops": [
+      {
+       "kind": "identity",
+       "from": {
+        "id": "ties:case:1990122101",
+        "label": "Sanctions case 1990122101 (TIES): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "to": {
+        "id": "eusanct:case:1990122101",
+        "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "hop_grade": null,
+       "claims": [],
+       "relation": "same_as",
+       "same_as": [
+        {
+         "left": "eusanct:case:1990122101",
+         "right": "ties:case:1990122101",
+         "statement_key": "reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101",
+         "rule": "eusanct_ties_case",
+         "independent_sources": false,
+         "evidence": {
+          "type": "provider_identity_statement",
+          "property": "eusanct:same_case_as",
+          "rule_note": "EUSANCT (Weber and Schneider, KonData) reuses the TIES case id for cases it took over from TIES and names TIES in its `datasource` column; the EUSANCT connector writes `eusanct:same_case_as` only when the case id is identical, the datasource names TIES and the target COW code is identical. Provider-published identity; EUSANCT's coding of these cases derives from TIES (and HSE), so the two records are NOT independent sources: their claims count once.",
+          "statement_keys": [
+           "eusanct.kondata:1990122101:same_case_as:ties"
+          ],
+          "independent_sources": false,
+          "statement_qualifiers": {
+           "evidence": "identical case id; EUSANCT datasource names TIES; identical target COW code",
+           "datasource": "TIES/HSE"
+          },
+          "statement_raw_sha256": "e5d94f19bcc80c703ba4b99402bb92f88112a31e043538155672542f52e28e47",
+          "statement_source_key": "eusanct.kondata"
+         }
+        }
+       ],
+       "note": "An identity hop joins two records of the same event (an evidenced events:same_as link: shared identifier or provider crosswalk, never name or date matching); it is not a causal claim and adds no causal hop."
+      },
+      {
+       "kind": "claim",
+       "from": {
+        "id": "eusanct:case:1990122101",
+        "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "to": {
+        "id": "eusanct:policy_result:1990122101",
+        "label": "Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome",
+        "label_fr": null,
+        "kind": "coded_outcome"
+       },
+       "hop_grade": "B",
+       "claims": [
+        {
+         "claim_key": "ds:eusanct.kondata:eusanct_case:1990122101:hse_contribution",
+         "row_id": 23856,
+         "cause": {
+          "id": "eusanct:case:1990122101",
+          "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+          "label_fr": null,
+          "kind": "sanction_episode"
+         },
+         "effect": {
+          "id": "eusanct:policy_result:1990122101",
+          "label": "Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome",
+          "label_fr": null,
+          "kind": "coded_outcome"
+         },
+         "relation": "contributing_factor",
+         "relation_label": {
+          "en": "contributing factor of",
+          "fr": "facteur contributif de"
+         },
+         "relation_inverse_label": {
+          "en": "has contributing factor",
+          "fr": "a comme facteur contributif"
+         },
+         "family": "cause",
+         "lane": "contributing",
+         "polarity": "promotes",
+         "stance": "asserts",
+         "asserted_on": null,
+         "source": {
+          "source_key": "eusanct.kondata",
+          "tier": "T1",
+          "dataset": "eusanct_case",
+          "source_revision": "eusanct-1.0",
+          "statement_key": null,
+          "statement_id": null,
+          "statement_row_id": null,
+          "selector": {
+           "row": 32,
+           "file": "EUSANCT_Dataset_Case-level.csv",
+           "columns": [
+            "caseid",
+            "sanctioncontribution",
+            "policyresult",
+            "HSEscore"
+           ]
+          },
+          "raw_sha256": "e5d94f19bcc80c703ba4b99402bb92f88112a31e043538155672542f52e28e47",
+          "references": [],
+          "citation": null,
+          "codebook": {
+           "url": "https://doi.org/10.48606/10",
+           "name": "EUSANCT Dataset – Codebook: Case-level Dataset (Weber & Schneider)",
+           "term": "sanctioncontribution",
+           "version": "2.0, March 2020 (Codebook_EUSANCT_Case-level-Dataset_01.pdf sha256 8d8da4c58a8a7ab1d4ef2268c25c239ccea52d44c7fd12e7b53ac4a2ea8696f7, inside the RADAR tar of doi:10.48606/10)",
+           "definition": "35. “Sanction Contribution:” This variable assesses the sanction’s contribution to the achievement of the goals of the sender. 1. “Negative Contribution” 2. “Little or No Contribution” 3. “Substantial Contribution” 4. “Decisive Contribution” 36. HSE “Success Score:” Multiply the scores for Policy Result and Sanction Contribution. A score of 9 or higher implies that the sanction made a substantial contribution to the goals of the sender."
+          },
+          "verification": "source_reported_not_verified",
+          "retrieved_at": "2026-10-17T00:06:10.137444Z"
+         },
+         "mechanism": null,
+         "scope": {},
+         "qualifiers": {},
+         "contests": [],
+         "disputed_by": [],
+         "attribution": null,
+         "grade": {
+          "grade": "B",
+          "rules_version": "2",
+          "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+          "rules_current": true,
+          "rule_ids": [
+           "tier.T1",
+           "temporal.undetermined",
+           "corroboration.single",
+           "contest.none",
+           "grade.B.expert"
+          ],
+          "reasons": [
+           {
+            "rule_id": "tier.T1",
+            "en": "Tier T1: expert-coded research dataset with a codebook definition.",
+            "fr": "Niveau T1 : jeu de données de recherche codé par des experts, avec définition du codebook."
+           },
+           {
+            "rule_id": "temporal.undetermined",
+            "en": "The order in time cannot be established (a start date is missing or out of range, or an entity's existence span does not decide it).",
+            "fr": "L'ordre dans le temps ne peut pas être établi (date de début manquante ou hors plage, ou durée d'existence d'une entité non décisive)."
+           },
+           {
+            "rule_id": "corroboration.single",
+            "en": "One independent source group asserts this link.",
+            "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+           },
+           {
+            "rule_id": "contest.none",
+            "en": "No source contests this claim.",
+            "fr": "Aucune source ne conteste cette affirmation."
+           },
+           {
+            "rule_id": "grade.B.expert",
+            "en": "Expert-coded or scholarly source (not both corroborated and time-consistent).",
+            "fr": "Source experte (jeu de données codé ou référence savante), sans être à la fois corroborée et cohérente dans le temps."
+           }
+          ],
+          "temporal_check": "undetermined",
+          "temporal": {
+           "rule": "cause start window vs effect start window, at date precision",
+           "check": "undetermined",
+           "cause_start": {
+            "to": "1990-12-21",
+            "from": "1990-12-21",
+            "basis": "P580",
+            "times": [
+             "1990-12-21"
+            ],
+            "precision": 11
+           },
+           "effect_start": null
+          },
+          "corroboration": 1,
+          "corroborating_claim_keys": [],
+          "upstream_groups": [
+           [
+            "dataset:eusanct.kondata/eusanct_case",
+            "lineage:reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101"
+           ]
+          ],
+          "contested_by": [],
+          "graded_at": "2026-10-17T02:22:32.343885Z"
+         },
+         "review_status": "unreviewed",
+         "wording": "According to eusanct.kondata (dataset eusanct_case, version eusanct-1.0, row {\"columns\":[\"caseid\",\"sanctioncontribution\",\"policyresult\",\"HSEscore\"],\"file\":\"EUSANCT_Dataset_Case-level.csv\",\"row\":32}), Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990 contributing factor of Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome; REVA does not establish causation.",
+         "wording_fr": "Selon eusanct.kondata (jeu de données eusanct_case, version eusanct-1.0, ligne {\"columns\":[\"caseid\",\"sanctioncontribution\",\"policyresult\",\"HSEscore\"],\"file\":\"EUSANCT_Dataset_Case-level.csv\",\"row\":32}), Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990 facteur contributif de Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome ; REVA n'établit pas de causalité.",
+         "origin": "live",
+         "recorded_at": "2026-10-17T00:06:13.452778Z",
+         "load_id": 15
+        }
+       ],
+       "relation": null,
+       "same_as": [],
+       "note": null
+      }
+     ],
+     "wording": "Composition by REVA of 1 separately asserted claim(s); chain grade = weakest hop (B). Each hop is asserted by its own source; REVA does not assert the chain. It crosses 1 identity link(s): records of the same event in two sources, joined by an evidenced same_as link (shown with its evidence) -- an identity, not a causal claim.",
+     "wording_fr": "Composition par REVA de 1 affirmation(s) énoncée(s) séparément ; note de la chaîne = maillon le plus faible (B). REVA n'affirme pas la chaîne. Elle traverse 1 lien(s) d'identité : enregistrements du même événement dans deux sources, reliés par un lien same_as fondé sur une preuve (montrée) -- une identité, pas une affirmation causale."
+    },
+    {
+     "length": 1,
+     "identity_hops": 1,
+     "cross_source": false,
+     "chain_grade": "B",
+     "weakest_hop": 1,
+     "hops": [
+      {
+       "kind": "identity",
+       "from": {
+        "id": "ties:case:1990122101",
+        "label": "Sanctions case 1990122101 (TIES): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "to": {
+        "id": "eusanct:case:1990122101",
+        "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "hop_grade": null,
+       "claims": [],
+       "relation": "same_as",
+       "same_as": [
+        {
+         "left": "eusanct:case:1990122101",
+         "right": "ties:case:1990122101",
+         "statement_key": "reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101",
+         "rule": "eusanct_ties_case",
+         "independent_sources": false,
+         "evidence": {
+          "type": "provider_identity_statement",
+          "property": "eusanct:same_case_as",
+          "rule_note": "EUSANCT (Weber and Schneider, KonData) reuses the TIES case id for cases it took over from TIES and names TIES in its `datasource` column; the EUSANCT connector writes `eusanct:same_case_as` only when the case id is identical, the datasource names TIES and the target COW code is identical. Provider-published identity; EUSANCT's coding of these cases derives from TIES (and HSE), so the two records are NOT independent sources: their claims count once.",
+          "statement_keys": [
+           "eusanct.kondata:1990122101:same_case_as:ties"
+          ],
+          "independent_sources": false,
+          "statement_qualifiers": {
+           "evidence": "identical case id; EUSANCT datasource names TIES; identical target COW code",
+           "datasource": "TIES/HSE"
+          },
+          "statement_raw_sha256": "e5d94f19bcc80c703ba4b99402bb92f88112a31e043538155672542f52e28e47",
+          "statement_source_key": "eusanct.kondata"
+         }
+        }
+       ],
+       "note": "An identity hop joins two records of the same event (an evidenced events:same_as link: shared identifier or provider crosswalk, never name or date matching); it is not a causal claim and adds no causal hop."
+      },
+      {
+       "kind": "claim",
+       "from": {
+        "id": "eusanct:case:1990122101",
+        "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+        "label_fr": null,
+        "kind": "sanction_episode"
+       },
+       "to": {
+        "id": "eusanct:policy_result:1990122101",
+        "label": "Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome",
+        "label_fr": null,
+        "kind": "coded_outcome"
+       },
+       "hop_grade": "B",
+       "claims": [
+        {
+         "claim_key": "ds:eusanct.kondata:eusanct_case:1990122101:hse_contribution",
+         "row_id": 23856,
+         "cause": {
+          "id": "eusanct:case:1990122101",
+          "label": "Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990",
+          "label_fr": null,
+          "kind": "sanction_episode"
+         },
+         "effect": {
+          "id": "eusanct:policy_result:1990122101",
+          "label": "Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome",
+          "label_fr": null,
+          "kind": "coded_outcome"
+         },
+         "relation": "contributing_factor",
+         "relation_label": {
+          "en": "contributing factor of",
+          "fr": "facteur contributif de"
+         },
+         "relation_inverse_label": {
+          "en": "has contributing factor",
+          "fr": "a comme facteur contributif"
+         },
+         "family": "cause",
+         "lane": "contributing",
+         "polarity": "promotes",
+         "stance": "asserts",
+         "asserted_on": null,
+         "source": {
+          "source_key": "eusanct.kondata",
+          "tier": "T1",
+          "dataset": "eusanct_case",
+          "source_revision": "eusanct-1.0",
+          "statement_key": null,
+          "statement_id": null,
+          "statement_row_id": null,
+          "selector": {
+           "row": 32,
+           "file": "EUSANCT_Dataset_Case-level.csv",
+           "columns": [
+            "caseid",
+            "sanctioncontribution",
+            "policyresult",
+            "HSEscore"
+           ]
+          },
+          "raw_sha256": "e5d94f19bcc80c703ba4b99402bb92f88112a31e043538155672542f52e28e47",
+          "references": [],
+          "citation": null,
+          "codebook": {
+           "url": "https://doi.org/10.48606/10",
+           "name": "EUSANCT Dataset – Codebook: Case-level Dataset (Weber & Schneider)",
+           "term": "sanctioncontribution",
+           "version": "2.0, March 2020 (Codebook_EUSANCT_Case-level-Dataset_01.pdf sha256 8d8da4c58a8a7ab1d4ef2268c25c239ccea52d44c7fd12e7b53ac4a2ea8696f7, inside the RADAR tar of doi:10.48606/10)",
+           "definition": "35. “Sanction Contribution:” This variable assesses the sanction’s contribution to the achievement of the goals of the sender. 1. “Negative Contribution” 2. “Little or No Contribution” 3. “Substantial Contribution” 4. “Decisive Contribution” 36. HSE “Success Score:” Multiply the scores for Policy Result and Sanction Contribution. A score of 9 or higher implies that the sanction made a substantial contribution to the goals of the sender."
+          },
+          "verification": "source_reported_not_verified",
+          "retrieved_at": "2026-10-17T00:06:10.137444Z"
+         },
+         "mechanism": null,
+         "scope": {},
+         "qualifiers": {},
+         "contests": [],
+         "disputed_by": [],
+         "attribution": null,
+         "grade": {
+          "grade": "B",
+          "rules_version": "2",
+          "rules_sha256": "70a730662557d1fc7c77435d3d948536f5d0870feef9056d9036c6e49a6a875b",
+          "rules_current": true,
+          "rule_ids": [
+           "tier.T1",
+           "temporal.undetermined",
+           "corroboration.single",
+           "contest.none",
+           "grade.B.expert"
+          ],
+          "reasons": [
+           {
+            "rule_id": "tier.T1",
+            "en": "Tier T1: expert-coded research dataset with a codebook definition.",
+            "fr": "Niveau T1 : jeu de données de recherche codé par des experts, avec définition du codebook."
+           },
+           {
+            "rule_id": "temporal.undetermined",
+            "en": "The order in time cannot be established (a start date is missing or out of range, or an entity's existence span does not decide it).",
+            "fr": "L'ordre dans le temps ne peut pas être établi (date de début manquante ou hors plage, ou durée d'existence d'une entité non décisive)."
+           },
+           {
+            "rule_id": "corroboration.single",
+            "en": "One independent source group asserts this link.",
+            "fr": "Un seul groupe de sources indépendantes affirme ce lien."
+           },
+           {
+            "rule_id": "contest.none",
+            "en": "No source contests this claim.",
+            "fr": "Aucune source ne conteste cette affirmation."
+           },
+           {
+            "rule_id": "grade.B.expert",
+            "en": "Expert-coded or scholarly source (not both corroborated and time-consistent).",
+            "fr": "Source experte (jeu de données codé ou référence savante), sans être à la fois corroborée et cohérente dans le temps."
+           }
+          ],
+          "temporal_check": "undetermined",
+          "temporal": {
+           "rule": "cause start window vs effect start window, at date precision",
+           "check": "undetermined",
+           "cause_start": {
+            "to": "1990-12-21",
+            "from": "1990-12-21",
+            "basis": "P580",
+            "times": [
+             "1990-12-21"
+            ],
+            "precision": 11
+           },
+           "effect_start": null
+          },
+          "corroboration": 1,
+          "corroborating_claim_keys": [],
+          "upstream_groups": [
+           [
+            "dataset:eusanct.kondata/eusanct_case",
+            "lineage:reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101"
+           ]
+          ],
+          "contested_by": [],
+          "graded_at": "2026-10-17T02:22:32.343885Z"
+         },
+         "review_status": "unreviewed",
+         "wording": "According to eusanct.kondata (dataset eusanct_case, version eusanct-1.0, row {\"columns\":[\"caseid\",\"sanctioncontribution\",\"policyresult\",\"HSEscore\"],\"file\":\"EUSANCT_Dataset_Case-level.csv\",\"row\":32}), Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990 contributing factor of Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome; REVA does not establish causation.",
+         "wording_fr": "Selon eusanct.kondata (jeu de données eusanct_case, version eusanct-1.0, ligne {\"columns\":[\"caseid\",\"sanctioncontribution\",\"policyresult\",\"HSEscore\"],\"file\":\"EUSANCT_Dataset_Case-level.csv\",\"row\":32}), Sanctions case 1990122101 (EUSANCT): target Guatemala (COW 90), from 1990 facteur contributif de Sender goals in sanctions case 1990122101 (EUSANCT, HSE policy result): Positive Outcome ; REVA n'établit pas de causalité.",
+         "origin": "live",
+         "recorded_at": "2026-10-17T00:06:13.452778Z",
+         "load_id": 15
+        }
+       ],
+       "relation": null,
+       "same_as": [],
+       "note": null
+      }
+     ],
+     "wording": "Composition by REVA of 1 separately asserted claim(s); chain grade = weakest hop (B). Each hop is asserted by its own source; REVA does not assert the chain. It crosses 1 identity link(s): records of the same event in two sources, joined by an evidenced same_as link (shown with its evidence) -- an identity, not a causal claim.",
+     "wording_fr": "Composition par REVA de 1 affirmation(s) énoncée(s) séparément ; note de la chaîne = maillon le plus faible (B). REVA n'affirme pas la chaîne. Elle traverse 1 lien(s) d'identité : enregistrements du même événement dans deux sources, reliés par un lien same_as fondé sur une preuve (montrée) -- une identité, pas une affirmation causale."
+    }
+   ],
+   "paths_found": 2,
+   "note": "composition by REVA of separately asserted claims; chain grade = weakest hop. Each hop is asserted by its own source; REVA does not assert the chain, and a chain is not evidence that the first event caused the last.",
+   "note_fr": "composition par REVA d'affirmations causales énoncées séparément ; note de la chaîne = maillon le plus faible. Chaque maillon est affirmé par sa propre source ; REVA n'affirme pas la chaîne.",
+   "not_found_reason": null,
+   "same_as": [],
+   "search": {
+    "max_hops": 4,
+    "min_grade": "D",
+    "levels_expanded": 1,
+    "edges_scanned": 1,
+    "ungraded_skipped": 0,
+    "below_min_grade_skipped": 0,
+    "quarantined_skipped": 0,
+    "class_nodes_skipped": 0,
+    "class_nodes_sample": [],
+    "node_rule": "intermediate nodes exclude classes: items with a P279 (subclass of) statement, or items that are only targets of P31 (instance of) and have no P31 of their own (KG statements, not names)",
+    "identity": {
+     "same_as_links_loaded": 915,
+     "identity_hops_note": "An identity hop joins two records of the same event (an evidenced events:same_as link: shared identifier or provider crosswalk, never name or date matching); it is not a causal claim and adds no causal hop."
+    },
+    "truncated": false,
+    "truncation_reasons": [],
+    "time_budget_ms": 5000,
+    "elapsed_ms": 56
+   }
+  },
+  "warnings": [
+   {
+    "code": "claims_not_causation",
+    "message": "Causal links are claims made by the named sources, graded A-E by declared rules (registry/causal/grading.yaml); REVA does not establish causation."
+   },
+   {
+    "code": "chain_is_composition",
+    "message": "composition by REVA of separately asserted claims; chain grade = weakest hop. Each hop is asserted by its own source; REVA does not assert the chain, and a chain is not evidence that the first event caused the last."
+   }
+  ]
+ },
+ "sources": {
+  "data": [
+   {
+    "source_key": "cow.data",
+    "rights": {
+     "licence": "COW terms of use (not an open licence): data must be cited; users cannot charge for access",
+     "attribution": "Correlates of War Project. 2025. State System Membership, v2024. Singer, Bremer and Stuckey (1972), National Material Capabilities v7.0. Sarkees and Wayman (2010), Resort to War: 1816-2007.",
+     "licence_url": "https://correlatesofwar.org/faq/"
+    }
+   },
+   {
+    "source_key": "eusanct.kondata",
+    "rights": {
+     "licence": "CC BY 4.0",
+     "attribution": "Weber, Patrick M.; Schneider, Gerald (2021): EUSANCT: Does Supranational Coercion Work? Onset, Impact and Effectiveness of EU Sanctions. Universität Konstanz. DOI 10.48606/10. Weber P.M., Schneider G. (2020) Post-cold war sanctioning by the EU, the UN, and the US: Introducing the EUSANCT dataset. Conflict Management and Peace Science.",
+     "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+     "licence_evidence": "KonDATA (RADAR) record https://kondata.uni-konstanz.de/radar/en/dataset/lCfLfgbpdRKseQvp (read 2026-10-16): \"Rights statement for the dataset: This work is licensed under CC BY 4.0\"."
+    }
+   },
+   {
+    "source_key": "icb.data",
+    "rights": {
+     "licence": "ICB terms: free download, citation requested (no open licence stated)",
+     "attribution": "Brecher, Michael and Jonathan Wilkenfeld (1997). A Study of Crisis. Ann Arbor: University of Michigan Press. Brecher, Michael, Jonathan Wilkenfeld, Kyle Beardsley, Patrick James and David Quinn (2025). International Crisis Behavior Data Codebook, Version 16. http://sites.duke.edu/icbdata/data-collections/",
+     "licence_url": "https://sites.duke.edu/icbdata/data-collections/",
+     "open_licence": false,
+     "redistribution": "not stated by the provider; derived records carry the citation; flagged for maintainer review",
+     "licence_evidence": "sites.duke.edu/icbdata/data-collections/ (read 2026-10-16): \"To give attribution of the data, we ask that users cite both the Brecher and Wilkenfeld (2000) A Study of Crisis book ... and the Brecher, Wilkenfeld, Beardsley, James and Quinn (2025) data codebook\". No licence text is published with the files."
+    }
+   },
+   {
+    "source_key": "idmc.gidd",
+    "rights": {
+     "licence": "CC BY-NC 4.0 (stated in the workbook's README sheet; the HDX dataset record says CC BY)",
+     "attribution": "Internal Displacement Monitoring Centre (IDMC). Global Internal Displacement Database - Disasters. https://www.internal-displacement.org/database/displacement-data/ (distributed on the Humanitarian Data Exchange)",
+     "licence_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+     "open_licence": false,
+     "redistribution": "non-commercial with attribution; flagged for maintainer review (licence statements disagree)",
+     "licence_evidence": "README sheet of IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx (last update 2025-05-13): \"USE LICENSE: This content is licensed under CC BY-NC.\" HDX package_show (read 2026-10-17): license_id cc-by. REVA applies the more restrictive statement of the provider's own file."
+    }
+   },
+   {
+    "source_key": "noaa.ncei_hazards",
+    "rights": {
+     "licence": "US Government work (NOAA): public domain in the US (17 U.S.C. 105); NCEI: access unrestricted",
+     "attribution": "National Geophysical Data Center / World Data Service (NGDC/WDS): NCEI/WDS Global Significant Earthquake Database (doi:10.7289/V5TD9V7K); NCEI/WDS Global Historical Tsunami Database (doi:10.7289/V5PN93H7); NCEI/WDS Global Significant Volcanic Eruptions Database (doi:10.7289/V5JW8BSH). NOAA National Centers for Environmental Information. [access date]",
+     "licence_url": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ngdc.mgg.hazards:G012153",
+     "licence_evidence": "NCEI ISO 19115-2 metadata landing pages gov.noaa.ngdc.mgg.hazards:G012153 (earthquakes, page sha256 ac0f7f7b87b68067d2992e6749ebeb09c8d0c6df94e2c4d87589bf6cb59e39f8), G02151 (tsunamis, 3b95f10438f1cd64137eaab90fcb7f94538c2de13ed6d921b0962587e4d02bcc) and G10147 (volcanoes, 0ec64f2cef3373432eef60908c435e84bf7f4fcc0a23d17446d24e56270a0c6a), read 2026-10-16: \"Access Constraints: Access to this dataset is unrestricted.\"; \"Fees: Free online\"; \"Cite as: ... doi:...\"; Use Constraints: no-warranty disclaimer only. NOAA is a US federal agency: works of the US Government are not subject to copyright in the US (17 U.S.C. 105)."
+    }
+   },
+   {
+    "source_key": "wikidata.wbapi",
+    "rights": {
+     "licence": "CC0-1.0",
+     "attribution": "Wikidata (CC0), community-edited",
+     "licence_url": "https://www.wikidata.org/wiki/Wikidata:Licensing"
+    }
+   }
+  ]
+ }
+}

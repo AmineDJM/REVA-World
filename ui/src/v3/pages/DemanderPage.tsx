@@ -55,7 +55,10 @@ export default function DemanderPage() {
     <section className="v3-page v3-demander" aria-labelledby="demander-title">
       <header className="v3-page-head">
         <h1 id="demander-title">Demander</h1>
-        <p className="v3-lede">Posez une question sur le monde. La réponse est composée uniquement à partir du graphe de connaissances, de l’atlas et des liens, avec une citation par phrase.</p>
+        <p className="v3-lede">
+          Posez une question sur le monde. La réponse est composée uniquement à partir du graphe de connaissances, de l’atlas, des liens et des affirmations causales sourcées, avec une
+          citation par phrase.
+        </p>
       </header>
       <SourcedOnlyBanner />
       <form className="v3-ask-form" onSubmit={submit}>
@@ -179,6 +182,21 @@ export function Answer({ data }: { data: AskResponse }) {
   );
 }
 
+/** Causal relations, read cause → effect (registry/causal/relations.yaml labels). */
+const RELATION_FR: Record<string, string> = {
+  has_cause: 'a causé',
+  has_effect: 'a pour effet',
+  immediate_cause: 'cause immédiate de',
+  underlying_cause: 'cause profonde de',
+  contributing_factor: 'facteur contributif de',
+  enabled: 'a rendu possible',
+  precipitated: 'a précipité',
+  prevented_or_delayed: 'a empêché ou retardé',
+  reaction_to: 'a provoqué la réaction',
+  coded_trigger: 'déclencheur codé de',
+  coded_outcome: 'a pour issue codée',
+};
+
 function labelOf(x: unknown): string {
   if (!x || typeof x !== 'object') return typeof x === 'string' ? x : '';
   const o = x as Record<string, unknown>;
@@ -220,10 +238,12 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
   } else if (e.kind === 'link') {
     what = `lien ${String(x.link_kind ?? '')} ${String(x.a ?? '')} – ${String(x.b ?? '')}`;
   } else if (e.kind === 'causal_claim') {
-    // a claim made by a named source (never REVA's): source, tier, grade
-    what = `${labelOf(x.cause)} → ${labelOf(x.effect)} · ${String(x.relation ?? '')}${x.stance === 'denies' ? ' (lien nié)' : ''} · selon ${source} (${s('tier') ?? '?'}) · ${
-      typeof x.grade === 'string' ? `preuve ${x.grade}` : 'non gradée'
-    }`;
+    // a claim made by a named source (never REVA's): source, tier, grade; who the source attributes it to
+    const rel = String(x.relation ?? '');
+    const who = Array.isArray(x.supported_by) ? (x.supported_by as unknown[]).map((p) => labelOf(p) || String(p)).filter(Boolean) : [];
+    what = `${labelOf(x.cause)} → ${labelOf(x.effect)} · ${RELATION_FR[rel] ?? rel.replace(/_/g, ' ')}${x.stance === 'denies' ? ' (lien nié)' : ''}${
+      rel === 'coded_outcome' ? ' (issue, pas une cause)' : ''
+    } · selon ${source} (${s('tier') ?? '?'})${who.length ? `, qui l’attribue à ${who.join(' et ')} (la source ne l’affirme pas elle-même)` : ''} · ${typeof x.grade === 'string' ? `preuve ${x.grade}` : 'non gradée'}`;
   }
   return (
     <li id={`ev-${e.id}`} className={`v3-ev${active ? ' active' : ''}`} data-testid="evidence-item">

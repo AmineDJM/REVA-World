@@ -54,12 +54,12 @@ describe('Causes & conséquences', () => {
     expect(within(card).getByTestId('event-dates')).toHaveTextContent('début au jour');
     expect(card).toHaveTextContent('Empire allemand — participant');
     expect(card).toHaveTextContent('Europe');
-    expect(card).toHaveTextContent('8 cause(s) · 3 conséquence(s) affirmées · 2 candidat(s) en quarantaine');
+    expect(card).toHaveTextContent('8 cause(s) · 2 conséquence(s) affirmées · 1 issue(s) codée(s) (comment l’événement s’est terminé, pas des conséquences) · 2 candidat(s) en quarantaine');
     expect(within(card).getByTestId('event-context')).toHaveTextContent('relation de contexte, pas une cause');
     const canvas = await screen.findByTestId('causal-canvas');
     // 8 causes (one is a denial → not an edge) + 3 effects
     expect(canvas).toHaveAttribute('data-edges', '10');
-    expect(canvas).toHaveAttribute('aria-label', expect.stringMatching(/8 cause\(s\) et 3 conséquence\(s\) affirmées par des sources/));
+    expect(canvas).toHaveAttribute('aria-label', expect.stringMatching(/8 cause\(s\) et 2 conséquence\(s\) affirmées par des sources, 1 issue\(s\) codée\(s\)/));
     expect(screen.getByTestId('causal-claim-banner')).toHaveTextContent('Un lien causal est une affirmation, jamais un fait établi par REVA.');
     expect(screen.getByTestId('causal-legend')).toHaveTextContent('cause immédiate (déclencheur)');
     expect(screen.getByTestId('causal-legend')).toHaveTextContent('Un grade n’est pas une probabilité.');
@@ -77,7 +77,7 @@ describe('Causes & conséquences', () => {
     expect(within(card).getByTestId('event-dates')).toHaveTextContent('28 juil. 1914 – 11 nov. 1918');
     expect(within(card).getByTestId('event-places')).toHaveTextContent('Europe (location)');
     expect(within(card).getByTestId('event-participants')).toHaveTextContent('France — belligérant, camp Alliés');
-    expect(card).toHaveTextContent('8 cause(s) · 3 conséquence(s) affirmées');
+    expect(card).toHaveTextContent('8 cause(s) · 2 conséquence(s) affirmées · 1 issue(s) codée(s)');
   });
 
   it('a clicked edge opens its claim: tier, source, statement + revision, verbatim mechanism, temporal check, corroboration, contested-by', async () => {
@@ -145,7 +145,7 @@ describe('Causes & conséquences', () => {
     expect(screen.queryByTestId('candidate')).toBeNull();
     await userEvent.click(toggle);
     const panel = await screen.findByTestId('candidates-panel');
-    expect(panel).toHaveTextContent('candidats extraits de textes — non sourcés, non vérifiés');
+    expect(panel).toHaveTextContent('non sourcé — candidats');
     const cands = await within(panel).findAllByTestId('candidate');
     expect(cands).toHaveLength(2);
     expect(cands[0]).toHaveTextContent('aucun grade');

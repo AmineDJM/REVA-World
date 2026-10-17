@@ -43,6 +43,8 @@ const STYLE: cytoscape.StylesheetJson = [
   { selector: 'node.cause', style: { 'background-color': '#f08c5a', shape: 'round-rectangle' } },
   { selector: 'node.effect', style: { 'background-color': '#69b3e7', shape: 'round-rectangle' } },
   { selector: 'node.both', style: { 'background-color': '#c3a6f2', shape: 'round-rectangle' } },
+  // a dataset's coded outcome of the event (how it ended): a diamond under the event, not a consequence
+  { selector: 'node.outcome', style: { 'background-color': '#8fd19e', shape: 'diamond' } },
   {
     selector: 'edge',
     style: {

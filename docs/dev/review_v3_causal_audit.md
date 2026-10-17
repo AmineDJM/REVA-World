@@ -43,29 +43,30 @@ dates, temporal check, grade arithmetic and verbatim text all held. The populati
   * 9,015 claims get an "overlapping" temporal check from dates that REVA copied from the cause.
   * 16,440 claims (59 %) quote codebooks whose bytes were never archived.
 
-**Defects ranked by severity** (details in §5):
+**Defects ranked by severity** (details in §5; the status column was added after the fixes, see
+`docs/dev/v3_audfix.md` and `docs/dev/v3_causfix.md`):
 
-| # | Sev. | Defect | Claims affected (snapshot) |
-|---|---|---|---:|
-| H1 | High | Wikidata T3 tier granted on non-source "references" (P143 imported from Wikimedia, P4656, P3452 inferred from, P887 heuristic) | 143 (114 C and 7 B that should be D; 22 already E) |
-| H2 | High | Non-independent corroboration lifts Wikidata claims to B (mirror statements whose second "source" is a Wikipedia import, a Wikidata inference or the same quotation) | 10, plus 2 arguable |
-| H3 | High | Claimant misattributed: P3680 "statement supported by" (Putin, Stalin…) rendered "According to Wikidata"; P5102 "nature of statement" ignored by tier, grade and wording | 10 (P3680), 25 (P5102) |
-| H4 | High | NOAA trigger claims on tsunamis that NCEI codes as validity 0, 1 or 2 (seiche, very doubtful, questionable), and on cause code 2 "Questionable Earthquake", graded B like definite events | 788 + 23 |
-| M1 | Medium | Generic, class-level Wikidata statements (e.g. "human → artificial object", "state ↔ process ↔ occurrence") loaded into the event causal graph; 3 of the 5 cycles; chain service composes through them | ≈ 414 (heuristic) |
-| M2 | Medium | Wikidata claims whose cause or effect is not in `kg.entity` (no label, kind or dates; always `undetermined`); not counted by the KG loader | 324 |
-| M3 | Medium | Circular temporal check: the effect is dated by copying the cause's dates, then reported as `overlapping` | 9,015 |
-| M4 | Medium | Codebook bytes not archived for NAVCO 1.2/1.3/2.1, MEC, MMP, TIES, Archigos and ESRB, so the "verbatim" definitions cannot be re-verified | 16,440 |
-| M5 | Medium | Archigos: one coded attribute (manner of exit) reified into two events and a causal edge "coup → removal"; removals by "other government actors" labelled coups; definition quoted for the wrong sub-case | 327 (44 + 10 sub-cases) |
-| M6 | Medium | UCDP peace agreements: the codebook association "conflicts related to the dyads signing" turned into `reaction_to` | 382 |
-| M7 | Medium | ESRB: claims regex-extracted from a free-text field ("Format: text"); narrative cells and loose mappings; mechanism silently truncated at 4,000 characters | 96 (12 specific) |
-| L1 | Low | NAVCO 2.1 outcomes with `success = 0` cite the definition of `success`; the coded category comes from `progress`, whose definition is not attached | 180 |
-| L2 | Low | "Coded outcome" asserted for campaigns that the source codes as still ONGOING | 189 |
-| L3 | Low | Inconsistent handling of non-responses: ICB "No response-inaction" is worded as a provoked reaction, while MMP "ignore" is dropped | 5 / 296 |
-| L4 | Low | The KG import drops reference and qualifier properties outside its allow-list: 11 claims are T4 although Wikidata has a reference, and 20 claims lose qualifiers, including scope (P1001, P1011, P1012) | 31 |
-| L5 | Low | Quoted definitions truncated or not from archived bytes: MID `outcome` ends mid-sentence; the NOAA "help" prefix | 2,419 / 2,186 (text only) |
-| L6 | Low | `coded_outcome` (an event → its own REVA-made outcome entity) makes up 36 % of the "causal claims" and counts in chains | 9,912 |
-| L7 | Low | A self-loop and five cycles are loaded as ordinary claims. The consistency report shows them, but nothing quarantines them | 1 + 13 edges |
-| L8 | Low | Retraction is never exercised on live data; the KG retraction reason is mislabelled when a value becomes somevalue or novalue; complete → partial downgrade is silent | 0 retractions |
+| # | Sev. | Defect | Claims affected (snapshot) | Status (2026-10-17) |
+|---|---|---|---:|---|
+| H1 | High | Wikidata T3 tier granted on non-source "references" (P143 imported from Wikimedia, P4656, P3452 inferred from, P887 heuristic) | 143 (114 C and 7 B that should be D; 22 already E) | fixed — CAUSFIX (`grading.kg_tier`, `NON_SOURCE_REF_PIDS`; `v3_causfix.md`) |
+| H2 | High | Non-independent corroboration lifts Wikidata claims to B (mirror statements whose second "source" is a Wikipedia import, a Wikidata inference or the same quotation) | 10, plus 2 arguable | fixed — CAUSFIX (`grading.reference_keys`; `v3_causfix.md`) |
+| H3 | High | Claimant misattributed: P3680 "statement supported by" (Putin, Stalin…) rendered "According to Wikidata"; P5102 "nature of statement" ignored by tier, grade and wording | 10 (P3680), 25 (P5102) | fixed — CAUSFIX (grade cap D, attribution wording; `v3_causfix.md`) |
+| H4 | High | NOAA trigger claims on tsunamis that NCEI codes as validity 0, 1 or 2 (seiche, very doubtful, questionable), and on cause code 2 "Questionable Earthquake", graded B like definite events | 788 + 23 | fixed — data: AUDFIX (`atlas.noaa_hazards` 1.1.0, `scope.source_validity`; `v3_audfix.md`); grade: CAUSFIX (`grade.D.source_doubtful`) |
+| M1 | Medium | Generic, class-level Wikidata statements (e.g. "human → artificial object", "state ↔ process ↔ occurrence") loaded into the event causal graph; 3 of the 5 cycles; chain service composes through them | ≈ 414 (heuristic) | partly — CAUSFIX: chains skip class items; claims kept (`v3_causfix.md`) |
+| M2 | Medium | Wikidata claims whose cause or effect is not in `kg.entity` (no label, kind or dates; always `undetermined`); not counted by the KG loader | 324 | fixed (reporting) — AUDFIX: both loaders count/sample claims with an endpoint missing from the KG (`model._count_unknown_endpoints`); frontier harvest not done |
+| M3 | Medium | Circular temporal check: the effect is dated by copying the cause's dates, then reported as `overlapping` | 9,015 | fixed — AUDFIX: typed-missing effect dates (MMP, MEC, NAVCO 1.2), Archigos claims removed (M5); `undetermined` with reason |
+| M4 | Medium | Codebook bytes not archived for NAVCO 1.2/1.3/2.1, MEC, MMP, TIES, Archigos and ESRB, so the "verbatim" definitions cannot be re-verified | 16,440 | fixed — AUDFIX: 8 codebooks fetched, archived, sha256-pinned; quotes verbatim with page/paragraph (`codebook.quote_source`) |
+| M5 | Medium | Archigos: one coded attribute (manner of exit) reified into two events and a causal edge "coup → removal"; removals by "other government actors" labelled coups; definition quoted for the wrong sub-case | 327 (44 + 10 sub-cases) | fixed — AUDFIX (`atlas.archigos` 1.1.0): one removal event, no claim; 327 retracted |
+| M6 | Medium | UCDP peace agreements: the codebook association "conflicts related to the dyads signing" turned into `reaction_to` | 382 | fixed — AUDFIX (`atlas.ucdp_term` 1.1.0): context `ucdppa:conflict`; 382 retracted |
+| M7 | Medium | ESRB: claims regex-extracted from a free-text field ("Format: text"); narrative cells and loose mappings; mechanism silently truncated at 4,000 characters | 96 (12 specific) | fixed — AUDFIX (`atlas.ecrises.esrb` 1.1.0): exact objective lists only, truncation marked; 27 retracted |
+| L1 | Low | NAVCO 2.1 outcomes with `success = 0` cite the definition of `success`; the coded category comes from `progress`, whose definition is not attached | 180 | fixed — AUDFIX (`atlas.navco` 1.1.x): success = 0 cites `progress` |
+| L2 | Low | "Coded outcome" asserted for campaigns that the source codes as still ONGOING | 189 | fixed — AUDFIX: no outcome claim for ONGOING; 189 retracted |
+| L3 | Low | Inconsistent handling of non-responses: ICB "No response-inaction" is worded as a provoked reaction, while MMP "ignore" is dropped | 5 / 296 | fixed — AUDFIX: inaction never `reaction_to` (ICB 5 retracted; MMP list kept verbatim) |
+| L4 | Low | The KG import drops reference and qualifier properties outside its allow-list: 11 claims are T4 although Wikidata has a reference, and 20 claims lose qualifiers, including scope (P1001, P1011, P1012) | 31 | fixed — AUDFIX: claim refs/qualifiers verbatim from the raw entity JSON (`load_kg_claims(store=…)`) |
+| L5 | Low | Quoted definitions truncated or not from archived bytes: MID `outcome` ends mid-sentence; the NOAA "help" prefix | 2,419 / 2,186 (text only) | fixed — AUDFIX: MID quote completed; NOAA help prefix dropped |
+| L6 | Low | `coded_outcome` (an event → its own REVA-made outcome entity) makes up 36 % of the "causal claims" and counts in chains | 9,912 | decided — CAUSFIX: `coded_outcome` not traversed by chains (`v3_causfix.md`) |
+| L7 | Low | A self-loop and five cycles are loaded as ordinary claims. The consistency report shows them, but nothing quarantines them | 1 + 13 edges | fixed — CAUSFIX: self-loop / cycle flags, chain quarantine |
+| L8 | Low | Retraction is never exercised on live data; the KG retraction reason is mislabelled when a value becomes somevalue or novalue; complete → partial downgrade is silent | 0 retractions | fixed — AUDFIX: retraction exercised live (1,005 retractions through the loader) and in throwaway-DB tests; `value_not_an_item` detail; `complete_requested/effective` |
 
 ## 2. Method
 

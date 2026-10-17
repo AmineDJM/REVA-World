@@ -76,7 +76,11 @@ describe('views', () => {
     const n = new Map(g.nodes.map((x) => [x.id, x]));
     expect(n.get('fixture:sarajevo_1914')!.x).toBeLessThan(0);
     expect(n.get('fixture:versailles')!.side).toBe('both'); // asserted as an effect and as an (inconsistent) cause: middle column
-    expect(n.get('fixture:armistice_1918')!.x).toBeGreaterThan(0);
+    // a coded outcome (how the war ended) is not a consequence: drawn under the event, apart from the effects
+    expect(n.get('fixture:armistice_1918')!.side).toBe('outcome');
+    expect(n.get('fixture:armistice_1918')!.y).toBeGreaterThan(0);
+    expect(n.get('fixture:russian_revolution')!.x).toBeGreaterThan(0);
+    expect(g.hidden).toBe(0);
     expect(g.edges.find((e) => e.id === F.C_UNGRADED.claim_key)!.grade).toBeNull();
   });
 });

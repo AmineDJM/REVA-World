@@ -70,12 +70,14 @@ export function relationFromText(text: string | null | undefined): string | null
 
 /** French labels of properties whose hop text is not of the "A — label → B" form (causal ones). */
 export const PID_LABEL_FR: Record<string, string> = {
+  // Wikidata's own property labels: P1536 / P1537 are written on the cause ("immediate cause of", "contributing
+  // factor of"), P1478 / P1479 on the effect ("has immediate cause", "has contributing factor")
   P828: 'a pour cause',
   P1542: 'a pour effet',
   P1478: 'a pour cause immédiate',
-  P1479: 'a pour cause contributive',
-  P1536: 'a pour cause sous-jacente',
-  P1537: 'a pour effet contributif',
+  P1479: 'a pour facteur contributif',
+  P1536: 'cause immédiate de',
+  P1537: 'facteur contributif de',
 };
 
 export function connectedSentence(relation: string): string {

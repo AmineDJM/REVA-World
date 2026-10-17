@@ -56,4 +56,3 @@ NOAA codes:
 | causeCode | 2 | Questionable Earthquake | doubtful | claim with qualifier |
 | causeCode | 1, 3–7 | (descriptor label) | definite_or_probable | claim with qualifier |
 
-(Work in progress: the per-defect results follow below as each fix lands.)

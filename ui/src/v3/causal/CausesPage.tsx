@@ -18,8 +18,10 @@ import {
 } from './api';
 import { CausalTimeline } from './CausalTimeline';
 import { ChainFinder } from './ChainFinder';
-import { buildGraph, dissentPairs, groupWhy } from './model';
+import { LicenceList } from '../components/Licence';
+import { buildGraph, dissentPairs, groupWhy, isOutcomeClaim } from './model';
 import { CANDIDATE_LABEL, CandidateList, CausalLegend, ClaimDetail, ClaimLine, DissentPanel, EventCard, WhyPanel } from './parts';
+import { RightsContext, useSourceRights } from './rights';
 import './causal.css';
 
 const CausalGraph = lazy(() => import('./CausalGraph'));
@@ -96,8 +98,15 @@ export default function CausesPage() {
     if (evCard?.status === 'ok' && event) setLabels((l) => ({ ...l, [event]: evCard.data.card.label }));
   }, [ev, evCard, event]);
 
+  const rights = useSourceRights(!!event);
+  const rightsMap = rights.status === 'ok' ? rights.map : null;
   const causeClaims = useMemo(() => (causes?.status === 'ok' ? causes.data.claims : []), [causes]);
   const effectClaims = useMemo(() => (effects?.status === 'ok' ? effects.data.claims : []), [effects]);
+  // a dataset's coded outcome (how an event ended) is listed apart: never a cause, never a consequence
+  const causeList = useMemo(() => causeClaims.filter((c) => !isOutcomeClaim(c)), [causeClaims]);
+  const outcomeOf = useMemo(() => causeClaims.filter(isOutcomeClaim), [causeClaims]);
+  const effectList = useMemo(() => effectClaims.filter((c) => !isOutcomeClaim(c)), [effectClaims]);
+  const outcomes = useMemo(() => effectClaims.filter(isOutcomeClaim), [effectClaims]);
   const all = useMemo(() => {
     const m = new Map<string, CausalClaim>(extra);
     const whyClaims = why?.status === 'ok' ? [...Object.values(why.data.groups).flat(), ...why.data.dissent] : [];
@@ -107,7 +116,12 @@ export default function CausesPage() {
 
   const focal = ev?.status === 'ok' ? ev.data.event : null;
   const card = evCard?.status === 'ok' ? evCard.data.card : null;
-  const focalLabel = card?.label ?? focal?.label ?? (event ? (labels[event] ?? event) : '');
+  // the focal label: EVENTS card, causal event view, the picker, else the label the claims carry for it
+  const claimLabel = useMemo(() => {
+    for (const c of [...causeClaims, ...effectClaims]) for (const n of [c.cause, c.effect]) if (n.id === event && n.label && n.label !== n.id) return n.label;
+    return null;
+  }, [causeClaims, effectClaims, event]);
+  const focalLabel = card?.label ?? (focal && focal.label !== focal.id ? focal.label : null) ?? claimLabel ?? (event ? (labels[event] ?? event) : '');
   const focalDates = card && (card.start || card.end) ? card : focal;
   const graph = useMemo(() => (event ? buildGraph({ id: event, label: focalLabel }, causeClaims, effectClaims) : null), [event, focalLabel, causeClaims, effectClaims]);
   const pairs = useMemo(() => dissentPairs([...all.values()]), [all]);
@@ -137,6 +151,14 @@ export default function CausesPage() {
   const screenUnavailable = unavailable(ev) && unavailable(causes) && unavailable(effects);
   const selectedClaim = selected ? (all.get(selected) ?? null) : null;
   const whyGroups = why?.status === 'ok' ? why.data.groups : unavailable(why) && causes?.status === 'ok' ? groupWhy(causeClaims) : null;
+  const shownLicences = useMemo(() => {
+    if (!rightsMap) return [];
+    const keys = new Set([...all.values()].map((c) => c.source.key));
+    // the event card's own facts come from sources too (EVENTS card statements, causal event view)
+    for (const f of [...(card?.places ?? []), ...(card?.participants ?? [])]) if (f.source) keys.add(f.source);
+    if (focal?.source) keys.add(focal.source);
+    return [...keys].map((k) => rightsMap.get(k)).filter((r): r is NonNullable<typeof r> => !!r);
+  }, [rightsMap, all, card, focal]);
   const warnings = [...new Set([...(ev?.status === 'ok' ? ev.data.warnings : []), ...(causes?.status === 'ok' ? causes.data.warnings : []), ...(effects?.status === 'ok' ? effects.data.warnings : [])])];
 
   return (
@@ -183,11 +205,19 @@ export default function CausesPage() {
               ))}
             </ul>
           )}
+          <RightsContext.Provider value={rightsMap}>
           <div className="v3-causes-top">
             <div className="v3-causes-event">
               {ev?.status === 'loading' && <V3Loading what="de l’événement" />}
               {ev?.status === 'error' && !card && <V3Error error={ev.error} what="La fiche de l’événement" />}
-              {(focal || card) && <EventCard e={focal} card={card} />}
+              {(focal || card) && (
+                <EventCard
+                  e={focal}
+                  card={card}
+                  fallbackLabel={focalLabel}
+                  loaded={causes?.status === 'ok' && effects?.status === 'ok' ? { causes: causeList.length, effects: effectList.length, outcomes: outcomes.length } : null}
+                />
+              )}
             </div>
             <div className="v3-causes-graph">
               <h2>Graphe causal gradué</h2>
@@ -201,14 +231,19 @@ export default function CausesPage() {
                     selected={selected}
                     onSelectClaim={setSelected}
                     onOpenNode={openNode}
-                    label={`Graphe causal de ${focalLabel} : ${causeClaims.length} cause(s) et ${effectClaims.length} conséquence(s) affirmées par des sources`}
+                    label={`Graphe causal de ${focalLabel} : ${causeList.length} cause(s) et ${effectList.length} conséquence(s) affirmées par des sources${outcomes.length ? `, ${outcomes.length} issue(s) codée(s)` : ''}`}
                     height={graphHeight(graph)}
                   />
                 </Suspense>
               )}
+              {graph && graph.hidden > 0 && (
+                <p className="field-hint" data-testid="graph-hidden">
+                  {graph.hidden} affirmation(s) non dessinée(s) pour garder le graphe lisible ; toutes figurent dans les listes ci-dessous.
+                </p>
+              )}
               {causes?.status === 'ok' && effects?.status === 'ok' && causeClaims.length === 0 && effectClaims.length === 0 && (
                 <p className="v3-missing" data-testid="no-claims">
-                  Aucune affirmation causale sourcée sur cet événement dans les données consultées. REVA ne déduit aucune cause de la chronologie.
+                  Aucune source chargée n’affirme de cause ni de conséquence pour cet événement. REVA ne déduit aucune cause de la chronologie.
                 </p>
               )}
               <CausalLegend />
@@ -220,9 +255,45 @@ export default function CausesPage() {
             </div>
           )}
           <div className="v3-claim-lists">
-            <ClaimListSection title="Causes affirmées" load={causes} claims={causeClaims} show="cause" onOpen={setSelected} testId="causes-list" />
-            <ClaimListSection title="Conséquences affirmées" load={effects} claims={effectClaims} show="effect" onOpen={setSelected} testId="effects-list" />
+            <ClaimListSection title="Causes affirmées" empty="Aucune source chargée n’affirme de cause pour cet événement." load={causes} claims={causeList} show="cause" onOpen={setSelected} testId="causes-list" />
+            <ClaimListSection
+              title="Conséquences affirmées"
+              empty="Aucune source chargée n’affirme de conséquence de cet événement."
+              load={effects}
+              claims={effectList}
+              show="effect"
+              onOpen={setSelected}
+              testId="effects-list"
+            />
           </div>
+          {(outcomes.length > 0 || outcomeOf.length > 0) && (
+            <div className="v3-claim-lists v3-outcomes">
+              {outcomes.length > 0 && (
+                <ClaimListSection
+                  title="Issues codées (comment l’événement s’est terminé)"
+                  hint="Codées par un jeu de données expert : l’issue n’est ni une cause ni une conséquence, et n’entre jamais dans une chaîne causale."
+                  load={effects}
+                  claims={outcomes}
+                  show="effect"
+                  onOpen={setSelected}
+                  testId="outcomes-list"
+                />
+              )}
+              {outcomeOf.length > 0 && (
+                <ClaimListSection
+                  title="Issue codée de"
+                  hint="Cet enregistrement est l’issue codée de l’événement ci-dessous (comment il s’est terminé selon le jeu de données), pas une conséquence causale."
+                  load={causes}
+                  claims={outcomeOf}
+                  show="cause"
+                  onOpen={setSelected}
+                  testId="outcome-of-list"
+                />
+              )}
+            </div>
+          )}
+          {shownLicences.length > 0 && <LicenceList licences={shownLicences} title="Licences restrictives des sources affichées" />}
+          {rights.status === 'unavailable' && <p className="field-hint">Licences des sources non consultables (registre des sources indisponible) : vérifiez-les avant toute réutilisation.</p>}
           {why?.status === 'loading' && <V3Loading what="de l’explication" />}
           {why?.status === 'error' && !unavailable(why) && <V3Error error={why.error} what="Le panneau « Pourquoi ? »" />}
           {whyGroups && <WhyPanel groups={whyGroups} derived={why?.status !== 'ok'} onOpen={setSelected} />}
@@ -252,7 +323,7 @@ export default function CausesPage() {
           <section className="v3-candidates-section" aria-labelledby="cand-title">
             <h2 id="cand-title">Espace des candidats</h2>
             <label className="v3-check">
-              <input type="checkbox" checked={showCandidates} onChange={(e) => setShowCandidates(e.target.checked)} data-testid="candidates-toggle" /> Afficher les {CANDIDATE_LABEL}
+              <input type="checkbox" checked={showCandidates} onChange={(e) => setShowCandidates(e.target.checked)} data-testid="candidates-toggle" /> Afficher l’espace « {CANDIDATE_LABEL} »
             </label>
             <p className="field-hint">
               Désactivé par défaut. Les candidats sont des liens proposés par extraction de texte ou par un modèle : ils ne sont affirmés par aucune source, n’ont pas de grade, ne figurent
@@ -269,14 +340,20 @@ export default function CausesPage() {
               </div>
             )}
           </section>
+          </RightsContext.Provider>
         </>
       )}
     </section>
   );
 }
 
+/** Lines shown at first, then by pages: a neighbourhood of hundreds of claims stays readable and fast. */
+export const CLAIM_PAGE = 25;
+
 function ClaimListSection({
   title,
+  hint,
+  empty = 'Aucune source chargée n’affirme de lien ici.',
   load,
   claims,
   show,
@@ -284,28 +361,39 @@ function ClaimListSection({
   testId,
 }: {
   title: string;
+  hint?: string;
+  empty?: string;
   load: Load<ClaimsResult> | null;
   claims: CausalClaim[];
   show: 'cause' | 'effect';
   onOpen: (id: string) => void;
   testId: string;
 }) {
+  const [n, setN] = useState(CLAIM_PAGE);
+  useEffect(() => setN(CLAIM_PAGE), [claims]);
   if (load?.status !== 'ok') return null;
+  const rest = claims.length - n;
   return (
     <section className="v3-claim-list" data-testid={testId}>
       <h3>
         {title} <span className="muted">({claims.length})</span>
       </h3>
+      {hint && <p className="field-hint">{hint}</p>}
       {claims.length === 0 ? (
-        <p className="muted">Aucune affirmation sourcée.</p>
+        <p className="muted">{empty}</p>
       ) : (
         <ul className="v3-plain">
-          {claims.map((c) => (
+          {claims.slice(0, n).map((c) => (
             <li key={c.id}>
               <ClaimLine c={c} show={show} onOpen={onOpen} />
             </li>
           ))}
         </ul>
+      )}
+      {rest > 0 && (
+        <button type="button" className="v3-link-button" onClick={() => setN((x) => x + CLAIM_PAGE)} data-testid="claims-more">
+          afficher {Math.min(CLAIM_PAGE, rest)} de plus ({rest} restante{rest > 1 ? 's' : ''})
+        </button>
       )}
       {load.data.truncated && <p className="field-hint">Liste bornée par le serveur : d’autres affirmations existent.</p>}
     </section>

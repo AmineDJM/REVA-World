@@ -79,7 +79,8 @@ export function ChainFinder({
       </div>
       <p className="v3-banner v3-banner-chain" role="note" data-testid="chain-banner">
         <strong>{CHAIN_BANNER.charAt(0).toUpperCase() + CHAIN_BANNER.slice(1)}.</strong> Aucune source n’affirme la chaîne entière : chaque maillon est une affirmation distincte, attribuée à sa
-        source ; seules les relations causales sont suivies (au plus {MAX_CHAIN_HOPS} maillons).
+        source ; seules les relations causales sont suivies (au plus {MAX_CHAIN_HOPS} maillons). Les relations de contexte, les issues codées (comment un événement s’est terminé), les
+        affirmations attribuées à un tiers ou qualifiées, et celles prises dans une boucle ne sont jamais composées.
       </p>
       {state.status === 'idle' && (
         <V3Empty>
@@ -102,6 +103,7 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
           {r.maxHops ? ` d’au plus ${r.maxHops} maillons` : ''} dans les données consultées. Cela ne prouve ni l’absence de lien causal, ni son existence.
         </p>
         {r.notFoundReason && <p className="muted">Raison donnée par le serveur : {r.notFoundReason}</p>}
+        <SkippedNote r={r} />
       </V3Empty>
     );
   }
@@ -119,6 +121,11 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
           <summary>Note du serveur</summary>
           <p>{r.note}</p>
         </details>
+      )}
+      {r.duplicatesMerged > 0 && (
+        <p className="field-hint" data-testid="chain-duplicates">
+          {r.duplicatesMerged} chemin(s) identique(s) renvoyé(s) en double par le serveur (mêmes maillons, mêmes affirmations, mêmes liens d’identité) : affiché(s) une seule fois.
+        </p>
       )}
       <ol className="v3-chain-list">
         {r.chains.map((ch, i) => {
@@ -160,6 +167,7 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
                             {typeof x.evidence.property === 'string' ? ` · ${x.evidence.property}` : ''}
                             {typeof x.evidence.value === 'string' ? ` = ${x.evidence.value}` : ''}
                             {x.independentSources === false ? ' · sources non indépendantes (comptées une fois)' : ''} · déclaration <code>{x.statementKey}</code>
+                            {x.note && <span className="v3-identity-note"> — {x.note}</span>}
                           </li>
                         ))}
                       </ul>
@@ -181,17 +189,35 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
                   ),
                 )}
               </ol>
-              {ch.wording && (
-                <details className="v3-hop-server">
-                  <summary>Formulation du serveur</summary>
-                  <p>{ch.wording}</p>
-                </details>
-              )}
+              <p className="v3-chain-wording" data-testid="chain-wording">
+                {identityHops > 0
+                  ? `Composition par REVA de ${causalHops.length} affirmation(s) énoncée(s) séparément, à travers ${identityHops} lien(s) d’identité (même événement dans deux sources) ; aucune source n’affirme cette chaîne.`
+                  : `Composition par REVA de ${causalHops.length} affirmation(s) énoncée(s) séparément ; aucune source n’affirme cette chaîne.`}
+                {ch.wording && <span className="muted"> Formulation du serveur : {ch.wording}</span>}
+              </p>
             </li>
           );
         })}
       </ol>
       {r.truncated && <p className="field-hint">Recherche bornée par le serveur : d’autres chaînes peuvent exister.</p>}
+      <SkippedNote r={r} />
     </>
+  );
+}
+
+/** What the search refused to traverse, as the server counts it (never silently). */
+function SkippedNote({ r }: { r: ChainResult }) {
+  const s = r.skipped;
+  const parts = [
+    s.classNodes > 0 ? `${s.classNodes} élément(s) de type classe (« guerre », « traité »…) non traversé(s)${s.classSample.length ? ` : ${s.classSample.slice(0, 5).join(', ')}` : ''}` : '',
+    s.quarantined > 0 ? `${s.quarantined} affirmation(s) en boucle ou auto-référente(s) écartée(s)` : '',
+    s.belowMinGrade > 0 ? `${s.belowMinGrade} affirmation(s) sous le grade minimal${r.minGrade ? ` ${r.minGrade}` : ''} écartée(s)` : '',
+    s.ungraded > 0 ? `${s.ungraded} affirmation(s) non gradée(s) écartée(s)` : '',
+  ].filter(Boolean);
+  if (parts.length === 0) return null;
+  return (
+    <p className="field-hint" data-testid="chain-skipped">
+      Écartés par la recherche : {parts.join(' ; ')}.
+    </p>
   );
 }

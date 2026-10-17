@@ -7,6 +7,8 @@ const W = 1000;
 const PAD = 70;
 const LANE_Y = { cause: 34, focal: 150, effect: 196 } as const;
 const ROW = 18;
+/** Rows drawn per lane; the others are counted under the frise (all are in the claim lists). */
+export const TIMELINE_MAX_PER_LANE = 30;
 
 function tone(claims: CausalClaim[]): string {
   if (claims.some((c) => c.temporal.status === 'inconsistent')) return 'bad';
@@ -29,6 +31,9 @@ export function CausalTimeline({ focal, causes, effects }: { focal: { id: string
   const lanes: Record<'cause' | 'effect', TimelineItem[]> = { cause: [], effect: [] };
   for (const it of m.items) if (it.lane !== 'focal') lanes[it.lane].push(it);
   for (const l of Object.values(lanes)) l.sort((a, b) => a.from - b.from);
+  const notDrawn = { cause: Math.max(0, lanes.cause.length - TIMELINE_MAX_PER_LANE), effect: Math.max(0, lanes.effect.length - TIMELINE_MAX_PER_LANE) };
+  lanes.cause = lanes.cause.slice(0, TIMELINE_MAX_PER_LANE);
+  lanes.effect = lanes.effect.slice(0, TIMELINE_MAX_PER_LANE);
   const focalItem = m.items.find((i) => i.lane === 'focal');
   const causeY = (i: number) => LANE_Y.cause + i * ROW;
   const focalY = Math.max(LANE_Y.focal, causeY(lanes.cause.length) + 30);
@@ -89,6 +94,13 @@ export function CausalTimeline({ focal, causes, effects }: { focal: { id: string
           </text>
           {lanes.effect.map((it, i) => bar(it, effectY(i)))}
         </svg>
+      )}
+      {(notDrawn.cause > 0 || notDrawn.effect > 0) && (
+        <p className="field-hint" data-testid="timeline-not-drawn">
+          Frise limitée à {TIMELINE_MAX_PER_LANE} lignes par voie : {notDrawn.cause > 0 ? `${notDrawn.cause} cause(s)` : ''}
+          {notDrawn.cause > 0 && notDrawn.effect > 0 ? ' et ' : ''}
+          {notDrawn.effect > 0 ? `${notDrawn.effect} conséquence(s) ou issue(s)` : ''} non dessinée(s) (les plus tardives) ; toutes figurent dans les listes.
+        </p>
       )}
       {!focalItem && <p className="v3-undated">L’événement lui-même n’est pas daté dans la source : l’alignement est indicatif.</p>}
       {m.outside.length > 0 && (

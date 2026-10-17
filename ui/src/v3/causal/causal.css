@@ -351,3 +351,38 @@ blockquote.v3-verbatim {
   font-size: 0.85rem;
   color: var(--muted);
 }
+
+/* UICHECK (real dev data): focal side of a claim line, attribution, outcomes, visible wordings */
+.v3-claim-focal {
+  color: var(--muted);
+}
+.v3-attrib {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  margin: 0 4px 0 2px;
+  border-radius: 4px;
+  background: #fff4e6;
+  color: #7a3e00;
+  border: 1px solid #f5c08a;
+  vertical-align: middle;
+}
+.v3-outcome-tag {
+  font-size: 0.72rem;
+  color: #2b8a3e;
+  font-weight: 600;
+}
+.v3-chain-wording,
+.v3-server-wording {
+  font-size: 0.85rem;
+  margin: 6px 0 2px;
+}
+.v3-temporal-reason {
+  font-size: 0.85rem;
+}
+.v3-identity-note {
+  font-style: italic;
+}
+.v3-outcomes {
+  margin-top: 4px;
+}
