@@ -466,6 +466,40 @@ class AtlasQueryAdapter:
                 out.extend(latest.values())
         return AtlasResult(tuple(out), declared)
 
+    def period_cells(self, concept_id: str, from_year: int | None, to_year: int | None) -> AtlasResult:
+        """Cells of a concept's declared series whatever their geography (a world price, a benchmark), for the
+        years asked; no year → the latest year with a cell (V6 NLQA6). At most 5,000 cells per series."""
+        c = self.catalog.concepts.get(concept_id)
+        if c is None:
+            return AtlasResult((), ())
+        out: list[AtlasCell] = []
+        try:
+            from reva.atlas.query import CELL_SELECT
+
+            for s in c.source_order:
+                sid = self.q.sid_of.get((s.source, s.dataset, s.indicator))
+                if sid is None:
+                    continue
+                lo, hi = from_year, to_year
+                if lo is None and hi is None:
+                    top = self.q._rows("SELECT max(x.year) AS y FROM cells_s x WHERE x.sid = ? AND x.has_value", [sid])
+                    if not top or top[0]["y"] is None:
+                        continue
+                    lo = hi = int(top[0]["y"])
+                rows = self.q._rows(
+                    f"SELECT {CELL_SELECT} FROM cells_s x WHERE x.sid = ? AND x.year BETWEEN ? AND ? "
+                    "ORDER BY x.period_start, x.period_end LIMIT 5000",
+                    [sid, lo if lo is not None else -9999, hi if hi is not None else 9999],
+                )
+                for r in rows:
+                    cell = self.q._cell(r)
+                    if cell.get("value") is None and cell.get("value_text") is None:
+                        continue
+                    out.append(_atlas_cell({**cell, "iso3": r.get("iso3")}, concept_id, self.snapshot))
+        except RevaError as e:
+            raise CapabilityUnavailable(f"atlas query failed: {e.code}", backend="atlas") from None
+        return AtlasResult(tuple(out), self._declared(concept_id))
+
     def series(self, concept_id: str, iso3: str, from_year: int | None, to_year: int | None) -> AtlasResult:
         cells = [
             c
@@ -999,6 +1033,9 @@ class LazyAtlasAdapter:
     def series(self, concept_id: str, iso3: str, from_year: int | None, to_year: int | None) -> AtlasResult:
         return self._get().series(concept_id, iso3, from_year, to_year)  # type: ignore[no-any-return]
 
+    def period_cells(self, concept_id: str, from_year: int | None, to_year: int | None) -> AtlasResult:
+        return self._get().period_cells(concept_id, from_year, to_year)  # type: ignore[no-any-return]
+
 
 def build_backends(
     engine: Engine | None,
@@ -1046,6 +1083,10 @@ def build_backends(
         b.causal = wire_causal(engine, origin="live" if getattr(settings, "reva_env", "") == "production" else None)
     if b.causal is None:
         b.notes.append("capability_unavailable: causal claims service (reva.causal) not wired")
+    if engine is not None:  # V6 domains (NLQA6): relation families, effect estimates, forecasts, decisions
+        from reva.nlqa.domain_adapters import wire_domains
+
+        wire_domains(b, engine, settings, atlas_store)
     if search_get is not None:  # a budget-metered Wikidata GET (WDHARVEST) — not wired by default
         b.search = WikidataSearchAdapter(search_get)
     return b

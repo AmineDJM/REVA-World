@@ -225,7 +225,7 @@ class EffectsDbAdapter:
     def terms(self) -> list[EffectTerm]:
         if self._terms and time.monotonic() - self._terms[0] < TERMS_TTL_S:
             return self._terms[1]
-        eq = self._eq()
+        self._eq()  # import check
         from reva.effects.variables import default_resolver
 
         res = default_resolver()
@@ -242,7 +242,6 @@ class EffectsDbAdapter:
         for k, i in rows:
             labels = res.labels(k, i) or {}
             out.append(EffectTerm(kind=str(k), id=str(i), labels=dict(labels) if labels else {"en": str(i)}))
-        del eq
         self._terms = (time.monotonic(), out)
         return out
 
