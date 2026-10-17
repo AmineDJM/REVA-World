@@ -182,7 +182,23 @@ is open on the same snapshot and its pre-trend diagnostics pass (event-study F-t
 significant at 5 %). Null results are written like any other (no publication bias). Hence 5 of the 6 runs qualify;
 `banking_crisis_lv → GDP` is archived and documented but not written.
 
-**Status in the dev DB:** pending — the archive/write step waits for the shared dev-DB lock (command in §7).
+**Status in the dev DB (2026-10-17, origin live, migration 0019 applied):** 6 run documents archived (namespace
+`evaluation`), 5 estimates written (loads 1-5, 0 rejected), 1 refused by the rule:
+
+| Estimate key | Cause → effect | Point (h = 5) | 95 % CI | Run document sha256 |
+|---|---|---|---|---|
+| `run:es-291a40103934bbb2b7a8:h5` | banking_crisis → wb.sl.uem.totl.zs | +2.81 pp | [+1.62, +4.00] | `0875ef3f…` |
+| `run:es-9af1a4b329e01ee5e382:h5` | coup → wb.ny.gdp.mktp.kd.zg | −3.92 % | [−6.55, −1.29] | `e9db9c7d…` |
+| `run:es-76c2041e480734d2686a:h5` | earthquake (M ≥ 7) → wb.ny.gdp.mktp.kd.zg | −1.73 % | [−3.44, −0.03] | `02e00977…` |
+| `run:es-c3a9b13419c5b3a1f0ec:h5` | earthquake (≥ 1,000 deaths) → wb.ny.gdp.mktp.kd.zg | −0.99 % | [−4.74, +2.76] | `04330893…` |
+| `run:es-1b3eff04653ec3971c9c:h5` | sanction_episode → wb.ny.gdp.pcap.kd.zg | +0.27 % | [−1.18, +1.72] | `88abcba0…` |
+| (not written) `es-ba6863761c52640f8fa5` | banking_crisis → wb.ny.gdp.mktp.kd.zg | −7.47 % | [−11.30, −3.64] | `d93a2330…` (pre-trend fails) |
+
+Replication report artifact `a5e30e1c…` (schema `reva-eventstudy-replication/1`); publication PDFs archived as
+restricted raw artifacts (`ea302115…` JST WP, `80c2b084…` BIS WP 226). The API wording reads "According to REVA
+estimation run … the estimated response of …"; the two earthquake treatments share `cause_id = earthquake` with
+different definitions (`cause_definition` tells them apart; PRED-ENGINE must not average them —
+`compare_estimates` keeps them side by side).
 
 ## 6. What is missing / owner decisions
 
