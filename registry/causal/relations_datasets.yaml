@@ -532,7 +532,8 @@ datasets:
       causal: true
       why: 'MAJOR RESPONSE TO CRISIS TRIGGER: ''Once the decision makers of a state perceive the act/event/change which triggers
         its crisis, they will decide on an appropriate response.'' The response is coded as a reaction to the trigger. No
-        claim when MAJRES is missing; MAJRES=1 (no response-inaction) is kept (a coded reaction category).'
+        claim when MAJRES is missing. AUDFIX (audit L3, atlas.icb 1.1.0): MAJRES=1 ''No response-inaction'' gives no claim
+        (inaction is not a reaction; same policy as MMP ''ignore''); it stays coded as the icb:response_type attribute.'
     - variables:
       - OUTCOM
       - OUTFOR
@@ -591,7 +592,7 @@ datasets:
           dispute. Because the determination of dispute outcomes is directly related to an alteration of the status quo, a
           state can only “win” a dispute when the status quo is changed in its favor. Although a status quo defender may gain
           tangible benefits from its successful maintenance, such outcomes should be coded as a “stalemate” since no alteration
-          of the status quo took
+          of the status quo took place.
         document: mid_dispute_manual
         pdf_page: 5
       outcome.victory:
@@ -1002,15 +1003,14 @@ datasets:
       - paid
       - conflict_id
       - pa_date
-      reva_kind: claim
-      relation: reaction_to
-      cause: ucdp:conflict:<conflict_id> (KGGEOPOL entity)
-      effect: ucdp:pa:<paid> (signature on pa_date)
-      codebook_term: peace_agreement
-      causal: true
-      why: 'The codebook defines a peace agreement as ''a formal agreement between at least two opposing primary warring parties,
-        which addresses the disputed incompatibility'' and conflict_id as the conflicts ''related to the dyads signing the
-        peace agreement'': each agreement is coded as a response to that armed conflict. One claim per (agreement, conflict_id).'
+      reva_kind: context
+      predicate: ucdppa:conflict
+      causal: false
+      why: 'AUDFIX (audit M6, atlas.ucdp_term 1.1.0): the codebook defines conflict_id as the ''conflicts related to the dyads
+        signing the peace agreement'' and a peace agreement as one that ''addresses the disputed incompatibility''. Neither
+        text says the agreement is a reaction to, or caused by, the conflict: a relatedness link, stored as the context
+        statement ucdppa:conflict (agreement -> ucdp:conflict:<conflict_id>), never a reaction_to claim. (Until 1.0.0 it was
+        a reaction_to claim; those 382 claims are retracted through the loader.)'
     - variables:
       - c_outcome=1 (termination dataset)
       - pa_date

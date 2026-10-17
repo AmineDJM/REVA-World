@@ -84,7 +84,8 @@ async def test_ucdp_term_ingest(db: Any, tmp_path: Path) -> None:
     s = await _run(db, atlas_ucdp_term, tmp_path)
     assert s["atlas"]["term_cy"]["created"] and s["atlas"]["pa_cy"]["created"]
     assert not s["kg"]["rejected"], s["kg"]
-    _claims_ok(s, ("term_conflict", "peace_agreements"))
+    _claims_ok(s, ("term_conflict",))
+    assert s["claims"]["peace_agreements"]["claims"] == 0  # context only (audit M6); the empty delivery retracts
     if cd.causal_available(db.worker):  # CAUSCORE present: claims are rows, dataset-coded, T1
         n = _count(
             db,

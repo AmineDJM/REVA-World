@@ -222,10 +222,14 @@ def test_ucdp_termination_claims(term: dict[str, Any]) -> None:
     assert st[("ucdp:conflict:200", "P580")].value == {"type": "time", "time": "1946-07-18", "precision": 11}
 
 
-def test_peace_agreements_reaction_and_window_pairing_is_not_a_claim(term: dict[str, Any]) -> None:
+def test_peace_agreements_and_window_pairing_are_not_claims(term: dict[str, Any]) -> None:
+    # audit M6 (AUDFIX): "conflicts related to the dyads signing" is relatedness -> context ucdppa:conflict, no claim
     pa = term["claims"]["peace_agreements"]
-    assert {x.relation for x in pa} == {"reaction_to"}
-    assert ("ucdp:conflict:333", "ucdp:pa:1565") in {(x.cause_id, x.effect_id) for x in pa}
+    assert pa == []
+    ctx = {(s.subject, s.object_qid) for s in term["statements"] if s.property == "ucdppa:conflict"}
+    assert ("ucdp:pa:1565", "ucdp:conflict:333") in ctx
+    m = next(x for x in cd.dataset_entry("peace_agreements")["mappings"] if "conflict_id" in x["variables"])
+    assert (m["reva_kind"], m["predicate"], m["causal"]) == ("context", "ucdppa:conflict", False)
     w = [s for s in term["statements"] if s.property == "causdata:agreement_in_termination_window"]
     assert {s.subject for s in w} >= {"ucdp:episode:33201:termination", "ucdp:episode:41602:termination"}
     assert all("not a causal claim" in s.qualifiers["rule"] for s in w)
@@ -238,6 +242,33 @@ def test_peace_agreements_reaction_and_window_pairing_is_not_a_claim(term: dict[
             dataset=ds,
             raw_sha256s=[term["shas"]["term" if ds == "term_cy" else "pa"]],
         )
+
+
+def test_icb_inaction_is_coded_but_not_a_reaction(crosswalk: G.StateCodeCrosswalk, icb: dict[str, Any]) -> None:
+    """Audit L3 (AUDFIX): MAJRES = 1 "No response-inaction" stays the coded response type, never a reaction_to."""
+    import csv
+    import dataclasses
+    import io
+
+    raws = {k: _body("atlas.icb", I.data_url(k)) for k in I.DATA_FILES}
+    text = raws["icb2"].body.decode("utf-8")
+    rows = list(csv.DictReader(io.StringIO(text)))
+    key = next(k for k in rows[0] if k.strip().lower() == "majres")
+    target = next(r for r in rows if r[key].strip() not in ("", "1"))
+    target[key] = "1"
+    buf = io.StringIO()
+    w = csv.DictWriter(buf, fieldnames=list(rows[0]), lineterminator="\n")
+    w.writeheader()
+    w.writerows(rows)
+    raws["icb2"] = dataclasses.replace(raws["icb2"], body=buf.getvalue().encode("utf-8"))
+    out = I.build(raws, crosswalk=crosswalk, qid_for_iso3={}, countrycode_sha256="0" * 64, strict=False)
+    crisno, cracno = target["crisno"].strip(), target["cracno"].strip()
+    claims = {c.source_claim_id for c in out["claims"]["icb2"] if c.relation == "reaction_to"}
+    before = {c.source_claim_id for c in icb["claims"]["icb2"] if c.relation == "reaction_to"}
+    assert f"{crisno}:{cracno}:majres" in before and f"{crisno}:{cracno}:majres" not in claims
+    assert out["majres_inaction_no_claim"] == icb["majres_inaction_no_claim"] + 1
+    rt = [s for s in out["statements"] if s.property == "icb:response_type" and f"actor:{cracno}:" in s.subject]
+    assert rt and rt[0].value["value"] == "No response-inaction"
 
 
 # ----------------------------------------------------------------------------- claims delivery + safety

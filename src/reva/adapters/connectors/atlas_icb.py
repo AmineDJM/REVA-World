@@ -53,7 +53,7 @@ from reva.ports.connectors import RawAcquisition
 
 SOURCE_KEY = "icb.data"
 CONNECTOR_NAME = "atlas.icb"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (AUDFIX L3): MAJRES=1 (no response-inaction) is not a reaction_to claim
 PARSER_VERSION = "atlas-icb-parse-1"
 ICB_VERSION = "v16"
 ATLAS_SOURCE = "icb"
@@ -126,6 +126,8 @@ DATA_FILES: dict[str, tuple[str, str, int, tuple[str, ...]]] = {
     ),
 }
 CODEBOOKS = {"icb1": "icb1_codebook", "icb2": "icb2_codebook"}
+#: MAJRES 1 "No response-inaction": coded, kept as the response-type attribute, never a reaction_to claim (L3)
+NO_RESPONSE_CODE = "1"
 MAX_BYTES = 5_000_000
 NON_STATE = {995: "internally generated", 996: "non-state actor", 997: "more than one state"}
 #: PCID 40-44: "crises that are not part of protracted conflicts" (regional buckets): no part_of statement.
@@ -176,6 +178,7 @@ class _Builder:
         self.ents: dict[str, KgEntity] = {}
         self.sts: list[KgStatement] = []
         self.claims: dict[str, list[cd.ClaimRecord]] = {"icb1": [], "icb2": []}
+        self.inaction_no_claim = 0  # MAJRES = 1 rows: response coded, no reaction_to claim (audit L3)
 
     def ent(self, eid: str, kind: str, label: str, desc: str) -> None:
         self.ents[eid] = KgEntity(qid=eid, kind=kind, labels={"en": label}, descriptions={"en": desc})
@@ -571,23 +574,28 @@ def kg_and_claims(
                         selector={**sel, "column": "majres"},
                     )
                 )
-                b.claims["icb2"].append(
-                    cd.ClaimRecord(
-                        cause_id=tid,
-                        effect_id=rid,
-                        relation="reaction_to",
-                        selector={
-                            "file": f2,
-                            "row": line,
-                            "crisno": n,
-                            "cracno": a,
-                            "columns": ["majres", "yerres", "monres", "dayres"],
-                        },
-                        raw_sha256=shas["icb2"],
-                        codebook_term="MAJRES",
-                        source_claim_id=f"{n}:{a}:majres",
+                if str(r["majres"]).strip() == NO_RESPONSE_CODE:
+                    # inaction is coded (attribute icb:response_type above) but is not a reaction: one policy with
+                    # MMP "ignore" (audit L3, docs/dev/v3_audfix.md)
+                    b.inaction_no_claim += 1
+                else:
+                    b.claims["icb2"].append(
+                        cd.ClaimRecord(
+                            cause_id=tid,
+                            effect_id=rid,
+                            relation="reaction_to",
+                            selector={
+                                "file": f2,
+                                "row": line,
+                                "crisno": n,
+                                "cracno": a,
+                                "columns": ["majres", "yerres", "monres", "dayres"],
+                            },
+                            raw_sha256=shas["icb2"],
+                            codebook_term="MAJRES",
+                            source_claim_id=f"{n}:{a}:majres",
+                        )
                     )
-                )
         # actor outcome
         oc = cd.value_label("icb2", "OUTCOM", r["outcom"])
         if oc:
@@ -751,6 +759,7 @@ def build(
         "entities": ents,
         "statements": stmts,
         "claims": b.claims,
+        "majres_inaction_no_claim": b.inaction_no_claim,
         "row_counts": {k: len(v) for k, v in parsed.items()},
         "unresolved_state_codes": {k: sorted(v) for k, v in resolver.unresolved.items()},
     }
@@ -787,6 +796,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     shas = out["shas"]
     res: dict[str, Any] = {
         "row_counts": out["row_counts"],
+        "majres_inaction_no_claim": out["majres_inaction_no_claim"],
         "atlas": {},
         "codebooks": {k: {x: v[x] for x in ("sha256", "matches")} for k, v in books.items()},
     }

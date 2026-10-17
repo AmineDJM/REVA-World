@@ -50,7 +50,7 @@ from reva.ports.connectors import RawAcquisition
 
 SOURCE_KEY = "cow.data"
 CONNECTOR_NAME = "atlas.mid"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.1 (AUDFIX L5): MID outcome quote completed ("took place.")
 PARSER_VERSION = "atlas-mid-parse-1"
 MID_VERSION = "5.0/5.01"
 ATLAS_SOURCE = "cow"

@@ -18,7 +18,10 @@ Outputs (semantics and reasons: ``registry/causal/relations_datasets.yaml`` data
   ``P155`` follows the previous episode, incompatibility as ``causdata:coded_issue`` -- an issue, not a cause),
   ``ucdp:episode:<c_epid>:termination`` (conflict_termination), ``ucdp:pa:<paid>`` (peace_agreement).
 * T1 claims: ``coded_outcome`` episode -> termination (one per terminated episode, codebook term
-  ``c_outcome=<value>``); ``reaction_to`` conflict -> peace agreement (one per agreement and conflict id).
+  ``c_outcome=<value>``). Peace agreements give **no** claim (connector 1.1.0, audit M6): the codebook relates an
+  agreement to "conflicts related to the dyads signing the peace agreement" (``conflict_id``) -- a relatedness link,
+  stored as the context statement ``ucdppa:conflict``, never as ``reaction_to``. The ``peace_agreements`` delivery
+  stays (empty, complete) so the claims of 1.0.0 are retracted through the loader.
 * Context only (never a claim): ``causdata:agreement_in_termination_window`` termination -> agreement(s) of the same
   conflict signed in the last active year or the first inactive year when the termination outcome is 1 (peace
   agreement): REVA's pairing of two datasets, with the rule in the qualifiers.
@@ -46,7 +49,7 @@ from reva.ports.connectors import RawAcquisition
 
 SOURCE_KEY = "ucdp.downloads"
 CONNECTOR_NAME = "atlas.ucdp_term"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (AUDFIX M6): peace agreements are context, not reaction_to claims
 PARSER_VERSION = "atlas-ucdp-term-parse-1"
 ATLAS_SOURCE = "ucdp"
 HOST = "ucdp.uu.se"
@@ -321,27 +324,13 @@ def kg_and_claims(
                     subject=pid,
                     property="ucdppa:conflict",
                     object_qid=f"ucdp:conflict:{cid}",
-                    qualifiers={"variable": "conflict_id"},
-                    raw_sha256=sp,
-                    selector={**sel, "column": "conflict_id"},
-                )
-            )
-            claims["peace_agreements"].append(
-                cd.ClaimRecord(
-                    cause_id=f"ucdp:conflict:{cid}",
-                    effect_id=pid,
-                    relation="reaction_to",
-                    selector={
-                        "file": PA_FILE,
-                        "sheet": "Dataset",
-                        "row": line,
-                        "paid": paid,
-                        "conflict_id": cid,
-                        "columns": ["paid", "conflict_id", "pa_date"],
+                    qualifiers={
+                        "variable": "conflict_id",
+                        "relation": "context: the codebook's 'conflicts related to the dyads signing the peace "
+                        "agreement' (not a reaction or a cause)",
                     },
                     raw_sha256=sp,
-                    codebook_term="peace_agreement",
-                    source_claim_id=f"{paid}:{cid}",
+                    selector={**sel, "column": "conflict_id"},
                 )
             )
             if year is not None:
