@@ -196,7 +196,9 @@ class Rows:
                 "value_text": pl.String,
             },
         ).select(ATLAS_SCHEMA.names())
-        dup = df.select(pl.struct("indicator", "provider_geo", "period_start", "period_end").is_duplicated().sum()).item()
+        dup = df.select(
+            pl.struct("indicator", "provider_geo", "period_start", "period_end").is_duplicated().sum()
+        ).item()
         if dup:
             raise _err(f"{self.source}.{self.dataset}: {dup} duplicate cells")
         return df
@@ -220,7 +222,9 @@ def _iso3(code: str | None, scheme: str) -> str | None:
 UNHCR_HOST = "api.unhcr.org"
 UNHCR_API = f"https://{UNHCR_HOST}/population/v1/"
 UNHCR_SOURCE_KEY = "unhcr.asylum"
-UNHCR_LICENCE = "CC BY 4.0 (UNHCR Refugee Data Finder; pending maintainer review, see registry/sources/unhcr_asylum.yaml)"
+UNHCR_LICENCE = (
+    "CC BY 4.0 (UNHCR Refugee Data Finder; pending maintainer review, see registry/sources/unhcr_asylum.yaml)"
+)
 UNHCR_RIGHTS: dict[str, Any] = {
     "licence": UNHCR_LICENCE,
     "licence_url": "https://creativecommons.org/licenses/by/4.0/",
@@ -278,8 +282,12 @@ UNHCR_ENDPOINTS = (
         "asylum-applications",
         "asylum-applications.csv",
         (("applied", "applied", "applied"),),
-        (("Authority", "authority"), ("Application type", "app_type"), ("Stage of procedure", "stage"),
-         ("Cases / Persons", "count")),
+        (
+            ("Authority", "authority"),
+            ("Application type", "app_type"),
+            ("Stage of procedure", "stage"),
+            ("Cases / Persons", "count"),
+        ),
         "asylum claims lodged during the calendar year (flow)",
     ),
     UnhcrEndpoint(
@@ -297,7 +305,13 @@ UNHCR_ENDPOINTS = (
         "decisions taken during the calendar year (flow)",
     ),
 )
-UNHCR_ID_COLUMNS = ("Year", "Country of origin", "Country of origin (ISO)", "Country of asylum", "Country of asylum (ISO)")
+UNHCR_ID_COLUMNS = (
+    "Year",
+    "Country of origin",
+    "Country of origin (ISO)",
+    "Country of asylum",
+    "Country of asylum (ISO)",
+)
 
 
 def read_zip_member(body: bytes, name: str, limit: int = 200_000_000) -> bytes:
@@ -443,9 +457,7 @@ def unhcr_note(ep: UnhcrEndpoint, rep: Mapping[str, Any]) -> str:
 # ============================================================================= Eurostat monthly asylum applicants
 ES_HOST = "ec.europa.eu"
 ES_DATASET_CODE = "migr_asyappctzm"
-ES_TSV_URL = (
-    f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}?format=TSV&compressed=true"
-)
+ES_TSV_URL = f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}?format=TSV&compressed=true"
 ES_FLAGS_URL = f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/OBS_FLAG/latest"
 ES_DATASET = "asylum_applicants_m"
 ES_KEY_HEADER = "freq,unit,citizen,sex,applicant,age,geo\\TIME_PERIOD"
@@ -488,8 +500,10 @@ def gunzip_lines(body: bytes, limit: int = ES_MAX_UNCOMPRESSED) -> Iterator[str]
 
 def parse_obs_flags(body: bytes) -> dict[str, str]:
     """Eurostat OBS_FLAG code list (SDMX 2.1 structure XML) -> {code: English name}."""
+    if b"<!DOCTYPE" in body or b"<!ENTITY" in body:
+        raise _err("Eurostat OBS_FLAG code list declares a DTD/entities (refused)")
     try:
-        root = ET.fromstring(body)
+        root = ET.fromstring(body)  # noqa: S314 - DTD/entities refused above; expat fetches nothing
     except ET.ParseError as e:
         raise _err("Eurostat OBS_FLAG code list is not XML") from e
     s = "{http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure}"
@@ -600,7 +614,10 @@ def build_eurostat_asylum(body: bytes, sha: str, flag_labels: Mapping[str, str])
 def _es_concept(app: str, cit: str) -> str | None:
     if cit != "TOTAL":
         return None
-    return {"TOTAL": "migration.eurostat.asylum_applicants_monthly", "FRST": "migration.eurostat.first_time_asylum_applicants_monthly"}.get(app)
+    return {
+        "TOTAL": "migration.eurostat.asylum_applicants_monthly",
+        "FRST": "migration.eurostat.first_time_asylum_applicants_monthly",
+    }.get(app)
 
 
 def eurostat_note(rep: Mapping[str, Any]) -> str:
@@ -726,7 +743,9 @@ def build_mmp(body: bytes, sha: str) -> tuple[pl.DataFrame, dict[str, Any]]:
             dead_flags["records_without_total"] = no_total
         if notes:
             dead_flags["provider_text_respelled"] = notes
-        concept = "migration.iom.mmp_dead_and_missing_monthly" if cause == "ALL" and kind == "country_of_incident" else None
+        concept = (
+            "migration.iom.mmp_dead_and_missing_monthly" if cause == "ALL" and kind == "country_of_incident" else None
+        )
         if len(rnums) > no_total:  # at least one record with a total: the sum is a reported quantity
             rows.add(
                 indicator=f"dead_and_missing|cause={cause}",
@@ -804,20 +823,42 @@ IDMC_RIGHTS: dict[str, Any] = {
 IDMC_COLUMNS: dict[str, tuple[str, str, str, str | None]] = {
     "Conflict Stock Displacement": ("conflict_idps|rounded=yes", "people", "end of the reporting year", None),
     "Conflict Stock Displacement (Raw)": (
-        "conflict_idps|rounded=no", "people", "end of the reporting year", "migration.idmc.conflict_idps"),
+        "conflict_idps|rounded=no",
+        "people",
+        "end of the reporting year",
+        "migration.idmc.conflict_idps",
+    ),
     "Conflict Internal Displacements": (
-        "conflict_internal_displacements|rounded=yes", "internal displacements (flows)", "reporting year", None),
+        "conflict_internal_displacements|rounded=yes",
+        "internal displacements (flows)",
+        "reporting year",
+        None,
+    ),
     "Conflict Internal Displacements (Raw)": (
-        "conflict_internal_displacements|rounded=no", "internal displacements (flows)", "reporting year",
-        "migration.idmc.conflict_internal_displacements"),
+        "conflict_internal_displacements|rounded=no",
+        "internal displacements (flows)",
+        "reporting year",
+        "migration.idmc.conflict_internal_displacements",
+    ),
     "Disaster Internal Displacements": (
-        "disaster_internal_displacements|rounded=yes", "internal displacements (flows)", "reporting year", None),
+        "disaster_internal_displacements|rounded=yes",
+        "internal displacements (flows)",
+        "reporting year",
+        None,
+    ),
     "Disaster Internal Displacements (Raw)": (
-        "disaster_internal_displacements|rounded=no", "internal displacements (flows)", "reporting year",
-        "migration.idmc.disaster_internal_displacements"),
+        "disaster_internal_displacements|rounded=no",
+        "internal displacements (flows)",
+        "reporting year",
+        "migration.idmc.disaster_internal_displacements",
+    ),
     "Disaster Stock Displacement": ("disaster_idps|rounded=yes", "people", "end of the reporting year", None),
     "Disaster Stock Displacement (Raw)": (
-        "disaster_idps|rounded=no", "people", "end of the reporting year", "migration.idmc.disaster_idps"),
+        "disaster_idps|rounded=no",
+        "people",
+        "end of the reporting year",
+        "migration.idmc.disaster_idps",
+    ),
 }
 IDMC_README_DEFINITIONS = (
     "Conflict Stock Displacement: Total number of IDPs (rounded figures at the national level), as a result of conflict "
@@ -1053,8 +1094,12 @@ async def _ingest_unhcr(run: Any, out: dict[str, Any]) -> None:
 async def _ingest_eurostat(run: Any, out: dict[str, Any]) -> None:
     if not run.wants(ES_DATASET):
         return
-    fl = await run.get(ES_FLAGS_URL, key="eurostat:codelist:OBS_FLAG", media_types=(
-        "application/vnd.sdmx.structure+xml", "application/xml", "text/xml"), max_bytes=2_000_000)
+    fl = await run.get(
+        ES_FLAGS_URL,
+        key="eurostat:codelist:OBS_FLAG",
+        media_types=("application/vnd.sdmx.structure+xml", "application/xml", "text/xml"),
+        max_bytes=2_000_000,
+    )
     raw = await run.get(
         ES_TSV_URL,
         key=f"eurostat:{ES_DATASET_CODE}:tsv",
@@ -1088,8 +1133,11 @@ async def _ingest_hdx(run: Any, out: dict[str, Any], kind: str) -> None:
     media = (
         ("text/csv", "application/octet-stream", "binary/octet-stream")
         if kind == "mmp"
-        else ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/octet-stream",
-              "binary/octet-stream")
+        else (
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/octet-stream",
+            "binary/octet-stream",
+        )
     )
     raw = await run.get(url, key=f"hdx:{package}:{resource}", media_types=media, max_bytes=60_000_000)
     sha_p, sha = run.archive(pkg), run.archive(raw)
