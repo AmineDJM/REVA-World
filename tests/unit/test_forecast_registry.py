@@ -370,3 +370,60 @@ def test_fix7_resolution_checks_issue_date_and_provider_publication_date() -> No
     res = resolve_batch(old, set(), {"t.food": issue_series}, {"t.food": [(pin, extract_series(late, fam)[0])]},
                         today=date(2027, 12, 1))  # fmt: skip
     assert {o["status"] for o in res["outcomes"] if o["question_id"] in nov} == {"not_prospective"}
+
+
+def test_fix7_void_after_period_end_needs_counterfactual_scores(monkeypatch: pytest.MonkeyPatch) -> None:
+    """QA-PRED X11: no selective deletion - a void after the period ended is refused unless the counterfactual
+    scores are computed and logged; refused before anything is written."""
+    from contextlib import contextmanager
+
+    from reva.evaluation.registry import service as svc
+
+    pins, frames = _frames()
+    m = build_batch(SPECS, pins, frames, cycle=CYCLE, issued_at=ISSUED, origin="test_fixture", already=set(),
+                    families=["t.food"])  # fmt: skip
+    fam = SPECS.family("t.food")
+    q = next(q for q in m["questions"] if q["geo"] == "FRA" and q["reference_period"] == "2026-11")
+    now = datetime(2027, 3, 1, tzinfo=UTC)  # the period (2026-11) has ended
+
+    class _Conn:
+        def execute(self, *_a: Any, **_k: Any) -> Any:
+            class R:
+                def scalar_one(self) -> datetime:
+                    return now
+
+            return R()
+
+    class _Eng:
+        @contextmanager
+        def connect(self) -> Any:
+            yield _Conn()
+
+    t_nov = P.parse_label("M", "2026-11")
+    v1 = cells("fao.cp", "23014|6121", "M", {**monthly("FRA", 120, LAST_M), ("FRA", t_nov): "2.5"})
+    pin = {"dataset_key": "atlas.fao.cp", "dataset_id": "v1", "artifact_sha256": "1" * 64, "recorded_at": "a"}
+    written: list[dict[str, Any]] = []
+    monkeypatch.setattr(svc, "_batches", lambda conn, origin: [{"sha": "b" * 64, "cycle": CYCLE, "context_id": "x"}])
+    monkeypatch.setattr(svc, "load_frozen_manifest", lambda store, sha: m)
+    monkeypatch.setattr(svc, "model_version_ids", lambda conn: {})
+    monkeypatch.setattr(svc, "handled_questions", lambda conn, sha: set())
+    monkeypatch.setattr(svc, "versions_between", lambda *a, **k: [pin])
+    monkeypatch.setattr(svc, "_series_for", lambda man, versions, cache: (
+        {"t.food": extract_series(frames["f" * 64], fam)[0]}, {"t.food": [(pin, extract_series(v1, fam)[0])]}))  # fmt: skip
+    monkeypatch.setattr(svc, "_record_resolution",
+                        lambda *a, **k: (written.append({"res": a[4], **k}) or ("r" * 64, {"void": 1})))  # fmt: skip
+    void = {q["question_id"]: {"reason": "r", "detail": "d"}}
+    with pytest.raises(ValueError, match="requires counterfactual=True"):
+        svc.void_questions(_Eng(), None, void, origin="test_fixture")  # type: ignore[arg-type]
+    assert written == []
+    out = svc.void_questions(_Eng(), None, void, origin="test_fixture", counterfactual=True)  # type: ignore[arg-type]
+    assert out["batches"][0]["status"] == "voided" and len(written) == 1
+    extra = written[0]["extra"]
+    assert "counterfactual" in extra["rule"] and extra["counterfactual_scores"]
+    assert {s["question_id"] for s in extra["counterfactual_scores"]} == {q["question_id"]}
+    assert written[0]["res"]["scores"] == []  # the void itself scores nothing
+    # no outcome published yet -> refused (void before the period end, or wait for the outcome)
+    monkeypatch.setattr(svc, "_series_for", lambda man, versions, cache: (
+        {"t.food": extract_series(frames["f" * 64], fam)[0]}, {"t.food": []}))  # fmt: skip
+    with pytest.raises(ValueError, match="no outcome published yet"):
+        svc.void_questions(_Eng(), None, void, origin="test_fixture", counterfactual=True)  # type: ignore[arg-type]

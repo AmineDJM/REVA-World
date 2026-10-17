@@ -69,7 +69,7 @@ def annotate_existing_retractions(
         if not todo:
             return {"annotated": 0}
         doc = {"schema": ANNOTATION_SCHEMA, "origin": origin, "audit": "AUDIT4 L5", "annotations": todo}
-        sha = repo.store_json_artifact(conn, store, doc, "evidence", schema_version=ANNOTATION_SCHEMA)
+        sha = repo.store_json_artifact(conn, store, doc, "normalised", schema_version=ANNOTATION_SCHEMA)
         act = repo.simple_activity(
             ACTIVITY_KIND,
             "review",

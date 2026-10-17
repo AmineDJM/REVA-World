@@ -230,11 +230,11 @@ class DomainOps:
 
     b: Any
 
-    def _entity(self, ref: str, lookups: dict[str, Resolved]) -> Resolved:  # pragma: no cover - Executor's
-        raise NotImplementedError
+    if TYPE_CHECKING:  # provided by Executor
 
-    def _iso3(self, country: str, lookups: dict[str, Resolved]) -> str | None:  # pragma: no cover - Executor's
-        raise NotImplementedError
+        def _entity(self, ref: str, lookups: dict[str, Resolved]) -> Resolved: ...
+
+        def _iso3(self, country: str, lookups: dict[str, Resolved]) -> str | None: ...
 
     def _need(self, attr: str, what: str) -> Any:
         port = getattr(self.b, attr, None)

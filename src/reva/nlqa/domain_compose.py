@@ -10,7 +10,7 @@ pas une probabilité »; missing data is said as "pas de donnée chargée", neve
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from reva.nlqa.ports import Entity, FamilyNeighbour
 
@@ -80,20 +80,17 @@ class DomainComposer:
     x: Any
     lang: str
 
-    def add(self, text: str, cites: Sequence[str], kind: str, op_id: str | None) -> None:  # pragma: no cover
-        raise NotImplementedError
+    if TYPE_CHECKING:  # provided by Composer
 
-    def fr(self) -> bool:  # pragma: no cover
-        raise NotImplementedError
+        def add(self, text: str, cites: Sequence[str], kind: str, op_id: str | None) -> None: ...
 
-    def entity(self, e: Entity) -> str:  # pragma: no cover
-        raise NotImplementedError
+        def fr(self) -> bool: ...
 
-    def country(self, iso3: str) -> str:  # pragma: no cover
-        raise NotImplementedError
+        def entity(self, e: Entity) -> str: ...
 
-    def concept(self, c: Any) -> str:  # pragma: no cover
-        raise NotImplementedError
+        def country(self, iso3: str) -> str: ...
+
+        def concept(self, c: Any) -> str: ...
 
     def _t(self, fr: str, en: str) -> str:
         return fr if self.fr() else en
