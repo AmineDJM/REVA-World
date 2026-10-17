@@ -149,7 +149,9 @@ def main(cap: str, repo: str) -> None:
             for i in (pw.ITEM_CHOKE_DAILY, pw.ITEM_PORTS_DAILY, pw.ITEM_PORTS_DB, pw.ITEM_CHOKE_DB)]  # fmt: skip
     cb = cache[pw.choke_csv_url()]
     lines = cb.decode("utf-8-sig").splitlines(True)
-    keep = [lines[0]] + [ln for ln in lines[1:] if ln.split(",")[4] in CHOKEPOINTS and ln.startswith(("2024/01/0", "2026/10/0"))]
+    keep = [lines[0]] + [
+        ln for ln in lines[1:] if ln.split(",")[4] in CHOKEPOINTS and ln.startswith(("2024/01/0", "2026/10/0"))
+    ]
     ents.append(entry(pw.choke_csv_url(), ("﻿" + "".join(keep)).encode("utf-8"), "text/csv", "csv", plic,
                       f"EXCERPT: rows of {list(CHOKEPOINTS)} on 2024-01-01..09 and 2026-10-01..09", cb))  # fmt: skip
     rng = cache[pw.date_range_url()]
