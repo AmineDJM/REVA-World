@@ -555,6 +555,93 @@ def resolve_batch(
     return {"outcomes": outcomes, "scores": scores}
 
 
+def _record_resolution(
+    engine: Engine,
+    store: Any,
+    b: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    res: Mapping[str, Any],
+    now: datetime,
+    mv: Mapping[str, Any],
+    origin: str,
+    actor: str,
+    extra: Mapping[str, Any] | None = None,
+) -> tuple[str, dict[str, int]]:
+    """Append one resolution manifest and one ``registry_score`` row per model (append-only; nothing edited)."""
+    from reva.adapters.postgres import repositories as repo
+
+    doc = {
+        "schema": RESOLUTION_SCHEMA,
+        "label": LABEL,
+        "batch_sha256": b["sha"],
+        "issued_at": manifest["issued_at"],
+        "resolved_at": now.isoformat(),
+        "rule": "first table version registered after issued_at publishing the cell as an observation",
+        **res,
+        **(extra or {}),
+    }
+    qids = sorted(o["question_id"] for o in res["outcomes"])
+    with engine.begin() as conn:
+        sha = repo.store_json_artifact(
+            conn, store, doc, "evaluation", schema_version="forecast-registry-resolution/1"
+        )
+        act = repo.simple_activity(
+            "evaluation.forecast_registry_resolve",
+            "evaluation",
+            actor,
+            {"batch_sha256": b["sha"], "resolved": len(qids), "label": LABEL},
+        )
+        srcs = sorted({o["source"]["artifact_sha256"] for o in res["outcomes"] if o.get("source")})
+        repo.record_activity(
+            conn,
+            act,
+            inputs=[(b["sha"], {"role": "sealed_batch"}), *[(s, {"role": "outcome_atlas_table"}) for s in srcs]],
+            outputs=[sha],
+        )
+        ctx = repo.create_context(
+            conn,
+            mode="evaluation",
+            origin=origin,
+            manifest_sha256=sha,
+            knowledge_cutoff=now,
+            parent_context_id=UUID(b["context_id"]),
+        )
+        scope = {
+            "kind": SCOPE_KIND,
+            "origin": origin,
+            "cycle": b["cycle"],
+            "batch_sha256": b["sha"],
+            "question_ids": qids,
+        }
+        counts: dict[str, int] = defaultdict(int)
+        for o in res["outcomes"]:
+            counts[o["status"]] += 1
+        for mk, (ver, _d) in sorted(all_models().items()):
+            mine = [s for s in res["scores"] if s["model"] == mk]
+            _insert_eval(
+                conn,
+                mv[mk],
+                ctx,
+                sha,
+                "operational_as_known",
+                scope,
+                {
+                    "kind": SCORE_KIND,
+                    "label": LABEL,
+                    "model": f"{mk}@{ver}",
+                    "resolution_sha256": sha,
+                    "resolved_at": now.isoformat(),
+                    "n_resolved": counts["resolved"],
+                    "n_void": counts["void"],
+                    "n_not_prospective": counts["not_prospective"],
+                    "summary": aggregate(mine),
+                    "scores": mine,
+                },
+                act.id,
+            )
+    return sha, dict(counts)
+
+
 def resolve_due(
     engine: Engine, store: Any, *, origin: str = "live", actor: str = "worker:forecast_registry"
 ) -> dict[str, Any]:
@@ -601,74 +688,7 @@ def resolve_due(
         if not res["outcomes"]:
             out.append({"batch_sha256": b["sha"], "status": "awaiting_outcomes", "due": len(due)})
             continue
-        doc = {
-            "schema": RESOLUTION_SCHEMA,
-            "label": LABEL,
-            "batch_sha256": b["sha"],
-            "issued_at": manifest["issued_at"],
-            "resolved_at": now.isoformat(),
-            "rule": "first table version registered after issued_at publishing the cell as an observation",
-            **res,
-        }
-        qids = sorted(o["question_id"] for o in res["outcomes"])
-        with engine.begin() as conn:
-            sha = repo.store_json_artifact(
-                conn, store, doc, "evaluation", schema_version="forecast-registry-resolution/1"
-            )
-            act = repo.simple_activity(
-                "evaluation.forecast_registry_resolve",
-                "evaluation",
-                actor,
-                {"batch_sha256": b["sha"], "resolved": len(qids), "label": LABEL},
-            )
-            srcs = sorted({o["source"]["artifact_sha256"] for o in res["outcomes"] if o.get("source")})
-            repo.record_activity(
-                conn,
-                act,
-                inputs=[(b["sha"], {"role": "sealed_batch"}), *[(s, {"role": "outcome_atlas_table"}) for s in srcs]],
-                outputs=[sha],
-            )
-            ctx = repo.create_context(
-                conn,
-                mode="evaluation",
-                origin=origin,
-                manifest_sha256=sha,
-                knowledge_cutoff=now,
-                parent_context_id=UUID(b["context_id"]),
-            )
-            scope = {
-                "kind": SCOPE_KIND,
-                "origin": origin,
-                "cycle": b["cycle"],
-                "batch_sha256": b["sha"],
-                "question_ids": qids,
-            }
-            counts: dict[str, int] = defaultdict(int)
-            for o in res["outcomes"]:
-                counts[o["status"]] += 1
-            for mk, (ver, _d) in sorted(all_models().items()):
-                mine = [s for s in res["scores"] if s["model"] == mk]
-                _insert_eval(
-                    conn,
-                    mv[mk],
-                    ctx,
-                    sha,
-                    "operational_as_known",
-                    scope,
-                    {
-                        "kind": SCORE_KIND,
-                        "label": LABEL,
-                        "model": f"{mk}@{ver}",
-                        "resolution_sha256": sha,
-                        "resolved_at": now.isoformat(),
-                        "n_resolved": counts["resolved"],
-                        "n_void": counts["void"],
-                        "n_not_prospective": counts["not_prospective"],
-                        "summary": aggregate(mine),
-                        "scores": mine,
-                    },
-                    act.id,
-                )
+        sha, counts = _record_resolution(engine, store, b, manifest, res, now, mv, origin, actor)
         out.append({"batch_sha256": b["sha"], "status": "scored", "resolution_sha256": sha, **dict(counts)})
     return {"origin": origin, "checked_at": now.isoformat(), "batches": out}
 

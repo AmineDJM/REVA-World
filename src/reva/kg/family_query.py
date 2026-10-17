@@ -168,6 +168,7 @@ def entity_families(
     qids = {qid} | {r["subject_qid"] for r in rows} | {r["object_qid"] for r in rows}
     labels = kq.labels_for(conn, qids)
     kinds = kq.kinds_for(conn, qids)
+    loaded = loaded_qids(conn, qids)
     props = kq.property_info(conn, {r["property_pid"] for r in rows} | {r["property_pid"] for r in literals})
     rights = rights_for(conn, [*rows, *literals])
     groups: dict[str, dict[str, Any]] = {}
@@ -192,7 +193,7 @@ def entity_families(
         m = ef.mapping
         g["neighbours"].append(
             {
-                "neighbour": kq._ref(other, labels, kinds),
+                "neighbour": {**kq._ref(other, labels, kinds), "entity_loaded": other in loaded},
                 "reading": {"label": dict(ef.label), "inverse": ef.inverse},
                 "subtype": m.subtype,
                 "mapping": {"origin": m.origin, "agent": m.agent, "direction": m.direction},
@@ -235,6 +236,8 @@ def entity_families(
     notes = [FAMILY_NOTE]
     if "associated_with" in groups:
         notes.append(ASSOCIATION_NOTE)
+    if any(not n["neighbour"]["entity_loaded"] for g in out_groups for n in g["neighbours"]):
+        notes.append(UNLOADED_NOTE)
     origins = sorted({r["origin"] for r in rows} | {r["origin"] for r in literals})
     return {
         "qid": qid,
@@ -250,6 +253,22 @@ def entity_families(
         "notes": notes,
         "origins": origins,
     }
+
+
+UNLOADED_NOTE = (
+    "Neighbours with entity_loaded = false are references to entities the KG has not loaded (no label, no statements "
+    "of their own yet, e.g. UniProt proteins named by HGNC): the edge is kept as the source states it."
+)
+
+
+def loaded_qids(conn: Connection, qids: Iterable[str]) -> set[str]:
+    """Which of ``qids`` exist as KG entities (any origin) -- an edge may name an entity no source has loaded."""
+    qs = sorted(set(qids))
+    if not qs:
+        return set()
+    return set(
+        conn.execute(text("SELECT DISTINCT qid FROM kg.entity_current WHERE qid = ANY(:q)"), {"q": qs}).scalars()
+    )
 
 
 def _count_scanned(rows: list[dict[str, Any]]) -> int:

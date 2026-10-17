@@ -56,6 +56,15 @@ class Series:
         return None
 
 
+def is_fiscal_year_cell(flags: Mapping[str, Any]) -> bool:
+    """A cell on a fiscal-year basis per its provider metadata (WEO ``latest_actual = FY…``, or a fiscal
+    ``period_basis``), whatever window an older parser gave it: it never resolves or trains a calendar-year
+    question (FIX4B, audit AUDIT3 M7)."""
+    return str(flags.get("latest_actual") or "").startswith("FY") or str(flags.get("period_basis") or "").startswith(
+        "fiscal_year"
+    )
+
+
 def _flags(raw: str | None) -> dict[str, Any]:
     if not raw:
         return {}
@@ -113,10 +122,14 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
     cells: dict[str, dict[int, list[dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
     want = "D" if family.value_rule == "monthly_mean_of_daily" else family.frequency
     dropped = 0
+    fiscal = 0
     for r in f.select(
         "iso3", "provider_geo", "indicator", "period_start", "period_end", "value", "flags", "raw_sha256", "selector"
     ).iter_rows(named=True):
         start, end = r["period_start"], r["period_end"]
+        if is_fiscal_year_cell(_flags(r["flags"])):
+            fiscal += 1
+            continue
         if want == "D":
             if (end - start).days != 1:
                 dropped += 1
@@ -142,6 +155,8 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
         )
     if dropped:
         notes.append({"family": family.key, "reason": "cells at another frequency / non-calendar window", "n": dropped})
+    if fiscal:
+        notes.append({"family": family.key, "reason": "fiscal-year cells (never a calendar-year question)", "n": fiscal})
     out: dict[str, Series] = {}
     for geo, by_idx in sorted(cells.items()):
         ambiguous = [k for k, v in by_idx.items() if len({c["indicator"] for c in v}) > 1 or len(v) > 1]
