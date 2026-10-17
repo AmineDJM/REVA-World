@@ -191,3 +191,70 @@ def test_dataset_delivery_minus_one_row_retracts_it(az) -> None:  # type: ignore
     # an empty complete delivery retracts every remaining claim of the dataset (a source dropped all its claims)
     r = load_dataset_claims(az.worker, az.store, retrieved_at=t0 + timedelta(minutes=4), claims=[], **kw)
     assert r.retracted == 3 and _current_keys(az, f"ds:{src}:") == []
+
+
+def test_kg_claims_keep_references_and_qualifiers_verbatim_from_raw(az) -> None:  # type: ignore[no-untyped-def]
+    """Audit L4: the KG import keeps allow-listed reference / qualifier properties only; the claim reads the
+    statement's own references and qualifiers from the archived raw entity JSON."""
+    import json
+
+    ns = _ns()
+    src = f"wikidata.{ns}"
+    sid = f"{ns.upper()}$1"
+    item = {"snaktype": "value", "datatype": "wikibase-item"}
+    raw_doc = {
+        "entities": {
+            "Q1": {
+                "id": "Q1",
+                "claims": {
+                    "P828": [
+                        {
+                            "id": sid,
+                            "rank": "normal",
+                            "mainsnak": {**item, "property": "P828",
+                                         "datavalue": {"type": "wikibase-entityid", "value": {"id": "Q2"}}},
+                            "qualifiers": {
+                                "P1001": [{**item, "property": "P1001",
+                                           "datavalue": {"type": "wikibase-entityid", "value": {"id": "Q3"}}}],
+                                "P3680": [{**item, "property": "P3680",
+                                           "datavalue": {"type": "wikibase-entityid", "value": {"id": "Q4"}}}],
+                            },
+                            "references": [
+                                {"snaks": {"P1651": [{"snaktype": "value", "property": "P1651",
+                                                      "datatype": "external-id",
+                                                      "datavalue": {"type": "string", "value": "8CfqjHbZ2_M"}}]}}
+                            ],
+                        }
+                    ]
+                },
+            }
+        }
+    }  # fmt: skip
+    sha = az.store.put_bytes(json.dumps(raw_doc).encode(), "raw", "application/json").sha256
+    # the KG copy: allow-listed qualifier only (P3680), no reference (P1651 / P1001 not on the allow-list)
+    st = KgStatement(
+        f"{ns}:q1", "P828", f"{ns}:q2", statement_id=sid, qualifiers={"P3680": ["Q4"]}, source_revision="r1"
+    )
+    rep = load_batch(
+        az.worker,
+        az.store,
+        statements=[st],
+        source_key=src,
+        raw_sha256s=[sha],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
+    assert rep.rejected_total == 0
+    r0 = load_kg_claims(az.worker, origin="test_fixture", source_keys=[src])  # no store: the KG copy
+    assert r0.inserted == 1 and r0.refs_source_counts == {}
+    r = load_kg_claims(az.worker, origin="test_fixture", source_keys=[src], store=az.store)
+    assert r.new_revision == 1 and r.refs_source_counts == {"raw_verbatim": 1, "kg_allowlisted": 0}
+    with az.api.connect() as c:
+        row = c.execute(
+            text("SELECT refs, qualifiers, scope, selector FROM kg.causal_claim_current WHERE claim_key = :k"),
+            {"k": f"kg:{src}:{sid}"},
+        ).one()
+    refs, quals, scope, sel = row
+    assert refs == [{"P1651": ["8CfqjHbZ2_M"]}]
+    assert quals == {"P1001": ["Q3"], "P3680": ["Q4"]} and scope["place"] == ["Q3"]
+    assert sel["refs_qualifiers"] == "verbatim from the raw entity JSON"

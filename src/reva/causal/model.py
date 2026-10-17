@@ -141,6 +141,8 @@ class ClaimLoadReport:
     #: retracted claims by reason detail (e.g. ``value_not_an_item``: the statement still exists, its value
     #: became somevalue/novalue), kept beside the stored retraction reason (audit L8)
     retraction_details: dict[str, int] = field(default_factory=dict)
+    #: KG claims whose references / qualifiers were read verbatim from the raw JSON vs the KG copy (audit L4)
+    refs_source_counts: dict[str, int] = field(default_factory=dict)
     rejected_counts: dict[str, int] = field(default_factory=dict)
     rejected_sample: list[dict[str, Any]] = field(default_factory=list)
     #: statements not turned into claims yet, by reason (e.g. ``references_unknown``: WDQS row, tier pending)
@@ -171,6 +173,8 @@ class ClaimLoadReport:
         ]
         for r, n in other.retraction_details.items():
             self.retraction_details[r] = self.retraction_details.get(r, 0) + n
+        for r, n in other.refs_source_counts.items():
+            self.refs_source_counts[r] = self.refs_source_counts.get(r, 0) + n
         self.load_ids += other.load_ids
         for r, n in other.rejected_counts.items():
             self.rejected_counts[r] = self.rejected_counts.get(r, 0) + n
@@ -545,6 +549,7 @@ def claim_from_statement(st: Mapping[str, Any], vocab: Vocabulary | None = None)
             "property": st["property_pid"],
             "statement_id": st["statement_id"],
             "rank": st["rank"],
+            **({"refs_qualifiers": "verbatim from the raw entity JSON"} if st.get("_verbatim") else {}),
         },
         "raw_sha256": st["raw_sha256"],
         "refs": refs,
@@ -564,10 +569,71 @@ def claim_from_statement(st: Mapping[str, Any], vocab: Vocabulary | None = None)
     return row
 
 
+class _RawStatements:
+    """Wikidata statements of the archived raw entity JSON, by statement id (audit L4).
+
+    The KG import keeps only allow-listed reference / qualifier properties; a causal claim keeps the statement's
+    references and qualifiers VERBATIM (compacted like the harvester, every property), read from the raw bytes the
+    KG statement names (``raw_sha256``). A raw document that cannot be read leaves the KG copy (counted)."""
+
+    def __init__(self, store: Any) -> None:
+        self.store = store
+        self.docs: dict[str, dict[str, Mapping[str, Any]] | None] = {}
+        self.missing = 0
+
+    def _load(self, sha: str) -> dict[str, Mapping[str, Any]] | None:
+        import gzip
+
+        try:
+            body = self.store.get("raw", sha)
+        except Exception:  # absent / unreadable raw: fall back to the KG copy, counted
+            return None
+        if body[:2] == b"\x1f\x8b":
+            body = gzip.decompress(body)
+        try:
+            doc = json.loads(body)
+        except ValueError:
+            return None
+        out: dict[str, Mapping[str, Any]] = {}
+        for ent in (doc.get("entities") or {}).values() if isinstance(doc, dict) else []:
+            for sts in (ent.get("claims") or {}).values() if isinstance(ent, dict) else []:
+                for st in sts if isinstance(sts, list) else []:
+                    if isinstance(st, dict) and isinstance(st.get("id"), str):
+                        out[st["id"]] = st
+        return out
+
+    def verbatim(self, st: Mapping[str, Any]) -> tuple[list[dict[str, list[Any]]], dict[str, list[Any]]] | None:
+        from reva.adapters.connectors.wikidata import TEMPORAL_QUALIFIERS, _compact_snak_value
+
+        sha, sid = st.get("raw_sha256"), st.get("statement_id")
+        if not sha or not sid:
+            return None
+        if sha not in self.docs:
+            self.docs[sha] = self._load(str(sha))
+        raw = (self.docs[sha] or {}).get(str(sid))
+        if raw is None:
+            self.missing += 1
+            return None
+        refs = [
+            {p: [_compact_snak_value(x) for x in snaks] for p, snaks in (r.get("snaks") or {}).items()}
+            for r in raw.get("references") or []
+        ]
+        quals = {
+            p: [_compact_snak_value(x) for x in snaks]
+            for p, snaks in (raw.get("qualifiers") or {}).items()
+            if p not in TEMPORAL_QUALIFIERS  # the claim's period comes from the KG start/end/point in time
+        }
+        return [r for r in refs if r], quals
+
+
 def load_kg_claims(
-    engine: Engine, *, origin: str | None = None, source_keys: Sequence[str] | None = None
+    engine: Engine, *, origin: str | None = None, source_keys: Sequence[str] | None = None, store: Any = None
 ) -> ClaimLoadReport:
-    """Causal statements of ``kg.statement_current`` -> ``kg.causal_claim`` (one transaction per origin)."""
+    """Causal statements of ``kg.statement_current`` -> ``kg.causal_claim`` (one transaction per origin).
+
+    With ``store`` (the artifact store holding the raw Wikidata responses), each claim's references and qualifiers
+    are the statement's own, verbatim from the archived raw JSON -- not the KG import's allow-listed subset (audit
+    L4); the tier is computed on them."""
     t0 = time.perf_counter()
     if origin is not None and origin not in ORIGINS:
         raise ValidationProblem("origin must be live or test_fixture", origin=str(origin)[:32])
@@ -597,15 +663,24 @@ def load_kg_claims(
             rep.scanned = len(rows_db)
             rows: list[dict[str, Any]] = []
             deferred_keys: list[str] = []
+            raw_sts = _RawStatements(store) if store is not None else None
             for i, st in enumerate(rows_db):
                 try:
-                    rows.append(claim_from_statement(dict(st), vocab))
+                    d = dict(st)
+                    vb = raw_sts.verbatim(d) if raw_sts is not None else None
+                    if vb is not None:
+                        d["refs"], d["qualifiers"] = vb
+                        d["_verbatim"] = True
+                    rows.append(claim_from_statement(d, vocab))
                 except Deferred as d:
                     rep.deferred_counts[d.reason] = rep.deferred_counts.get(d.reason, 0) + 1
                     deferred_keys.append("kg:" + st["statement_key"])
                 except ValueError as e:
                     rep.reject(i, str(e)[:100], st["statement_key"])
             current_stmt = {r["statement_key"] for r in rows_db}
+            if raw_sts is not None:
+                n_raw = sum(1 for r in rows if "refs_qualifiers" in r["selector"])
+                rep.refs_source_counts = {"raw_verbatim": n_raw, "kg_allowlisted": len(rows) - n_raw}
             _count_unknown_endpoints(conn, rows, rep)
             # Current causal statements whose value is no longer an item (somevalue / novalue): the statement still
             # exists, so their claim is retracted as "no_longer_causal", never "source_statement_retracted" (L8).

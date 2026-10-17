@@ -38,7 +38,6 @@ __all__ = [
 
 def refresh(engine: Any, store: Any = None, *, origin: str | None = None) -> dict[str, Any]:
     """Load causal claims from the KG current view, then grade every current claim (worker)."""
-    _ = store
-    loaded = load_kg_claims(engine, origin=origin)
+    loaded = load_kg_claims(engine, origin=origin, store=store)  # refs/qualifiers verbatim from raw (audit L4)
     graded = grade_claims(engine, origin=origin)
     return {"loaded": loaded.as_dict(), "graded": graded.as_dict()}
