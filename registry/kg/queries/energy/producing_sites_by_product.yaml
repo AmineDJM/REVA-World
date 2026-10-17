@@ -1,0 +1,21 @@
+id: energy.producing_sites_by_product
+domain: energy
+owner: V4ENERGY
+description: >-
+  Sites (oil and gas fields, mines, wells, plants) that Wikidata says produce (P1056 product or material produced)
+  petroleum Q22656, natural gas Q40858, coal Q24489, uranium Q1098, lithium Q568, cobalt Q740, nickel Q744 or copper
+  Q753, restricted to items with coordinates (P625) that are not organisations. Snapshots keep country (P17),
+  located in (P131 -> ADM1 items bridged to ISO 3166-2 by V4LINK), coordinates, discovery date (P575), discoverer
+  (P61), inception (P571), owner (P127), operator (P137), product (P1056), and -- once allow-listed -- nominal power
+  output (P2109), production rate (P2197), service entry/retirement (P729/P730), GEM wiki id (P13333). Selection is
+  by product id, never by label.
+purpose: seed_entities
+entity_kind: facility
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?product { wd:Q22656 wd:Q40858 wd:Q24489 wd:Q1098 wd:Q568 wd:Q740 wd:Q744 wd:Q753 }
+    ?item wdt:P1056 ?product ; wdt:P625 ?coord .
+    FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q43229 . }
+  }
+max_rows: 30000
+expand_hops: 1

@@ -1,0 +1,19 @@
+id: energy.mines
+domain: energy
+owner: V4ENERGY
+description: >-
+  Mines (instances of mine Q820477 or of its subclasses, e.g. coal mine Q959309) that state a product (P1056), with
+  their country, ADM1 (P131), coordinates, owner (P127), operator (P137), inception (P571), discovery (P575/P61) as
+  Wikidata states them. Ids checked with wbgetentities on 2026-10-17.
+purpose: seed_entities
+entity_kind: facility
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q820477 ; wdt:P1056 ?product .
+  }
+max_rows: 40000
+expand_hops: 1
+api_search:
+  instance_of: [Q820477]
+  subclass_depth: 2
+  extra: "haswbstatement:P1056"

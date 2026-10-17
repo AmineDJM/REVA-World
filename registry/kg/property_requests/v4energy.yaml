@@ -1,0 +1,46 @@
+# Property requests from V4ENERGY (energy & natural resources). Merged into registry/kg/properties.yaml by
+# `python -m reva.kg.harvest merge-property-requests` (checks each id and datatype against Wikidata, takes the en/fr
+# labels from the property entity). Ids, English labels and datatypes checked with wbgetentities on 2026-10-17
+# (archived through the governed client, ledger in reva_kg_v4energy).
+- property: P2109
+  why: nominal power output of power stations / generating units (installed capacity as Wikidata states it, with unit).
+  reva_predicate: nominal_power_output
+  inverse: null
+  kind: quantity
+  group: energy
+  label_en: nominal power output
+  label_fr: puissance nominale
+- property: P2197
+  why: production rate of fields and mines (quantity per time unit, with point-in-time qualifiers).
+  reva_predicate: production_rate
+  inverse: null
+  kind: quantity
+  group: energy
+  label_en: production rate
+  label_fr: taux de production
+- property: P729
+  why: service entry (first production / commissioning of plants, fields, mines).
+  reva_predicate: service_entry
+  inverse: null
+  kind: time
+  group: energy
+  label_en: service entry
+  label_fr: date de mise en service
+- property: P730
+  why: service retirement (decommissioning of plants, end of production).
+  reva_predicate: service_retirement
+  inverse: null
+  kind: time
+  group: energy
+  label_en: service retirement
+  label_fr: date de mise hors service
+- property: P13333
+  why: >-
+    Global Energy Monitor Wiki ID (external id on ~13.8k facilities and companies): the identifier through which GEM
+    tracker rows (which carry the wiki URL) can be bridged to Wikidata items, never by name.
+  reva_predicate: gem_wiki_id
+  inverse: null
+  kind: external_id
+  group: energy
+  label_en: Global Energy Monitor Wiki ID
+  label_fr: identifiant Global Energy Monitor Wiki

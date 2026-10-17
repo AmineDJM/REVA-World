@@ -1,0 +1,21 @@
+id: energy.power_stations
+domain: energy
+owner: V4ENERGY
+description: >-
+  Power stations (instances of power station Q159719 or its subclasses, e.g. nuclear power plant Q134447) that carry
+  a Global Energy Monitor wiki id (P13333) -- the bounded, best-documented subset (GEM wiki pages exist for ~13.8k
+  items). Snapshots keep country, P131, coordinates, owner (P127), operator (P137), inception (P571) and -- once
+  allow-listed -- nominal power output (P2109), service entry/retirement (P729/P730) and the GEM wiki id itself,
+  the identifier through which GEM tracker rows can later be bridged (no name matching with GPPD plants).
+purpose: seed_entities
+entity_kind: facility
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q159719 ; wdt:P13333 ?gem .
+  }
+max_rows: 20000
+expand_hops: 1
+api_search:
+  instance_of: [Q159719]
+  subclass_depth: 2
+  extra: "haswbstatement:P13333"

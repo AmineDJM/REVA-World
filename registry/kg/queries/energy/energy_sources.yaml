@@ -1,0 +1,20 @@
+id: energy.energy_sources
+domain: energy
+owner: V4ENERGY
+description: >-
+  Energy sources and fuels as Wikidata classifies them: the classes fossil fuel (Q12748), renewable energy (Q12705)
+  and fuel (Q42501), their direct subclasses (petroleum, natural gas, coal, biofuels, wind power, ...), and the core
+  items petroleum (Q22656), natural gas (Q40858), coal (Q24489), uranium (Q1098), nuclear power (Q12739) and wind
+  power (Q43302) (ids checked with wbgetentities on 2026-10-17). Snapshots keep has part (P527) / made from material
+  (P186, once allow-listed) -- the composition edges V4LINK bridges to ChEBI/PubChem through Wikidata's own P683/P662
+  -- and subclass/instance links. Selection is by class id, never by label.
+purpose: seed_entities
+entity_kind: energy_source
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { VALUES ?item { wd:Q12748 wd:Q12705 wd:Q42501 wd:Q22656 wd:Q40858 wd:Q24489 wd:Q1098 wd:Q12739 wd:Q43302 } }
+    UNION
+    { VALUES ?root { wd:Q12748 wd:Q12705 wd:Q42501 } ?item wdt:P279 ?root . }
+  }
+max_rows: 3000
+expand_hops: 1

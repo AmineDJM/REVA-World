@@ -1,0 +1,17 @@
+id: energy.producing_companies_by_product
+domain: energy
+owner: V4ENERGY
+description: >-
+  Organisations that Wikidata says produce (P1056) petroleum Q22656, natural gas Q40858, coal Q24489, uranium Q1098,
+  lithium Q568, cobalt Q740, nickel Q744 or copper Q753 (e.g. national oil companies, miners). The same QIDs are the
+  company identity V4INDUSTRY uses (bridged to LEI / SEC CIK by V4LINK through Wikidata's own P1278 / P5531).
+  Snapshots keep country, headquarters, inception, owner (P127), parent (P749), subsidiaries (P355), industry, product.
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?product { wd:Q22656 wd:Q40858 wd:Q24489 wd:Q1098 wd:Q568 wd:Q740 wd:Q744 wd:Q753 }
+    ?item wdt:P1056 ?product ; wdt:P31/wdt:P279* wd:Q43229 .
+  }
+max_rows: 20000
+expand_hops: 1
