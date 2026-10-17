@@ -221,3 +221,33 @@ def test_04_api(env: Env) -> None:
     assert "final_vintage_pseudo_real_time" in {w["code"] for w in bt["warnings"]}
     r = env.client.get("/v1/forecasts/questions/fq_" + "0" * 24, headers={"Authorization": f"Bearer {env.token}"})
     assert r.status_code == 404
+
+
+def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch: pytest.MonkeyPatch) -> None:
+    """FIX4B (audit AUDIT3 M7): a sealed question that cannot be resolved as worded is closed as void with a
+    reason by an appended resolution; the sealed batch is untouched; unknown ids are refused before any write."""
+    qs = get(env, "/v1/forecasts/questions", origin="test_fixture", status="resolved")["data"]["questions"]
+    qid = qs[0]["question_id"]
+    void = {qid: {"reason": "fiscal_year_basis", "detail": "synthetic test: worded as a calendar year"}}
+    with pytest.raises(ValueError, match="not in any sealed batch"):
+        svc.void_questions(env.worker, env.store, {"fq_" + "0" * 24: void[qid]}, origin="test_fixture")
+    with pytest.raises(ValueError, match="reason and a detail"):
+        svc.void_questions(env.worker, env.store, {qid: {"reason": "x"}}, origin="test_fixture")
+    out = svc.void_questions(env.worker, env.store, void, origin="test_fixture")
+    assert out["batches"][0]["status"] == "already_handled"  # resolved questions are never re-closed
+    with env.worker.connect() as c:
+        before = c.execute(text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")).scalar()
+    monkeypatch.setattr(svc, "handled_questions", lambda conn, sha: set())  # pretend it is still open
+    out = svc.void_questions(env.worker, env.store, void, origin="test_fixture")
+    b = out["batches"][0]
+    assert b["status"] == "voided" and b["void"] == 1, out
+    doc = json.loads(env.store.get("evaluation", b["resolution_sha256"]))
+    assert doc["outcomes"] == [{"question_id": qid, "status": "void", **void[qid]}] and doc["scores"] == []
+    assert "never edited or re-sealed" in doc["rule"]
+    with env.worker.connect() as c:
+        rows = c.execute(
+            text("SELECT metrics FROM model.evaluation WHERE metrics->>'kind' = 'registry_score' "
+                 "AND metrics->>'resolution_sha256' = :s"), {"s": b["resolution_sha256"]}
+        ).scalars().all()  # fmt: skip
+        after = c.execute(text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")).scalar()
+    assert after == before + len(rows) and rows and all(r["n_void"] == 1 and r["scores"] == [] for r in rows)

@@ -1,0 +1,467 @@
+# Geography scheme of agent V6MIGR: IOM Missing Migrants Project 'country_of_incident' names -> crosswalk entities.
+# MMP publishes a country NAME per incident (no code). Only EXACT equality after case-folding and whitespace
+# collapsing (and decoding HTML character references such as &#039;) with one crosswalk name field (label / iso_name / un_name / worldbank_name / comtrade_reporter_label) of
+# exactly one entity is accepted; no similarity matching. Generated from the HDX file
+# iom-missing-migrants-project-data.csv (raw sha256 7e3b099fe58f7a6d59b5101befaa821477263ee0005dcb92ea818ba8ae5d6ad8, read 2026-10-17).
+# Deliberately absent (kept unmapped, iso3 null): none at generation time; names added later by MMP stay unmapped until this file is regenerated.
+scheme: iom_mmp
+base: iso3
+aliases:
+  - code: "Afghanistan"
+    iso3: AFG
+    source: "exact normalised name match: MMP country_of_incident 'Afghanistan' = crosswalk label 'Afghanistan'"
+  - code: "Albania"
+    iso3: ALB
+    source: "exact normalised name match: MMP country_of_incident 'Albania' = crosswalk label 'Albania'"
+  - code: "Algeria"
+    iso3: DZA
+    source: "exact normalised name match: MMP country_of_incident 'Algeria' = crosswalk label 'Algeria'"
+  - code: "Angola"
+    iso3: AGO
+    source: "exact normalised name match: MMP country_of_incident 'Angola' = crosswalk label 'Angola'"
+  - code: "Argentina"
+    iso3: ARG
+    source: "exact normalised name match: MMP country_of_incident 'Argentina' = crosswalk label 'Argentina'"
+  - code: "Aruba"
+    iso3: ABW
+    source: "exact normalised name match: MMP country_of_incident 'Aruba' = crosswalk label 'Aruba'"
+  - code: "Austria"
+    iso3: AUT
+    source: "exact normalised name match: MMP country_of_incident 'Austria' = crosswalk label 'Austria'"
+  - code: "Bahamas"
+    iso3: BHS
+    source: "exact normalised name match: MMP country_of_incident 'Bahamas' = crosswalk label 'Bahamas'"
+  - code: "Bangladesh"
+    iso3: BGD
+    source: "exact normalised name match: MMP country_of_incident 'Bangladesh' = crosswalk label 'Bangladesh'"
+  - code: "Belarus"
+    iso3: BLR
+    source: "exact normalised name match: MMP country_of_incident 'Belarus' = crosswalk label 'Belarus'"
+  - code: "Belgium"
+    iso3: BEL
+    source: "exact normalised name match: MMP country_of_incident 'Belgium' = crosswalk label 'Belgium'"
+  - code: "Benin"
+    iso3: BEN
+    source: "exact normalised name match: MMP country_of_incident 'Benin' = crosswalk label 'Benin'"
+  - code: "Bolivia (Plurinational State of)"
+    iso3: BOL
+    source: "exact normalised name match: MMP country_of_incident 'Bolivia (Plurinational State of)' = crosswalk label 'Bolivia (Plurinational State of)'"
+  - code: "Bosnia and Herzegovina"
+    iso3: BIH
+    source: "exact normalised name match: MMP country_of_incident 'Bosnia and Herzegovina' = crosswalk label 'Bosnia and Herzegovina'"
+  - code: "Brazil"
+    iso3: BRA
+    source: "exact normalised name match: MMP country_of_incident 'Brazil' = crosswalk label 'Brazil'"
+  - code: "Bulgaria"
+    iso3: BGR
+    source: "exact normalised name match: MMP country_of_incident 'Bulgaria' = crosswalk label 'Bulgaria'"
+  - code: "Burkina Faso"
+    iso3: BFA
+    source: "exact normalised name match: MMP country_of_incident 'Burkina Faso' = crosswalk label 'Burkina Faso'"
+  - code: "Cabo Verde"
+    iso3: CPV
+    source: "exact normalised name match: MMP country_of_incident 'Cabo Verde' = crosswalk label 'Cabo Verde'"
+  - code: "Cambodia"
+    iso3: KHM
+    source: "exact normalised name match: MMP country_of_incident 'Cambodia' = crosswalk label 'Cambodia'"
+  - code: "Cameroon"
+    iso3: CMR
+    source: "exact normalised name match: MMP country_of_incident 'Cameroon' = crosswalk label 'Cameroon'"
+  - code: "Canada"
+    iso3: CAN
+    source: "exact normalised name match: MMP country_of_incident 'Canada' = crosswalk label 'Canada'"
+  - code: "Cayman Islands"
+    iso3: CYM
+    source: "exact normalised name match: MMP country_of_incident 'Cayman Islands' = crosswalk label 'Cayman Islands'"
+  - code: "Central African Republic"
+    iso3: CAF
+    source: "exact normalised name match: MMP country_of_incident 'Central African Republic' = crosswalk label 'Central African Republic'"
+  - code: "Chad"
+    iso3: TCD
+    source: "exact normalised name match: MMP country_of_incident 'Chad' = crosswalk label 'Chad'"
+  - code: "Chile"
+    iso3: CHL
+    source: "exact normalised name match: MMP country_of_incident 'Chile' = crosswalk label 'Chile'"
+  - code: "China"
+    iso3: CHN
+    source: "exact normalised name match: MMP country_of_incident 'China' = crosswalk label 'China'"
+  - code: "China, Hong Kong Special Administrative Region"
+    iso3: HKG
+    source: "exact normalised name match: MMP country_of_incident 'China, Hong Kong Special Administrative Region' = crosswalk label 'China, Hong Kong Special Administrative Region'"
+  - code: "China, Macao Special Administrative Region"
+    iso3: MAC
+    source: "exact normalised name match: MMP country_of_incident 'China, Macao Special Administrative Region' = crosswalk label 'China, Macao Special Administrative Region'"
+  - code: "Colombia"
+    iso3: COL
+    source: "exact normalised name match: MMP country_of_incident 'Colombia' = crosswalk label 'Colombia'"
+  - code: "Comoros"
+    iso3: COM
+    source: "exact normalised name match: MMP country_of_incident 'Comoros' = crosswalk label 'Comoros'"
+  - code: "Costa Rica"
+    iso3: CRI
+    source: "exact normalised name match: MMP country_of_incident 'Costa Rica' = crosswalk label 'Costa Rica'"
+  - code: "Croatia"
+    iso3: HRV
+    source: "exact normalised name match: MMP country_of_incident 'Croatia' = crosswalk label 'Croatia'"
+  - code: "Cuba"
+    iso3: CUB
+    source: "exact normalised name match: MMP country_of_incident 'Cuba' = crosswalk label 'Cuba'"
+  - code: "Cyprus"
+    iso3: CYP
+    source: "exact normalised name match: MMP country_of_incident 'Cyprus' = crosswalk label 'Cyprus'"
+  - code: "Czechia"
+    iso3: CZE
+    source: "exact normalised name match: MMP country_of_incident 'Czechia' = crosswalk label 'Czechia'"
+  - code: "Côte d&#039;Ivoire"
+    iso3: CIV
+    source: "exact normalised name match (after decoding the provider's HTML character reference, e.g. &#039; = apostrophe): MMP country_of_incident 'Côte d&#039;Ivoire' = crosswalk iso_name 'Côte d'Ivoire'"
+  - code: "Democratic People&#039;s Republic of Korea"
+    iso3: PRK
+    source: "exact normalised name match (after decoding the provider's HTML character reference, e.g. &#039; = apostrophe): MMP country_of_incident 'Democratic People&#039;s Republic of Korea' = crosswalk label 'Democratic People's Republic of Korea'"
+  - code: "Democratic Republic of the Congo"
+    iso3: COD
+    source: "exact normalised name match: MMP country_of_incident 'Democratic Republic of the Congo' = crosswalk label 'Democratic Republic of the Congo'"
+  - code: "Djibouti"
+    iso3: DJI
+    source: "exact normalised name match: MMP country_of_incident 'Djibouti' = crosswalk label 'Djibouti'"
+  - code: "Dominica"
+    iso3: DMA
+    source: "exact normalised name match: MMP country_of_incident 'Dominica' = crosswalk label 'Dominica'"
+  - code: "Dominican Republic"
+    iso3: DOM
+    source: "exact normalised name match: MMP country_of_incident 'Dominican Republic' = crosswalk label 'Dominican Republic'"
+  - code: "Ecuador"
+    iso3: ECU
+    source: "exact normalised name match: MMP country_of_incident 'Ecuador' = crosswalk label 'Ecuador'"
+  - code: "Egypt"
+    iso3: EGY
+    source: "exact normalised name match: MMP country_of_incident 'Egypt' = crosswalk label 'Egypt'"
+  - code: "El Salvador"
+    iso3: SLV
+    source: "exact normalised name match: MMP country_of_incident 'El Salvador' = crosswalk label 'El Salvador'"
+  - code: "Equatorial Guinea"
+    iso3: GNQ
+    source: "exact normalised name match: MMP country_of_incident 'Equatorial Guinea' = crosswalk label 'Equatorial Guinea'"
+  - code: "Eritrea"
+    iso3: ERI
+    source: "exact normalised name match: MMP country_of_incident 'Eritrea' = crosswalk label 'Eritrea'"
+  - code: "Ethiopia"
+    iso3: ETH
+    source: "exact normalised name match: MMP country_of_incident 'Ethiopia' = crosswalk label 'Ethiopia'"
+  - code: "Finland"
+    iso3: FIN
+    source: "exact normalised name match: MMP country_of_incident 'Finland' = crosswalk label 'Finland'"
+  - code: "France"
+    iso3: FRA
+    source: "exact normalised name match: MMP country_of_incident 'France' = crosswalk label 'France'"
+  - code: "French Guiana"
+    iso3: GUF
+    source: "exact normalised name match: MMP country_of_incident 'French Guiana' = crosswalk label 'French Guiana'"
+  - code: "Gabon"
+    iso3: GAB
+    source: "exact normalised name match: MMP country_of_incident 'Gabon' = crosswalk label 'Gabon'"
+  - code: "Gambia"
+    iso3: GMB
+    source: "exact normalised name match: MMP country_of_incident 'Gambia' = crosswalk label 'Gambia'"
+  - code: "Germany"
+    iso3: DEU
+    source: "exact normalised name match: MMP country_of_incident 'Germany' = crosswalk label 'Germany'"
+  - code: "Ghana"
+    iso3: GHA
+    source: "exact normalised name match: MMP country_of_incident 'Ghana' = crosswalk label 'Ghana'"
+  - code: "Greece"
+    iso3: GRC
+    source: "exact normalised name match: MMP country_of_incident 'Greece' = crosswalk label 'Greece'"
+  - code: "Grenada"
+    iso3: GRD
+    source: "exact normalised name match: MMP country_of_incident 'Grenada' = crosswalk label 'Grenada'"
+  - code: "Guatemala"
+    iso3: GTM
+    source: "exact normalised name match: MMP country_of_incident 'Guatemala' = crosswalk label 'Guatemala'"
+  - code: "Guinea"
+    iso3: GIN
+    source: "exact normalised name match: MMP country_of_incident 'Guinea' = crosswalk label 'Guinea'"
+  - code: "Guinea-Bissau"
+    iso3: GNB
+    source: "exact normalised name match: MMP country_of_incident 'Guinea-Bissau' = crosswalk label 'Guinea-Bissau'"
+  - code: "Guyana"
+    iso3: GUY
+    source: "exact normalised name match: MMP country_of_incident 'Guyana' = crosswalk label 'Guyana'"
+  - code: "Haiti"
+    iso3: HTI
+    source: "exact normalised name match: MMP country_of_incident 'Haiti' = crosswalk label 'Haiti'"
+  - code: "Honduras"
+    iso3: HND
+    source: "exact normalised name match: MMP country_of_incident 'Honduras' = crosswalk label 'Honduras'"
+  - code: "Hungary"
+    iso3: HUN
+    source: "exact normalised name match: MMP country_of_incident 'Hungary' = crosswalk label 'Hungary'"
+  - code: "India"
+    iso3: IND
+    source: "exact normalised name match: MMP country_of_incident 'India' = crosswalk label 'India'"
+  - code: "Indonesia"
+    iso3: IDN
+    source: "exact normalised name match: MMP country_of_incident 'Indonesia' = crosswalk label 'Indonesia'"
+  - code: "Iran (Islamic Republic of)"
+    iso3: IRN
+    source: "exact normalised name match: MMP country_of_incident 'Iran (Islamic Republic of)' = crosswalk label 'Iran (Islamic Republic of)'"
+  - code: "Iraq"
+    iso3: IRQ
+    source: "exact normalised name match: MMP country_of_incident 'Iraq' = crosswalk label 'Iraq'"
+  - code: "Israel"
+    iso3: ISR
+    source: "exact normalised name match: MMP country_of_incident 'Israel' = crosswalk label 'Israel'"
+  - code: "Italy"
+    iso3: ITA
+    source: "exact normalised name match: MMP country_of_incident 'Italy' = crosswalk label 'Italy'"
+  - code: "Jamaica"
+    iso3: JAM
+    source: "exact normalised name match: MMP country_of_incident 'Jamaica' = crosswalk label 'Jamaica'"
+  - code: "Japan"
+    iso3: JPN
+    source: "exact normalised name match: MMP country_of_incident 'Japan' = crosswalk label 'Japan'"
+  - code: "Jordan"
+    iso3: JOR
+    source: "exact normalised name match: MMP country_of_incident 'Jordan' = crosswalk label 'Jordan'"
+  - code: "Kazakhstan"
+    iso3: KAZ
+    source: "exact normalised name match: MMP country_of_incident 'Kazakhstan' = crosswalk label 'Kazakhstan'"
+  - code: "Kenya"
+    iso3: KEN
+    source: "exact normalised name match: MMP country_of_incident 'Kenya' = crosswalk label 'Kenya'"
+  - code: "Lao People&#039;s Democratic Republic"
+    iso3: LAO
+    source: "exact normalised name match (after decoding the provider's HTML character reference, e.g. &#039; = apostrophe): MMP country_of_incident 'Lao People&#039;s Democratic Republic' = crosswalk label 'Lao People's Democratic Republic'"
+  - code: "Latvia"
+    iso3: LVA
+    source: "exact normalised name match: MMP country_of_incident 'Latvia' = crosswalk label 'Latvia'"
+  - code: "Lebanon"
+    iso3: LBN
+    source: "exact normalised name match: MMP country_of_incident 'Lebanon' = crosswalk label 'Lebanon'"
+  - code: "Lesotho"
+    iso3: LSO
+    source: "exact normalised name match: MMP country_of_incident 'Lesotho' = crosswalk label 'Lesotho'"
+  - code: "Liberia"
+    iso3: LBR
+    source: "exact normalised name match: MMP country_of_incident 'Liberia' = crosswalk label 'Liberia'"
+  - code: "Libya"
+    iso3: LBY
+    source: "exact normalised name match: MMP country_of_incident 'Libya' = crosswalk label 'Libya'"
+  - code: "Lithuania"
+    iso3: LTU
+    source: "exact normalised name match: MMP country_of_incident 'Lithuania' = crosswalk label 'Lithuania'"
+  - code: "Madagascar"
+    iso3: MDG
+    source: "exact normalised name match: MMP country_of_incident 'Madagascar' = crosswalk label 'Madagascar'"
+  - code: "Malawi"
+    iso3: MWI
+    source: "exact normalised name match: MMP country_of_incident 'Malawi' = crosswalk label 'Malawi'"
+  - code: "Malaysia"
+    iso3: MYS
+    source: "exact normalised name match: MMP country_of_incident 'Malaysia' = crosswalk label 'Malaysia'"
+  - code: "Mali"
+    iso3: MLI
+    source: "exact normalised name match: MMP country_of_incident 'Mali' = crosswalk label 'Mali'"
+  - code: "Malta"
+    iso3: MLT
+    source: "exact normalised name match: MMP country_of_incident 'Malta' = crosswalk label 'Malta'"
+  - code: "Mauritania"
+    iso3: MRT
+    source: "exact normalised name match: MMP country_of_incident 'Mauritania' = crosswalk label 'Mauritania'"
+  - code: "Mayotte"
+    iso3: MYT
+    source: "exact normalised name match: MMP country_of_incident 'Mayotte' = crosswalk label 'Mayotte'"
+  - code: "Mexico"
+    iso3: MEX
+    source: "exact normalised name match: MMP country_of_incident 'Mexico' = crosswalk label 'Mexico'"
+  - code: "Montenegro"
+    iso3: MNE
+    source: "exact normalised name match: MMP country_of_incident 'Montenegro' = crosswalk label 'Montenegro'"
+  - code: "Morocco"
+    iso3: MAR
+    source: "exact normalised name match: MMP country_of_incident 'Morocco' = crosswalk label 'Morocco'"
+  - code: "Mozambique"
+    iso3: MOZ
+    source: "exact normalised name match: MMP country_of_incident 'Mozambique' = crosswalk label 'Mozambique'"
+  - code: "Myanmar"
+    iso3: MMR
+    source: "exact normalised name match: MMP country_of_incident 'Myanmar' = crosswalk label 'Myanmar'"
+  - code: "Nepal"
+    iso3: NPL
+    source: "exact normalised name match: MMP country_of_incident 'Nepal' = crosswalk label 'Nepal'"
+  - code: "Netherlands"
+    iso3: NLD
+    source: "exact normalised name match: MMP country_of_incident 'Netherlands' = crosswalk iso_name 'Netherlands'"
+  - code: "Nicaragua"
+    iso3: NIC
+    source: "exact normalised name match: MMP country_of_incident 'Nicaragua' = crosswalk label 'Nicaragua'"
+  - code: "Niger"
+    iso3: NER
+    source: "exact normalised name match: MMP country_of_incident 'Niger' = crosswalk label 'Niger'"
+  - code: "Nigeria"
+    iso3: NGA
+    source: "exact normalised name match: MMP country_of_incident 'Nigeria' = crosswalk label 'Nigeria'"
+  - code: "North Macedonia"
+    iso3: MKD
+    source: "exact normalised name match: MMP country_of_incident 'North Macedonia' = crosswalk label 'North Macedonia'"
+  - code: "Norway"
+    iso3: NOR
+    source: "exact normalised name match: MMP country_of_incident 'Norway' = crosswalk label 'Norway'"
+  - code: "Oman"
+    iso3: OMN
+    source: "exact normalised name match: MMP country_of_incident 'Oman' = crosswalk label 'Oman'"
+  - code: "Pakistan"
+    iso3: PAK
+    source: "exact normalised name match: MMP country_of_incident 'Pakistan' = crosswalk label 'Pakistan'"
+  - code: "Panama"
+    iso3: PAN
+    source: "exact normalised name match: MMP country_of_incident 'Panama' = crosswalk label 'Panama'"
+  - code: "Paraguay"
+    iso3: PRY
+    source: "exact normalised name match: MMP country_of_incident 'Paraguay' = crosswalk label 'Paraguay'"
+  - code: "Peru"
+    iso3: PER
+    source: "exact normalised name match: MMP country_of_incident 'Peru' = crosswalk label 'Peru'"
+  - code: "Philippines"
+    iso3: PHL
+    source: "exact normalised name match: MMP country_of_incident 'Philippines' = crosswalk label 'Philippines'"
+  - code: "Poland"
+    iso3: POL
+    source: "exact normalised name match: MMP country_of_incident 'Poland' = crosswalk label 'Poland'"
+  - code: "Portugal"
+    iso3: PRT
+    source: "exact normalised name match: MMP country_of_incident 'Portugal' = crosswalk label 'Portugal'"
+  - code: "Puerto Rico"
+    iso3: PRI
+    source: "exact normalised name match: MMP country_of_incident 'Puerto Rico' = crosswalk label 'Puerto Rico'"
+  - code: "Republic of Korea"
+    iso3: KOR
+    source: "exact normalised name match: MMP country_of_incident 'Republic of Korea' = crosswalk label 'Republic of Korea'"
+  - code: "Republic of Moldova"
+    iso3: MDA
+    source: "exact normalised name match: MMP country_of_incident 'Republic of Moldova' = crosswalk label 'Republic of Moldova'"
+  - code: "Romania"
+    iso3: ROU
+    source: "exact normalised name match: MMP country_of_incident 'Romania' = crosswalk label 'Romania'"
+  - code: "Russian Federation"
+    iso3: RUS
+    source: "exact normalised name match: MMP country_of_incident 'Russian Federation' = crosswalk label 'Russian Federation'"
+  - code: "Rwanda"
+    iso3: RWA
+    source: "exact normalised name match: MMP country_of_incident 'Rwanda' = crosswalk label 'Rwanda'"
+  - code: "Saint Kitts and Nevis"
+    iso3: KNA
+    source: "exact normalised name match: MMP country_of_incident 'Saint Kitts and Nevis' = crosswalk label 'Saint Kitts and Nevis'"
+  - code: "Saint Vincent and the Grenadines"
+    iso3: VCT
+    source: "exact normalised name match: MMP country_of_incident 'Saint Vincent and the Grenadines' = crosswalk label 'Saint Vincent and the Grenadines'"
+  - code: "Saudi Arabia"
+    iso3: SAU
+    source: "exact normalised name match: MMP country_of_incident 'Saudi Arabia' = crosswalk label 'Saudi Arabia'"
+  - code: "Senegal"
+    iso3: SEN
+    source: "exact normalised name match: MMP country_of_incident 'Senegal' = crosswalk label 'Senegal'"
+  - code: "Serbia"
+    iso3: SRB
+    source: "exact normalised name match: MMP country_of_incident 'Serbia' = crosswalk label 'Serbia'"
+  - code: "Sierra Leone"
+    iso3: SLE
+    source: "exact normalised name match: MMP country_of_incident 'Sierra Leone' = crosswalk label 'Sierra Leone'"
+  - code: "Singapore"
+    iso3: SGP
+    source: "exact normalised name match: MMP country_of_incident 'Singapore' = crosswalk label 'Singapore'"
+  - code: "Slovenia"
+    iso3: SVN
+    source: "exact normalised name match: MMP country_of_incident 'Slovenia' = crosswalk label 'Slovenia'"
+  - code: "Somalia"
+    iso3: SOM
+    source: "exact normalised name match: MMP country_of_incident 'Somalia' = crosswalk label 'Somalia'"
+  - code: "South Africa"
+    iso3: ZAF
+    source: "exact normalised name match: MMP country_of_incident 'South Africa' = crosswalk label 'South Africa'"
+  - code: "South Sudan"
+    iso3: SSD
+    source: "exact normalised name match: MMP country_of_incident 'South Sudan' = crosswalk label 'South Sudan'"
+  - code: "Spain"
+    iso3: ESP
+    source: "exact normalised name match: MMP country_of_incident 'Spain' = crosswalk label 'Spain'"
+  - code: "Sri Lanka"
+    iso3: LKA
+    source: "exact normalised name match: MMP country_of_incident 'Sri Lanka' = crosswalk label 'Sri Lanka'"
+  - code: "Sudan"
+    iso3: SDN
+    source: "exact normalised name match: MMP country_of_incident 'Sudan' = crosswalk label 'Sudan'"
+  - code: "Sweden"
+    iso3: SWE
+    source: "exact normalised name match: MMP country_of_incident 'Sweden' = crosswalk label 'Sweden'"
+  - code: "Switzerland"
+    iso3: CHE
+    source: "exact normalised name match: MMP country_of_incident 'Switzerland' = crosswalk label 'Switzerland'"
+  - code: "Syrian Arab Republic"
+    iso3: SYR
+    source: "exact normalised name match: MMP country_of_incident 'Syrian Arab Republic' = crosswalk label 'Syrian Arab Republic'"
+  - code: "Thailand"
+    iso3: THA
+    source: "exact normalised name match: MMP country_of_incident 'Thailand' = crosswalk label 'Thailand'"
+  - code: "Togo"
+    iso3: TGO
+    source: "exact normalised name match: MMP country_of_incident 'Togo' = crosswalk label 'Togo'"
+  - code: "Trinidad and Tobago"
+    iso3: TTO
+    source: "exact normalised name match: MMP country_of_incident 'Trinidad and Tobago' = crosswalk label 'Trinidad and Tobago'"
+  - code: "Tunisia"
+    iso3: TUN
+    source: "exact normalised name match: MMP country_of_incident 'Tunisia' = crosswalk label 'Tunisia'"
+  - code: "Turks and Caicos Islands"
+    iso3: TCA
+    source: "exact normalised name match: MMP country_of_incident 'Turks and Caicos Islands' = crosswalk label 'Turks and Caicos Islands'"
+  - code: "Türkiye"
+    iso3: TUR
+    source: "exact normalised name match: MMP country_of_incident 'Türkiye' = crosswalk label 'Türkiye'"
+  - code: "Uganda"
+    iso3: UGA
+    source: "exact normalised name match: MMP country_of_incident 'Uganda' = crosswalk label 'Uganda'"
+  - code: "Ukraine"
+    iso3: UKR
+    source: "exact normalised name match: MMP country_of_incident 'Ukraine' = crosswalk label 'Ukraine'"
+  - code: "United Arab Emirates"
+    iso3: ARE
+    source: "exact normalised name match: MMP country_of_incident 'United Arab Emirates' = crosswalk label 'United Arab Emirates'"
+  - code: "United Kingdom of Great Britain and Northern Ireland"
+    iso3: GBR
+    source: "exact normalised name match: MMP country_of_incident 'United Kingdom of Great Britain and Northern Ireland' = crosswalk label 'United Kingdom of Great Britain and Northern Ireland'"
+  - code: "United Republic of Tanzania"
+    iso3: TZA
+    source: "exact normalised name match: MMP country_of_incident 'United Republic of Tanzania' = crosswalk label 'United Republic of Tanzania'"
+  - code: "United States Virgin Islands"
+    iso3: VIR
+    source: "exact normalised name match: MMP country_of_incident 'United States Virgin Islands' = crosswalk label 'United States Virgin Islands'"
+  - code: "United States of America"
+    iso3: USA
+    source: "exact normalised name match: MMP country_of_incident 'United States of America' = crosswalk label 'United States of America'"
+  - code: "Uruguay"
+    iso3: URY
+    source: "exact normalised name match: MMP country_of_incident 'Uruguay' = crosswalk label 'Uruguay'"
+  - code: "Venezuela (Bolivarian Republic of)"
+    iso3: VEN
+    source: "exact normalised name match: MMP country_of_incident 'Venezuela (Bolivarian Republic of)' = crosswalk label 'Venezuela (Bolivarian Republic of)'"
+  - code: "Viet Nam"
+    iso3: VNM
+    source: "exact normalised name match: MMP country_of_incident 'Viet Nam' = crosswalk label 'Viet Nam'"
+  - code: "Western Sahara"
+    iso3: ESH
+    source: "exact normalised name match: MMP country_of_incident 'Western Sahara' = crosswalk label 'Western Sahara'"
+  - code: "Yemen"
+    iso3: YEM
+    source: "exact normalised name match: MMP country_of_incident 'Yemen' = crosswalk label 'Yemen'"
+  - code: "Zambia"
+    iso3: ZMB
+    source: "exact normalised name match: MMP country_of_incident 'Zambia' = crosswalk label 'Zambia'"
+  - code: "Zimbabwe"
+    iso3: ZWE
+    source: "exact normalised name match: MMP country_of_incident 'Zimbabwe' = crosswalk label 'Zimbabwe'"
+source:
+  kind: provider_data
+  url: https://data.humdata.org/dataset/missing-migrants-project-data
+  retrieved_at: "2026-10-17T20:30:00Z"
+  note: "IOM Missing Migrants Project CSV via HDX; see docs/dev/v6_migration.md"

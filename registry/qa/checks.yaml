@@ -1,0 +1,159 @@
+# REVA data-quality checks (V6 QA-DATA): tolerances and declared rules for `reva qa run`.
+# Loader: reva.qa.config. Every check is READ-ONLY: it reports, it never fixes, retracts or rewrites anything.
+# A divergence between two sources is a finding to review (definitions, scope, vintages differ), never a reason to
+# blend, pick or "correct" a value.
+schema: reva-qa-checks/1
+
+# ------------------------------------------------------------------ (1) cross-source consistency
+cross_source:
+  # Pairs are built from (a) every pair of series of each headline concept (registry/atlas/source_order, with each
+  # series' declared scale and not_equivalent_for exclusions), (b) every pair of series from different sources of a
+  # catalog concept (registry/atlas/catalog; the catalog declares them the same quantity in the concept's unit), and
+  # (c) the explicit pairs below. Only calendar-year, numeric, non-projection, country (iso3) cells are compared.
+  # A cell pair diverges when |a-b| > abs_tol AND |a-b| / max(|a|,|b|) > rel_tol.
+  defaults: {rel_tol: 0.05, abs_tol: 0.0, max_diverging_share: 0.10, min_overlap: 5}
+  # First matching override (regex on the concept id or explicit pair name) wins.
+  overrides:
+    - match: '^reva\.population\.'
+      rel_tol: 0.03
+      note: WPP vs WDI differ by definition for census-based economies (review V3b); 3 % flags the material ones.
+    - match: '^reva\.economy\.gdp'
+      rel_tol: 0.05
+      note: exchange-rate choices and benchmark revisions differ between the WDI and the WEO.
+    - match: '(literacy|enrolment|expenditure|food_insecurity|undernourishment|water\.stress)'
+      rel_tol: 0.10
+      abs_tol: 1.0
+      note: UIS/FAO/WHO publish revised estimates the WDI picks up with a lag; 1 point / 10 % is a material gap.
+    - match: '(mortality|immunization|incidence|prevalence|coverage|skilled_birth|out_of_pocket)'
+      rel_tol: 0.10
+      abs_tol: 0.5
+    - match: '^history\.'
+      rel_tol: 0.15
+      note: long-run compilations (back-casts, territorial bases differ).
+  explicit:
+    - name: unemployment.ilo_vs_wdi
+      a: {series: ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15}
+      b: {series: wb.wdi_social.SL.UEM.TOTL.ZS}
+      rel_tol: 0.02
+      abs_tol: 0.1
+      note: the WDI republishes the ILO modelled estimate (15+), so the two should agree to rounding.
+    - name: unemployment.ilo_vs_eurostat
+      a: {series: ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15}
+      b: {series: eurostat.une_m.une_rt_m|s_adj=NSA|age=TOTAL|unit=PC_ACT|sex=T, aggregate: annual_mean}
+      rel_tol: 0.10
+      abs_tol: 0.5
+      note: ILO modelled 15+ vs Eurostat LFS 15-74 (annual mean of 12 non-adjusted months; years with < 12 months skipped).
+    - name: unemployment.ilo_vs_weo
+      a: {series: ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15}
+      b: {series: imf.weo.LUR}
+      rel_tol: 0.15
+      abs_tol: 1.0
+      note: WEO follows national definitions; ILO harmonised modelled estimates.
+    - name: population.weo_vs_wdi
+      a: {series: imf.weo.LP}
+      b: {series: wb.wdi_social.SP.POP.TOTL}
+      rel_tol: 0.03
+      note: declared not_equivalent in the headline registry (national definitions); compared for review only.
+    - name: co2.owid_vs_wdi_edgar
+      a: {series: owid.co2.co2}
+      b: {series: wb.wdi_social.EN.GHG.CO2.MT.CE.AR5}
+      rel_tol: 0.10
+      abs_tol: 0.5
+      note: OWID = Global Carbon Project fossil + cement CO2; WDI = EDGAR CO2 excl. LULUCF. Different inventories.
+
+# ------------------------------------------------------------------ (2) unit / scale sanity
+units:
+  # The effective unit of a cell is the catalog concept's unit when its series is in a catalog source_order,
+  # else the provider unit written in the cell.
+  bounded:
+    - name: share_pct_of_total
+      unit_regex: '(?i)^%( \(share\))? of (the )?(total|population|households|women|men|adults|female|male|rural|urban|children|cohort|relevant age group|labou?r force|employment|deaths|land area|a day)'
+      min: 0
+      max: 100
+    - name: fraction_0_1
+      unit_regex: '(?i)(\(0-1\)|^index 0-1$|fraction of total)'
+      min: 0
+      max: 1
+    - name: index_0_100
+      unit_regex: '(?i)\(0-100\)'
+      min: 0
+      max: 100
+    - name: index_0_10
+      unit_regex: '(?i)\(0-10\)'
+      min: 0
+      max: 10
+    - name: share_concept_pct
+      # catalog concepts in plain '%' whose id says share/prevalence/coverage/rate of a population
+      unit_regex: '(?i)^(%|percent|percentage)$'
+      concept_regex: '(?i)(share|prevalence|coverage|literacy|immuni[sz]ation|_pct$|proportion|access_|attendance)'
+      concept_exempt_regex: '(?i)(growth|change|gross_enrol|enrolment_gross|_ger|gdp|gni|ratio|yield|inflation)'
+      min: 0
+      max: 100
+  bounded_tolerance: 1.0e-9
+  counts:
+    unit_regex: '(?i)^(number|count|persons|people|individuals|headcount.*|number of .*|persons \(.*\)|thousands of persons|thousands|tonnes.*|hectares|head|deaths|cases)$'
+    exempt_regex: '(?i)(net|change|balance|migration|growth|diff|surplus|deficit|variation|delta|stock_?change|_chg)'
+  identities:
+    - name: wdi.gdp_per_capita_x_population
+      product: [wb.wdi_econ.NY.GDP.PCAP.CD, wb.wdi_social.SP.POP.TOTL]
+      total: wb.wdi_econ.NY.GDP.MKTP.CD
+      scale: 1
+      rel_tol: 0.01
+    - name: weo.gdp_per_capita_x_population
+      product: [imf.weo.NGDPDPC, imf.weo.LP]
+      total: imf.weo.NGDPD
+      scale: 1
+      rel_tol: 0.01
+    - name: wdi.co2_per_capita_x_population
+      product: [wb.wdi_social.EN.GHG.CO2.PC.CE.AR5, wb.wdi_social.SP.POP.TOTL]
+      total: wb.wdi_social.EN.GHG.CO2.MT.CE.AR5
+      scale: 1.0e-6   # t/person x persons = t; total in Mt
+      rel_tol: 0.02
+
+# ------------------------------------------------------------------ (3) time sanity
+time:
+  # Days of grace after "today" before a non-projection cell starting in the future is reported.
+  future_grace_days: 0
+  # Tables whose every cell is a projection/forecast (must carry a projection flag).
+  projection_tables:
+    - un_wpp.wpp2024_age5_proj
+    - un_wpp.wpp2024_variants
+    - cckp_ts.cmip6_annual
+    - cckp_ts.cmip6_monthly_clim
+    - eia_steo.steo_forecast
+    - vintage_us.spf_median
+    - vintage_ea.ecb_spf
+  # Expected period length (days) per table-name suffix: precision mismatch = a cell outside the range.
+  precision_suffixes:
+    _d: [1, 1]
+    _m: [28, 31]
+    _q: [90, 92]
+    _a: [365, 366]
+  # KG predicates whose values are legitimately future dates (scheduled expiries, planned end dates).
+  kg_future_ok_predicates: [eusanctionsmap:expires, P582, P3001]
+
+# ------------------------------------------------------------------ (4) graph sanity
+graph:
+  cycle_families: [part_of, is_a]
+  cycle_exclude_pids: [P31]          # instance-of is not transitive: not a taxonomy edge
+  located_in:
+    family: located_in
+    # anatomical / genomic "located in" is not geography
+    exclude_pids: [uberon:located_in, doid:has_location, mondo:has_location, mondo:inflammation_site, hgnc:located_on_chromosome, P30]
+  examples: 8
+
+# ------------------------------------------------------------------ (5) licence / (6) provenance
+licence:
+  pending_review_values: [pending_maintainer_review, licence_review, pending]
+provenance:
+  # objects fully decoded + re-hashed per run (seeded sample); --verify-all re-hashes every object.
+  verify_sample: 200
+  verify_seed: QA-DATA-1
+  verify_max_bytes: 200000000
+
+# ------------------------------------------------------------------ (7) causal sanity
+causal:
+  # Words that make a non-causal layer read as causation (KG predicate ids, family / link-type labels).
+  wording_regex: '(?i)(\bcaus|\beffect of\b|\bleads? to\b|\bdrives?\b|\bdriver\b|\btrigger|\bresults? in\b|\bdue to\b|\bprovoqu|\bentra[iî]n|\bcause\b)'
+  # Claim relations whose wording is reviewed apart (the AUDIT3 H1 disruption axioms).
+  source_relations_review: ['RO:0004021', 'RO:0004020', 'RO:0004030']

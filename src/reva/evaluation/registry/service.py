@@ -690,6 +690,72 @@ def resolve_due(
     return {"origin": origin, "checked_at": now.isoformat(), "batches": out}
 
 
+VOID_RULE = (
+    "void by registry rule before resolution: the sealed question cannot be resolved as worded (its definition "
+    "contradicts the provider's metadata); the sealed manifest is never edited or re-sealed, the question is closed "
+    "with this appended resolution (status void, reason) and no forecast is scored"
+)
+
+
+def void_questions(
+    engine: Engine,
+    store: Any,
+    voids: Mapping[str, Mapping[str, Any]],
+    *,
+    origin: str = "live",
+    actor: str = "worker:forecast_registry",
+) -> dict[str, Any]:
+    """Close sealed, not yet handled questions as ``void`` with a stated reason (append-only).
+
+    ``voids``: question_id -> {"reason": <code>, "detail": <text>, ...evidence}. A question already handled
+    (resolved / void / not prospective) is left alone and reported; an unknown id is refused. Nothing in the
+    sealed batch changes: one resolution manifest + one ``registry_score`` row per model are appended per batch,
+    with ``n_void`` and empty scores (FIX4B, audit AUDIT3 M7)."""
+    _check_origin(origin)
+    for qid, v in voids.items():
+        if not str(v.get("reason") or "").strip() or not str(v.get("detail") or "").strip():
+            raise ValueError(f"void of {qid} needs a reason and a detail")
+    with engine.connect() as conn:
+        now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+        batches = _batches(conn, origin)
+        mv = model_version_ids(conn) if batches else {}
+    hits: list[tuple[Mapping[str, Any], Mapping[str, Any], list[Mapping[str, Any]]]] = []
+    for b in batches:
+        manifest = load_frozen_manifest(store, b["sha"])
+        if manifest.get("schema") != BATCH_SCHEMA:
+            raise IntegrityFailure("not a forecast registry batch", sha256=b["sha"])
+        mine = [q for q in manifest["questions"] if q["question_id"] in voids]
+        if mine:
+            hits.append((b, manifest, mine))
+    unknown = sorted(set(voids) - {q["question_id"] for _, _, m in hits for q in m})
+    if unknown:  # checked before anything is written
+        raise ValueError(f"question ids not in any sealed batch of origin {origin}: {unknown}")
+    out: list[dict[str, Any]] = []
+    for hb, hman, mine in hits:
+        b, manifest = dict(hb), dict(hman)
+        with engine.connect() as conn:
+            handled = handled_questions(conn, b["sha"])
+        todo = [q for q in mine if q["question_id"] not in handled]
+        skipped = sorted(q["question_id"] for q in mine if q["question_id"] in handled)
+        if not todo:
+            out.append({"batch_sha256": b["sha"], "status": "already_handled", "question_ids": skipped})
+            continue
+        res = {
+            "outcomes": [
+                {"question_id": q["question_id"], "status": "void", **dict(voids[q["question_id"]])} for q in todo
+            ],
+            "scores": [],
+        }
+        sha, counts = _record_resolution(
+            engine, store, b, manifest, res, now, mv, origin, actor, extra={"rule": VOID_RULE}
+        )
+        out.append(
+            {"batch_sha256": b["sha"], "status": "voided", "resolution_sha256": sha, "already_handled": skipped}
+            | dict(counts)
+        )
+    return {"origin": origin, "checked_at": now.isoformat(), "batches": out}
+
+
 # --------------------------------------------------------------------------- pseudo-real-time back-test
 
 

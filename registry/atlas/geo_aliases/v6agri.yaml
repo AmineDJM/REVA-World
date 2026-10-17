@@ -1,0 +1,202 @@
+# Agent V6AGRI: geography scheme `usda_psd` = the `Country_Code` column of the USDA FAS PSD Online bulk files
+# (psd_grains_pulses_csv.zip, psd_oilseeds_csv.zip). PSD codes are USDA's own 2-letter codes; most coincide with
+# FIPS 10-4, some are older USDA codes (DM Benin, GU Guinea, PN Panama, RH Zimbabwe, TC United Arab Emirates ...).
+# PSD publishes no crosswalk in the bulk files (the PSD API, which returns GENC codes, needs an api.data.gov key).
+# Rule: an alias is kept only when TWO published facts agree: the PSD code equals the FIPS 10-4 code of a
+# GeoNames countryInfo row (registry/atlas/reference/geonames_countryInfo.txt, sha256 c55f638cfaaf…) AND the PSD
+# Country_Name equals that row's name exactly. Everything else stays unmapped (iso3 = null, provider_geo kept)
+# and is listed below; no alias is made from a name alone.
+# Unmapped (code: PSD name -- reason):
+#   BE: Belgium-Luxembourg -- GeoNames FIPS BE = BEL 'Belgium' but PSD names 'Belgium-Luxembourg'
+#   BM: Burma -- GeoNames FIPS BM = MMR 'Myanmar' but PSD names 'Burma'
+#   CF: Congo (Brazzaville) -- GeoNames FIPS CF = COG 'Republic of the Congo' but PSD names 'Congo (Brazzaville)'
+#   CG: Congo (Kinshasa) -- GeoNames FIPS CG = COD 'Democratic Republic of the Congo' but PSD names 'Congo (Kinshasa)'
+#   CZ: Former Czechoslovakia -- not the FIPS 10-4 code of any GeoNames row
+#   DM: Benin -- not the FIPS 10-4 code of any GeoNames row
+#   E2: EU-15 -- not the FIPS 10-4 code of any GeoNames row
+#   E4: European Union -- not the FIPS 10-4 code of any GeoNames row
+#   EZ: Czech Republic -- GeoNames FIPS EZ = CZE 'Czechia' but PSD names 'Czech Republic'
+#   GA: Gambia, The -- GeoNames FIPS GA = GMB 'Gambia' but PSD names 'Gambia, The'
+#   GC: German Democratic Republic -- not the FIPS 10-4 code of any GeoNames row
+#   GE: Germany, Federal Republic of -- not the FIPS 10-4 code of any GeoNames row
+#   GU: Guinea -- not the FIPS 10-4 code of any GeoNames row
+#   IV: Cote d'Ivoire -- GeoNames FIPS IV = CIV 'Ivory Coast' but PSD names 'Cote d'Ivoire'
+#   KN: Korea, North -- GeoNames FIPS KN = PRK 'North Korea' but PSD names 'Korea, North'
+#   KS: Korea, South -- GeoNames FIPS KS = KOR 'South Korea' but PSD names 'Korea, South'
+#   MC: Macau -- GeoNames FIPS MC = MAC 'Macao' but PSD names 'Macau'
+#   NA: Netherlands Antilles -- not the FIPS 10-4 code of any GeoNames row
+#   NH: Vanuatu/New Hebrides -- GeoNames FIPS NH = VUT 'Vanuatu' but PSD names 'Vanuatu/New Hebrides'
+#   NL: Netherlands -- GeoNames FIPS NL = NLD 'The Netherlands' but PSD names 'Netherlands'
+#   PN: Panama -- not the FIPS 10-4 code of any GeoNames row
+#   RB: Serbia -- not the FIPS 10-4 code of any GeoNames row
+#   RH: Zimbabwe -- not the FIPS 10-4 code of any GeoNames row
+#   SR: Serbia and Montenegro -- not the FIPS 10-4 code of any GeoNames row
+#   TC: United Arab Emirates -- not the FIPS 10-4 code of any GeoNames row
+#   UR: Union of Soviet Socialist Repu -- not the FIPS 10-4 code of any GeoNames row
+#   YE: Yemen (Sanaa) -- not the FIPS 10-4 code of any GeoNames row
+#   YO: Former Yugoslavia -- not the FIPS 10-4 code of any GeoNames row
+#   YS: Yemen (Aden) -- not the FIPS 10-4 code of any GeoNames row
+#   YU: Yugoslavia (>05/92) -- not the FIPS 10-4 code of any GeoNames row
+#   ZZ: Other -- not the FIPS 10-4 code of any GeoNames row
+schemes:
+  usda_psd:
+    base: null
+    source: {kind: archived_reference, file: registry/atlas/reference/geonames_countryInfo.txt, column: fips, note: "PSD Country_Code == GeoNames FIPS 10-4 and PSD Country_Name == GeoNames country name (both required)"}
+    aliases:
+      - {code: "AF", iso3: AFG, source: "PSD AF 'Afghanistan' = GeoNames FIPS AF 'Afghanistan' -> AFG"}
+      - {code: "AG", iso3: DZA, source: "PSD AG 'Algeria' = GeoNames FIPS AG 'Algeria' -> DZA"}
+      - {code: "AJ", iso3: AZE, source: "PSD AJ 'Azerbaijan' = GeoNames FIPS AJ 'Azerbaijan' -> AZE"}
+      - {code: "AL", iso3: ALB, source: "PSD AL 'Albania' = GeoNames FIPS AL 'Albania' -> ALB"}
+      - {code: "AM", iso3: ARM, source: "PSD AM 'Armenia' = GeoNames FIPS AM 'Armenia' -> ARM"}
+      - {code: "AO", iso3: AGO, source: "PSD AO 'Angola' = GeoNames FIPS AO 'Angola' -> AGO"}
+      - {code: "AR", iso3: ARG, source: "PSD AR 'Argentina' = GeoNames FIPS AR 'Argentina' -> ARG"}
+      - {code: "AS", iso3: AUS, source: "PSD AS 'Australia' = GeoNames FIPS AS 'Australia' -> AUS"}
+      - {code: "AU", iso3: AUT, source: "PSD AU 'Austria' = GeoNames FIPS AU 'Austria' -> AUT"}
+      - {code: "BA", iso3: BHR, source: "PSD BA 'Bahrain' = GeoNames FIPS BA 'Bahrain' -> BHR"}
+      - {code: "BB", iso3: BRB, source: "PSD BB 'Barbados' = GeoNames FIPS BB 'Barbados' -> BRB"}
+      - {code: "BC", iso3: BWA, source: "PSD BC 'Botswana' = GeoNames FIPS BC 'Botswana' -> BWA"}
+      - {code: "BD", iso3: BMU, source: "PSD BD 'Bermuda' = GeoNames FIPS BD 'Bermuda' -> BMU"}
+      - {code: "BG", iso3: BGD, source: "PSD BG 'Bangladesh' = GeoNames FIPS BG 'Bangladesh' -> BGD"}
+      - {code: "BK", iso3: BIH, source: "PSD BK 'Bosnia and Herzegovina' = GeoNames FIPS BK 'Bosnia and Herzegovina' -> BIH"}
+      - {code: "BL", iso3: BOL, source: "PSD BL 'Bolivia' = GeoNames FIPS BL 'Bolivia' -> BOL"}
+      - {code: "BO", iso3: BLR, source: "PSD BO 'Belarus' = GeoNames FIPS BO 'Belarus' -> BLR"}
+      - {code: "BP", iso3: SLB, source: "PSD BP 'Solomon Islands' = GeoNames FIPS BP 'Solomon Islands' -> SLB"}
+      - {code: "BR", iso3: BRA, source: "PSD BR 'Brazil' = GeoNames FIPS BR 'Brazil' -> BRA"}
+      - {code: "BT", iso3: BTN, source: "PSD BT 'Bhutan' = GeoNames FIPS BT 'Bhutan' -> BTN"}
+      - {code: "BU", iso3: BGR, source: "PSD BU 'Bulgaria' = GeoNames FIPS BU 'Bulgaria' -> BGR"}
+      - {code: "BX", iso3: BRN, source: "PSD BX 'Brunei' = GeoNames FIPS BX 'Brunei' -> BRN"}
+      - {code: "BY", iso3: BDI, source: "PSD BY 'Burundi' = GeoNames FIPS BY 'Burundi' -> BDI"}
+      - {code: "CA", iso3: CAN, source: "PSD CA 'Canada' = GeoNames FIPS CA 'Canada' -> CAN"}
+      - {code: "CB", iso3: KHM, source: "PSD CB 'Cambodia' = GeoNames FIPS CB 'Cambodia' -> KHM"}
+      - {code: "CD", iso3: TCD, source: "PSD CD 'Chad' = GeoNames FIPS CD 'Chad' -> TCD"}
+      - {code: "CE", iso3: LKA, source: "PSD CE 'Sri Lanka' = GeoNames FIPS CE 'Sri Lanka' -> LKA"}
+      - {code: "CH", iso3: CHN, source: "PSD CH 'China' = GeoNames FIPS CH 'China' -> CHN"}
+      - {code: "CI", iso3: CHL, source: "PSD CI 'Chile' = GeoNames FIPS CI 'Chile' -> CHL"}
+      - {code: "CM", iso3: CMR, source: "PSD CM 'Cameroon' = GeoNames FIPS CM 'Cameroon' -> CMR"}
+      - {code: "CN", iso3: COM, source: "PSD CN 'Comoros' = GeoNames FIPS CN 'Comoros' -> COM"}
+      - {code: "CO", iso3: COL, source: "PSD CO 'Colombia' = GeoNames FIPS CO 'Colombia' -> COL"}
+      - {code: "CS", iso3: CRI, source: "PSD CS 'Costa Rica' = GeoNames FIPS CS 'Costa Rica' -> CRI"}
+      - {code: "CT", iso3: CAF, source: "PSD CT 'Central African Republic' = GeoNames FIPS CT 'Central African Republic' -> CAF"}
+      - {code: "CU", iso3: CUB, source: "PSD CU 'Cuba' = GeoNames FIPS CU 'Cuba' -> CUB"}
+      - {code: "CV", iso3: CPV, source: "PSD CV 'Cabo Verde' = GeoNames FIPS CV 'Cabo Verde' -> CPV"}
+      - {code: "CY", iso3: CYP, source: "PSD CY 'Cyprus' = GeoNames FIPS CY 'Cyprus' -> CYP"}
+      - {code: "DA", iso3: DNK, source: "PSD DA 'Denmark' = GeoNames FIPS DA 'Denmark' -> DNK"}
+      - {code: "DJ", iso3: DJI, source: "PSD DJ 'Djibouti' = GeoNames FIPS DJ 'Djibouti' -> DJI"}
+      - {code: "DR", iso3: DOM, source: "PSD DR 'Dominican Republic' = GeoNames FIPS DR 'Dominican Republic' -> DOM"}
+      - {code: "EC", iso3: ECU, source: "PSD EC 'Ecuador' = GeoNames FIPS EC 'Ecuador' -> ECU"}
+      - {code: "EG", iso3: EGY, source: "PSD EG 'Egypt' = GeoNames FIPS EG 'Egypt' -> EGY"}
+      - {code: "EI", iso3: IRL, source: "PSD EI 'Ireland' = GeoNames FIPS EI 'Ireland' -> IRL"}
+      - {code: "EN", iso3: EST, source: "PSD EN 'Estonia' = GeoNames FIPS EN 'Estonia' -> EST"}
+      - {code: "ER", iso3: ERI, source: "PSD ER 'Eritrea' = GeoNames FIPS ER 'Eritrea' -> ERI"}
+      - {code: "ES", iso3: SLV, source: "PSD ES 'El Salvador' = GeoNames FIPS ES 'El Salvador' -> SLV"}
+      - {code: "ET", iso3: ETH, source: "PSD ET 'Ethiopia' = GeoNames FIPS ET 'Ethiopia' -> ETH"}
+      - {code: "FI", iso3: FIN, source: "PSD FI 'Finland' = GeoNames FIPS FI 'Finland' -> FIN"}
+      - {code: "FJ", iso3: FJI, source: "PSD FJ 'Fiji' = GeoNames FIPS FJ 'Fiji' -> FJI"}
+      - {code: "FO", iso3: FRO, source: "PSD FO 'Faroe Islands' = GeoNames FIPS FO 'Faroe Islands' -> FRO"}
+      - {code: "FR", iso3: FRA, source: "PSD FR 'France' = GeoNames FIPS FR 'France' -> FRA"}
+      - {code: "GB", iso3: GAB, source: "PSD GB 'Gabon' = GeoNames FIPS GB 'Gabon' -> GAB"}
+      - {code: "GG", iso3: GEO, source: "PSD GG 'Georgia' = GeoNames FIPS GG 'Georgia' -> GEO"}
+      - {code: "GH", iso3: GHA, source: "PSD GH 'Ghana' = GeoNames FIPS GH 'Ghana' -> GHA"}
+      - {code: "GM", iso3: DEU, source: "PSD GM 'Germany' = GeoNames FIPS GM 'Germany' -> DEU"}
+      - {code: "GR", iso3: GRC, source: "PSD GR 'Greece' = GeoNames FIPS GR 'Greece' -> GRC"}
+      - {code: "GT", iso3: GTM, source: "PSD GT 'Guatemala' = GeoNames FIPS GT 'Guatemala' -> GTM"}
+      - {code: "GY", iso3: GUY, source: "PSD GY 'Guyana' = GeoNames FIPS GY 'Guyana' -> GUY"}
+      - {code: "HA", iso3: HTI, source: "PSD HA 'Haiti' = GeoNames FIPS HA 'Haiti' -> HTI"}
+      - {code: "HK", iso3: HKG, source: "PSD HK 'Hong Kong' = GeoNames FIPS HK 'Hong Kong' -> HKG"}
+      - {code: "HO", iso3: HND, source: "PSD HO 'Honduras' = GeoNames FIPS HO 'Honduras' -> HND"}
+      - {code: "HR", iso3: HRV, source: "PSD HR 'Croatia' = GeoNames FIPS HR 'Croatia' -> HRV"}
+      - {code: "HU", iso3: HUN, source: "PSD HU 'Hungary' = GeoNames FIPS HU 'Hungary' -> HUN"}
+      - {code: "IC", iso3: ISL, source: "PSD IC 'Iceland' = GeoNames FIPS IC 'Iceland' -> ISL"}
+      - {code: "ID", iso3: IDN, source: "PSD ID 'Indonesia' = GeoNames FIPS ID 'Indonesia' -> IDN"}
+      - {code: "IN", iso3: IND, source: "PSD IN 'India' = GeoNames FIPS IN 'India' -> IND"}
+      - {code: "IR", iso3: IRN, source: "PSD IR 'Iran' = GeoNames FIPS IR 'Iran' -> IRN"}
+      - {code: "IS", iso3: ISR, source: "PSD IS 'Israel' = GeoNames FIPS IS 'Israel' -> ISR"}
+      - {code: "IT", iso3: ITA, source: "PSD IT 'Italy' = GeoNames FIPS IT 'Italy' -> ITA"}
+      - {code: "IZ", iso3: IRQ, source: "PSD IZ 'Iraq' = GeoNames FIPS IZ 'Iraq' -> IRQ"}
+      - {code: "JA", iso3: JPN, source: "PSD JA 'Japan' = GeoNames FIPS JA 'Japan' -> JPN"}
+      - {code: "JM", iso3: JAM, source: "PSD JM 'Jamaica' = GeoNames FIPS JM 'Jamaica' -> JAM"}
+      - {code: "JO", iso3: JOR, source: "PSD JO 'Jordan' = GeoNames FIPS JO 'Jordan' -> JOR"}
+      - {code: "KE", iso3: KEN, source: "PSD KE 'Kenya' = GeoNames FIPS KE 'Kenya' -> KEN"}
+      - {code: "KG", iso3: KGZ, source: "PSD KG 'Kyrgyzstan' = GeoNames FIPS KG 'Kyrgyzstan' -> KGZ"}
+      - {code: "KU", iso3: KWT, source: "PSD KU 'Kuwait' = GeoNames FIPS KU 'Kuwait' -> KWT"}
+      - {code: "KZ", iso3: KAZ, source: "PSD KZ 'Kazakhstan' = GeoNames FIPS KZ 'Kazakhstan' -> KAZ"}
+      - {code: "LA", iso3: LAO, source: "PSD LA 'Laos' = GeoNames FIPS LA 'Laos' -> LAO"}
+      - {code: "LE", iso3: LBN, source: "PSD LE 'Lebanon' = GeoNames FIPS LE 'Lebanon' -> LBN"}
+      - {code: "LG", iso3: LVA, source: "PSD LG 'Latvia' = GeoNames FIPS LG 'Latvia' -> LVA"}
+      - {code: "LH", iso3: LTU, source: "PSD LH 'Lithuania' = GeoNames FIPS LH 'Lithuania' -> LTU"}
+      - {code: "LI", iso3: LBR, source: "PSD LI 'Liberia' = GeoNames FIPS LI 'Liberia' -> LBR"}
+      - {code: "LO", iso3: SVK, source: "PSD LO 'Slovakia' = GeoNames FIPS LO 'Slovakia' -> SVK"}
+      - {code: "LT", iso3: LSO, source: "PSD LT 'Lesotho' = GeoNames FIPS LT 'Lesotho' -> LSO"}
+      - {code: "LY", iso3: LBY, source: "PSD LY 'Libya' = GeoNames FIPS LY 'Libya' -> LBY"}
+      - {code: "MA", iso3: MDG, source: "PSD MA 'Madagascar' = GeoNames FIPS MA 'Madagascar' -> MDG"}
+      - {code: "MD", iso3: MDA, source: "PSD MD 'Moldova' = GeoNames FIPS MD 'Moldova' -> MDA"}
+      - {code: "MG", iso3: MNG, source: "PSD MG 'Mongolia' = GeoNames FIPS MG 'Mongolia' -> MNG"}
+      - {code: "MI", iso3: MWI, source: "PSD MI 'Malawi' = GeoNames FIPS MI 'Malawi' -> MWI"}
+      - {code: "MK", iso3: MKD, source: "PSD MK 'North Macedonia' = GeoNames FIPS MK 'North Macedonia' -> MKD"}
+      - {code: "ML", iso3: MLI, source: "PSD ML 'Mali' = GeoNames FIPS ML 'Mali' -> MLI"}
+      - {code: "MO", iso3: MAR, source: "PSD MO 'Morocco' = GeoNames FIPS MO 'Morocco' -> MAR"}
+      - {code: "MP", iso3: MUS, source: "PSD MP 'Mauritius' = GeoNames FIPS MP 'Mauritius' -> MUS"}
+      - {code: "MR", iso3: MRT, source: "PSD MR 'Mauritania' = GeoNames FIPS MR 'Mauritania' -> MRT"}
+      - {code: "MT", iso3: MLT, source: "PSD MT 'Malta' = GeoNames FIPS MT 'Malta' -> MLT"}
+      - {code: "MU", iso3: OMN, source: "PSD MU 'Oman' = GeoNames FIPS MU 'Oman' -> OMN"}
+      - {code: "MX", iso3: MEX, source: "PSD MX 'Mexico' = GeoNames FIPS MX 'Mexico' -> MEX"}
+      - {code: "MY", iso3: MYS, source: "PSD MY 'Malaysia' = GeoNames FIPS MY 'Malaysia' -> MYS"}
+      - {code: "MZ", iso3: MOZ, source: "PSD MZ 'Mozambique' = GeoNames FIPS MZ 'Mozambique' -> MOZ"}
+      - {code: "NC", iso3: NCL, source: "PSD NC 'New Caledonia' = GeoNames FIPS NC 'New Caledonia' -> NCL"}
+      - {code: "NG", iso3: NER, source: "PSD NG 'Niger' = GeoNames FIPS NG 'Niger' -> NER"}
+      - {code: "NI", iso3: NGA, source: "PSD NI 'Nigeria' = GeoNames FIPS NI 'Nigeria' -> NGA"}
+      - {code: "NO", iso3: NOR, source: "PSD NO 'Norway' = GeoNames FIPS NO 'Norway' -> NOR"}
+      - {code: "NP", iso3: NPL, source: "PSD NP 'Nepal' = GeoNames FIPS NP 'Nepal' -> NPL"}
+      - {code: "NS", iso3: SUR, source: "PSD NS 'Suriname' = GeoNames FIPS NS 'Suriname' -> SUR"}
+      - {code: "NU", iso3: NIC, source: "PSD NU 'Nicaragua' = GeoNames FIPS NU 'Nicaragua' -> NIC"}
+      - {code: "NZ", iso3: NZL, source: "PSD NZ 'New Zealand' = GeoNames FIPS NZ 'New Zealand' -> NZL"}
+      - {code: "OD", iso3: SSD, source: "PSD OD 'South Sudan' = GeoNames FIPS OD 'South Sudan' -> SSD"}
+      - {code: "PA", iso3: PRY, source: "PSD PA 'Paraguay' = GeoNames FIPS PA 'Paraguay' -> PRY"}
+      - {code: "PE", iso3: PER, source: "PSD PE 'Peru' = GeoNames FIPS PE 'Peru' -> PER"}
+      - {code: "PK", iso3: PAK, source: "PSD PK 'Pakistan' = GeoNames FIPS PK 'Pakistan' -> PAK"}
+      - {code: "PL", iso3: POL, source: "PSD PL 'Poland' = GeoNames FIPS PL 'Poland' -> POL"}
+      - {code: "PO", iso3: PRT, source: "PSD PO 'Portugal' = GeoNames FIPS PO 'Portugal' -> PRT"}
+      - {code: "PP", iso3: PNG, source: "PSD PP 'Papua New Guinea' = GeoNames FIPS PP 'Papua New Guinea' -> PNG"}
+      - {code: "PU", iso3: GNB, source: "PSD PU 'Guinea-Bissau' = GeoNames FIPS PU 'Guinea-Bissau' -> GNB"}
+      - {code: "QA", iso3: QAT, source: "PSD QA 'Qatar' = GeoNames FIPS QA 'Qatar' -> QAT"}
+      - {code: "RE", iso3: REU, source: "PSD RE 'Reunion' = GeoNames FIPS RE 'Reunion' -> REU"}
+      - {code: "RO", iso3: ROU, source: "PSD RO 'Romania' = GeoNames FIPS RO 'Romania' -> ROU"}
+      - {code: "RP", iso3: PHL, source: "PSD RP 'Philippines' = GeoNames FIPS RP 'Philippines' -> PHL"}
+      - {code: "RS", iso3: RUS, source: "PSD RS 'Russia' = GeoNames FIPS RS 'Russia' -> RUS"}
+      - {code: "RW", iso3: RWA, source: "PSD RW 'Rwanda' = GeoNames FIPS RW 'Rwanda' -> RWA"}
+      - {code: "SA", iso3: SAU, source: "PSD SA 'Saudi Arabia' = GeoNames FIPS SA 'Saudi Arabia' -> SAU"}
+      - {code: "SF", iso3: ZAF, source: "PSD SF 'South Africa' = GeoNames FIPS SF 'South Africa' -> ZAF"}
+      - {code: "SG", iso3: SEN, source: "PSD SG 'Senegal' = GeoNames FIPS SG 'Senegal' -> SEN"}
+      - {code: "SI", iso3: SVN, source: "PSD SI 'Slovenia' = GeoNames FIPS SI 'Slovenia' -> SVN"}
+      - {code: "SL", iso3: SLE, source: "PSD SL 'Sierra Leone' = GeoNames FIPS SL 'Sierra Leone' -> SLE"}
+      - {code: "SN", iso3: SGP, source: "PSD SN 'Singapore' = GeoNames FIPS SN 'Singapore' -> SGP"}
+      - {code: "SO", iso3: SOM, source: "PSD SO 'Somalia' = GeoNames FIPS SO 'Somalia' -> SOM"}
+      - {code: "SP", iso3: ESP, source: "PSD SP 'Spain' = GeoNames FIPS SP 'Spain' -> ESP"}
+      - {code: "SU", iso3: SDN, source: "PSD SU 'Sudan' = GeoNames FIPS SU 'Sudan' -> SDN"}
+      - {code: "SW", iso3: SWE, source: "PSD SW 'Sweden' = GeoNames FIPS SW 'Sweden' -> SWE"}
+      - {code: "SY", iso3: SYR, source: "PSD SY 'Syria' = GeoNames FIPS SY 'Syria' -> SYR"}
+      - {code: "SZ", iso3: CHE, source: "PSD SZ 'Switzerland' = GeoNames FIPS SZ 'Switzerland' -> CHE"}
+      - {code: "TD", iso3: TTO, source: "PSD TD 'Trinidad and Tobago' = GeoNames FIPS TD 'Trinidad and Tobago' -> TTO"}
+      - {code: "TH", iso3: THA, source: "PSD TH 'Thailand' = GeoNames FIPS TH 'Thailand' -> THA"}
+      - {code: "TI", iso3: TJK, source: "PSD TI 'Tajikistan' = GeoNames FIPS TI 'Tajikistan' -> TJK"}
+      - {code: "TO", iso3: TGO, source: "PSD TO 'Togo' = GeoNames FIPS TO 'Togo' -> TGO"}
+      - {code: "TP", iso3: STP, source: "PSD TP 'Sao Tome and Principe' = GeoNames FIPS TP 'Sao Tome and Principe' -> STP"}
+      - {code: "TS", iso3: TUN, source: "PSD TS 'Tunisia' = GeoNames FIPS TS 'Tunisia' -> TUN"}
+      - {code: "TU", iso3: TUR, source: "PSD TU 'Turkey' = GeoNames FIPS TU 'Turkey' -> TUR"}
+      - {code: "TW", iso3: TWN, source: "PSD TW 'Taiwan' = GeoNames FIPS TW 'Taiwan' -> TWN"}
+      - {code: "TX", iso3: TKM, source: "PSD TX 'Turkmenistan' = GeoNames FIPS TX 'Turkmenistan' -> TKM"}
+      - {code: "TZ", iso3: TZA, source: "PSD TZ 'Tanzania' = GeoNames FIPS TZ 'Tanzania' -> TZA"}
+      - {code: "UG", iso3: UGA, source: "PSD UG 'Uganda' = GeoNames FIPS UG 'Uganda' -> UGA"}
+      - {code: "UK", iso3: GBR, source: "PSD UK 'United Kingdom' = GeoNames FIPS UK 'United Kingdom' -> GBR"}
+      - {code: "UP", iso3: UKR, source: "PSD UP 'Ukraine' = GeoNames FIPS UP 'Ukraine' -> UKR"}
+      - {code: "US", iso3: USA, source: "PSD US 'United States' = GeoNames FIPS US 'United States' -> USA"}
+      - {code: "UV", iso3: BFA, source: "PSD UV 'Burkina Faso' = GeoNames FIPS UV 'Burkina Faso' -> BFA"}
+      - {code: "UY", iso3: URY, source: "PSD UY 'Uruguay' = GeoNames FIPS UY 'Uruguay' -> URY"}
+      - {code: "UZ", iso3: UZB, source: "PSD UZ 'Uzbekistan' = GeoNames FIPS UZ 'Uzbekistan' -> UZB"}
+      - {code: "VE", iso3: VEN, source: "PSD VE 'Venezuela' = GeoNames FIPS VE 'Venezuela' -> VEN"}
+      - {code: "VM", iso3: VNM, source: "PSD VM 'Vietnam' = GeoNames FIPS VM 'Vietnam' -> VNM"}
+      - {code: "WA", iso3: NAM, source: "PSD WA 'Namibia' = GeoNames FIPS WA 'Namibia' -> NAM"}
+      - {code: "WS", iso3: WSM, source: "PSD WS 'Samoa' = GeoNames FIPS WS 'Samoa' -> WSM"}
+      - {code: "WZ", iso3: SWZ, source: "PSD WZ 'Eswatini' = GeoNames FIPS WZ 'Eswatini' -> SWZ"}
+      - {code: "YM", iso3: YEM, source: "PSD YM 'Yemen' = GeoNames FIPS YM 'Yemen' -> YEM"}
+      - {code: "ZA", iso3: ZMB, source: "PSD ZA 'Zambia' = GeoNames FIPS ZA 'Zambia' -> ZMB"}

@@ -310,3 +310,19 @@ def test_monthly_mean_of_daily_excludes_the_latest_month() -> None:
                      "flags": "{}", "raw_sha256": RAW, "selector": "{}"})  # fmt: skip
     s, _ = extract_series(pl.DataFrame(rows, schema=ATLAS_SCHEMA), fam)
     assert [(P.label_of("M", c.idx), c.value) for c in s["FRA"].observed] == [("2026-08", "1.50000000")]
+
+
+def test_fiscal_year_cells_never_enter_a_calendar_question() -> None:
+    """FIX4B (audit AUDIT3 M7): WEO cells of a fiscal-year series (latest_actual FY…), even when an older parser
+    placed them on calendar years, are dropped with a note; calendar cells are kept."""
+    from reva.evaluation.registry.questions import is_fiscal_year_cell
+
+    weo = SPECS.family("t.weo")
+    fy = {"latest_actual": "FY2025/26"}
+    frame = cells("imf.weo", "NGDP_RPCH", "A", {("FRA", 2024): "1.1", ("FRA", 2025): "13.2", ("FRA", 2026): "12.0"},
+                  {("FRA", 2025): fy, ("FRA", 2026): fy})  # fmt: skip
+    s, notes = extract_series(frame, weo)
+    assert [c.idx for c in s["FRA"].observed] == [2024] and not s["FRA"].projections
+    assert {"family": "t.weo", "reason": "fiscal-year cells (never a calendar-year question)", "n": 2} in notes
+    assert is_fiscal_year_cell({"period_basis": "fiscal_year_labelled_as_calendar"})
+    assert not is_fiscal_year_cell({"latest_actual": "2025"})
