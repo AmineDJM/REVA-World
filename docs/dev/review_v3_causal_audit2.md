@@ -304,6 +304,24 @@ note ("a chain is not evidence that the first event caused the last").
 
 Severity scale as in audit 1.
 
+**Fix status** (updated by the fixing agents; FIXB = dataset side, `docs/dev/v3_fixb.md`; FIXA = loader, grading, API
+and UI):
+
+| # | Severity | Status | Where / what |
+|---|---|---|---|
+| N1 | Medium | (FIXA) | |
+| N2 | Medium | (FIXA) | |
+| N3 | Medium | (FIXA) | |
+| N4 | Medium | **fixed (FIXB)** | `atlas.idmc` 1.1.0: 1,210 preventive-evacuation / hazard-risk rows give no causal claim. They are context statements `idmc:displacement_in_anticipation_of` (basis, verbatim flag, README A24/A52), and the 1,210 claims were retracted `reclassified_by_reva`. No relation of `relations.yaml` fits; the need is recorded in `v3_fixb.md` |
+| N5 | Low | **fixed (FIXB)** | The archived README does not say that 01/01 means year-only or aggregate, and REVA does not claim it. The 1,400 events whose coded start is 1 January are at year precision, with `coded_start` verbatim and `day_not_relied_on`; no day is invented |
+| N6 | Low | **fixed (FIXB)** | `atlas.ucdp_dyadterm` 1.1.1 / `atlas.ucdp_term` 1.2.1: every terminal row is kept (one claim per row, `source_duplicate_terminal_rows`). Differing outcomes contest each other (12 claims, grade E): 7 dyad + 2 conflict episodes. 55701 is now claims 97300 / 97301 |
+| N7 | Low | (FIXA) | |
+| N8 | Low | **fixed (FIXB)** | 23,219 of 23,219 COW / UCDP termination / IDMC claims carry `codebook.quote_source` (archived file sha256 + PDF page / README cell). The COW intra-state v5.1 zip is archived (`b2d1f489…`) and the v4.1 choice is recomputed from its bytes. PA-X has 0 claims (codebook archived) |
+| N9 | Low | (FIXA) | |
+| N10 | Low | **fixed (FIXB)** | UCDP precision 6 is year precision with the typed note `source_date_certainty: assigned` (9 claims, scope `effect_time_certainty`); 7 is a typed missing date (none in this release). Grading on it is left to the causal core (`v3_fixb.md`) |
+| N11 | Low | (FIXA) | |
+| N12 | Low | **fixed (FIXB)** | 2,695 REVA-made IDMC identities labelled en/fr ("enregistrement IDMC sans identifiant d'événement — identité créée par REVA"). The 10 identical-row groups (11 copies) are recorded as `idmc:source_duplicate_rows` (count + row selectors) |
+
 **Status after the fixes** (added after the audit; the evidence below is unchanged):
 
 | # | Status |
