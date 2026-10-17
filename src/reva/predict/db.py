@@ -88,7 +88,7 @@ class DbEffectSource:
         if self._vars is None:
             try:
                 self._vars = {str(v["id"]): dict(v) for v in self._reader.effect_variables()}
-            except Exception:  # noqa: BLE001 - vocabulary unavailable: labels/units unknown (typed downstream)
+            except Exception:
                 log.exception("effect variables unavailable")
                 self._vars = {}
         v = self._vars.get(ref.id)
@@ -119,7 +119,7 @@ class DbClaimSource:
             for side in (cg.causes, cg.effects):
                 try:
                     res = side(self.conn, i, origin=self.origin, limit=limit_per_id)
-                except Exception:  # noqa: BLE001 - an unknown/invalid anchor yields no claim, reported by count
+                except Exception:
                     log.warning("causal claims for anchor %s unavailable", i)
                     continue
                 for c in res.get("claims") or []:
@@ -153,15 +153,17 @@ class AtlasBaseline:
     def baseline(self, ref: VarRef, geo: str) -> dict[str, Any] | None:
         if self.q is None or geo == "WLD":
             return None
-        concepts = self.effects.atlas_concepts_of(ref) if self.effects is not None else (
-            [ref.id] if ref.kind == "atlas_concept" else []
+        concepts = (
+            self.effects.atlas_concepts_of(ref)
+            if self.effects is not None
+            else ([ref.id] if ref.kind == "atlas_concept" else [])
         )
         for cid in concepts:
             if cid not in self.catalog.concepts:
                 continue
             try:
                 cells = self.q.best_cells(self.catalog, [cid], iso3=geo)
-            except Exception:  # noqa: BLE001 - an unreadable snapshot gives no baseline (typed by the caller)
+            except Exception:
                 log.exception("atlas baseline for %s %s unavailable", cid, geo)
                 return None
             actual = [c for c in cells if c.get("value") is not None and not _is_projection(c.get("flags"))]
@@ -183,7 +185,9 @@ class AtlasBaseline:
         return None
 
 
-def atlas_baseline(conn: Connection, store: Any, effects: DbEffectSource | None) -> tuple[AtlasBaseline | None, str | None]:
+def atlas_baseline(
+    conn: Connection, store: Any, effects: DbEffectSource | None
+) -> tuple[AtlasBaseline | None, str | None]:
     """The latest live atlas snapshot's query file, only if already materialised (never built here)."""
     try:
         from reva.atlas.catalog import cached_catalog
@@ -193,7 +197,7 @@ def atlas_baseline(conn: Connection, store: Any, effects: DbEffectSource | None)
         snap = resolve_snapshot(conn, store, origin="live")
         q = query_for(snap, store, build=False)
         return AtlasBaseline(q, cached_catalog(), effects, snap.sha256), None
-    except Exception as e:  # noqa: BLE001 - no snapshot / not materialised: baselines are absent, said so
+    except Exception as e:
         return None, f"atlas baseline unavailable: {type(e).__name__}: {str(e)[:200]}"
 
 
@@ -210,7 +214,7 @@ def _value_decimal(vd: Mapping[str, Any] | None) -> Decimal | None:
 
 
 def _year(temporal: Any) -> int | None:
-    from reva.simulation.compile import calendar_year_of
+    from reva.simulation.crude_plugin import calendar_year_of
 
     return calendar_year_of(temporal)
 
@@ -262,13 +266,17 @@ def io_arrays(conn: Connection, store: Any, release: Mapping[str, Any]) -> tuple
     req = InputRequirement(io.DATASET_INPUT, io.DATASET_CONCEPT, io.DATASET_SUBJECT, (), "dataset")
     try:
         inputs = resolve_inputs(conn, dict(release), [req], store)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         return None, {}, f"IO table not resolvable: {type(e).__name__}: {str(e)[:200]}"
     d = inputs.dataset(io.DATASET_INPUT, io.DATASET_SUBJECT)
     if d.is_missing:
-        return None, {}, (
-            f"the baseline release {release['id']} pins no {io.DATASET_CONCEPT} dataset (FIGARO); "
-            f"reason: {d.missing_reason}"
+        return (
+            None,
+            {},
+            (
+                f"the baseline release {release['id']} pins no {io.DATASET_CONCEPT} dataset (FIGARO); "
+                f"reason: {d.missing_reason}"
+            ),
         )
     sha = str(d.artifact_sha256)
     if sha not in _IO_CACHE:
@@ -313,7 +321,7 @@ def retirement_runner(conn: Connection, store: Any, release: Mapping[str, Any]) 
                 "provenance": prov,
                 "labels": labels,
             }
-        except Exception as e:  # noqa: BLE001 - a refused run is a typed gap, never a number
+        except Exception as e:
             problem = e.problem() if hasattr(e, "problem") else {"detail": str(e)[:300]}
             return {"status": "unsupported", "problems": [_jsonable(problem)], "provenance": {}}
 

@@ -107,7 +107,7 @@ def _dec(v: Any) -> Decimal | None:
         return None
     try:
         d = Decimal(str(v))
-    except Exception:  # noqa: BLE001 - any unparsable value is missing, never zero
+    except Exception:
         return None
     return d if d.is_finite() else None
 

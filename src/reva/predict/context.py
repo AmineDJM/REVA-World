@@ -146,7 +146,9 @@ class StaticClaimSource:
     def claims_touching(self, ids: Sequence[str], limit_per_id: int = 25) -> list[dict[str, Any]]:
         want = set(ids)
         return [
-            c for c in self._claims if (c.get("cause") or {}).get("id") in want or (c.get("effect") or {}).get("id") in want
+            c
+            for c in self._claims
+            if (c.get("cause") or {}).get("id") in want or (c.get("effect") or {}).get("id") in want
         ]
 
 

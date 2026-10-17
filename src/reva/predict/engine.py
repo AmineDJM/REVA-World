@@ -265,7 +265,9 @@ class Engine:
         return node
 
     # -------------------------------------------------------------------------------- estimates
-    def _apply(self, node: Node, hop: es.Hop, hid: str) -> tuple[np.ndarray | None, list[str | None], np.ndarray | None, list[str]]:
+    def _apply(
+        self, node: Node, hop: es.Hop, hid: str
+    ) -> tuple[np.ndarray | None, list[str | None], np.ndarray | None, list[str]]:
         notes: list[str] = []
         z = self._zs(hop.estimate_key)
         if hop.dated is not None:
@@ -285,7 +287,9 @@ class Engine:
                 for s in range(t + 1):
                     col = inc[:, s]
                     if np.isnan(col).any():
-                        why = (node.reasons[s] if node.reasons and s < len(node.reasons) else None) or "upstream_missing"
+                        why = (
+                            node.reasons[s] if node.reasons and s < len(node.reasons) else None
+                        ) or "upstream_missing"
                         break
                     if not col.any():
                         continue
@@ -303,7 +307,9 @@ class Engine:
         if node.undated is not None:
             x1 = node.undated
         elif node.decision_change is not None:
-            x1 = np.full(self.n, float(node.decision_change.change) if node.decision_change.timing != "occurrence" else 1.0)
+            x1 = np.full(
+                self.n, float(node.decision_change.change) if node.decision_change.timing != "occurrence" else 1.0
+            )
             notes.append("undated estimate applied to the decided change (the decision's duration is not used)")
         else:
             assert node.dated is not None
@@ -336,7 +342,9 @@ class Engine:
         for e in ests:
             hop = es.hop_from_estimate(e, self._unit_of)
             if self.as_of_max and hop.as_of and hop.as_of.isoformat() > self.as_of_max:
-                self.excluded.append(self._excl(node, hop, "not_knowable_at_as_of", f"as_of {hop.as_of} > {self.as_of_max}"))
+                self.excluded.append(
+                    self._excl(node, hop, "not_knowable_at_as_of", f"as_of {hop.as_of} > {self.as_of_max}")
+                )
                 continue
             if not hop.quantified:
                 self.unquantified.append(
@@ -361,7 +369,9 @@ class Engine:
             for g in self._out_geos(node, effect):
                 cands: list[tuple[es.Hop, str, list[str], str | None]] = []
                 for h in hops:
-                    app, app_notes = es.applicability(h.scope, g if g != "WLD" or node.geo == "WLD" else node.geo, self.d.start_year)
+                    app, app_notes = es.applicability(
+                        h.scope, g if g != "WLD" or node.geo == "WLD" else node.geo, self.d.start_year
+                    )
                     if app == "out_of_scope":
                         self.excluded.append(self._excl(node, h, "out_of_scope", "; ".join(app_notes), geo=g))
                         continue
@@ -485,7 +495,12 @@ class Engine:
 
     def _run_plugins(self, node: Node) -> None:
         for key, wiring in sorted(self.vars.plugins.items()):
-            if not any(node.ref.kind == k and node.ref.id == i and es.units_compatible(node.unit, u)[0] for k, i, u in wiring.inputs):
+            if not any(
+                node.ref.kind == k
+                and node.ref.id == i
+                and es.units_compatible(node.unit, es.canonical_unit(u)[0] or u)[0]
+                for k, i, u in wiring.inputs
+            ):
                 continue
             run_key = f"{key}|{node.id}"
             if run_key in self._plugins_run:
@@ -591,7 +606,9 @@ class Engine:
             entry.update(
                 frequency="year",
                 undated=None,
-                periods=[{"period": str(y), **_summary(v), "missing_reason": None} for y, v in sorted(o.yearly.items())],
+                periods=[
+                    {"period": str(y), **_summary(v), "missing_reason": None} for y, v in sorted(o.yearly.items())
+                ],
             )
         return entry
 
@@ -611,7 +628,9 @@ class Engine:
             if not node.propagate:
                 continue
             if node.depth >= self.max_depth:
-                self.gaps.append({"code": "max_depth", "node": node.id, "message": f"propagation stops at {self.max_depth} hops"})
+                self.gaps.append(
+                    {"code": "max_depth", "node": node.id, "message": f"propagation stops at {self.max_depth} hops"}
+                )
                 continue
             self._expand(node, queue)
         self._anchor_claims()
@@ -739,10 +758,12 @@ def _atlas_catalog() -> dict[str, dict[str, Any]]:
 
         try:
             cat = cached_catalog()
-        except Exception:  # noqa: BLE001 - another agent's catalog file may be mid-edit: read leniently
+        except Exception:
             cat = load_catalog(strict=False)
-        return {cid: {"unit": c.unit, "fr": c.labels.get("fr"), "en": c.labels.get("en")} for cid, c in cat.concepts.items()}
-    except Exception:  # noqa: BLE001 - a missing catalog only removes labels/units (typed later as unknown)
+        return {
+            cid: {"unit": c.unit, "fr": c.labels.get("fr"), "en": c.labels.get("en")} for cid, c in cat.concepts.items()
+        }
+    except Exception:
         return {}
 
 

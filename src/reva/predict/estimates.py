@@ -372,9 +372,13 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
     if irf:
         prof = _quarter_profile(irf, _f(unc.get("ci_level")), notes)
         if prof:
-            dated = {q: ProfilePoint(p.coef * scale, None if p.sd is None else abs(p.sd * scale)) for q, p in prof.items()}
+            dated = {
+                q: ProfilePoint(p.coef * scale, None if p.sd is None else abs(p.sd * scale)) for q, p in prof.items()
+            }
             if any(p.sd is None for p in dated.values()) and sd_s is not None:
-                notes.append("some lag-profile points have no published uncertainty: those horizons are scenario points")
+                notes.append(
+                    "some lag-profile points have no published uncertainty: those horizons are scenario points"
+                )
         else:
             undated_kind = str(hz.get("kind") or "unspecified")
     elif hz.get("kind") == "impact" and coef is not None:
