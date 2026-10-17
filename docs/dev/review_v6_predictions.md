@@ -178,8 +178,8 @@ Report not yet landed at writing time; code review only.
 | REVA econometric models vs naive | 0 of 16 holdout hypotheses (direct AR, BVAR, pools vs persistence) confirmed; G7 nowcasts: no development hypothesis |
 | Energy | Nothing beats EIA STEO on points; nothing beats the random walk on Brent, WTI, Henry Hub |
 | Finance | 0 winners: FX (EUR vs USD/GBP/JPY/CHF/CNY), 10y and 2s10s Treasury yields, Brent, FOMC/ECB/BoE moves; structural models (PPP, Nelson-Siegel) are worse than the random walk |
-| Conflict | 0 winners vs persistence / base rate / history-only logit; no VIEWS comparison loaded |
-| Health | backtest numbers not yet published (pending PRED-HEALTH report) |
+| Conflict | 0 winners vs persistence / base rate / history-only logit (KG candidate never significantly better than persistence: best Holm p 0.29). VIEWS beats persistence at 1–6 country-months in point estimate, not significantly after Holm |
+| Health | CDC hub ensembles beat every REVA model on the as-of backtests (FluSight: REVA's best relative WIS 1.14, p 0.026; COVID 1.25, p < 1e-5). The two "winners" (FluNet blend, GHE log-drift) come from final-vintage families only (see §7) |
 | Prospective registry | thousands of sealed forecasts, **0 resolved**: no prospective evidence of any kind yet |
 
 **Benchmarks that beat naive forecasts (not REVA's merit, useful as references):** IMF WEO vs persistence (GDP h0
@@ -214,3 +214,39 @@ statement verified: "for Brent and WTI, EIA's STEO point forecasts are not bette
 (my re-run: MAE ratio 0.95–1.05, no significant DM test).
 
 **PRED-FIN backtest JSON** committed; §5 table of the report matches my subset re-run. No change of verdict.
+
+## 7. Pass 3 (≈ 21:45 UTC) — reports landed: `v6_pred_conflict.md`, `v6_pred_health.md`
+
+**PRED-CONFLICT — credible.** Headline "no REVA candidate passed the pre-declared winner rule; persistence is very
+hard to beat" matches my independent re-run of `run_backtest` on the live panel (same ratios to the third digit,
+e.g. KG candidate deaths CRPS h1 1.12, onset h2 0.951; 0 winners). The VIEWS comparisons are reported as
+non-significant and with the information tilt stated; the report does not claim REVA beats VIEWS. Remaining design
+items for the *next* claim (unchanged from §3.F): X2 (VIEWS CRPS = AE of a point; the report already calls VIEWS a
+"point mass" and does not conclude from CRPS — keep it that way), X9 (V-Dem v16 / current WDI only on the candidate
+side), X13 (country clusters only). Label fix still needed: the 2026 country-year questions (sealed 17 Oct 2026)
+are near-nowcasts (≈ 80 % of the year elapsed), not 1-year-ahead forecasts.
+
+**PRED-HEALTH — headline credible, two admissions overstated.**
+
+| Claim | Verdict | Evidence | Exact fix |
+|---|---|---|---|
+| "The CDC hub ensembles beat every REVA model on the as-of backtests" | **credible** | design reviewed in §3.G (round vintages, same truth, attributed ensemble quantiles) | — |
+| FluNet: `health.blend` is a significant winner (rel. WIS 0.84 vs persistence, 0.81 vs climatology) and is issued | **overstated** | final-vintage FluNet (backfilled late reports): the blend contains the AR component, which benefits most from revised recent weeks (X9); no real-time check exists for FluNet | issue the blend, but label it "admitted on a final-vintage backtest"; run the same comparison on archived FluNet table versions as they accumulate, or on ERVISS/RespiCast vintages, before calling it skill |
+| GHE: `log_drift` and `blend` beat persistence (rel. WIS 0.84, p 3e-5), issued for 504 questions | **overstated** | 11 annual origins, overlapping 1–3-year horizons, on a *modelled* series that WHO re-estimates in every release (smooth by construction, X9); the outcome will be the next release's re-estimate | label GHE questions "forecast of the next WHO GHE estimate", not of deaths; require ≥ 20 origins or a vintage (release-to-release) backtest before admission |
+| NHSN flu/COVID: no REVA winner; blend beats persistence (0.73 / 0.95) | **credible** | as-of rounds; ensemble far better | — |
+| Multiplicity | **minor** | Bonferroni over baselines only; 3 candidates × 6 families uncorrected (X3) — the FluNet and GHE p-values (≤ 3e-5) would survive a correction over 18 | X3 |
+
+Not re-run by QA-PRED: the health backtests (their entry point records to the DB with worker credentials; no
+read-only path), so the health numbers above are taken from the report, checked only for internal consistency.
+
+## 8. Final scoreboard delta (after passes 2–3)
+
+* Unchanged: the only holdout-confirmed REVA gains are calibrated densities around the IMF WEO and SPF points
+  (§4); no REVA point forecast beats an official forecaster (IMF, SPF, EIA, CDC hub ensembles) anywhere.
+* Added: REVA's health blend beats naive baselines on FluNet positivity (final vintage) and loses to the CDC
+  ensembles in real time; conflict: nothing beats persistence; energy: EIA STEO itself does not beat a random walk on
+  crude prices.
+* Sealed so far across all agents (dev DB, origin live): registry batches of PRED-REGISTRY, PRED-FIN, PRED-ENERGY
+  (`6d76937c…`), PRED-CONFLICT (`ef57141a…`, 1,530 questions), PRED-HEALTH (`0ab8fcc2…`, 1,212 questions),
+  PRED-MODELS supplementary batches — **resolved: 0**. The first honest prospective numbers arrive from 2026-10-22
+  (NHSN) and mid-December 2026 (FFPI, HICP, Brent).
