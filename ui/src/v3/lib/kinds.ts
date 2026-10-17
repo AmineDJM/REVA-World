@@ -102,6 +102,27 @@ const KIND_LABEL_FR: Record<string, string> = {
   era: 'époque',
   place: 'lieu',
   other: 'autre',
+  // kinds of the event / causal records loaded by the V3 dataset agents (ICB, MID, UCDP, NAVCO, COW, IDMC, NOAA…)
+  international_crisis: 'crise internationale',
+  foreign_policy_crisis: 'crise de politique étrangère',
+  crisis_trigger: 'déclencheur de crise (codé)',
+  crisis_response: 'réponse à une crise (codée)',
+  crisis_outcome: 'issue de crise (codée)',
+  militarized_interstate_dispute: 'différend interétatique militarisé',
+  dispute_outcome: 'issue de différend (codée)',
+  armed_conflict_episode: 'épisode de conflit armé',
+  conflict_termination: 'fin de conflit (codée)',
+  campaign_outcome: 'issue de campagne (codée)',
+  war_outcome: 'issue de guerre (codée)',
+  coded_outcome: 'issue codée',
+  sanction_episode: 'épisode de sanctions',
+  disaster_event: 'catastrophe',
+  disaster_displacement: 'déplacements dus à une catastrophe',
+  tsunami: 'tsunami',
+  earthquake: 'séisme',
+  volcanic_eruption: 'éruption volcanique',
+  condition: 'condition',
+  unclassified: 'non classé',
 };
 
 /** French label of a raw KG kind ("historical_state" -> "État historique"). */

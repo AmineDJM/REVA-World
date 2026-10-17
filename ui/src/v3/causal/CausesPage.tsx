@@ -206,140 +206,140 @@ export default function CausesPage() {
             </ul>
           )}
           <RightsContext.Provider value={rightsMap}>
-          <div className="v3-causes-top">
-            <div className="v3-causes-event">
-              {ev?.status === 'loading' && <V3Loading what="de l’événement" />}
-              {ev?.status === 'error' && !card && <V3Error error={ev.error} what="La fiche de l’événement" />}
-              {(focal || card) && (
-                <EventCard
-                  e={focal}
-                  card={card}
-                  fallbackLabel={focalLabel}
-                  loaded={causes?.status === 'ok' && effects?.status === 'ok' ? { causes: causeList.length, effects: effectList.length, outcomes: outcomes.length } : null}
-                />
-              )}
-            </div>
-            <div className="v3-causes-graph">
-              <h2>Graphe causal gradué</h2>
-              {(causes?.status === 'loading' || effects?.status === 'loading') && <V3Loading what="des affirmations causales" />}
-              {causes?.status === 'error' && <V3Error error={causes.error} what="Les causes affirmées" />}
-              {effects?.status === 'error' && <V3Error error={effects.error} what="Les conséquences affirmées" />}
-              {graph && causes?.status !== 'loading' && effects?.status !== 'loading' && (causeClaims.length > 0 || effectClaims.length > 0) && (
-                <Suspense fallback={<V3Loading what="du graphe" />}>
-                  <CausalGraph
-                    model={graph}
-                    selected={selected}
-                    onSelectClaim={setSelected}
-                    onOpenNode={openNode}
-                    label={`Graphe causal de ${focalLabel} : ${causeList.length} cause(s) et ${effectList.length} conséquence(s) affirmées par des sources${outcomes.length ? `, ${outcomes.length} issue(s) codée(s)` : ''}`}
-                    height={graphHeight(graph)}
+            <div className="v3-causes-top">
+              <div className="v3-causes-event">
+                {ev?.status === 'loading' && <V3Loading what="de l’événement" />}
+                {ev?.status === 'error' && !card && <V3Error error={ev.error} what="La fiche de l’événement" />}
+                {(focal || card) && (
+                  <EventCard
+                    e={focal}
+                    card={card}
+                    fallbackLabel={focalLabel}
+                    loaded={causes?.status === 'ok' && effects?.status === 'ok' ? { causes: causeList.length, effects: effectList.length, outcomes: outcomes.length } : null}
                   />
-                </Suspense>
-              )}
-              {graph && graph.hidden > 0 && (
-                <p className="field-hint" data-testid="graph-hidden">
-                  {graph.hidden} affirmation(s) non dessinée(s) pour garder le graphe lisible ; toutes figurent dans les listes ci-dessous.
-                </p>
-              )}
-              {causes?.status === 'ok' && effects?.status === 'ok' && causeClaims.length === 0 && effectClaims.length === 0 && (
-                <p className="v3-missing" data-testid="no-claims">
-                  Aucune source chargée n’affirme de cause ni de conséquence pour cet événement. REVA ne déduit aucune cause de la chronologie.
-                </p>
-              )}
-              <CausalLegend />
+                )}
+              </div>
+              <div className="v3-causes-graph">
+                <h2>Graphe causal gradué</h2>
+                {(causes?.status === 'loading' || effects?.status === 'loading') && <V3Loading what="des affirmations causales" />}
+                {causes?.status === 'error' && <V3Error error={causes.error} what="Les causes affirmées" />}
+                {effects?.status === 'error' && <V3Error error={effects.error} what="Les conséquences affirmées" />}
+                {graph && causes?.status !== 'loading' && effects?.status !== 'loading' && (causeClaims.length > 0 || effectClaims.length > 0) && (
+                  <Suspense fallback={<V3Loading what="du graphe" />}>
+                    <CausalGraph
+                      model={graph}
+                      selected={selected}
+                      onSelectClaim={setSelected}
+                      onOpenNode={openNode}
+                      label={`Graphe causal de ${focalLabel} : ${causeList.length} cause(s) et ${effectList.length} conséquence(s) affirmées par des sources${outcomes.length ? `, ${outcomes.length} issue(s) codée(s)` : ''}`}
+                      height={graphHeight(graph)}
+                    />
+                  </Suspense>
+                )}
+                {graph && graph.hidden > 0 && (
+                  <p className="field-hint" data-testid="graph-hidden">
+                    {graph.hidden} affirmation(s) non dessinée(s) pour garder le graphe lisible ; toutes figurent dans les listes ci-dessous.
+                  </p>
+                )}
+                {causes?.status === 'ok' && effects?.status === 'ok' && causeClaims.length === 0 && effectClaims.length === 0 && (
+                  <p className="v3-missing" data-testid="no-claims">
+                    Aucune source chargée n’affirme de cause ni de conséquence pour cet événement. REVA ne déduit aucune cause de la chronologie.
+                  </p>
+                )}
+                <CausalLegend />
+              </div>
             </div>
-          </div>
-          {selectedClaim && (
-            <div className="v3-claim-panel">
-              <ClaimDetail c={selectedClaim} all={all} onOpen={setSelected} onClose={() => setSelected(null)} />
-            </div>
-          )}
-          <div className="v3-claim-lists">
-            <ClaimListSection title="Causes affirmées" empty="Aucune source chargée n’affirme de cause pour cet événement." load={causes} claims={causeList} show="cause" onOpen={setSelected} testId="causes-list" />
-            <ClaimListSection
-              title="Conséquences affirmées"
-              empty="Aucune source chargée n’affirme de conséquence de cet événement."
-              load={effects}
-              claims={effectList}
-              show="effect"
-              onOpen={setSelected}
-              testId="effects-list"
-            />
-          </div>
-          {(outcomes.length > 0 || outcomeOf.length > 0) && (
-            <div className="v3-claim-lists v3-outcomes">
-              {outcomes.length > 0 && (
-                <ClaimListSection
-                  title="Issues codées (comment l’événement s’est terminé)"
-                  hint="Codées par un jeu de données expert : l’issue n’est ni une cause ni une conséquence, et n’entre jamais dans une chaîne causale."
-                  load={effects}
-                  claims={outcomes}
-                  show="effect"
-                  onOpen={setSelected}
-                  testId="outcomes-list"
-                />
-              )}
-              {outcomeOf.length > 0 && (
-                <ClaimListSection
-                  title="Issue codée de"
-                  hint="Cet enregistrement est l’issue codée de l’événement ci-dessous (comment il s’est terminé selon le jeu de données), pas une conséquence causale."
-                  load={causes}
-                  claims={outcomeOf}
-                  show="cause"
-                  onOpen={setSelected}
-                  testId="outcome-of-list"
-                />
-              )}
-            </div>
-          )}
-          {shownLicences.length > 0 && <LicenceList licences={shownLicences} title="Licences restrictives des sources affichées" />}
-          {rights.status === 'unavailable' && <p className="field-hint">Licences des sources non consultables (registre des sources indisponible) : vérifiez-les avant toute réutilisation.</p>}
-          {why?.status === 'loading' && <V3Loading what="de l’explication" />}
-          {why?.status === 'error' && !unavailable(why) && <V3Error error={why.error} what="Le panneau « Pourquoi ? »" />}
-          {whyGroups && <WhyPanel groups={whyGroups} derived={why?.status !== 'ok'} onOpen={setSelected} />}
-          {focalDates && (causeClaims.length > 0 || effectClaims.length > 0) && (
-            <CausalTimeline focal={{ id: event, label: focalLabel, start: focalDates.start, end: focalDates.end }} causes={causeClaims} effects={effectClaims} />
-          )}
-          <DissentPanel pairs={pairs} onOpen={setSelected} />
-          <ChainFinder
-            from={chainFrom}
-            to={chainTo}
-            labels={labels}
-            onChange={(p) => {
-              const patch: Record<string, string | null> = {};
-              if (p.from !== undefined) {
-                if (p.from) setLabels((l) => ({ ...l, [p.from!.qid]: p.from!.label }));
-                patch.de = p.from ? (p.from.qid === event ? null : p.from.qid) : null;
-              }
-              if (p.to !== undefined) {
-                if (p.to) setLabels((l) => ({ ...l, [p.to!.qid]: p.to!.label }));
-                patch.vers = p.to ? p.to.qid : null;
-              }
-              set(patch);
-            }}
-            onOpen={openClaim}
-            onLabels={(l) => setLabels((old) => ({ ...l, ...old }))}
-          />
-          <section className="v3-candidates-section" aria-labelledby="cand-title">
-            <h2 id="cand-title">Espace des candidats</h2>
-            <label className="v3-check">
-              <input type="checkbox" checked={showCandidates} onChange={(e) => setShowCandidates(e.target.checked)} data-testid="candidates-toggle" /> Afficher l’espace « {CANDIDATE_LABEL} »
-            </label>
-            <p className="field-hint">
-              Désactivé par défaut. Les candidats sont des liens proposés par extraction de texte ou par un modèle : ils ne sont affirmés par aucune source, n’ont pas de grade, ne figurent
-              ni dans le graphe ni dans « Pourquoi ? », et ne sont jamais utilisés dans les réponses.
-            </p>
-            {showCandidates && (
-              <div className="v3-candidates" data-testid="candidates-panel">
-                <p className="v3-candidates-label">
-                  <strong>{CANDIDATE_LABEL}</strong>
-                </p>
-                {cands?.status === 'loading' && <V3Loading what="des candidats" />}
-                {cands?.status === 'error' && <V3Error error={cands.error} what="L’espace des candidats" />}
-                {cands?.status === 'ok' && <CandidateList items={cands.data.candidates} />}
+            {selectedClaim && (
+              <div className="v3-claim-panel">
+                <ClaimDetail c={selectedClaim} all={all} onOpen={setSelected} onClose={() => setSelected(null)} />
               </div>
             )}
-          </section>
+            <div className="v3-claim-lists">
+              <ClaimListSection title="Causes affirmées" empty="Aucune source chargée n’affirme de cause pour cet événement." load={causes} claims={causeList} show="cause" onOpen={setSelected} testId="causes-list" />
+              <ClaimListSection
+                title="Conséquences affirmées"
+                empty="Aucune source chargée n’affirme de conséquence de cet événement."
+                load={effects}
+                claims={effectList}
+                show="effect"
+                onOpen={setSelected}
+                testId="effects-list"
+              />
+            </div>
+            {(outcomes.length > 0 || outcomeOf.length > 0) && (
+              <div className="v3-claim-lists v3-outcomes">
+                {outcomes.length > 0 && (
+                  <ClaimListSection
+                    title="Issues codées (comment l’événement s’est terminé)"
+                    hint="Codées par un jeu de données expert : l’issue n’est ni une cause ni une conséquence, et n’entre jamais dans une chaîne causale."
+                    load={effects}
+                    claims={outcomes}
+                    show="effect"
+                    onOpen={setSelected}
+                    testId="outcomes-list"
+                  />
+                )}
+                {outcomeOf.length > 0 && (
+                  <ClaimListSection
+                    title="Issue codée de"
+                    hint="Cet enregistrement est l’issue codée de l’événement ci-dessous (comment il s’est terminé selon le jeu de données), pas une conséquence causale."
+                    load={causes}
+                    claims={outcomeOf}
+                    show="cause"
+                    onOpen={setSelected}
+                    testId="outcome-of-list"
+                  />
+                )}
+              </div>
+            )}
+            {shownLicences.length > 0 && <LicenceList licences={shownLicences} title="Licences restrictives des sources affichées" />}
+            {rights.status === 'unavailable' && <p className="field-hint">Licences des sources non consultables (registre des sources indisponible) : vérifiez-les avant toute réutilisation.</p>}
+            {why?.status === 'loading' && <V3Loading what="de l’explication" />}
+            {why?.status === 'error' && !unavailable(why) && <V3Error error={why.error} what="Le panneau « Pourquoi ? »" />}
+            {whyGroups && <WhyPanel groups={whyGroups} derived={why?.status !== 'ok'} onOpen={setSelected} />}
+            {focalDates && (causeClaims.length > 0 || effectClaims.length > 0) && (
+              <CausalTimeline focal={{ id: event, label: focalLabel, start: focalDates.start, end: focalDates.end }} causes={causeClaims} effects={effectClaims} />
+            )}
+            <DissentPanel pairs={pairs} onOpen={setSelected} />
+            <ChainFinder
+              from={chainFrom}
+              to={chainTo}
+              labels={labels}
+              onChange={(p) => {
+                const patch: Record<string, string | null> = {};
+                if (p.from !== undefined) {
+                  if (p.from) setLabels((l) => ({ ...l, [p.from!.qid]: p.from!.label }));
+                  patch.de = p.from ? (p.from.qid === event ? null : p.from.qid) : null;
+                }
+                if (p.to !== undefined) {
+                  if (p.to) setLabels((l) => ({ ...l, [p.to!.qid]: p.to!.label }));
+                  patch.vers = p.to ? p.to.qid : null;
+                }
+                set(patch);
+              }}
+              onOpen={openClaim}
+              onLabels={(l) => setLabels((old) => ({ ...l, ...old }))}
+            />
+            <section className="v3-candidates-section" aria-labelledby="cand-title">
+              <h2 id="cand-title">Espace des candidats</h2>
+              <label className="v3-check">
+                <input type="checkbox" checked={showCandidates} onChange={(e) => setShowCandidates(e.target.checked)} data-testid="candidates-toggle" /> Afficher l’espace « {CANDIDATE_LABEL} »
+              </label>
+              <p className="field-hint">
+                Désactivé par défaut. Les candidats sont des liens proposés par extraction de texte ou par un modèle : ils ne sont affirmés par aucune source, n’ont pas de grade, ne figurent
+                ni dans le graphe ni dans « Pourquoi ? », et ne sont jamais utilisés dans les réponses.
+              </p>
+              {showCandidates && (
+                <div className="v3-candidates" data-testid="candidates-panel">
+                  <p className="v3-candidates-label">
+                    <strong>{CANDIDATE_LABEL}</strong>
+                  </p>
+                  {cands?.status === 'loading' && <V3Loading what="des candidats" />}
+                  {cands?.status === 'error' && <V3Error error={cands.error} what="L’espace des candidats" />}
+                  {cands?.status === 'ok' && <CandidateList items={cands.data.candidates} />}
+                </div>
+              )}
+            </section>
           </RightsContext.Provider>
         </>
       )}
