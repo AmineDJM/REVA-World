@@ -23,7 +23,6 @@ requires.
 from __future__ import annotations
 
 import csv
-import io
 import sys
 from collections import Counter
 from collections.abc import Mapping
@@ -161,7 +160,9 @@ def parse_csv(f: hc.Fetched, rows: hc.DailyRows, report: dict[str, Any]) -> None
     report["rates_d"] = {"rows": dict(n), "empty_cells": dict(empty), "titles": titles}
 
 
-def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, hc.TableBuild], dict]:
+def build(
+    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out = {ds: hc.TableBuild(hc.DailyRows(ATLAS_SOURCE, ds)) for ds in wanted}
     report: dict[str, Any] = {}
     if "rates_d" in wanted:

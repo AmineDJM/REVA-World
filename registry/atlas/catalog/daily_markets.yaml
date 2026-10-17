@@ -1,0 +1,1340 @@
+# Atlas catalog 'daily_markets' (agent PRED-HF, V5, 2026-10-17). Provider-declared concepts (not human-reviewed)
+# for the daily series of atlas_hf_{ecb,bis,ust,eia,boe,nyfed}.py; generated from the real provider downloads
+# (titles and definitions verbatim). Themes: prices (energy spot prices) and finance (rates, FX, yields).
+# See docs/dev/v5_pred_hf.md.
+domain: daily_markets
+labels:
+  fr: Marchés et taux quotidiens
+  en: Daily markets and rates
+maintainer: PRED-HF
+concepts:
+- id: prices.daily.wti_spot
+  labels:
+    en: WTI crude oil spot price, Cushing (daily)
+    fr: Prix spot du pétrole brut WTI, Cushing (quotidien)
+  definition: 'EIA series RWTC: Cushing, OK WTI Spot Price FOB (Dollars per Barrel).'
+  unit: Dollars per Barrel
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=RWTC
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.brent_spot
+  labels:
+    en: Brent crude oil spot price (daily)
+    fr: Prix spot du pétrole brut Brent (quotidien)
+  definition: 'EIA series RBRTE: Europe Brent Spot Price FOB (Dollars per Barrel). EIA definition: Brent A blended crude stream
+    produced in the North Sea region which serves as a reference or "marker" for pricing a number of other crude streams.'
+  unit: Dollars per Barrel
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=RBRTE
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.gasoline_conventional_nyh_spot
+  labels:
+    en: Conventional regular gasoline spot price, New York Harbor (daily)
+    fr: Prix spot de l'essence ordinaire conventionnelle, port de New York (quotidien)
+  definition: 'EIA series EER_EPMRU_PF4_Y35NY_DPG: New York Harbor Conventional Gasoline Regular Spot Price FOB (Dollars per
+    Gallon). EIA definition: Conventional Gasoline Finished motor gasoline not included in the oxygenated or reformulated
+    gasoline categories. Excludes reformulated gasoline blendstock for oxygenate blending (RBOB) as well as other blendstock.'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPMRU_PF4_Y35NY_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.gasoline_conventional_usgc_spot
+  labels:
+    en: Conventional regular gasoline spot price, U.S. Gulf Coast (daily)
+    fr: Prix spot de l'essence ordinaire conventionnelle, côte du golfe des États-Unis (quotidien)
+  definition: 'EIA series EER_EPMRU_PF4_RGC_DPG: U.S. Gulf Coast Conventional Gasoline Regular Spot Price FOB (Dollars per
+    Gallon). EIA definition: Conventional Gasoline Finished motor gasoline not included in the oxygenated or reformulated
+    gasoline categories. Excludes reformulated gasoline blendstock for oxygenate blending (RBOB) as well as other blendstock.'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPMRU_PF4_RGC_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.gasoline_rbob_la_spot
+  labels:
+    en: RBOB regular gasoline spot price, Los Angeles (daily)
+    fr: Prix spot de l'essence RBOB ordinaire, Los Angeles (quotidien)
+  definition: 'EIA series EER_EPMRR_PF4_Y05LA_DPG: Los Angeles Reformulated RBOB Regular Gasoline Spot Price (Dollars per
+    Gallon).'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPMRR_PF4_Y05LA_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.heating_oil_nyh_spot
+  labels:
+    en: No. 2 heating oil spot price, New York Harbor (daily)
+    fr: Prix spot du fioul domestique n° 2, port de New York (quotidien)
+  definition: 'EIA series EER_EPD2F_PF4_Y35NY_DPG: New York Harbor No. 2 Heating Oil Spot Price FOB (Dollars per Gallon).'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPD2F_PF4_Y35NY_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.ulsd_nyh_spot
+  labels:
+    en: Ultra-low sulfur No. 2 diesel spot price, New York Harbor (daily)
+    fr: Prix spot du gazole n° 2 à très basse teneur en soufre, port de New York (quotidien)
+  definition: 'EIA series EER_EPD2DXL0_PF4_Y35NY_DPG: New York Harbor Ultra-Low Sulfur No 2 Diesel Spot Price (Dollars per
+    Gallon). EIA definition: No. 2 Diesel Fuel A gasoil type distillate for use in high speed diesel engines generally operated
+    under uniform speed and load conditions, with distillation temperatures between 540-640 degrees Fahrenheit at the 90-percent
+    recovery point; and the kinematic viscosities between 1.9-4.1 centistokes at 100 degrees Fahrenheit as defined in ASTM
+    specification D975-93. Includes Type R-R diesel fuel used for railroad locomotive engines, and Type T-T for diesel-engine
+    trucks. For pricing data: Ultra-Low Sulfur or On-Highway Diesel Fuel is No. 2 diesel fuel which has a sulfur level less
+    than or equal to 15 ppm (parts per million); Low Sulfur Diesel Fuel is No. 2 diesel fuel which has a sulfur level greater
+    than 15 and less than or equal to 500 ppm; and High Sulfur refers to No. 2 distillate (either diesel or fuel oil) which
+    has a sulfur level greater than 500 ppm.'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPD2DXL0_PF4_Y35NY_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.ulsd_usgc_spot
+  labels:
+    en: Ultra-low sulfur No. 2 diesel spot price, U.S. Gulf Coast (daily)
+    fr: Prix spot du gazole n° 2 à très basse teneur en soufre, côte du golfe des États-Unis (quotidien)
+  definition: 'EIA series EER_EPD2DXL0_PF4_RGC_DPG: U.S. Gulf Coast Ultra-Low Sulfur No 2 Diesel Spot Price (Dollars per Gallon).
+    EIA definition: No. 2 Diesel Fuel A gasoil type distillate for use in high speed diesel engines generally operated under
+    uniform speed and load conditions, with distillation temperatures between 540-640 degrees Fahrenheit at the 90-percent
+    recovery point; and the kinematic viscosities between 1.9-4.1 centistokes at 100 degrees Fahrenheit as defined in ASTM
+    specification D975-93. Includes Type R-R diesel fuel used for railroad locomotive engines, and Type T-T for diesel-engine
+    trucks. For pricing data: Ultra-Low Sulfur or On-Highway Diesel Fuel is No. 2 diesel fuel which has a sulfur level less
+    than or equal to 15 ppm (parts per million); Low Sulfur Diesel Fuel is No. 2 diesel fuel which has a sulfur level greater
+    than 15 and less than or equal to 500 ppm; and High Sulfur refers to No. 2 distillate (either diesel or fuel oil) which
+    has a sulfur level greater than 500 ppm.'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPD2DXL0_PF4_RGC_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.carb_diesel_la_spot
+  labels:
+    en: Ultra-low sulfur CARB diesel spot price, Los Angeles (daily)
+    fr: Prix spot du gazole CARB à très basse teneur en soufre, Los Angeles (quotidien)
+  definition: 'EIA series EER_EPD2DC_PF4_Y05LA_DPG: Los Angeles, CA Ultra-Low Sulfur CARB Diesel Spot Price (Dollars per Gallon).'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPD2DC_PF4_Y05LA_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.jet_fuel_usgc_spot
+  labels:
+    en: Kerosene-type jet fuel spot price, U.S. Gulf Coast (daily)
+    fr: Prix spot du carburéacteur de type kérosène, côte du golfe des États-Unis (quotidien)
+  definition: 'EIA series EER_EPJK_PF4_RGC_DPG: U.S. Gulf Coast Kerosene-Type Jet Fuel Spot Price FOB (Dollars per Gallon).
+    EIA definition: Kerosene-Type Jet Fuel A kerosene-based product having a maximum distillation temperature of 400 degrees
+    Fahrenheit at the 10-percent recovery point and a final maximum boiling point of 572 degrees Fahrenheit and meeting ASTM
+    Specification D 1655 and Military Specifications MIL-T-5624P and MIL-T-83133D (Grades JP-5 and JP-8). It is used for commercial
+    and military turbojet and turboprop aircraft engines.'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPJK_PF4_RGC_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.propane_mont_belvieu_spot
+  labels:
+    en: Propane spot price, Mont Belvieu TX (daily)
+    fr: Prix spot du propane, Mont Belvieu (Texas) (quotidien)
+  definition: 'EIA series EER_EPLLPA_PF4_Y44MB_DPG: Mont Belvieu, TX Propane Spot Price FOB (Dollars per Gallon).'
+  unit: Dollars per Gallon
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=EER_EPLLPA_PF4_Y44MB_DPG
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: prices.daily.henry_hub_spot
+  labels:
+    en: Henry Hub natural gas spot price (daily)
+    fr: Prix spot du gaz naturel au Henry Hub (quotidien)
+  definition: 'EIA series RNGWHHD: Henry Hub Natural Gas Spot Price (Dollars per Million Btu). EIA: Spot Price The price for
+    a one-time open market transaction for immediate delivery of a specific quantity of product at a specific location where
+    the commodity is purchased "on the spot" at current market rates. Prices are based on delivery at the Henry Hub in Louisiana.'
+  unit: Dollars per Million Btu
+  domain: daily_markets
+  subdomain: energy_spot
+  theme: prices
+  source_order:
+  - eia.spot_d.EIA_SPOT|series=RNGWHHD
+  provider_declared: true
+  notes: 'Daily closing spot price, one cell per trading day (atlas eia.spot_d). Prices sourced by EIA from Refinitiv, an
+    LSEG business: licence review flagged on every value.'
+  tags:
+  - daily
+  - energy
+  - spot
+- id: finance.daily.eur_ref_usd
+  labels:
+    en: Euro reference exchange rate, US dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, USD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of US dollar (USD) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: USD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=USD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_jpy
+  labels:
+    en: Euro reference exchange rate, Japanese yen per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, JPY pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Japanese yen (JPY) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: JPY per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=JPY
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_czk
+  labels:
+    en: Euro reference exchange rate, Czech koruna per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, CZK pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Czech koruna (CZK) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: CZK per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=CZK
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_dkk
+  labels:
+    en: Euro reference exchange rate, Danish krone per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, DKK pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Danish krone (DKK) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: DKK per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=DKK
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_gbp
+  labels:
+    en: Euro reference exchange rate, Pound sterling per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, GBP pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Pound sterling (GBP) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: GBP per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=GBP
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_huf
+  labels:
+    en: Euro reference exchange rate, Hungarian forint per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, HUF pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Hungarian forint (HUF) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: HUF per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=HUF
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_pln
+  labels:
+    en: Euro reference exchange rate, Polish zloty per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, PLN pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Polish zloty (PLN) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: PLN per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=PLN
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_ron
+  labels:
+    en: Euro reference exchange rate, Romanian leu per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, RON pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Romanian leu (RON) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: RON per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=RON
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_sek
+  labels:
+    en: Euro reference exchange rate, Swedish krona per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, SEK pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Swedish krona (SEK) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: SEK per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=SEK
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_chf
+  labels:
+    en: Euro reference exchange rate, Swiss franc per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, CHF pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Swiss franc (CHF) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: CHF per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=CHF
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_isk
+  labels:
+    en: Euro reference exchange rate, Icelandic krona per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, ISK pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Icelandic krona (ISK) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: ISK per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=ISK
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_nok
+  labels:
+    en: Euro reference exchange rate, Norwegian krone per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, NOK pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Norwegian krone (NOK) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: NOK per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=NOK
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_try
+  labels:
+    en: Euro reference exchange rate, Turkish lira per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, TRY pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Turkish lira (TRY) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: TRY per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=TRY
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_aud
+  labels:
+    en: Euro reference exchange rate, Australian dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, AUD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Australian dollar (AUD) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: AUD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=AUD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_brl
+  labels:
+    en: Euro reference exchange rate, Brazilian real per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, BRL pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Brazilian real (BRL) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: BRL per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=BRL
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_cad
+  labels:
+    en: Euro reference exchange rate, Canadian dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, CAD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Canadian dollar (CAD) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: CAD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=CAD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_cny
+  labels:
+    en: Euro reference exchange rate, Chinese yuan renminbi per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, CNY pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Chinese yuan renminbi (CNY) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: CNY per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=CNY
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_hkd
+  labels:
+    en: Euro reference exchange rate, Hong Kong dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, HKD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Hong Kong dollar (HKD) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: HKD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=HKD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_idr
+  labels:
+    en: Euro reference exchange rate, Indonesian rupiah per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, IDR pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Indonesian rupiah (IDR) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: IDR per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=IDR
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_ils
+  labels:
+    en: Euro reference exchange rate, Israeli shekel per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, ILS pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Israeli shekel (ILS) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: ILS per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=ILS
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_inr
+  labels:
+    en: Euro reference exchange rate, Indian rupee per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, INR pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Indian rupee (INR) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: INR per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=INR
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_krw
+  labels:
+    en: Euro reference exchange rate, South Korean won per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, KRW pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of South Korean won (KRW) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: KRW per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=KRW
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_mxn
+  labels:
+    en: Euro reference exchange rate, Mexican peso per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, MXN pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Mexican peso (MXN) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: MXN per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=MXN
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_myr
+  labels:
+    en: Euro reference exchange rate, Malaysian ringgit per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, MYR pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Malaysian ringgit (MYR) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: MYR per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=MYR
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_nzd
+  labels:
+    en: Euro reference exchange rate, New Zealand dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, NZD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of New Zealand dollar (NZD) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: NZD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=NZD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_php
+  labels:
+    en: Euro reference exchange rate, Philippine peso per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, PHP pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Philippine peso (PHP) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: PHP per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=PHP
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_sgd
+  labels:
+    en: Euro reference exchange rate, Singapore dollar per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, SGD pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Singapore dollar (SGD) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: SGD per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=SGD
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_thb
+  labels:
+    en: Euro reference exchange rate, Thai baht per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, THB pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of Thai baht (THB) per 1 euro. ECB: "All currencies quoted
+    against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: THB per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=THB
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.eur_ref_zar
+  labels:
+    en: Euro reference exchange rate, South African rand per euro (ECB, daily)
+    fr: Taux de change de référence de l'euro, ZAR pour un euro (BCE, quotidien)
+  definition: 'ECB euro foreign exchange reference rate: units of South African rand (ZAR) per 1 euro. ECB: "All currencies
+    quoted against the euro (base currency)"; "The reference rates are published for information purposes only."'
+  unit: ZAR per EUR
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - ecb.fx_ref.EUR_REF|currency=ZAR
+  provider_declared: true
+  notes: Published around 16:00 CET each TARGET working day (flags.publication); atlas ecb.fx_ref.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.estr
+  labels:
+    en: Euro short-term rate (€STR)
+    fr: Taux à court terme de l'euro (€STR)
+  definition: 'ECB series EST.B.EU000A2X2A25.WT: Euro short-term rate, Volume-weighted trimmed mean rate - Unsecured - Overnight
+    - Borrowing - Financial corporations (series title verbatim). Period = trading day.'
+  unit: Percent
+  domain: daily_markets
+  subdomain: money_market
+  theme: finance
+  source_order:
+  - ecb.estr.EST.B.EU000A2X2A25.WT
+  provider_declared: true
+  notes: Published 08:00 CET the next TARGET2 business day; same-day revision only above 2 bp.
+  tags:
+  - daily
+  - rates
+- id: finance.daily.ecb_deposit_facility
+  labels:
+    en: ECB deposit facility rate (daily, level in force)
+    fr: Taux de la facilité de dépôt de la BCE (quotidien)
+  definition: 'ECB series FM.D.U2.EUR.4F.KR.DFR.LEV: Deposit facility - date of changes (raw data) - Level (series title verbatim).'
+  unit: Percent per annum
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - ecb.key_rates.FM.D.U2.EUR.4F.KR.DFR.LEV
+  provider_declared: true
+  notes: Level in force on each calendar day; atlas ecb.key_rates.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.ecb_mro_fixed_rate
+  labels:
+    en: ECB main refinancing operations, fixed rate (daily, level in force)
+    fr: Taux fixe des opérations principales de refinancement de la BCE (quotidien)
+  definition: 'ECB series FM.D.U2.EUR.4F.KR.MRR_FR.LEV: Main refinancing operations - fixed rate tenders (fixed rate) (date
+    of changes) - Level (series title verbatim).'
+  unit: Percent per annum
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - ecb.key_rates.FM.D.U2.EUR.4F.KR.MRR_FR.LEV
+  provider_declared: true
+  notes: Level in force on each calendar day; atlas ecb.key_rates.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.ecb_mro_minimum_bid_rate
+  labels:
+    en: ECB main refinancing operations, minimum bid rate (daily, level in force)
+    fr: Taux de soumission minimal des opérations principales de refinancement de la BCE (quotidien)
+  definition: 'ECB series FM.D.U2.EUR.4F.KR.MRR_MBR.LEV: ECB Main refinancing operations - variable rate tenders (minimun
+    bid rate) (date of changes) - Level (series title verbatim).'
+  unit: Percent per annum
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - ecb.key_rates.FM.D.U2.EUR.4F.KR.MRR_MBR.LEV
+  provider_declared: true
+  notes: Level in force on each calendar day; atlas ecb.key_rates.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.ecb_marginal_lending
+  labels:
+    en: ECB marginal lending facility rate (daily, level in force)
+    fr: Taux de la facilité de prêt marginal de la BCE (quotidien)
+  definition: 'ECB series FM.D.U2.EUR.4F.KR.MLFR.LEV: Marginal lending facility - date of changes (raw data) - Level (series
+    title verbatim).'
+  unit: Percent per annum
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - ecb.key_rates.FM.D.U2.EUR.4F.KR.MLFR.LEV
+  provider_declared: true
+  notes: Level in force on each calendar day; atlas ecb.key_rates.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.policy_rate
+  labels:
+    en: Central bank policy rate (daily, end of period)
+    fr: Taux directeur de la banque centrale (quotidien)
+  definition: 'BIS central bank policy rates, daily series (WS_CBPOL, FREQ D, end of period): the policy rate in force each
+    day; which rate the BIS uses in which period is the series COMPILATION text (atlas bis.cbpol_d_series).'
+  unit: Per cent per year
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - bis.cbpol_d.CBPOL
+  provider_declared: true
+  notes: 'Daily cells (per-source series); monthly: finance.policy_rate (bis.cbpol).'
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.neer_broad
+  labels:
+    en: Nominal effective exchange rate, broad (64 economies) basket (daily)
+    fr: Taux de change effectif nominal, panier large (64 économies) (quotidien)
+  definition: BIS effective exchange rates (WS_EER), daily, nominal, broad 64 economies basket; COLLECTION 'Average of observations
+    through period'.
+  unit: Index, 2020 = 100
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer_d.EER|eer_type=N|eer_basket=B
+  provider_declared: true
+  notes: Holiday/weekend cells (status H) are not observations.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.neer_narrow
+  labels:
+    en: Nominal effective exchange rate, narrow (27 economies) basket (daily)
+    fr: Taux de change effectif nominal, panier étroit (27 économies) (quotidien)
+  definition: BIS effective exchange rates (WS_EER), daily, nominal, narrow 27 economies basket; COLLECTION 'Average of observations
+    through period'.
+  unit: Index, 2020 = 100
+  domain: daily_markets
+  subdomain: exchange_rates
+  theme: finance
+  source_order:
+  - bis.eer_d.EER|eer_type=N|eer_basket=N
+  provider_declared: true
+  notes: Holiday/weekend cells (status H) are not observations.
+  tags:
+  - daily
+  - fx
+- id: finance.daily.ust_par_1mo
+  labels:
+    en: US Treasury par yield, 1 Mo (daily)
+    fr: Rendement au pair du Trésor américain, 1 Mo (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "1 Mo": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=1 Mo
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_1_5month
+  labels:
+    en: US Treasury par yield, 1.5 Month (daily)
+    fr: Rendement au pair du Trésor américain, 1.5 Month (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "1.5 Month": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=1.5 Month
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_2mo
+  labels:
+    en: US Treasury par yield, 2 Mo (daily)
+    fr: Rendement au pair du Trésor américain, 2 Mo (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "2 Mo": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=2 Mo
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_3mo
+  labels:
+    en: US Treasury par yield, 3 Mo (daily)
+    fr: Rendement au pair du Trésor américain, 3 Mo (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "3 Mo": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=3 Mo
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_4mo
+  labels:
+    en: US Treasury par yield, 4 Mo (daily)
+    fr: Rendement au pair du Trésor américain, 4 Mo (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "4 Mo": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=4 Mo
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_6mo
+  labels:
+    en: US Treasury par yield, 6 Mo (daily)
+    fr: Rendement au pair du Trésor américain, 6 Mo (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "6 Mo": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=6 Mo
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_1yr
+  labels:
+    en: US Treasury par yield, 1 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 1 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "1 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=1 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_2yr
+  labels:
+    en: US Treasury par yield, 2 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 2 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "2 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=2 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_3yr
+  labels:
+    en: US Treasury par yield, 3 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 3 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "3 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=3 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_5yr
+  labels:
+    en: US Treasury par yield, 5 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 5 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "5 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=5 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_7yr
+  labels:
+    en: US Treasury par yield, 7 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 7 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "7 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=7 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_10yr
+  labels:
+    en: US Treasury par yield, 10 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 10 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "10 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=10 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_20yr
+  labels:
+    en: US Treasury par yield, 20 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 20 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "20 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=20 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_par_30yr
+  labels:
+    en: US Treasury par yield, 30 Yr (daily)
+    fr: Rendement au pair du Trésor américain, 30 Yr (quotidien)
+  definition: 'U.S. Treasury Daily Treasury Par Yield Curve Rates, column "30 Yr": par yield read from the official Treasury
+    yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before).'
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.par_yield.UST_PAR|tenor=30 Yr
+  provider_declared: true
+  notes: 'Inputs: indicative bid-side quotations at or near 3:30 PM each trading day (Treasury methodology).'
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_real_par_5yr
+  labels:
+    en: US Treasury real par yield, 5 YR (daily)
+    fr: Rendement réel au pair du Trésor américain, 5 YR (quotidien)
+  definition: U.S. Treasury Daily Treasury Par Real Yield Curve Rates, column "5 YR".
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.real_yield.UST_REAL_PAR|tenor=5 YR
+  provider_declared: true
+  notes: Since 2003.
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_real_par_7yr
+  labels:
+    en: US Treasury real par yield, 7 YR (daily)
+    fr: Rendement réel au pair du Trésor américain, 7 YR (quotidien)
+  definition: U.S. Treasury Daily Treasury Par Real Yield Curve Rates, column "7 YR".
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.real_yield.UST_REAL_PAR|tenor=7 YR
+  provider_declared: true
+  notes: Since 2003.
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_real_par_10yr
+  labels:
+    en: US Treasury real par yield, 10 YR (daily)
+    fr: Rendement réel au pair du Trésor américain, 10 YR (quotidien)
+  definition: U.S. Treasury Daily Treasury Par Real Yield Curve Rates, column "10 YR".
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.real_yield.UST_REAL_PAR|tenor=10 YR
+  provider_declared: true
+  notes: Since 2003.
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_real_par_20yr
+  labels:
+    en: US Treasury real par yield, 20 YR (daily)
+    fr: Rendement réel au pair du Trésor américain, 20 YR (quotidien)
+  definition: U.S. Treasury Daily Treasury Par Real Yield Curve Rates, column "20 YR".
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.real_yield.UST_REAL_PAR|tenor=20 YR
+  provider_declared: true
+  notes: Since 2003.
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.ust_real_par_30yr
+  labels:
+    en: US Treasury real par yield, 30 YR (daily)
+    fr: Rendement réel au pair du Trésor américain, 30 YR (quotidien)
+  definition: U.S. Treasury Daily Treasury Par Real Yield Curve Rates, column "30 YR".
+  unit: percent
+  domain: daily_markets
+  subdomain: yields
+  theme: finance
+  source_order:
+  - ust.real_yield.UST_REAL_PAR|tenor=30 YR
+  provider_declared: true
+  notes: Since 2003.
+  tags:
+  - daily
+  - rates
+  - yield_curve
+- id: finance.daily.uk_bank_rate
+  labels:
+    en: Bank of England Official Bank Rate (daily)
+    fr: Taux directeur de la Banque d'Angleterre (quotidien)
+  definition: 'Bank of England series IUDBEDR: Official Bank Rate (series description verbatim).'
+  unit: percent
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - boe.rates_d.IUDBEDR
+  provider_declared: true
+  notes: Since 1975; OGL v3.0.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.sonia
+  labels:
+    en: Sterling overnight index average (SONIA, daily)
+    fr: Taux moyen au jour le jour de la livre sterling (SONIA, quotidien)
+  definition: 'Bank of England series IUDSOIA: Daily Sterling overnight index average (SONIA) rate (series description verbatim).'
+  unit: percent
+  domain: daily_markets
+  subdomain: money_market
+  theme: finance
+  source_order:
+  - boe.rates_d.IUDSOIA
+  provider_declared: true
+  notes: Reforms of the benchmark in April 2018 (BoE); in the BoE Database two London business days after the reference day.
+  tags:
+  - daily
+  - rates
+- id: finance.daily.effr
+  labels:
+    en: Effective federal funds rate (EFFR, daily)
+    fr: Taux effectif des fonds fédéraux (EFFR, quotidien)
+  definition: New York Fed reference rate EFFR, API field percentRate (volume-weighted median rate).
+  unit: percent
+  domain: daily_markets
+  subdomain: money_market
+  theme: finance
+  source_order:
+  - nyfed.rates_d.EFFR|field=percentRate
+  provider_declared: true
+  notes: Published the business day after the effective date; same-day revisions > 1 bp flagged (revision_indicator).
+  tags:
+  - daily
+  - rates
+- id: finance.daily.obfr
+  labels:
+    en: Overnight bank funding rate (OBFR, daily)
+    fr: Taux de financement bancaire au jour le jour (OBFR, quotidien)
+  definition: New York Fed reference rate OBFR, API field percentRate (volume-weighted median rate).
+  unit: percent
+  domain: daily_markets
+  subdomain: money_market
+  theme: finance
+  source_order:
+  - nyfed.rates_d.OBFR|field=percentRate
+  provider_declared: true
+  notes: Published the business day after the effective date; same-day revisions > 1 bp flagged (revision_indicator).
+  tags:
+  - daily
+  - rates
+- id: finance.daily.sofr
+  labels:
+    en: Secured overnight financing rate (SOFR, daily)
+    fr: Taux de financement garanti au jour le jour (SOFR, quotidien)
+  definition: New York Fed reference rate SOFR, API field percentRate (volume-weighted median rate).
+  unit: percent
+  domain: daily_markets
+  subdomain: money_market
+  theme: finance
+  source_order:
+  - nyfed.rates_d.SOFR|field=percentRate
+  provider_declared: true
+  notes: Published the business day after the effective date; same-day revisions > 1 bp flagged (revision_indicator).
+  tags:
+  - daily
+  - rates
+- id: finance.daily.fed_funds_target_lower
+  labels:
+    en: FOMC federal funds target (lower bound or single target, daily)
+    fr: Cible des fonds fédéraux du FOMC (borne basse ou cible unique, quotidien)
+  definition: 'New York Fed EFFR record, API field targetRateFrom: the target rate (before the target range) or the lower
+    limit of the FOMC target range.'
+  unit: percent
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - nyfed.rates_d.EFFR|field=targetRateFrom
+  provider_declared: true
+  notes: Daily with the EFFR record.
+  tags:
+  - daily
+  - rates
+  - policy
+- id: finance.daily.fed_funds_target_upper
+  labels:
+    en: FOMC federal funds target range, upper bound (daily)
+    fr: Borne haute de la fourchette cible des fonds fédéraux du FOMC (quotidien)
+  definition: 'New York Fed EFFR record, API field targetRateTo: upper limit of the FOMC target range.'
+  unit: percent
+  domain: daily_markets
+  subdomain: policy_rates
+  theme: finance
+  source_order:
+  - nyfed.rates_d.EFFR|field=targetRateTo
+  provider_declared: true
+  notes: Daily with the EFFR record.
+  tags:
+  - daily
+  - rates
+  - policy

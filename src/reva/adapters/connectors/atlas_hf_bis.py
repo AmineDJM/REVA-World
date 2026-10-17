@@ -269,7 +269,9 @@ def parse_flow(flow: Flow, f: hc.Fetched, out: Mapping[str, hc.TableBuild], repo
                             "attribute_rows": len(groups)}  # fmt: skip
 
 
-def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, hc.TableBuild], dict]:
+def build(
+    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out = {ds: hc.TableBuild(hc.DailyRows(ATLAS_SOURCE, ds)) for ds in wanted}
     report: dict[str, Any] = {}
     for flow in FLOWS:

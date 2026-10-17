@@ -254,6 +254,8 @@ async def clb_pages(
         raise TaxonomyError(
             f"{key}: paging returned {len(out)} records for total {total}", retryable=False, kind="truncated"
         )
+    if len({str(rec.get("id")) for rec, _s, _sel in out}) != total:  # unstable sort: a page repeated a usage
+        raise TaxonomyError(f"{key}: paging repeated usages (unstable order)", retryable=True, kind="paging")
     return out, total
 
 
@@ -1190,7 +1192,13 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
     import tempfile
     from pathlib import Path
 
-    from reva.adapters.connectors.wikidata import Archive, MachineLock, WikidataClient
+    from reva.adapters.connectors.wikidata import (
+        Archive,
+        MachineLock,
+        QueryTimeout,
+        WikidataClient,
+        WikidataError,
+    )
 
     if not run.wants(WD_DATASET):
         return {"skipped": True}
@@ -1204,6 +1212,7 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
     queries: list[dict[str, Any]] = []
     shas: list[str] = []
     retrieved: list[datetime] = []
+    timeouts: list[str] = []
     with tempfile.TemporaryDirectory(prefix="reva-v4bio-lock-") as tmp:
         lock = MachineLock(Path(tmp), min_interval=0.0) if run.origin != "live" else None
         client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
@@ -1211,30 +1220,44 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
         async def ask(q: str, purpose: str) -> None:
             if len(queries) >= max_queries:
                 raise _Budget()
-            res = await client.sparql(q, meta={"purpose": purpose, "connector": WD_NAME})
+            try:
+                res = await client.sparql(q, meta={"purpose": purpose, "connector": WD_NAME})
+            except QueryTimeout:  # this query only: the next ones still run (the run is then incomplete)
+                queries.append({"purpose": purpose, "error": "query_timeout"})
+                timeouts.append(purpose)
+                return
             queries.append({"purpose": purpose, "rows": len(res.bindings), "raw_sha256": res.raw_sha256})
             shas.append(res.raw_sha256)
             retrieved.append(res.retrieved_at)
             rows.extend((b, res.raw_sha256) for b in res.bindings)
 
         complete = True
+        stopped: str | None = None
         try:
-            covered: set[str] = set()
+            # 1. per-rank queries (kingdom..family: every item with a GBIF key and that rank)
             for rank, rq in RANK_QIDS.items():
                 await ask(wd_rank_query(rq), f"gbif_rank:{rank}")
             covered = {g for r, _s in rows if (g := _b(r, "gbif"))}
-            rest = sorted(
-                (k for k, rk in ranks.items() if rk in ("genus", "species") and k not in covered),
-                key=lambda x: (len(x), x),
-            )
-            for i in range(0, len(rest), WD_CHUNK):
-                await ask(wd_values_query("P846", rest[i : i + WD_CHUNK]), f"gbif_values:{i}")
-            ncbi = sorted(loaded_ncbi, key=lambda x: (len(x), x))
-            for i in range(0, len(ncbi), WD_CHUNK):
-                await ask(wd_values_query("P685", ncbi[i : i + WD_CHUNK]), f"ncbi_values:{i}")
+            # 2. curated scope species, 3. NCBI ids that carry genomes / reviewed proteins, 4. the other species/genera
+            scope = {str(sp.key) for sp in load_scope().species} & loaded_gbif
+            prio_ncbi = _priority_ncbi(run.engine, run.origin, int(opts.get("min_reviewed", 100))) & loaded_ncbi
+            rest = {k for k, rk in ranks.items() if rk in ("genus", "species")} - covered - scope
+            plan = [
+                ("P846", "scope", sorted(scope - covered, key=lambda x: (len(x), x))),
+                ("P685", "ncbi_priority", sorted(prio_ncbi, key=lambda x: (len(x), x))),
+                ("P846", "gbif_rest", sorted(rest, key=lambda x: (len(x), x))),
+                ("P685", "ncbi_rest", sorted(loaded_ncbi - prio_ncbi, key=lambda x: (len(x), x))),
+            ]
+            for prop, label, keys in plan:
+                for i in range(0, len(keys), WD_CHUNK):
+                    await ask(wd_values_query(prop, keys[i : i + WD_CHUNK]), f"{label}:{i}")
         except _Budget:
+            complete, stopped = False, f"max_queries={max_queries} reached"
+        except WikidataError as e:  # throttled / timed out: keep what was answered, never retract
+            complete, stopped = False, f"{type(e).__name__}: {str(e)[:200]}"
+        if timeouts:
             complete = False
-    if not rows and not queries:
+    if not retrieved:
         return {"skipped": True, "reason": "no query sent"}
     parts = wikidata_kg(
         rows, retrieved_at=max(retrieved), loaded_gbif=loaded_gbif, loaded_ncbi=loaded_ncbi, loaded_col=loaded_col
@@ -1255,6 +1278,7 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
     return {
         "queries": queries,
         "complete": complete,
+        "stopped": stopped,
         "loaded": {"gbif": len(loaded_gbif), "ncbi": len(loaded_ncbi), "col": len(loaded_col)},
         "build": parts.report,
         "kg": kg,
@@ -1264,6 +1288,29 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
 
 class _Budget(Exception):
     pass
+
+
+def _priority_ncbi(engine: Any, origin: str, min_reviewed: int) -> set[str]:
+    """NCBI taxon ids that genome assemblies point to, plus organisms with >= ``min_reviewed`` Swiss-Prot entries."""
+    from sqlalchemy import text
+
+    with engine.connect() as c:
+        a = set(
+            c.execute(
+                text("""SELECT DISTINCT split_part(object_qid, ':', 2) FROM kg.statement_current
+                        WHERE origin = :o AND property_pid IN ('ensembl:assembly_of', 'ncbi:assembly_of')"""),
+                {"o": origin},
+            ).scalars()
+        )
+        b = set(
+            c.execute(
+                text("""SELECT split_part(subject_qid, ':', 2) FROM kg.statement_current
+                        WHERE origin = :o AND property_pid = 'uniprot:reviewed_protein_count'
+                          AND (value->>'amount')::numeric >= :m"""),
+                {"o": origin, "m": min_reviewed},
+            ).scalars()
+        )
+    return {str(x) for x in a | b if x}
 
 
 def _ranks_of_loaded(engine: Any, origin: str) -> dict[str, str]:

@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "74e6bcc423ea50319b7197a4bff51c0f0e37c4e621f973507f8b270add275d5a",
+    "url": "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/1975&Dateto=now&SeriesCodes=IUDBEDR,IUDSOIA,IUDZLS6,IUDZLS7,IUDZLS8,IUDZLS9&CSVF=TT&UsingCodes=Y&VPD=Y&VFD=N",
+    "file": "74e6bcc423ea5031.csv",
+    "sha256": "9126ac5cafd5e59ddd0731a3ff87b8f07db6fbb33fef05723b0d20d06ab58d72",
+    "status": 200,
+    "headers": {
+      "content-type": "application/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "513e451e750bbe3bec2a09a3dd3f72dec3a989c7d5aa7a791c30d00d8e6cbbee",
+    "url": "https://www.bankofengland.co.uk/legal",
+    "file": "513e451e750bbe3b.html",
+    "sha256": "158c7d4972ac7a9ee0a7c0b9c08cbfb28d37e7abda32c47903c40b9bbdbb453f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "f1d889f2909768e185e6c6a2629a539ac6a5d9d763047fa58ceb7f3f6de8525f",
+    "url": "https://www.bankofengland.co.uk/statistics/details/further-details-about-sonia-data",
+    "file": "f1d889f2909768e1.html",
+    "sha256": "cb1d2fa9a2185924fe0fc18d3316011abaff70ca0d736a646299201b986dab76",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  }
+]

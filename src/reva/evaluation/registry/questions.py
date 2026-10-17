@@ -67,10 +67,12 @@ def _flags(raw: str | None) -> dict[str, Any]:
 
 
 def _country_labels() -> dict[str, tuple[str, str]]:
-    from reva.adapters.connectors.country_crosswalk import load_crosswalk  # local import: registry data only
+    """Country labels from the reviewed crosswalk file (read directly: no connector import, invariant 11)."""
+    from reva.ontology.registry import REGISTRY_ROOT
 
+    doc = json.loads((REGISTRY_ROOT / "entities" / "country_crosswalk.json").read_text(encoding="utf-8"))
     out: dict[str, tuple[str, str]] = {}
-    for e in load_crosswalk().get("entities", []):
+    for e in doc.get("entities", []):
         key = e.get("key")
         if key:
             out[str(key)] = (str(e.get("label") or key), str(e.get("label_fr") or e.get("label") or key))

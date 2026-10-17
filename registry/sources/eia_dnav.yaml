@@ -1,0 +1,27 @@
+# V5 (agent PRED-HF): EIA petroleum / natural gas data browser daily spot price history pages. Connector
+# src/reva/adapters/connectors/atlas_hf_eia.py (atlas table eia.spot_d). The EIA bulk files (INTL, STEO) are under
+# source key eia.opendata_bulk (A-RESOURCES / V4ENERGY).
+source_key: eia.dnav
+title: EIA daily spot prices — WTI, Brent, petroleum products, Henry Hub natural gas (data browser history pages)
+provider_url: https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm
+lineage_family: eia
+rights:
+  licence: "EIA public domain statement; prices sourced by EIA from Refinitiv, an LSEG business (third-party; owner review)"
+  licence_url: https://www.eia.gov/about/copyrights_reuse.php
+  attribution: "Source: U.S. Energy Information Administration (EIA); spot prices: Refinitiv, an LSEG business"
+  terms_quote: >-
+    U.S. government publications are in the public domain and are not subject to copyright protection. [...]
+    You may see on our website documents, illustrations, photographs, or other information resources contributed or
+    licensed by private individuals, companies, or organizations that may be protected by U.S. and foreign copyright
+    laws. (Table definitions, spot prices: "Sources Refinitiv, an LSEG business"; Henry Hub: "Spot Price: Refinitiv,
+    an LSEG business.")
+  licence_checked: "2026-10-17"
+  licence_review: "third-party price data republished by EIA: redistribution beyond REVA needs an owner decision"
+metadata:
+  allowed_hosts: [www.eia.gov]
+  files:
+    history: "https://www.eia.gov/dnav/pet/hist/<SERIES>D.htm (11 series), https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm"
+    definitions: https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp, https://www.eia.gov/dnav/ng/TblDefs/ng_pri_fut_tbldef2.asp
+  authentication: none (the EIA API v2 needs a key and is not used)
+  cadence: "weekly release (page Release Date / Next Release Date)"
+  not_used: "NYMEX futures prices (CME data); hist_xls BIFF8 workbooks (same numbers, no reader); PET.zip bulk (55 MB)"

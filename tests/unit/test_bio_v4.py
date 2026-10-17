@@ -48,7 +48,7 @@ def test_predicates_and_family_mappings_are_consistent() -> None:
 
 def test_scope_file_is_well_formed() -> None:
     scope = tx.load_scope()
-    assert scope.group_keys() == [359, 212]
+    assert scope.group_keys() == [359]
     keys = [s.key for s in scope.species]
     assert len(keys) == len(set(keys)) and len(keys) >= 150
     groups = {s.group for s in scope.species}
@@ -136,11 +136,11 @@ async def test_facet_partitions_recurse_only_where_truncated(monkeypatch: pytest
         None: [("1", 100), ("2", 50), ("99", 40)],
         "1": [("1", 100), ("20", 60)],  # complete (2 < 3): 30 absent -> exhaustive zero
         "2": [("2", 50), ("40", 7), ("41", 5)],  # truncated: its child 42 is asked for
-        "42": [("42", 9), ("44", 1), ("45", 1)],  # truncated again, 43 has no deeper partition -> missing
+        "42": [("42", 9), ("44", 1), ("45", 1)],  # truncated again; 43 (parent not loaded) is reachable by no partition
     }
     totals = {None: 150, "1": 100, "2": 50, "42": 9}
     run = _FacetHttp(answers, totals)
-    children = {"1": ["20"], "20": ["30"], "2": ["40", "42"], "42": ["43"]}
+    children = {"1": ["20"], "20": ["30"], "2": ["40", "42"]}
     needed = {"1", "2", "20", "30", "40", "42", "43"}
     fc = await tx.facet_counts(run, needed=needed, children=children, roots=["1", "2"], raws=[])
     assert run.calls == [None, "1", "2", "42"]

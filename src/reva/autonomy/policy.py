@@ -96,9 +96,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # * budgets.yaml -> budgets-1.3.21 (2026-10-17, PRED-VINTAGE): merge of pred_vintage.yaml (new dbnomics.api 80/day,
 #   philfed.data 20/day, ecb.data_api 6/day; oecd.sdmx 92 -> 120) and of pred_effect.yaml filed since 1.3.20
 #   (effects.literature 40/day); same caps.
+# * budgets.yaml -> budgets-1.3.23 (2026-10-17, PRED-HF): merge of pred_hf.yaml (new daily-series sources ecb.stats
+#   12/day, bis.bulk 6/day, ustreasury.rates 130/day, eia.dnav 32/day, boe.iadb 8/day, nyfed.markets 12/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "22edc7088671673c61ba23a6f3d3c670a616aa2bc58a31c1227c02fcb2086a87",
+    "budgets.yaml": "adefe498cca5fa868b66bdbf76fe4e3ed9597fa71bed1a89563d17d631717093",
 }
 
 

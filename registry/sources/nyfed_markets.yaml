@@ -1,0 +1,30 @@
+# V5 (agent PRED-HF): Federal Reserve Bank of New York Markets Data API. Connector
+# src/reva/adapters/connectors/atlas_hf_nyfed.py (atlas table nyfed.rates_d).
+source_key: nyfed.markets
+title: New York Fed reference rates — EFFR, OBFR, SOFR (daily, with revision indicators)
+provider_url: https://markets.newyorkfed.org/static/docs/markets-api.html
+lineage_family: nyfed
+rights:
+  licence: "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer"
+  licence_url: https://www.newyorkfed.org/privacy/termsofuse
+  attribution: "Source: Federal Reserve Bank of New York"
+  terms_quote: >-
+    If you use or distribute reference rate data or related information posted to the website, you must include the
+    following notice and disclaimer with your presentation of that data or information: "The [NAME OF DATA or
+    CONTENT]* is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for
+    publication of the [DATA NAME] by [NAME OF PUBLISHER], does not [sanction] or [endorse] any particular
+    republication, and has no liability for your use." [...] The Secured Overnight Financing Rate (SOFR) Data and
+    Broad General Collateral Rate (BGCR) Data are calculated using data provided under a license granted to the New
+    York Fed by DTCC Solutions LLC.
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [markets.newyorkfed.org, www.newyorkfed.org]
+  files:
+    effr: https://markets.newyorkfed.org/api/rates/unsecured/effr/last/0.json
+    obfr: https://markets.newyorkfed.org/api/rates/unsecured/obfr/last/0.json
+    sofr: https://markets.newyorkfed.org/api/rates/secured/sofr/last/0.json
+  authentication: none
+  cadence: "daily (EFFR/OBFR ~9:00 a.m. ET, SOFR ~8:00 a.m. ET, business day after the effective date)"
+  revision_policy: >-
+    Same-day revision at approximately 2:30 p.m. ET only if the change exceeds one basis point; footnoted
+    (API revisionIndicator).

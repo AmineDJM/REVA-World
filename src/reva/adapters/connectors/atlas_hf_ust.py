@@ -180,7 +180,9 @@ def parse_year(ds: str, f: hc.Fetched, rows: hc.DailyRows, report: dict[str, Any
     stats["empty_cells"] += empty
 
 
-def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, hc.TableBuild], dict]:
+def build(
+    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out = {ds: hc.TableBuild(hc.DailyRows(ATLAS_SOURCE, ds)) for ds in wanted}
     report: dict[str, Any] = {}
     for key in sorted(files):

@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "6aeb2fba80f5569c2b9e1b44533808e1811a44ff26133aa6a64d31f6ba890068",
+    "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
+    "file": "6aeb2fba80f5569c.zip",
+    "sha256": "3c896e56366b87d0af743abb419d4c39847fd895793aed52d2c9f2b35d569c5b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "48cf3fc2920b1324175bd673f88901a6d23f716097f3425441a60c1535e87611",
+    "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+    "file": "48cf3fc2920b1324.html",
+    "sha256": "2b5aa9e81c0db754bba7ea9e6bfbab198948ed730fc5392511a2ff3f32ce70ad",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "e61d841316e2f3dc6f8af7f95542db1f26dcfcd311ed266d895a939c3639b100",
+    "url": "https://data-api.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT+R25+R75+TT+NT+NB+VL?format=csvdata",
+    "file": "e61d841316e2f3dc.csv",
+    "sha256": "6efb453cf89a48ecf926b6b9f97dad51f299165b953b2744f95040bc780eb876",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "69e94724ebe8514250ba5058052c8404b1c8f717057832c8078d0034a483b453",
+    "url": "https://www.ecb.europa.eu/stats/financial_markets_and_interest_rates/euro_short-term_rate/html/index.en.html",
+    "file": "69e94724ebe85142.html",
+    "sha256": "1425622317c771e84059bf0926d2213a3ab8fc72bf14b1c981e1dcd5dafd167a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "fc2237fbd00c1801bb0a7cf584b4765d9aef77b02aede42ee70c9b288e5eeb07",
+    "url": "https://data-api.ecb.europa.eu/service/data/FM/D.U2.EUR.4F.KR.DFR+MRR_FR+MRR_MBR+MLFR.LEV?format=csvdata",
+    "file": "fc2237fbd00c1801.csv",
+    "sha256": "0123562b2823f969813ad96042efab93b7eec61834c5ba5c42cb3fa4cbe192a6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "674e117901189d0f1d23770a8f1325d33f7eeb07fad5f2ebb4571129fa06f720",
+    "url": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html",
+    "file": "674e117901189d0f.html",
+    "sha256": "3c8f061d340daadd574dee5a63b42588e160f5f579c51f2e3a28d21f25b56ad0",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  }
+]

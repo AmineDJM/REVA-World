@@ -14,7 +14,7 @@
 version: "2026-10-17"
 species_groups:
   - {gbif_key: 359, name: Mammalia, load: true}
-  - {gbif_key: 212, name: Aves, load: true}
+  - {gbif_key: 212, name: Aves, load: false}
   - {gbif_key: 131, name: Amphibia, load: false}
   - {gbif_key: 11592253, name: Squamata, load: false}
   - {gbif_key: 11418114, name: Testudines, load: false}

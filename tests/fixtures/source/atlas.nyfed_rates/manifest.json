@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "a2c1cbf50c0066eada968973c202acc02e645023ac6ce876bb4d910f5fe92e00",
+    "url": "https://markets.newyorkfed.org/api/rates/unsecured/effr/last/0.json",
+    "file": "a2c1cbf50c0066ea.json",
+    "sha256": "8ec2fd28fd8eb1e91391b0255a067841919da90dbb17a450fb602f2653fe8f1a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "baf31f047ed9c4d817929fd964091def54cd12ae457950bb5158ee49b19ac046",
+    "url": "https://markets.newyorkfed.org/api/rates/unsecured/obfr/last/0.json",
+    "file": "baf31f047ed9c4d8.json",
+    "sha256": "7fb740cffa5f97ff18e99098e48a5119e2a9e9767469a112439a5b78d7a786ee",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "51280d554809e50e169d48d3b387217401940e42e86b08aa28ef1a1fba1b55c2",
+    "url": "https://markets.newyorkfed.org/api/rates/secured/sofr/last/0.json",
+    "file": "51280d554809e50e.json",
+    "sha256": "66f4051ab1d5c1934f1488dbceb0e4d6a3d5fe49e7f496b5a3ee82f06f17360f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "6e24717d9808da84788b6fa50e6f995e6f37e7e4b7ed116734c87e830440f383",
+    "url": "https://www.newyorkfed.org/privacy/termsofuse",
+    "file": "6e24717d9808da84.html",
+    "sha256": "4ec1de4fb12064cd2396be33d47659d7cb14ccc258823a8c4e5e126a076eab5d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "fba229f8d98332e844b4c4cf6d486ef6fa282c6b675d84190eafd6bad34a22e0",
+    "url": "https://www.newyorkfed.org/markets/reference-rates/additional-information-about-reference-rates",
+    "file": "fba229f8d98332e8.html",
+    "sha256": "889f425384538e27922b377241c1c93512b755bb06dd3845c3417355e131d72f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "New York Fed Terms of Use: reference-rate data may be used and distributed with the prescribed notice and disclaimer",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  }
+]

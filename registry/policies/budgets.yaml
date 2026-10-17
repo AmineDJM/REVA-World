@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.22"
+policy_version: "budgets-1.3.23"
 daily:
-  http_requests_total: 19643
+  http_requests_total: 19843
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -17,10 +17,14 @@ per_source_daily_requests:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
   # archigos.leaders: requested by A-COUPS (a_coups.yaml), AUDFIX (audfix.yaml)
   archigos.leaders: 30
+  # bis.bulk: requested by PRED-HF (pred_hf.yaml)
+  bis.bulk: 6
   # bis.stats: requested by A-FISCAL (a_fiscal.yaml)
   bis.stats: 14
   # bmr.dataverse: requested by A-POL (a_pol.yaml)
   bmr.dataverse: 6
+  # boe.iadb: requested by PRED-HF (pred_hf.yaml)
+  boe.iadb: 8
   # carbonbrief.attribution: requested by V4CLIMATE (v4climate.yaml)
   carbonbrief.attribution: 6
   # cbs.opendata: requested by GAPHUNT (gaphunt.yaml)
@@ -57,8 +61,12 @@ per_source_daily_requests:
   doid.obo: 8
   # ecb.data_api: requested by PRED-VINTAGE (pred_vintage.yaml)
   ecb.data_api: 6
+  # ecb.stats: requested by PRED-HF (pred_hf.yaml)
+  ecb.stats: 12
   # effects.literature: requested by PRED-EFFECT (pred_effect.yaml)
   effects.literature: 40
+  # eia.dnav: requested by PRED-HF (pred_hf.yaml)
+  eia.dnav: 32
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)
   eia.opendata_bulk: 12
   # ensembl.rest: requested by V4BIO (v4bio.yaml)
@@ -157,6 +165,8 @@ per_source_daily_requests:
   noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
+  # nyfed.markets: requested by PRED-HF (pred_hf.yaml)
+  nyfed.markets: 12
   # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), PRED-VINTAGE (pred_vintage.yaml), V4ECON (v4econ.yaml), V4INDUSTRY (v4industry.yaml), V4MIND (v4mind.yaml)
   oecd.sdmx: 120
   # ofac.programs: requested by A-SANCTIONS (a_sanctions.yaml)
@@ -241,6 +251,8 @@ per_source_daily_requests:
   untc.mtdsg: 120
   # usgs.sciencebase: requested by A-RESOURCES (a_resources.yaml)
   usgs.sciencebase: 20
+  # ustreasury.rates: requested by PRED-HF (pred_hf.yaml)
+  ustreasury.rates: 130
   # vdem.vdemdata: requested by A-POL (a_pol.yaml)
   vdem.vdemdata: 9
   # wals.cldf: requested by KGLANG (kglang.yaml)

@@ -214,7 +214,7 @@ def parse_fx(f: hc.Fetched, rows: hc.DailyRows, report: dict[str, Any]) -> None:
     rights = RIGHTS["fx_ref"]
     flags = rows.flags(**hc.base_flags(rights, f, base_currency="EUR"))
     flags_norm = rows.flags(**hc.base_flags(rights, f, base_currency="EUR", value_normalised=True))
-    na = Counter()
+    na: Counter[str] = Counter()
     for i, rec in enumerate(reader, start=2):
         if not rec or not rec[0].strip():
             continue
@@ -244,8 +244,8 @@ def parse_sdmx_csv(ds: str, f: hc.Fetched, rows: hc.DailyRows, report: dict[str,
     if unit_col not in reader.fieldnames:
         raise hc.err(f"{ds}: no unit column")
     rights = RIGHTS[ds]
-    empty = Counter()
-    series = Counter()
+    empty: Counter[str] = Counter()
+    series: Counter[str] = Counter()
     for i, r in enumerate(reader, start=2):
         key = r["KEY"].strip()
         if r.get("FREQ") not in ("D", "B"):
@@ -282,7 +282,9 @@ def parse_sdmx_csv(ds: str, f: hc.Fetched, rows: hc.DailyRows, report: dict[str,
     report[ds] = {"series": dict(series), "empty_values": dict(empty)}
 
 
-def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, hc.TableBuild], dict]:
+def build(
+    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out = {ds: hc.TableBuild(hc.DailyRows(ATLAS_SOURCE, ds)) for ds in wanted}
     report: dict[str, Any] = {}
     if "fx_ref" in wanted:

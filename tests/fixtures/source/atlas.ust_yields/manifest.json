@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "00e6406017625933ff50ce6b5083c724105342998dc3ff0584b059848e17c7e9",
+    "url": "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/treasury-yield-curve-methodology",
+    "file": "00e6406017625933.html",
+    "sha256": "038df3e42cb2250e81b8af5e471803acddb74b93128d62dfb97f1ed4cbde6e68",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "f07c0034e9498b4ce76b10364c284f470e9386b901cae93a7066e77445a10e60",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1990/all?type=daily_treasury_yield_curve&field_tdr_date_value=1990&page&_format=csv",
+    "file": "f07c0034e9498b4c.csv",
+    "sha256": "c1d9c8154c598a3726203a14a09faf9684b2f7c46bd38ba72eca8f1e63a29e5b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "71d4a20f0de6285affb08b1f3a786711a04ec58a7473299fd8293fce5cc8f730",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_yield_curve&field_tdr_date_value=2025&page&_format=csv",
+    "file": "71d4a20f0de6285a.csv",
+    "sha256": "d601b7177f72febee5658332af19de321896395915a742f6b7805290c986ba6c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "3bb2d38445c0c00619bd6392b2ad84776d798e8562ba913c5d8d29cfb1186b9a",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+    "file": "3bb2d38445c0c006.csv",
+    "sha256": "2a33d9118015082492838d0e67fa967508f62d6c4811eddd902ea106712cb6f3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "73767e8d6e0c96f7dfe543f681c480f4b2d56d12140a8cd153df2acbc15633a0",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2003/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2003&page&_format=csv",
+    "file": "73767e8d6e0c96f7.csv",
+    "sha256": "1b24356691b16e5c1a073ee5cce826db714e375ca9366709c20058a7cbfda5ef",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "96cd710200cb015121fdc7b65febafc12f840c82f618536c5409be6ee932d382",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+    "file": "96cd710200cb0151.csv",
+    "sha256": "42ac3cc76a995aeea821ac4bf6e8de9049f3ede7c963dc1d123d370d1605d79a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "U.S. Government work (17 U.S.C. 105): not subject to copyright in the United States",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  }
+]

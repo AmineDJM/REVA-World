@@ -195,7 +195,7 @@ def test_03_backtest_is_labelled_final_vintage(env: Env) -> None:
 def test_04_api(env: Env) -> None:
     fams = get(env, "/v1/forecasts/families", origin="test_fixture")["data"]
     st = {f["key"]: f["status"] for f in fams}
-    assert st[FAM] == "available" and st["fao.food_price_index"] == "awaiting_source"
+    assert st[FAM] == "available" and st["fao.food_price_index"] == "awaiting_table"
     assert st["imf.cpi_inflation_monthly"] == "awaiting_table"
     batches = get(env, "/v1/forecasts/batches", origin="test_fixture")
     assert batches["origin"] == "test_fixture" and len(batches["data"]) == 1

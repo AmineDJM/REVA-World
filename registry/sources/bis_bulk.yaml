@@ -1,0 +1,27 @@
+# V5 (agent PRED-HF): BIS Data Portal bulk downloads (daily series). Connector
+# src/reva/adapters/connectors/atlas_hf_bis.py (atlas tables bis.cbpol_d, bis.cbpol_d_series, bis.eer_d).
+# The monthly/quarterly BIS series come from the SDMX API under source key bis.stats (A-FISCAL, atlas_bis.py).
+source_key: bis.bulk
+title: BIS bulk downloads — daily central bank policy rates and daily effective exchange rates (flat CSV zips)
+provider_url: https://data.bis.org/bulkdownload
+lineage_family: bis
+rights:
+  licence: "BIS terms of permitted use of BIS statistics (use unrestricted provided the BIS is cited as source)"
+  licence_url: https://data.bis.org/help/legal#terms-of-permitted-use-of-bis-statistics
+  attribution: "Source: Bank for International Settlements (BIS) statistics"
+  terms_quote: >-
+    The use of the statistics is unrestricted, provided that: if the statistics are reproduced, the BIS must be
+    cited in your publication or product as the source of the statistics; if the statistics will be translated
+    into another language, a statement must be included in your publication or product that the translation is
+    not an official BIS translation; your use of the statistics must not be potentially misleading [...]; if the
+    statistics will be used in a commercial publication or product, their inclusion in the publication or product
+    will not result in any additional charge to subscribers or other users; [...] No other use is permissible.
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [data.bis.org]
+  files:
+    cbpol: https://data.bis.org/static/bulk/WS_CBPOL_csv_flat.zip (4.1 MB zipped, 476 MB inflated)
+    eer: https://data.bis.org/static/bulk/WS_EER_csv_flat.zip (6.6 MB zipped, 296 MB inflated)
+  authentication: none
+  cadence: "replaced at each BIS release (release calendar https://data.bis.org/release-calendar); weekly check"
+  revision_policy: "not stated per observation; bulk files are replaced at each release (Last-Modified archived)"

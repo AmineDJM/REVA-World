@@ -1,0 +1,197 @@
+[
+  {
+    "request_fingerprint": "afd068988266c826ae1aa11388bb564e10e01f8b75aaa9c9e961931e45d085bb",
+    "url": "https://www.eia.gov/dnav/pet/hist/RWTCD.htm",
+    "file": "afd068988266c826.html",
+    "sha256": "14b328ece64402c52fe93d3fb1496c30f6527dce4115b178bfbaf10ecfe520fe",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "703bc66c267969f02191c58cfef034d495887655cf5023b1ad7cd44570672e8b",
+    "url": "https://www.eia.gov/dnav/pet/hist/RBRTED.htm",
+    "file": "703bc66c267969f0.html",
+    "sha256": "dd4781ef837597a41e794c96e11d709646c5700e77a2c139dff07a16618af383",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "4fe114eb09dfb7496dadd80527183cdd2af7e00f88c6ae5d28ed40b219a55a00",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPMRU_PF4_Y35NY_DPGD.htm",
+    "file": "4fe114eb09dfb749.html",
+    "sha256": "539aa13f95d62644a7997aacdf31c7921af0c05729542afad21c9b6ec2d9133b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "f527a3d183a6b3afc6762bfd754dd81b32c024285a81bad037577055ccfc7e79",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPMRU_PF4_RGC_DPGD.htm",
+    "file": "f527a3d183a6b3af.html",
+    "sha256": "a490eab662e33516592bbd4114303f91adc73e2ca638ca596469437918529def",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "dd4b4b05359a8ecb003c0a0a6bc9114576d2c0a93f1f971a5e09fb8ffe0037bc",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPMRR_PF4_Y05LA_DPGD.htm",
+    "file": "dd4b4b05359a8ecb.html",
+    "sha256": "36714c6709c2c8d2bd37e2200a0df37a0732e97ffd6780bac117ca344ab115a8",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "92989124bb9f9eda1f810e981b1e83b47bff232723942662a3dc1224c56e1565",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPD2F_PF4_Y35NY_DPGD.htm",
+    "file": "92989124bb9f9eda.html",
+    "sha256": "4d3042d0273955c999b98eb67013add9de532cdbd07aa40f65ca4bab42758875",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "e3f071da98c737d4664b58ec9f25865507ce9035bb1f77b054571b46a51aa322",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPD2DXL0_PF4_Y35NY_DPGD.htm",
+    "file": "e3f071da98c737d4.html",
+    "sha256": "d6e32f2c145a260962389b6eeee185bc3513e384148da1749c460677a1ba08b1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "45fc3ac27a99c11847630d172d9d690918f369654143f4e0e3ddc2fdf73fee1c",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPD2DXL0_PF4_RGC_DPGD.htm",
+    "file": "45fc3ac27a99c118.html",
+    "sha256": "ba1e643f1a1a960abc5a71cf94bfe1a8fd58314e63e6a17b3ab7038cbc56f4b3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "551fa67b785f4aed17206a91c5fe0cb6ee882829d11ee4286bb5bdea23ba7d1f",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPD2DC_PF4_Y05LA_DPGD.htm",
+    "file": "551fa67b785f4aed.html",
+    "sha256": "7220f157065b33e0027f8dd9e9f96bc8c5e5f56ebbb59821a20f6f0221d573ce",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "7f938baa0418b2cf82f847babf180751c461fbb59cce995d9a6d7874ed52eb15",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPJK_PF4_RGC_DPGD.htm",
+    "file": "7f938baa0418b2cf.html",
+    "sha256": "8573940cc1b9eedc973ba438507ab9720e024cdf20b4913ad5e624fb2537eb53",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "bbed3c2c194f30fc76c701faf16e577f6aad58939478d5411eeabf1d1ec5194b",
+    "url": "https://www.eia.gov/dnav/pet/hist/EER_EPLLPA_PF4_Y44MB_DPGD.htm",
+    "file": "bbed3c2c194f30fc.html",
+    "sha256": "dd4e37a7efc45dcb31f2e0ae1e1c02470bdb5c219ad10c2c3b6c3304b8cd9a5e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "1cdadf161fdeb7248221d9451c1b3e2e2f3f3179948467d6a040254bcd613856",
+    "url": "https://www.eia.gov/dnav/ng/hist/rngwhhdD.htm",
+    "file": "1cdadf161fdeb724.html",
+    "sha256": "d348cfdbe681b6d50c3cd6d882c0c3c5b7580277c0f3ad1faa354c2a5ce2cb14",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "1f40cd77a800be09dfcb1e68c94e2a06ed24802e9f6dfa234d24ed2bed9b4487",
+    "url": "https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp",
+    "file": "1f40cd77a800be09.html",
+    "sha256": "50bdc9d038165acaedb88798406b316bcc4c5a45505a42eb9c98e8d5297d27e2",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "8449d48e1ed4db5bef740413b4c169ef5fee112267d3ec20e156f53bbf827e59",
+    "url": "https://www.eia.gov/dnav/ng/TblDefs/ng_pri_fut_tbldef2.asp",
+    "file": "8449d48e1ed4db5b.html",
+    "sha256": "0292e73906746b6a4d41a3d0c7f993da12f42bc8bf0b0718a200c076d1e6239c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  },
+  {
+    "request_fingerprint": "5cb2693a9e40a8bc2908759e0381708b6ac2d4543cb29acad36f1be7fb9afeff",
+    "url": "https://www.eia.gov/about/copyrights_reuse.php",
+    "file": "5cb2693a9e40a8bc.html",
+    "sha256": "c66c7fceda2f9f45c5725fcb4e87ab4e12dc48d089b69f69e53d9ab3a4a0eb96",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain; these prices are third-party data (Refinitiv, an LSEG business) republished by EIA",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; visible text of the page)"
+  }
+]

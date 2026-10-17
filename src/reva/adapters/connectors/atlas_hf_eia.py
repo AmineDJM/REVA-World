@@ -223,7 +223,9 @@ def parse_page(s: Series, f: hc.Fetched, rows: hc.DailyRows, report: dict[str, A
                                               "release_date": rel[False]}  # fmt: skip
 
 
-def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, hc.TableBuild], dict]:
+def build(
+    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out = {ds: hc.TableBuild(hc.DailyRows(ATLAS_SOURCE, ds)) for ds in wanted}
     report: dict[str, Any] = {}
     if "spot_d" in wanted:

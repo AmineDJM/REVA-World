@@ -297,3 +297,16 @@ def test_backtest_family_reports_relative_metrics() -> None:
     pers = [r for r in out["results"] if r["model"] == "forecast.registry_persistence"]
     assert pers and pers[0]["mae_vs_persistence"]["ratio"] == pytest.approx(1.0)
     assert all(r["n_scored"] > 0 for r in out["results"])
+
+
+def test_monthly_mean_of_daily_excludes_the_latest_month() -> None:
+    base = SPECS.family("t.food")
+    fam = base.__class__(**{**base.__dict__, "value_rule": "monthly_mean_of_daily", "indicator": "D"})
+    rows = []
+    for d, v in ((date(2026, 8, 3), "1.0"), (date(2026, 8, 4), "2.0"), (date(2026, 9, 1), "4.0")):
+        rows.append({"source": "fao", "dataset": "cp", "indicator": "D", "concept_id": None, "iso3": "FRA",
+                     "provider_geo": "FRA", "entity_qid": None, "period_start": d,
+                     "period_end": date.fromordinal(d.toordinal() + 1), "value": v, "value_text": None, "unit": "x",
+                     "flags": "{}", "raw_sha256": RAW, "selector": "{}"})  # fmt: skip
+    s, _ = extract_series(pl.DataFrame(rows, schema=ATLAS_SCHEMA), fam)
+    assert [(P.label_of("M", c.idx), c.value) for c in s["FRA"].observed] == [("2026-08", "1.50000000")]

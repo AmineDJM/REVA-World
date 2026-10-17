@@ -362,51 +362,136 @@ families:
       First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
       historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
 
-  # ------------------------------------------------------------------ no table / connector yet
+  # ------------------------------------------------------------------ V4ECON / PRED-HF daily and monthly price tables
   - key: fao.food_price_index
     concept_id: null
     labels: {fr: "Indice FAO des prix des produits alimentaires", en: "FAO Food Price Index"}
-    definition: null
-    definition_source: null
-    dataset_key: null
-    awaiting: "no connector yet: FAO Food Price Index (fao.org/worldfoodsituation/foodpricesindex, monthly CSV) — V4ECON or PRED-HF"
+    definition: >-
+      "FAO Food Price Index (FFPI) is a measure of the monthly change in international prices of a basket of food
+      commodities. It consists of the average of five commodity group price indices weighted by the average export
+      shares of each of the groups over 2014-2016." (FAO World Food Situation page, quoted by atlas_fao_ffpi)
+    definition_source: src/reva/adapters/connectors/atlas_fao_ffpi.py
+    dataset_key: atlas.fao_ffpi.ffpi_m
+    indicator: Food Price Index
+    owner_agent: V4ECON
+    geos: [{provider_geo: world, key: WORLD, label_fr: "Monde (prix internationaux)", label_en: "World (international prices)"}]
     frequency: M
     value_rule: cell
-    unit: "index (2014-2016 = 100)"
+    unit: "2014-2016=100"
     questions:
       - {type: quantity, horizons: [1, 3, 6, 12]}
-    publication_lag_days: 10
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 15
     void_after_days: 365
     backtest_lag_periods: 1
+    resolution_note: >-
+      First FAO FFPI release (atlas.fao_ffpi ffpi_m) registered after sealing that publishes the month. FAO website
+      terms: non-commercial use (every cell flagged licence_restriction = non_commercial; owner decision pending).
 
-  - key: ecb.fx_eur_monthly_mean
+  - key: eia.brent_spot_monthly_mean
     concept_id: null
-    labels: {fr: "Taux de référence BCE (moyenne mensuelle des cours quotidiens)", en: "ECB reference rate (monthly mean of daily rates)"}
-    definition: null
-    definition_source: null
-    dataset_key: null
-    awaiting: "PRED-HF: ECB euro foreign exchange reference rates (daily); value_rule monthly_mean_of_daily once the table lands"
+    labels: {fr: "Brent (Europe), moyenne mensuelle des cours quotidiens", en: "Brent spot (Europe), monthly mean of daily prices"}
+    definition: >-
+      Derived by REVA: arithmetic mean of the daily EIA spot prices of series RBRTE (Europe Brent Spot Price FOB,
+      dollars per barrel) published for the month; a month counts as observed once a later day is published.
+    definition_source: src/reva/adapters/connectors/atlas_hf_eia.py
+    dataset_key: atlas.eia.spot_d
+    indicator: EIA_SPOT|series=RBRTE
+    owner_agent: PRED-HF
+    geos: [{provider_geo: Europe, key: BRENT, label_fr: "Brent (Europe)", label_en: "Brent (Europe)"}]
     frequency: M
     value_rule: monthly_mean_of_daily
-    unit: "currency per euro"
+    unit: "Dollars per Barrel"
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 10
+    void_after_days: 180
+    backtest_lag_periods: 1
+    resolution_note: >-
+      Mean of the daily cells of the first atlas.eia spot_d version registered after sealing that also publishes a
+      later day. EIA names Refinitiv (LSEG) as the price source: every cell carries flags.licence_review.
+
+  - key: ecb.eurusd_monthly_mean
+    concept_id: null
+    labels: {fr: "Taux de référence BCE USD par euro (moyenne mensuelle)", en: "ECB reference rate, USD per EUR (monthly mean)"}
+    definition: >-
+      Derived by REVA: arithmetic mean of the daily ECB euro foreign exchange reference rates for the US dollar
+      (USD per EUR) published for the month; a month counts as observed once a later day is published.
+    definition_source: src/reva/adapters/connectors/atlas_hf_ecb.py
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=USD
+    owner_agent: PRED-HF
+    geos: [{provider_geo: U2, key: EUR-USD, label_fr: "Zone euro (EUR/USD)", label_en: "Euro area (EUR/USD)"}]
+    frequency: M
+    value_rule: monthly_mean_of_daily
+    unit: "USD per EUR"
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
+
+  - key: ecb.eurcny_monthly_mean
+    concept_id: null
+    labels: {fr: "Taux de référence BCE CNY par euro (moyenne mensuelle)", en: "ECB reference rate, CNY per EUR (monthly mean)"}
+    definition: Derived by REVA as for ecb.eurusd_monthly_mean, currency CNY (CNY per EUR).
+    definition_source: src/reva/adapters/connectors/atlas_hf_ecb.py
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=CNY
+    owner_agent: PRED-HF
+    geos: [{provider_geo: U2, key: EUR-CNY, label_fr: "Zone euro (EUR/CNY)", label_en: "Euro area (EUR/CNY)"}]
+    frequency: M
+    value_rule: monthly_mean_of_daily
+    unit: "CNY per EUR"
     questions:
       - {type: interval, horizons: [1, 3, 6, 12]}
     publication_lag_days: 5
     void_after_days: 120
     backtest_lag_periods: 1
+    resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
 
-  - key: bis.policy_rate_daily
+  - key: ecb.eurjpy_monthly_mean
     concept_id: null
-    labels: {fr: "Taux directeur (BIS, moyenne mensuelle des taux quotidiens)", en: "Central bank policy rate (BIS, monthly mean of daily rates)"}
-    definition: null
-    definition_source: null
-    dataset_key: null
-    awaiting: "PRED-HF: BIS central bank policy rates (daily); value_rule monthly_mean_of_daily once the table lands"
+    labels: {fr: "Taux de référence BCE JPY par euro (moyenne mensuelle)", en: "ECB reference rate, JPY per EUR (monthly mean)"}
+    definition: Derived by REVA as for ecb.eurusd_monthly_mean, currency JPY (JPY per EUR).
+    definition_source: src/reva/adapters/connectors/atlas_hf_ecb.py
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=JPY
+    owner_agent: PRED-HF
+    geos: [{provider_geo: U2, key: EUR-JPY, label_fr: "Zone euro (EUR/JPY)", label_en: "Euro area (EUR/JPY)"}]
     frequency: M
     value_rule: monthly_mean_of_daily
-    unit: "% per annum"
+    unit: "JPY per EUR"
     questions:
-      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+      - {type: interval, horizons: [1, 3, 6, 12]}
     publication_lag_days: 5
     void_after_days: 120
     backtest_lag_periods: 1
+    resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
+
+  - key: bis.policy_rate_daily
+    concept_id: null
+    labels: {fr: "Taux directeur (BIS, moyenne mensuelle des niveaux quotidiens)", en: "Central bank policy rate (BIS, monthly mean of daily levels)"}
+    definition: >-
+      Derived by REVA: arithmetic mean of the BIS WS_CBPOL daily central bank policy rate levels (end of period,
+      % per year) published for the month; a month counts as observed once a later day is published.
+    definition_source: src/reva/adapters/connectors/atlas_hf_bis.py
+    dataset_key: atlas.bis.cbpol_d
+    indicator: CBPOL
+    owner_agent: PRED-HF
+    panel: g20_plus
+    frequency: M
+    value_rule: monthly_mean_of_daily
+    unit: "% per year"
+    questions:
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+      - {type: quantity, horizons: [6]}
+    publication_lag_days: 10
+    void_after_days: 180
+    backtest_lag_periods: 1
+    resolution_note: Mean of the daily cells of the first atlas.bis cbpol_d version after sealing that publishes a later day.

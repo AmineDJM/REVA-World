@@ -1,0 +1,34 @@
+# Budget request from agent PRED-HF (V5, 2026-10-17). Merged by `python -m reva.atlas.budget_merge --write`.
+# Daily series connectors (docs/dev/v5_pred_hf.md); one full run each per day at most, plus one retry.
+agent: PRED-HF
+requests:
+  - source_key: ecb.stats
+    # atlas.ecb_daily: FX zip (0.64 MB) + €STR CSV (4.2 MB) + key-rates CSV (10 MB) + 3 policy pages (~0.4 MB) = 6
+    daily_requests: 12
+    expected_bytes_per_day: 32000000
+    reason: "6 requests (~15 MB) per full run plus one retry; ECB, no key"
+  - source_key: bis.bulk
+    # atlas.bis_daily: WS_CBPOL + WS_EER flat zips (4.1 + 6.6 MB) + terms page (0.35 MB) = 3
+    daily_requests: 6
+    expected_bytes_per_day: 24000000
+    reason: "3 requests (~11 MB) per full run plus one retry; BIS bulk downloads, no key"
+  - source_key: ustreasury.rates
+    # atlas.ust_yields: one CSV per curve and year (1990-2026 nominal, 2003-2026 real = 61) + methodology page = 62
+    daily_requests: 130
+    expected_bytes_per_day: 4000000
+    reason: "62 small requests (~1.5 MB) per full run plus one retry; grows by 2 per calendar year"
+  - source_key: eia.dnav
+    # atlas.eia_spot: 12 daily history pages (~4.6 MB) + 3 definition/terms pages = 15
+    daily_requests: 32
+    expected_bytes_per_day: 11000000
+    reason: "15 requests (~5 MB) per full run plus one retry; EIA data browser, no key"
+  - source_key: boe.iadb
+    # atlas.boe_daily: one IADB CSV export (0.6 MB) + legal + SONIA pages = 3
+    daily_requests: 8
+    expected_bytes_per_day: 2000000
+    reason: "3 requests (~0.8 MB) per full run plus one retry; Bank of England Database, no key"
+  - source_key: nyfed.markets
+    # atlas.nyfed_rates: 3 full-history JSON files (~2.7 MB) + terms + methodology pages = 5
+    daily_requests: 12
+    expected_bytes_per_day: 7000000
+    reason: "5 requests (~3 MB) per full run plus one retry; New York Fed Markets API, no key"
