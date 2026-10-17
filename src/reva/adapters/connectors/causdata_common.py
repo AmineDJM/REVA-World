@@ -258,7 +258,7 @@ async def fetch_codebook(run: Any, book: PinnedCodebook) -> dict[str, Any]:
             book.url, key=f"codebook:{book.key}", media_types=book.media_types, max_bytes=book.max_bytes
         )
     except SourceResponseError as e:
-        if run.origin == "live" or getattr(e, "kind", None) != "fixture_missing":
+        if run.origin == "live" or (getattr(e, "details", None) or {}).get("kind") != "fixture_missing":
             raise
         return {"document": book.key, "sha256": None, "pinned_sha256": book.sha256, "matches": False,
                 "archived": False, "status": "fixture_missing"}  # fmt: skip
