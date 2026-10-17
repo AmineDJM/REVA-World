@@ -1,0 +1,19 @@
+id: economy.v4_factories
+domain: economy
+owner: V4INDUSTRY
+description: >-
+  Factories (instance of factory Q83405 or of one of its subclasses: car plants, breweries, steelworks, chip fabs ...)
+  that have coordinates (P625) and at least one of owner (P127), operator (P137) or product (P1056): ~3,600 items at
+  2026-10-17 (25,914 factory items in all). Facility layer of the industry domain: facility -> owned_by / operated by
+  -> company, facility -> produces -> product, facility -> located_in (P131 / P17). Power plants and mines belong to
+  V4ENERGY (GEM / WRI / USGS sources) and are not selected unless Wikidata classes them as factories.
+purpose: seed_entities
+entity_kind: facility
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q83405 .
+    ?item wdt:P625 ?coord .
+    { ?item wdt:P127 ?o . } UNION { ?item wdt:P137 ?o . } UNION { ?item wdt:P1056 ?o . }
+  }
+max_rows: 5000
+expand_hops: 1

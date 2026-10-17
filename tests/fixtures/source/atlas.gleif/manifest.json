@@ -14,6 +14,111 @@
     "excerpt_of_sha256": "c0d9f69af4f1758ee688844b1c56fee9dd51e0fcf88004553b3f08ef0292e3eb"
   },
   {
+    "request_fingerprint": "d0ac09b6c86b04c9dc630c3c8d14d842363e787ebdb3796169a8cd0253f4e1dc",
+    "url": "https://api.gleif.org/api/v1/entity-legal-forms?page%5Bsize%5D=200&page%5Bnumber%5D=1",
+    "file": "d0ac09b6c86b04c9.json",
+    "sha256": "460268181daa8fc7e6eebb84090ce37f788217615185b03e89fc383f4950d9ea",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:41:05+00:00",
+    "licence": "CC0-1.0",
+    "note": "EXCERPT: the real ELF entries of Japan (all statuses) + US codes H1UM and XTIQ, collected from the 18 live pages; meta.pagination set to one page of the excerpt size",
+    "excerpt_of_sha256": "d559e5872c0e70803275f12d83707b6e7c2280eb66e2d028acb65c7cbc24c95f"
+  },
+  {
+    "request_fingerprint": "da55050cba906a9348fbe6448e0061704c700e7ef029d7cc1d82115af17469f0",
+    "url": "https://api.gleif.org/api/v1/lei-records/6SHGI4ZSSLCXXQSBB395/direct-children?page%5Bsize%5D=1",
+    "file": "da55050cba906a93.json",
+    "sha256": "a52aaf65c939c62784cdf9044c1c98a9603ce4a987c4e37c45786f2acb234346",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:20+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (direct-children of 6SHGI4ZSSLCXXQSBB395, page size 1)"
+  },
+  {
+    "request_fingerprint": "39a5e446711c8d9d0ebde5818be4b03b1dcc4d9da4f79ae691ef296418dfc6b0",
+    "url": "https://api.gleif.org/api/v1/lei-records/6SHGI4ZSSLCXXQSBB395/ultimate-children?page%5Bsize%5D=1",
+    "file": "39a5e446711c8d9d.json",
+    "sha256": "d3c4af8db68045c1418408656045e9c9e0dc636cd4450496f56197934048bfc3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:17+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (ultimate-children of 6SHGI4ZSSLCXXQSBB395, page size 1)"
+  },
+  {
+    "request_fingerprint": "f49bcb2247004d2a2ce951cd54e9fe533b72fb0599490d797ae80a575c3e0c39",
+    "url": "https://api.gleif.org/api/v1/lei-records/9DJT3UXIJIZJI4WXO774/direct-children?page%5Bsize%5D=1",
+    "file": "f49bcb2247004d2a.json",
+    "sha256": "25a270bd63d868ec86ca35882502d6b4bd729c7d2dbb1f623483e06758fa91e7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:14+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (direct-children of 9DJT3UXIJIZJI4WXO774, page size 1)"
+  },
+  {
+    "request_fingerprint": "349e325ced5b6793345da13cb447dbb945b19c576810c3c2ff691d8945c39eac",
+    "url": "https://api.gleif.org/api/v1/lei-records/9DJT3UXIJIZJI4WXO774/ultimate-children?page%5Bsize%5D=1",
+    "file": "349e325ced5b6793.json",
+    "sha256": "ffafb55bc33e2692ac8fa4e386628d3c75b4feffa4c2708da85270cac44d2a78",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:11+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (ultimate-children of 9DJT3UXIJIZJI4WXO774, page size 1)"
+  },
+  {
+    "request_fingerprint": "4653bcd670908f51c7a34f31dbdbfe0513d0223738d09f5585285143dbc0049c",
+    "url": "https://api.gleif.org/api/v1/lei-records/IGJSJL3JD5P30I6NJZ34/direct-children?page%5Bsize%5D=1",
+    "file": "4653bcd670908f51.json",
+    "sha256": "5a2a17546649f19672e547a508ee4ff7adc3f7df2cafd2695f340c70eebdaafa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:08+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (direct-children of IGJSJL3JD5P30I6NJZ34, page size 1)"
+  },
+  {
+    "request_fingerprint": "78e2559ab74f96ee7e99e44802f27500dbc53ebe49c07aac12348df0d392998d",
+    "url": "https://api.gleif.org/api/v1/lei-records/IGJSJL3JD5P30I6NJZ34/ultimate-children?page%5Bsize%5D=1",
+    "file": "78e2559ab74f96ee.json",
+    "sha256": "d66965f9fab690b8ebc9d59d54b14760db0bd44cf5f22603f3a1b3953c7113fc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:05+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (ultimate-children of IGJSJL3JD5P30I6NJZ34, page size 1)"
+  },
+  {
+    "request_fingerprint": "a76fa41cf60960d19ddc3a2d9b04cfc64a25fe4716b684f77d2cd609c3c3cb23",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=BV&page%5Bsize%5D=1",
+    "file": "a76fa41cf60960d1.json",
+    "sha256": "2d319dcd3b29a2308b1208cb50f9ca60db404e34bcbab65f76e8999dc183c003",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:41:02+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count BV:all, page size 1)"
+  },
+  {
     "request_fingerprint": "5788b53f159fedc02560235f89b58c3b0ddf8e1b3cfcc09d6c25d91621a84303",
     "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&filter%5Bentity.category%5D=BRANCH&page%5Bsize%5D=1",
     "file": "5788b53f159fedc0.json",
@@ -77,6 +182,136 @@
     "retrieved_at": "2026-10-17T13:39:25+00:00",
     "licence": "CC0-1.0",
     "note": "real live response (count FR:all, page size 1)"
+  },
+  {
+    "request_fingerprint": "8e028badf93e472bbaefa96ddf790baa24b93a68e2b3ff6806eb9a600107dab7",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=2NRQ&page%5Bsize%5D=1",
+    "file": "8e028badf93e472b.json",
+    "sha256": "e4446f6fb60f7fb52518fe570eaf90e76b1d3cb6338a08ef4357c5a16cdc7aa2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:29+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form 2NRQ, page size 1)"
+  },
+  {
+    "request_fingerprint": "6d5d778f67ed6c50f9413701073b404ab528527a053425367a2036ccec2a9a1d",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=5MVV&page%5Bsize%5D=1",
+    "file": "6d5d778f67ed6c50.json",
+    "sha256": "1d1769adddac2f5daaba54aa4a28e2485185d802b24a4f1426ce3b703b2d7b33",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:33+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form 5MVV, page size 1)"
+  },
+  {
+    "request_fingerprint": "d1ab84a70837ff0da545ec0f3e7e8783000966953ee259a732400a0b4e1c5164",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=7QQ0&page%5Bsize%5D=1",
+    "file": "d1ab84a70837ff0d.json",
+    "sha256": "66ba33c95fbf16a01ef6d8236ab9480ed885475e5b3f8528ff4db81f4b8e0919",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:36+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form 7QQ0, page size 1)"
+  },
+  {
+    "request_fingerprint": "082d4d07daa03bab527746f59eded548eaf96439a3360aff8612ac462f9f545c",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=DYQK&page%5Bsize%5D=1",
+    "file": "082d4d07daa03bab.json",
+    "sha256": "dbd14d77bd392ed0b748d88f0f7cb54f637bbcc6e3a4214aceb74811e1a0df0a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:40+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form DYQK, page size 1)"
+  },
+  {
+    "request_fingerprint": "dde91a0afdf41ffdecab8df8ac08c5203d5e87bfc2d65b08295723126d0aff4e",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=IUVI&page%5Bsize%5D=1",
+    "file": "dde91a0afdf41ffd.json",
+    "sha256": "e530295e78ffba178b11414c4965f06cc5f366576591c9edfcbd8fa0b75e7a84",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:43+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form IUVI, page size 1)"
+  },
+  {
+    "request_fingerprint": "e82244e53cc7f2e5e6f89132d98263e7acefa867ece84e92179d2061dda986bc",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=MXMH&page%5Bsize%5D=1",
+    "file": "e82244e53cc7f2e5.json",
+    "sha256": "e063d45ecc6fc3ad326f1de9423caca9a90bf47fc0980cda264943b6d7d46d91",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:46+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form MXMH, page size 1)"
+  },
+  {
+    "request_fingerprint": "b2a5afe896a4343d7119c50e579871b39eb7f7c273e303819db05c8c21a3618f",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=N3JU&page%5Bsize%5D=1",
+    "file": "b2a5afe896a4343d.json",
+    "sha256": "093bb30c24a4be2cebd6c5b16734913504c86a7c69a3369d32477622cdc42d2e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:49+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form N3JU, page size 1)"
+  },
+  {
+    "request_fingerprint": "6031223599c4dd9bc17bd7ee9056b4ad2bf53f2534b67287233f26977b31c222",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=R4LR&page%5Bsize%5D=1",
+    "file": "6031223599c4dd9b.json",
+    "sha256": "3a814f4fa0023a559467cb366b04f5af38ccdf742166ad88b9d0de9405eef63a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:52+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form R4LR, page size 1)"
+  },
+  {
+    "request_fingerprint": "0bb43d5020e209c4f470bf4f5d278aff655a9f31da738727ee895e6a1c9bd910",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=T417&page%5Bsize%5D=1",
+    "file": "0bb43d5020e209c4.json",
+    "sha256": "098c43a1356420b35d7a3a5f0548bb13225fd16e4c09dbf6adda9d1cbf0bdc50",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:55+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form T417, page size 1)"
+  },
+  {
+    "request_fingerprint": "9ef10264d5c42eb5f2ef1d4673d86db4e8806ae28dcb56a7013e907e2752b33b",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=JP&filter%5Bentity.legalForm%5D=VQLD&page%5Bsize%5D=1",
+    "file": "9ef10264d5c42eb5.json",
+    "sha256": "41be819163a7a6b7e190d5055e05893e4bd002969a1cfeb588fa29076cac4f37",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:44:58+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count JP legal form VQLD, page size 1)"
   },
   {
     "request_fingerprint": "2d38e63b40dc578061301d81c5f74cec824dbfc42ae06650ef2032a7a15aa725",
@@ -144,6 +379,19 @@
     "note": "real live response (count LU:all, page size 1)"
   },
   {
+    "request_fingerprint": "2c17b2451a32bd4eb1c273c7739d4f273eed2d7eba3152c3db877e0561249bd1",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&filter%5Bentity.category%5D=BRANCH&page%5Bsize%5D=1",
+    "file": "2c17b2451a32bd4e.json",
+    "sha256": "b69558047e2d565acc450ea398430d06d96c212396d5c6ef81900676bb49a21e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:40:59+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count XK:branch, page size 1)"
+  },
+  {
     "request_fingerprint": "d4ec158963d9e540ad0424fd4f5293dbf4c0804d7c6234fc2b76546ad3f133a5",
     "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&filter%5Bentity.category%5D=FUND&page%5Bsize%5D=1",
     "file": "d4ec158963d9e540.json",
@@ -194,5 +442,44 @@
     "retrieved_at": "2026-10-17T13:39:54+00:00",
     "licence": "CC0-1.0",
     "note": "real live response (count XK:all, page size 1)"
+  },
+  {
+    "request_fingerprint": "9b3b3272b8bfa3d6cb6688185cdbfbd7d1e89df5308da11c1bb0fbfe0283e1d3",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Blei%5D=529900QBVWXMWANH7H45%2CW38RGI023J3WT1HWRP32&page%5Bsize%5D=200",
+    "file": "9b3b3272b8bfa3d6.json",
+    "sha256": "468c662c13884d54a94fb8bb38b7fa691174d59c40ee9186d2db25692c2fbe95",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:46:57+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response: the two parent records named by the include of the seed request (Level 1 only)"
+  },
+  {
+    "request_fingerprint": "a50848358905794134a02106ad543dc7613d381df4d87599e5692290eee5d1a7",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Blei%5D=5493006W3QUS5LMH6R84%2CHWUPKR0MPOU8FGXBT394%2C529900IR3Y1XBIR1GX29%2C54930070NSV60J38I987&include=direct-parent%2Cultimate-parent&page%5Bsize%5D=200",
+    "file": "a508483589057941.json",
+    "sha256": "42d8da946f71ff4468e6f019ac1698a6df187c6113e8506c564b34a41c1d47dd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:24+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response: Toyota, Apple, Siemens Healthcare (PK), General Motors with include=direct-parent,ultimate-parent"
+  },
+  {
+    "request_fingerprint": "71b1779cf04bec4054d766c8312880851318bb04d8c6a8856ff638eb0ed53c0b",
+    "url": "https://api.gleif.org/api/v1/lei-records?sort=-ultimateChildCount&page%5Bsize%5D=3",
+    "file": "71b1779cf04bec40.json",
+    "sha256": "4a81d416b4a3f3150df799f74fd3308eae6c61b7fd177ff4533027c376156df3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:45:02+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (top 3 LEI records by ultimateChildCount)"
   }
 ]

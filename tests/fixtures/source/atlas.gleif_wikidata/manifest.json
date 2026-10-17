@@ -1,0 +1,16 @@
+[
+  {
+    "request_fingerprint": "aa5ad1e9048de02a6203d411021e72d83077c2d45609f637019eabd372cc593a",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Flei+%3Frank+%3Fsitelinks+WHERE+%7B%0A++%3Fitem+p%3AP1278+%3Fstatement+.%0A++%3Fstatement+ps%3AP1278+%3Flei+%3B%0A+++++++++++++wikibase%3Arank+%3Frank+.%0A++FILTER%28%3Frank+%21%3D+wikibase%3ADeprecatedRank%29%0A++OPTIONAL+%7B+%3Fitem+wikibase%3Asitelinks+%3Fsitelinks+.+%7D%0A%7D&format=json",
+    "file": "aa5ad1e9048de02a.json",
+    "sha256": "8522d3769ad8ddb95872a771cb0fb05b4977677937dd81b3332a2646bc4add9d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:00+00:00",
+    "licence": "CC0-1.0",
+    "note": "EXCERPT: 14 real bindings of the live WDQS answer (53523 rows): the LEIs of Toyota, Apple, GM, Siemens, Morgan Stanley, the first invalid LEI values, low-sitelink items",
+    "excerpt_of_sha256": "3c8c217f173c0896e35a3bc47f27e1a67e6b1e04b3e621fb005e55c6fbd54a5b"
+  }
+]

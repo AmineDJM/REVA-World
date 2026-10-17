@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--NSI Web Service v10.11.8.0-->
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF56</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-10-17T15:47:34.5940478+02:00</message:Prepared>
+    <message:Sender id="Unknown" />
+    <message:Receiver id="Unknown" />
+  </message:Header>
+  <message:Structures>
+    <structure:Codelists>
+      <structure:Codelist id="CL_ACTIVITY_ISIC4" agencyID="OECD" version="1.5" isFinal="true">
+        <common:Name xml:lang="en">Codelist for economic activity, ISIC rev.4</common:Name>
+        <common:Name xml:lang="fr">Liste des codes pour les activités economiques, ISIC rev.4</common:Name>
+        <common:Description xml:lang="en">International Standard Industrial Classification, revision 4</common:Description>
+        <common:Description xml:lang="fr">Classification industrielle internationale de toutes les branches d'activité économique, revision 4</common:Description>
+        <structure:Code id="_T">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Total - All activities</common:Name>
+          <common:Name xml:lang="fr">Total - Toutes les activités</common:Name>
+        </structure:Code>
+<structure:Code id="A">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">120</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">120</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Agriculture, forestry and fishing</common:Name>
+          <common:Name xml:lang="fr">Agriculture, sylviculture et pêche</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="B">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>B05+B06+B07+B08+B09</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">880</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">880</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Mining and quarrying</common:Name>
+          <common:Name xml:lang="fr">Activités extractives</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="C">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>C10+C11+C12+C13+C14+C15+C16+C17+C18+C19+C20+C21+C22+C23+C24+C25+C26+C27+C28+C29+C30+C31+C32+C33</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">1230</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">1230</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Manufacturing</common:Name>
+          <common:Name xml:lang="fr">Activités de fabrication</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="D">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>D35</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4030</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4030</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Electricity, gas, steam and air conditioning supply</common:Name>
+          <common:Name xml:lang="fr">Production et distribution d’électricité, de gaz, de vapeur et climatisation</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="E">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>E36+E37+E38+E39</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4170</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4170</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Water supply; sewerage, waste management and remediation activities</common:Name>
+          <common:Name xml:lang="fr">Distribution d’eau; réseau d’assainissement; gestion des déchets et activités de remise en état</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="F">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>F41+F42+F43</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4390</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4390</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Construction</common:Name>
+          <common:Name xml:lang="fr">Construction</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="G">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>G45+G46+G47</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4750</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4750</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Wholesale and retail trade; repair of motor vehicles and motorcycles</common:Name>
+          <common:Name xml:lang="fr">Commerce de gros et de détail, réparations de véhicules automobiles et de motocycles</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="H">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>H49+H50+H51+H52+H53</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">5510</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">5510</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Transportation and storage</common:Name>
+          <common:Name xml:lang="fr">Transport et entreposage</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="I">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>I55+I56</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">6010</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">6010</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Accommodation and food service activities</common:Name>
+          <common:Name xml:lang="fr">Activités d’hébergement et de restauration</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="J">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>J58+J59+J60+J61+J62+J63</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">6210</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">6210</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Information and communication</common:Name>
+          <common:Name xml:lang="fr">Information et communication</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="K">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>K64+K65+K66</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">6780</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">6780</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Financial and insurance activities</common:Name>
+          <common:Name xml:lang="fr">Activités financières et d’assurances</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="L">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>L68</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">7190</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">7190</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Real estate activities</common:Name>
+          <common:Name xml:lang="fr">Activités immobilières</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="M">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>M69+M70+M71+M72+M73+M74+M75</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">7320</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">7320</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Professional, scientific and technical activities</common:Name>
+          <common:Name xml:lang="fr">Activités professionnelles, scientifiques et techniques</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="N">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>N77+N78+N79+N80+N81+N82</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">7830</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">7830</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Administrative and support service activities</common:Name>
+          <common:Name xml:lang="fr">Activités de services administratifs et d’appui</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="O">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>O84</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">8460</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">8460</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Public administration and defence; compulsory social security</common:Name>
+          <common:Name xml:lang="fr">Administration publique et défense; sécurité sociale obligatoire</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="P">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>P85</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">8650</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">8650</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Education</common:Name>
+          <common:Name xml:lang="fr">Éducation</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="Q">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>Q86+Q87+Q88</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">8810</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">8810</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Human health and social work activities</common:Name>
+          <common:Name xml:lang="fr">Santé et et activités d’action sociale</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="R">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>R90+R91+R92+R93</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">9080</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9080</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Arts, entertainment and recreation</common:Name>
+          <common:Name xml:lang="fr">Arts, spectacles et loisirs</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="S">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>S94+S95+S96</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">9330</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9330</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Other service activities</common:Name>
+          <common:Name xml:lang="fr">Autres activités de services</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+<structure:Code id="T">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>T97+T98</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">9640</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9640</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use</common:Name>
+          <common:Name xml:lang="fr">Activités des ménages privés employant du personnel domestique; activités non différenciées de production de biens et de services des ménages privés pour usage propre</common:Name>
+          <structure:Parent>
+            <Ref id="_T" />
+          </structure:Parent>
+        </structure:Code>
+      </structure:Codelist>
+    </structure:Codelists>
+  </message:Structures>
+</message:Structure>

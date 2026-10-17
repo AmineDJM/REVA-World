@@ -1,0 +1,26 @@
+# Budget request from agent V4INDUSTRY (companies, ownership, supply chains). Merged into
+# registry/policies/budgets.yaml by `uv run python -m reva.atlas.budget_merge --write`. Sizes measured live
+# on 2026-10-17 (docs/dev/v4_v4industry.md).
+agent: V4INDUSTRY
+requests:
+  - source_key: gleif.api
+    # atlas.gleif, one full run: countries list 1 + lei_counts <= 250 countries x 5 filters (page size 1, ~3.3 kB
+    # each; filters skipped where the country total is 0) + legal_form_counts 18 ELF pages + ~570 per-form counts
+    # (20 countries) + groups 1 + 2 x 200 child counts + entities 18 ELF pages + ~20 record pages of 200 LEIs
+    # (~1-2 MB each) + parent pages. GLEIF allows 60 requests/minute: the connector paces 1.1 s.
+    daily_requests: 3000
+    expected_bytes_per_day: 70000000
+    reason: "GLEIF API aggregations (pagination totals) + bounded LEI selections; Golden Copy bulk files never fetched"
+  - source_key: oecd.sdmx
+    # atlas.oecd_tiva: 2 codelists (26 kB + 0.9 MB) + 1 available constraint (16 kB) + 7 TiVA principal-indicator
+    # requests (~2-3 MB each, 2010-2022) + 2 FDVA requests (~11 MB + ~17 MB) = 12 requests, ~50 MB per run.
+    daily_requests: 15
+    expected_bytes_per_day: 60000000
+    reason: "OECD TiVA 2025 compact indicators (principal indicators + origin of value added in final demand)"
+daily_totals_increase:
+  http_requests_total: "+3015"
+  http_bytes_total: "+130_000_000"
+notes: >-
+  atlas.gleif_wikidata uses the existing wikidata.wdqs key (1 SPARQL query, ~34 MB JSON, archived gzip). SEC EDGAR
+  (data.sec.gov) is NOT requested: it requires a contact e-mail in the User-Agent and REVA_HTTP_CONTACT_EMAIL is not
+  configured (owner decision). Open Supply Hub is NOT requested: its API answers 401 without an account token.

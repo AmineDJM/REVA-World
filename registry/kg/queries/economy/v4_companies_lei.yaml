@@ -1,0 +1,21 @@
+id: economy.v4_companies_lei
+domain: economy
+owner: V4INDUSTRY
+description: >-
+  Notable companies and other legal entities that carry a Legal Entity Identifier (P1278) on Wikidata: items with
+  P1278 and at least 20 sitelinks (3,104 at 2026-10-17: Apple, Toyota, General Motors, Siemens, Saudi Aramco ...;
+  sitelinks are a notability bound, not a size ranking). They are the Wikidata side of the GLEIF join (the LEI
+  itself, through atlas.gleif_wikidata -- never the name). Snapshots keep the allow-listed claims: industry (P452),
+  headquarters (P159), country (P17), owner (P127), parent organisation (P749), subsidiaries (P355), owner of (P1830),
+  products (P1056), employees (P1128), stock exchange (P414), inception (P571), founders (P112); revenue / assets /
+  LEI / CIK once registry/kg/property_requests/v4industry.yaml is merged.
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P1278 ?lei .
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+  }
+max_rows: 4500
+expand_hops: 1

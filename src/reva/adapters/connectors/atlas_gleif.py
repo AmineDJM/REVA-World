@@ -66,7 +66,7 @@ import json
 import re
 import sys
 from collections import Counter
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Any
@@ -207,15 +207,12 @@ def elf_url(page: int) -> str:
     return url("entity-legal-forms", [("page[size]", str(PAGE_MAX)), ("page[number]", str(page))])
 
 
-def records_url(leis: Sequence[str]) -> str:
-    return url(
-        "lei-records",
-        [
-            ("filter[lei]", ",".join(leis)),
-            ("include", "direct-parent,ultimate-parent"),
-            ("page[size]", str(PAGE_MAX)),
-        ],
-    )
+def records_url(leis: Sequence[str], *, with_parents: bool = True) -> str:
+    ps = [("filter[lei]", ",".join(leis))]
+    if with_parents:
+        ps.append(("include", "direct-parent,ultimate-parent"))
+    ps.append(("page[size]", str(PAGE_MAX)))
+    return url("lei-records", ps)
 
 
 def top_groups_url(n: int) -> str:
@@ -432,15 +429,20 @@ def _parent(rel: Any, exceptions: Mapping[str, Mapping[str, Any]]) -> Parent | N
 @dataclass
 class RecordsPage:
     records: list[LeiRecord]
-    included: list[LeiRecord]
     publish_date: str
     total: int
     missing: list[str] = field(default_factory=list)
+    #: parent LEIs named by ``include`` (the API embeds only their identifiers; their records need a 2nd request)
+    parent_leis: list[str] = field(default_factory=list)
+    #: True: a page of parent records (Level 1 only, their own parents are not followed)
+    parents_page: bool = False
 
 
-def parse_records(body: bytes, *, requested: Sequence[str] = (), with_parents: bool = True) -> RecordsPage:
-    """A ``lei-records`` page (``filter[lei]`` with ``include=direct-parent,ultimate-parent``, or the top-groups
-    sort without include). ``missing``: requested LEIs the index did not return."""
+def parse_records(
+    body: bytes, *, requested: Sequence[str] = (), with_parents: bool = True, parents_page: bool = False
+) -> RecordsPage:
+    """A ``lei-records`` page (``filter[lei]`` with ``include=direct-parent,ultimate-parent``, a parent page without
+    include, or the top-groups sort). ``missing``: requested LEIs the index did not return."""
     doc = _doc(body, "lei-records")
     pd = _publish(doc, "lei-records")
     total = _total(doc, "lei-records")
@@ -448,17 +450,17 @@ def parse_records(body: bytes, *, requested: Sequence[str] = (), with_parents: b
     exceptions = {str(x.get("id")): (x.get("attributes") or {}) for x in inc if x.get("type") == "reporting-exceptions"}
     recs: list[LeiRecord] = []
     for i, x in enumerate(doc["data"]):
-        r = _record(x, i, False)
+        r = _record(x, i, parents_page)
         if with_parents:
             rel = x.get("relationships") or {}
             r.direct_parent = _parent(rel.get("direct-parent"), exceptions)
             r.ultimate_parent = _parent(rel.get("ultimate-parent"), exceptions)
         recs.append(r)
-    included = [_record(x, i, True) for i, x in enumerate(inc) if x.get("type") == "lei-records"]
+    parents = [str(x["id"]) for x in inc if x.get("type") == "lei-records" and isinstance(x.get("id"), str)]
     if requested and total != len(recs):
         raise _err(f"lei-records: {len(recs)} of {total} returned (page too small)", kind="incomplete")
     got = {r.lei for r in recs}
-    return RecordsPage(recs, included, pd, total, [lei for lei in requested if lei not in got])
+    return RecordsPage(recs, pd, total, [lei for lei in requested if lei not in got], parents, parents_page)
 
 
 # ============================================================================================== atlas rows
@@ -547,7 +549,7 @@ def kg_records(
 
     for page, raw in zip(pages, raws, strict=True):
         rev = f"gc:{page.publish_date[:19]}"
-        for r in [*page.records, *page.included]:
+        for r in page.records:
             key = lei_key(r.lei)
             if not lei_valid(r.lei):
                 stats["invalid_lei_record"] += 1
@@ -568,34 +570,38 @@ def kg_records(
                 ),
             )
             q = {"corroboration_level": r.corroboration, "registration_status": r.registration_status}
+            ctx = (key, q, r.lei, page.publish_date, rev, raw)
 
-            def lit(prop: str, sid: str, value: Any, path: str, extra: Mapping[str, Any] | None = None) -> None:
+            def emit(
+                prop: str,
+                sid: str,
+                path: str,
+                *,
+                value: Any = None,
+                obj: str | None = None,
+                extra: Mapping[str, Any] | None = None,
+                c: tuple[Any, ...] = ctx,
+            ) -> None:
+                k, qual, lei, pd, rv, rw = c
                 add(
                     KgStatement(
-                        subject_qid=key,
-                        property_pid=P[prop],
-                        value=value,
-                        qualifiers={**q, **(extra or {})},
-                        references=ref(r.lei, page.publish_date, path),  # noqa: B023
-                        source_revision=rev,  # noqa: B023
-                        statement_id=f"{r.lei}:{sid}",  # noqa: B023
-                        raw_sha256=raw,  # noqa: B023
-                    )
-                )
-
-            def item(prop: str, sid: str, obj: str, path: str, extra: Mapping[str, Any] | None = None) -> None:
-                add(
-                    KgStatement(
-                        subject_qid=key,
+                        subject_qid=k,
                         property_pid=P[prop],
                         object_qid=obj,
-                        qualifiers={**q, **(extra or {})},
-                        references=ref(r.lei, page.publish_date, path),  # noqa: B023
-                        source_revision=rev,  # noqa: B023
-                        statement_id=f"{r.lei}:{sid}",  # noqa: B023
-                        raw_sha256=raw,  # noqa: B023
+                        value=value,
+                        qualifiers={**qual, **(extra or {})},
+                        references=ref(lei, pd, path),
+                        source_revision=rv,
+                        statement_id=f"{lei}:{sid}",
+                        raw_sha256=rw,
                     )
                 )
+
+            def lit(prop: str, sid: str, value: Any, path: str, extra: Mapping[str, Any] | None = None) -> None:
+                emit(prop, sid, path, value=value, extra=extra)
+
+            def item(prop: str, sid: str, obj: str, path: str, extra: Mapping[str, Any] | None = None) -> None:
+                emit(prop, sid, path, obj=obj, extra=extra)
 
             for prop, code, path in (
                 ("legal_country", r.legal_country, "entity.legalAddress.country"),
@@ -907,7 +913,7 @@ async def ingest_legal_forms(run: Any) -> dict[str, Any]:
     for cc in wanted:
         codes = sorted(f.code for f in forms.values() if f.country == cc)
         for code in codes:
-            u = count_url(cc, {"entity.legalForm.id": code})
+            u = count_url(cc, {"entity.legalForm": code})
             r, sha = await _get(run, u, f"form:{cc}:{code}")
             total, pd = parse_count(r.body, f"legal form {cc} {code}")
             shas.append(sha)
@@ -924,7 +930,7 @@ async def ingest_legal_forms(run: Any) -> dict[str, Any]:
                     raw_sha256=sha,
                     request_url=u,
                     flags={
-                        "filter": {"entity.legalAddress.country": cc, "entity.legalForm.id": code},
+                        "filter": {"entity.legalAddress.country": cc, "entity.legalForm": code},
                         "elf_code": code,
                         "elf_names": list(lf.names),
                         "elf_status": lf.status,
@@ -1044,6 +1050,15 @@ async def ingest_entities(run: Any) -> dict[str, Any]:
         pages.append(page)
         shas.append(sha)
         missing += page.missing
+    got = {r.lei for p in pages for r in p.records}
+    parents = sorted({lei for p in pages for lei in p.parent_leis if lei not in got and lei_valid(lei)})
+    for i in range(0, len(parents), PAGE_MAX):
+        chunk = parents[i : i + PAGE_MAX]
+        raw, sha = await _get(run, records_url(chunk, with_parents=False), f"parents:{i // PAGE_MAX}")
+        page = parse_records(raw.body, requested=chunk, with_parents=False, parents_page=True)
+        pages.append(page)
+        shas.append(sha)
+        missing += page.missing
     ents, sts, info = kg_records(pages, shas, elf=forms)
     kg = load_kg(
         run.engine,
@@ -1063,7 +1078,7 @@ async def ingest_entities(run: Any) -> dict[str, Any]:
         "requests": len(pages),
         "missing_from_index": missing[:100],
         "missing_count": len(missing),
-        "parents_included": sum(len(p.included) for p in pages),
+        "parents_fetched": len(parents),
         "build": info,
         "kg": kg,
     }
@@ -1138,15 +1153,11 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     return out
 
 
-def _iter_unused(_: Iterable[Any]) -> None:  # pragma: no cover - keeps typing imports honest
-    return None
-
-
 __all__ = [
     "CONNECTOR_NAME",
     "COUNT_FILTERS",
-    "LeiRecord",
     "WD_NAME",
+    "LeiRecord",
     "atlas_ingest",
     "atlas_source",
     "children_count_url",

@@ -1,0 +1,50 @@
+# Property requests from V4INDUSTRY (companies, ownership, facilities). WDHARVEST's merge
+# (`python -m reva.kg.harvest merge-property-requests`) checks every id and datatype against Wikidata and takes the
+# en/fr labels from the property entity itself. Used by registry/kg/queries/economy/v4_*.yaml (seed specs keep every
+# allow-listed property, so once merged these claims are kept on the next (re-)harvest).
+- property: P1278
+  why: >-
+    Legal Entity Identifier (ISO 17442) of a company or other legal entity, e.g. Toyota -> 5493006W3QUS5LMH6R84. The
+    only key joining Wikidata companies to GLEIF records (atlas.gleif_wikidata, registry/kg/predicates_industry.yaml).
+  reva_predicate: legal_entity_identifier
+  inverse: null
+  kind: external_id
+  group: economy
+  label_en: Legal Entity Identifier
+- property: P5531
+  why: >-
+    Central Index Key (SEC EDGAR filer id), e.g. Apple -> 0000320193; joins Wikidata companies to SEC company facts
+    once SEC access is configured (owner decision, docs/dev/v4_v4industry.md).
+  reva_predicate: sec_central_index_key
+  inverse: null
+  kind: external_id
+  group: economy
+  label_en: Central Index Key
+- property: P2139
+  why: total revenue of a company (quantity with point in time and currency unit), e.g. Toyota FY revenue.
+  reva_predicate: total_revenue
+  inverse: null
+  kind: quantity
+  group: economy
+  label_en: total revenue
+- property: P2403
+  why: total assets of a company (quantity with point in time and currency unit).
+  reva_predicate: total_assets
+  inverse: null
+  kind: quantity
+  group: economy
+  label_en: total assets
+- property: P2295
+  why: net profit of a company (quantity with point in time and currency unit).
+  reva_predicate: net_profit
+  inverse: null
+  kind: quantity
+  group: economy
+  label_en: net profit
+- property: P2226
+  why: market capitalization of a listed company (quantity with point in time and currency unit).
+  reva_predicate: market_capitalization
+  inverse: null
+  kind: quantity
+  group: economy
+  label_en: market capitalization

@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--NSI Web Service v10.11.8.0-->
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF59</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-10-17T15:47:33.031614+02:00</message:Prepared>
+    <message:Sender id="Unknown" />
+    <message:Receiver id="Unknown" />
+  </message:Header>
+  <message:Structures>
+    <structure:Codelists>
+      <structure:Codelist id="CL_TIVA_MEASURE" agencyID="OECD.STI.PIE" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Measure</common:Name>
+        <structure:Code id="EXGR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">1</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross exports</common:Name>
+          <common:Name xml:lang="fr">Exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_FNL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">2</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross exports of final products</common:Name>
+          <common:Name xml:lang="fr">Exportations brutes de produits finals</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_INT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">3</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross exports of intermediate products</common:Name>
+          <common:Name xml:lang="fr">Exportations brutes de produits intermédiaires</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_DDC">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">5</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Direct domestic value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes, contenu direct</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_IDC">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">6</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Indirect domestic value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes, contenu indirect</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_RIM">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">7</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Re-imported domestic value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes, contenu réimporté</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_FVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">8</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée étrangère des exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">9</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross imports</common:Name>
+          <common:Name xml:lang="fr">Importations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGR_FNL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross imports of final products</common:Name>
+          <common:Name xml:lang="fr">Importations brutes de produits finals</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGR_INT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">11</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross imports of intermediate products</common:Name>
+          <common:Name xml:lang="fr">Importations brutes de produits intermédiaires</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGR_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">12</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross imports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des importations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="BALGR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">13</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross trade, balance</common:Name>
+          <common:Name xml:lang="fr">Balance commerciale en valeur brute</common:Name>
+        </structure:Code>
+        <structure:Code id="REII">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">14</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Re-exported intermediate imports</common:Name>
+          <common:Name xml:lang="fr">Réexportations de produits intermédiaires importés</common:Name>
+        </structure:Code>
+        <structure:Code id="PROD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">15</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Production, gross output</common:Name>
+          <common:Name xml:lang="fr">Production brute</common:Name>
+        </structure:Code>
+        <structure:Code id="VALU">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">16</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="FFD_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">17</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in foreign final demand</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale dans la demande finale étrangère</common:Name>
+        </structure:Code>
+        <structure:Code id="DFD_FVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">18</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign value added in domestic final demand</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée étrangère dans la demande finale intérieure</common:Name>
+        </structure:Code>
+        <structure:Code id="BALVAFD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">19</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in final demand, balance</common:Name>
+          <common:Name xml:lang="fr">Balance commerciale en valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="FD_VA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in final demand</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la demande finale</common:Name>
+        </structure:Code>
+        <structure:Code id="CONS_VA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">21</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in consumption</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la consommation finale</common:Name>
+        </structure:Code>
+        <structure:Code id="GFCF_VA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">22</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in gross fixed capital formation</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la formation brute de capital fixe</common:Name>
+        </structure:Code>
+        <structure:Code id="FEXGR_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">24</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in foreign gross exports</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes étrangères</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_FNL_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">25</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports of final products</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes de produits finals</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_INT_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">26</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports of intermediate products</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes de produits intermédiaires</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_INT_DVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">27</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports of intermediate products, destination partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes de produits intermédiaires, parts selon les partenaires à l'exportation</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">28</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross exports, destination partner shares</common:Name>
+          <common:Name xml:lang="fr">Exportations brutes, parts selon les partenaires à l'exportation</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_DVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">29</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports, destination partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes, parts selon les partenaires à l'exportation</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_DVA_CTR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in gross exports, economic activity contributions</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes, contributions sectorielles</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_FVA_CTR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">31</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign value added in gross exports, economic activity contributions</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée étrangère des exportations brutes, contributions sectorielles</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_SERV_DVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">32</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic services content in gross exports</common:Name>
+          <common:Name xml:lang="fr">Contenu en services locaux des exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_SERV_FVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">33</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign services content in gross exports</common:Name>
+          <common:Name xml:lang="fr">Contenu en services étrangers des exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGR_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">34</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross imports, origin partner shares</common:Name>
+          <common:Name xml:lang="fr">Importations brutes, parts selon les partenaires à l'importation</common:Name>
+        </structure:Code>
+        <structure:Code id="FFD_DVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">35</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in foreign final demand, final demand partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale dans la demande finale étrangère, parts selon les pays de la demande finale</common:Name>
+        </structure:Code>
+        <structure:Code id="DFD_FVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">36</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign value added in domestic final demand, value added origin partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée étrangère dans la demande finale intérieure, parts selon l'origine géographique de la valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="VALU_PROD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">37</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added production ratio</common:Name>
+          <common:Name xml:lang="fr">Ratio de la valeur ajoutée sur la production</common:Name>
+        </structure:Code>
+        <structure:Code id="FD_VA_SH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">38</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in final demand, value added origin shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la demande finale, parts selon l'origine de la valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="CONS_VA_SH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">39</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in consumption, value added origin shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la consommation finale, parts selon l'origine de la valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="GFCF_VA_SH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Value added in gross fixed capital formation, value added origin shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée dans la formation brute de capital fixe, parts selon l'origine de la valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGR_FVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">41</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Foreign value added in gross exports, value added origin partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée étrangère des exportations brutes, parts selon l'origine géographique de la valeur ajoutée</common:Name>
+        </structure:Code>
+        <structure:Code id="FEXGR_DVA_PSH">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">42</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Domestic value added in foreign gross exports, exporting partner shares</common:Name>
+          <common:Name xml:lang="fr">Valeur ajoutée locale des exportations brutes étrangères, parts selon les partenaires exportateurs</common:Name>
+        </structure:Code>
+        <structure:Code id="EXGRVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Origin of value added in gross exports</common:Name>
+          <common:Name xml:lang="fr">Origine du contenu en valeur ajoutée des exportations brutes</common:Name>
+        </structure:Code>
+        <structure:Code id="FDVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Origin of value added in final demand</common:Name>
+          <common:Name xml:lang="fr">Origine du contenu en valeur ajoutée de la demande finale</common:Name>
+        </structure:Code>
+        <structure:Code id="IMGRVA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Origin of value added in gross imports</common:Name>
+          <common:Name xml:lang="fr">Origine du contenu en valeur ajoutée des importations brutes</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+    </structure:Codelists>
+  </message:Structures>
+</message:Structure>
