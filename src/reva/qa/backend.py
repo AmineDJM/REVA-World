@@ -27,7 +27,7 @@ import polars as pl
 
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
 
-_LIT_RE = re.compile(r"^[A-Za-z0-9_:.\-/|=+ ]{1,200}$")
+_LIT_RE = re.compile(r"^[A-Za-z0-9_:.\-/|=+% ]{1,200}$")
 
 
 def lit(value: str) -> str:
