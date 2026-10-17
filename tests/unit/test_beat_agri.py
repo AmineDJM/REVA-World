@@ -161,3 +161,21 @@ def test_prospective_records_for_the_open_year() -> None:
     assert "us.corn.yield" in series and "us.wheat.yield" not in series  # wheat yield window ends in September
     r = next(x for x in out["records"] if x["series"] == "world.corn.production")
     assert r["k"] == 5 and r["points"]["bc"] is not None and "2027-11-01" in r["truth_rule"]
+
+
+def test_sealed_batch_labels_and_question_ids() -> None:
+    from reva.evaluation.beat_agri import seal as SE
+
+    v = _synthetic(last=date(2026, 10, 10))
+    now = datetime(2026, 10, 17, tzinfo=UTC)
+    out = S.prospective_records(v, None, now)
+    b = SE.build_batch(out, now=now, confirmed=["us_yield|mid|bc|ae"], pins={})
+    assert len({q["question_id"] for q in b["questions"]}) == len(b["questions"]) == len(out["records"])
+    f = [x for x in b["forecasts"] if x["model"] == "forecast.beat_agri_bc" and x["status"] == "issued"]
+    lab = {x["question_id"]: x["label"] for x in f}
+    qy = next(q for q in b["questions"] if q["series"] == "us.corn.yield")
+    assert "confirmed on the holdout: us_yield|mid|bc|ae" in lab[qy["question_id"]]
+    qw = next(q for q in b["questions"] if q["series"] == "world.corn.production")
+    assert "NOT confirmed" in lab[qw["question_id"]]
+    ref = next(x for x in b["forecasts"] if x["model"] == "forecast.reference_usda_wasde")
+    assert "predictive" not in ref and "USDA" in ref["attribution"]

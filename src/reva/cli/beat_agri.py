@@ -150,5 +150,72 @@ def holdout_cmd() -> None:
                    f"cov80={r.get('coverage80')} confirmed={r['confirmed']}")  # fmt: skip
 
 
+@app.command("seal")
+def seal_cmd(
+    dry_run: bool = typer.Option(True, "--dry-run/--seal", help="--seal writes to the dev DB (use flock)"),
+) -> None:
+    """Seals the 2026/27 batch on the WASDE release in force (once per release; idempotent)."""
+    import shutil as _sh
+
+    from sqlalchemy import text
+
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres import repositories as repo
+    from reva.adapters.postgres.engine import make_engine
+    from reva.evaluation.beat_agri import seal as SE
+    from reva.evaluation.registry.service import ISSUE_KIND, ISSUE_LOCK, _insert_eval
+    from reva.settings import get_settings
+
+    v, w, pins = load_inputs()
+    led = S.load_yaml(S.REGISTRY_DIR / "holdout_ledger.yaml")
+    confirmed = sorted({k for o in led.get("openings") or [] for k in o.get("confirmed") or []})
+    eng = make_engine("api" if dry_run else "worker", get_settings())
+    with eng.connect() as conn:
+        now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+    prosp = S.prospective_records(v, w, now)
+    batch = SE.build_batch(prosp, now=now, confirmed=confirmed, pins=pins)
+    if dry_run:
+        typer.echo(yaml.safe_dump({"release": prosp["release_in_force"], "questions": len(batch["questions"]),
+                                   "forecasts": len(batch["forecasts"]), "records": prosp["records"]},
+                                  sort_keys=False))  # fmt: skip
+        return
+    free_gb = _sh.disk_usage("/").free / 1024**3
+    store = get_store()
+    with eng.begin() as conn:
+        mv = {r["model_key"]: r["id"] for r in conn.execute(
+            text("SELECT model_key, version, id::text AS id FROM model.version WHERE model_key = ANY(:k)"),
+            {"k": sorted(SE.MODELS)}).mappings() if r["version"] == SE.MODELS[r["model_key"]][0]}  # fmt: skip
+        if set(mv) != set(SE.MODELS):
+            raise SystemExit(f"models not seeded: {sorted(set(SE.MODELS) - set(mv))} (reva seed)")
+        dup = conn.execute(
+            text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = :k AND task_scope->>'kind' = :sk "
+                 "AND task_scope->>'cycle' = :c"),
+            {"k": ISSUE_KIND, "sk": SE.SCOPE_KIND, "c": batch["cycle"]},
+        ).scalar_one()  # fmt: skip
+        if dup:
+            typer.echo(f"already sealed for {batch['cycle']}")
+            return
+        conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": ISSUE_LOCK})
+        sha = repo.store_json_artifact(conn, store, batch, "evaluation", schema_version="forecast-registry-batch/1",
+                                       rights={"licence": "internal-derived; WASDE values: U.S. public domain (USDA, "
+                                               "attributed); NCEI weather: U.S. public domain"})  # fmt: skip
+        act = repo.simple_activity("evaluation.forecast_registry_issue", "evaluation", "agent:beat-agri",
+                                   {"cycle": batch["cycle"], "origin": "live", "batch_sha256": sha})  # fmt: skip
+        repo.record_activity(conn, act, inputs=[], outputs=[sha])
+        ctx = repo.create_context(conn, mode="evaluation", origin="live", manifest_sha256=sha, knowledge_cutoff=now)
+        qids = sorted(q["question_id"] for q in batch["questions"])
+        scope = {"kind": SE.SCOPE_KIND, "origin": "live", "cycle": batch["cycle"], "batch_sha256": sha,
+                 "question_keys": sorted(q["question_key"] for q in batch["questions"]), "question_ids": qids}  # fmt: skip
+        for mk, (ver, _m) in SE.MODELS.items():
+            mine = [f for f in batch["forecasts"] if f["model"] == mk]
+            _insert_eval(conn, mv[mk], ctx, sha, "operational_as_known", scope,
+                         {"kind": ISSUE_KIND, "status": "sealed", "label": batch["label"], "model": f"{mk}@{ver}",
+                          "issued_at": now.isoformat(), "batch_sha256": sha, "n_questions": len(qids),
+                          "n_issued": sum(1 for f in mine if f["status"] == "issued"),
+                          "n_abstained": sum(1 for f in mine if f["status"] == "abstained")}, act.id)  # fmt: skip
+    typer.echo(yaml.safe_dump({"status": "sealed", "batch_sha256": sha, "issued_at": now.isoformat(),
+                               "questions": len(qids), "free_gb_before_write": round(free_gb, 2)}, sort_keys=False))  # fmt: skip
+
+
 if __name__ == "__main__":
     app()
