@@ -21,7 +21,14 @@ old one is retracted by the next run), qualifiers = classification (Definitive /
 Disputed / Refuted / No Known Disease Relationship ...), mode of inheritance, SOP version, classification date,
 expert panel (GCEP), report URL, gene symbol and disease label as written. Family ``associated_with``: a ClinGen
 classification grades the *evidence* for a gene-disease relationship; REVA does not turn it into a causal claim
-(docs/dev/v4_v4health.md, "Gene-disease"). Gene and disease entities are not created here (HGNC: V4BIO; Mondo:
+(docs/dev/v4_v4health.md, "Gene-disease").
+
+FIX4A (audit AUDIT3 H2, docs/dev/v6_fix4a.md): only the classifications that support a relationship (Definitive,
+Strong, Moderate, Limited) are ``clingen:gene_disease_validity`` (family ``associated_with``). *Refuted*, *Disputed*
+and *No Known Disease Relationship* say the gene is not (or not shown to be) related to the disease: they are
+``clingen:gene_disease_curation_negative`` (statement id ``<assertion id>#curation_negative``, classification
+verbatim in the qualifiers, deliberately unmapped in the families -- never a relation hop). Any other classification
+blocks the load (drift) until it is reviewed. Gene and disease entities are not created here (HGNC: V4BIO; Mondo:
 ``atlas.mondo``); ids are used exactly as the file gives them, never matched by symbol or label.
 """
 
@@ -38,8 +45,8 @@ from reva.adapters.connectors.health_obo_common import digest, drift, kg_availab
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.clingen"
-VERSION = "1.0.1"
-PARSER_VERSION = "atlas_clingen/1"
+VERSION = "1.1.0"  # 1.1.0 (FIX4A, AUDIT3 H2): negative classifications under their own unmapped predicate
+PARSER_VERSION = "atlas_clingen/2"
 SOURCE_KEY = "clingen.gene_validity"
 HOST = "search.clinicalgenome.org"
 URL = f"https://{HOST}/kb/gene-validity/download"
@@ -47,6 +54,11 @@ DATASET = "gene_validity"
 MAX_BYTES = 20_000_000
 MIN_ROWS_LIVE = 2_000
 PID = "clingen:gene_disease_validity"
+PID_NEGATIVE = "clingen:gene_disease_curation_negative"
+#: ClinGen classifications (verbatim) that support a gene-disease relationship -> ``PID`` (associated_with)
+SUPPORTING = frozenset({"Definitive", "Strong", "Moderate", "Limited"})
+#: classifications saying the gene is not / not shown to be related -> ``PID_NEGATIVE`` (no family)
+NEGATIVE = frozenset({"Refuted", "Disputed", "No Known Disease Relationship"})
 HEADER = (
     "GENE SYMBOL",
     "GENE ID (HGNC)",
@@ -122,7 +134,11 @@ def build(rows: list[dict[str, Any]], *, raw_sha256: str, revision: str) -> tupl
         if sid in sts:
             skipped["duplicate_assertion"] += 1
             continue
-        classes[r["CLASSIFICATION"]] += 1
+        cls = r["CLASSIFICATION"]
+        if cls not in SUPPORTING and cls not in NEGATIVE:
+            raise drift(f"ClinGen CSV line {r['_line']}: unreviewed classification {cls!r} (FIX4A: review the mapping)")
+        negative = cls in NEGATIVE
+        classes[cls] += 1
         quals = {
             "classification": r["CLASSIFICATION"],
             "mode_of_inheritance": r["MOI"],
@@ -135,7 +151,7 @@ def build(rows: list[dict[str, Any]], *, raw_sha256: str, revision: str) -> tupl
         }
         sts[sid] = KgStatement(
             subject_qid=f"hgnc:{g.group(1)}",
-            property_pid=PID,
+            property_pid=PID_NEGATIVE if negative else PID,
             object_qid=f"mondo:{d.group(1)}",
             qualifiers={k: v for k, v in quals.items() if v},
             references=[
@@ -144,7 +160,7 @@ def build(rows: list[dict[str, Any]], *, raw_sha256: str, revision: str) -> tupl
                     "selector": {"file": "gene-validity download (CSV)", "line": r["_line"], "assertion": sid},
                 }
             ],
-            statement_id=sid,
+            statement_id=f"{sid}#curation_negative" if negative else sid,
             source_revision=revision,
             raw_sha256=raw_sha256,
         )
@@ -154,6 +170,7 @@ def build(rows: list[dict[str, Any]], *, raw_sha256: str, revision: str) -> tupl
         "genes": len({s.subject_qid for s in sts.values()}),
         "diseases": len({s.object_qid for s in sts.values()}),
         "by_classification": dict(classes.most_common()),
+        "by_predicate": dict(Counter(s.property_pid for s in sts.values())),
         "skipped": dict(skipped),
     }
     return list(sts.values()), rep
@@ -184,7 +201,9 @@ def atlas_source() -> AtlasSourceSpec:
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
         field_mappings={"subject": "GENE ID (HGNC)", "object": "DISEASE ID (MONDO)", "statement_id": "ONLINE REPORT"},
-        notes="KG only: one associated_with statement per ClinGen gene-disease validity curation (not causal).",
+        notes="KG only: one statement per ClinGen gene-disease validity curation (not causal): associated_with for "
+        "Definitive/Strong/Moderate/Limited; Refuted/Disputed/No Known Disease Relationship under an unmapped "
+        "negative-curation predicate.",
     )
 
 
@@ -220,4 +239,4 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     return out
 
 
-__all__ = ["NAME", "PID", "SOURCE_KEY", "atlas_ingest", "atlas_source", "build", "parse"]
+__all__ = ["NAME", "NEGATIVE", "PID", "PID_NEGATIVE", "SOURCE_KEY", "SUPPORTING", "atlas_ingest", "atlas_source", "build", "parse"]

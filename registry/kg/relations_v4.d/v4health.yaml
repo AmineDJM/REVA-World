@@ -4,6 +4,9 @@
 # has major susceptibility factor) never become KG statements; they are T1 claims of the causal loader
 # (docs/dev/v4_v4health.md). Literal predicates (definition, xref) and the identity crosswalk mondo:equivalent_doid
 # are deliberately unmapped (an equivalence is not a relation family; V4LINK / same_as handles identity).
+# FIX4A (audit AUDIT3 H2): clingen:gene_disease_curation_negative (Refuted / Disputed / No Known Disease Relationship)
+# is deliberately unmapped too: a refuted or disputed curation is not an association and is never a family hop.
+# FIX4A (M1, M9, H1): doid:inheritance_mode, doid:has_disease_driver and the REVA-made altered-state links are context.
 version: 1
 agent: V4HEALTH
 note: >-
@@ -24,6 +27,10 @@ mappings:
   - {property: 'doid:derives_from', family: context, subtype: doid_derives_from, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0001000'}
   - {property: 'doid:onset_during', family: occurs_during, subtype: doid_existence_starts_during, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002488'}
   - {property: 'doid:adjacent_to', family: context, subtype: doid_adjacent_to, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002220'}
+  - {property: 'doid:inheritance_mode', family: context, subtype: doid_inheritance_mode, source: doid.obo, subject_kinds: [disease], note: 'DOID has material basis in (IDO:0000664) with a GENO inheritance-pattern filler; a mode of inheritance, not a cause (FIX4A, AUDIT3 M1)'}
+  - {property: 'doid:has_disease_driver', family: context, subtype: doid_has_disease_driver, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0007001 (under RO:0007000 has driver, not under RO:0002410 causally related to; FIX4A, AUDIT3 M9)'}
+  - {property: 'doid:altered_state_of', family: context, subtype: doid_altered_state_of, source: doid.obo, subject_kinds: [reva_altered_state], note: 'REVA-made node -> the process or structure it is a disruption / dysfunction / alteration of (FIX4A, AUDIT3 H1)'}
+  - {property: 'mondo:altered_state_of', family: context, subtype: mondo_altered_state_of, source: mondo.obo, subject_kinds: [reva_altered_state], note: 'REVA-made node -> the process or structure it is a disruption / dysfunction / alteration of (FIX4A, AUDIT3 H1)'}
   - {property: 'doid:has_origin', family: context, subtype: doid_has_origin, source: doid.obo, subject_kinds: [disease], note: source relation so#has_origin}
   - {property: 'mondo:subclass_of', family: is_a, subtype: mondo_subclass_of, source: mondo.obo, subject_kinds: [disease]}
   - {property: 'mondo:has_location', family: located_in, subtype: mondo_disease_has_location, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0004026'}
@@ -35,6 +42,6 @@ mappings:
   - {property: 'mondo:responds_to', family: associated_with, subtype: mondo_disease_responds_to, source: mondo.obo, subject_kinds: [disease]}
   - {property: 'mondo:in_taxon', family: context, subtype: mondo_in_taxon, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002162'}
   - {property: 'mondo:transmitted_by', family: context, subtype: mondo_transmitted_by, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002451'}
-  - {property: 'clingen:gene_disease_validity', family: associated_with, subtype: clingen_gene_disease_validity, source: clingen.gene_validity, subject_kinds: [gene], object_kinds: [disease], note: ClinGen classification (Definitive ... Refuted) grades the evidence for the association; not a causal claim}
+  - {property: 'clingen:gene_disease_validity', family: associated_with, subtype: clingen_gene_disease_validity, source: clingen.gene_validity, subject_kinds: [gene], object_kinds: [disease], note: 'ClinGen classification (Definitive, Strong, Moderate, Limited) grades the evidence for the association; not a causal claim. Refuted / Disputed / No Known Disease Relationship are clingen:gene_disease_curation_negative (unmapped; FIX4A, AUDIT3 H2)'}
   - {property: P2176, family: associated_with, subtype: drug_used_for_treatment, source: wikidata, subject_kinds: [disease], note: 'requested by V4HEALTH; a treatment use is an association, never a causal claim'}
   - {property: P2175, family: associated_with, subtype: medical_condition_treated, source: wikidata, object_kinds: [disease], note: 'requested by V4HEALTH; inverse view of P2176 on drug items'}

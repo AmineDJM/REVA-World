@@ -72,6 +72,19 @@ predicates:
   - {pid: "doid:has_origin", value_kind: item, reva_predicate: doid_has_origin, family: context, ro: "so#has_origin",
      label_en: "has origin (Disease Ontology, SO relation)", label_fr: "a pour origine (Disease Ontology, relation SO)",
      inverse_name: doid_origin_of, inverse_label_en: "is the origin of (Disease Ontology, SO relation)", inverse_label_fr: "est l'origine de (Disease Ontology, relation SO)"}
+  # FIX4A (audit AUDIT3 M1, M9, H1; docs/dev/v6_fix4a.md)
+  - {pid: "doid:inheritance_mode", value_kind: item, reva_predicate: doid_inheritance_mode, family: context, ro: "IDO:0000664",
+     label_en: "mode of inheritance (Disease Ontology 'has material basis in' an inheritance pattern; not a cause)",
+     label_fr: "mode de transmission (Disease Ontology « has material basis in » un mode de transmission ; pas une cause)",
+     inverse_name: doid_inheritance_mode_of, inverse_label_en: "is the mode of inheritance of (Disease Ontology)", inverse_label_fr: "est le mode de transmission de (Disease Ontology)"}
+  - {pid: "doid:has_disease_driver", value_kind: item, reva_predicate: doid_has_disease_driver, family: context, ro: "RO:0007001",
+     label_en: "has disease driver (Disease Ontology, RO:0007001; not under RO 'causally related to')",
+     label_fr: "a pour facteur de maladie (Disease Ontology, RO:0007001 « has disease driver » ; hors de la branche causale de RO)",
+     inverse_name: doid_disease_driver_of, inverse_label_en: "is a disease driver of (Disease Ontology, RO:0007001)", inverse_label_fr: "est un facteur de la maladie (Disease Ontology, RO:0007001)"}
+  - {pid: "doid:altered_state_of", value_kind: item, reva_predicate: doid_altered_state_of, family: context,
+     label_en: "is the altered state of (REVA-made node of a Disease Ontology axiom)",
+     label_fr: "est l'état altéré de (nœud créé par REVA, axiome Disease Ontology)",
+     inverse_name: doid_has_altered_state, inverse_label_en: "has altered state (REVA-made node, Disease Ontology)", inverse_label_fr: "a pour état altéré (nœud créé par REVA, Disease Ontology)"}
   - {pid: "doid:xref", value_kind: external_id, reva_predicate: doid_xref,
      label_en: "database cross-reference (Disease Ontology xref: ICD-10-CM, ICD-9-CM, ICD-11, MeSH, OMIM, ORDO, UMLS, NCIt, SNOMED CT, GARD ...)",
      label_fr: "référence croisée (xref Disease Ontology : CIM-10-CM, CIM-9-CM, CIM-11, MeSH, OMIM, ORDO, UMLS, NCIt, SNOMED CT, GARD ...)"}
@@ -108,6 +121,10 @@ predicates:
   - {pid: "mondo:transmitted_by", value_kind: item, reva_predicate: mondo_transmitted_by, family: context, ro: "RO:0002451",
      label_en: "transmitted by (Mondo)", label_fr: "transmis(e) par (Mondo)",
      inverse_name: mondo_transmits, inverse_label_en: "transmits (Mondo)", inverse_label_fr: "transmet (Mondo)"}
+  - {pid: "mondo:altered_state_of", value_kind: item, reva_predicate: mondo_altered_state_of, family: context,
+     label_en: "is the altered state of (REVA-made node of a Mondo axiom: disruption / dysfunction / alteration in structure)",
+     label_fr: "est l'état altéré de (nœud créé par REVA, axiome Mondo : perturbation / dysfonctionnement / altération de structure)",
+     inverse_name: mondo_has_altered_state, inverse_label_en: "has altered state (REVA-made node, Mondo)", inverse_label_fr: "a pour état altéré (nœud créé par REVA, Mondo)"}
   - {pid: "mondo:equivalent_doid", value_kind: item, reva_predicate: mondo_equivalent_doid,
      label_en: "equivalent Disease Ontology class (Mondo xref annotated MONDO:equivalentTo)",
      label_fr: "classe équivalente de la Disease Ontology (xref Mondo annotée MONDO:equivalentTo)",
@@ -118,6 +135,13 @@ predicates:
   - {pid: "mondo:definition", value_kind: string, reva_predicate: mondo_definition,
      label_en: "definition (Mondo, verbatim)", label_fr: "définition (Mondo, verbatim, en anglais)"}
   # ------------------------------------------------------------------ ClinGen gene-disease validity
+  # FIX4A (audit AUDIT3 H2): Refuted / Disputed / No Known Disease Relationship are NOT associations: a separate
+  # predicate, deliberately unmapped in the families (never a relation hop), classification kept verbatim.
+  - {pid: "clingen:gene_disease_curation_negative", value_kind: item, reva_predicate: clingen_gene_disease_curation_negative,
+     label_en: "gene-disease curation refuted, disputed or with no known disease relationship (ClinGen; NOT an association)",
+     label_fr: "évaluation gène-maladie réfutée, contestée ou sans relation connue (ClinGen ; PAS une association)",
+     inverse_name: clingen_disease_gene_curation_negative, inverse_label_en: "gene whose relationship with this disease ClinGen refuted, disputed or found no known relationship",
+     inverse_label_fr: "gène dont ClinGen a réfuté, contesté ou n'a trouvé aucune relation connue avec cette maladie"}
   - {pid: "clingen:gene_disease_validity", value_kind: item, reva_predicate: clingen_gene_disease_validity, family: associated_with,
      label_en: "gene-disease validity curation (ClinGen; association with an evidence classification, not causation)",
      label_fr: "validité gène-maladie (ClinGen ; association avec classement de preuve, pas une causalité)",
