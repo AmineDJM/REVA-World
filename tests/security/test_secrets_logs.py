@@ -33,6 +33,8 @@ HARD_PATTERNS = {
     "openai_like_key": re.compile(r"\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{24,}\b"),
     "google_api_key": re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b"),
     "jwt": re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
+    # Mapbox access tokens (public pk. / secret sk.), e.g. embedded in a provider page's inline config
+    "mapbox_token": re.compile(r"\b[ps]k\.eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}"),
 }
 # Softer shapes: acceptable only as documented local-only examples.
 URL_CREDENTIALS = re.compile(r"[a-z][a-z0-9+.-]*://([^:@/\s'\"]+):([^@/\s'\"]+)@")
