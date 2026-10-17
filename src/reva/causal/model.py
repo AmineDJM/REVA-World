@@ -22,7 +22,7 @@ import json
 import re
 import time
 from collections import Counter
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
@@ -141,6 +141,9 @@ class ClaimLoadReport:
     #: retracted claims by reason detail (e.g. ``value_not_an_item``: the statement still exists, its value
     #: became somevalue/novalue), kept beside the stored retraction reason (audit L8)
     retraction_details: dict[str, int] = field(default_factory=dict)
+    #: retracted claims by stored reason (audit2 N1: ``reclassified_by_reva`` when the source row is still there,
+    #: ``removed_at_source`` only when it is verified absent, ``absent_from_delivery`` when not checked)
+    retraction_reasons: dict[str, int] = field(default_factory=dict)
     #: KG claims whose references / qualifiers were read verbatim from the raw JSON vs the KG copy (audit L4)
     refs_source_counts: dict[str, int] = field(default_factory=dict)
     rejected_counts: dict[str, int] = field(default_factory=dict)
@@ -173,6 +176,8 @@ class ClaimLoadReport:
         ]
         for r, n in other.retraction_details.items():
             self.retraction_details[r] = self.retraction_details.get(r, 0) + n
+        for r, n in other.retraction_reasons.items():
+            self.retraction_reasons[r] = self.retraction_reasons.get(r, 0) + n
         for r, n in other.refs_source_counts.items():
             self.refs_source_counts[r] = self.refs_source_counts.get(r, 0) + n
         self.load_ids += other.load_ids
@@ -289,7 +294,8 @@ def _latest(conn: Connection, origin: str, prefix: str) -> dict[str, dict[str, A
     out: dict[str, dict[str, Any]] = {}
     for r in conn.execute(
         text("""SELECT DISTINCT ON (c.claim_key) c.id, c.claim_key, c.content_sha256, c.retrieved_at,
-                       c.statement_key, (r.id IS NOT NULL) AS retracted
+                       c.statement_key, c.raw_sha256, c.source_revision, c.selector, c.load_id,
+                       (r.id IS NOT NULL) AS retracted
                   FROM kg.causal_claim c LEFT JOIN kg.causal_claim_retraction r ON r.claim_row_id = c.id
                  WHERE c.origin = :o AND starts_with(c.claim_key, :p)
                  ORDER BY c.claim_key, c.id DESC"""),
@@ -371,7 +377,9 @@ def _write(
                 continue
             if batch_retrieved_at is not None and lt["retrieved_at"] > batch_retrieved_at:
                 continue
-            gone.append((lt["id"], k, retract_reason(lt)))
+            reason, detail = retract_reason(lt)
+            rep.retraction_reasons[reason] = rep.retraction_reasons.get(reason, 0) + 1
+            gone.append((lt["id"], k, reason, detail))
     if not to_insert and not gone:
         return
     load_id = load()
@@ -380,8 +388,8 @@ def _write(
     for i in range(0, len(gone), INSERT_CHUNK):
         part = gone[i : i + INSERT_CHUNK]
         n = conn.execute(
-            text("""INSERT INTO kg.causal_claim_retraction(load_id, claim_row_id, claim_key, origin, reason)
-                    SELECT :load, (x->>0)::bigint, x->>1, :o, x->>2
+            text("""INSERT INTO kg.causal_claim_retraction(load_id, claim_row_id, claim_key, origin, reason, detail)
+                    SELECT :load, (x->>0)::bigint, x->>1, :o, x->>2, NULLIF(x->3, 'null'::jsonb)
                       FROM jsonb_array_elements(CAST(:rows AS jsonb)) x"""),
             {"load": load_id, "o": origin, "rows": _json([list(g) for g in part])},
         ).rowcount
@@ -701,13 +709,15 @@ def load_kg_claims(
                 _cur: set[str] = current_stmt,
                 _ni: set[str] = not_item,
                 _rep: ClaimLoadReport = rep,
-            ) -> str:
+            ) -> tuple[str, dict[str, Any]]:
                 if lt["statement_key"] in _ni:
                     _rep.retraction_details["value_not_an_item"] = (
                         _rep.retraction_details.get("value_not_an_item", 0) + 1
                     )
-                    return "no_longer_causal"
-                return "no_longer_causal" if lt["statement_key"] in _cur else "source_statement_retracted"
+                    return "no_longer_causal", {"basis": "value_not_an_item", "statement_key": lt["statement_key"]}
+                if lt["statement_key"] in _cur:
+                    return "no_longer_causal", {"basis": "statement_current_no_claim", "statement_key": lt["statement_key"]}
+                return "source_statement_retracted", {"basis": "statement_not_current", "statement_key": lt["statement_key"]}
 
             if sks is None:
                 prefixes = ["kg:"]
