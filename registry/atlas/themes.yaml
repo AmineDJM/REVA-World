@@ -28,6 +28,17 @@ themes:
   trade: {fr: "Commerce extérieur", en: "Trade"}
   finance: {fr: "Finances publiques et monnaie", en: "Public finance and money"}
   society: {fr: "Société et qualité de vie", en: "Society and quality of life"}
+  # V4 themes (owner V4CORE, docs/roadmap/v4_world_model.md section 5)
+  chemistry: {fr: "Chimie", en: "Chemistry"}
+  materials: {fr: "Matériaux et ressources", en: "Materials and resources"}
+  biology: {fr: "Biologie", en: "Biology"}
+  ecology: {fr: "Écologie et faune", en: "Ecology and wildlife"}
+  climate: {fr: "Météo et climat", en: "Weather and climate"}
+  health_body: {fr: "Corps humain et maladies", en: "Human body and diseases"}
+  industry: {fr: "Industrie", en: "Industry"}
+  companies: {fr: "Entreprises", en: "Companies"}
+  prices: {fr: "Prix", en: "Prices"}
+  behaviour: {fr: "Comportement et psychologie", en: "Behaviour and psychology"}
 
 # first match wins (before the domain defaults)
 rules:
