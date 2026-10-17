@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mockFetch } from '../../test/fetchMock';
-import { PID_LABEL_FR } from '../lib/paths';
+import { PID_INVERSE_LABEL_FR, PID_LABEL_FR } from '../lib/paths';
 import V3App from '../V3App';
 import { CausalClaim, getCausalChain, notFoundReasonFr } from './api';
 import { attributedTo, buildGraph, groupWhy, ticks } from './model';
@@ -68,6 +68,12 @@ describe('real claim JSON (dev DB, grading v2)', () => {
     expect(c.attribution?.nature.map((p) => p.id)).toEqual(['Q20820099']);
   });
 
+  it('a source’s own doubtful coding (scope.source_validity, e.g. NOAA validity) is read; none is loaded in the dev DB yet', () => {
+    const c = CausalClaim.parse({ ...OUT, scope: { source_validity: [{ field: 'validity', code: '1', label: 'very doubtful tsunami', certainty: 'doubtful' }] } });
+    expect(c.attribution?.doubtful).toEqual([{ field: 'validity', code: '1', label: 'very doubtful tsunami' }]);
+    expect(CausalClaim.parse(OUT).attribution).toBeNull();
+  });
+
   it('an effect dated by its inception is compared by its existence span, undetermined, with the reason in French', () => {
     const c = CausalClaim.parse(INC);
     expect(c.temporal.status).toBe('undetermined');
@@ -119,6 +125,8 @@ describe('real claim JSON (dev DB, grading v2)', () => {
     expect(PID_LABEL_FR.P1536).toBe('cause immédiate de');
     expect(PID_LABEL_FR.P1537).toBe('facteur contributif de');
     expect(PID_LABEL_FR.P1479).toBe('a pour facteur contributif');
+    // a P1542 statement "WWI has effect Austria-Hungary" traversed backwards reads "Austria-Hungary is an effect of WWI"
+    expect(PID_INVERSE_LABEL_FR.P1542).toBe('est un effet de');
   });
 });
 

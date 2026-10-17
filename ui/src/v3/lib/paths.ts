@@ -80,6 +80,16 @@ export const PID_LABEL_FR: Record<string, string> = {
   P1537: 'facteur contributif de',
 };
 
+/** The same causal properties read from their object back to their subject (a path traversed backwards). */
+export const PID_INVERSE_LABEL_FR: Record<string, string> = {
+  P828: 'est une cause de',
+  P1542: 'est un effet de',
+  P1478: 'est la cause immédiate de',
+  P1479: 'est un facteur contributif de',
+  P1536: 'a pour cause immédiate',
+  P1537: 'a pour facteur contributif',
+};
+
 export function connectedSentence(relation: string): string {
   return `relié via « ${relation} »`;
 }
@@ -100,7 +110,7 @@ export function fromLinks(d: LinksPathData): PathsView {
         // backward hops, e.g. "ancienne puissance coloniale de"); the type tables are fallbacks.
         const typeLabel = h.kind === 'link' ? LINK_TYPE_LABEL[h.type] : PID_LABEL_FR[h.type];
         const relation =
-          relationFromText(h.text.fr) ?? (typeLabel ? (h.forward ? typeLabel : `${typeLabel} (sens inverse)`) : null) ?? relationFromText(h.text.en) ?? h.type;
+          relationFromText(h.text.fr) ?? (typeLabel ? (h.forward ? typeLabel : h.kind !== 'link' && PID_INVERSE_LABEL_FR[h.type] ? PID_INVERSE_LABEL_FR[h.type]! : `${typeLabel} (sens inverse)`) : null) ?? relationFromText(h.text.en) ?? h.type;
         const citations = h.evidence.map(citeLinkEvidence);
         const stmtEvidence = h.evidence.find((e) => e.kind === 'kg_statement');
         const isCausal = h.causal === true && h.kind === 'statement' && !!stmtEvidence;
