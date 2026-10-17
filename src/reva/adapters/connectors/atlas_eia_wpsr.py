@@ -36,7 +36,7 @@ from reva.adapters.connectors import hf_daily_common as hc
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.eia_wpsr"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_eia_wpsr/1"
 SOURCE_KEY = "eia.dnav"
 ATLAS_SOURCE = "eia"
