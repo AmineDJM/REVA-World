@@ -44,10 +44,10 @@ naturalearth.admin1_10m 2) and the digest re-pinned in `src/reva/autonomy/policy
 
 | table | content | rows (live) |
 |---|---|---|
-| `cckp_ts.cru_monthly` / `cru_annual` | CRU TS 4.09 `tas` (°C), `pr` (mm/month, mm/year), 246 CCKP geographies | CCKP_ROWS |
-| `cckp_ts.era5_monthly` / `era5_annual` | ERA5 `tas`, `pr` | |
-| `cckp_ts.cmip6_annual` | `tas|scenario=<ssp>|stat=<median|p10|p90>` 2015-2100, `scenario=historical` 1950-2014 | |
-| `cckp_ts.cmip6_monthly_clim` | `…|clim=2040-2059|month=07` (period = the 20 years) | |
+| `cckp_ts.cru_monthly` / `cru_annual` | CRU TS 4.09 `tas` (°C), `pr` (mm/month, mm/year), 246 CCKP geographies (BLM, BVT null on the 0.5° grid) | 726,144 / 60,512 |
+| `cckp_ts.era5_monthly` / `era5_annual` | ERA5 `tas`, `pr` | 442,800 / 36,900 |
+| `cckp_ts.cmip6_annual` | `tas|scenario=<ssp>|stat=<median|p10|p90>` 2015-2100, `scenario=historical` 1950-2014 | 603,684 |
+| `cckp_ts.cmip6_monthly_clim` | `…|clim=2040-2059|month=07` (period = the 20 years) | 100,368 |
 | `climind.noaa_gml` | `co2_mlo|average|deseasonalized`, `co2_gl|average|trend`, `ch4_gl|…`, `n2o_gl|…` (ppm/ppb) | 4,432 |
 | `climind.gistemp` | `land_ocean_anomaly` monthly 1880-2026 + `|annual=J-D` | 1,907 |
 | `climind.hadcrut5` | `anomaly` monthly 1850-2026-08, 95 % limits in flags | 2,120 |
