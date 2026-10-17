@@ -15,9 +15,9 @@ requests:
     reason: "one run = 3 requests"
   - source_key: who.eeml
     # list.essentialmeds.org: list page (1.3 MB) + ~650 medicine pages (13 kB) + ~1,130 recommendation pages (12 kB). CC BY 3.0 IGO.
-    daily_requests: 2000
-    expected_bytes_per_day: 30000000
-    reason: "one full run ~1,790 requests (~23 MB) at 1 request/s"
+    daily_requests: 4000
+    expected_bytes_per_day: 50000000
+    reason: "one full run ~1,790 requests (~23 MB) at 1 request/s; 4,000/day allows a re-run after a failed run (2026-10-17: run 1 stopped at medicine 403, an equivalent-only page)"
   - source_key: openfda.api
     # api.fda.gov count aggregations: ~23 country-year + ~15 recall-year + 3 top lists + <= 600 substances (<= 10 kB each). CC0.
     daily_requests: 900

@@ -48,8 +48,8 @@ from reva.adapters.connectors import drugs_common as dc
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.who_eml"
-VERSION = "1.0.0"
-PARSER_VERSION = "atlas_drugs_eml/1"
+VERSION = "1.0.1"
+PARSER_VERSION = "atlas_drugs_eml/2"
 SOURCE_KEY = "who.eeml"
 DATASET = "eml"
 HOST = "list.essentialmeds.org"
@@ -205,7 +205,10 @@ def parse_medicine(body: bytes, mid: str) -> Medicine:
                 cur = None
     recs_box = root.find("div", "recommendations")
     if recs_box is None:
-        raise dc.err(f"eEML medicine {mid}: no recommendations block")
+        # a medicine listed only as a therapeutic equivalent of another one has no recommendation of its own
+        if not med.equivalent_for:
+            raise dc.err(f"eEML medicine {mid}: no recommendations block and no therapeutic equivalence")
+        return med
     for a in recs_box.find_all("a", "indication-name"):
         m = REC_LINK_RE.match(a.attrs.get("href", ""))
         if m and m.group(1) not in med.recommendations:

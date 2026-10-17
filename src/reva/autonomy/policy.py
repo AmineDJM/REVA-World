@@ -126,9 +126,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   accessnow.stop 8/day, cfr.cyber_operations 6/day); same caps.
 # * budgets.yaml -> budgets-1.3.38 (2026-10-17, merge run and pinned by V6TRADEHF; 1.3.37 was an intermediate
 #   write of the same merge): 1.3.36 plus v6tradehf.yaml (new eurostat.comext 300/day; imf.sdmx 80 -> 98); same caps.
+# * budgets.yaml -> budgets-1.3.39 (2026-10-17, merge run and pinned by V6DRUGS): 1.3.38 plus v6drugs.yaml update
+#   (who.eeml 2000 -> 4000/day: a re-run after a failed run must fit the same day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "fc8aa2ac75c6b152c932a9099a79f271e1339ac3773c0da5d7c409c3ec49269e",
+    "budgets.yaml": "10acd8d384af0139cce233c009858da69349f2150ca44165e5fe3ae8ebeb1a5c",
 }
 
 
