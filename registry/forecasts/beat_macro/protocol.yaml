@@ -42,7 +42,7 @@ origins:
   prospective: origins from 2026 onward (registry, sealed) - targets 2026 resolve with the October 2027 WEO.
 
 inputs:
-  vintages: [IMF WEO (DBnomics copies + IMF portal), ECB SPF, OECD MEI real-time editions] - VintageAccessor + LeakageGuard
+  vintages: "IMF WEO (DBnomics copies + IMF portal), ECB SPF, OECD MEI real-time editions - VintageAccessor + LeakageGuard"
   lagged_final_vintage: >-
     IMF CPI database headline index (month m usable from the 1st of m + max(3, gap+2), gap = months between the
     table's recording month and the country's last published month; gap > 12 excluded); Eurostat HICP index
