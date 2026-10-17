@@ -127,7 +127,40 @@ Details and documented differences:
 
 ## 4. New REVA estimates (local projections, h = 0..5, annual, 200 permutation draws, seed 20261017)
 
-RESULTS_TABLE_PLACEHOLDER
+| Treatment → outcome (LHS) | Sample | IRF h = 0..5 | SE | h = 5 [95 % CI] | Placebo leads (SE); pre-trend | perm. p < 0.05 at h | Run id |
+|---|---|---|---|---|---|---|---|
+| `banking_crisis_lv` → `concept:wb.ny.gdp.mktp.kd.zg` (cumsum) | 151 onsets; h5 sample: 144 events, 212 countries, 8527 obs; years 1961-2025 | -1.86 / -4.69 / -5.65 / -6.51 / -6.82 / -7.47 | 0.44 / 0.88 / 1.25 / 1.53 / 1.78 / 1.94 | -7.47 [-11.30, -3.64] | h-3: +3.32 (1.07); h-2: +1.99 (0.71); F-test p = 0.02 | 0,1,2,3,4,5 | `es-ba6863761c52640f8fa5` |
+| `banking_crisis_lv` → `concept:wb.sl.uem.totl.zs` (diff) | 151 onsets; h5 sample: 77 events, 187 countries, 4487 obs; years 1991-2025 | +0.60 / +1.78 / +2.01 / +2.13 / +2.50 / +2.81 | 0.17 / 0.37 / 0.41 / 0.46 / 0.55 / 0.61 | +2.81 [+1.62, +4.00] | h-3: -0.63 (0.36); h-2: -0.03 (0.14); F-test p = 0.61 | 0,1,2,3,4,5 | `es-291a40103934bbb2b7a8` |
+| `coup_archigos_military` → `concept:wb.ny.gdp.mktp.kd.zg` (cumsum) | 271 onsets; h5 sample: 140 events, 211 countries, 8899 obs; years 1961-2025 | -2.41 / -3.35 / -4.06 / -4.59 / -4.47 / -3.92 | 0.53 / 0.71 / 0.93 / 1.12 / 1.24 / 1.33 | -3.92 [-6.55, -1.29] | h-3: +0.64 (0.74); h-2: +0.82 (0.53); F-test p = 0.21 | 0,1,2,3,4 | `es-9af1a4b329e01ee5e382` |
+| `earthquake_ncei_m7` → `concept:wb.ny.gdp.mktp.kd.zg` (cumsum) | 1190 onsets; h5 sample: 344 events, 212 countries, 9903 obs; years 1961-2025 | -0.36 / -1.08 / -1.85 / -2.04 / -1.85 / -1.73 | 0.27 / 0.52 / 0.73 / 0.83 / 0.85 / 0.87 | -1.73 [-3.44, -0.03] | h-3: +1.00 (0.55); h-2: +0.56 (0.30); F-test p = 0.21 | 1,2,3,4 | `es-76c2041e480734d2686a` |
+| `earthquake_ncei_1000_deaths` → `concept:wb.ny.gdp.mktp.kd.zg` (cumsum) | 143 onsets; h5 sample: 52 events, 212 countries, 9903 obs; years 1961-2025 | -0.70 / -0.34 / -1.61 / -2.38 / -1.15 / -0.99 | 0.44 / 0.81 / 1.08 / 1.28 / 1.80 / 1.90 | -0.99 [-4.74, +2.76] | h-3: +2.37 (1.46); h-2: +1.01 (1.12); F-test p = 0.11 | none | `es-c3a9b13419c5b3a1f0ec` |
+| `sanctions_ties_imposed` → `concept:wb.ny.gdp.pcap.kd.zg` (cumsum) | 770 onsets; h5 sample: 436 events, 205 countries, 6849 obs; years 1961-2025 | +0.17 / -0.21 / +0.23 / +0.20 / +0.25 / +0.27 | 0.36 / 0.39 / 0.50 / 0.59 / 0.65 / 0.73 | +0.27 [-1.18, +1.72] | h-3: +0.02 (0.50); h-2: -0.21 (0.25); F-test p = 0.66 | none | `es-1b3eff04653ec3971c9c` |
+
+Units: `cumsum` = cumulative GDP growth from t to t+h in % (≈ % change of the GDP level relative to country-years
+without an onset); `diff` = change of the unemployment rate from t−1 to t+h in percentage points. Placebo leads:
+Y(t+h) − Y(t−1), a positive value = higher level before the baseline year. All runs: snapshot `717e8452…`,
+lags 2, leads 3, future-onset controls, country + year FE, SE clustered by country, replication gate open (3/3).
+
+Reading (associations, not established effects):
+
+* **Coups → GDP** (Archigos military removals): GDP about 2.4 % lower in the coup year and 3.9 % lower after five
+  years than in comparable country-years (95 % CI −6.6 to −1.3); no significant pre-trend (p = 0.21), permutation
+  p < 0.05 at h = 0..4. Successful military removals only; the onset year mixes pre-coup crisis and coup.
+* **Banking crises → unemployment** (LV starts 1991-2017 where ILO modelled estimates exist): +0.6 pp in the start
+  year, +2.8 pp after five years (CI +1.6 to +4.0); pre-trend p = 0.61. ILO modelled estimates are themselves
+  model-based for many countries.
+* **Banking crises → GDP**: −7.5 % at five years (CI −11.3 to −3.6), but the **pre-trend test fails** (p = 0.02;
+  placebo leads +3.3 and +2.0: output was already falling before the coded start year). Flagged; **not written** to
+  the effect layer (rule in §5). Its size is close to the output losses usually cited for banking crises, which is
+  not evidence of identification.
+* **Earthquakes M ≥ 7 → GDP**: −1.7 % at five years (CI −3.4 to −0.03), significant at h = 1..4 by permutation;
+  lead h = −3 +1.0 (SE 0.55) is not significant but positive. 1,190 onsets include many offshore or low-damage
+  events attributed to the country NCEI names.
+* **Earthquakes with ≥ 1,000 deaths → GDP**: no horizon significant (−1.0 %, CI −4.7 to +2.8; 52 events at h = 5).
+  Selecting on deaths selects on damage (see caveat), and the sample is small.
+* **TIES sanction impositions (any sender) → GDP per capita**: no detectable association (+0.3 %, CI −1.2 to +1.7).
+  This is not a replication of Neuenkirch & Neumeier (2015) or Gutmann et al. (2021) (other database, all senders,
+  no threat reference group); it does not contradict them either.
 
 ## 5. Effect-estimate layer
 
@@ -135,7 +168,28 @@ ESTIMATES_PLACEHOLDER
 
 ## 6. What is missing / owner decisions
 
-OWNER_PLACEHOLDER
+* **Rights.** Laeven-Valencia (IMF terms, "not an open licence", flagged by A-ECRISES) and JST (CC BY-NC-SA,
+  non-commercial) feed runs and replications; run documents and effect estimates carry `restricted` /
+  `non_commercial` flags. Maintainer review of the LV terms is still pending (owner decision).
+* **Publication PDFs** (JST NBER WP, BIS WP 226) are archived as restricted `raw` artifacts for provenance only
+  (EconStor/NBER/BIS terms: personal and scholarly use); they are not in the repository. Owner: confirm this use.
+* **PRED-EFFECT curation of the reproduced publications.** The published numbers REVA reproduced live in
+  `registry/estimation/replications.yaml` (replication targets, not effect estimates). If PRED-EFFECT curates them as
+  `pub:` entries, the next runs can list them in `run.replicates` (empty today).
+* **Quarterly panels.** The engine handles calendar-quarter provider series, but the pinned snapshot holds only BIS
+  property prices and debt-service ratios at quarterly frequency; the quarterly macro series of V4ECON were not in
+  snapshot `717e8452…`. No quarterly estimate was produced.
+* **Real-time (vintage) runs.** The PRED-VINTAGE adapter is wired (`vintage:<family>.<variable>` + `--as-of`) and
+  unit-tested with a stub accessor; no live vintage run was made (vintage tables were landing during this work).
+  Every estimate written here is `final_vintage_pseudo_real_time`.
+* **Not reproduced / out of reach with loaded data:** Cerra-Saxena (2008 AER) IRFs (numbers not in an open
+  text), sanctions papers based on the Global Sanctions Database, disaster papers based on EM-DAT / GeoMet. Owner:
+  EM-DAT needs an account (non-commercial licence) — not worked around.
+* **LV output losses reproduced marginally** (Spearman 0.756 vs threshold 0.75): treat that PASS as weak; a
+  maintainer may decide to declare the mean-trend-growth reading as a new target (a new id, with this outcome kept).
+* **Identification.** None of these designs has an instrument or a natural experiment; they are selection-on-
+  observables event studies. PRED-ENGINE must treat them as associations with their pre-trend diagnostics, and
+  prefer published quasi-experimental estimates when available.
 
 ## 7. Commands
 

@@ -347,7 +347,8 @@ families:
     dataset_key: atlas.eia_steo.steo_observed
     indicator: STEO.BREPUUS.M
     owner_agent: V4ENERGY
-    geos: [{provider_geo: not_stated, key: WORLD, label_fr: "Monde (référence Brent)", label_en: "World (Brent benchmark)"}]
+    # EIA's STEO `geography` for BREPUUS is "USA" (verbatim); the Brent benchmark itself is not a U.S. value.
+    geos: [{provider_geo: USA, key: BRENT-STEO, label_fr: "Brent (série STEO de l'EIA)", label_en: "Brent (EIA STEO series)"}]
     frequency: M
     value_rule: cell
     unit: "dollars per barrel"
