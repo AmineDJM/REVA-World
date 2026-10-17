@@ -138,8 +138,25 @@ benchmark professionals use and the one REVA would most likely lose to — are n
 
 ### 5.3 Pooled (informational, never used to admit a model)
 
-Scale-free panel DM tests per pool (FX month-end, FX monthly-mean, yields, spread, oil, meetings up/down) are in
-`pooled_informational` of the manifest: see §9 for the recorded run.
+Scale-free panel DM tests (loss differential scaled by the reference's mean loss per family, averaged per origin;
+`pooled_informational` in the manifest). They are *not* part of the pre-declared winner rule:
+
+| Pool (families) | Model | h | scaled CRPS/Brier diff. | one-sided p (better) |
+|---|---|---|---|---|
+| FX month end (5) | GARCH | 1 / 3 / 12 | −0.010 / −0.002 / −0.007 | 0.010 / 0.35 / 0.20 |
+| FX month end (5) | forward proxy | 1 / 3 / 12 | +0.006 / +0.016 / +0.044 | worse (p_worse 0.003 / 0.009 / 0.021) |
+| FX month end (5) | PPP | 1 / 3 / 12 | +0.015 / +0.040 / +0.092 | worse (p_worse 0.0003 / 0.003 / 0.08) |
+| FX monthly mean (3) | forward proxy | 1-12 | +0.008 … +0.086 | worse (p_worse ≤ 0.0024) |
+| Brent | GARCH | 1 / 3 | −0.017 / −0.021 | 0.013 / 0.035 |
+| Meetings, hikes (3) | Taylor logit | — | −0.285 | 0.0025 |
+| Meetings, hikes (3) | momentum | — | −0.134 | 0.025 |
+| Meetings, cuts (3) | momentum / Taylor | — | −0.082 / −0.050 | 0.013 / 0.13 |
+
+Reading: across currencies the carry/UIP forward is *worse* than the random walk (the forward-premium puzzle: high-rate
+currencies do not depreciate as UIP says), PPP reversion is worse at 1-12 months, and the only consistent gains are in
+the spread (GARCH) and in policy-cycle persistence. The pooled Taylor-logit result for hikes (−28 % Brier,
+p = 0.0025) is the most promising lead; it is not admitted because the pre-declared rule is per family cell and
+against every benchmark — it should be re-tested prospectively (sealed questions resolve from 2026-11).
 
 ## 6. What REVA issues (sealed)
 
