@@ -11,6 +11,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from reva.evaluation.energy_backtests import ALPHA, LABEL, load_and_run
+from reva.models.forecasting.energy_models import NOT_ISSUABLE
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -44,12 +45,28 @@ def write_winners(res: Mapping[str, Any], path: str) -> None:
         "backtest_label": LABEL,
         "backtest_digest": res["digest"],
         "rule": (
-            f"REVA candidate whose CRPS beats the random walk (DM-HLN one-sided p, Holm-Bonferroni over every "
-            f"(candidate, horizon) of the variable, alpha {ALPHA}) on the STEO archive vintage backtest"
+            f"REVA candidate whose CRPS beats the random walk (DM-HLN one-sided p, ONE Holm-Bonferroni family over "
+            f"every (variable, issuable candidate, horizon) test of the run, alpha {ALPHA}) on the STEO archive "
+            f"vintage backtest; EIA-derived candidates excluded from issuance: {sorted(NOT_ISSUABLE)} (FIX7)"
         ),
+        "selection_note": "in-sample selection (no holdout): admission to the registry, not evidence of skill; "
+        "skill is measured only on resolved prospective questions",
         "origins": [o["vintage"] for o in res["origins"]],
         "winners": [
-            {k: w[k] for k in ("code", "h", "model", "model_key", "p_challenger_better", "holm_family_size")}
+            {
+                k: w.get(k)
+                for k in (
+                    "code",
+                    "h",
+                    "model",
+                    "model_key",
+                    "p_challenger_better",
+                    "holm_family_size",
+                    "crps_ratio_vs_rw",
+                    "coverage_80",
+                    "ae_vs_steo_mean_diff",
+                )
+            }
             for w in res["winners"]
         ],
     }

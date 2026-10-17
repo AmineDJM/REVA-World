@@ -95,7 +95,7 @@ class FamiliesDbAdapter:
         groups: list[FamilyGroup] = []
         identities: list[FamilyNeighbour] = []
         for g in res["families"]:
-            ns = []
+            ns: list[FamilyNeighbour] = []
             for n in g["neighbours"]:
                 fn = FamilyNeighbour(
                     family=g["family"],
@@ -110,7 +110,11 @@ class FamiliesDbAdapter:
                 )
                 (identities if fn.identity else ns).append(fn)
             if ns:
-                groups.append(FamilyGroup(g["family"], dict(g["label"]), int(g["count"]), tuple(ns), bool(g.get("count_is_lower_bound"))))
+                groups.append(
+                    FamilyGroup(
+                        g["family"], dict(g["label"]), int(g["count"]), tuple(ns), bool(g.get("count_is_lower_bound"))
+                    )
+                )
         lits = tuple((statement_from_kg(s, labels), s.get("rights")) for s in res.get("literals") or [])
         return FamilyView(
             qid=qid,
@@ -135,7 +139,7 @@ class FamiliesDbAdapter:
                 if fams
                 else {(p, d) for p in reg.mappings for d in ("out", "in")}
             )
-            pairs = {(p, d) for p, d in pairs if (reg.edge_family(p, d) or None) and reg.edge_family(p, d).family != "same_as"}  # type: ignore[union-attr]
+            pairs = {(p, d) for p, d in pairs if getattr(reg.edge_family(p, d), "family", "same_as") != "same_as"}
             return sorted({p for p, d in pairs if d == "out"}), sorted({p for p, d in pairs if d == "in"})
 
         a_out, a_in = sides(a_families)
@@ -153,13 +157,17 @@ class FamiliesDbAdapter:
         try:
             with _conn(self.engine, "families") as conn:
                 conn.exec_driver_sql("SET LOCAL jit = off")
-                rows = conn.execute(
-                    text(f"""WITH a AS ({side.format(n="a", o=osql)}), b AS ({side.format(n="b", o=osql)}),
+                rows = (
+                    conn.execute(
+                        text(f"""WITH a AS ({side.format(n="a", o=osql)}), b AS ({side.format(n="b", o=osql)}),
                               j AS (SELECT a.x, min(a.sid) AS a_id, min(b.sid) AS b_id FROM a JOIN b ON a.x = b.x
                                      WHERE a.x NOT IN (:a, :b) GROUP BY a.x)
                              SELECT j.*, count(*) OVER () AS total FROM j ORDER BY j.x LIMIT :lim"""),
-                    params,
-                ).mappings().all()
+                        params,
+                    )
+                    .mappings()
+                    .all()
+                )
                 if not rows:
                     return CrossResult(rows=(), total=0)
                 ids = [r["a_id"] for r in rows] + [r["b_id"] for r in rows]
@@ -251,10 +259,18 @@ class EffectsDbAdapter:
         eq = self._eq()
         seen: dict[str, Mapping[str, Any]] = {}
         with _conn(self.engine, "effects") as conn:
-            for c in list(cause_ids) or [None]:
-                for e in list(effect_ids) or [None]:
+            causes: list[str | None] = list(cause_ids) or [None]
+            effects: list[str | None] = list(effect_ids) or [None]
+            for c in causes:
+                for e in effects:
                     for r in eq.list_estimates(
-                        conn, cause=c, effect=e, country=country, origin=self.origin, limit=limit, include_variables=False
+                        conn,
+                        cause=c,
+                        effect=e,
+                        country=country,
+                        origin=self.origin,
+                        limit=limit,
+                        include_variables=False,
                     ):
                         seen.setdefault(str(r["estimate_key"]), r)
                     if len(seen) >= limit:
@@ -290,7 +306,9 @@ class ForecastRegistryAdapter:
         except (RevaError, OSError) as e:
             if isinstance(e, CapabilityUnavailable):
                 raise
-            raise CapabilityUnavailable(f"forecast registry read failed: {type(e).__name__}", backend="forecasts") from None
+            raise CapabilityUnavailable(
+                f"forecast registry read failed: {type(e).__name__}", backend="forecasts"
+            ) from None
         return list(rows)
 
     def question(self, question_id: str) -> Mapping[str, Any] | None:
@@ -334,7 +352,7 @@ class DecisionEngineAdapter:
         d = Decision.model_validate(dict(decision))
         with _conn(self.engine, "decisions") as conn:
             conn.execute(text("SET TRANSACTION READ ONLY"))
-            return run_on_connection(conn, self._store(), d, draws=draws, seed=seed, origin=self.origin)  # type: ignore[no-any-return]
+            return run_on_connection(conn, self._store(), d, draws=draws, seed=seed, origin=self.origin)  # type: ignore[no-any-return,unused-ignore]
 
 
 def wire_domains(b: Any, engine: Engine, settings: Any, store: Any) -> None:

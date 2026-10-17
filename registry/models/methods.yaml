@@ -824,6 +824,9 @@ models:
     kind: forecast
     approval_status: candidate
     description: >-
+      CALIBRATED INTERVAL AROUND THE IMF WEO POINT - not a better point forecast (holdout AE ratio vs WEO 0.999; its
+      holdout win was against a weak benchmark, N(WEO point, persistence spread); on probation until it beats the fair
+      error-fan benchmark forecast.weo_error_fan prospectively - FIX7, QA-PRED X1).
       WEO + median past normalised WEO error known at the origin; centred conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
       outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
     input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
@@ -835,12 +838,28 @@ models:
     kind: forecast
     approval_status: candidate
     description: >-
+      CALIBRATED INTERVAL AROUND THE IMF WEO POINT - not a better point forecast (the point is the IMF's; its holdout
+      win was against a weak benchmark, N(WEO point, persistence spread); on probation until it beats the fair
+      error-fan benchmark forecast.weo_error_fan prospectively - FIX7, QA-PRED X1).
       WEO projection + scaled past out-of-sample WEO errors known at the origin (calibrated density around the IMF point). Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
       outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
     input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
     output_ports: [{name: point_forecast}, {name: predictive_empirical}]
     applicability: {min_past_errors: 15}
     assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.weo_error_fan
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      BENCHMARK (FIX7, QA-PRED X1): N(IMF WEO point, RMS of the country's own past WEO errors at the same horizon whose
+      outcome was published at the origin) - the standard error-based fan, the fair benchmark for densities wrapped
+      around the WEO point. Issued next to the registered WEO densities (src/reva/evaluation/pred_models/issue.py,
+      fair_benchmark.py); not a REVA forecast.
+    input_ports: [{name: official_point, kind: point}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {min_past_errors: 8}
+    assumptions: [Gaussian errors; the country's past WEO errors representative of the next one]
   - model_key: forecast.direct_ar_conformal
     version: "1.0.0"
     kind: forecast
@@ -857,6 +876,9 @@ models:
     kind: forecast
     approval_status: candidate
     description: >-
+      CALIBRATED INTERVAL AROUND THE SPF MEDIAN - not a better point forecast (the point is the SPF's; its holdout win
+      was against a weak benchmark, N(SPF point, persistence spread); does not beat the fair error-fan benchmark on
+      development (CRPS ratio 1.02) - FIX7, QA-PRED X1; issues nothing: no registry family).
       SPF median + scaled past SPF errors known at the release (calibrated density around the SPF point). Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
       outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
     input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]

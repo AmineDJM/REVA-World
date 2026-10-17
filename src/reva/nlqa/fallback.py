@@ -374,7 +374,6 @@ def countries_in(question: str, catalog: QaCatalog) -> list[str]:
 
 
 def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> dict[str, Any]:
-    q = fold(question)
     lang = detect_language(question)
     years = [int(y) for y in _YEAR.findall(question)]
     ops: list[dict[str, Any]] = []

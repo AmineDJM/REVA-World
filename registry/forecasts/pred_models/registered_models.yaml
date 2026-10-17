@@ -1,5 +1,7 @@
 # Forecasters that beat their benchmark with significance on the locked holdout (agent PRED-MODELS).
 # Each entry is a scope (task, variable, horizon) - the model is registered for that scope only.
+# FIX7 (QA-PRED X1, 2026-10-17): fields from `label_en` down are APPENDED annotations; the holdout results above them
+# are unchanged. These are calibrated intervals around the IMF/SPF point, never "REVA beats the IMF/SPF".
 schema: reva-pred-models-registered/1
 protocol_sha256: 3116db108443245ed29b3266b60d249f50cb35ae6de92269b550c91e792df89c
 holdout_json_sha256: f73d8afa628c0ddc83d0da12737c186d310c476bfcc7082483306b5d7ce0999e
@@ -13,6 +15,13 @@ registered:
   holdout_p_better: 0.00052982
   holdout_relative: 0.765334
   holdout_coverage80: 0.745404
+  label_en: "Calibrated interval around the IMF WEO point - not a better point forecast"
+  claim: calibrated_interval_around_official_point
+  not_a_better_point_forecast: true
+  holdout_benchmark_was_weak: "won against benchmark.imf_weo_gauss = N(official point, sigma of REVA's persistence predictive), whose 80 % interval covers 93-100 % of outcomes at 12 of 14 holdout origins - a strawman spread (QA-PRED X1); the win shows a better-calibrated band around the official number, not a better forecast than the IMF WEO"
+  fair_benchmark: "benchmark.imf_weo_errfan (backtests) / forecast.weo_error_fan (registry): N(WEO point, RMS of the country's own past WEO errors known at the origin)"
+  development_vs_fair_benchmark: {crps_ratio: 0.985, p_better: 0.033, holm_rejected: false, n_origins: 13, purged_overlap: {crps_ratio: 0.988, p_better: 0.095}}
+  issuance: {status: probation, rule: "keeps issuing only if it beats forecast.weo_error_fan on the next prospective evaluation (CRPS, one-sided country-clustered DM p < 0.05, >= 30 resolved common questions; issue.fair_gate); decisions appended to issuance_decisions.yaml"}
 - task: weo
   variable: real_gdp_growth
   horizon: h0
@@ -22,6 +31,13 @@ registered:
   holdout_p_better: 0.000385357
   holdout_relative: 0.763467
   holdout_coverage80: 0.745803
+  label_en: "Calibrated interval around the IMF WEO point - not a better point forecast (holdout AE ratio vs WEO 0.999)"
+  claim: calibrated_interval_around_official_point
+  not_a_better_point_forecast: true
+  holdout_benchmark_was_weak: "won against benchmark.imf_weo_gauss = N(official point, sigma of REVA's persistence predictive), whose 80 % interval covers 93-100 % of outcomes at 12 of 14 holdout origins - a strawman spread (QA-PRED X1); the win shows a better-calibrated band around the official number, not a better forecast than the IMF WEO"
+  fair_benchmark: "benchmark.imf_weo_errfan (backtests) / forecast.weo_error_fan (registry): N(WEO point, RMS of the country's own past WEO errors known at the origin)"
+  development_vs_fair_benchmark: {crps_ratio: 0.992, p_better: 0.18, holm_rejected: false, n_origins: 13, purged_overlap: {crps_ratio: 0.996, p_better: 0.33}}
+  issuance: {status: probation, rule: "keeps issuing only if it beats forecast.weo_error_fan on the next prospective evaluation (CRPS, one-sided country-clustered DM p < 0.05, >= 30 resolved common questions; issue.fair_gate); decisions appended to issuance_decisions.yaml"}
 - task: us
   variable: real_gdp_growth
   horizon: spf2
@@ -31,3 +47,10 @@ registered:
   holdout_p_better: 1.82139e-05
   holdout_relative: 0.914068
   holdout_coverage80: 0.888889
+  label_en: "Calibrated interval around the SPF median - not a better point forecast"
+  claim: calibrated_interval_around_official_point
+  not_a_better_point_forecast: true
+  holdout_benchmark_was_weak: "won against benchmark.spf_gauss = N(official point, sigma of REVA's persistence predictive), whose 80 % interval covers 96 % of holdout outcomes - a strawman spread (QA-PRED X1); the win shows a better-calibrated band around the official number, not a better forecast than the SPF median"
+  fair_benchmark: "benchmark.spf_errfan: N(SPF median, RMS of the SPF's own past errors known at the release)"
+  development_vs_fair_benchmark: {crps_ratio: 1.018, p_better: 0.70, holm_rejected: false, n_origins: 74, purged_overlap: {crps_ratio: 1.015, p_better: 0.67}}
+  issuance: {status: not_issuing, rule: "no registry family (awaiting_family); before any issuance it must beat benchmark.spf_errfan on a prospective evaluation - it does not on development"}

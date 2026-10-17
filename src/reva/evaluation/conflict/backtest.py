@@ -11,7 +11,7 @@ of the point and squared error of ``ln(1 + point)`` vs ``ln(1 + y)`` (MSLE, VIEW
 
 Decision rule (declared before running): the candidate becomes a *registry forecaster* for a (family, horizon)
 only if its mean primary loss (Brier for binary, CRPS for quantity) is lower than **every** baseline's and every
-one-sided DM test candidate-vs-baseline (cluster-robust by country) has a Holm-adjusted p-value < 0.05, the Holm
+one-sided DM test candidate-vs-baseline (two-way cluster-robust by country and year, FIX7) has a Holm-adjusted p-value < 0.05, the Holm
 family being all candidate-vs-baseline primary tests of the back-test.
 
 VIEWS: the December run of year ``Y`` (last input data December ``Y``) gives the h = 1 and h = 2 annual sums for
@@ -177,15 +177,19 @@ def run_backtest(
     return evaluate(scored, abstained, views_scored, views_missing, views_used, families, horizons, last)
 
 
-def _pair(a: Sequence[Mapping[str, Any]], b: Sequence[Mapping[str, Any]], metric: str) -> tuple[list[float], list[str]]:
+def _pair(
+    a: Sequence[Mapping[str, Any]], b: Sequence[Mapping[str, Any]], metric: str
+) -> tuple[list[float], list[str], list[Any]]:
+    """Paired differentials with their country and origin-year clusters (two-way DM, FIX7)."""
     ib = {(r["geo"], r["origin"]): r for r in b}
-    d, cl = [], []
+    d, cl, yr = [], [], []
     for r in a:
         o = ib.get((r["geo"], r["origin"]))
         if o is not None:
             d.append(r[metric] - o[metric])
             cl.append(r["geo"])
-    return d, cl
+            yr.append(r["origin"])
+    return d, cl, yr
 
 
 def evaluate(
@@ -212,7 +216,7 @@ def evaluate(
             pers = scored.get((fam.key, h, "forecast.conflict_persistence"), [])
             for r in results:
                 rows = scored.get((fam.key, h, r["model"]), [])
-                d, _ = _pair(rows, pers, prim)
+                d, _, _ = _pair(rows, pers, prim)
                 if d:
                     common = {(x["geo"], x["origin"]) for x in rows}
                     pbase = [x for x in pers if (x["geo"], x["origin"]) in common]
@@ -220,7 +224,7 @@ def evaluate(
                     r[f"{prim}_vs_persistence"] = (bm + math.fsum(d) / len(d)) / bm if bm else None
             for cand in CANDIDATE_KEYS:
                 for base in BASELINE_KEYS:
-                    d, cl = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), prim)
+                    d, cl, yr = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), prim)
                     k = f"{fam.key}|h{h}|{cand}|vs|{base}|{prim}"
                     tests[k] = {
                         "family": fam.key,
@@ -228,12 +232,12 @@ def evaluate(
                         "candidate": cand,
                         "baseline": base,
                         "metric": prim,
-                        **dm_test(d, cl),
+                        **dm_test(d, cl, yr),
                     }
                     pvals[k] = tests[k]["p_one_sided"]
                     for m2 in SECONDARY[fam.kind]:
-                        d2, cl2 = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), m2)
-                        secondary[f"{fam.key}|h{h}|{cand}|vs|{base}|{m2}"] = {"metric": m2, **dm_test(d2, cl2)}
+                        d2, cl2, yr2 = _pair(scored.get((fam.key, h, cand), []), scored.get((fam.key, h, base), []), m2)
+                        secondary[f"{fam.key}|h{h}|{cand}|vs|{base}|{m2}"] = {"metric": m2, **dm_test(d2, cl2, yr2)}
             fam_out.append(
                 {"family": fam.key, "horizon": h, "kind": fam.kind, "primary_metric": prim, "results": results}
             )
@@ -275,11 +279,12 @@ def evaluate(
         )
         for mk in (*BASELINE_KEYS, *CANDIDATE_KEYS):
             rows = scored.get((fk, h, mk), [])
-            for metric in ("crps", "msle"):
+            for metric in ("abs_error", "msle"):  # point losses only: VIEWS is a point mass (X2)
                 iv = {(r["geo"], r["origin"]): r for r in vrows}
                 pairs = [(r, iv[(r["geo"], r["origin"])]) for r in rows if (r["geo"], r["origin"]) in iv]
                 d = [a[metric] - b[metric] for a, b in pairs]
                 cl = [a["geo"] for a, _ in pairs]
+                yr = [a["origin"] for a, _ in pairs]
                 k = f"{fk}|h{h}|{mk}|vs|{VIEWS_KEY}|{metric}"
                 vtests[k] = {
                     "family": fk,
@@ -288,7 +293,7 @@ def evaluate(
                     "metric": metric,
                     "model_mean": math.fsum(a[metric] for a, _ in pairs) / len(pairs) if pairs else None,
                     "views_mean": math.fsum(b[metric] for _, b in pairs) / len(pairs) if pairs else None,
-                    **dm_test(d, cl),
+                    **dm_test(d, cl, yr),
                 }
                 vp[k] = vtests[k]["p_two_sided"]
     vadj = holm(vp)
@@ -317,10 +322,15 @@ def evaluate(
             "runs": dict(views_used),
             "note": "VIEWS December runs: sum of 12 monthly point predictions per calendar year (REVA aggregation); "
             "REVA's origin-Y forecasts use final UCDP data for Y, published after VIEWS' run and revised since, so the "
-            "comparison favours REVA on information; DM variance cluster-robust by country, cross-country "
-            "dependence within a year not modelled",
+            "comparison favours REVA on information; DM variance two-way cluster-robust (country and origin year). "
+            "VIEWS is a point mass: its CRPS equals its absolute error, so any density centred near it 'beats' it on "
+            "CRPS - compare on point losses (abs_error, msle) only (QA-PRED X2)",
         },
-        "dependence_note": "cluster-robust by country; cross-country dependence within a year is not modelled",
+        "dependence_note": "DM variance two-way cluster-robust by country and origin year (Cameron-Gelbach-Miller; "
+        "FIX7, QA-PRED X13); the country-only z is reported as z_country_only",
+        "input_vintage_note": "the KG candidate alone uses V-Dem v16 and current WDI, both re-estimated / revised back "
+        "in time (final vintage); baselines use UCDP history only - a candidate advantage would be inflated (QA-PRED "
+        "X9): it must not be admitted on this backtest without origin-dated V-Dem / WDI versions",
     }
 
 

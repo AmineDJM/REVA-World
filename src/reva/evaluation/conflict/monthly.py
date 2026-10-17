@@ -157,7 +157,7 @@ def evaluate_runs(
     runs: Mapping[str, ViewsRun], outcome: MonthlyPanel, inputs: MonthlyPanel, *, label: str
 ) -> dict[str, Any]:
     """Score VIEWS runs and the baselines (fitted on ``inputs`` up to each run's last input month) on the months of
-    ``outcome``'s coverage; DM tests baseline vs VIEWS per (family, step group), cluster-robust by country, Holm."""
+    ``outcome``'s coverage; DM tests baseline vs VIEWS per (family, step group), two-way cluster-robust (country, run), Holm."""
     rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
     used = []
     assert outcome.covered is not None
@@ -216,7 +216,11 @@ def evaluate_runs(
                     "metric": metric,
                     "model_mean": math.fsum(a[metric] for a, _ in pairs) / len(pairs) if pairs else None,
                     "views_mean": math.fsum(b[metric] for _, b in pairs) / len(pairs) if pairs else None,
-                    **dm_test([a[metric] - b[metric] for a, b in pairs], [a["geo"] for a, _ in pairs]),
+                    **dm_test(
+                        [a[metric] - b[metric] for a, b in pairs],
+                        [a["geo"] for a, _ in pairs],
+                        [a["run"] for a, _ in pairs],  # two-way: country and VIEWS run (FIX7, QA-PRED X13)
+                    ),
                 }
                 pv[k] = tests[k]["p_two_sided"]
     adj = holm(pv)

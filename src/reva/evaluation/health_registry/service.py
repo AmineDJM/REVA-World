@@ -50,6 +50,33 @@ BACKTEST_LABELS = {
     "publication lag) but values are the final (revised) vintage, not the data as published then; never real-time skill",
 }
 REPLAY = {"as_of_vintages": "available_then_reconstruction", "final_vintage": "revised_data_retrospective"}
+#: FIX7 (QA-PRED §7, X9): how a candidate was admitted, carried by every question and candidate record
+ADMISSION_NOTES = {
+    "final_vintage": "FINAL-VINTAGE RESULT: admitted on a final-vintage back-test (revised / backfilled data, not the "
+    "data as published at each origin); backfill favours AR-type candidates over climatology - not evidence of "
+    "real-time skill; skill only from resolved prospective questions",
+    "as_of_vintages": "admitted on an as-of (real-time vintage) back-test",
+}
+GHE_TARGET_NOTE = (
+    "forecast of the next WHO Global Health Estimates release (a modelled estimate WHO re-estimates in every "
+    "release), not of registered deaths; admission rests on 11 annual final-vintage origins"
+)
+
+
+def admission_basis(fam: C.Family, winners: Sequence[str]) -> dict[str, Any] | None:
+    """Admission metadata of a family's issued candidates (None when no candidate is admitted)."""
+    if not winners:
+        return None
+    kind = str((fam.raw.get("backtest") or {}).get("kind") or "unknown")
+    out: dict[str, Any] = {
+        "backtest_kind": kind,
+        "final_vintage": kind == "final_vintage",
+        "note": ADMISSION_NOTES.get(kind, "admission basis not declared"),
+        "candidates": list(winners),
+    }
+    if fam.key.startswith("ghe."):
+        out["target_note"] = GHE_TARGET_NOTE
+    return out
 
 
 def _clock(conn: Any) -> datetime:
@@ -334,7 +361,9 @@ def build_batch(
         qs, sk = C.generate_questions(fam, series, labels, today=today, source_pin=_short_pin(pin))
         skipped.extend(sk + notes)
         bt = winners.get(fam.key)
-        issued_models = list(fam.baselines) + [m for m in (bt[1] if bt else []) if m in fam.candidates]
+        admitted = [m for m in (bt[1] if bt else []) if m in fam.candidates]
+        issued_models = list(fam.baselines) + admitted
+        adm = admission_basis(fam, admitted)
         ens = None
         if fam.reference:
             rp = pins.get(str(fam.reference["dataset_key"]))
@@ -350,6 +379,10 @@ def build_batch(
             target = hist[-1][0] + int(q["steps_from_last_observed"])
             res = C.run_models(fam, hist, target)
             fcs = [C.forecast_record(q, m, res[m], hist) for m in issued_models]
+            if adm is not None:
+                for f in fcs:
+                    if f.get("model") in admitted:
+                        f["admission"] = adm["note"]
             if all(f["status"] == "abstained" for f in fcs):
                 skipped.append(
                     {"family": fam.key, "question_key": q["question_key"], "reason": "every issued model abstained"}
@@ -359,6 +392,10 @@ def build_batch(
                 fcs.append(C.reference_record(q, fam, (ens or {}).get((q["round"], q["geo"], target))))
             q["issued_models"] = issued_models + ([str(fam.reference["model_key"])] if fam.reference else [])
             q["backtest_sha256"] = bt[0] if bt else None
+            if adm is not None:
+                q["candidate_admission"] = adm
+            if fam.key.startswith("ghe."):
+                q["target_note"] = GHE_TARGET_NOTE
             questions.append(q)
             forecasts.extend(fcs)
         if len(questions) > n_before:
@@ -369,6 +406,7 @@ def build_batch(
                 "issued_models": issued_models,
                 "backtest_sha256": bt[0] if bt else None,
                 "winners": bt[1] if bt else [],
+                "candidate_admission": adm,
             }
     return {
         "schema": BATCH_SCHEMA,

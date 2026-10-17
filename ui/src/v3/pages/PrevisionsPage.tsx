@@ -36,6 +36,11 @@ export function modelFr(key: string): string {
     'forecast.registry_ar': 'AR(p) estimé à la date d’émission',
     'forecast.registry_hist_quantile': 'Quantiles historiques',
     'forecast.reference_imf_weo': 'FMI — Perspectives (WEO), attribué',
+    // FIX7 (QA-PRED X1): densities around the official point, never "REVA bat le FMI"
+    'forecast.weo_conformal': 'Intervalle calibré autour du point FMI (WEO), pas une meilleure prévision ponctuelle',
+    'forecast.weo_bias_corrected': 'Intervalle calibré autour du point FMI (WEO), pas une meilleure prévision ponctuelle',
+    'forecast.weo_error_fan': 'Référence équitable : éventail des erreurs passées du FMI (WEO)',
+    'forecast.spf_conformal': 'Intervalle calibré autour de la médiane SPF, pas une meilleure prévision ponctuelle',
   };
   return m[key.split('@')[0]!] ?? key;
 }

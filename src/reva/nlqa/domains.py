@@ -39,7 +39,9 @@ def _lookup(text: str, kind: str | None = None) -> dict[str, Any]:
 _FAMILY_RULES: tuple[tuple[tuple[re.Pattern[str], ...], tuple[str, ...], str, bool], ...] = (
     (  # composition / parts
         (
-            re.compile(r"\b(?:de|en)\s+quoi\s+(?:est|sont)\s+(?:fai|compos[ée]|constitu[ée])\w*\s+(?P<x>.+?)" + _END, re.I),
+            re.compile(
+                r"\b(?:de|en)\s+quoi\s+(?:est|sont)\s+(?:fai|compos[ée]|constitu[ée])\w*\s+(?P<x>.+?)" + _END, re.I
+            ),
             re.compile(r"\bqu['’]est-ce\s+qui\s+(?:compose|constitue)\s+(?P<x>.+?)" + _END, re.I),
             re.compile(r"\bcomposition\s+(?:chimique\s+)?" + _DE + r"(?P<x>.+?)" + _END, re.I),
             re.compile(
@@ -138,7 +140,11 @@ _FAMILY_RULES: tuple[tuple[tuple[re.Pattern[str], ...], tuple[str, ...], str, bo
 )
 #: "quels gènes sur le chromosome 17", "which genes are on chromosome 17": what is located in / part of X
 _CONTENTS = (
-    re.compile(r"^\s*quel(?:le)?s\s+(?:sont\s+les\s+)?(?P<noun>[\w-]+)\s+(?:se\s+trouvent\s+)?(?:sur|dans)\s+(?P<x>.+?)" + _END, re.I),
+    re.compile(
+        r"^\s*quel(?:le)?s\s+(?:sont\s+les\s+)?(?P<noun>[\w-]+)\s+(?:se\s+trouvent\s+)?(?:sur|dans)\s+(?P<x>.+?)"
+        + _END,
+        re.I,
+    ),
     re.compile(r"^\s*(?:which|what)\s+(?P<noun>\w+)\s+(?:are\s+)?(?:located\s+)?(?:on|in)\s+(?P<x>.+?)" + _END, re.I),
 )
 #: "combien d'espèces de mammifères", "how many species of mammals"
@@ -200,7 +206,9 @@ _EFFECT = (
 _FORECAST_WORD = re.compile(r"\b(?:pr[ée]visions?|pr[ée]vu(?:e|s|es)?|forecasts?|projections?|pronostics?)\b", re.I)
 _FORECAST_TOPIC = (
     re.compile(
-        r"\b(?:pr[ée]visions?|forecasts?|projections?|pronostics?)\s+(?:" + _DE[3:-1] + r"|pour\s+(?:la\s+|le\s+|l['’]\s*|les\s+)?|"
+        r"\b(?:pr[ée]visions?|forecasts?|projections?|pronostics?)\s+(?:"
+        + _DE[3:-1]
+        + r"|pour\s+(?:la\s+|le\s+|l['’]\s*|les\s+)?|"
         r"of\s+(?:the\s+)?|for\s+(?:the\s+)?)(?P<t>.+?)(?:\s+(?:pour|en|au|aux|dans|in|for)\s+[^?]+)?" + _END,
         re.I,
     ),
@@ -225,7 +233,10 @@ UNIT_OF = (
     ("bp", re.compile(r"^(?:pb|points?\s+de\s+base|bps?|basis\s+points?)$", re.I)),
     ("pp", re.compile(r"^(?:pp|points?\s+de\s+pourcentage|percentage\s+points?)$", re.I)),
     ("percent", re.compile(r"^(?:%|pour\s*cent|percent)$", re.I)),
-    ("mb/d", re.compile(r"^(?:mb/[jd]|millions?\s+de\s+barils\s+par\s+jour|million\s+barrels\s+(?:per|a)\s+day)$", re.I)),
+    (
+        "mb/d",
+        re.compile(r"^(?:mb/[jd]|millions?\s+de\s+barils\s+par\s+jour|million\s+barrels\s+(?:per|a)\s+day)$", re.I),
+    ),
     ("years", re.compile(r"^(?:ans|years?)$", re.I)),
 )
 
@@ -244,14 +255,16 @@ def magnitude(question: str) -> tuple[str | None, str | None]:
     return v, unit
 
 
-def _family_ops(x: str, families: Sequence[str], reading: str, count: bool, catalog: QaCatalog) -> list[dict]:
+def _family_ops(x: str, families: Sequence[str], reading: str, count: bool, catalog: QaCatalog) -> list[dict[str, Any]]:
     fams = [f for f in families if f in catalog.families]
     if not x or not fams:
         return []
     return [_lookup(x), {"op": "kg_families", "entity": "s1", "families": fams, "reading": reading, "count": count}]
 
 
-def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, countries: Sequence[str]) -> list[dict] | None:
+def domain_plan(
+    question: str, catalog: QaCatalog, *, concept_matched: bool, countries: Sequence[str]
+) -> list[dict[str, Any]] | None:
     """Operations for a V6-domain question shape, or ``None`` (the classic keyword rules then apply)."""
     q = question.strip()
     if _WHAT_IF.search(q):

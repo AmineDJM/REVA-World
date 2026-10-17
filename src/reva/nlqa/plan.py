@@ -495,7 +495,7 @@ def _as_of(v: Any) -> str | None:
 
 _FR_HINTS = re.compile(
     r"\b(le|la|les|des|du|est|sont|quel(le)?s?|comment|pourquoi|quand|où|ou|au|aux|une?|pays|salaire|"
-    r"position|depuis|entre|avec|sur|dans|années)\b",
+    r"position|depuis|entre|avec|sur|dans|années|combien|quoi|qui|que|de|en|mange|vit|possède|décès|prévision)\b",
     re.IGNORECASE,
 )
 _EN_HINTS = re.compile(r"\b(the|is|are|what|which|how|why|when|where|of|in|with|between|countries)\b", re.IGNORECASE)
@@ -617,17 +617,19 @@ def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
                 (catalog.families.get(f) or {}).get(plan.language, f) for f in (a.get("families") or [])
             ) or ("toute relation" if fr else "any relation")
             if o.op == "kg_families":
-                what = ("le nombre de rattachements" if fr else "the number of links") if a["count"] else (
-                    "les relations" if fr else "the relations"
+                what = (
+                    ("le nombre de rattachements" if fr else "the number of links")
+                    if a["count"]
+                    else ("les relations" if fr else "the relations")
                 )
                 inv = {"inverse": " (lecture inverse)" if fr else " (inverse reading)", "any": ""}.get(a["reading"], "")
                 parts.append(
-                    f"{what} « {fams} »{inv} de {ent(a['entity'])}" if fr else f"{what} “{fams}”{inv} of {ent(a['entity'])}"
+                    f"{what} « {fams} »{inv} de {ent(a['entity'])}"
+                    if fr
+                    else f"{what} “{fams}”{inv} of {ent(a['entity'])}"
                 )
             else:
-                other = ", ".join(
-                    (catalog.families.get(f) or {}).get(plan.language, f) for f in a["other_families"]
-                )
+                other = ", ".join((catalog.families.get(f) or {}).get(plan.language, f) for f in a["other_families"])
                 parts.append(
                     f"les entités reliées à {ent(a['entity'])} ({fams}) et à {ent(a['other_entity'])} ({other})"
                     if fr

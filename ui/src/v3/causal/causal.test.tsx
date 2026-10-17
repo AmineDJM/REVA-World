@@ -235,6 +235,28 @@ describe('Demander — causal answers (real NLQA pipeline output over test fixtu
     expect(items.some((i) => /affirmation causale \(de la source\)/.test(i.textContent ?? '') && /selon icb\.data \(T1\)/.test(i.textContent ?? ''))).toBe(true);
   });
 
+  it('V6 domains: forecast, decision scenario, effects and missing data keep their honesty wording', async () => {
+    for (const [key, expected] of [
+      ['forecast', /aucun score encore/],
+      ['decision', /^Scénario non validé — pas une probabilité/],
+      ['effects', /ne les moyenne pas/],
+      ['missing', /Aucune entité ne correspond à « tigre »/],
+    ] as const) {
+      const body = (ASK as Record<string, unknown>)[key] as { sentences: { text: string; kind: string }[] };
+      expect(body.sentences.some((x) => expected.test(x.text))).toBe(true);
+    }
+    mockFetch({ 'POST /v1/ask': { body: ASK.forecast } });
+    at('/v3/demander');
+    await userEvent.type(await screen.findByLabelText('Votre question'), 'Quelle est la prévision d’inflation pour la France ?');
+    await userEvent.click(screen.getByRole('button', { name: 'Demander' }));
+    const answer = await screen.findByTestId('ask-answer');
+    const kinds = within(answer).getAllByTestId('answer-sentence').map((x) => x.getAttribute('data-kind'));
+    expect(kinds).toContain('forecast');
+    expect(kinds).toContain('sources');
+    const items = within(answer).getAllByTestId('evidence-item');
+    expect(items.some((i) => /prévision scellée \(registre\)/.test(i.textContent ?? ''))).toBe(true);
+  });
+
   it('chain answer', async () => {
     mockFetch({ 'POST /v1/ask': { body: ASK.chain } });
     at('/v3/demander');

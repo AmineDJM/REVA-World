@@ -40,12 +40,27 @@ FAMILY_OF: dict[tuple[str, str, str], tuple[str, int]] = {
     ("weo", "unemployment_rate", "h1"): ("weo.unemployment", 1),
 }
 ISSUERS = {"forecast.weo_conformal", "forecast.weo_bias_corrected"}
+#: FIX7 (QA-PRED X1): the fair benchmark, sealed next to the registered WEO densities on the same questions
+FAIR_BENCHMARK = "forecast.weo_error_fan"
+CLAIM = (
+    "calibrated interval around the IMF WEO point - NOT a better point forecast (the point is the IMF's, attributed); "
+    "its holdout win was against a weak benchmark (N(WEO point, persistence spread), 80 % interval covering 93-100 % "
+    "of outcomes); on probation: issuance continues only if it beats the fair error-fan benchmark "
+    "(forecast.weo_error_fan) on the next prospective evaluation"
+)
 DESCRIPTIONS = {
-    "forecast.weo_conformal": "IMF WEO projection + scaled past out-of-sample WEO errors (calibrated density); "
-    "registered on the locked holdout for its scopes only",
-    "forecast.weo_bias_corrected": "IMF WEO + median past WEO error, centred conformal density; registered on the "
-    "locked holdout for its scopes only",
+    "forecast.weo_conformal": "Calibrated interval around the IMF WEO point (WEO projection + scaled past "
+    "out-of-sample WEO errors) - not a better point forecast. " + CLAIM,
+    "forecast.weo_bias_corrected": "Calibrated interval around the IMF WEO point (WEO + median past WEO error, "
+    "centred conformal density; its point is not better than the WEO's: holdout AE ratio 0.999) - not a better "
+    "point forecast. " + CLAIM,
+    FAIR_BENCHMARK: "BENCHMARK (FIX7): N(IMF WEO point, RMS of the country's own past WEO errors at this horizon whose "
+    "outcome was published at issue) - the standard error-based fan, the fair benchmark for densities around the "
+    "WEO point; not a REVA forecast",
 }
+DECISIONS_FILE = "issuance_decisions.yaml"
+GATE_ALPHA = 0.05
+GATE_MIN_QUESTIONS = 30
 
 
 @lru_cache(maxsize=1)
@@ -58,14 +73,49 @@ def registered() -> tuple[dict[str, Any], ...]:
     return tuple(dict(r) for r in doc.get("registered") or [])
 
 
+def issuance_decisions() -> dict[str, dict[str, Any]]:
+    """Latest prospective-gate decision per model (append-only ``issuance_decisions.yaml``; FIX7)."""
+    path = REGISTRY_DIR / DECISIONS_FILE
+    if not path.exists():
+        return {}
+    with open(path, encoding="utf-8") as f:
+        doc = yaml.safe_load(f) or {}
+    out: dict[str, dict[str, Any]] = {}
+    for d in doc.get("decisions") or []:
+        out[str(d["model"])] = dict(d)
+    return out
+
+
+def issuance_status(model_key: str) -> str:
+    """``probation`` (registered, not yet tested against the fair benchmark prospectively), ``confirmed`` or
+    ``suspended`` (lost to the fair benchmark: issues nothing)."""
+    return str(issuance_decisions().get(model_key, {}).get("status") or "probation")
+
+
 def issuing_scopes() -> dict[str, list[tuple[str, int]]]:
-    """model_key -> [(registry family, cycle horizon)] for registered scopes that map to a question family."""
+    """model_key -> [(registry family, cycle horizon)] for registered scopes that map to a question family; the
+    fair benchmark issues on the union of the issuing densities' scopes (FIX7)."""
     out: dict[str, list[tuple[str, int]]] = {}
     for r in registered():
         fam = FAMILY_OF.get((r["task"], r["variable"], r["horizon"]))
-        if fam and r["candidate"] in ISSUERS:
+        if fam and r["candidate"] in ISSUERS and issuance_status(r["candidate"]) != "suspended":
             out.setdefault(r["candidate"], []).append(fam)
+    if out:
+        out[FAIR_BENCHMARK] = sorted({f for fams in out.values() for f in fams})
     return out
+
+
+def fair_gate(pairs: Sequence[tuple[str, float, float]], *, alpha: float = GATE_ALPHA) -> dict[str, Any]:
+    """Prospective gate (pure). ``pairs``: (country, candidate CRPS, fair-benchmark CRPS) on the resolved questions
+    both issued. ``pending`` below ``GATE_MIN_QUESTIONS`` pairs; ``confirmed`` iff the mean CRPS difference is
+    negative with a one-sided country-clustered DM p < alpha; otherwise ``suspended``."""
+    from reva.evaluation.conflict.stats import dm_test
+
+    if len(pairs) < GATE_MIN_QUESTIONS:
+        return {"status": "pending", "n": len(pairs), "reason": f"fewer than {GATE_MIN_QUESTIONS} resolved pairs"}
+    t = dm_test([a - b for _g, a, b in pairs], [g for g, _a, _b in pairs])
+    ok = t["mean_diff"] is not None and t["mean_diff"] < 0 and t["p_one_sided"] is not None and t["p_one_sided"] < alpha
+    return {"status": "confirmed" if ok else "suspended", **t}
 
 
 def registry_models() -> dict[str, tuple[str, str]]:
@@ -75,6 +125,24 @@ def registry_models() -> dict[str, tuple[str, str]]:
 
 def awaiting_family() -> list[dict[str, Any]]:
     return [r for r in registered() if (r["task"], r["variable"], r["horizon"]) not in FAMILY_OF]
+
+
+def weo_own_errors(cells: pl.DataFrame, variable: str, horizon: str, at: datetime) -> dict[str, list[float]]:
+    """Raw WEO errors (outcome - WEO) per country, of the vintage backtest cases whose outcome was published at or
+    before ``at`` (the fair benchmark's input; FIX7)."""
+    origins = [t for t in R.default_weo_origins(2008, at.year) if t < at]
+    out: dict[str, list[float]] = {}
+    for c in R.weo_cases(cells, variable, origins):
+        w = c.preds.get(R.WEO)
+        if (
+            c.horizon == horizon
+            and isinstance(w, Predictive)
+            and c.outcome is not None
+            and c.outcome_known_at is not None
+            and c.outcome_known_at <= at
+        ):
+            out.setdefault(c.geo, []).append(c.outcome - w.point)
+    return out
 
 
 def weo_error_book(cells: pl.DataFrame, variable: str, horizon: str, at: datetime) -> list[float]:
@@ -110,6 +178,10 @@ def forecast_weo_registered(
 ) -> Predictive | Abstain:
     if projection is None:
         return Abstain("no WEO projection cell for this period in the pinned table version")
+    if model_key == FAIR_BENCHMARK:
+        from reva.evaluation.pred_models.fair_benchmark import MIN_OWN, error_fan
+
+        return error_fan(projection, errs, MIN_OWN)
     run = final_run(history, 60)
     scale = R.series_scale([v for _, v in run])
     if scale is None:
@@ -141,6 +213,7 @@ def supplement_batch(
     if not scopes:
         return None
     books: dict[tuple[str, int], list[float]] = {}
+    own_books: dict[tuple[str, int], dict[str, list[float]]] = {}
     var_of = {v: (t, var, h) for (t, var, h), v in FAMILY_OF.items()}
     questions: list[dict[str, Any]] = []
     forecasts: list[dict[str, Any]] = []
@@ -162,22 +235,32 @@ def supplement_batch(
                 forecasts.append(abstention(q, mk, "series not found in the pinned table version"))
                 continue
             key = (fam_key, int(q["cycle_horizon"]))
-            if key not in books:
-                _t, var, hz = var_of[key]
-                books[key] = weo_error_book(cells, var, hz, issued_at)
+            _t, var, hz = var_of[key]
+            if mk == FAIR_BENCHMARK:
+                if key not in own_books:
+                    own_books[key] = weo_own_errors(cells, var, hz, issued_at)
+                errs = own_books[key].get(str(q.get("iso3") or q["geo"]), [])
+            else:
+                if key not in books:
+                    books[key] = weo_error_book(cells, var, hz, issued_at)
+                errs = books[key]
             target = P.parse_label(fam.frequency, q["reference_period"])
             cell = s.projections.get(target)
             proj = float(cell.value) if cell is not None else None
             hist = s.history()
-            p = forecast_weo_registered(mk, hist, proj, books[key])
+            p = forecast_weo_registered(mk, hist, proj, errs)
             rec = abstention(q, mk, p.reason) if isinstance(p, Abstain) else _record(q, mk, p, hist)
             if not isinstance(p, Abstain):
                 rec["inputs"] = {
                     "weo_projection_cell": dict(cell.refs[0]) if cell is not None else None,
-                    "past_errors": len(books[key]),
+                    "past_errors": len(errs),
                     "error_source": "vintage backtest (registry/forecasts/pred_models), outcomes published at "
-                    "or before issued_at",
+                    "or before issued_at" + (" - this country's own raw WEO errors" if mk == FAIR_BENCHMARK else ""),
                 }
+                rec["attribution"] = (
+                    "point: International Monetary Fund, World Economic Outlook (projection), as pinned"
+                )
+                rec["claim"] = "benchmark (error-based fan around the WEO point)" if mk == FAIR_BENCHMARK else CLAIM
             forecasts.append(rec)
             if not any(x["question_id"] == q["question_id"] for x in questions):
                 questions.append(q)
@@ -199,7 +282,11 @@ def supplement_batch(
         "families": {k: v for k, v in original["families"].items() if any(q["family"] == k for q in questions)},
         "models": [{"model_key": k, "version": v, "description": d} for k, (v, d) in registry_models().items()],
         "data": original["data"],
-        "evidence": {"registered_scopes": [r for r in reg if r["candidate"] in scopes]},
+        "evidence": {
+            "registered_scopes": [r for r in reg if r["candidate"] in scopes],
+            "issuance_status": {k: issuance_status(k) for k in scopes if k != FAIR_BENCHMARK},
+            "fair_benchmark": FAIR_BENCHMARK,
+        },
         "code_digest": original.get("code_digest"),
         "questions": questions,
         "forecasts": forecasts,
@@ -296,13 +383,19 @@ def issue_supplements(
 
 
 __all__ = [
+    "CLAIM",
+    "FAIR_BENCHMARK",
     "FAMILY_OF",
     "awaiting_family",
+    "fair_gate",
     "forecast_weo_registered",
+    "issuance_decisions",
+    "issuance_status",
     "issue_supplements",
     "issuing_scopes",
     "registered",
     "registry_models",
     "supplement_batch",
     "weo_error_book",
+    "weo_own_errors",
 ]

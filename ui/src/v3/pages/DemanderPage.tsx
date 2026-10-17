@@ -223,6 +223,11 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
     link: 'lien dérivé',
     absence: 'absence constatée',
     causal_claim: 'affirmation causale (de la source)',
+    effect_estimate: 'estimation d’effet (attribuée)',
+    sealed_forecast: 'prévision scellée (registre)',
+    decision_scenario: 'scénario non validé',
+    decision_hop: 'maillon du scénario',
+    registry_term: 'terme du registre',
   };
   let what = '';
   if (e.kind === 'kg_statement') {
@@ -244,6 +249,18 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
     what = `${labelOf(x.cause)} → ${labelOf(x.effect)} · ${RELATION_FR[rel] ?? rel.replace(/_/g, ' ')}${x.stance === 'denies' ? ' (lien nié)' : ''}${
       rel === 'coded_outcome' ? ' (issue, pas une cause)' : ''
     } · selon ${source} (${s('tier') ?? '?'})${who.length ? `, qui l’attribue à ${who.join(' et ')} (la source ne l’affirme pas elle-même)` : ''} · ${typeof x.grade === 'string' ? `preuve ${x.grade}` : 'non gradée'}`;
+  } else if (e.kind === 'effect_estimate') {
+    // one estimate, attributed to its source; never pooled with others
+    what = `${typeof x.wording_fr === 'string' ? x.wording_fr : ''}`;
+  } else if (e.kind === 'sealed_forecast') {
+    const st = x.status === 'resolved' ? 'résolue' : x.status === 'pending' ? 'en attente (pas de score)' : String(x.status ?? '');
+    what = `${String(x.family ?? '')} · ${String(x.geo ?? '')} · ${String(x.reference_period ?? '')} · ${st} · lot ${(s('batch_sha256') ?? '').slice(0, 12)}…`;
+  } else if (e.kind === 'decision_scenario') {
+    what = `${String(x.label ?? 'scénario non validé — pas une probabilité')}`;
+  } else if (e.kind === 'decision_hop') {
+    what = `${String(x.estimate_key ?? 'hypothèse de scénario')}`;
+  } else if (e.kind === 'registry_term') {
+    what = `${String(x.term_id ?? '')} pour « ${String(x.query ?? '')} » (${String(x.registry ?? '')})`;
   }
   return (
     <li id={`ev-${e.id}`} className={`v3-ev${active ? ' active' : ''}`} data-testid="evidence-item">

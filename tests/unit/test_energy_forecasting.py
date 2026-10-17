@@ -172,3 +172,25 @@ def test_outcomes_ignore_projection_cells() -> None:
     )
     out = eb.outcomes_from_frame(f)
     assert out == {"BREPUUS": {2026 * 12 + 7: 70.0}}
+
+
+def test_fix7_one_holm_family_per_run_and_eia_combination_never_a_winner() -> None:
+    """FIX7 (QA-PRED X3): winners come from ONE Holm family over the run; combo_steo_rw is never a winner."""
+    from reva.evaluation import energy_backtests as EB
+    from reva.models.forecasting import energy_models as em
+
+    recs = []
+    for code in ("COPRPUS", "PAPR_WORLD"):
+        for i in range(30):
+            y = 10.0 + (i % 5)
+            for m, err in (("rw", 1.0), ("steo", 0.5), ("combo_steo_rw", 0.6), ("ar_diff", 0.7)):
+                if m not in em.models_for(code):
+                    continue
+                e = err + 0.05 * ((i * 7) % 3)
+                recs.append({"code": code, "model": m, "origin": f"o{i:02d}", "h": 1, "crps": e, "se": e * e, "ae": e,
+                             "log_score": None, "pit": 0.5})  # fmt: skip
+    _s, _t, winners = EB._summaries(recs, ["COPRPUS", "PAPR_WORLD"], [1])
+    assert winners and all(w["model"] != "combo_steo_rw" for w in winners)
+    sizes = {w["holm_family_size"] for w in winners}
+    assert len(sizes) == 1 and sizes.pop() >= 2  # one family across both variables
+    assert all("coverage_80" in w and "ae_vs_steo_mean_diff" in w for w in winners)

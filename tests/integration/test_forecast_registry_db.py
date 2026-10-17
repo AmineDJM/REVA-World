@@ -240,12 +240,20 @@ def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch
             text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
         ).scalar()
     monkeypatch.setattr(svc, "handled_questions", lambda conn, sha: set())  # pretend it is still open
-    out = svc.void_questions(env.worker, env.store, void, origin="test_fixture")
+    # FIX7 (QA-PRED X11): its period has ended -> a void needs logged counterfactual scores; refused before any write
+    with pytest.raises(ValueError, match="requires counterfactual=True"):
+        svc.void_questions(env.worker, env.store, void, origin="test_fixture")
+    with env.worker.connect() as c:
+        assert c.execute(
+            text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
+        ).scalar() == before  # fmt: skip
+    out = svc.void_questions(env.worker, env.store, void, origin="test_fixture", counterfactual=True)
     b = out["batches"][0]
     assert b["status"] == "voided" and b["void"] == 1, out
     doc = json.loads(env.store.get("evaluation", b["resolution_sha256"]))
     assert doc["outcomes"] == [{"question_id": qid, "status": "void", **void[qid]}] and doc["scores"] == []
-    assert "never edited or re-sealed" in doc["rule"]
+    assert "never edited or re-sealed" in doc["rule"] and "counterfactual" in doc["rule"]
+    assert doc["counterfactual_scores"] and {s["question_id"] for s in doc["counterfactual_scores"]} == {qid}
     with env.worker.connect() as c:
         rows = c.execute(
             text("SELECT metrics FROM model.evaluation WHERE metrics->>'kind' = 'registry_score' "
@@ -255,3 +263,4 @@ def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch
             text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
         ).scalar()
     assert after == before + len(rows) and rows and all(r["n_void"] == 1 and r["scores"] == [] for r in rows)
+    assert any(r.get("counterfactual_scores") for r in rows)  # kept per model for the leaderboard audit

@@ -326,3 +326,47 @@ def test_fiscal_year_cells_never_enter_a_calendar_question() -> None:
     assert {"family": "t.weo", "reason": "fiscal-year cells (never a calendar-year question)", "n": 2} in notes
     assert is_fiscal_year_cell({"period_basis": "fiscal_year_labelled_as_calendar"})
     assert not is_fiscal_year_cell({"latest_actual": "2025"})
+
+
+# --------------------------------------------------------------------------- FIX7 (QA-PRED X10): prospectivity
+def test_fix7_no_question_on_an_ended_period_and_horizon_from_issue() -> None:
+    pins, frames = _frames()
+    late = datetime(2026, 12, 10, 12, 0, tzinfo=UTC)  # same cycle (2026-Q4) as ISSUED, issued late in it
+    m = build_batch(SPECS, pins, frames, cycle=CYCLE, issued_at=late, origin="test_fixture", already=set())
+    food = [q for q in m["questions"] if q["family"] == "t.food"]
+    assert sorted({q["reference_period"] for q in food}) == ["2027-01"]  # 2026-11 had ended at issue
+    assert any(s.get("period") == "2026-11" and "ended at issue" in s["reason"] for s in m["generation"]["skipped"])
+    jan = food[0]
+    assert jan["cycle_horizon"] == 3 and jan["issue_horizon"] == 1 and jan["timing"]["kind"] == "forecast"
+    weo26 = next(q for q in m["questions"] if q["family"] == "t.weo" and q["reference_period"] == "2026")
+    assert weo26["timing"]["kind"] == "near_nowcast" and weo26["timing"]["elapsed_fraction_at_issue"] > 0.9
+
+
+def test_fix7_resolution_checks_issue_date_and_provider_publication_date() -> None:
+    pins, frames = _frames()
+    m = build_batch(SPECS, pins, frames, cycle=CYCLE, issued_at=ISSUED, origin="test_fixture", already=set(),
+                    families=["t.food"])  # fmt: skip
+    fam = SPECS.family("t.food")
+    issue_series, _ = extract_series(frames["f" * 64], fam)
+    t_nov = P.parse_label("M", "2026-11")
+    nov = {q["question_id"] for q in m["questions"] if q["geo"] == "FRA" and q["reference_period"] == "2026-11"}
+    pin = {"dataset_key": "atlas.fao.cp", "dataset_id": "v1", "artifact_sha256": "1" * 64, "recorded_at": "a"}
+    # (c) the provider's release date of the outcome cell is before the seal -> not prospective
+    early = cells("fao.cp", "23014|6121", "M", {**monthly("FRA", 120, LAST_M), ("FRA", t_nov): "2.5"},
+                  {("FRA", t_nov): {"release_date": "2026-10-02"}})  # fmt: skip
+    res = resolve_batch(m, set(), {"t.food": issue_series}, {"t.food": [(pin, extract_series(early, fam)[0])]},
+                        today=date(2027, 12, 1))  # fmt: skip
+    got = {o["question_id"]: o for o in res["outcomes"] if o["question_id"] in nov}
+    assert got and all(o["status"] == "not_prospective" and "flags.release_date" in o["reason"] for o in got.values())
+    assert not [s for s in res["scores"] if s["question_id"] in nov]
+    # a later release date resolves normally; a non-ISO 'release' label is ignored, never guessed
+    late = cells("fao.cp", "23014|6121", "M", {**monthly("FRA", 120, LAST_M), ("FRA", t_nov): "2.5"},
+                 {("FRA", t_nov): {"release_date": "2026-12-04", "release": "Dec"}})  # fmt: skip
+    res = resolve_batch(m, set(), {"t.food": issue_series}, {"t.food": [(pin, extract_series(late, fam)[0])]},
+                        today=date(2027, 12, 1))  # fmt: skip
+    assert {o["status"] for o in res["outcomes"] if o["question_id"] in nov} == {"resolved"}
+    # (a) a batch sealed after the period ended (older code) -> not prospective, whatever the tables say
+    old = {**m, "issued_at": "2026-12-15T00:00:00+00:00"}
+    res = resolve_batch(old, set(), {"t.food": issue_series}, {"t.food": [(pin, extract_series(late, fam)[0])]},
+                        today=date(2027, 12, 1))  # fmt: skip
+    assert {o["status"] for o in res["outcomes"] if o["question_id"] in nov} == {"not_prospective"}

@@ -66,6 +66,11 @@ ENERGY_MODELS: dict[str, tuple[str, str, str]] = {
     "forecast.energy_combo_steo_rw": ("1.0.0", "candidate", "equal-weight STEO + random walk (REVA combination)"),
     "forecast.energy_combo_models": ("1.0.0", "candidate", "equal-weight average of REVA energy models"),
 }
+#: FIX7 (QA-PRED X3 / §3.D): candidates never issued to the registry and never "winners", whatever their CRPS.
+NOT_ISSUABLE: dict[str, str] = {
+    "combo_steo_rw": "EIA-derived: half of it is EIA's own STEO projection, and it is worse than STEO alone on point "
+    "loss (U.S. crude h4 MAE 0.445 vs STEO 0.337) - a win over the random walk dominated by the attributed reference",
+}
 MODEL_KEYS: dict[str, str] = {
     "rw": "forecast.energy_rw",
     "steo": "forecast.reference_eia_steo",
@@ -379,6 +384,7 @@ __all__ = [
     "ENERGY_MODELS",
     "INPUT_CODES",
     "MODEL_KEYS",
+    "NOT_ISSUABLE",
     "PRICE_CODES",
     "QUANTITY_CODES",
     "REFERENCE",

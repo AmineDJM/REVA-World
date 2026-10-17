@@ -9,8 +9,9 @@ vintage whose availability instant is reported (``outcome_known_at``): a score i
   first WEO vintage available on/after 1 October of the following year (the "October t+1" outturn used in
   the WEO forecast-evaluation literature; when that release is missing the next one is used and counted).
 * :func:`spf_backtest` — Philadelphia Fed SPF median real GDP growth forecasts (annualised q/q, horizons
-  2..6) vs a no-change baseline (the latest quarterly growth in the RTDSM vintage in force at the survey's
-  release), outcome = the first-release growth (the first RTDSM vintage holding the quarter; growth computed
+  2..6) vs a no-change baseline (the latest quarterly growth in the RTDSM vintage of the survey quarter, i.e. the
+  panellists' information set — FIX7; ``baseline_vintage="available_then"`` gives the V5 one-quarter-staler rule),
+  outcome = the first-release growth (the first RTDSM vintage holding the quarter; growth computed
   inside that vintage).
 
 No probability is produced; these are point-forecast accuracy comparisons (MAE, RMSE) with counts.
@@ -67,7 +68,17 @@ def _scores(pairs: list[tuple[float, float, float]]) -> dict[str, Any]:
         # medians: robust to hyperinflation / collapse outliers that dominate means in cross-country panels
         "median_ae_forecast": round(statistics.median(abs(e) for e in ef), 4),
         "median_ae_baseline": round(statistics.median(abs(e) for e in eb), 4),
+        # FIX7 (QA-PRED X6): ratio of medians, the headline for pooled inflation panels (hyperinflation dominates means)
+        "relative_median_ae": (
+            round(statistics.median(abs(e) for e in ef) / statistics.median(abs(e) for e in eb), 4)
+            if statistics.median(abs(e) for e in eb)
+            else None
+        ),
     }
+
+
+#: variables whose pooled cross-country means are dominated by hyperinflation episodes: headline = medians
+MEDIAN_HEADLINE_VARIABLES = frozenset({"cpi_inflation", "inflation", "cpi_inflation_eop", "gdp_deflator_inflation"})
 
 
 def default_weo_origins(first_year: int = 2008, last_year: int = 2025) -> list[datetime]:
@@ -181,6 +192,15 @@ def weo_backtest(
             "origins": [o.isoformat() for o in origins],
         },
         "scores": by_h,
+        "headline_metric": "relative_median_ae" if variable in MEDIAN_HEADLINE_VARIABLES else "relative_mae",
+        "headline_note": (
+            "pooled cross-country inflation: means are dominated by hyperinflation episodes (WEO CPI h0 MAE is 10x "
+            "persistence while the median AE is 0.38x); quote the ratio of medians, never a pooled-mean ratio"
+            if variable in MEDIAN_HEADLINE_VARIABLES
+            else None
+        ),
+        "outcome_vintage_note": "outcomes are the WEO's own October t+1 estimate (same institution; for many "
+        "low-capacity countries an IMF staff estimate): flatters the WEO; see QA-PRED X7",
         "counts": dict(counts),
         "scored_as_of": max(known) if known else None,
         "details": details,
@@ -198,7 +218,24 @@ def _growth_by_vintage(levels: pl.DataFrame) -> pl.DataFrame:
     return df.with_columns((100 * ((pl.col("x") / pl.col("x_prev")) ** 4 - 1)).alias("growth"))
 
 
-def spf_backtest(cells: pl.DataFrame, *, horizons: Sequence[str] = ("2", "3", "4", "5", "6")) -> dict[str, Any]:
+BASELINE_VINTAGE_RULES = {
+    "survey_quarter": "no change: latest quarterly growth in the RTDSM vintage OF THE SURVEY QUARTER (data 'as known "
+    "in the middle month' of that quarter, i.e. the information set SPF panellists had at their mid-quarter "
+    "deadline) - FIX7, QA-PRED X8: the same information set as the forecasters",
+    "available_then": "no change: latest quarterly growth in the RTDSM vintage in force at the release under the "
+    "conservative availability rule (vintage counted from the month after its middle month): one quarter staler "
+    "than what panellists knew - V5 rule, kept for reproducibility; inflates the SPF's advantage",
+}
+
+
+def spf_backtest(
+    cells: pl.DataFrame,
+    *,
+    horizons: Sequence[str] = ("2", "3", "4", "5", "6"),
+    baseline_vintage: str = "survey_quarter",
+) -> dict[str, Any]:
+    if baseline_vintage not in BASELINE_VINTAGE_RULES:
+        raise ValueError(f"unknown baseline_vintage {baseline_vintage!r}")
     spf = cells.filter((pl.col("family") == "philfed_spf") & (pl.col("variable") == "real_gdp_growth_q_ann"))
     rt = cells.filter((pl.col("family") == "philfed_rtdsm") & (pl.col("variable") == "real_gdp_level"))
     g = _growth_by_vintage(rt)
@@ -216,7 +253,15 @@ def spf_backtest(cells: pl.DataFrame, *, horizons: Sequence[str] = ("2", "3", "4
     for sv, sa in surveys.iter_rows():
         acc = VintageAccessor(cells, sa, CutoffMode.available_then)
         fc = acc.forecasts(family="philfed_spf", variable="real_gdp_growth_q_ann").rows.filter(pl.col("vintage") == sv)
-        rt_now = acc.latest(family="philfed_rtdsm", variable="real_gdp_level").rows
+        if baseline_vintage == "survey_quarter":
+            # the RTDSM vintage labelled with the survey quarter (both are 'YYYYQn'); its conservative available_at
+            # is after the SPF release, but its content is the data panellists saw (documented RTDSM definition)
+            rt_now = rt.filter(pl.col("vintage") == sv)
+            if rt_now.height < 2:
+                counts["survey_quarter_vintage_missing"] += 1
+                continue
+        else:
+            rt_now = acc.latest(family="philfed_rtdsm", variable="real_gdp_level").rows
         if rt_now.height < 2:
             counts["no_rtdsm_vintage_at_survey"] += 1
             continue
@@ -241,8 +286,8 @@ def spf_backtest(cells: pl.DataFrame, *, horizons: Sequence[str] = ("2", "3", "4
         "design": {
             "forecast": "SPF median annualised q/q real GDP growth (medianGrowth.xlsx drgdp2..6) of each survey, "
             "as of its News Release Date",
-            "baseline": "no change: latest quarterly growth in the RTDSM vintage in force at the release "
-            "(conservative availability: RTDSM vintages count from the month after their middle month)",
+            "baseline": BASELINE_VINTAGE_RULES[baseline_vintage],
+            "baseline_vintage": baseline_vintage,
             "outcome": "first release: growth of the target quarter in the first RTDSM vintage holding it",
         },
         "scores": {f"h{h}": _scores(pairs[h]) for h in horizons},
@@ -251,4 +296,12 @@ def spf_backtest(cells: pl.DataFrame, *, horizons: Sequence[str] = ("2", "3", "4
     }
 
 
-__all__ = ["HONESTY", "LABEL", "default_weo_origins", "spf_backtest", "weo_backtest"]
+__all__ = [
+    "BASELINE_VINTAGE_RULES",
+    "HONESTY",
+    "LABEL",
+    "MEDIAN_HEADLINE_VARIABLES",
+    "default_weo_origins",
+    "spf_backtest",
+    "weo_backtest",
+]

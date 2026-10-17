@@ -140,13 +140,21 @@ def test_steo_reference_is_attributed_point_only_and_pinned() -> None:
 
 
 def test_only_winners_are_issued(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(EN, "winners", lambda rel: ("e" * 64, frozenset({("BREPUUS", 3, "combo_models")}), "f" * 64))
+    m = _batch(datetime(2026, 10, 17, 12, tzinfo=UTC))
+    c3 = _fc(m, "forecast.energy_combo_models", "2027-01", "quantity")
+    # the winner is attempted at its horizon (here it abstains for its own reason: too few component models in the
+    # fixture); elsewhere it abstains as "not a significant winner"
+    assert "not a significant winner" not in str(c3.get("reason") or "")
+    c1 = _fc(m, "forecast.energy_combo_models", "2026-11", "quantity")
+    assert c1["status"] == "abstained" and "not a significant winner" in c1["reason"]
+
+
+def test_eia_derived_combination_is_never_issued(monkeypatch: pytest.MonkeyPatch) -> None:
+    """FIX7 (QA-PRED §3.D): the STEO + random-walk combination is excluded even if a winners file lists it."""
     monkeypatch.setattr(EN, "winners", lambda rel: ("e" * 64, frozenset({("BREPUUS", 3, "combo_steo_rw")}), "f" * 64))
     m = _batch(datetime(2026, 10, 17, 12, tzinfo=UTC))
-    c3 = _fc(m, "forecast.energy_combo_steo_rw", "2027-01", "quantity")
-    assert c3["status"] == "issued" and "combination" in c3["attribution"]
-    assert dict(c3["detail"])["winners_sha256"] == "e" * 64
-    c1 = _fc(m, "forecast.energy_combo_steo_rw", "2026-11", "quantity")
-    assert c1["status"] == "abstained" and "not a significant winner" in c1["reason"]
+    assert not any(f["model"] == "forecast.energy_combo_steo_rw" for f in m["forecasts"])
 
 
 def test_no_issue_in_force_before_its_availability() -> None:

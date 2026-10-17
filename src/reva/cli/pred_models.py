@@ -111,5 +111,17 @@ def holdout_cmd(store_db: bool = typer.Option(False, "--store", help="record the
     typer.echo(json.dumps(S._rounded(out), indent=1))
 
 
+@app.command("fair-dev")
+def fair_dev_cmd(task: list[str] = typer.Option([], "--task", help="weo, us (repeatable; default both)")) -> None:
+    """FIX7 (QA-PRED X1): density candidates vs the fair error-fan benchmark, DEVELOPMENT origins only (the
+    holdout is spent and never re-opened); writes fair_benchmark_development.json."""
+    from reva.evaluation.pred_models import fair_benchmark as FB
+
+    cells, _extra, _st = _load()
+    doc = FB.fair_development(cells, tasks=tuple(task) or ("weo", "us"))
+    sha = S.write_json(S.REGISTRY_DIR / "fair_benchmark_development.json", doc)
+    typer.echo(json.dumps(S._rounded({"json_sha256": sha, "registered_scopes": FB.registered_rows(doc)}), indent=1))
+
+
 if __name__ == "__main__":  # pragma: no cover
     app()

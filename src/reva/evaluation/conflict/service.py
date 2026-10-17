@@ -367,7 +367,7 @@ def build_questions_and_forecasts(
             for i, e in enumerate(test):
                 iso = panel.iso(e.geo, last)
                 assert iso is not None
-                q = _question(fam, e, iso, target, ch, cycle, source_pin)
+                q = _question(fam, e, iso, target, ch, cycle, source_pin, issued_on)
                 if q["question_key"] in already:
                     continue
                 recs = [_record(q, mk, fcs[mk][i], last, h) for mk in models]
@@ -406,7 +406,14 @@ def build_questions_and_forecasts(
 
 
 def _question(
-    fam: F.ConflictFamily, e: Example, iso: str, target: int, ch: int, cycle: str, source_pin: Mapping[str, Any]
+    fam: F.ConflictFamily,
+    e: Example,
+    iso: str,
+    target: int,
+    ch: int,
+    cycle: str,
+    source_pin: Mapping[str, Any],
+    issued_on: date | None = None,
 ) -> dict[str, Any]:
     en, fr = country_label(iso)
     last = {"period": str(e.t), "value": num(e.last)}
@@ -459,6 +466,13 @@ def _question(
             "issue_table": dict(source_pin),
         },
     }
+    if issued_on is not None:
+        # FIX7 (QA-PRED §3.F): a question on the current year sealed late in the year is a near-nowcast, not a
+        # 1-year-ahead forecast; scored separately from forecasts
+        from reva.evaluation.registry.questions import issue_timing
+
+        q["timing"] = issue_timing(date(target, 1, 1), pend, issued_on)
+        q["issue_horizon"] = target - issued_on.year
     q["text_fr"], q["text_en"] = F.question_texts(fam, fr, en, iso, str(target), last)
     q["question_id"] = question_id(q)
     return q

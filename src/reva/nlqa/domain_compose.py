@@ -54,7 +54,24 @@ def _licence_of(item: Mapping[str, Any]) -> tuple[str, str] | None:
         return "reva.forecast_registry", "REVA (calcul sur tables atlas déclarées)"
     if k == "decision_scenario":
         return "reva.predict", "REVA (calcul)"
+    if k == "decision_hop" and c.get("estimate_key"):
+        return str(c.get("source") or "?"), lic
     return None
+
+
+def day_or_period(cell: Any) -> str:
+    """A one-day cell ([d, d+1) half-open, or start = end) is named by its day; else :func:`period_label`."""
+    import datetime as dt
+
+    from reva.nlqa.compose import period_label
+
+    s, e = str(cell.period_start)[:10], str(cell.period_end)[:10]
+    try:
+        if s == e or dt.date.fromisoformat(e) - dt.date.fromisoformat(s) == dt.timedelta(days=1):
+            return s
+    except ValueError:
+        pass
+    return period_label(cell)
 
 
 class DomainComposer:
@@ -100,10 +117,16 @@ class DomainComposer:
             v = n.share.get("fraction")
             if v is not None:
                 pct = format_number(str(float(v) * 100), self.lang)
-                bits.append(self._t(f"part ≈ {pct} % ({n.share.get('qualifier')})", f"share ≈ {pct}% ({n.share.get('qualifier')})"))
+                bits.append(
+                    self._t(f"part {pct} % ({n.share.get('qualifier')})", f"share {pct}% ({n.share.get('qualifier')})")
+                )
             else:
-                bits.append(self._t(f"part {n.share.get('value')} {n.share.get('unit') or ''}", f"share {n.share.get('value')} {n.share.get('unit') or ''}").strip())
-        bits.append(f"{s.source_key}, {self._lic(n.rights, s.source_key)}")
+                bits.append(
+                    self._t(
+                        f"part {n.share.get('value')} {n.share.get('unit') or ''}",
+                        f"share {n.share.get('value')} {n.share.get('unit') or ''}",
+                    ).strip()
+                )
         return f"{n.neighbour.label(self.lang)} ({' ; '.join(bits) if self.fr() else '; '.join(bits)})"
 
     # ------------------------------------------------------------------ families
@@ -126,7 +149,22 @@ class DomainComposer:
                 "note",
                 op.id,
             )
-        for fam, label, count, items, lower in d.get("groups") or []:
+        if d.get("answered_by") is not None:
+            ab, ch = d["answered_by"], d["chosen"]
+            self.add(
+                self._t(
+                    f"Rien de chargé sur {self.entity(ch)} ({ch.qid}) pour cette relation ; réponse lue sur "
+                    f"{self.entity(ab)} ({ab.qid}), autre fiche au même libellé dans l'index du graphe (fiches non "
+                    f"fusionnées).",
+                    f"Nothing loaded on {self.entity(ch)} ({ch.qid}) for this relation; answer read on "
+                    f"{self.entity(ab)} ({ab.qid}), another record with the same label in the graph index (records "
+                    f"not merged).",
+                ),
+                [d.get("answered_by_eid") or ""],
+                "identification",
+                op.id,
+            )
+        for fam, label, count, items, lower in d.get("fam_groups") or []:
             reading = items[0][0].reading.get(self.lang) or items[0][0].reading.get("en") or label.get(self.lang, fam)
             subject = items[0][0].statement.subject_label(self.lang) if not items[0][0].inverse else None
             who = self.entity(e) if subject is None else subject
@@ -148,8 +186,10 @@ class DomainComposer:
                     op.id,
                 )
                 continue
-            listed = " ; ".join(self._neighbour(n) for n, _ in items[:MAX_LISTED]) if self.fr() else "; ".join(
-                self._neighbour(n) for n, _ in items[:MAX_LISTED]
+            listed = (
+                " ; ".join(self._neighbour(n) for n, _ in items[:MAX_LISTED])
+                if self.fr()
+                else "; ".join(self._neighbour(n) for n, _ in items[:MAX_LISTED])
             )
             more = ""
             if count > min(len(items), MAX_LISTED):
@@ -157,20 +197,39 @@ class DomainComposer:
                     f" ({min(len(items), MAX_LISTED)} montrée(s) sur {n_total})",
                     f" ({min(len(items), MAX_LISTED)} shown of {n_total})",
                 )
+            srcs = sorted({n.statement.source_key for n, _ in items[:MAX_LISTED]})
+            community = any("wikidata" in x for x in srcs)
+            src_txt = self._t(
+                f" (source : {', '.join(srcs)}{' ; donnée communautaire' if community else ''})",
+                f" (source: {', '.join(srcs)}{'; community-edited' if community else ''})",
+            )
             self.add(
-                self._t(f"{who} — « {reading} »{more} : {listed}{tail}.", f"{who} — “{reading}”{more}: {listed}{tail}."),
+                self._t(
+                    f"{who} — « {reading} »{more} : {listed}{src_txt}{tail}.",
+                    f"{who} — “{reading}”{more}: {listed}{src_txt}{tail}.",
+                ),
                 [eid for _, eid in items[:MAX_LISTED]],
                 "fact",
                 op.id,
             )
         lits = d.get("literals") or []
         if lits:
-            parts = [
-                f"{s.property_label(self.lang)} : « {s.object_label(self.lang)} »"
-                if self.fr()
-                else f"{s.property_label(self.lang)}: “{s.object_label(self.lang)}”"
-                for s, _ in lits
-            ]
+            parts = []
+            for s, _ in lits:
+                share = next(
+                    (
+                        str(v)
+                        for k, v in (s.qualifiers or {}).items()
+                        if "share" in str(k) and isinstance(v, str | int | float)
+                    ),
+                    None,
+                )
+                extra = self._t(f" (part publiée : {share})", f" (published share: {share})") if share else ""
+                parts.append(
+                    f"{s.property_label(self.lang)} : « {s.object_label(self.lang)} »{extra}"
+                    if self.fr()
+                    else f"{s.property_label(self.lang)}: “{s.object_label(self.lang)}”{extra}"
+                )
             src = sorted({s.source_key for s, _ in lits})
             self.add(
                 self._t(
@@ -187,7 +246,7 @@ class DomainComposer:
     def op_kg_cross(self, res: Any) -> None:
         d, op = res.data, res.op
         a, b = d["a"], d["b"]
-        rows = d["rows"]
+        rows = d["cross_rows"]
         items = []
         for row, _ea, _eb in rows[:MAX_LISTED]:
             ra = row.a.statement.property_label(self.lang)
@@ -222,7 +281,9 @@ class DomainComposer:
             terms = d.get(f"{side}_terms") or []
             if not terms:
                 continue
-            names = ", ".join(f"{t.labels.get(self.lang) or t.labels.get('en') or t.id} ({t.id}, {t.kind})" for t, _ in terms)
+            names = ", ".join(
+                f"{t.labels.get(self.lang) or t.labels.get('en') or t.id} ({t.id}, {t.kind})" for t, _ in terms
+            )
             text = d[f"{side}_text"]
             self.add(
                 self._t(
@@ -242,8 +303,10 @@ class DomainComposer:
             cite += f", doi:{ref['doi']}"
         loc = f", {src['locator']}" if src.get("locator") else ""
         quote = str(src.get("quote") or "")
-        q = f" ; extrait : « {quote[:220]}{'…' if len(quote) > 220 else ''} »" if quote and self.fr() else (
-            f"; excerpt: “{quote[:220]}{'…' if len(quote) > 220 else ''}”" if quote else ""
+        q = (
+            f" ; extrait : « {quote[:220]}{'…' if len(quote) > 220 else ''} »"
+            if quote and self.fr()
+            else (f"; excerpt: “{quote[:220]}{'…' if len(quote) > 220 else ''}”" if quote else "")
         )
         lic = self._lic(src.get("rights"), str(src.get("source_key") or ""))
         wording = str(e.get("wording_fr") if self.fr() else e.get("wording"))
@@ -287,7 +350,9 @@ class DomainComposer:
         models = d.get("models") or {}
         terms = d.get("family_terms") or []
         if terms:
-            names = ", ".join(f"{(f.get('label_fr') if self.fr() else f.get('label_en'))} ({f.get('key')})" for f, _ in terms)
+            names = ", ".join(
+                f"{(f.get('label_fr') if self.fr() else f.get('label_en'))} ({f.get('key')})" for f, _ in terms
+            )
             self.add(
                 self._t(
                     f"Familles de questions retenues pour « {d['text']} » (libellés du registre de prévisions) : {names}.",
@@ -297,16 +362,7 @@ class DomainComposer:
                 "identification",
                 op.id,
             )
-        for k in d.get("not_covering") or []:
-            self.add(
-                self._t(
-                    f"La famille de questions {k} ne couvre pas {self.country(d['iso3'])} ; elle n'est pas montrée.",
-                    f"The question family {k} does not cover {self.country(d['iso3'])}; it is not shown.",
-                ),
-                [],
-                "note",
-                op.id,
-            )
+        self._not_covering(d, op.id)
         for fam, detail, eid in d["questions"]:
             q = detail.get("question") or {}
             seal = detail.get("seal") or {}
@@ -317,7 +373,12 @@ class DomainComposer:
                 desc = (models.get(str(f.get("model"))) or ("", ""))[1]
                 meth = self._t(f" (méthode : {desc})", f" (method: {desc})") if desc else ""
                 if f.get("status") != "issued":
-                    parts.append(self._t(f"{f.get('model')} : abstention ({f.get('reason')})", f"{f.get('model')}: abstained ({f.get('reason')})"))
+                    parts.append(
+                        self._t(
+                            f"{f.get('model')} : abstention ({f.get('reason')})",
+                            f"{f.get('model')}: abstained ({f.get('reason')})",
+                        )
+                    )
                     continue
                 val = self._fmt(f.get("point"))
                 qs = f.get("quantiles") or {}
@@ -329,17 +390,32 @@ class DomainComposer:
                     )
                 prob = ""
                 if f.get("prob_above") is not None:
-                    prob = self._t(f", P(> seuil) = {self._fmt(f['prob_above'])}", f", P(> threshold) = {self._fmt(f['prob_above'])}")
-                parts.append(f"{f.get('model')} : {val}{band}{prob}{meth}" if self.fr() else f"{f.get('model')}: {val}{band}{prob}{meth}")
+                    prob = self._t(
+                        f", P(> seuil) = {self._fmt(f['prob_above'])}",
+                        f", P(> threshold) = {self._fmt(f['prob_above'])}",
+                    )
+                parts.append(
+                    f"{f.get('model')} : {val}{band}{prob}{meth}"
+                    if self.fr()
+                    else f"{f.get('model')}: {val}{band}{prob}{meth}"
+                )
             status = detail.get("status")
             oc = detail.get("outcome") or {}
             if status == "resolved":
                 scored = []
                 for f in detail.get("forecasts") or []:
                     sc = f.get("score") or {}
-                    nums = [f"{k} {self._fmt(v)}" for k, v in sc.items() if isinstance(v, int | float) and not isinstance(v, bool)]
+                    nums = [
+                        f"{k} {self._fmt(v)}"
+                        for k, v in sc.items()
+                        if isinstance(v, int | float) and not isinstance(v, bool)
+                    ]
                     if nums:
-                        scored.append(f"{f.get('model')} : {', '.join(nums[:4])}" if self.fr() else f"{f.get('model')}: {', '.join(nums[:4])}")
+                        scored.append(
+                            f"{f.get('model')} : {', '.join(nums[:4])}"
+                            if self.fr()
+                            else f"{f.get('model')}: {', '.join(nums[:4])}"
+                        )
                 st = self._t(
                     f"Statut : résolue — valeur publiée {self._fmt(oc.get('value'))} ({oc.get('source') or q.get('resolution', {}).get('source')}) ; "
                     f"scores : {' ; '.join(scored) or 'non calculés'}.",
@@ -347,7 +423,10 @@ class DomainComposer:
                     f"scores: {'; '.join(scored) or 'not computed'}.",
                 )
             elif status == "void":
-                st = self._t("Statut : annulée (aucune valeur publiée à temps) — pas de score.", "Status: void (no value published in time) — no score.")
+                st = self._t(
+                    "Statut : annulée (aucune valeur publiée à temps) — pas de score.",
+                    "Status: void (no value published in time) — no score.",
+                )
             else:
                 exp = (q.get("resolution") or {}).get("expected_date")
                 st = self._t(
@@ -367,6 +446,21 @@ class DomainComposer:
                 [eid],
                 "forecast",
                 op.id,
+            )
+
+    def _not_covering(self, d: Mapping[str, Any], op_id: str) -> None:
+        nc = d.get("not_covering") or []
+        if nc:
+            self.add(
+                self._t(
+                    f"Famille(s) de questions correspondante(s) qui ne couvrent pas {self.country(d['iso3'])} : "
+                    f"{', '.join(nc)} ; non montrée(s).",
+                    f"Matching question famil(y/ies) that do not cover {self.country(d['iso3'])}: {', '.join(nc)}; "
+                    f"not shown.",
+                ),
+                [d.get("not_covering_eid") or ""],
+                "note",
+                op_id,
             )
 
     # ------------------------------------------------------------------ decision scenarios
@@ -392,9 +486,9 @@ class DomainComposer:
         name = ref.get("label_fr") if self.fr() else (ref.get("label_en") or ref.get("label_fr"))
         self.add(
             self._t(
-                f"Scénario non validé — pas une probabilité ({label}) : moteur de décision REVA, décision de référence "
+                f"Scénario non validé — pas une probabilité{'' if label == label_fr else f' ({label})'} : moteur de décision REVA, décision de référence "
                 f"« {name} » ({ref.get('id')}){changed}. Validation : {v.get('status')} ({v.get('reason') or 'aucune'}).",
-                f"Unvalidated scenario — not a probability ({label}): REVA decision engine, reference decision "
+                f"Unvalidated scenario — not a probability: REVA decision engine, reference decision "
                 f"“{name}” ({ref.get('id')}){changed}. Validation: {v.get('status')} ({v.get('reason') or 'none'}).",
             ),
             [scen, d.get("term") or ""],
@@ -420,32 +514,43 @@ class DomainComposer:
             if shown >= MAX_SCENARIO_VARIABLES:
                 break
             periods = [p for p in var.get("periods") or [] if p.get("p50") is not None]
-            if not periods:
+            und = var.get("undated") if isinstance(var.get("undated"), Mapping) else None
+            if periods:
+                p = dict(periods[-1])
+            elif und and und.get("p50") is not None:
+                p = {**und, "period": None}
+            else:
                 continue
-            p = periods[-1]
             vv = var.get("variable") or {}
             vlabel = vv.get("label_fr") if self.fr() else (vv.get("label_en") or vv.get("label_fr"))
             u = UNIT_TEXT.get(str(var.get("unit")), (f" {var.get('unit')}", f" {var.get('unit')}"))
             unit = u[0] if self.fr() else u[1]
-            num = (lambda x: format_number(str(x), self.lang))  # noqa: E731
+
+            def num(x: Any) -> str:
+                return format_number(str(x), self.lang)
+
             band = (
                 self._t("aucune incertitude publiée sur cette chaîne", "no published uncertainty on this chain")
                 if p.get("degenerate")
-                else self._t(f"5 %–95 % : {num(p['p05'])} à {num(p['p95'])}", f"5%–95%: {num(p['p05'])} to {num(p['p95'])}")
+                else self._t(
+                    f"5 %–95 % : {num(p['p05'])} à {num(p['p95'])}", f"5%–95%: {num(p['p05'])} to {num(p['p95'])}"
+                )
             )
             path_eids = [hops[h][1] for h in var.get("path") or [] if h in hops]
             srcs = sorted(
                 {
-                    str(((hops[h][0].get("estimate") or {}).get("estimate_key")) or "")
+                    str(hops[h][0].get("estimate_key"))
                     for h in var.get("path") or []
-                    if h in hops and (hops[h][0].get("estimate") or {}).get("estimate_key")
+                    if h in hops and hops[h][0].get("estimate_key")
                 }
             )
             via = self._t(f" ; estimations : {', '.join(srcs)}", f"; estimates: {', '.join(srcs)}") if srcs else ""
             self.add(
                 self._t(
-                    f"{vlabel} — {var.get('geo')} : variation {num(p['p50'])}{unit} en {p.get('period')} ({band}{via}).",
-                    f"{vlabel} — {var.get('geo')}: change {num(p['p50'])}{unit} in {p.get('period')} ({band}{via}).",
+                    f"{vlabel} — {var.get('geo')} : variation {num(p['p50'])}{unit} "
+                    f"{('en ' + str(p['period'])) if p.get('period') else '(non datée : horizon de la source)'} ({band}{via}).",
+                    f"{vlabel} — {var.get('geo')}: change {num(p['p50'])}{unit} "
+                    f"{('in ' + str(p['period'])) if p.get('period') else '(undated: source horizon)'} ({band}{via}).",
                 ),
                 [scen, *path_eids],
                 "scenario",
@@ -478,11 +583,11 @@ class DomainComposer:
 
     # ------------------------------------------------------------------ atlas without country
     def op_atlas_period(self, res: Any) -> None:
-        from reva.nlqa.compose import _status, _value, period_label
+        from reva.nlqa.compose import _status, _value
 
         d, op = res.data, res.op
         c = d["concept"]
-        for src, n, picks, years in d["groups"]:
+        for src, n, picks, years in d["period_groups"]:
             span = f"{years[0]}–{years[-1]}" if years and years[0] != years[-1] else (str(years[0]) if years else "")
             names = {
                 "first": ("première", "first"),
@@ -494,9 +599,9 @@ class DomainComposer:
             for k, (cell, _eid) in picks.items():
                 nm = names[k][0] if self.fr() else names[k][1]
                 parts.append(
-                    f"{nm} ({period_label(cell)}{_status(cell, self.lang)}) : {_value(cell, self.lang)}"
+                    f"{nm} ({day_or_period(cell)}{_status(cell, self.lang)}) : {_value(cell, self.lang)}"
                     if self.fr()
-                    else f"{nm} ({period_label(cell)}{_status(cell, self.lang)}): {_value(cell, self.lang)}"
+                    else f"{nm} ({day_or_period(cell)}{_status(cell, self.lang)}): {_value(cell, self.lang)}"
                 )
             self.add(
                 self._t(
@@ -515,6 +620,22 @@ class DomainComposer:
         d, op = res.data, res.op
         consulted = ", ".join(res.consulted)
         nd = self._nodata()
+        if d.get("approximate") is not None:
+            r = d["approximate"]
+            cands = ", ".join(f"{e.label(self.lang)} ({e.qid})" for e in [r.entity, *r.alternatives[:3]])
+            self.add(
+                self._t(
+                    f"Aucune entité au libellé ou alias exact pour « {r.text} » dans l'index du graphe REVA : seules des "
+                    f"correspondances approchées existent ({cands}) ; aucune réponse n'est donnée sur une entité "
+                    f"incertaine (préciser le nom).",
+                    f"No entity with this exact label or alias for “{r.text}” in REVA's graph index: only approximate "
+                    f"matches exist ({cands}); no answer is given about an uncertain entity (give the exact name).",
+                ),
+                [d["absence"]],
+                "missing",
+                op.id,
+            )
+            return
         if op.op == "kg_families":
             e = d["entity"]
             fams = ", ".join(op.args["families"])
@@ -601,10 +722,11 @@ class DomainComposer:
                     op.id,
                 )
                 return
-            fams = d.get("families") or []
+            self._not_covering(d, op.id)
+            fam_rows = d.get("families") or []
             why = " ; ".join(
                 f"{f.get('key')} : {f.get('status')}{(' — ' + str(f.get('status_reason'))) if f.get('status_reason') else ''}"
-                for f in fams
+                for f in fam_rows
             )
             where = self.country(d["iso3"]) if d.get("iso3") else self._t("toute zone", "any area")
             self.add(
@@ -621,18 +743,20 @@ class DomainComposer:
                 op.id,
             )
         elif op.op == "decision":
-            cands = d.get("candidates") or []
+            cand_rows: list[Any] = d.get("candidates") or []
             avail = " ; ".join(
-                f"{r.get('id')} (« {r.get('label_fr')} »)" if self.fr() else f"{r.get('id')} (“{r.get('label_en') or r.get('label_fr')}”)"
-                for r in (cands or d.get("references") or [])
+                f"{r.get('id')} (« {r.get('label_fr')} »)"
+                if self.fr()
+                else f"{r.get('id')} (“{r.get('label_en') or r.get('label_fr')}”)"
+                for r in (cand_rows or d.get("references") or [])
             )
             self.add(
                 self._t(
                     f"Aucune décision de référence unique du moteur ne correspond à la question "
-                    f"({'candidates' if cands else 'décisions disponibles'} : {avail}) ; le moteur ne compose pas de "
+                    f"({'candidates' if cand_rows else 'décisions disponibles'} : {avail}) ; le moteur ne compose pas de "
                     f"décision à partir d'un texte libre, aucun scénario n'est calculé.",
                     f"No single reference decision of the engine matches the question "
-                    f"({'candidates' if cands else 'available decisions'}: {avail}); the engine does not compose a "
+                    f"({'candidates' if cand_rows else 'available decisions'}: {avail}); the engine does not compose a "
                     f"decision from free text, no scenario is computed.",
                 ),
                 [d["absence"]],
@@ -668,7 +792,11 @@ class DomainComposer:
         if not by:
             return
         unk = self._t("licence non renseignée dans la réponse", "licence not stated in the answer")
-        parts = [f"{s} ({', '.join(sorted(lics)) or unk})" for s, lics in sorted(by.items())]
+
+        def short(t: str) -> str:
+            return t if len(t) <= 90 else t[:89].rstrip() + "…"
+
+        parts = [f"{s} ({' | '.join(short(x) for x in sorted(lics)) or unk})" for s, lics in sorted(by.items())]
         self.add(
             self._t(f"Sources et licences : {' ; '.join(parts)}.", f"Sources and licences: {'; '.join(parts)}."),
             cites,

@@ -31,6 +31,7 @@ SCHEMA = "reva-effects-literature/1"
 SOURCE_KEY = "effects.literature"
 PDFTOTEXT_TIMEOUT_S = 120
 _ENTRY_KEYS = {
+    "retired",
     "schema",
     "id",
     "source_key",
@@ -86,6 +87,21 @@ class Entry:
     path: Path | None = None
     sha256: str = ""
     notes: str | None = None
+    #: estimates withdrawn from the curation: ``{id, reason, replaced_by: [ids], basis}`` (AUDIT4 L5); the loader
+    #: copies the matching entry into the retraction detail
+    retired: list[dict[str, Any]] = field(default_factory=list)
+
+    def retired_by_estimate_key(self) -> dict[str, dict[str, Any]]:
+        """``pub:<source_key>:<entry id>:<estimate id>`` -> retirement record (replacements as estimate keys)."""
+        pre = f"pub:{self.source_key}:{self.id}:"
+        return {
+            pre + r["id"]: {
+                "reason": r["reason"],
+                "replaced_by": [pre + x for x in r.get("replaced_by") or []],
+                **({"basis": r["basis"]} if r.get("basis") else {}),
+            }
+            for r in self.retired
+        }
 
     def pdf_pages(self) -> dict[str, int | None]:
         return {e["id"]: e.get("pdf_page") for e in self.estimates}
@@ -154,7 +170,25 @@ def parse_entry(data: bytes, path: Path | None = None) -> Entry:
         path=path,
         sha256=hashlib.sha256(data).hexdigest(),
         notes=doc.get("notes"),
+        retired=_retired(doc.get("retired"), {e["id"] for e in ests}, name),
     )
+
+
+def _retired(raw: Any, live_ids: set[str], name: str) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for i, r in enumerate(raw or []):
+        if not isinstance(r, dict) or not r.get("id") or not str(r.get("reason") or "").strip():
+            raise ValidationProblem(f"{name}: retired[{i}] needs an id and a reason")
+        bad = set(r) - {"id", "reason", "replaced_by", "basis"}
+        if bad:
+            raise ValidationProblem(f"{name}: retired[{i}] has unknown keys", keys=sorted(bad))
+        if r["id"] in live_ids:
+            raise ValidationProblem(f"{name}: retired estimate {r['id']} is still curated")
+        rep = r.get("replaced_by") or []
+        if not isinstance(rep, list) or any(x not in live_ids for x in rep):
+            raise ValidationProblem(f"{name}: retired[{i}].replaced_by must list curated estimate ids")
+        out.append(dict(r))
+    return out
 
 
 def load_entries(directory: Path = LITERATURE_DIR) -> list[Entry]:

@@ -303,6 +303,18 @@ def load_properties(path: Path = PROPERTIES) -> tuple[KgProperty, ...]:
     return tuple(out)
 
 
+@lru_cache(maxsize=1)
+def relation_families() -> dict[str, dict[str, str]]:
+    """Family ids and labels of V4CORE's relation registry (``reva.kg.families``); empty when absent."""
+    try:
+        from reva.kg.families import load_registry
+
+        reg = load_registry()
+    except Exception:  # an absent or broken registry leaves the family operations unavailable, never guessed
+        return {}
+    return {fid: {"fr": f.label.get("fr", fid), "en": f.label.get("en", fid)} for fid, f in reg.families.items()}
+
+
 @dataclass(frozen=True)
 class QaCatalog:
     concepts: Mapping[str, Concept]
@@ -403,18 +415,6 @@ def atlas_catalog_concepts() -> list[Concept] | None:
         )
         for c in sorted(cat.concepts.values(), key=lambda c: c.id)
     ]
-
-
-@lru_cache(maxsize=1)
-def relation_families() -> dict[str, dict[str, str]]:
-    """Family ids and labels of V4CORE's relation registry (``reva.kg.families``); empty when absent."""
-    try:
-        from reva.kg.families import load_registry
-
-        reg = load_registry()
-    except Exception:  # an absent or broken registry leaves the family operations unavailable, never guessed
-        return {}
-    return {fid: {"fr": f.label.get("fr", fid), "en": f.label.get("en", fid)} for fid, f in reg.families.items()}
 
 
 def build_catalog(

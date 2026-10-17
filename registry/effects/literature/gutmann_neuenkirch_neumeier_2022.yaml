@@ -40,6 +40,18 @@ defaults:
   scope: {country_group: "158 countries", period: {from: "1960", to: "2016"}, frequency: annual, n_countries: 158}
   identification: "Panel event study (Schmidheiny and Siegloch design) with pre-treatment (-3..-1), episode-year (1..11+) and post-treatment dummies; sanctions from TIES and EUSANCT; reference = threatened but not sanctioned country-years; 95% bands in Figure 1 (not tabulated); coefficients reported as significant at the 1% level"
   applicability: "REVA note: average over sanction episodes 1960-2016 (larger in the Cold War and for US unilateral and financial sanctions per the authors); not specific to a given sender, target or embargo type."
+# AUDIT4 L5 (FIX6): why the two FIX4B retractions happened and what replaces them; the loader copies each record into
+# the retraction detail of a future retraction, and the two existing retractions (load 20) carry it through an
+# appended annotation (reva.effects.retired.annotate_existing_retractions).
+retired:
+  - id: gdp_pc_growth_year1
+    reason: "horizon convention (AUDIT3 M5a): the first year of a sanction episode was stored as horizon 1 instead of h = 0 (onset year), and under the GDP-per-capita level variable with a pp unit; replaced by the h = 0..1 lag profile of the growth variable"
+    replaced_by: [gdp_pc_growth_years_1_2]
+    basis: "docs/dev/v6_fix4b.md (M5a); docs/dev/v5_effect_interface.md 'Horizon convention'"
+  - id: gdp_pc_growth_year2
+    reason: "horizon convention (AUDIT3 M5a): the second year of a sanction episode was stored as horizon 2 instead of h = 1, and under the GDP-per-capita level variable with a pp unit; replaced by the h = 0..1 lag profile of the growth variable"
+    replaced_by: [gdp_pc_growth_years_1_2]
+    basis: "docs/dev/v6_fix4b.md (M5a); docs/dev/v5_effect_interface.md 'Horizon convention'"
 estimates:
   # FIX4B (audit AUDIT3 M5, 2026-10-17): the two growth numbers are one published lag profile. They were two
   # single-horizon estimates (gdp_pc_growth_year1 / _year2, now withdrawn_by_curator) placed one year late

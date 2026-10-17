@@ -156,7 +156,8 @@ def energy_forecasts(q: Mapping[str, Any], fam: Any, ctx: Mapping[str, Any]) -> 
     from reva.evaluation.registry.forecasts import _record, abstention
 
     code = str(ctx["code"])
-    keys = [RW_KEY, STEO_KEY, *sorted({em.MODEL_KEYS[m] for (c, _h, m) in ctx.get("winners", ()) if c == code})]
+    keys = [RW_KEY, STEO_KEY, *sorted({em.MODEL_KEYS[m] for (c, _h, m) in ctx.get("winners", ())
+                                        if c == code and m not in em.NOT_ISSUABLE})]  # fmt: skip
     if ctx.get("issue") is None:
         return [abstention(q, k, str(ctx.get("reason") or "no STEO issue")) for k in (RW_KEY, STEO_KEY)]
     target = P.parse_label("M", str(q["reference_period"]))
@@ -174,7 +175,8 @@ def energy_forecasts(q: Mapping[str, Any], fam: Any, ctx: Mapping[str, Any]) -> 
         ("information_set", "STEO issue in force (vintage accessor, as_known at issue)"),
         ("horizon_months_after_issue", str(h)),
     )
-    win = {m for (c, hh, m) in ctx.get("winners", ()) if c == code and hh == h}
+    # FIX7: an EIA-derived candidate (em.NOT_ISSUABLE) is never issued, even if an older winners file lists it
+    win = {m for (c, hh, m) in ctx.get("winners", ()) if c == code and hh == h and m not in em.NOT_ISSUABLE}
     for m in [em.BENCHMARK, em.REFERENCE, *sorted(win)]:
         mk = em.MODEL_KEYS[m]
         if m == em.REFERENCE and q["type"] != "quantity":
@@ -188,7 +190,11 @@ def energy_forecasts(q: Mapping[str, Any], fam: Any, ctx: Mapping[str, Any]) -> 
         if m not in (em.BENCHMARK, em.REFERENCE):
             d = (
                 *detail,
-                ("winner_rule", "significant CRPS gain vs random walk (DM-HLN, Holm), STEO archive backtest"),
+                (
+                    "winner_rule",
+                    "significant CRPS gain vs random walk (DM-HLN, one Holm over the run), STEO archive "
+                    "backtest; in-sample selection = admission to the registry, not evidence of skill",
+                ),
                 ("winners_sha256", str(ctx.get("winners_sha256"))),
                 ("backtest_digest", str(ctx.get("backtest_digest"))),
             )

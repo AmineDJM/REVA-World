@@ -135,6 +135,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             estimates=ests,
             complete=not refused,
             retraction_reason="withdrawn_by_curator",
+            retired=entry.retired_by_estimate_key(),
             parameters={
                 "connector": f"{CONNECTOR_NAME}@{CONNECTOR_VERSION}",
                 "entry_sha256": entry.sha256,

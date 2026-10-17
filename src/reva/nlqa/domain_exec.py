@@ -196,18 +196,29 @@ def ev_scenario(ev: Evidence, out: Mapping[str, Any]) -> str:
 
 
 def ev_hop(ev: Evidence, h: Mapping[str, Any]) -> str:
-    est = h.get("estimate") or {}
+    raw_src = h.get("source")
+    src: Mapping[str, Any] = raw_src if isinstance(raw_src, Mapping) else {}
+    key = h.get("estimate_key") or src.get("estimate_key")
     return ev._add(
-        ("scenario_hop", h.get("id"), est.get("estimate_key") or h.get("plugin")),
+        ("scenario_hop", h.get("id"), key or h.get("plugin")),
         {
             "kind": "decision_hop",
-            "hop": {k: h.get(k) for k in ("id", "kind", "from", "to", "label_fr", "plugin") if h.get(k) is not None},
-            "estimate_key": est.get("estimate_key"),
+            "hop": {
+                k: h.get(k)
+                for k in ("id", "kind", "from", "to", "label_fr", "plugin", "measure", "unit", "coefficient")
+                if h.get(k) is not None
+            },
+            "estimate_key": key,
             "citation": {
-                "source": est.get("source_key") or est.get("source") or h.get("plugin") or "decision",
-                "estimate_key": est.get("estimate_key"),
-                "reference": est.get("citation"),
-                "status": "attributed_estimate" if est else "scenario_assumption",
+                "source": src.get("source_key") or h.get("plugin") or "decision",
+                "estimate_key": key,
+                "reference": src.get("citation"),
+                "doi": src.get("doi"),
+                "locator": src.get("locator"),
+                "quote": src.get("quote"),
+                "raw_sha256": src.get("raw_sha256"),
+                "rights": src.get("rights"),
+                "status": "attributed_estimate" if key else "scenario_assumption",
             },
         },
     )
@@ -241,8 +252,21 @@ class DomainOps:
             return OpResult(op, "unresolved", data={"lookup": a["entity"]})
         port = self._need("families", "the relation-family index of the KG")
         consulted = [port.name]
+        approx = _approximate(op, r, ev, consulted)
+        if approx is not None:
+            return approx
+        # the chosen record first, then the records with the same label match (several sources publish the
+        # same taxon or compound under one exact label): the answer names the record that answered
         view = port.families(r.entity.qid, families=a["families"], per_family=MAX_FAMILY_NEIGHBOURS)
         groups = _kept_groups(view, a["reading"])
+        answered_by = None
+        for alt in r.alternatives[:MAX_IDENTITY_HOPS]:
+            if any(g[3] for g in groups):
+                break
+            other = port.families(alt.qid, families=a["families"], per_family=MAX_FAMILY_NEIGHBOURS)
+            more = _kept_groups(other, a["reading"])
+            if any(g[3] for g in more) or _literals(other, a["families"]):
+                view, groups, answered_by = other, more, alt
         via: list[tuple[FamilyNeighbour, str]] = []
         if not any(g[3] for g in groups) and view.identities:
             # nothing on this record: the records a source identifies with it (same_as, identifier evidence)
@@ -254,18 +278,22 @@ class DomainOps:
                     groups.extend(more)
         literals = _literals(view, a["families"])
         data: dict[str, Any] = {
-            "entity": r.entity,
+            "entity": answered_by or r.entity,
+            "chosen": r.entity,
+            "answered_by": answered_by,
             "families": a["families"],
             "reading": a["reading"],
             "count": a["count"],
             "kind": view.kind,
         }
+        if answered_by is not None:
+            data["answered_by_eid"] = ev.entity(answered_by, query=r.text, match=r.match or "")
         if not any(g[3] for g in groups) and not literals:
             data["absence"] = ev.absence(
                 "kg_families", consulted, qid=r.entity.qid, families=",".join(a["families"]), reading=a["reading"]
             )
             return OpResult(op, "empty", data=data, consulted=consulted)
-        data["groups"] = [
+        data["fam_groups"] = [
             (fam, label, count, [(n, ev_family_edge(ev, n)) for n in ns], lower)
             for fam, label, count, ns, lower in groups
             if ns
@@ -283,6 +311,10 @@ class DomainOps:
             return OpResult(op, "unresolved", data={"lookup": a["entity"] if ra.entity is None else a["other_entity"]})
         port = self._need("families", "the relation-family index of the KG")
         consulted = [port.name]
+        for r in (ra, rb):
+            approx = _approximate(op, r, ev, consulted)
+            if approx is not None:
+                return approx
         res = port.cross(
             ra.entity.qid, a["families"] or None, rb.entity.qid, a["other_families"], limit=min(a["limit"], MAX_CROSS)
         )
@@ -295,7 +327,7 @@ class DomainOps:
         data.update(
             total=res.total,
             lower_bound=res.total_is_lower_bound,
-            rows=[(row, ev_family_edge(ev, row.a), ev_family_edge(ev, row.b)) for row in res.rows],
+            cross_rows=[(row, ev_family_edge(ev, row.a), ev_family_edge(ev, row.b)) for row in res.rows],
         )
         return OpResult(op, "ok", data=data, consulted=consulted)
 
@@ -324,7 +356,9 @@ class DomainOps:
             data[f"{side}_terms"] = [
                 (
                     terms[i],
-                    ev_term(ev, registry=EFFECT_VOCAB, term_id=i, kind=terms[i].kind, labels=terms[i].labels, query=text),
+                    ev_term(
+                        ev, registry=EFFECT_VOCAB, term_id=i, kind=terms[i].kind, labels=terms[i].labels, query=text
+                    ),
                 )
                 for i in ids
             ]
@@ -363,7 +397,11 @@ class DomainOps:
             return OpResult(op, "empty", data=data, consulted=consulted)
         if iso3:
             covering = [k for k in keys if iso3 in (fams[k].get("countries") or [])]
-            data["not_covering"] = [k for k in keys if k not in covering]
+            data["not_covering"] = [k for k in keys if k not in covering][:MAX_FORECAST_FAMILIES]
+            if data["not_covering"]:
+                data["not_covering_eid"] = ev.absence(
+                    "forecast_geo", consulted, families=",".join(data["not_covering"]), geo=iso3
+                )
             keys = covering
         data["family_terms"] = [
             (
@@ -400,9 +438,7 @@ class DomainOps:
         consulted = [port.name, "registry/predict/reference_decisions.yaml"]
         refs = {str(d["id"]): d for d in port.references()}
         instr = {str(i["id"]): i for i in port.instruments()}
-        labels = {
-            k: {"fr": str(d.get("label_fr") or ""), "en": str(d.get("label_en") or "")} for k, d in refs.items()
-        }
+        labels = {k: {"fr": str(d.get("label_fr") or ""), "en": str(d.get("label_en") or "")} for k, d in refs.items()}
         extra = {
             k: " ".join(str((instr.get(str(d.get("instrument"))) or {}).get(x) or "") for x in ("label_fr", "label_en"))
             for k, d in refs.items()
@@ -466,8 +502,15 @@ class DomainOps:
             if len(numeric) >= 3:
                 picks["min"] = min(numeric, key=lambda c: (_dec(c.value), c.period_start))
                 picks["max"] = max(numeric, key=lambda c: (_dec(c.value), c.period_start))
-            out.append((src, len(cells), {k: (c, ev.cell(c)) for k, c in picks.items()}, sorted({c.year for c in cells if c.year is not None})))
-        data["groups"] = out
+            out.append(
+                (
+                    src,
+                    len(cells),
+                    {k: (c, ev.cell(c)) for k, c in picks.items()},
+                    sorted({c.year for c in cells if c.year is not None}),
+                )
+            )
+        data["period_groups"] = out
         return OpResult(op, "ok", data=data, consulted=consulted)
 
 
@@ -478,7 +521,9 @@ def _same(a: Any, b: Any) -> bool:
         return False
 
 
-def _kept_groups(view: FamilyView, reading: str) -> list[tuple[str, Mapping[str, str], int, list[FamilyNeighbour], bool]]:
+def _kept_groups(
+    view: FamilyView, reading: str
+) -> list[tuple[str, Mapping[str, str], int, list[FamilyNeighbour], bool]]:
     out = []
     for g in view.groups:
         ns = [
@@ -495,11 +540,34 @@ def _literals(view: FamilyView, families: Sequence[str]) -> list[tuple[Any, Mapp
     if not hints:
         return []
     out = []
+    seen: set[tuple[str, str]] = set()
     for s, rights in view.literals:
         words = " ".join([s.property, *[str(v) for v in s.property_labels.values()]]).lower()
-        if any(h in words for h in hints):
+        key = (s.property, s.object_label("en"))
+        if any(h in words for h in hints) and key not in seen:
+            seen.add(key)
             out.append((s, rights))
     return out[:12]
+
+
+#: Matches the V6 domain operations accept: a family answer about an entity found only by the beginning of a
+#: label ("wolf" → "Wolfiporia cocos") or a fuzzy match would be an answer about another thing.
+STRICT_MATCHES = frozenset({"label_exact", "alias_exact", "label_words", "crosswalk_label"})
+
+
+def _approximate(op: Any, r: Any, ev: Any, consulted: list[str]) -> OpResult | None:
+    from reva.nlqa.executor import OpResult
+
+    if r.match in STRICT_MATCHES or r.match is None:
+        return None
+    eid = ev.absence(
+        "exact_entity",
+        consulted,
+        query=r.text,
+        match=str(r.match),
+        candidates=",".join([r.entity.qid] + [x.qid for x in r.alternatives[:3]]),
+    )
+    return OpResult(op, "empty", data={"approximate": r, "absence": eid}, consulted=consulted)
 
 
 def _pick_questions(qs: Sequence[Mapping[str, Any]]) -> list[Mapping[str, Any]]:

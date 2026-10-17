@@ -764,8 +764,12 @@ def load_effect_estimates(
     retraction_reason: str = "absent_from_delivery",
     parameters: Mapping[str, Any] | None = None,
     resolver: Resolver | None = None,
+    retired: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> EffectLoadReport:
-    """Load one delivery of estimates of ``(source_key, dataset)`` in one transaction (interface doc)."""
+    """Load one delivery of estimates of ``(source_key, dataset)`` in one transaction (interface doc).
+
+    ``retired``: estimate key -> the curator's retirement record (reason, replacing keys); copied into the
+    retraction detail of that key when it is retracted (AUDIT4 L5)."""
     t0 = time.perf_counter()
     if source_kind not in v.SOURCE_KINDS:
         raise ValidationProblem("invalid source_kind", source_kind=str(source_kind))
@@ -878,14 +882,26 @@ def load_effect_estimates(
             n = conn.execute(
                 text("""INSERT INTO kg.effect_estimate_retraction(load_id, estimate_row_id, estimate_key, origin,
                                                                    reason, detail)
-                        SELECT :load, (x->>0)::bigint, x->>1, :o, :reason, CAST(:detail AS jsonb)
+                        SELECT :load, (x->>0)::bigint, x->>1, :o, :reason, x->2
                           FROM jsonb_array_elements(CAST(:rows AS jsonb)) x"""),
                 {
                     "load": load_id,
                     "o": origin,
                     "reason": retraction_reason,
-                    "detail": _json({"basis": "absent_from_complete_delivery", "raw_sha256s": raws}),
-                    "rows": _json([list(g) for g in gone]),
+                    "rows": _json(
+                        [
+                            [
+                                gid,
+                                key,
+                                {
+                                    "basis": "absent_from_complete_delivery",
+                                    "raw_sha256s": raws,
+                                    **({"retired": dict(retired[key])} if retired and key in retired else {}),
+                                },
+                            ]
+                            for gid, key in gone
+                        ]
+                    ),
                 },
             ).rowcount
             rep.retracted += int(n)
