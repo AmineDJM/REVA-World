@@ -1116,3 +1116,68 @@ models:
     output_ports: [{name: point_forecast}, {name: predictive_empirical}]
     applicability: {frequencies: [A], question_types: [quantity], min_past_origins: 3}
     assumptions: [past relative accuracy of nowcast vs official informative about the next, normalised errors exchangeable within a bucket]
+  # V7 BEAT-AGRI (src/reva/evaluation/beat_agri/; registry/forecasts/beat_agri/protocol.yaml): REVA vs USDA WASDE.
+  - model_key: forecast.reference_usda_wasde
+    version: "1.0.0"
+    information_source: usda.wasde.point
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference, attributed to USDA: the WASDE projection (U.S. / World production, yield, ending stocks of
+      corn, soybeans, wheat, rice) in the WASDE release in force at issue (atlas.usda_wasde_esmis). Point only; REVA
+      does not produce it.
+    input_ports: [{name: wasde_projection_cell, kind: atlas_cell}]
+    output_ports: [{name: point_forecast}]
+    applicability: {families: [beat_agri.*], question_types: [quantity]}
+    assumptions: [USDA projection as published; no distribution]
+  - model_key: forecast.wasde_fair_fan
+    version: "1.0.0"
+    information_source: usda.wasde.point
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      BENCHMARK (QA-PRED X1 fair fan): Gaussian N(WASDE point, |point| x RMS of WASDE's own past relative errors at the
+      same series and report month, truths published by the origin, >= 5 past marketing years).
+    input_ports: [{name: wasde_projection_cell, kind: atlas_cell}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_gaussian}]
+    applicability: {families: [beat_agri.*], question_types: [quantity], min_past_errors: 5}
+    assumptions: [relative errors at a report month exchangeable across marketing years]
+  - model_key: forecast.beat_agri_bc
+    version: "1.0.0"
+    information_source: usda.wasde.point
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      USES THE WASDE PROJECTION AS AN INPUT: bias correction W (1 + n/(n+5) mean past relative error at the same series
+      and report month); density N(point, RMS of own past errors). A win reads "REVA's correction of the WASDE
+      projection beats the WASDE projection alone on the same release date".
+    input_ports: [{name: wasde_projection_cell, kind: atlas_cell}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_gaussian}]
+    applicability: {families: [beat_agri.*], question_types: [quantity], min_past_years: 3}
+    assumptions: [persistent relative bias of WASDE at a given report month]
+  - model_key: forecast.beat_agri_rev
+    version: "1.0.0"
+    information_source: usda.wasde.point
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      USES THE WASDE PROJECTION AS AN INPUT: revision-smoothing correction W (1 + a + b D), D = relative revision since
+      the previous WASDE, b pooled over the group's series and the window's report months from past errors (shrunk,
+      clipped), a = shrunk mean of past residual errors; density N(point, RMS of own past errors).
+    input_ports: [{name: wasde_projection_cells, kind: atlas_cell}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_gaussian}]
+    applicability: {families: [beat_agri.*], question_types: [quantity], min_past_years: 3}
+    assumptions: [USDA revisions are smoothed (positively autocorrelated), Isengildina, Irwin and Good (2006)]
+  - model_key: forecast.beat_agri_wx
+    version: "1.0.0"
+    information_source: usda.wasde.point
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      USES THE WASDE PROJECTION AS AN INPUT + NCEI weather: U.S. corn / soybeans yield and production, W (1 + shrunk
+      mean past error + ridge(past errors ~ June-August belt temperature/precipitation anomalies usable at the
+      release)); weather = final-vintage nClimDiv with a publication-lag rule (day 12 of the next month).
+    input_ports: [{name: wasde_projection_cell, kind: atlas_cell}, {name: weather, kind: atlas_ncei_cag}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_gaussian}]
+    applicability: {families: [beat_agri.us.corn.*, beat_agri.us.soybeans.*], question_types: [quantity], min_past_years: 6}
+    assumptions: [weather surprises after the WASDE's information date move final yields]
