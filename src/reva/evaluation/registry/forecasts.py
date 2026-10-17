@@ -156,7 +156,14 @@ def pred_models() -> dict[str, tuple[str, str]]:
 
 
 def all_models() -> dict[str, tuple[str, str]]:
-    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models(), **energy_models(), **pred_models()}
+    return {
+        **BASELINES,
+        **REFERENCE_MODELS,
+        **finance_models(),
+        **conflict_models(),
+        **energy_models(),
+        **pred_models(),
+    }
 
 
 __all__ = [
