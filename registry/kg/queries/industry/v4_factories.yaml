@@ -1,5 +1,5 @@
-id: economy.v4_factories
-domain: economy
+id: industry.v4_factories
+domain: industry
 owner: V4INDUSTRY
 description: >-
   Factories (instance of factory Q83405 or of one of its subclasses: car plants, breweries, steelworks, chip fabs ...)

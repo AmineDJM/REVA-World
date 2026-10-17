@@ -131,7 +131,7 @@ owner decision before archiving it) joined to the ICD-10 xrefs already loaded fr
 
 ## Drugs, vaccines, Wikidata bridges (specs, not harvested: WDQS throttled)
 
-`registry/kg/queries/science/health/`: `disease_ontology_ids` (P699), `mondo_ids` (P5270), `uberon_ids` (P1554) —
+`registry/kg/queries/health/`: `disease_ontology_ids` (P699), `mondo_ids` (P5270), `uberon_ids` (P1554) —
 the identifier bridges Wikidata QID ↔ `doid:`/`mondo:`/`uberon:` entities (V4LINK joins them; that also links the
 V3 `science.vaccines` items: vaccine `—P1924 vaccine for→` disease Q `—P699→ doid:n`);
 `disease_treatments_symptoms` (P2176, P780 for items with P699); `essential_medicines` (seeds items pointing to the

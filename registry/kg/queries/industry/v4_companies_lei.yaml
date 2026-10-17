@@ -1,5 +1,5 @@
-id: economy.v4_companies_lei
-domain: economy
+id: industry.v4_companies_lei
+domain: industry
 owner: V4INDUSTRY
 description: >-
   Notable companies and other legal entities that carry a Legal Entity Identifier (P1278) on Wikidata: items with

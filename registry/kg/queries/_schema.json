@@ -32,7 +32,8 @@
         "geography",
         "economy",
         "causal",
-        "energy"
+        "energy",
+        "industry"
       ],
       "description": "Must equal the directory name the file lives in."
     },
