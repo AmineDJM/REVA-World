@@ -1,0 +1,283 @@
+[
+  {
+    "request_fingerprint": "13f18deddbf673854c01620218390f6e807b4f47ac4a45ef26ad54b9d2c0c25f",
+    "url": "https://www.arcgis.com/sharing/rest/content/items/3da2b9ca97684916b75c4013f95d18ab?f=json",
+    "file": "13f18deddbf67385.json",
+    "sha256": "f87f1c4c9d1c139380b1dd97ecce4ac4ae69232e7ed11c585a33faee66fbefa4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "verbatim"
+  },
+  {
+    "request_fingerprint": "331f1fd81143e51a16a3eca48f7e81b705b192035a212c2ec72a97a722042c82",
+    "url": "https://www.arcgis.com/sharing/rest/content/items/83b1bbc7b3354c5fb1f40673bb8f852e?f=json",
+    "file": "331f1fd81143e51a.json",
+    "sha256": "d5607d9fa0ea254a32237b6281825a0007b0ce867a33150cb871acd6162677f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "verbatim"
+  },
+  {
+    "request_fingerprint": "a30c0f44ea25653a680ade4ce629e33840ad609b13384ba7032291cd0eadc86f",
+    "url": "https://www.arcgis.com/sharing/rest/content/items/acc668d199d1472abaaf2467133d4ca4?f=json",
+    "file": "a30c0f44ea25653a.json",
+    "sha256": "d19aa2ccbc1a6e533ccd346223075839dfcbea4fbb0e049734a37817c848d823",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "verbatim"
+  },
+  {
+    "request_fingerprint": "4fc675f17bdac2e2065ac7d8ae1361f9aed7c65c38c8060a283e945c509812c7",
+    "url": "https://www.arcgis.com/sharing/rest/content/items/fa9a5800b0ee4855af8b2944ab1e07af?f=json",
+    "file": "4fc675f17bdac2e2.json",
+    "sha256": "58cfd61e8e20e3082cc848375dcc048372fc79ccab33707e2c7a9b31b250a579",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "verbatim"
+  },
+  {
+    "request_fingerprint": "fc81620fbcaf108bbb387e739e06dfc452a0d5e2b459459276f4e868581106c6",
+    "url": "https://hub.arcgis.com/api/v3/datasets/3da2b9ca97684916b75c4013f95d18ab_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
+    "file": "fc81620fbcaf108b.csv",
+    "sha256": "7b83baa51f51794703c2e24ca682029b8b26a03fb4cdab95c47c7989bb7fc3d2",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: rows of ['chokepoint1', 'chokepoint2', 'chokepoint6'] on 2024-01-01..09 and 2026-10-01..09",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "e5a32cba7c1f89a5a7ee3de6207ba586e48c0b6a48f720dc8ba200e398caf82d"
+    }
+  },
+  {
+    "request_fingerprint": "9a383bc703fe90a27ee7f23dcf3de3f34a14760022dcf9d0156000a57eee0b61",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=1%3D1&outStatistics=%5B%7B%22statisticType%22%3A%22min%22%2C%22onStatisticField%22%3A%22date%22%2C%22outStatisticFieldName%22%3A%22min%22%7D%2C%7B%22statisticType%22%3A%22max%22%2C%22onStatisticField%22%3A%22date%22%2C%22outStatisticFieldName%22%3A%22max%22%7D%5D&f=json",
+    "file": "9a383bc703fe90a2.json",
+    "sha256": "43df8d9ccb54bb96da3a9197bcb031f4305ea4a171ee1f3601c331791eac95e1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "verbatim"
+  },
+  {
+    "request_fingerprint": "a612f8c3ae47088d5888bc2dbe2a39e295519505aee279319d912277cea5d2a5",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2019&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "a612f8c3ae47088d.json",
+    "sha256": "038d4e369d69c859f0f9874321e39befb44059bf226d64e0a610e31b3b06077f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "dab2c72f399df7c0335aae9ce862db7d01ce6b62c0ab20bdc84c2d5f386b8e52"
+    }
+  },
+  {
+    "request_fingerprint": "95a3f49eeae2e69c2dc125e7d9a891b4b53bcce332404887d957f2cbc1916d56",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2020&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "95a3f49eeae2e69c.json",
+    "sha256": "23b8ac2b8b85399c3d31dae9af1795c2dfbcbef713da3ae9e12654b90f87872b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "fa0d7f3dc5eee5e076a54ee3e27de1271f62b1a3ea6bd00e76910cb63cf97d9a"
+    }
+  },
+  {
+    "request_fingerprint": "1ef338ee9061517e20ad528c11584c04cbd34af6f54750b5ec761f80631406e3",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2021&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "1ef338ee9061517e.json",
+    "sha256": "0408a4fa2420f58fc608da38a266056d00d18b5ed87a08103a896cf035ea11fb",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "43a975c51c24855c5a3a38cc75f6cd5fcf6b574f7232766693252a9863a94ce7"
+    }
+  },
+  {
+    "request_fingerprint": "cd642f739fe007531c0027ee50cc6a581e24cb23db2d05a765e9122cd98843f4",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2022&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "cd642f739fe00753.json",
+    "sha256": "a4acc6b330d683dd28490964bcbca04c3c3e94b78403c7e310ee2755cc4e8526",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "7642f10f20c696a321acbff2c2aab85702e384cf3f9b5ebfdc8172fe578b243b"
+    }
+  },
+  {
+    "request_fingerprint": "0d173317af8cf824cf67a7cd2da21af07b716d35f3b2d5bd156bbcb5f55b5137",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2023&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "0d173317af8cf824.json",
+    "sha256": "05284d62e7ad02e38003ea69b397fbcb55888554abb2a03690eded80f0f496e0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "e1dd775c87bca9f5e283701a9d261f724cbc000a6b5119bfb42b04797b2db6be"
+    }
+  },
+  {
+    "request_fingerprint": "b150d5b632b658d55854e6ee02cacb55ef85c91be4be1f5c05b8ba7e024c0760",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2024&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "b150d5b632b658d5.json",
+    "sha256": "364645c4735d09fe96ed809de2d65f903f178e4954c1c343df7cdd229663e238",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "4d076436d0f937f1eb5de5000407720f6427c961f58752a7f7993d85f9fb8d53"
+    }
+  },
+  {
+    "request_fingerprint": "176da74af39efbe665b962a1a78f1313684756359f77cc1f1a245bd826291df0",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2025&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "176da74af39efbe6.json",
+    "sha256": "616ea6d01cdb1cc1c92c213257aa43088281e808eaa4a82d194676f5f536de30",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "a8cca0774e7410ef94fb4ed86ccb9eda5140342d400a116a775a4287b3f2a863"
+    }
+  },
+  {
+    "request_fingerprint": "cc43d1d67dc32ce8e6741d9576bdcba7d85a6163c00bed559424e639a2fc69ad",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Ports_Data/FeatureServer/0/query?where=year%3D2026&groupByFieldsForStatistics=ISO3%2Cyear%2Cmonth&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22portcalls%22%2C%22outStatisticFieldName%22%3A%22portcalls%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22import%22%2C%22outStatisticFieldName%22%3A%22import_t%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22export%22%2C%22outStatisticFieldName%22%3A%22export_t%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22ObjectId%22%2C%22outStatisticFieldName%22%3A%22port_days%22%7D%5D&orderByFieldsForStatistics=ISO3%2Cyear%2Cmonth&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "cc43d1d67dc32ce8.json",
+    "sha256": "33fbeb3c22d08757269ba77deea4b3474fcc6183b38f236d9439cb39b0c2645f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: groups of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] from all pages of the year",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "1040b585d2f7221173f16556a3e3b4a7cf456de17b0bc7ad5865cc90fc0a4454"
+    }
+  },
+  {
+    "request_fingerprint": "fc80a70555efc405634d48b7e65f7b4c00f13d7152d94ab853a8b6c876dff32d",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/PortWatch_ports_database/FeatureServer/0/query?where=1%3D1&outFields=portid%2Cportname%2Ccountry%2CISO3%2Cfullname%2Clat%2Clon%2CLOCODE&returnGeometry=false&orderByFields=portid&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "fc80a70555efc405.json",
+    "sha256": "cea98e79a74534e8b55524d11bc31070ec90708b43d825f65a3f9737f588a8af",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: ports of ['FRA', 'DZA', 'NLD', 'SGP', 'EGY', 'PAN', 'MAR'] + ['fso0', 'fso1']",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "7dc8378a2823c57a90cfd1a1a3b4738f358b59c344094907b5848968be19789f"
+    }
+  },
+  {
+    "request_fingerprint": "a0ec6f109d1197983c12a19a3ef53abc5d8c8312389c4d700b7e7e7b7677126c",
+    "url": "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/PortWatch_chokepoints_database/FeatureServer/0/query?where=1%3D1&outFields=portid%2Cportname%2Ccountry%2CISO3%2Cfullname%2Clat%2Clon%2CLOCODE&returnGeometry=false&orderByFields=portid&resultOffset=0&resultRecordCount=1000&f=json",
+    "file": "a0ec6f109d119798.json",
+    "sha256": "02acbea8cd1c19acdadcf452213aaa9e8797ad5804d9ac87c2c4fd5d95a0c754",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "IMF terms (licence review pending)",
+    "note": "EXCERPT: ['chokepoint1', 'chokepoint2', 'chokepoint6']",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "12699f643fb1cbeb2230ddc8b1c181e107a38015903c8cdce902c3525d8704ce"
+    }
+  },
+  {
+    "request_fingerprint": "9a5a66e5468b9b0a9be9fd4ba291f4f18526c80cafb997f4c57ba4e7dc37b26b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
+    "file": "9a5a66e5468b9b0a.zip",
+    "sha256": "19e9bf9d5b1cb421c6777897d8d33d1088a54cdba038bd6a47c897b2cacd559c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "Public domain (Natural Earth)",
+    "note": "EXCERPT: admin-1 features with iso_a2 in ['FR', 'DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'MC', 'TV']",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05"
+    }
+  }
+]

@@ -11,5 +11,23 @@
     "retrieved_at": "2026-10-16T18:11:46+00:00",
     "licence": "US Government work",
     "note": "trimmed excerpt: <=30 ports for FR, DZ, QM, XU, MA, SG"
+  },
+  {
+    "request_fingerprint": "9a5a66e5468b9b0a9be9fd4ba291f4f18526c80cafb997f4c57ba4e7dc37b26b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
+    "file": "9a5a66e5468b9b0a.zip",
+    "sha256": "19e9bf9d5b1cb421c6777897d8d33d1088a54cdba038bd6a47c897b2cacd559c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "Public domain (Natural Earth)",
+    "note": "EXCERPT: admin-1 features with iso_a2 in ['FR', 'DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'MC', 'TV']",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
+      "source_sha256": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05"
+    }
   }
 ]
