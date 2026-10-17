@@ -135,18 +135,19 @@ async def test_facet_partitions_recurse_only_where_truncated(monkeypatch: pytest
     answers = {
         None: [("1", 100), ("2", 50), ("99", 40)],
         "1": [("1", 100), ("20", 60)],  # complete (2 < 3): 30 absent -> exhaustive zero
-        "2": [("2", 50), ("40", 7), ("41", 5)],  # truncated, its child 42 is unknown -> missing
+        "2": [("2", 50), ("40", 7), ("41", 5)],  # truncated: its child 42 is asked for
+        "42": [("42", 9), ("44", 1), ("45", 1)],  # truncated again, 43 has no deeper partition -> missing
     }
-    totals = {None: 150, "1": 100, "2": 50}
+    totals = {None: 150, "1": 100, "2": 50, "42": 9}
     run = _FacetHttp(answers, totals)
-    children = {"1": ["20"], "20": ["30"], "2": ["40", "42"]}
-    fc = await tx.facet_counts(run, needed={"1", "2", "20", "30", "40", "42"}, children=children, roots=["1", "2"],
-                               raws=[])
-    assert run.calls == [None, "1", "2"]
-    assert fc.counts["20"][0] == 60 and fc.counts["40"][0] == 7
+    children = {"1": ["20"], "20": ["30"], "2": ["40", "42"], "42": ["43"]}
+    needed = {"1", "2", "20", "30", "40", "42", "43"}
+    fc = await tx.facet_counts(run, needed=needed, children=children, roots=["1", "2"], raws=[])
+    assert run.calls == [None, "1", "2", "42"]
+    assert fc.counts["20"][0] == 60 and fc.counts["40"][0] == 7 and fc.counts["42"][0] == 9
     assert fc.counts["30"][:2] == (0, "absent_from_exhaustive_facet")
-    assert fc.missing == ["42"]
-    assert [p["truncated"] for p in fc.partitions] == [True, False, True]
+    assert fc.missing == ["43"]
+    assert [p["truncated"] for p in fc.partitions] == [True, False, True, True]
 
 
 def test_gbif_kg_records() -> None:
@@ -230,7 +231,7 @@ def test_wikidata_bridges_need_unique_values_both_ways() -> None:
     assert not any(o in ("gbif:111", "gbif:222") for _s, o in same)
     assert parts.report["ambiguous"]["P685_value_on_several_items"] == 2
     item = _by(parts.statements, "bio:wikidata_item", "gbif:2435099")[0]
-    assert item.object_qid == "Q35255" and item.qualifiers["wikidata_statement_id"] == "Q35255-ABC"
+    assert item.object_qid == "Q35255" and item.qualifiers["wikidata_statement_id"] == "Q35255$ABC"
     name = _by(parts.statements, "bio:common_name", "gbif:2435099")[0]
     assert name.value == {"type": "monolingualtext", "text": "Puma", "language": "fr"}
 

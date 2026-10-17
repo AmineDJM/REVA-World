@@ -146,13 +146,24 @@ def weo_backtest(
                     counts[f"h{h}_no_outcome"] += 1
                     continue
                 pairs[(h, "june" if t.month < 9 else "december")].append((f, bvals[g], ovals[g]))
-            details.append({"origin": t.isoformat(), "vintage_in_force": inforce["vintage"], "horizon": h,
-                            "target_year": ty, "outcome_vintage": ov, "outcome_known_at": oa.isoformat()})
+            details.append(
+                {
+                    "origin": t.isoformat(),
+                    "vintage_in_force": inforce["vintage"],
+                    "horizon": h,
+                    "target_year": ty,
+                    "outcome_vintage": ov,
+                    "outcome_known_at": oa.isoformat(),
+                }
+            )
     by_h: dict[str, Any] = {}
     for h in horizons:
         allp = pairs[(h, "june")] + pairs[(h, "december")]
-        by_h[f"h{h}"] = {"all": _scores(allp), "june_origins": _scores(pairs[(h, "june")]),
-                         "december_origins": _scores(pairs[(h, "december")])}
+        by_h[f"h{h}"] = {
+            "all": _scores(allp),
+            "june_origins": _scores(pairs[(h, "june")]),
+            "december_origins": _scores(pairs[(h, "december")]),
+        }
     known = [d["outcome_known_at"] for d in details]
     return {
         "label": LABEL,
@@ -175,8 +186,10 @@ def weo_backtest(
 def _growth_by_vintage(levels: pl.DataFrame) -> pl.DataFrame:
     """Annualised q/q growth of each quarter inside each vintage (percent)."""
     df = levels.with_columns(pl.col("value").cast(pl.Float64).alias("x")).sort("vintage", "period_start")
-    df = df.with_columns(pl.col("x").shift(1).over("vintage").alias("x_prev"),
-                         pl.col("period_start").shift(1).over("vintage").alias("p_prev"))
+    df = df.with_columns(
+        pl.col("x").shift(1).over("vintage").alias("x_prev"),
+        pl.col("period_start").shift(1).over("vintage").alias("p_prev"),
+    )
     df = df.filter(pl.col("x_prev").is_not_null() & (pl.col("p_prev").dt.offset_by("3mo") == pl.col("period_start")))
     return df.with_columns((100 * ((pl.col("x") / pl.col("x_prev")) ** 4 - 1)).alias("growth"))
 
@@ -198,9 +211,7 @@ def spf_backtest(cells: pl.DataFrame, *, horizons: Sequence[str] = ("2", "3", "4
     pairs: dict[str, list[tuple[float, float, float]]] = defaultdict(list)
     for sv, sa in surveys.iter_rows():
         acc = VintageAccessor(cells, sa, CutoffMode.available_then)
-        fc = acc.forecasts(family="philfed_spf", variable="real_gdp_growth_q_ann").rows.filter(
-            pl.col("vintage") == sv
-        )
+        fc = acc.forecasts(family="philfed_spf", variable="real_gdp_growth_q_ann").rows.filter(pl.col("vintage") == sv)
         rt_now = acc.latest(family="philfed_rtdsm", variable="real_gdp_level").rows
         if rt_now.height < 2:
             counts["no_rtdsm_vintage_at_survey"] += 1

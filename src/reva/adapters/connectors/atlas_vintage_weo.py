@@ -129,8 +129,11 @@ def atlas_source() -> list[AtlasSourceSpec]:
             planned_requests=len(DBN_VINTAGES) + 4,
             max_response_bytes=MAX_DBN_BYTES,
             min_interval_seconds=1.0,
-            field_mappings={"atlas_tables": [f"{ATLAS_SOURCE}.{DS_DBN}"], "geo_scheme": GEO_SCHEME,
-                            "subjects": sorted(SUBJECTS)},
+            field_mappings={
+                "atlas_tables": [f"{ATLAS_SOURCE}.{DS_DBN}"],
+                "geo_scheme": GEO_SCHEME,
+                "subjects": sorted(SUBJECTS),
+            },
             notes="one DBnomics series request per WEO vintage (5 subjects x all countries); vintage folded in indicator",
             **common,
         ),
@@ -145,8 +148,11 @@ def atlas_source() -> list[AtlasSourceSpec]:
             planned_requests=len(IMF_FLOWS) + 1,
             max_response_bytes=MAX_IMF_BYTES,
             min_interval_seconds=1.0,
-            field_mappings={"atlas_tables": [f"{ATLAS_SOURCE}.{DS_IMF}"], "geo_scheme": GEO_SCHEME,
-                            "subjects": sorted(SUBJECTS)},
+            field_mappings={
+                "atlas_tables": [f"{ATLAS_SOURCE}.{DS_IMF}"],
+                "geo_scheme": GEO_SCHEME,
+                "subjects": sorted(SUBJECTS),
+            },
             notes="IMF portal WEO vintage dataflows; PUBLICATION_DATE = available_at",
             **common,
         ),
@@ -252,8 +258,12 @@ def parse_dbn(docs: list[dict[str, Any]], vintage: str, raw_sha: str, rows: Rows
                     copy="DBnomics IMF/WEO:" + vintage,
                 ),
                 raw_sha256=raw_sha,
-                selector={"dataset": f"IMF/WEO:{vintage}", "series_code": d.get("series_code"), "index": i,
-                          "period": p},
+                selector={
+                    "dataset": f"IMF/WEO:{vintage}",
+                    "series_code": d.get("series_code"),
+                    "index": i,
+                    "period": p,
+                },
             )
             stats["cells"] = stats.get("cells", 0) + 1
 
@@ -288,7 +298,7 @@ def parse_imf(body: bytes, raw_sha: str, flow: str, version: str, rows: Rows, st
         )
         if ek not in (None, "projection", "unknown_boundary"):
             raise WeoVintageError(f"{flow}: unexpected estimate_kind {ek!r}")
-        s, e = year_bounds(y)
+        p0, p1 = year_bounds(y)
         rows.add(
             source=ATLAS_SOURCE,
             dataset=DS_IMF,
@@ -345,15 +355,20 @@ def _note(ds: str, frame: pl.DataFrame, stats: dict[str, Any]) -> str:
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     fixture = run.origin == "test_fixture"
     out: dict[str, Any] = {"tables": {}, "failures": [], "requests": 0}
-    rows, stats, raws = Rows(), {}, []
+    rows, stats, raws = Rows(), dict[str, int](), []
     if run.spec.name == NAME_DBN:
         vintages = tuple(run.options.get("vintages") or (FIXTURE_DBN_VINTAGES if fixture else DBN_VINTAGES))
         for v in vintages:
             try:
                 offset, got, total = 0, 0, None
                 while total is None or got < total:
-                    raw = await run.get(dbn_url(v, offset), key=f"weo:{v}:{offset}", media_types=("application/json",),
-                                        max_bytes=MAX_DBN_BYTES, params={"vintage": v, "offset": offset})
+                    raw = await run.get(
+                        dbn_url(v, offset),
+                        key=f"weo:{v}:{offset}",
+                        media_types=("application/json",),
+                        max_bytes=MAX_DBN_BYTES,
+                        params={"vintage": v, "offset": offset},
+                    )
                     out["requests"] += 1
                     sha = run.archive(raw)
                     raws.append(sha)
@@ -371,10 +386,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         out["vintages"] = []
         for flow, version in flows:
             try:
-                raw = await run.get(imf_url(flow, version), key=f"weo:{flow}:{version}",
-                                    media_types=("application/vnd.sdmx.structurespecificdata+xml", "application/xml"),
-                                    headers={"Accept": atlas_imf.ACCEPT}, max_bytes=MAX_IMF_BYTES,
-                                    params={"flow": flow, "version": version})
+                raw = await run.get(
+                    imf_url(flow, version),
+                    key=f"weo:{flow}:{version}",
+                    media_types=("application/vnd.sdmx.structurespecificdata+xml", "application/xml"),
+                    headers={"Accept": atlas_imf.ACCEPT},
+                    max_bytes=MAX_IMF_BYTES,
+                    params={"flow": flow, "version": version},
+                )
                 out["requests"] += 1
                 sha = run.archive(raw)
                 raws.append(sha)
@@ -388,10 +407,21 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         out["status"] = "no_cells"
         return out
     frame = rows.frame()
-    reg = run.register(dataset=ds, frame=frame, raw_sha256s=sorted(set(raws)), coverage_note=_note(ds, frame, stats),
-                       geo_scheme=GEO_SCHEME, rights=rights(dbn))
-    out["tables"][ds] = {"dataset_key": reg["dataset_key"], "rows": reg["row_count"], "created": reg["created"],
-                         "artifact_sha256": reg["artifact_sha256"], "coverage": coverage_line(frame)}
+    reg = run.register(
+        dataset=ds,
+        frame=frame,
+        raw_sha256s=sorted(set(raws)),
+        coverage_note=_note(ds, frame, stats),
+        geo_scheme=GEO_SCHEME,
+        rights=rights(dbn),
+    )
+    out["tables"][ds] = {
+        "dataset_key": reg["dataset_key"],
+        "rows": reg["row_count"],
+        "created": reg["created"],
+        "artifact_sha256": reg["artifact_sha256"],
+        "coverage": coverage_line(frame),
+    }
     out["stats"] = stats
     return out
 

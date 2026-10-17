@@ -54,7 +54,7 @@ def _est(raw: str, i: int, **kw: Any) -> EffectEstimateIn:
         sign="negative",
         method="time_series_regression",
         as_of="2013-01-31",
-        point=-0.4 - i / 100,
+        point=round(-0.4 - i / 100, 2),
         point_kind="point",
         as_printed=f"{-0.4 - i / 100:.2f}",
         uncertainty=Uncertainty(se=0.05, status="reported"),

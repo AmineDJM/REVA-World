@@ -95,8 +95,12 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=3.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"atlas_tables": [f"{ATLAS_SOURCE}.{DS}"], "geo_scheme": "iso3", "areas": list(AREAS),
-                        "measures": sorted(MEASURES)},
+        field_mappings={
+            "atlas_tables": [f"{ATLAS_SOURCE}.{DS}"],
+            "geo_scheme": "iso3",
+            "areas": list(AREAS),
+            "measures": sorted(MEASURES),
+        },
         notes="one CSV request per edition year (quarterly editions, history window Y-3..)",
     )
 
@@ -128,8 +132,18 @@ def edition_available_at(edition: str) -> datetime:
 def parse_csv(body: bytes, raw_sha: str, rows: Rows, stats: dict[str, int], *, year: int | None = None) -> None:
     text = body.decode("utf-8-sig")
     reader = csv.DictReader(io.StringIO(text))
-    need = {"REF_AREA", "FREQ", "MEASURE", "UNIT_MEASURE", "ACTIVITY", "EDITION", "TIME_PERIOD", "OBS_VALUE",
-            "OBS_STATUS", "UNIT_MULT"}
+    need = {
+        "REF_AREA",
+        "FREQ",
+        "MEASURE",
+        "UNIT_MEASURE",
+        "ACTIVITY",
+        "EDITION",
+        "TIME_PERIOD",
+        "OBS_VALUE",
+        "OBS_STATUS",
+        "UNIT_MULT",
+    }
     if not need <= set(reader.fieldnames or ()):
         raise OecdRtError(f"OECD CSV lacks columns {sorted(need - set(reader.fieldnames or ()))}")
     for i, r in enumerate(reader, start=2):
@@ -179,12 +193,18 @@ def parse_csv(body: bytes, raw_sha: str, rows: Rows, stats: dict[str, int], *, y
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     fixture = run.origin == "test_fixture"
-    rows, stats, raws = Rows(), {}, []
+    rows, stats, raws = Rows(), dict[str, int](), []
     out: dict[str, Any] = {"tables": {}, "failures": [], "requests": 0}
     for y in FIXTURE_YEARS if fixture else years():
         try:
-            raw = await run.get(url(y), key=f"stes_rev:{y}", media_types=("application/vnd.sdmx.data+csv", "text/csv"),
-                                headers={"Accept": ACCEPT}, max_bytes=MAX_BYTES, params={"edition_year": y})
+            raw = await run.get(
+                url(y),
+                key=f"stes_rev:{y}",
+                media_types=("application/vnd.sdmx.data+csv", "text/csv"),
+                headers={"Accept": ACCEPT},
+                max_bytes=MAX_BYTES,
+                params={"edition_year": y},
+            )
             out["requests"] += 1
             sha = run.archive(raw)
             raws.append(sha)
@@ -200,10 +220,16 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         f"quarterly editions, history window edition year - {HISTORY_YEARS}; available_at = first instant of the "
         f"month after the edition. Coverage: {coverage_line(frame)}. Parse: {stats}. Failures: {out['failures']}."
     )[:4000]
-    reg = run.register(dataset=DS, frame=frame, raw_sha256s=raws, coverage_note=note, geo_scheme="iso3",
-                       rights=rights())
-    out["tables"][DS] = {"dataset_key": reg["dataset_key"], "rows": reg["row_count"], "created": reg["created"],
-                         "coverage": coverage_line(frame), "stats": stats}
+    reg = run.register(
+        dataset=DS, frame=frame, raw_sha256s=raws, coverage_note=note, geo_scheme="iso3", rights=rights()
+    )
+    out["tables"][DS] = {
+        "dataset_key": reg["dataset_key"],
+        "rows": reg["row_count"],
+        "created": reg["created"],
+        "coverage": coverage_line(frame),
+        "stats": stats,
+    }
     return out
 
 

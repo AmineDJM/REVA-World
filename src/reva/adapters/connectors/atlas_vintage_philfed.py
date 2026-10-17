@@ -62,7 +62,9 @@ DS_RTDSM = "rtdsm"
 DS_SPF = "spf_median"
 HOST = "www.philadelphiafed.org"
 BASE = f"https://{HOST}/-/media/frbp/assets/surveys-and-data"
-RTDSM_DOC_URL = f"https://{HOST}/-/media/FRBP/Assets/Surveys-And-Data/real-time-data/data-files/documentation/gen_doc_NIPA.pdf"
+RTDSM_DOC_URL = (
+    f"https://{HOST}/-/media/FRBP/Assets/Surveys-And-Data/real-time-data/data-files/documentation/gen_doc_NIPA.pdf"
+)
 SPF_DOC_URL = f"{BASE}/survey-of-professional-forecasters/spf-documentation.pdf"
 SPF_DATES_URL = f"{BASE}/survey-of-professional-forecasters/spf-release-dates.txt"
 SPF_FILES = {"level": "medianLevel.xlsx", "growth": "medianGrowth.xlsx"}
@@ -127,7 +129,8 @@ def atlas_source() -> AtlasSourceSpec:
         provider="Federal Reserve Bank of Philadelphia (Real-Time Data Set for Macroeconomists; Survey of "
         "Professional Forecasters)",
         licence="Federal Reserve Bank of Philadelphia public data downloads; no explicit open licence (site terms: "
-        + TERMS_URL + "); cite the source",
+        + TERMS_URL
+        + "); cite the source",
         allowed_hosts=(HOST,),
         datasets=(DS_RTDSM, DS_SPF),
         dataset_ids=tuple(RTDSM_FILES) + tuple(SPF_FILES.values()),
@@ -137,8 +140,10 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=2.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"atlas_tables": [f"{ATLAS_SOURCE}.{DS_RTDSM}", f"{ATLAS_SOURCE}.{DS_SPF}"],
-                        "geo_scheme": "iso3"},
+        field_mappings={
+            "atlas_tables": [f"{ATLAS_SOURCE}.{DS_RTDSM}", f"{ATLAS_SOURCE}.{DS_SPF}"],
+            "geo_scheme": "iso3",
+        },
         notes="RTDSM quarterly-vintage workbooks + SPF median workbooks + SPF release dates + documentation PDFs",
     )
 
@@ -301,7 +306,11 @@ def horizon_period(sy: int, sq: int, h: str) -> tuple[date, date, str]:
 
 
 def parse_spf(
-    body: bytes, kind: str, raw_sha: str, dates: dict[tuple[int, int], dict[str, str]], rows: Rows,
+    body: bytes,
+    kind: str,
+    raw_sha: str,
+    dates: dict[tuple[int, int], dict[str, str]],
+    rows: Rows,
     stats: dict[str, int],
 ) -> None:
     try:
@@ -414,7 +423,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         return raw.body, run.archive(raw)
 
     if run.wants(DS_RTDSM):
-        rows, stats, raws = Rows(), {}, []
+        rows, stats, raws = Rows(), dict[str, int](), []
         if not fixture:  # the documentation PDF is archived as the evidence of the availability rule
             _, doc_sha = await get(RTDSM_DOC_URL, "rtdsm:doc", ("application/pdf",))
             raws.append(doc_sha)
@@ -423,12 +432,23 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             raws.append(sha)
             parse_rtdsm(body, file, sha, rows, stats)
         frame = rows.frame()
-        reg = run.register(dataset=DS_RTDSM, frame=frame, raw_sha256s=raws, coverage_note=_note(DS_RTDSM, frame, stats),
-                           geo_scheme="iso3", rights=rights())
-        out["tables"][DS_RTDSM] = {"dataset_key": reg["dataset_key"], "rows": reg["row_count"],
-                                   "created": reg["created"], "coverage": coverage_line(frame), "stats": stats}
+        reg = run.register(
+            dataset=DS_RTDSM,
+            frame=frame,
+            raw_sha256s=raws,
+            coverage_note=_note(DS_RTDSM, frame, stats),
+            geo_scheme="iso3",
+            rights=rights(),
+        )
+        out["tables"][DS_RTDSM] = {
+            "dataset_key": reg["dataset_key"],
+            "rows": reg["row_count"],
+            "created": reg["created"],
+            "coverage": coverage_line(frame),
+            "stats": stats,
+        }
     if run.wants(DS_SPF):
-        rows, stats, raws = Rows(), {}, []
+        rows, stats, raws = Rows(), dict[str, int](), []
         if not fixture:
             _, doc_sha = await get(SPF_DOC_URL, "spf:doc", ("application/pdf",))
             raws.append(doc_sha)
@@ -436,15 +456,27 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         raws.append(dsha)
         dates = parse_release_dates(dbody)
         for kind, file in SPF_FILES.items():
-            body, sha = await get(f"{BASE}/survey-of-professional-forecasters/historical-data/{file.lower()}",
-                                  f"spf:{file}", XLSX_MEDIA)
+            body, sha = await get(
+                f"{BASE}/survey-of-professional-forecasters/historical-data/{file.lower()}", f"spf:{file}", XLSX_MEDIA
+            )
             raws.append(sha)
             parse_spf(body, kind, sha, dates, rows, stats)
         frame = rows.frame()
-        reg = run.register(dataset=DS_SPF, frame=frame, raw_sha256s=raws, coverage_note=_note(DS_SPF, frame, stats),
-                           geo_scheme="iso3", rights=rights())
-        out["tables"][DS_SPF] = {"dataset_key": reg["dataset_key"], "rows": reg["row_count"],
-                                 "created": reg["created"], "coverage": coverage_line(frame), "stats": stats}
+        reg = run.register(
+            dataset=DS_SPF,
+            frame=frame,
+            raw_sha256s=raws,
+            coverage_note=_note(DS_SPF, frame, stats),
+            geo_scheme="iso3",
+            rights=rights(),
+        )
+        out["tables"][DS_SPF] = {
+            "dataset_key": reg["dataset_key"],
+            "rows": reg["row_count"],
+            "created": reg["created"],
+            "coverage": coverage_line(frame),
+            "stats": stats,
+        }
     return out
 
 

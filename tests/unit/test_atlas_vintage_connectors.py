@@ -37,8 +37,13 @@ from reva.evaluation.vintages import cells_from_atlas_frame
 ROOT = Path(__file__).resolve().parents[2]
 FIX = ROOT / "tests" / "fixtures" / "source"
 SHA = "a" * 64
-NAMES = ["atlas.vintage_weo_dbn", "atlas.vintage_weo_imf", "atlas.vintage_philfed", "atlas.vintage_ecb_spf",
-         "atlas.vintage_oecd_rt"]
+NAMES = [
+    "atlas.vintage_weo_dbn",
+    "atlas.vintage_weo_imf",
+    "atlas.vintage_philfed",
+    "atlas.vintage_ecb_spf",
+    "atlas.vintage_oecd_rt",
+]
 
 
 def _fixture(conn: str, url_part: str) -> bytes:
@@ -78,8 +83,13 @@ def test_registry_sources_and_budget_request() -> None:
 
 
 def test_vintage_flags_refuse_unknown_terms_and_half_availability() -> None:
-    ok = dict(family="imf_weo", vintage="2008-04", variable="real_gdp_growth", provider_variable="NGDP_RPCH",
-              estimate_kind="projection")
+    ok = dict(
+        family="imf_weo",
+        vintage="2008-04",
+        variable="real_gdp_growth",
+        provider_variable="NGDP_RPCH",
+        estimate_kind="projection",
+    )
     with pytest.raises(ValueError):
         vintage_flags(**ok, available_at=datetime(2008, 5, 1, tzinfo=UTC), basis=None)
     with pytest.raises(ValueError):
@@ -98,14 +108,19 @@ def test_weo_dbnomics_vintages_are_month_end_and_never_mix_projections() -> None
         docs, n = weo.parse_dbn_page(_fixture("atlas.vintage_weo_dbn", f"WEO:{v}"), v)
         assert n == len(docs)
         weo.parse_dbn(docs, v, SHA, rows, stats)
-    f, unmapped = validate_atlas_frame(rows.frame(), source="vintage_weo", dataset="weo_dbnomics",
-                                       raw_sha256s=[SHA], geo_scheme="imf")
+    f, unmapped = validate_atlas_frame(
+        rows.frame(), source="vintage_weo", dataset="weo_dbnomics", raw_sha256s=[SHA], geo_scheme="imf"
+    )
     assert {u["provider_geo"] for u in unmapped} <= {"UVK"}  # Kosovo (WEO code UVK, later vintages) stays unmapped
     assert set(f["iso3"].drop_nulls().unique()) == {"FRA", "USA", "DEU"}  # WBG/UVK: not in these early vintages
     fra = f.filter((pl.col("provider_geo") == "FRA") & (pl.col("indicator") == "NGDP_RPCH|v=2008-04"))
     fl = {r["period_start"].year: json.loads(r["flags"]) for r in fra.to_dicts()}
-    assert fl[2008]["estimate_kind"] == "projection" and fl[2007]["estimate_kind"] == "published_history_boundary_unknown"
-    assert fl[2007]["available_at"] == "2008-05-01T00:00:00Z" and fl[2007]["availability_basis"] == "weo_release_month_end"
+    assert (
+        fl[2008]["estimate_kind"] == "projection" and fl[2007]["estimate_kind"] == "published_history_boundary_unknown"
+    )
+    assert (
+        fl[2007]["available_at"] == "2008-05-01T00:00:00Z" and fl[2007]["availability_basis"] == "weo_release_month_end"
+    )
     assert fl[2007]["vintage_date_text"] is None  # DBnomics keeps no release day: never invented
     v2 = f.filter((pl.col("provider_geo") == "FRA") & (pl.col("indicator") == "NGDP_RPCH|v=2009-10"))
     assert json.loads(v2["flags"][0])["available_at"] == "2009-11-01T00:00:00Z"
@@ -120,11 +135,13 @@ def test_weo_dbnomics_vintages_are_month_end_and_never_mix_projections() -> None
 def test_weo_imf_portal_vintage_uses_publication_date_and_boundary() -> None:
     rows: Rows = Rows()
     stats: dict = {}
-    vint = weo.parse_imf(_fixture("atlas.vintage_weo_imf", "WEO_2025_OCT_VINTAGE"), SHA, "WEO_2025_OCT_VINTAGE",
-                         "1.0.0", rows, stats)
+    vint = weo.parse_imf(
+        _fixture("atlas.vintage_weo_imf", "WEO_2025_OCT_VINTAGE"), SHA, "WEO_2025_OCT_VINTAGE", "1.0.0", rows, stats
+    )
     assert vint["vintage"] == "2025-10" and vint["publication_date"] == "2025-10-14T13:00:00Z"
-    f, unmapped = validate_atlas_frame(rows.frame(), source="vintage_weo", dataset="weo_imf", raw_sha256s=[SHA],
-                                       geo_scheme="imf")
+    f, unmapped = validate_atlas_frame(
+        rows.frame(), source="vintage_weo", dataset="weo_imf", raw_sha256s=[SHA], geo_scheme="imf"
+    )
     assert {u["provider_geo"] for u in unmapped} == {"G001"}
     usa = f.filter((pl.col("provider_geo") == "USA") & (pl.col("indicator") == "NGDP_RPCH|v=2025-10"))
     fl = {r["period_start"].year: json.loads(r["flags"]) for r in usa.to_dicts()}
@@ -142,8 +159,9 @@ def test_rtdsm_vintage_columns_and_middle_month_rule() -> None:
     stats: dict = {}
     for f in pf.FIXTURE_RTDSM:
         pf.parse_rtdsm(_fixture("atlas.vintage_philfed", f"xlsx/{f}"), f, SHA, rows, stats)
-    df, _ = validate_atlas_frame(rows.frame(), source="vintage_us", dataset="rtdsm", raw_sha256s=[SHA],
-                                 geo_scheme="iso3")
+    df, _ = validate_atlas_frame(
+        rows.frame(), source="vintage_us", dataset="rtdsm", raw_sha256s=[SHA], geo_scheme="iso3"
+    )
     # 2007:Q4 real GDP first appears in the 2008:Q1 vintage (BEA advance estimate)
     q4 = df.filter((pl.col("period_start") == date(2007, 10, 1)) & pl.col("indicator").str.starts_with("ROUTPUT|"))
     vint = sorted(json.loads(x)["vintage"] for x in q4["flags"])
@@ -165,8 +183,9 @@ def test_spf_release_dates_verbatim_and_unknown_before_1990q2() -> None:
     stats: dict = {}
     pf.parse_spf(_fixture("atlas.vintage_philfed", "medianlevel.xlsx"), "level", SHA, dates, rows, stats)
     pf.parse_spf(_fixture("atlas.vintage_philfed", "mediangrowth.xlsx"), "growth", SHA, dates, rows, stats)
-    df, _ = validate_atlas_frame(rows.frame(), source="vintage_us", dataset="spf_median", raw_sha256s=[SHA],
-                                 geo_scheme="iso3")
+    df, _ = validate_atlas_frame(
+        rows.frame(), source="vintage_us", dataset="spf_median", raw_sha256s=[SHA], geo_scheme="iso3"
+    )
     fl = _flags(df)
     assert all(f["estimate_kind"] == "projection" for f in fl)
     old = [f for f in fl if f["vintage"] in ("1989Q4", "1990Q1")]
@@ -201,8 +220,9 @@ def test_oecd_editions_month_end_and_values_verbatim() -> None:
     rows: Rows = Rows()
     stats: dict = {}
     oecd.parse_csv(_fixture("atlas.vintage_oecd_rt", "sdmx.oecd.org"), SHA, rows, stats, year=2008)
-    df, _ = validate_atlas_frame(rows.frame(), source="vintage_oecd", dataset="stes_revisions", raw_sha256s=[SHA],
-                                 geo_scheme="iso3")
+    df, _ = validate_atlas_frame(
+        rows.frame(), source="vintage_oecd", dataset="stes_revisions", raw_sha256s=[SHA], geo_scheme="iso3"
+    )
     assert set(df["iso3"].unique()) == {"FRA", "USA"}
     fl = _flags(df)
     assert {f["vintage"] for f in fl} == {"200802", "200805", "200808", "200811"}

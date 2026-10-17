@@ -54,8 +54,7 @@ VINTAGE_DATASET_KEYS: tuple[str, ...] = (
 )
 FINAL_VINTAGE_LABEL = "final_vintage_pseudo_real_time"
 FINAL_VINTAGE_DISCLAIMER = (
-    "final-vintage pseudo-real-time: the latest published vintage is used at every origin; "
-    + RETROSPECTIVE_DISCLAIMER
+    "final-vintage pseudo-real-time: the latest published vintage is used at every origin; " + RETROSPECTIVE_DISCLAIMER
 )
 SERIES_KEY = ("family", "variable", "provider_geo", "period_start", "period_end")
 _FLAG_FIELDS = {
@@ -284,10 +283,19 @@ class VintageAccessor:
         if self._mode is not CutoffMode.revised_data_retrospective:
             late = rows.filter(pl.col("available_at").is_null() | (pl.col("available_at") > self._cutoff))
             if late.height:
-                raise LeakageBlocked("vintage cell published after the cutoff was selected", cutoff=self._cutoff.isoformat())
+                raise LeakageBlocked(
+                    "vintage cell published after the cutoff was selected", cutoff=self._cutoff.isoformat()
+                )
         for r in rows.select(
-            "dataset_key", "indicator", "provider_geo", "period_start", "table_recorded_at", "available_at",
-            "availability_basis", "vintage", "vintage_date_text",
+            "dataset_key",
+            "indicator",
+            "provider_geo",
+            "period_start",
+            "table_recorded_at",
+            "available_at",
+            "availability_basis",
+            "vintage",
+            "vintage_date_text",
         ).iter_rows(named=True):
             self._guard.check(
                 InputRef(
@@ -296,8 +304,11 @@ class VintageAccessor:
                     recorded_at=r["table_recorded_at"],
                     source_available_at=r["available_at"],
                     availability_basis=(
-                        {"rule": r["availability_basis"], "vintage": r["vintage"],
-                         "vintage_date_text": r["vintage_date_text"]}
+                        {
+                            "rule": r["availability_basis"],
+                            "vintage": r["vintage"],
+                            "vintage_date_text": r["vintage_date_text"],
+                        }
                         if r["availability_basis"]
                         else None
                     ),
@@ -363,8 +374,9 @@ class VintageAccessor:
             return None
         top = (
             adm.group_by("vintage", "dataset_key")
-            .agg(pl.col("available_at").max(), pl.col("availability_basis").first(),
-                 pl.col("vintage_date_text").first())
+            .agg(
+                pl.col("available_at").max(), pl.col("availability_basis").first(), pl.col("vintage_date_text").first()
+            )
             .sort(["available_at", "vintage"], descending=True)
             .row(0, named=True)
         )
@@ -465,8 +477,11 @@ def vintage_replay(
             "availability_proof": {
                 "kind": "source_availability",
                 "source_available_at": _plain(r["available_at"]),
-                "availability_basis": {"rule": r["availability_basis"], "vintage": r["vintage"],
-                                       "vintage_date_text": r["vintage_date_text"]},
+                "availability_basis": {
+                    "rule": r["availability_basis"],
+                    "vintage": r["vintage"],
+                    "vintage_date_text": r["vintage_date_text"],
+                },
             },
         }
         for r in scope.rows.to_dicts()

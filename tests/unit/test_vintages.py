@@ -42,11 +42,25 @@ def _cells(spec: list[tuple[str, datetime | None, int, str, str]], geo: str = "F
     for v, avail, y, val, kind in spec:
         s, e = year_bounds(y)
         rows.add(
-            source="vintage_weo", dataset="weo_dbnomics", indicator=f"NGDP_RPCH|v={v}", provider_geo=geo, start=s,
-            end=e, value=val, unit="pcent", raw_sha256=SHA, selector={"v": v, "y": y},
-            flags=vintage_flags(family="imf_weo", vintage=v, available_at=avail,
-                                basis="weo_release_month_end" if avail else None, variable="real_gdp_growth",
-                                provider_variable="NGDP_RPCH", estimate_kind=kind),
+            source="vintage_weo",
+            dataset="weo_dbnomics",
+            indicator=f"NGDP_RPCH|v={v}",
+            provider_geo=geo,
+            start=s,
+            end=e,
+            value=val,
+            unit="pcent",
+            raw_sha256=SHA,
+            selector={"v": v, "y": y},
+            flags=vintage_flags(
+                family="imf_weo",
+                vintage=v,
+                available_at=avail,
+                basis="weo_release_month_end" if avail else None,
+                variable="real_gdp_growth",
+                provider_variable="NGDP_RPCH",
+                estimate_kind=kind,
+            ),
         )
     return cells_from_atlas_frame(rows.frame(), dataset_key="atlas.vintage_weo.weo_dbnomics", table_recorded_at=REC)
 
@@ -99,7 +113,9 @@ def test_projection_is_never_returned_as_an_observation() -> None:
 
 
 def test_no_availability_proof_means_exclusion_never_a_guess() -> None:
-    cells = _cells([("1989Q4", None, 1990, "2.0", "projection"), ("2008-04", _t(2008, 5, 1), 2008, "1.4", "projection")])
+    cells = _cells(
+        [("1989Q4", None, 1990, "2.0", "projection"), ("2008-04", _t(2008, 5, 1), 2008, "1.4", "projection")]
+    )
     scope = VintageAccessor(cells, _t(2026, 10, 1)).forecasts(family="imf_weo")
     assert scope.rows["vintage"].to_list() == ["2008-04"]
     assert scope.exclusions["no_availability_proof"] == 1
@@ -162,8 +178,9 @@ def _real_cells() -> pl.DataFrame:
     for v in weo.FIXTURE_DBN_VINTAGES:
         docs, _ = weo.parse_dbn_page(_fixture("atlas.vintage_weo_dbn", f"WEO:{v}"), v)
         weo.parse_dbn(docs, v, SHA, rows, {})
-    weo.parse_imf(_fixture("atlas.vintage_weo_imf", "WEO_2025_OCT_VINTAGE"), SHA, "WEO_2025_OCT_VINTAGE", "1.0.0",
-                  rows, {})
+    weo.parse_imf(
+        _fixture("atlas.vintage_weo_imf", "WEO_2025_OCT_VINTAGE"), SHA, "WEO_2025_OCT_VINTAGE", "1.0.0", rows, {}
+    )
     a = cells_from_atlas_frame(rows.frame(), dataset_key="atlas.vintage_weo.mixed", table_recorded_at=REC)
     spf = Rows()
     dates = pf.parse_release_dates(_fixture("atlas.vintage_philfed", "spf-release-dates.txt"))
@@ -187,7 +204,9 @@ def test_property_no_selected_cell_is_published_after_the_cutoff() -> None:
                 assert got.filter(pl.col("available_at").is_null() | (pl.col("available_at") > c)).height == 0
                 # each selected cell is the latest admissible vintage of its series key
                 adm = cells.filter((pl.col("family") == fam) & (pl.col("available_at") <= c))
-                best = adm.group_by("variable", "provider_geo", "period_start", "period_end").agg(pl.col("available_at").max())
+                best = adm.group_by("variable", "provider_geo", "period_start", "period_end").agg(
+                    pl.col("available_at").max()
+                )
                 j = got.join(best, on=["variable", "provider_geo", "period_start", "period_end"], suffix="_best")
                 assert j.filter(pl.col("available_at") != pl.col("available_at_best")).height == 0
 

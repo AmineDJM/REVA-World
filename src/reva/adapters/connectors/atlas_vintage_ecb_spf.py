@@ -106,8 +106,18 @@ def parse_csv(body: bytes, raw_sha: str, rows: Rows, stats: dict[str, int]) -> N
     except UnicodeDecodeError as e:
         raise EcbSpfError(f"ECB SPF CSV is not UTF-8 ({e})") from e
     reader = csv.DictReader(io.StringIO(text))
-    need = {"KEY", "REF_AREA", "FCT_TOPIC", "FCT_BREAKDOWN", "FCT_HORIZON", "FCT_SOURCE", "TIME_PERIOD", "OBS_VALUE",
-            "TITLE_COMPL", "UNIT"}
+    need = {
+        "KEY",
+        "REF_AREA",
+        "FCT_TOPIC",
+        "FCT_BREAKDOWN",
+        "FCT_HORIZON",
+        "FCT_SOURCE",
+        "TIME_PERIOD",
+        "OBS_VALUE",
+        "TITLE_COMPL",
+        "UNIT",
+    }
     if not need <= set(reader.fieldnames or ()):
         raise EcbSpfError(f"ECB SPF CSV lacks columns {sorted(need - set(reader.fieldnames or ()))}")
     for i, r in enumerate(reader, start=2):
@@ -134,14 +144,14 @@ def parse_csv(body: bytes, raw_sha: str, rows: Rows, stats: dict[str, int]) -> N
         if val is None:
             stats["no_value"] = stats.get("no_value", 0) + 1
             continue
-        s, e = year_bounds(ty)
+        p0, p1 = year_bounds(ty)
         rows.add(
             source=ATLAS_SOURCE,
             dataset=DS,
             indicator=indicator(f"{topic}.{h}", r["TIME_PERIOD"]),
             provider_geo="U2",
-            start=s,
-            end=e,
+            start=p0,
+            end=p1,
             value=val,
             unit=r["UNIT"] or "not stated",
             flags=vintage_flags(
@@ -165,10 +175,11 @@ def parse_csv(body: bytes, raw_sha: str, rows: Rows, stats: dict[str, int]) -> N
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
-    raw = await run.get(URL, key="spf:csvdata", media_types=("text/csv", "application/vnd.sdmx.data+csv"),
-                        max_bytes=MAX_BYTES)
+    raw = await run.get(
+        URL, key="spf:csvdata", media_types=("text/csv", "application/vnd.sdmx.data+csv"), max_bytes=MAX_BYTES
+    )
     sha = run.archive(raw)
-    rows, stats = Rows(), {}
+    rows, stats = Rows(), dict[str, int]()
     parse_csv(raw.body, sha, rows, stats)
     frame = rows.frame()
     note = (
@@ -177,8 +188,18 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         f"Coverage: {coverage_line(frame)}. Parse: {stats}."
     )[:4000]
     reg = run.register(dataset=DS, frame=frame, raw_sha256s=[sha], coverage_note=note, rights=rights())
-    return {"tables": {DS: {"dataset_key": reg["dataset_key"], "rows": reg["row_count"], "created": reg["created"],
-                            "coverage": coverage_line(frame), "stats": stats}}, "requests": 1}
+    return {
+        "tables": {
+            DS: {
+                "dataset_key": reg["dataset_key"],
+                "rows": reg["row_count"],
+                "created": reg["created"],
+                "coverage": coverage_line(frame),
+                "stats": stats,
+            }
+        },
+        "requests": 1,
+    }
 
 
 __all__ = ["NAME", "atlas_ingest", "atlas_source", "parse_csv"]
