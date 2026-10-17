@@ -30,7 +30,7 @@ from reva.effects import curation as cur
 from reva.effects import model as effects_model
 
 CONNECTOR_NAME = "atlas.effects_lit"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered from an in-flight snapshot with different code
 PARSER_VERSION = "atlas_effects_lit/1"
 SOURCE_KEY = "effects.literature"
 ATLAS_SOURCE = "effects"

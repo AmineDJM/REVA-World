@@ -186,7 +186,7 @@ Readers (plain dicts in the JSON shape below; `conn` = any SQLAlchemy connection
 
 ```json
 {
-  "estimate_key": "pub:ecb.publications:ecb_op113_2010:io_cpi_total_ea",
+  "estimate_key": "pub:effects.literature:ecb_op113_2010:consumer_prices_total_ea",
   "row_id": 12,
   "cause": {"kind": "variable", "id": "energy_price.all_products", "label": "Energy prices", "label_fr": "Prix de l'énergie",
             "definition": "10% increase in energy prices: coal/lignite/peat (NACE 10), …", "transform": "percent_change"},
@@ -199,7 +199,7 @@ Readers (plain dicts in the JSON shape below; `conn` = any SQLAlchemy connection
   "horizon": {"kind": "unspecified", "value": null, "unit": null}, "irf": [],
   "scope": {"country_group": "Euro area (12-country weighted average)", "period": {"from": "2005", "to": "2005"}},
   "method": "input_output", "identification": "Static Leontief cost-push calculation …", "meta": null,
-  "source": {"kind": "publication", "source_key": "ecb.publications",
+  "source": {"kind": "publication", "source_key": "effects.literature", "dataset": "ecb_op113_2010",
              "citation": {"text": "…verbatim…", "doi": null, "url": "https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf", "year": 2010},
              "locator": "Table 12, row 'Total', column 'euro area' (pdf p.77)", "quote": "…0.36…",
              "selector": null, "transcription": "transcribed_double_checked", "raw_sha256": "d38a…",
@@ -231,3 +231,12 @@ Readers (plain dicts in the JSON shape below; `conn` = any SQLAlchemy connection
   every hop; respect `as_of_max` in replays; never fabricate uncertainty (`normal_approx(...)["basis"] is None`
   ⇒ scenario point only, no probability).
 * Comparability: do not average estimates across comparability keys; pick explicitly and record the choice.
+
+## Curated publications (implementation note, PRED-EFFECT)
+
+Published numbers come from `registry/effects/literature/<entry>.yaml` (one publication = one `dataset`), loaded
+by the connector `atlas.effects_lit` (`reva.effects.curation`): the document is fetched through the metered client
+and archived, its sha256 must equal the pinned one, and every `quote` is re-found automatically on its `pdf_page`
+in the text extracted from the archived bytes before the estimate is loaded (`transcribed_double_checked`).
+`curation.printed_transform = "negated"` marks a coefficient the source prints with the opposite sign convention
+(e.g. a Phillips curve written `π = … − κ u`): `point` is the response of the effect to an increase of the cause.

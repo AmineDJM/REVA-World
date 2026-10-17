@@ -1,0 +1,114 @@
+# V5 PRED-EFFECT — effect-estimates layer (report)
+
+Agent PRED-EFFECT, 2026-10-17. Spec: `docs/roadmap/v5_prediction_engine.md` (decision 3: effect sizes only as
+attributed numbers). Contract for other agents: `docs/dev/v5_effect_interface.md` (first commit, 81bf633).
+
+## What was built
+
+| Piece | Where |
+|---|---|
+| Migration `0019_effect_estimates` (down_revision `0018_retraction_reasons`): `kg.effect_load`, `kg.effect_estimate`, `kg.effect_estimate_retraction` (append-only, `meta.reject_mutation`), view `kg.effect_estimate_current`; load/row/retraction triggers (verified raw artifacts, rows restate their load, sealed loads); CHECKs for unit-vs-measure, sign = sign(point), interval order / point inside / level, uncertainty status, horizon, per-source-kind requirements (publication: citation + locator + raw sha256 + quote; run: run record; identity: formula); grants as `kg.causal_*` (worker INSERT, api/sim/worker SELECT, gate nothing, restricted-deletion role) | `migrations/versions/0019_effect_estimates.py` |
+| Schema contract regenerated (2,292 objects, fingerprint `d2fe2f9235dbed10`, head 0019) | `migrations/schema_contract.json` |
+| Backup manifest | no change needed: `scripts/backup_restore.py` digests every table of schema `kg` generically |
+| Python package (vocabularies, validation, loader, readers, wording, uncertainty for Monte-Carlo, curation + automatic quote re-check) | `src/reva/effects/{vocab,variables,model,query,uncertainty,curation}.py` |
+| Effect-variable vocabulary (19 variables, en/fr, REVA definitions, curated atlas links: `prices.consumer_level -> imf.cpi_index`) | `registry/effects/variables.yaml` |
+| Curated publications (7 entries, 57 estimates) | `registry/effects/literature/*.yaml` |
+| Connector `atlas.effects_lit@1.0.1` (source `effects.literature`, metered through `run_atlas_ingest`, raw PDFs archived, pinned sha256, quote re-check, load per publication) | `src/reva/adapters/connectors/atlas_effects_lit.py`, `registry/sources/effects_literature.yaml`, `registry/atlas/budget_requests/pred_effect.yaml` (merged: 40 req/day) |
+| API `/v1/effects/estimates`, `/v1/effects/estimates/{key}`, `/v1/effects/compare`, `/v1/effects/variables` (read scope, envelope warnings `attributed_estimates`, `no_pooling`, `licence_restricted`) | `src/reva/api/routes/effects.py` (+1 router line in `app.py`), `contracts/openapi.json` |
+| Tests: 37 unit (vocab = migration, every curated entry validates, 27 rejection rules, quote re-check, pdftotext on stdin, uncertainty bases, connector spec) + 6 integration on a throwaway DB (loader idempotence / revision / retraction / reinstatement / partial delivery, DB CHECKs and append-only, grants, sealed loads, REVA-run rows and readers, connector fixture run, API) | `tests/unit/effects/`, `tests/integration/test_effects_store.py`, synthetic fixture `tests/fixtures/effects/`, `tests/fixtures/source/atlas.effects_lit/` |
+
+### Honesty rules as implemented
+
+* Every number is quoted: `as_printed` must appear in the verbatim `quote` (and `se_as_printed` too); `point` must
+  equal the printed number (or its negation when the source writes the slope with a minus sign — Phillips curve
+  κ/ψ — recorded as `curation.printed_transform = negated`).
+* **Double check**: at load time the connector extracts the text of the archived bytes (`pdftotext -layout`,
+  bytes on stdin) and re-finds every quote on the declared `pdf_page`; a missing quote or another page refuses the
+  estimate (`quote_not_in_source`, `locator_page_mismatch`). Only re-found estimates are
+  `transcribed_double_checked` (the check is stored in `curation.text_check` and in the load parameters). The check
+  caught my own wrong page guesses for Head & Mayer, Hazell et al. and Choi et al. during curation.
+* A document whose bytes differ from the pinned sha256 is not loaded (`document_changed`).
+* No invented uncertainty: SEs only where printed; ranges across countries are `range_across_estimates`
+  (`partial`); meta-analytic dispersion stays in `meta.sd_across_estimates`; `normal_approx()` returns
+  `basis: null` when nothing is reported (PRED-ENGINE must then treat the estimate as a scenario point).
+* No unverified DOIs: DOIs are recorded only when printed in the archived document (none of the 7 are); citations
+  are assembled from the title pages of the version read and say so (`text_basis`), with `version_read`.
+* Country codes in `scope.countries` were assigned by the curator from the printed English names / two-letter
+  column heads, and the printed name is kept in `scope.sample_note`.
+* REVA's own notes are in `applicability` and start with "REVA note:"; source caveats are verbatim in
+  `source_caveats`.
+
+## Sources (live fetch, 2026-10-17)
+
+| Entry (dataset) | Document | Bytes | Licence | Estimates |
+|---|---|---|---|---|
+| `ball_leigh_loungani_2013` | Ball, Leigh & Loungani, *Okun's Law: Fit at Fifty?*, NBER WP 18668 (Jan 2013), https://www.nber.org/system/files/working_papers/w18668/w18668.pdf | 690,678 | © authors, short quotation with credit | 24: US annual levels λ=100/1,000 and changes (Table 1), US quarterly with two lags (Table 2, lag profile in `irf`), 20 advanced economies (Table 5) |
+| `head_mayer_2013` | Head & Mayer, *Gravity Equations: Workhorse, Toolkit, and Cookbook*, CEPII WP 2013-27 (Sep 2013), https://www.cepii.fr/PDF_PUB/wp/2013/wp2013-27.pdf | 738,834 | no licence statement (treated as all rights reserved) | 8: trade elasticities (Table 5: full, structural, tariff-identified −5.03 = authors' preferred, price/wage/FX-identified), distance, RTA/FTA, EU, common currency (Table 4, structural medians) |
+| `choi_furceri_loungani_mishra_poplawski_ribeiro_2017` | Choi et al., *Oil Prices and Inflation Dynamics*, IMF WP/17/196 (Sep 2017), https://www.imf.org/-/media/files/publications/wp/2017/wp17196.pdf | 1,179,217 | © IMF | 1: +10 % global oil price → +0.4 pp domestic inflation on impact (72 economies, 1970-2015) |
+| `ortega_osbat_2020` | Ortega & Osbat (eds.), *Exchange rate pass-through in the euro area and EU countries*, ECB OP 241 (Apr 2020), https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op241~c7c3080d60.en.pdf | 1,534,158 | © ECB, all rights reserved | 8: 1 % euro depreciation → import prices 0.30 %, HICP 0.03 % (range −0.06..0.17) within a year; time-varying Bayesian estimates EA import 0.22 / consumer 0.01 and DE/FR/IT/ES HICP 0.05/0.03/0.04/0.09 |
+| `ramey_zubairy_2014` | Ramey & Zubairy, *Government Spending Multipliers in Good Times and in Bad*, NBER WP 20719 (Nov 2014), https://www.nber.org/system/files/working_papers/w20719/w20719.pdf | 269,086 | © authors, short quotation with credit | 6: 2- and 4-year integral multipliers, linear / high / low unemployment (Table 1, with SEs) |
+| `hazell_herreno_nakamura_steinsson_2021` | Hazell, Herreño, Nakamura & Steinsson, *The Slope of the Phillips Curve: Evidence from U.S. States*, NBER WP 28005 (rev. May 2021), https://www.nber.org/system/files/working_papers/w28005/w28005.pdf | 546,497 | © authors, short quotation with credit | 6: κ (cols 3, 4) and ψ (cols 3, 4) of Table 1; κ pre/post-1990 with time FE (Table 2 cols 5, 6) |
+| `ecb_op113_2010` | ESCB Task Force, *Energy markets and the euro area macroeconomy*, ECB OP 113 (Jun 2010), https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf | 2,836,963 | © ECB (no licence text captured) | 4: +10 % energy prices → consumer prices EA 0.36 %, FR 0.34 %, DE 0.37 %, producer prices EA 0.39 % (input-output, first round) |
+
+Raw archive: 7 PDFs, 7.8 MB (budget ≤ 100 MB). The PDFs are not redistributable; they live only in the raw
+store (provenance) and are **not** committed (fixture tests use a synthetic CC0 text document).
+
+## Load (dev DB)
+
+LOAD_RESULTS
+
+## Examples (ids)
+
+* `pub:effects.literature:ball_leigh_loungani_2013:country_fra_levels_hp100` — cause `variable:output.gap` (gap),
+  effect `variable:labour.unemployment_gap` (gap), slope −0.367 pp per 1 % (SE 0.0441), France 1980-2011, Table 5,
+  pdf p.29, quote "France -0.367*** (0.0441) 32 0.681 0.394".
+* `pub:effects.literature:ball_leigh_loungani_2013:us_annual_changes` — cause `atlas_concept:imf.gdp_real_growth`
+  (growth rate) → effect `atlas_concept:imf.unemployment_rate` (pp change): −0.405 (SE 0.029), so PRED-ENGINE can
+  propagate directly between atlas concepts.
+* `pub:effects.literature:choi_furceri_loungani_mishra_poplawski_ribeiro_2017:headline_inflation_impact_10pct_oil` —
+  `variable:oil_price.global` +10 % → `atlas_concept:imf.inflation_cpi_avg` +0.4 pp on impact (no SE: `basis: null`).
+* `pub:effects.literature:head_mayer_2013:trade_elasticity_tariff_identified_structural` — trade elasticity −5.03
+  (median of 435 estimates, s.d. across estimates 9.3).
+* `pub:effects.literature:ramey_zubairy_2014:linear_2y` — U.S. government purchases multiplier 0.76 (SE 0.102),
+  2-year integral.
+* `/v1/effects/estimates?effect=imf.cpi_index` also returns ECB OP 113 and OP 241 consumer-price estimates through
+  the curated link `prices.consumer_level -> imf.cpi_index` (`matched_via: variable:prices.consumer_level`).
+
+## What is missing and why
+
+* **Fiscal-multiplier meta-analysis datasets** (Gechert 2015; Gechert & Rannenberg): no open download found from
+  an allowed host in this session; only Ramey & Zubairy's Table 1 was loaded. Blanchard & Leigh (IMF WP/13/1,
+  archived copy checked, β = −1.095, t = −4.294) was not loaded: its estimand is a *forecast-error* coefficient
+  (multiplier minus the forecasters' implicit multiplier), which needs its own variable and careful wording.
+* **IMF WEO box estimates**: none loaded (not machine-readable in what I fetched; transcription from boxes deferred).
+* **Head & Mayer gravity elasticities by sector** (machine-readable): the open data files were not checked; the
+  Table 4/5 meta-analytic medians are loaded instead.
+* **Published-version numbers**: every entry is a working-paper version; journal versions may print different
+  numbers (said in `version_read`). DOIs are left null rather than unverified.
+* **IRFs**: only Okun's distributed-lag coefficients; the oil and fiscal IRFs are figures (not transcribed —
+  reading numbers off a chart would be invented precision).
+* **Causal-claim links** (`causal_claim_keys`): none yet; there is no KG claim these estimates quantify.
+
+## Owner decisions
+
+1. Quoting single numbers with short verbatim passages from all-rights-reserved working papers (NBER explicitly
+   allows short quotation with credit; IMF/ECB/CEPII do not say): OK for research use? Archived PDFs are kept for
+   provenance only.
+2. Curator-assigned ISO3 codes from printed country names (kept verbatim beside the code): acceptable, or should a
+   maintainer review each?
+3. Whether a maintainer review (`curation.review_status`) is required before PRED-ENGINE may use an estimate.
+
+## Commands (to repeat or extend)
+
+```bash
+uv run python scripts/update_schema_contract.py            # after any migration change (done)
+flock /tmp/reva-devdb.lock uv run reva db bootstrap        # applies 0019 (done)
+flock /tmp/reva-devdb.lock uv run reva seed                # registers atlas.effects_lit@1.0.1
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.effects_lit            # all entries
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.effects_lit --option entry=<id>   # one entry
+uv run pytest -q tests/unit/effects tests/integration/test_effects_store.py
+```
+
+Adding a publication: write `registry/effects/literature/<id>.yaml` (pin the document sha256, give `pdf_page`,
+`locator` and the verbatim `quote` of every number), run the unit tests (every entry must validate), then ingest;
+the connector re-finds every quote in the archived bytes before loading.
