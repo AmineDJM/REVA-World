@@ -235,10 +235,15 @@ def test_navco_claims(navco: dict[str, Any]) -> None:
             assert c.cause_id != c.effect_id and c.effect_id.startswith(c.cause_id + ":")
             assert c.mechanism is None and c.stance == "asserts"
     rows13, _ = N.navco1_rows(parsed["n13"].table, N.FILES["n13"])
-    assert len(claims["navco13"]) == sum(r.outcome is not None for r in rows13)
-    ongoing = [c for c in claims["navco13"] if c.selector["coded"].endswith("(ongoing)")]
-    assert ongoing and all(c.codebook_term == "ONGOING" for c in ongoing)
+    # audit L2 (AUDFIX): a campaign coded ONGOING has no coded_outcome claim (its "failure" is censoring)
+    assert any(r.ongoing for r in rows13)
+    assert len(claims["navco13"]) == sum(r.outcome is not None and not r.ongoing for r in rows13)
+    assert not any(c.selector["coded"].endswith("(ongoing)") or c.codebook_term == "ONGOING" for c in claims["navco13"])
     assert "ongoing as of 12/31/2019" in N.CODEBOOK["n13"]["ONGOING"]
+    # audit L1: NAVCO 2.1 outcomes rest on "success" only when success = 1, else on "progress"
+    n21 = [c for c in claims["navco21"] if c.relation == "coded_outcome"]
+    assert n21 and all((c.codebook_term == "success") == c.selector["coded"].endswith("success = 1") for c in n21)
+    assert any(c.codebook_term == "progress" for c in n21)
     camps = N.n21_campaigns(parsed["n21"].table, N.FILES["n21"])
     rows12, _ = N.navco1_rows(parsed["n12"].table, N.FILES["n12"])
     expected = sum(y.repression in ("1", "2", "3") for c in camps.values() for y in c.years)
@@ -247,6 +252,16 @@ def test_navco_claims(navco: dict[str, Any]) -> None:
     # every effect / cause is a KG entity of the same build (no dangling claim ends)
     ents = {e.qid for e in out["entities"]}
     assert all(c.cause_id in ents and c.effect_id in ents for c in _all(claims))
+
+
+def test_navco12_regime_violence_has_no_borrowed_date(navco: dict[str, Any]) -> None:
+    """Audit M3 (AUDFIX): NAVCO 1.2 codes no date for REGVIOL -> unknown value + typed missing, not the BYEAR."""
+    out = navco["out"]
+    rv = [s for s in out["statements"] if s.subject.endswith(":regime_violence") and s.property == "P580"]
+    assert rv and all(s.value == {"type": "somevalue"} for s in rv)
+    assert all(s.qualifiers["missing"]["reason"] == "not_collected" for s in rv)
+    claims = [c for c in out["claims"]["navco12"] if c.relation == "reaction_to"]
+    assert claims and all(c.scope["effect_time"]["kind"] == "missing" for c in claims)
 
 
 def test_claim_deliveries_have_the_causcore_shape(navco: dict[str, Any]) -> None:
@@ -260,6 +275,17 @@ def test_claim_deliveries_have_the_causcore_shape(navco: dict[str, Any]) -> None
     assert doc["dataset_revision"] == "doi:10.7910/DVN/ON9XND@1.0#3769104"
     assert set(doc["codebook"]["definitions"]) == set(N.CODEBOOK["n13"])
     assert p.f.codebook_md5 in doc["codebook"]["version"] and doc["raw_sha256s"] == [p.sha]
+    assert "sources" not in doc["codebook"]  # no codebook fetched: nothing is said about archived bytes
+    fetched = {"sha256": p.f.codebook_sha256, "matches": True, "archived": True}
+    d2 = N.delivery(p.f, "navco13", [], source_key=N.SOURCE_KEY_NAVCO, raw_sha256=p.sha,
+                    retrieved_at=datetime(2026, 10, 16, tzinfo=UTC), origin="test_fixture", codebook_fetch=fetched)  # fmt: skip
+    doc2 = d2.as_json()
+    assert doc2["raw_sha256s"] == sorted([p.sha, p.f.codebook_sha256])
+    src = doc2["codebook"]["sources"]["ONGOING"]
+    assert (src["sha256"], src["pages"]) == (p.f.codebook_sha256, [12])
+    assert N.codebook_ok(fetched, "live") and not N.codebook_ok({**fetched, "matches": False}, "test_fixture")
+    assert N.codebook_ok({"status": "fixture_missing", "matches": False}, "test_fixture")
+    assert not N.codebook_ok({"status": "fixture_missing", "matches": False}, "live")
     assert {c["codebook_term"] for c in doc["claims"]} <= set(doc["codebook"]["definitions"])
     with pytest.raises(ValueError, match="no codebook definition"):
         N.claim(key=f"{N.SOURCE_KEY_NAVCO}:n13:x", cause="a", effect="b", relation="coded_outcome", f=p.f,
@@ -285,8 +311,15 @@ def test_mec(mec: dict[str, Any]) -> None:
     rows, stats = N.mec_rows(p.table, N.FILES["mec"])
     unknown = [r for r in rows if r.outcome is None]
     assert stats["outcome_unknown"] == len(unknown)
-    assert sum(c.relation == "coded_outcome" for c in out["claims"]["mec"]) == len(rows) - len(unknown)
+    ongoing = [r for r in rows if r.outcome is not None and r.ongoing]
+    assert sum(c.relation == "coded_outcome" for c in out["claims"]["mec"]) == len(rows) - len(unknown) - len(ongoing)
     assert sum(c.relation == "reaction_to" for c in out["claims"]["mec"]) == sum(bool(r.regviol) for r in rows)
+    # audit M3: the regime violence has no date of its own -> "unknown value" + typed missing, never the episode's
+    rv = [s for s in out["statements"] if s.subject.endswith(":regime_violence") and s.property in ("P580", "P582")]
+    assert rv and all(s.value == {"type": "somevalue"} for s in rv)
+    assert all(s.qualifiers["missing"] == {"kind": "missing", "reason": "not_collected"} for s in rv)
+    react = [c for c in out["claims"]["mec"] if c.relation == "reaction_to"]
+    assert all(c.scope["effect_time"]["kind"] == "missing" for c in react)
     # Tibet episodes are placed in China by the provider (ccode 710): counted in CHN with the name listed
     chn = frame.filter((pl.col("iso3") == "CHN") & (pl.col("indicator") == "episodes_active"))
     tibet_years = {y for r in rows if r.location == "Tibet" for y in range(r.begin.year, r.end.year + 1)}
@@ -340,7 +373,21 @@ def test_mmp_state_responses_and_claims(mmp: dict[str, Any]) -> None:
     )
     resp = [s for s in out["statements"] if s.subject == c.effect_id and s.property in ("P580", "P582")]
     prot = [s for s in out["statements"] if s.subject == c.cause_id and s.property in ("P580", "P582")]
-    assert sorted(s.value["time"] for s in resp) == sorted(s.value["time"] for s in prot)  # dated by the protest
+    # audit M3 (AUDFIX): MMP codes no date for the response -> unknown value + typed missing, never the protest's
+    assert len(resp) == 2 and all(s.value == {"type": "somevalue"} for s in resp)
+    assert all(s.qualifiers["missing"]["reason"] == "not_collected" for s in resp)
+    assert all(s.value["type"] == "time" for s in prot)
+    assert c.scope["effect_time"] == {
+        "kind": "missing",
+        "reason": "not_collected",
+        "note": "MMP codes no separate date for the state response",
+    }
+    # audit L3: the coded response list is kept verbatim, inaction marked (not a reaction)
+    mixed = [x for x in acting if "ignore" in x.responses]
+    by_cause = {cl.cause_id: cl for cl in claims}
+    for x in mixed:
+        sel = by_cause[f"mmp:{x.pid}"].selector
+        assert sel["coded_responses"] == x.responses and sel["inaction_not_a_reaction"] == ["ignore"]
 
 
 def test_mmp_refuses_unknown_categories(mmp: dict[str, Any]) -> None:

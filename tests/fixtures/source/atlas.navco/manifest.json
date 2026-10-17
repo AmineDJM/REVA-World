@@ -102,5 +102,44 @@
     "retrieved_at": "2026-10-16T20:18:00+00:00",
     "licence": "CC0 1.0",
     "note": "slice of navco3-0full.xlsx: header + 358 of the real 112,381 rows (estonia, egypt 2011 first 150, us first 40), original row numbers and coded cells kept, free-text columns (news leads, source titles, localities, actor names, notes) removed; real file sha256 5a3886ab4d00212700352f5a79e7cdd102ac41960ca3600f292e7f932134d4e7 md5 8d90fc7433bd9765bbd3b94258042e4e"
+  },
+  {
+    "request_fingerprint": "38bef378c2112756c26005b0ffed000480aaa23e83ff0f14f5155b593f2c1e9b",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3621197",
+    "file": "38bef378c2112756.pdf",
+    "sha256": "6743dc6163167966dcdf92ce6a8f9b6d1bbcf6c40cc047b8f82030ebee25a30b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "pinned codebook file 3621197, complete and byte-identical (AUDFIX: archived codebook, quotes located in these bytes)"
+  },
+  {
+    "request_fingerprint": "7cca4dc4434b75e12ca2475a09d04384b4f0875cd9cef5aeb179d488378257d1",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3769105",
+    "file": "7cca4dc4434b75e1.pdf",
+    "sha256": "8a265f0083a7541d353a54976e4648a8298c8386b3d5948a0f4da00620341af3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "pinned codebook file 3769105, complete and byte-identical (AUDFIX: archived codebook, quotes located in these bytes)"
+  },
+  {
+    "request_fingerprint": "822b85b07e1b558d3688c684b409ba0ce1802cc3bc7a11f5d9302e4f4fb8f724",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3648624",
+    "file": "822b85b07e1b558d.pdf",
+    "sha256": "6fe8faa4c6ad45c74d61082d6aedc780d5440a7ace25747a63eaf338951c9a93",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "pinned codebook file 3648624, complete and byte-identical (AUDFIX: archived codebook, quotes located in these bytes)"
   }
 ]

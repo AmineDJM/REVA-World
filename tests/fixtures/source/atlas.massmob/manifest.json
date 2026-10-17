@@ -24,5 +24,18 @@
     "retrieved_at": "2026-10-16T20:18:00+00:00",
     "licence": "CC0 1.0",
     "note": "slice of mmALL_073120_csv.tab: header + 274 of the real rows (selected countries, a few blank rows kept), lines byte-identical except the sources and notes cells, emptied (news citations/excerpts are not redistributed); real file sha256 e4a3285b5f39fcc0723d98135679189eef37a0987b26f5ad549aaf43db542189"
+  },
+  {
+    "request_fingerprint": "84b4e98e21a7c6e5b5bb8839afc264426ea18d5679f50bed9944d76814154b22",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2775560",
+    "file": "84b4e98e21a7c6e5.pdf",
+    "sha256": "03541007078e661e4df11863f5c62fbe9adb3f745e91547446d05737fcf7cd45",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "pinned codebook file 2775560, complete and byte-identical (AUDFIX: archived codebook, quotes located in these bytes)"
   }
 ]

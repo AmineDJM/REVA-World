@@ -24,5 +24,18 @@
     "retrieved_at": "2026-10-16T20:18:00+00:00",
     "licence": "CC0 1.0",
     "note": "slice of MEC Data Release.tab: header + 96 of the real rows (selected countries, a few blank rows kept), lines byte-identical; real file sha256 6fd1a0b96e46983133ace16f5562bb9f26b74fad63fea5b60f8e7cc2a7f60ac1"
+  },
+  {
+    "request_fingerprint": "f04aeab140174a393ffdecf91655aa727d19b2a7e00e88e762fb3bf42d90c707",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/11543083",
+    "file": "f04aeab140174a39.docx",
+    "sha256": "3d5b0133516cec2d5d5a6db7d4c62821a778fcca456c70ac30b1d773757e16bd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "pinned codebook file 11543083, complete and byte-identical (AUDFIX: archived codebook, quotes located in these bytes)"
   }
 ]

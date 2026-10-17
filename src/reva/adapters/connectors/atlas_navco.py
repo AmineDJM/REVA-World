@@ -49,7 +49,15 @@ Outputs
   quoted in :data:`CODEBOOK`). One complete delivery per dataset file; loaded when CAUSCORE's loader exists,
   else staged as JSON in ``run.options["claims_staging"]`` (``causdata_common.deliver_claims``).
 * Event dates are Wikidata ``P580`` start time / ``P582`` end time / ``P585`` point in time (the dates the
-  causal grader reads), with the provider's precision.
+  causal grader reads), with the provider's precision. NAVCO 1.2 / MEC regime-violence events have no date in the
+  data: their ``P580``/``P582`` are "unknown value" with a typed-missing qualifier (``not_collected``), so the
+  temporal check is ``undetermined`` instead of comparing a date copied from the campaign (audit M3).
+* Campaigns coded ONGOING (NAVCO 1.2 / 1.3, MEC) keep their coded outcome as an attribute but give no
+  ``coded_outcome`` claim: the source codes them as failures only because they had not ended (audit L2).
+* Each codebook file is fetched through the run, archived and compared with its pinned sha256 (audit M4); every
+  claim's codebook carries ``quote_source`` (archived sha256 + page / paragraph). A changed codebook withholds that
+  file's claims; in fixture mode a codebook without a captured fixture is reported and the claims carry no
+  ``quote_source``.
 """
 
 from __future__ import annotations
@@ -77,7 +85,11 @@ from reva.adapters.connectors.atlas_geopol_common import (
 )
 from reva.kernel.errors import SourceResponseError
 
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"
+# 1.1.0 (AUDFIX, docs/dev/v3_audfix.md): codebooks fetched + archived + sha256-checked, quotes located in the archived
+# bytes (M4); state repression events coded without a date of their own get a typed-missing date, never the
+# campaign's (M3); no coded_outcome claim for campaigns the source codes as ongoing (L2); NAVCO 2.1 outcomes with
+# success = 0 cite the progress definition (L1)
 PARSER_VERSION = "atlas-contention-navco-1"
 HOSTS = ("dataverse.harvard.edu", "dvn-cloud-iqss.s3.amazonaws.com")
 VERSION_URL = "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/{version}?persistentId={doi}"
@@ -272,29 +284,34 @@ FILES: dict[str, DvFile] = {
     ),
 }
 
-#: Codebook text quoted verbatim (whitespace joined; typographic quotes/apostrophes as ASCII). Checked against
-#: the pinned codebook files (sha256 in :data:`FILES`) on 2026-10-16 (``docs/dev/v3_a_contention.md``).
+#: Codebook text quoted verbatim from the pinned codebook files (sha256 in :data:`FILES`): only whitespace is
+#: normalised; typographic quotes, apostrophes and bullets are kept as printed. Where each quote sits in the archived
+#: bytes is :data:`CODEBOOK_LOCATIONS`; ``tests/unit/test_audfix_codebooks.py`` re-checks every quote against the
+#: archived bytes (AUDFIX, audit M4: three NAVCO 1.2 quotes were cut short and two used ASCII quotes).
 CODEBOOK: dict[str, dict[str, str]] = {
     "n12": {
         "SUCCESS": "Binary variable identifying whether the campaign achieved 100% of its stated goals within a "
-        "year of the peak of activities. In most cases, outcome was achieved within a year of the campaign's peak. "
-        'Some campaigns\' goals were achieved years after the "peak" of the struggle in terms of membership, but '
+        "year of the peak of activities. In most cases, outcome was achieved within a year of the campaign’s peak. "
+        "Some campaigns’ goals were achieved years after the “peak” of the struggle in terms of membership, but "
         "the success was a direct result of campaign activities. When such a direct link can be demonstrated, "
-        "these campaigns are coded as successful.",
+        "these campaigns are coded as successful. Note that where information was available regarding the "
+        "campaign’s outcome in 2014, the most current information was used.",
         "LIMITED": "Binary variable identifying whether the campaign achieved some of its stated goals within a year "
         "of the peak of activities. When a regime makes concessions to the campaign or reforms short of complete "
         "campaign success, such reforms are counted as limited success.",
         "FAILURE": "Binary variable identifying whether the campaign achieved none of its stated goals; includes "
         "campaigns that have been suppressed. Campaigns are coded as failures when they are ongoing as of the end "
-        'of 2014 and are classified as "ongoing."',
+        "of 2014 and are classified as “ongoing.”",
         "ONGOING": "Binary variable identifying whether the campaign is ongoing and has not yet achieved its "
         "goals. Only when campaigns are ongoing and have achieved no stated objectives/outcomes by the end of 2014.",
         "REGVIOL": "Binary variable identifying whether the regime used violence to crack down on campaign.",
-        "DEFECT": "Binary variable identifying whether the target's security forces defected or engaged in "
-        "noncooperation during the conflict.",
+        "DEFECT": "Binary variable identifying whether the target’s security forces defected or engaged in "
+        "noncooperation during the conflict. Does not include routine individual mutinies or desertions, but rather "
+        "large-scale, systematic breakdowns of the execution of orders from the target regime. Coded for nonviolent "
+        "campaigns only.",
         "EYEAR": "Year at which the campaign reaches its peak; i.e. the most members or watershed events. If data "
         "is unavailable for membership or events, this peak is considered to be the year in which the campaign "
-        "ended",
+        "ended (i.e. if the regime changed in 2002, the peak is 2002).",
         "NAVCOID": "they were split into two campaigns but share a NAVCO ID and are coded as a single campaign in "
         "the NAVCO 2.1 dataset",
         "PARTICIPATION": "Number of participants observed actively confronting opponent at highest point (peak "
@@ -313,7 +330,7 @@ CODEBOOK: dict[str, dict[str, str]] = {
         "as ongoing are also coded as failures.",
         "EYEAR": "Year at which the campaign reaches its peak; i.e. the most members or watershed events. If data "
         "is unavailable for membership or events, this peak is considered to be the year in which the campaign "
-        "ended",
+        "ended (i.e. if the regime changed in 2002, the peak is 2002).",
         "LOCATION": "Geographic base of campaign (contemporary sovereign country name).",
     },
     "n21": {
@@ -323,8 +340,8 @@ CODEBOOK: dict[str, dict[str, str]] = {
         "goal within 1 calendar year of its end date.",
         "progress": "Ordinal variable identifying whether the campaign achieved some or all of its stated overall "
         "political objectives.",
-        "start_date": "First date on which campaign activity is observed",
-        "end_date": "Last date on which campaign activity is observed",
+        "start_date": "First date on which campaign activity is observed (dd/mm/yyyy)",
+        "end_date": "Last date on which campaign activity is observed (31/12/2017 if status=1)",
     },
     "mec": {
         "SUCCESS": "Dichotomous variable identifying whether the campaign achieved 100% of its stated goals within a "
@@ -336,20 +353,23 @@ CODEBOOK: dict[str, dict[str, str]] = {
         "includes campaigns that have been suppressed. Note that campaigns that were coded as ongoing as of "
         "December 31, 2018 were also coded 1 for failure.",
         "ONGOING": "Dichotomous variable identifying whether the campaign is ongoing and has not yet achieved its "
-        "stated objectives/goals, as of December 31, 2018.",
+        "stated objectives/goals, as of December 31, 2018. Note that campaigns that were coded as ongoing as of "
+        "December 31, 2018 were also coded 1 for failure.",
         "REGVIOL": "Dichotomous variable identifying whether the regime used violence to crack down on campaign.",
         "REGVIOL_TABLE": "Did the target use violence to retaliate against the campaign",
     },
 }
 
 N21_REPRESSION = {"0": "none", "1": "mild", "2": "moderate", "3": "extreme"}
+#: NAVCO 2.1 codebook, "repression" coding (verbatim, bullets as printed)
 N21_REPRESSION_DEF = {
-    "1": "verbal or threatening action short of physical action; express intent to engage in conflict or threaten; "
-    "use of economic fees and levies to increase costs on opposition; decline to cease ongoing conflict",
-    "2": "physical or violent action aimed at coercing opponent; harassment and imprisonment of campaign members; "
-    "no apparent intention to kill",
-    "3": "physical action exhibiting intent to kill and violently silence opponents; torture or severe violence "
-    "(such as severe beatings), which could easily kill someone",
+    "1": "1=mild repression ● verbal or threatening action short of physical action ● express intent to engage in "
+    "conflict or threaten ● use of economic fees and levies to increase costs on opposition ● decline to cease "
+    "ongoing conflict; maintain the status quo during conflict",
+    "2": "2=moderate repression ● physical or violent action aimed at coercing opponent ● harassment and "
+    "imprisonment of campaign members ● no apparent intention to kill",
+    "3": "3=extreme repression ● physical action exhibiting intent to kill and violently silence opponents ● torture "
+    "or severe violence (such as severe beatings), which could easily kill someone ● mass violence",
 }
 N21_PROGRESS = {
     "0": "status quo",
@@ -394,6 +414,89 @@ MEC_GOALS = {
 }
 MEC_CATEGORY = {"2": "reformist", "4": "maximalist"}
 OUTCOMES = ("success", "limited", "failure", "ongoing")
+
+#: Where each quote of :data:`CODEBOOK` (and the MMP manual) sits in the pinned codebook bytes: 1-based physical PDF
+#: page(s), or the 1-based paragraph of the docx body (``word/document.xml``). Extraction: poppler ``pdftotext``
+#: (``-layout``; NAVCO 1.2 table cells read column by column), whitespace normalised; checked by
+#: ``tests/unit/test_audfix_codebooks.py``.
+CODEBOOK_LOCATIONS: dict[str, dict[str, dict[str, Any]]] = {
+    "n12": {
+        "SUCCESS": {"pages": [10, 11]},
+        "LIMITED": {"pages": [11]},
+        "FAILURE": {"pages": [11]},
+        "ONGOING": {"pages": [11]},
+        "REGVIOL": {"pages": [12]},
+        "DEFECT": {"pages": [12, 13]},
+        "EYEAR": {"pages": [10]},
+        "NAVCOID": {"pages": [6]},
+        "PARTICIPATION": {"pages": [12]},
+    },
+    "n13": {
+        "SUCCESS": {"pages": [12]},
+        "LIMITED": {"pages": [12]},
+        "FAILURE": {"pages": [12]},
+        "ONGOING": {"pages": [12]},
+        "EYEAR": {"pages": [11]},
+        "LOCATION": {"pages": [11]},
+    },
+    "n21": {
+        "repression": {"pages": [19]},
+        "success": {"pages": [26]},
+        "progress": {"pages": [26]},
+        "start_date": {"pages": [8]},
+        "end_date": {"pages": [8]},
+    },
+    "mec": {
+        "SUCCESS": {"paragraph": 271},
+        "LIMITED": {"paragraph": 276},
+        "FAILURE": {"paragraph": 280},
+        "ONGOING": {"paragraph": 284},
+        "REGVIOL": {"paragraph": 339},
+        "REGVIOL_TABLE": {"paragraph": 197},
+    },
+    "mmp": {
+        "protest": {"pages": [3]},
+        "state_response": {"pages": [5]},
+        "killings": {"pages": [5]},
+        "ignore": {"pages": [6]},
+        "participants": {"pages": [4]},
+    },
+}
+#: N21_REPRESSION_DEF quotes: NAVCO 2.1 codebook page 20
+N21_REPRESSION_DEF_PAGES = [20]
+CODEBOOK_MEDIA = {
+    ".pdf": ("application/pdf", "application/octet-stream", "binary/octet-stream"),
+    ".docx": (
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/octet-stream",
+        "binary/octet-stream",
+    ),
+}
+#: missing-date note of the state repression events whose dataset codes no date for them (audit M3)
+NO_OWN_DATE = {
+    "n12": "NAVCO 1.2 codes no date for the regime violence (REGVIOL is a campaign-level flag)",
+    "mec": "MEC codes no date for the regime violence (regviol is an episode-level flag)",
+}
+
+
+def pinned_codebook(f: DvFile) -> Any:
+    """The pinned codebook of a Dataverse file as a :class:`causdata_common.PinnedCodebook`."""
+    from reva.adapters.connectors.causdata_common import PinnedCodebook
+
+    ext = "." + f.codebook_name.rsplit(".", 1)[-1].lower()
+    docx = ext == ".docx"
+    return PinnedCodebook(
+        key=f"{f.key}_codebook",
+        title=f"{f.codebook_name} (Dataverse file {f.codebook_id}, {f.doi} v{f.version})",
+        url=FILE_URL.format(f.codebook_id),
+        sha256=f.codebook_sha256,
+        media_types=CODEBOOK_MEDIA[ext],
+        max_bytes=2_000_000,
+        extraction="docx word/document.xml paragraphs, whitespace normalised"
+        if docx
+        else "poppler pdftotext (-layout; table cells column by column), whitespace normalised",
+        quotes=CODEBOOK_LOCATIONS.get(f.key, {}),
+    )
 
 
 # =============================================================================== parsing helpers
@@ -816,6 +919,11 @@ def claim(
     )
 
 
+def effect_time_missing(note: str) -> dict[str, Any]:
+    """Claim scope: the effect has no date of its own in the dataset (typed missing, audit M3)."""
+    return {"kind": "missing", "reason": "not_collected", "note": note}
+
+
 def codebook_definitions(f: DvFile) -> dict[str, str]:
     if f.key == "mmp":
         from reva.adapters.connectors.atlas_massmob import MANUAL
@@ -824,29 +932,58 @@ def codebook_definitions(f: DvFile) -> dict[str, str]:
     return dict(CODEBOOK[f.key])
 
 
-def codebook_record(f: DvFile) -> dict[str, Any]:
-    """``reva.causal.Codebook`` fields: the pinned codebook file (Dataverse id, md5, sha256) and its verbatim
-    definitions."""
-    return {
+def codebook_record(f: DvFile, fetched: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """``reva.causal.Codebook`` fields: the pinned codebook file (Dataverse id, md5, sha256), its verbatim
+    definitions and -- when the codebook was fetched and archived with the pinned sha256 -- where each quote sits in
+    those archived bytes (``sources``)."""
+    from reva.adapters.connectors.causdata_common import codebook_sources
+
+    out = {
         "name": f"{f.title} codebook ({f.codebook_name})",
         "version": f"{f.doi} v{f.version}; file {f.codebook_id} md5 {f.codebook_md5} sha256 {f.codebook_sha256}",
         "url": FILE_URL.format(f.codebook_id),
         "definitions": codebook_definitions(f),
     }
+    sources = codebook_sources(pinned_codebook(f), fetched)
+    if sources:
+        out["sources"] = sources
+    return out
+
+
+def codebook_ok(fetched: Mapping[str, Any] | None, origin: str) -> bool:
+    """Deliver claims? Yes when the archived codebook equals the pinned one; in fixture mode also when the
+    codebook has no captured fixture (reported, no ``quote_source``); never on a changed codebook."""
+    if not fetched:
+        return False
+    if fetched.get("matches"):
+        return True
+    return origin != "live" and fetched.get("status") == "fixture_missing"
 
 
 def delivery(
-    f: DvFile, dataset: str, claims: Sequence[Any], *, source_key: str, raw_sha256: str, retrieved_at: Any, origin: str
+    f: DvFile,
+    dataset: str,
+    claims: Sequence[Any],
+    *,
+    source_key: str,
+    raw_sha256: str,
+    retrieved_at: Any,
+    origin: str,
+    codebook_fetch: Mapping[str, Any] | None = None,
 ) -> Any:
-    """Exactly the arguments of ``reva.causal.load_dataset_claims`` for one dataset file (complete delivery)."""
+    """Exactly the arguments of ``reva.causal.load_dataset_claims`` for one dataset file (complete delivery). The
+    archived codebook (when fetched) is one of the delivery's raw objects."""
     from reva.adapters.connectors.causdata_common import ClaimDelivery
 
+    raws = [raw_sha256]
+    if codebook_fetch and codebook_fetch.get("matches") and codebook_fetch.get("archived"):
+        raws.append(str(codebook_fetch["sha256"]))
     return ClaimDelivery(
         source_key=source_key,
         dataset=dataset,
         dataset_revision=f.revision,
-        codebook=codebook_record(f),
-        raw_sha256s=[raw_sha256],
+        codebook=codebook_record(f, codebook_fetch),
+        raw_sha256s=raws,
         retrieved_at=retrieved_at,
         origin=origin,
         claims=list(claims),
@@ -1007,6 +1144,20 @@ class Kg:
 
     def item(self, key: str, subject: str, prop: str, obj: str, *, line: int, column: Any = None, **kw: Any) -> None:
         self.s(key, subject, prop, line=line, column=column, object_qid=obj, **kw)
+
+    def missing_time(self, key: str, subject: str, prop: str, note: str, *, line: int, column: Any = None) -> None:
+        """A date the dataset does not code: "unknown value" + typed-missing qualifier (never a borrowed date)."""
+        from reva.adapters.connectors.causdata_common import MISSING_DATE_VALUE, missing_date_qualifiers
+
+        self.s(
+            key,
+            subject,
+            prop,
+            line=line,
+            column=column,
+            value=dict(MISSING_DATE_VALUE),
+            qualifiers=missing_date_qualifiers(note),
+        )
 
     def quantity(
         self, key: str, subject: str, prop: str, amount: str, unit: str, *, line: int, column: Any = None, **kw: Any
@@ -1297,7 +1448,7 @@ def navco1_kg(
                     rv,
                     "event",
                     f"Regime violence against {r.name} ({r.location}, {r.byear}-{r.eyear})",
-                    "state repression event as coded by NAVCO 1.2 (REGVIOL = 1); dated by the campaign period",
+                    "state repression event as coded by NAVCO 1.2 (REGVIOL = 1); the dataset codes no date for it",
                 )
                 kg.string(
                     f"{k}:rv:type", rv, "contention:event_type", "state_repression", line=r.line, column="REGVIOL"
@@ -1312,16 +1463,7 @@ def navco1_kg(
                     qualifiers={"definition": CODEBOOK["n12"]["REGVIOL"]},
                 )
                 kg.item(f"{k}:rv:location", rv, "contention:location", pl.node, line=r.line, column="LOCATION")
-                kg.time(
-                    f"{k}:rv:start",
-                    rv,
-                    "P580",
-                    f"{r.byear:04d}-01-01",
-                    9,
-                    line=r.line,
-                    column="BYEAR",
-                    qualifiers={"dating": "campaign period (NAVCO 1.2 codes no date for the repression)"},
-                )
+                kg.missing_time(f"{k}:rv:start", rv, "P580", NO_OWN_DATE["n12"], line=r.line, column="REGVIOL")
             if r.navco_id in n21_ids:
                 target = f"navco21:{r.navco_id}"
                 if id_rows[r.navco_id] > 1:
@@ -1356,8 +1498,8 @@ def navco1_claims(rows: Sequence[Navco1Row], f: DvFile, *, raw_sha256: str, sour
     for r in rows:
         ev = f"{ns}:{r.key}"
         sel = {"file": f.file_name, "line": r.line}
-        if r.outcome:
-            value = r.outcome + (" (ongoing)" if r.ongoing else "")
+        if r.outcome and not r.ongoing:  # ONGOING: coded "failure" only because not ended -> no claim (L2)
+            value = r.outcome
             var = r.outcome.upper()
             out.append(
                 claim(
@@ -1370,7 +1512,7 @@ def navco1_claims(rows: Sequence[Navco1Row], f: DvFile, *, raw_sha256: str, sour
                     raw_sha256=raw_sha256,
                     selector={**sel, "columns": ["SUCCESS", "LIMITED", "FAILURE", "ONGOING"]},
                     coded_value=value,
-                    codebook_term="ONGOING" if r.ongoing else var,
+                    codebook_term=var,
                     scope={"place": r.location},
                 )
             )
@@ -1387,7 +1529,7 @@ def navco1_claims(rows: Sequence[Navco1Row], f: DvFile, *, raw_sha256: str, sour
                     selector={**sel, "column": "REGVIOL"},
                     coded_value="REGVIOL = 1",
                     codebook_term="REGVIOL",
-                    scope={"place": r.location},
+                    scope={"place": r.location, "effect_time": effect_time_missing(NO_OWN_DATE["n12"])},
                 )
             )
     return out
@@ -1733,7 +1875,7 @@ def n21_kg(camps: Mapping[int, N21Campaign], f: DvFile, places: Places, *, raw_s
                 value,
                 line=ey.line,
                 column=["progress", "success"],
-                qualifiers={"definition": CODEBOOK["n21"]["success"]},
+                qualifiers={"definition": CODEBOOK["n21"]["success" if ey.success else "progress"]},
             )
             kg.item(f"{k}:outcome:of", oc, "contention:outcome_of", ev, line=ey.line)
             kg.time(f"{k}:outcome:start", oc, "P585", f"{ey.year:04d}-01-01", 9, line=ey.line, column="year")
@@ -1785,7 +1927,8 @@ def n21_claims(
                     raw_sha256=raw_sha256,
                     selector={"file": f.file_name, "line": ey.line, "columns": ["progress", "success"]},
                     coded_value=value,
-                    codebook_term="success",
+                    # success = 1 rests on the success definition; otherwise the coded category is progress (L1)
+                    codebook_term="success" if ey.success else "progress",
                     scope={"place": camp.location},
                 )
             )
@@ -2067,7 +2210,7 @@ def mec_kg(rows: Sequence[MecRow], f: DvFile, places: Places, *, raw_sha256: str
                 rv,
                 "event",
                 f"Regime violence against {r.name} ({r.location}, {r.begin.year}-{r.end.year})",
-                "state repression event as coded by MEC v3.0 (regviol = 1); dated by the episode period",
+                "state repression event as coded by MEC v3.0 (regviol = 1); the dataset codes no date for it",
             )
             kg.string(f"{k}:rv:type", rv, "contention:event_type", "state_repression", line=r.line, column="regviol")
             kg.item(
@@ -2080,17 +2223,8 @@ def mec_kg(rows: Sequence[MecRow], f: DvFile, places: Places, *, raw_sha256: str
                 qualifiers={"definition": CODEBOOK["mec"]["REGVIOL"]},
             )
             kg.item(f"{k}:rv:location", rv, "contention:location", pl.node, line=r.line, column="location")
-            kg.time(
-                f"{k}:rv:start",
-                rv,
-                "P580",
-                r.begin.isoformat(),
-                11,
-                line=r.line,
-                column="bdate",
-                qualifiers={"dating": "episode period (MEC codes no date for the repression)"},
-            )
-            kg.time(f"{k}:rv:end", rv, "P582", r.end.isoformat(), 11, line=r.line, column="edate")
+            kg.missing_time(f"{k}:rv:start", rv, "P580", NO_OWN_DATE["mec"], line=r.line, column="regviol")
+            kg.missing_time(f"{k}:rv:end", rv, "P582", NO_OWN_DATE["mec"], line=r.line, column="regviol")
     kg.entities.extend(places.entities())
     return kg
 
@@ -2100,7 +2234,7 @@ def mec_claims(rows: Sequence[MecRow], f: DvFile, *, raw_sha256: str, source_key
     for r in rows:
         ev = f"mec:{r.mid}"
         sel = {"file": f.file_name, "line": r.line}
-        if r.outcome:
+        if r.outcome and not r.ongoing:  # ONGOING as of 2018-12-31: no outcome claim (L2)
             var = r.outcome.upper()
             out.append(
                 claim(
@@ -2112,8 +2246,8 @@ def mec_claims(rows: Sequence[MecRow], f: DvFile, *, raw_sha256: str, source_key
                     source_key=source_key,
                     raw_sha256=raw_sha256,
                     selector={**sel, "columns": ["success", "limited", "failure", "ongoing", "unknown"]},
-                    coded_value=r.outcome + (" (ongoing)" if r.ongoing else ""),
-                    codebook_term="ONGOING" if r.ongoing else var,
+                    coded_value=r.outcome,
+                    codebook_term=var,
                     scope={"place": r.location, "category": r.category},
                 )
             )
@@ -2130,7 +2264,11 @@ def mec_claims(rows: Sequence[MecRow], f: DvFile, *, raw_sha256: str, source_key
                     selector={**sel, "column": "regviol"},
                     coded_value="regviol = 1",
                     codebook_term="REGVIOL",
-                    scope={"place": r.location, "category": r.category},
+                    scope={
+                        "place": r.location,
+                        "category": r.category,
+                        "effect_time": effect_time_missing(NO_OWN_DATE["mec"]),
+                    },
                 )
             )
     return out
@@ -2371,7 +2509,7 @@ def atlas_source() -> list[Any]:
             provider="Harvard Dataverse (Chenoweth & Shay, NAVCO data project)",
             datasets=("n13_cy", "n21_cy", "n30_cy"),
             dataset_ids=tuple(FILES[k].revision for k in ("n12", "n13", "n21", "n30")),
-            planned_requests=10,
+            planned_requests=13,  # + the three quoted codebooks (AUDFIX)
             field_mappings={
                 "geo": "provider location names -> geo scheme navco_loc (registry/atlas/geo_aliases/a_contention.yaml)",
                 "time": "campaign years (BYEAR..EYEAR) / campaign-years",
@@ -2389,7 +2527,7 @@ def atlas_source() -> list[Any]:
             provider="Harvard Dataverse (Chenoweth & Kang, Major Episodes of Contention)",
             datasets=("episodes_cy",),
             dataset_ids=(FILES["mec"].revision,),
-            planned_requests=3,
+            planned_requests=4,  # + the quoted codebook (AUDFIX)
             field_mappings={
                 "geo": "provider location names -> geo scheme mec_loc",
                 "time": "bdate..edate",
@@ -2419,6 +2557,17 @@ class Parsed:
     sha: str
     table: Table
     meta: dict[str, Any]
+    #: the pinned codebook fetched + archived through the run (``causdata_common.fetch_codebook``), set by
+    #: :func:`fetch_codebook_of` after the data were parsed and archived
+    codebook: dict[str, Any] | None = None
+
+
+async def fetch_codebook_of(run: Any, p: Parsed) -> dict[str, Any]:
+    """Fetch, archive and check the pinned codebook of a parsed file (audit M4)."""
+    from reva.adapters.connectors.causdata_common import fetch_codebook
+
+    p.codebook = await fetch_codebook(run, pinned_codebook(p.f))
+    return p.codebook
 
 
 async def fetch_parse(run: Any, key: str, *, strict: bool) -> Parsed:
@@ -2495,6 +2644,9 @@ async def _ingest_navco(run: Any) -> dict[str, Any]:
     for p in parsed.values():  # parsed and checked: archive raw bytes (version records too)
         run.archive(p.meta_raw)
         run.archive(p.data_raw)
+    if run.dataset is None:  # the quoted codebooks (claims only)
+        for p in parsed.values():
+            await fetch_codebook_of(run, p)
     res: dict[str, Any] = {"stats": out["stats"], "atlas": {}, "unmapped_locations": out["unmapped_locations"]}
     for ds, key, note in (
         (
@@ -2550,6 +2702,8 @@ async def _ingest_mec(run: Any) -> dict[str, Any]:
     out = build_mec(p)
     run.archive(p.meta_raw)
     run.archive(p.data_raw)
+    if run.dataset is None:
+        await fetch_codebook_of(run, p)
     res: dict[str, Any] = {"stats": out["stats"], "atlas": {}, "unmapped_locations": out["unmapped_locations"]}
     if run.wants("episodes_cy"):
         r = run.register(
@@ -2591,18 +2745,29 @@ def finish(
             origin=run.origin,
         )
     if run.dataset is None:
-        deliveries = [
-            delivery(
-                files[ds].f,
-                ds,
-                cs,
-                source_key=source_key,
-                raw_sha256=files[ds].sha,
-                retrieved_at=files[ds].data_raw.retrieved_at,
-                origin=run.origin,
+        deliveries = []
+        for ds, cs in out["claims"].items():
+            p = files[ds]
+            if p.codebook is None:
+                raise ContentionParseError(f"{p.f.title}: codebook not fetched", retryable=False, kind="internal")
+            res.setdefault("codebooks", {})[p.f.key] = {
+                k: p.codebook.get(k) for k in ("sha256", "pinned_sha256", "matches", "archived", "status")
+            }
+            if not codebook_ok(p.codebook, run.origin):
+                res.setdefault("claims_withheld", {})[ds] = "codebook differs from the pinned sha256"
+                continue
+            deliveries.append(
+                delivery(
+                    p.f,
+                    ds,
+                    cs,
+                    source_key=source_key,
+                    raw_sha256=p.sha,
+                    retrieved_at=p.data_raw.retrieved_at,
+                    origin=run.origin,
+                    codebook_fetch=p.codebook,
+                )
             )
-            for ds, cs in out["claims"].items()
-        ]
         res["claims_delivery"] = deliver(run, deliveries)
     return res
 

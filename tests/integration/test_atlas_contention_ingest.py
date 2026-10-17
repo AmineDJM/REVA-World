@@ -52,6 +52,7 @@ async def test_navco_ingest(db: Any, tmp_path: Path) -> None:
     assert not s["kg"]["rejected"], s["kg"]
     assert s["kg"]["statements_inserted"] == s["kg_counts"]["statements"]
     _check_delivery(s)
+    assert all(s["codebooks"][k]["matches"] and s["codebooks"][k]["archived"] for k in ("n12", "n13", "n21"))
     with db.owner.connect() as c:
         kinds = dict(
             c.execute(
@@ -85,6 +86,7 @@ async def test_mec_ingest(db: Any, tmp_path: Path) -> None:
     _check_delivery(s)
     assert s["atlas"]["episodes_cy"]["created"] and not s["kg"]["rejected"], s
     assert s["claims"]["coded_outcome"] > 0
+    assert s["codebooks"]["mec"]["matches"] and s["codebooks"]["mec"]["archived"]
 
 
 async def test_massmob_ingest(db: Any, tmp_path: Path) -> None:
@@ -101,3 +103,20 @@ async def test_massmob_ingest(db: Any, tmp_path: Path) -> None:
             {"pat": "mmp:%:state_response"},
         ).scalar_one()
     assert n == s["claims"]["reaction_to"]
+    # AUDFIX (audit M4): the users manual is fetched, archived and pinned; the claims say where the quote sits
+    cb = s["codebooks"]["mmp"]
+    assert cb["matches"] and cb["archived"] and cb["sha256"] == atlas_massmob.FILE.codebook_sha256
+    d = s["claims_delivery"]["mmp"]
+    if d["status"] == "loaded":
+        with db.owner.connect() as c:
+            src = c.execute(
+                text(
+                    "SELECT codebook->'quote_source' FROM kg.causal_claim_current "
+                    "WHERE source_key = 'harvard.dataverse.massmob' LIMIT 1"
+                )
+            ).scalar_one()
+            assert src["sha256"] == atlas_massmob.FILE.codebook_sha256 and src["pages"] == [5]
+            archived = c.execute(
+                text("SELECT count(*) FROM evidence.acquisition WHERE raw_sha256 = :s"), {"s": src["sha256"]}
+            ).scalar_one()
+            assert archived >= 1

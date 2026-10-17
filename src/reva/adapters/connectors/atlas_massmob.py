@@ -26,8 +26,13 @@ Outputs
   state-response event ``mmp:<id>:state_response`` linked with ``contention:directed_at``.
 * Causal claims (tier T1): ``reaction_to`` -- state response -> the protest it answers ("We identify seven
   types of actions (or inaction) the state might take in response to protests", manual). ``ignore`` makes no
-  claim: the manual says it may be the press ignoring the response rather than the state not responding.
+  claim: the manual says it may be the press ignoring the response rather than the state not responding; the same
+  policy as ICB's MAJRES "No response-inaction" (audit L3). The claim selector keeps the full coded response list
+  verbatim (``coded_responses``, ``ignore`` included, ``inaction_not_a_reaction``).
   Demands are goals, not causes: no claim.
+* The state-response event has no date in MMP: its ``P580``/``P582`` are "unknown value" with a typed-missing
+  qualifier, and the claim scope says so (``effect_time``), so the temporal check is ``undetermined`` -- never the
+  protest's dates copied onto the response (audit M3).
 """
 
 from __future__ import annotations
@@ -51,9 +56,12 @@ from reva.adapters.connectors.atlas_navco import (
     Places,
     claim,
     claim_counts,
+    codebook_ok,
     count_rows,
     deliver,
     delivery,
+    effect_time_missing,
+    fetch_codebook_of,
     fetch_parse_file,
     flag01,
     geo_key,
@@ -63,7 +71,10 @@ from reva.adapters.connectors.atlas_navco import (
 
 SOURCE_KEY = "harvard.dataverse.massmob"
 CONNECTOR_NAME = "atlas.massmob"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"
+# 1.1.0 (AUDFIX, docs/dev/v3_audfix.md): users manual fetched + archived + sha256-checked, quotes located (M4); the
+# state response has no date of its own in MMP -> typed-missing date, never the protest's (M3); the coded response
+# list is kept verbatim in the claim selector, "ignore" included and marked as inaction (L3)
 PARSER_VERSION = "atlas-contention-massmob-1"
 ATLAS_SOURCE = "mmp"
 
@@ -147,6 +158,7 @@ PARTICIPANT_CATEGORIES = {
     ">10000": "gt_10000",
 }
 BLANK = ("", ".")
+NO_RESPONSE_DATE = "MMP codes no separate date for the state response"
 
 
 @dataclass
@@ -421,7 +433,7 @@ def mmp_kg(protests: Sequence[Protest], places: Places, *, raw_sha256: str) -> K
                 sr,
                 "event",
                 f"State response to protest MMP {p.pid} ({p.country}, {p.start.isoformat()}): {', '.join(acts)}",
-                "state response coded by the Mass Mobilization Project; dated by the protest it answers",
+                "state response coded by the Mass Mobilization Project; MMP codes no date for it",
             )
             kg.string(f"{k}:sr:type", sr, "contention:event_type", "state_response", line=p.line)
             for r in acts:
@@ -444,19 +456,9 @@ def mmp_kg(protests: Sequence[Protest], places: Places, *, raw_sha256: str) -> K
                 qualifiers={"definition": MANUAL["state_response"]},
             )
             kg.item(f"{k}:sr:location", sr, "contention:location", pl.node, line=p.line, column="country")
-            kg.time(
-                f"{k}:sr:start",
-                sr,
-                "P580",
-                p.start.isoformat(),
-                11,
-                line=p.line,
-                column=["startyear", "startmonth", "startday"],
-                qualifiers={"dating": "the protest's dates (MMP codes no separate date for the response)"},
-            )
-            kg.time(
-                f"{k}:sr:end", sr, "P582", p.end.isoformat(), 11, line=p.line, column=["endyear", "endmonth", "endday"]
-            )
+            cols = [f"stateresponse{i}" for i in range(1, 8)]
+            kg.missing_time(f"{k}:sr:start", sr, "P580", NO_RESPONSE_DATE, line=p.line, column=cols)
+            kg.missing_time(f"{k}:sr:end", sr, "P582", NO_RESPONSE_DATE, line=p.line, column=cols)
     kg.entities.extend(places.entities())
     return kg
 
@@ -480,10 +482,12 @@ def mmp_claims(protests: Sequence[Protest], *, raw_sha256: str) -> list[dict[str
                     "file": FILE.file_name,
                     "line": p.line,
                     "columns": [f"stateresponse{i}" for i in range(1, 8)],
+                    "coded_responses": list(p.responses),  # verbatim, in column order (L3)
+                    **({"inaction_not_a_reaction": ["ignore"]} if "ignore" in p.responses else {}),
                 },
                 coded_value=", ".join(acts),
                 codebook_term="state_response",
-                scope={"place": p.country},
+                scope={"place": p.country, "effect_time": effect_time_missing(NO_RESPONSE_DATE)},
             )
         )
     return out
@@ -521,7 +525,7 @@ def atlas_source() -> Any:
         datasets=("protests_cy",),
         dataset_ids=(FILE.revision,),
         cadence_seconds=180 * 86400,
-        planned_requests=3,
+        planned_requests=4,  # + the users manual (AUDFIX)
         max_response_bytes=20_000_000,
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
@@ -539,6 +543,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     out = build(p)
     run.archive(p.meta_raw)
     run.archive(p.data_raw)
+    if run.dataset is None:
+        await fetch_codebook_of(run, p)
     res: dict[str, Any] = {
         "stats": out["stats"],
         "years": out["years"],
@@ -572,6 +578,10 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             origin=run.origin,
         )
     if run.dataset is None:
+        res["codebooks"] = {"mmp": {k: (p.codebook or {}).get(k) for k in ("sha256", "matches", "archived", "status")}}
+        if not codebook_ok(p.codebook, run.origin):
+            res["claims_withheld"] = {"mmp": "users manual differs from the pinned sha256"}
+            return res
         d = delivery(
             FILE,
             "mmp",
@@ -580,6 +590,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             raw_sha256=p.sha,
             retrieved_at=p.data_raw.retrieved_at,
             origin=run.origin,
+            codebook_fetch=p.codebook,
         )
         res["claims_delivery"] = deliver(run, [d])
     return res
