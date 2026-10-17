@@ -69,6 +69,7 @@ _EST_KEYS = {
     "printed_transform",
     "evidence",
     "causal_claim_keys",
+    "shock_profile",
 }
 
 
@@ -275,6 +276,7 @@ def to_estimates(
                 method=e["method"],
                 identification=e.get("identification"),
                 meta=e.get("meta"),
+                shock_profile=e.get("shock_profile"),
                 citation=entry.citation,
                 locator=e.get("locator"),
                 quote=e.get("quote"),

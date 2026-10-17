@@ -1,0 +1,143 @@
+# Monetary policy shocks -> output and prices: meta-analysis summarised in ECB Occasional Paper 377 (agent PRED-EFFECT).
+schema: reva-effects-literature/1
+id: bobasu_ciccarelli_notarpietro_2025
+source_key: effects.literature
+citation:
+  text: "Alina Bobasu, Matteo Ciccarelli, Alessandro Notarpietro (editors), Working Group on Econometric Modelling, Working Group on Forecasting. Monetary policy transmission: a reference guide through ESCB models and empirical benchmarks. ECB Occasional Paper Series No 377. doi:10.2866/0318025."
+  text_basis: assembled from the cover and imprint of the version read; the meta-analysis section is co-authored with A. Giammaria, S. Gechert, P. Heimberger and F. Prante and summarises Enzinger et al. (forthcoming)
+  short: "Bobasu, Ciccarelli & Notarpietro (eds., 2025), ECB Occasional Paper 377"
+  authors: [Alina Bobasu (editor), Matteo Ciccarelli (editor), Alessandro Notarpietro (editor)]
+  title: "Monetary policy transmission: a reference guide through ESCB models and empirical benchmarks"
+  year: 2025
+  series: ECB Occasional Paper Series No 377
+  doi: "10.2866/0318025"
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op377en.pdf
+document:
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op377en.pdf
+  media_type: application/pdf
+  sha256: 15a9e475b048c239a4fac8b1a3c698a3240e651a1b88b40e42a325a0c0f26422
+  bytes: 7546684
+  version_read: "ECB Occasional Paper No 377 (© European Central Bank, 2025); publication month not printed in the extracted text, as_of set to the end of November 2025 (ECB listing date 6 November 2025, read on the ECB site)"
+as_of: "2025-11-30"
+rights:
+  licence: "© European Central Bank, 2025. All rights reserved. Any reproduction, publication and reprint in the form of a different publication, whether printed or produced electronically, in whole or in part, is permitted only with the explicit written authorisation of the ECB or the authors."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: one_time_impulse
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+          definition: "an unexpected 25 basis point increase in the policy rate (conventional monetary policy shock; primary-study responses standardised to 25 bp)"}
+  measure: response
+  shock: {size: 0.25, unit: percentage_points}
+  sign: negative
+  method: meta_analysis
+  uncertainty: {status: partial}
+  scope: {country_group: "primary studies for a wide range of countries (not just the euro area)", sample_note: "409 primary studies, 4,871 impulse-response graphs, 81,697 point estimates; literature search ended February 2023"}
+  meta: {n_studies: 409, n_estimates: 81697}
+  identification: "Meta-analysis of published impulse responses to conventional monetary policy shocks (VARs, local projections, various identification schemes), responses standardised to a 25 bp shock and averaged per quarter (mean or median); estimates and standard errors winsorised at the 2nd and 98th percentiles"
+  applicability: "REVA note: average across many countries, periods and identification schemes; the authors warn that meta-averages are inflated by publication bias (corrected values are loaded separately) and that responses are wide-banded (68% band excludes zero for output only between 3 and 14 quarters)."
+estimates:
+  - id: output_peak_mean
+    pdf_page: 7
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: "output, percent response (mean across primary-study estimates), peak about two years after the shock"}
+    unit: percent
+    point: -0.25
+    point_kind: mean
+    as_printed: "-0.25"
+    horizon: {kind: peak, value: 2, unit: year}
+    locator: "Executive summary, conclusion 4 (printed p.6); same mean in Section 3.2.1 'Recent meta-analyses', Chart 1 (printed p.75)"
+    quote: "with average (median) responses peaking at around -0.25 (-0.15) percent after two years for output"
+  - id: output_peak_median
+    pdf_page: 76
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: "output, percent response (median across primary-study estimates), peak about two years after the shock"}
+    unit: percent
+    point: -0.15
+    point_kind: median
+    as_printed: "-0.15"
+    horizon: {kind: peak, value: 2, unit: year}
+    locator: "Section 3.2.1 'Recent meta-analyses', Chart 1 median (printed p.75)"
+    quote: "The peak output response is -0.15% about two years after the shock, while the peak price level response is -0.11% after about four years"
+  - id: price_level_peak_mean
+    pdf_page: 76
+    effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: "price level, percent response (mean across primary-study estimates), peak after about four years"}
+    unit: percent
+    point: -0.18
+    point_kind: mean
+    as_printed: "-0.18"
+    horizon: {kind: peak, value: 4, unit: year}
+    locator: "Section 3.2.1, Chart 1 mean (printed p.75)"
+    quote: "the peak price level response being -0.18% after about four years"
+  - id: price_level_peak_median
+    pdf_page: 76
+    effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: "price level, percent response (median across primary-study estimates), peak after about four years"}
+    unit: percent
+    point: -0.11
+    point_kind: median
+    as_printed: "-0.11"
+    horizon: {kind: peak, value: 4, unit: year}
+    locator: "Section 3.2.1, Chart 1 median (printed p.75)"
+    quote: "The peak output response is -0.15% about two years after the shock, while the peak price level response is -0.11% after about four years"
+  - id: inflation_peak_mean
+    pdf_page: 76
+    effect: {kind: atlas_concept, id: imf.inflation_cpi_avg, transform: pp_change, definition: "annual inflation, percentage-point response (mean), peak after about three years"}
+    unit: percentage_points
+    point: -0.05
+    point_kind: mean
+    as_printed: "-0.05"
+    horizon: {kind: peak, value: 3, unit: year}
+    locator: "Section 3.2.1, Chart 1 mean (printed p.75)"
+    quote: "The corresponding annual inflation response peaks at -0.05 percentage points after about three years."
+  - id: inflation_peak_median
+    pdf_page: 76
+    effect: {kind: atlas_concept, id: imf.inflation_cpi_avg, transform: pp_change, definition: "annual inflation, percentage-point response (median), peak after about three years"}
+    unit: percentage_points
+    point: -0.03
+    point_kind: median
+    as_printed: "-0.03"
+    horizon: {kind: peak, value: 3, unit: year}
+    locator: "Section 3.2.1, Chart 1 median (printed p.75)"
+    quote: "with the corresponding annual inflation response peaking at -0.03 percentage points after about three years"
+  - id: output_peak_mean_bias_corrected
+    pdf_page: 7
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: "output, percent response after correction for publication bias (mean), peak about two years after the shock"}
+    unit: percent
+    point: -0.14
+    point_kind: mean
+    as_printed: "-0.14"
+    horizon: {kind: peak, value: 2, unit: year}
+    locator: "Executive summary, conclusion 5 (printed p.6)"
+    quote: "Correcting the estimates would yield final average (median) effects that peak at -0.14 (-0.08) percent for output and -0.08 (-0.05) percent for price level at the same horizons as for non- corrected estimates."
+  - id: output_peak_median_bias_corrected
+    pdf_page: 7
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: "output, percent response after correction for publication bias (median), peak about two years after the shock"}
+    unit: percent
+    point: -0.08
+    point_kind: median
+    as_printed: "-0.08"
+    horizon: {kind: peak, value: 2, unit: year}
+    locator: "Executive summary, conclusion 5 (printed p.6)"
+    quote: "Correcting the estimates would yield final average (median) effects that peak at -0.14 (-0.08) percent for output and -0.08 (-0.05) percent for price level at the same horizons as for non- corrected estimates."
+  - id: price_level_peak_mean_bias_corrected
+    pdf_page: 7
+    effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: "price level, percent response after correction for publication bias (mean), peak after about four years"}
+    unit: percent
+    point: -0.08
+    point_kind: mean
+    as_printed: "-0.08"
+    horizon: {kind: peak, value: 4, unit: year}
+    locator: "Executive summary, conclusion 5 (printed p.6)"
+    quote: "Correcting the estimates would yield final average (median) effects that peak at -0.14 (-0.08) percent for output and -0.08 (-0.05) percent for price level at the same horizons as for non- corrected estimates."
+  - id: price_level_peak_median_bias_corrected
+    pdf_page: 7
+    effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: "price level, percent response after correction for publication bias (median), peak after about four years"}
+    unit: percent
+    point: -0.05
+    point_kind: median
+    as_printed: "-0.05"
+    horizon: {kind: peak, value: 4, unit: year}
+    locator: "Executive summary, conclusion 5 (printed p.6)"
+    quote: "Correcting the estimates would yield final average (median) effects that peak at -0.14 (-0.08) percent for output and -0.08 (-0.05) percent for price level at the same horizons as for non- corrected estimates."

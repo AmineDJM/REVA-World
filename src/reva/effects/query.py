@@ -152,6 +152,7 @@ def estimate_json(r: Mapping[str, Any], res: Resolver | None = None) -> dict[str
         "measure": r["measure"],
         "unit": r["unit"],
         "shock": None if r.get("shock_size") is None else {"size": _f(r["shock_size"]), "unit": r["shock_unit"]},
+        "shock_profile": (r.get("meta") or {}).get("shock_profile") or "unspecified",
         "sign": r["sign"],
         "point": _f(r.get("point")),
         "point_kind": r.get("point_kind"),

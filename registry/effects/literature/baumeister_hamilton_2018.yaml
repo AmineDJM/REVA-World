@@ -1,0 +1,84 @@
+# Oil supply / demand elasticities and the activity effect of oil supply shocks (agent PRED-EFFECT).
+schema: reva-effects-literature/1
+id: baumeister_hamilton_2018
+source_key: effects.literature
+citation:
+  text: "Christiane J.S. Baumeister and James D. Hamilton. Structural Interpretation of Vector Autoregressions with Incomplete Identification: Revisiting the Role of Oil Supply and Demand Shocks. NBER Working Paper No. 24167, December 2017, Revised August 2018."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Baumeister & Hamilton (2018), NBER WP 24167"
+  authors: [Christiane J.S. Baumeister, James D. Hamilton]
+  title: "Structural Interpretation of Vector Autoregressions with Incomplete Identification: Revisiting the Role of Oil Supply and Demand Shocks"
+  year: 2018
+  series: NBER Working Paper No. 24167
+  doi: null
+  url: http://www.nber.org/papers/w24167
+document:
+  url: https://www.nber.org/system/files/working_papers/w24167/w24167.pdf
+  media_type: application/pdf
+  sha256: 73c519c6bc756bdd3924a28ef9bc6b4a7abdadb37343e3c5d49395b6053807ce
+  bytes: 1214556
+  version_read: NBER Working Paper 24167, December 2017, revised August 2018 (a journal version may differ)
+as_of: "2018-08-31"
+rights:
+  licence: "© 2017 by Christiane J.S. Baumeister and James D. Hamilton. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  method: bvar
+  point_kind: median
+  pdf_page: 42
+  scope: {countries: [WLD], period: {from: "1975-02", to: "2016-12"}, frequency: monthly,
+          sample_note: "World oil market; 1958:M1-1975:M1 observations used to inform the prior; benchmark column (1)"}
+  identification: "Bayesian structural VAR (oil production, OECD+6 industrial production, real oil price, inventories) with informative priors on the contemporaneous coefficients (elasticities) instead of exact identifying restrictions; posterior median and 68% posterior credibility region"
+  applicability: "REVA note: short-run (within-month) world elasticities for 1975-2016; the implied price response to a given supply cut is a composition of the two elasticities (REVA's computation), not a number printed here."
+estimates:
+  - id: oil_supply_elasticity
+    shock_profile: contemporaneous_relation
+    cause: {kind: variable, id: oil_price.global, transform: log_change,
+            definition: "real price of oil (refiner acquisition cost deflated), in logs"}
+    effect: {kind: variable, id: oil.world_production, transform: log_change,
+             definition: "world crude oil production, in logs (short-run price elasticity of oil supply αqp)"}
+    measure: elasticity
+    unit: ratio
+    sign: positive
+    point: 0.15
+    as_printed: "0.15"
+    uncertainty: {ci_low: 0.09, ci_high: 0.22, ci_level: 0.68, interval_kind: credible, status: reported}
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Table 3 'Sensitivity of parameter inference ...', panel A 'Short-run price elasticity of oil supply αqp', column (1) Benchmark (printed p.40)"
+    quote: "A. Short-run price elasticity of oil supply αqp 0.15 0.11 0.15 0.14 0.14 0.15 0.13 (0.09, 0.22)"
+  - id: oil_demand_elasticity
+    shock_profile: contemporaneous_relation
+    cause: {kind: variable, id: oil_price.global, transform: log_change,
+            definition: "real price of oil (refiner acquisition cost deflated), in logs"}
+    effect: {kind: variable, id: oil.world_consumption, transform: log_change,
+             definition: "world oil consumption demand, in logs (short-run price elasticity of oil demand βqp)"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -0.35
+    as_printed: "-0.35"
+    uncertainty: {ci_low: -0.51, ci_high: -0.24, ci_level: 0.68, interval_kind: credible, status: reported}
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Table 3, panel B 'Short-run price elasticity of oil demand βqp', column (1) Benchmark (printed p.40)"
+    quote: "B. Short-run price elasticity of oil demand βqp -0.35 -0.47 -0.35 -0.35 -0.35 -0.35 -0.31 (-0.51, -0.24)"
+  - id: activity_12m_after_supply_shock_10pct
+    shock_profile: one_time_impulse
+    cause: {kind: variable, id: oil_price.global, transform: percent_change,
+            definition: "oil supply shock that raises real oil price by 10% (structural supply shock at time 0, normalised by its impact on the real oil price)"}
+    effect: {kind: variable, id: output.world_industrial_production, transform: log_level,
+             definition: "economic activity (extended OECD+6 industrial production index), percent response 12 months later"}
+    measure: response
+    unit: percent
+    shock: {size: 10, unit: percent}
+    sign: negative
+    point: -0.50
+    as_printed: "-0.50"
+    uncertainty: {ci_low: -0.91, ci_high: -0.17, ci_level: 0.68, interval_kind: credible, status: reported}
+    horizon: {kind: at_horizon, value: 12, unit: month}
+    locator: "Table 3, panel C 'Effect of oil supply shock that raises real oil price by 10% on economic activity 12 months later', column (1) Benchmark (printed p.40)"
+    quote: "C. Effect of oil supply shock that raises real oil price by 10% on economic activity 12 months later -0.50 -0.62 -0.50 -0.35 -0.52 -0.49 -0.55 (-0.91, -0.17)"

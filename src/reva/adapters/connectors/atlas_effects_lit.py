@@ -30,12 +30,12 @@ from reva.effects import curation as cur
 from reva.effects import model as effects_model
 
 CONNECTOR_NAME = "atlas.effects_lit"
-CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered from an in-flight snapshot with different code
+CONNECTOR_VERSION = "1.0.2"  # 1.0.0 was registered from an in-flight snapshot; 1.0.1 seeded before shock_profile
 PARSER_VERSION = "atlas_effects_lit/1"
 SOURCE_KEY = "effects.literature"
 ATLAS_SOURCE = "effects"
 DATASET = "literature_estimates"
-HOSTS = ("www.nber.org", "www.cepii.fr", "www.imf.org", "www.ecb.europa.eu")
+HOSTS = ("www.nber.org", "www.cepii.fr", "www.imf.org", "www.ecb.europa.eu", "www.uni-trier.de")
 MAX_BYTES = 20_000_000
 REPO_ROOT = Path(__file__).resolve().parents[4]
 FIXTURE_LITERATURE_DIR = REPO_ROOT / "tests" / "fixtures" / "effects" / "literature"

@@ -104,3 +104,33 @@ variables:
     definition: Indicator that the two countries share a currency (currency union).
     unit: indicator (0/1)
     atlas_concepts: []
+  - id: output.real_gdp_per_capita
+    labels: {en: Real GDP per capita, fr: PIB réel par habitant}
+    definition: Real gross domestic product per person; its growth rate is the annual percent change.
+    unit: constant-price currency per person
+    atlas_concepts: []
+  - id: output.world_industrial_production
+    labels: {en: World industrial production, fr: Production industrielle mondiale}
+    definition: Index of industrial production of a broad group of economies used as a measure of world economic activity (e.g. OECD plus six major other countries).
+    unit: index
+    atlas_concepts: []
+  - id: oil.world_production
+    labels: {en: World crude oil production, fr: Production mondiale de pétrole brut}
+    definition: Quantity of crude oil produced worldwide per period.
+    unit: barrels per day
+    atlas_concepts: []
+  - id: oil.world_consumption
+    labels: {en: World oil consumption, fr: Consommation mondiale de pétrole}
+    definition: Quantity of crude oil (or oil products) consumed worldwide per period (oil demand).
+    unit: barrels per day
+    atlas_concepts: []
+  - id: trade.export_restriction
+    labels: {en: Export restriction, fr: Restriction à l'exportation}
+    definition: A government measure restricting exports of a product (ban, quota, minimum export price or export tax); as a cause, the introduction or presence of the restriction.
+    unit: indicator or ad valorem equivalent (as the estimate states)
+    atlas_concepts: []
+  - id: pension.minimum_pension_age
+    labels: {en: Minimum pension age, fr: Âge minimum de départ à la retraite}
+    definition: Statutory minimum (earliest eligibility) age at which an old-age pension can be claimed.
+    unit: years of age
+    atlas_concepts: []

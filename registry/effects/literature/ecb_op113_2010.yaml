@@ -30,6 +30,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: permanent_level_shift
   cause: {kind: variable, id: energy_price.all_products, transform: percent_change,
           definition: "a 10% increase in energy prices (coal/lignite/peat, crude petroleum and natural gas, coke/refined petroleum/nuclear fuels, electricity/gas/steam/hot water; imported and domestically produced energy inputs)"}
   measure: response

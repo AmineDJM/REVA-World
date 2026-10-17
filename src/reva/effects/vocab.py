@@ -47,6 +47,21 @@ UNITS = (
     "log_points",
 )
 SIGNS = ("positive", "negative", "zero", "ambiguous")
+#: How the cause moves in the experiment the number refers to (PRED-ENGINE reads lag profiles as responses to it):
+#: one_time_impulse = a structural shock at t=0, the cause then follows its own estimated dynamics;
+#: sustained = the cause is held at the new value over the horizon; permanent_level_shift = a static/permanent
+#: change of the level (e.g. input-output price computations); state_indicator = an episode/status that is on
+#: (dummy = 1) while it lasts; contemporaneous_relation = a regression slope between co-moving variables, no
+#: shock path; cross_sectional = differences across units, no time path; unspecified = the source does not say.
+SHOCK_PROFILES = (
+    "one_time_impulse",
+    "sustained",
+    "permanent_level_shift",
+    "state_indicator",
+    "contemporaneous_relation",
+    "cross_sectional",
+    "unspecified",
+)
 POINT_KINDS = ("point", "mean", "median")
 INTERVAL_KINDS = ("confidence", "credible", "range_across_estimates", "interquartile", "min_max")
 UNCERTAINTY_STATUSES = ("reported", "partial", "not_reported")

@@ -45,6 +45,7 @@ everyone (`meta.reject_mutation`); restricted-deletion role covers the tables li
 | `measure` | text | what the number is: `elasticity` (% effect per 1 % cause), `pass_through` (cumulative % of a cause % change passed to the effect, as a ratio), `semi_elasticity` (% effect per unit/pp of cause), `slope` (units of effect per unit of cause, e.g. pp per pp), `multiplier` (currency of effect per currency of cause), `response` (change of the effect for the stated shock), `identity_coefficient` |
 | `unit` | text | `ratio`, `percent_per_percent`, `percent_per_pp`, `pp_per_pp`, `pp_per_percent`, `currency_per_currency`, `percent`, `percentage_points`, `log_points`, `unit_per_unit`; allowed per measure (table below) |
 | `shock_size`, `shock_unit` | numeric, text | required for `measure = response` (e.g. `10`, `percent`; `1`, `std_dev`; `1`, `percent_of_gdp`; `1`, `occurrence`) |
+| `meta.shock_profile` | (jsonb key) | how the cause moves in the experiment the number refers to: `one_time_impulse` (structural shock at t=0, the cause then follows its own dynamics), `sustained` (held over the horizon), `permanent_level_shift` (static / permanent level change), `state_indicator` (episode or status on while it lasts), `contemporaneous_relation` (slope between co-moving variables, no shock path), `cross_sectional`, `unspecified`; `EffectEstimateIn.shock_profile`, JSON `shock_profile`. PRED-ENGINE reads lag profiles as responses to this shock. |
 | `sign` | text | `positive` · `negative` · `zero` · `ambiguous` — direction of the effect for an increase (or occurrence) of the cause; must equal sign(point) when a point is given |
 | `point` | numeric | point estimate (nullable: sign-only estimates are allowed) |
 | `point_kind` | text | `point` · `mean` · `median` |
@@ -192,7 +193,7 @@ Readers (plain dicts in the JSON shape below; `conn` = any SQLAlchemy connection
             "definition": "10% increase in energy prices: coal/lignite/peat (NACE 10), …", "transform": "percent_change"},
   "effect": {"kind": "atlas_concept", "id": "imf.cpi_index", "label": "…", "label_fr": "…",
              "definition": "Total (direct + indirect) increase in consumer prices before taxes", "transform": "percent_change"},
-  "measure": "response", "unit": "percent", "shock": {"size": 10, "unit": "percent"},
+  "measure": "response", "unit": "percent", "shock": {"size": 10, "unit": "percent"}, "shock_profile": "permanent_level_shift",
   "sign": "positive", "point": 0.36, "point_kind": "point", "as_printed": "0.36",
   "uncertainty": {"se": null, "ci_low": null, "ci_high": null, "ci_level": null, "interval_kind": null,
                   "draws": null, "status": "not_reported"},

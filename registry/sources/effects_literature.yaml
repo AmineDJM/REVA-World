@@ -16,7 +16,7 @@ rights:
     store for provenance only and must not be redistributed. A maintainer should confirm this use before any public
     release.
 metadata:
-  allowed_hosts: [www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu]
+  allowed_hosts: [www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu, www.uni-trier.de]
   files: "document.url of each registry/effects/literature/<entry>.yaml"
   authentication: none
   cadence: static publications; re-fetch only when an entry is added or changed

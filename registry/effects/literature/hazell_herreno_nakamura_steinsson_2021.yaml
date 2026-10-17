@@ -30,6 +30,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: contemporaneous_relation
   effect: {kind: variable, id: prices.nontradeable_inflation_regional, transform: pp_change,
            definition: "cumulative non-tradeable inflation over four quarters, measured in percentage points (state-level price indexes for non-tradeable goods)"}
   measure: slope

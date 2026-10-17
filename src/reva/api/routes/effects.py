@@ -97,6 +97,10 @@ class EffectEstimate(s.ApiModel):
     measure: str
     unit: str
     shock: dict[str, Any] | None = Field(description="{size, unit} of the shock a 'response' refers to")
+    shock_profile: str = Field(
+        description="How the cause moves in the experiment: one_time_impulse, sustained, permanent_level_shift, "
+        "state_indicator, contemporaneous_relation, cross_sectional or unspecified (lag profiles are responses to it)"
+    )
     sign: Literal["positive", "negative", "zero", "ambiguous"]
     point: float | None
     point_kind: str | None

@@ -1,0 +1,74 @@
+# Economic effects of international sanctions on the target (agent PRED-EFFECT), Trier research paper.
+schema: reva-effects-literature/1
+id: gutmann_neuenkirch_neumeier_2022
+source_key: effects.literature
+citation:
+  text: "Jerg Gutmann, Matthias Neuenkirch, Florian Neumeier. The Economic Effects of International Sanctions: An Event Study. Research Papers in Economics No. 3/21, University of Trier. First Version: October 1, 2020; This Version: December 23, 2022."
+  text_basis: assembled from the title pages of the version read (University of Trier research paper; also CESifo WP 9007, April 2021, an earlier version)
+  short: "Gutmann, Neuenkirch & Neumeier (2022), Trier RP 3/21"
+  authors: [Jerg Gutmann, Matthias Neuenkirch, Florian Neumeier]
+  title: "The Economic Effects of International Sanctions: An Event Study"
+  year: 2022
+  series: Research Papers in Economics No. 3/21 (University of Trier)
+  doi: null
+  url: https://www.uni-trier.de/fileadmin/fb4/prof/VWL/EWF/Research_Papers/2021-03.pdf
+document:
+  url: https://www.uni-trier.de/fileadmin/fb4/prof/VWL/EWF/Research_Papers/2021-03.pdf
+  media_type: application/pdf
+  sha256: 56916eaec191a9c5bdbeabd10fc21f0e4042181cac5d27cd491e3e14a92352a5
+  bytes: 945852
+  version_read: "Version of December 23, 2022 (working paper)"
+as_of: "2022-12-23"
+rights:
+  licence: "No licence statement in the document read (university working paper, free download); treated as all rights reserved."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: state_indicator
+  cause: {kind: event_type, id: sanction_episode, transform: occurrence,
+          definition: "international sanctions (an ongoing sanction episode; comparison: country-years with sanction threats but no sanctions)"}
+  method: event_study
+  point_kind: point
+  measure: response
+  shock: {size: 1, unit: occurrence}
+  sign: negative
+  uncertainty: {status: partial}
+  scope: {country_group: "158 countries", period: {from: "1960", to: "2016"}, frequency: annual, n_countries: 158}
+  identification: "Panel event study (Schmidheiny and Siegloch design) with pre-treatment (-3..-1), episode-year (1..11+) and post-treatment dummies; sanctions from TIES and EUSANCT; reference = threatened but not sanctioned country-years; 95% bands in Figure 1 (not tabulated); coefficients reported as significant at the 1% level"
+  applicability: "REVA note: average over sanction episodes 1960-2016 (larger in the Cold War and for US unilateral and financial sanctions per the authors); not specific to a given sender, target or embargo type."
+estimates:
+  - id: gdp_pc_growth_year1
+    pdf_page: 14
+    effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate,
+             definition: "growth rate of GDP per capita (first year of a sanction episode)"}
+    unit: percentage_points
+    point: -1.32
+    as_printed: "-1.32"
+    horizon: {kind: at_horizon, value: 1, unit: year}
+    locator: "Section 4.2 'Results for GDP growth and its main components', Figure 1 coefficients reported in the text (printed p.13)"
+    quote: "international sanctions lead to a reduction of GDP growth during the first (−1.32 pp) and second year (−1.50 pp) of a sanction episode"
+  - id: gdp_pc_growth_year2
+    pdf_page: 14
+    effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate,
+             definition: "growth rate of GDP per capita (second year of a sanction episode)"}
+    unit: percentage_points
+    point: -1.50
+    as_printed: "-1.50"
+    horizon: {kind: at_horizon, value: 2, unit: year}
+    locator: "Section 4.2, Figure 1 coefficients reported in the text (printed p.13)"
+    quote: "international sanctions lead to a reduction of GDP growth during the first (−1.32 pp) and second year (−1.50 pp) of a sanction episode"
+  - id: gdp_pc_level_first_two_years
+    pdf_page: 14
+    effect: {kind: variable, id: output.real_gdp_per_capita, transform: log_level,
+             definition: "target country's GDP per capita, cumulative drop over the first two years of a sanction episode"}
+    unit: percent
+    point: -2.82
+    as_printed: "2.82"
+    printed_transform: negated
+    horizon: {kind: cumulative, value: 2, unit: year}
+    locator: "Section 4.2 (printed p.13)"
+    quote: "The adverse effect of sanctions on GDP growth rates translates into a 2.82 percent drop in the target country’s GDP per capita over the first two years"

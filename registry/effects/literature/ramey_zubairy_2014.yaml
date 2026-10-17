@@ -28,6 +28,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: one_time_impulse
   cause: {kind: variable, id: fiscal.government_purchases, transform: level_change,
           definition: "government spending (real government purchases), cumulative change after a military news shock"}
   effect: {kind: variable, id: output.real_gdp_level, transform: level_change,

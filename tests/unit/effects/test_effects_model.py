@@ -165,10 +165,20 @@ def test_valid_publication_row_and_key() -> None:
         ({"as_of": "2013-13-01"}, "invalid_as_of"),
         ({"transcription": "computed"}, "publication_cannot_be_computed"),
         ({"transcription": "machine_readable"}, "selector_required"),
+        ({"shock_profile": "forever"}, "invalid_shock_profile"),
     ],
 )
 def test_rejections(kw, reason) -> None:  # type: ignore[no-untyped-def]
     assert _reason(_est(**kw)) == reason
+
+
+def test_shock_profile_is_stored_in_meta() -> None:
+    row = _ok(_est(shock_profile="one_time_impulse", meta={"n_obs": 3}))
+    assert row["meta"] == {"n_obs": 3, "shock_profile": "one_time_impulse"}
+    assert _ok(_est())["meta"] is None
+    for entry in load_entries():
+        for est in entry.estimates:
+            assert est.get("shock_profile") in vocab.SHOCK_PROFILES, (entry.id, est["id"])
 
 
 def test_negated_printed_transform_and_sign_only() -> None:

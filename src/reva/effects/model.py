@@ -139,6 +139,7 @@ class EffectEstimateIn:
     scope: Mapping[str, Any] = field(default_factory=dict)
     identification: str | None = None
     meta: Mapping[str, Any] | None = None
+    shock_profile: str | None = None  # vocab.SHOCK_PROFILES; stored as meta.shock_profile
     entry_id: str | None = None
     citation: Mapping[str, Any] | None = None
     locator: str | None = None
@@ -253,6 +254,17 @@ def _obj(x: Any, reason: str) -> dict[str, Any] | None:
     if len(_json(d)) > MAX_JSON_BYTES:
         raise Reject(reason)
     return d  # type: ignore[no-any-return]
+
+
+def _meta(e: EffectEstimateIn) -> dict[str, Any] | None:
+    meta = _obj(e.meta, "invalid_meta")
+    if e.shock_profile is None:
+        if meta is not None and meta.get("shock_profile") not in (None, *v.SHOCK_PROFILES):
+            raise Reject("invalid_shock_profile")
+        return meta
+    if e.shock_profile not in v.SHOCK_PROFILES:
+        raise Reject("invalid_shock_profile")
+    return {**(meta or {}), "shock_profile": e.shock_profile}
 
 
 def _sign_of(x: float) -> str:
@@ -555,7 +567,7 @@ def validate_estimate(
         "scope": scope,
         "method": e.method,
         "identification": _txt(e.identification, "invalid_identification"),
-        "meta": _obj(e.meta, "invalid_meta"),
+        "meta": _meta(e),
         "source_kind": source_kind,
         "citation": citation,
         "locator": locator,

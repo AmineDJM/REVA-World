@@ -29,6 +29,7 @@ curation:
   review_status: maintainer_review_pending
 estimates:
   - id: headline_inflation_impact_10pct_oil
+    shock_profile: one_time_impulse
     pdf_page: 12
     cause: {kind: variable, id: oil_price.global, transform: percent_change,
             definition: "global oil price inflation (percent change in the global oil price)"}

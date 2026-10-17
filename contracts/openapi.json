@@ -11241,6 +11241,11 @@
             "description": "{size, unit} of the shock a 'response' refers to",
             "title": "Shock"
           },
+          "shock_profile": {
+            "description": "How the cause moves in the experiment: one_time_impulse, sustained, permanent_level_shift, state_indicator, contemporaneous_relation, cross_sectional or unspecified (lag profiles are responses to it)",
+            "title": "Shock Profile",
+            "type": "string"
+          },
           "sign": {
             "enum": [
               "positive",
@@ -11290,6 +11295,7 @@
           "measure",
           "unit",
           "shock",
+          "shock_profile",
           "sign",
           "point",
           "point_kind",

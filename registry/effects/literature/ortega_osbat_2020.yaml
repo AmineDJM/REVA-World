@@ -28,6 +28,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: unspecified
   cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change,
           definition: "a 1% depreciation in the euro (nominal effective exchange rate)"}
   measure: response

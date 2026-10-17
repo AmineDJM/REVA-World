@@ -29,6 +29,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: cross_sectional
   effect: {kind: variable, id: trade.bilateral_trade_flow, transform: log_change,
            definition: "bilateral trade (the dependent variable of the gravity equations summarised, in logs)"}
   point_kind: median
@@ -107,6 +108,7 @@ estimates:
     locator: "Table 4 'Estimates of typical gravity variables', row 'Distance', Structural Gravity median (printed p.34)"
     quote: "Distance -.89 -.93 .4 1835 -1.14 -1.1 .41 328"
   - id: rta_fta_structural
+    shock_profile: state_indicator
     pdf_page: 34
     cause: {kind: variable, id: trade.rta_membership, transform: occurrence,
             definition: "RTA/FTA dummy (the pair has a regional or free trade agreement)"}
@@ -123,6 +125,7 @@ estimates:
     quote: "RTA/FTA .47 .59 .5 257 .28 .36 .42 108"
     source_caveats: "The numbers reported in Table 4 establish the typical findings but they should not be interpreted as preferred estimates of the causal effects of the policy variables."
   - id: eu_structural
+    shock_profile: state_indicator
     pdf_page: 34
     cause: {kind: variable, id: trade.eu_membership, transform: occurrence,
             definition: "EU dummy (both countries are EU members)"}
@@ -139,6 +142,7 @@ estimates:
     quote: "EU .23 .14 .56 329 .19 .16 .5 26"
     source_caveats: "The numbers reported in Table 4 establish the typical findings but they should not be interpreted as preferred estimates of the causal effects of the policy variables."
   - id: common_currency_structural
+    shock_profile: state_indicator
     pdf_page: 34
     cause: {kind: variable, id: trade.common_currency, transform: occurrence,
             definition: "Common currency dummy (the pair shares a currency)"}

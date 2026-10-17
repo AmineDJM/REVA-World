@@ -29,6 +29,7 @@ curation:
   curated_at: "2026-10-17"
   review_status: maintainer_review_pending
 defaults:
+  shock_profile: contemporaneous_relation
   cause: {kind: variable, id: output.gap, transform: gap,
           definition: "Yt – Yt*: log real output minus its long-run level (Hodrick-Prescott trend with the smoothing parameter stated)"}
   effect: {kind: variable, id: labour.unemployment_gap, transform: gap,
