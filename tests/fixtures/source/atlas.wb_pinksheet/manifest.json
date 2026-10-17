@@ -1,0 +1,48 @@
+[
+ {
+  "request_fingerprint": "ddcb19ff26de15587702254ef22932aa116af40b4b42161eb5743133833eea0c",
+  "url": "https://www.worldbank.org/en/research/commodity-markets",
+  "file": "ddcb19ff26de1558.html",
+  "sha256": "2d481c0a799e41f0a1cac171bb95d959184fa3f773680906d8bfec7b46293792",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html;charset=utf-8",
+   "last-modified": "Fri, 09 Oct 2026 22:43:55 GMT"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0",
+  "live_sha256": "2d481c0a799e41f0a1cac171bb95d959184fa3f773680906d8bfec7b46293792",
+  "live_bytes": 55918,
+  "excerpt": "whole Commodity Markets page"
+ },
+ {
+  "request_fingerprint": "7dcfe70a88a54158cf88b4f6800ccc92ecf1992f11012cf81f3bf1e1172279b5",
+  "url": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx",
+  "file": "7dcfe70a88a54158.xlsx",
+  "sha256": "02d4805e3431d97e118752e4f624f11ff1cc1bb3a5979af88a7b87a671e0e59a",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0",
+  "live_sha256": "ea1c350827878ea3bbe30e3cda16a13fd3bd5b409b8458940dc94a36b5a33154",
+  "live_bytes": 586099,
+  "excerpt": "the live workbook with every worksheet's period rows cut to the first 2 and last 3 (plus every row holding a spreadsheet error cell); header, note and Description rows and all other package parts verbatim"
+ },
+ {
+  "request_fingerprint": "fd2d667715701974adfbca925badbf76ea68cfb2bd791659465a35efd4305544",
+  "url": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Annual.xlsx",
+  "file": "fd2d667715701974.xlsx",
+  "sha256": "3e388e763001775d48c1d796cee3179e7fd1a2c10b9896adedcdac50912bfe34",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0",
+  "live_sha256": "d07bcb67ac39ceba4ef46a36e9d252f89d52c590ce6c05b23acb023d845e3a8b",
+  "live_bytes": 3175465,
+  "excerpt": "the live workbook with every worksheet's period rows cut to the first 2 and last 3 (plus every row holding a spreadsheet error cell); header, note and Description rows and all other package parts verbatim"
+ }
+]

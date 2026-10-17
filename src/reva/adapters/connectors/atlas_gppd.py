@@ -67,6 +67,7 @@ CSV_URL = f"{REPO}/output_database/global_power_plant_database.csv"
 VERSION_URL = f"{REPO}/output_database/DATABASE_VERSION"
 README_URL = f"{REPO}/README.md"
 LICENCE = "CC-BY-4.0"
+GEO_SCHEME = "gppd"
 LICENCE_SENTENCE = "Creative Commons-Attribution 4.0 (CC BY 4.0)"
 MAX_CSV_BYTES = 40_000_000
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -220,9 +221,7 @@ def parse_csv(body: bytes, *, min_plants: int = 1) -> tuple[list[Plant], ParseRe
             lat=(r.get("latitude") or "").strip(),
             lon=(r.get("longitude") or "").strip(),
             primary_fuel=(r.get("primary_fuel") or "").strip(),
-            other_fuels=tuple(
-                f for f in ((r.get(f"other_fuel{k}") or "").strip() for k in (1, 2, 3)) if f
-            ),
+            other_fuels=tuple(f for f in ((r.get(f"other_fuel{k}") or "").strip() for k in (1, 2, 3)) if f),
             commissioning_year=(r.get("commissioning_year") or "").strip(),
             owner=(r.get("owner") or "").strip(),
             source=(r.get("source") or "").strip(),
@@ -264,8 +263,19 @@ def load_predicates(path: Path = PREDICATES_FILE) -> list[Any]:
     from reva.kg.model import KgProperty
 
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    keys = ("pid", "value_kind", "reva_predicate", "label_en", "label_fr", "inverse_name", "inverse_label_en", "inverse_label_fr")
-    return [KgProperty(**{k: p[k] for k in keys if k in p}) for p in doc["predicates"] if str(p["pid"]).startswith("gppd:")]
+    keys = (
+        "pid",
+        "value_kind",
+        "reva_predicate",
+        "label_en",
+        "label_fr",
+        "inverse_name",
+        "inverse_label_en",
+        "inverse_label_fr",
+    )
+    return [
+        KgProperty(**{k: p[k] for k in keys if k in p}) for p in doc["predicates"] if str(p["pid"]).startswith("gppd:")
+    ]
 
 
 def _year(y: str) -> Any:
@@ -286,9 +296,7 @@ class KgParts:
     counters: dict[str, int]
 
 
-def build_kg(
-    plants: Sequence[Plant], *, raw_sha256: str, version: str, country_qids: Mapping[str, str]
-) -> KgParts:
+def build_kg(plants: Sequence[Plant], *, raw_sha256: str, version: str, country_qids: Mapping[str, str]) -> KgParts:
     from reva.kg.model import KgEntity, KgStatement
 
     rev = f"gppd-{version}"
@@ -340,7 +348,7 @@ def build_kg(
         if not p.name:
             c["plant_without_name"] += 1
         base = f"plant:{p.idnr}"
-        iso = country_iso3(p.country, "iso3") if p.country else None
+        iso = country_iso3(p.country, GEO_SCHEME) if p.country else None
         if iso:
             cq = country_qids.get(iso)
             obj = cq or f"iso3:{iso}"
@@ -349,9 +357,21 @@ def build_kg(
         else:
             c["country_unmapped"] += 1
         if p.primary_fuel:
-            st(f"{base}:primary_fuel", q, "gppd:primary_fuel", obj=fuel_qid(p.primary_fuel), qualifiers={"selector": sel})
+            st(
+                f"{base}:primary_fuel",
+                q,
+                "gppd:primary_fuel",
+                obj=fuel_qid(p.primary_fuel),
+                qualifiers={"selector": sel},
+            )
         for k, f in enumerate(p.other_fuels, start=1):
-            st(f"{base}:other_fuel:{k}", q, "gppd:other_fuel", obj=fuel_qid(f), qualifiers={"selector": sel, "column": f"other_fuel{k}"})
+            st(
+                f"{base}:other_fuel:{k}",
+                q,
+                "gppd:other_fuel",
+                obj=fuel_qid(f),
+                qualifiers={"selector": sel, "column": f"other_fuel{k}"},
+            )
         cap = _kg_dec(p.capacity_mw)
         if cap is not None:
             kw: dict[str, Any] = {}
@@ -387,9 +407,21 @@ def build_kg(
         else:
             c["coordinates_missing"] += 1
         if p.owner:
-            st(f"{base}:owner_name", q, "gppd:owner_name", value={"type": "string", "value": p.owner}, qualifiers={"selector": sel})
+            st(
+                f"{base}:owner_name",
+                q,
+                "gppd:owner_name",
+                value={"type": "string", "value": p.owner},
+                qualifiers={"selector": sel},
+            )
         if p.wepp_id:
-            st(f"{base}:wepp_id", q, "gppd:wepp_id", value={"type": "external_id", "value": p.wepp_id}, qualifiers={"selector": sel})
+            st(
+                f"{base}:wepp_id",
+                q,
+                "gppd:wepp_id",
+                value={"type": "external_id", "value": p.wepp_id},
+                qualifiers={"selector": sel},
+            )
         if p.source:
             st(
                 f"{base}:data_source",
@@ -502,7 +534,12 @@ async def atlas_ingest(run: Any, *, load: bool = True) -> dict[str, Any]:
     }
     if load:
         out["kg"] = load_kg(
-            run.engine, run.store, parts, raw_sha256s=[sha, readme_sha, ver_sha], retrieved_at=retrieved, origin=run.origin
+            run.engine,
+            run.store,
+            parts,
+            raw_sha256s=[sha, readme_sha, ver_sha],
+            retrieved_at=retrieved,
+            origin=run.origin,
         )
     return out
 

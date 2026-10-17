@@ -227,9 +227,7 @@ def parse_sheet(table: list[list[Any]], sh: Sheet, raw_sha: str, file_name: str)
     rep.updated = upd[0] if upd else None
     if rep.updated is None:
         raise PinkSheetParseError(f"{sh.sheet}: no 'Updated on' line")
-    subtitle = next(
-        (t for t in title_rows if not t.startswith(("World Bank Commodity", "Updated", "("))), ""
-    )
+    subtitle = next((t for t in title_rows if not t.startswith(("World Bank Commodity", "Updated", "("))), "")
     if not subtitle:
         raise PinkSheetParseError(f"{sh.sheet}: no subtitle (price basis) line")
     width = max(len(r) for r in table[first:])
@@ -404,7 +402,9 @@ def coverage_note(sh: Sheet, rep: SheetReport, url: str, notes: list[str]) -> st
 # --------------------------------------------------------------------------- ingest
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     wanted = {s.dataset for s in SHEETS if run.wants(s.dataset)}
-    raw_page = await run.get(PAGE_URL, key="page:commodity-markets", media_types=("text/html",), max_bytes=MAX_PAGE_BYTES)
+    raw_page = await run.get(
+        PAGE_URL, key="page:commodity-markets", media_types=("text/html",), max_bytes=MAX_PAGE_BYTES
+    )
     page_sha = run.archive(raw_page)
     links = parse_page(raw_page.body)
     out: dict[str, Any] = {"links": links, "tables": {}}

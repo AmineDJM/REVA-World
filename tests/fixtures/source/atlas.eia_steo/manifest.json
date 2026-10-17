@@ -1,0 +1,34 @@
+[
+ {
+  "request_fingerprint": "4db18128761fde9c08ead00c9ff5594cd1f30de67d423f1ce01de1c4b4b57b49",
+  "url": "https://www.eia.gov/opendata/bulk/manifest.txt",
+  "file": "4db18128761fde9c.txt",
+  "sha256": "019c779cb0f8bf4043d45a8116aa0f513fa0e049761eef396e89377daa6bfae0",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "019c779cb0f8bf4043d45a8116aa0f513fa0e049761eef396e89377daa6bfae0",
+  "live_bytes": 28398,
+  "excerpt": "whole bulk manifest"
+ },
+ {
+  "request_fingerprint": "1f3d0b1f3f76ff2670b8f981274e530169f68b51333b9aa6a8e10e4c89dcc9ad",
+  "url": "https://www.eia.gov/opendata/bulk/STEO.zip",
+  "file": "1f3d0b1f3f76ff26.zip",
+  "sha256": "aa110d357a907a2048ade0153b116b345f8082d998b5b357a1c7c366eb6b6c59",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed",
+   "etag": "\"01c328fcf55dd1:0\"",
+   "last-modified": "Tue, 06 Oct 2026 20:16:24 GMT"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "828caff63e7303833fbe9af50b9fee52b6db8ab22f1a3a46a3aad2f56644c8e0",
+  "live_bytes": 5449396,
+  "excerpt": "STEO.txt with 13 verbatim lines of the live member (2 category lines; series ['STEO.BREPUUS.A', 'STEO.BREPUUS.M', 'STEO.BREPUUS.Q', 'STEO.COPR_IR.M', 'STEO.COPR_SA.M', 'STEO.NGHHUUS.M', 'STEO.PAPR_SA.A', 'STEO.PAPR_SA.M', 'STEO.PAPR_VE.A', 'STEO.WTIPUUS.M'] and the first annual series whose geography is a U.S. state list)"
+ }
+]

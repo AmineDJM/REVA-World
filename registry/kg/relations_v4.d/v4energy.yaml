@@ -1,0 +1,21 @@
+# V4ENERGY mappings of the energy-layer dataset predicates (registry/kg/predicates_energy.yaml) to the universal
+# relation families. Wikidata properties used by the energy specs (P1056 product, P127 owned by, P61 discoverer,
+# P131/P17 location, P186 made from, P527 has part, P749/P355 parent/subsidiary) are mapped by V4CORE in
+# relations_v4.yaml; P137 (operator) is mapped here (V4CORE leaves it unmapped).
+# Deliberately unmapped: literal predicates (capacity, commissioning year, coordinates, owner name string, WEPP id,
+# data source, generation). GPPD owner names are free text: no owned_by edge exists without an owner identifier.
+version: 1
+agent: V4ENERGY
+note: >-
+  GPPD fuel categories are GPPD's own vocabulary entities (gppd:fuel:<code>), not Wikidata items: no identifier links
+  them to energy-source items, so they are kept separate (a curated equivalence would be an owner decision).
+mappings:
+  - {property: "gppd:country", family: located_in, subtype: country, source: wri.gppd,
+     subject_kinds: [facility], object_kinds: [country]}
+  - {property: "gppd:primary_fuel", family: context, subtype: primary_fuel, source: wri.gppd,
+     subject_kinds: [facility], object_kinds: [energy_source],
+     note: "GPPD primary_fuel: 'energy source used in primary electricity generation or export'"}
+  - {property: "gppd:other_fuel", family: context, subtype: other_fuel, source: wri.gppd,
+     subject_kinds: [facility], object_kinds: [energy_source]}
+  - {property: P137, family: owned_by, subtype: operator, source: wikidata,
+     note: "operator (Wikidata P137): the organisation that operates the facility; control of operations as Wikidata states it, not ownership or an equity share"}

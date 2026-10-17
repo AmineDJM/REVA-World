@@ -1,0 +1,48 @@
+[
+ {
+  "request_fingerprint": "62cfe6977af472c19081265203f4613a27c5d5069c141b8c01a5be301ce3a4f1",
+  "url": "https://raw.githubusercontent.com/wri/global-power-plant-database/master/README.md",
+  "file": "62cfe6977af472c1.md",
+  "sha256": "9d2661ad16d7abde0e2cf64aa78034824e6249357c977109eb84bf16cc65f1b9",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0 (data) / MIT (code)",
+  "live_sha256": "9d2661ad16d7abde0e2cf64aa78034824e6249357c977109eb84bf16cc65f1b9",
+  "live_bytes": 8450,
+  "excerpt": "whole README"
+ },
+ {
+  "request_fingerprint": "f955c1252721436ce2ac94bc6b12c0e95140ee3a83aed726ce0b32f17ce7db4d",
+  "url": "https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/DATABASE_VERSION",
+  "file": "f955c1252721436c.txt",
+  "sha256": "64d23f858ef51b0f996e4966d4e27c0371b437e2d2787890b1f7ad22d4ec5663",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0",
+  "live_sha256": "64d23f858ef51b0f996e4966d4e27c0371b437e2d2787890b1f7ad22d4ec5663",
+  "live_bytes": 6,
+  "excerpt": "whole file"
+ },
+ {
+  "request_fingerprint": "bc971b2a9e467601f949506dcf06b529472d6a65ca4bc8be273afa11c082e994",
+  "url": "https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv",
+  "file": "bc971b2a9e467601.csv",
+  "sha256": "e667ec5c7be3dfa1e84994047ea80c21038be735f85326bb228c0f2d6a5dca4d",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain; charset=utf-8",
+   "etag": "\"488e9286075c385367ae88f6f0a53cdbe7776fefacf1e4ed3f2f3f07a6171925\""
+  },
+  "retrieved_at": "2026-10-17T13:30:00+00:00",
+  "licence": "CC BY 4.0",
+  "live_sha256": "4b1f93e0fd93664f18684d9b05d0a52ed9658c6a8cf0d21ff2520791379ba7fc",
+  "live_bytes": 11973385,
+  "excerpt": "header + 114 verbatim rows (at most 2 per country x primary fuel for AFG, BRA, CHN, FRA, IND, NOR, SAU, USA, XKX)"
+ }
+]

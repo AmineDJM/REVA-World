@@ -1,0 +1,15 @@
+# Provider geography schemes of the V4ENERGY sources (agent V4ENERGY, 2026-10-17).
+#
+# gppd: WRI Global Power Plant Database v1.3.0 column `country` = ISO 3166-1 alpha-3 except KOS for Kosovo
+#   (column country_long = "Kosovo" on both KOS rows; ISO has no code for Kosovo, the crosswalk entity is XKX).
+schemes:
+  gppd:
+    base: iso3
+    aliases:
+      - code: KOS
+        iso3: XKX
+        source: "GPPD v1.3.0 global_power_plant_database.csv: the 2 rows with country 'KOS' have country_long 'Kosovo'"
+    source:
+      kind: provider_data
+      url: "https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv"
+      retrieved_at: "2026-10-17"

@@ -66,7 +66,11 @@ DS_FC = "steo_forecast"
 NOT_STATED = "not_stated"
 MODEL = "EIA Short-Term Energy Outlook"
 DECIMAL_RE = re.compile(r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$")
-PERIOD_RE = {"A": re.compile(r"^([0-9]{4})$"), "Q": re.compile(r"^([0-9]{4})Q([1-4])$"), "M": re.compile(r"^([0-9]{4})(0[1-9]|1[0-2])$")}
+PERIOD_RE = {
+    "A": re.compile(r"^([0-9]{4})$"),
+    "Q": re.compile(r"^([0-9]{4})Q([1-4])$"),
+    "M": re.compile(r"^([0-9]{4})(0[1-9]|1[0-2])$"),
+}
 ISO3_RE = re.compile(r"^[A-Z]{3}$")
 
 
@@ -183,7 +187,9 @@ def _lines(body: bytes):  # type: ignore[no-untyped-def]
         yield from enumerate(fh, start=1)
 
 
-def parse_bulk(body: bytes, raw_sha: str, datasets: set[str] | None = None) -> tuple[dict[str, pl.DataFrame], SteoReport]:
+def parse_bulk(
+    body: bytes, raw_sha: str, datasets: set[str] | None = None
+) -> tuple[dict[str, pl.DataFrame], SteoReport]:
     want = set(datasets) if datasets else {DS_OBS, DS_FC}
     rep = SteoReport()
     rows: dict[str, dict[str, list[Any]]] = {
@@ -347,4 +353,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     return out
 
 
-__all__ = ["CONNECTOR_NAME", "DS_FC", "DS_OBS", "SteoParseError", "atlas_ingest", "atlas_source", "parse_bulk", "parse_manifest"]
+__all__ = [
+    "CONNECTOR_NAME",
+    "DS_FC",
+    "DS_OBS",
+    "SteoParseError",
+    "atlas_ingest",
+    "atlas_source",
+    "parse_bulk",
+    "parse_manifest",
+]
