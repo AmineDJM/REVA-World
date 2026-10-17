@@ -182,8 +182,9 @@ def causwd_usage_today(engine: Any) -> int:
             c.execute(
                 text(
                     "SELECT COALESCE(sum(COALESCE(consumed, reserved)), 0) FROM ops.budget_ledger "
-                    "WHERE operation_id LIKE 'ingest:kgcauswd-%-wbapi:%:requests' "
-                    f"AND recorded_at >= {DAY_START_SQL}"
+                    "WHERE operation_id LIKE :pat "
+                    f"AND recorded_at >= {DAY_START_SQL}",
+                    {"pat": "ingest:kgcauswd-%-wbapi:%:requests"},
                 )
             ).scalar_one()
         )
