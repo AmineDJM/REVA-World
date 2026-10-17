@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Google Tag Manager -->
+    <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-T26P2Z5&l=dataLkyer"></script><script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLkyer', 'GTM-T26P2Z5');</script>
+    <!-- End Google Tag Manager -->
+    
+    <!-- Always force latest IE rendering engine & Chrome Frame -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="cleartype" content="on">
+    <link rel="shortcut icon" href="https://ucdp.uu.se/favicon.ico">
+
+    <!-- Responsive and mobile friendly stuff -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://ucdp.uu.se/apidocs/css/html5reset.css?v=1.1" media="all">
+    <link rel="stylesheet" href="https://ucdp.uu.se/apidocs/css/col.css?v=1.1" media="all">
+    <link rel="stylesheet" href="https://ucdp.uu.se/apidocs/css/2cols.css?v=1.1" media="all">
+    <link rel="stylesheet" href="https://ucdp.uu.se/apidocs/css/3cols.css?v=1.1" media="all">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/prettify.css">
+    <link href="https://ucdp.uu.se/Scripts/lib/foundation-sites/dist/foundation.css" rel="stylesheet">
+    <link href="https://ucdp.uu.se/Content/foundation-icons.css" rel="stylesheet">
+    <link href="https://ucdp.uu.se/Content/site.css" rel="stylesheet">
+    <link href="https://ucdp.uu.se/Content/print.csss" rel="stylesheet">
+    <link href="https://ucdp.uu.se/Scripts/lib/select2/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <title>UCDP Dataset Download Center</title>
+
+    <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+        --navy:        #12131a;
+        --navy-mid:    #1e2030;
+        --navy-soft:   #2b2e42;
+        --accent:      #990000;
+        --accent2:     #bb1111;
+        --accent-pale: #fff5f5;
+        --gold:        #d4a84b;
+        --text:        #222;
+        --text-mid:    #444;
+        --text-light:  #6b7280;
+        --border:      #e5e7eb;
+        --border-mid:  #d1d5db;
+        --bg:          #ffffff;
+        --bg-soft:     #f9fafb;
+            --sidebar-w:   230px;
+        --content-max: 820px;
+        --header-h:    138px;
+        --radius:      8px;
+        --shadow-sm:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+        --shadow-md:   0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    /* ── Reset ── */
+    html { scroll-behavior: smooth; }
+    body {
+        background: var(--bg);
+        font-family: 'Work Sans', system-ui, sans-serif;
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.75;
+        -webkit-font-smoothing: antialiased;
+    }
+
+        /* Skip link */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 16px;
+            background: #7a0000;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 0 0 4px 4px;
+            z-index: 9999;
+            transition: top 0.1s;
+            border-bottom: none;
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        section[id] {
+            scroll-margin-top: 158px;
+        }
+
+        /* ── UU-style Header ── */
+        #ucdp-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+        }
+
+        /* Utility bar */
+        .uu-util-bar {
+            background: #12131a;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .uu-util-bar__inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .uu-util-bar__uu-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border-bottom: none;
+            color: rgba(255,255,255,0.75);
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .uu-util-bar__uu-link:hover { color: #fff; }
+
+        .uu-util-bar__uu-logo {
+            display: block;
+            height: 20px;
+            width: auto;
+        }
+
+        .uu-util-bar__nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .uu-util-bar__nav a {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            border-bottom: none;
+            transition: color 0.15s;
+        }
+
+        .uu-util-bar__nav a:hover { color: #fff; }
+
+        /* Main header bar */
+        .uu-header__bar {
+            background: #12131a;
+            border-bottom: 4px solid #990000;
+        }
+
+        .uu-header__inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .uu-header__logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            border-bottom: none;
+        }
+
+        .uu-header__uu-logo {
+            display: block;
+            width: 60px;
+            height: 60px;
+        }
+
+        .uu-header__logo-divider {
+            width: 1px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .uu-header__logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .uu-header__logo-ucdp {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+            letter-spacing: 0.01em;
+        }
+
+        .uu-header__logo-sub {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1;
+        }
+
+        .uu-header__nav {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 100%;
+        }
+
+        .uu-header__nav a {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-bottom: none;
+            padding: 0 14px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -4px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .uu-header__nav a:hover {
+            color: #fff;
+            border-bottom-color: rgba(255,255,255,0.4);
+        }
+
+        .uu-header__nav--active {
+            color: #fff !important;
+            border-bottom-color: #990000 !important;
+            font-weight: 600 !important;
+        }
+
+        .uu-header__nav-label {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+
+        .uu-header__nav-btn {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9) !important;
+            text-decoration: none !important;
+            border-bottom: none !important;
+            padding: 6px 14px;
+            height: auto !important;
+            display: inline-flex !important;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.25) !important;
+            border-radius: 3px;
+            margin: 0 3px;
+            margin-bottom: 0 !important;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            background: transparent;
+        }
+
+        .uu-header__nav-btn:hover {
+            background: rgba(255,255,255,0.12) !important;
+            border-color: rgba(255,255,255,0.5) !important;
+            color: #fff !important;
+        }
+
+    /* ─────────────────────────────────────────────
+       LAYOUT
+    ───────────────────────────────────────────── */
+        /* ── Main layout ── */
+        main {
+            display: block;
+            min-height: 100vh;
+            padding-top: 138px;
+            padding-left: var(--sidebar-w);
+        }
+
+        main .row {
+            display: block;
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        #ucdp-sidebar {
+            position: fixed;
+            top: 138px;
+            left: 0;
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            height: calc(100vh - 138px);
+            overflow-y: auto;
+            padding: 32px 0 32px 24px;
+            background: #ffffff;
+            border-right: 1px solid #e8e8e8;
+            z-index: 50;
+        }
+
+        #ucdp-sidebar h4,
+        #ucdp-sidebar .sidebar-label {
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin: 0 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #ucdp-sidebar ul {
+            list-style: none;
+            margin: 0 0 24px 0;
+            padding: 0;
+        }
+
+        #ucdp-sidebar ul li a {
+            display: block;
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 13px;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 5px 10px 5px 0;
+            border-radius: 3px;
+            transition: color 0.15s, padding-left 0.15s;
+            line-height: 1.4;
+        }
+
+        #ucdp-sidebar ul li a:hover {
+            color: var(--accent);
+            padding-left: 4px;
+        }
+
+        #ucdp-sidebar ul li a.active {
+            color: var(--accent);
+            font-weight: 600;
+            border-left: 2px solid var(--accent);
+            padding-left: 6px;
+        }
+
+    /* ── Content wrapper ── */
+    .dl-content-wrap {
+        max-width: var(--content-max);
+        padding: 48px 48px 80px 56px !important;
+    }
+
+    /* ─────────────────────────────────────────────
+       TYPOGRAPHY
+    ───────────────────────────────────────────── */
+    h1 {
+        font-family: 'Work Sans', Arial, sans-serif;
+        font-size: 2rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--navy);
+        margin: 0 0 6px 0;
+        line-height: 1.2;
+    }
+    h2 {
+        font-family: 'Work Sans', sans-serif;
+        font-size: 1.15rem; font-weight: 700;
+        color: var(--navy); margin: 0 0 20px 0;
+        letter-spacing: -0.01em;
+    }
+    h3 {
+        font-family: 'Work Sans', sans-serif;
+        font-size: 0.75rem; font-weight: 700;
+        color: var(--text-light);
+        text-transform: uppercase; letter-spacing: 0.1em;
+        margin: 20px 0 8px 0;
+    }
+    p {
+        margin: 0 0 1rem 0;
+        color: #333;
+        font-size: 16px; line-height: 1.75;
+    }
+    a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(153,0,0,0.3);
+        transition: border-color 0.12s;
+    }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 600; color: var(--navy); }
+    hr {
+        border: none; border-top: 1px solid var(--border);
+        margin: 28px 0;
+    }
+
+    /* ─────────────────────────────────────────────
+       BREADCRUMB
+    ───────────────────────────────────────────── */
+    nav.breadcrumb {
+        font-size: 11.5px; color: var(--text-light);
+        margin-bottom: 20px; letter-spacing: 0.01em;
+    }
+    nav.breadcrumb a { color: var(--text-light); border-bottom: none; }
+    nav.breadcrumb a:hover { color: var(--accent); }
+
+    /* ─────────────────────────────────────────────
+       INTRO RESOURCE CARDS
+    ───────────────────────────────────────────── */
+    .intro-links { margin: 32px 0 6px 0; }
+    .intro-links__label {
+        font-size: 9.5px; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--text-light);
+        margin: 0 0 14px 0;
+    }
+    .intro-links__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .intro-link-card {
+        display: flex; flex-direction: column; gap: 3px;
+        padding: 13px 15px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        text-decoration: none; border-bottom: none;
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.14s, box-shadow 0.14s, border-color 0.14s;
+    }
+    .intro-link-card:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+        border-bottom: none;
+    }
+    .intro-link-card__title {
+        font-size: 12.5px; font-weight: 600; color: var(--accent);
+    }
+    .intro-link-card__desc {
+        font-size: 11.5px; color: var(--text-light); line-height: 1.4;
+    }
+    .ver-badge {
+        display: inline-block;
+        font-size: 10px; font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--text-light);
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 7px;
+        vertical-align: middle;
+        margin-left: 4px;
+        font-family: 'IBM Plex Mono', monospace;
+    }
+    .also-see {
+        font-size: 12.5px; color: var(--text-light);
+        margin: 14px 0 0 0;
+    }
+    .also-see a { font-size: 12.5px; }
+
+    /* ─────────────────────────────────────────────
+       SECTION HEADINGS
+    ───────────────────────────────────────────── */
+    section.header2 { margin-bottom: 0; }
+    section.header2 .header { padding: 0 0 8px 0; }
+    section.header2 > .header > h2 {
+        font-size: 1rem; font-weight: 700;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 22px 0 10px 0;
+        margin: 0 0 0 0;
+        border-bottom: 2px solid var(--border);
+        display: flex; align-items: center; gap: 10px;
+    }
+    section.header2 > .header > h2::before {
+        content: '';
+        display: inline-block; width: 18px; height: 2px;
+        background: var(--accent); flex-shrink: 0;
+    }
+
+    /* ─────────────────────────────────────────────
+       DATASET ENTRIES — card design
+    ───────────────────────────────────────────── */
+    .dataset-entry {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 24px 18px 24px;
+        margin: 14px 0 0 0;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .dataset-entry:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--border-mid);
+    }
+
+    .dataset-heading h3,
+    .panel-title, h3.panel-title {
+        font-family: 'Work Sans', sans-serif !important;
+        font-size: 14.5px !important;
+        font-weight: 600 !important;
+        color: var(--navy) !important;
+        margin: 0 0 10px 0 !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        line-height: 1.4 !important;
+    }
+
+    .dataset-heading[id] {
+        scroll-margin-top: 158px;
+    }
+
+    .dataset-body {
+        color: var(--text-mid);
+        font-size: 13.5px;
+        line-height: 1.7;
+    }
+    .dataset-body p { font-size: 13.5px; }
+
+    /* ─────────────────────────────────────────────
+       DOWNLOAD BUTTONS
+    ───────────────────────────────────────────── */
+    .availableas {
+        display: flex; flex-wrap: wrap;
+        gap: 6px; align-items: center;
+        margin: 10px 0 14px 0;
+    }
+    .dl-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 11px; font-weight: 600;
+        letter-spacing: 0.05em; text-transform: uppercase;
+        text-decoration: none; border-bottom: none !important;
+        cursor: pointer;
+        transition: background 0.13s, box-shadow 0.13s, transform 0.1s;
+        white-space: nowrap; line-height: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .dl-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+    .dl-btn:active { transform: translateY(0); }
+    .avail-label { font-size: 10.5px !important; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light) !important; margin: 14px 0 6px 0 !important; }
+    .dl-btn svg { flex-shrink: 0; }
+
+    .dl-btn--csv   { background: #e8f5f1; color: #0a6b57; border: 1.5px solid #a8d8cc !important; }
+    .dl-btn--csv:hover   { background: #0a6b57; color: #fff !important; border-color: #0a6b57 !important; }
+    .dl-btn--xlsx  { background: #eaf5ea; color: #1a6335; border: 1.5px solid #a5d6a5 !important; }
+    .dl-btn--xlsx:hover  { background: #1a6335; color: #fff !important; border-color: #1a6335 !important; }
+    .dl-btn--stata { background: #e8f0fc; color: #1a4fa0; border: 1.5px solid #a8c0ec !important; }
+    .dl-btn--stata:hover { background: #1a4fa0; color: #fff !important; border-color: #1a4fa0 !important; }
+    .dl-btn--r     { background: #eef0fc; color: #2b47b0; border: 1.5px solid #b0bcec !important; }
+    .dl-btn--r:hover     { background: #2b47b0; color: #fff !important; border-color: #2b47b0 !important; }
+    .dl-btn--pdf   { background: #fef0f0; color: #8a0000; border: 1.5px solid #f0b8b8 !important; }
+    .dl-btn--pdf:hover   { background: #8a0000; color: #fff !important; border-color: #8a0000 !important; }
+
+    /* ─────────────────────────────────────────────
+       CITATION BOX
+    ───────────────────────────────────────────── */
+    .cite-box {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--border-mid);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 12px 16px;
+        margin: 14px 0 6px 0;
+    }
+    .cite-box-label {
+        font-size: 9.5px !important;
+        font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-light) !important;
+        margin: 0 0 8px 0 !important;
+    }
+    .cite-box p {
+        font-size: 12px !important;
+        color: #666 !important;
+        margin: 0 0 5px 0 !important;
+        line-height: 1.55;
+    }
+    .cite-box p:last-child { margin-bottom: 0 !important; }
+
+    /* ─────────────────────────────────────────────
+       TOC INDEX
+    ───────────────────────────────────────────── */
+    .dataset-toc h2 {
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.12em;
+        color: var(--text-light);
+        margin: 20px 0 6px 0; padding: 0;
+        border: none;
+    }
+    .dataset-toc h2::before { display: none; }
+    .dataset-toc ul {
+        list-style: none;
+        margin: 0 0 4px 0;
+        padding: 0;
+    }
+    .dataset-toc li {
+        border-bottom: 1px solid var(--border);
+    }
+    .dataset-toc li:last-child { border-bottom: none; }
+    .dataset-toc a {
+        color: var(--text-mid); border-bottom: none;
+        font-size: 13px; display: block;
+        padding: 6px 4px 6px 0;
+        transition: color 0.12s, padding-left 0.12s;
+        line-height: 1.35;
+    }
+    .dataset-toc a:hover {
+        color: var(--accent);
+        padding-left: 6px;
+    }
+    .dataset-toc .ver-badge {
+        opacity: 0.7;
+    }
+
+        #footer-view footer {
+            background: #1a1a1a;
+            color: #ccc;
+            padding: 0;
+            text-align: left;
+            position: relative;
+            z-index: 60;
+        }
+
+        .uu-footer__bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 32px;
+            font-family: 'Work Sans', Arial, sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .uu-footer__bottom a {
+            color: rgba(255,255,255,0.55);
+            border-bottom: none;
+            text-decoration: none;
+        }
+
+        .uu-footer__bottom a:hover { color: rgba(255,255,255,0.85); }
+
+    /* ─────────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+        #ucdp-sidebar { display: none; }
+        main { padding-left: 0; }
+        .dl-content-wrap { padding: 28px 20px 60px 20px; }
+        .uu-header__nav { display: none; }
+        .uu-util-bar__nav { display: none; }
+        .intro-links__grid { grid-template-columns: 1fr 1fr; }
+        h1 { font-size: 1.5rem; }
+    }
+</style>
+</head>
+
+<body data-new-gr-c-s-check-loaded="14.1239.0" data-gr-ext-installed="">
+<!-- UU-style header -->
+<header id="ucdp-header">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <!-- Utility bar -->
+    <div class="uu-util-bar">
+        <div class="uu-util-bar__inner">
+            <a href="https://www.uu.se/en" class="uu-util-bar__uu-link"><span>Uppsala University</span></a>
+            <nav class="uu-util-bar__nav" aria-label="Utility navigation">
+                <a href="https://www.uu.se/en/department/peace-and-conflict-research">Department of Peace and Conflict Research</a>
+            </nav>
+        </div>
+    </div>
+    <!-- Main header bar -->
+    <div class="uu-header__bar">
+        <div class="uu-header__inner">
+            <a class="uu-header__logo" href="https://ucdp.uu.se/encyclopedia" aria-label="UCDP – Uppsala Conflict Data Program">
+                <img src="data:image/png;base64,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" alt="Uppsala University" class="uu-header__uu-logo">
+                <span class="uu-header__logo-divider"></span>
+                <span class="uu-header__logo-text">
+                    <span class="uu-header__logo-ucdp">UCDP</span>
+                    <span class="uu-header__logo-sub">Uppsala Conflict Data Program</span>
+                </span>
+            </a>
+            <nav class="uu-header__nav" aria-label="Main navigation">
+                <span class="uu-header__nav-label">Explore organized violence by</span>
+                <a href="https://ucdp.uu.se/encyclopedia" class="uu-header__nav-btn">Countries in Conflict</a>
+                <a href="https://ucdp.uu.se/exploratory" class="uu-header__nav-btn">Fatalities</a>
+            </nav>
+        </div>
+    </div>
+</header>
+        <main id="main-content">
+    <nav id="ucdp-sidebar" aria-label="Page sections" tabindex="0">
+        <p class="sidebar-label">On this page</p>
+        <ul>
+            <li><a href="#">Introduction</a></li>
+            <li><a href="#section-toc">Index</a></li>
+            <li><a href="#section-disaggregated">Disaggregated Datasets</a></li>
+            <li><a href="#section-yearly-1946">Yearly Datasets (1946–2025)</a></li>
+            <li><a href="#section-yearly-1989">Yearly Datasets (1989–2025)</a></li>
+            <li><a href="#section-other">Other UCDP Datasets</a></li>
+        </ul>
+    </nav>
+        <div class="row">
+        <div class="dl-content-wrap" id="header-view">
+                <nav aria-label="Breadcrumb" class="breadcrumb">
+                    <a href="https://ucdp.uu.se/encyclopedia">Start</a> / <a href="https://ucdp.uu.se/downloads/" aria-current="page">Downloads</a>
+                </nav>
+                <h1>UCDP Dataset Download Center</h1>
+					<hr>
+                <p>
+                    The <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/about-ucdp">Uppsala Conflict Data Program (UCDP)</a> is the world's main provider of data on organized violence and the oldest ongoing data collection project for civil war, with a history of more than 40 years. Its definition of armed conflict has become the global standard for how conflicts are systematically defined and studied.
+                </p>
+                <p>
+                    This page provides free downloads of all current UCDP datasets. Each entry includes a codebook and, where available, a version history. All datasets are free of charge and licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> — you are free to use and redistribute them provided you cite the relevant publications listed with each dataset.
+                </p>
+                <p>
+                    For programmatic or bulk access, the <a href="https://ucdp.uu.se/apidocs/">UCDP API</a> provides structured JSON access to the same data. If you are looking to explore the data visually before downloading, see the <a href="https://ucdp.uu.se/downloads/charts/">UCDP Charts and Maps</a> page or the interactive <a href="https://ucdp.uu.se/encyclopedia">UCDP Conflict Encyclopedia</a>.
+                </p>
+
+                <div class="intro-links" aria-label="Related UCDP resources">
+                    <p class="intro-links__label">Related resources</p>
+                    <div class="intro-links__grid">
+                        <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-definitions" class="intro-link-card">
+                            <span class="intro-link-card__title">Definitions</span>
+                            <span class="intro-link-card__desc">Key UCDP concepts and definitions used across all datasets</span>
+                        </a>
+                        <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology" class="intro-link-card">
+                            <span class="intro-link-card__title">Methodology</span>
+                            <span class="intro-link-card__desc">Data collection, source evaluation, coding and validation</span>
+                        </a>
+                        <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/frequently-asked-questions" class="intro-link-card">
+                            <span class="intro-link-card__title">FAQ</span>
+                            <span class="intro-link-card__desc">Frequently asked questions about UCDP data and its use</span>
+                        </a>
+                        <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-publications" class="intro-link-card">
+                            <span class="intro-link-card__title">Publications</span>
+                            <span class="intro-link-card__desc">A selection of peer-reviewed UCDP publications</span>
+                        </a>
+                        <a href="https://ucdp.uu.se/apidocs/" class="intro-link-card">
+                            <span class="intro-link-card__title">API Documentation</span>
+                            <span class="intro-link-card__desc">Programmatic access to UCDP data via REST API</span>
+                        </a>
+                        <a href="mailto:ucdp@pcr.uu.se" class="intro-link-card">
+                            <span class="intro-link-card__title">Contact</span>
+                            <span class="intro-link-card__desc">Questions about data? Write to ucdp@pcr.uu.se</span>
+                        </a>
+                    </div>
+                </div>
+
+                <p class="also-see">Also see: <a href="https://ucdp.uu.se/downloads/olddw.html">Old/historical versions of our datasets</a> &nbsp;·&nbsp; <a href="https://ucdp.uu.se/downloads/replication_data.html">Replication data used by our researchers</a> &nbsp;·&nbsp; <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/about-ucdp/ucdp-team">UCDP Team</a></p>
+                <hr>
+<section class="header2" aria-label="Dataset Index" id="section-toc">
+    <div class="header dataset-toc">
+        <h2>Disaggregated Event Datasets</h2>
+        <ul>
+            <li><a href="#ged_global">UCDP Georeferenced Event Dataset (GED) Global <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#candidate">UCDP Candidate Events Dataset (UCDP Candidate) <span class="ver-badge">version 26.0.X</span></a></li>
+        </ul>
+        <h2>Yearly Datasets covering 1946–2025</h2>
+        <ul>
+            <li><a href="#armedconflict">UCDP/PRIO Armed Conflict Dataset <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#dyadic">UCDP Dyadic Dataset <span class="ver-badge">version 26.1</span></a></li>
+        </ul>
+        <h2>Yearly Datasets covering 1989–2025</h2>
+        <ul>
+            <li><a href="#onesided">UCDP One-sided Violence Dataset <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#nonstate">UCDP Non-State Conflict Dataset <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#battlerelated">UCDP Battle-Related Deaths Dataset <span class="ver-badge">version 26.1</span></a></li>
+        </ul>
+        <h2>Other UCDP Datasets</h2>
+        <ul>
+            <li><a href="#actor">UCDP Actor Dataset <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#orgviocy">UCDP Country-Year Dataset on Organized Violence within Country Borders <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#vpp">UCDP Violent Political Protest Dataset <span class="ver-badge">version 26.1</span></a></li>
+            <li><a href="#vppged">UCDP Violent Political Protest GED Dataset <span class="ver-badge">version 26.1.4.1101.2512</span></a></li>
+            <li><a href="#onset">UCDP Onset Dataset <span class="ver-badge">version 25.1</span></a></li>
+            <li><a href="#termination">UCDP Conflict Termination Dataset <span class="ver-badge">version 4-2024</span></a></li>
+            <li><a href="#cid">UCDP Conflict Issues Dataset <span class="ver-badge">version 23.2</span></a></li>
+            <li><a href="#par">UCDP Peacemakers at Risk (PAR) Dataset <span class="ver-badge">version 1.0-2016</span></a></li>
+            <li><a href="#peaceagreement">UCDP Peace Agreement Dataset <span class="ver-badge">version 22.2</span></a></li>
+            <li><a href="#cace">Cities and Armed Conflict Events (CACE)</a></li>
+            <li><a href="#deco">Deadly Electoral Conflict dataset (DECO)</a></li>
+            <li><a href="#eosv">The Ethnic One-Sided Violence (EOSV) Dataset</a></li>
+            <li><a href="#idtranslation">ID translation tables</a></li>
+            <li><a href="#nonstateia">UCDP Non-state Conflict Issues and Actors Dataset</a></li>
+            <li><a href="#externalsupportns">UCDP External Support in Non-state Conflict Dataset</a></li>
+            <li><a href="#externalsupport">UCDP External Support Dataset (ESD)</a></li>
+            <li><a href="#milc">UCDP Managing Intrastate Low-intensity Conflict (MILC) dataset</a></li>
+            <li><a href="#mic">UCDP Managing Intrastate Conflict (MIC) dataset</a></li>
+        </ul>
+    </div>
+</section>
+<hr>
+<section class="header2" aria-label="Disaggregated Datasets" id="section-disaggregated">
+    <div class="header">
+        <h2>Disaggregated Event Datasets</h2>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="ged_global">
+                <h3>UCDP Georeferenced Event Dataset (GED) Global <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p>This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/ged/ged261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/ged/ged261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/ged/ged261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/ged/ged261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/ged/ged261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Sundberg, Ralph and Erik Melander (2013) Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4).</p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="candidate">
+                <h3>UCDP Candidate Events Dataset (UCDP Candidate) <span class="ver-badge">version 26.0.X</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> The UCDP Candidate Events Dataset (UCDP Candidate) is based on UCDP Georeferenced Event Dataset (UCDP GED), but published at a monthly release cycle. It makes available monthly releases of candidate events data with not more than a month’s lag globally. See codebook for similarieties and differences between the two products. </p>
+                        <p>August 2026 | Version 26.0.8 (global) available as:</p>
+                        <div class="availableas">
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_8.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDevent_v26_0_8.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                             </div>
+                        <p>July 2026 | Version 26.0.7 (global) available as:</p>
+                        <div class="availableas">
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_7.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDevent_v26_0_7.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                             </div>
+                        <p>January-June 2026 | Version 26.01.26.06 (global) available as:</p>
+                        <div class="availableas">
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_01_26_06.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_01_26_06.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                            <a href="https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                        </div>
+                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Hegre, Håvard, Mihai Croicu, Kristine Eck, and Stina Högbladh (July 2020) Introducing the UCDP Candidate Events Dataset. Research &amp; Politics </p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+    </div>
+</section>
+<section class="header2" aria-label="Yearly Datasets 1946–2025" id="section-yearly-1946">
+    <div class="header">
+        <h2>Yearly Datasets covering 1946–2025</h2>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="armedconflict">
+                <h3>UCDP/PRIO Armed Conflict Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A conflict-year dataset with information on armed conflict where at least one party is the government of a state in the time period 1946-2025. </p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p><a href="https://ucdp.uu.se/downloads/ucdpprio/versionhistory-acd-261.pdf" target="_blank" rel="noopener noreferrer">Version history</a></p>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Gleditsch, Nils Petter, Peter Wallensteen, Mikael Eriksson, Margareta Sollenberg, and Håvard Strand (2002) Armed Conflict 1946-2001: A New Dataset. Journal of Peace Research 39(5). </p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+<p>Also see <a href="https://www.prio.org/Data/Armed-Conflict/UCDP-PRIO/">PRIO's webpage</a></p>
+            </div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="dyadic">
+                <h3>UCDP Dyadic Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dyad-year version of the UCDP/PRIO Armed Conflict Dataset. A dyad consists of two opposing actors in an armed conflict where at least one party is the government of a state. </p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/dyadic/ucdp-dyadic-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/dyadic/ucdp-dyadic-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/dyadic/ucdp-dyadic-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/dyadic/ucdp-dyadic-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/dyadic/ucdp-dyadic-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p><a href="https://ucdp.uu.se/downloads/dyadic/version-history-dyadic-261.pdf" target="_blank" rel="noopener noreferrer">Version history</a></p>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Harbom, Lotta, Erik Melander &amp; Peter Wallensteen (2008) Dyadic Dimensions of Armed Conflict, 1946-2007. Journal of Peace Research 45(5).</p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+    </div>
+</section>
+<section class="header2" aria-label="Yearly Datasets 1989–2025" id="section-yearly-1989">
+    <div class="header">
+        <h2>Yearly Datasets covering 1989–2025</h2>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="onesided">
+                <h3>UCDP One-sided Violence Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p><a href="https://ucdp.uu.se/downloads/nsos/versionhistory-onesided-261.pdf" target="_blank" rel="noopener noreferrer">Version History</a></p>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Eck, Kristine &amp; Lisa Hultman (2007) Violence Against Civilians in War. Journal of Peace Research 44(2).</p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="nonstate">
+                <h3>UCDP Non-State Conflict Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A conflict-year dataset containing information on communal and organized armed conflict where none of the parties is the government of a state.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p><a href="https://ucdp.uu.se/downloads/nsos/versionhistory-nonstate-261.pdf" target="_blank" rel="noopener noreferrer">Version history</a></p>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Sundberg, Ralph, Kristine Eck and Joakim Kreutz (2012) Introducing the UCDP Non-State Conflict Dataset. Journal of Peace Research 49(2). </p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="battlerelated">
+                <h3>UCDP Battle-Related Deaths Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p>
+                                        This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2023 that appear in the UCDP/PRIO Armed Conflict Dataset.
+                                    </p>Available at dyadic level as: <p></p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p></p>Available at conflict level as: <p></p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <!-- <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>-->
+                                        <a href="https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <p><a href="https://ucdp.uu.se/downloads/brd/versionhistory-brd-261.pdf" target="_blank" rel="noopener noreferrer">Version history</a></p>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• UCDP is part of and funded by DEMSCORE, national research infrastructure grant 2021-00162 from the Swedish Research Council.</p>
+</div>
+</div>
+        </div>
+    </div>
+</section>
+<section class="header2" aria-label="Other UCDP Datasets" id="section-other">
+    <div class="header">
+        <h2>Other UCDP Datasets</h2>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="actor">
+                <h3>UCDP Actor Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dataset of all the actors (including their full names and alternate names) as available in UCDP datasets <span class="ver-badge">version 26.1.</span> The dataset also includes information on which conflicts and dyads the actors have been involved in, as well as information on the groups' origins and alliances.</p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/actor/ucdp-actor-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/actor/ucdp-actor-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/actor/ucdp-actor-codebook-261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="orgviocy">
+                <h3>UCDP Country-Year Dataset on Organized Violence within Country Borders <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A country-year dataset providing accurate aggregations based on the UCDP GED - the most comprehensive structured event data available on organized violence in the post-1989 world.</p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/organizedviolencecy/organizedviolencecy-261-csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/organizedviolencecy/organizedviolencecy-261-xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <!-- <a href="https://ucdp.uu.se/downloads/organizedviolencecy/organizedviolencecy-261-rds.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>-->
+                                            <a href="https://ucdp.uu.se/downloads/organizedviolencecy/UCDP_OrganizedViolenceCY_Codebook_261.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        <p>&nbsp;</p>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Sundberg, Ralph and Erik Melander (2013) Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4).</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="vpp">
+                <h3>UCDP Violent Political Protest Dataset <span class="ver-badge">version 26.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p>A dyad-year dataset identifying violent political protests, 1989-2025. It presents standalone category of organized violence, which complements, and is compatible with, UCDP’s three categories of organized violence: one-sided violence, non-state, and state-based conflict.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/vpp/UCDP_VPP_Dataset_v26_1.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                        <a href="https://ucdp.uu.se/downloads/vpp/vpp_codebook_v20_1.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Svensson, Isak, Susanne Schaftenaar &amp; Marie Allansson (2022). Violent Political Protest: Introducing a New Uppsala Conflict Data Program Data Set on Organized Violence, 1989-2019. Journal of Conflict Resolution. https://doi.org/10.1177/00220027221109791</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="vppged">
+                <h3>UCDP Violent Political Protest GED Dataset <span class="ver-badge">version 26.1.4.1101.2512</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p>An event dataset covering individual events of violent political protests 2011-2025. These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/vpp/GEDEvent_v26_1_4_1101_2512.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/vpp/GEDEvent_v26_1_4_1101_2512.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                    </div>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Shawn Davies, Therése Pettersson, Magnus Öberg, Organized violence 1989–2025, and violent political protests, <em>Journal of Peace Research</em>, 2026. <a href="https://doi.org/10.1093/jopres/xjag046">https://doi.org/10.1093/jopres/xjag046</a></p>
+<p>• Svensson, Isak, Susanne Schaftenaar &amp; Marie Allansson (2022). Violent Political Protest: Introducing a New Uppsala Conflict Data Program Data Set on Organized Violence, 1989-2019. Journal of Conflict Resolution. https://doi.org/10.1177/00220027221109791</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="onset">
+                <h3>UCDP Onset Dataset <span class="ver-badge">version 25.1</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> UCDP provides onset datasets for interstate and intrastate conflict, coding onsets in three distinct ways for each type of conflict, resulting in six distinct datasets. All datasets contain variables recording onsets of new armed conflict, and re-starts of previously active armed conflict after 1, 2, 3, 5, 10, and 20-years of inactivity.</p>
+                                        <p>Onset datasets for intrastate conflict: </p>
+                                        <div>
+                                           <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-intrastate-conflict-onset-251.csv">UCDP Intrastate Conflict Level Onset Dataset</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-intrastate-country-onset-251.csv">UCDP Intrastate Country Level Onset Dataset</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-intrastate-country-multiple-onset-251.csv">UCDP Intrastate Country Level Multiple Onset Dataset</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-codebook-onset-251.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a></p>
+                                        </div>
+                                        <p>Onset datasets for interstate conflict: </p>
+                                        <div>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-interstate-conflict-onset-251.csv">UCDP Interstate Conflict Level Onset Dataset</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-interstate-country-onset-251.csv">UCDP Interstate Country Level Onset Dataset</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-interstate-country-multiple-onset-251.csv">UCDP Interstate Country Level Multiple Onset Dataset</a></p>
+                                           <p><a href="https://ucdp.uu.se/downloads/onset/ucdp-codebook-onset-251.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a></p>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Gleditsch, Nils Petter; Peter Wallensteen, Mikael Eriksson, Margareta Sollenberg & Håvard Strand (2002) Armed Conflict 1946–2001: A New Dataset. Journal of Peace Research 39(5). </p>
+
+<p>• Davies, S., Pettersson, T., Sollenberg, M., & Öberg, M. (2025). Organized violence 1989–2024, and the challenges of identifying civilian victims. Journal of Peace Research, 62(4). </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="termination">
+                <h3>UCDP Conflict Termination Dataset <span class="ver-badge">version 4-2024</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> This dataset provides information on specific start- and end- dates for conflict activity and means of termination for each conflict episode. The data is available as a conflict-level dataset which corresponds with the UCDP/PRIO Armed Conflict Dataset v 25.1, and a dyad-level dataset which corresponds with the UCDP Dyadic Dataset v. 25.1.</p>
+                            <p>Available at conflict level as: </p>
+                            <div class="availableas">
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Conflict.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Conflict-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                            </div>
+                            <p>Available at dyadic level as: </p>
+                            <div class="availableas">
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Dyad.csv" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Dyad-dta.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                <a href="https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                            </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Kreutz, Joakim (2010) How and When Armed Conflicts End: Introducing the UCDP Conflict Termination Dataset. Journal of Peace Research 47(2). </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="cid">
+                <h3>UCDP Conflict Issues Dataset <span class="ver-badge">version 23.2</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dyad-issue-year and a dyad-year dataset containing conflict issues: I.e. the stated goals of rebel groups in UCDP armed conflicts between 1989-2017. The first dataset lists each issue stated by a group on a early basis, while the other contains dyad-years with dummy variables for each possible issue in each calendar year. This webpage also contains a codebook for the issue narratives (based on the UCDP CID version 2023-1) found in the UCDP Conflict Encyclopedia.</p>
+                                        <p>Dyad-year dataset available as:</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/cid/ucdp_issues_dataset_dyadyear_232.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/cid/ucdp_issues_dataset_dyadyear_232.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        </div>
+                                        <p>Dyad-issue-year dataset available as:</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/cid/ucdp_issues_dataset_dyadissueyear_232.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/cid/ucdp_issues_dataset_dyadissueyear_232.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        </div>
+                                        <p>Codebooks:</p>
+                                        <div>
+                                            <p><a href="https://ucdp.uu.se/downloads/cid/UCDP_CID_Codebook_231.pdf" target="_blank" rel="noopener noreferrer">UCDP CID Codebook</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/cid/UCDP_CID_Issue_Narratives_Codebook.pdf" target="_blank" rel="noopener noreferrer">UCDP CID Issue Narratives Codebook</a></p>
+                                            <p><a href="https://ucdp.uu.se/downloads/cid/UCDP_CID_version_232_fixes.pdf" target="_blank" rel="noopener noreferrer">UCDP CID version 23.2 - Fixes</a></p>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Johan Brosché and Ralph Sundberg, 2023, “What They Are Fighting For: Introducing the UCDP Conflict Issues Dataset”, Journal of Conflict Resolution, DOI: 10.1177/00220027231218633/</p>
+
+<p>• Brosché, Johan, Ralph Sundberg, Peter Wallensteen, Gabrielle Lövquist, Tom Renvall, Sebastian Raattamaa, Andrew Fallon, Louis-Alassane Cassaignard Viaux, Tim Gåsste, Anna Svedin, Tania Estrada, Tobias Gustafsson, Magnus Lundström, Jakob Schabus, Annika Leers, Stefano Cisternino, Theodor Stensö, David Edberg Landström, Theo Valois Souza Ferreira, Robin Sällström, Cecilia Borella, Inge Volleberg, Nanar Hawach, and Noah Celander. 2023, “UCDP CID Codebook version 23.1”, Department of Peace and Conflict Research, Uppsala University</p>
+</div>
+                        </div>
+            </div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="par">
+                <h3>UCDP Peacemakers at Risk (PAR) Dataset <span class="ver-badge">version 1.0-2016</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> This event-dataset tracks violence against peacekeepers deployed to conflict-affected countries in sub-Saharan Africa as part of both UN and non-UN peace operations. The Peacemakers at Risk (PAR) records reported incidences of violence resulting in direct peacekeeping personnel fatalities, injuries and kidnappings. Each recorded event also provides information on the timing, location and actors implicated, as well as on the nationalities of those violence-affected peacekeepers. The dataset also tracks reports of fatal violence perpetrated by peacekeepers, which allows for the study of peacekeepers' use of force.  In its current version, the dataset covers the 1989 - 2009 time-period. The dataset is made compatible with other existing UCDP datasets on organized violence. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/par/par.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/par/par.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/par/par_R.zip" class="dl-btn dl-btn--r" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> R</a>
+                                            <a href="https://ucdp.uu.se/downloads/par/par_codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p><a href="https://ucdp.uu.se/downloads/par/online_appendix.pdf" target="_blank" rel="noopener noreferrer">Online Appendix</a></p>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Lindberg Bromley, Sara. “Introducing the UCDP Peacemakers at Risk Dataset, Sub-Saharan Africa 1989-2009.” Journal of Peace Research 55, no. 1 (2018): 122–31. https://doi.org/10.1177/0022343317735882. </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="peaceagreement">
+                <h3>UCDP Peace Agreement Dataset <span class="ver-badge">version 22.2</span></h3>
+            </div>
+            <div class="dataset-body">
+                <p> The Peace Agreement dataset, that covers peace agreements signed between at least two opposing primary warring parties in an armed conflict 1975-2021. This version is compatible with UCDP datasets version 22.1. </p>
+                                        <p>Full texts for most peace agreements are available via the <a href="https://ucdp.uu.se/downloads/fullpeace.html">UCDP Peace Agreement full texts page</a> (or through links in the dataset). </p>
+                                        <p>The original 22.1 dataset contained links to full peace agreement texts that are no longer accessible. These links were updated in May 2026, resulting in the new 22.2 version. The previous 22.1 version remains available <a href="https://ucdp.uu.se/downloads/peace/ucdp-peace-agreements-221.xlsx">here</a> should you need it.</p>
+
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/peace/ucdp-peace-agreements-222.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/peace/ucdp-codebook-peace-agreements-221.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Pettersson, Therese, Stina Högbladh &amp; Magnus Öberg (2019). <a href="https://uu.diva-portal.org/smash/record.jsf?pid=diva2%3A1343886&amp;dswid=4343"> Organized violence, 1989-2018 and peace agreements.</a> Journal of Peace Research 56(4): 589-603. </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="cace">
+                <h3>Cities and Armed Conflict Events (CACE)</h3>
+            </div>
+            <div class="dataset-body">
+                <p> The Cities and Armed Conflict Events (CACE) dataset constitutes an extension of the UCDP-GED. CACE provides a systematic coding of whether these armed conflict events took place in cities. To identify which events of armed conflict took place in cities, the data was manually matched to data from the United Nations Statistics Division (see the codebook for more details). The current version is based on UCDP-GED v 18.1.</p>
+                                    <p class="avail-label">Available as</p>
+                                    <div class="availableas">
+                                        <a href="https://ucdp.uu.se/downloads/cace/CACE_1989-2017.xlsx" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/cace/CACE_1989-2017.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                        <a href="https://ucdp.uu.se/downloads/cace/CACE_codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                    </div>
+                                    <div>
+                                        <p>CACE city list:</p>
+                                        <p><a href="https://ucdp.uu.se/downloads/cace/CACE_city_list.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a></p>
+                                    </div>
+                                    <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Elfversson, Emma &amp; Kristine Höglund (2021) <a href="https://www.sciencedirect.com/science/article/pii/S0264275121002560?via%3Dihub">Are armed conflicts becoming more urban?</a> Cities, Volume 119</p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="deco">
+                <h3><strong></strong>Deadly Electoral Conflict dataset (DECO)</h3>
+            </div>
+            <div class="dataset-body">
+                <p> A global, georeferenced event dataset, based on UCDP data, identifying electoral violence with lethal outcomes from 1989 to 2017. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/deco/DECO_v.1.0.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/deco/DECO_v.1.0_xlsx.zip" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/deco/DECO_v.1.0.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                            <a href="https://ucdp.uu.se/downloads/deco/DECO_codebook_1.0.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Fjelde, Hanne and Kristine Höglund (2021) “Introducing the Deadly Electoral Conflict Dataset (DECO)” Journal of Conflict Resolution,  <a href="https://doi.org/10.1177/00220027211021620">https://doi.org/10.1177/00220027211021620</a></p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="eosv">
+                <h3>The Ethnic One-Sided Violence (EOSV) Dataset</h3>
+            </div>
+            <div class="dataset-body">
+                <p> An actor-year dataset with information on the ethnic identity of civilian victims of direct and deliberate killings by state and non-state actors from 1989 to 2013. The dataset is based on the UCDP One-Sided Violence Dataset version 1.4-2014. Target groups are denoted with <a href="https://icr.ethz.ch/data/epr/">EPR</a> IDs.</p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/eosv/EOSV_Dataset.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                            <a href="https://ucdp.uu.se/downloads/eosv/EOSV_Codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Fjelde, Hanne, Lisa Hultman, Livia Schubiger, Lars-Erik Cederman, Simon Hug, and Margareta Sollenberg (2019) Introducing the Ethnic One-Sided Violence dataset. Conflict Management and Peace Science: <a href="https://doi.org/10.1177/0738894219863256">https://doi.org/10.1177/0738894219863256</a></p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="idtranslation">
+                <h3>ID translation tables</h3>
+            </div>
+            <div class="dataset-body">
+                <p>In <span class="ver-badge">version 17.1</span> of all UCDP datasets, the ID system for conflicts, actors and dyads was changed in order to make them unique across all UCDP core datasets and all UCDP types of violence. This allows easier aggregation and disaggregation of data as well as simplify data management for users, especially when combining multiple UCDP products together. </p>
+                                        <p>This means all IDs used in the dataset from <span class="ver-badge">version 17.1</span> and onwards are no longer compatible with those in older versions of UCDP products. Further, this means that external products relying on UCDP IDs for data management tasks will have to be adapted to work with the new ID systems. </p>
+                                        <p>A conversion table between the new and old ID systems is available below, if you want to use the current datasets with the old ones. </p>
+                                        <p>For State-based (UCDP/PRIO) conflict IDs: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/actor/translate_conf.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/actor/translation_tables.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p>For State-based, Non-State and One-Sided Dyad IDs: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/actor/translate_dyad.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/actor/translation_tables.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p>For Actor IDs: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/actor/translate_actor.csv" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/actor/translation_tables.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+            </div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="nonstateia">
+                <h3>UCDP Non-state Conflict Issues and Actors Dataset</h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dyad-year dataset containing information on conflict issues and key actor characteristics in non-state conflict. The dataset covers non-state conflicts in Africa, 1989-2011 and is compatible with the UCDP Non-State Conflict Dataset v. 2.5-2016. </p>
+                                        <p>The data builds on and extends the UCDP Non-State Conflict Dataset by introducing additional information on what the actors in the conflict are fighting over, alongside actor characteristics. The data set distinguishes between two main categories of issues, territory or authority, in addition to a residual category of other issues. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/nonstateconflict/UCDP_NS_IAD.csv.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/nonstateconflict/Codebook_nsissues.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Nina von Uexkull &amp; Therese Pettersson (2018) Issues and Actors in African Nonstate Conflicts: A New Data Set. International Interactions. <a href="https://doi.org/10.1080/03050629.2018.1493478">Full text is available here. </a></p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="externalsupportns">
+                <h3>UCDP External Support in Non-state Conflict Dataset</h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dyad-year dataset containing information on external support in non-state conflict. The dataset covers non-state conflicts in Africa, 1989-2011 and is compatible with the UCDP Non-State Conflict Dataset v. 2.5-2016. </p>
+                                        <p>The data builds on and extends the UCDP External Support Dataset and the UCDP Non-State Conflict Dataset by introducing additional information on external support to warring parties in non-state conflicts. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/nonstateconflict/UCDP%20External%20Support%20in%20Non-state%20Conflict%20Dataset%20v.1.0.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/nonstateconflict/Codebook_extsupp.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Nina von Uexkull &amp; Therese Pettersson (2018) Issues and Actors in African Nonstate Conflicts: A New Data Set. International Interactions. <a href="https://doi.org/10.1080/03050629.2018.1493478">Full text is available here.</a></p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="externalsupport">
+                <h3>UCDP External Support Dataset (ESD)</h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dataset providing information on the existence, type, and provider of external support for all warring parties (actors) coded as active in UCDP data, on an annual basis, between 1975 and 2017. The ESD builds on the UCDP Dyadic Dataset 18.1 derived from the UCDP/PRIO Armed Conflict Dataset 18.1 but goes beyond the dyad-level and offers the warring party-opponent-year (actor-year) as well as the warring-party-supporter-opponent-year (or triad-year) as units of analysis in addition to the dyad-year.</p>
+                                        <p>Choosing the right dataset:</p>
+										<p>When using the ESD, researchers can choose between the following three different units of analysis: the triad-year version (ESD TY), the actor-year version (ESD AY), and the dyad-year version (ESD DY). Further units of analysis, e.g. at the conflict-level or the actor-level, can be created from the triad-year version.</p>
+                                        <p><em>ESD TY: Triad-year </em> The triad-level dataset (ESD TY) is the most disaggregated and extensive version of the data. It contains yearly information on the external supporter and the recipient of support specific to the conflict-dyad the recipient is involved in. It thus contains one observation (row) for each combination of external supporter, recipient, and opponent per year. All aggregated versions of the dataset can be built from this version. This version is appropriate where the focus rests on the individual external supporters and can be used to create aggregate measures of characteristics of the external supporter such as, e.g. combined military capabilities. </p>
+                                        <p><em>ESD AY: Actor-year </em> The actor-year dataset (ESD AY) contains all support a recipient receives in a given dyad-year. If more than one external supporter provides external support, the external support is combined and presented as aggregate measures. It thus contains one observation (row) for each actor per dyad-year. This version is appropriate where the focus rests on the recipients of external support regardless of which external supporters provide the support. </p>
+                                        <p><em>ESD DY: Dyad-year </em> The dyad-level dataset (ESD DY) is the most aggregated version of the three datasets and presents information on external support to the conflict-dyad as a whole at the dyad-year unit of analysis. If more than one external supporter provides external support, the external support is combined and presented as aggregate measures. As such it contains one observation (row) for each dyad per year. This version is appropriate where existing data is in a dyad-year structure or the focus rests on the impact of external support on conflict more generally. </p>
+                                        <p>ESD TY: Triad-year: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-ty-181.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+											<a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-ty-181.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-181.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p>ESD AY: Actor-year: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-ay-181.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+											<a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-ay-181.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-181.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p>ESD DY: Dyad-year: </p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-dy-181.xlsx" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+											<a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-dy-181.zip" class="dl-btn dl-btn--stata" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Stata</a>
+                                            <a href="https://ucdp.uu.se/downloads/extsup/ESD/ucdp-esd-181.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <p><em>Erratum: </em> In the UCDP External Support Dataset (ESD), external supporter ID 11545 appears without a corresponding supporter name. This is a coding error; the correct external supporter is actor ID 675, Republic of Somaliland. Affected observations should be recoded accordingly. </p>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Meier, Vanessa, Niklas Karlén, Therése Pettersson &amp; Mihai Croicu (2022). External Support in Armed Conflicts. Introducing the UCDP External Support Dataset (ESD), 1975-2017. Journal of Peace Research. Online First. </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="milc">
+                <h3>UCDP Managing Intrastate Low-intensity Conflict (MILC) dataset</h3>
+            </div>
+            <div class="dataset-body">
+                <p> An event-dataset that covers all measures taken by third parties in low-intensity intrastate dyad-years in the time period 1993-2004. The dataset includes information on e.g. the date of each event, name of third party/-ies, total number of third parties, type of measure, the topic of talks etc. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/micmilc/milc-10.xls" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/micmilc/milc-10-codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Melander, Erik, Möller, Frida and Öberg, Magnus (2009) Managing Intrastate Low-Intensity Armed Conflict 1993-2004: A New Dataset. International Interactions 35(1). </p>
+</div>
+</div>
+        </div>
+        <div class="dataset-entry">
+            <div class="dataset-heading" id="mic">
+                <h3>UCDP Managing Intrastate Conflict (MIC) dataset</h3>
+            </div>
+            <div class="dataset-body">
+                <p> A dataset containing all third party interventions in conflict dyads in Africa between 1993 and 2007. The dataset is compatible with the UCDP Dyadic Dataset v.1 2010 for the years 1993-2007. The dataset is highly disaggregated, the object of analysis being the dyad-third-party intervention event-day. For each third party intervention a substantial number of variables are collected. These include the identity and type (state, IGO, NGO etc.) of the interveners, the type and topic of intervention and the receiver of intervention (whether the target was the government, rebel(s) or both sides). Data is collected for all UCDP active years as well as for a three year period of inactivity after each conflict episode. </p>
+                                        <p>A list of Actor IDs in the MIC data not included in the UCDP Actor Dataset is available as a <a href="https://ucdp.uu.se/downloads/micmilc/micactorlist.csv" target="_blank" rel="noopener noreferrer">CSV actor ID list</a>. </p>
+                                        <p class="avail-label">Available as</p>
+                                        <div class="availableas">
+                                            <a href="https://ucdp.uu.se/downloads/micmilc/ucdp-mic-22.xls" class="dl-btn dl-btn--xlsx" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel</a>
+                                            <a href="https://ucdp.uu.se/downloads/micmilc/ucdp-mic-22.zip" class="dl-btn dl-btn--csv" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> CSV</a>
+                                            <a href="https://ucdp.uu.se/downloads/micmilc/ucdp_mic_codebook.pdf" class="dl-btn dl-btn--pdf" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h4a2 2 0 0 1 2 2v6H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h2v6H6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Codebook</a>
+                                        </div>
+                                        <div class="cite-box">
+<p class="cite-box-label">Please cite</p>
+<p>• Croicu, Mihai, Erik Melander, Marcus Nilsson and Peter Wallensteen, Mediation and Violence: Searching for third party intervention that matters. Paper presented at the Annual Meeting of the International Studies Association, San Francisco, USA, 3-6 April 2013. </p>
+</div>
+</div>
+        </div>
+    </div>
+</section>
+        </div>
+    </div><!-- /.row -->
+    </main>
+    <script>
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('#ucdp-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(a => a.classList.remove('active'));
+                    const active = document.querySelector('#ucdp-sidebar a[href="#' + entry.target.id + '"]');
+                    if (active) active.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => observer.observe(s));
+        // Highlight Introduction on initial page load
+        const firstLink = document.querySelector('#ucdp-sidebar a');
+        if (firstLink) firstLink.classList.add('active');
+    </script>
+
+<div id="footer-view">
+        <footer id="footer" class="footer">
+            <div class="uu-footer__bottom">
+                <span>Take a look at the website's <a href="https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-conflict-encyclopedia-ucdp-database/accessibility-statement" target="_blank" rel="noopener noreferrer">accessibility report</a></span>
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ Back to top</a>
+            </div>
+        </footer>
+    </div>
+</html>

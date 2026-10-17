@@ -240,7 +240,9 @@ def _consecutive_tail(series: dict[int, float], last: int, maxlen: int) -> list[
     return out[::-1]
 
 
-def us_cases(cells: pl.DataFrame, *, bvar_seed: int = 20261017) -> list[Case]:
+def us_cases(
+    cells: pl.DataFrame, *, bvar_seed: int = 20261017, origin_filter: Callable[[datetime], bool] | None = None
+) -> list[Case]:
     rt = cells.filter(pl.col("family") == "philfed_rtdsm")
     spf = cells.filter(pl.col("family") == "philfed_spf")
     # first releases: per target quarter, the earliest vintage that holds it (transform inside that vintage)
@@ -263,6 +265,8 @@ def us_cases(cells: pl.DataFrame, *, bvar_seed: int = 20261017) -> list[Case]:
     both = pl.concat([rt, spf])
     out: list[Case] = []
     for sv, sa in surveys.iter_rows():
+        if origin_filter is not None and not origin_filter(sa):
+            continue
         acc = VintageAccessor(both, sa, CutoffMode.available_then)
         series: dict[str, dict[int, float]] = {}
         vin = None

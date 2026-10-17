@@ -179,7 +179,7 @@ def parse_mapping(body: bytes) -> tuple[str, list[tuple[str, str, str, str]]]:
         if len(parts) != 4:
             raise dc.err(f"chembl_uniprot_mapping.txt line {n}: {len(parts)} columns")
         acc, tid, name, ttype = (p.strip() for p in parts)
-        if not UNIPROT_RE.match(acc) or not CHEMBL_ID_RE.match(tid):
+        if not CHEMBL_ID_RE.match(tid) or not acc or len(acc) > 40 or not re.match(r"^[A-Za-z0-9_.-]+$", acc):
             raise dc.err(f"chembl_uniprot_mapping.txt line {n}: not an accession / target id")
         out.append((acc, tid, name, ttype))
     return m.group(1).lower(), out
