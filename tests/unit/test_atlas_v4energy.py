@@ -243,3 +243,10 @@ def test_usgs_facilities_kg_owners_with_shares_and_missing_never_zero() -> None:
     assert all((q := s.qualifiers.get("share_percent")) is None or q[0]["amount"] != "-999" for s in owners)
     hti = [s for s in parts.statements if s.property_pid == "usgs_myb:country" and s.object_qid == "iso3:HTI"]
     assert hti  # evidenced name alias (registry/atlas/geo_aliases/v4energy.yaml)
+
+
+def test_steo_long_state_lists_fit_the_atlas_bound() -> None:
+    long = "+".join(f"USA-{s}" for s in ("CT", "DC", "DE", "FL", "GA", "MA", "MD", "ME", "NC", "NH", "NJ", "NY", "PA"))
+    g = atlas_eia_steo.provider_geo(long)
+    assert len(long) > 64 and g.startswith("eia_geo:") and len(g) <= 64
+    assert atlas_eia_steo.provider_geo("SAU") == "SAU"

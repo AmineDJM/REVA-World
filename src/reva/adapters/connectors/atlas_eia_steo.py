@@ -23,7 +23,8 @@ Outlook", release: the series ``last_updated``}. A series without ``lastHistoric
 
 Cells: ``indicator`` = the STEO series id verbatim (``STEO.BREPUUS.M``: series code + frequency; the
 code embeds the geography and unit), ``provider_geo`` = the series ``geography`` verbatim (ISO3,
-``USA-..+..`` state lists) or ``not_stated`` when EIA gives none (world / OPEC totals, prices; the name says
+``USA-..+..`` state lists; a list longer than the atlas bound of 64 characters becomes ``eia_geo:<sha256[:16]>``
+with the full list in ``flags.eia_geography``) or ``not_stated`` when EIA gives none (world / OPEC totals, prices; the name says
 which); ``iso3`` only for a single ISO3 code; ``value`` = the JSON number text verbatim
 (``parse_float=str``); JSON null → no cell (counted). Periods: ``YYYY`` (A), ``YYYYQn`` (Q), ``YYYYMM`` (M).
 ``flags``: ``series_name``, ``series_last_updated``, ``last_historical_period``, ``frequency``.
@@ -48,7 +49,7 @@ from reva.atlas.tables import ATLAS_SCHEMA, country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.eia_steo"
-CONNECTOR_VERSION = "1.0.1"
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas_eia_steo/1"
 SOURCE_KEY = "eia.opendata_bulk"
 SOURCE = "eia_steo"
@@ -72,6 +73,7 @@ PERIOD_RE = {
     "M": re.compile(r"^([0-9]{4})(0[1-9]|1[0-2])$"),
 }
 ISO3_RE = re.compile(r"^[A-Z]{3}$")
+MAX_GEO = 64
 
 
 class SteoParseError(SourceResponseError):
@@ -127,6 +129,14 @@ def parse_manifest(body: bytes) -> dict[str, Any]:
     if d.get("accessURL") != ZIP_URL:
         raise SteoParseError(f"bulk manifest: STEO accessURL {d.get('accessURL')!r} != {ZIP_URL}")
     return {k: d.get(k) for k in ("last_updated", "title", "accessURL")}
+
+
+def provider_geo(geography: str) -> str:
+    """EIA's geography verbatim when it fits the atlas bound (64 characters); a longer U.S. state list becomes
+    ``eia_geo:<sha256[:16]>`` (the full list is kept in ``flags.eia_geography``)."""
+    if len(geography) <= MAX_GEO:
+        return geography
+    return "eia_geo:" + hashlib.sha256(geography.encode()).hexdigest()[:16]
 
 
 def period_bounds(period: str, f: str) -> tuple[int, int, int, int]:
@@ -211,12 +221,15 @@ def parse_bulk(
             raise SteoParseError(f"line {line_no}: series {sid} has frequency {f!r}")
         rep.frequencies[f] = rep.frequencies.get(f, 0) + 1
         unit = str(d.get("units") or "").strip() or "not stated by EIA"
-        geo = str(d.get("geography") or "").strip() or NOT_STATED
+        geo_full = str(d.get("geography") or "").strip() or NOT_STATED
+        geo = provider_geo(geo_full)
         rep.geos[geo] = rep.geos.get(geo, 0) + 1
         lu = str(d.get("last_updated") or "")
         rep.last_updated.add(lu)
         lhp = d.get("lastHistoricalPeriod")
         base: dict[str, Any] = {"series_name": str(d.get("name") or ""), "series_last_updated": lu, "frequency": f}
+        if geo != geo_full:
+            base["eia_geography"] = geo_full
         cr = str(d.get("copyright", "None"))
         if cr != "None":
             base["copyright"] = cr

@@ -16,6 +16,7 @@ Owner of the format and of the executor: **WDHARVEST** (`src/reva/kg/harvest.py`
 | `chemistry/**` (domain `science`, ids `science.chem_*`) | V4CHEM |
 | `health/` (domain `science`, ids `science.health_*`: DOID/Mondo/UBERON id bridges, treatments, symptoms, essential medicines) | V4HEALTH |
 | `causal/` (disabled for `run`; driven by `python -m reva.causal_harvest`, see `docs/dev/v3_causwd.md`) | CAUSWD |
+| `industry/` (LEI-bearing companies, factories) | V4INDUSTRY |
 | `energy/` (energy sources, producing sites and companies by product, mines, power stations) | V4ENERGY |
 
 One YAML file = one spec. The machine-checkable contract is [`_schema.json`](_schema.json)
