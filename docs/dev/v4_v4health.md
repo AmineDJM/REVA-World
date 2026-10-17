@@ -15,9 +15,9 @@ no cause-of-death breakdown; GHO's own `GHE_*` indicators stop at WHO regions, 2
 | `atlas.mondo` (`mondo.obo`) | `mondo.obo` release v2026-10-06 | 53,320,617 | CC BY 4.0 (header checked) |
 | (all three) | Relation Ontology `ro.obo` (releases/2026-09-04), fetched by every ontology run: relation hierarchy + verbatim definitions | 457,912 (one object) | CC0 1.0 |
 | `atlas.clingen` (`clingen.gene_validity`) | ClinGen Gene-Disease Validity summary CSV (`FILE CREATED 2026-10-17`) | 1,130,959 | CC0 1.0 (terms of use: "All curated content published by ClinGen is available free of restriction under the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication") |
-| `atlas.who_ghe` (`who.ghe`) | **not run live** (disk below 5 GB, see below). Fixture-tested: WHO data portal xMart `DEX_CMS/GHE_FULL` | ~48 MB per run (planned) | CC BY 4.0 + WHO terms (same as `who.gho`) |
+| `atlas.who_ghe` (`who.ghe`) | WHO data portal xMart `DEX_CMS/GHE_FULL`. Not run by V4HEALTH (disk below 5 GB); **run live later by the lead**: table `atlas.who.ghe` registered 2026-10-17 14:16 UTC, 620,004 rows (correction FIX4C, AUDIT3 L6) | ~48 MB per run | CC BY 4.0 + WHO terms (same as `who.gho`) |
 
-Raw archive written by V4HEALTH: **91.7 MB** (cap 150 MB; GHE would add ~48 MB → ~140 MB).
+Raw archive written by V4HEALTH: **91.7 MB** (cap 150 MB); the lead's WHO GHE run added ~48 MB.
 
 Connectors: `src/reva/adapters/connectors/atlas_health_onto.py` (UBERON, DOID, Mondo), `atlas_clingen.py`,
 `atlas_who_ghe.py` (reuses `atlas_healthedu_common.fetch_archive_register` of A-HEALTHEDU), shared parsing in
@@ -150,8 +150,8 @@ machine-wide Wikidata lock); WDHARVEST should pin the QID after the first run.
 
 ## Missing, and why
 
-* **WHO GHE live load** — connector, fixtures, unit + DB tests done; not run live because free disk was 4.8 GB (< 5
-  GB rule) after the ontology loads. Command below.
+* **WHO GHE live load** — done after this report by the lead (`atlas.who.ghe`, 620,004 rows, 2026-10-17 14:16 UTC);
+  V4HEALTH itself had stopped at 4.8 GB free disk (< 5 GB rule). Command below for refreshes.
 * **IHME GBD** — skipped: IHME Free-of-Charge Non-commercial User Agreement (no redistribution, commercial use
   forbidden) and the GBD Results tool needs an account. Owner decision.
 * **WHO priority pathogen lists** (bacterial BPPL 2024, fungal FPPL 2022, R&D Blueprint) — published only as PDF

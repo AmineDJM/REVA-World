@@ -10,8 +10,8 @@ skill is measured by the forecast registry (sealed forecasts, proper scores, as-
 
 Atlas ≈ 100 M values (now with monthly/quarterly/daily series, regions NUTS/OECD/ADM1, vintages); KG ≈ 3.3 M
 statements (chemistry, anatomy, diseases, genes in progress, species interactions, ecoregions, power plants,
-mines, companies/LEI, regions, weather stations); ≈ 65 k causal claims; 77 effect estimates; 575 sealed
-questions / 2,243 baseline forecasts; decision engine running with attributed, unvalidated scenarios.
+mines, companies/LEI, regions, weather stations); ≈ 65 k causal claims; 77 effect estimates; 586 sealed
+questions / 2,287 baseline forecasts (AUDIT3 census, 2026-10-17 16:50 UTC); decision engine running with attributed, unvalidated scenarios.
 
 ## Bottlenecks (honest)
 
