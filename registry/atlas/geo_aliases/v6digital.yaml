@@ -1,0 +1,165 @@
+# Provider geography schemes of the V6DIGITAL atlas tables (agent V6DIGITAL, docs/dev/v6_digital.md).
+# Both providers publish country NAMES only (no code). An alias is either an exact, verbatim match of the provider
+# name to one crosswalk name field (label / iso_name / un_name / worldbank_name; generated, field named in `source`)
+# or one of the few listed conventional names with its evidence. Never fuzzy. Names that are not crosswalk entities
+# (Somaliland) stay unmapped (iso3 null, provider_geo kept).
+schemes:
+  # Access Now #KeepItOn STOP column `country` (a cell naming several countries separated by ";" is split by the connector).
+  keepiton_country:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "exact crosswalk label (UN M49)"}
+      - {code: "Albania", iso3: ALB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Algeria", iso3: DZA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Angola", iso3: AGO, source: "exact crosswalk label (UN M49)"}
+      - {code: "Armenia", iso3: ARM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Azerbaijan", iso3: AZE, source: "exact crosswalk label (UN M49)"}
+      - {code: "Bahrain", iso3: BHR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Bangladesh", iso3: BGD, source: "exact crosswalk label (UN M49)"}
+      - {code: "Belarus", iso3: BLR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Benin", iso3: BEN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Brazil", iso3: BRA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Burkina Faso", iso3: BFA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Burundi", iso3: BDI, source: "exact crosswalk label (UN M49)"}
+      - {code: "Cambodia", iso3: KHM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Cameroon", iso3: CMR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Central African Republic", iso3: CAF, source: "exact crosswalk label (UN M49)"}
+      - {code: "Chad", iso3: TCD, source: "exact crosswalk label (UN M49)"}
+      - {code: "China", iso3: CHN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Comoros", iso3: COM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Congo", iso3: COG, source: "exact crosswalk label (UN M49)"}
+      - {code: "Congo (Democratic Republic of the)", iso3: COD, source: "provider name = crosswalk ISO 3166-1 name 'Congo, The Democratic Republic of the' re-punctuated (the Republic of the Congo is a different name)"}
+      - {code: "Cuba", iso3: CUB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Côte d'Ivoire", iso3: CIV, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "Ecuador", iso3: ECU, source: "exact crosswalk label (UN M49)"}
+      - {code: "Egypt", iso3: EGY, source: "exact crosswalk label (UN M49)"}
+      - {code: "El Salvador", iso3: SLV, source: "exact crosswalk label (UN M49)"}
+      - {code: "Equatorial Guinea", iso3: GNQ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Eritrea", iso3: ERI, source: "exact crosswalk label (UN M49)"}
+      - {code: "Eswatini", iso3: SWZ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact crosswalk label (UN M49)"}
+      - {code: "Gabon", iso3: GAB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Gambia", iso3: GMB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Guinea", iso3: GIN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "exact crosswalk label (UN M49)"}
+      - {code: "India", iso3: IND, source: "exact crosswalk label (UN M49)"}
+      - {code: "Indonesia", iso3: IDN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Iran (Islamic Republic of)", iso3: IRN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Iraq", iso3: IRQ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Israel", iso3: ISR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Jordan", iso3: JOR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Kenya", iso3: KEN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Laos", iso3: LAO, source: "common English short name of the Lao People's Democratic Republic"}
+      - {code: "Latvia", iso3: LVA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Lebanon", iso3: LBN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Liberia", iso3: LBR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Libya", iso3: LBY, source: "exact crosswalk label (UN M49)"}
+      - {code: "Lithuania", iso3: LTU, source: "exact crosswalk label (UN M49)"}
+      - {code: "Malawi", iso3: MWI, source: "exact crosswalk label (UN M49)"}
+      - {code: "Malaysia", iso3: MYS, source: "exact crosswalk label (UN M49)"}
+      - {code: "Mali", iso3: MLI, source: "exact crosswalk label (UN M49)"}
+      - {code: "Mauritania", iso3: MRT, source: "exact crosswalk label (UN M49)"}
+      - {code: "Mauritius", iso3: MUS, source: "exact crosswalk label (UN M49)"}
+      - {code: "Montenegro", iso3: MNE, source: "exact crosswalk label (UN M49)"}
+      - {code: "Morocco", iso3: MAR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Mozambique", iso3: MOZ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Myanmar", iso3: MMR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Nepal", iso3: NPL, source: "exact crosswalk label (UN M49)"}
+      - {code: "New Caledonia", iso3: NCL, source: "exact crosswalk label (UN M49)"}
+      - {code: "Nicaragua", iso3: NIC, source: "exact crosswalk label (UN M49)"}
+      - {code: "Niger", iso3: NER, source: "exact crosswalk label (UN M49)"}
+      - {code: "Nigeria", iso3: NGA, source: "exact crosswalk label (UN M49)"}
+      - {code: "North Korea", iso3: PRK, source: "common English short name of the Democratic People's Republic of Korea"}
+      - {code: "Oman", iso3: OMN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Pakistan", iso3: PAK, source: "exact crosswalk label (UN M49)"}
+      - {code: "Palestine, State of", iso3: PSE, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "Panama", iso3: PAN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "exact crosswalk label (UN M49)"}
+      - {code: "Philippines", iso3: PHL, source: "exact crosswalk label (UN M49)"}
+      - {code: "Qatar", iso3: QAT, source: "exact crosswalk label (UN M49)"}
+      - {code: "Russian Federation", iso3: RUS, source: "exact crosswalk label (UN M49)"}
+      - {code: "Rwanda", iso3: RWA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "exact crosswalk label (UN M49)"}
+      - {code: "Senegal", iso3: SEN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Sierra Leone", iso3: SLE, source: "exact crosswalk label (UN M49)"}
+      - {code: "South Korea", iso3: KOR, source: "common English short name of the Republic of Korea"}
+      - {code: "South Sudan", iso3: SSD, source: "exact crosswalk label (UN M49)"}
+      - {code: "Sri Lanka", iso3: LKA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Sudan", iso3: SDN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Suriname", iso3: SUR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Syrian Arab Republic", iso3: SYR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Tajikistan", iso3: TJK, source: "exact crosswalk label (UN M49)"}
+      - {code: "Tanzania, United Republic of", iso3: TZA, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "Togo", iso3: TGO, source: "exact crosswalk label (UN M49)"}
+      - {code: "Tunisia", iso3: TUN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Turkey", iso3: TUR, source: "ISO 3166-1 English short name of TUR until 2022 ('Turkey'; now 'Türkiye')"}
+      - {code: "Turkmenistan", iso3: TKM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Uganda", iso3: UGA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Ukraine", iso3: UKR, source: "exact crosswalk label (UN M49)"}
+      - {code: "United Arab Emirates", iso3: ARE, source: "exact crosswalk label (UN M49)"}
+      - {code: "United Kingdom", iso3: GBR, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "United States of America", iso3: USA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Uzbekistan", iso3: UZB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Venezuela (Bolivarian Republic of)", iso3: VEN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Viet Nam", iso3: VNM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Yemen", iso3: YEM, source: "exact crosswalk label (UN M49)"}
+      - {code: "Zambia", iso3: ZMB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "exact crosswalk label (UN M49)"}
+    # unmapped on purpose (not a crosswalk entity): ['Somaliland']
+  # CFR Cyber Operations Tracker column `Sponsor` (several sponsors separated by ", " are split by the connector; "Palestine, State of" kept whole).
+  cfr_cyber_country:
+    aliases:
+      - {code: "Australia", iso3: AUS, source: "exact crosswalk label (UN M49)"}
+      - {code: "Bahrain", iso3: BHR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Belarus", iso3: BLR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Bulgaria", iso3: BGR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Canada", iso3: CAN, source: "exact crosswalk label (UN M49)"}
+      - {code: "China", iso3: CHN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Egypt", iso3: EGY, source: "exact crosswalk label (UN M49)"}
+      - {code: "El Salvador", iso3: SLV, source: "exact crosswalk label (UN M49)"}
+      - {code: "Ethiopia", iso3: ETH, source: "exact crosswalk label (UN M49)"}
+      - {code: "France", iso3: FRA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Germany", iso3: DEU, source: "exact crosswalk label (UN M49)"}
+      - {code: "Ghana", iso3: GHA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Greece", iso3: GRC, source: "exact crosswalk label (UN M49)"}
+      - {code: "Hong Kong", iso3: HKG, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "India", iso3: IND, source: "exact crosswalk label (UN M49)"}
+      - {code: "Indonesia", iso3: IDN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Iran (Islamic Republic of)", iso3: IRN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Israel", iso3: ISR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Japan", iso3: JPN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Jordan", iso3: JOR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "exact crosswalk label (UN M49)"}
+      - {code: "Korea (Democratic People's Republic of)", iso3: PRK, source: "crosswalk ISO 3166-1 name 'Korea, Democratic People's Republic of' re-punctuated"}
+      - {code: "Korea (Republic of)", iso3: KOR, source: "crosswalk ISO 3166-1 name 'Korea, Republic of' re-punctuated"}
+      - {code: "Lebanon", iso3: LBN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Lithuania", iso3: LTU, source: "exact crosswalk label (UN M49)"}
+      - {code: "Mexico", iso3: MEX, source: "exact crosswalk label (UN M49)"}
+      - {code: "Morocco", iso3: MAR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Myanmar", iso3: MMR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Netherlands", iso3: NLD, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "New Zealand", iso3: NZL, source: "exact crosswalk label (UN M49)"}
+      - {code: "Pakistan", iso3: PAK, source: "exact crosswalk label (UN M49)"}
+      - {code: "Palestine, State of", iso3: PSE, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "Panama", iso3: PAN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Poland", iso3: POL, source: "exact crosswalk label (UN M49)"}
+      - {code: "Russian Federation", iso3: RUS, source: "exact crosswalk label (UN M49)"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "exact crosswalk label (UN M49)"}
+      - {code: "South Sudan", iso3: SSD, source: "exact crosswalk label (UN M49)"}
+      - {code: "Spain", iso3: ESP, source: "exact crosswalk label (UN M49)"}
+      - {code: "Syrian Arab Republic", iso3: SYR, source: "exact crosswalk label (UN M49)"}
+      - {code: "Taiwan", iso3: TWN, source: "exact crosswalk label (UN M49)"}
+      - {code: "Thailand", iso3: THA, source: "exact crosswalk label (UN M49)"}
+      - {code: "The Philippines", iso3: PHL, source: "crosswalk label 'Philippines' with the article"}
+      - {code: "Togo", iso3: TGO, source: "exact crosswalk label (UN M49)"}
+      - {code: "Turkey", iso3: TUR, source: "ISO 3166-1 English short name of TUR until 2022 ('Turkey'; now 'Türkiye')"}
+      - {code: "Uganda", iso3: UGA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Ukraine", iso3: UKR, source: "exact crosswalk label (UN M49)"}
+      - {code: "United Arab Emirates", iso3: ARE, source: "exact crosswalk label (UN M49)"}
+      - {code: "United Kingdom", iso3: GBR, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "United States", iso3: USA, source: "exact crosswalk ISO 3166-1 name"}
+      - {code: "United States of America", iso3: USA, source: "exact crosswalk label (UN M49)"}
+      - {code: "Uzbekistan", iso3: UZB, source: "exact crosswalk label (UN M49)"}
+      - {code: "Vietnam", iso3: VNM, source: "common English spelling of crosswalk label 'Viet Nam'"}
+    # unmapped on purpose (not a crosswalk entity): []
