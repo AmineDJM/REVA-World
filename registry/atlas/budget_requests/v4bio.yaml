@@ -25,11 +25,11 @@ requests:
     expected_bytes_per_day: 40000000
     reason: "one run = 1 request (17 MB); allow one retry"
   - source_key: uniprot.rest
-    # rest.uniprot.org: reviewed organism-id stream (3.7 MB), ~75 taxonomy chunks (200 ids, ~15 kB each), human
+    # rest.uniprot.org: reviewed organism-id stream (3.7 MB), ~150 taxonomy chunks (100 ids max per query), human
     # reviewed stream with fields (~15 MB); ftp.uniprot.org reldate.txt twice. CC BY 4.0.
     daily_requests: 200
     expected_bytes_per_day: 50000000
-    reason: "one run ~80 requests (~20 MB); 200/day allows one retried run"
+    reason: "one run ~155 requests (~20 MB)"
   - source_key: ensembl.rest
     # rest.ensembl.org: info/species (vertebrates, ~0.3 MB) + info/assembly for 2 karyotype species.
     daily_requests: 15

@@ -16,7 +16,7 @@ Four atlas sources (KG only, no atlas table: nothing here is per country):
     UniProtKB REST (``rest.uniprot.org``, streamed TSV with field selection; release from ``X-UniProt-Release``):
     (1) the organism id of every reviewed (Swiss-Prot) entry -> exact counts per NCBI taxon id
     (``uniprot:reviewed_protein_count`` on ``ncbitaxon:<id>``); (2) the UniProt taxonomy records of those organisms
-    (scientific name, rank, common name) -> ``ncbitaxon:<id>`` entities; (3) the reviewed human entries: accession,
+    (scientific name, rank, common name; 100 ids per request, the API maximum) -> ``ncbitaxon:<id>`` entities; (3) the reviewed human entries: accession,
     entry name, primary gene, protein names, length, function comment (verbatim, cut at 1,200 characters and flagged),
     HGNC cross-reference -> ``uniprot:<acc>`` (kind ``protein``) with ``uniprot:encoded_by`` -> ``hgnc:<n>``,
     ``uniprot:in_taxon``, ``uniprot:sequence_length``, ``uniprot:function``, ``uniprot:gene_name``.
@@ -55,7 +55,7 @@ from urllib.parse import quote, urlencode
 from reva.adapters.connectors import bio_common as bc
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_bio_molecular/1"
 ATLAS_SOURCE = "bio"
 
@@ -73,7 +73,7 @@ UNIPROT_DATASET = "uniprot_reviewed"
 UNIPROT_HOST = "rest.uniprot.org"
 UNIPROT_API = "https://rest.uniprot.org"
 UNIPROT_MAX_BYTES = 60_000_000
-TAXON_CHUNK = 200
+TAXON_CHUNK = 100  # UniProt refuses more than 100 OR conditions per query
 FUNCTION_MAX = 1200
 MIN_REVIEWED_LIVE = 500_000
 MIN_HUMAN_LIVE = 20_000
@@ -1151,7 +1151,7 @@ def atlas_source() -> list[AtlasSourceSpec]:
             (UNIPROT_HOST, "ftp.uniprot.org"),
             UNIPROT_DATASET,
             ("uniprotkb:reviewed",),
-            110,
+            170,
             UNIPROT_MAX_BYTES,
             1.0,
             "KG only: reviewed entry counts per organism, organism names, human reviewed proteins.",
