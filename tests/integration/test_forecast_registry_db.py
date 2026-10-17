@@ -155,7 +155,7 @@ def test_01_issue_seals_a_batch_once_per_cycle(env: Env) -> None:
             text("SELECT evaluation_manifest_sha256, replay_mode, metrics FROM model.evaluation "
                  "WHERE metrics->>'kind' = 'registry_issue'")
         ).all()  # fmt: skip
-    assert len(rows) == 5 and {r[0] for r in rows} == {out["batch_sha256"]}
+    assert len(rows) == len(svc.all_models()) and {r[0] for r in rows} == {out["batch_sha256"]}
     assert {r[1] for r in rows} == {"operational_as_known"}
     with pytest.raises(Exception, match=r"immutable|not allowed|reject"):  # sealed rows never change
         with env.owner.begin() as c:
