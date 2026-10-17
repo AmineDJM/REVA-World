@@ -58,3 +58,24 @@ def test_bias_correction_uses_only_published_targets() -> None:
     assert all(r["n_past"] <= be.QTY_WINDOW for r in recs)
     first = recs[0]
     assert first["n_past"] == 0 and "steo_bc" not in first
+
+
+def test_seal_only_inside_the_registered_window_and_on_existing_questions() -> None:
+    import pytest
+
+    from reva.evaluation import beat_energy_seal as bs
+
+    o = Origin("2026-10", "10/06/2026", datetime(2026, 10, 7, tzinfo=UTC), _idx(2026, 10))
+    o.steo = {c: {_idx(2026, 10): 100.0} for c in be.SPOT_SERIES}
+    with pytest.raises(ValueError, match="7 days"):
+        bs.seal_records([o], {}, {}, datetime(2026, 10, 10, tzinfo=UTC))
+    with pytest.raises(ValueError, match="current month"):
+        bs.seal_records([o], {}, {}, datetime(2026, 11, 20, tzinfo=UTC))
+    q = {"type": "quantity", "reference_period": "2027-01"}
+    mans = [
+        {"supplement_of": "x", "questions": [{**q, "family": f} for f in bs.WIN_CODES.values()]},
+        {"questions": [{**q, "family": f} for f in bs.WIN_CODES.values()]},
+    ]
+    found = bs.find_questions(mans, "2027-01")
+    assert set(found) == set(bs.WIN_CODES.values()) and all(m is mans[1] for m, _ in found.values())
+    assert bs.find_questions(mans, "2026-10") == {}

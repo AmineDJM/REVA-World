@@ -1,0 +1,100 @@
+[
+  {
+    "request_fingerprint": "3f49c17183c9d83c95917b69b3f9688ea140aebc117236877244ceb28a5fdda1",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W",
+    "file": "3f49c17183c9d83c.html",
+    "sha256": "f9a61622f6eaad68d16d5b7d9b9cc6189af1d1f23b7527e561f1fba733ae6ad6",
+    "live_sha256": "5d3ed456489a4add142cf1a9fb3399741d0060eeba1468849a6217a35bfe4dd6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "63693452db0c7449dbb9503a74d165e0d6d778449fd0adb80d07b2c1be36a2c0",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCESTUS1&f=W",
+    "file": "63693452db0c7449.html",
+    "sha256": "0ef776143578e56db253af13531d373ab5c11893aa5871d2cbf873a8bcab54e1",
+    "live_sha256": "ee30b8c47e81d3eebcb369c27a4a48f1e2f9ce1fcfdf2224d9a3e44198972c09",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "8a2e018508009acad3f905d8a61dd4d6c736093f344c0c381637cb3a9f10176d",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W",
+    "file": "8a2e018508009aca.html",
+    "sha256": "d9a8bba2723a7f20e9eac35af1e3ef23a00d52aaa70ff6a85790716cbe09ee11",
+    "live_sha256": "9a2fe313504a64fc3fdbdf580bdb96ef8d7da3189449587941d3778e4bf6c60c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "33ff3a48176e6f7e900c923332a779fc287c044caa3b2ed5c72f532d17b128c5",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRRIUS2&f=W",
+    "file": "33ff3a48176e6f7e.html",
+    "sha256": "bc1208be3b0babdabd81a4e0e0b5059bdbbe1b6de03e1256105ca740dbb0d55a",
+    "live_sha256": "0d222361a18e363d7498256e993e0fbd485ef3edc3dd079b1e63025138deee3a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "4ece501a36511192f3472e2a7d1c09c593ba45b56adbea19a780ae150a76bc77",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WGTSTUS1&f=W",
+    "file": "4ece501a36511192.html",
+    "sha256": "071b38fd22a5aa5968a14d2847e6195a1b3abdc40abdaee307774f7aa120bf8c",
+    "live_sha256": "1be7680d953967b34190cb594acbfdfa01b8966e401da2177e028e647b9f8645",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "de843c0b783646ec6d851f94b1cd49f766d2bbcf757228277f23549a5ca6372f",
+    "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WDISTUS1&f=W",
+    "file": "de843c0b783646ec.html",
+    "sha256": "9fc74f156a9d83e708b7e5e40837e5c393e52d7f5a76e94c9b125a5e7268976c",
+    "live_sha256": "6f7630a613ddfc24b0d50d7bfe623c07d7ce6962590b0e84985cede64ae92f9d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  },
+  {
+    "request_fingerprint": "5cb2693a9e40a8bc2908759e0381708b6ac2d4543cb29acad36f1be7fb9afeff",
+    "url": "https://www.eia.gov/about/copyrights_reuse.php",
+    "file": "5cb2693a9e40a8bc.html",
+    "sha256": "4ded01a60300d89412d767d7f260518d43308864f88d0d052caa3b4a34d8f468",
+    "live_sha256": "821ec2732035327f4df9e116780a7e1a3e93afa2c885067acb192d27b2d60df3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T22:00:00+00:00",
+    "licence": "EIA: U.S. government publications are in the public domain (EIA weekly survey data)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (first 2 and last 3 month rows kept verbatim; copyright page reduced to its public-domain paragraph)"
+  }
+]

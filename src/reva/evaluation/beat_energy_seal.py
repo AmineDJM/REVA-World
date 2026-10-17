@@ -16,7 +16,7 @@ database entry point (``seal``) lives in :mod:`reva.cli.beat_energy` (invariant 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from reva.evaluation import beat_energy as be
@@ -59,6 +59,8 @@ def seal_records(
     inforce = max((o for o in origins if o.available_at <= now), key=lambda o: o.available_at)
     if (now.year * 12 + now.month - 1) != inforce.issue_idx:
         raise ValueError("the STEO issue in force is not for the current month: h = 0 is not the current month")
+    if now < inforce.available_at + timedelta(days=min(be.OFFSETS)):
+        raise ValueError("less than 7 days after the STEO issue's availability: outside the registered window")
     rows, _ = be.w1_rows(origins, release_of, be.next_release_map(list(release_of.values())), daily, {})
     rows = [r for r in rows if r.offset == OFFSET and r.h == 0 and r.code in WIN_CODES and r.t < now]
     for code, sid in be.SPOT_SERIES.items():
@@ -79,47 +81,52 @@ def seal_records(
     return out
 
 
+def find_questions(batches: Sequence[Mapping[str, Any]], target: str) -> dict[str, tuple[Mapping[str, Any], Any]]:
+    """Per winning family: the first sealed (non-supplement) batch holding a quantity question on ``target``.
+
+    The registry asks monthly questions only from h = 1 of a quarterly cycle, so the issue month of a quarterly STEO
+    issue is found in the PREVIOUS cycle's batches (e.g. 2027-01 = horizon 3 of cycle 2026-Q4)."""
+    out: dict[str, tuple[Mapping[str, Any], Any]] = {}
+    for man in batches:
+        if man.get("supplement_of"):
+            continue
+        for q in man.get("questions") or []:
+            f = q["family"]
+            if f in WIN_CODES.values() and f not in out and q["type"] == "quantity" and q["reference_period"] == target:
+                out[f] = (man, q)
+    return out
+
+
 def build_batch(
     original: Mapping[str, Any],
+    questions: Mapping[str, Mapping[str, Any]],
     recs: Mapping[str, Mapping[str, Any]],
-    series_by_family: Mapping[str, Any],
-    pins: Mapping[str, Mapping[str, Any]],
     steo_cells: Mapping[str, Mapping[str, Any]],
     *,
     now: datetime,
-    cycle: str,
 ) -> dict[str, Any]:
+    """Supplementary sealed batch on existing registry questions (same question records and pinned tables as the
+    original batch; the daily table and the STEO archive version used are listed in ``evidence``)."""
     from reva.evaluation.registry.energy import to_predictive
     from reva.evaluation.registry.forecasts import _record, abstention
-    from reva.evaluation.registry.questions import generate_questions
-    from reva.evaluation.registry.service import BATCH_SCHEMA, _family_of
+    from reva.evaluation.registry.service import BATCH_SCHEMA
     from reva.models.forecasting.registry_baselines import Predictive
 
-    fam_docs: dict[str, Any] = {}
-    questions: list[dict[str, Any]] = []
     forecasts: list[dict[str, Any]] = []
+    qs: list[Mapping[str, Any]] = []
     for code, fam_key in WIN_CODES.items():
-        doc = dict(original["families"][fam_key])
-        doc["questions"] = [{"type": "quantity", "horizons": [0]}]
-        doc["beat_energy"] = {"protocol": be.PROTOCOL_PATH, "window": "W1", "h": 0}
-        fam = _family_of(doc)
-        fam_docs[fam_key] = doc
-        pin = pins[str(fam.dataset_key)]
-        qs, skipped = generate_questions(
-            fam, series_by_family[fam_key], cycle=cycle, interval_level=0.8, source_pin=pin, issued_on=now.date()
-        )
-        if not qs:
-            raise LookupError(f"no question generated for {fam_key}: {skipped}")
-        q = qs[0]
+        if fam_key not in questions:
+            continue
+        q = questions[fam_key]
         r = recs[code]
         if q["reference_period"] != r["target"]:
             raise ValueError(f"question period {q['reference_period']} != nowcast target {r['target']}")
-        questions.append(q)
-        hist: list[tuple[int, float]] = []
+        qs.append(q)
         detail = (
             ("steo_issue", str(recs["_inforce"]["vintage"])),
             ("steo_release_date", str(recs["_inforce"]["release"])),
             ("daily_information", f"EIA daily spot {be.SPOT_SERIES[code]}, days <= seal day - {be.DAILY_LAG_DAYS}"),
+            ("horizon_months_after_issue", "0"),
             ("past_errors", str(r["n_past"])),
             ("protocol", be.PROTOCOL_PATH),
         )
@@ -129,10 +136,11 @@ def build_batch(
                 forecasts.append(abstention(q, mk, f"fewer than {be.MIN_PAST} past errors at this offset"))
                 continue
             p = to_predictive(v, detail) if isinstance(v, em.Pred) else Predictive("point", float(v), detail=detail)
-            rec = _record(q, mk, p, hist)
+            rec = _record(q, mk, p, [])
             if m == "steo":
                 rec["attribution"] = (
-                    f"U.S. Energy Information Administration, Short-Term Energy Outlook {recs['_inforce']['vintage']} (projection), as pinned at issue"
+                    f"U.S. Energy Information Administration, Short-Term Energy Outlook {recs['_inforce']['vintage']} "
+                    "(projection), as pinned at issue"
                 )
                 rec["source_cell"] = dict(steo_cells[code])
             elif m == "steo_fair_ln":
@@ -151,27 +159,26 @@ def build_batch(
         "schema": BATCH_SCHEMA,
         "label": "V7 BEAT-ENERGY sealed winners (pre-registered W1 timeliness nowcasts) + benchmarks",
         "origin": original["origin"],
-        "cycle": cycle,
+        "cycle": original["cycle"],
         "issued_at": now.isoformat(),
         "replay_mode": "operational_as_known",
         "supplement_of": original.get("_sha256"),
         "statement": (
-            "Only the Holm winners of registry/forecasts/beat_energy/protocol.yaml are issued (W1 h0: Brent, WTI), "
-            "with the pre-registered benchmarks (EIA STEO point, STEO fair log-normal). Target month "
-            f"{questions[0]['reference_period']} is partly elapsed at issue (question timing)."
+            "Supplementary sealed batch: only the Holm winners of registry/forecasts/beat_energy/protocol.yaml (W1 "
+            "h0: Brent, WTI monthly mean of the STEO issue month, 1-4 weeks after the release) with the "
+            "pre-registered benchmarks (EIA STEO point, STEO fair log-normal), on the original batch's questions and "
+            "pinned tables. The reference month is partly elapsed at issue (timeliness)."
         ),
         "specs": original["specs"],
-        "families": fam_docs,
+        "families": {k: v for k, v in original["families"].items() if k in questions},
         "models": [{"model_key": k, "version": v, "description": d} for k, (v, d) in MODELS.items()],
-        "data": {
-            "selection_rule": "per dataset_key: latest evidence.dataset version at issued_at",
-            "tables": dict(pins),
-        },
+        "data": original["data"],
+        "evidence": {"beat_energy_inputs": recs.get("_pins")},
         "code_digest": original.get("code_digest"),
-        "questions": questions,
+        "questions": qs,
         "forecasts": forecasts,
         "generation": {"skipped": [], "pending_families": [], "notes": []},
     }
 
 
-__all__ = ["KEY_OF", "MODELS", "WIN_CODES", "build_batch", "seal_records"]
+__all__ = ["KEY_OF", "MODELS", "WIN_CODES", "build_batch", "find_questions", "seal_records"]

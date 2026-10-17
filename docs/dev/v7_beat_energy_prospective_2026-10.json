@@ -1,0 +1,78 @@
+{
+ "status": "no_registry_question",
+ "reason": "no sealed quantity question on 2026-10 for ['eia.brent_monthly', 'eia.wti_monthly'] (the registry asks monthly questions from h = 1 of a cycle; the next STEO issue month with questions is the next quarter's)",
+ "issued_at": "2026-10-17T22:10:00.097088+00:00",
+ "inforce": {
+  "vintage": "2026-10",
+  "release": "10/06/2026"
+ },
+ "inputs": {
+  "atlas.vintage_steo.steo_archive": {
+   "dataset_key": "atlas.vintage_steo.steo_archive",
+   "artifact_sha256": "3ac6e561eb76b43f517b6c8c0826ec84131d1e7196294e18046a2be3994d3289",
+   "recorded_at": "2026-10-17T16:59:58.821493+00:00"
+  },
+  "atlas.eia.spot_d": {
+   "dataset_key": "atlas.eia.spot_d",
+   "artifact_sha256": "cc75e5b1af9248d23464526681a59f9c972b9e44d10a1ace03954ee8f6f248ca",
+   "recorded_at": "2026-10-17T15:42:35.016934+00:00"
+  }
+ },
+ "nowcast": {
+  "BREPUUS": {
+   "window": "W1",
+   "code": "BREPUUS",
+   "h": 0,
+   "offset": 7,
+   "issue": "2026-10",
+   "t": "2026-10-17T22:10:00.097088+00:00",
+   "target": "2026-10",
+   "outcome": null,
+   "n_past": 20,
+   "steo": 111.0,
+   "daily_rw": 129.10636363636365,
+   "w_steo": 0.6262060240521465,
+   "combo_steo_daily": 117.45001733917967,
+   "daily_rw_ln": {
+    "dist": "lognormal",
+    "point": 129.10636363636365,
+    "mu": 4.86063658894113,
+    "sigma": 0.057384611521045084
+   },
+   "steo_fair_ln": {
+    "dist": "lognormal",
+    "point": 111.0,
+    "mu": 4.709530201312334,
+    "sigma": 0.044335639215298685
+   }
+  },
+  "WTIPUUS": {
+   "window": "W1",
+   "code": "WTIPUUS",
+   "h": 0,
+   "offset": 7,
+   "issue": "2026-10",
+   "t": "2026-10-17T22:10:00.097088+00:00",
+   "target": "2026-10",
+   "outcome": null,
+   "n_past": 20,
+   "steo": 100.0,
+   "daily_rw": 97.9759090909091,
+   "w_steo": 0.6168124794486957,
+   "combo_steo_daily": 99.21949843489293,
+   "daily_rw_ln": {
+    "dist": "lognormal",
+    "point": 97.9759090909091,
+    "mu": 4.584721622847537,
+    "sigma": 0.05446813843586337
+   },
+   "steo_fair_ln": {
+    "dist": "lognormal",
+    "point": 100.0,
+    "mu": 4.605170185988092,
+    "sigma": 0.042931062311417044
+   }
+  }
+ },
+ "note": "NOT a registry seal: no registry question asks the STEO issue month (registry monthly horizons start at h=1). Git-committed record of the pre-registered W1 winners at this instant (inputs pinned by sha256); resolves with the November 2026 STEO (October 2026 monthly mean as history)."
+}
