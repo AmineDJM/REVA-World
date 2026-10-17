@@ -137,8 +137,10 @@ record the supply and demand conditions as they were believed to exist at the ti
 ## Loaded (dev DB) — honest status
 
 **Not loaded live.** Free disk on `/` was 4.9 GB → 4.3 GB from 20:45 UTC onwards (other agents' loads), below the
-5 GB floor of the common rules, so no live ingest was started. `reva seed` (connector registration) was queued
-behind the dev-DB lock (see "Commands"). What is verified:
+5 GB floor of the common rules (2.1-4.3 GB until the end of the session), so no live ingest was started. The
+connector versions **are registered** in the dev DB by `reva seed` (atlas.usda_psd / fao_tm / ifpri_er 1.0.1,
+atlas.usda_wasde 1.0.0, digests equal to the committed code; the 1.0.0 rows of the first three were written by a
+concurrent seed from a pre-format working copy and are unused). What is verified:
 
 | Check | Result |
 |---|---|
@@ -189,7 +191,7 @@ behind the dev-DB lock (see "Commands"). What is verified:
 
 ```bash
 df -h /                                                             # >= 5 GB free
-flock /tmp/reva-devdb.lock uv run reva seed                         # registers atlas.usda_psd / fao_tm / ifpri_er 1.0.1, atlas.usda_wasde 1.0.0
+flock /tmp/reva-devdb.lock uv run reva seed                         # already done 2026-10-17; re-run only after a code change
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ifpri_er  # 3 requests, ~0.15 MB; KG events
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_psd  # 2 requests, ~7 MB
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_wasde  # ~72 requests, ~72 MB (2021-01..now)
