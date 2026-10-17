@@ -112,9 +112,27 @@ _PHRASE_STOP = {
     "fell",
 }
 _LEADING_ARTICLES = re.compile(r"^(?:(?:le|la|les|un|une|the|a|an)\s+|l['’]\s*)", re.IGNORECASE)
-#: "pourquoi …" / "why …" name an event only with a capitalised word or a year ("pourquoi le ciel est-il bleu"
-#: is not an event question)
-_NAMED = re.compile(r"(?:^|\s)[A-ZÀ-ÖØ-Þ]|\d{3,4}")
+#: "pourquoi …" / "why …" name an event only with a capitalised word (also after an elided article: "l'URSS"), a
+#: year, or an event noun with a qualifier ("pourquoi la guerre russo-ukrainienne ?"); "pourquoi le ciel est-il
+#: bleu" and "why did the war start" are not event questions (no event named). The nouns are kinds of events (a
+#: closed list of words), never names: the event itself is found by the entity lookup in the KG label index.
+_NAMED = re.compile(r"(?:^|[\s'’-])[A-ZÀ-ÖØ-Þ]|\d{3,4}")
+_EVENT_NOUNS = re.compile(
+    r"(?<!\w)(?:guerres?|crises?|r[ée]volutions?|dissolution|dislocation|chute|effondrement|d[ée]pression|"
+    r"r[ée]cession|krach|famines?|pand[ée]mies?|[ée]pid[ée]mies?|g[ée]nocides?|invasion|coup d['’ ]?[ée]tat|"
+    r"attentats?|assassinats?|batailles?|conflits?|ind[ée]pendance|r[ée]unification|partition|annexion|"
+    r"insurrection|r[ée]voltes?|soul[èe]vements?|r[ée]bellion|massacres?|s[ée]ismes?|tremblements? de terre|"
+    r"tsunamis?|[ée]ruptions?|ouragans?|cyclones?|inondations?|s[ée]cheresses?|"
+    r"wars?|crisis|crises|revolutions?|collapse|fall|depression|recession|crash|pandemics?|epidemics?|"
+    r"invasion|coup|assassination|battles?|conflicts?|independence|reunification|annexation|uprising|"
+    r"rebellion|earthquakes?|eruptions?|hurricanes?|floods?|droughts?)(?!\w)",
+    re.IGNORECASE,
+)
+
+
+def _names_an_event(phrase: str) -> bool:
+    """A capitalised word or a year, else an event noun with a qualifier ("guerre russo-ukrainienne", not "war")."""
+    return bool(_NAMED.search(phrase)) or (bool(_EVENT_NOUNS.search(phrase)) and len(phrase.split()) >= 2)
 
 
 def event_phrase(text: str) -> str:
@@ -149,7 +167,7 @@ def causal_plan(question: str) -> list[dict[str, Any]] | None:
             m = rx.search(q)
             if m:
                 x = event_phrase(m.group("why") if "why" in m.groupdict() else m.group("x"))
-                if "why" in m.groupdict() and not _NAMED.search(x):
+                if "why" in m.groupdict() and not _names_an_event(x):
                     continue
                 if x:
                     return [

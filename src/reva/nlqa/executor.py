@@ -63,7 +63,7 @@ TIME_BUDGET_S = 45.0
 #: Bounded BFS (fallback path search): neighbour calls and nodes per frontier.
 BFS_MAX_CALLS = 60
 BFS_MAX_FRONTIER = 150
-_MATCH_RANK = {"label_exact": 0, "alias_exact": 1, "label_prefix": 2, "search": 3, "fuzzy": 4}
+_MATCH_RANK = {"label_exact": 0, "alias_exact": 1, "label_prefix": 2, "search": 3, "fuzzy": 4, "label_words": 5}
 
 
 _WD_QID = re.compile(r"^Q[1-9][0-9]*$")

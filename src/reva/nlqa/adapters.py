@@ -132,6 +132,19 @@ _MATCH = {
 }
 
 
+#: Function words left out of a words match (fr + en): elided articles ("l URSS", "d Ukraine") included.
+_WORDS_STOP = frozenset(
+    "a an and at au aux d de des du en et for from in l la le les of on par pour s sur the to un une".split()
+)
+_WORDS_MAX = 6
+
+
+def label_words(text_: str) -> list[str]:
+    """The content words of a search text (lower case, function words and single letters left out)."""
+    words = [w for w in re.findall(r"\w+", text_.lower()) if len(w) > 1 and w not in _WORDS_STOP]
+    return list(dict.fromkeys(words))
+
+
 class KgDbAdapter:
     """:class:`~reva.nlqa.ports.KgPort` on :mod:`reva.kg.query` (read-only connection per call)."""
 
@@ -169,6 +182,8 @@ class KgDbAdapter:
             with self._conn() as conn:
                 res = kq.search(conn, text_, langs=tuple(dict.fromkeys(langs)), kind=None, limit=limit)
                 hits = res.get("results") or []
+                if not hits:
+                    return self._words_search(conn, kq, text_, limit)
                 iso = self._iso3_of(conn, [h["qid"] for h in hits])
         except RevaError as e:
             if isinstance(e, CapabilityUnavailable):
@@ -194,6 +209,53 @@ class KgDbAdapter:
                 )
             )
         return out
+
+    def _words_search(self, conn: Any, kq: Any, text_: str, limit: int) -> list[EntityMatch]:
+        """No label or alias contains the text as written: the entities whose French or English labels and aliases
+        (the KG label index, ``kg.entity_label``) hold *every* content word of it, each as a whole word — e.g.
+        "dissolution de l'URSS" finds the item labelled "dislocation de l'URSS" (fr) and "dissolution of the Soviet
+        Union" (en); "l URSS" written without its apostrophe still matches "l'URSS". Match kind ``label_words``:
+        the answer says the entity was found by the words of its labels, and lists equally good candidates."""
+        words = label_words(text_)
+        if len(words) < 2 or len(words) > _WORDS_MAX:
+            return []
+        rows = conn.execute(
+            text(r"""WITH w AS (SELECT unnest(CAST(:w AS text[])) AS word),
+                     hit AS (SELECT DISTINCT l.entity_id, w.word
+                               FROM w JOIN kg.entity_label l
+                                 ON lower(l.label) ~ ('\m' || w.word || '\M') AND l.lang = ANY(:langs))
+                     SELECT e.qid, e.kind, e.sitelinks
+                       FROM hit h JOIN kg.entity e ON e.id = h.entity_id
+                      WHERE NOT EXISTS (SELECT 1 FROM kg.entity n WHERE n.qid = e.qid AND n.origin = e.origin
+                                           AND n.id > e.id)
+                      GROUP BY e.id, e.qid, e.kind, e.sitelinks
+                     HAVING count(DISTINCT h.word) = :n
+                      ORDER BY e.sitelinks DESC NULLS LAST, e.qid
+                      LIMIT :lim"""),
+            {"w": words, "langs": ["fr", "en"], "n": len(words), "lim": max(1, min(limit, 10))},
+        ).all()
+        seen: dict[str, Any] = {}
+        for q, kind, sitelinks in rows:
+            seen.setdefault(q, (kind, sitelinks))
+        if not seen:
+            return []
+        labels = kq.labels_for(conn, list(seen))
+        iso = self._iso3_of(conn, list(seen))
+        return [
+            EntityMatch(
+                Entity(
+                    qid=q,
+                    labels=labels.get(q) or {},
+                    kind=kind,
+                    sitelinks=int(sitelinks or 0),
+                    iso3=iso.get(q),
+                    source="kg",
+                ),
+                "label_words",
+                " ".join(words),
+            )
+            for q, (kind, sitelinks) in seen.items()
+        ]
 
     @staticmethod
     def _iso3_of(conn: Any, qids: Sequence[str]) -> dict[str, str]:

@@ -101,7 +101,7 @@ class Entity:
 @dataclass(frozen=True)
 class EntityMatch:
     entity: Entity
-    #: label_exact | alias_exact | label_prefix | fuzzy | search
+    #: label_exact | alias_exact | label_prefix | fuzzy | search | label_words (every content word in its labels)
     match: str
     matched_text: str = ""
 

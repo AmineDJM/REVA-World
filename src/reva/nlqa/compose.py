@@ -559,6 +559,11 @@ class Composer:
                 "label_exact": "libellé exact" if fr else "exact label",
                 "alias_exact": "alias exact" if fr else "exact alias",
                 "label_prefix": "début de libellé" if fr else "label prefix",
+                "label_words": (
+                    "tous les mots de la question figurent dans ses libellés ou alias fr/en"
+                    if fr
+                    else "every word of the question is in its fr/en labels or aliases"
+                ),
             }.get(r.match or "", r.match or "")
             where = (
                 (
