@@ -821,6 +821,18 @@ dataset_kinds:
     coded_type_map: {resistance_campaign: resistance_campaign, contentious_episode: protest, protest: protest,
                      state_repression: state_repression, state_response: state_response, coded_outcome: null}
     note: A-CONTENTION (docs/dev/v3_a_contention.md); campaign outcomes are coded outcomes, not events.
+  - id_prefix: "cbattr:extreme:"
+    source_key: carbonbrief.attribution
+    type: disaster
+    label_en: extreme weather event studied by an attribution study (Carbon Brief attribution map; V4CLIMATE)
+    coded_type_property: "cbattr:event_type"
+    coded_type_map: {"Impact": null}
+    coded_properties: ["cbattr:event_type", "cbattr:event_period_text", "cbattr:finding"]
+    note: >-
+      V4CLIMATE (docs/dev/v4_v4climate.md). Carbon Brief event types (Heat, Rain & flooding, Drought, Storm, Cold, snow &
+      ice, Wildfire, Compound, Oceans, Atmosphere, Rivers, Sunshine) stay the generic disaster type ("Rain & flooding"
+      lumps rainfall with floods, so it is not mapped to flood); "Impact" records (mortality, coral bleaching) are
+      impacts, not weather events. Trends are `cbattr:trend:*` (never events). CC BY-NC-ND 4.0.
 
 derived:
   cshapes_independence:
