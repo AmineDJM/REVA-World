@@ -53,7 +53,7 @@ OPS: tuple[str, ...] = (
 #: Reading of a family from the looked-up entity: as the source states it (``forward``), its inverse, or both.
 READINGS = ("forward", "inverse", "any")
 #: Units a decision magnitude may be stated in (normalised by the keyword planner; checked against the instrument).
-DECISION_UNITS = ("bp", "pp", "percent", "mb/d", "years", "share")
+DECISION_UNITS = ("bp", "pp", "percent", "mb/d", "years")
 _MAGNITUDE_RE = re.compile(r"^-?\d{1,6}(\.\d{1,4})?$")
 #: Causal operations (v3_causality.md): answered only from claims asserted by named sources (T1–T4).
 CAUSAL_DIRECTIONS = ("causes", "effects")

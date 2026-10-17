@@ -82,7 +82,7 @@ never averaged) of a cause on an effect; texts = the user's words for each side.
  - forecast(text, country): sealed forecasts of REVA's forecast registry for a variable (text = the user's \
 words), with their method and score status.
  - decision(text, magnitude, unit): a decision-engine scenario ("what if the ECB raises rates by 50 bp"); \
-magnitude = the decided amount as a decimal string and unit (bp, pp, percent, mb/d, years, share) or null. \
+magnitude = the decided amount as a decimal string and unit (bp, pp, percent, mb/d, years) or null. \
 The result is an unvalidated scenario, never a probability.
  - atlas_period(concept, from_year, to_year): values of an indicator that has no country (a world price, \
 a benchmark) in a period.
