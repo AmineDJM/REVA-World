@@ -404,19 +404,6 @@ concepts:
   source_order:
   - who.gho_mental.MH_9
   provider_declared: true
-- id: mind.who.mental_health_workforce
-  labels:
-    fr: Effectif total du secteur de la santé mentale (pour 100 000) (OMS)
-    en: Total workforce in mental health sector (per 100,000) (WHO)
-  definition: WHO Global Health Observatory indicator MH_21 'Total workforce in mental health sector (per 100,000)' (GHO indicator
-    name, verbatim). WHO Mental Health Atlas, answers of Member State questionnaires compiled by WHO.
-  unit: per 100,000
-  domain: mind
-  subdomain: mental_health
-  theme: behaviour
-  source_order:
-  - who.gho_mental.MH_21
-  provider_declared: true
 - id: mind.who.mental_hospital_beds
   labels:
     fr: Lits en hôpitaux psychiatriques (pour 100 000) (OMS)

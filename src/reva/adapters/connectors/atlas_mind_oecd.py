@@ -50,7 +50,7 @@ from reva.adapters.connectors.atlas_fiscal_common import Flow, FlowReport
 from reva.atlas.sources import AtlasSourceSpec
 
 CONNECTOR_NAME = "atlas.oecd.wellbeing"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 PARSER_VERSION = "atlas_mind_oecd/1"
 CATALOG_FILE = "mind.yaml"
 

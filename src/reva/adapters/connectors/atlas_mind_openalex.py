@@ -49,7 +49,7 @@ from reva.kernel.errors import SourceResponseError
 
 # ----------------------------------------------------------------------------- taxonomy (S3 snapshot)
 TAX_CONNECTOR = "atlas.openalex_taxonomy"
-TAX_VERSION = "1.0.0"
+TAX_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 TAX_SOURCE_KEY = "openalex.snapshot"
 S3_HOST = "openalex.s3.amazonaws.com"
 S3_BASE = f"https://{S3_HOST}/"
@@ -316,7 +316,7 @@ async def _ingest_taxonomy(run: Any) -> dict[str, Any]:
 
 # ----------------------------------------------------------------------------- works per country (API)
 MIND_CONNECTOR = "atlas.openalex_mind"
-MIND_VERSION = "1.0.0"
+MIND_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 MIND_DATASET = "works_country_subfield_mind"
 #: OpenAlex subfield ids -> names (verbatim from the 2026-10-14 snapshot's subfields file).
 SUBFIELDS: dict[str, str] = {

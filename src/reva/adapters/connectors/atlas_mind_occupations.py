@@ -44,7 +44,7 @@ from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem
 
 CONNECTOR_NAME = "atlas.ilostat_occupation"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 PARSER_VERSION = "atlas_mind_occupations/1+" + ilo.PARSER_VERSION
 KG_SOURCE_KEY = "ilostat.classif1"
 INDICATORS: tuple[ilo.IloIndicator, ...] = (

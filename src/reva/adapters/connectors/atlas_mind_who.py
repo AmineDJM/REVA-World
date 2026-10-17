@@ -39,7 +39,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.ports.connectors import FetchItem
 
 CONNECTOR_NAME = "atlas.who_mental"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 PARSER_VERSION = "atlas_mind_who/1"
 DATASET = "gho_mental"
 CATALOG_FILE = "mind.yaml"

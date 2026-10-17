@@ -49,7 +49,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.ports.connectors import FetchItem
 
 CONNECTOR_NAME = "atlas.un_sdg_timeuse"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 PARSER_VERSION = "atlas_mind_timeuse/1"
 SOURCE = "un_sdg"
 DATASET = "sdg_timeuse"
