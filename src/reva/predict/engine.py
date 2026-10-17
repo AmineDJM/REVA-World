@@ -421,6 +421,9 @@ class Engine:
                     continue
                 hid = self._hop_id()
                 y, reasons, u, notes = self._apply(node, chosen, hid)
+                scale_note = _extrapolation_note(node, chosen)
+                if scale_note:
+                    notes.append(scale_note)
                 if y is None and u is None:
                     self.gaps.append({"code": "upstream_missing", "node": target_id, "message": "; ".join(notes)})
                     continue
@@ -735,6 +738,28 @@ class Engine:
             u["kind_label_fr"] = es.UNDATED_LABEL_FR.get(u["kind"], u["kind"])
             entry.update(frequency="undated", periods=[], undated=u)
         return entry
+
+
+EXTRAPOLATION_FACTOR = 3.0
+
+
+def _extrapolation_note(node: Node, hop: es.Hop) -> str | None:
+    """A response scaled far beyond the published shock size is a linear extrapolation: say so."""
+    if not hop.shock_canonical:
+        return None
+    vals = node.undated if node.undated is not None else node.dated
+    if vals is None:
+        return None
+    finite = np.abs(vals[np.isfinite(vals)])
+    if finite.size == 0:
+        return None
+    m = float(np.median(finite)) if node.undated is not None else float(np.max(np.median(np.abs(vals), axis=0)))
+    if m > EXTRAPOLATION_FACTOR * hop.shock_canonical:
+        return (
+            f"the change reaching this estimate ({m:.3g}) is {m / hop.shock_canonical:.1f} times the published shock "
+            f"({hop.shock_canonical:g}): linear extrapolation beyond the estimated range"
+        )
+    return None
 
 
 def _scenario_level(

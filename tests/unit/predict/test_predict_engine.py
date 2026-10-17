@@ -446,3 +446,19 @@ def test_registry_baseline_path_is_used_only_for_its_exact_periods() -> None:
     assert v["periods"][0]["scenario_level"]["p50"] == pytest.approx(1.75)  # persistence 2.0 − 0.25
     assert v["periods"][1]["scenario_level"]["p50"] == pytest.approx(2.75)  # registry 3.0 − 0.25
     assert "registry forecast forecast.registry_ar" in v["periods"][1]["scenario_level"]["note"]
+
+
+def test_linear_extrapolation_beyond_the_published_shock_is_flagged() -> None:
+    e = est(
+        "small",
+        RATE,
+        INFL,
+        measure="response",
+        unit="percentage_points",
+        shock={"size": 10, "unit": "bp"},  # published for 10 bp, applied to 50 bp
+        point=-0.1,
+        uncertainty={"status": "not_reported"},
+    )
+    v = var(run(decision(), [e], draws=200), "atlas_concept:imf.inflation_cpi_avg@FRA")
+    assert v["undated"]["p50"] == pytest.approx(-0.5)
+    assert any("linear extrapolation" in n for n in v["notes"])

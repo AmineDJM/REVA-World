@@ -201,6 +201,7 @@ class Hop:
     raw: Mapping[str, Any]
     notes: list[str] = field(default_factory=list)
     problems: list[str] = field(default_factory=list)
+    shock_canonical: float | None = None  # published shock size in the cause's canonical unit (response measure)
 
     @property
     def quantified(self) -> bool:
@@ -322,6 +323,7 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
     in_unit = _side_unit(c_tr, cause, unit_of)
     out_unit = _side_unit(e_tr, effect, unit_of)
     scale = 1.0
+    shock_canonical: float | None = None
     if measure == "response":
         shock = est.get("shock") or {}
         size = _f(shock.get("size"))
@@ -331,6 +333,7 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
         else:
             in_unit = s_unit
             scale = 1.0 / (size * float(factor))
+            shock_canonical = abs(size * float(factor))
             if size != 1 or factor != 1:
                 notes.append(
                     f"published response to a shock of {shock.get('size')} {shock.get('unit')} scaled linearly "
@@ -429,6 +432,7 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
         raw=est,
         notes=notes,
         problems=problems,
+        shock_canonical=shock_canonical,
     )
 
 
