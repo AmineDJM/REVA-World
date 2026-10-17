@@ -1,12 +1,12 @@
-policy_version: "budgets-1.3.16"
+policy_version: "budgets-1.3.19"
 daily:
-  http_requests_total: 14062
+  http_requests_total: 17578
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
   un.comtrade.public_preview: 100
   crossref.works: 50
-  eurostat.dissemination: 100
+  eurostat.dissemination: 116
   # 1.2.0 (V2 step 3a, agent POP): built-in connector eurostat.demography; one full run is
   # 31 countries x 3 tables x 3 time windows + 3 EUROPOP2023 tables = 282 small requests
   # (resumable via its cursor).
@@ -21,6 +21,8 @@ per_source_daily_requests:
   bis.stats: 14
   # bmr.dataverse: requested by A-POL (a_pol.yaml)
   bmr.dataverse: 6
+  # carbonbrief.attribution: requested by V4CLIMATE (v4climate.yaml)
+  carbonbrief.attribution: 6
   # cbs.opendata: requested by GAPHUNT (gaphunt.yaml)
   cbs.opendata: 12
   # ccp.data: requested by A-LAW (a_law.yaml)
@@ -29,6 +31,10 @@ per_source_daily_requests:
   cdpd.dataverse: 6
   # cepii.baci: requested by A-TRADE (a_trade.yaml)
   cepii.baci: 40
+  # chebi.release: requested by V4CHEM (v4chem.yaml)
+  chebi.release: 8
+  # climate.global_indices: requested by V4CLIMATE (v4climate.yaml)
+  climate.global_indices: 80
   # clingen.gene_validity: requested by V4HEALTH (v4health.yaml)
   clingen.gene_validity: 4
   # clio_infra.dataverse: requested by A-HISTECON (a_histecon.yaml)
@@ -57,6 +63,8 @@ per_source_daily_requests:
   factbook.json: 900
   # fao.faostat: requested by A-FAO (a_fao.yaml)
   fao.faostat: 45
+  # fao.ffpi: requested by V4ECON (v4econ.yaml)
+  fao.ffpi: 4
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
@@ -65,6 +73,8 @@ per_source_daily_requests:
   geonames.cities: 6
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
   geonames.countryinfo: 2
+  # gleif.api: requested by V4INDUSTRY (v4industry.yaml)
+  gleif.api: 3000
   # glottolog.cldf: requested by KGLANG (kglang.yaml)
   glottolog.cldf: 8
   # grambank.cldf: requested by KGLANG (kglang.yaml)
@@ -93,8 +103,8 @@ per_source_daily_requests:
   idmc.gidd: 12
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml), V4MIND (v4mind.yaml)
   ilostat.rplumber: 75
-  # imf.sdmx: requested by A-IMF (a_imf.yaml)
-  imf.sdmx: 60
+  # imf.sdmx: requested by A-IMF (a_imf.yaml), V4ECON (v4econ.yaml)
+  imf.sdmx: 76
   # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
   insee.bdm: 6
   # ipu.parline: requested by A-POL (a_pol.yaml)
@@ -113,14 +123,20 @@ per_source_daily_requests:
   mondo.obo: 8
   # naturalearth.admin0_10m: requested by A-GEO (a_geo.yaml)
   naturalearth.admin0_10m: 12
+  # naturalearth.admin1_10m: requested by V4CLIMATE (v4climate.yaml)
+  naturalearth.admin1_10m: 2
   # nga.wpi: requested by A-INFRA (a_infra.yaml)
   nga.wpi: 3
+  # nist.codata: requested by V4CHEM (v4chem.yaml)
+  nist.codata: 4
+  # noaa.ghcnm: requested by V4CLIMATE (v4climate.yaml)
+  noaa.ghcnm: 10
   # noaa.ncei_hazards: requested by A-HAZARDS (a_hazards.yaml), AUDFIX (audfix.yaml)
   noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
-  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), V4MIND (v4mind.yaml)
-  oecd.sdmx: 82
+  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), V4ECON (v4econ.yaml), V4INDUSTRY (v4industry.yaml), V4MIND (v4mind.yaml)
+  oecd.sdmx: 92
   # ofac.programs: requested by A-SANCTIONS (a_sanctions.yaml)
   ofac.programs: 4
   # ohchr.indicators: requested by A-TREATIES (a_treaties.yaml)
@@ -141,6 +157,8 @@ per_source_daily_requests:
   pax.peaceagreements: 12
   # powell_thyne.coups: requested by A-COUPS (a_coups.yaml)
   powell_thyne.coups: 6
+  # pubchem.pug: requested by V4CHEM (v4chem.yaml)
+  pubchem.pug: 300
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)
   rcs_dem.osf: 12
   # reign.leaderlist: requested by A-COUPS (a_coups.yaml)
@@ -219,10 +237,10 @@ per_source_daily_requests:
   wipo.gii: 3
   # wipo.ipstats_bulk: requested by A-SCI (a_sci.yaml)
   wipo.ipstats_bulk: 5
-  # worldbank.atlas: requested by A-WB (a_wb.yaml)
-  worldbank.atlas: 40
-  # worldbank.cckp: requested by A-GEO (a_geo.yaml)
-  worldbank.cckp: 6
+  # worldbank.atlas: requested by A-WB (a_wb.yaml), V4ECON (v4econ.yaml)
+  worldbank.atlas: 42
+  # worldbank.cckp: requested by A-GEO (a_geo.yaml), V4CLIMATE (v4climate.yaml)
+  worldbank.cckp: 80
   # worldbank.cmo: requested by V4ENERGY (v4energy.yaml)
   worldbank.cmo: 8
   # worldbank.wbl: requested by A-LAW (a_law.yaml)

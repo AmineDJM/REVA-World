@@ -83,9 +83,15 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   openalex.snapshot 30/day; oecd.sdmx 76 -> 82, who.gho 129 -> 160, ilostat.rplumber 60 -> 75, openalex.api 400 -> 700).
 # * budgets.yaml -> budgets-1.3.16 (2026-10-17, V4HEALTH): merge of v4health.yaml (new uberon.obo 8/day, doid.obo 8/day,
 #   mondo.obo 8/day, clingen.gene_validity 4/day, who.ghe 400/day); same caps.
+# * budgets.yaml -> budgets-1.3.17 (2026-10-17, V4ECON): merge of v4econ.yaml (new fao.ffpi 4/day; imf.sdmx 60 -> 76,
+#   oecd.sdmx 82 -> 92, eurostat.dissemination 100 -> 116, worldbank.atlas 40 -> 42); same caps.
+# * budgets.yaml -> budgets-1.3.18 (2026-10-17, V4INDUSTRY): merge of v4industry.yaml (new gleif.api 3000/day;
+#   oecd.sdmx +15) and of the V4 requests filed since 1.3.17 (chebi.release, ...); same caps.
+# * budgets.yaml -> budgets-1.3.19 (2026-10-17, V4CLIMATE): merge of v4climate.yaml (new climate.global_indices 80/day,
+#   noaa.ghcnm 10/day, carbonbrief.attribution 6/day, naturalearth.admin1_10m 2/day; worldbank.cckp 6 -> 80).
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "5587b3d6bbc787c76a3e2e2d6cc21893e627998719501bdba97decd52e6c2be1",
+    "budgets.yaml": "ffa2468ee3e7b1286352d026162b3f7c0438ed485186db07f7a6bd01c30f14c3",
 }
 
 
