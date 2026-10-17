@@ -11,8 +11,8 @@ history. Everything below is what a source states; REVA-computed numbers are fla
 | PubChem periodic table (`pubchem.pug`) | `https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON` | NLM / US Government work | 1 request, 44 kB |
 | PubChem element pages (`pubchem.pug`) | `.../rest/pug_view/data/element/<Z>/JSON`, Z = 1..118 | per contributor, recorded on every value: IUPAC CIAAW (bylaws), AMDC/IAEA (disclaimer), NIST PML, Jefferson Lab (citation notice), LANL, IUPAC IPTEI (CC BY-NC-ND 4.0, flagged `licence_noncommercial`; no IPTEI section is parsed) | 118 requests, 14.6 MB (with the table) |
 | NIST CODATA (`nist.codata`) | `https://physics.nist.gov/cuu/Constants/Table/allascii.txt` | NIST SRD 121: cite "Source: NIST", possible US copyright (15 U.S.C. 290e) → `licence_review` | 1 request, 40.8 kB |
-| ChEBI release 256 (`chebi.release`) | `https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi_lite.obo.gz` (7.9 MB), `.../flat_files/chemical_data.tsv.gz` (3.8 MB) | CC BY 4.0 per the ontology header; flat-files README also says CC BY-SA 4.0 (owner to confirm) | see "Live runs" |
-| PubChem compounds (`pubchem.pug`) | `.../rest/pug/substance/sourceid/ChEBI/<ids>/xrefs/RegistryID/JSON`, `.../cids/JSON`, `.../compound/cid/<cids>/property/.../JSON` | NLM; depositor terms may apply | see "Live runs" |
+| ChEBI release 256 (`chebi.release`) | `https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi_lite.obo.gz` (7.9 MB), `.../flat_files/chemical_data.tsv.gz` (3.8 MB) | CC BY 4.0 per the ontology header; flat-files README also says CC BY-SA 4.0 (owner to confirm) | 3 requests incl. periodic table, 11.7 MB |
+| PubChem compounds (`pubchem.pug`) | `.../rest/pug/substance/sourceid/ChEBI/<ids>/xrefs/RegistryID/JSON`, `.../cids/JSON`, `.../compound/cid/<cids>/property/.../JSON` | NLM; depositor terms may apply | 50 requests (list splitting), 0.1 MB |
 | Wikidata (`wikidata.wdqs` / `wikidata.wbapi`, WDHARVEST's harvester) | specs in `registry/kg/queries/chemistry/wikidata/` | CC0, community-edited | not harvested yet (WDQS 429 cool-downs all session) |
 
 Not used, owner decisions:
@@ -78,13 +78,14 @@ Honesty choices worth knowing:
 | Elements (PubChem periodic table + 118 pages) | 118 `chemical_element` | 45,101 (`pubchem.pug`) incl. elements + nuclides | `pubchem.elements` 1,555 |
 | Nuclides (AMDC via PubChem; CIAAW/NIST abundances) | 5,637 `isotope` | (in the 45,101): 5,637 half-life texts, 4,546 in seconds, 146 in years, 5,317 discovery years, 8,892 decay modes, 6,261 masses, 541 abundances (+36 intervals) | `pubchem.nuclides` 17,168 |
 | CODATA 2022 | 355 `physical_constant` | 355 (`nist.codata`) | `codata.constants` 355 |
-| ChEBI subset / PubChem compounds | see "Live runs" | | |
+| ChEBI subset (release 256, seeds file) | 1,356 (`compound`, `chemical_class`, `chemical_role`, `mineral`, `chemical_element`, `isotope`) | 6,281 (`chebi.release`): is_a 2,011, made_of 964, definitions 937, has_role 915, formula/mass/charge ~445 each, has_part 72 | `chebi.composition` 1,408 |
+| PubChem compounds for the ChEBI seeds | 110 `compound` | 1,032 (`pubchem.pug`), incl. made_of from formulas and 114 ChEBI→CID links | `pubchem.compounds` 479 |
 
 Element statements by predicate: atomic weight per contributor 378 (+26 intervals), crustal abundance 88,
 oceanic abundance 80, history texts 409, year discovered 118, periodic-table properties (symbol, configuration,
 state, block, mass, MP/BP, density, radius, IE, EA, electronegativity, oxidation states) 93–118 each.
 
-Fixture-mode test of the ChEBI subset on the full seed list (offline, release 256): 1,356 entities (seeds 156,
+ChEBI subset composition (release 256): 1,356 entities (seeds 156,
 role members 53, mineral/alkane/cycloalkane members 341, relation targets 227, + is_a ancestors), 6,281
 statements (is_a 2,011, made_of 964, definitions 937, has_role 915, formula/mass/charge ~445 each, has_part 72),
 391 formulas parsed, 57 not interpreted (51 generic, 6 unknown symbols).
@@ -121,7 +122,7 @@ not edges, and are deliberately unmapped.
   `science.chem_compound_identifiers`, which lists the ChEBI class ids too) → `chebi:24632` hydrocarbon /
   `chebi:18310` alkane / `chebi:23453` cycloalkane / `chebi:33658` arene → `chebi:is_a` members (110 alkanes,
   39 cycloalkanes loaded) → `chebi:formula_element` → `element:6` carbon, `element:1` hydrogen (with shares).
-  Today the ChEBI → element half of the chain is loaded; the petroleum → class edge waits for the Wikidata harvest
+  Today the ChEBI → element half of the chain is loaded in the dev DB; the petroleum → class edge waits for the Wikidata harvest
   (no other open source stating petroleum's composition was found; see owner decisions).
 
 ## Wikidata specs (`registry/kg/queries/chemistry/wikidata/`, domain `science`; all specs validate)
@@ -147,8 +148,14 @@ P2374, P1148, P683, P662, P231, P579 (P186 was requested by another agent and is
 * Done live: `atlas.chem_codata`, `atlas.chem_elements` (all 118 pages, no missing page, 0 KG rejections).
   Note: the element run was started while `df` showed 4.7 GB free (the gate was read but not enforced by the
   command); it added 14.6 MB of raw bytes. Later runs are gated in the command itself.
-* ChEBI subset and PubChem compounds: live runs gated on ≥ 5 GB free disk (free stayed at 4.7–4.8 GB, shared
-  with other agents) — see "Commands" for the status at the end of the session and how to finish.
+* ChEBI subset and PubChem compounds: run live once free disk was back above 5 GB (6.7 GB; the gate is in the
+  command): 0 KG rejections. PubChem refused 4 seed ids as unknown ChEBI sources (`not_in_pubchem`: CHEBI:17234
+  glucose, CHEBI:18723 nicotine, CHEBI:30187 aluminium oxide, CHEBI:35150 calcium hydroxide — typed missing, likely
+  deposited under other ChEBI ids; not guessed) and 3 deposits have no standardised CID (CHEBI:6078 ivermectin, a
+  mixture; CHEBI:28984 aluminium atom; CHEBI:33101 nitrogen dioxide).
+* Shared-worktree note: the move of the specs to `chemistry/wikidata/` was swept into V4INDUSTRY's commit b41de6c
+  (shared git index), and my commit fcba77e carried another agent's staged `nature/ecology -> geography/ecology`
+  renames; contents are correct.
 * Wikidata: WDQS returned 429 with 15-minute cool-downs for the whole session (all agents share the egress);
   `harvest try` of the petroleum spec waited in the cool-down queue.
 * Abundance in the **universe** (and Sun / meteorites): not on the PubChem pages; no open source found (CRC
@@ -168,9 +175,10 @@ P2374, P1148, P683, P662, P231, P579 (P186 was requested by another agent and is
 
 ```bash
 df -h /                                                     # >= 5 GB free first
+# all four ran live on 2026-10-17; refresh monthly (ChEBI releases monthly):
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_chebi      # ~12 MB, 3 requests
-flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_pubchem    # ~10 requests, < 1 MB
-flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_elements   # monthly refresh (119 requests, ~15 MB)
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_pubchem    # ~50 requests, < 1 MB
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_elements   # 119 requests, ~15 MB
 uv run python -m reva.kg.harvest merge-property-requests                  # WDHARVEST: P1086 P246 P189 P274 ...
 uv run python -m reva.kg.harvest run registry/kg/queries/chemistry --via api
 uv run pytest tests/unit/test_atlas_chem.py tests/integration/test_atlas_chem_ingest.py
