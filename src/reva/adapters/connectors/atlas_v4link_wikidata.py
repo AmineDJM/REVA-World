@@ -97,7 +97,6 @@ def pack_query(pack: Pack) -> str:
     return f"""SELECT ?item ?prop ?st ?v ?rank ?en ?fr WHERE {{
   {_selector(pack)}
 {unions}
-  FILTER(?rank != wikibase:DeprecatedRank)
   OPTIONAL {{ ?item rdfs:label ?en . FILTER(LANG(?en) = "en") }}
   OPTIONAL {{ ?item rdfs:label ?fr . FILTER(LANG(?fr) = "fr") }}
 }}"""
@@ -112,12 +111,12 @@ def duplicates_query(pid: str) -> str:
 
 def country_query(pack: Pack) -> str:
     """Best-rank-filtered P17 statements of every item holding one of the pack's properties. Written as a UNION
-    (no sub-select): QLever answered the sub-select form with 71 rows instead of ~6,400 on 2026-10-17."""
+    without sub-select or DISTINCT: QLever answered those forms with 71 / 161 rows instead of ~9,000 on 2026-10-17
+    (duplicate rows of an item holding both properties are removed in Python)."""
     holders = " UNION ".join(f"{{ ?item wdt:{p} [] }}" for p in pack.properties)
-    return f"""SELECT DISTINCT ?item ?st ?country ?rank WHERE {{
+    return f"""SELECT ?item ?st ?country ?rank WHERE {{
   {holders}
   ?item p:P17 ?st . ?st ps:P17 ?country ; wikibase:rank ?rank .
-  FILTER(?rank != wikibase:DeprecatedRank)
 }}"""
 
 

@@ -169,7 +169,7 @@ def test_bridge_statements_direction_and_provenance() -> None:
 def test_pack_queries_are_bounded_and_rank_filtered() -> None:
     rules = common.load_rules()
     q = wd.pack_query(rules.packs["chemistry"])
-    assert "wdt:P683 [] ; wdt:P662 []" in q and "?sl >= 10" in q and "DeprecatedRank" in q
+    assert "wdt:P683 [] ; wdt:P662 []" in q and "?sl >= 10" in q and "wikibase:rank ?rank" in q
     q = wd.pack_query(rules.packs["health"])
     assert "HAVING (COUNT(DISTINCT ?pd) >= 2)" in q
     assert "GROUP BY ?v HAVING (COUNT(DISTINCT ?i) > 1)" in wd.duplicates_query("P683")
