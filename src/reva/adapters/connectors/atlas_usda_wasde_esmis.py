@@ -280,8 +280,11 @@ def _xml_cells(e: ET.Element, ctx: dict[str, str]) -> Iterator[tuple[dict[str, s
 
 def parse_xml(body: bytes) -> ReportParse:
     """Headline cells of one WASDE XML report."""
+    head = body[:4096].upper()
+    if b"<!DOCTYPE" in head or b"<!ENTITY" in body.upper():
+        raise EsmisError("XML with a DTD / entity declaration refused")
     try:
-        root = ET.fromstring(body)
+        root = ET.fromstring(body)  # noqa: S314 - DTD/entity declarations refused above; expat fetches nothing
     except ET.ParseError as e:
         raise EsmisError(f"XML does not parse: {e}") from e
     rep = ReportParse()
@@ -469,7 +472,9 @@ def _txt_us(
         cols = [(hist[0], nums[0], ""), (hist[1] + " Est.", nums[1], ""), (proj_my + " Proj.", nums[-1], months[-1])]
         for my_label, v, mon in cols:
             y, status = my_of(my_label)
-            _txt_put(found, series, y, v, status, {"table": title, "row": lab.strip(), "market_year": my_label, "month": mon})
+            _txt_put(
+                found, series, y, v, status, {"table": title, "row": lab.strip(), "market_year": my_label, "month": mon}
+            )
     missing = {a for a in US_ATTRS} - got
     if missing:
         raise EsmisError(f"{title!r}: rows not found {sorted(missing)}")
@@ -511,7 +516,7 @@ def _txt_world(found: dict[tuple[str, int], Cell], rep: ReportParse, crop: str, 
                         j += 1
                     if rep.report_month not in rows:
                         raise EsmisError(f"{title!r}: no {rep.report_month} row under World ({sorted(rows)})")
-                    mon, nums = rows[rep.report_month]  # type: ignore[index]
+                    mon, nums = rows[rep.report_month]
                 if len(nums) < 6:
                     raise EsmisError(f"{title!r}: World row with {len(nums)} values")
                 y, status, my_label = block
@@ -649,7 +654,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             break
         for r in got:
             prev = releases.get(r.release)
-            releases[r.release] = r if prev is None else Release(r.release, tuple(dict.fromkeys(prev.files + r.files)), prev.view)
+            releases[r.release] = (
+                r if prev is None else Release(r.release, tuple(dict.fromkeys(prev.files + r.files)), prev.view)
+            )
         if not explicit and min(r.release for r in got) < first:
             break
     rows = Rows()

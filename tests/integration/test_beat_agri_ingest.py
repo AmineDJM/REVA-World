@@ -45,8 +45,11 @@ async def test_wasde_esmis_fixture_ingest(db: Any) -> None:
         ).scalar_one()
     f = read_atlas_table(db.store, sha)
     assert f.height == 180
-    row = f.filter(f["indicator"] == "wasde_esmis:us.corn.production|v=2015-07-10").filter(
-        f["period_start"].dt.year() == 2015
+    import polars as pl
+
+    row = f.filter(
+        (pl.col("indicator") == "wasde_esmis:us.corn.production|v=2015-07-10")
+        & (pl.col("period_start").dt.year() == 2015)
     )
     assert row["value"].to_list() == ["13530"]
     flags = json.loads(row["flags"][0])

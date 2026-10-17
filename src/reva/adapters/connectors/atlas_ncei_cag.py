@@ -156,7 +156,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                     raw_sha256=sha,
                     selector={"region": region, "param": param, "date": f"{y}{mo:02d}"},
                 )
-            files.append({"region": region, "param": param, "rows": len(vals), "last": f"{vals[-1][0]}-{vals[-1][1]:02d}" if vals else None})
+            files.append(
+                {
+                    "region": region,
+                    "param": param,
+                    "rows": len(vals),
+                    "last": f"{vals[-1][0]}-{vals[-1][1]:02d}" if vals else None,
+                }
+            )
     frame = rows.frame()
     if frame.height == 0:
         raise CagError("no CAG row", kind="no_data")

@@ -42,7 +42,9 @@ def test_txt_2005_headline_cells_and_positional_status() -> None:
     # U.S. corn 2005/06 July projection (last column), 2004/05 estimate, 2003/04 history
     assert c[("us.corn.yield", 2005)].value == "145" and c[("us.corn.yield", 2005)].status == "projection"
     assert c[("us.corn.production", 2005)].value == "10785"
-    assert c[("us.corn.ending_stocks", 2004)].value == "2115" and c[("us.corn.ending_stocks", 2004)].status == "estimate"
+    assert (
+        c[("us.corn.ending_stocks", 2004)].value == "2115" and c[("us.corn.ending_stocks", 2004)].status == "estimate"
+    )
     assert c[("us.corn.production", 2003)].status == "published_history"
     assert c[("us.soybeans.production", 2005)].value == "2890"
     assert c[("us.wheat.ending_stocks", 2005)].value == "700"
@@ -92,7 +94,11 @@ def test_numbers_and_labels() -> None:
 
 
 def test_layout_surprise_is_typed() -> None:
-    body = (E / "wasde-07-12-2005.txt").read_bytes().replace(b"Production                  : 10,089", b"Production                  : 10,0x9")
+    body = (
+        (E / "wasde-07-12-2005.txt")
+        .read_bytes()
+        .replace(b"Production                  : 10,089", b"Production                  : 10,0x9")
+    )
     with pytest.raises(W.EsmisError):
         W.parse_txt(body)
 

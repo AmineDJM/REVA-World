@@ -130,9 +130,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   (who.eeml 2000 -> 4000/day: a re-run after a failed run must fit the same day); same caps.
 # * budgets.yaml -> budgets-1.3.40 (2026-10-17, merge run and pinned by BEAT-AGRI): 1.3.39 plus beat_agri.yaml (new
 #   usda.wasde_esmis 450/day, noaa.ncei_cag 12/day); same caps.
+# * budgets.yaml -> budgets-1.3.41 (2026-10-17, merge run and pinned by BEAT-NOWCAST): 1.3.40 plus beat_nowcast.yaml
+#   (new fed.nowcasts 30/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "1979f83c8201036d6f2e5e36dc0a70afec8c413379b54219ef87e24bf414de61",
+    "budgets.yaml": "95c139e128e3ff30544fab784406eedd1dc5a4e21d6c2754ab6c59dba2c6da4a",
 }
 
 

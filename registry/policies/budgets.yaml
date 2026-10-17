@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.40"
+policy_version: "budgets-1.3.41"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -105,6 +105,8 @@ per_source_daily_requests:
   fao.ffpi: 4
   # fao.fishstat: requested by V4ECO (v4eco.yaml)
   fao.fishstat: 4
+  # fed.nowcasts: requested by BEAT-NOWCAST (beat_nowcast.yaml)
+  fed.nowcasts: 30
   # frb.releases: requested by V6FINDATA (v6findata.yaml)
   frb.releases: 8
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
