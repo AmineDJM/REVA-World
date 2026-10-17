@@ -1,12 +1,12 @@
 """PA-X Peace Agreements Database v10 (University of Edinburgh, PeaceRep): peace agreements as events, the conflict or
-war each one addresses (T1 ``reaction_to`` claims), peace processes (context) and UCDP agreement ids (identity
-evidence) (agent CAUSMORE).
+war each one addresses, peace processes and UCDP agreement ids (identity evidence) -- all context, no causal claim
+(agent CAUSMORE).
 
 Source and access
 -----------------
 ``www.peaceagreements.org`` (no account): the full dataset ``/cms/documents/3957/pax_data_2257_agreements_v10.csv``
 (2,257 agreements 1990-2025, one row per agreement) and the codebook ``/cms/documents/3956/PA_X_codebook_v10.pdf``
-(sha256 pinned in ``registry/causal/relations_causmore.yaml``: a changed codebook withholds the claims). Registered
+(sha256 pinned in ``registry/causal/relations_causmore.yaml``). Registered
 source ``pax.peaceagreements``; 2 requests per run.
 
 **Terms** (Terms_of_Use.pdf, read 2026-10-17): "the content of the Databases is provided under a Creative Commons
@@ -22,10 +22,12 @@ What is built (reasons: ``relations_causmore.yaml`` dataset ``pax``)
   ``pax:location`` strings), ``P361`` part of ``pax:process:<PP>`` (peace process, ``PPName``).
 * Identifiers: ``pax:ucdp_agreement_id`` (``UcdpAgr``; ``same_as`` to ``ucdp:pa:<id>`` through
   ``registry/events/same_as_rules.yaml`` rule ``pax_ucdp_agreement_id``), ``pax:pam_agreement_id`` (``PamAgr``).
-* T1 claims ``reaction_to``: ``ucdp:conflict:<UcdpCon>`` -> agreement and ``cow:war:<CowWar>`` -> agreement (codebook
-  term ``peace_agreement``: "addressing conflict with a view to ending it"), with ``pax:ucdp_conflict`` /
-  ``pax:cow_war`` context statements carrying the same pairing. ``CowWar`` is the v4 COW numbering (see
-  :mod:`atlas_cowwars`).
+* Context ``pax:ucdp_conflict`` (``UcdpCon`` -> ``ucdp:conflict:<id>``) and ``pax:cow_war`` (``CowWar`` ->
+  ``cow:war:<n>``, the v4 COW numbering, see :mod:`atlas_cowwars`): the conflict / war the agreement addresses.
+  Connector 1.0.0 made these ``reaction_to`` claims; 1.1.0 keeps them as context because the codebook defines a
+  peace agreement as a document "addressing conflict with a view to ending it" -- what it addresses, not that it is
+  a reaction (the same reading as the causal audit's M6 for the UCDP Peace Agreement Dataset). The ``pax`` claims
+  delivery stays (empty, complete) so the 1.0.0 claims are retracted through the loader.
 * Not made: links between agreements. ``Stage = Imp`` ("Aiming to implement an earlier agreement") names no agreement
   and ``OthAgr`` lists other agreements by their names "as found in the text": joining them would be name matching.
 """
@@ -42,7 +44,7 @@ from reva.adapters.connectors import causmore_common as cm
 from reva.adapters.connectors.atlas_geopol_common import KgEntity, KgStatement
 
 NAME = "atlas.pax"
-VERSION = "1.0.0"
+VERSION = "1.1.0"  # 1.1.0: conflict/war -> agreement is context, not reaction_to (as audit M6 for UCDP)
 PARSER_VERSION = "atlas_pax/1"
 SOURCE_KEY = "pax.peaceagreements"
 ATLAS_SOURCE = "pax"
@@ -53,6 +55,10 @@ DATA_URL = f"https://{HOST}/cms/documents/3957/pax_data_2257_agreements_v10.csv"
 DATA_FILE = "pax_data_2257_agreements_v10.csv"
 CODEBOOK_KEY = "pax_codebook"
 PAX_VERSION = "v10"
+RELATEDNESS = (
+    "context: the conflict / war the agreement addresses (codebook: a peace agreement is a document 'addressing "
+    "conflict with a view to ending it'); not a reaction or a cause"
+)
 MEDIA = ("text/csv", "application/csv", "application/octet-stream", "text/plain")
 PDF_MEDIA = ("application/pdf", "application/octet-stream")
 MAX_BYTES = 12_000_000
@@ -236,9 +242,9 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
                     target,
                     raw_sha256=sha,
                     selector={**sel, "column": "UcdpCon"},
+                    relation=RELATEDNESS,
                 )
             )
-            claims.append(_claim(target, aid, sel, sha, "UcdpCon", f"{agt}:ucdp:{cid}"))
         for col_v in coded_ids(r["CowWar"]):
             n = W.war_number(col_v)
             if n is None:
@@ -253,9 +259,9 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
                     raw_sha256=sha,
                     selector={**sel, "column": "CowWar"},
                     numbering="COW v4 (Resort to War, Sarkees and Wayman 2010)",
+                    relation=RELATEDNESS,
                 )
             )
-            claims.append(_claim(target, aid, sel, sha, "CowWar", f"{agt}:cow:{n}"))
     for pp, names in sorted(processes.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 0):
         name, _ = names.most_common(1)[0]
         pid = f"pax:process:{pp}"
@@ -280,19 +286,6 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
     return {"entities": list(ents.values()), "statements": sts, "claims": claims, "anomalies": dict(anomalies)}
 
 
-def _claim(cause: str, effect: str, sel: Mapping[str, Any], sha: str, col: str, scid: str) -> cd.ClaimRecord:
-    return cd.ClaimRecord(
-        cause_id=cause,
-        effect_id=effect,
-        relation="reaction_to",
-        selector={**sel, "columns": ["AgtId", col, "Dat"]},
-        raw_sha256=sha,
-        codebook_term="peace_agreement",
-        source_claim_id=scid,
-        scope={"coded_by": col},
-    )
-
-
 def atlas_source() -> Any:
     from reva.atlas.sources import AtlasSourceSpec
 
@@ -314,7 +307,7 @@ def atlas_source() -> Any:
         parser_version=PARSER_VERSION,
         field_mappings={
             "kg": "pax:agt:<AgtId>, pax:process:<PP>",
-            "claims": "registry/causal/relations_causmore.yaml dataset pax (UcdpCon, CowWar -> reaction_to)",
+            "claims": "none (registry/causal/relations_causmore.yaml dataset pax: UcdpCon / CowWar are context)",
             "same_as": "pax:ucdp_agreement_id -> ucdp:pa:<id> (registry/events/same_as_rules.yaml)",
         },
         notes="KG-only source (no atlas table).",

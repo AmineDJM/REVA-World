@@ -68,13 +68,15 @@ async def test_cowwars_ingest(db: Any, tmp_path: Path) -> None:
 async def test_pax_ingest(db: Any, tmp_path: Path) -> None:
     s = await _run(db, atlas_pax, tmp_path)
     assert s["codebook"]["matches"] and not s["kg"]["rejected"], s
-    _claims_ok(s, ("pax",))
+    # 1.1.0: no claims, an empty complete delivery (retracts 1.0.0's reaction_to claims)
+    rep = s["claims"]["pax"]
+    assert rep["claims"] == 0 and rep["status"] in ("loaded", "staged"), rep
     if cd.causal_available(db.worker):
         n = _count(
             db,
-            "SELECT count(*) FROM kg.causal_claim_current WHERE cause_id = 'cow:war:856' AND relation = 'reaction_to'",
+            "SELECT count(*) FROM kg.causal_claim_current WHERE effect_id LIKE 'pax:agt:%'",
         )
-        assert n > 0
+        assert n == 0
     assert _count(db, "SELECT count(*) FROM kg.statement_current WHERE property_pid = 'pax:ucdp_agreement_id'") >= 3
     again = await _run(db, atlas_pax, tmp_path)
     assert again["kg"]["statements_inserted"] == 0

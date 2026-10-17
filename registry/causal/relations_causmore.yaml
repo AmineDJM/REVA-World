@@ -508,26 +508,20 @@ datasets:
         pdf_page: 16
     mappings:
       - variables: [UcdpCon]
-        reva_kind: claim
-        causal: true
-        relation: reaction_to
-        codebook_term: peace_agreement
-        cause: ucdp:conflict:<UcdpCon> (KGGEOPOL's UCDP/PRIO conflict ids, the post-2017 designation the codebook names)
-        effect: pax:agt:<AgtId>
-        why: 'A PA-X peace agreement is by definition "addressing conflict with a view to ending it" and UcdpCon codes
-          which (UCDP) conflict. Same mapping as the UCDP Peace Agreement Dataset in CAUSDATA (conflict -> agreement,
-          reaction_to): the agreement is a response to the conflict. Empty / NA -> no claim.'
+        reva_kind: context
+        causal: false
+        predicate: pax:ucdp_conflict (pax:agt:<AgtId> -> ucdp:conflict:<UcdpCon>)
+        why: 'A PA-X peace agreement is a document "addressing conflict with a view to ending it" and UcdpCon codes which
+          (UCDP) conflict. That says what the agreement addresses, not that it is a reaction to or caused by the conflict
+          (same reading as the causal audit M6 for the UCDP Peace Agreement Dataset, docs/dev/review_v3_causal_audit.md).
+          Connector 1.0.0 delivered these as reaction_to claims; 1.1.0 keeps them as context and its empty complete
+          delivery retracts the 1.0.0 claims.'
       - variables: [CowWar]
-        reva_kind: claim
-        causal: true
-        relation: reaction_to
-        codebook_term: peace_agreement
-        cause: cow:war:<CowWar> (COW v4 war numbering, the numbering of Resort to War cited by the codebook)
-        effect: pax:agt:<AgtId>
-        why: 'Same definition; CowWar codes which COW war the agreement''s conflict is. PA-X cites Sarkees & Wayman (2010):
-          the v4 numbering (checked: e.g. 856 "Eighth Colombia" in COW intra-state v4.1). A number absent from the COW v4
-          files (wars not loaded, e.g. 836 "Second South Sudan" is in v4.1) still makes the claim; the entity is then an
-          unknown entity of the loader until COW is loaded.'
+        reva_kind: context
+        causal: false
+        predicate: pax:cow_war (pax:agt:<AgtId> -> cow:war:<CowWar>, COW v4 numbering)
+        why: 'Same definition and decision as UcdpCon. PA-X cites Sarkees & Wayman (2010): the v4 numbering (checked: e.g.
+          856 "Eighth Colombia" in COW intra-state v4.1).'
       - variables: [UcdpAgr]
         reva_kind: context
         causal: false

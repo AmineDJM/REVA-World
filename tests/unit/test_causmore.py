@@ -161,25 +161,25 @@ def test_cow_intra_participants(wars: dict[str, Any]) -> None:
 # ----------------------------------------------------------------------------- PA-X
 
 
-def test_pax_reaction_claims_and_context(pax: dict[str, Any]) -> None:
-    claims = pax["claims"]
-    assert claims and {c.relation for c in claims} == {"reaction_to"}
-    assert {c.scope["coded_by"] for c in claims} == {"UcdpCon", "CowWar"}
-    assert all(c.effect_id.startswith("pax:agt:") and c.codebook_term == "peace_agreement" for c in claims)
-    causes = {c.cause_id for c in claims}
-    assert "cow:war:856" in causes and "cow:war:215" in causes
-    assert any(x.startswith("ucdp:conflict:") for x in causes)
+def test_pax_conflict_links_are_context_not_claims(pax: dict[str, Any]) -> None:
+    # the codebook says what an agreement addresses, not that it reacts to the conflict (audit M6 reading)
+    assert pax["claims"] == []
+    rel = {m["variables"][0]: m for m in cm.dataset_entry("pax")["mappings"]}
+    assert rel["UcdpCon"]["reva_kind"] == "context" and rel["CowWar"]["reva_kind"] == "context"
+    st = pax["statements"]
+    wars = {s.object_qid for s in st if s.property == "pax:cow_war"}
+    assert {"cow:war:856", "cow:war:215"} <= wars
+    assert any(s.property == "pax:ucdp_conflict" and s.object_qid.startswith("ucdp:conflict:") for s in st)
+    assert all(
+        "not a reaction" in s.qualifiers["relation"] for s in st if s.property in ("pax:cow_war", "pax:ucdp_conflict")
+    )
     # no agreement -> agreement link of any kind (Imp / OthAgr name no agreement id)
-    assert not [c for c in claims if c.cause_id.startswith("pax:")]
-    assert not [
-        s for s in pax["statements"] if s.subject.startswith("pax:agt:") and (s.object_qid or "").startswith("pax:agt:")
-    ]
-    st = [s for s in pax["statements"] if s.property == "pax:ucdp_agreement_id"]
-    assert {s.value["value"] for s in st} >= {"1070", "1502"}
-    assert any(s.property == "P361" and s.object_qid.startswith("pax:process:") for s in pax["statements"])
-    assert any(s.property == "P17" and s.object_qid == "Q739" for s in pax["statements"])
-    kinds = {e.kind for e in pax["entities"]}
-    assert kinds == {"peace_agreement", "peace_process"}
+    assert not [s for s in st if s.subject.startswith("pax:agt:") and (s.object_qid or "").startswith("pax:agt:")]
+    ids = [s for s in st if s.property == "pax:ucdp_agreement_id"]
+    assert {s.value["value"] for s in ids} >= {"1070", "1502"}
+    assert any(s.property == "P361" and s.object_qid.startswith("pax:process:") for s in st)
+    assert any(s.property == "P17" and s.object_qid == "Q739" for s in st)
+    assert {e.kind for e in pax["entities"]} == {"peace_agreement", "peace_process"}
 
 
 def test_pax_same_as_rule_is_declared() -> None:
