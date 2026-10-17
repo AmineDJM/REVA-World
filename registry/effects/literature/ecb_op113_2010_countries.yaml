@@ -1,0 +1,288 @@
+# First-round (input-output) pass-through of energy prices: the remaining euro-area countries of Tables 10 and 12
+# (agent EFFECTS-MORE, V6; same document as entry ecb_op113_2010, which holds the EA/FR/DE consumer and EA producer rows).
+schema: reva-effects-literature/1
+id: ecb_op113_2010_countries
+source_key: effects.literature
+citation:
+  text: "Task Force of the Monetary Policy Committee of the European System of Central Banks. Energy markets and the euro area macroeconomy. ECB Occasional Paper Series No 113, June 2010."
+  text_basis: assembled from the cover of the version read (ECB occasional paper)
+  short: "ESCB Task Force (2010), ECB Occasional Paper 113"
+  authors: [Task Force of the Monetary Policy Committee of the European System of Central Banks]
+  title: "Energy markets and the euro area macroeconomy"
+  year: 2010
+  series: ECB Occasional Paper Series No 113
+  doi: null
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf
+document:
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf
+  media_type: application/pdf
+  sha256: d38a4290e31a1d37d2f75ddbc868806009702d507e2c59a998ad6ab324e7fe52
+  bytes: 2836963
+  version_read: ECB Occasional Paper No 113, June 2010
+as_of: "2010-06-30"
+rights:
+  licence: "ECB publication; no licence statement captured in the version read; treated as all rights reserved."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: permanent_level_shift
+  cause: {kind: variable, id: energy_price.all_products, transform: percent_change,
+          definition: "a 10% increase in energy prices (coal/lignite/peat, crude petroleum and natural gas, coke/refined petroleum/nuclear fuels, electricity/gas/steam/hot water; imported and domestically produced energy inputs)"}
+  measure: response
+  unit: percent
+  shock: {size: 10, unit: percent}
+  sign: positive
+  pdf_page: 77
+  point_kind: point
+  uncertainty: {status: not_reported}
+  horizon: {kind: unspecified}
+  method: input_output
+  identification: "Static Leontief cost-push calculation on 2005 symmetric input-output tables: fixed technical coefficients, full cost pass-through, no substitution, constant wages and margins (first-round direct + indirect effects); an accounting computation, not an econometric estimate"
+  applicability: "REVA note: first-round effects with 2005 cost structures; second-round effects (wages, margins, expectations) and monetary policy are excluded; all energy products move together (an upper-side benchmark for a crude-only shock)."
+estimates:
+- id: consumer_prices_total_ie
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.44
+  as_printed: '0.44'
+  scope:
+    countries: [IRL]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'IE'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'IE' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_gr
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.36
+  as_printed: '0.36'
+  scope:
+    countries: [GRC]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'GR'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'GR' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_es
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.32
+  as_printed: '0.32'
+  scope:
+    countries: [ESP]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'ES'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'ES' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_it
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.39
+  as_printed: '0.39'
+  scope:
+    countries: [ITA]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'IT'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'IT' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_nl
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.35
+  as_printed: '0.35'
+  scope:
+    countries: [NLD]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'NL'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'NL' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_at
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.42
+  as_printed: '0.42'
+  scope:
+    countries: [AUT]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'AT'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'AT' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_pt
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.4
+  as_printed: '0.40'
+  scope:
+    countries: [PRT]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'PT'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'PT' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_si
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.61
+  as_printed: '0.61'
+  scope:
+    countries: [SVN]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'SI'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'SI' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_sk
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.63
+  as_printed: '0.63'
+  scope:
+    countries: [SVK]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'SK'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'SK' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: consumer_prices_total_fi
+  pdf_page: 77
+  effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: 'consumer prices before taxes, overall (direct and indirect) impact'}
+  point: 0.34
+  as_printed: '0.34'
+  scope:
+    countries: [FIN]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'FI'
+  locator: Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'FI' (printed p.75)
+  quote: Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22 Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14 Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36
+- id: producer_prices_total_de
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.33
+  as_printed: '0.33'
+  scope:
+    countries: [DEU]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'DE'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''DE'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_ie
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.25
+  as_printed: '0.25'
+  scope:
+    countries: [IRL]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'IE'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''IE'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_gr
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.47
+  as_printed: '0.47'
+  scope:
+    countries: [GRC]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'GR'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''GR'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_es
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.44
+  as_printed: '0.44'
+  scope:
+    countries: [ESP]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'ES'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''ES'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_fr
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.3
+  as_printed: '0.30'
+  scope:
+    countries: [FRA]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'FR'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''FR'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_it
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.4
+  as_printed: '0.40'
+  scope:
+    countries: [ITA]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'IT'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''IT'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_nl
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.79
+  as_printed: '0.79'
+  scope:
+    countries: [NLD]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'NL'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''NL'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_at
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.42
+  as_printed: '0.42'
+  scope:
+    countries: [AUT]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'AT'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''AT'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_pt
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.52
+  as_printed: '0.52'
+  scope:
+    countries: [PRT]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'PT'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''PT'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_si
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.36
+  as_printed: '0.36'
+  scope:
+    countries: [SVN]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'SI'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''SI'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_sk
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.78
+  as_printed: '0.78'
+  scope:
+    countries: [SVK]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'SK'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''SK'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'
+- id: producer_prices_total_fi
+  pdf_page: 75
+  effect: {kind: variable, id: prices.producer_level, transform: percent_change, definition: 'producer prices (all branches), direct and indirect impact'}
+  point: 0.43
+  as_printed: '0.43'
+  scope:
+    countries: [FIN]
+    period: {from: '2005', to: '2005'}
+    sample_note: column 'FI'
+  locator: 'Table 10 ''Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)'', row ''Total'', column ''FI'' (printed p.74)'
+  quote: 'Table 10 Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005) DE IE GR ES FR IT NL AT PT SI SK FI euro area Direct 0.17 0.13 0.27 0.20 0.16 0.19 0.38 0.22 0.25 0.21 0.42 0.22 0.20 Indirect 0.15 0.12 0.21 0.24 0.14 0.21 0.41 0.20 0.28 0.16 0.36 0.21 0.20 Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39'

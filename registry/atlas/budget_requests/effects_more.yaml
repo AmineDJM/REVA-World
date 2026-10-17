@@ -1,0 +1,13 @@
+# Budget request from agent EFFECTS-MORE (V6 effect estimates). One request per curated publication PDF.
+agent: EFFECTS-MORE
+requests:
+  - source_key: effects.literature
+    # 34 curated publications after V6 (one PDF each, 0.3-7.5 MB; ~50 MB per full run); one full run plus retries
+    daily_requests: 100
+    expected_bytes_per_day: 120000000
+    reason: "one full run = one request per curated publication (34 after EFFECTS-MORE); allow a retry run and per-entry reloads"
+daily_totals_increase:
+  http_requests_total: "+60"
+  http_bytes_total: "+80_000_000"
+notes: >-
+  Raw archive: about 33 MB of new PDFs (budget for V6 agents: <= 100 MB).

@@ -1,0 +1,139 @@
+# Early retirement age and retirement decisions, Austria (agent EFFECTS-MORE, V6; archives a source already curated in
+# registry/assumptions/retirement_employment_response.yaml).
+schema: reva-effects-literature/1
+id: manoli_weber_2016
+source_key: effects.literature
+citation:
+  text: "Dayanand S. Manoli and Andrea Weber. The Effects of the Early Retirement Age on Retirement Decisions. NBER Working Paper No. 22561, August 2016."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Manoli & Weber (2016), NBER WP 22561"
+  authors: [Dayanand S. Manoli, Andrea Weber]
+  title: "The Effects of the Early Retirement Age on Retirement Decisions"
+  year: 2016
+  series: NBER Working Paper No. 22561
+  doi: null
+  url: https://www.nber.org/papers/w22561
+document:
+  url: https://www.nber.org/system/files/working_papers/w22561/w22561.pdf
+  media_type: application/pdf
+  sha256: 75a7d5dc9ff72277577e19417012e32f12035c15d3db2f448b89ecad24d8e8ac
+  bytes: 1036455
+  version_read: "NBER Working Paper 22561, August 2016"
+as_of: "2016-08-01"
+rights:
+  licence: "© 2016 by Dayanand S. Manoli and Andrea Weber. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  pdf_page: 32
+  shock_profile: permanent_level_shift
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change,
+          definition: "early retirement age (ERA) increase of the 2000 Austrian pension reform, phased by birth quarter (per year of ERA increase, estimated at the kink)"}
+  measure: slope
+  unit: unit_per_unit
+  method: rdd
+  point_kind: point
+  horizon: {kind: long_run}
+  identification: "Fuzzy regression kink design at the birth-date kink of the ERA schedule (maximum symmetric bandwidth), Austrian administrative social security data"
+  applicability: "REVA note: years of later exit (claiming) per year of ERA increase, a local estimate at the reform's kink."
+estimates:
+- id: exit_age_per_era_year_short_women
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average labour-market exit age (years), women with short contribution years'}
+  point: 0.39
+  as_printed: '0.390'
+  sign: positive
+  uncertainty: {se: 0.062, se_as_printed: '0.062', status: reported}
+  scope:
+    countries: [AUT]
+    population: women with short contribution years
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Exit Age', column 'Short Contribution Years - Women' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: exit_age_per_era_year_short_men
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average labour-market exit age (years), men with short contribution years'}
+  point: 0.358
+  as_printed: '0.358'
+  sign: positive
+  uncertainty: {se: 0.047, se_as_printed: '0.047', status: reported}
+  scope:
+    countries: [AUT]
+    population: men with short contribution years
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Exit Age', column 'Short Contribution Years - Men' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: exit_age_per_era_year_full_women
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average labour-market exit age (years), women (full sample)'}
+  point: 0.391
+  as_printed: '0.391'
+  sign: positive
+  uncertainty: {se: 0.05, se_as_printed: '0.050', status: reported}
+  scope:
+    countries: [AUT]
+    population: women (full sample)
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Exit Age', column 'Full Sample - Women' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: exit_age_per_era_year_full_men
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average labour-market exit age (years), men (full sample)'}
+  point: 0.32
+  as_printed: '0.320'
+  sign: positive
+  uncertainty: {se: 0.03, se_as_printed: '0.030', status: reported}
+  scope:
+    countries: [AUT]
+    population: men (full sample)
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Exit Age', column 'Full Sample - Men' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: claim_age_per_era_year_short_women
+  effect: {kind: variable, id: pension.claiming_age, transform: level_change, definition: 'average pension claiming age (years), women with short contribution years'}
+  point: 0.54
+  as_printed: '0.540'
+  sign: positive
+  uncertainty: {se: 0.059, se_as_printed: '0.059', status: reported}
+  scope:
+    countries: [AUT]
+    population: women with short contribution years
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Claim Age', column 'Short Contribution Years - Women' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: claim_age_per_era_year_short_men
+  effect: {kind: variable, id: pension.claiming_age, transform: level_change, definition: 'average pension claiming age (years), men with short contribution years'}
+  point: 0.539
+  as_printed: '0.539'
+  sign: positive
+  uncertainty: {se: 0.049, se_as_printed: '0.049', status: reported}
+  scope:
+    countries: [AUT]
+    population: men with short contribution years
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Claim Age', column 'Short Contribution Years - Men' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: claim_age_per_era_year_full_women
+  effect: {kind: variable, id: pension.claiming_age, transform: level_change, definition: 'average pension claiming age (years), women (full sample)'}
+  point: 0.496
+  as_printed: '0.496'
+  sign: positive
+  uncertainty: {se: 0.048, se_as_printed: '0.048', status: reported}
+  scope:
+    countries: [AUT]
+    population: women (full sample)
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Claim Age', column 'Full Sample - Women' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'
+- id: claim_age_per_era_year_full_men
+  effect: {kind: variable, id: pension.claiming_age, transform: level_change, definition: 'average pension claiming age (years), men (full sample)'}
+  point: 0.464
+  as_printed: '0.464'
+  sign: positive
+  uncertainty: {se: 0.031, se_as_printed: '0.031', status: reported}
+  scope:
+    countries: [AUT]
+    population: men (full sample)
+    sample_note: Birth cohorts around the kink of the 2000 Austrian pension reform
+  locator: Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A 'Kink Pension Reform 2000', row 'Claim Age', column 'Full Sample - Men' (printed p.30)
+  quote: 'Table 3: Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith Short Contribution Years Full Sample Women Men Women Men A. Kink Pension Reform 2000 Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030) Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031) Observations 83,575 71,880 110,897 133,334'

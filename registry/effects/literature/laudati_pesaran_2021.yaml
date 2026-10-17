@@ -1,0 +1,102 @@
+# Sanctions on an oil exporter: effects on Iran's output growth, exchange rate and inflation (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: laudati_pesaran_2021
+source_key: effects.literature
+citation:
+  text: "Dario Laudati and M. Hashem Pesaran. Identifying the Effects of Sanctions on the Iranian Economy using Newspaper Coverage. arXiv:2110.09400v1 [econ.GN], August 2021."
+  text_basis: assembled from the first page of the version read (arXiv preprint v1)
+  short: "Laudati & Pesaran (2021), arXiv:2110.09400"
+  authors: [Dario Laudati, M. Hashem Pesaran]
+  title: "Identifying the Effects of Sanctions on the Iranian Economy using Newspaper Coverage"
+  year: 2021
+  series: arXiv preprint 2110.09400v1
+  doi: null
+  url: https://arxiv.org/abs/2110.09400v1
+document:
+  url: https://arxiv.org/pdf/2110.09400v1
+  media_type: application/pdf
+  sha256: c6d0edaf461b53c8a51523a41cc45f64f2d432279dcd98ff44701c072df845d6
+  bytes: 4625707
+  version_read: "arXiv:2110.09400v1 (August 2021; a later journal version may differ)"
+as_of: "2021-10-04"
+rights:
+  licence: "arXiv preprint; the licence chosen by the authors is shown on arxiv.org and was not captured in the PDF; treated as all rights reserved; short quotation with credit."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  point_kind: point
+  uncertainty: {status: not_reported}
+  measure: response
+  scope: {countries: [IRN], period: {from: "1989Q1", to: "2020Q1"}, frequency: quarterly}
+estimates:
+  - id: output_growth_loss_median_sanctions
+    pdf_page: 38
+    shock_profile: state_indicator
+    cause: {kind: event_type, id: sanction_episode, transform: occurrence,
+            definition: "sanctions at the median value of the newspaper-based sanctions intensity st over 1989q1-2020q1 (versus no sanctions)"}
+    effect: {kind: variable, id: output.real_gdp_growth, transform: growth_rate, definition: "Iran's output growth, percent per annum"}
+    unit: percentage_points
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -2
+    as_printed: "2"
+    printed_transform: negated
+    horizon: {kind: long_run}
+    method: time_series_regression
+    identification: "Reduced-form output growth equations with the sanctions intensity variable and domestic and foreign controls; long-run effect -0.031 (0.013) (online supplement Table S.9) evaluated at the median of st"
+    locator: "Section 6 (counterfactual output growth), text after the long-run estimate (printed p.37)"
+    quote: "This in turn suggests output growth losses of around 2 per cent per annum if we use the median value of st over the sample under consideration, or 3 per cent if we use the mean value of st"
+    applicability: "REVA note: printed as a loss of around 2 per cent per annum; stored as -2 (printed_transform: negated). Specific to Iran 1989-2020."
+  - id: fx_depreciation_1se_sanctions_shock
+    pdf_page: 33
+    shock_profile: one_time_impulse
+    cause: {kind: variable, id: sanctions.intensity_newspaper, transform: std_dev_shock, definition: "a single quarter (one standard error) shock to sanctions intensity"}
+    effect: {kind: variable, id: exchange_rate.bilateral_depreciation, transform: percent_change, definition: "free-market rial exchange rate (rial per U.S. dollar), depreciation in the same quarter"}
+    unit: percent
+    shock: {size: 1, unit: std_dev}
+    sign: positive
+    point: 3
+    as_printed: "3"
+    horizon: {kind: impact, value: 0, unit: quarter}
+    method: svar
+    identification: "Structural VAR with the newspaper-based sanctions intensity, the free-market exchange rate, inflation and output growth (Figure 3; bands in the figure only)"
+    locator: "Section 5, impulse responses to the sanction shock (Figure 3, panel A) (printed p.31)"
+    quote: "A single quarter shock to sanctions intensity causes the foreign exchange rate to depreciate by about 3 per cent in the same quarter"
+  - id: inflation_1se_sanctions_shock_first_year
+    pdf_page: 33
+    shock_profile: one_time_impulse
+    cause: {kind: variable, id: sanctions.intensity_newspaper, transform: std_dev_shock, definition: "a single quarter (one standard error) shock to sanctions intensity"}
+    effect: {kind: variable, id: prices.inflation_rate, transform: pp_change, definition: "inflation, percent per quarter, increase in the first year after the shock"}
+    unit: percentage_points
+    shock: {size: 1, unit: std_dev}
+    sign: positive
+    point: 0.3
+    as_printed: "0.3"
+    horizon: {kind: average, value: 1, unit: year}
+    method: svar
+    identification: "Structural VAR with the newspaper-based sanctions intensity, the free-market exchange rate, inflation and output growth (Figure 3)"
+    locator: "Section 5, impulse responses to the sanction shock (Figure 3, panel A) (printed p.31)"
+    quote: "Its effects on inflation are particularly persistent and last at least for four years after the shock, although its magnitude is relatively small: 0.3 per cent increase per quarter in the first year"
+  - id: real_gdp_2011_2014_sanctions_gharehgozli
+    pdf_page: 15
+    evidence: secondary
+    shock_profile: state_indicator
+    cause: {kind: event_type, id: sanction_episode, transform: occurrence, definition: "the 2011-2014 intensification of sanctions on Iran ('sanctions on' period) versus a synthetic sanctions-free Iran"}
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: "Iran's real GDP relative to the synthetic control"}
+    unit: percent
+    shock: {size: 1, unit: occurrence}
+    sign: negative
+    point: -17
+    as_printed: "17"
+    printed_transform: negated
+    horizon: {kind: cumulative, value: 4, unit: year}
+    method: synthetic_control
+    scope: {countries: [IRN], period: {from: "1995", to: "2014"}, frequency: annual, sample_note: "Gharehgozli (2017): 1995-2010 'sanctions off', 2011-2014 'sanctions on'; synthetic Iran from 13 countries"}
+    identification: "As cited by Laudati and Pesaran: Gharehgozli (2017), synthetic control method"
+    locator: "Section 2 (literature review), synthetic control studies (printed p.13)"
+    quote: "She concludes that the 2011-2014 sanctions resulted in Iran’s real GDP to fall by as much as 17 per cent"
+    applicability: "REVA note: number of Gharehgozli (2017) as reported by Laudati and Pesaran (secondary evidence; 'as much as'), stored as -17 (printed_transform: negated); all of the output shortfall is attributed to sanctions by that study."

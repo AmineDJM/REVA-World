@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.31"
+policy_version: "budgets-1.3.32"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -73,8 +73,8 @@ per_source_daily_requests:
   ecb.stats: 28
   # ecdc.erviss: requested by PRED-HEALTH (pred_health.yaml)
   ecdc.erviss: 10
-  # effects.literature: requested by PRED-EFFECT (pred_effect.yaml)
-  effects.literature: 40
+  # effects.literature: requested by EFFECTS-MORE (effects_more.yaml), PRED-EFFECT (pred_effect.yaml)
+  effects.literature: 100
   # eia.dnav: requested by PRED-HF (pred_hf.yaml)
   eia.dnav: 32
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)

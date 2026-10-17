@@ -114,9 +114,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # * budgets.yaml -> budgets-1.3.31 (2026-10-17, merge run and pinned by V6FINDATA): 1.3.30 plus v6findata.yaml (new
 #   frb.releases 8/day, kfrench.library 12/day; bis.stats 14 -> 24, bis.bulk 6 -> 14, ecb.stats 12 -> 28,
 #   boe.iadb 8 -> 16, imf.sdmx 76 -> 80) and the requests pending at merge time; same caps.
+# * budgets.yaml -> budgets-1.3.32 (2026-10-17, merge run and pinned by EFFECTS-MORE): 1.3.31 plus effects_more.yaml
+#   (effects.literature 40 -> 100/day: one request per curated publication, 34 after V6); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "0a7ffaec595c571de4b5837510acac2d192091aff86e4887c158edf5660bbabc",
+    "budgets.yaml": "2507d2951326349e8d12a6b0e34b0b7a1470f29ef07f3150a755983f67decb4f",
 }
 
 

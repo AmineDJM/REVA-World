@@ -1,0 +1,51 @@
+# Export restrictions and international food prices, 2008-10 (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: giordani_rocha_ruta_2012
+source_key: effects.literature
+citation:
+  text: "Paolo E. Giordani, Nadia Rocha, Michele Ruta. Food Prices and the Multiplier Effect of Export Policy. World Trade Organization Staff Working Paper ERSD-2012-08, April 2012."
+  text_basis: assembled from the title page of the version read (WTO staff working paper)
+  short: "Giordani, Rocha & Ruta (2012), WTO ERSD-2012-08"
+  authors: [Paolo E. Giordani, Nadia Rocha, Michele Ruta]
+  title: "Food Prices and the Multiplier Effect of Export Policy"
+  year: 2012
+  series: WTO Staff Working Paper ERSD-2012-08
+  doi: null
+  url: https://www.wto.org/english/res_e/reser_e/ersd201208_e.pdf
+document:
+  url: https://www.wto.org/english/res_e/reser_e/ersd201208_e.pdf
+  media_type: application/pdf
+  sha256: df454275925bfeb157de09d829f24345c0daead710946a18ae60670b703b910a
+  bytes: 823059
+  version_read: "WTO Staff Working Paper ERSD-2012-08, April 2012"
+as_of: "2012-04-01"
+rights:
+  licence: "No licence statement in the document read (WTO staff working paper, free download; 'not meant to represent the position or opinions of the WTO'); treated as all rights reserved; short quotation with credit."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: contemporaneous_relation
+  cause: {kind: variable, id: trade.export_restriction_share, transform: log_change,
+          definition: "global export restrictions on product k: share of world trade of the product covered by export restrictions (log)"}
+  effect: {kind: variable, id: prices.international_food_commodity, transform: log_change, definition: "international price of food product k (log)"}
+  measure: elasticity
+  unit: ratio
+  method: iv
+  point_kind: point
+  horizon: {kind: impact, value: 0, unit: month}
+  scope: {countries: [WLD], period: {from: "2008", to: "2010"}, sample_note: "29 food products, 2008-10 food crisis period; 595 observations"}
+  identification: "Two-stage least squares on a system of world price and global export restriction equations with product and time fixed effects; instrument: proximity of elections in top producing countries; controls for rainfall in top producers and energy prices"
+  applicability: "REVA note: average over 29 food products in 2008-10; the authors call it a conservative estimate for staple foods. The cause is the share of world trade covered by restrictions (log), not the occurrence of one country's ban."
+estimates:
+- id: food_price_elasticity_global_export_restrictions
+  pdf_page: 42
+  point: 1.103
+  as_printed: '1.103'
+  sign: positive
+  uncertainty: {se: 0.584, se_as_printed: '0.584', status: reported}
+  locator: 'Table 7 ''Impact of export restrictions on international food prices'', second-stage results, row ''log Global Export Restrictions'' (standard errors in brackets) (printed p.41); text p.25: ''an increase by 1 per cent in the share of trade covered by export restrictions, raises international prices by 1.1 per cent on average'''
+  quote: 'Table 7: Impact of export restrictions on international food prices Second stage results log Global Export Restrictionst 1.103* [0.584]'

@@ -1,0 +1,155 @@
+# Food price insulation (export restrictions and import-barrier cuts) and world food prices, 2006-08 (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: anderson_ivanic_martin_2013
+source_key: effects.literature
+citation:
+  text: "Kym Anderson, Maros Ivanic, and Will Martin. Food Price Spikes, Price Insulation and Poverty. NBER Working Paper No. 19530, October 2013."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Anderson, Ivanic & Martin (2013), NBER WP 19530"
+  authors: [Kym Anderson, Maros Ivanic, Will Martin]
+  title: "Food Price Spikes, Price Insulation and Poverty"
+  year: 2013
+  series: NBER Working Paper No. 19530
+  doi: null
+  url: http://www.nber.org/papers/w19530
+document:
+  url: https://www.nber.org/system/files/working_papers/w19530/w19530.pdf
+  media_type: application/pdf
+  sha256: 7539fd64f6cf070251d6fdc05920f69a67ffb177f1ccfac753b4b858e7a7f8df
+  bytes: 651443
+  version_read: "NBER Working Paper 19530, October 2013"
+as_of: "2013-10-01"
+rights:
+  licence: "© 2013 by Kym Anderson, Maros Ivanic, and Will Martin. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: state_indicator
+  cause: {kind: variable, id: trade.price_insulation_global, transform: level_change,
+          definition: "all countries' price-insulating behavior during 2006-08 (observed changes in trade protection: export restrictions and taxes, import barrier reductions) versus refraining from insulating"}
+  measure: response
+  unit: percent
+  shock: {size: 1, unit: occurrence}
+  method: calibration
+  point_kind: point
+  uncertainty: {status: not_reported}
+  horizon: {kind: unspecified}
+  identification: "Partial-equilibrium computation from observed annual changes in nominal protection (domestic vs border prices) in up to 103 countries covering over 90 percent of world markets, under stated supply and demand elasticity assumptions (Distortions to Agricultural Incentives database and FAO data)"
+  applicability: "REVA note: effect of the 2006-08 insulating behaviour of ALL countries together on the international price (a counterfactual computation for one historical episode), not the effect of a single country's export ban; not scalable to one country without further modelling."
+estimates:
+- id: world_price_edible_oils_no_supply_response
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of edible oils, % change attributable to insulation 2006-08 (Assuming no supply response)'}
+  point: 30.9
+  as_printed: '30.9'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 96
+    sample_note: 'Edible oils: 96 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Edible oils', column 'Assuming no supply response' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_edible_oils_es1_ed_minus02
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of edible oils, % change attributable to insulation 2006-08 (Assuming es=1 and ed=-0.2)'}
+  point: 25.5
+  as_printed: '25.5'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 96
+    sample_note: 'Edible oils: 96 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Edible oils', column 'Assuming es=1 and ed=-0.2' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_maize_no_supply_response
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of maize, % change attributable to insulation 2006-08 (Assuming no supply response)'}
+  point: 18.0
+  as_printed: '18'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 103
+    sample_note: 'Maize: 103 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Maize', column 'Assuming no supply response' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_maize_es1_ed_minus02
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of maize, % change attributable to insulation 2006-08 (Assuming es=1 and ed=-0.2)'}
+  point: 17.3
+  as_printed: '17.3'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 103
+    sample_note: 'Maize: 103 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Maize', column 'Assuming es=1 and ed=-0.2' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_rice_no_supply_response
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of rice, % change attributable to insulation 2006-08 (Assuming no supply response)'}
+  point: 51.9
+  as_printed: '51.9'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 82
+    sample_note: 'Rice: 82 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Rice', column 'Assuming no supply response' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_rice_es1_ed_minus02
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of rice, % change attributable to insulation 2006-08 (Assuming es=1 and ed=-0.2)'}
+  point: 50.5
+  as_printed: '50.5'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 82
+    sample_note: 'Rice: 82 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Rice', column 'Assuming es=1 and ed=-0.2' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_wheat_no_supply_response
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of wheat, % change attributable to insulation 2006-08 (Assuming no supply response)'}
+  point: 17.6
+  as_printed: '17.6'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 87
+    sample_note: 'Wheat: 87 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Wheat', column 'Assuming no supply response' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'
+- id: world_price_wheat_es1_ed_minus02
+  pdf_page: 30
+  effect: {kind: variable, id: prices.international_food_commodity, transform: percent_change, definition: 'international price of wheat, % change attributable to insulation 2006-08 (Assuming es=1 and ed=-0.2)'}
+  point: 16.2
+  as_printed: '16.2'
+  sign: positive
+  scope:
+    countries: [WLD]
+    period: {from: '2006', to: '2008'}
+    frequency: annual
+    n_countries: 87
+    sample_note: 'Wheat: 87 countries included (Table 3)'
+  locator: Table 3 'Impacts of domestic market insulation on international prices, 2006–08', row 'Wheat', column 'Assuming es=1 and ed=-0.2' (printed p.28)
+  quote: 'Table 3: Impacts of domestic market insulation on international prices, 2006-08 Assuming no Assuming Share of world Share of world Number of supply response es=1 and consumption production countries ed=-0.2. % covered, % covered, % included Edible oils 30.9 25.5 95 97 96 Maize 18 17.3 93.8 97.2 103 Rice 51.9 50.5 91.8 93.9 82 Wheat 17.6 16.2 92.9 97.2 87'

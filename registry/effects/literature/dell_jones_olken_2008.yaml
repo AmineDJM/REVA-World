@@ -42,7 +42,7 @@ defaults:
 estimates:
 - id: growth_poor_temperature_0_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; contemporaneous effect'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), poor countries; contemporaneous effect'}
   point: -1.087
   as_printed: '-1.087'
   sign: negative
@@ -53,7 +53,7 @@ estimates:
   quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
 - id: growth_poor_temperature_1_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 1 lag(s) (cumulated effect)'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 1 lag(s) (cumulated effect)'}
   point: -1.304
   as_printed: '-1.304'
   sign: negative
@@ -64,7 +64,7 @@ estimates:
   quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
 - id: growth_poor_temperature_3_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 3 lag(s) (cumulated effect)'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 3 lag(s) (cumulated effect)'}
   point: -1.605
   as_printed: '-1.605'
   sign: negative
@@ -75,7 +75,7 @@ estimates:
   quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
 - id: growth_poor_temperature_5_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 5 lag(s) (cumulated effect)'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 5 lag(s) (cumulated effect)'}
   point: -1.718
   as_printed: '-1.718'
   sign: negative
@@ -86,7 +86,7 @@ estimates:
   quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
 - id: growth_poor_temperature_10_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 10 lag(s) (cumulated effect)'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), poor countries; sum of the temperature coefficient and its 10 lag(s) (cumulated effect)'}
   point: -2.006
   as_printed: '-2.006'
   sign: negative
@@ -97,7 +97,7 @@ estimates:
   quote: Sum of all temp. coeff. -1.087** -1.304* -1.605** -1.718** -2.006** -1.074** -1.275* -1.576** -1.662** -1.946** in poor countries (0.442) (0.677) (0.641) (0.720) (0.866)
 - id: growth_rich_temperature_no_lags
   pdf_page: 40
-  effect: {kind: variable, id: output.real_gdp_per_capita, transform: growth_rate, definition: 'annual growth rate of per-capita output (PWT), rich countries; contemporaneous effect (Temperature × Rich)'}
+  effect: {kind: variable, id: output.real_gdp_per_capita_growth, transform: pp_change, definition: 'annual growth rate of per-capita output (PWT), rich countries; contemporaneous effect (Temperature × Rich)'}
   point: 0.219
   as_printed: '0.219'
   sign: positive
