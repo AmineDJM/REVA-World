@@ -292,10 +292,10 @@ def _meeting_text(q: Mapping[str, Any]) -> tuple[str, str]:
     return (
         f"« {q['label_fr']} » : le taux en vigueur le {ev['level_day']} (réunion {ev['body']}, décision le "
         f"{ev['decision_day']}) sera-t-il strictement {'supérieur' if up else 'inférieur'} au niveau en vigueur à "
-        f"l'émission ({ev['basis_value']} {q['unit']}, dernier jour publié {ev['basis_day']}) ?",
+        f"l'émission ({ev['basis_value']} %, dernier jour publié {ev['basis_day']}) ?",
         f"'{q['label_en']}': will the rate in force on {ev['level_day']} ({ev['body']} meeting, decision on "
         f"{ev['decision_day']}) be strictly {'above' if up else 'below'} the level in force when asked "
-        f"({ev['basis_value']} {q['unit']}, last published day {ev['basis_day']})?",
+        f"({ev['basis_value']} %, last published day {ev['basis_day']})?",
     )
 
 

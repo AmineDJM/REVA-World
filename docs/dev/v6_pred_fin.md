@@ -189,9 +189,35 @@ See §9: the finance families' benchmark forecasts (and no candidate) sealed und
 5. Licence market-implied benchmarks (futures/OIS/forwards) — without them the meeting and FX evaluations miss the
    strongest reference.
 
-## 9. Live runs (dev DB, 2026-10-17)
+## 9. Live runs (dev DB, 2026-10-17, writes under `flock /tmp/reva-devdb.lock`)
 
-(filled below)
+* `reva seed`: 9 `fin.*` model versions registered (candidate status).
+* `reva atlas ingest atlas.cb_calendars` (free disk 5.4 GB): 6 requests, 624,345 bytes archived (budget
+  `budgets-1.3.32`, `cbcal.calendars` 14/day), table `cbcal.meetings` **90 rows**: FOMC 56 decision days
+  (2021-01-27 … 2027-12-08; one notation vote skipped), ECB Governing Council 18 (2026-10-29 … 2028-12-07; one
+  unlabelled first day of a two-day meeting skipped), BoE MPC 16 (2026-02-05 … 2027-12-16); 3/3 licence quotes and
+  4/4 page quotes found on the archived pages. Example: `POLICY_DECISION|body=FOMC` / `US` / 2026-10-28,
+  value_text "2026 FOMC Meetings: October 27-28", flags.estimate_kind `announced_schedule`.
+* Back-test recorded: manifest sha256 `c5a53a653cc4c1996d43caa277c12805dc420ac20906e8f9df91c7849bcdebf3`
+  (`model.evaluation` rows `metrics.kind = finance_backtest`, replay mode `revised_data_retrospective`), copy in
+  `docs/dev/v6_pred_fin_backtest.json`; **winners: none**.
+* Sealed batch `6f19e6711db83adbef582e99643a37f3de7cf05b221530e66dc90a141c9fe2d1` (cycle 2026-Q4, issued
+  2026-10-17 21:09:07 UTC): **160 questions, 764 forecasts** (17 abstentions: AR non-stationary fits) — FX month end
+  5 × 9, UST 10y 9, 2s10s 9, policy meetings 12 (2 per family: FOMC 2026-10-28 / 12-09, ECB 2026-10-29 / 12-17, BoE
+  2026-11-05 / 12-17), ECB monthly means 14, Brent monthly mean 11, and PRED-REGISTRY's pending `bis.policy_rate_daily`
+  60. Finance forecasters issued: `fin.rw_histvol` 88, `fin.fx_forward_cip` 59, `fin.ust_eh_forward` 18,
+  `fin.meeting_base_rate` 12, `fin.meeting_momentum` 12; candidates 0. Pinned tables: ecb.fx_ref, bis.cbpol_d,
+  ust.par_yield, eia.spot_d, nyfed.rates_d, ecb.key_rates, boe.rates_d, cbcal.meetings.
+* Examples: `fq_56efb10f91c45600d77fcf8c` "Will EUR/USD (month end) for 2026-11 be strictly above 1.1355 (latest
+  month-end, 2026-09)?" — P(yes): random walk 0.318 (latest daily value 1.1253), forward proxy 0.353, monthly
+  persistence 0.5. `fq_aeefdd807fd1fbd2bff396a8` "ECB DFR in force on 2026-11-05 (decision 2026-10-29) strictly
+  above 2.5 %?" — base rate 0.063, momentum 0.217. `fq_fb30048ea8cf3dec3bc6b7b3` FOMC cut at the 2026-10-28
+  meeting — base rate 0.056, momentum 0.018. `fq_416f768888d35e95b1390ee6` 2s10s above 0.41 in 2026-11 — random walk
+  0.347, EH forward 0.276.
+* Known wording defect in this sealed batch: the meeting question text prints the basis level with the family unit
+  ("4.00 percentage points") — the level is in percent; the frozen text cannot change (fixed for later batches; the
+  value and rule fields are unambiguous: `event.basis_value`, `resolution.basis`).
+* Not run here (lead's job): `reva atlas snapshot`, `reva links materialise`.
 
 ## 10. Commands
 
@@ -205,4 +231,5 @@ uv run python -m reva.cli.fin_backtest --out docs/dev/v6_pred_fin_backtest.json 
 flock /tmp/reva-devdb.lock uv run reva forecasts issue --family fin.fx_eurusd_month_end ...  # see §9 for the list
 ```
 A candidate joins a family's `finance.forecasters` only by an explicit spec edit citing the back-test sha256 and
-the winning cells (none today).
+the winning cells (none today). The admission is per family (all horizons); a per-horizon gate would be needed if a
+candidate ever wins on some horizons only (not implemented: no winner).
