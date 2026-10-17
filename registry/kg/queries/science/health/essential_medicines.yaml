@@ -1,0 +1,20 @@
+id: science.health_essential_medicines
+domain: science
+owner: V4HEALTH
+description: >-
+  Seeds every Wikidata item that has a direct statement pointing to the item labelled (en) exactly "WHO Model List
+  of Essential Medicines" (membership is modelled with P361 / P1343 depending on the item; the anchor is selected by
+  its exact English label because its QID was not resolvable while WDQS was throttled on 2026-10-17 -- WDHARVEST:
+  pin the QID in a VALUES clause after the first run). Snapshots keep the allow-listed claims, incl. PubChem CID
+  (P662) and ChEBI ID (P683) once allow-listed (requested by V4CHEM): the identity hand-off from an essential
+  medicine to V4CHEM's compounds, by identifier only. P2175 (medical condition treated) is requested by V4HEALTH.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?eml rdfs:label "WHO Model List of Essential Medicines"@en .
+    ?item ?p ?eml .
+    FILTER(STRSTARTS(STR(?item), "http://www.wikidata.org/entity/Q"))
+  }
+max_rows: 3000
+expand_hops: 1

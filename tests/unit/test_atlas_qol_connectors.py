@@ -175,7 +175,17 @@ async def test_whr_three_year_windows_aliases_and_licence_flag() -> None:
 # ----------------------------------------------------------------------------- OWID
 async def test_owid_tables_keep_original_sources_and_exclude_pass_through_columns() -> None:
     out = await _builds(atlas_owid.OwidConnector(), FixtureHttp("atlas.owid"))
-    assert set(out) == {"owid.energy", "owid.co2", "owid.g_ghg_by_sector", "owid.g_temperature_anomaly"}
+    assert set(out) == {
+        "owid.energy",
+        "owid.co2",
+        "owid.g_ghg_by_sector",
+        "owid.g_temperature_anomaly",
+        "owid.g_living_planet_index",  # V4ECO: WWF/ZSL published LPI trends
+    }
+    _b, lpi, unm_lpi = out["owid.g_living_planet_index"]
+    assert {"Freshwater", "Marine", "Terrestrial", "OWID_WRL"} <= {u["provider_geo"] for u in unm_lpi}
+    w = _cell(lpi, indicator="lpi_final", provider_geo="OWID_WRL", period_start=date(2022, 1, 1))
+    assert 0 < float(w["value"]) < 1 and w["unit"] == "(1970 = 1)"
     _b, energy, unm = out["owid.energy"]
     assert not energy.filter(pl.col("indicator").is_in(["population", "gdp"])).height
     cell = _cell(energy, indicator="renewables_share_elec", iso3="FRA", period_start=date(2023, 1, 1))

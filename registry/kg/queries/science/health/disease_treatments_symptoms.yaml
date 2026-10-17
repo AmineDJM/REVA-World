@@ -1,0 +1,26 @@
+id: science.health_disease_treatments_symptoms
+domain: science
+owner: V4HEALTH
+description: >-
+  For every Wikidata item with a Disease Ontology ID (P699): "drug or therapy used for treatment" (P2176) and
+  "symptoms and signs" (P780) statements, with statement nodes (re-read from wbgetentities with their references).
+  Community-edited associations: P780 maps to associated_with (V4CORE), P2176 is requested here and maps to nothing
+  causal (a treatment use is not a causal claim in REVA). Objects are expanded (labels) so drugs and symptoms are
+  labelled; drug identity (PubChem CID P662 / ChEBI P683) comes with the drug snapshots of
+  science.health_essential_medicines and V4CHEM's specs.
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    VALUES ?prop { wd:P2176 wd:P780 }
+    ?item wdt:P699 ?doid .
+    ?prop wikibase:claim ?claim ; wikibase:statementProperty ?ps .
+    ?item ?claim ?statement .
+    ?statement ?ps ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    {{qid_filter}}
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+split: {by: qid_prefix}
+max_rows: 60000
+expand_hops: 1

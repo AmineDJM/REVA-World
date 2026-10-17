@@ -30,6 +30,9 @@ kg_app = typer.Typer(no_args_is_help=True, help="V3 knowledge graph: governed im
 app.add_typer(kg_app, name="kg")
 events_app = typer.Typer(no_args_is_help=True, help="V3 events: evidence-based same_as identity links")
 app.add_typer(events_app, name="events")
+from reva.estimation.cli import estimate_app  # noqa: E402  (V5 PRED-EVENTSTUDY)
+
+app.add_typer(estimate_app, name="estimate")
 forecasts_app = typer.Typer(no_args_is_help=True, help="V5 prospective forecast registry (PRED-REGISTRY)")
 app.add_typer(forecasts_app, name="forecasts")
 

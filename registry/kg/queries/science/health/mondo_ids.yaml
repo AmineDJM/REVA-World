@@ -1,0 +1,22 @@
+id: science.health_mondo_ids
+domain: science
+owner: V4HEALTH
+description: >-
+  Wikidata items carrying a MonDO ID (P5270), with the statement node so the claim is re-read from wbgetentities. This is the
+  identifier bridge Wikidata QID <-> mondo:<n> that V4LINK uses to join the V4HEALTH ontology entities (loaded from the
+  ontology files themselves) to the V3 world graph: an external-id statement Wikidata publishes (community-edited),
+  never a name match. P5270 is requested in registry/kg/property_requests/v4health.yaml; rows are skipped until it is
+  allow-listed.
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    ?item p:P5270 ?statement .
+    ?statement ps:P5270 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    BIND(wd:P5270 AS ?prop)
+    {{qid_filter}}
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+split: {by: qid_prefix}
+max_rows: 80000

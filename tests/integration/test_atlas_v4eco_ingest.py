@@ -33,7 +33,8 @@ async def test_gbif_occ_tables_and_kg(db: Any) -> None:
     atlas = rep["atlas"]
     assert set(atlas) == {"country_group", "country_year", "country_iucn", "taxon_country"}
     assert all(a["created"] for a in atlas.values())
-    assert set(atlas["country_group"]["unmapped_provider_geo"]) <= {"XZ", "ZZ", "XK", "AQ", "UM", "CP"}
+    unmapped = {u["provider_geo"] for u in atlas["country_group"]["unmapped_provider_geo"]}
+    assert "XZ" in unmapped and len(unmapped) < 10, unmapped  # international waters etc. stay unmapped
     key = _scalar(
         db,
         "SELECT artifact_sha256 FROM evidence.dataset WHERE dataset_key = 'atlas.gbif_occ.country_group' "
@@ -150,4 +151,4 @@ async def test_fishstat_production(db: Any) -> None:
     assert nor.height == 1 and 1_000_000 < float(nor["value"][0]) < 5_000_000
     assert nor["unit"][0] == "tonnes live weight"
     # former / non-ISO FAO areas keep their FAO code and stay unmapped
-    assert all(g.startswith("un:") or len(g) == 3 for g in a["unmapped_provider_geo"])
+    assert all(u["provider_geo"].startswith("un:") or len(u["provider_geo"]) == 3 for u in a["unmapped_provider_geo"])

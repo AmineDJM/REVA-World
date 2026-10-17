@@ -1,0 +1,137 @@
+# Exchange-rate pass-through in the euro area (agent PRED-EFFECT), ECB Occasional Paper 241.
+schema: reva-effects-literature/1
+id: ortega_osbat_2020
+source_key: effects.literature
+citation:
+  text: "Eva Ortega and Chiara Osbat (eds.). Exchange rate pass-through in the euro area and EU countries. ECB Occasional Paper Series No 241, April 2020."
+  text_basis: assembled from the cover and page footers of the version read (ECB occasional paper)
+  short: "Ortega & Osbat (eds., 2020), ECB Occasional Paper 241"
+  authors: [Eva Ortega (editor), Chiara Osbat (editor)]
+  title: "Exchange rate pass-through in the euro area and EU countries"
+  year: 2020
+  series: ECB Occasional Paper Series No 241
+  doi: null
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op241~c7c3080d60.en.pdf
+document:
+  url: https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op241~c7c3080d60.en.pdf
+  media_type: application/pdf
+  sha256: 60034888cc2ca2e746e8ecc8df6d21ec599e1aa2b6b685c41e01f41a9908bf0a
+  bytes: 1534158
+  version_read: ECB Occasional Paper No 241, April 2020
+as_of: "2020-04-30"
+rights:
+  licence: "© European Central Bank, 2020. All rights reserved. Any reproduction, publication and reprint in the form of a different publication, whether printed or produced electronically, in whole or in part, is permitted only with the explicit written authorisation of the ECB or the authors."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change,
+          definition: "a 1% depreciation in the euro (nominal effective exchange rate)"}
+  measure: response
+  unit: percent
+  shock: {size: 1, unit: percent}
+  sign: positive
+  pdf_page: 14
+  method: time_series_regression
+estimates:
+  - id: ea_import_prices_1y
+    effect: {kind: variable, id: prices.import_level, transform: percent_change,
+             definition: "total import prices in the euro area and its member countries"}
+    point: 0.30
+    point_kind: mean
+    as_printed: "0.30"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 1, unit: year}
+    scope: {country_group: "euro area and its member countries (average)"}
+    identification: "Reduced-form models estimated for this paper over a common sample and specification for EU Member States"
+    locator: "Section 1 (overview of ERPT estimates), printed p.13 (sentence begun on p.12)"
+    quote: "and its member countries, on average, by around 0.30% within a year, and headline HICP inflation by around 0.03% (ranging from -0.06% to 0.17%)."
+    source_caveats: "Both estimates lie on the low side of the range of those found in the literature."
+  - id: ea_hicp_1y
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change,
+             definition: "headline HICP (consumer prices) in the euro area and its member countries"}
+    point: 0.03
+    point_kind: mean
+    as_printed: "0.03"
+    uncertainty: {ci_low: -0.06, ci_high: 0.17, interval_kind: range_across_estimates, status: partial}
+    horizon: {kind: at_horizon, value: 1, unit: year}
+    scope: {country_group: "euro area and its member countries (average; range across countries)"}
+    identification: "Reduced-form models estimated for this paper over a common sample and specification for EU Member States"
+    locator: "Section 1 (overview of ERPT estimates), printed p.13"
+    quote: "and its member countries, on average, by around 0.30% within a year, and headline HICP inflation by around 0.03% (ranging from -0.06% to 0.17%)."
+    source_caveats: "Both estimates lie on the low side of the range of those found in the literature."
+  - id: ea_import_prices_tv_bayesian_avg
+    effect: {kind: variable, id: prices.import_level, transform: percent_change,
+             definition: "total import prices (extra plus intra euro area)"}
+    point: 0.22
+    point_kind: mean
+    as_printed: "0.22"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {country_group: euro area, period: {from: "1999Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "estimation sample Q2 1997-Q4 2019; value = Q1 1999-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 1 'Empirical estimates for the ERPT to import and consumer prices for the euro area (percentage impact (after four quarters) following a 1% depreciation in the euro nominal effective exchange rate)', row 'Author calculations', column 'ERPT to total import prices' (printed p.13)"
+    quote: "Author calculations Q2 1997-Q4 2019 Time-varying estimate using 0.22 0.01"
+  - id: ea_consumer_prices_tv_bayesian_avg
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change,
+             definition: "consumer prices (euro area)"}
+    point: 0.01
+    point_kind: mean
+    as_printed: "0.01"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {country_group: euro area, period: {from: "2000Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "estimation sample Q2 1997-Q4 2019; value = Q1 2000-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 1, row 'Author calculations', column 'ERPT to consumer prices' (printed p.13)"
+    quote: "Author calculations Q2 1997-Q4 2019 Time-varying estimate using 0.22 0.01"
+  - id: deu_hicp_tv_bayesian_avg
+    pdf_page: 15
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: "HICP (Germany)"}
+    point: 0.05
+    point_kind: mean
+    as_printed: "0.05"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {countries: [DEU], period: {from: "2000Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "Country as printed: DE; Q1 2000-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 2 'Empirical estimates for the ERPT to import and consumer prices for the largest euro area countries (percentage impact in the short run (after four quarters) following a 1% depreciation)', row 'Author calculations', column DE (printed p.14)"
+    quote: "Author Q2 1997- Time-varying estimate HICP: 0.05 HICP: 0.03 HICP: 0.04 HICP: 0.09"
+  - id: fra_hicp_tv_bayesian_avg
+    pdf_page: 15
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: "HICP (France)"}
+    point: 0.03
+    point_kind: mean
+    as_printed: "0.03"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {countries: [FRA], period: {from: "2000Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "Country as printed: FR; Q1 2000-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 2, row 'Author calculations', column FR (printed p.14)"
+    quote: "Author Q2 1997- Time-varying estimate HICP: 0.05 HICP: 0.03 HICP: 0.04 HICP: 0.09"
+  - id: ita_hicp_tv_bayesian_avg
+    pdf_page: 15
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: "HICP (Italy)"}
+    point: 0.04
+    point_kind: mean
+    as_printed: "0.04"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {countries: [ITA], period: {from: "2000Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "Country as printed: IT; Q1 2000-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 2, row 'Author calculations', column IT (printed p.14)"
+    quote: "Author Q2 1997- Time-varying estimate HICP: 0.05 HICP: 0.03 HICP: 0.04 HICP: 0.09"
+  - id: esp_hicp_tv_bayesian_avg
+    pdf_page: 15
+    effect: {kind: variable, id: prices.consumer_level, transform: percent_change, definition: "HICP (Spain)"}
+    point: 0.09
+    point_kind: mean
+    as_printed: "0.09"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    scope: {countries: [ESP], period: {from: "2000Q1", to: "2019Q4"}, frequency: quarterly, sample_note: "Country as printed: ES; Q1 2000-Q4 2019 average of a time-varying estimate"}
+    identification: "Time-varying estimate using Bayesian single equation (author calculations)"
+    locator: "Table 2, row 'Author calculations', column ES (printed p.14)"
+    quote: "Author Q2 1997- Time-varying estimate HICP: 0.05 HICP: 0.03 HICP: 0.04 HICP: 0.09"

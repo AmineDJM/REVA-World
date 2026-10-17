@@ -74,7 +74,10 @@ async def test_health_layer_fixture_ingest(db: Any) -> None:
     )
     assert cl and all(r.object_qid.startswith("mondo:") for r in cl) and cl[0].qualifiers["classification"]
     # causal claims (T1, codebook quoted) when CAUSCORE is present
-    for n, effect, cause in (("atlas.doid", "doid:399", "ncbitaxon:1773"), ("atlas.mondo", "mondo:0007739", "hgnc:4851")):
+    for n, effect, cause in (
+        ("atlas.doid", "doid:399", "ncbitaxon:1773"),
+        ("atlas.mondo", "mondo:0007739", "hgnc:4851"),
+    ):
         res = out[n]["summary"]["causal"]
         ds = "doid" if n == "atlas.doid" else "mondo"
         if not cd.causal_available(db.worker):
@@ -89,7 +92,7 @@ async def test_health_layer_fixture_ingest(db: Any) -> None:
             c=cause,
         )
         assert len(claim) == 1 and claim[0].source_tier == "T1", claim
-        assert claim[0].codebook["definition"].startswith(("\"", "[no definition"))
+        assert claim[0].codebook["definition"].startswith(('"', "[no definition"))
         assert claim[0].codebook.get("quote_source", {}).get("sha256")
     # GHE atlas table
     ghe = out["atlas.who_ghe"]["summary"]["atlas"]

@@ -36,3 +36,5 @@ mappings:
   - {property: 'mondo:in_taxon', family: context, subtype: mondo_in_taxon, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002162'}
   - {property: 'mondo:transmitted_by', family: context, subtype: mondo_transmitted_by, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002451'}
   - {property: 'clingen:gene_disease_validity', family: associated_with, subtype: clingen_gene_disease_validity, source: clingen.gene_validity, subject_kinds: [gene], object_kinds: [disease], note: ClinGen classification (Definitive ... Refuted) grades the evidence for the association; not a causal claim}
+  - {property: P2176, family: associated_with, subtype: drug_used_for_treatment, source: wikidata, subject_kinds: [disease], note: 'requested by V4HEALTH; a treatment use is an association, never a causal claim'}
+  - {property: P2175, family: associated_with, subtype: medical_condition_treated, source: wikidata, object_kinds: [disease], note: 'requested by V4HEALTH; inverse view of P2176 on drug items'}

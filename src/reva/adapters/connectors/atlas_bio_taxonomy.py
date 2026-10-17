@@ -582,13 +582,14 @@ async def ingest_gbif(run: Any) -> dict[str, Any]:
         return {"skipped": True}
     scope = load_scope()
     opts = run.options or {}
-    ranks = tuple(opts.get("ranks") or HIGHER_RANKS)
+    ranks = tuple(bc.opt_list(opts.get("ranks")) or HIGHER_RANKS)
     if any(r not in HIGHER_RANKS for r in ranks):
         raise ValidationProblem("unknown rank option", ranks=list(ranks))
-    group_opt = opts.get("groups")
+    group_opt = bc.opt_list(opts.get("groups"))
     groups = [str(g) for g in group_opt] if group_opt is not None else [str(k) for k in scope.group_keys()]
     with_scope = str(opts.get("scope_species", "true")).lower() != "false"
-    full = ranks == HIGHER_RANKS and group_opt is None and with_scope
+    only_keys = set(bc.opt_list(opts.get("scope_keys")) or [])
+    full = ranks == HIGHER_RANKS and group_opt is None and with_scope and not only_keys
     raws: list[Any] = []
     g_meta = await run.get(f"{GBIF_API}/dataset/{BACKBONE_KEY}", key="gbif:dataset", max_bytes=2_000_000)
     c_meta = await run.get(f"{CLB_API}/dataset/{CLB_BACKBONE}", key="clb:dataset:53147", max_bytes=2_000_000)
@@ -629,6 +630,8 @@ async def ingest_gbif(run: Any) -> dict[str, Any]:
     refused: list[dict[str, Any]] = []
     if with_scope:
         for sp in scope.species:
+            if only_keys and str(sp.key) not in only_keys:
+                continue
             raw = await run.get(f"{GBIF_API}/species/{sp.key}", key=f"gbif:species:{sp.key}", max_bytes=1_000_000)
             sha = run.archive(raw)
             raws.append(raw)

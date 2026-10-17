@@ -160,89 +160,97 @@ def parse_flow(flow: Flow, f: hc.Fetched, out: Mapping[str, hc.TableBuild], repo
         raise hc.err(f"{flow.dataset}: unexpected members {z.namelist()[:5]}")
     if z.getinfo(flow.member).file_size > MAX_MEMBER:
         raise hc.err(f"{flow.dataset}: member too large", kind="too_large")
-    with z.open(flow.member) as raw:
-        reader = csv.reader(io.TextIOWrapper(raw, encoding="utf-8-sig", newline=""))
-        header = next(reader, None) or []
-        codes = [h.split(":", 1)[0] for h in header]
-        col = {c: i for i, c in enumerate(codes)}
-        need = {*flow.dims, "TIME_PERIOD", "OBS_VALUE", "OBS_STATUS", "UNIT_MEASURE", *flow.meta_attrs, *flow.flag_attrs}
-        if not need <= set(col):
-            raise hc.err(f"{flow.dataset}: columns missing {sorted(need - set(col))}")
-        attr_cols = [c for c in codes if c not in (*flow.dims, "STRUCTURE", "STRUCTURE_ID", "ACTION", "TIME_PERIOD",
-                                                   "OBS_VALUE", "OBS_STATUS", "OBS_CONF", "OBS_PRE_BREAK")]  # fmt: skip
-        groups: list[tuple[tuple[str, ...], dict[str, str]]] = []
-        series_attrs: dict[tuple[str, ...], dict[str, str]] = {}
-        spans: dict[tuple[str, ...], list[Any]] = {}
-        rows = out[flow.dataset].rows
-        rights = RIGHTS[flow.dataset]
-        dropped: Counter[str] = Counter()
-        kept_status: Counter[str] = Counter()
-        seen_obs = False
-        for line, rec in enumerate(reader, start=2):
-            if len(rec) != len(header):
-                raise hc.err(f"{flow.dataset}: line {line} has {len(rec)} fields, header {len(header)}")
+
+    def records() -> Any:
+        with z.open(flow.member) as raw:
+            yield from csv.reader(io.TextIOWrapper(raw, encoding="utf-8-sig", newline=""))
+
+    # pass 1: series-level / partial-key attribute rows (empty TIME_PERIOD), interleaved with the observations
+    it = records()
+    header = next(it, None) or []
+    codes = [h.split(":", 1)[0] for h in header]
+    col = {c: i for i, c in enumerate(codes)}
+    need = {*flow.dims, "TIME_PERIOD", "OBS_VALUE", "OBS_STATUS", "UNIT_MEASURE", *flow.meta_attrs, *flow.flag_attrs}
+    if not need <= set(col):
+        raise hc.err(f"{flow.dataset}: columns missing {sorted(need - set(col))}")
+    attr_cols = [c for c in codes if c not in (*flow.dims, "STRUCTURE", "STRUCTURE_ID", "ACTION", "TIME_PERIOD",
+                                               "OBS_VALUE", "OBS_STATUS", "OBS_CONF", "OBS_PRE_BREAK")]  # fmt: skip
+    groups: list[tuple[tuple[str, ...], dict[str, str]]] = []
+    tcol = col["TIME_PERIOD"]
+    for line, rec in enumerate(it, start=2):
+        if len(rec) != len(header):
+            raise hc.err(f"{flow.dataset}: record {line} has {len(rec)} fields, header {len(header)}")
+        if not rec[tcol].strip():
             dims = tuple(_code(rec[col[d]]) for d in flow.dims)
-            tp = rec[col["TIME_PERIOD"]].strip()
-            if not tp:  # series-level (or partial-key group) attribute row
-                if seen_obs:
-                    raise hc.err(f"{flow.dataset}: attribute row after observations (line {line})")
-                groups.append((dims, {a: rec[col[a]].strip() for a in attr_cols if rec[col[a]].strip()}))
-                continue
-            seen_obs = True
-            if dims[0] != "D":
-                continue
-            status = _code(rec[col["OBS_STATUS"]])
-            if status in STATUS_NO_ROW:
-                dropped[f"status_{status}"] += 1
-                continue
-            v, normalised = hc.number(rec[col["OBS_VALUE"]])
-            if v is None:
-                dropped["not_a_number"] += 1
-                continue
-            try:
-                d = date.fromisoformat(tp)
-            except ValueError as e:
-                raise hc.err(f"{flow.dataset}: line {line}: bad TIME_PERIOD {tp!r}") from e
-            attrs = series_attrs.get(dims)
-            if attrs is None:
-                attrs = {}
-                for gdims, gattrs in groups:
-                    if all(g in ("", s) for g, s in zip(gdims, dims, strict=True)):
-                        attrs.update(gattrs)
-                series_attrs[dims] = attrs
-            own = {a: rec[col[a]].strip() for a in attr_cols if rec[col[a]].strip()}
-            merged = {**attrs, **own}
-            unit = merged.get("UNIT_MEASURE")
-            if not unit:
-                raise hc.err(f"{flow.dataset}: series {'.'.join(dims)} has no UNIT_MEASURE", kind="unit")
-            area = dims[flow.dims.index("REF_AREA")]
-            ind = flow.prefix + "".join(f"|{d.lower()}={dims[flow.dims.index(d)]}" for d in flow.fold)
-            extra: dict[str, Any] = {"frequency": "D", "series_key": ".".join(dims)}
-            if "UNIT_MULT" in merged:
-                extra["unit_mult"] = merged["UNIT_MULT"]
-            for a in flow.flag_attrs:
-                if merged.get(a):
-                    extra[a.lower()] = _label(merged[a]) if a == "COLLECTION" else merged[a].strip()
-            if flow.meta_attrs:
-                extra["series_texts"] = f"bis.{flow.dataset}_series"
-            if status != STATUS_NORMAL:
-                extra["obs_status"] = rec[col["OBS_STATUS"]].strip()
-                kept_status[status] += 1
-            conf = _code(rec[col["OBS_CONF"]]) if "OBS_CONF" in col else ""
-            if conf and conf != "F":
-                extra["confidentiality"] = rec[col["OBS_CONF"]].strip()
-            if "OBS_PRE_BREAK" in col and rec[col["OBS_PRE_BREAK"]].strip():
-                extra["pre_break_value"] = rec[col["OBS_PRE_BREAK"]].strip()
-            if normalised:
-                extra["value_normalised"] = True
-            rows.add(indicator=ind, provider_geo=area, day=d, value=v, unit=_label(unit),
-                     flags=rows.flags(**hc.base_flags(rights, f, **extra)), raw_sha256=f.sha256,
-                     selector={"file": flow.member, "record": line})  # fmt: skip
-            sp = spans.get(dims)
-            if sp is None:
-                spans[dims] = [d, d, line, merged]
-            else:
-                sp[0], sp[1] = min(sp[0], d), max(sp[1], d)
+            groups.append((dims, {a: rec[col[a]].strip() for a in attr_cols if rec[col[a]].strip()}))
+    # pass 2: daily observations
+    it = records()
+    next(it, None)
+    series_attrs: dict[tuple[str, ...], dict[str, str]] = {}
+    spans: dict[tuple[str, ...], list[Any]] = {}
+    rows = out[flow.dataset].rows
+    rights = RIGHTS[flow.dataset]
+    dropped: Counter[str] = Counter()
+    kept_status: Counter[str] = Counter()
+    for line, rec in enumerate(it, start=2):
+        tp = rec[tcol].strip()
+        if not tp:
+            continue
+        dims = tuple(_code(rec[col[d]]) for d in flow.dims)
+        if dims[0] != "D":
+            continue
+        status = _code(rec[col["OBS_STATUS"]])
+        if status in STATUS_NO_ROW:
+            dropped[f"status_{status}"] += 1
+            continue
+        v, normalised = hc.number(rec[col["OBS_VALUE"]])
+        if v is None:
+            dropped["not_a_number"] += 1
+            continue
+        try:
+            d = date.fromisoformat(tp)
+        except ValueError as e:
+            raise hc.err(f"{flow.dataset}: line {line}: bad TIME_PERIOD {tp!r}") from e
+        attrs = series_attrs.get(dims)
+        if attrs is None:
+            attrs = {}
+            for gdims, gattrs in groups:
+                if all(g in ("", s) for g, s in zip(gdims, dims, strict=True)):
+                    attrs.update(gattrs)
+            series_attrs[dims] = attrs
+        own = {a: rec[col[a]].strip() for a in attr_cols if rec[col[a]].strip()}
+        merged = {**attrs, **own}
+        unit = merged.get("UNIT_MEASURE")
+        if not unit:
+            raise hc.err(f"{flow.dataset}: series {'.'.join(dims)} has no UNIT_MEASURE", kind="unit")
+        area = dims[flow.dims.index("REF_AREA")]
+        ind = flow.prefix + "".join(f"|{d.lower()}={dims[flow.dims.index(d)]}" for d in flow.fold)
+        extra: dict[str, Any] = {"frequency": "D", "series_key": ".".join(dims)}
+        if "UNIT_MULT" in merged:
+            extra["unit_mult"] = merged["UNIT_MULT"]
+        for a in flow.flag_attrs:
+            if merged.get(a):
+                extra[a.lower()] = _label(merged[a]) if a == "COLLECTION" else merged[a].strip()
+        if flow.meta_attrs:
+            extra["series_texts"] = f"bis.{flow.dataset}_series"
+        if status != STATUS_NORMAL:
+            extra["obs_status"] = rec[col["OBS_STATUS"]].strip()
+            kept_status[status] += 1
+        conf = _code(rec[col["OBS_CONF"]]) if "OBS_CONF" in col else ""
+        if conf and conf != "F":
+            extra["confidentiality"] = rec[col["OBS_CONF"]].strip()
+        if "OBS_PRE_BREAK" in col and rec[col["OBS_PRE_BREAK"]].strip():
+            extra["pre_break_value"] = rec[col["OBS_PRE_BREAK"]].strip()
+        if normalised:
+            extra["value_normalised"] = True
+        rows.add(indicator=ind, provider_geo=area, day=d, value=v, unit=_label(unit),
+                 flags=rows.flags(**hc.base_flags(rights, f, **extra)), raw_sha256=f.sha256,
+                 selector={"file": flow.member, "record": line})  # fmt: skip
+        sp = spans.get(dims)
+        if sp is None:
+            spans[dims] = [d, d, line, merged]
+        else:
+            sp[0], sp[1] = min(sp[0], d), max(sp[1], d)
     if flow.meta_attrs:
         meta = out.get(f"{flow.dataset}_series")
         if meta is not None:

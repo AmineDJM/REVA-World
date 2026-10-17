@@ -91,6 +91,15 @@ def day_time(iso_day: str) -> Any:
     return KgTime(f"{d}T00:00:00Z", 11)
 
 
+def opt_list(v: Any) -> list[str] | None:
+    """A run option given as a list of strings or a comma-separated CLI string (None when absent)."""
+    if v is None:
+        return None
+    if isinstance(v, str):
+        return [x.strip() for x in v.split(",") if x.strip()]
+    return [str(x) for x in v]
+
+
 def as_int(v: Any, what: str) -> int:
     if isinstance(v, bool) or not isinstance(v, (int, str)) or not DECIMAL_RE.match(str(v)):
         raise err(f"{what}: not a non-negative integer: {v!r}")

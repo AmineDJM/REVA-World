@@ -104,12 +104,21 @@ RIGHTS: dict[str, dict[str, Any]] = {
         "pub_lag": "same_day",
         "revision_policy": "no revision policy stated on the reference-rate page; value as fetched (as_of)",
         "policy_quotes": {
-            "fx_publication": ("fx_page", "The reference rates are usually updated at around 16:00 CET every working "
-                               "day, except on TARGET closing days."),
-            "fx_concertation": ("fx_page", "They are based on the daily concertation procedure between central banks "
-                                "across Europe, which normally takes place around 14:10 CET."),
-            "fx_information_only": ("fx_page", "The reference rates are published for information purposes only. Using "
-                                    "the rates for transaction purposes is strongly discouraged."),
+            "fx_publication": (
+                "fx_page",
+                "The reference rates are usually updated at around 16:00 CET every working "
+                "day, except on TARGET closing days.",
+            ),
+            "fx_concertation": (
+                "fx_page",
+                "They are based on the daily concertation procedure between central banks "
+                "across Europe, which normally takes place around 14:10 CET.",
+            ),
+            "fx_information_only": (
+                "fx_page",
+                "The reference rates are published for information purposes only. Using "
+                "the rates for transaction purposes is strongly discouraged.",
+            ),
             "fx_base_currency": ("fx_page", "All currencies quoted against the euro (base currency)"),
             "copyright": _COPYRIGHT_Q,
             "modified": _MODIFIED_Q,
@@ -127,8 +136,11 @@ RIGHTS: dict[str, dict[str, Any]] = {
         "https://www.ecb.europa.eu/stats/euro-short-term-rates/interest_rate_benchmarks/WG_euro_risk-free_rates/"
         "shared/pdf/ecb.ESTER_methodology_and_policies.en.pdf, read 2026-10-17, not archived by this connector)",
         "policy_quotes": {
-            "estr_publication": ("estr_page", "The euro short-term rate (€STR) is published on each TARGET2 business day "
-                                 "based on transactions conducted and settled on the previous TARGET2 business day."),
+            "estr_publication": (
+                "estr_page",
+                "The euro short-term rate (€STR) is published on each TARGET2 business day "
+                "based on transactions conducted and settled on the previous TARGET2 business day.",
+            ),
             "estr_licence": ("estr_page", "The ECB does not charge for the €STR or license its use."),
             "copyright": _COPYRIGHT_Q,
         },

@@ -113,7 +113,12 @@ def test_no_kg_predicate_is_causal_and_every_family_mapping_is_registered() -> N
     assert not [p.pid for p in preds if any(m in p.pid or m in p.reva_predicate for m in markers)]
     doc = yaml.safe_load((REPO / "registry/kg/relations_v4.d/v4health.yaml").read_text())
     pids = {p.pid for p in preds}
-    assert {m["property"] for m in doc["mappings"]} <= pids
+    mapped = {m["property"] for m in doc["mappings"]}
+    assert {p for p in mapped if not p.startswith("P")} <= pids
+    requested = {
+        r["property"] for r in yaml.safe_load((REPO / "registry/kg/property_requests/v4health.yaml").read_text())
+    }
+    assert {p for p in mapped if p.startswith("P")} <= requested
     validate()
     reg = load_registry()
     for pid, fam in (

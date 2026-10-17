@@ -237,9 +237,19 @@ class DailyRows:
             raise err(f"{self.dataset}: duplicate or invalid text cell {k}", kind="invalid")
         self._seen.add(k)
         c = self.cols
-        for col, v in (("indicator", indicator), ("iso3", iso3), ("provider_geo", provider_geo),
-                       ("period_start", span[0]), ("period_end", span[1]), ("value", None), ("value_text", text),
-                       ("unit", unit), ("flags", flags), ("raw_sha256", raw_sha256), ("selector", canon(selector))):
+        for col, v in (
+            ("indicator", indicator),
+            ("iso3", iso3),
+            ("provider_geo", provider_geo),
+            ("period_start", span[0]),
+            ("period_end", span[1]),
+            ("value", None),
+            ("value_text", text),
+            ("unit", unit),
+            ("flags", flags),
+            ("raw_sha256", raw_sha256),
+            ("selector", canon(selector)),
+        ):
             c[col].append(v)  # fmt: skip
 
     def frame(self) -> pl.DataFrame:
@@ -317,7 +327,10 @@ def register_tables(
 
 
 def check_policy_pages(
-    files: Mapping[str, Fetched], specs: Sequence[FileSpec], rights: Mapping[str, Mapping[str, Any]], wanted: Iterable[str]
+    files: Mapping[str, Fetched],
+    specs: Sequence[FileSpec],
+    rights: Mapping[str, Mapping[str, Any]],
+    wanted: Iterable[str],
 ) -> dict[str, bool]:
     pages = {s.key: files[s.key] for s in specs if s.role == "policy" and s.key in files}
     quotes: dict[str, tuple[str, str]] = {}

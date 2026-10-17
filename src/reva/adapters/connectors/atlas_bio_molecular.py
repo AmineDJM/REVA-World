@@ -4,7 +4,7 @@ Four atlas sources (KG only, no atlas table: nothing here is per country):
 
 ``atlas.hgnc`` (source key ``hgnc.complete_set``, CC0)
     The HGNC complete set (``hgnc_complete_set.txt``, ~17 MB TSV, one row per approved human gene symbol) from
-    HGNC's public download bucket; its md5 (``x-goog-hash``) is checked. Entities ``hgnc:<n>`` (kind ``gene``,
+    HGNC's public download bucket; its md5 (the Cloud Storage ETag) is checked. Entities ``hgnc:<n>`` (kind ``gene``,
     label = approved symbol, aliases = HGNC alias and previous symbols); statements: symbol, name, locus type and
     group, cytogenetic location (verbatim), ``hgnc:located_on_chromosome`` -> ``chromosome:9606:<name>`` (the
     chromosome part of HGNC's location: ``19q13.43`` -> 19, ``Xp22.33 and Yp11.2`` -> X and Y, ``mitochondria`` ->
@@ -40,7 +40,6 @@ Four atlas sources (KG only, no atlas table: nothing here is per country):
 
 from __future__ import annotations
 
-import base64
 import csv
 import hashlib
 import io
@@ -362,16 +361,11 @@ async def ingest_hgnc(run: Any) -> dict[str, Any]:
     if not run.wants(HGNC_DATASET):
         return {"skipped": True}
     raw = await run.get(HGNC_URL, key="hgnc:complete_set", media_types=("text/plain",), max_bytes=HGNC_MAX_BYTES)
-    md5_b64 = None
-    for part in (header(raw, "x-goog-hash") or "").split(","):
-        if part.strip().startswith("md5="):
-            md5_b64 = part.strip()[4:]
-    if md5_b64 is not None:
-        got = base64.b64encode(hashlib.md5(raw.body, usedforsecurity=False).digest()).decode()
-        if got != md5_b64:
-            raise MolecularError(
-                "HGNC file does not match its x-goog-hash md5 (truncated?)", retryable=True, kind="checksum"
-            )
+    etag = (header(raw, "etag") or "").strip('"').lower()
+    md5_checked = bool(re.match(r"^[0-9a-f]{32}$", etag))
+    if md5_checked and hashlib.md5(raw.body, usedforsecurity=False).hexdigest() != etag:
+        # Cloud Storage's ETag of a non-composite object is its md5 (hex): a mismatch is a truncated body
+        raise MolecularError("HGNC file does not match its ETag md5 (truncated?)", retryable=True, kind="checksum")
     sha = run.archive(raw)
     genes = parse_hgnc(raw.body)
     if run.origin == "live" and len(genes) < MIN_HGNC_ROWS_LIVE:
@@ -395,7 +389,7 @@ async def ingest_hgnc(run: Any) -> dict[str, Any]:
     )
     return {
         "revision": revision,
-        "raw": {"sha256": sha, "bytes": len(raw.body), "md5_checked": md5_b64 is not None},
+        "raw": {"sha256": sha, "bytes": len(raw.body), "md5_checked": md5_checked},
         "build": parts.report,
         "kg": kg,
     }
@@ -441,12 +435,18 @@ class Release:
         return f"UniProt {self.name} ({self.date})"
 
 
-def uniprot_release(raw: Any) -> Release:
-    name = header(raw, "x-uniprot-release")
-    date_ = header(raw, "x-uniprot-release-date")
-    if not name or not date_:
-        raise MolecularError("UniProt response without release headers", retryable=False, kind="schema_drift")
-    return Release(name, datetime.strptime(date_, "%d-%B-%Y").date().isoformat())
+RELDATE_URL = "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt"
+RELDATE_RE = re.compile(
+    r"UniProtKB/Swiss-Prot Release (?P<name>[0-9]{4}_[0-9]{2}) of (?P<date>[0-9]{2}-[A-Za-z]{3}-[0-9]{4})"
+)
+
+
+def uniprot_release(body: bytes) -> Release:
+    """The Swiss-Prot release named in ``reldate.txt`` (fetched before and after the streams: must not change)."""
+    m = RELDATE_RE.search(body.decode("utf-8", "replace"))
+    if not m:
+        raise MolecularError("reldate.txt does not name a Swiss-Prot release", retryable=False, kind="schema_drift")
+    return Release(m.group("name"), datetime.strptime(m.group("date"), "%d-%b-%Y").date().isoformat())
 
 
 def uniprot_kg(
@@ -617,13 +617,16 @@ async def ingest_uniprot(run: Any) -> dict[str, Any]:
     if not run.wants(UNIPROT_DATASET):
         return {"skipped": True}
     raws: list[Any] = []
+    r_rel = await run.get(RELDATE_URL, key="uniprot:reldate:before", media_types=("text/plain",), max_bytes=100_000)
+    rel = uniprot_release(r_rel.body)
+    rel_sha = run.archive(r_rel)
+    raws.append(r_rel)
     r_org = await run.get(
         uniprot_stream_url("reviewed:true", ["organism_id"]),
         key="uniprot:reviewed:organism_id",
         media_types=("text/plain",),
         max_bytes=UNIPROT_MAX_BYTES,
     )
-    rel = uniprot_release(r_org)
     org_sha = run.archive(r_org)
     raws.append(r_org)
     counts = organism_counts(r_org.body)
@@ -648,11 +651,15 @@ async def ingest_uniprot(run: Any) -> dict[str, Any]:
         media_types=("text/plain",),
         max_bytes=UNIPROT_MAX_BYTES,
     )
-    rel_h = uniprot_release(r_h)
-    if rel_h != rel:
-        raise MolecularError("UniProt release changed between requests", retryable=True, kind="version_mismatch")
     h_sha = run.archive(r_h)
     raws.append(r_h)
+    r_rel2 = await run.get(
+        RELDATE_URL + "?after=1", key="uniprot:reldate:after", media_types=("text/plain",), max_bytes=100_000
+    )
+    run.archive(r_rel2)
+    raws.append(r_rel2)
+    if uniprot_release(r_rel2.body) != rel:
+        raise MolecularError("UniProt release changed during the run", retryable=True, kind="version_mismatch")
     rows = tsv_rows(r_h.body, ["Entry", "Entry Name", "Length", "HGNC", "Organism (ID)"], "UniProt human")
     human = [(r, i + 2) for i, r in enumerate(rows)]
     if run.origin == "live" and len(human) < MIN_HUMAN_LIVE:
@@ -664,7 +671,7 @@ async def ingest_uniprot(run: Any) -> dict[str, Any]:
         entities=parts.entities,
         statements=parts.statements,
         source_key=UNIPROT_SOURCE_KEY,
-        raw_sha256s=sorted({org_sha, h_sha, *(s for _r, s in taxa.values())}),
+        raw_sha256s=sorted({rel_sha, org_sha, h_sha, *(s for _r, s in taxa.values())}),
         retrieved_at=max(r.retrieved_at for r in raws),
         origin=run.origin,
         parameters={"connector": UNIPROT_NAME, "parser": PARSER_VERSION, "release": rel.__dict__},
@@ -873,7 +880,7 @@ async def ingest_ensembl(run: Any) -> dict[str, Any]:
     releases = sorted({str(s.get("release")) for s in species if s.get("release")})
     release = releases[-1] if releases else "unknown"
     kar: dict[str, tuple[Mapping[str, Any], str]] = {}
-    for name in (run.options or {}).get("karyotypes") or KARYOTYPE_SPECIES:
+    for name in bc.opt_list((run.options or {}).get("karyotypes")) or KARYOTYPE_SPECIES:
         ra = await run.get(
             f"{ENSEMBL_API}/info/assembly/{name}?content-type=application/json",
             key=f"ensembl:info:assembly:{name}",
@@ -1141,7 +1148,7 @@ def atlas_source() -> list[AtlasSourceSpec]:
             UNIPROT_SOURCE_KEY,
             "UniProt Consortium, UniProtKB REST API",
             UNIPROT_RIGHTS,
-            (UNIPROT_HOST,),
+            (UNIPROT_HOST, "ftp.uniprot.org"),
             UNIPROT_DATASET,
             ("uniprotkb:reviewed",),
             110,

@@ -1,0 +1,58 @@
+# Property requests from V4HEALTH (human body and diseases). Merged by WDHARVEST
+# (python -m reva.kg.harvest merge-property-requests checks id, datatype and labels against the property entity).
+- property: P699
+  why: Disease Ontology ID (external id) -- identifier bridge Wikidata item <-> doid:<n> (science.health_disease_ontology_ids)
+  reva_predicate: disease_ontology_id
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: Disease Ontology ID
+  label_fr: identifiant Disease Ontology
+- property: P5270
+  why: MonDO ID (external id) -- identifier bridge Wikidata item <-> mondo:<n> (science.health_mondo_ids)
+  reva_predicate: mondo_id
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: MonDO ID
+  label_fr: identifiant MonDO
+- property: P1554
+  why: UBERON ID (external id) -- identifier bridge Wikidata item <-> uberon:<n> (science.health_uberon_ids)
+  reva_predicate: uberon_id
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: UBERON ID
+  label_fr: identifiant UBERON
+- property: P2176
+  why: drug or therapy used for treatment (disease -> drug); a use, not a causal claim (science.health_disease_treatments_symptoms)
+  reva_predicate: drug_used_for_treatment
+  inverse: treats_condition
+  kind: entity
+  group: health
+  label_en: drug or therapy used for treatment
+  label_fr: médicament ou thérapie utilisé pour traiter
+- property: P2175
+  why: medical condition treated (drug -> disease), inverse view of P2176 on drug items (science.health_essential_medicines)
+  reva_predicate: medical_condition_treated
+  inverse: treated_by_drug
+  kind: entity
+  group: health
+  label_en: medical condition treated
+  label_fr: affection traitée
+- property: P494
+  why: ICD-10 code (external id) on disease items -- bridge to WHO causes of death and DOID/Mondo ICD-10 xrefs
+  reva_predicate: icd10_code
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: ICD-10
+  label_fr: CIM-10
+- property: P7807
+  why: ICD-11 (foundation) id on disease items -- bridge to Mondo icd11.foundation xrefs
+  reva_predicate: icd11_foundation_id
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: ICD-11 (foundation)
+  label_fr: CIM-11 (fondation)

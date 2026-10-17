@@ -1,0 +1,52 @@
+# Oil price pass-through to domestic inflation, 72 economies (agent PRED-EFFECT), IMF working paper.
+schema: reva-effects-literature/1
+id: choi_furceri_loungani_mishra_poplawski_ribeiro_2017
+source_key: effects.literature
+citation:
+  text: "Sangyup Choi, Davide Furceri, Prakash Loungani, Saurabh Mishra, and Marcos Poplawski-Ribeiro. Oil Prices and Inflation Dynamics: Evidence from Advanced and Developing Economies. IMF Working Paper WP/17/196, September 2017."
+  text_basis: assembled from the title page of the version read (IMF working paper)
+  short: "Choi, Furceri, Loungani, Mishra & Poplawski-Ribeiro (2017), IMF WP/17/196"
+  authors: [Sangyup Choi, Davide Furceri, Prakash Loungani, Saurabh Mishra, Marcos Poplawski-Ribeiro]
+  title: "Oil Prices and Inflation Dynamics: Evidence from Advanced and Developing Economies"
+  year: 2017
+  series: IMF Working Paper WP/17/196
+  doi: null
+  url: https://www.imf.org/-/media/files/publications/wp/2017/wp17196.pdf
+document:
+  url: https://www.imf.org/-/media/files/publications/wp/2017/wp17196.pdf
+  media_type: application/pdf
+  sha256: c29ed049c32b7c9db69ac906d088e2cee9ef1fca8ccc850c8d87c3357742d301
+  bytes: 1179217
+  version_read: IMF Working Paper WP/17/196, September 2017 (working paper; "IMF Working Papers describe research in progress")
+as_of: "2017-09-30"
+rights:
+  licence: "© 2017 International Monetary Fund (IMF copyright and usage terms; no open licence stated in the document)."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+estimates:
+  - id: headline_inflation_impact_10pct_oil
+    pdf_page: 12
+    cause: {kind: variable, id: oil_price.global, transform: percent_change,
+            definition: "global oil price inflation (percent change in the global oil price)"}
+    effect: {kind: atlas_concept, id: imf.inflation_cpi_avg, transform: pp_change,
+             definition: "domestic (headline CPI) inflation, percentage points"}
+    measure: response
+    unit: percentage_points
+    shock: {size: 10, unit: percent}
+    sign: positive
+    point: 0.4
+    point_kind: mean
+    as_printed: "0.4"
+    uncertainty: {status: not_reported}
+    horizon: {kind: impact, value: 0, unit: year}
+    scope: {country_group: "unbalanced panel of 72 advanced and developing economies", period: {from: "1970", to: "2015"}, frequency: annual, n_countries: 72}
+    method: local_projection
+    identification: "Panel local projections of domestic CPI inflation on global oil price inflation interacted with the lagged share of transport in the CPI basket, with country and time fixed effects and two lags of inflation; coefficients rescaled by the average oil share; 90 percent bands shown in Figure 3 (not tabulated)"
+    locator: "Section 4.2 'Baseline results' (printed p.12), estimates of Table 2 / Figure 3; same number in the abstract"
+    quote: "The estimates suggest that a 10 percent increase in global oil price typically increases domestic inflation by 0.4 percentage point in the short term (i.e. in the year of the oil price shock), and becomes statistically insignificant two years after the shock."
+    source_caveats: "We also find that the effect is asymmetric, with positive oil price shocks having a larger effect than negative ones. The impact of oil price shocks, however, has declined over time due in large part to a better conduct of monetary policy."
+    applicability: "REVA note: average over 72 economies and 1970-2015; the paper reports a decline over time and cross-country differences linked to the transport share in the CPI and energy subsidies. The uncertainty is only shown graphically (Figure 3), so no standard error is stored."

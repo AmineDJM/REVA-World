@@ -384,6 +384,26 @@ class CutoffRepository:
             )
         return out
 
+    # ----------------------------------------------------------------- vintage (real-time) data
+    def vintages(self, store: Any, *, dataset_keys: Sequence[str] | None = None) -> Any:
+        """A :class:`reva.evaluation.vintages.VintageAccessor` at this cutoff and mode (V5, PRED-VINTAGE).
+
+        Data as published at the time, from the vintage atlas tables: ``available_then`` admits a cell iff
+        its evidenced ``available_at`` is at/before the cutoff (today's table versions: a reconstruction);
+        ``as_known`` additionally needs the table version REVA had recorded at the cutoff. Time is filtered
+        before any vintage is chosen."""
+        import polars as pl
+
+        from reva.evaluation.vintages import VINTAGE_DATASET_KEYS, VintageAccessor, load_vintage_cells
+
+        keys = tuple(dataset_keys) if dataset_keys else VINTAGE_DATASET_KEYS
+        tables_cutoff = self._cutoff if self._mode is CutoffMode.as_known else self._now
+        frames = [
+            load_vintage_cells(self._conn, store, origin=o, tables_cutoff=tables_cutoff, dataset_keys=keys)
+            for o in self._origins
+        ]
+        return VintageAccessor(pl.concat(frames, how="vertical"), self._cutoff, self._mode)
+
     # ----------------------------------------------------------------- belief releases
     def releases(self, origin: str | None = None) -> list[dict[str, Any]]:
         """Releases published (ops.publication) at/before the cutoff, in publication order."""
