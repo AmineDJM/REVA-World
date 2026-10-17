@@ -139,4 +139,200 @@ paths; gaps.
 
 ## 7. Reference decisions on the dev DB (read-only)
 
-RUN_OUTPUTS_PLACEHOLDER
+Run: `uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` (role `reva_sim`, `SET TRANSACTION READ
+ONLY`; nothing written), 2026-10-17 ~14:30 UTC. State of the dev DB at that time: migration 0019 applied but
+**`kg.effect_estimate_current` empty** (PRED-EFFECT's `atlas.effects_lit` ingest and PRED-EVENTSTUDY's REVA-run
+writes were queued behind the shared dev-DB lock); one published live belief release
+(`3536d02e…`, 482 estimates: HS 2709 crude trade, nominal GDP, population; **no pinned dataset**: no FIGARO table, no
+Eurostat/ILO retirement inputs); latest live atlas snapshot `717e8452…`; forecast registry readable.
+
+**Result in one sentence: none of the five reference decisions yields a number on the dev DB today, and that is the
+correct answer.** Each stops at a typed gap: no attributed estimate has the decision's direct variable as its cause
+(OPEC+ crude supply → price, policy rate → anything, sanction episode → anything, export restriction is not even in
+the effect vocabulary), or the simulator's inputs are not pinned (retirement). What remains is attributed context:
+sourced causal claims around the analogue episodes (7 for OPEC+, 8 for the EU ban), listed without numbers.
+First decision of a process: ~43 s (almost all of it the atlas query-file integrity hash and the catalog load, cached afterwards), then < 1 s per decision.
+
+### `ecb_plus_50bp_2027q1` — La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `4f53cda18c2baa0c…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: none.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 42.827 s.
+* Direct changes (scenario assumptions): `imf.policy_rate` @ DEU 0.5 percentage_points (step, held); `imf.policy_rate` @ FRA 0.5 percentage_points (step, held); `imf.policy_rate` @ ITA 0.5 percentage_points (step, held); `imf.policy_rate` @ ESP 0.5 percentage_points (step, held); `imf.policy_rate` @ NLD 0.5 percentage_points (step, held)
+
+**No quantified variable.**
+
+Gaps:
+* `no_effect_estimate_for_cause`: aucune estimation d'effet n'a pour cause imf.policy_rate : la propagation s'arrête ici
+
+### `eu_ban_russian_oil_2027q1` — L'UE interdit toute importation de pétrole russe à partir du 1er trimestre 2027
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `4f53cda18c2baa0c…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: none.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 0.48 s.
+* Direct changes (scenario assumptions): `sanction_episode` @ RUS 1 occurrence (occurrence, held)
+
+**No quantified variable.**
+
+Liens non chiffrés (8):
+* Selon Wikidata (déclaration Q110999040$0a72faa9-472b-eccf-8879-90e92d0f26d3, révision 2553782105, édition communautaire), invasion de l'Ukraine par la Russie a pour effet sanctions internationales lors de l'invasion de l'Ukraine par la Russie ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q111022187$fc03c281-4881-4ac8-fa60-50f00864d2b6, révision 2553619590, édition communautaire), sanctions internationales lors de l'invasion de l'Ukraine par la Russie a pour cause invasion de l'Ukraine par la Russie ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q111022187$18b240d2-415e-a337-18fa-64c56658ce74, révision 2553619590, édition communautaire), sanctions internationales lors de l'invasion de l'Ukraine par la Russie a pour effet Q113320321 (libellé non chargé) ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q17373979$21baffb0-4ac3-a2be-9d11-a3c5f7d2e6cc, révision 2459817118, édition communautaire), sanctions contre la Russie a pour effet Impact économique de la guerre d'Ukraine ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q110999040$30a0e890-4fae-b85b-5457-71d5316f6192, révision 2553782105, édition communautaire), invasion de l'Ukraine par la Russie a pour effet Impact économique de la guerre d'Ukraine ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q111034374$da5887b5-4cf8-e184-ea22-d72deb567ca4, révision 2522132221, édition communautaire), Impact économique de la guerre d'Ukraine a pour cause invasion de l'Ukraine par la Russie ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q111034374$044f14d4-4c4a-3606-431c-38c4bdf1a3a1, révision 2522132221, édition communautaire), Impact économique de la guerre d'Ukraine a pour cause sanctions contre la Russie ; REVA n'établit pas de causalité. (grade D)
+* Selon eusanct.kondata (jeu de données eusanct_case, version eusanct-1.0, ligne {"columns":["caseid","finaloutcome"],"file":"EUSANCT_Dataset_Case-level.csv","row":317}), Sanctions case 2014022701 (EUSANCT): target Russia (COW 365), from 2014 a pour issue codée Outcome of sanctions case 2014022701 (EUSANCT): Stalemate after Sanction Imposition ; REVA n'établit pas de causalité. (grade B)
+
+Gaps:
+* `no_effect_estimate_for_cause`: aucune estimation d'effet n'a pour cause sanction_episode : la propagation s'arrête ici
+
+### `france_retirement_65_2027` — La France porte l'âge légal de départ à la retraite à 65 ans en 2027
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `36a351b546dbe9b9…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: `social.retirement_age@1.0.0`.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 0.893 s.
+* Direct changes (scenario assumptions): `pension.minimum_pension_age` @ FRA 780 months (step, held)
+
+**No quantified variable.**
+
+Hops:
+* `h2` plugin `social.retirement_age@1.0.0` from variable:pension.minimum_pension_age@FRA: Projection conditionnelle sous hypothèses énoncées (pas une prévision), résultats « qualifiés » : les voies de départ anticipé (carrières longues, invalidité) ne sont pas modélisées ; réponse de l'emploi tirée de la littérature citée (registry/assumptions/retirement_employment_response.yaml).
+
+Gaps:
+* `missing_input` (FRA): the retirement model did not run on the pinned release — missing: demography.deaths.age_sex, demography.live_births.mother_age_newborn_sex, demography.population.jan1_age_sex, labour.activity_rate.lfs_age_sex, labour.employment_rate.lfs_age_sex, social.pension_beneficiaries.esspros_old_age, social.pension_expenditure.esspros
+
+### `india_rice_export_ban_2027q1` — L'Inde interdit les exportations de riz pendant un an à partir du 1er trimestre 2027
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `4f53cda18c2baa0c…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: none.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 0.038 s.
+* Direct changes (scenario assumptions): `trade.export_restriction` @ IND 1 occurrence (occurrence, 4 quarters)
+
+**No quantified variable.**
+
+Gaps:
+* `variable_not_in_effect_vocabulary`: la variable trade.export_restriction n'est pas dans le vocabulaire des effets (registry/effects/variables.yaml) : aucune estimation ne peut la citer comme cause
+* `no_effect_estimate_for_cause`: aucune estimation d'effet n'a pour cause trade.export_restriction : la propagation s'arrête ici
+
+### `opec_plus_cut_2mbd_2027q1` — OPEP+ réduit sa production de 2 mb/j à partir du 1er trimestre 2027
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `4f53cda18c2baa0c…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: none.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 0.192 s.
+* Direct changes (scenario assumptions): `resources.energy.eia.crude_oil_production` @ WLD -2000 thousand barrels per day (step, held)
+
+**No quantified variable.**
+
+Liens non chiffrés (7):
+* Selon Wikidata (déclaration Q4574284$C3AB6850-FC50-4C5D-8C00-1FF73F550218, révision 2547562028, édition communautaire), choc pétrolier a comme facteur contributif guerre du Kippour ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q4574284$31090F54-ABB6-4CCD-B19B-1DA9208E1960, révision 2547562028, édition communautaire), choc pétrolier a comme facteur contributif Révolution iranienne ; REVA n'établit pas de causalité. (grade E)
+* Selon Wikidata (déclaration Q4574284$0FC8E5B0-E177-4FEF-803E-001221CBED95, révision 2547562028, édition communautaire), choc pétrolier a pour effet Q615231 (libellé non chargé) ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q4574284$7B5C794D-A7E8-43A8-AD5A-4BB3265E1557, révision 2547562028, édition communautaire), choc pétrolier a pour effet Q800510 (libellé non chargé) ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q126065$68f55414-4755-ab56-d41e-940d1aeca749, révision 2556614482, édition communautaire), Révolution iranienne a pour effet deuxième choc pétrolier ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q1925730$29744924-491a-ae23-d23a-a4a940311fa9, révision 2537182131, édition communautaire), deuxième choc pétrolier a pour cause Révolution iranienne ; REVA n'établit pas de causalité. (grade D)
+* Selon Wikidata (déclaration Q1925730$5d7fc053-472a-1391-891c-3d443f694158, révision 2537182131, édition communautaire), deuxième choc pétrolier a pour cause guerre Iran-Irak ; REVA n'établit pas de causalité. (grade E)
+
+Gaps:
+* `no_effect_estimate_for_cause`: aucune estimation d'effet n'a pour cause resources.energy.eia.crude_oil_production : la propagation s'arrête ici
+
+
+
+### Illustration (not a reference decision): a user-stated oil-price assumption
+
+To show the numeric path on real dev-DB data, the composed decision below states the oil-price change itself
+(instrument `oil_price_assumption`; the +10 % for 4 quarters is an arbitrary round assumption, **not** an estimate
+of any OPEC+ decision's effect on prices). Only the crude-exposure simulator could run (border values and GDP of
+2024 in the release for FRA, USA, CHN); the IO model has no pinned FIGARO table, and no estimate was loaded for
+`oil_price.global` yet (when PRED-EFFECT's load lands, Choi et al. 2017 — +0.4 pp CPI inflation per +10 % oil in
+the year of the shock, no SE — will add `imf.inflation_cpi_avg` for countries in its 72-economy group scope,
+flagged *group membership not verified* and *scenario point, no published uncertainty*).
+
+### `illustration_oil_plus_10pct_2027q1` — Illustration : hypothèse d'un prix mondial du brut +10 % pendant 4 trimestres à partir de 2027T1
+
+* Label: **scénario non validé — pas une probabilité** (validation: `unvalidated`, chain signature `053a440c0d460ff5…`).
+* Effect layer: `present` (kg.effect_estimate_current via reva.effects; 0 estimates matched); chain: `economic.crude_exposure@1.0.0`.
+* Read-only run: release `3536d02e-1f88-4ef9-a5d2-389d3ea93f01`, atlas snapshot `717e8452dc07da89…`, forecast registry: read, 2000 draws, seed 0, 37.864 s.
+* Direct changes (scenario assumptions): `oil_price.global` @ WLD 10 percent (step, 4 quarters)
+
+| Variable @ geo | unit | kind | value (5 % / median / 95 %) | uncertainty complete |
+|---|---|---|---|---|
+| Coût extérieur net du brut (valeur frontière), en % du PIB de référence — pas une perte de PIB @ FRA | pp_gdp | plugin_output | first_round: 0.0939 / 0.0939 / 0.0939 | yes |
+| Coût extérieur net du brut (valeur frontière), en % du PIB de référence — pas une perte de PIB @ USA | pp_gdp | plugin_output | first_round: 0.0191 / 0.0191 / 0.0191 | yes |
+| Coût extérieur net du brut (valeur frontière), en % du PIB de référence — pas une perte de PIB @ CHN | pp_gdp | plugin_output | first_round: 0.173 / 0.173 / 0.173 | yes |
+
+Hops:
+* `h2` plugin `economic.crude_exposure@1.0.0` from variable:oil_price.global@WLD: Les prix frontière du brut importé et exporté varient comme le prix du brut (multiplicateur 1 + Δ %), quantités fixes, une période comptable annuelle ; ce n'est ni une perte de PIB ni une inflation.
+
+Gaps:
+* `missing_input` (DEU): crude border values or GDP absent from the pinned release (never zero-filled) — M (trade.hs2709.import_value.world_total), X (trade.hs2709.export_value.world_total), G (economics.gdp.nominal_current_usd)
+* `missing_input` (IND): crude border values or GDP absent from the pinned release (never zero-filled) — M (trade.hs2709.import_value.world_total), X (trade.hs2709.export_value.world_total), G (economics.gdp.nominal_current_usd)
+* `missing_input` (JPN): crude border values or GDP absent from the pinned release (never zero-filled) — M (trade.hs2709.import_value.world_total), X (trade.hs2709.export_value.world_total), G (economics.gdp.nominal_current_usd)
+* `plugin_data_missing`: the baseline release 3536d02e-1f88-4ef9-a5d2-389d3ea93f01 pins no economics.io.figaro_ii_table dataset (FIGARO); reason: unavailable
+* `no_effect_estimate_for_cause`: aucune estimation d'effet n'a pour cause oil_price.global : la propagation s'arrête ici
+
+
+
+Reading the table: +10 % on crude border prices with fixed 2024 quantities raises France's net crude border cost by
+0.094 % of 2024 GDP (USD 29.7 bn imports vs 0.016 bn exports), China's by 0.17 %, the United States' by 0.019 %
+(large own exports offset imports). Degenerate (5 % = 95 %) because the assumption is stated, not estimated; it is
+an accounting exposure, not a GDP loss, an inflation or a forecast. DEU, IND, JPN: inputs absent from the release
+(typed `missing_input`, never zero).
+
+## 8. What is missing, and why
+
+* **Effect estimates for the reference decisions' first links.** PRED-EFFECT's curated publications cover oil price →
+  CPI, energy prices → CPI (IO), exchange-rate pass-through, fiscal multipliers, Okun, Phillips slopes, trade
+  elasticity — none starts from crude *supply*, a policy *rate*, an *export restriction* or a *sanction*. The
+  missing estimates, in order of value: (1) oil supply shock → real oil price (e.g. Kilian 2009; Baumeister &
+  Hamilton 2019; Caldara, Cavallo & Iacoviello 2019 — *names of candidate sources, nothing transcribed*); (2)
+  monetary-policy shock → euro-area HICP, GDP, unemployment (local projections / SVAR with IRFs and SEs); (3) export
+  restriction → world rice price; (4) sanctions/embargo → target GDP and oil export volumes (PRED-EVENTSTUDY's TIES
+  → GDP per capita estimate, +0.3 % CI −1.2..+1.7, will match `sanction_episode` @ RUS once written if its scope lists
+  RUS). The engine needs no change for any of them: they propagate as soon as they are in `kg.effect_estimate_current`.
+* **Variables outside the effect vocabulary**: `trade.export_restriction`, `pension.minimum_pension_age` (decision
+  variables of two instruments). Request for PRED-EFFECT: add them (or an event type `export_restriction` to
+  `registry/events/taxonomy.yaml`) so estimates can cite them.
+* **Simulator inputs not pinned on the dev DB**: FIGARO 2024 (`economics.io.figaro_ii_table`, ~13 MB Parquet) and the
+  retirement model's 7 Eurostat datasets (LFS employment/activity, ESSPROS beneficiaries/expenditure, population,
+  deaths, births). They need a belief release that pins them (the V2 pipeline does it; lead operation).
+* **Crude inputs** for DEU, IND, JPN are absent from the release (Comtrade/WDI coverage of that release).
+* **Monthly price horizons** (roadmap: prices 1–12 months): the grid is quarterly; monthly lag profiles are
+  averaged per quarter. A monthly grid is a contained change in `engine.py` (`H`, labels) once daily/monthly price
+  estimates exist.
+* **Feedback** (e.g. inflation → policy rate reaction) is out of scope: the propagation graph is acyclic by
+  construction (visited set), as in `reva.simulation.coupling`.
+* **Validation**: no chain has a back-test or calibration record; the judge (PRED-REGISTRY + PRED-VINTAGE) must write
+  `registry/predict/validated_chains.yaml` entries. Until then no probability is ever shown.
+
+## 9. Owner decisions
+
+1. **Step-response reading of lag profiles.** Published IRFs are usually responses to a one-time shock with its own
+   persistence; the engine reads them as responses to a sustained change and superposes increments (stated on every
+   result). Alternative: impulse convolution (needs the cause's own dynamics). Keep the stated assumption?
+2. **Group scopes.** Estimates scoped to a verbatim country group ("72 advanced and developing economies") are used
+   for any country with a warning (membership not machine-checked). Stricter option: require a machine-readable
+   country list for use outside "exact"/"WLD".
+3. **Choice rule vs. showing all estimates.** One estimate per edge is chosen deterministically (alternatives
+   listed). Alternative: run one scenario per estimate (an ensemble of chains, never averaged) — more honest about
+   model disagreement, more output.
+4. **Comonotone horizons** (one z per estimate across horizons) overstates the persistence of uncertainty when the
+   source's horizons are independent estimates; no covariance is published, so either choice is an assumption.
+5. **Analogue anchors** are REVA curation (5 ids). Should the curator also add anchors for the rice ban, the ECB hike
+   and the French reform once suitable KG events exist?
+6. **`oil_price_assumption`** lets a user state a price change (labelled as the user's assumption). Keep it, or
+   allow only decisions whose first link is an attributed estimate?
+
+## 10. Commands
+
+```bash
+uv run pytest -q tests/unit/predict                       # 23 unit
+uv run pytest -q tests/integration/test_predict_api.py    # 4 integration (throwaway DB)
+(cd ui && npx vitest run src/v5)                          # 6 UI
+uv run ruff check src/reva/predict src/reva/api/routes/predict.py && uv run mypy src/reva/predict src/reva/api/routes/predict.py
+uv run python scripts/export_contracts.py --check
+# reference decisions on a database, read-only (JSON):
+uv run python -m reva.predict.run --reference all --draws 2000 --seed 0 --out /tmp/pred.json
+# after PRED-EFFECT / PRED-EVENTSTUDY loads, or once a release pins FIGARO + the retirement datasets: rerun the line
+# above and replace §7. API: POST /v1/predict/decision {"reference_id": "opec_plus_cut_2mbd_2027q1"}; UI: /v3/decision
+```
