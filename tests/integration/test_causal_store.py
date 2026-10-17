@@ -231,7 +231,7 @@ def test_grader_rules_corroboration_contest_and_recompute(cz) -> None:  # type: 
         [
             _date(x, "P580", "+1914-07-28T00:00:00Z", 11, "dx"),
             _date(y, "P585", "+1918-00-00T00:00:00Z", 9, "dy"),
-            _date(z, "P571", "+1700-00-00T00:00:00Z", 9, "dz"),
+            _date(z, "P580", "+1700-00-00T00:00:00Z", 9, "dz"),
             _date(w, "P580", "-0043-03-15T00:00:00Z", 11, "dw"),
             # x => y twice with the same upstream reference (URL variants) -> one group
             KgStatement(y, "P828", x, statement_id="C1", references=same),
@@ -259,7 +259,7 @@ def test_grader_rules_corroboration_contest_and_recompute(cz) -> None:  # type: 
     ]
     assert (rows["C3"]["grade"], rows["C3"]["temporal_check"]) == ("E", "inconsistent")
     assert (rows["C4"]["grade"], rows["C4"]["temporal_check"]) == ("D", "consistent")  # BCE cause precedes
-    # y (1918, year precision) => z (inception 1700): inconsistent too, even though corroborated
+    # y (1918, year precision) => z (start 1700): inconsistent too, even though corroborated
     assert (rows["C5"]["grade"], rows["C5"]["corroboration"]) == ("E", 2)
     # recompute with unchanged inputs writes nothing
     g2 = grade_claims(cz.worker, origin="test_fixture")

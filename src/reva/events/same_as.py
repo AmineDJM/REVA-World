@@ -145,6 +145,7 @@ def shared_property_links(
                             "value": v,
                             "statement_keys": [holders[a], holders[b]],
                             "rule_note": rule.get("note", ""),
+                            **_independence(rule),
                         },
                     )
                 )
@@ -173,10 +174,17 @@ def prefix_property_links(
         {"p": rule["property"], "origin": origin, "lim": MAX_LINKS * 2},
     ).all()
     by_value: dict[str, dict[str, str]] = defaultdict(dict)
+    values_of: dict[str, set[str]] = defaultdict(set)
     for subj, val, key in rows:
         v = _id_value(val)
         if v is not None:
             by_value[v].setdefault(subj, key)
+            if prefix + v in known:
+                values_of[subj].add(v)
+    # `one_value_per_holder`: a record citing several dataset records (e.g. one PA-X agreement row citing two UCDP
+    # agreement ids) lumps events the other dataset keeps apart -> ambiguous, never linked (else the two dataset
+    # records would end up in one identity cluster).
+    one_value = bool(rule.get("one_value_per_holder", False))
     links: list[SameAsLink] = []
     ambiguous: list[dict[str, Any]] = []
     for v, holders in sorted(by_value.items()):
@@ -187,6 +195,17 @@ def prefix_property_links(
             ambiguous.append({"rule": rule["id"], "value": v, "holders": sorted(holders), "dataset_record": target})
             continue
         ((holder, key),) = holders.items()
+        if one_value and len(values_of[holder]) > 1:
+            ambiguous.append(
+                {
+                    "rule": rule["id"],
+                    "value": v,
+                    "holders": [holder],
+                    "dataset_records": sorted(prefix + x for x in values_of[holder]),
+                    "reason": "holder_cites_several_records",
+                }
+            )
+            continue
         links.append(
             SameAsLink(
                 holder,
@@ -199,6 +218,73 @@ def prefix_property_links(
                     "dataset_record": target,
                     "statement_keys": [key],
                     "rule_note": rule.get("note", ""),
+                    **_independence(rule),
+                },
+            )
+        )
+    return links, ambiguous
+
+
+def _independence(rule: Mapping[str, Any]) -> dict[str, Any]:
+    """``independent_sources`` of a rule, copied into each link's evidence (read by the causal grader: records
+    joined by a link declared ``false`` -- one derived from the other -- count once for corroboration)."""
+    if "independent_sources" not in rule:
+        return {}
+    return {"independent_sources": bool(rule["independent_sources"])}
+
+
+def statement_link_links(
+    conn: Connection, rule: Mapping[str, Any], *, origin: str | None
+) -> tuple[list[SameAsLink], list[dict[str, Any]]]:
+    """A provider-coded identity statement (``kind: statement_link``): the loading connector wrote, from the
+    provider's own published key, a statement ``<record> <property> <record>`` (e.g. EUSANCT's case id and
+    datasource naming TIES -> ``eusanct:same_case_as``). One-to-one only: a record linked to several records of the
+    other side is ambiguous, never linked. Optional ``subject_prefix`` / ``object_prefix`` guards."""
+    rows = conn.execute(
+        text(f"""SELECT s.subject_qid, s.object_qid, s.statement_key, s.source_key, s.raw_sha256, s.qualifiers
+                   FROM kg.statement_current s
+                  WHERE s.property_pid = :p AND s.object_qid IS NOT NULL{_origin_sql(origin, "s")}
+                  ORDER BY s.statement_key LIMIT :lim"""),
+        {"p": rule["property"], "origin": origin, "lim": MAX_LINKS * 2},
+    ).all()
+    sp, op = rule.get("subject_prefix"), rule.get("object_prefix")
+    rows = [
+        r
+        for r in rows
+        if r[0] != r[1] and (not sp or str(r[0]).startswith(sp)) and (not op or str(r[1]).startswith(op))
+    ]
+    objs: dict[str, set[str]] = defaultdict(set)
+    subs: dict[str, set[str]] = defaultdict(set)
+    for subj, obj, *_ in rows:
+        objs[subj].add(obj)
+        subs[obj].add(subj)
+    links: list[SameAsLink] = []
+    ambiguous: list[dict[str, Any]] = []
+    for subj, obj, key, src, raw, q in rows:
+        if len(objs[subj]) > 1 or len(subs[obj]) > 1:
+            ambiguous.append(
+                {
+                    "rule": rule["id"],
+                    "value": f"{subj}->{obj}",
+                    "holders": sorted(objs[subj] | subs[obj] | {subj, obj}),
+                    "reason": "not_one_to_one",
+                }
+            )
+            continue
+        links.append(
+            SameAsLink(
+                subj,
+                obj,
+                rule["id"],
+                {
+                    "type": "provider_identity_statement",
+                    "property": rule["property"],
+                    "statement_keys": [key],
+                    "statement_source_key": src,
+                    "statement_raw_sha256": raw,
+                    "statement_qualifiers": dict(q or {}),
+                    "rule_note": rule.get("note", ""),
+                    **_independence(rule),
                 },
             )
         )
@@ -271,6 +357,7 @@ def mapping_table_links(
                         if k in e
                     },
                     "entry_key": {k: e.get(k) for k in table.get("key_fields", [])},
+                    **_independence(table),
                 },
             )
         )
@@ -288,7 +375,11 @@ def derive_links(
         if rule.get("status") != "active":
             skipped.append({"rule": rule.get("id"), "status": rule.get("status"), "note": rule.get("note", "")})
             continue
-        fn = {"same_property": shared_property_links, "prefix_vs_property": prefix_property_links}[rule["kind"]]
+        fn = {
+            "same_property": shared_property_links,
+            "prefix_vs_property": prefix_property_links,
+            "statement_link": statement_link_links,
+        }[rule["kind"]]
         lk, amb = fn(conn, rule, origin=origin)
         links += lk
         ambiguous += amb

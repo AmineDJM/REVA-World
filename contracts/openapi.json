@@ -6749,6 +6749,20 @@
             "title": "Below Min Grade Skipped",
             "type": "integer"
           },
+          "class_nodes_sample": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Class Nodes Sample",
+            "type": "array"
+          },
+          "class_nodes_skipped": {
+            "default": 0,
+            "description": "Class items (KG P279 / P31-only targets) not traversed",
+            "title": "Class Nodes Skipped",
+            "type": "integer"
+          },
           "edges_scanned": {
             "title": "Edges Scanned",
             "type": "integer"
@@ -6774,6 +6788,11 @@
               "E"
             ],
             "title": "Min Grade",
+            "type": "string"
+          },
+          "node_rule": {
+            "default": "",
+            "title": "Node Rule",
             "type": "string"
           },
           "time_budget_ms": {
@@ -6803,6 +6822,9 @@
           "edges_scanned",
           "ungraded_skipped",
           "below_min_grade_skipped",
+          "class_nodes_skipped",
+          "class_nodes_sample",
+          "node_rule",
           "truncated",
           "truncation_reasons",
           "time_budget_ms",

@@ -50,8 +50,22 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
         KgStatement(n("e"), "P1542", n("f"), statement_id="ef"),
         KgStatement(n("f"), "P1542", n("g"), statement_id="fg"),
         KgStatement(n("g"), "P1542", n("h"), statement_id="gh", references=[{"P248": ["Q1"]}]),
+        # a genuine order problem (cause 1947 -> effect starting 1945, cf. Truman Doctrine -> Cold War)
+        KgStatement(n("t"), "P1542", n("u"), statement_id="tu"),
+        KgStatement(
+            n("t"),
+            "P585",
+            value={"type": "time", "time": "+1947-03-12T00:00:00Z", "precision": 11},
+            statement_id="tdate",
+        ),
+        KgStatement(
+            n("u"),
+            "P580",
+            value={"type": "time", "time": "+1945-00-00T00:00:00Z", "precision": 9},
+            statement_id="udate",
+        ),
     ]
-    ents = [KgEntity(n(x), "event", {"en": f"Synthetic {x}", "fr": f"Synthétique {x}"}) for x in "abcdefgh"]
+    ents = [KgEntity(n(x), "event", {"en": f"Synthetic {x}", "fr": f"Synthétique {x}"}) for x in "abcdefghtu"]
     rep = load_batch(
         db.worker,
         db.store,
@@ -138,7 +152,8 @@ def test_event_summary(api) -> None:  # type: ignore[no-untyped-def]
     d = r.json()["data"]
     assert d["event"]["label"] == "World War I" and d["event"]["label_fr"] == "Première Guerre mondiale"
     assert d["dates"]["start"]["from"] == "1914-07-28" and d["dates"]["start"]["basis"] == "P580"
-    assert sum(d["effects"]["cause"].values()) >= 10 and d["effects"]["cause"].get("E", 0) >= 1
+    # grading.yaml v2: "WWI has effect <empire dated by inception>" is undetermined in time, not E
+    assert sum(d["effects"]["cause"].values()) >= 10 and d["effects"]["cause"].get("E", 0) == 0
     assert r.json()["origin"] == "test_fixture" and "claims_not_causation" in _codes(r.json())
 
 
@@ -210,7 +225,10 @@ def test_consistency_reports_cycles_and_self_loops(api) -> None:  # type: ignore
     assert len(cyc) == 1
     ex = [m["id"] for m in cyc[0]["example_cycle"]]
     assert ex[0] == ex[-1] and len(ex) == 4
-    assert d["temporal_violations"]["count"] >= 4  # the real WWI -> empires claims
+    # grading.yaml v2: the WWI -> empires claims (effects dated by inception) are no longer violations; a
+    # genuine order problem stays one
+    flagged = {(c["cause"]["id"], c["effect"]["id"]) for c in d["temporal_violations"]["sample"]}
+    assert ("czapi:t", "czapi:u") in flagged and not any(a == "Q361" for a, _ in flagged)
 
 
 def test_candidates_are_separate_and_labelled(api) -> None:  # type: ignore[no-untyped-def]

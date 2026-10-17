@@ -92,17 +92,30 @@ def test_1918_flu_and_world_war_one_as_asserted_by_wikidata(real) -> None:  # ty
     assert {c["source"]["selector"]["property"] for c in p["hops"][0]["claims"]} == {"P1478", "P1536"}
 
 
-def test_temporal_violations_are_flagged_and_kept(real) -> None:  # type: ignore[no-untyped-def]
+def test_entity_effects_dated_by_inception_and_import_pointers(real) -> None:  # type: ignore[no-untyped-def]
+    """grading.yaml v2. "WWI has effect Russian Empire" (P1542, its only reference: imported from a Wikimedia
+    project, P143): T4 — a pointer to another wiki is not a source — and, the Russian Empire being dated by its
+    inception (1721) and dissolution (1917), not as an event, the time order is undetermined (not E)."""
     eff = _by_pair(cg.effects(real, WWI, origin="test_fixture", limit=500)["claims"])
     c = eff[(WWI, RUSSIAN_EMPIRE)][0]
-    assert c["source"]["tier"] == "T3" and c["grade"]["grade"] == "E"
-    assert c["grade"]["temporal_check"] == "inconsistent"
-    assert "grade.E.temporal_inconsistent" in c["grade"]["rule_ids"]
-    # Russian Empire inception 1721-10-22 (Julian) is compared as 1721-11-02 (proleptic Gregorian)
-    assert c["grade"]["temporal"]["effect_start"]["from"] == "1721-11-02"
+    assert c["source"]["tier"] == "T4" and c["grade"]["grade"] == "D"
+    assert c["grade"]["temporal_check"] == "undetermined"
+    ids = c["grade"]["rule_ids"]
+    assert "tier.T4.wikimedia_import_only" in ids and "temporal.entity_dated_by_inception" in ids
+    t = c["grade"]["temporal"]
+    # Russian Empire inception 1721-10-22 (Julian) is read as 1721-11-02 (proleptic Gregorian); the span ends at
+    # its dissolution (P576 1917-09-01 Julian -> 1917-09-14)
+    assert t["effect_start"]["from"] == "1721-11-02" and t["effect_time"]["kind"] == "entity_existence"
+    assert (t["effect_time"]["from"], t["effect_time"]["to"]) == ("1721-11-02", "1917-09-14")
+    assert t["entity_dated_by_inception"] == ["effect"] and "not an event" in t["reason"]
     cons = cg.consistency(real, origin="test_fixture", limit=200)
     flagged = {(x["cause"]["id"], x["effect"]["id"]) for x in cons["temporal_violations"]["sample"]}
-    assert (WWI, RUSSIAN_EMPIRE) in flagged
+    assert (WWI, RUSSIAN_EMPIRE) not in flagged
+    # WWI (1914) -> Weimar Republic (inception 1918-11-09): the cause precedes the whole existence -> consistent
+    w = eff[(WWI, "Q41304")][0]
+    assert (
+        w["grade"]["temporal_check"] == "consistent" and w["grade"]["temporal"]["effect_time"]["to"] == "1933-12-31"
+    )  # year precision
 
 
 def test_reload_and_regrade_are_idempotent(real, db) -> None:  # type: ignore[no-untyped-def]

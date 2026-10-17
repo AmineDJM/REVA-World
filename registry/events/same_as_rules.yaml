@@ -6,7 +6,17 @@
 #   * an evidenced mapping table (a reviewed table with per-entry evidence).
 # Never from name or date similarity. A value held by several records on one side is reported as ambiguous and
 # never linked. Only rules with `status: active` run; the others document why no link can be made today.
-version: 1
+#
+# `independent_sources` (optional, copied into each link's evidence): `false` when one record is derived from the
+# other (the provider took the record over from the other dataset, or both come from one project): the causal grader
+# then gives the claims on both records a shared upstream, so they count once for corroboration. `true` when the two
+# records come from different providers coding the event separately (the link lets their claims corroborate).
+#
+# Changelog: 1 (2026-10-16, EVENTS) shared identifier + mapping table; 2 (2026-10-17, SAMEAS) kind `statement_link`
+# (provider-coded identity statements), `one_value_per_holder`, `independent_sources`, rules eusanct_ties_case,
+# navco12_navco21_campaign, pax_ucdp_agreement_id; Wikidata identifier search of 2026-10-17 recorded
+# (registry/events/_recorded/wikidata_property_search.json).
+version: 2
 rules:
   - id: untc_mtdsg_number
     kind: same_property
@@ -36,11 +46,41 @@ rules:
     id_prefix: "ucdp:pa:"
     property: "pax:ucdp_agreement_id"
     status: active
+    one_value_per_holder: true
+    independent_sources: true
     note: >-
       PA-X (CAUSMORE, atlas.pax) codes for each of its agreements the UCDP Peace Agreement Dataset id of the same
       document (codebook v10, variable UcdpAgr: "Uppsala Conflict Data Program peace agreement ID"). A PA-X agreement
       `pax:agt:<AgtId>` carrying value N is the UCDP record `ucdp:pa:N` (CAUSDATA, atlas.ucdp_term) when that record
       exists. A UCDP id coded on several PA-X agreements (v10: 1113 on 4, 1070 on 2) is reported ambiguous, never linked.
+      SAMEAS (2026-10-17): a PA-X agreement citing several UCDP agreements is ambiguous too (`one_value_per_holder`).
+      The two programmes code agreements separately (own definitions, own conflict designation): independent
+      sources, so their claims on the linked records corroborate each other. Caveat (docs/dev/v3_sameas.md): the
+      cross-reference shows PA-X's coders consulted UCDP's agreement list; REVA cannot exclude that PA-X's conflict
+      id was taken from UCDP for some agreements.
+  - id: eusanct_ties_case
+    kind: statement_link
+    property: "eusanct:same_case_as"
+    subject_prefix: "eusanct:case:"
+    object_prefix: "ties:case:"
+    status: active
+    independent_sources: false
+    note: >-
+      EUSANCT (Weber and Schneider, KonData) reuses the TIES case id for cases it took over from TIES and names TIES
+      in its `datasource` column; the EUSANCT connector writes `eusanct:same_case_as` only when the case id is identical,
+      the datasource names TIES and the target COW code is identical. Provider-published identity; EUSANCT's coding of
+      these cases derives from TIES (and HSE), so the two records are NOT independent sources: their claims count once.
+  - id: navco12_navco21_campaign
+    kind: statement_link
+    property: "contention:same_campaign_as"
+    subject_prefix: "navco12:"
+    object_prefix: "navco21:"
+    status: active
+    independent_sources: false
+    note: >-
+      NAVCO 1.2 codebook: "NAVCO ID source = NAVCO 2.1 ('ID assigned to campaign.')" -- the NAVCO project assigns one
+      campaign id across its versions; the NAVCO connector writes `contention:same_campaign_as` from it. Same project:
+      not independent sources.
   - id: ucdp_conflict_id_on_wikidata
     kind: prefix_vs_property
     id_prefix: "ucdp:conflict:"
@@ -50,7 +90,9 @@ rules:
       No Wikidata property holding UCDP conflict ids was found. Checked 2026-10-16: P7166 (suggested) is not a
       UCDP identifier (registry/events/_recorded/wikidata_verification.json), and none of the external-id claims
       on the archived snapshots of the Algerian War (Q200790, UCDP conflict 246), the Suez Crisis (Q49101) and 10
-      other war items carries a UCDP-keyed value. Activate with the property id once one is verified.
+      other war items carries a UCDP-keyed value. Activate with the property id once one is verified. Re-checked 2026-10-17 by a full-text search of the
+      property namespace ("UCDP", "Uppsala Conflict Data", "PRIO", "conflict identifier", "peace agreement": no UCDP
+      property; registry/events/_recorded/wikidata_property_search.json).
   - id: cow_war_number_on_wikidata
     kind: prefix_vs_property
     id_prefix: "cow:war:"
@@ -58,7 +100,8 @@ rules:
     status: no_identifier_property
     note: >-
       No Wikidata property holding Correlates of War war numbers was found on the archived war snapshots (same
-      check as above). COW and UCDP records also share no identifier with each other: no COW <-> UCDP link.
+      check as above). COW and UCDP records also share no identifier with each other: no COW <-> UCDP link. Re-checked
+      2026-10-17 ("Correlates of War", "Correlates", "war identifier": no COW property).
   - id: unpk_mission_on_wikidata
     kind: prefix_vs_property
     id_prefix: "unpk:mission:"
@@ -67,6 +110,33 @@ rules:
     note: >-
       UN peace operations are keyed by their acronym in the UN Peace and Security Data Hub; no Wikidata
       identifier property for these keys is known. Acronym-to-label matching would be name matching: not done.
+  - id: icb_crisis_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "icb:crisis:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      No Wikidata property for International Crisis Behavior crisis numbers (search 2026-10-17: "International Crisis
+      Behavior", "crisis"). ICB's own files carry no MID, COW war or UCDP key either (ICB1/ICB2 v16 headers: crisno,
+      cracno, cracid, pcid ...): no ICB <-> MID / COW / UCDP link.
+  - id: mid_dispute_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "mid:dispute:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      No Wikidata property for MID dispute numbers (search 2026-10-17: "Militarized Interstate Dispute"). MID 5.0
+      (MIDA/MIDB/MIDI/MIDIP) carries no COW war number and no ICB crisis number: no MID <-> war / crisis link.
+  - id: ncei_hazard_event_on_wikidata
+    kind: prefix_vs_property
+    id_prefix: "ncei_hazards:"
+    property: null
+    status: no_identifier_property
+    note: >-
+      Wikidata has earthquake identifiers (P3196 USGS earthquake ID, P6419 GEOFON, P4207 INGV, P5182 JMA) and P14355
+      EM-DAT disaster number, but NCEI's hazard records carry none of them (archived NCEI API responses), and no
+      property holds NCEI event ids (search 2026-10-17: "NCEI", "NGDC", "National Centers for Environmental
+      Information", "tsunami"). Volcanoes (places, not events) are linked by P1886 in the NCEI connector.
 mapping_tables:
   - id: untc_treaty_qids
     path: registry/entities/treaty_qids.json

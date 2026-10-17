@@ -11,6 +11,21 @@ covering window: REVA does not pick one.
 * ``inconsistent`` — the cause's start window begins after the effect's start window ends (beyond precision);
 * ``overlapping``  — the windows overlap: the order cannot be decided at this precision;
 * ``undetermined`` — a start is missing (or outside the PostgreSQL date range, e.g. geological time).
+
+Entities dated by inception (``registry/causal/grading.yaml`` version 2)
+----------------------------------------------------------------------
+An endpoint whose start is its inception (P571: it has no P580 start / P585 point in time) is an *entity* — a
+state, polity, organisation — not an event. "World War I has effect German Empire" does not mean that the war
+preceded the empire's founding (1871), and REVA does not reinterpret it as "... its dissolution" either. Such an
+endpoint is compared through its whole *existence span* [inception window start, end window end (P576 dissolved,
+or P582) — open when it has none]: the claim is ``consistent`` only when every possible time of the cause precedes
+every possible time of the effect, ``inconsistent`` only when every one follows (e.g. a cause founded after the
+effect began, or a cause starting after the effect entity was dissolved), and otherwise ``undetermined`` with the
+reason "entity dated by inception, not an event" — never ``overlapping``, which is reserved for date precision.
+
+When the *effect* is such an entity and the claim carries its own time qualifier (P585 point in time, else P580
+start time: the time Wikidata gives for the asserted effect), that window is the effect time instead (an event
+time, compared like an event start). Event-to-event claims are unchanged (start window vs start window).
 """
 
 from __future__ import annotations
@@ -119,16 +134,85 @@ def check(cause_start: Window | None, effect_start: Window | None) -> TemporalCh
     return "overlapping"
 
 
-def temporal_detail(cause: EventDates | None, effect: EventDates | None) -> tuple[TemporalCheck, dict[str, Any]]:
+INCEPTION_PID = "P571"
+_OPEN_HI: YMD = (10**6, 12, 31)
+ENTITY_REASON = "entity dated by inception (P571), not an event: its existence span is compared, not its founding"
+RULE_EVENTS = "cause start window vs effect start window, at date precision"
+
+
+def _span(d: EventDates) -> tuple[YMD, YMD, dict[str, Any]]:
+    """Existence span of an inception-dated entity: inception window start .. end window end (open without one)."""
+    assert d.start is not None
+    hi = d.end.hi if d.end is not None else _OPEN_HI
+    return (
+        d.start.lo,
+        hi,
+        {
+            "kind": "entity_existence",
+            "from": _iso(d.start.lo),
+            "to": _iso(d.end.hi) if d.end is not None else None,
+            "inception": d.start.as_dict(),
+            "end": d.end.as_dict() if d.end is not None else None,
+        },
+    )
+
+
+def temporal_detail(
+    cause: EventDates | None, effect: EventDates | None, claim_time: Window | None = None
+) -> tuple[TemporalCheck, dict[str, Any]]:
+    """Temporal check of one claim and the windows it used (see the module docstring for the rules)."""
     cs = cause.start if cause else None
     es = effect.start if effect else None
-    result = check(cs, es)
-    return result, {
-        "check": result,
+    out: dict[str, Any] = {
         "cause_start": cs.as_dict() if cs else None,
         "effect_start": es.as_dict() if es else None,
-        "rule": "cause start window vs effect start window, at date precision",
     }
+    entity_cause = cs is not None and cs.basis == INCEPTION_PID
+    entity_effect = es is not None and es.basis == INCEPTION_PID
+    if not (entity_cause or entity_effect) or cs is None or es is None:
+        plain = check(cs, es)
+        return plain, {"check": plain, **out, "rule": RULE_EVENTS}
+    assert cause is not None and effect is not None
+    if entity_cause:
+        c_lo, c_hi, c_desc = _span(cause)
+    else:
+        c_lo, c_hi, c_desc = cs.lo, cs.hi, {"kind": "event_start", **cs.as_dict()}
+    rule = "existence span of the entity dated by inception vs the other endpoint's time"
+    if entity_effect and claim_time is not None:
+        e_lo, e_hi, e_desc = claim_time.lo, claim_time.hi, {"kind": "claim_time_qualifier", **claim_time.as_dict()}
+        rule = "effect time = the claim's own time qualifier; " + (
+            rule if entity_cause else "compared with the cause start window"
+        )
+    elif entity_effect:
+        e_lo, e_hi, e_desc = _span(effect)
+    else:
+        e_lo, e_hi, e_desc = es.lo, es.hi, {"kind": "event_start", **es.as_dict()}
+    spans = entity_cause or e_desc["kind"] == "entity_existence"
+    result: TemporalCheck
+    if c_hi < e_lo:
+        result = "consistent"
+    elif c_lo > e_hi:
+        result = "inconsistent"
+    elif spans:
+        result = "undetermined"
+    else:
+        result = "overlapping"
+    detail = {"check": result, **out, "cause_time": c_desc, "effect_time": e_desc, "rule": rule}
+    if spans:
+        detail["entity_dated_by_inception"] = [s for s, f in (("cause", entity_cause), ("effect", entity_effect)) if f]
+        detail["reason"] = ENTITY_REASON
+    return result, detail
+
+
+def claim_time_window(period: Mapping[str, Any] | None) -> Window | None:
+    """The claim's own time qualifier (``scope.period`` of a KG claim): P585 point in time, else P580 start."""
+    for key, pid in (("pit", "P585"), ("start", "P580")):
+        p = (period or {}).get(key)
+        if isinstance(p, Mapping) and isinstance(p.get("time"), str) and isinstance(p.get("precision"), int):
+            w = window_of_time(p["time"], p["precision"], pid)
+            if w is not None:
+                return w
+    return None
 
 
 def dates_from_rows(rows: Iterable[Mapping[str, Any]]) -> dict[str, EventDates]:
@@ -150,6 +234,7 @@ __all__ = [
     "Window",
     "astro_iso",
     "check",
+    "claim_time_window",
     "dates_from_rows",
     "event_dates",
     "temporal_detail",

@@ -17,7 +17,7 @@ from sqlalchemy import Connection, Engine, text
 
 from reva.causal import grading as gr
 from reva.causal.model import _json, _new_load
-from reva.causal.temporal import DATE_PIDS, EventDates, dates_from_rows, temporal_detail
+from reva.causal.temporal import DATE_PIDS, EventDates, claim_time_window, dates_from_rows, temporal_detail
 from reva.kernel.errors import ValidationProblem
 
 GRADER_SOURCE = "reva.causal.grader"
@@ -79,6 +79,19 @@ class Computed:
     inputs_sha256: str
 
 
+def _notes(c: Mapping[str, Any], tdetail: Mapping[str, Any]) -> list[str]:
+    """Explanatory fact ids (grading.yaml version 2): why a KG claim is T4 despite references, how time was read."""
+    notes = []
+    if c.get("statement_key") and c["source_tier"] == "T4" and c.get("refs"):
+        if gr.kg_tier(c["source_key"], c["refs"])[1] == "wikimedia_import_only":
+            notes.append("tier.T4.wikimedia_import_only")
+    if tdetail.get("entity_dated_by_inception"):
+        notes.append("temporal.entity_dated_by_inception")
+    if (tdetail.get("effect_time") or {}).get("kind") == "claim_time_qualifier":
+        notes.append("temporal.claim_time_qualifier")
+    return notes
+
+
 def compute(claims: Sequence[Mapping[str, Any]], dates: Mapping[str, EventDates], rules: gr.Rules) -> list[Computed]:
     """Grades of ``claims`` (current claim rows of ONE origin) — pure, deterministic."""
     # Claims on the same (cause, effect, family) with the same stance corroborate each other; the opposite
@@ -105,8 +118,10 @@ def compute(claims: Sequence[Mapping[str, Any]], dates: Mapping[str, EventDates]
             | set(contests_of.get(c["claim_key"], []))
             | {f"qualifier:{d.get('property')}:{d.get('by')}" for d in (c.get("disputed_by") or [])}
         )
-        tcheck, tdetail = temporal_detail(dates.get(c["cause_id"]), dates.get(c["effect_id"]))
-        g = gr.decide(gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested)), rules)
+        tcheck, tdetail = temporal_detail(
+            dates.get(c["cause_id"]), dates.get(c["effect_id"]), claim_time_window((c.get("scope") or {}).get("period"))
+        )
+        g = gr.decide(gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested)), rules, _notes(c, tdetail))
         sha = gr.inputs_sha256(
             {
                 "rules": [rules.version, rules.sha256],
@@ -133,7 +148,8 @@ def grade_claims(engine: Engine, *, origin: str | None = None, rules: gr.Rules |
             claims = (
                 conn.execute(
                     text("""SELECT c.id, c.claim_key, c.cause_id, c.effect_id, c.family, c.stance, c.source_key,
-                                   c.source_tier, c.upstream_keys, c.contests, c.disputed_by, c.content_sha256
+                                   c.source_tier, c.upstream_keys, c.contests, c.disputed_by, c.content_sha256,
+                                   c.statement_key, c.refs, c.scope
                               FROM kg.causal_claim_current c WHERE c.origin = :o ORDER BY c.id LIMIT :cap"""),
                     {"o": o, "cap": MAX_CLAIMS_GRADED + 1},
                 )

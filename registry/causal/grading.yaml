@@ -5,13 +5,33 @@
 # temporal check, corroboration and contestation), so a grade can always be explained and re-derived.
 #
 # Changing any rule = bump `version`; the grader then writes new grade rows for every claim (new inputs).
+# Old grade rows are never edited: kg.causal_grade_current shows the latest row of each claim.
+#
+# Changelog
+#   1  (2026-10-16, CAUSCORE) initial table.
+#   2  (2026-10-17, CAUSFIX, findings of the Wikidata causal harvest docs/dev/v3_causwd.md; report
+#      docs/dev/v3_causfix.md):
+#      * tier: a reference made only of "imported from Wikimedia project" (P143) / "Wikimedia import URL"
+#        (P4656) snaks (and P813 retrieval dates) is a pointer to another wiki, not a source -> T4, with the
+#        fact rule tier.T4.wikimedia_import_only (reva.causal.grading.kg_tier; was T3).
+#      * tier: WDQS rows (source key wikidata.wdqs) were read without their references: "references unknown",
+#        not "unreferenced". The loader defers them (no claim, no tier invented; ClaimLoadReport.deferred_counts
+#        ["references_unknown"]) until an entity snapshot of the statement (wikidata.wbapi) is loaded.
+#      * temporal: an endpoint dated only by its inception (P571, no P580/P585) is an entity (state, polity,
+#        organisation), not an event: its existence span [inception .. P576/P582 end, open without one] is
+#        compared, never its founding date. consistent / inconsistent only when the whole span decides the
+#        order, else undetermined (fact temporal.entity_dated_by_inception). When the effect is such an entity
+#        and the claim carries its own P585 / P580 qualifier, that is the effect time (temporal.claim_time_qualifier).
+#        Event-to-event claims are unchanged.
+#      * the loader rejects a row the database refuses (per statement, with the constraint as reason) instead of
+#        aborting the whole load; chain search does not traverse class items (reva.causal.graph.class_nodes).
 #
 # Inputs of a claim:
 #   tier            T1..T4 (T5/T6 never reach this table: candidates are not graded)
 #   temporal_check  consistent | overlapping | inconsistent | undetermined
 #   corroborated    corroboration >= corroborated_min (independent source groups, the claim's own included)
 #   contested       a denying claim, an explicit `contests`, or a source qualifier (P1310 statement disputed by)
-version: "1"
+version: "2"
 corroborated_min: 2
 
 # Rules are evaluated in order; the first whose `when` matches decides the grade. Each condition key must
@@ -57,8 +77,8 @@ rules:
     grade: D
     when: {tier: [T4]}
     reason:
-      en: "Wikidata statement without references (community-edited, unsourced)."
-      fr: "Déclaration Wikidata sans référence (édition communautaire, non sourcée)."
+      en: "Wikidata statement without a source reference (community-edited, unsourced)."
+      fr: "Déclaration Wikidata sans référence à une source (édition communautaire, non sourcée)."
 
 # Fact rules: attached to every grade to say what the grade rule saw.
 facts:
@@ -72,8 +92,11 @@ facts:
     en: "Tier T3: Wikidata causal statement with references."
     fr: "Niveau T3 : déclaration causale Wikidata avec références."
   tier.T4:
-    en: "Tier T4: Wikidata causal statement without references."
-    fr: "Niveau T4 : déclaration causale Wikidata sans référence."
+    en: "Tier T4: Wikidata causal statement without a source reference."
+    fr: "Niveau T4 : déclaration causale Wikidata sans référence à une source."
+  tier.T4.wikimedia_import_only:
+    en: "Its only references say it was imported from a Wikimedia project (P143 / P4656): a pointer to another wiki, not a source."
+    fr: "Ses seules références indiquent une importation depuis un projet Wikimedia (P143 / P4656) : un renvoi vers un autre wiki, pas une source."
   temporal.consistent:
     en: "The cause starts before the effect, beyond date precision."
     fr: "La cause commence avant l'effet, au-delà de la précision des dates."
@@ -84,8 +107,14 @@ facts:
     en: "The cause starts after the effect, beyond date precision."
     fr: "La cause commence après l'effet, au-delà de la précision des dates."
   temporal.undetermined:
-    en: "A start date is missing (or outside the supported range): time was not checked."
-    fr: "Une date de début manque (ou hors de la plage prise en charge) : le temps n'a pas été vérifié."
+    en: "The order in time cannot be established (a start date is missing or out of range, or an entity's existence span does not decide it)."
+    fr: "L'ordre dans le temps ne peut pas être établi (date de début manquante ou hors plage, ou durée d'existence d'une entité non décisive)."
+  temporal.entity_dated_by_inception:
+    en: "The cause or effect is an entity dated by its inception (P571), not an event: its whole existence span was compared, not its founding date."
+    fr: "La cause ou l'effet est une entité datée par sa création (P571), pas un événement : toute sa durée d'existence a été comparée, pas sa date de fondation."
+  temporal.claim_time_qualifier:
+    en: "The effect time is the claim's own time qualifier (P585 point in time / P580 start time)."
+    fr: "Le moment de l'effet est le qualificatif temporel de l'affirmation elle-même (P585 date / P580 début)."
   corroboration.single:
     en: "One independent source group asserts this link."
     fr: "Un seul groupe de sources indépendantes affirme ce lien."
@@ -102,6 +131,7 @@ facts:
 # Temporal check (reva.causal.temporal): event start = P580 start time, else P585 point in time, else P571
 # inception; event end = P582, else P585, else P576. Each date is the window of its precision (year 1929 ->
 # 1929-01-01..1929-12-31; decade -> the decade; century and coarser widened one unit each side, as kg).
+# Version 2: a start read from P571 marks an entity; its existence span is compared (see the changelog).
 temporal:
   start_properties: [P580, P585, P571]
   end_properties: [P582, P585, P576]

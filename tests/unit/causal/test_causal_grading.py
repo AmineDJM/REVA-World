@@ -22,7 +22,7 @@ RULES = gr.load_rules()
 
 # ---------------------------------------------------------------------------------------------- rules
 def test_rule_table_is_versioned_and_complete() -> None:
-    assert RULES.version == "1" and len(RULES.sha256) == 64 and RULES.corroborated_min == 2
+    assert RULES.version == "2" and len(RULES.sha256) == 64 and RULES.corroborated_min == 2
     for tier, tc, corr, contested in itertools.product(gr.TIERS, gr.TEMPORAL, (1, 2, 3), (False, True)):
         g = gr.decide(gr.GradeInputs(tier, tc, corr, contested), RULES)
         assert g.grade in gr.GRADES and len(g.rule_ids) == 5

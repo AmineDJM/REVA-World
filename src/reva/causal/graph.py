@@ -7,6 +7,9 @@ Honesty rules (docs/roadmap/v3_causality.md):
   temporal check; the wording says "according to <source>" and that REVA does not establish causation;
 * a chain is REVA's *composition* of separately asserted claims; chain grade = weakest hop; ≤ 6 hops; only
   causal edges of the ``cause`` family with stance ``asserts`` are traversed (context edges never count);
+  intermediate nodes must not be *classes* by the KG's own statements (:func:`class_nodes`: "war", "peace
+  treaty", "casus belli" are kinds of events, not events); self-loops are reported by :func:`consistency`, never
+  traversed;
 * candidates (T5/T6) are only returned by :func:`candidates`, labelled unsourced;
 * every result is bounded (row caps, time budget, k paths) and says when it was cut.
 """
@@ -462,6 +465,34 @@ def _edges(
     return [(a, b, g) for a, b, g in rows[:cap]], len(rows) > cap
 
 
+CLASS_NODE_RULE = (
+    "intermediate nodes exclude classes: items with a P279 (subclass of) statement, or items that are only "
+    "targets of P31 (instance of) and have no P31 of their own (KG statements, not names)"
+)
+
+
+def class_nodes(conn: Connection, ids: Iterable[str], origin: str | None = None) -> set[str]:
+    """The ids the KG shows to be classes, not events: a P279 *subclass of* statement of their own, or targets
+    of P31 *instance of* with no P31 of their own. Ids the KG knows nothing about are not classes."""
+    qs = sorted(set(ids))
+    if not qs:
+        return set()
+    o_sql = " AND s.origin = :origin" if origin else ""
+    return {
+        q
+        for (q,) in conn.execute(
+            text(f"""SELECT q.id FROM unnest(CAST(:q AS text[])) q(id)
+                      WHERE EXISTS (SELECT 1 FROM kg.statement_current s
+                                     WHERE s.subject_qid = q.id AND s.property_pid = 'P279'{o_sql})
+                         OR (EXISTS (SELECT 1 FROM kg.statement_current s
+                                      WHERE s.object_qid = q.id AND s.property_pid = 'P31'{o_sql})
+                             AND NOT EXISTS (SELECT 1 FROM kg.statement_current s
+                                              WHERE s.subject_qid = q.id AND s.property_pid = 'P31'{o_sql}))"""),
+            {"q": qs, "origin": origin},
+        ).all()
+    }
+
+
 def chain(
     conn: Connection,
     frm: str,
@@ -498,12 +529,17 @@ def chain(
         "edges_scanned": 0,
         "ungraded_skipped": 0,
         "below_min_grade_skipped": 0,
+        "class_nodes_skipped": 0,
+        "class_nodes_sample": [],
+        "node_rule": CLASS_NODE_RULE,
         "truncated": False,
         "truncation_reasons": [],
         "time_budget_ms": int(time_budget_s * 1000),
     }
     best_len: int | None = None
     meet: set[str] = set()
+    is_class: dict[str, bool] = {}
+    skipped_classes: set[str] = set()
     while depth[0] + depth[1] < max_hops and frontier[0] and frontier[1]:
         if time.perf_counter() - t0 > time_budget_s:
             search["truncated"] = True
@@ -531,8 +567,14 @@ def chain(
                 search["below_min_grade_skipped"] += 1
             else:
                 usable.add((a, b))
+        reached = {(b if side == 0 else a) for a, b in usable} - {frm, to} - set(is_class)
+        found = class_nodes(conn, reached, origin)
+        is_class.update({q: q in found for q in reached})
         for a, b in usable:
             u, w = (a, b) if side == 0 else (b, a)
+            if is_class.get(w):  # an intermediate class node (endpoints as asked are kept)
+                skipped_classes.add(w)
+                continue
             if w not in dist[side]:
                 dist[side][w] = d + 1
                 nxt.add(w)
@@ -545,6 +587,8 @@ def chain(
             best_len = min(dist[0][m] + dist[1][m] for m in common)
             meet = {m for m in common if dist[0][m] + dist[1][m] == best_len}
             break
+    search["class_nodes_skipped"] = len(skipped_classes)
+    search["class_nodes_sample"] = sorted(skipped_classes)[:20]
     search["elapsed_ms"] = int((time.perf_counter() - t0) * 1000)
     labels_ids = {frm, to}
     if best_len is None:
@@ -552,6 +596,8 @@ def chain(
         reason = "no causal chain within max_hops among claims graded at least " + min_grade
         if search["truncated"] or search["ungraded_skipped"] or search["below_min_grade_skipped"]:
             reason += " (bounds, ungraded claims or the grade filter may hide one)"
+        if skipped_classes:
+            reason += f" ({len(skipped_classes)} class node(s) were not traversed)"
         return {
             "from": _ref(frm, lab, {}),
             "to": _ref(to, lab, {}),

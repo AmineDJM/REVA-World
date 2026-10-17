@@ -215,6 +215,9 @@ class ChainSearch(s.ApiModel):
     edges_scanned: int
     ungraded_skipped: int
     below_min_grade_skipped: int
+    class_nodes_skipped: int = Field(0, description="Class items (KG P279 / P31-only targets) not traversed")
+    class_nodes_sample: list[str] = Field(default_factory=list, max_length=20)
+    node_rule: str = ""
     truncated: bool
     truncation_reasons: list[str]
     time_budget_ms: int

@@ -1,0 +1,1014 @@
+{
+ "schema": "reva-events-wikidata-property-search/1",
+ "built_by": "agent SAMEAS, 2026-10-17",
+ "method": "Full-text search of the Wikidata property namespace (ns 120) through Special:Search page views (https://www.wikidata.org/w/index.php?search=<term>&title=Special:Search&profile=advanced&fulltext=1&ns120=1&limit=100), then Special:EntityData snapshots of the candidate properties; all through the budget-metered wikidata.wbapi client (reva.events.verify.wbapi_client, machine-wide lock). The action API (wbsearchentities / list=search) answered HTTP 429 to the shared egress during the run. Raw bodies are archived content-addressed in var/kg/objects (raw_sha256, var/kg/archive_index.jsonl).",
+ "control": "'Global Volcanism Program' finds P1886 (Global Volcanism Program ID), the property NCEI volcano records are already linked by.",
+ "finding": "No Wikidata property holds identifiers of Correlates of War wars, UCDP conflicts/agreements, ICB crises, MID disputes, Archigos, NAVCO, Mass Mobilization, TIES or PRIO records (searches return no property). Earthquake identifier properties exist (P3196 USGS earthquake ID, P6419 GEOFON, P4207 INGV, P5182 JMA) and P14355 EM-DAT disaster number, but the NCEI hazard records REVA loads carry none of these identifiers (checked in the archived NCEI API responses: fields id, earthquakeEventId, tsunamiEventId, volcanoLocationNum, ...), so no NCEI event can be linked to a Wikidata item by a shared identifier.",
+ "searches": {
+  "Correlates of War": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "78bb47b68ded4167802e2f7e3e759cbaf88c1b6dd2a931f3d80356883c5e7df2",
+   "retrieved_at": "2026-10-17T01:50:00.162922+00:00"
+  },
+  "UCDP": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "bff8e4650f7f18f14de22f905fabaafa00b6d93710b4fd17b279c19ef7dd33a7",
+   "retrieved_at": "2026-10-17T01:50:02.411964+00:00"
+  },
+  "Uppsala Conflict Data": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "94bd51f6f512f40de6f5764022edb76f7dd14f56609c631f2ae973c9bae0a12a",
+   "retrieved_at": "2026-10-17T01:50:04.705644+00:00"
+  },
+  "International Crisis Behavior": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "94371175571003dcfb8a880946ac81f6df6a9d355c429b2523929fcda7260bdc",
+   "retrieved_at": "2026-10-17T01:50:06.996727+00:00"
+  },
+  "Militarized Interstate Dispute": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "c032b48f43eb1acbcf8e8271cf621bd0351d407642d214e99601c4d289cbb523",
+   "retrieved_at": "2026-10-17T01:50:09.276712+00:00"
+  },
+  "NCEI": {
+   "hits": [
+    "P4150"
+   ],
+   "no_results": false,
+   "raw_sha256": "556ead6647c76b77cfa22765c49cd782e46d20f73572f83874182a507097d050",
+   "retrieved_at": "2026-10-17T01:50:11.554108+00:00"
+  },
+  "National Centers for Environmental Information": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "5b24c620e108d581d92bb5996ca3cbb3dc49ee12501934dd18552b62c4fc5640",
+   "retrieved_at": "2026-10-17T01:50:13.780848+00:00"
+  },
+  "NGDC": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "9249dc06247f5662e3df792e31c489f58379a4dc65c7ba8764d9797f5c9391f2",
+   "retrieved_at": "2026-10-17T01:50:16.030353+00:00"
+  },
+  "tsunami": {
+   "hits": [
+    "P9936"
+   ],
+   "no_results": false,
+   "raw_sha256": "b03a3aaff033b08b9d8714b8d1a45acb6284ee44ea10add02a726958e3901be1",
+   "retrieved_at": "2026-10-17T01:50:18.256916+00:00"
+  },
+  "earthquake": {
+   "hits": [
+    "P2528",
+    "P6419",
+    "P2527",
+    "P3196",
+    "P4207",
+    "P2320",
+    "P2784",
+    "P5900",
+    "P8455",
+    "P5386",
+    "P5182",
+    "P10099"
+   ],
+   "no_results": false,
+   "raw_sha256": "c5a3d77db8feb10eec0faa11db7bf58f35337787854c5d41757a5562dead9a05",
+   "retrieved_at": "2026-10-17T01:50:20.654163+00:00"
+  },
+  "GLIDE": {
+   "hits": [
+    "P1470"
+   ],
+   "no_results": false,
+   "raw_sha256": "c887106f680c749b37a6d5acd674f4a40049a38b09fad58325a7839e26f82746",
+   "retrieved_at": "2026-10-17T01:50:22.982415+00:00"
+  },
+  "EM-DAT": {
+   "hits": [
+    "P14355",
+    "P7888",
+    "P813",
+    "P144",
+    "P65",
+    "P1114",
+    "P138",
+    "P585",
+    "P1629",
+    "P171",
+    "P1317",
+    "P9660",
+    "P2354",
+    "P1111",
+    "P576",
+    "P1314",
+    "P9073",
+    "P8010",
+    "P577",
+    "P119",
+    "P94",
+    "P1810",
+    "P1434",
+    "P6375",
+    "P937",
+    "P1855",
+    "P1034",
+    "P19",
+    "P580",
+    "P10960",
+    "P571",
+    "P131",
+    "P11868"
+   ],
+   "no_results": false,
+   "raw_sha256": "ee60ddd96a1bb9b276fca779852417e8d26f6847a4d36caa4d7eceec620b373f",
+   "retrieved_at": "2026-10-17T01:50:25.362830+00:00"
+  },
+  "Archigos": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "671444a4961da74a7d5ccb9a83deaf0bddd74b6142e8ca74ce7541c528dd4e06",
+   "retrieved_at": "2026-10-17T01:50:27.681196+00:00"
+  },
+  "NAVCO": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "edf5445977513fe7b432ae071d8c8333180fde7dcf4c0b927bc1f3825d0249f5",
+   "retrieved_at": "2026-10-17T01:50:29.903954+00:00"
+  },
+  "sanctions": {
+   "hits": [
+    "P14521",
+    "P10632",
+    "P1596"
+   ],
+   "no_results": false,
+   "raw_sha256": "255fe5c6045a4973647ae38e3d0bbcdf247dbbdf3737834a35bcfcea8ef53f5f",
+   "retrieved_at": "2026-10-17T01:50:32.173881+00:00"
+  },
+  "peace agreement": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "e48da22cb085fad0ec2120da2e28e400c4638a61759ef623cd08c5e350d58789",
+   "retrieved_at": "2026-10-17T01:50:34.412268+00:00"
+  },
+  "Global Volcanism Program": {
+   "hits": [
+    "P1886"
+   ],
+   "no_results": false,
+   "raw_sha256": "1e4e312f822c49763a896728ac1df1da0a551eecb66bcb265fbc951b678c2169",
+   "retrieved_at": "2026-10-17T01:50:36.663739+00:00"
+  },
+  "PRIO": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "82e75f64d81a9fa5d762375646690fe84971fbd063c6a7d464d13d61c2d7a914",
+   "retrieved_at": "2026-10-17T01:50:38.995302+00:00"
+  },
+  "PA-X": {
+   "hits": [
+    "P2002",
+    "P6552",
+    "P5933",
+    "P7973",
+    "P8720",
+    "P6835",
+    "P8687",
+    "P304",
+    "P195",
+    "P4196",
+    "P4945",
+    "P7194",
+    "P7820",
+    "P4575",
+    "P274",
+    "P443",
+    "P2061",
+    "P7607",
+    "P1207",
+    "P7793",
+    "P213",
+    "P1258",
+    "P957",
+    "P3308",
+    "P5282",
+    "P6262",
+    "P9753",
+    "P12001",
+    "P12735"
+   ],
+   "no_results": false,
+   "raw_sha256": "b09723c5ab5a5e7b91d40b90a962a75b7eb6929de60d98f5b94f7e1c31123862",
+   "retrieved_at": "2026-10-17T01:50:41.428154+00:00"
+  },
+  "Correlates": {
+   "hits": [
+    "P11821",
+    "P1659",
+    "P668"
+   ],
+   "no_results": false,
+   "raw_sha256": "65c902b9b867be4ac076ffba15eb0d6529178890d7c6747d00da9ef86c03e5b3",
+   "retrieved_at": "2026-10-17T01:51:54.235743+00:00"
+  },
+  "conflict identifier": {
+   "hits": [
+    "P11157",
+    "P13196",
+    "P11263",
+    "P12537"
+   ],
+   "no_results": false,
+   "raw_sha256": "f5d51225001c9d1fee2df9a2cf21979bb2e3c3516d3a9ad77cbda7bfa4de9795",
+   "retrieved_at": "2026-10-17T01:51:56.634554+00:00"
+  },
+  "crisis": {
+   "hits": [
+    "P10099",
+    "P8369"
+   ],
+   "no_results": false,
+   "raw_sha256": "5a336b29150c322be8fe3b842209e057396373f1e21ca0a247808e0d5d9daa82",
+   "retrieved_at": "2026-10-17T01:51:58.834643+00:00"
+  },
+  "coup": {
+   "hits": [
+    "P9184",
+    "P1399",
+    "P10729",
+    "P8839",
+    "P1437",
+    "P5286",
+    "P8031",
+    "P3530",
+    "P7781"
+   ],
+   "no_results": false,
+   "raw_sha256": "fcf5218bc1136d149469b83b8190f778dc46166875fb6bf3186cde404eec2e31",
+   "retrieved_at": "2026-10-17T01:52:01.345357+00:00"
+  },
+  "war identifier": {
+   "hits": [
+    "P1908",
+    "P10865",
+    "P1920",
+    "P5956",
+    "P3038",
+    "P9426",
+    "P6713",
+    "P4601",
+    "P8578",
+    "P8992",
+    "P7474",
+    "P9910",
+    "P8387",
+    "P9890",
+    "P7949",
+    "P10348",
+    "P1047",
+    "P7298",
+    "P1116",
+    "P3798",
+    "P4947",
+    "P9201",
+    "P1562",
+    "P3819",
+    "P3167",
+    "P3638",
+    "P10447",
+    "P7875",
+    "P8013",
+    "P1229",
+    "P6337",
+    "P1185",
+    "P4554",
+    "P7717",
+    "P7686",
+    "P6284",
+    "P8400",
+    "P3106",
+    "P3851",
+    "P12832",
+    "P10248",
+    "P10546",
+    "P10951",
+    "P11030",
+    "P8820",
+    "P4551",
+    "P5990",
+    "P1115",
+    "P10171",
+    "P9671",
+    "P10411",
+    "P3817",
+    "P1417",
+    "P10501",
+    "P2013",
+    "P12375",
+    "P6196",
+    "P12875",
+    "P12666",
+    "P13583",
+    "P13200",
+    "P14338",
+    "P11877",
+    "P14048",
+    "P12580",
+    "P11797",
+    "P11537",
+    "P12741",
+    "P11573",
+    "P11643",
+    "P12253"
+   ],
+   "no_results": false,
+   "raw_sha256": "d1e0be1b13db0b299f8258e8cff0bd435bb20dff0ca3747a77e669ec12a6806b",
+   "retrieved_at": "2026-10-17T01:52:04.633461+00:00"
+  },
+  "battle": {
+   "hits": [
+    "P607",
+    "P4220",
+    "P5756",
+    "P13193",
+    "P1685",
+    "P10913",
+    "P6723",
+    "P1346",
+    "P5248",
+    "P7688",
+    "P6666",
+    "P7690",
+    "P5116",
+    "P13196",
+    "P14460",
+    "P11768",
+    "P12953"
+   ],
+   "no_results": false,
+   "raw_sha256": "a315447f5e7b4ed77b576d139ca84c6c2d1da60ff2fdbc26634b3f26cb121d10",
+   "retrieved_at": "2026-10-17T01:52:06.902343+00:00"
+  },
+  "protest": {
+   "hits": [
+    "P5004",
+    "P11641"
+   ],
+   "no_results": false,
+   "raw_sha256": "8531d23609e03b03c415ad28f2e77e65ef08e67bdf3bf9f62497e29eb92d2a09",
+   "retrieved_at": "2026-10-17T01:52:09.186498+00:00"
+  },
+  "Treaty Series": {
+   "hits": [
+    "P4222",
+    "P4231",
+    "P5799"
+   ],
+   "no_results": false,
+   "raw_sha256": "bf6d732c7708e3e2f3400739086b7bfc5434f9b8e4e9bf16b300736554252b70",
+   "retrieved_at": "2026-10-17T01:52:11.478955+00:00"
+  },
+  "United Nations Treaty": {
+   "hits": [
+    "P4222",
+    "P4231",
+    "P9966"
+   ],
+   "no_results": false,
+   "raw_sha256": "765c21487f509560f3b9c2bac4bcb3cbfafe349f987757d005bfe34b52adcebb",
+   "retrieved_at": "2026-10-17T01:52:13.735518+00:00"
+  },
+  "MTDSG": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "32b1f0a9d35004e03007351c50855861429958afc758376b87224a76c5b3d91f",
+   "retrieved_at": "2026-10-17T01:52:15.934488+00:00"
+  },
+  "peacekeeping": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "c84368b09dc7955fcfc8e9f9f875ec3e1557c02cfd0afa063855443a6d7d335d",
+   "retrieved_at": "2026-10-17T01:52:18.249743+00:00"
+  },
+  "Seshat": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "dc5d99734961f898ad5bd80c6895fdc2d59a40c8cead7d6e6c552ffba6e6005a",
+   "retrieved_at": "2026-10-17T01:52:20.449739+00:00"
+  },
+  "Cliopatria": {
+   "hits": [
+    "P2514",
+    "P2513"
+   ],
+   "no_results": false,
+   "raw_sha256": "c042a62a5c7899d11b3016c1e28d18ccd24cde876f8af771a38494b84b5f99a0",
+   "retrieved_at": "2026-10-17T01:52:22.792368+00:00"
+  },
+  "disaster": {
+   "hits": [
+    "P10099",
+    "P14355",
+    "P9924",
+    "P14356",
+    "P12537"
+   ],
+   "no_results": false,
+   "raw_sha256": "fe942a8a1236e37c2c3c460143852f7d88733c2a30d2d35b90a4c78712538353",
+   "retrieved_at": "2026-10-17T01:52:25.014345+00:00"
+  },
+  "Mass Mobilization": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "56a10b3f64147f7651484560db21ff51a7ed4e3da107bd891b80e514b618f70f",
+   "retrieved_at": "2026-10-17T01:52:27.241751+00:00"
+  },
+  "Threat and Imposition": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "3412913a0ab8f144fb2904ffa7330cca56c35f4564dc8d15b24013bf246fec49",
+   "retrieved_at": "2026-10-17T01:52:29.973931+00:00"
+  },
+  "volcanic eruption": {
+   "hits": [
+    "P1903",
+    "P3815"
+   ],
+   "no_results": false,
+   "raw_sha256": "2fd38d3a51402a36b9be10597415c144caecdda95b0f16238cd10fceb136857c",
+   "retrieved_at": "2026-10-17T01:52:32.311797+00:00"
+  }
+ },
+ "properties": {
+  "P2527": {
+   "label_en": "earthquake magnitude on the moment magnitude scale",
+   "description_en": "magnitude of an earthquake according to the moment magnitude scale",
+   "datatype": "quantity",
+   "lastrevid": 2529964880,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 201605,
+     "id": "Q201605"
+    }
+   ],
+   "raw_sha256": "ed9c60dd3d36a23e5543abf6244c699557b7f58fcf949cfdf91c31c8ed721e18",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P2528": {
+   "label_en": "earthquake magnitude on the Richter magnitude scale",
+   "description_en": "magnitude of an earthquake according to the Richter magnitude scale",
+   "datatype": "quantity",
+   "lastrevid": 2538702702,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 38768,
+     "id": "Q38768"
+    }
+   ],
+   "raw_sha256": "f7bda073e6b6ec0f049df32c0bfcd768eadf9992cfede009b6ff035d688a9a64",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P1470": {
+   "label_en": "maximum glide ratio",
+   "description_en": "maximum glide ratio of an aircraft",
+   "datatype": "quantity",
+   "lastrevid": 2326270965,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 845727,
+     "id": "Q845727"
+    }
+   ],
+   "raw_sha256": "936e5af7b0c37287432106792e21b098e55f9687310be8f09e5f87f24b6a4fd5",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P1596": {
+   "label_en": "penalty",
+   "description_en": "penalty imposed by an authority",
+   "datatype": "wikibase-item",
+   "lastrevid": 2551716879,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 186361,
+     "id": "Q186361"
+    },
+    {
+     "entity-type": "item",
+     "numeric-id": 1763090,
+     "id": "Q1763090"
+    }
+   ],
+   "raw_sha256": "1edbc3a84ab974c5263e044b4575501988cc4965d3c19a2bddded650c43b053d",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P1886": {
+   "label_en": "Global Volcanism Program ID",
+   "description_en": "identifier of volcano in the Smithsonian Global Volcanism Program. Format: 6 digits.",
+   "datatype": "external-id",
+   "lastrevid": 2421471244,
+   "formatter_url_P1630": [
+    "https://volcano.si.edu/volcano.cfm?vn=$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "c473aa3737c2cf322e55f16344714f12f01a1f88940ce0ac4d4b57035a445e8e",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P2320": {
+   "label_en": "aftershocks",
+   "description_en": "number of smaller earthquakes which follow a significant earthquake",
+   "datatype": "quantity",
+   "lastrevid": 2544594726,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 308442,
+     "id": "Q308442"
+    }
+   ],
+   "raw_sha256": "28cf7612d13e31196275e7f6aa09c1772aee24c05f67f176154d05ff8dd6177a",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P2784": {
+   "label_en": "modified Mercalli intensity scale",
+   "description_en": "measurement of the intensity of an earthquake",
+   "datatype": "wikibase-item",
+   "lastrevid": 2530339265,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 170350,
+     "id": "Q170350"
+    }
+   ],
+   "raw_sha256": "bdec13689e002b6fbc6eca00a8828356f835b29f2f33bf2c1aba2388a025f120",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P3196": {
+   "label_en": "USGS earthquake ID",
+   "description_en": "identifier for an earthquake or other seismic event, in the United States Geological Survey database",
+   "datatype": "external-id",
+   "lastrevid": 2510232562,
+   "formatter_url_P1630": [
+    "https://earthquake.usgs.gov/earthquakes/eventpage/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "2d2eb04b042bbd8d46dd3a81dbdb3f4eefeefcf5568b0417537116473b2b35ee",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P4150": {
+   "label_en": "weather history",
+   "description_en": "link to a Commons tabular data file with the weather history of a certain place",
+   "datatype": "tabular-data",
+   "lastrevid": 2329426897,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 47333333,
+     "id": "Q47333333"
+    }
+   ],
+   "raw_sha256": "db4665ae226c1afc604a66e833d556472cfb3ee423e91bfebc8d2fb630da3ee8",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P4207": {
+   "label_en": "Italian National Earthquake Center ID",
+   "description_en": "identifier for an earthquake in the Italian National Earthquake Centre database",
+   "datatype": "external-id",
+   "lastrevid": 2341139377,
+   "formatter_url_P1630": [
+    "http://cnt.rm.ingv.it/event/$1",
+    "https://terremoti.ingv.it/event/$1",
+    "https://terremoti.ingv.it/en/event/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "2006117bc67216e8bc07ad9b69b8868f07c037832901c14a29bf7b475814f5c1",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P5182": {
+   "label_en": "JMA Seismic Intensity Database ID",
+   "description_en": "identifier for an earthquake event in Japan Meteorological Agency Seismic Intensity Database",
+   "datatype": "external-id",
+   "lastrevid": 2531483074,
+   "formatter_url_P1630": [
+    "http://www.data.jma.go.jp/svd/eqdb/data/shindo/Event.php?ID=$1",
+    "https://www.data.jma.go.jp/svd/eqdb/data/shindo/#$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "b291eb12ca8bbe6d6ba1893e6805c9a2a9b19b10705051fd440fa06d39361693",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P5386": {
+   "label_en": "JMA Seismic Intensity Scale",
+   "description_en": "maximum intensity scale of this earthquake given by JMA Seismic Intensity Scale",
+   "datatype": "wikibase-item",
+   "lastrevid": 2531483293,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 131048,
+     "id": "Q131048"
+    }
+   ],
+   "raw_sha256": "2ac675969b525900d8406c6d40b97a208f5b353a7752c0f38de267d129b532dc",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P5900": {
+   "label_en": "JMA Magnitude",
+   "description_en": "magnitude of an earthquake according to Japan Meteorological Agency",
+   "datatype": "quantity",
+   "lastrevid": 2531483635,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 1676638,
+     "id": "Q1676638"
+    }
+   ],
+   "raw_sha256": "e350708d58b03fa225d3b3e4bf7a3e67180a3604030e1ac949f8ac87d437f11d",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P6419": {
+   "label_en": "GEOFON earthquake ID",
+   "description_en": "ID of an earthquake in GEOFON earthquake ID",
+   "datatype": "external-id",
+   "lastrevid": 2531483829,
+   "formatter_url_P1630": [
+    "https://geofon.gfz-potsdam.de/eqinfo/event.php?id=$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "3684b5728b103ba2378bb7ea295461f843be3cc0d6214a39d1d02a216da55a03",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P7888": {
+   "label_en": "merged into",
+   "description_en": "the subject was dissolved and merged into the object, that existed previously",
+   "datatype": "wikibase-item",
+   "lastrevid": 2547719263,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 17853087,
+     "id": "Q17853087"
+    }
+   ],
+   "raw_sha256": "87e28a9e64556beb85b3553f1ec48548126e3a71da2b48a08539aa300a69dbed",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P8455": {
+   "label_en": "US Quaternary Fault ID",
+   "description_en": "ID Number of Quaternary Fault in the US as assigned by the United States Geological Survey",
+   "datatype": "external-id",
+   "lastrevid": 2542641947,
+   "formatter_url_P1630": [
+    "https://earthquake.usgs.gov/cfusion/qfault/show_report_AB.cfm?fault_id=$1&section_id="
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "ab874f10bdd93fec43a2ec57fae0b23f09897412a06eba805945c199a7b4ba7e",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P9936": {
+   "label_en": "Indonesian Museum National Registration System ID",
+   "description_en": "identifiant of Indonesian Museum National Registration System by Ministry of Education, Culture, Research and Technology of Indonesia",
+   "datatype": "external-id",
+   "lastrevid": 2555849444,
+   "formatter_url_P1630": [
+    "https://museum.kemdikbud.go.id/museum/profile/$1",
+    "https://museum.kemenbud.go.id/museum/profile/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "3e371c7e0b6b76c5e5699212428dae91bea277201676ee4f7b017e4f13891455",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P10099": {
+   "label_en": "Australian Institute for Disaster Resilience Knowledge Hub ID",
+   "description_en": "identifier in the Australian Institute for Disaster Resilience Knowledge Hub",
+   "datatype": "external-id",
+   "lastrevid": 2386730434,
+   "formatter_url_P1630": [
+    "https://knowledge.aidr.org.au/resources/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "3ca020a6580e6dcfc458d0b271d77ff301ebb7f3f3c454ddec4f828dfc90c9bc",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P10632": {
+   "label_en": "OpenSanctions ID",
+   "description_en": "identifier of persons, companies, luxury vessels of political, criminal, or economic interest at opensanctions.org",
+   "datatype": "external-id",
+   "lastrevid": 2531654093,
+   "formatter_url_P1630": [
+    "https://www.opensanctions.org/entities/$1/"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 110087116,
+     "id": "Q110087116"
+    }
+   ],
+   "raw_sha256": "4b07e5c767b50fbd0677c345c1e1709ab94d5e503bc06980345dad1c4b6a6191",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P14355": {
+   "label_en": "EM-DAT disaster number",
+   "description_en": "unique identifier of a disaster in EM-DAT (Emergency Events Database)",
+   "datatype": "external-id",
+   "lastrevid": 2484603265,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 56304318,
+     "id": "Q56304318"
+    }
+   ],
+   "raw_sha256": "5acfc29897cba0d4cac3ae543967d4592b0b67dd3f37dd8eb82a41642fe14b86",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P14521": {
+   "label_en": "EU sanctions tracker subject ID",
+   "description_en": "identifier for an individual or entity on the EU sanctions tracker",
+   "datatype": "external-id",
+   "lastrevid": 2553494960,
+   "formatter_url_P1630": [
+    "https://data.europa.eu/apps/eusanctionstracker/subjects/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "ecfded6bf9a9b3b8c5e17265d66c296fd5eacd7fe11c09f08707cb6ae3f26a4e",
+   "retrieved_at": "2026-10-16T18:24:45.667636+00:00"
+  },
+  "P668": {
+   "label_en": "GeneReviews ID",
+   "description_en": "collection of peer-reviewed articles that describe specific gene-related diseases",
+   "datatype": "external-id",
+   "lastrevid": 2341383917,
+   "formatter_url_P1630": [
+    "https://www.ncbi.nlm.nih.gov/books/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "5b56ded8c8c2776c5436ebed54510e6e22d60e4f24e0bcecb0ef19c220fdd1e2",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P1903": {
+   "label_en": "volcanic explosivity index",
+   "description_en": "scale indicating size of an explosive volcanic eruption",
+   "datatype": "wikibase-item",
+   "lastrevid": 2525729766,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 210510,
+     "id": "Q210510"
+    }
+   ],
+   "raw_sha256": "887017f54bc5caa222a326ed00181a97fa518d0c6370b727fe11943c3d9bad2d",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P3815": {
+   "label_en": "volcano observatory",
+   "description_en": "institution that monitors this volcanic landform or phenomenon",
+   "datatype": "wikibase-item",
+   "lastrevid": 2316724734,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 1778118,
+     "id": "Q1778118"
+    }
+   ],
+   "raw_sha256": "3819fe109c026a07073c1cc573acc366d0eed6a6fe9d5d7a1872d4c5c03b1ffb",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P4222": {
+   "label_en": "United Nations Treaty Series Volume Number",
+   "description_en": "volume number within the United Nations Treaty Series",
+   "datatype": "external-id",
+   "lastrevid": 2347033783,
+   "formatter_url_P1630": [
+    "https://treaties.un.org/doc/Publication/UNTS/Volume%20$1/v$1.pdf"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "c535bf20d16df0c6e81a489aed65b7892fa43faa2daa4a2eba9fe30c03956841",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P4231": {
+   "label_en": "United Nations Treaty Series registration number",
+   "description_en": "registration number of a treaty within the United Nations Treaty Series",
+   "datatype": "external-id",
+   "lastrevid": 2528669863,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [],
+   "raw_sha256": "9b6e507c03bcc6cbe6135d0143dc8f1269ea447eb71eb0b8c2364276c97c3332",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P5004": {
+   "label_en": "in opposition to",
+   "description_en": "object of a social action",
+   "datatype": "wikibase-item",
+   "lastrevid": 2521963927,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 49773,
+     "id": "Q49773"
+    }
+   ],
+   "raw_sha256": "2aacce57b81242b7d5de26fb3caf63d832174aed868810d27c34dd135f796a40",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P5799": {
+   "label_en": "AustLII ID",
+   "description_en": "identifier in the Australasian Legal Information Institute (AustLII) online database",
+   "datatype": "external-id",
+   "lastrevid": 2344885343,
+   "formatter_url_P1630": [
+    "https://www.austlii.edu.au/$1.html"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 4823441,
+     "id": "Q4823441"
+    }
+   ],
+   "raw_sha256": "4dcc91dff4faffbaf2743f703345872af0956ad9c8a063f12ad2a986b6d3f3c3",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P8369": {
+   "label_en": "Econlib entry ID",
+   "description_en": "identifier for an entry in encyclopedia of the Library of Economics and Liberty by Liberty Fund, Inc., a private, educational foundation",
+   "datatype": "external-id",
+   "lastrevid": 2203536806,
+   "formatter_url_P1630": [
+    "https://www.econlib.org/library/Enc/$1.html"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "8f09619235b43ee2b2704f3c5d17c1160085ffc3387c151eef27c9a19cfa6a40",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P9924": {
+   "label_en": "number of evacuated",
+   "description_en": "number of people who have to be evacuated as a result of an event such as a natural or human disaster",
+   "datatype": "quantity",
+   "lastrevid": 2538702281,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 606332,
+     "id": "Q606332"
+    }
+   ],
+   "raw_sha256": "10e99b78605754595b3eea79ace3fabdfe3d0c96c7b9004b18c093d6ed96880b",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P9966": {
+   "label_en": "United Nations Treaty Collection object ID",
+   "description_en": "identifier in the United Nations database of treaties registered with the Secretariat",
+   "datatype": "external-id",
+   "lastrevid": 2280415043,
+   "formatter_url_P1630": [
+    "https://treaties.un.org/Pages/showDetails.aspx?objid=$1",
+    "https://treaties.un.org/Pages/showDetails.aspx?objid=$1&clang=_en",
+    "https://treaties.un.org/Pages/showDetails.aspx?objid=$1&clang=_fr"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 108775623,
+     "id": "Q108775623"
+    }
+   ],
+   "raw_sha256": "76d98e9530775b8a62e18a9dcf08721a5d1bb591839c2296e9e227c8b94ad168",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P11157": {
+   "label_en": "HiSCoD ID",
+   "description_en": "identifier for a riot or other event in the Historical Social Conflict Database",
+   "datatype": "external-id",
+   "lastrevid": 2052073328,
+   "formatter_url_P1630": [
+    "https://pdnprod.unicaen.fr/hiscod/ead.html?id=HISCOD&c=HISCOD_$1",
+    "https://www.unicaen.fr/hiscod/ead.html?id=HISCOD&c=HISCOD_$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "6c5abf7792963508b147b7e59d06ce74b36cc7e1914f7ada3214a5f87c7bb73a",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P11263": {
+   "label_en": "The Britannica Dictionary entry",
+   "description_en": "identifier for an entry in The Britannica Dictionary",
+   "datatype": "external-id",
+   "lastrevid": 2358841034,
+   "formatter_url_P1630": [
+    "https://www.britannica.com/dictionary/$1",
+    "https://wikidata-externalid-url.toolforge.org/?url=https%3A%2F%2Fwww.britannica.com%2Fdictionary%2F%251&exp=%28.%2A%29&id=$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "35009fa8a802fe8354a9fe6ca6ee2b0f5e69e0d9156fae582be050bc2a7c1a69",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P11641": {
+   "label_en": "explain xkcd ID",
+   "description_en": "identifier for an explain xkcd article",
+   "datatype": "external-id",
+   "lastrevid": 2553547049,
+   "formatter_url_P1630": [
+    "https://explainxkcd.com/wiki/index.php/$1"
+   ],
+   "subject_item_P1629": [],
+   "raw_sha256": "6ae7acca7ef44b43a5942b520b0c2b5d4afd2163b0e701644251243bfda01758",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P11821": {
+   "label_en": "quality is the result of process",
+   "description_en": "quality that this process/activity directly correlates to and produces",
+   "datatype": "wikibase-item",
+   "lastrevid": 2554272130,
+   "formatter_url_P1630": [],
+   "subject_item_P1629": [
+    null
+   ],
+   "raw_sha256": "eeb2137d83a0e470e29129ed7d48d585515a40d76a0d086964d856bcfc3e7a21",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P12537": {
+   "label_en": "EJAtlas ID",
+   "description_en": "identifier for an environmental issue, conflict, disaster, etc. in the Environmental Justice Atlas",
+   "datatype": "external-id",
+   "lastrevid": 2101847367,
+   "formatter_url_P1630": [
+    "https://ejatlas.org/conflict/$1"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 119999054,
+     "id": "Q119999054"
+    }
+   ],
+   "raw_sha256": "ff35c9766bfe33451124eb6def5955ebaa8dda8ae6eee4182bd03ce9baba4647",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P13196": {
+   "label_en": "Three Decks conflict ID",
+   "description_en": "database identifier for conflicts involving of sail powered warships",
+   "datatype": "external-id",
+   "lastrevid": 2341553382,
+   "formatter_url_P1630": [
+    "https://threedecks.org/index.php?display_type=show_battle&id=$1"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 68966143,
+     "id": "Q68966143"
+    }
+   ],
+   "raw_sha256": "d475b91219b4c3931be933d7f2e4319e7c5744a8b1d1342c220349896512524c",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  },
+  "P14356": {
+   "label_en": "UNDRR-ISC Hazard Information Profile ID",
+   "description_en": "identifier at the Hazard Information Profiles published by the United Nations Office for Disaster Risk Reduction and the International Science Council",
+   "datatype": "external-id",
+   "lastrevid": 2499216860,
+   "formatter_url_P1630": [
+    "https://www.preventionweb.net/understanding-disaster-risk/terminology/hips/$1"
+   ],
+   "subject_item_P1629": [
+    {
+     "entity-type": "item",
+     "numeric-id": 139380405,
+     "id": "Q139380405"
+    }
+   ],
+   "raw_sha256": "87179a081dec449ba1429978178bccbc3d73bf97f29085aa482a47c38078fc52",
+   "retrieved_at": "2026-10-17T01:52:38.817357+00:00"
+  }
+ }
+}

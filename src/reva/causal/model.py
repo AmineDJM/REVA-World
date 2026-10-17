@@ -1,9 +1,11 @@
 """Causal claims and candidates: the write side (loaders). See ``docs/dev/v3_causal_interface.md``.
 
 * :func:`load_kg_claims` — causal Wikidata statements of ``kg.statement_current`` -> claims (T3 with
-  references, T4 without; T2 when a reference carries a DOI/ISBN), direction normalised, statement key/id/row,
-  revision, raw sha256 and references kept verbatim. Idempotent; a statement that left the KG current view
-  retracts its claim.
+  references, T4 without — or with only "imported from Wikimedia" pointers; T2 when a reference carries a
+  DOI/ISBN; WDQS rows, whose references were never read, are deferred: no tier is invented), direction
+  normalised, statement key/id/row, revision, raw sha256 and references kept verbatim. Idempotent; a statement
+  that left the KG current view retracts its claim. A row the database refuses is rejected with its reason;
+  it never aborts the load.
 * :func:`load_dataset_claims` — T1/T2 claims of expert-coded datasets (dataset row selector + raw sha256 +
   codebook). Idempotent; with ``complete=True`` claims absent from the delivery are retracted.
 * :func:`insert_candidates` — quarantined T5/T6 candidates (separate table, never graded, never in answers).
@@ -26,6 +28,7 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import Connection, Engine, text
+from sqlalchemy.exc import DBAPIError
 
 from reva.causal import grading as gr
 from reva.causal.vocab import CAUSAL_PIDS, POLARITIES, RELATIONS, STANCES, Vocabulary, normalise_wikidata, vocabulary
@@ -33,7 +36,7 @@ from reva.kernel.errors import ValidationProblem
 from reva.kg.model import QID_RE, SHA_RE, SOURCE_KEY_RE, _ensure_raw_artifacts
 from reva.kg.query import is_community_edited
 
-LOADER_VERSION = "reva.causal.model/1"
+LOADER_VERSION = "reva.causal.model/2"
 KG_LOADER_SOURCE = "reva.causal.kg"
 MAX_CLAIMS_PER_CALL = 100_000
 MAX_KG_STATEMENTS = 500_000
@@ -123,6 +126,8 @@ class ClaimLoadReport:
     unknown_entities: int = 0
     rejected_counts: dict[str, int] = field(default_factory=dict)
     rejected_sample: list[dict[str, Any]] = field(default_factory=list)
+    #: statements not turned into claims yet, by reason (e.g. ``references_unknown``: WDQS row, tier pending)
+    deferred_counts: dict[str, int] = field(default_factory=dict)
     truncated: bool = False
     elapsed_s: float = 0.0
 
@@ -146,6 +151,8 @@ class ClaimLoadReport:
         self.load_ids += other.load_ids
         for r, n in other.rejected_counts.items():
             self.rejected_counts[r] = self.rejected_counts.get(r, 0) + n
+        for r, n in other.deferred_counts.items():
+            self.deferred_counts[r] = self.deferred_counts.get(r, 0) + n
         self.rejected_sample += other.rejected_sample[: MAX_REPORTED - len(self.rejected_sample)]
         self.truncated |= other.truncated
 
@@ -156,6 +163,15 @@ class ClaimLoadReport:
 
 
 class _Reject(Exception):
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
+class Deferred(ValueError):
+    """A KG statement that cannot be tiered yet (``reason``, e.g. ``references_unknown``): not a claim, not an
+    error — counted in :attr:`ClaimLoadReport.deferred_counts`; any stored claim of it is kept as is."""
+
     def __init__(self, reason: str) -> None:
         super().__init__(reason)
         self.reason = reason
@@ -299,29 +315,28 @@ def _write(
     retract_reason: Any,
     batch_retrieved_at: datetime | None,
     rep: ClaimLoadReport,
+    keep: Iterable[str] = (),
 ) -> None:
-    """Classify ``rows`` against the stored latest rows, insert what changed, retract what disappeared.
+    """Classify ``rows`` against the stored latest rows, insert what changed, retract what disappeared (except
+    the claim keys in ``keep``: deferred statements still at the source).
 
     ``load`` is a zero-argument callable returning the load id: the load row is created only when something is
     written (an unchanged reload records nothing)."""
     latest = _latest(conn, origin, prefix)
-    to_insert: list[tuple[dict[str, Any], int | None]] = []
+    to_insert: list[tuple[dict[str, Any], int | None, str]] = []
     for row in rows:
         lt = latest.get(row["claim_key"])
         if lt is None:
-            rep.new += 1
-            to_insert.append((row, None))
+            to_insert.append((row, None, "new"))
         elif batch_retrieved_at is not None and lt["retrieved_at"] > batch_retrieved_at:
             rep.stale += 1
         elif lt["retracted"]:
-            rep.reinstated += 1
-            to_insert.append((row, lt["id"]))
+            to_insert.append((row, lt["id"], "reinstated"))
         elif lt["content_sha256"] == row["content_sha256"]:
             rep.unchanged += 1
         else:
-            rep.new_revision += 1
-            to_insert.append((row, None))
-    seen = {r["claim_key"] for r in rows}
+            to_insert.append((row, None, "new_revision"))
+    seen = {r["claim_key"] for r in rows} | set(keep)
     gone = []
     if retract_missing:
         for k, lt in latest.items():
@@ -334,18 +349,7 @@ def _write(
         return
     load_id = load()
     for i in range(0, len(to_insert), INSERT_CHUNK):
-        chunk = to_insert[i : i + INSERT_CHUNK]
-        payload = _json([[r[c] for c in _CLAIM_COLS] + [reinst] for r, reinst in chunk])
-        n = conn.execute(
-            text(f"""INSERT INTO kg.causal_claim(load_id, origin, {", ".join(_CLAIM_COLS)}, reinstates_row_id)
-                     SELECT :load, :o, {", ".join("st." + c for c in _CLAIM_COLS)}, st.reinstates_row_id
-                       FROM (SELECT {_STAGE_SELECT}, (x->>{len(_CLAIM_COLS)})::bigint AS reinstates_row_id,
-                                    ordinality AS ord
-                               FROM jsonb_array_elements(CAST(:rows AS jsonb)) WITH ORDINALITY AS t(x, ordinality)) st
-                      ORDER BY st.ord"""),
-            {"load": load_id, "o": origin, "rows": payload},
-        ).rowcount
-        rep.inserted += int(n)
+        _insert_claims(conn, load_id, origin, to_insert[i : i + INSERT_CHUNK], rep)
     for i in range(0, len(gone), INSERT_CHUNK):
         part = gone[i : i + INSERT_CHUNK]
         n = conn.execute(
@@ -355,6 +359,63 @@ def _write(
             {"load": load_id, "o": origin, "rows": _json([list(g) for g in part])},
         ).rowcount
         rep.retracted += int(n)
+
+
+def _close(sp: Any, rep: ClaimLoadReport, loaded: list[int]) -> None:
+    """Release the write savepoint, or roll it back (with its load row) when the database refused every row."""
+    if loaded and rep.inserted == 0 and rep.retracted == 0:
+        sp.rollback()
+        loaded.clear()
+    else:
+        sp.commit()
+
+
+def _db_reason(e: DBAPIError) -> str:
+    """Short, stable rejection reason for a row the database refused (constraint name, else its message)."""
+    diag = getattr(e.orig, "diag", None)
+    name = getattr(diag, "constraint_name", None)
+    if name:
+        return f"db_refused:{name}"[:100]
+    msg = getattr(diag, "message_primary", None) or (str(e.orig).splitlines() or ["error"])[0]
+    return ("db_refused:" + re.sub(r"\d+", "#", msg))[:100]
+
+
+def _insert_claims(
+    conn: Connection,
+    load_id: int,
+    origin: str,
+    items: Sequence[tuple[dict[str, Any], int | None, str]],
+    rep: ClaimLoadReport,
+) -> None:
+    """Insert claim rows under a savepoint; when the database refuses the batch (a CHECK, a trigger), split it
+    until the refused rows are isolated, insert the others and reject each refused row with its reason. One bad
+    statement never aborts the load."""
+    if not items:
+        return
+    payload = _json([[r[c] for c in _CLAIM_COLS] + [reinst] for r, reinst, _k in items])
+    try:
+        with conn.begin_nested():
+            n = conn.execute(
+                text(f"""INSERT INTO kg.causal_claim(load_id, origin, {", ".join(_CLAIM_COLS)}, reinstates_row_id)
+                     SELECT :load, :o, {", ".join("st." + c for c in _CLAIM_COLS)}, st.reinstates_row_id
+                       FROM (SELECT {_STAGE_SELECT}, (x->>{len(_CLAIM_COLS)})::bigint AS reinstates_row_id,
+                                    ordinality AS ord
+                               FROM jsonb_array_elements(CAST(:rows AS jsonb)) WITH ORDINALITY AS t(x, ordinality)) st
+                      ORDER BY st.ord"""),
+                {"load": load_id, "o": origin, "rows": payload},
+            ).rowcount
+    except DBAPIError as e:
+        if len(items) == 1:
+            row = items[0][0]
+            rep.reject(-1, _db_reason(e), row["claim_key"])
+            return
+        mid = len(items) // 2
+        _insert_claims(conn, load_id, origin, items[:mid], rep)
+        _insert_claims(conn, load_id, origin, items[mid:], rep)
+        return
+    rep.inserted += int(n)
+    for _r, _reinst, kind in items:
+        setattr(rep, kind, getattr(rep, kind) + 1)
 
 
 def _unknown_entities(conn: Connection, ids: Iterable[str]) -> int:
@@ -402,8 +463,10 @@ def claim_from_statement(st: Mapping[str, Any], vocab: Vocabulary | None = None)
     n = normalise_wikidata(st["subject_qid"], st["property_pid"], st["object_qid"], v)
     refs = list(st.get("refs") or [])
     quals = dict(st.get("qualifiers") or {})
-    citation = gr.citation_of(refs)
-    tier = "T2" if citation else ("T3" if refs else "T4")
+    tier, _basis = gr.kg_tier(st["source_key"], refs)
+    if tier is None:  # references never read (WDQS row): tier pending, not "unreferenced"
+        raise Deferred(_basis)
+    citation = gr.citation_of(refs) if tier == "T2" else None
     scope: dict[str, Any] = {}
     places = sorted({q for p in SCOPE_PLACE_PIDS for q in _items(quals.get(p, []))})
     if places:
@@ -491,9 +554,13 @@ def load_kg_claims(
                 rows_db = rows_db[:MAX_KG_STATEMENTS]
             rep.scanned = len(rows_db)
             rows: list[dict[str, Any]] = []
+            deferred_keys: list[str] = []
             for i, st in enumerate(rows_db):
                 try:
                     rows.append(claim_from_statement(dict(st), vocab))
+                except Deferred as d:
+                    rep.deferred_counts[d.reason] = rep.deferred_counts.get(d.reason, 0) + 1
+                    deferred_keys.append("kg:" + st["statement_key"])
                 except ValueError as e:
                     rep.reject(i, str(e)[:100], st["statement_key"])
             current_stmt = {r["statement_key"] for r in rows_db}
@@ -525,6 +592,7 @@ def load_kg_claims(
                     )
                 return _loaded[0]
 
+            sp = conn.begin_nested()  # dropped when every row was refused: no empty load row
             for p in prefixes:
                 part = [r for r in rows if r["claim_key"].startswith(p)]
                 _write(
@@ -537,7 +605,9 @@ def load_kg_claims(
                     retract_reason=reason,
                     batch_retrieved_at=None,
                     rep=rep,
+                    keep=[k for k in deferred_keys if k.startswith(p)],
                 )
+            _close(sp, rep, loaded)
             rep.load_ids += loaded
         total.merge(rep)
     total.elapsed_s = round(time.perf_counter() - t0, 4)
@@ -744,6 +814,7 @@ def load_dataset_claims(
         _ensure_raw_artifacts(conn, store, raws, source_key)
         rep.unknown_entities = _unknown_entities(conn, [r["cause_id"] for r in rows] + [r["effect_id"] for r in rows])
         loaded: list[int] = []
+        sp = conn.begin_nested()  # dropped when every row was refused: no empty load row
 
         def mk() -> int:
             if not loaded:
@@ -778,6 +849,7 @@ def load_dataset_claims(
             batch_retrieved_at=retrieved_at,
             rep=rep,
         )
+        _close(sp, rep, loaded)
         rep.load_ids += loaded
     rep.elapsed_s = round(time.perf_counter() - t0, 4)
     return rep

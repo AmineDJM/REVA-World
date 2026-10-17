@@ -43,6 +43,16 @@ _CONDITION_KEYS = {"tier", "temporal_check", "corroborated", "contested"}
 DOI_PIDS = ("P356",)
 ISBN_PIDS = ("P212", "P957")
 RETRIEVAL_PIDS = ("P813",)
+#: "Imported from Wikimedia project" (P143) and "Wikimedia import URL" (P4656) point at another wiki: they say
+#: where an editor copied the statement from, not who asserts it. A reference made only of these (and retrieval
+#: dates) is a pointer, not a source: it does not raise a statement to T3 (grading.yaml version 2).
+WIKIMEDIA_IMPORT_PIDS = ("P143", "P4656")
+#: KG source keys whose statements were read without their references (WDQS listings select statement id,
+#: object and rank only; ``reva.kg.harvest`` stores them with ``references=[]``): "references unknown", never
+#: "unreferenced". Their tier is left pending until an entity snapshot of the statement is loaded.
+REFERENCES_UNREAD_SOURCE_KEYS = ("wikidata.wdqs",)
+#: Tier basis of a KG claim (why it has its tier); ``references_unknown`` means no tier (claim deferred).
+TIER_BASES = ("citation", "references", "wikimedia_import_only", "no_references", "references_unknown")
 
 
 # ---------------------------------------------------------------------------------------------- rules
@@ -125,7 +135,16 @@ def _fact_ids() -> list[str]:
         [f"tier.{t}" for t in TIERS]
         + [f"temporal.{t}" for t in TEMPORAL]
         + ["corroboration.single", "corroboration.corroborated", "contest.none", "contest.contested"]
+        + list(NOTE_FACTS)
     )
+
+
+#: Explanatory fact rules (version 2) attached when they apply, after the four base facts.
+NOTE_FACTS = (
+    "tier.T4.wikimedia_import_only",
+    "temporal.entity_dated_by_inception",
+    "temporal.claim_time_qualifier",
+)
 
 
 @lru_cache(maxsize=4)
@@ -155,8 +174,9 @@ class GradeResult:
     reasons: tuple[dict[str, str], ...]
 
 
-def decide(inp: GradeInputs, rules: Rules) -> GradeResult:
-    """The first matching rule decides; fact rule ids record what it saw."""
+def decide(inp: GradeInputs, rules: Rules, notes: Sequence[str] = ()) -> GradeResult:
+    """The first matching rule decides; fact rule ids record what it saw (``notes``: explanatory fact ids from
+    :data:`NOTE_FACTS`, placed after the base facts)."""
     if inp.tier not in TIERS or inp.temporal_check not in TEMPORAL or inp.corroboration < 1:
         raise ValueError(f"invalid grade inputs {inp!r}")
     for r in rules.rules:
@@ -167,7 +187,7 @@ def decide(inp: GradeInputs, rules: Rules) -> GradeResult:
                 "corroboration.corroborated" if inp.corroboration >= rules.corroborated_min else "corroboration.single",
                 "contest.contested" if inp.contested else "contest.none",
             ]
-            ids = (*facts, r.id)
+            ids = (*facts, *(n for n in NOTE_FACTS if n in notes), r.id)
             return GradeResult(r.grade, ids, r.id, tuple(rules.reason(i) for i in ids))
     raise ValueError(f"no grading rule decides {inp!r} (grading.yaml must be complete)")
 
@@ -246,6 +266,33 @@ def citation_of(refs: Sequence[Mapping[str, Any]]) -> dict[str, list[str]] | Non
             out.setdefault("isbn", []).extend(t for t in map(_text, _vals(ref, pid)) if t)
     out = {k: sorted(set(v)) for k, v in out.items() if v}
     return out or None
+
+
+def is_wikimedia_import_only(ref: Mapping[str, Any]) -> bool:
+    """A reference made only of "imported from Wikimedia project" / "Wikimedia import URL" snaks (and retrieval
+    dates): a pointer to another wiki, not a source."""
+    keys = set(ref)
+    return bool(keys & set(WIKIMEDIA_IMPORT_PIDS)) and keys <= set(WIKIMEDIA_IMPORT_PIDS) | set(RETRIEVAL_PIDS)
+
+
+def kg_tier(source_key: str, refs: Sequence[Mapping[str, Any]]) -> tuple[str | None, str]:
+    """Tier of a community-edited (Wikidata) KG causal statement and its basis (:data:`TIER_BASES`).
+
+    * ``wikidata.wdqs`` rows (references not read) -> ``(None, "references_unknown")``: no tier is invented;
+    * a DOI/ISBN in a reference -> T2 (``citation``);
+    * at least one reference that is not a Wikimedia-import pointer -> T3 (``references``);
+    * only Wikimedia-import pointers -> T4 (``wikimedia_import_only``); no references -> T4 (``no_references``).
+    """
+    if source_key in REFERENCES_UNREAD_SOURCE_KEYS:
+        return None, "references_unknown"
+    mrefs = [r for r in refs if isinstance(r, Mapping)]
+    if citation_of(mrefs):
+        return "T2", "citation"
+    if any(r and not is_wikimedia_import_only(r) for r in mrefs):
+        return "T3", "references"
+    if mrefs and any(mrefs):
+        return "T4", "wikimedia_import_only"
+    return "T4", "no_references"
 
 
 def reference_keys(ref: Mapping[str, Any]) -> list[str]:
