@@ -102,7 +102,7 @@ Checks:
 
 ### V3 quick start (atlas, graph, links, causality)
 
-Run these after `make bootstrap` (migrations to head `0016_causal_ops`). Ingests are
+Run these after `make bootstrap` (migrations to head `0017_links_retention`). Ingests are
 budget-metered: the daily cap is 3 GiB in all, so run big sources one at a time and
 keep at least 5 GB of disk free. Resume notes are in
 [docs/dev/HANDOFF_V3.md](docs/dev/HANDOFF_V3.md).

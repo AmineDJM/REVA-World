@@ -686,3 +686,72 @@ causal; each link carries its licence / terms in `basis.licence`.
 
 Not done: no live materialisation (the new sources' budgets are not merged); `scripts/e2e_stack.py --v3-fixtures`
 does not replay these fixtures (owner: lead / LINKWIRE).
+
+# LINKRET — link store retention: `reva links prune` (agent LINKRET, 2026-10-17)
+
+The store (L2.3) was append-only with no deletion path: every daily `links_materialise` run with new inputs added a
+full materialisation and nothing removed the old ones. Measured on the dev DB (2026-10-17): **one** live
+materialisation (id 1, atlas snapshot `1d9b950f…`, KG watermark 321) = 1,147,110 rows, `kg.link_row` **1.46 GB**
+(heap 1.39 GB incl. TOAST, indexes 42 MB) — about 1.3 kB per row, so ~1.4 GB per full materialisation, not the
+~400 MB estimated earlier.
+
+**Code.** `src/reva/links/retention.py` (policy, plan, prune, vacuum), CLI `reva links prune` in
+`src/reva/cli/main.py`, migration `migrations/versions/0017_links_retention.py` (schema contract regenerated, head
+`0017_links_retention`), readers in `store.py` / `jobs.py`. Tests: `tests/unit/links/test_links_retention.py` (5),
+`tests/integration/test_links_retention_db.py` (4, own throwaway DB `reva_test_linkret_*`).
+
+```sh
+uv run reva links prune --dry-run                 # what would be pruned, and why each kept one is kept
+uv run reva links prune [--keep 2] [--vacuum plain|full|none] [--reason "…"]   # owner credentials
+```
+
+**What is kept** (each kept materialisation is listed with its reasons):
+
+| Reason | Why |
+|---|---|
+| `latest` | the newest materialisation: the path engine reads `latest_materialisation(conn)` |
+| `latest_live` | newest live-atlas (or atlas-less) + live-KG one: what production's API serves (`live_only`) |
+| `latest_lineage:<atlas>/<kg>` | newest per (atlas origin, KG origin): fixture and live stores coexist |
+| `recent` | the newest `--keep N` (default 2, the current one included) |
+| `current_atlas_snapshot:<origin>` | newest materialisation of the latest recorded atlas snapshot of each origin |
+| `atlas_pin` | newest materialisation of the snapshot pinned in the atlas query cache (`live-snapshot.pin`) |
+| `fk:<schema.table.column>` | referenced by a foreign key from any other table (found from the catalog: a future release / pin table is honoured without code changes; a unit test flags any new `REFERENCES kg.link_materialisation`) |
+
+References searched and found **not** to pin a materialisation: `belief.release` / `release_artifact` /
+`release_dataset` and `ops.publication` (artefacts and datasets only); no `meta.artifact` schema embeds a
+materialisation id (checked on the dev DB too); `/v1/links*` responses are `Cache-Control: no-store` and NLQA
+answers are not persisted; `ops.job` results of `links_materialise` name their materialisation id — they stay
+resolvable because the materialisation row is never deleted.
+
+**What a prune does** (one transaction per materialisation, owner engine): `kg.prune_link_materialisation(id, run,
+reason, policy)` counts the rows and their size (`pg_column_size`), inserts the `kg.link_prune` record, deletes the
+link rows and checks the count; the CLI adds one `ops.audit` row (actor `owner:links-prune`, action `links.prune`,
+target `{materialisation_id, run_id}`, details: rows deleted, row bytes, estimated disk bytes, inputs, keep policy).
+The `kg.link_materialisation` row (inputs: atlas snapshot, KG watermark, taxonomy sha256, method, top-k) stays.
+Then `VACUUM (ANALYZE) kg.link_row` (default `plain`: the space is reused by the next materialisation, so the table
+stays at about (keep + 1) materialisations; it is **not** returned to the OS) or `--vacuum full` (rewrites the table
+and returns the space; ACCESS EXCLUSIVE lock, needs free disk equal to what remains).
+Throughput measured on a throwaway DB: 2 × 500,000 rows (~0.56 GB each) pruned and vacuumed in 30.5 s.
+
+**Database guards (migration 0017, whatever the caller).**
+* `kg.link_row` DELETE is refused (`meta.reject_mutation`) unless a `kg.link_prune` row for that materialisation was
+  inserted **in the same transaction** (`kg.link_prune_in_xact`); UPDATE and TRUNCATE stay refused; the reviewed
+  restricted-deletion path (`reva_restricted_deletion` + ticket) is unchanged (integration test).
+* `kg.link_prune` is append-only; only the owner inserts (runtime roles: SELECT only; `kg.prune_link_materialisation`
+  EXECUTE revoked from PUBLIC and granted to nobody; both refuse a non-owner session). The insert is refused for the
+  latest materialisation of its lineage and for the latest live one, and when `rows_deleted` exceeds `link_count`;
+  a deferred constraint trigger refuses the commit if any row of a pruned materialisation remains.
+* Readers: `latest_materialisation` and the job's `existing_materialisation` (skip-unchanged reuse) never return a
+  pruned materialisation — a job with the same inputs re-materialises instead of reusing empty rows.
+
+**Rebuild and reproducibility (honest limit).** `reva links materialise --atlas-snapshot <sha> --kg-origin <o>`
+re-derives from the same immutable atlas snapshot but from the KG as it is then (`kg.statement_current`, context
+and genealogy reads are not bounded by the recorded watermark), so a rebuild can differ from the pruned rows.
+Anything that must stay bit-reproducible must be kept (referenced), not rebuilt — hence the `fk:` rule.
+
+**Dev DB run (2026-10-17).** Dev DB migrated to `0017_links_retention` (`reva db bootstrap`, fingerprint
+`d2e33cc3…` = contract). `reva links prune --dry-run` and the real run: **nothing to prune** — the store holds a
+single materialisation (id 1), kept as latest / latest_live / lineage / recent / current atlas snapshot / atlas pin.
+0 rows deleted, no VACUUM needed (0 dead tuples), 0 bytes freed. The policy starts to delete with the third
+materialisation of new inputs (keep 2): from then on each daily run with new inputs frees ~1.4 GB for reuse.
+Not automated: pruning needs owner credentials, so it is not a worker job; run it after `links_materialise`.

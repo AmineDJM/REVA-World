@@ -28,11 +28,12 @@ deterministically). Rebuilding costs provider requests within the daily budgets 
 dockerd > /tmp/dockerd.log 2>&1 &         # docker daemon is not started automatically
 docker start reva-db || make up           # PostgreSQL 17 + PostGIS
 uv sync && (cd ui && npm ci)
-uv run reva db bootstrap                  # migrations to head (0016), roles, seed
+uv run reva db bootstrap                  # migrations to head (0017), roles, seed
 uv run reva atlas list                    # every atlas source (discovered from atlas_*.py)
 uv run reva atlas ingest <source>         # one at a time, budget-metered; then:
 uv run reva atlas snapshot --skip-unchanged
 uv run reva links materialise
+uv run reva links prune --dry-run          # then without --dry-run: keeps the 2 newest + served/pinned ones
 uv run reva causal refresh
 uv run python -m reva.kg.harvest status   # Wikidata harvest state (resumable per spec)
 ```
@@ -73,7 +74,12 @@ ingests sequentially (several sources peak at 3–5 GB RAM).
    `uv run python -m reva.kg.harvest merge-property-requests` (events.yaml: P1923, P8031, P8032, P726,
    P991, P1590, P1339) when the budget resets.
 2. `reva_kg_wdharvest` was migrated to an earlier 0015 revision → recreate it (or re-bootstrap) before reuse.
-3. Links store retention policy (each full materialisation ≈ 400 MB; nothing deletes old ones).
+3. ~~Links store retention policy~~ **done (LINKRET, migration `0017_links_retention`)**: `uv run reva links prune
+   [--dry-run] [--keep 2] [--vacuum plain|full]` (owner credentials) deletes the derived `kg.link_row` rows of
+   materialisations nothing serves, pins or references; records `kg.link_prune` + `ops.audit` (`links.prune`);
+   details in `docs/dev/v3_links.md` § LINKRET. A full materialisation is ~1.4 GB (not 400 MB); the dev DB holds
+   one, so the first run pruned nothing. Run it after each `links_materialise` that wrote new rows (not a worker
+   job: owner-only).
 4. Final V3 completion report + `docs/implementation_status.md` V3 ledger rows (not yet written;
    `docs/final_report.md` covers V1/V2).
 5. Full test sweep on a quiet machine (`uv run pytest -m "not live and not perf"`), full e2e
