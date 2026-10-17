@@ -206,3 +206,9 @@ def test_atlas_dimension_declaration_points_at_loaded_codes(parsed: uc.Parsed) -
     hs2 = next(d for d in doc["dimensions"] if d["dimension"] == "hs2")
     assert hs2["kg_prefix"] == "hs1992:" and atlas_baci.HS == "HS92"
     assert "27" in atlas_baci.HS2_CHAPTERS and f"{hs2['kg_prefix']}27" in parsed.codes
+
+
+def test_statement_ids_from_wdqs_and_qlever_iris() -> None:
+    assert wd.statement_id("http://www.wikidata.org/entity/statement/Q90-ABC-1") == "Q90$ABC-1"
+    assert wd.statement_id("http://www.wikidata.org/entity/statement/q100166-60EB") == "Q100166$60EB"
+    assert wd.statement_id("http://example.org/x") is None

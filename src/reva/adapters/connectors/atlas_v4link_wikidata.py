@@ -119,8 +119,20 @@ def country_query(pack: Pack) -> str:
 
 
 # ============================================================================================== parsing
+def statement_id(uri: str | None) -> str | None:
+    """Wikidata statement IRI -> ``Q42$GUID`` (the wbgetentities form). The munged dump QLever indexes writes the
+    entity part in lower case (``.../statement/q42-GUID``); the item id is case-insensitive, so it is upper-cased."""
+    if not uri:
+        return None
+    tail = uri.rsplit("/", 1)[-1]
+    head, sep, rest = tail.partition("-")
+    if sep and head[:1] in ("Q", "q") and head[1:].isdigit() and rest:
+        return f"Q{head[1:]}${rest}"
+    return None
+
+
 def held_rows(bindings: Sequence[Mapping[str, Any]]) -> tuple[list[Held], dict[str, dict[str, str]], Counter[str]]:
-    from reva.adapters.connectors.wikidata import qid_from_uri, statement_id_from_uri
+    from reva.adapters.connectors.wikidata import qid_from_uri
 
     rows: list[Held] = []
     labels: dict[str, dict[str, str]] = defaultdict(dict)
@@ -128,7 +140,7 @@ def held_rows(bindings: Sequence[Mapping[str, Any]]) -> tuple[list[Held], dict[s
     seen: set[tuple[str, str]] = set()
     for b in bindings:
         qid = qid_from_uri((b.get("item") or {}).get("value"))
-        sid = statement_id_from_uri((b.get("st") or {}).get("value"))
+        sid = statement_id((b.get("st") or {}).get("value"))
         pid = str((b.get("prop") or {}).get("value") or "")
         val = str((b.get("v") or {}).get("value") or "")
         rank = RANKS.get(str((b.get("rank") or {}).get("value") or ""))
@@ -203,14 +215,14 @@ def country_statements(
     query_sha256: str,
     retrieved_at: datetime,
 ) -> tuple[list[Any], dict[str, Any]]:
-    from reva.adapters.connectors.wikidata import qid_from_uri, statement_id_from_uri
+    from reva.adapters.connectors.wikidata import qid_from_uri
     from reva.kg.model import KgStatement
 
     rows: list[Held] = []
     skipped: Counter[str] = Counter()
     for b in bindings:
         qid = qid_from_uri((b.get("item") or {}).get("value"))
-        sid = statement_id_from_uri((b.get("st") or {}).get("value"))
+        sid = statement_id((b.get("st") or {}).get("value"))
         country = qid_from_uri((b.get("country") or {}).get("value"))
         rank = RANKS.get(str((b.get("rank") or {}).get("value") or ""))
         if not qid or not sid or not country or not country.startswith("Q") or rank is None:
