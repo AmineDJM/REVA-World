@@ -57,7 +57,12 @@ async def test_wikidata_bridges_from_qlever_fixture(db: Any) -> None:
     """atlas.v4link_qlever, pack `places` (trimmed live QLever responses): identity statements, best rank, the
     ambiguous holder (Ile-de-France holds NUTS FR1 and FR10) not linked, best-rank P17 only, new item entities."""
     from reva.adapters.connectors import atlas_v4link_wikidata as wd
+    from reva.adapters.connectors.wikidata import load_allowlist
+    from reva.kg.harvest import kg_properties
+    from reva.kg.model import register_properties
 
+    # P17 as the KG allow-list defines it (the dev DB has it from the Wikidata harvest; a fresh test DB does not)
+    register_properties(db.owner, [p for p in kg_properties(load_allowlist()) if p.pid == "P17"])
     ensure_registered(db.owner, db.store, get_source(wd.QL_NAME).spec)
     out = await run_atlas_ingest(
         db.settings, db.worker, db.store, wd.QL_NAME, mode="fixture", options={"packs": "places"}
