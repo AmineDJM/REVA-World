@@ -123,10 +123,15 @@ def _atlas_file(directory: Path, isos: list[str], onsets: dict[tuple[str, int], 
     directory.mkdir(mode=0o700, parents=True, exist_ok=True)
     path = directory / f"atlas-{SNAP}-v6.duckdb"
     con = duckdb.connect(str(path))
-    con.execute("CREATE TABLE meta AS SELECT 'atlas-duckdb/6' AS format, ? AS snapshot_sha256, 'test_fixture' AS origin,"
-                " '2026-10-17T00:00:00+00:00' AS cutoff", [SNAP])
-    con.execute("CREATE TABLE series AS SELECT 1 AS sid, 'wb' AS source, 'wdi_econ' AS dataset, "
-                "'NY.GDP.MKTP.KD.ZG' AS indicator")
+    con.execute(
+        "CREATE TABLE meta AS SELECT 'atlas-duckdb/6' AS format, ? AS snapshot_sha256, 'test_fixture' AS origin,"
+        " '2026-10-17T00:00:00+00:00' AS cutoff",
+        [SNAP],
+    )
+    con.execute(
+        "CREATE TABLE series AS SELECT 1 AS sid, 'wb' AS source, 'wdi_econ' AS dataset, "
+        "'NY.GDP.MKTP.KD.ZG' AS indicator"
+    )
     con.execute("""CREATE TABLE cells_s(sid INTEGER, iso3 VARCHAR, year INTEGER, has_value BOOLEAN, value VARCHAR,
                    value_text VARCHAR, unit VARCHAR, raw_sha256 VARCHAR, table_sha VARCHAR, period_start DATE,
                    period_end DATE)""")

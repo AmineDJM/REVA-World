@@ -25,8 +25,11 @@ def build_atlas_file(
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     path = directory / f"atlas-{snapshot}-v6.duckdb"
     con = duckdb.connect(str(path))
-    con.execute("CREATE TABLE meta AS SELECT 'atlas-duckdb/6' AS format, ? AS snapshot_sha256, 'test_fixture' AS origin, "
-                "'2026-10-17T00:00:00+00:00' AS cutoff", [snapshot])
+    con.execute(
+        "CREATE TABLE meta AS SELECT 'atlas-duckdb/6' AS format, ? AS snapshot_sha256, 'test_fixture' AS origin, "
+        "'2026-10-17T00:00:00+00:00' AS cutoff",
+        [snapshot],
+    )
     con.execute("CREATE TABLE series(sid INTEGER, source VARCHAR, dataset VARCHAR, indicator VARCHAR)")
     con.execute(
         """CREATE TABLE cells_s(sid INTEGER, iso3 VARCHAR, year INTEGER, has_value BOOLEAN, value VARCHAR,

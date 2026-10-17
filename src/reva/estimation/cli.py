@@ -18,7 +18,9 @@ from typing import Any
 
 import typer
 
-estimate_app = typer.Typer(no_args_is_help=True, help="V5 estimation: event studies / local projections on atlas panels")
+estimate_app = typer.Typer(
+    no_args_is_help=True, help="V5 estimation: event studies / local projections on atlas panels"
+)
 
 
 def _out(obj: Any) -> None:

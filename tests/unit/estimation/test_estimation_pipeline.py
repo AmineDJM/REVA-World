@@ -47,7 +47,9 @@ def synthetic(n_c: int = 60, years: range = range(1960, 2011), effect: float = -
 
 
 def test_concept_panel_best_available_and_refusals(atlas_file: Callable[..., Path], tmp_path: Path) -> None:
-    d = atlas_file({GDP: [("FRA", 2000, "1.0"), ("FRA", 2002, "n.a.")], GDP2: [("FRA", 2000, "9"), ("FRA", 2001, "2.0")]})
+    d = atlas_file(
+        {GDP: [("FRA", 2000, "1.0"), ("FRA", 2002, "n.a.")], GDP2: [("FRA", 2000, "9"), ("FRA", 2001, "2.0")]}
+    )
     with SnapshotPanels(FAKE_SNAPSHOT, d) as p:
         panel = p.concept("wb.ny.gdp.mktp.kd.zg")
         assert panel.values == {("FRA", 2000): 1.0, ("FRA", 2001): 2.0}
@@ -86,7 +88,9 @@ def test_atlas_treatment_onsets(atlas_file: Callable[..., Path]) -> None:
 
 def test_run_recovers_effect_and_is_reproducible(atlas_file: Callable[..., Path]) -> None:
     d = atlas_file(synthetic())
-    req = EventStudyRequest(treatment="banking_crisis_jst", outcome="concept:wb.ny.gdp.mktp.kd.zg", horizons=3, n_perm=20)
+    req = EventStudyRequest(
+        treatment="banking_crisis_jst", outcome="concept:wb.ny.gdp.mktp.kd.zg", horizons=3, n_perm=20
+    )
     with SnapshotPanels(FAKE_SNAPSHOT, d) as p:
         doc = run_event_study(req, p)
         again = run_event_study(req, p)
@@ -115,7 +119,9 @@ def test_run_recovers_effect_and_is_reproducible(atlas_file: Callable[..., Path]
 
 def test_effect_estimates_need_concept_outcome(atlas_file: Callable[..., Path]) -> None:
     d = atlas_file(synthetic(n_c=30))
-    req = EventStudyRequest(treatment="banking_crisis_jst", outcome="series:wb.wdi_econ.NY.GDP.MKTP.KD.ZG", horizons=1, n_perm=0)
+    req = EventStudyRequest(
+        treatment="banking_crisis_jst", outcome="series:wb.wdi_econ.NY.GDP.MKTP.KD.ZG", horizons=1, n_perm=0
+    )
     with SnapshotPanels(FAKE_SNAPSHOT, d) as p:
         doc = run_event_study(req, p)
     with pytest.raises(ValidationProblem):
