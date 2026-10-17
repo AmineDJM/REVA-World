@@ -1,0 +1,3531 @@
+{
+ "code_sha256": "a6bd813b0dd08bc22253790c6454c2264a3463a1123734e7fb2b40c974c53909",
+ "descriptive": {
+  "all_comparisons": [
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": -0.582746,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 2.02463,
+    "loss_candidate": 1.87373,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.280982,
+    "p_worse": 0.719018,
+    "relative": 0.925468,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": -0.96476,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 1.72387,
+    "loss_candidate": 1.55424,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.169017,
+    "p_worse": 0.830983,
+    "relative": 0.901601,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": -2.09822,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 2.02463,
+    "loss_candidate": 1.6922,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.0197745,
+    "p_worse": 0.980225,
+    "relative": 0.835807,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": -2.7516,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 1.72387,
+    "loss_candidate": 1.43348,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.00378479,
+    "p_worse": 0.996215,
+    "relative": 0.83155,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 11,
+    "dm_stat": 1.06589,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 2.02463,
+    "loss_candidate": 2.19999,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.854905,
+    "p_worse": 0.145095,
+    "relative": 1.08662,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 11,
+    "dm_stat": 0.632365,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 1.72387,
+    "loss_candidate": 1.81534,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.735381,
+    "p_worse": 0.264619,
+    "relative": 1.05306,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 11,
+    "dm_stat": -2.43207,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 2.02463,
+    "loss_candidate": 1.76707,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.00880595,
+    "p_worse": 0.991194,
+    "relative": 0.872787,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 11,
+    "dm_stat": -2.01031,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 1.72387,
+    "loss_candidate": 1.49751,
+    "n_origins": 70,
+    "n_pairs": 10425,
+    "p_better": 0.0241544,
+    "p_worse": 0.975846,
+    "relative": 0.868691,
+    "task": "weo_cpi",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": 0.824648,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.931341,
+    "loss_candidate": 1.05594,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.793793,
+    "p_worse": 0.206207,
+    "relative": 1.13379,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": 0.826255,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.773102,
+    "loss_candidate": 0.882039,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.794246,
+    "p_worse": 0.205754,
+    "relative": 1.14091,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": -0.288097,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.931341,
+    "loss_candidate": 0.9037,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.387068,
+    "p_worse": 0.612932,
+    "relative": 0.970321,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": 0.0425897,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.773102,
+    "loss_candidate": 0.774092,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.516924,
+    "p_worse": 0.483076,
+    "relative": 1.00128,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 11,
+    "dm_stat": 3.5559,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.931341,
+    "loss_candidate": 1.32821,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.999657,
+    "p_worse": 0.000342822,
+    "relative": 1.42612,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 11,
+    "dm_stat": 3.77432,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.773102,
+    "loss_candidate": 1.09378,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.999832,
+    "p_worse": 0.000167984,
+    "relative": 1.41479,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 11,
+    "dm_stat": -0.643727,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.931341,
+    "loss_candidate": 0.894477,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.260943,
+    "p_worse": 0.739057,
+    "relative": 0.960419,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 11,
+    "dm_stat": 0.0134905,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.773102,
+    "loss_candidate": 0.774819,
+    "n_origins": 70,
+    "n_pairs": 460,
+    "p_better": 0.505362,
+    "p_worse": 0.494638,
+    "relative": 1.00222,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "cpi_inflation"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 3,
+    "dm_stat": 1.54783,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.903524,
+    "loss_candidate": 1.67767,
+    "n_origins": 27,
+    "n_pairs": 189,
+    "p_better": 0.933125,
+    "p_worse": 0.0668748,
+    "relative": 1.85681,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "real_gdp_growth"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 3,
+    "dm_stat": 1.50585,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.755904,
+    "loss_candidate": 1.38579,
+    "n_origins": 27,
+    "n_pairs": 189,
+    "p_better": 0.92792,
+    "p_worse": 0.0720796,
+    "relative": 1.83329,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "real_gdp_growth"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 3,
+    "dm_stat": -0.264139,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.903524,
+    "loss_candidate": 0.895857,
+    "n_origins": 27,
+    "n_pairs": 189,
+    "p_better": 0.396878,
+    "p_worse": 0.603122,
+    "relative": 0.991514,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "real_gdp_growth"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 3,
+    "dm_stat": 0.0111695,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.755904,
+    "loss_candidate": 0.756623,
+    "n_origins": 27,
+    "n_pairs": 189,
+    "p_better": 0.504413,
+    "p_worse": 0.495587,
+    "relative": 1.00095,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "real_gdp_growth"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": -2.76594,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.643629,
+    "loss_candidate": 0.417523,
+    "n_origins": 70,
+    "n_pairs": 490,
+    "p_better": 0.00363843,
+    "p_worse": 0.996362,
+    "relative": 0.648701,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "unemployment_rate"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 11,
+    "dm_stat": -2.09976,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.530976,
+    "loss_candidate": 0.355984,
+    "n_origins": 70,
+    "n_pairs": 490,
+    "p_better": 0.0197042,
+    "p_worse": 0.980296,
+    "relative": 0.670433,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "unemployment_rate"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": -2.69517,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.643629,
+    "loss_candidate": 0.405302,
+    "n_origins": 70,
+    "n_pairs": 490,
+    "p_better": 0.00441466,
+    "p_worse": 0.995585,
+    "relative": 0.629713,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "unemployment_rate"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 11,
+    "dm_stat": -2.03145,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.530976,
+    "loss_candidate": 0.342685,
+    "n_origins": 70,
+    "n_pairs": 490,
+    "p_better": 0.0230316,
+    "p_worse": 0.976968,
+    "relative": 0.645388,
+    "task": "g7rt",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "unemployment_rate"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 3,
+    "dm_stat": 0.0731953,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.879014,
+    "loss_candidate": 0.905027,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.528905,
+    "p_worse": 0.471095,
+    "relative": 1.02959,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_bridge",
+    "dm_lag": 3,
+    "dm_stat": -0.00838408,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.817203,
+    "loss_candidate": 0.814464,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.496686,
+    "p_worse": 0.503314,
+    "relative": 0.996648,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 3,
+    "dm_stat": -0.155338,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.879014,
+    "loss_candidate": 0.841833,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.438855,
+    "p_worse": 0.561145,
+    "relative": 0.957702,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_stack",
+    "dm_lag": 3,
+    "dm_stat": -0.322931,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.817203,
+    "loss_candidate": 0.749557,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.374618,
+    "p_worse": 0.625382,
+    "relative": 0.917222,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 3,
+    "dm_stat": 0.307094,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.879014,
+    "loss_candidate": 0.96559,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.619436,
+    "p_worse": 0.380564,
+    "relative": 1.09849,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "dm_lag": 3,
+    "dm_stat": 0.190843,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.817203,
+    "loss_candidate": 0.862908,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.574962,
+    "p_worse": 0.425038,
+    "relative": 1.05593,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": false,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 3,
+    "dm_stat": -0.156538,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "ae",
+    "loss_benchmark": 0.879014,
+    "loss_candidate": 0.850597,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.438387,
+    "p_worse": 0.561613,
+    "relative": 0.967672,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "hicp_inflation"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "dm_lag": 3,
+    "dm_stat": -0.370213,
+    "horizon": "cy",
+    "kernel": "rectangular",
+    "loss": "crps",
+    "loss_benchmark": 0.817203,
+    "loss_candidate": 0.767408,
+    "n_origins": 28,
+    "n_pairs": 28,
+    "p_better": 0.357056,
+    "p_worse": 0.642944,
+    "relative": 0.939066,
+    "task": "ecb_hicp",
+    "tested": true,
+    "uses_official_forecast": true,
+    "variable": "hicp_inflation"
+   }
+  ],
+  "by_month": [
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 1.08336,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 1.01026,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.954684,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.887561,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 1.26882,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.935995,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.823502,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.690234,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.572219,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.889823,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 1.04874,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 0.982781,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.93324,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.865979,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 1.25187,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.917543,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.810879,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.682777,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.57258,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.777476,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 0.95538,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 0.92063,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.886429,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.837095,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 0.964527,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.848148,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.763662,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.660609,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.565313,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.811575,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 0.958342,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 0.924577,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.888841,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.837982,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 0.963854,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.843714,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.760457,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.658305,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.56944,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.703789,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 1.21605,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 1.07032,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.947388,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.98558,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 1.85524,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 1.10571,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 1.04253,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.88404,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.740272,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 1.08637,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 1.17026,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 1.04001,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.926796,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.933422,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 1.83432,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 1.07691,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 1.03201,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.869185,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.73554,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.948258,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 0.957537,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 0.922624,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.872937,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.818937,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 0.998416,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.900374,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.870076,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.783839,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.683591,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.88264,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 1034,
+      "relative": 0.974098,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 1040,
+      "relative": 0.942176,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 1040,
+      "relative": 0.882363,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 1040,
+      "relative": 0.797438,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 1046,
+      "relative": 0.965814,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 1046,
+      "relative": 0.897126,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 1046,
+      "relative": 0.874553,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 1046,
+      "relative": 0.785036,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 1046,
+      "relative": 0.691548,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 1041,
+      "relative": 0.771815,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "weo_cpi"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.2014,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.2014,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.921992,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.921992,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 2.17021,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.14766,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.14766,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.713504,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.713504,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 3.13078,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.22042,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.22042,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.950077,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.950077,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 2.09983,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.13321,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.13321,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.687955,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.687955,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 3.47938,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.06614,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.06614,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.958804,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.958804,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 1.03121,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 0.931907,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 0.931907,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.725777,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.725777,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 1.44495,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.1105,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.1105,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 1.01127,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 1.01127,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 1.06271,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 0.945476,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 0.945476,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.713754,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.713754,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 1.50888,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.46659,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.34751,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.687271,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.928916,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 3.97998,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.63156,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.8942,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.957397,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 1.02244,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 4.25337,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.48498,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.30985,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.686091,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.906511,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 3.95806,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.50518,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.81829,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.930801,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.98474,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 4.94723,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.0619,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.0234,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.918793,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.784651,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 0.874071,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.01899,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.08408,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.873307,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.953594,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 1.49853,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 46,
+      "relative": 1.15666,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 2,
+      "n": 46,
+      "relative": 1.11079,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 3,
+      "n": 46,
+      "relative": 0.955389,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 4,
+      "n": 46,
+      "relative": 0.80415,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 5,
+      "n": 46,
+      "relative": 0.840928,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 7,
+      "n": 46,
+      "relative": 1.04412,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 8,
+      "n": 46,
+      "relative": 1.11836,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 9,
+      "n": 46,
+      "relative": 0.881665,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 10,
+      "n": 46,
+      "relative": 0.954915,
+      "variable": "cpi_inflation"
+     },
+     {
+      "month": 11,
+      "n": 46,
+      "relative": 1.67746,
+      "variable": "cpi_inflation"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 1.32356,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 2.691,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 7,
+      "n": 42,
+      "relative": 1.55259,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 3.01437,
+      "variable": "real_gdp_growth"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 1.21286,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 2.82232,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 7,
+      "n": 42,
+      "relative": 1.61033,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 3.37629,
+      "variable": "real_gdp_growth"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.964862,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 0.971168,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 7,
+      "n": 42,
+      "relative": 0.992682,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 1.13546,
+      "variable": "real_gdp_growth"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.965087,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 0.989838,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 7,
+      "n": 42,
+      "relative": 1.00847,
+      "variable": "real_gdp_growth"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 1.18115,
+      "variable": "real_gdp_growth"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_bridge",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.663803,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 2,
+      "n": 49,
+      "relative": 0.663803,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 3,
+      "n": 49,
+      "relative": 0.662088,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 4,
+      "n": 49,
+      "relative": 0.662088,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 1.02744,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 7,
+      "n": 49,
+      "relative": 0.666568,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 8,
+      "n": 49,
+      "relative": 0.666568,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 9,
+      "n": 49,
+      "relative": 0.367609,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 10,
+      "n": 49,
+      "relative": 0.367609,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 0.776044,
+      "variable": "unemployment_rate"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_bridge",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.72337,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 2,
+      "n": 49,
+      "relative": 0.72337,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 3,
+      "n": 49,
+      "relative": 0.696606,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 4,
+      "n": 49,
+      "relative": 0.696606,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 1.01615,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 7,
+      "n": 49,
+      "relative": 0.671302,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 8,
+      "n": 49,
+      "relative": 0.671302,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 9,
+      "n": 49,
+      "relative": 0.356901,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 10,
+      "n": 49,
+      "relative": 0.356901,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 0.775108,
+      "variable": "unemployment_rate"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo",
+    "candidate": "forecast.bm_stack",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.720577,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 2,
+      "n": 49,
+      "relative": 0.720577,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 3,
+      "n": 49,
+      "relative": 0.668373,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 4,
+      "n": 49,
+      "relative": 0.668373,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 0.818034,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 7,
+      "n": 49,
+      "relative": 0.628804,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 8,
+      "n": 49,
+      "relative": 0.628804,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 9,
+      "n": 49,
+      "relative": 0.330592,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 10,
+      "n": 49,
+      "relative": 0.330592,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 0.644397,
+      "variable": "unemployment_rate"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.imf_weo_errfan",
+    "candidate": "forecast.bm_stack",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 49,
+      "relative": 0.76773,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 2,
+      "n": 49,
+      "relative": 0.76773,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 3,
+      "n": 49,
+      "relative": 0.722085,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 4,
+      "n": 49,
+      "relative": 0.722085,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 5,
+      "n": 49,
+      "relative": 0.79573,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 7,
+      "n": 49,
+      "relative": 0.604975,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 8,
+      "n": 49,
+      "relative": 0.604975,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 9,
+      "n": 49,
+      "relative": 0.326597,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 10,
+      "n": 49,
+      "relative": 0.326597,
+      "variable": "unemployment_rate"
+     },
+     {
+      "month": 11,
+      "n": 49,
+      "relative": 0.610084,
+      "variable": "unemployment_rate"
+     }
+    ],
+    "task": "g7rt"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_bridge",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.17868,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.999834,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 0.856472,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.732033,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_bridge",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.18325,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.937408,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 0.784872,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.75644,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_stack",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 0.896528,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 1.10264,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 0.876119,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.802842,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_stack",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 0.874761,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 1.0492,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 0.799807,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.777374,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.35759,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.762253,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 1.23943,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.958169,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_bridge_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.36288,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.700511,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 1.14796,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.927054,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "ae",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.04432,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.777409,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 1.20878,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.935832,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   },
+   {
+    "benchmark": "benchmark.ecb_spf_errfan",
+    "candidate": "forecast.bm_stack_oil",
+    "loss": "crps",
+    "rows": [
+     {
+      "month": 1,
+      "n": 7,
+      "relative": 1.03155,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 4,
+      "n": 7,
+      "relative": 0.743345,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 7,
+      "n": 7,
+      "relative": 1.1333,
+      "variable": "hicp_inflation"
+     },
+     {
+      "month": 10,
+      "n": 7,
+      "relative": 0.961817,
+      "variable": "hicp_inflation"
+     }
+    ],
+    "task": "ecb_hicp"
+   }
+  ],
+  "cpi_revision_check": {
+   "mae_final_vintage_imf_cpi": 0.987105,
+   "mae_real_time_mei": 1.05594,
+   "n": 460,
+   "statement": "same target, same origins; a large gap would mean the final-vintage CPI flatters the panel"
+  },
+  "per_series": [
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.990448,
+     "n_series": 163,
+     "share_series_better": 0.515337
+    },
+    "candidate": "forecast.bm_bridge",
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.872761,
+     "n_series": 163,
+     "share_series_better": 0.773006
+    },
+    "candidate": "forecast.bm_stack",
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.18544,
+     "n_series": 163,
+     "share_series_better": 0.282209
+    },
+    "candidate": "forecast.bm_bridge_oil",
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.908648,
+     "n_series": 163,
+     "share_series_better": 0.668712
+    },
+    "candidate": "forecast.bm_stack_oil",
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.13854,
+     "n_series": 7,
+     "share_series_better": 0.142857
+    },
+    "candidate": "forecast.bm_bridge",
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.989969,
+     "n_series": 7,
+     "share_series_better": 0.571429
+    },
+    "candidate": "forecast.bm_stack",
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.44913,
+     "n_series": 7,
+     "share_series_better": 0.0
+    },
+    "candidate": "forecast.bm_bridge_oil",
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.986627,
+     "n_series": 7,
+     "share_series_better": 0.571429
+    },
+    "candidate": "forecast.bm_stack_oil",
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.91906,
+     "n_series": 7,
+     "share_series_better": 0.0
+    },
+    "candidate": "forecast.bm_bridge",
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.94969,
+     "n_series": 7,
+     "share_series_better": 0.571429
+    },
+    "candidate": "forecast.bm_stack",
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.743304,
+     "n_series": 7,
+     "share_series_better": 0.714286
+    },
+    "candidate": "forecast.bm_bridge",
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.570147,
+     "n_series": 7,
+     "share_series_better": 1.0
+    },
+    "candidate": "forecast.bm_stack",
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.02959,
+     "n_series": 1,
+     "share_series_better": 0.0
+    },
+    "candidate": "forecast.bm_bridge",
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.957702,
+     "n_series": 1,
+     "share_series_better": 1.0
+    },
+    "candidate": "forecast.bm_stack",
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 1.09849,
+     "n_series": 1,
+     "share_series_better": 0.0
+    },
+    "candidate": "forecast.bm_bridge_oil",
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "ae_vs_official": {
+     "median_ratio": 0.967672,
+     "n_series": 1,
+     "share_series_better": 1.0
+    },
+    "candidate": "forecast.bm_stack_oil",
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   }
+  ],
+  "summaries": [
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 3.53472,
+    "median_ae": 1.05065,
+    "model": "benchmark.imf_weo",
+    "n": 13129,
+    "pit_hist10": null,
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.811895,
+    "crps": 2.96211,
+    "is80": 23.7931,
+    "log": -3.17856,
+    "mae": 3.52061,
+    "median_ae": 1.05065,
+    "model": "benchmark.imf_weo_errfan",
+    "n": 13115,
+    "pit_hist10": [
+     788,
+     805,
+     1124,
+     1591,
+     2397,
+     2033,
+     1272,
+     713,
+     713,
+     1679
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.77076,
+    "crps": 2.9637,
+    "is80": 24.0367,
+    "log": -4.25161,
+    "mae": 3.55883,
+    "median_ae": 1.03004,
+    "model": "benchmark.imf_weo_errfan_own",
+    "n": 12572,
+    "pit_hist10": [
+     942,
+     1007,
+     1231,
+     1594,
+     1686,
+     1521,
+     1145,
+     769,
+     737,
+     1940
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 5.16085,
+    "median_ae": 1.98704,
+    "model": "benchmark.persistence",
+    "n": 13129,
+    "pit_hist10": null,
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.617746,
+    "crps": 1.55424,
+    "is80": 12.692,
+    "log": -5.26607,
+    "mae": 1.87373,
+    "median_ae": 0.893273,
+    "model": "forecast.bm_bridge",
+    "n": 10425,
+    "pit_hist10": [
+     1975,
+     1152,
+     943,
+     720,
+     541,
+     637,
+     743,
+     800,
+     925,
+     1989
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.621295,
+    "crps": 1.43348,
+    "is80": 11.8854,
+    "log": -4.97915,
+    "mae": 1.6922,
+    "median_ae": 0.805497,
+    "model": "forecast.bm_stack",
+    "n": 10425,
+    "pit_hist10": [
+     1526,
+     1019,
+     952,
+     820,
+     709,
+     637,
+     678,
+     717,
+     970,
+     2397
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.612662,
+    "crps": 1.81534,
+    "is80": 14.7243,
+    "log": -7.11904,
+    "mae": 2.19999,
+    "median_ae": 1.18005,
+    "model": "forecast.bm_bridge_oil",
+    "n": 10425,
+    "pit_hist10": [
+     1841,
+     1104,
+     897,
+     656,
+     561,
+     546,
+     760,
+     867,
+     1027,
+     2166
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.622062,
+    "crps": 1.49751,
+    "is80": 12.432,
+    "log": -6.11181,
+    "mae": 1.76707,
+    "median_ae": 0.867876,
+    "model": "forecast.bm_stack_oil",
+    "n": 10425,
+    "pit_hist10": [
+     1456,
+     975,
+     921,
+     864,
+     726,
+     610,
+     634,
+     781,
+     999,
+     2459
+    ],
+    "task": "weo_cpi",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 0.91988,
+    "median_ae": 0.497838,
+    "model": "benchmark.imf_weo",
+    "n": 490,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.681633,
+    "crps": 0.758456,
+    "is80": 6.1097,
+    "log": -3.45974,
+    "mae": 0.91988,
+    "median_ae": 0.497838,
+    "model": "benchmark.imf_weo_errfan",
+    "n": 490,
+    "pit_hist10": [
+     24,
+     43,
+     41,
+     62,
+     49,
+     52,
+     20,
+     45,
+     22,
+     132
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.673469,
+    "crps": 0.745668,
+    "is80": 5.89382,
+    "log": -3.31661,
+    "mae": 0.91988,
+    "median_ae": 0.497838,
+    "model": "benchmark.imf_weo_errfan_own",
+    "n": 490,
+    "pit_hist10": [
+     29,
+     32,
+     47,
+     60,
+     51,
+     58,
+     12,
+     37,
+     33,
+     131
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 2.2332,
+    "median_ae": 1.50377,
+    "model": "benchmark.persistence",
+    "n": 490,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.484783,
+    "crps": 0.882039,
+    "is80": 7.53442,
+    "log": -7.14951,
+    "mae": 1.05594,
+    "median_ae": 0.633105,
+    "model": "forecast.bm_bridge",
+    "n": 460,
+    "pit_hist10": [
+     105,
+     33,
+     50,
+     49,
+     25,
+     19,
+     31,
+     16,
+     4,
+     128
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.526087,
+    "crps": 0.774092,
+    "is80": 6.74767,
+    "log": -16.9198,
+    "mae": 0.9037,
+    "median_ae": 0.450086,
+    "model": "forecast.bm_stack",
+    "n": 460,
+    "pit_hist10": [
+     89,
+     35,
+     35,
+     31,
+     37,
+     40,
+     28,
+     21,
+     19,
+     125
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.530435,
+    "crps": 1.09378,
+    "is80": 8.72978,
+    "log": -12.2857,
+    "mae": 1.32821,
+    "median_ae": 0.826737,
+    "model": "forecast.bm_bridge_oil",
+    "n": 460,
+    "pit_hist10": [
+     86,
+     49,
+     28,
+     36,
+     34,
+     21,
+     25,
+     36,
+     20,
+     125
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": 0.541304,
+    "crps": 0.774819,
+    "is80": 6.65085,
+    "log": -19.704,
+    "mae": 0.894477,
+    "median_ae": 0.431316,
+    "model": "forecast.bm_stack_oil",
+    "n": 460,
+    "pit_hist10": [
+     69,
+     35,
+     33,
+     35,
+     30,
+     30,
+     30,
+     36,
+     28,
+     134
+    ],
+    "task": "g7rt",
+    "variable": "cpi_inflation"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 0.903524,
+    "median_ae": 0.421,
+    "model": "benchmark.imf_weo",
+    "n": 189,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": 0.783069,
+    "crps": 0.755904,
+    "is80": 6.03617,
+    "log": -1.89625,
+    "mae": 0.903524,
+    "median_ae": 0.421,
+    "model": "benchmark.imf_weo_errfan",
+    "n": 189,
+    "pit_hist10": [
+     18,
+     10,
+     15,
+     13,
+     27,
+     30,
+     30,
+     17,
+     6,
+     23
+    ],
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": 0.798942,
+    "crps": 0.762583,
+    "is80": 6.17173,
+    "log": -2.29104,
+    "mae": 0.903524,
+    "median_ae": 0.421,
+    "model": "benchmark.imf_weo_errfan_own",
+    "n": 189,
+    "pit_hist10": [
+     16,
+     10,
+     16,
+     16,
+     25,
+     28,
+     26,
+     24,
+     6,
+     22
+    ],
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 3.51884,
+    "median_ae": 1.486,
+    "model": "benchmark.persistence",
+    "n": 189,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": 0.730159,
+    "crps": 1.38579,
+    "is80": 11.3489,
+    "log": -5.98906,
+    "mae": 1.67767,
+    "median_ae": 0.709992,
+    "model": "forecast.bm_bridge",
+    "n": 189,
+    "pit_hist10": [
+     24,
+     22,
+     18,
+     19,
+     14,
+     29,
+     13,
+     13,
+     10,
+     27
+    ],
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": 0.740741,
+    "crps": 0.756623,
+    "is80": 6.55826,
+    "log": -12.7687,
+    "mae": 0.895857,
+    "median_ae": 0.389608,
+    "model": "forecast.bm_stack",
+    "n": 189,
+    "pit_hist10": [
+     23,
+     17,
+     15,
+     18,
+     16,
+     18,
+     14,
+     27,
+     16,
+     25
+    ],
+    "task": "g7rt",
+    "variable": "real_gdp_growth"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 0.643629,
+    "median_ae": 0.3575,
+    "model": "benchmark.imf_weo",
+    "n": 490,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": 0.781633,
+    "crps": 0.530976,
+    "is80": 4.24764,
+    "log": -2.07106,
+    "mae": 0.643629,
+    "median_ae": 0.3575,
+    "model": "benchmark.imf_weo_errfan",
+    "n": 490,
+    "pit_hist10": [
+     94,
+     37,
+     73,
+     61,
+     49,
+     108,
+     34,
+     21,
+     0,
+     13
+    ],
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": 0.797959,
+    "crps": 0.51891,
+    "is80": 4.05898,
+    "log": -2.34368,
+    "mae": 0.643629,
+    "median_ae": 0.3575,
+    "model": "benchmark.imf_weo_errfan_own",
+    "n": 490,
+    "pit_hist10": [
+     85,
+     65,
+     57,
+     61,
+     46,
+     85,
+     38,
+     34,
+     5,
+     14
+    ],
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 0.843339,
+    "median_ae": 0.508,
+    "model": "benchmark.persistence",
+    "n": 490,
+    "pit_hist10": null,
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": 0.671429,
+    "crps": 0.355984,
+    "is80": 2.66849,
+    "log": -5.58928,
+    "mae": 0.417523,
+    "median_ae": 0.208333,
+    "model": "forecast.bm_bridge",
+    "n": 490,
+    "pit_hist10": [
+     75,
+     27,
+     24,
+     9,
+     26,
+     31,
+     41,
+     50,
+     115,
+     92
+    ],
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": 0.563265,
+    "crps": 0.342685,
+    "is80": 2.70733,
+    "log": -12.7624,
+    "mae": 0.405302,
+    "median_ae": 0.210632,
+    "model": "forecast.bm_stack",
+    "n": 490,
+    "pit_hist10": [
+     93,
+     25,
+     30,
+     13,
+     13,
+     18,
+     38,
+     34,
+     112,
+     114
+    ],
+    "task": "g7rt",
+    "variable": "unemployment_rate"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 0.879014,
+    "median_ae": 0.334701,
+    "model": "benchmark.ecb_spf",
+    "n": 28,
+    "pit_hist10": null,
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.678571,
+    "crps": 0.817203,
+    "is80": 7.28282,
+    "log": -4.51087,
+    "mae": 0.879014,
+    "median_ae": 0.334701,
+    "model": "benchmark.ecb_spf_errfan",
+    "n": 28,
+    "pit_hist10": [
+     1,
+     2,
+     4,
+     3,
+     6,
+     4,
+     0,
+     0,
+     0,
+     8
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.642857,
+    "crps": 0.791687,
+    "is80": 6.99036,
+    "log": -5.22136,
+    "mae": 0.879014,
+    "median_ae": 0.334701,
+    "model": "benchmark.ecb_spf_errfan_own",
+    "n": 28,
+    "pit_hist10": [
+     2,
+     1,
+     4,
+     4,
+     5,
+     3,
+     1,
+     0,
+     0,
+     8
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": null,
+    "crps": null,
+    "is80": null,
+    "log": null,
+    "mae": 2.43927,
+    "median_ae": 2.30228,
+    "model": "benchmark.persistence",
+    "n": 28,
+    "pit_hist10": null,
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.535714,
+    "crps": 0.814464,
+    "is80": 7.2714,
+    "log": -12.9551,
+    "mae": 0.905027,
+    "median_ae": 0.362001,
+    "model": "forecast.bm_bridge",
+    "n": 28,
+    "pit_hist10": [
+     5,
+     1,
+     2,
+     2,
+     2,
+     4,
+     2,
+     2,
+     0,
+     8
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.535714,
+    "crps": 0.749557,
+    "is80": 6.69567,
+    "log": -8.90221,
+    "mae": 0.841833,
+    "median_ae": 0.424094,
+    "model": "forecast.bm_stack",
+    "n": 28,
+    "pit_hist10": [
+     5,
+     1,
+     4,
+     3,
+     1,
+     2,
+     3,
+     1,
+     0,
+     8
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.5,
+    "crps": 0.862908,
+    "is80": 7.68342,
+    "log": -10.29,
+    "mae": 0.96559,
+    "median_ae": 0.418774,
+    "model": "forecast.bm_bridge_oil",
+    "n": 28,
+    "pit_hist10": [
+     7,
+     0,
+     3,
+     1,
+     3,
+     2,
+     3,
+     0,
+     1,
+     8
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   },
+   {
+    "coverage80": 0.535714,
+    "crps": 0.767408,
+    "is80": 6.88587,
+    "log": -9.99406,
+    "mae": 0.850597,
+    "median_ae": 0.348185,
+    "model": "forecast.bm_stack_oil",
+    "n": 28,
+    "pit_hist10": [
+     3,
+     3,
+     2,
+     3,
+     5,
+     1,
+     3,
+     1,
+     0,
+     7
+    ],
+    "task": "ecb_hicp",
+    "variable": "hicp_inflation"
+   }
+  ]
+ },
+ "family_size": 7,
+ "hypotheses_sha256": "47d4f51d7e5a95ac3fcbbd394b0cb13ef8ebe4298f321cb0125c31eb78c05471",
+ "n_cases": {
+  "ecb_hicp": {
+   "origins": 28,
+   "scored": 28
+  },
+  "g7rt": {
+   "origins": 70,
+   "scored": 1169
+  },
+  "weo_cpi": {
+   "origins": 70,
+   "scored": 13129
+  }
+ },
+ "opened_at": "2026-10-17T22:03:43.435352+00:00",
+ "pins": {
+  "atlas.eia.spot_d": {
+   "artifact_sha256": "cc75e5b1af9248d23464526681a59f9c972b9e44d10a1ace03954ee8f6f248ca",
+   "dataset_key": "atlas.eia.spot_d",
+   "recorded_at": "2026-10-17T15:42:35.016934+00:00",
+   "row_count": 90255
+  },
+  "atlas.eurostat.hicp_m": {
+   "artifact_sha256": "ed13ff43e85dbf5692234751a2b2a5791366748a48a13934df8e509aab137c59",
+   "dataset_key": "atlas.eurostat.hicp_m",
+   "recorded_at": "2026-10-17T14:10:38.039597+00:00",
+   "row_count": 43547
+  },
+  "atlas.imf.cpi_m": {
+   "artifact_sha256": "31a4f25503b1a8c0fa6fd5910724d8380d91f6642381757e12258110a61bb859",
+   "dataset_key": "atlas.imf.cpi_m",
+   "recorded_at": "2026-10-17T15:22:16.822168+00:00",
+   "row_count": 131444
+  },
+  "vintage_cells": {
+   "rows": 2233400
+  }
+ },
+ "results": [
+  {
+   "benchmark": "benchmark.imf_weo",
+   "candidate": "forecast.bm_stack",
+   "confirmed": false,
+   "cov80_candidate": null,
+   "dev_p_better": 1.77002e-06,
+   "dev_relative": 0.877633,
+   "dm_stat": -0.288097,
+   "holm_m": 7,
+   "holm_rejected": false,
+   "holm_threshold": null,
+   "horizon": "cy",
+   "loss": "ae",
+   "loss_benchmark": 0.931341,
+   "loss_candidate": 0.9037,
+   "n_origins": 70,
+   "n_pairs": 460,
+   "p_better": 0.387068,
+   "relative": 0.970321,
+   "task": "g7rt",
+   "tested": true,
+   "uses_official_forecast": true,
+   "variable": "cpi_inflation"
+  },
+  {
+   "benchmark": "benchmark.imf_weo",
+   "candidate": "forecast.bm_stack",
+   "confirmed": true,
+   "cov80_candidate": null,
+   "dev_p_better": 7.18709e-10,
+   "dev_relative": 0.809353,
+   "dm_stat": -2.69517,
+   "holm_m": 7,
+   "holm_rejected": true,
+   "holm_threshold": 0.00833333,
+   "horizon": "cy",
+   "loss": "ae",
+   "loss_benchmark": 0.643629,
+   "loss_candidate": 0.405302,
+   "n_origins": 70,
+   "n_pairs": 490,
+   "p_better": 0.00441466,
+   "relative": 0.629713,
+   "task": "g7rt",
+   "tested": true,
+   "uses_official_forecast": true,
+   "variable": "unemployment_rate"
+  },
+  {
+   "benchmark": "benchmark.imf_weo_errfan",
+   "candidate": "forecast.bm_bridge",
+   "confirmed": false,
+   "cov80_candidate": 0.671429,
+   "dev_p_better": 0.000654847,
+   "dev_relative": 0.807414,
+   "dm_stat": -2.09976,
+   "holm_m": 7,
+   "holm_rejected": false,
+   "holm_threshold": null,
+   "horizon": "cy",
+   "loss": "crps",
+   "loss_benchmark": 0.530976,
+   "loss_candidate": 0.355984,
+   "n_origins": 70,
+   "n_pairs": 490,
+   "p_better": 0.0197042,
+   "relative": 0.670433,
+   "task": "g7rt",
+   "tested": true,
+   "uses_official_forecast": false,
+   "variable": "unemployment_rate"
+  },
+  {
+   "benchmark": "benchmark.imf_weo_errfan",
+   "candidate": "forecast.bm_stack",
+   "confirmed": false,
+   "cov80_candidate": 0.563265,
+   "dev_p_better": 6.33652e-10,
+   "dev_relative": 0.450857,
+   "dm_stat": -2.03145,
+   "holm_m": 7,
+   "holm_rejected": false,
+   "holm_threshold": null,
+   "horizon": "cy",
+   "loss": "crps",
+   "loss_benchmark": 0.530976,
+   "loss_candidate": 0.342685,
+   "n_origins": 70,
+   "n_pairs": 490,
+   "p_better": 0.0230316,
+   "relative": 0.645388,
+   "task": "g7rt",
+   "tested": true,
+   "uses_official_forecast": true,
+   "variable": "unemployment_rate"
+  },
+  {
+   "benchmark": "benchmark.imf_weo",
+   "candidate": "forecast.bm_stack",
+   "confirmed": false,
+   "cov80_candidate": null,
+   "dev_p_better": 1.32637e-25,
+   "dev_relative": 0.825865,
+   "dm_stat": -2.09822,
+   "holm_m": 7,
+   "holm_rejected": false,
+   "holm_threshold": null,
+   "horizon": "cy",
+   "loss": "ae",
+   "loss_benchmark": 2.02463,
+   "loss_candidate": 1.6922,
+   "n_origins": 70,
+   "n_pairs": 10425,
+   "p_better": 0.0197745,
+   "relative": 0.835807,
+   "task": "weo_cpi",
+   "tested": true,
+   "uses_official_forecast": true,
+   "variable": "cpi_inflation"
+  },
+  {
+   "benchmark": "benchmark.imf_weo_errfan",
+   "candidate": "forecast.bm_bridge",
+   "confirmed": false,
+   "cov80_candidate": 0.617746,
+   "dev_p_better": 0.00027988,
+   "dev_relative": 0.68352,
+   "dm_stat": -0.96476,
+   "holm_m": 7,
+   "holm_rejected": false,
+   "holm_threshold": null,
+   "horizon": "cy",
+   "loss": "crps",
+   "loss_benchmark": 1.72387,
+   "loss_candidate": 1.55424,
+   "n_origins": 70,
+   "n_pairs": 10425,
+   "p_better": 0.169017,
+   "relative": 0.901601,
+   "task": "weo_cpi",
+   "tested": true,
+   "uses_official_forecast": false,
+   "variable": "cpi_inflation"
+  },
+  {
+   "benchmark": "benchmark.imf_weo_errfan",
+   "candidate": "forecast.bm_stack",
+   "confirmed": false,
+   "cov80_candidate": 0.621295,
+   "dev_p_better": 2.12926e-40,
+   "dev_relative": 0.687665,
+   "dm_stat": -2.7516,
+   "holm_m": 7,
+   "holm_rejected": true,
+   "holm_threshold": 0.00714286,
+   "horizon": "cy",
+   "loss": "crps",
+   "loss_benchmark": 1.72387,
+   "loss_candidate": 1.43348,
+   "n_origins": 70,
+   "n_pairs": 10425,
+   "p_better": 0.00378479,
+   "relative": 0.83155,
+   "task": "weo_cpi",
+   "tested": true,
+   "uses_official_forecast": true,
+   "variable": "cpi_inflation"
+  }
+ ],
+ "schema": "reva-beat-macro/1",
+ "split": "2019-01-01",
+ "stage": "holdout",
+ "statement": "Holdout = origins on/after 2019-01-01 on the 1st of every month except June and December (never evaluated by V6) for the WEO tasks, quarter starts for the ECB SPF task (never evaluated before). Targets 2019-2025 overlap V6's holdout targets (outcomes were seen in V6 reports); the information dates and the REVA nowcasts are new."
+}

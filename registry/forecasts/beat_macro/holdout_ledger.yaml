@@ -1,0 +1,14 @@
+schema: reva-beat-macro-holdout-ledger/1
+statement: 'Append-only: one entry per opening of the BEAT-MACRO holdout. Never edit
+  past entries.'
+openings:
+- hypotheses_sha256: 47d4f51d7e5a95ac3fcbbd394b0cb13ef8ebe4298f321cb0125c31eb78c05471
+  opened_at: '2026-10-17T22:03:43.435352+00:00'
+  code_sha256: a6bd813b0dd08bc22253790c6454c2264a3463a1123734e7fb2b40c974c53909
+  status: opening
+- hypotheses_sha256: 47d4f51d7e5a95ac3fcbbd394b0cb13ef8ebe4298f321cb0125c31eb78c05471
+  opened_at: '2026-10-17T22:03:43.435352+00:00'
+  holdout_json_sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
+  confirmed:
+  - g7rt|unemployment_rate|cy|forecast.bm_stack|benchmark.imf_weo|ae
+  status: scored
