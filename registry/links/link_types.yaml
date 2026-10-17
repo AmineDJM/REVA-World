@@ -612,6 +612,89 @@ derived_links:
     status: derivable
     path_cost: 1.5
 
+  # ---------------------------------------------------------------- human mobility (V6MIGR)
+  - id: refugee_flow
+    labels: {fr: "réfugiés originaires de l'un accueillis par l'autre (HCR, stock en fin d'année)", en: "refugees from one hosted by the other (UNHCR, end-year stock)"}
+    inverse_labels: {fr: "pays d'asile de réfugiés originaires de", en: "country of asylum of refugees from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [unhcr]
+      atlas:
+        source: unhcr
+        datasets: [pop_bilateral]
+        indicator_prefix: "refugees|origin="
+        partner: flags.counterpart_iso3
+        row_role: object
+        flow: "refugees under UNHCR's mandate originating from the origin and living in the country of asylum on 31 December (UNHCR population statistics)"
+      notes: >-
+        A-UN table unhcr.pop_bilateral (UNHCR Refugee Population Statistics API, CC BY 4.0): row = country of asylum,
+        counterpart origin in the indicator (refugees|origin=<ISO3>) and flags.counterpart_iso3. Link direction origin ->
+        country of asylum. It is an end-year STOCK (people displaced across a border, by origin), not the number who moved
+        that year: the id says "flow" for the displacement relation it describes. The API's string "0" cells (no figure)
+        were never stored; stateless (XXA), unknown (UNK) and Tibetan (TIB) origins have no crosswalk key and give no link.
+        Why people fled is not in this table (no causal reading).
+    temporal: {kind: snapshot, description: "reference year (stock at 31 December)"}
+    weight: {kind: source_quantity, unit: persons}
+    honesty: {fr: "relié via : réfugiés originaires de l'un accueillis par l'autre ({weight}, fin {year}, HCR)", en: "connected via: refugees from one hosted by the other ({weight}, end of {year}, UNHCR)"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  - id: asylum_applications
+    labels: {fr: "demandes d'asile déposées (pays d'origine → pays d'asile, HCR)", en: "asylum applications lodged (origin → country of asylum, UNHCR)"}
+    inverse_labels: {fr: "pays d'asile des demandeurs originaires de", en: "country of asylum of applicants from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      sources: [unhcr]
+      atlas:
+        source: unhcr
+        datasets: [asylum_applications]
+        indicator_prefix: "applied|origin="
+        partner: flags.counterpart_iso3
+        row_role: object
+        require_dims: {count: P}
+        facet_dims: [authority, app_type, stage]
+        flow: "asylum claims lodged during the year by people from the origin in the country of asylum, persons (UNHCR); one series per authority / application type / stage of procedure"
+      notes: >-
+        V6MIGR table unhcr.asylum_applications (UNHCR API asylum-applications download, CC BY 4.0): row = country of
+        asylum, origin in the indicator and flags.counterpart_iso3; only the persons series (count=P; case-level series
+        such as most US figures are left out, never converted). UNHCR splits a pair's claims by authority (G government,
+        J joint, U UNHCR), application type (N new, R repeat, A appeal, ...) and stage of procedure: each combination is
+        its own facet, never summed by REVA. A year without a record gives no link (not zero).
+    temporal: {kind: snapshot, description: "reference year (claims lodged during the calendar year)"}
+    weight: {kind: source_quantity, unit: persons}
+    honesty: {fr: "relié via : demandes d'asile déposées ({weight} personnes, {year}, HCR)", en: "connected via: asylum applications lodged ({weight} persons, {year}, UNHCR)"}
+    causal: false
+    status: derivable
+    path_cost: 1.6
+
+  - id: remittance
+    labels: {fr: "envois de fonds des migrants (pays d'envoi → pays de réception)", en: "migrant remittances (sending → receiving country)"}
+    inverse_labels: {fr: "pays de réception d'envois de fonds depuis", en: "receiving country of remittances from"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      concepts: [migration.remittances_bilateral]
+      sources: [knomad]
+      notes: >-
+        No bilateral source loaded. The World Bank / KNOMAD Bilateral Remittance Matrix (last release: 2021, published
+        December 2022) no longer resolves on knomad.org (KNOMAD closed in 2024; the old file URL redirects to a World
+        Bank brief), and the Center for Global Development 2024 re-run answers 403 to non-browser clients. Both are
+        modelled allocations of each country's aggregate inflow over migrant stocks and incomes, not observed
+        transactions: if an owner supplies the file, the link must carry that caveat. Country totals (inflows
+        BX.TRF.PWKR.CD.DT, outflows BM.TRF.PWKR.CD.DT) are in wb.wdi_econ.
+    temporal: {kind: snapshot, description: "reference year of the matrix"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : envois de fonds estimés (matrice modélisée)", en: "connected via: estimated remittances (modelled matrix)"}
+    causal: false
+    status: no_open_source
+    path_cost: 1.5
+
   # ---------------------------------------------------------------- physical networks (A-INFRA; LINKS3)
   - id: submarine_cable
     labels: {fr: "câbles sous-marins listant les deux pays (Wikidata)", en: "submarine cables listing both countries (Wikidata)"}

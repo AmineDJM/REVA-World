@@ -1,0 +1,24 @@
+# Budget request from agent V6POLITICS (V6, 2026-10-17): elections, cabinets and dated policy events
+# (docs/dev/v6_politics.md). Merged by `python -m reva.atlas.budget_merge --write`.
+agent: V6POLITICS
+requests:
+  - source_key: parlgov.dataverse
+    # atlas.parlgov_cabinets: Dataverse record + view_cabinet / view_party / view_election CSVs (~3.2 MB) = 4
+    daily_requests: 10
+    expected_bytes_per_day: 8000000
+    reason: "4 requests (~3.2 MB) per run plus one retry; CC0"
+  - source_key: nelda.dataverse
+    # atlas.nelda: Dataverse record + tab export (3.7 MB) + codebook PDF (0.2 MB) + countrycode tarball (CRAN) = 4
+    daily_requests: 10
+    expected_bytes_per_day: 10000000
+    reason: "4 requests (~4.5 MB) per run plus one retry; no licence stated (terms 'public')"
+  - source_key: oxcgrt.github
+    # atlas.oxcgrt: README + LICENSE.txt + codebook markdown + compact national CSV (~44 MB) = 4
+    daily_requests: 8
+    expected_bytes_per_day: 100000000
+    reason: "4 requests (~44 MB) per run plus one retry; static final dataset; CC BY 4.0"
+  - source_key: whogov.dataverseno
+    # atlas.whogov: DataverseNO record + cross-sectional CSV (3.7 MB) + ReadMe + codebook PDF (0.3 MB) = 4
+    daily_requests: 12
+    expected_bytes_per_day: 10000000
+    reason: "4 requests (~4 MB) per run plus retries (DataverseNO answered 403 intermittently); CC BY 4.0"

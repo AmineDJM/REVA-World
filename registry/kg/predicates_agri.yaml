@@ -1,0 +1,122 @@
+# Dataset predicates of the V6AGRI food-systems layer (owner: V6AGRI). Not Wikidata properties: registered in the KG
+# allow-list (kg.property / kg.property_version) by src/reva/adapters/connectors/atlas_ifpri_er.py through
+# reva.kg.model.register_properties (agri_common.guarded_kg_load). WDHARVEST's registry/kg/properties.yaml is not
+# touched; P580 / P582 (start / end time) are used with WDHARVEST's own definitions.
+#
+# Relation families: registry/kg/relations_v4.d/v6agri.yaml (none causal).
+#
+# Honesty:
+# * ifpri_er:* statements are the coded fields of the IFPRI Food Export Restrictions Tracker public workbooks
+#   (COVID-19 and Ukraine-crisis versions, licence ODC-By as stated in each workbook): one KG entity per measure
+#   `ifpri_er:<tracker>:<Code>`. Dates, category, products, HS4 codes, status and sources are IFPRI's coding, quoted
+#   verbatim. A measure is an event (type `export_restriction`, registry/events/taxonomy.yaml), never a cause: its
+#   effect on prices is not stated by these statements.
+# * The HS version of IFPRI's "HS4" column is not stated in the workbooks; ifpri_er:covers_hs_heading links the code as
+#   stated to the HS 2017 heading of the same code (REVA's assumption, stated in each statement's qualifiers); the
+#   code as stated is kept separately (ifpri_er:hs4_as_stated).
+
+version: 1
+owner: V6AGRI
+predicates:
+  - pid: "ifpri_er:imposed_by"
+    value_kind: item
+    reva_predicate: ifpri_er_imposed_by
+    label_en: "imposed by (country, IFPRI export restrictions tracker)"
+    label_fr: "imposée par (pays, suivi IFPRI des restrictions à l'exportation)"
+    inverse_name: ifpri_er_imposed
+    inverse_label_en: "imposed food export restriction (IFPRI)"
+    inverse_label_fr: "a imposé une restriction alimentaire à l'exportation (IFPRI)"
+    derived: false
+    description: >-
+      Measure -> country that applies it: IFPRI column Country_Alpha3 ("Unique 3-letter country code per ISO 3166-1
+      alpha-3 nomenclature."), resolved to the reviewed country QID (registry/entities/country_qids.json) or
+      `iso3:<code>`.
+  - pid: "ifpri_er:covers_hs_heading"
+    value_kind: item
+    reva_predicate: ifpri_er_covers_hs_heading
+    label_en: "covers HS heading (IFPRI export restrictions tracker)"
+    label_fr: "porte sur la position SH (suivi IFPRI des restrictions à l'exportation)"
+    inverse_name: ifpri_er_heading_restricted_by
+    inverse_label_en: "heading covered by export restriction (IFPRI)"
+    inverse_label_fr: "position visée par une restriction à l'exportation (IFPRI)"
+    derived: false
+    description: >-
+      Measure -> `hs2017:<HS4>`: IFPRI column HS4 ("HS4 codes of categories of products affected by policy measure.
+      If available, based on source. Otherwise, encoded by data enterer."). The HS edition is not stated by IFPRI:
+      HS 2017 is REVA's assumption (qualifier `hs_version_basis`); malformed codes are not linked.
+  - pid: "ifpri_er:hs4_as_stated"
+    value_kind: string
+    reva_predicate: ifpri_er_hs4_as_stated
+    label_en: "HS4 codes as stated (IFPRI)"
+    label_fr: "codes SH4 tels que déclarés (IFPRI)"
+    derived: false
+    description: The HS4 cell verbatim (several codes separated by ';' as in the workbook).
+  - pid: "ifpri_er:measure_category"
+    value_kind: string
+    reva_predicate: ifpri_er_measure_category
+    label_en: "measure category (IFPRI: Announcement, Ban, Licensing, Not Binding, Tax ...)"
+    label_fr: "catégorie de mesure (IFPRI)"
+    derived: false
+    description: IFPRI column Category ("Categorization of the policy. [Announcement, Ban, Licensing, Not Binding]"), verbatim.
+  - pid: "ifpri_er:products"
+    value_kind: string
+    reva_predicate: ifpri_er_products
+    label_en: "products as named by IFPRI"
+    label_fr: "produits tels que nommés par l'IFPRI"
+    derived: false
+    description: IFPRI column Products ("text list of names of products, based on source"), verbatim.
+  - pid: "ifpri_er:description"
+    value_kind: string
+    reva_predicate: ifpri_er_description
+    label_en: "description of the measure (IFPRI)"
+    label_fr: "description de la mesure (IFPRI)"
+    derived: false
+    description: IFPRI column Description ("Text description of policy measure ..."), verbatim (truncated at 4,000 characters, flagged).
+  - pid: "ifpri_er:announced"
+    value_kind: time
+    reva_predicate: ifpri_er_announced
+    label_en: "announcement date (IFPRI)"
+    label_fr: "date d'annonce (IFPRI)"
+    derived: false
+    description: >-
+      IFPRI column AnnouncementDate ("Date, MM/DD/YYYY, that the policy was formally announced. If unavailable, earliest
+      date identifying it, such as mention in news source. If no information available, starting date of the policy.").
+  - pid: "ifpri_er:last_update"
+    value_kind: time
+    reva_predicate: ifpri_er_last_update
+    label_en: "record last updated (IFPRI)"
+    label_fr: "fiche mise à jour (IFPRI)"
+    derived: false
+    description: IFPRI column LastUpdate ("Date that the entry was recorded or last updated.").
+  - pid: "ifpri_er:verification_status"
+    value_kind: string
+    reva_predicate: ifpri_er_verification_status
+    label_en: "verification status (IFPRI)"
+    label_fr: "statut de vérification (IFPRI)"
+    derived: false
+    description: >-
+      IFPRI column Status ('"Checked" if at least two sources report the policy measure or a single, sufficiently
+      reliable source reported the measure. Else "Under verification".'), verbatim.
+  - pid: "ifpri_er:source_url"
+    value_kind: string
+    reva_predicate: ifpri_er_source_url
+    label_en: "source cited by IFPRI"
+    label_fr: "source citée par l'IFPRI"
+    derived: false
+    description: IFPRI columns Source / Source2 verbatim (one statement per cell; not fetched by REVA).
+  - pid: "ifpri_er:wto_notified"
+    value_kind: string
+    reva_predicate: ifpri_er_wto_notified
+    label_en: "notified to the WTO (IFPRI coding)"
+    label_fr: "notifiée à l'OMC (codage IFPRI)"
+    derived: false
+    description: IFPRI column WTOnotification ("Has the country notified the WTO about this policy?"), verbatim code.
+  - pid: "ifpri_er:protected_countries"
+    value_kind: string
+    reva_predicate: ifpri_er_protected_countries
+    label_en: "countries exempted / co-implementing (IFPRI, as named)"
+    label_fr: "pays exemptés ou co-appliquants (IFPRI, tels que nommés)"
+    derived: false
+    description: >-
+      IFPRI column ProtectedCountries ("Countries protected from the policy measure, either as a co-implementer or
+      through exemption."), verbatim text; names are never mapped to countries.

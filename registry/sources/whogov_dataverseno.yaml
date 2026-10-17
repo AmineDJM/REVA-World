@@ -1,0 +1,27 @@
+# V6 (agent V6POLITICS): The WhoGov Project Version 4 (Nyrup, Bramwell et al.), DataverseNO. Connector
+# src/reva/adapters/connectors/atlas_whogov.py (atlas whogov.cabinet_cy, whogov.government_starts; KG
+# whogov:government:<ISO3>:<start>). Report docs/dev/v6_politics.md.
+source_key: whogov.dataverseno
+title: WhoGov Version 4 -- members of cabinets in 177 countries since 1966 (cross-sectional file)
+provider_url: https://doi.org/10.18710/OLPOZK
+lineage_family: whogov
+rights:
+  licence: CC-BY-4.0
+  licence_url: http://creativecommons.org/licenses/by/4.0
+  attribution: >-
+    Nyrup, Jacob, Stuart Bramwell et al. 2026. The WhoGov Project, https://doi.org/10.18710/OLPOZK, DataverseNO;
+    Nyrup & Bramwell (2020), American Political Science Review 114(4): 1366-1374.
+  licence_evidence: >-
+    Dataverse record license.name "CC BY 4.0"; 0_ReadMe.txt "Licenses/Restrictions: CC BY 4.0."
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [dataverse.no, uit-dataverseno-prod01.s3-oslo.educloud.no]
+  files:
+    - https://dataverse.no/api/datasets/:persistentId/?persistentId=doi:10.18710/OLPOZK
+    - https://dataverse.no/api/access/datafile/290057  # WhoGov_crosssectional_V4.0.csv (3.7 MB)
+    - https://dataverse.no/api/access/datafile/295623  # 0_ReadMe.txt
+    - https://dataverse.no/api/access/datafile/295899  # whogov_codebookandappendix.pdf
+  not_fetched: https://dataverse.no/api/access/datafile/290051  # WhoGov_within_V4.0.csv (82 MB, bigger machine)
+  authentication: none
+  cadence: irregular releases
+  availability_note: DataverseNO answered 403 (outage page) intermittently on 2026-10-17; retries succeeded

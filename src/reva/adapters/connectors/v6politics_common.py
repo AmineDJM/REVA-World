@@ -2,7 +2,7 @@
 registered atlas input tables (for the derived change tables) and small parsing helpers.
 
 Not an atlas source module (no ``atlas_`` prefix): the sources are ``atlas_parlgov_kg``, ``atlas_nelda``,
-``atlas_oxcgrt`` and ``atlas_politics_derived``. Report: ``docs/dev/v6_politics.md``.
+``atlas_oxcgrt``, ``atlas_whogov`` and ``atlas_politics_derived``. Report: ``docs/dev/v6_politics.md``.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 PREDICATES_FILE = REPO_ROOT / "registry" / "kg" / "predicates_politics.yaml"
 _PROPERTY_KEYS = ("pid", "value_kind", "reva_predicate", "label_en", "label_fr")
 #: Wikidata properties the politics layer states (WDHARVEST allow-list definitions are reused unchanged).
-WIKIDATA_PIDS = ("P17", "P580", "P585")
+WIKIDATA_PIDS = ("P17", "P580", "P582", "P585")
 
 
 class PoliticsParseError(SourceResponseError):
@@ -59,7 +59,7 @@ def load_predicates(prefix: str | None = None) -> list[Any]:
 
 
 def kg_properties(prefix: str) -> list[Any]:
-    """The namespaced predicates starting with ``prefix`` plus the Wikidata P17/P580/P585 definitions."""
+    """The namespaced predicates starting with ``prefix`` plus the Wikidata P17/P580/P582/P585 definitions."""
     from reva.adapters.connectors.wikidata import load_allowlist
     from reva.kg.harvest import kg_properties as wd_props
 

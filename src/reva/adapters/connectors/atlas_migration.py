@@ -269,11 +269,16 @@ class UnhcrEndpoint:
     dims: tuple[tuple[str, str], ...]  # (CSV column, indicator dimension)
     time_reference: str
 
-    def download_url(self) -> str:
-        return f"{UNHCR_API}{self.endpoint}/?limit=1000000&coo_all=true&coa_all=true&download=true"
+    def _scope(self, origin: str | None) -> str:
+        return f"coo={origin}&coa_all=true" if origin else "coo_all=true&coa_all=true"
 
-    def check_url(self) -> str:
-        return f"{UNHCR_API}{self.endpoint}/?limit=1&coo_all=true&coa_all=true"
+    def download_url(self, origin: str | None = None) -> str:
+        """Every record (all years: the API returns them without a year filter); ``origin`` (ISO3, run option
+        ``unhcr_origin``) restricts to one country of origin -- the recorded fixtures are such real responses."""
+        return f"{UNHCR_API}{self.endpoint}/?limit=1000000&{self._scope(origin)}&download=true"
+
+    def check_url(self, origin: str | None = None) -> str:
+        return f"{UNHCR_API}{self.endpoint}/?limit=1&{self._scope(origin)}"
 
 
 UNHCR_ENDPOINTS = (
@@ -458,6 +463,17 @@ def unhcr_note(ep: UnhcrEndpoint, rep: Mapping[str, Any]) -> str:
 ES_HOST = "ec.europa.eu"
 ES_DATASET_CODE = "migr_asyappctzm"
 ES_TSV_URL = f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}?format=TSV&compressed=true"
+_ES_KEY = re.compile(r"^[A-Za-z0-9_+]*(\.[A-Za-z0-9_+]*){6}$")
+
+
+def es_tsv_url(key: str | None = None) -> str:
+    """The whole dataset, or (run option ``eurostat_key``, an SDMX series key such as
+    ``M.PER.SY+UA.T.TOTAL+FRST.TOTAL.DE+FR``) a real filtered extraction in the same TSV layout (fixtures)."""
+    if not key:
+        return ES_TSV_URL
+    if not _ES_KEY.match(key):
+        raise ValueError(f"eurostat_key {key!r} is not an SDMX key of 7 dimensions")
+    return f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}/{key}?format=TSV&compressed=true"
 ES_FLAGS_URL = f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/OBS_FLAG/latest"
 ES_DATASET = "asylum_applicants_m"
 ES_KEY_HEADER = "freq,unit,citizen,sex,applicant,age,geo\\TIME_PERIOD"

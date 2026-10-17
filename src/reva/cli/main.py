@@ -38,6 +38,9 @@ app.add_typer(forecasts_app, name="forecasts")
 from reva.cli.objects import objects_app  # noqa: E402  (V6 DISKZ)
 
 app.add_typer(objects_app, name="objects")
+from reva.qa.cli import qa_app  # noqa: E402  (V6 QA-DATA)
+
+app.add_typer(qa_app, name="qa")
 
 
 def _out(obj: Any) -> None:

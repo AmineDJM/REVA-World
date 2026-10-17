@@ -1,5 +1,5 @@
 # Dataset predicates of the V6 politics layer (owner: V6POLITICS; connectors
-# src/reva/adapters/connectors/atlas_parlgov_kg.py and atlas_nelda.py register them through
+# src/reva/adapters/connectors/atlas_parlgov_kg.py, atlas_nelda.py and atlas_whogov.py register them through
 # reva.kg.model.register_properties, reading this file). Family mappings: registry/kg/relations_v4.d/v6politics.yaml.
 # Event types: registry/events/taxonomy.yaml (dataset kinds parlgov:election:, parlgov:cabinet:, nelda:election:).
 # Report: docs/dev/v6_politics.md.
@@ -30,3 +30,4 @@ predicates:
   - {pid: "nelda:round", value_kind: quantity, reva_predicate: nelda_round, label_en: "round of the election (last digit of the NELDA electionID)", label_fr: "tour de l'élection (dernier chiffre de l'electionID NELDA)"}
   - {pid: "nelda:coded_answer", value_kind: string, reva_predicate: nelda_coded_answer, label_en: "NELDA coded answer (yes / no / unclear / N/A) to the question named in the qualifiers", label_fr: "réponse codée NELDA (yes / no / unclear / N/A) à la question nommée en qualificatif"}
   - {pid: "nelda:gw_code", value_kind: external_id, reva_predicate: nelda_gw_code, label_en: "Gleditsch-Ward state code NELDA gives for the election (ccode)", label_fr: "code d'État Gleditsch-Ward donné par NELDA (ccode)"}
+  - {pid: "whogov:government_name", value_kind: string, reva_predicate: whogov_government_name, label_en: "government name as given by WhoGov (govern_name; WhoGov: based on Döring 2019 or Bértoa 2020)", label_fr: "nom du gouvernement selon WhoGov (govern_name ; d'après Döring 2019 ou Bértoa 2020)"}

@@ -72,7 +72,7 @@ DATA_FILE = "OxCGRT_compact_national_v1.csv"
 MAX_BYTES = {"readme": 1_000_000, "licence": 1_000_000, "codebook": 2_000_000, "compact": 80_000_000}
 MIN_ROWS = 150_000
 DATASETS = ("indices_daily", "policy_changes", "fiscal_announcements")
-GEO_SCHEME = "oxcgrt"
+GEO_SCHEME = "iso3"
 INDICES = ("StringencyIndex_Average", "GovernmentResponseIndex_Average", "ContainmentHealthIndex_Average",
            "EconomicSupportIndex")  # fmt: skip
 

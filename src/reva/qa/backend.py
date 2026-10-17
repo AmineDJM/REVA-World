@@ -96,7 +96,7 @@ class QaBackend:
             return "missing"
         except IntegrityFailure:
             return "corrupt"
-        except Exception:  # noqa: BLE001 - an undecodable wrapper is a corrupt object, reported, never raised
+        except Exception:
             return "corrupt"
         return "ok"
 
@@ -105,7 +105,9 @@ class QaBackend:
             c()
 
 
-def postgres_backend(engine: Any, store: Any, *, today: date | None = None, statement_timeout_s: int = 1800) -> QaBackend:
+def postgres_backend(
+    engine: Any, store: Any, *, today: date | None = None, statement_timeout_s: int = 1800
+) -> QaBackend:
     from sqlalchemy import text
 
     conn = engine.connect().execution_options(isolation_level="AUTOCOMMIT")

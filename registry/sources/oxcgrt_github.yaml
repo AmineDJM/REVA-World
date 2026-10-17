@@ -1,0 +1,26 @@
+# V6 (agent V6POLITICS): Oxford COVID-19 Government Response Tracker, final v1 dataset (GitHub). Connector
+# src/reva/adapters/connectors/atlas_oxcgrt.py (atlas oxcgrt.indices_daily, oxcgrt.policy_changes [derived],
+# oxcgrt.fiscal_announcements). Report docs/dev/v6_politics.md.
+source_key: oxcgrt.github
+title: OxCGRT -- Oxford COVID-19 Government Response Tracker, compact national v1 (2020-2022)
+provider_url: https://github.com/OxCGRT/covid-policy-dataset
+lineage_family: oxcgrt
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Oxford COVID-19 Government Response Tracker, Blavatnik School of Government, University of Oxford. Hale, T. et
+    al. (2021). A global panel database of pandemic policies. Nature Human Behaviour. doi:10.1038/s41562-021-01079-8
+  licence_evidence: >-
+    LICENSE.txt "Attribution 4.0 International" (CC BY 4.0 legal code); README.md "Our data is made available free to
+    use for any purpose under a Creative Commons CC BY 4.0 license" (both archived and checked every run)
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  files:
+    - https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/data/OxCGRT_compact_national_v1.csv  # ~44 MB
+    - https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/README.md
+    - https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/LICENSE.txt
+    - https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/documentation_and_codebook.md
+  authentication: none
+  cadence: static (data collection ended; complete dataset compiled June 2023)
