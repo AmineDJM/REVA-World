@@ -78,7 +78,6 @@ gene name/length/function (verbatim, cut at 1,200 characters with `truncated` + 
 counts, Ensembl assembly name/genebuild/golden path, NCBI gene counts/assembly name/level/length, Wikidata common
 names (fr/en, verbatim). No predicate is causal.
 
-LIVE_RESULTS_PLACEHOLDER
 
 ## Live loads in the dev DB `reva` (2026-10-17, origin `live`)
 

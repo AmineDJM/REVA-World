@@ -328,14 +328,15 @@ appended resolutions — nothing edited).
 | M5 | **fixed** (a: h = 0 = onset year, profile estimate; b: growth variable `output.real_gdp_per_capita_growth`; c: `panel_member` / "membership not checked") | FIX4B | `v6_fix4b.md` §M5 |
 | M6 | **fixed** (`PROJECTION_SQL` + engine baseline: `unknown_boundary` never an observation; 1,978 cells / 16 series) | FIX4B | `v6_fix4b.md` §M6 |
 | M7 | **fixed in code; 5 sealed questions void** (`fiscal_year_basis_mismatch`, appended resolution `39b404b0…`); `atlas.imf` 1.3.0 parser keeps the fiscal basis; live WEO re-ingest with the new parser not run (disk 4.5 GB < 5 GB) — queued command in the report | FIX4B | `v6_fix4b.md` §M7 |
-| M8 | open | — | |
+| M8 | **fixed** (V4LINK identity rules on P1278; live replay of the archived WDQS response: 52,458 kept, 1,005 retracted `reclassified_by_reva`, load 480) | FIX4C | `docs/dev/v6_fix4c.md` §M8 |
 | M9 | open | — | |
-| L1 | open | — | |
-| L2 | open | — | |
+| L1 | **fixed in code** (`atlas.gleif` 1.0.3: parent edges from the relationship record's own fields; else `relationship_record: not_fetched`, no child fields); live `entities` run queued (disk 4.2 GB < 5 GB) | FIX4C | `v6_fix4c.md` §L1 |
+| L2 | **fixed** (families API serves the statement's own licence when the artifact was recorded for another source; NE zip archived under `atlas.naturalearth_admin1` / `naturalearth.admin1_10m` from ghcnm 1.0.2; existing artifact row immutable) | FIX4C | `v6_fix4c.md` §L2 |
 | L3 | **fixed** (`shock_profile = one_time_impulse` on the 5 run estimates, new revisions) | FIX4B | `v6_fix4b.md` |
-| L4 | open | — | |
-| L5 | open | — | |
-| L6 | open | — | |
-| L7 | open | — | |
+| L4 | **fixed in code** (`atlas.fishstat` 1.0.2 flags N cells; offline on the archived release: 26,502 sums with N, 2,903 all-N); live re-ingest queued (disk < 5 GB) | FIX4C | `v6_fix4c.md` §L4 |
+| L5 | **fixed in code** (`atlas.oecd.wellbeing` 1.0.2: `licence_review` on every cell; no per-observation upstream is published → owner decision stands); live re-ingest queued | FIX4C | `v6_fix4c.md` §L5 |
+| L6 | **fixed** (v4_v4health WHO GHE status, v6_plan registry counts, v4_v4bio placeholder line removed) | FIX4C | `v6_fix4c.md` §L6 |
+| L7 | **fixed** (HGNC targets all loaded by V4BIO since the audit: 0 dangling; remaining 478 edges (GEM 290, GloBI 40, Mondo taxon 148) marked `entity_loaded: false` in the families API) | FIX4C | `v6_fix4c.md` §L7 |
 | L8 | open | — | |
-| L9 | open | — | |
+| L9 | **fixed in code** (`atlas.climate_indices` 1.0.1: STAR rows = cycle intervals, stated time in flags); live re-ingest queued | FIX4C | `v6_fix4c.md` §L9 |
+| §5 | **USGS fixed in code** (`atlas.usgs_myb_facilities` 1.0.2: country from the Facility ID GENC prefix; live run queued); the other curated mappings listed for maintainer review in `registry/curation/name_based_mappings.yaml` | FIX4C | `v6_fix4c.md` §5 |
