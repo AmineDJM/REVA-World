@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.14"
+policy_version: "budgets-1.3.15"
 daily:
-  http_requests_total: 13248
+  http_requests_total: 13634
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -77,6 +77,8 @@ per_source_daily_requests:
   harvard.dataverse.unvotes: 12
   # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
   hief.dataverse: 6
+  # hofstede.dimensions: requested by V4MIND (v4mind.yaml)
+  hofstede.dimensions: 4
   # hyde.dans: requested by A-HISTECON (a_histecon.yaml)
   hyde.dans: 10
   # icb.data: requested by CAUSDATA (causdata.yaml)
@@ -85,8 +87,8 @@ per_source_daily_requests:
   icow.paulhensel: 8
   # idmc.gidd: requested by CAUSMORE (causmore.yaml), FIXB (fixb.yaml)
   idmc.gidd: 12
-  # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml)
-  ilostat.rplumber: 60
+  # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml), V4MIND (v4mind.yaml)
+  ilostat.rplumber: 75
   # imf.sdmx: requested by A-IMF (a_imf.yaml)
   imf.sdmx: 60
   # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
@@ -111,14 +113,16 @@ per_source_daily_requests:
   noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
-  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)
-  oecd.sdmx: 76
+  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), V4MIND (v4mind.yaml)
+  oecd.sdmx: 82
   # ofac.programs: requested by A-SANCTIONS (a_sanctions.yaml)
   ofac.programs: 4
   # ohchr.indicators: requested by A-TREATIES (a_treaties.yaml)
   ohchr.indicators: 50
-  # openalex.api: requested by A-SCI (a_sci.yaml)
-  openalex.api: 400
+  # openalex.api: requested by A-SCI (a_sci.yaml), V4MIND (v4mind.yaml)
+  openalex.api: 700
+  # openalex.snapshot: requested by V4MIND (v4mind.yaml)
+  openalex.snapshot: 30
   # openflights.data: requested by A-INFRA (a_infra.yaml)
   openflights.data: 10
   # ourairports.data: requested by A-INFRA (a_infra.yaml)
@@ -155,7 +159,7 @@ per_source_daily_requests:
   un.desa_ims: 5
   # un.psdata: requested by A-MILITARY (a_military.yaml)
   un.psdata: 30
-  # un.sdg: requested by A-UN (a_un.yaml)
+  # un.sdg: requested by A-UN (a_un.yaml), V4MIND (v4mind.yaml)
   un.sdg: 400
   # un.wpp: requested by A-UN (a_un.yaml), SIMWORLD (simworld.yaml)
   un.wpp: 20
@@ -187,8 +191,8 @@ per_source_daily_requests:
   vdem.vdemdata: 9
   # wals.cldf: requested by KGLANG (kglang.yaml)
   wals.cldf: 6
-  # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml), A-SOCIETY (a_society.yaml)
-  who.gho: 129
+  # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml), A-SOCIETY (a_society.yaml), V4MIND (v4mind.yaml)
+  who.gho: 160
   # whr.figure21: requested by A-QOL (a_qol.yaml)
   whr.figure21: 5
   # wid.bulk: requested by A-QOL (a_qol.yaml)

@@ -1,0 +1,47 @@
+# Budget request from agent V4MIND (psychology, behaviour, sociology). Merged by `python -m reva.atlas.budget_merge`.
+# The merge keeps the largest request per source (never the sum): where V4MIND shares a source key with V3 agents,
+# the figure below is the existing limit plus V4MIND's own runs so both can run on the same day.
+agent: V4MIND
+requests:
+  - source_key: oecd.sdmx
+    # How's Life? DF_HSL_CWB + DF_HSL_FWB, 2 SDMX-CSV requests (~20 MB) per run (atlas.oecd.wellbeing).
+    daily_requests: 82
+    expected_bytes_per_day: 60000000
+    reason: "existing 76 (A-FISCAL/A-ILO/A-SOCIETY/A-TRADE) + V4MIND 2 per run, one retry"
+  - source_key: who.gho
+    # 1 indicator list + 29 GHO indicators (small; < 5 MB in all) per run (atlas.who_mental).
+    daily_requests: 160
+    expected_bytes_per_day: 15000000
+    reason: "existing 129 (A-HEALTHEDU/A-SOCIETY) + V4MIND 30 per run"
+  - source_key: un.sdg
+    # 3 SDG 5.4.1 series, one 10,000-record page each (~3 MB) per run (atlas.un_sdg_timeuse).
+    daily_requests: 10
+    expected_bytes_per_day: 20000000
+    reason: "3 requests per run, two runs"
+  - source_key: ilostat.rplumber
+    # TOC + 5 dictionaries + classif1 dictionary + 3 occupation indicators (gzip CSV) per run (atlas.ilostat_occupation).
+    daily_requests: 75
+    expected_bytes_per_day: 60000000
+    reason: "existing 60 (A-ILO/SIMWORLD) + V4MIND 10 per run, one retry"
+  - source_key: openalex.api
+    # 88 group_by queries (2015-2025 x 8 subfields), ~1-4 requests each without an API key (atlas.openalex_mind).
+    daily_requests: 700
+    expected_bytes_per_day: 400000000
+    reason: "existing 400 (A-SCI) + V4MIND 300 planned per run; OpenAlex's own free per-IP budget may still refuse (429)"
+  - source_key: openalex.snapshot
+    # 4 manifests + ~10 gzip JSON-lines files (~7.5 MB) per run (atlas.openalex_taxonomy).
+    daily_requests: 30
+    expected_bytes_per_day: 20000000
+    reason: "14 requests per run, two runs"
+  - source_key: hofstede.dimensions
+    # licence page (66 kB) + CSV (4 kB) per run (atlas.hofstede).
+    daily_requests: 4
+    expected_bytes_per_day: 200000
+    reason: "2 requests per run, two runs"
+daily_totals_increase:
+  http_requests_total: "+400"
+  http_bytes_total: "+500_000_000"
+notes: >-
+  Wikidata specs (registry/kg/queries/society/mind_*.yaml) run through WDHARVEST's budgeted client under the existing
+  wikidata.wdqs / wikidata.wbapi keys. Disk: raw ~30 MB per full run of every V4MIND source (OpenAlex works counts
+  ~10 MB more), Parquet < 20 MB.

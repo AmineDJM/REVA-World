@@ -329,7 +329,7 @@ SUBFIELDS: dict[str, str] = {
     "3207": "Social Psychology",
     "3312": "Sociology and Political Science",
 }
-MIND_YEARS = (2000, 2025)
+MIND_YEARS = (2015, 2025)
 FIXTURE_YEARS = (2020, 2020)
 
 
@@ -369,13 +369,13 @@ def mind_spec() -> AtlasSourceSpec:
         datasets=(MIND_DATASET,),
         dataset_ids=("works group_by authorships.countries, primary_topic.subfield.id",),
         cadence_seconds=90 * 86400,
-        planned_requests=900,
+        planned_requests=300,
         max_response_bytes=oa.MAX_BYTES,
         min_interval_seconds=0.25,
         parser_version=PARSER_VERSION + "+" + oa.PARSER_VERSION,
         code_digest=code_digest(sys.modules[__name__]),
         field_mappings={"subfields": SUBFIELDS, "years": list(MIND_YEARS), "group_by": "authorships.countries"},
-        notes="208 queries (26 years x 8 subfields), ~1-4 requests each without an API key; no contact address sent.",
+        notes="88 queries (11 years x 8 subfields), ~1-4 requests each without an API key; no contact address sent.",
     )
 
 
