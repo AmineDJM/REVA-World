@@ -1,0 +1,11 @@
+# Budget request from agent SAMEAS (evidenced cross-source event identity, docs/dev/v3_sameas.md).
+# ATLASCORE merge rule: max(current, request) per source, never the sum.
+agent: SAMEAS
+requests:
+  - source_key: pax.peaceagreements
+    # atlas.pax was ingested at 1.0.0 (2 requests, plus 2 refused by a `Content-Encoding: none` the safe client did not
+    # read yet) and must be re-ingested the same day at 1.1.0 (conflict -> agreement is context, audit M6): one more
+    # run of 2 requests (planned 3) on top of CAUSMORE's 6/day.
+    daily_requests: 12
+    expected_bytes_per_day: 20000000
+    reason: "atlas.pax re-run after a same-day connector version change (1.0.0 -> 1.1.0): 2 requests / 4.5 MB per run"

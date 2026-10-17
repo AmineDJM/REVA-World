@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.9"
+policy_version: "budgets-1.3.10"
 daily:
-  http_requests_total: 12921
+  http_requests_total: 12927
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -127,8 +127,8 @@ per_source_daily_requests:
   owid.compilations: 50
   # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
   parlgov.dataverse: 6
-  # pax.peaceagreements: requested by CAUSMORE (causmore.yaml)
-  pax.peaceagreements: 6
+  # pax.peaceagreements: requested by CAUSMORE (causmore.yaml), SAMEAS (sameas.yaml)
+  pax.peaceagreements: 12
   # powell_thyne.coups: requested by A-COUPS (a_coups.yaml)
   powell_thyne.coups: 6
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)

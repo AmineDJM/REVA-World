@@ -68,9 +68,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # * budgets.yaml -> budgets-1.3.8 (2026-10-16, lead): merge of A-COLONIAL (coldat, icow, cow terrchange); same caps.
 # * budgets.yaml -> budgets-1.3.9 (2026-10-17, CAUSMORE): merge of causmore.yaml (cow.data 34 -> 44 for
 #   atlas.cowwars; new pax.peaceagreements 6, idmc.gidd 6); same caps.
+# * budgets.yaml -> budgets-1.3.10 (2026-10-17, SAMEAS): merge of sameas.yaml (pax.peaceagreements 6 -> 12: same-day
+#   re-run of atlas.pax after its 1.0.0 -> 1.1.0 change); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "73afadfc17d7c69c4807fa1315c0c49d25fad5d6d8d28dfb0076040986bbde64",
+    "budgets.yaml": "d9af2562e62c93e7c015fde00f20089140a284573606aefda4f2d3d76a24e139",
 }
 
 
