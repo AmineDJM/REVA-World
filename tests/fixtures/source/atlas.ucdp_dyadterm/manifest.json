@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "77a87652190f623a74833e7ef9fd0db785b627e3ed489c0a6f18c2cb3162e55f",
+    "url": "https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Dyad.csv",
+    "file": "77a87652190f623a.csv",
+    "sha256": "fb73b1e2c8d4b3bbaf81ebc75721eac0f22b3ae59c9a3c0b1574e84890bf481e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of UCDPConflictTerminationDataset_v4_2024_Dyad.csv: conflicts 200, 209, 287, 332, 333, 416 and dyad 649 (288 rows), original header and row text; real file sha256 37b250d228db2ba51999debc93dd3cea3bdccb536d13b8dc21b9665f8d577ba9"
+  },
+  {
+    "request_fingerprint": "709c8f43724025e5228d62a73575ccdbcd3031abe9fbffbe77f52d1d6f520ece",
+    "url": "https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf",
+    "file": "709c8f43724025e5.pdf",
+    "sha256": "648c1601f41796f1b565ab91616b4e8968ec7e84aca5434ddad8945b2079908d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "termination codebook, full file (same bytes as atlas.ucdp_term's fixture)"
+  }
+]

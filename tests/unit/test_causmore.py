@@ -16,13 +16,14 @@ import yaml
 from reva.adapters.connectors import atlas_cowwars as W
 from reva.adapters.connectors import atlas_idmc as I
 from reva.adapters.connectors import atlas_pax as P
+from reva.adapters.connectors import atlas_ucdp_dyadterm as D
 from reva.adapters.connectors import causdata_common as cd
 from reva.adapters.connectors import causmore_common as cm
 from reva.evidence.runner import FixtureHttp
 from reva.kg.model import CAUSAL_PIDS
 
 REPO = Path(__file__).resolve().parents[2]
-MODULES = (W, P, I)
+MODULES = (W, P, I, D)
 
 
 def _body(name: str, url: str) -> Any:
@@ -46,6 +47,11 @@ def idmc() -> dict[str, Any]:
     return I.build(_body("atlas.idmc", url), country_qids={"CHN": "Q148"}, strict=False)
 
 
+@pytest.fixture(scope="module")
+def dyad() -> dict[str, Any]:
+    return D.build(_body("atlas.ucdp_dyadterm", D.DATA_URL), strict=False)
+
+
 def _claims(out: dict[str, Any]) -> list[cd.ClaimRecord]:
     c = out["claims"]
     return [x for v in c.values() for x in v] if isinstance(c, dict) else list(c)
@@ -63,7 +69,12 @@ def test_relations_registry_is_consistent_with_the_causal_vocabulary() -> None:
             assert m["reva_kind"] in ("claim", "context") and m["why"].strip(), (key, m)
             if m["reva_kind"] == "claim":
                 assert m["causal"] is True and m["relation"] in vocab, (key, m)
-                assert m["codebook_term"] in ds["definitions"], (key, m)
+                term = m["codebook_term"]
+                if term.endswith("=<value>"):
+                    base = term.split("=")[0]
+                    assert any(k.startswith(base + "=") for k in ds["definitions"]), (key, m)
+                else:
+                    assert term in ds["definitions"], (key, m)
             else:
                 assert m["causal"] is False and "relation" not in m, (key, m)
         for t in ds["definitions"].values():
@@ -227,15 +238,38 @@ def test_idmc_dates_and_codes() -> None:
         I.resource_url(b'{"success": true, "result": {"name": "other", "organization": {"name": "x"}}}')
 
 
+# ----------------------------------------------------------------------------- UCDP dyad termination
+
+
+def test_ucdp_dyad_termination_claims(dyad: dict[str, Any]) -> None:
+    claims = dyad["claims"]
+    assert claims and {c.relation for c in claims} == {"coded_outcome"}
+    defs = cm.codebook("ucdp_term_dyad")["definitions"]
+    assert all(c.codebook_term in defs for c in claims)
+    assert all(c.effect_id == c.cause_id + ":termination" for c in claims)
+    assert "There is no information in this dataset regarding the group-specific circumstance" in defs["d_outcome=5"]
+    assert cm.check_pdf(
+        "ucdp_term_codebook", _body("atlas.ucdp_dyadterm", cm.document("ucdp_term_codebook")["download_url"]).body
+    )["matches"]
+    st = dyad["statements"]
+    assert any(s.property == "P710" and s.object_qid.startswith("ucdp:actor:") for s in st)
+    assert any(s.property == "P361" and s.object_qid == "ucdp:conflict:200" for s in st)
+    # ceasefire / agreement dates are dated facts on the termination, never a link to an agreement
+    for s in st:
+        if s.property in ("ucdpterm:dyad_ceasefire_date", "ucdpterm:dyad_peace_agreement_date"):
+            assert s.object_qid is None and s.value["type"] == "time"
+    assert "64901" in dyad["anomalies"].get("episodes_with_several_terminal_rows", [])
+
+
 # ----------------------------------------------------------------------------- common
 
 
 def test_no_causal_kg_predicate_and_unique_keys(
-    wars: dict[str, Any], pax: dict[str, Any], idmc: dict[str, Any]
+    wars: dict[str, Any], pax: dict[str, Any], idmc: dict[str, Any], dyad: dict[str, Any]
 ) -> None:
     assert not set(cm.CAUSMORE_PROPERTIES) & CAUSAL_PIDS
     allowed = set(cm.CAUSMORE_PROPERTIES) | set(cm.WIKIDATA_PIDS) | set(cd.CAUSDATA_PROPERTIES) | set(cd.WIKIDATA_PIDS)
-    for out in (wars, pax, idmc):
+    for out in (wars, pax, idmc, dyad):
         used = {s.property for s in out["statements"]}
         assert not used & CAUSAL_PIDS
         assert used <= allowed, used - allowed

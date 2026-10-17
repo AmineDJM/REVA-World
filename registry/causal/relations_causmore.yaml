@@ -65,7 +65,156 @@ documents:
     sheet: README
     check: every definition text below must be a README cell verbatim (the workbook bytes change with each data
       release, so no file sha256 is pinned for this document)
+  ucdp_term_codebook:
+    title: UCDP Conflict Termination Dataset Codebook v.4 2024 (same pinned PDF as CAUSDATA term_codebook)
+    authors: Joakim Kreutz
+    date: '2025-06-24'
+    url: https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf
+    download_url: https://ucdp.uu.se/downloads/monadterm/UCDPConflictTerminationDataset_v4_2024_Codebook.pdf
+    sha256: 648c1601f41796f1b565ab91616b4e8968ec7e84aca5434ddad8945b2079908d
 datasets:
+  # ------------------------------------------------------------------------------------------------ UCDP dyad termination
+  ucdp_term_dyad:
+    source_key: ucdp.downloads
+    dataset: term_dyad
+    dataset_revision: v4-2024 (4.2024002)
+    file: UCDPConflictTerminationDataset_v4_2024_Dyad.csv
+    codebook_document: ucdp_term_codebook
+    codebook_name: UCDP Conflict Termination Dataset Codebook v.4 2024 (dyad level)
+    citation: 'Kreutz, Joakim (2010). How and when armed conflicts end: Introducing the UCDP Conflict Termination dataset.
+      Journal of Peace Research 47(2): 243-250.'
+    definitions:
+      d_outcome:
+        text: d outcome The coding of outcomes are based on the final year of activity and first year of non-activity. While
+          the dataset include some information (i.e. ceasefires and peace agreements) outside this window, it does not follow
+          warring party devel-opment beyond this time period. 1= Peace agreement 2= Ceasefire 3= Victory for Side A /Government
+          Side 4= Victory for Side B /Non-State Side 5= Low activity (some, but less than 25 battle-deaths in subsequent year(s))
+          6= Actor ceases to exist
+        document: ucdp_term_codebook
+        pdf_page: 8
+      d_outcome=1:
+        text: 1 = Peace agreement A peace agreement, or the first or last in a series of agreements, concerned with resolving
+          or regulating the incompatibility – completely or a central part of – which is signed and/or accepted by all or
+          the main parties active in last year of conflict. The agreement is signed either during the last year of active
+          conflict or the first year of inactivity.
+        document: ucdp_term_codebook
+        pdf_page: 3
+      d_outcome=2:
+        text: 2 = Ceasefire agreement Ceasefire agreements, or the first or last in a series of agreements, does not include
+          any resolution of the incompatibility. Typically, ceasefires are but con-cerned with ending the use of force by
+          the warring sides but they can also offer amnesty for participation in the conflict (”guns for peace”). The agreement
+          is signed and/or accepted either during the last year of active conflict or the first year of inactivity. In cases
+          when a ceasefire agreement is immediately followed by a more comprehensive agreement (peace agreement), the latter
+          is considered the main cause of termination.
+        document: ucdp_term_codebook
+        pdf_page: 3
+      d_outcome=3:
+        text: 3 = Victory for Side A (government side) Side A (the government side) manages to comprehensively defeat or eliminate
+          the opposition, who may succumb to the power of the other through capitulation or public announcement.
+        document: ucdp_term_codebook
+        pdf_page: 4
+      d_outcome=4:
+        text: 4 = Victory for Side B (non-state side) Side B (the rebel side) manages to oust the government, or comprehensively
+          defeat or eliminate the opposition, who may succumb to the power of the other through capitulation or public announcement.
+        document: ucdp_term_codebook
+        pdf_page: 4
+      d_outcome=5:
+        text: 5 = Low activity Conflict activity continues but does not reach the UCDP threshold with regard to fatalities.
+          There is no information in this dataset regarding the group-specific circumstance for when fighting reduces to below
+          the UCDP battle-death thresh-old. In some cases it may be because of successful military operations by the counterpart
+          (similar to victory), but it could also be for a strategic reorientation towards the use of nonviolent or nonfatal
+          methods, to explore the possibility of negotiations, organizational reorganization, or intra-rebel fighting, or
+          a combi-nation of these factors.
+        document: ucdp_term_codebook
+        pdf_page: 4
+      d_outcome=6:
+        text: 6 = Actor ceases to exist This means that conflict activity continues but at least one of the parties ceases
+          to exist or becomes another conflict actor. For states, this means for example when Hyderabad became incorporated
+          into India in 1948 (ending Hyderabad (government) conflict), when Soviet Union no longer included the territory
+          of subsequent Azerbaijan (ending Soviet Union (Nagorno-Karabakh) conflict), or when no central government could
+          be identified by UCDP (Somalia in 1996 and 2002). For rebel organizations, changing the party is not simply a name
+          change but an organizational change such as forming an alliance of many rebel groups (such as in El Salvador 1981)
+          or changing territorial aims (such as Russia (Chechnya) becoming Russia (Caucasus Emirate) in 2008.
+        document: ucdp_term_codebook
+        pdf_page: 4
+      episode:
+        text: A conflict episode, thus, is defined as a continuous period of active conflict years in the UCDP-PRIO armed
+          conflict dataset. A conflict episode ends when an active year is followed by a year in which there are fewer than
+          25 battle-related deaths. In the event that armed activity over the same incompatibility (for conflicts) and involving
+          the same warring sides (dyadic), this is coded as a new episode.
+        document: ucdp_term_codebook
+        pdf_page: 2
+      outcome_window:
+        text: The coding of outcomes are based on the final year of activity and first year of non-activity. While the dataset
+          include some information (i.e. ceasefires and peace agreements) outside this window, it does not follow warring
+          party development beyond this time period. For example, the Algerian rebel group GIA is coded as terminated by low
+          activity in 2003, even though it continued with occasional attacks in 2004 and 2005. By 2010, remaining members
+          of the group had joined AQIM who was still fighting, but since this occurred outside of the window coded in the
+          dataset, this doesn’t change the ”low activity” outcome.
+        document: ucdp_term_codebook
+        pdf_page: 2
+      d_cfiredate:
+        text: d cfiredate The date of a ceasefire in the dyad at, or after, the end of the dyad episode but prior to the onset
+          of the next dyad episode.
+        document: ucdp_term_codebook
+        pdf_page: 9
+      d_peagdate:
+        text: d peagdate The date of a peace agreement in the dyad at, or after, the end of the dyad episode but prior to
+          the onset of the next dyad episode.
+        document: ucdp_term_codebook
+        pdf_page: 9
+    values:
+      d_outcome:
+        1: Peace agreement
+        2: Ceasefire
+        3: Victory for Side A /Government Side
+        4: Victory for Side B /Non-State Side
+        5: Low activity (some, but less than 25 battle-deaths in subsequent year(s))
+        6: Actor ceases to exist
+    mappings:
+    - variables:
+      - d_outcome
+      - d_epterm
+      - d_ependdate
+      - d_ependprec
+      reva_kind: claim
+      causal: true
+      relation: coded_outcome
+      codebook_term: d_outcome=<value>
+      cause: ucdp:dyadepisode:<d_epid>
+      effect: ucdp:dyadepisode:<d_epid>:termination
+      why: The coded way the dyad episode ended (same outcome categories as the conflict level, CAUSDATA term_conflict). The
+        conflict-level file is CAUSDATA's; the dyad file adds one termination per warring dyad (e.g. which rebel group was
+        defeated or signed). Outcome 5 keeps its verbatim caveat in the delivered definitions.
+    - variables:
+      - d_cfiredate
+      - d_peagdate
+      reva_kind: context
+      causal: false
+      predicate: ucdpterm:dyad_ceasefire_date / ucdpterm:dyad_peace_agreement_date (time, on the termination)
+      why: 'Dates of a ceasefire / peace agreement in the dyad "at, or after, the end of the dyad episode but prior to the
+        onset of the next": dated facts about the dyad, not a coded cause; no agreement id is given, so no link to an agreement
+        record is made.'
+    - variables:
+      - side_a_id
+      - side_b_id
+      reva_kind: context
+      causal: false
+      predicate: P710 participant (ucdp:actor:<id>, side qualifier)
+      why: The warring sides of the dyad (participation).
+    - variables:
+      - conflict_id
+      - d_epno
+      reva_kind: context
+      causal: false
+      predicate: P361 part of ucdp:conflict:<id>; P155 follows the previous dyad episode
+      why: Structure and order only.
+    - variables:
+      - incompatibility
+      reva_kind: context
+      causal: false
+      predicate: causdata:coded_issue
+      why: The contested issue, not a cause (as CAUSDATA).
   # ------------------------------------------------------------------------------------------------ COW wars v4
   cow_inter:
     source_key: cow.data

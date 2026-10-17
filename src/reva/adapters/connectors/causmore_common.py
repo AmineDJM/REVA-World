@@ -260,6 +260,22 @@ CAUSMORE_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]
         None,
         None,
     ),
+    "ucdpterm:dyad_ceasefire_date": (
+        "time",
+        "ucdp_dyad_ceasefire_date",
+        "ceasefire date in the dyad at or after the episode end (UCDP d_cfiredate)",
+        "date de cessez-le-feu dans la dyade (UCDP)",
+        None,
+        None,
+    ),
+    "ucdpterm:dyad_peace_agreement_date": (
+        "time",
+        "ucdp_dyad_peace_agreement_date",
+        "peace agreement date in the dyad at or after the episode end (UCDP d_peagdate)",
+        "date d'accord de paix dans la dyade (UCDP)",
+        None,
+        None,
+    ),
     "idmc:country": ("string", "idmc_country", "country (IDMC ISO3, unmapped)", "pays (IDMC, non apparié)", None, None),
 }
 WIKIDATA_PIDS = ("P17",)

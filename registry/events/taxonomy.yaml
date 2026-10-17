@@ -782,11 +782,13 @@ dataset_kinds:
     label_en: CAUSMORE record (COW war outcomes, PA-X peace agreements and processes, IDMC disaster displacements)
     coded_type_property: "causmore:event_type"
     coded_type_map: {peace_agreement: peace_agreement, peace_process: null, war_outcome: null,
-                     disaster_displacement: disaster_displacement}
+                     disaster_displacement: disaster_displacement, dyad_conflict_episode: armed_conflict_episode,
+                     conflict_termination: null}
     note: >-
       CAUSMORE (docs/dev/v3_causmore.md): `pax:agt:*` PA-X agreements, `pax:process:*` peace processes (a grouping, not
       an event), `cowwar:outcome:*` coded war outcomes (outcomes, not events, as CAUSDATA's), `idmc:displacement:*`
-      internal displacements IDMC attributes to a disaster event.
+      internal displacements IDMC attributes to a disaster event, `ucdp:dyadepisode:*` UCDP dyad episodes and their
+      terminations (coded outcomes, not events).
   - id_prefix: ""
     marker_property: "idmc:hazard_sub_type"
     source_key: idmc.gidd
