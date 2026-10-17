@@ -41,7 +41,7 @@ from reva.evaluation.leakage import (
     LeakageGuard,
     RefKind,
 )
-from reva.kernel.errors import CapabilityGap, LeakageBlocked, ValidationProblem
+from reva.kernel.errors import CapabilityGap, IntegrityFailure, LeakageBlocked, ValidationProblem
 
 #: The registered vintage atlas tables (dataset keys).
 VINTAGE_DATASET_KEYS: tuple[str, ...] = (
@@ -139,6 +139,28 @@ def cells_from_atlas_frame(
     return out.cast(dict(CELL_SCHEMA))  # type: ignore[arg-type]
 
 
+#: Same selection as ``reva.atlas.snapshot.TABLES_AS_OF_SQL`` (latest table version recorded at the cutoff),
+#: restated here so evaluation never imports the atlas/ingest stack (invariant 11: no network code reachable).
+_TABLES_AS_OF_SQL = """
+SELECT DISTINCT ON (d.dataset_key) d.dataset_key, d.artifact_sha256, d.recorded_at
+FROM evidence.dataset d
+WHERE d.concept_id = 'atlas.table' AND d.origin = :o AND d.recorded_at <= :cut AND d.dataset_key = ANY(:keys)
+ORDER BY d.dataset_key, d.recorded_at DESC, d.id DESC
+"""
+_ATLAS_NAMESPACE = "normalised"
+
+
+def _read_table(store: Any, sha: str) -> pl.DataFrame:
+    import io
+
+    import pyarrow.parquet as pq  # type: ignore[import-untyped]
+
+    data = store.get(_ATLAS_NAMESPACE, sha)
+    if hashlib.sha256(data).hexdigest() != sha:
+        raise IntegrityFailure("vintage table bytes do not match their sha256", sha256=sha)
+    return pl.from_arrow(pq.read_table(io.BytesIO(data)))  # type: ignore[return-value]
+
+
 def load_vintage_cells(
     conn: Any,
     store: Any,
@@ -150,20 +172,12 @@ def load_vintage_cells(
     """Vintage cells of the atlas table versions recorded at ``tables_cutoff`` (default: now)."""
     from sqlalchemy import text
 
-    from reva.atlas.snapshot import atlas_tables_as_of
-    from reva.atlas.tables import read_atlas_table
-
     cut = tables_cutoff or conn.execute(text("SELECT clock_timestamp()")).scalar_one()
     frames = []
-    for t in atlas_tables_as_of(conn, cutoff=cut, origin=origin):
-        if t["dataset_key"] not in dataset_keys:
-            continue
-        df = read_atlas_table(store, t["artifact_sha256"])
-        frames.append(
-            cells_from_atlas_frame(
-                df, dataset_key=t["dataset_key"], table_recorded_at=datetime.fromisoformat(t["recorded_at"])
-            )
-        )
+    rows = conn.execute(text(_TABLES_AS_OF_SQL), {"o": origin, "cut": cut, "keys": list(dataset_keys)}).mappings()
+    for t in rows:
+        df = _read_table(store, t["artifact_sha256"])
+        frames.append(cells_from_atlas_frame(df, dataset_key=t["dataset_key"], table_recorded_at=t["recorded_at"]))
     return pl.concat(frames, how="vertical") if frames else pl.DataFrame(schema=CELL_SCHEMA)
 
 
