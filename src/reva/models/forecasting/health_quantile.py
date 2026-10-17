@@ -142,7 +142,9 @@ def climatology(
         return min(d, 52 - d)
 
     tw = season_week_of(target)
-    pool = [(i, v) for i, v in history if i <= target - exclude_recent and dist(season_week_of(i), tw) <= CLIM_HALF_WIDTH]
+    pool = [
+        (i, v) for i, v in history if i <= target - exclude_recent and dist(season_week_of(i), tw) <= CLIM_HALF_WIDTH
+    ]
     years = {year_of(i) for i, _ in pool}
     if len(years) < CLIM_MIN_YEARS or len(pool) < 3 * CLIM_MIN_YEARS:
         return Abstain(f"fewer than {CLIM_MIN_YEARS} earlier years of the same season week")

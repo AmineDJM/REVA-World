@@ -305,7 +305,9 @@ def build_country_monthly(pages: list[tuple[ic.Fetched, list[dict[str, Any]]]], 
                 if v is None:
                     rep["null_sums"] += 1
                     continue
-                if not isinstance(v, int):
+                if isinstance(v, float) and v.is_integer():  # the service types sums as double
+                    v = int(v)
+                if not isinstance(v, int) or isinstance(v, bool):
                     raise _err(f"monthly sum {field} for {geo} {y}-{mo} is not an integer: {v!r}")
                 src = {"portcalls": "portcalls", "import_t": "import", "export_t": "export"}[field]
                 fl = {**FLAG_RIGHTS, "derived": "sum", "estimate_kind": kind, "definition": q,

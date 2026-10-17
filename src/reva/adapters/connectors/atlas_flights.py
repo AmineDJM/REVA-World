@@ -44,6 +44,20 @@ crowd-sourced, daily-updated database, not an official register):
 ``AIRPORTS|type=<type>`` for each open type, ``AIRPORTS_OPEN`` (every type except ``closed``),
 ``AIRPORTS_SCHEDULED_SERVICE`` (open and ``scheduled_service = yes``), ``AIRPORTS_CLOSED`` (records the
 source marks closed).
+
+V6INFRA (1.1.0): **licence check fallback** -- when ``ourairports.com/data/`` does not state the public-domain
+sentence (it served a "Temporarily unavailable ... routine maintenance" page, or HTTP 503, on 2026-10-16/17), the
+licence is read from the data repository itself, ``github.com/davidmegginson/ourairports-data`` file ``LICENSE``
+("This is free and unencumbered software released into the public domain", the Unlicense), archived; the basis is
+recorded in the rights and on every row (``licence_basis``). Neither statement found -> the run is refused.
+**KG layer** (source key ``ourairports.data``): ``airport`` entities ``ourairports:<id>`` (the database's numeric
+id; ``ident`` kept as alias and literal) for open records of type ``large_airport`` / ``medium_airport`` or with
+``scheduled_service = yes`` (a size bound: ~5,800 of ~86,000 records; every record is in the counts): ``P17``
+(``iso_country``), ``P625`` (``latitude_deg``/``longitude_deg``), ``ourairports:type``,
+``ourairports:scheduled_service``, ``ourairports:ident`` / ``ourairports:icao`` / ``ourairports:iata`` (codes as
+published), ``ourairports:iso_region`` (literal) and ``ourairports:in_adm1`` -> ``iso3166_2:<code>``: the published
+``iso_region`` when it is a Natural Earth admin-1 code (basis ``published_code``), else REVA point in polygon
+(:mod:`v6infra_common`).
 """
 
 from __future__ import annotations
@@ -55,12 +69,13 @@ from collections import defaultdict
 from typing import Any
 
 from reva.adapters.connectors import atlas_infra_common as ic
+from reva.adapters.connectors import v6infra_common as vc
 from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 # ----------------------------------------------------------------------------- OpenFlights
 OF_NAME = "atlas.openflights"
-OF_VERSION = "1.0.1"
+OF_VERSION = "1.0.2"  # 1.0.2: module code changed (OurAirports 1.1.0); OpenFlights behaviour unchanged
 OF_SOURCE_KEY = "openflights.data"
 OF_ATLAS_SOURCE = "openflights"
 OF_DATASET = "routes_2014"
@@ -83,7 +98,7 @@ OF_STALE = "provider warning: route data ceased being updated in June 2014; of h
 
 # ----------------------------------------------------------------------------- OurAirports
 OA_NAME = "atlas.ourairports"
-OA_VERSION = "1.0.1"
+OA_VERSION = "1.1.0"  # 1.1.0 (V6INFRA): repository LICENSE fallback for the licence check; KG airports
 OA_SOURCE_KEY = "ourairports.data"
 OA_ATLAS_SOURCE = "ourairports"
 OA_DATASET = "airports"
@@ -91,6 +106,33 @@ OA_PARSER = "atlas_ourairports/1"
 OA_BASE = "https://davidmegginson.github.io/ourairports-data/"
 OA_PAGE = "https://ourairports.com/data/"
 OA_LICENCE_MARKER = "released to the Public Domain"
+OA_REPO_LICENSE = "https://raw.githubusercontent.com/davidmegginson/ourairports-data/main/LICENSE"
+OA_REPO_LICENSE_MARKER = "This is free and unencumbered software released into the public domain"
+OA_KG_TYPES = ("large_airport", "medium_airport")
+OA_KG_PREDICATES: dict[str, tuple[str, str, str, str]] = {
+    "ourairports:type": ("string", "ourairports_type", "OurAirports airport type", "type d'aéroport OurAirports"),
+    "ourairports:scheduled_service": (
+        "string",
+        "ourairports_scheduled_service",
+        "scheduled airline service (OurAirports)",
+        "service aérien régulier (OurAirports)",
+    ),
+    "ourairports:ident": ("external_id", "ourairports_ident", "OurAirports ident", "identifiant OurAirports"),
+    "ourairports:icao": ("external_id", "ourairports_icao", "ICAO code (OurAirports)", "code OACI (OurAirports)"),
+    "ourairports:iata": ("external_id", "ourairports_iata", "IATA code (OurAirports)", "code IATA (OurAirports)"),
+    "ourairports:iso_region": (
+        "string",
+        "ourairports_iso_region",
+        "region code published by OurAirports",
+        "code de région publié par OurAirports",
+    ),
+    "ourairports:in_adm1": (
+        "item",
+        "ourairports_in_adm1",
+        "located in first-level subdivision",
+        "situé dans la subdivision de premier niveau",
+    ),
+}
 OA_TYPES = ("large_airport", "medium_airport", "small_airport", "heliport", "seaplane_base", "balloonport")
 OA_RIGHTS = {
     "licence": "Public domain (OurAirports: 'All data is released to the Public Domain')",
@@ -111,7 +153,7 @@ def _err(msg: str) -> SourceResponseError:
 
 
 def code_digest() -> str:
-    return ic.code_digest(sys.modules[__name__])
+    return ic.code_digest(sys.modules[__name__], vc, vc.gh)
 
 
 def atlas_source() -> list[AtlasSourceSpec]:
@@ -143,16 +185,17 @@ def atlas_source() -> list[AtlasSourceSpec]:
             atlas_source=OA_ATLAS_SOURCE,
             provider="OurAirports (open data, davidmegginson.github.io/ourairports-data)",
             licence=f"{OA_RIGHTS['licence']}; attribution (courtesy): {OA_RIGHTS['attribution']}",
-            allowed_hosts=("davidmegginson.github.io", "ourairports.com"),
+            allowed_hosts=("davidmegginson.github.io", "ourairports.com", "raw.githubusercontent.com", vc.NE_HOST),
             datasets=(OA_DATASET,),
             dataset_ids=("ourairports:airports.csv", "ourairports:countries.csv"),
             cadence_seconds=30 * ic.DAY,
-            planned_requests=3,
+            planned_requests=5,
             max_response_bytes=40_000_000,
             min_interval_seconds=1.0,
             parser_version=OA_PARSER,
             code_digest=digest,
-            notes="Daily-updated crowd-sourced airport database; counts are snapshots of the retrieval day.",
+            notes="Daily-updated crowd-sourced airport database; counts are snapshots of the retrieval day; larger "
+            "airports in the KG (country, coordinates, codes, ADM1).",
         ),
     ]
 
@@ -388,7 +431,9 @@ async def ingest_openflights(run: Any) -> dict[str, Any]:
 
 
 # ============================================================================= OurAirports
-def build_ourairports(airports: ic.Fetched, countries: ic.Fetched, day: Any) -> tuple[ic.RowBuilder, dict[str, Any]]:
+def build_ourairports(
+    airports: ic.Fetched, countries: ic.Fetched, day: Any, *, licence_basis: str | None = None
+) -> tuple[ic.RowBuilder, dict[str, Any]]:
     from reva.atlas.tables import country_iso3
 
     rows = list(csv.DictReader(io.StringIO(airports.body.decode("utf-8-sig"))))
@@ -417,6 +462,8 @@ def build_ourairports(airports: ic.Fetched, countries: ic.Fetched, day: Any) -> 
     period = ic.day_span(day)
     rb = ic.RowBuilder(OA_ATLAS_SOURCE, OA_DATASET)
     snap = {"snapshot": "retrieval day of a daily-updated crowd-sourced database", "licence": "public domain"}
+    if licence_basis:
+        snap["licence_basis"] = licence_basis
     for c in sorted(by):
         iso3 = country_iso3(c, "ourairports")
         extra = {**snap, "provider_country_name": names.get(c)}
@@ -455,16 +502,42 @@ def build_ourairports(airports: ic.Fetched, countries: ic.Fetched, day: Any) -> 
     return rb, report
 
 
+async def oa_licence(run: Any) -> tuple[list[ic.Fetched], str]:
+    """The archived licence evidence and its basis: the terms page, else the data repository's LICENSE file."""
+    from reva.operations.budgets import BudgetExhausted
+
+    files: list[ic.Fetched] = []
+    try:
+        page = await ic.fetch_archived(
+            run, OA_PAGE, name="ourairports_data_page", key="ourairports:terms", media_types=("text/html",),
+            max_bytes=2_000_000,
+        )  # fmt: skip
+        files.append(page)
+        if OA_LICENCE_MARKER in page.body.decode("utf-8", "replace"):
+            return files, f"terms page {OA_PAGE}: 'All data is released to the Public Domain'"
+    except BudgetExhausted:
+        raise
+    except Exception as e:  # HTTP 503 during the provider's maintenance: fall back to the repository LICENSE
+        if isinstance(e, SourceResponseError) and getattr(e, "kind", "") == "licence":
+            raise
+    lic = await ic.fetch_archived(
+        run, OA_REPO_LICENSE, name="ourairports-data_LICENSE", key="ourairports:repo_license",
+        media_types=("text/plain", "application/octet-stream"), max_bytes=100_000,
+    )  # fmt: skip
+    files.append(lic)
+    if OA_REPO_LICENSE_MARKER not in lic.body.decode("utf-8", "replace"):
+        raise SourceResponseError("OurAirports: neither the terms page nor the repository LICENSE states public domain",
+                                  retryable=False, kind="licence")  # fmt: skip
+    return files, (f"data repository LICENSE {OA_REPO_LICENSE} (Unlicense: 'released into the public domain'); the "
+                   f"terms page {OA_PAGE} did not state its public-domain sentence at retrieval")  # fmt: skip
+
+
 async def ingest_ourairports(run: Any) -> dict[str, Any]:
+    from reva.adapters.connectors.atlas_geo_common import load_country_qids
+
     if not run.wants(OA_DATASET):
         return {"ok": True, "tables": [], "skipped": OA_DATASET}
-    page = await ic.fetch_archived(
-        run, OA_PAGE, name="ourairports_data_page", key="ourairports:terms", media_types=("text/html",),
-        max_bytes=2_000_000,
-    )  # fmt: skip
-    if OA_LICENCE_MARKER not in page.body.decode("utf-8", "replace"):
-        raise SourceResponseError("OurAirports data page no longer states public domain", retryable=False,
-                                  kind="licence")  # fmt: skip
+    lic_files, basis = await oa_licence(run)
     countries = await ic.fetch_archived(
         run, OA_BASE + "countries.csv", name="countries.csv", key="ourairports:countries.csv",
         media_types=("text/csv",), max_bytes=2_000_000,
@@ -473,19 +546,86 @@ async def ingest_ourairports(run: Any) -> dict[str, Any]:
         run, OA_BASE + "airports.csv", name="airports.csv", key="ourairports:airports.csv",
         media_types=("text/csv",), max_bytes=40_000_000,
     )  # fmt: skip
-    rb, report = build_ourairports(airports, countries, airports.retrieved_at.date())
+    rb, report = build_ourairports(airports, countries, airports.retrieved_at.date(), licence_basis=basis)
     out = run.register(
         dataset=OA_DATASET,
         frame=rb.frame(),
-        raw_sha256s=[page.sha256, countries.sha256, airports.sha256],
+        raw_sha256s=[*(f.sha256 for f in lic_files), countries.sha256, airports.sha256],
         coverage_note=(
             f"OurAirports snapshot {airports.retrieved_at.date().isoformat()}: {report['airport_records']} records, "
-            f"{report['countries']} provider countries; unmapped: {', '.join(report['unmapped']) or 'none'}"
+            f"{report['countries']} provider countries; unmapped: {', '.join(report['unmapped']) or 'none'}; "
+            f"licence basis: {basis}"
         ),
         geo_scheme="ourairports",
-        rights={**OA_RIGHTS, "source_key": OA_SOURCE_KEY},
+        rights={**OA_RIGHTS, "source_key": OA_SOURCE_KEY, "licence_basis": basis},
     )
-    return {"ok": True, "tables": [_table(out)], "report": report}
+    idx = await vc.fetch_ne_admin1(run)
+    kb = build_ourairports_kg(airports, idx, load_country_qids(), basis)
+    kg = vc.load(run, kb, OA_KG_PREDICATES, ("P17", "P625"), [airports.sha256, idx.fetched.sha256],
+                 airports.retrieved_at, {"connector": OA_NAME, "parser": OA_PARSER})  # fmt: skip
+    kg["counts"] = dict(kb.counts)
+    return {"ok": True, "tables": [_table(out)], "report": {**report, "licence_basis": basis}, "kg": kg}
+
+
+def build_ourairports_kg(
+    airports: ic.Fetched, idx: vc.Adm1Index | None, qids: dict[str, str], basis: str
+) -> vc.KgBuilder:
+    """``airport`` entities for the larger open airports (see the module docstring)."""
+    from reva.atlas.tables import country_iso3
+
+    rows = list(csv.DictReader(io.StringIO(airports.body.decode("utf-8-sig"))))
+    kb = vc.KgBuilder(OA_SOURCE_KEY, f"ourairports-{airports.retrieved_at.date().isoformat()}")
+    ref = [vc.kg_ref(airports, file="airports.csv", licence=OA_RIGHTS["licence"], licence_basis=basis)]
+    adm_ref = [*ref, idx.ref()] if idx is not None else ref
+    for r in rows:
+        t, sched = r["type"].strip(), r["scheduled_service"].strip()
+        if t == "closed" or not (t in OA_KG_TYPES or sched == "yes"):
+            continue
+        rid = r.get("id", "").strip()
+        if not rid.isdigit():
+            kb.counts["skipped_bad_id"] += 1
+            continue
+        qid = f"ourairports:{rid}"
+        ident = r["ident"].strip()
+        codes = [r.get(k, "").strip() for k in ("icao_code", "iata_code", "gps_code")]
+        kb.entity(qid, "airport", r["name"].strip() or ident, aliases=[ident, *codes],
+                  description=f"OurAirports record {rid} ({t}; {r.get('municipality', '').strip() or 'municipality not stated'}"
+                  f", {r['iso_country'].strip()})")  # fmt: skip
+        q0 = {"ourairports_id": rid}
+
+        def st(pid: str, *, obj: str | None = None, value: dict[str, Any] | None = None,
+               quals: dict[str, Any] | None = None, refs: list[dict[str, Any]] = ref, qid: str = qid,
+               q0: dict[str, Any] = q0) -> None:  # fmt: skip
+            kb.st(qid, pid, raw=airports.sha256, refs=refs, obj=obj, value=value, quals={**q0, **(quals or {})})
+
+        c = r["iso_country"].strip()
+        cq = vc.country_qid(country_iso3(c, "ourairports") if c else None, qids)
+        lat, lon = vc.decimal_text(r["latitude_deg"]), vc.decimal_text(r["longitude_deg"])
+        region = r["iso_region"].strip()
+        place = vc.place_facility(idx, country_iso2=c or None, published_code=region or None, lat=lat, lon=lon)
+        if cq:
+            pq: dict[str, Any] = {"basis": "OurAirports iso_country (ISO 3166-1 alpha-2)", "country_code": c}
+            if "coordinates_fall_in" in place.quals:
+                pq["coordinates_fall_in"] = place.quals["coordinates_fall_in"]
+            st("P17", obj=cq, quals=pq)
+        else:
+            kb.counts["country_unmapped_or_no_qid"] += 1
+        if lat and lon:
+            st("P625", value=vc.coordinate_value(lat, lon), quals={"provider_fields": "latitude_deg, longitude_deg"})
+        st("ourairports:type", value={"type": "string", "value": t})
+        if sched:
+            st("ourairports:scheduled_service", value={"type": "string", "value": sched})
+        st("ourairports:ident", value={"type": "external_id", "value": ident})
+        for col, pid in (("icao_code", "ourairports:icao"), ("iata_code", "ourairports:iata")):
+            v = r.get(col, "").strip()
+            if v:
+                st(pid, value={"type": "external_id", "value": v})
+        if region:
+            st("ourairports:iso_region", value={"type": "string", "value": region})
+        if place.code:
+            st("ourairports:in_adm1", obj=f"iso3166_2:{place.code}", quals=place.quals, refs=adm_ref)
+        kb.counts[f"adm1_{place.reason}"] += 1
+    return kb
 
 
 def _table(out: dict[str, Any]) -> dict[str, Any]:

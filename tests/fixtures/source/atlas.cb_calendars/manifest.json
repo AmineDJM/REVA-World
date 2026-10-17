@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "54fcec27d2b48f1ce9c1a8ac3b9f311aaf3541ce08abed9fad6a08181472bb5c",
+    "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+    "file": "54fcec27d2b48f1c.html",
+    "sha256": "11d179cc8f014e5d67a1cd3e33c07dbd80b0c3d703aad3fb895c9734b2dec1fc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "Federal Reserve Board website: public domain unless otherwise indicated (cite the Board)",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  },
+  {
+    "request_fingerprint": "636d5b34b9758a00fbc9ef28c7b84ab22aea9aa2caf87b10967c9ca950c48b3b",
+    "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
+    "file": "636d5b34b9758a00.html",
+    "sha256": "2ed31acb79570857aa6b38f8ebc332e4627e7ff021c1aea1c4abaa7ba938c73d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  },
+  {
+    "request_fingerprint": "f1cf868ca0fb516ae9dd3317a873b8f7fa3c8350c2c66bf8f5ea51747fa8ad66",
+    "url": "https://www.bankofengland.co.uk/monetary-policy/upcoming-mpc-dates",
+    "file": "f1cf868ca0fb516a.html",
+    "sha256": "6406d1447c85f4898932d3a15b5e242ff0ca6b8dc350e634e9f0a35a61c71d12",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "Bank of England website: personal or internal non-commercial use unless the Bank grants permission (Database terms do not cover this page)",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  },
+  {
+    "request_fingerprint": "7dc9107dc33862004ef2fb76ac855d88405637d04f31a3c789869031301378b9",
+    "url": "https://www.federalreserve.gov/disclaimer.htm",
+    "file": "7dc9107dc3386200.html",
+    "sha256": "1d317cd557aa2f757e3bb16817f99731e9e769995a7e0b6a4c34f138360dc30b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "Federal Reserve Board website: public domain unless otherwise indicated (cite the Board)",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  },
+  {
+    "request_fingerprint": "674e117901189d0f1d23770a8f1325d33f7eeb07fad5f2ebb4571129fa06f720",
+    "url": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html",
+    "file": "674e117901189d0f.html",
+    "sha256": "88d8ac453de9bf08377d87ef9b3c4d8fb169e7cd9752cdd228669e46d3f4cc82",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  },
+  {
+    "request_fingerprint": "513e451e750bbe3bec2a09a3dd3f72dec3a989c7d5aa7a791c30d00d8e6cbbee",
+    "url": "https://www.bankofengland.co.uk/legal",
+    "file": "513e451e750bbe3b.html",
+    "sha256": "e9bdbf47ac970a90eeae9c01c0d6882f62e21233a290268984e3b862b71896da",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "Bank of England website: personal or internal non-commercial use unless the Bank grants permission (Database terms do not cover this page)",
+    "excerpt": "verbatim slices of the real provider page downloaded 2026-10-17 (calendar entries / terms paragraph kept, rest dropped)"
+  }
+]

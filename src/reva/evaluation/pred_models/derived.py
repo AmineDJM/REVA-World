@@ -32,8 +32,17 @@ class DerivedSpec:
     description: str
 
 
+CONFORMAL_KEYS = {
+    WEO: "forecast.weo_conformal",
+    SPF: "forecast.spf_conformal",
+    DIRECT_AR: "forecast.direct_ar_conformal",
+    BVAR: "forecast.bvar_conformal",
+    DFM: "forecast.dfm_conformal",
+}
+
+
 def conf_key(base: str) -> str:
-    return f"{base}+conformal"
+    return CONFORMAL_KEYS[base]
 
 
 TASK_DERIVED: dict[str, tuple[DerivedSpec, ...]] = {

@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { Link, useSearchParams } from 'react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { entityLabel, getKgEntity, getKgNeighbours, type KgEntity } from '../api/kg';
+import { flagsText, getFamilyRegistry, specialProperties } from '../api/families';
 import { useApi } from '../../lib/useApi';
 import { CitationChip } from '../components/CitationChip';
 import { EntityCard } from '../components/EntityCard';
@@ -328,6 +329,8 @@ function SidePanel({
   onSelect: (id: string) => void;
 }) {
   const ent = useApi((s) => getKgEntity(qid, s), [qid]);
+  const reg = useApi(() => getFamilyRegistry(), []);
+  const special = useMemo(() => specialProperties(reg.status === 'ok' ? reg.data : null), [reg]);
   const edges = useMemo(() => incidentEdges(model, qid), [model, qid]);
   const label = model.nodes.get(qid)?.label ?? qid;
   return (
@@ -355,13 +358,13 @@ function SidePanel({
       {edges.length === 0 ? (
         <p className="muted">{expanded ? 'Aucune relation entre entités chargée pour ce nœud.' : 'Dépliez le nœud pour voir ses déclarations.'}</p>
       ) : (
-        <StatementList qid={qid} edges={edges} model={model} visibleEdges={visibleEdges} onSelect={onSelect} />
+        <StatementList qid={qid} edges={edges} model={model} visibleEdges={visibleEdges} onSelect={onSelect} special={special} />
       )}
     </div>
   );
 }
 
-function StatementList({ qid, edges, model, visibleEdges, onSelect }: { qid: string; edges: GEdge[]; model: GraphModel; visibleEdges: Set<string>; onSelect: (id: string) => void }) {
+function StatementList({ qid, edges, model, visibleEdges, onSelect, special }: { qid: string; edges: GEdge[]; model: GraphModel; visibleEdges: Set<string>; onSelect: (id: string) => void; special: ReturnType<typeof specialProperties> }) {
   const parent = useRef<HTMLDivElement>(null);
   const v = useVirtualizer({ count: edges.length, getScrollElement: () => parent.current, estimateSize: () => 84, overscan: 6 });
   const items = v.getVirtualItems();
@@ -402,6 +405,14 @@ function StatementList({ qid, edges, model, visibleEdges, onSelect }: { qid: str
                   </>
                 )}
                 {e.causal && <span className="v3-badge v3-badge-causal">cause affirmée par la source</span>}
+                {special.identity.has(e.statement.property.pid) && (
+                  <span className="v3-badge v3-badge-identity" title="Un élément source porte les deux identifiants ; REVA ne fusionne pas les entités.">
+                    identité (pas une relation)
+                  </span>
+                )}
+                {special.concordance.has(e.statement.property.pid) && flagsText(e.statement.qualifiers as Record<string, unknown>) && (
+                  <span className="muted"> · {flagsText(e.statement.qualifiers as Record<string, unknown>)}</span>
+                )}
                 {(out ? otherId : qid).startsWith('atlas:') && (
                   <>
                     {' '}
