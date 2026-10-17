@@ -493,7 +493,7 @@ LINK_GROUPS: dict[str, tuple[str, ...]] = {
     "conflict": ("conflict_co_participant", "conflict_same_side", "conflict_opposing_sides"),
     "diplomatic": ("diplomatic_relation", "unga_vote_agreement"),
     "trade": ("bilateral_trade", "bilateral_trade_imports", "bilateral_trade_baci"),
-    "migration": ("migrant_stock",),
+    "migration": ("migrant_stock", "refugee_flow", "asylum_applications"),
     "shared_institution": ("shared_head_of_state", "shared_currency", "shared_legal_family"),
     "peacekeeping": ("peacekeeping_contributor_to_host",),
     "historical_polity": ("shared_polity_territory",),

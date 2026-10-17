@@ -1,0 +1,16 @@
+country_name_short,country_name,party_name_short,party_name_english,party_name,party_name_ascii,family_name_short,family_name,left_right,state_market,liberty_authority,eu_anti_pro,cmp,euprofiler,ees,castles_mair,huber_inglehart,ray,benoit_laver,chess,country_id,party_id,family_id
+DEU,Germany,AfD,Alternative for Germany,Alternative für Deutschland,Alternative fuer Deutschland,right,Right-wing,8.7,5.9,8.5,2.3,,,,,,,,,54,2253,40
+DEU,Germany,B90/Gru,Alliance 90 / Greens,Bündnis 90 / Die Grünen,Buendnis 90 / Die Gruenen,eco,Green/Ecologist,2.9308,4.3268,1.3251,7.6101,41113,115,1276113,802,1502,305,6015,304,54,772,19
+DEU,Germany,CDU,Christian Democratic Union,Christlich Demokratische Union,Christlich Demokratische Union,chr,Christian democracy,6.2503,6.3498,6.9333,8.5024,41521,116,1276521,805,1505,301,5943,301,54,808,3
+DEU,Germany,CDU+CSU,Christian Democratic Union / Christian Social Union,Christlich Demokratische Union / Christlich Soziale Union,Christlich Demokratische Union / Christlich Soziale Union,chr,Christian democracy,6.2503,6.3498,6.9333,8.5024,41521,116,1276521,805,1505,301,5943,301,54,1727,3
+DEU,Germany,CSU,Christian Social Union,Christlich Soziale Union,Christlich Soziale Union,chr,Christian democracy,7.2871,6.5615,7.8675,6.668,41521,117,1276521,806,1506,309,5943,308,54,1180,3
+DEU,Germany,FDP,Free Democratic Party,Freie Demokratische Partei,Freie Demokratische Partei,lib,Liberal,5.9233,8.2173,3.0695,8.4855,41420,119,1276420,804,1504,303,5997,303,54,543,6
+DEU,Germany,FW,Free Voters,Freie Wähler,Freie Waehler,con,Conservative,7.4,6.4,6.9,7.9,,121,,,,,,,54,41,26
+DEU,Germany,NPD,National Democratic Party,Nationaldemokratische Partei Deutschlands,Nationaldemokratische Partei Deutschlands,right,Right-wing,9.8246,4.2105,9.4219,0.7989,,,,,,,6033,,54,1537,40
+DEU,Germany,PARTEI,The PARTY,Die PARTEI,Die PARTEI,spec,Special issue,,,,,,,,,,,,,54,2649,16
+DEU,Germany,PDS|Li,PDS | The Left,PDS | Die Linke,PDS | Die Linke,com,Communist/Socialist,1.2152,1.0617,3.205,4.3508,41221,,,,1501,307,6051,306,54,791,14
+DEU,Germany,Pi,German Pirate Party,Piratenpartei Deutschland,Piratenpartei Deutschland,spec,Special issue,,,,,,,,,,,,,54,865,16
+DEU,Germany,SPD,Social Democratic Party of Germany,Sozialdemokratische Partei Deutschlands,Sozialdemokratische Partei Deutschlands,soc,Social democracy,3.6451,3.8443,3.9791,7.9318,41320,120,1276320,803,1503,302,6087,302,54,558,11
+DEU,Germany,SSW,South Schleswig Voter League,Südschleswigscher Wählerverband,Suedschleswigscher Waehlerverband,spec,Special issue,,,,,,,,,,,,,54,2850,16
+DEU,Germany,Tier,Animal Protection Party,Tierschutzpartei,Tierschutzpartei,spec,Special issue,,,,,,,,,,,,,54,301,16
+DEU,Germany,dieBasis,Grassroots Democratic Party of Germany,Basisdemokratische Partei Deutschland,Basisdemokratische Partei Deutschland,spec,Special issue,,,,,,,,,,,,,54,2821,16

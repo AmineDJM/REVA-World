@@ -442,14 +442,14 @@ def build_unhcr_asylum(
     return rows.frame(), report
 
 
-def unhcr_note(ep: UnhcrEndpoint, rep: Mapping[str, Any]) -> str:
+def unhcr_note(ep: UnhcrEndpoint, rep: Mapping[str, Any], origin: str | None = None) -> str:
     defs = "; ".join(
         f"{k}: '{UNHCR_DEFINITIONS[k]}'"
         for k in ("procedure_type", "app_type", "dec_level", "app_pc", *(n for _, n, _ in ep.values))
         if k in UNHCR_DEFINITIONS
     )
     return (
-        f"UNHCR {ep.endpoint} (API download {ep.download_url()}), {rep['records']} records, years "
+        f"UNHCR {ep.endpoint} (API download {ep.download_url(origin)}), {rep['records']} records, years "
         f"{rep['years'][0]}-{rep['years'][1]}; provider_geo = country of asylum ISO code, origin folded into the "
         "indicator (UNK unknown, XXA stateless, TIB Tibetan kept unmapped). Dimensions: authority = procedure_type, "
         "app_type, stage = decision level, count = cases (C) or persons (P), the unit says which. Cells written 0 (the "
@@ -473,7 +473,11 @@ def es_tsv_url(key: str | None = None) -> str:
         return ES_TSV_URL
     if not _ES_KEY.match(key):
         raise ValueError(f"eurostat_key {key!r} is not an SDMX key of 7 dimensions")
-    return f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}/{key}?format=TSV&compressed=true"
+    return (
+        f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/data/{ES_DATASET_CODE}/{key}?format=TSV&compressed=true"
+    )
+
+
 ES_FLAGS_URL = f"https://{ES_HOST}/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/OBS_FLAG/latest"
 ES_DATASET = "asylum_applicants_m"
 ES_KEY_HEADER = "freq,unit,citizen,sex,applicant,age,geo\\TIME_PERIOD"
@@ -636,10 +640,10 @@ def _es_concept(app: str, cit: str) -> str | None:
     }.get(app)
 
 
-def eurostat_note(rep: Mapping[str, Any]) -> str:
+def eurostat_note(rep: Mapping[str, Any], key: str | None = None) -> str:
     return (
         f"Eurostat {ES_DATASET_CODE} 'Asylum applicants by type, citizenship, sex and age - monthly data' (bulk TSV "
-        f"{ES_TSV_URL}); selection unit=PER (persons), sex=T, age=TOTAL, applicant TOTAL / FRST "
+        f"{es_tsv_url(key)}); selection unit=PER (persons), sex=T, age=TOTAL, applicant TOTAL / FRST "
         f"({ES_APPLICANT_LABELS}); {rep['series']} series, {rep['cells']} cells, months {rep['periods']}. provider_geo = "
         "reporting country (Eurostat code, scheme eurostat; EU27_2020 kept unmapped), citizenship folded into the "
         "indicator and repeated in flags.counterpart_* (aggregates such as TOTAL, EXT_EU27_2020, STLS stateless, UNK "
@@ -1082,13 +1086,21 @@ def _table_summary(reg: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _opt(run: Any, key: str) -> str | None:
+    v = (getattr(run, "options", None) or {}).get(key)
+    return str(v) if v else None
+
+
 async def _ingest_unhcr(run: Any, out: dict[str, Any]) -> None:
+    origin = _opt(run, "unhcr_origin")
+    if origin is not None and not re.fullmatch(r"[A-Z]{3}", origin):
+        raise ValueError(f"unhcr_origin {origin!r} is not an ISO3 code")
     for ep in UNHCR_ENDPOINTS:
         if not run.wants(ep.dataset):
             continue
-        chk = await run.get(ep.check_url(), key=f"unhcr:{ep.endpoint}:check", max_bytes=1_000_000)
+        chk = await run.get(ep.check_url(origin), key=f"unhcr:{ep.endpoint}:check", max_bytes=1_000_000)
         raw = await run.get(
-            ep.download_url(),
+            ep.download_url(origin),
             key=f"unhcr:{ep.endpoint}:download",
             media_types=("application/zip",),
             max_bytes=30_000_000,
@@ -1099,7 +1111,7 @@ async def _ingest_unhcr(run: Any, out: dict[str, Any]) -> None:
             dataset=ep.dataset,
             frame=frame,
             raw_sha256s=[sha, sha_c],
-            coverage_note=unhcr_note(ep, rep),
+            coverage_note=unhcr_note(ep, rep, origin),
             geo_scheme="iso3",
             rights=dict(UNHCR_RIGHTS),
         )
@@ -1116,8 +1128,9 @@ async def _ingest_eurostat(run: Any, out: dict[str, Any]) -> None:
         media_types=("application/vnd.sdmx.structure+xml", "application/xml", "text/xml"),
         max_bytes=2_000_000,
     )
+    key = _opt(run, "eurostat_key")
     raw = await run.get(
-        ES_TSV_URL,
+        es_tsv_url(key),
         key=f"eurostat:{ES_DATASET_CODE}:tsv",
         media_types=("text/tab-separated-values", "application/gzip", "application/octet-stream"),
         max_bytes=60_000_000,
@@ -1128,7 +1141,7 @@ async def _ingest_eurostat(run: Any, out: dict[str, Any]) -> None:
         dataset=ES_DATASET,
         frame=frame,
         raw_sha256s=[sha, sha_f],
-        coverage_note=eurostat_note(rep),
+        coverage_note=eurostat_note(rep, key),
         geo_scheme="eurostat",
         rights=dict(ES_RIGHTS),
     )

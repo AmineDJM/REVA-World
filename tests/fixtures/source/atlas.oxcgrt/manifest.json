@@ -1,0 +1,51 @@
+[
+  {
+    "request_fingerprint": "be5cdeefc9efc7083187a7ed4a58b3b649579228ed26e43cca58b8ba48131fad",
+    "url": "https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/README.md",
+    "file": "be5cdeefc9efc708.md",
+    "sha256": "0de910fbc97a2733551e3887bfb91e4a6e835dd33d6ce33d7d7593dfe4c36edd",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "c2543b289b408f2d52b01fc119fce2f1f6b2519cf815427ed6bdc2a1d2c6dc0b",
+    "url": "https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/LICENSE.txt",
+    "file": "c2543b289b408f2d.txt",
+    "sha256": "168d0ce568e9dbdb8287c183b4f8e93161833f5d05edd5b2f1112ba9c988b49b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "7be196dbb706ae344a3eeac0f7e75cf80f0d26558afc5f2e91d09aab33ad3757",
+    "url": "https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/documentation_and_codebook.md",
+    "file": "7be196dbb706ae34.md",
+    "sha256": "18f0f36b687d5aa8c25a6fce3a064118f5d07b45ecc24bea72cc451fca6fa555",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "9b51b31a98457437edc58ff7b0d33c55a426b244e559f3c646099dfed8c90a2c",
+    "url": "https://raw.githubusercontent.com/OxCGRT/covid-policy-dataset/main/data/OxCGRT_compact_national_v1.csv",
+    "file": "9b51b31a98457437.csv",
+    "sha256": "b2dcc730a7cc07d1a21202bdb1932706a1db8eb187bc9e989ef6e9dea5a86538",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0",
+    "note": "subset of OxCGRT_compact_national_v1.csv (first 3 MB fetched by byte range): ABW and AFG, 2020"
+  }
+]

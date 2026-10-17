@@ -273,6 +273,8 @@ class AtlasScan:
             for b in self.bounded:
                 if not re.search(b["unit_regex"], eff or ""):
                     continue
+                if b.get("unit_exempt_regex") and re.search(b["unit_exempt_regex"], eff or ""):
+                    continue
                 if b.get("concept_regex"):
                     if concept is None or not re.search(b["concept_regex"], concept):
                         continue
@@ -280,7 +282,10 @@ class AtlasScan:
                         continue
                 rule = (b["name"], float(b["min"]), float(b["max"]), eff)
                 break
-            if rule is None and self.counts and re.search(self.counts["unit_regex"], eff or ""):
+            cat_only = self.counts.get("catalog_only_unit_regex")
+            if cat_only and concept is None and re.search(cat_only, eff or ""):
+                pass  # a generic provider unit ("Number") says nothing about the quantity: catalog units only
+            elif rule is None and self.counts and re.search(self.counts["unit_regex"], eff or ""):
                 ex = self.counts.get("exempt_regex")
                 if not ex or not (re.search(ex, g["indicator"]) or (concept and re.search(ex, concept))):
                     rule = ("non_negative_count", 0.0, float("inf"), eff)
@@ -318,9 +323,15 @@ class AtlasScan:
             if bad.height:
                 ex = [
                     _cell(t.key, r, "_rule", "_eff_unit", "is_proj")
-                    for r in bad.sort("_v", descending=True).head(3).iter_rows(named=True)
+                    for r in bad.sort("_v", descending=True).head(2).iter_rows(named=True)
                 ]
                 acc.add(t.key, bad.height, ex)
+                acc.by[t.key] -= bad.height  # per-indicator rows instead of one per table
+                if acc.by[t.key] <= 0:
+                    del acc.by[t.key]
+                grp = bad.group_by("indicator", "_eff_unit", "_rule").agg(pl.len())
+                for g in grp.iter_rows(named=True):
+                    acc.by[f"{t.key} | {g['indicator']} | {g['_eff_unit']} | {g['_rule']}"] += g["len"]
 
     def _time(self, t: AtlasTable, df: pl.DataFrame) -> None:
         obs = df.filter(~pl.col("is_proj"))
@@ -497,6 +508,13 @@ class AtlasScan:
                         )
                     continue
                 share = div.height / n
+                flips = div.filter(
+                    (pl.col("va") * pl.col("vb") < 0)
+                    & (
+                        (pl.col("va").abs() - pl.col("vb").abs()).abs()
+                        <= 0.01 * pl.max_horizontal(pl.col("va").abs(), pl.col("vb").abs())
+                    )
+                ).height
                 n_div += div.height
                 n_overlap += n
                 status = (
@@ -513,6 +531,7 @@ class AtlasScan:
                         "diverging": div.height,
                         "share": round(share, 4),
                         "max_rel": round(float(top["rel"][0]), 4) if div.height else 0.0,
+                        "sign_flips": flips,
                         "rel_tol": rel_tol,
                         "abs_tol": abs_tol,
                         "status": status,
@@ -576,7 +595,12 @@ class AtlasScan:
             for i in range(len(frames)):
                 prod = prod * pl.col(f"p{i}")
             j = j.with_columns(prod.alias("product")).with_columns(
-                ((pl.col("product") - pl.col("total")).abs() / pl.col("total").abs()).alias("rel")
+                (
+                    (pl.col("product") - pl.col("total")).abs()
+                    / pl.max_horizontal(pl.col("product").abs(), pl.col("total").abs())
+                )
+                .fill_nan(0.0)
+                .alias("rel")
             )
             bad = j.filter(pl.col("rel") > float(idn.get("rel_tol", 0.01))).sort("rel", descending=True)
             total += bad.height
@@ -642,7 +666,7 @@ class AtlasScan:
                     a.count,
                     a.checked,
                     a.examples,
-                    [{"table": k, "cells": v} for k, v in a.by.most_common()],
+                    [{"where": k, "cells": v} for k, v in a.by.most_common()],
                 )
             )
         lic = self.licence_rows

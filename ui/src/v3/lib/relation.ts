@@ -29,7 +29,7 @@ export type ThemeId = 'trade' | 'migration' | 'votes' | 'colonial' | 'border' | 
 
 export const THEMES: { id: ThemeId; label: string; kinds: string[] }[] = [
   { id: 'trade', label: 'Commerce de biens', kinds: ['bilateral_trade', 'bilateral_trade_imports', 'bilateral_trade_baci'] },
-  { id: 'migration', label: 'Migrations (stocks de migrants)', kinds: ['migrant_stock'] },
+  { id: 'migration', label: 'Migrations et asile (stocks de migrants, réfugiés, demandes d’asile)', kinds: ['migrant_stock', 'refugee_flow', 'asylum_applications', 'remittance'] },
   { id: 'votes', label: 'Votes à l’Assemblée générale de l’ONU', kinds: ['unga_vote_agreement'] },
   { id: 'colonial', label: 'Domination coloniale', kinds: ['colony_of', 'former_colony_of', 'colonial_rule_cshapes', 'colonial_rule_cow', 'colonised_by_coldat'] },
   { id: 'border', label: 'Frontières', kinds: ['land_border', 'land_border_cshapes', 'border_wikidata', 'maritime_neighbour'] },

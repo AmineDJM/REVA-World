@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "0546faa25e1d832631c0fee29f425697dbb3ebeed87df47f252bdd554dc68b87",
+    "url": "https://api.unhcr.org/population/v1/asylum-applications/?limit=1&coo=SYR&coa_all=true",
+    "file": "0546faa25e1d8326.json",
+    "sha256": "6e3b8c4fb21a06636b51711022ca4434ec30644f90ebd256779c88709a5c1b53",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY 4.0 (UNHCR)",
+    "note": "UNHCR asylum-applications JSON, limit=1, origin SYR: full real response (record count + totals)"
+  },
+  {
+    "request_fingerprint": "e0f326b90ed9f29e14d60fd96825663f63ea971e933fd8a737e3ef40548f23fa",
+    "url": "https://api.unhcr.org/population/v1/asylum-applications/?limit=1000000&coo=SYR&coa_all=true&download=true",
+    "file": "e0f326b90ed9f29e.zip",
+    "sha256": "73e241dfc6e0d72a90869f339f8eaadb6bc778c777b80ce62a831ad8a96426a5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY 4.0 (UNHCR)",
+    "note": "UNHCR asylum-applications download (ZIP of CSV), origin SYR, every year: full real response"
+  },
+  {
+    "request_fingerprint": "7e04c5f8c28c01876dc144d75347b4db01d0685849911368f837d34aa94d5955",
+    "url": "https://api.unhcr.org/population/v1/asylum-decisions/?limit=1&coo=SYR&coa_all=true",
+    "file": "7e04c5f8c28c0187.json",
+    "sha256": "89bc0719fbe41ba5e6f3478c1c71f11fc3a69b82e0a9595a3b60fa80982a61a8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY 4.0 (UNHCR)",
+    "note": "UNHCR asylum-decisions JSON, limit=1, origin SYR: full real response (record count + totals)"
+  },
+  {
+    "request_fingerprint": "7fb5bcc03e5c8aa432b1b198c919292fdaf394234837a1c6a4f5437e94bdd552",
+    "url": "https://api.unhcr.org/population/v1/asylum-decisions/?limit=1000000&coo=SYR&coa_all=true&download=true",
+    "file": "7fb5bcc03e5c8aa4.zip",
+    "sha256": "91a9da80b5d49c09aa3fcbc3c131cf076e8873c3eb9c09e6c26d2f75592c7f2c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY 4.0 (UNHCR)",
+    "note": "UNHCR asylum-decisions download (ZIP of CSV), origin SYR, every year: full real response"
+  }
+]

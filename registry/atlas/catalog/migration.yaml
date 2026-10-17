@@ -1,0 +1,102 @@
+# Atlas catalog 'migration' (agent V6MIGR, V6, 2026-10-17). Provider-declared concepts (not human-reviewed) of
+# atlas_migration.py: IDMC national internal displacement, Eurostat monthly asylum applicants, IOM Missing Migrants.
+# One source each (no cross-provider equivalence asserted). Bilateral series (UNHCR asylum applications / decisions by
+# origin, Eurostat applicants by citizenship) are dyadic: they feed the LINKS layer (refugee_flow,
+# asylum_applications), not country concepts. See docs/dev/v6_migration.md.
+domain: migration
+labels:
+  en: Human mobility - displacement, asylum, migrant deaths
+  fr: Mobilité humaine - déplacements, asile, décès de migrants
+maintainer: V6MIGR
+concepts:
+- id: migration.idmc.conflict_idps
+  labels:
+    en: 'Internally displaced persons, conflict and violence (stock, IDMC)'
+    fr: 'Personnes déplacées internes, conflits et violence (stock, IDMC)'
+  definition: "IDMC README: 'Conflict Stock Displacement (Raw): Total number of IDPs (not rounded), as a result of conflict and violence as of the end of the reporting year. Units are recorded as 'People'.'"
+  unit: people
+  domain: migration
+  subdomain: displacement
+  theme: population
+  source_order: ['idmc.gidd_national.conflict_idps|rounded=no']
+  provider_declared: true
+  notes: 'End-of-year stock. The rounded national figure (as in the GRID report) is conflict_idps|rounded=yes. Licence CC BY-NC 4.0 (non-commercial). The trigger is IDMC''s coding, not a REVA causal claim.'
+  tags: [idmc, non_commercial]
+- id: migration.idmc.conflict_internal_displacements
+  labels:
+    en: 'Internal displacements, conflict and violence (flow, IDMC)'
+    fr: 'Déplacements internes, conflits et violence (flux, IDMC)'
+  definition: "IDMC README: 'Conflict Internal Displacements (Raw): Total number of internal displacements reported (not rounded), as a result of conflict and violence over the reporting year. Units are recorded as 'internal displacement flows' or 'internal displacement movements'.'"
+  unit: internal displacements (flows)
+  domain: migration
+  subdomain: displacement
+  theme: population
+  source_order: ['idmc.gidd_national.conflict_internal_displacements|rounded=no']
+  provider_declared: true
+  notes: 'A flow over the year; IDMC: "This figure may include individuals who are displaced multiple times during the year by different events." Licence CC BY-NC 4.0.'
+  tags: [idmc, non_commercial]
+- id: migration.idmc.disaster_internal_displacements
+  labels:
+    en: 'Internal displacements, disasters (flow, IDMC)'
+    fr: 'Déplacements internes, catastrophes (flux, IDMC)'
+  definition: "IDMC README: 'Disaster Internal Displacements (Raw): Total number of internal displacements reported (not rounded), as a result of disasters over the reporting year. Units are recorded as 'internal displacement flows' or 'internal displacement movements'.'"
+  unit: internal displacements (flows)
+  domain: migration
+  subdomain: displacement
+  theme: population
+  source_order: ['idmc.gidd_national.disaster_internal_displacements|rounded=no']
+  provider_declared: true
+  notes: 'Includes pre-emptive evacuations (IDMC: disaster displacement is "as a result, or in anticipation of" natural hazards). Event-level records and their attributed causes are atlas.idmc (KG). Licence CC BY-NC 4.0.'
+  tags: [idmc, non_commercial]
+- id: migration.idmc.disaster_idps
+  labels:
+    en: 'Internally displaced persons, disasters (stock, IDMC)'
+    fr: 'Personnes déplacées internes, catastrophes (stock, IDMC)'
+  definition: "IDMC README: 'Disaster Stock Displacement (Raw): Total number of IDPs (not rounded), as a result of disasters as of the end of the reporting year. Units are recorded as 'People'.'"
+  unit: people
+  domain: migration
+  subdomain: displacement
+  theme: population
+  source_order: ['idmc.gidd_national.disaster_idps|rounded=no']
+  provider_declared: true
+  notes: 'IDMC README: the metrics on the total number of IDPs from disaster-related events are available from 2019 onwards. Licence CC BY-NC 4.0.'
+  tags: [idmc, non_commercial]
+- id: migration.eurostat.asylum_applicants_monthly
+  labels:
+    en: 'Asylum applicants, all citizenships, monthly (Eurostat)'
+    fr: 'Demandeurs d''asile, toutes nationalités, mensuel (Eurostat)'
+  definition: 'Eurostat migr_asyappctzm "Asylum applicants by type, citizenship, sex and age - monthly data": applicant type Total, citizenship Total, sex Total, age Total, persons, per reporting country and month.'
+  unit: persons
+  domain: migration
+  subdomain: asylum
+  theme: population
+  source_order: ['eurostat.asylum_applicants_m.asylum_applicants|applicant=TOTAL|citizen=TOTAL']
+  provider_declared: true
+  notes: 'EU/EFTA reporting countries (EU27_2020 aggregate kept unmapped). By citizenship: asylum_applicants|applicant=TOTAL|citizen=<code>.'
+  tags: [monthly, eurostat]
+- id: migration.eurostat.first_time_asylum_applicants_monthly
+  labels:
+    en: 'First-time asylum applicants, all citizenships, monthly (Eurostat)'
+    fr: 'Primo-demandeurs d''asile, toutes nationalités, mensuel (Eurostat)'
+  definition: 'Eurostat migr_asyappctzm, applicant type "First time applicant" (code FRST), citizenship Total, sex Total, age Total, persons, per reporting country and month.'
+  unit: persons
+  domain: migration
+  subdomain: asylum
+  theme: population
+  source_order: ['eurostat.asylum_applicants_m.asylum_applicants|applicant=FRST|citizen=TOTAL']
+  provider_declared: true
+  notes: 'By citizenship: asylum_applicants|applicant=FRST|citizen=<code>.'
+  tags: [monthly, eurostat]
+- id: migration.iom.mmp_dead_and_missing_monthly
+  labels:
+    en: 'Dead and missing migrants recorded by IOM, by country of incident, monthly'
+    fr: 'Migrants morts et disparus recensés par l''OIM, par pays de l''incident, mensuel'
+  definition: 'Sum computed by REVA of the IOM Missing Migrants Project field total_dead_and_missing ("The sum of the ‘number dead’ and ‘number missing’ variables.") over the incident records of a country of incident and month of reported_date ("Estimated date of death"), all causes of death.'
+  unit: persons (dead and missing)
+  domain: migration
+  subdomain: migrant_deaths
+  theme: population
+  source_order: ['iom.mmp_monthly.dead_and_missing|cause=ALL']
+  provider_declared: true
+  notes: 'A minimum count (deaths reported to some source). A "cumulative total" record is dated at the end of its range. By MMP cause of death: dead_and_missing|cause=<category>; by MMP region: provider_geo mmp_region:<name>; incident counts: incident_records|cause=...'
+  tags: [monthly, iom]

@@ -1,0 +1,15 @@
+version: 1
+agent: V6AGRI
+note: >-
+  IFPRI Food Export Restrictions Tracker measures (docs/dev/v6_agri.md, predicates registry/kg/predicates_agri.yaml).
+  ifpri_er:imposed_by is an event role (participant, role actor) read by the events taxonomy, not a family. The
+  measure -> HS heading link says which products the measure covers (as coded by IFPRI; HS 2017 edition assumed by
+  REVA and stated on each statement). No family is causal: a restriction is an event, its price effect is not stated.
+mappings:
+  - property: "ifpri_er:covers_hs_heading"
+    family: associated_with
+    subtype: export_restriction_covers_product
+    source: ifpri.export_restrictions
+    subject_kinds: [export_restriction]
+    object_kinds: [hs_code]
+    note: "the measure applies to (part of) the products of this HS heading, as coded in IFPRI's HS4 column"

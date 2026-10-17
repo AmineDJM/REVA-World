@@ -181,13 +181,13 @@ def parse_wide(lines: Any, codes: dict[str, Any], raw_sha256: str, rep: TmReport
         raise TmError(f"{WIDE_MEMBER}: empty member")
     head = next(csv.reader([header.decode("utf-8-sig")]))
     if tuple(head[: len(FIXED)]) != FIXED:
-        raise TmError(f"{WIDE_MEMBER}: header changed: {head[:len(FIXED)]}")
+        raise TmError(f"{WIDE_MEMBER}: header changed: {head[: len(FIXED)]}")
     years: list[tuple[int, int, int]] = []  # (year, value column, flag column)
     for j in range(len(FIXED), len(head), 2):
-        y, fcol = head[j], head[j + 1] if j + 1 < len(head) else ""
-        if not (y.startswith("Y") and y[1:].isdigit() and fcol == f"{y}F"):
-            raise TmError(f"{WIDE_MEMBER}: unexpected year columns {y!r} {fcol!r}")
-        years.append((int(y[1:]), j, j + 1))
+        ycol, fcol = head[j], head[j + 1] if j + 1 < len(head) else ""
+        if not (ycol.startswith("Y") and ycol[1:].isdigit() and fcol == f"{ycol}F"):
+            raise TmError(f"{WIDE_MEMBER}: unexpected year columns {ycol!r} {fcol!r}")
+        years.append((int(ycol[1:]), j, j + 1))
     rep.years = [y for y, _, _ in years]
     needles = tuple(f'"{c}","\''.encode() for c in sorted(ITEMS))
     meanings: dict[str, str] = codes["flags"]
@@ -334,7 +334,11 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         raise TmError(f"{WIDE_MEMBER} is {wide.csize} bytes compressed (cap {MAX_WIDE_COMPRESSED})", kind="too_large")
     hi = wide.offset + 30 + wide.name_len + wide.extra_len + 1024 + wide.csize - 1
     part = await run.get_range(
-        ARCHIVE_URL, key="tm:wide", start=wide.offset, end=min(hi, size - 1), if_range=etag,
+        ARCHIVE_URL,
+        key="tm:wide",
+        start=wide.offset,
+        end=min(hi, size - 1),
+        if_range=etag,
         params={"member": WIDE_MEMBER},
     )
     served, _e2, _s2 = content_range(part)
@@ -352,8 +356,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         f" unmapped partner areas (aggregates/historical/unspecified). Licence CC BY 4.0, cite: FAO. FAOSTAT: Trade - "
         f"Detailed trade matrix. {TERMS_URL}"
     )[:4000]
-    reg = run.register(dataset=DATASET, frame=frame, raw_sha256s=[wide_sha, tail_sha], coverage_note=note,
-                       rights=rights())
+    reg = run.register(
+        dataset=DATASET, frame=frame, raw_sha256s=[wide_sha, tail_sha], coverage_note=note, rights=rights()
+    )
     return {
         "tables": {
             DATASET: {
@@ -369,4 +374,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     }
 
 
-__all__ = ["CONNECTOR_NAME", "ITEMS", "TmError", "atlas_ingest", "atlas_source", "code_lists", "iter_lines", "parse_wide"]
+__all__ = [
+    "CONNECTOR_NAME",
+    "ITEMS",
+    "TmError",
+    "atlas_ingest",
+    "atlas_source",
+    "code_lists",
+    "iter_lines",
+    "parse_wide",
+]

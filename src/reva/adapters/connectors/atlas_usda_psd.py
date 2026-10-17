@@ -226,13 +226,7 @@ def parse_psd(f: PsdFile, body: bytes, raw_sha256: str, *, last_modified: str | 
             rep.empty_values += 1  # no cell (never a zero)
             continue
         y = int(my)
-        kind = (
-            "projection"
-            if y == latest[code]
-            else "estimated"
-            if y == latest[code] - 1
-            else "published_history"
-        )
+        kind = "projection" if y == latest[code] else "estimated" if y == latest[code] - 1 else "published_history"
         kinds[kind] += 1
         flags: dict[str, Any] = {
             "commodity": cname,

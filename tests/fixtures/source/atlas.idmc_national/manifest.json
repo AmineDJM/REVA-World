@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "36980c301b282b815d77b51fde13de9367d087a0b89d611dfbff1fdbbd3c1a54",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=idmc_internal_displacement_conflict-violence_disasters",
+    "file": "36980c301b282b81.json",
+    "sha256": "3e2bbb684d309af592535c498b71b800007481e1c80607bc764722dccf373789",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "HDX dataset record (metadata)",
+    "note": "HDX package_show of the IDMC dataset, full real response"
+  },
+  {
+    "request_fingerprint": "2c3cd64d2988f04ffdab6809ba603bcd3348e94ac0b41eee8345dacaa1e89437",
+    "url": "https://data.humdata.org/dataset/0b1c4dc1-6ae5-4e2d-8e32-2111d0e10697/resource/761feae0-f812-4f0f-8e38-54b5526baf85/download/idmc_internal_displacement_conflict-violence_disasters-39.xlsx",
+    "file": "2c3cd64d2988f04f.xlsx",
+    "sha256": "1af744e6efe3e5c0b8b729871c79a5d45c76f5e602a2ad509a739ae65a3963bc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY-NC 4.0 (workbook README); HDX record: CC BY",
+    "note": "slice of IDMC_Internal_Displacement_Conflict-Violence_Disasters.xlsx: README unchanged, sheet 1_Displacement_data rows of AFG, SYR, UKR, AB9 (57 of 2200) kept with their original row numbers and cell XML, sheets 2 and 3 emptied (not read); real file sha256 aef0742ce517d67512e3b7e24f8d4fb9b3cd9e94f960e4940ab7b0c6e76651be"
+  }
+]

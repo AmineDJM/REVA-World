@@ -27,6 +27,10 @@ cross_source:
     - match: '(mortality|immunization|incidence|prevalence|coverage|skilled_birth|out_of_pocket)'
       rel_tol: 0.10
       abs_tol: 0.5
+    - match: '(growth|inflation|current_account|balance|_zg$|deficit)'
+      rel_tol: 0.10
+      abs_tol: 0.5
+      note: rates and balances cross zero; a relative gap alone is meaningless near zero, so 0.5 point is required too.
     - match: '^history\.'
       rel_tol: 0.15
       note: long-run compilations (back-casts, territorial bases differ).
@@ -68,6 +72,9 @@ units:
   bounded:
     - name: share_pct_of_total
       unit_regex: '(?i)^%( \(share\))? of (the )?(total|population|households|women|men|adults|female|male|rural|urban|children|cohort|relevant age group|labou?r force|employment|deaths|land area|a day)'
+      # a ratio to another aggregate ("% of total reserves", "% of exports") is not a share of a whole
+      unit_exempt_regex: '(?i)(reserves|exports|imports|gni|gdp|revenue|of total external debt service|relevant age group|age group immediately following)'
+      # gross ratios (enrolment, intake, completion) are % of an age group and legitimately exceed 100
       min: 0
       max: 100
     - name: fraction_0_1
@@ -86,13 +93,15 @@ units:
       # catalog concepts in plain '%' whose id says share/prevalence/coverage/rate of a population
       unit_regex: '(?i)^(%|percent|percentage)$'
       concept_regex: '(?i)(share|prevalence|coverage|literacy|immuni[sz]ation|_pct$|proportion|access_|attendance)'
-      concept_exempt_regex: '(?i)(growth|change|gross_enrol|enrolment_gross|_ger|gdp|gni|ratio|yield|inflation)'
+      concept_exempt_regex: '(?i)(growth|change|gross_enrol|enrolment_gross|_ger|gdp|gni|ratio|yield|inflation|trade_)'
       min: 0
       max: 100
   bounded_tolerance: 1.0e-9
   counts:
+    # generic provider units ("Number", "count") only count when the series' catalog concept declares them
+    catalog_only_unit_regex: '(?i)^(number|count)$'
     unit_regex: '(?i)^(number|count|persons|people|individuals|headcount.*|number of .*|persons \(.*\)|thousands of persons|thousands|tonnes.*|hectares|head|deaths|cases)$'
-    exempt_regex: '(?i)(net|change|balance|migration|growth|diff|surplus|deficit|variation|delta|stock_?change|_chg)'
+    exempt_regex: '(?i)(net|change|balance|migration|growth|diff|surplus|deficit|variation|delta|stock_?change|_chg|luc|lulucf|ghg|wgi|_est$|index|score|rank)'
   identities:
     - name: wdi.gdp_per_capita_x_population
       product: [wb.wdi_econ.NY.GDP.PCAP.CD, wb.wdi_social.SP.POP.TOTL]

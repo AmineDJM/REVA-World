@@ -1,0 +1,58 @@
+[
+  {
+    "request_fingerprint": "18d8e0e02e8f49978888cf1df3f815d1a5515f834642e40d8e4c2804048f2484",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/2VZ5ZC",
+    "file": "18d8e0e02e8f4997.json",
+    "sha256": "91cd6f74e1a7800b056a80cfb86bde63fd48a497e7e97f4f580cb84dbeac07f6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "e5b6565ff7f1c01624d10b1a352c6ce1a625025f8322ccbf5ce399d114a6aeeb",
+    "note": "real Dataverse record; MD5 of the three CSVs replaced by the subsets'"
+  },
+  {
+    "request_fingerprint": "63f866872964d4b8d117ae494fb8f251cd0982bca8daf6a8044b54fa2a3970da",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10437088?format=original",
+    "file": "63f866872964d4b8.csv",
+    "sha256": "9f96286d2395f70b21509e36bfe0202f7af82ae260ac5b5955e0d57c018a8cbf",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "e3103e66cc276efe3c931e43591c00db283e103b7f053930a1c65d34f214dd7f",
+    "note": "subset of view_cabinet.csv: German cabinets with start_date 2005-2022"
+  },
+  {
+    "request_fingerprint": "495fc0e2737cdf35ee1e045cf5ec7f671c6d71bfbd670f9cdd5b68fc3807e55c",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10437089?format=original",
+    "file": "495fc0e2737cdf35.csv",
+    "sha256": "b73dedce3321cd7b397414400bba7c9146569e8b89d667724f1c21a4da30efcc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "e8368a513046218aaa43301fa3db0073ad1f7e47ba25266e34f5b6acafd21371",
+    "note": "subset of view_party.csv: the parties of those cabinets and elections"
+  },
+  {
+    "request_fingerprint": "5ba179d52e22c2a29ac0ea8ffe9b30bbc33016cf337cf6c0a4a13533d03ce9f0",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10437092?format=original",
+    "file": "5ba179d52e22c2a2.csv",
+    "sha256": "effe48351e6434633137b170c327b04cff6a8168da2c1a9457af5271a14ac61e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "a421fb7060f57f8203af6ccd0dce8d79dfee953db8702837f4c5390ef6b23fb6",
+    "note": "subset of view_election.csv: the elections those cabinets reference"
+  }
+]

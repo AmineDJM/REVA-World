@@ -1,0 +1,56 @@
+[
+  {
+    "request_fingerprint": "676e8a8b5ad3e3bf484db4fc360915202b1a12b641079c965ee9a9df920d90b1",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/DDNWOR",
+    "file": "676e8a8b5ad3e3bf.json",
+    "sha256": "6d6c0252fb7e7d8cc86afdf988afcde5f0d81fa8bb60bcce8453ff6e5ab9fa31",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "No licence stated (Dataverse terms 'public', citation required); excerpt for tests only",
+    "derived_from_sha256": "8bc6df6a0ea03f03b5ce81fe76606d774275e64b73f9a38d8763301614668edb",
+    "note": "real Dataverse record; filesize of the tab export replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "fa85b816dc597514dd4fb5eb42f41c43d86686c8b675a5cdf6df7341671c1896",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2427654",
+    "file": "fa85b816dc597514.tab",
+    "sha256": "e2496dc1acf2456527297ca631084aa9c8a78e5fe4c0373a4484c3d6b920c0a0",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "No licence stated (Dataverse terms 'public', citation required); excerpt for tests only",
+    "derived_from_sha256": "87e8896dc878ac820938b4a5e7aea4c17d75d1234d51b5bba3bc48b6a898c48a",
+    "note": "subset of id & q-wide.tab: ['002-1946-1105-L1', '220-1981-0426-P1', '220-1981-0426-P2', '365-1996-0616-P1', '365-1996-0616-P2', '625-1974-0400-L1']"
+  },
+  {
+    "request_fingerprint": "d0877acbe9c5c7a3323a71109d4decb04581d398dce9bc872c65f95527842879",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2427655",
+    "file": "d0877acbe9c5c7a3.pdf",
+    "sha256": "bc6e38b6930c80eb0593d882f7a2aefb927c3426f05a50d6f1f5958c7aa2fcb0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "No licence stated (Dataverse terms 'public', citation required); excerpt for tests only",
+    "note": "NELDA_codebook_2011.pdf, unchanged"
+  },
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "GPL-3 (countrycode R package)",
+    "note": "copy of tests/fixtures/source/atlas.coups/b9eef8431dd6ce91.tar.gz"
+  }
+]

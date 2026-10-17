@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "f59e01860130f0eb44bd5d04fb5aa531309e90083014d2d85e07eb75d1fb88d0",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/OBS_FLAG/latest",
+    "file": "f59e01860130f0eb.xml",
+    "sha256": "34fc65a6d77899221473941b0e64fd16b5324ec9717486933ed41e4fe57e25c6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.structure+xml"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0)",
+    "note": "Eurostat OBS_FLAG code list, full real response"
+  },
+  {
+    "request_fingerprint": "eaf58a66bd9a32684472d7e4a3e31c8e14837bbd620119ca180522b2d80533cc",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/migr_asyappctzm/M.PER.SY+UA.T.TOTAL+FRST.TOTAL.DE+FR+EU27_2020?format=TSV&compressed=true",
+    "file": "eaf58a66bd9a3268.tsv.gz",
+    "sha256": "5f14450d285b68dd3ac8eabd3c2e1ddc4473bdcc120643475bd187c288cc2369",
+    "status": 200,
+    "headers": {
+      "content-type": "text/tab-separated-values"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0)",
+    "note": "migr_asyappctzm extraction for the SDMX key M.PER.SY+UA.T.TOTAL+FRST.TOTAL.DE+FR+EU27_2020 (citizens SY, UA; DE, FR, EU27_2020), full real response"
+  }
+]

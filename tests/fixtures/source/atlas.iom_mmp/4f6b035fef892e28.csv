@@ -1,0 +1,489 @@
+web_id,region,reported_date,number_dead,number_missing,total_dead_and_missing,number_of_survivors,number_of_female,number_of_male,number_of_children,cause_death,country_of_incident,location_description,unsd_geographic_grouping,location_coodinates,migration_route,information_source,url,source_quality,region_origin,country_origin
+2015.MMP00366,Mediterranean,2015-09-02,,0,0,,,,,Drowning,Türkiye,"Bodrum district of Muğla province (04:13h), en route to Kos
+",Uncategorized,"37.2028822, 28.311496",Eastern Mediterranean,IOM Türkiye,,4,Western Asia,Syrian Arab Republic
+2015.MMP00366,Mediterranean,2015-09-02,,0,0,,,,,Drowning,Türkiye,"Bodrum district of Muğla province (04:13h), en route to Kos
+",Uncategorized,"37.2028822, 28.311496",Eastern Mediterranean,IOM Türkiye,,4,Western Asia,Syrian Arab Republic
+2015.MMP00108,Mediterranean,2015-04-18,750,272,"1,022",28,,,,Drowning,Libya,"120 miles south of Lampedusa, 110 kilometers north of Libya (almost 70 miles)
+",Uncategorized,"35.03, 14.6777",Central Mediterranean,"Humanitarian partners, The Guardian, The New York Times, The Telegraph","http://bit.ly/1Oa2qYi, https://archive.ph/1JmL0, https://archive.ph/8jgxu",4,Mixed,"Mali, Côte d&#039;Ivoire, Guinea, Sudan, Syrian Arab Republic, Eritrea, Somalia, Gambia, Tunisia, Sierra Leone, Bangladesh, Algeria, Egypt, Niger, Zambia, Ghana"
+2018.MMP01559,Western Africa,2018-12-07,1,0,1,,1,,,Mixed or unknown,Côte d&#039;Ivoire,"Abobo, near Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.451341, -4.041236",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01553,Western Africa,2018-12-05,2,0,2,,2,1,,Mixed or unknown,Côte d&#039;Ivoire,"Near Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.422953, -4.084726",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01554,Western Africa,2018-12-05,1,0,1,,,1,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Daloa, Côte d&#039;Ivoire
+",Western Africa,"6.936205, -6.476191",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01333,Western Africa,2018-10-14,2,0,2,,1,1,,Mixed or unknown,Côte d&#039;Ivoire,"Unspecified location in Cote d&#039;Ivoire
+",Western Africa,"7.236226, -5.038495",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01332,Western Africa,2018-10-14,2,0,2,,2,,,Mixed or unknown,Côte d&#039;Ivoire,"Unspecified location in Cote d&#039;Ivoire
+",Western Africa,"7.236226, -5.038495",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01286,Western Africa,2018-10-06,1,0,1,,,1,1,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Gagnoa, Cote d&#039;Ivoire
+",Western Africa,"6.133333, -5.933333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01282,Western Africa,2018-10-05,1,0,1,,,1,,"Harsh environmental conditions / lack of adequate shelter, food, water",Côte d&#039;Ivoire,"Unspecified location in Cote d&#039;Ivoire
+",Western Africa,"7.988257, -5.497591",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01193,Western Africa,2018-09-19,2,0,2,,2,,1,Mixed or unknown,Côte d&#039;Ivoire,"Bouake, Cote d&#039;Ivoire
+",Western Africa,"7.683333, -5.016667",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01174,Western Africa,2018-09-16,2,0,2,,,,,Mixed or unknown,Côte d&#039;Ivoire,"Yamoussoukro, Cote d&#039;Ivoire
+",Western Africa,"6.816667, -5.283333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01161,Western Africa,2018-09-15,1,0,1,,,,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Cote d&#039;Ivoire
+",Western Africa,"5.316667, -4.033333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01129,Western Africa,2018-09-10,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ferkessedougou, Cote d&#039;Ivoire
+",Western Africa,"9.583333, -5.2",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01104,Western Africa,2018-09-02,3,0,3,,1,1,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Yamoussoukro, Cote d&#039;Ivoire
+",Western Africa,"6.816667, -5.283333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01053,Western Africa,2018-08-20,1,0,1,,,1,1,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Cote d&#039;Ivoire
+",Western Africa,"5.316667, -4.033333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP01019,Western Africa,2018-08-13,3,0,3,,,,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Unspecified location in Cote d&#039;Ivoire
+",Western Africa,"8.615293, -4.976938",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP00809,Western Africa,2018-07-04,1,0,1,,1,,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Bouake, Cote d&#039;Ivoire
+",Western Africa,"7.683333, -5.016667",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP00812,Western Africa,2018-07-04,2,0,2,,1,1,1,Mixed or unknown,Côte d&#039;Ivoire,"Yamoussoukro, Cote d&#039;Ivoire
+",Western Africa,"6.816667, -5.283333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP00810,Western Africa,2018-07-04,3,0,3,,1,1,1,Mixed or unknown,Côte d&#039;Ivoire,"Bouake, Cote d&#039;Ivoire
+",Western Africa,"7.683333, -5.016667",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2018.MMP00813,Western Africa,2018-07-04,1,0,1,,1,,,Violence,Côte d&#039;Ivoire,"Abidjan, Cote d&#039;Ivoire
+",Western Africa,"5.316667, -4.033333",,Mixed Migration Monitoring Mechanism Initiative (4mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01756,Western Africa,2019-12-11,2,0,2,,2,,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Bouake, Ivory Coast
+",Western Africa,"-5.033005, 7.686422",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01728,Western Africa,2019-12-07,1,0,1,,,1,,Violence,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01616,Western Africa,2019-11-13,1,0,1,,,1,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ferkessedougou, Ivory Coast
+",Western Africa,"-5.194344, 9.58323",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01572,Western Africa,2019-11-08,1,0,1,,1,,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01570,South-eastern Asia,2019-11-06,2,0,2,,,2,,Mixed or unknown,Lao People&#039;s Democratic Republic,"Bokèo  Province, Laos
+",South-eastern Asia,"19.963732, 100.608055",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Unknown,Unknown
+2019.MMP01482,Western Africa,2019-10-16,1,0,1,,,1,,Violence,Côte d&#039;Ivoire,"Abobo, Ivory Coast
+",Western Africa,"-4.039775, 5.430734",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01448,Western Africa,2019-10-10,1,0,1,,,1,,Violence,Côte d&#039;Ivoire,"Yopougon, Ivory Coast
+",Western Africa,"-4.091135, 5.314491",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01412,Western Africa,2019-10-05,1,0,1,,,1,1,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Gagnoa, Ivory Coast
+",Western Africa,"-5.951714, 6.149981",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01393,Western Africa,2019-10-04,1,0,1,,1,,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01347,Western Africa,2019-09-23,1,0,1,,,1,,Violence,Côte d&#039;Ivoire,"Abobo, Ivory Coast
+",Western Africa,"-4.039775, 5.430734",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01297,Western Africa,2019-09-17,1,0,1,,,,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Odienne, Ivory Coast
+",Western Africa,"-7.557931, 9.516828",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01159,Western Africa,2019-08-19,1,0,1,,,1,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ferkessedougou, Ivory Coast
+",Western Africa,"-5.194344, 9.58323",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01137,Western Africa,2019-08-16,2,0,2,,,2,,Violence,Côte d&#039;Ivoire,"Abobo, Ivory Coast
+",Western Africa,"-4.039775, 5.430734",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP01112,Western Africa,2019-08-14,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Yamoussoukro, Ivory Coast
+",Western Africa,"-5.289204, 6.823737",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00846,Western Africa,2019-06-22,1,0,1,,,1,1,Mixed or unknown,Côte d&#039;Ivoire,"Daloa, Ivory Coast
+",Western Africa,"-6.439898, 6.884798",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00845,Western Africa,2019-06-22,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00844,Western Africa,2019-06-21,1,0,1,,,1,,Violence,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00818,Western Africa,2019-06-19,1,0,1,,,1,1,Mixed or unknown,Côte d&#039;Ivoire,"Bouake, Ivory Coast
+",Western Africa,"-5.033005, 7.686422",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00810,Western Africa,2019-06-15,1,0,1,,1,,,Violence,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00792,Western Africa,2019-06-13,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00666,Western Africa,2019-05-21,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00575,Western Africa,2019-05-05,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00569,Western Africa,2019-05-03,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00529,Western Africa,2019-04-26,1,0,1,,1,,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"-4.024984, 5.34845",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00503,Western Africa,2019-04-23,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Bouake, Côte d&#039;Ivoire
+",Western Africa,"7.738804, -5.006729",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00504,Western Africa,2019-04-23,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Bouaké, Côte d&#039;Ivoire
+",Western Africa,"7.738804, -5.006729",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00505,Western Africa,2019-04-23,1,0,1,,1,,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.446192, -3.995437",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00489,Western Africa,2019-04-22,1,0,1,,,1,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.446192, -3.995437",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00501,Western Africa,2019-04-22,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.605775751, -3.979681824",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00476,Western Africa,2019-04-19,2,0,2,,,2,2,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ouangolodougou, Côte d&#039;Ivoire
+",Western Africa,"10.000556754, -5.149189627",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00465,Western Africa,2019-04-17,1,0,1,,,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"5.34845, -4.024984",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00463,Western Africa,2019-04-17,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Unspecified location between Côte d&#039;Ivoire and Burkina Faso
+",Western Africa,"9.924704, -3.41545",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00466,Western Africa,2019-04-17,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Unspecified location in Ivory Coast near border with Burkina Faso
+",Western Africa,"9.779978, -5.020201",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00459,Western Africa,2019-04-15,2,0,2,,,1,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ouangolodougou, Ivory Coast
+",Western Africa,"9.976867, -5.147179",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00447,Western Africa,2019-04-14,2,0,2,,1,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Côte d&#039;Ivoire
+",Western Africa,"5.446192, -3.995437",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00453,Western Africa,2019-04-14,2,0,2,,2,,,Violence,Côte d&#039;Ivoire,"Abobo, Ivory Coast
+",Western Africa,"5.430734, -4.039775",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00456,Western Africa,2019-04-14,2,0,2,,1,1,,Mixed or unknown,Côte d&#039;Ivoire,"Abidjan, Ivory Coast
+",Western Africa,"5.34845, -4.024984",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00436,Western Africa,2019-04-12,2,0,2,2,,,,Violence,Côte d&#039;Ivoire,"Abobo, Côte d&#039;Ivoire
+",Western Africa,"5.448645, -4.026206",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00305,Western Africa,2019-03-14,1,0,1,,1,,1,Violence,Côte d&#039;Ivoire,"Abobo, Côte d&#039;Ivoire
+",Western Africa,"5.448645, -4.026206",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00159,Western Africa,2019-02-08,3,0,3,1,,1,1,Vehicle accident / death linked to hazardous transport,Côte d&#039;Ivoire,"Ayame, Côte d&#039;Ivoire
+",Western Africa,"5.600909, -3.161187",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00142,Western Africa,2019-02-03,1,0,1,1,,1,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Yamoussoukro, Côte d&#039;Ivoire
+",Western Africa,"6.764231, -5.249555",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2019.MMP00127,Western Africa,2019-01-30,1,0,1,,,1,,Sickness / lack of access to adequate healthcare,Côte d&#039;Ivoire,"Odienne, Côte d&#039;Ivoire
+",Western Africa,"9.532575, -7.55468",,Mixed Migration Monitoring Mechanism Initiative (4Mi),http://www.mixedmigration.org/4mi/,2,Sub-Saharan Africa (P),Unknown
+2020.MMP01028,Eastern Asia,2020-12-20,,1,1,1,,1,,Drowning,Democratic People&#039;s Republic of Korea,"Musan County, North Hamgyong Province, the Democratic People&#039;s Republic of Korea (North Korea)
+",Eastern Asia,"42.2281916, 129.214835",,Daily NK,https://archive.vn/MZbHo,1,Eastern Asia,Democratic People&#039;s Republic of Korea
+2020.MMP00725,Eastern Asia,2020-09-22,1,0,1,,,1,,Violence,Democratic People&#039;s Republic of Korea,"In North Korea&#039;s territorial waters - He disappeared about 10km from the border with North Korea, near the island of Yeonpyeong.
+",Eastern Asia,"37.7008021, 125.65685652",,"The New York Times, The Guardian","https://archive.ph/84oIE, https://archive.vn/wdtGw",3,Eastern Asia,Republic of Korea
+2023.MMP1409,Eastern Asia,2023-11-07,3,0,3,,,,,Violence,Democratic People&#039;s Republic of Korea,"Around Tumen River near the city of Musan, North Hamgyong, North Korea
+",Eastern Asia,"42.25568963, 129.1903068",,Daily NK,https://archive.ph/Dp9Yp,1,Eastern Asia,Democratic People&#039;s Republic of Korea
+2023.MMP1414,Eastern Asia,2023-11-07,5,0,5,,,,,Violence,Democratic People&#039;s Republic of Korea,"Around Tumen River near the city of Musan, North Hamgyong, North Korea
+",Eastern Asia,"42.20304164, 129.2252266",,Daily NK,https://archive.ph/Dp9Yp,1,Eastern Asia,Democratic People&#039;s Republic of Korea
+2023.MMP1024,Northern Africa,2023-09-30,1,0,1,,,,,Sickness / lack of access to adequate healthcare,Libya,"Qatrun, Libya
+",Northern Africa,"24.9329601, 14.5762233",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Unknown,Unknown
+2023.MMP0913,Mediterranean,2023-09-29,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Souq Al-Khamis area, Al-Khums, Libya
+",Uncategorized,"32.57008675, 14.35960996",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0912,Mediterranean,2023-09-26,1,0,1,,,,,Drowning,Libya,"Remains washed ashore off Tripoli, Libya
+",Uncategorized,"32.89335495, 13.182271",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0910,Mediterranean,2023-09-25,2,0,2,,,,,Drowning,Libya,"Remains washed ashore off Sabratha, Libya
+",Uncategorized,"32.8251103, 12.46405256",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0911,Mediterranean,2023-09-25,1,0,1,,,,,Drowning,Libya,"Remains washed ashore off Azzawiyah, Libya
+",Uncategorized,"32.76540473, 12.731254",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP1101,Northern Africa,2023-09-22,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Libya,"Tajarhi, Libya
+",Northern Africa,"24.368417, 14.46545265",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Western Africa,Niger
+2023.MMP1287,Western Asia,2023-09-21,1,0,1,,,,1,Violence,Türkiye,"Unspecified location on the Turkiye-Bulgaria border
+",Western Asia,"41.774197, 26.340055",Türkiye-Europe land route,IOM Edirne,,4,Western Asia,Syrian Arab Republic
+2023.MMP0848,Mediterranean,2023-09-20,1,0,1,,,1,,Drowning,Libya,"Remains recovered from sea off Sidi Bennour near Garabulli, Tripoli, Libya
+",Uncategorized,"32.80171482, 13.60443969",Central Mediterranean,GACS via IOM Libya,,5,Northern Africa,Egypt
+2023.MMP0847,Mediterranean,2023-09-18,,13,13,6,,,,Drowning,Libya,"Off Al Khums, Libya - departure from Gaser Alkhayar on 17 Sep
+",Uncategorized,"32.66914868, 14.29387471",Central Mediterranean,IOM Libya,,4,Mixed,Mixed
+2023.MMP0843,Western Asia,2023-09-17,5,0,5,21,,,,Vehicle accident / death linked to hazardous transport,Türkiye,"Near the Kurubaş Pass on the Van-Gürpınar highway en route from Kurubaş Removal Center, Van to Gaziantep, Türkiye
+",Western Asia,"38.4563337, 43.41077211",,"Son Dakika, Yeni Safak, Turkey Alaan","https://web.archive.org/web/20230919075801/https://www.sondakika.com/dunya/habe…, https://web.archive.org/web/20230919075745/https://www.yenisafak.com/gundem/van…, https://web.archive.org/save/https://www.turkeyalaan.net/2023/09/18/%D8%AE%D8%A…",3,Western / Southern Asia (P),Unknown
+2023.MMP0842,Western Asia,2023-09-11,1,0,1,,,1,,Mixed or unknown,Türkiye,"Remains found in Lalapaşa, Edirne, Türkiye
+",Western Asia,"41.84295684, 26.73845726",Türkiye-Europe land route,IOM Edirne,,4,Western / Southern Asia (P),Syrian Arab Republic
+2023.MMP1025,Northern Africa,2023-09-10,6,0,6,,2,4,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Shahat, Libya
+",Northern Africa,"32.81307668, 21.85590858",,IOM Libya Displacement Tracking Matrix,,4,Unknown,Unknown
+2023.MMP1026,Northern Africa,2023-09-10,15,17,32,,1,13,1,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Albayda, Libya
+",Northern Africa,"32.7600248, 21.75235931",,IOM Libya Displacement Tracking Matrix,,2,Unknown,Unknown
+2023.MMP1288,Mediterranean,2023-09-07,,1,1,,,1,,Mixed or unknown,Türkiye,"Unspecified location in the Mediterranean between Greece and Turkiye
+",Uncategorized,"39.985172, 25.850204",Eastern Mediterranean,IOM Edirne,,4,Western Asia,Türkiye
+2023.MMP0832,Mediterranean,2023-09-01,3,0,3,,,,,Drowning,Libya,"Remains washed ashore off Tocra, Libya
+",Uncategorized,"30.95541783, 20.117447",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Unknown,Unknown
+2023.MMP0841,Western Asia,2023-08-31,6,0,6,,,6,,Violence,Türkiye,"Close to Bulgarian border, Kırklareli, Türkiye
+",Western Asia,"41.97084748, 27.40739782",Türkiye-Europe land route,PDMM via IOM Edirne,,4,Southern Asia,Syrian Arab Republic
+2023.MMP0831,Mediterranean,2023-08-30,2,0,2,,,,,Drowning,Libya,"Remains washed ashore off Tocra, Libya
+",Uncategorized,"32.53250652, 20.57543",Central Mediterranean,Libyan Coast Guard via IOM Libya,,4,Unknown,Unknown
+2023.MMP0830,Mediterranean,2023-08-28,1,0,1,,,,,Drowning,Libya,"Remains washed ashore off Tajura, Libya
+",Uncategorized,"32.87137211, 13.44909146",Central Mediterranean,GACS and LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0713,Mediterranean,2023-08-28,4,0,4,22,,,4,Drowning,Türkiye,"In Turkish territorial waters between Maden island, Türkiye and Lesvos, Greece
+",Uncategorized,"39.37874447, 26.51234092",Eastern Mediterranean,"HCG via IOM Greece, TCG","https://web.archive.org/web/20230901094759/https://www.hcg.gr/el/drasthriothtes…, https://web.archive.org/web/20230901101817/https://en.sg.gov.tr/press-release-0…",5,Sub-Saharan Africa,Unknown
+2023.MMP0829,Mediterranean,2023-08-27,1,0,1,,,,,Drowning,Libya,"Remains washed ashore off Abusitta, Libya
+",Uncategorized,"32.90268359, 13.227957",Central Mediterranean,Libyan Red Crescent via IOM Libya,,4,Unknown,Unknown
+2023.MMP0706,Mediterranean,2023-08-25,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Marsa Della port, Azzawiyah, Libya
+",Uncategorized,"32.79473488, 12.74829417",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0710,Mediterranean,2023-08-24,2,0,2,,,,,Drowning,Libya,"Remains washed ashore at Sabratha, Libya
+",Uncategorized,"32.81091575, 12.45429888",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0708,Mediterranean,2023-08-22,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Surman, Libya
+",Uncategorized,"32.79121877, 12.56559574",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0709,Mediterranean,2023-08-22,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Azzawiyah, Libya
+",Uncategorized,"32.78927276, 12.70718028",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0685,Mediterranean,2023-08-21,,1,1,1,,1,,Drowning,Libya,"AlMutaifla near Qaminis, Libya
+",Uncategorized,"31.5157641, 19.85398398",Central Mediterranean,National Safety Authority via IOM Libya,,5,Northern Africa,Egypt
+2023.MMP0707,Mediterranean,2023-08-21,5,36,41,15,,,,Drowning,Libya,"North of Azzawiyah, Libya
+",Uncategorized,"32.83911014, 12.61104915",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0685,Mediterranean,2023-08-21,1,0,1,26,,1,,Drowning,Libya,"AlMutaifla near Qaminis, Libya
+",Uncategorized,"31.5157641, 19.85398398",Central Mediterranean,National Safety Authority via IOM Libya,,5,Western Asia,Syrian Arab Republic
+2023.MMP0684,Mediterranean,2023-08-18,1,0,1,,,,,Drowning,Libya,"Remains retreived at Sabratha, Libya
+",Uncategorized,"32.78384464, 12.44757307",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0674,Mediterranean,2023-08-13,,9,9,12,,7,,Drowning,Libya,"Libyan Coast en route to Italy, Libya
+",Uncategorized,"34.93834872, 14.07707915",Central Mediterranean,"Libya Update, Bangladesh Post ","https://bangladeshpost.net/posts/9-narsingdi-youths-missing-in-mediterranean-se…, https://en.prothomalo.com/bangladesh/5uzy56v0w6",4,Southern Asia,Bangladesh
+2023.MMP0679,Mediterranean,2023-08-10,1,0,1,,,,,Drowning,Libya,"Off the coast of Alhamidya, Libya
+",Uncategorized,"32.92815089, 12.0960383",Central Mediterranean,LCG via IOM Libya,,4,Northern Africa,Egypt
+2023.MMP0679,Mediterranean,2023-08-10,4,0,4,,,,,Drowning,Libya,"Off the coast of Alhamidya, Libya
+",Uncategorized,"32.92815089, 12.0960383",Central Mediterranean,LCG via IOM Libya,,4,Southern Asia,Bangladesh
+2023.MMP0679,Mediterranean,2023-08-10,1,28,29,24,,,,Drowning,Libya,"Off the coast of Alhamidya, Libya
+",Uncategorized,"32.92815089, 12.0960383",Central Mediterranean,LCG via IOM Libya,,4,Unknown,Unknown
+2023.MMP0672,Northern Africa,2023-08-08,27,0,27,,,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Unspecified location at the Libyan-Tunisian border
+",Uncategorized,"32.25802585, 11.07169798",,"Spokesperson for the Libyan government via AP News, Middle East Monitor","https://apnews.com/article/libya-migrants-deaths-desert-tunisia-d1030c82521aa6c…, https://www.middleeastmonitor.com/20230810-27-migrants-found-dead-at-tunisia-li…",5,Sub-Saharan Africa (P),Mixed/Unknown
+2023.MMP0678,Mediterranean,2023-08-08,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Alzzawyia, Libya
+",Uncategorized,"32.76205422, 12.74202167",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0681,Mediterranean,2023-08-03,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Sabratha, Libya
+",Uncategorized,"32.78384464, 12.44757307",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0670,Northern Africa,2023-08-02,2,0,2,80,8,,3,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Unspecified location at the Libyan-Tunisian border
+",Uncategorized,"32.34653924, 11.21441542",,Brigadier 19 Border Guard&#039;s Facebook page,https://www.facebook.com/permalink.php?story_fbid=pfbid02uXiv8GW9yRKwvoCeqmN4rP…,5,Sub-Saharan Africa (P),Mixed/Unknown
+2023.MMP0671,Northern Africa,2023-07-31,6,0,6,,,2,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Between Ain Naka and Abu al-Sharaf near the border town of al-Assa, at the Libyan-Tunisian border.
+",Uncategorized,"32.83086083, 11.63617787",,"Brigadier 19 Border Guard&#039;s Facebook page, Libyan News Agency","https://lana.gov.ly/post.php?lang=en&amp;id=284435, https://www.facebook.com/watch/?v=845640496568910&amp;ref=sharing",5,Sub-Saharan Africa (P),Mixed/Unknown
+2023.MMP0680,Mediterranean,2023-07-30,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Um Alarzam, Libya
+",Uncategorized,"32.7660136, 22.63258664",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0736,Northern Africa,2023-07-30,1,0,1,,,1,,Violence,Libya,"Al Afia, Brak, Libya
+",Northern Africa,"27.53753065, 14.2601236",,IOM Libya Displacement Tracking Matrix,,2,Unknown,Unknown
+2023.MMP0606,Northern Africa,2023-07-28,1,0,1,,1,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Unspecified location between Ra&#039;s Ajdir and Al Assah, Libya, along the border with Tunisia
+",Northern Africa,"32.94810449, 11.54907656",,"IOM Libya, Libya Ministry of Justice",,4,Western Africa,Sierra Leone
+2023.MMP0606,Northern Africa,2023-07-27,1,0,1,,,1,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Unspecified location between Ra&#039;s Ajdir and Al Assah, Libya, along the border with Tunisia
+",Northern Africa,"32.94810449, 11.54907656",,"IOM Libya, Libya Ministry of Justice",,4,Northern Africa,Sudan
+2023.MMP0606,Northern Africa,2023-07-26,9,0,9,,2,6,2,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Unspecified location between Ra&#039;s Ajdir and Al Assah, Libya, along the border with Tunisia
+",Northern Africa,"32.94810449, 11.54907656",,"IOM Libya, Libya Ministry of Justice",,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0584,Western Asia,2023-07-26,2,0,2,,,2,,Vehicle accident / death linked to hazardous transport,Türkiye,"At the Kapıkule Türkiye-Bulgaria Border Gate, Edirne, Türkiye
+",Western Asia,"41.71697242, 26.35148883",Türkiye-Europe land route,"Son Dakika, Hurriyet","https://archive.ph/qVaGR, https://archive.ph/c3Qtu",3,Western Africa (P),Syrian Arab Republic
+2023.MMP0573,Northern Africa,2023-07-23,1,0,1,10,,1,,Mixed or unknown,Libya,"Body recovered near Tawil Rutba, Libya, presumably after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0583,Western Asia,2023-07-23,4,0,4,,,4,,Vehicle accident / death linked to hazardous transport,Türkiye,"In Ipsala, Edirne province, Türkiye - travelling from Izmir towards Thessaloniki, Greece
+",Western Asia,"40.91271268, 26.36965745",Türkiye-Europe land route,"Andalou Agency, Son Dakika, Orient News","https://archive.ph/AypOI, https://archive.ph/wBxYR, https://archive.ph/6Ydzv, https://twitter.com/OrientNews/status/1683758248879353862?s=20",3,Western Asia,Syrian Arab Republic
+2023.MMP0568,Mediterranean,2023-07-23,1,0,1,,,,,Drowning,Libya,"Remains found near Um&#039;alrazam 100 km northeast of Benghazi, Libya
+",Uncategorized,"32.23812491, 20.14974298",Central Mediterranean,Libya National Safety Authority in East via IOM Libya ,,4,Unknown,Unknown
+2023.MMP0572,Northern Africa,2023-07-23,1,0,1,,1,,,Mixed or unknown,Libya,"Body recovered near Tawil Rutba, Libya, presumably after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Western Africa,Sierra Leone
+2023.MMP0567,Northern Africa,2023-07-22,4,0,4,,,,,Mixed or unknown,Libya,"Bersis 50 KM of Benghazi, Libya
+",Northern Africa,"32.10260631, 20.07295652",,Libyan Red Crescent via IOM Libya,,4,Unknown,Unknown
+2023.MMP0571,Northern Africa,2023-07-22,1,0,1,,1,,,Mixed or unknown,Libya,"Body recovered near Tawil Rutba, Libya, presumably after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0567,Northern Africa,2023-07-22,1,0,1,,,,,Mixed or unknown,Libya,"Tulmitha 50 KM of Benghazi, Libya
+",Northern Africa,"32.13061505, 20.09069147",,Libyan Red Crescent via IOM Libya,,4,Unknown,Unknown
+2023.MMP0569,Northern Africa,2023-07-19,1,0,1,,,1,,Mixed or unknown,Libya,"Body recovered at unspecified location in desert in Libya, presumably after alleged forced expulsion from Tunisia
+",Northern Africa,"32.94655961, 11.53297772",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0570,Northern Africa,2023-07-19,3,0,3,,3,,,Mixed or unknown,Libya,"Survivors rescued from Tawil Rutba, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0517,Northern Africa,2023-07-18,2,1,3,2,,,,Mixed or unknown,Libya,"Survivors rescued from Boushref, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.94655961, 11.53297772",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0515,Northern Africa,2023-07-17,3,5,8,10,,,,Mixed or unknown,Libya,"Survivors rescued from Dharet Alkss, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.94655961, 11.53297772",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0516,Northern Africa,2023-07-17,,2,2,12,,,,Mixed or unknown,Libya,"Survivors rescued from Tawil Rutba, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0514,Northern Africa,2023-07-16,5,14,19,16,,,,Mixed or unknown,Libya,"Survivors rescued from Tawil Rutba, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0513,Northern Africa,2023-07-15,2,0,2,4,,,,Mixed or unknown,Libya,"Survivors rescued from Boushref, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.94655961, 11.53297772",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0512,Northern Africa,2023-07-14,,1,1,21,,,,Mixed or unknown,Libya,"Survivors rescued from Tawil Rutba, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"32.80827441, 11.5844874",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0511,Northern Africa,2023-07-13,,2,2,54,,,,Mixed or unknown,Libya,"Survivors rescued from Dharet Alkss, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"33.07199003, 11.54367303",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0474,Mediterranean,2023-07-09,1,0,1,4,,1,,Drowning,Libya,"Off Tobruk, Libya
+",Uncategorized,"32.11376569, 23.96038201",Central Mediterranean,Abereen Foundation and LRC via IOM Libya,,4,Northern Africa,Egypt
+2023.MMP0473,Mediterranean,2023-07-06,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Sidi Khalifah north Benghazi, Libya
+",Uncategorized,"32.25205827, 20.17981628",Central Mediterranean,Benghazi Security Directorate via IOM Libya,,5,Southern Asia,Bangladesh
+2023.MMP0471,Mediterranean,2023-07-06,5,0,5,,,,,Drowning,Libya,"Remains washed ashore at Sabratha beach, Libya
+",Uncategorized,"32.80783346, 12.47861188",Central Mediterranean,LRC Sabratah via IOM Libya,,4,Unknown,Unknown
+2023.MMP0470,Mediterranean,2023-07-04,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Om AlQandeel, Sirte, Libya
+",Uncategorized,"30.89983521, 17.80480948",Central Mediterranean,CID Ras Lanof via IOM Libya,,5,Unknown,Unknown
+2023.MMP0472,Mediterranean,2023-07-04,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Al Khoms, Libya
+",Uncategorized,"32.66175664, 14.25669294",Central Mediterranean,LRC Khoms via IOM Libya,,4,Unknown,Unknown
+2023.MMP0735,Northern Africa,2023-07-03,2,0,2,2,,2,,Accidental death,Libya,"El Madinah, Tobruk, Libya
+",Northern Africa,"32.09428941, 23.91910352",,IOM Libya Displacement Tracking Matrix,,5,Unknown,Unknown
+2023.MMP0449,Mediterranean,2023-07-01,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Om AlQandeel, Sirte, Libya
+",Uncategorized,"30.89983521, 17.80480948",Central Mediterranean,CID Ras Lanof via IOM Libya,,5,Unknown,Unknown
+2023.MMP0448,Mediterranean,2023-06-29,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Tocra, Marj, Libya
+",Uncategorized,"32.53798293, 20.56632073",Central Mediterranean,"LRC Tocra via IOM Libya, CID",,5,Unknown,Unknown
+2023.MMP0440,Mediterranean,2023-06-28,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at the area between Sirte Company and Al-Arasa near Brega, Al Wahat, Libya
+",Uncategorized,"30.40378902, 19.54790364",Central Mediterranean,CID via IOM Libya,,5,Unknown,Unknown
+2023.MMP0641,Mediterranean,2023-06-23,,1,1,13,,1,,Drowning,Libya,"Fell overboard around 35°08&#039;N 015°39’E - Departed from Khoms, Libya on 21 June
+",Uncategorized,"35.133333, 15.65",Central Mediterranean,Médecins Sans Frontières (MSF OCA) ,,4,Western Asia,Syrian Arab Republic
+2023.MMP0434,Mediterranean,2023-06-23,2,0,2,,,,,Drowning,Libya,"Remains washed ashore at Almabni, Benghazi, Libya
+",Uncategorized,"32.46469887, 20.47115602",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0433,Mediterranean,2023-06-23,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Al Uqaylah, Al Wahat, Libya
+",Uncategorized,"30.26272494, 19.18867859",Central Mediterranean,CID via IOM Libya,,5,Unknown,Unknown
+2023.MMP0450,Mediterranean,2023-06-22,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Om ِ AlKhonfes, Sirte, Libya
+",Uncategorized,"30.97037245, 17.59373489",Central Mediterranean,CID Ras Lanof via IOM Libya,,5,Unknown,Unknown
+2023.MMP0734,Northern Africa,2023-06-22,1,0,1,,,1,,Accidental death,Libya,"Karzaz, Misrata, Libya
+",Northern Africa,"32.308206, 15.09103195",,IOM Libya Displacement Tracking Matrix,,1,Western Africa,Niger
+2023.MMP0432,Mediterranean,2023-06-18,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Alsidra, Sirte, Libya
+",Uncategorized,"30.64288066, 18.34214918",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0430,Mediterranean,2023-06-17,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Tolmeita, Marj, Libya
+",Uncategorized,"32.7087558, 20.93975543",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0431,Mediterranean,2023-06-17,3,0,3,,,,,Drowning,Libya,"Remains washed ashore at separate locations in Tocra, Marj, Libya
+",Uncategorized,"32.53798293, 20.56632073",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0429,Mediterranean,2023-06-16,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Almabni, Benghazi, Libya
+",Uncategorized,"32.46469887, 20.47115602",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0411,Mediterranean,2023-06-14,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Almabni, Benghazi, Libya
+",Uncategorized,"32.46469887, 20.47115602",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0410,Mediterranean,2023-06-12,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Barsis, Benghazi, Libya
+",Uncategorized,"32.46867686, 20.48246762",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0409,Mediterranean,2023-06-11,1,0,1,,,,,Drowning,Libya,"Remains washed ashore in Daryanah, Benghazi, Libya
+",Uncategorized,"32.3589058, 20.31488559",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0408,Mediterranean,2023-06-10,1,0,1,,,,,Drowning,Libya,"Remains washed ashore in Daryanah, Benghazi, Libya
+",Uncategorized,"32.3589058, 20.31488559",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0407,Mediterranean,2023-06-10,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Al Mutrid beach, Al Harsha, West Zawiyah, Libya
+",Uncategorized,"32.79312907, 12.62708446",Central Mediterranean,LRC AlZawiyah via IOM Libya,,4,Unknown,Unknown
+2023.MMP0406,Mediterranean,2023-06-08,3,0,3,,,,,Drowning,Libya,"Off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.82541911, 13.74246858",Central Mediterranean,IOM Libya,,4,Western Africa,Senegal
+2023.MMP0406,Mediterranean,2023-06-08,4,0,4,,,,,Drowning,Libya,"Off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.82541911, 13.74246858",Central Mediterranean,IOM Libya,,4,Western Africa,Mali
+2023.MMP0406,Mediterranean,2023-06-08,2,0,2,,,,,Drowning,Libya,"Off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.82541911, 13.74246858",Central Mediterranean,IOM Libya,,4,Western Africa,Gambia
+2023.MMP0406,Mediterranean,2023-06-08,1,0,1,,,,,Drowning,Libya,"Off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.82541911, 13.74246858",Central Mediterranean,IOM Libya,,4,Western Africa,Nigeria
+2023.MMP0406,Mediterranean,2023-06-08,,10,10,90,,,,Drowning,Libya,"Off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.82541911, 13.74246858",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP1403,South-eastern Asia,2023-06-07,3,0,3,6,1,1,1,Drowning,Lao People&#039;s Democratic Republic,"Mekong River starting the boat trip from Nakhon Phanom province, Thailand to Thakhek district, Khammouane province, Laos
+",South-eastern Asia,"17.5374879, 104.6851419",,The Laotian Times,"https://archive.ph/hlflo, https://archive.ph/4wz8I",1,South-eastern Asia,Lao People&#039;s Democratic Republic
+2023.MMP0509,Northern Africa,2023-05-30,1,0,1,6,,7,,Vehicle accident / death linked to hazardous transport,Libya,"Alchuirif El gharbia, Ashshwayrif, Libya
+",Northern Africa,"14.22490057, 65.55526733",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Sub-Saharan Africa (P),Unknown
+2023.MMP0382,Mediterranean,2023-05-29,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Barsis near Tocra, Benghazi, Libya
+",Uncategorized,"32.46867686, 20.48246762",Central Mediterranean,LRC Tocra via IOM Libya,,4,Unknown,Unknown
+2023.MMP0370,Western Asia,2023-05-21,2,0,2,9,,,,Vehicle accident / death linked to hazardous transport,Türkiye,"Süleymandanişment, Lalapaşa, Edirne, Türkiye on route to Evros river
+",Western Asia,"41.89594357, 26.88381199",Türkiye-Europe land route,"IOM Edirne, sonDakika",https://archive.vn/1b8Tz,4,Unknown,Unknown
+2023.MMP0508,Northern Africa,2023-05-17,1,0,1,,,1,,Accidental death,Libya,"Umm Sa&#039;ad, Libya
+",Northern Africa,"31.6124278, 25.0465479",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,4,Unknown,Unknown
+2023.MMP0807,Northern Africa,2023-05-15,3,0,3,,,3,,Vehicle accident / death linked to hazardous transport,Libya,"Mararam, Libya en route from Murzuq
+",Northern Africa,"25.04289929, 14.59359883",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0354,Mediterranean,2023-05-13,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Sabratha beach, Libya
+",Uncategorized,"32.81451278, 12.45462404",Central Mediterranean,IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0510,Northern Africa,2023-05-12,,5,5,52,,,,Mixed or unknown,Libya,"Survivors rescued from Dharet Alkss, near Al-Assah, Libya after alleged forced expulsion from Tunisia
+",Northern Africa,"33.07199003, 11.54367303",,IOM Libya,,4,Unknown,Unknown
+2023.MMP0339,Northern Africa,2023-05-11,2,0,2,8,,2,,Vehicle accident / death linked to hazardous transport,Libya,"On route between El Ezzeiat and Timimi, Derna, Libya
+",Northern Africa,"32.25830917, 22.85359981",,DCIM Derna Facebook page,https://www.facebook.com/permalink.php?story_fbid=pfbid02XmXt1zUDFx9qrn2stum4VR…,5,Northern Africa,Egypt
+2023.MMP0338,Mediterranean,2023-05-10,1,0,1,,,1,,Drowning,Libya,"Remains retreived in Zliten, Libya
+",Uncategorized,"32.47808041, 14.64219524",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0507,Northern Africa,2023-05-07,8,0,8,,,8,,Vehicle accident / death linked to hazardous transport,Libya,"Qaminis, Libya
+",Northern Africa,"31.65071241, 20.01119174",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Southern Asia,Bangladesh
+2023.MMP0314,Mediterranean,2023-05-04,1,2,3,6,1,1,1,Drowning,Türkiye,"Off the coast of Ayvalık, Balıkesir, Türkiye
+",Uncategorized,"39.31457034, 26.60516435",Eastern Mediterranean,"TCG, IOM Izmir",https://archive.vn/MWFh6,5,Western Asia,Syrian Arab Republic
+2023.MMP0506,Northern Africa,2023-05-04,5,0,5,8,,,,Vehicle accident / death linked to hazardous transport,Libya,"Bouzreq, AlKufra, Libya
+",Northern Africa,"24.92367718, 22.10708665",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,1,Sub-Saharan Africa (P),Unknown
+2023.MMP0312,Northern Africa,2023-05-03,9,0,9,,,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Remains found in local valleys and buried in Beni Walid, Libya
+",Northern Africa,"31.75594591, 14.02744934",,Al Wasat via IOM Libya,https://archive.vn/GzW9A,1,Unknown,Unknown
+2023.MMP0311,Mediterranean,2023-05-02,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Zliten, Libya
+",Uncategorized,"32.52878269, 14.62433051",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0266,Mediterranean,2023-04-27,3,-3,0,,,,,Drowning,Libya,"Unspecified location off the coast of Garabouli, Libya
+",Uncategorized,"33.22129272, 13.97705034",Central Mediterranean,"Libya MoI Security Operations, IOM Libya",https://m.facebook.com/story.php?story_fbid=pfbid02ru6hBA9Jrut6wefBqgYLhfX8RE7j…,5,Unknown,Unknown
+2023.MMP0266,Mediterranean,2023-04-25,6,0,6,,,5,1,Drowning,Libya,"Unspecified location off the coast of Garabouli, Libya
+",Uncategorized,"33.22129272, 13.97705034",Central Mediterranean,IOM Libya,,4,Southern Asia,Pakistan
+2023.MMP0266,Mediterranean,2023-04-25,1,0,1,,,1,,Drowning,Libya,"Unspecified location off the coast of Garabouli, Libya
+",Uncategorized,"33.22129272, 13.97705034",Central Mediterranean,IOM Libya,,4,Northern Africa,Egypt
+2023.MMP0266,Mediterranean,2023-04-25,,45,45,5,,,,Drowning,Libya,"Unspecified location off the coast of Garabouli, Libya
+",Uncategorized,"33.22129272, 13.97705034",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0266,Mediterranean,2023-04-25,3,0,3,,,3,,Drowning,Libya,"Unspecified location off the coast of Garabouli, Libya
+",Uncategorized,"33.22129272, 13.97705034",Central Mediterranean,IOM Libya,,4,Western Asia,Syrian Arab Republic
+2023.MMP0264,Mediterranean,2023-04-21,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Sousa, Libya
+",Uncategorized,"32.90704937, 21.95905363",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0505,Northern Africa,2023-04-19,1,0,1,,,1,,Violence,Libya,"Umm Sa&#039;ad, Libya
+",Northern Africa,"31.6488315, 25.0522523",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,3,Northern Africa,Egypt
+2023.MMP0262,Mediterranean,2023-04-19,5,0,5,30,,,,Drowning,Libya,"2nm north of Zliten, Libya
+",Uncategorized,"32.52878269, 14.62433051",Central Mediterranean,IOM Libya,,4,Southern Asia,Bangladesh
+2023.MMP0261,Mediterranean,2023-04-18,51,9,60,,3,38,,Drowning,Libya,"Off the coast of Sabratah, Libya
+",Uncategorized,"32.84315119, 12.44173492",Central Mediterranean,"IOM Libya, General Secretary of the Libyan Red Crescent",https://archive.ph/JU0Jz,4,Unknown,Unknown
+2023.MMP0263,Northern Africa,2023-04-15,1,0,1,,,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Around Tsawah Wadi Otbh, Libya
+",Northern Africa,"26.09978266, 13.4838287",,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0265,Mediterranean,2023-04-15,,2,2,43,,,,Mixed or unknown,Libya,"Around 60 nautical miles northwest of Benghazi, Libya - survivors disembarked in Malta on 17 April
+",Uncategorized,"32.6779507, 19.30063181",Central Mediterranean,"IOM Libya, UNHCR Malta, Alarm Phone",https://archive.ph/y9s1J,4,Unknown,Unknown
+2023.MMP0212,Mediterranean,2023-04-12,1,0,1,,,,,Drowning,Libya,"Remains retreived from the coast of Kirissah (23 KM West Dernah), Libya
+",Uncategorized,"32.8499379, 22.4244689",Central Mediterranean,LRC Derna via IOM Libya,,4,Unknown,Unknown
+2023.MMP0213,Mediterranean,2023-04-12,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore near Bab Albahr hotel, Tripoli, Libya
+",Uncategorized,"32.89398375, 13.16331059",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0504,Northern Africa,2023-04-10,8,0,8,18,,8,,Mixed or unknown,Libya,"Brak, Libya
+",Northern Africa,"27.54179645, 14.30055113",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0198,Mediterranean,2023-04-09,2,2,4,6,,,,Drowning,Libya,"Off the coast of Musaid (600 KM East Benghazi), Libya
+",Uncategorized,"31.70476985, 25.16720172",Central Mediterranean,IOM Libya via LRC Tobruk and Al Abereen Foundation,,4,Northern Africa,Egypt
+2023.MMP0197,Mediterranean,2023-04-07,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Tolmeitha (100KM NE Benghazi), Libya
+",Uncategorized,"32.70830818, 20.93927745",Central Mediterranean,IOM Libya via the Safety Authority ,,5,Unknown,Unknown
+2023.MMP0805,Northern Africa,2023-04-07,5,0,5,,1,4,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"40 KM from Teziré, in the Libyan desert, Libya
+",Northern Africa,"24.0242542, 14.40908168",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0783,Northern Africa,2023-04-05,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Libya,"Al Gatrun, Libya
+",Northern Africa,"25.04289929, 14.59359883",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Middle Africa,Chad
+2023.MMP0783,Northern Africa,2023-04-05,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Libya,"Al Gatrun, Libya
+",Northern Africa,"25.04289929, 14.59359883",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Western Africa,Niger
+2023.MMP0196,Mediterranean,2023-04-05,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Ghanima (between Alauas and Al Khoms), Libya
+",Uncategorized,"32.72354098, 14.0541238",Central Mediterranean,IOM Libya via LRC,,4,Unknown,Unknown
+2023.MMP0503,Northern Africa,2023-04-03,2,0,2,,,2,,Vehicle accident / death linked to hazardous transport,Libya,"Alchuirif El gharbia, Ashshwayrif, Libya
+",Northern Africa,"14.22490057, 65.55526733",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Western Africa,Nigeria
+2023.MMP0502,Northern Africa,2023-04-01,6,0,6,2,,8,,Vehicle accident / death linked to hazardous transport,Libya,"Bint Bayya, Wadi al Shatii District, Libya
+",Northern Africa,"27.48775812, 13.36060699",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0501,Northern Africa,2023-03-26,2,0,2,3,,2,1,Vehicle accident / death linked to hazardous transport,Libya,"Qatrun, Al-gatroun, Libya
+",Northern Africa,"27.04400604, 14.43657436",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Western Africa,Mauritania
+2023.MMP0176,Mediterranean,2023-03-25,2,0,2,76,,2,,Drowning,Libya,"Off Zuwara, Libya - embarkation from Zuwara 24 Mar 22:00
+",Uncategorized,"33.01660256, 12.1281323",Central Mediterranean,IOM Libya,,4,Southern Asia,Pakistan
+2023.MMP0500,Northern Africa,2023-03-17,1,0,1,,,1,,Sickness / lack of access to adequate healthcare,Libya,"Qatrun, Al-gatroun, Libya
+",Northern Africa,"27.04400604, 14.43657436",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0147,Northern Africa,2023-03-16,8,0,8,40,,,,Vehicle accident / death linked to hazardous transport,Libya,"Al Mardom, Bani Walid, Libya
+",Northern Africa,"31.77950151, 14.05536622",,IOM Libya,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0793,Northern Africa,2023-03-15,4,0,4,,1,2,1,Violence,Libya,"Tamanine, Sabha, Libya
+",Northern Africa,"27.21281647, 14.61913781",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0152,Mediterranean,2023-03-14,1,0,1,,1,,,Drowning,Türkiye,"Off the coast of Kuşadası, Aydın, Türkiye
+",Uncategorized,"37.82357274, 27.18133383",Eastern Mediterranean,"Turkish Coast Guard, IOM Izmir",https://archive.ph/NmLoN,5,Middle Africa,Democratic Republic of the Congo
+2023.MMP0152,Mediterranean,2023-03-14,1,0,1,,,1,,Drowning,Türkiye,"Off the coast of Kuşadası, Aydın, Türkiye
+",Uncategorized,"37.82357274, 27.18133383",Eastern Mediterranean,"Turkish Coast Guard, IOM Izmir",https://archive.ph/NmLoN,5,Eastern Africa,Somalia
+2023.MMP0152,Mediterranean,2023-03-14,2,0,2,,2,,,Drowning,Türkiye,"Off the coast of Kuşadası, Aydın, Türkiye
+",Uncategorized,"37.82357274, 27.18133383",Eastern Mediterranean,"Turkish Coast Guard, IOM Izmir",https://archive.ph/NmLoN,5,Western Africa,Liberia
+2023.MMP0143,Mediterranean,2023-03-12,,30,30,17,,,,Drowning,Libya,"Off the coast of Libya, en route to Italy (see coordinates for last known location)
+",Uncategorized,"33.56, 18.28",Central Mediterranean,"Alarm Phone, Sea Watch","https://archive.ph/nOI0S, https://archive.ph/nvZWw",4,Unknown,Unknown
+2023.MMP0141,Mediterranean,2023-03-11,7,8,15,16,4,3,,Drowning,Türkiye,"Boat capsized between Didim, Türkiye and Farmakonisi, Greece
+",Uncategorized,"37.31969373, 27.1714101",Eastern Mediterranean,"Turkish Coast Guard, Hellenic Coast Guard","https://archive.ph/LeWGV, https://archive.ph/w6ESi",5,Sub-Saharan Africa,Unknown
+2023.MMP0499,Northern Africa,2023-03-07,2,6,8,8,,8,,Vehicle accident / death linked to hazardous transport,Libya,"Bazimah in the South of Rbaaniah, Al-Kufra, Libya
+",Northern Africa,"21.95627, 24.25597",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0497,Northern Africa,2023-03-04,1,0,1,,,1,,Violence,Libya,"Gatroun, Al-Qatroun, Libya
+",Northern Africa,"24.94447643, 14.62777857",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Middle Africa,Chad
+2023.MMP0150,Western Asia,2023-03-04,1,0,1,,,1,,Violence,Türkiye,"Unspecified location in  Meriç region, Türkiye
+",Western Asia,"41.20184031, 26.318883",Türkiye-Europe land route,Turkish National Police and Edirne PDMM via IOM Türkiye,,5,Western Asia,Syrian Arab Republic
+2023.MMP0498,Northern Africa,2023-03-04,1,0,1,1,,2,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Umm Sa&#039;ad, Libya
+",Northern Africa,"24.20642056, 23.29027124",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Western Asia,Syrian Arab Republic
+2023.MMP0164,Mediterranean,2023-03-03,25,4,29,7,3,4,3,Drowning,Libya,"Off Tobruk, Libya - embarkation from Kambut, Libya
+",Uncategorized,"32.12385825, 24.23538937",Central Mediterranean,"Alarm Phone, Violations Documentation Center in Syria (VDS-NS), North Press Syria","https://archive.vn/BBowK, https://archive.vn/HlcRu",4,Western Asia,Syrian Arab Republic
+2023.MMP0149,Western Asia,2023-03-02,1,0,1,,,1,,Drowning,Türkiye,"Unspecified location in Meriç River, Meriç region, Türkiye
+",Western Asia,"41.20184031, 26.318883",Türkiye-Europe land route,Meriç Gendarmerie and Edirne PDMM via IOM Türkiye,,5,Southern Asia,Afghanistan
+2023.MMP0797,Northern Africa,2023-02-28,3,0,3,4,,3,,Vehicle accident / death linked to hazardous transport,Libya,"Murzuk, Libya
+",Northern Africa,"25.91292194, 13.9192577",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0096,Northern Africa,2023-02-26,1,0,1,,,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"35 KM East of Kufra, Libya
+",Northern Africa,"23.8578024, 23.342171",,Ambulance and Emergency Services Kufra via IOM Libya,,5,Unknown,Unknown
+2023.MMP0496,Northern Africa,2023-02-25,1,0,1,,,,,"Harsh environmental conditions / lack of adequate shelter, food, water",Libya,"Al-Jawf, AlKufra, Libya
+",Northern Africa,"24.20642056, 23.29027124",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Sub-Saharan Africa (P),Unknown
+2023.MMP0094,Mediterranean,2023-02-22,28,,28,8,,,,Drowning,Libya,"Shat-Albadien - Ar Raqtah, 105KM South of Benghazi, Libya
+",Uncategorized,"31.19405069, 20.167656",Central Mediterranean,Al-Aberien Foundation via IOM Libya,,4,Southern Asia (P),Unknown
+2023.MMP0495,Northern Africa,2023-02-22,3,0,3,,1,2,,Mixed or unknown,Libya,"Al-Jawf, AlKufra, Libya
+",Northern Africa,"24.20642056, 23.29027124",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Sub-Saharan Africa (P),Unknown
+2023.MMP0492,Northern Africa,2023-02-17,1,0,1,,,1,,Vehicle accident / death linked to hazardous transport,Libya,"Rass Al-Magil, Misrata, Libya
+",Northern Africa,"32.33801861, 15.04426714",,IOM Libya Displacement Tracking Matrix,,5,Western Africa,Nigeria
+2023.MMP0493,Northern Africa,2023-02-17,1,0,1,,,1,,Accidental death,Libya,"Al-Jawf, AlKufra, Libya
+",Northern Africa,"24.20637163, 23.29034634",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,2,Northern Africa,Sudan
+2023.MMP0764,Northern Africa,2023-02-15,3,0,3,,,3,,Vehicle accident / death linked to hazardous transport,Libya,"Ghadduwah, Libya
+",Northern Africa,"26.64383836, 14.25563066",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0079,Mediterranean,2023-02-14,20,53,73,7,1,15,,Drowning,Libya,"Boat capsized East of Qasr Al-Akhyar, Libya - remains washed ashore in Qasr Al-Akhyar
+",Uncategorized,"32.78104669, 13.90541965",Central Mediterranean,IOM Libya,https://archive.vn/s0qFh,4,Unknown,Unknown
+2023.MMP0766,Northern Africa,2023-02-13,3,0,3,,,3,,Vehicle accident / death linked to hazardous transport,Libya,"Mararam, Libya
+",Northern Africa,"25.04289929, 14.59359883",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Western Africa,Niger
+2023.MMP0064,Mediterranean,2023-02-06,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Ad Dafiniyah, Misrata, Libya
+",Uncategorized,"32.43709571, 14.83607961",Central Mediterranean,LRC via IOM Libya,,4,Unknown,Unknown
+2023.MMP0491,Northern Africa,2023-01-26,1,0,1,,,1,,Sickness / lack of access to adequate healthcare,Libya,"Al-Madina, Tobruk, Libya
+",Northern Africa,"32.09704552, 23.99175378",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Sub-Saharan Africa (P),Unknown
+2023.MMP0042,Mediterranean,2023-01-25,,4,4,95,,,,Drowning,Libya,"Approximately 50 km NE of Tripoli, Libya - embarkation from Al Khoms on 24 Jan
+",Uncategorized,"33.578333, 14.041667",Central Mediterranean,SOS Mediterranee,https://archive.ph/GF6Rc,4,Sub-Saharan Africa (P),Unknown
+2023.MMP0768,Northern Africa,2023-01-24,2,0,2,,,2,,Vehicle accident / death linked to hazardous transport,Libya,"Al Gatrun, Libya
+",Northern Africa,"25.04289929, 14.59359883",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Western Africa (P),Unknown
+2023.MMP0048,Mediterranean,2023-01-24,1,0,1,,,1,,Drowning,Libya,"60 km East of Tripoli, Libya, off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.902656, 13.737635",Central Mediterranean,"IOM Libya, Libya RC tweet, AP, Libyan Red Cresent, Info Migrants","https://archive.ph/lTF7F, https://archive.ph/qWThv, https://archive.ph/zTt8F",5,Sub-Saharan Africa (P),Unknown
+2023.MMP0048,Mediterranean,2023-01-24,2,0,2,,,2,,Drowning,Libya,"60 km East of Tripoli, Libya, off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.902656, 13.737635",Central Mediterranean,"IOM Libya, Libya RC tweet, AP, Libyan Red Cresent, Info Migrants","https://archive.ph/lTF7F, https://archive.ph/qWThv, https://archive.ph/zTt8F",5,Western Africa,Nigeria
+2023.MMP0048,Mediterranean,2023-01-24,2,0,2,,,2,,Drowning,Libya,"60 km East of Tripoli, Libya, off the coast of Garabulli (Castelverde), Libya
+",Uncategorized,"32.902656, 13.737635",Central Mediterranean,"IOM Libya, Libya RC tweet, AP, Libyan Red Cresent, Info Migrants","https://archive.ph/lTF7F, https://archive.ph/qWThv, https://archive.ph/zTt8F",5,Northern Africa,Sudan
+2023.MMP0494,Northern Africa,2023-01-24,3,0,3,4,,7,,Vehicle accident / death linked to hazardous transport,Libya,"Alchuirif El gharbia, Ashshwayrif, Libya
+",Northern Africa,"31.04216493, 14.43142557",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Sub-Saharan Africa (P),Unknown
+2023.MMP0026,Mediterranean,2023-01-18,1,0,1,,,1,,Drowning,Türkiye,"Remains washed ashore in İnceburun, Bodrum district, Muğla, Türkiye
+",Western Asia,"37.032764, 27.435176",Eastern Mediterranean,"DHA, Vaziyet Tweet","https://archive.ph/GIKrc, https://archive.ph/BvrnJ",3,Unknown,Unknown
+2023.MMP0023,Western Asia,2023-01-17,1,0,1,35,,,,Vehicle accident / death linked to hazardous transport,Türkiye,"The Adana-Pozantı Highway in the Damlama district of Mersin&#039;s Tarsus district, Turkiye
+",Western Asia,"37.422571, 34.876721",,"Haberler, TelegrafTurk Twitter, Haber Global, Memleket, Hurriyet","https://archive.ph/AM3FT, https://archive.ph/NDulF, https://archive.ph/03BG3, https://archive.ph/CsWio, https://archive.ph/agsnM",4,Northern Africa,Morocco
+2023.MMP0025,Mediterranean,2023-01-16,1,0,1,,,,,Drowning,Libya,"Remains washed ashore between Al Arasah and Bishr (10 KM West of Brega), Al Wahat, Libya
+",Uncategorized,"30.35064393, 19.44894185",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0024,Mediterranean,2023-01-16,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Az-Zuwaytinah, Libya
+",Uncategorized,"30.95437014, 20.11118172",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0771,Northern Africa,2023-01-15,3,0,3,,,3,,Vehicle accident / death linked to hazardous transport,Libya,"Sabha, Libya
+",Northern Africa,"27.02945518, 14.44309085",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0770,Northern Africa,2023-01-15,2,0,2,,1,1,,Vehicle accident / death linked to hazardous transport,Libya,"Murzuk, Libya
+",Northern Africa,"25.91292194, 13.9192577",Sahara Desert crossing,IOM Niger Displacement Tracking Matrix,,2,Sub-Saharan Africa (P),Unknown
+2023.MMP0020,Mediterranean,2023-01-13,1,0,1,,,,,Drowning,Libya,"Remains washed ashore West of Brega, Libya
+",Uncategorized,"30.41107053, 19.57017182",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0015,Mediterranean,2023-01-12,1,0,1,,,,,Drowning,Libya,"Remains recovered off Daryanah (40km NE Benghazi), Libya
+",Uncategorized,"32.35375915, 20.30853265",Central Mediterranean,LRC via IOM Libya,https://www.facebook.com/crcscent.tocra/posts/pfbid0V6wA4xVcC6ycCtzSRBgA1McSZ61…,4,Unknown,Unknown
+2023.MMP0016,Mediterranean,2023-01-12,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore at Al Mutrid beach, West Zawiyah, Libya
+",Uncategorized,"32.7937413, 12.61739823",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0014,Mediterranean,2023-01-11,1,0,1,,,1,,Drowning,Libya,"Remains recovered off Daryanah (40km NE Benghazi), Libya
+",Uncategorized,"32.35375915, 20.30853265",Central Mediterranean,IOM Libya,,4,Southern Asia,Unknown
+2023.MMP0013,Mediterranean,2023-01-10,1,0,1,,,,,Drowning,Libya,"Remains washed ashore at Az-Zuwaytinah (LRC Ajdabiya branch), Libya
+",Uncategorized,"30.95437014, 20.11118172",Central Mediterranean,LRC via IOM Libya,https://www.facebook.com/permalink.php?story_fbid=pfbid0jSMGVQ1eBxthKV1q6eaJFzP…,4,Unknown,Unknown
+2023.MMP0490,Northern Africa,2023-01-07,1,0,1,,,1,,Violence,Libya,"Qondofah, Benghazi, Libya
+",Northern Africa,"32.029039, 20.016156",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Northern Africa,Egypt
+2023.MMP0009,Western Asia,2023-01-07,2,0,2,18,,,,Violence,Türkiye,"At a police checkpoint on Van-Özalp highway, Van, Türkiye
+",Western Asia,"38.65706324, 43.97719951",Iran to Türkiye,"Serhat News, Haber Turk","https://archive.vn/shiHa, https://archive.vn/yOemA",4,Southern Asia (P),Unknown
+2023.MMP0489,Northern Africa,2023-01-05,1,0,1,,,1,,Sickness / lack of access to adequate healthcare,Libya,"Al-Jawf, AlKufra, Libya
+",Northern Africa,"24.22092653, 23.29179132",Sahara Desert crossing,IOM Libya Displacement Tracking Matrix,,5,Northern Africa,Sudan
+2023.MMP0003,Mediterranean,2023-01-03,1,0,1,,,1,,Drowning,Libya,"Remains washed ashore near Misfat Al Zawiyah DP, Al Zawiyah, Libya
+",Uncategorized,"32.79178513, 12.67936865",Central Mediterranean,IOM Libya,,4,Unknown,Unknown
+2023.MMP0007,Mediterranean,2023-01-02,1,0,1,176,,1,,Accidental death,Libya,"Off Garabulli (Castelverde), Libya - embarkation from Garabulli on 1 Jan 21:00 and disembarkation at Tripoli port
+",Uncategorized,"32.84183165, 13.69131602",Central Mediterranean,"IOM Libya, Foroyaa",https://archive.ph/NqgVc#selection-2043.34-2043.49,4,Western Africa,Gambia
+2024.MMP1169,South-eastern Asia,2024-09-02,,30,30,16,,,,Drowning,Lao People&#039;s Democratic Republic,"In the Mekong River, around the Golden Triangle Special Economic Zone (SEZ), Bokeo Province, Lao PDR
+",Uncategorized,"20.357284, 100.085122",,"MGR Online, Radio Free Asia (RFA), The  Laotian Times, Channel 7 Thailand, Thai PBS","https://archive.ph/floz1#, https://archive.vn/4ZPqn, https://archive.ph/3YWyL, https://archive.vn/WLfFm, https://archive.ph/xMU0T, https://archive.ph/WM1Or",3,South-eastern Asia,Myanmar
+2024.MMP1209,Eastern Asia,2024-08-08,1,0,1,,,1,,Drowning,Democratic People&#039;s Republic of Korea,"West Sea nearby Gyodong island, neutral water nearby the Han River estuary between two Korean nations
+",Uncategorized,"37.829867, 126.265129",,"TV Chosun, KBS, YTN, Insight, and more","https://archive.vn/Ls12U, https://archive.vn/Zkmgh, https://archive.vn/fg0u2, https://archive.vn/H2jWt, https://archive.vn/NfCZW",3,Eastern Asia,Democratic People&#039;s Republic of Korea
+2025.MMP0220,Eastern Asia,2025-02-20,3,0,3,,,3,,Violence,Democratic People&#039;s Republic of Korea,"Executed in Songjong-ri, South Hwanghae province. The attempt was in an unspecified location on the Korean peninsula&#039;s west coast, possibly around South Hwanghae province
+",Eastern Asia,"38.26583, 125.19889",,Radio Free Asia,"https://perma.cc/NTC2-58CA, https://perma.cc/ZBE6-4U6Q",1,Eastern Asia,Democratic People&#039;s Republic of Korea

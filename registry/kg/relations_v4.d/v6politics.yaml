@@ -1,0 +1,48 @@
+version: 1
+agent: V6POLITICS
+note: >-
+  Elections, cabinets and parties (docs/dev/v6_politics.md): ParlGov 2024 (parlgov:*), NELDA (nelda:*), WhoGov V4
+  (whogov:*). Entity-valued predicates only; dates (P585/P580/P582), coded answers, vote shares and seats are values
+  or qualifiers, not edges. Countries use Wikidata P17 (core mapping). Party results and cabinet membership are
+  recorded facts, never causal; a cabinet "after" an election is ParlGov's parliament reference, not an effect.
+mappings:
+  - property: "parlgov:cabinet_party"
+    family: has_part
+    subtype: cabinet_includes_party
+    source: parlgov.dataverse
+    subject_kinds: [cabinet]
+    object_kinds: [political_party]
+    note: "ParlGov view_cabinet rows with cabinet_party = 1 (seats and prime_minister flag in qualifiers)"
+  - property: "parlgov:party_result"
+    family: context
+    subtype: party_contested_election
+    source: parlgov.dataverse
+    subject_kinds: [event]
+    object_kinds: [political_party]
+    note: "ParlGov view_election: the party's vote share and seats at this election in qualifiers (verbatim)"
+  - property: "parlgov:prime_minister_party"
+    family: context
+    subtype: prime_minister_party
+    source: parlgov.dataverse
+    subject_kinds: [cabinet]
+    object_kinds: [political_party]
+  - property: "parlgov:after_election"
+    family: context
+    subtype: formed_in_parliament_of_election
+    source: parlgov.dataverse
+    subject_kinds: [cabinet]
+    object_kinds: [event]
+    note: "ParlGov election_id of the cabinet: the parliament it was formed in (sequence, not cause)"
+  - property: "parlgov:previous_cabinet"
+    family: context
+    subtype: preceded_by
+    source: parlgov.dataverse
+    subject_kinds: [cabinet]
+    object_kinds: [cabinet]
+  - property: "parlgov:previous_election"
+    family: context
+    subtype: preceded_by
+    source: parlgov.dataverse
+    subject_kinds: [event]
+    object_kinds: [event]
+    note: "ParlGov previous_parliament_election_id: the most recent national parliament election before this one"

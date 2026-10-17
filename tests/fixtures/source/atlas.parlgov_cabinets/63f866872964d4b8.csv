@@ -1,0 +1,34 @@
+country_name_short,country_name,election_date,start_date,cabinet_name,caretaker,cabinet_party,prime_minister,seats,election_seats_total,party_name_short,party_name,party_name_english,left_right,country_id,election_id,cabinet_id,previous_cabinet_id,party_id
+DEU,Germany,2005-09-18,2005-11-22,Merkel I,0,0,0,51,614,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,118,85,529,772
+DEU,Germany,2005-09-18,2005-11-22,Merkel I,0,1,1,226,614,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,118,85,529,1727
+DEU,Germany,2005-09-18,2005-11-22,Merkel I,0,0,0,61,614,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,118,85,529,543
+DEU,Germany,2005-09-18,2005-11-22,Merkel I,0,0,0,54,614,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,118,85,529,791
+DEU,Germany,2005-09-18,2005-11-22,Merkel I,0,1,0,222,614,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,118,85,529,558
+DEU,Germany,2009-09-27,2009-10-28,Merkel II,0,0,0,68,622,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,93,472,85,772
+DEU,Germany,2009-09-27,2009-10-28,Merkel II,0,1,1,239,622,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,93,472,85,1727
+DEU,Germany,2009-09-27,2009-10-28,Merkel II,0,1,0,93,622,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,93,472,85,543
+DEU,Germany,2009-09-27,2009-10-28,Merkel II,0,0,0,76,622,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,93,472,85,791
+DEU,Germany,2009-09-27,2009-10-28,Merkel II,0,0,0,146,622,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,93,472,85,558
+DEU,Germany,2013-09-22,2013-12-17,Merkel III,0,0,0,63,631,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,800,1071,472,772
+DEU,Germany,2013-09-22,2013-12-17,Merkel III,0,1,1,311,631,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,800,1071,472,1727
+DEU,Germany,2013-09-22,2013-12-17,Merkel III,0,0,0,64,631,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,800,1071,472,791
+DEU,Germany,2013-09-22,2013-12-17,Merkel III,0,1,0,193,631,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,800,1071,472,558
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,0,0,94,709,AfD,Alternative für Deutschland,Alternative for Germany,8.7,54,1016,1515,1071,2253
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,0,0,67,709,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,1016,1515,1071,772
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,1,1,246,709,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,1016,1515,1071,1727
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,0,0,80,709,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,1016,1515,1071,543
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,0,0,69,709,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,1016,1515,1071,791
+DEU,Germany,2017-09-24,2017-09-24,Merkel IV,1,1,0,153,709,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,1016,1515,1071,558
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,0,0,94,709,AfD,Alternative für Deutschland,Alternative for Germany,8.7,54,1016,1528,1515,2253
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,0,0,67,709,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,1016,1528,1515,772
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,1,1,246,709,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,1016,1528,1515,1727
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,0,0,80,709,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,1016,1528,1515,543
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,0,0,69,709,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,1016,1528,1515,791
+DEU,Germany,2017-09-24,2018-03-14,Merkel V,0,1,0,153,709,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,1016,1528,1515,558
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,0,0,83,736,AfD,Alternative für Deutschland,Alternative for Germany,8.7,54,1096,1661,1528,2253
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,1,0,118,736,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,1096,1661,1528,772
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,0,0,197,736,CDU+CSU,Christlich Demokratische Union / Christlich Soziale Union,Christian Democratic Union / Christian Social Union,6.2503,54,1096,1661,1528,1727
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,1,0,92,736,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,1096,1661,1528,543
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,0,0,39,736,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,1096,1661,1528,791
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,1,1,206,736,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,1096,1661,1528,558
+DEU,Germany,2021-09-26,2021-12-08,Scholz,0,0,0,1,736,SSW,Südschleswigscher Wählerverband,South Schleswig Voter League,,54,1096,1661,1528,2850

@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "f01aea628756c1a58bc12fcd7540eb06ce6bba2c65a67d90881f53f082d0fd46",
+    "url": "https://data.humdata.org/api/3/action/package_show?id=missing-migrants-project-data",
+    "file": "f01aea628756c1a5.json",
+    "sha256": "8b72446d04111e5a9a6d1d6bd61fab184fe4404d140502014c9502b0f099f5be",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "HDX dataset record (metadata)",
+    "note": "HDX package_show of the MMP dataset, full real response"
+  },
+  {
+    "request_fingerprint": "4f6b035fef892e28dc30d650439b8389fa28f629457b74d172dfbf94a4b45de2",
+    "url": "https://data.humdata.org/dataset/fc59785a-31d2-4018-aac7-6b9f619ae8ec/resource/99078436-9c4a-473b-a073-428304a9cf8a/download/iom-missing-migrants-project-data.csv",
+    "file": "4f6b035fef892e28.csv",
+    "sha256": "b68a1b2a5c76e9f43408d3ff7fba569e046bc887e66645cb60259283d37b12ce",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC BY-IGO (HDX record)",
+    "note": "slice of iom-missing-migrants-project-data.csv: 244 of 23720 records (Libya/Türkiye 2023-01..09, the '1,022' total, HTML-escaped country names, 3 records without a total, one fully identical pair), re-serialised with Python csv (values unchanged); real file sha256 7e3b099fe58f7a6d59b5101befaa821477263ee0005dcb92ea818ba8ae5d6ad8"
+  }
+]

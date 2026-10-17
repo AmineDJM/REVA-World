@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "30152798af4afa9d9a49c03c5d07ed77e9a7ddf710b72a292afa3e678aa3b25b",
+    "url": "https://dataverse.no/api/datasets/:persistentId/?persistentId=doi:10.18710/OLPOZK",
+    "file": "30152798af4afa9d.json",
+    "sha256": "a128c995405a1611c93f8fa30cc525a062d3cde3fd8a438471189996487d575e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from_sha256": "1de63df4df6ac0f3c7b2395fb29802548566cbec092ee8c2583a48eb3be13dcd",
+    "note": "real DataverseNO record; MD5 of the cross-sectional CSV replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "a29b71dfeb7702b6d2336b62c0c9adf3881c01df258f86e626c240899a834743",
+    "url": "https://dataverse.no/api/access/datafile/295623",
+    "file": "a29b71dfeb7702b6.txt",
+    "sha256": "acdf44fd47ad10e099c298a3271594706141a05b2e5b396801f50e675e1dd9a7",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "7d145fe0815d0f4f892867bc9c87044188fb28ae6e47199aadd8c8dfdf9e3a3f",
+    "url": "https://dataverse.no/api/access/datafile/290057",
+    "file": "7d145fe0815d0f4f.csv",
+    "sha256": "7e19d670897e93c70058b6acf1954cd6c2421adc8c4682d79b59cf7c869a6259",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from_sha256": "d56f22f177303ce2940a3a55309387e8dc9ad702e7b02b6c1963fe0e90b13836",
+    "note": "subset of WhoGov_crosssectional_V4.0.csv: DEU, SUN, ALB from 1985"
+  },
+  {
+    "request_fingerprint": "5f92e985488fae6cedac9c5f32b668a832987765483e0378cfc6a4a2afd23a24",
+    "url": "https://dataverse.no/api/access/datafile/295899",
+    "file": "5f92e985488fae6c.pdf",
+    "sha256": "decbce7af6429cfd287c24519d4777d526d0525aaafbc518dacffff447ec2915",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T20:45:00+00:00",
+    "licence": "CC-BY-4.0"
+  }
+]

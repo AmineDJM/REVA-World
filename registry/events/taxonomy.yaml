@@ -217,6 +217,16 @@ types:
     parent: event
     wikidata_classes: [Q40231]
     roles: [candidate, winner, organizer]
+  - id: cabinet_formation
+    label_en: cabinet taking office (dataset type)
+    label_fr: entrée en fonction d'un gouvernement (type de jeu de données)
+    parent: event
+    wikidata_classes: []
+    roles: [participant]
+    description: >-
+      V6POLITICS: a cabinet / government as recorded by ParlGov (parlgov:cabinet:<id>) or WhoGov
+      (whogov:government:<ISO3>:<start>), dated by its P580 (the day it took office). A dataset type: no verified
+      Wikidata class is used.
   - id: referendum
     label_en: referendum
     label_fr: référendum
@@ -413,6 +423,16 @@ types:
     description: >-
       No Wikidata class verified (KGGEOPOL found none). TIES / EUSANCT cases (threat and/or imposition of sanctions
       by a sender against a target); EU sanctions-map regimes and OFAC programs are regimes, not episodes.
+  - id: export_restriction
+    label_en: food export restriction
+    label_fr: restriction à l'exportation de produits alimentaires
+    parent: event
+    wikidata_classes: []
+    roles: [actor]
+    description: >-
+      V6AGRI (docs/dev/v6_agri.md). A government measure restricting exports of food or fertilizer products (ban,
+      licensing, tax, announcement), as coded by the IFPRI Food Export Restrictions Tracker (ifpri_er:<tracker>:<Code>,
+      ODC-By); the imposing country is the actor. No Wikidata class verified. An event, never a cause.
 
   # -------------------------------------------------------------- diplomacy
   - id: treaty
@@ -650,6 +670,7 @@ properties:
   - {pid: "ties:target", family: participant, role: target}
   - {pid: "eusanct:sender", family: participant, role: sender}
   - {pid: "eusanct:target", family: participant, role: target}
+  - {pid: "ifpri_er:imposed_by", family: participant, role: actor, note: "V6AGRI: the country applying the food export restriction (IFPRI Country_Alpha3)"}
   - {pid: "coup:leader_removed", family: participant, role: target, note: "Archigos: the leader the coup removed"}
   - {pid: "archigos:removal_of", family: participant, role: target, note: "Archigos: the leader removed"}
   - {pid: "icowcol:independence_of", family: participant, role: gainer, note: "ICOW: the state becoming independent"}
@@ -662,6 +683,8 @@ properties:
   - {pid: "cowtc:loser", family: participant, role: former_ruler, note: "COW TC: the state that lost the territory"}
   - {pid: "icowclaim:challenger", family: participant, role: challenger}
   - {pid: "icowclaim:target", family: participant, role: target}
+  - {pid: "parlgov:party_result", family: participant, role: candidate, note: "V6POLITICS: a party contesting the election (ParlGov vote share and seats in qualifiers)"}
+  - {pid: "parlgov:cabinet_party", family: participant, role: participant, note: "V6POLITICS: a party in the cabinet (ParlGov cabinet_party = 1)"}
   # structure (context, never causal)
   - {pid: P361, family: structure, role: part_of}
   - {pid: P527, family: structure, role: has_part}
@@ -670,6 +693,9 @@ properties:
   - {pid: P793, family: structure, role: significant_event}
   - {pid: "cowwar:transformed_into", family: structure, role: followed_by, note: "COW war transformation (TransTo/TransFrom): the conflict changed category; not causal (CAUSMORE)"}
   - {pid: "cowwar:transformed_into", family: structure, role: follows, direction: in, note: "COW war transformation, seen from the later war"}
+  - {pid: "parlgov:previous_cabinet", family: structure, role: follows, note: "V6POLITICS: ParlGov previous_cabinet_id"}
+  - {pid: "parlgov:previous_election", family: structure, role: follows, note: "V6POLITICS: ParlGov previous_parliament_election_id"}
+  - {pid: "parlgov:after_election", family: structure, role: follows, note: "V6POLITICS: the election of the parliament the cabinet was formed in (ParlGov election_id)"}
 
 dataset_kinds:
   - id_prefix: "ucdp:conflict:"
@@ -773,6 +799,12 @@ dataset_kinds:
     type: sanction_episode
     label_en: sanction case (EUSANCT)
     coded_properties: ["eusanct:issue", "eusanct:final_outcome"]
+  - id_prefix: "ifpri_er:"
+    source_key: ifpri.export_restrictions
+    type: export_restriction
+    label_en: food export restriction (IFPRI tracker)
+    coded_properties: ["ifpri_er:measure_category", "ifpri_er:verification_status"]
+    note: V6AGRI; IFPRI Food Export Restrictions Tracker public workbooks (COVID-19, Ukraine crisis; 2020-2022 measures).
   - id_prefix: ""
     marker_property: "ecrises:crisis_type"
     source_key: null
@@ -866,6 +898,31 @@ dataset_kinds:
       ice, Wildfire, Compound, Oceans, Atmosphere, Rivers, Sunshine) stay the generic disaster type ("Rain & flooding"
       lumps rainfall with floods, so it is not mapped to flood); "Impact" records (mortality, coral bleaching) are
       impacts, not weather events. Trends are `cbattr:trend:*` (never events). CC BY-NC-ND 4.0.
+  # V6POLITICS (docs/dev/v6_politics.md): elections and cabinets
+  - id_prefix: "parlgov:election:"
+    source_key: parlgov.dataverse
+    type: election
+    label_en: national parliament or European Parliament election (ParlGov)
+    coded_properties: ["parlgov:election_type"]
+    note: ParlGov 2024 (CC0); P585 election day, P17 country, party results with vote share and seats.
+  - id_prefix: "parlgov:cabinet:"
+    source_key: parlgov.dataverse
+    type: cabinet_formation
+    label_en: cabinet (ParlGov)
+    coded_properties: ["parlgov:caretaker"]
+    note: ParlGov 2024 (CC0); P580 = start_date (the day the cabinet took office); no end date published.
+  - id_prefix: "nelda:election:"
+    source_key: nelda.dataverse
+    type: election
+    label_en: national election round (NELDA)
+    coded_properties: ["nelda:election_type", "nelda:round"]
+    note: NELDA (Hyde & Marinov, Dataverse 2013 release, no licence stated); one record per election round, P585 = the round's voting day.
+  - id_prefix: "whogov:government:"
+    source_key: whogov.dataverseno
+    type: cabinet_formation
+    label_en: government (WhoGov V4)
+    coded_properties: []
+    note: WhoGov V4 (CC BY 4.0); P580/P582 per WhoGov ("based on Döring (2019) or Bértoa (2020)").
 
 derived:
   cshapes_independence:

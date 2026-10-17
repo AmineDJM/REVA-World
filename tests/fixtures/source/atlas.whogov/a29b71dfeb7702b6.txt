@@ -1,0 +1,116 @@
+This README file was generated on 2026-08-15 by Jacob Nyrup.
+Last updated: 2026-08-15.
+
+-------------------
+GENERAL INFORMATION
+-------------------
+
+Title of Dataset: The WhoGov Project
+DOI: https://doi.org/10.18710/OLPOZK
+Contact Information
+     Name: Jacob Nyrup
+     Institution: Department of Political Science, University of Oslo
+     Email: jacob.nyrup@stv.uio.no
+     ORCID: 0000-0001-6368-441X
+
+Contributors: Nyrup, Jacob; Bramwell, Stuart; Lönn, Gabriel; Bokobza, Laura; Høgfeldt, Cecilia; Faarvang, Winnie;
+Therkildsen, Camilla; Vikner, Jakob; Thomas, Sirimon; Maguire, Ruairi; Pripitu, Sara; Salkeld, Isabella
+Data Type: Observational data
+Date of Collection: 2018-01-01 to 2026-07-01
+Funding sources: Nuffield College, Aarhus University, University of Oslo, European Research Council (Grant no. 101221191)
+
+Description of dataset:
+
+WhoGov provides open, global, individual-level data on the people who make up
+governments. Version 4 covers cabinet members in 177 countries from 1966 onwards,
+comprising 60,458 individuals across 9,495 country-years, with information on
+gender, age, party affiliation, and portfolios. The project is based at the
+University of Oslo and the dataset is continuously extended, both forwards in
+time and backwards towards 1789. The dataset is described in Nyrup, Jacob, and
+Stuart Bramwell (2020), "Who governs? A new global dataset on members of
+cabinets", American Political Science Review 114(4): 1366-1374,
+https://doi.org/10.1017/S0003055420000490. Changes introduced in Version 4 are
+documented in WhoGov_update_v4.pdf, included in this dataverse.
+
+--------------------------
+METHODOLOGICAL INFORMATION
+--------------------------
+
+Description of sources and methods used for collection/generation of data:
+
+Data are coded by the project team from publicly available sources, including government websites and directories, encyclopaedias, Wikipedia/Wikidata, and historical and biographical reference works. CIA World Leaders and Cabinet Members of Foreign Governments  is the origin source for the data from 1966-2016. All recorded information concerns individuals acting in their public capacity as members of government. The collection procedure is described in Nyrup and Bramwell (2020) (see above) and, for Version 4, in WhoGov_update_v4.pdf.
+Methods for processing the data:
+
+Coded entries are compiled, harmonised, and quality-checked before release.
+Country and country-year units follow standard country codes; position titles are
+harmonised into a standardised portfolio classification to enable comparison
+across countries and over time. See WhoGov_update_v4.pdf for processing changes
+specific to Version 4.
+
+Facility-, instrument- or software-specific information needed to interpret the data:
+
+The .csv files are plain text (comma-separated, UTF-8) and require no specific
+software. The .xlsx files require Microsoft Excel or compatible spreadsheet
+software. The .rds files require R (readable with readRDS()).
+
+Describe any quality-assurance procedures performed on the data:
+
+Coding follows a documented codebook with defined categories and coding rules.
+Entries are double checked against source material and reviewed by the project team
+before release. Corrections reported by users are assessed and incorporated into
+subsequent versions.
+
+--------------------
+DATA & FILE OVERVIEW
+--------------------
+
+File List:
+
+All data files are provided in three equivalent formats (.csv, .rds, .xlsx); the
+.csv version is authoritative. Files are organised in the folder "WhoGov Version 4/".
+
+     WhoGov_crosssectional_V4.0.csv / .rds / .xlsx
+          WhoGov Version 4 - Cross-sectional data.
+     WhoGov_within_V4.0.csv / .rds / .xlsx
+          WhoGov Version 4 - Individual-level data.
+     WhoGov_update_v4.pdf
+          Data note documenting Version 4, including coverage and changes from previous versions.
+
+Relationship between files, if important:
+
+The cross-sectional and individual-level files are two structurings of the same
+underlying data and can be linked on country and year. The three file formats of
+each are equivalent in content. WhoGov_update_v4.pdf & whogov_codebookandappendix.pdf documents both data files.
+
+Is this an updated version of a dataset published on DataverseNO? No, but earlier versions of the dataset is found at https://politicscentre.nuffield.ox.ac.uk/whogov-dataset/
+
+-----------------------------------------
+DATA-SPECIFIC INFORMATION FOR: ALL DATA FILES
+-----------------------------------------
+
+Variable/Column List:
+
+Full variable definitions, value labels, and sources are documented in
+whogov_codebookandappendix.pdf, included in this dataset, and in Nyrup and Bramwell (2020).
+Variables cover country and year identifiers, the individual's name, gender, birth
+year, party affiliation, position held, and standardised portfolio classification.
+
+Missing data codes:
+
+NA denotes missing information.
+
+Specialized formats or other abbreviations used:
+
+Countries are identified by name and standard country code. Text fields are
+encoded in UTF-8 to represent non-Latin characters and diacritics in personal,
+party, and place names.
+
+--------------------------
+SHARING/ACCESS INFORMATION
+--------------------------
+
+Licenses/Restrictions: CC BY 4.0.
+Links to publications that cite or use the data: Nyrup, Jacob, and Stuart Bramwell. "Who governs? A new global dataset on members of cabinets." American Political Science Review 114.4 (2020): 1366-1374.
+Links/relationships to related data sets: See metadata field Related Dataset.
+Data sources: CIA World Leaders and Cabinet Members of Foreign Governments, government websites and directories, encyclopaedias, Wikipedia/Wikidata, and historical and biographical reference works.	
+Recommended citation: Nyrup, Jacob; Stuart Bramwell; Gabriel Lönn; Kristiansen, Ina Lyftingsmo; Schmid, Jonas Willibald; Matthews, Austin; Thoma, Andreina; Javier Padilla Moreno-Torres; Langsæther, Peter Egge; Knutsen, Carl Henrik, 2026, "The WhoGov Project", https://doi.org/10.18710/OLPOZK, DataverseNO
