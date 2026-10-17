@@ -13,7 +13,7 @@ history. Everything below is what a source states; REVA-computed numbers are fla
 | NIST CODATA (`nist.codata`) | `https://physics.nist.gov/cuu/Constants/Table/allascii.txt` | NIST SRD 121: cite "Source: NIST", possible US copyright (15 U.S.C. 290e) → `licence_review` | 1 request, 40.8 kB |
 | ChEBI release 256 (`chebi.release`) | `https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi_lite.obo.gz` (7.9 MB), `.../flat_files/chemical_data.tsv.gz` (3.8 MB) | CC BY 4.0 per the ontology header; flat-files README also says CC BY-SA 4.0 (owner to confirm) | see "Live runs" |
 | PubChem compounds (`pubchem.pug`) | `.../rest/pug/substance/sourceid/ChEBI/<ids>/xrefs/RegistryID/JSON`, `.../cids/JSON`, `.../compound/cid/<cids>/property/.../JSON` | NLM; depositor terms may apply | see "Live runs" |
-| Wikidata (`wikidata.wdqs` / `wikidata.wbapi`, WDHARVEST's harvester) | specs in `registry/kg/queries/science/chemistry/` | CC0, community-edited | not harvested yet (WDQS 429 cool-downs all session) |
+| Wikidata (`wikidata.wdqs` / `wikidata.wbapi`, WDHARVEST's harvester) | specs in `registry/kg/queries/chemistry/wikidata/` | CC0, community-edited | not harvested yet (WDQS 429 cool-downs all session) |
 
 Not used, owner decisions:
 
@@ -124,11 +124,11 @@ not edges, and are deliberately unmapped.
   Today the ChEBI → element half of the chain is loaded; the petroleum → class edge waits for the Wikidata harvest
   (no other open source stating petroleum's composition was found; see owner decisions).
 
-## Wikidata specs (`registry/kg/queries/science/chemistry/`, domain `science`; all 125 specs validate)
+## Wikidata specs (`registry/kg/queries/chemistry/wikidata/`, domain `science`; all specs validate)
 
-The brief asked for `registry/kg/queries/chemistry/` with domain `science`; the harvester refuses a domain that
-differs from the directory name, so the specs live in `science/chemistry/` (same pattern as `nature/*` with domain
-`geography`).
+The harvester checks domain == directory name only one level below the queries root, so the specs live one level
+deeper, in `chemistry/wikidata/` with domain `science` (same pattern as `nature/*` with domain `geography`); the
+README owner table lists `chemistry/**` -> V4CHEM. (`science/` is KGSCIECO's, whose tests own every spec there.)
 
 | Spec | What |
 |---|---|
@@ -172,7 +172,7 @@ flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_chebi      # ~12 
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_pubchem    # ~10 requests, < 1 MB
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.chem_elements   # monthly refresh (119 requests, ~15 MB)
 uv run python -m reva.kg.harvest merge-property-requests                  # WDHARVEST: P1086 P246 P189 P274 ...
-uv run python -m reva.kg.harvest run registry/kg/queries/science/chemistry --via api
+uv run python -m reva.kg.harvest run registry/kg/queries/chemistry --via api
 uv run pytest tests/unit/test_atlas_chem.py tests/integration/test_atlas_chem_ingest.py
 ```
 

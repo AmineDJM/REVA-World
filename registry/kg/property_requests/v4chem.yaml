@@ -3,7 +3,7 @@
 # property entity itself; the labels below are the expected ones). Ids written from the agent's knowledge on
 # 2026-10-17 (Wikidata wbgetentities answered HTTP 429): the merge check is what confirms them.
 # P186 (made from material) is already requested by another agent and mapped by V4CORE; it is used by
-# science/chemistry/petroleum_composition.yaml and materials_made_from.yaml.
+# chemistry/wikidata/petroleum_composition.yaml and materials_made_from.yaml.
 - property: P1086
   why: atomic number (element -> Z); the identifier that links Wikidata element items to REVA element:<Z> nodes.
   reva_predicate: atomic_number
