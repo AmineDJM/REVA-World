@@ -59,20 +59,69 @@ def value_label(dataset: str, variable: str, code: Any) -> str | None:
     return None if label is None else str(label)
 
 
-def codebook(dataset: str, documents_sha256: Mapping[str, str] | None = None) -> dict[str, Any]:
-    """``Codebook`` fields for ``load_dataset_claims`` (name, version + document sha256s, url, verbatim definitions)."""
+#: How a quote was extracted from its archived document (``codebook.quote_source.extraction``).
+PDF_EXTRACTION = cd.PDF_QUOTE_EXTRACTION
+XLSX_EXTRACTION = (
+    "cell text of the sheet as stored in the archived workbook (inline string, atlas_xlsx reader); whitespace "
+    "normalised to single spaces"
+)
+
+
+def quote_sources(dataset: str, archived: Mapping[str, str] | None) -> dict[str, dict[str, Any]]:
+    """``Codebook.sources`` (audit2 N8, AUDFIX's convention): per quoted term, the ARCHIVED file that holds the quote
+    (its full sha256 -- an ``evidence.acquisition`` of the run) and where the quote sits in it (``page`` of a PDF or
+    ``cell`` of a workbook sheet). ``archived`` maps a document key to the sha256 of the archived file holding it; a
+    document absent from ``archived`` gives no entry (nothing is said about bytes that were not archived)."""
+    e = dataset_entry(dataset)
+    out: dict[str, dict[str, Any]] = {}
+    for term, d in e["definitions"].items():
+        key = d["document"]
+        sha = (archived or {}).get(key)
+        if not sha:
+            continue
+        doc = document(key)
+        src: dict[str, Any] = {
+            "document": doc["title"],
+            "document_key": key,
+            "url": doc.get("download_url") or doc.get("url") or "",
+            "sha256": sha,
+        }
+        if d.get("pdf_page"):
+            src.update(page=int(d["pdf_page"]), extraction=PDF_EXTRACTION)
+        else:
+            sheet, _, cell = str(d["cell"]).partition("!")
+            src.update(sheet=sheet, cell=cell, extraction=XLSX_EXTRACTION)
+            if doc.get("file"):
+                src["file"] = doc["file"]
+        out[term] = src
+    return out
+
+
+def codebook(
+    dataset: str,
+    documents_sha256: Mapping[str, str] | None = None,
+    *,
+    archived: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """``Codebook`` fields for ``load_dataset_claims`` (name, version + full document sha256s, url, verbatim
+    definitions and -- for documents archived by the run -- ``sources``, carried by each claim as
+    ``codebook.quote_source``)."""
     e = dataset_entry(dataset)
     doc = document(e["codebook_document"])
     version = str(e["dataset_revision"])
     shas = dict(documents_sha256 or {})
     if shas:
-        version += " (" + ", ".join(f"{k} sha256 {v[:12]}" for k, v in sorted(shas.items())) + ")"
-    return {
+        version += " (" + ", ".join(f"{k} sha256 {v}" for k, v in sorted(shas.items())) + ")"
+    out: dict[str, Any] = {
         "name": e["codebook_name"],
         "version": version,
         "url": doc.get("download_url") or doc.get("url") or "",
         "definitions": {k: str(v["text"]) for k, v in e["definitions"].items()},
     }
+    sources = quote_sources(dataset, archived)
+    if sources:
+        out["sources"] = sources
+    return out
 
 
 def check_pdf(key: str, body: bytes) -> dict[str, Any]:
@@ -108,14 +157,18 @@ def delivery(
     retrieved_at: Any,
     origin: str,
     documents_sha256: Mapping[str, str],
+    archived: Mapping[str, str] | None = None,
 ) -> cd.ClaimDelivery:
+    """One complete delivery. ``archived`` (document key -> sha256 of the archived file holding the quotes) adds
+    ``codebook.sources`` and makes those files raw objects of the load (as AUDFIX)."""
     e = dataset_entry(dataset)
+    raws = list(dict.fromkeys([*raw_sha256s, *sorted(set((archived or {}).values()))]))
     return cd.ClaimDelivery(
         source_key=e["source_key"],
         dataset=e["dataset"],
         dataset_revision=str(e["dataset_revision"]),
-        codebook=codebook(dataset, documents_sha256),
-        raw_sha256s=list(raw_sha256s),
+        codebook=codebook(dataset, documents_sha256, archived=archived),
+        raw_sha256s=raws,
         retrieved_at=retrieved_at,
         origin=origin,
         claims=list(claims),
@@ -277,6 +330,26 @@ CAUSMORE_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]
         None,
     ),
     "idmc:country": ("string", "idmc_country", "country (IDMC ISO3, unmapped)", "pays (IDMC, non apparié)", None, None),
+    # FIXB (audit2 N4): displacement the source reports as preventive evacuation / in anticipation of a hazard
+    # (possibly one that never struck): context displacement record -> IDMC event, never a causal claim.
+    "idmc:displacement_in_anticipation_of": (
+        "item",
+        "idmc_displacement_in_anticipation_of",
+        "displacement reported in anticipation of the hazard event (IDMC preventive evacuations / hazard risk; "
+        "not causal)",
+        "déplacement signalé en anticipation de l'aléa (évacuations préventives / risque, IDMC ; non causal)",
+        "idmc_anticipatory_displacement",
+        "has displacement reported in anticipation (IDMC; not causal)",
+    ),
+    # FIXB (audit2 N12): fully identical provider rows loaded once (provenance note, count + row selectors)
+    "idmc:source_duplicate_rows": (
+        "string",
+        "idmc_source_duplicate_rows",
+        "identical IDMC rows loaded once (provenance note)",
+        "lignes IDMC identiques chargées une fois (note de provenance)",
+        None,
+        None,
+    ),
 }
 WIKIDATA_PIDS = ("P17",)
 

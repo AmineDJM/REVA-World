@@ -124,7 +124,8 @@ def test_coded_dates_lower_precision_never_guess() -> None:
     assert cd.coded_date("1918", "", "") == ("1918-01-01", 9)
     assert cd.coded_date("1918", "6", "31") == ("1918-06-01", 10)  # impossible day: kept at month precision
     assert cd.coded_date("", "5", "1") is None
-    assert T._dated("1949-09-15", "3") == ("1949-09-01", 10) and T._dated("1949-09-15", "5") == ("1949-01-01", 9)
+    assert cd.ucdp_date("1949-09-15", "3").value == ("1949-09-01", 10)
+    assert cd.ucdp_date("1949-09-15", "5").value == ("1949-01-01", 9)
 
 
 # ----------------------------------------------------------------------------- ICB
@@ -205,7 +206,8 @@ def test_mid_incidents_follow_in_order_not_cause(mid: dict[str, Any]) -> None:
 
 def test_ucdp_termination_claims(term: dict[str, Any]) -> None:
     c = term["claims"]["term_conflict"]
-    assert len(c) == 17 and {x.relation for x in c} == {"coded_outcome"}
+    # 17 episodes; 20901 has two terminal rows, both kept (audit2 N6)
+    assert len(c) == 18 and {x.relation for x in c} == {"coded_outcome"}
     by = {x.cause_id: x for x in c}
     assert by["ucdp:episode:20001"].codebook_term == "c_outcome=4"
     assert by["ucdp:episode:28702"].codebook_term == "c_outcome=5"

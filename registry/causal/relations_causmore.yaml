@@ -16,6 +16,9 @@
 version: 1
 maintainer: CAUSMORE
 updated: '2026-10-17'
+# FIXB (2026-10-17, docs/dev/v3_fixb.md, audit2 N4/N5/N6/N8/N10/N12): IDMC anticipatory displacement is context,
+# not a claim; every UCDP dyad terminal row is kept; each claim carries codebook.quote_source (the archived FILE's
+# sha256 + pdf_page / README cell); the COW intra-state v5.1 zip is archived as the numbering evidence.
 conventions:
   quotes: 'Codebook text quoted verbatim from the provider document (pdftotext -layout of the pinned PDF, page by page):
     whitespace normalised to single spaces, page-number lines dropped, a hyphen at a line end joined to the next line
@@ -63,8 +66,10 @@ documents:
     url: https://data.humdata.org/dataset/idmc_internal_displacement_conflict-violence_disasters
     kind: xlsx_sheet
     sheet: README
+    file: IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx
     check: every definition text below must be a README cell verbatim (the workbook bytes change with each data
-      release, so no file sha256 is pinned for this document)
+      release, so no file sha256 is pinned for this document). quote_source = the archived workbook (its sha256)
+      and the cell (FIXB, audit2 N8); the 2025-05-13 release is 60dd7c1ecd76f727bb987ce03e41e309191a9ac4aefadbfb6b1ae7df05f025a2
   ucdp_term_codebook:
     title: UCDP Conflict Termination Dataset Codebook v.4 2024 (same pinned PDF as CAUSDATA term_codebook)
     authors: Joakim Kreutz
@@ -182,10 +187,15 @@ datasets:
       relation: coded_outcome
       codebook_term: d_outcome=<value>
       cause: ucdp:dyadepisode:<d_epid>
-      effect: ucdp:dyadepisode:<d_epid>:termination
+      effect: ucdp:dyadepisode:<d_epid>:termination (ucdp:dyadepisode:<d_epid>:termination:<year> per terminal row when
+        the source codes several)
       why: The coded way the dyad episode ended (same outcome categories as the conflict level, CAUSDATA term_conflict). The
         conflict-level file is CAUSDATA's; the dyad file adds one termination per warring dyad (e.g. which rebel group was
-        defeated or signed). Outcome 5 keeps its verbatim caveat in the delivered definitions.
+        defeated or signed). Outcome 5 keeps its verbatim caveat in the delivered definitions. An episode coded with
+        several terminal rows (d_epterm = 1) keeps every row as the source states (scope source_duplicate_terminal_rows;
+        claims whose coded outcomes differ contest each other, scope contested_by_source) - REVA chooses none (FIXB,
+        audit2 N6). d_ependprec 6 (year assigned) is year precision with the typed note source_date_certainty; 7 (year
+        missing) is a typed missing date, never the placeholder 31 December (audit2 N10).
     - variables:
       - d_cfiredate
       - d_peagdate
@@ -337,7 +347,12 @@ datasets:
     version_note: v4.1, not v5.1. Intra-state v5.1 (Dixon and Sarkees 2016) renumbers wars and reuses numbers for other
       wars (e.g. 856 is "Eighth Colombia" in v4.1 and "Romanian War of 1989" in v5.1), while the inter-/extra-/non-state
       v4.0 files, atlas_cow's cow:war:<n> entities and PA-X's CowWar all use the v4 numbering. Mixing would join
-      different wars under one id; v5.1 is a follow-up under its own namespace.
+      different wars under one id; v5.1 is a follow-up under its own namespace. Evidence archived (FIXB, audit2 N8) -
+      atlas.cowwars 1.1.0 fetches the provider's Intra-State-Wars-v5.1.zip (sha256
+      b2d1f4892d3cbb02604cf8e506c5c2c3e87fb85df75276f69b1089e67fb25236 on 2026-10-17; it also holds the v5.1 codebook
+      with its "Changes since Guide" list) and reports v51_numbering_check from those bytes (334 v4.1 wars, 420 v5.1
+      wars, 295 shared numbers, 39 v4.1 numbers absent from v5.1, 28 shared numbers whose v5.1 war starts in
+      another year).
     definitions:
       Outcome:
         text: 'Outcome: coded as: 1 - Side A wins 2 - Side B wins 3 - Compromise 4 - The war was transformed into another
@@ -585,6 +600,11 @@ datasets:
         text: 'Date of Event (Start): Approximate start date of the event.'
         document: idmc_readme
         cell: README!A44
+      event_name:
+        text: 'Event Name: Common or official event name for the event, if available. Otherwise, events are coded based
+          on the country, type of hazard, location, and event start date.'
+        document: idmc_readme
+        cell: README!A43
     mappings:
       - variables: [Event ID, Disaster Internal Displacements (Raw), ISO3, Year]
         reva_kind: claim
@@ -595,9 +615,23 @@ datasets:
         effect: idmc:displacement:<event key>:<ISO3>:<Year> (the internal displacements the row reports)
         why: 'The README defines the figure as internal displacements "as a result of disasters" and disaster displacement
           as people "forced to leave their homes ... as a result, or in anticipation of the negative impact of natural
-          hazards": the source attributes the displacement to the event (has_effect, polarity promotes). Rows reporting
-          preventive evacuations (displacement in anticipation) keep that flag in the claim scope. A row without a positive
-          figure would give no claim (none in the 2025-05-13 file).'
+          hazards": the source attributes the displacement to the event (has_effect, polarity promotes). A row without a
+          positive figure would give no claim (none in the 2025-05-13 file). Rows whose displacement is (also) in
+          anticipation of the hazard give NO claim (FIXB, audit2 N4; next mapping).'
+      - variables: [Displacement occurred, Event Name]
+        reva_kind: context
+        causal: false
+        predicate: idmc:displacement_in_anticipation_of (idmc:displacement:<event key>:<ISO3>:<Year> -> idmc:event:<key>)
+        why: 'README A24 counts displacement "as a result, or in anticipation of the negative impact of natural hazards"
+          and A52 flags rows where "preventive evacuations were reported. These evacuations are the result of existing
+          early warning systems." For a row flagged "Displacement reporting preventive evacuations", or whose IDMC-coded
+          event name describes a hazard risk, a threat, a false alarm or a pre-emptive / preventive move, the figure
+          includes displacement in anticipation of a hazard that may never have struck, which IDMC does not separate
+          from displacement by an impact. No relation of registry/causal/relations.yaml fits (has_effect asserts an
+          effect of the hazard event; reaction_to / precipitated assert that the event provoked or triggered it, while
+          A52 attributes the evacuations to early warning systems), so these rows are context only (basis, the
+          verbatim flag and both README passages in the qualifiers; the figure stays on the displacement record).
+          Need recorded for the causal core in docs/dev/v3_fixb.md.'
       - variables: [Event Codes (Code:Type)]
         reva_kind: context
         causal: false

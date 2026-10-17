@@ -102,5 +102,18 @@
     "retrieved_at": "2026-10-17T02:00:00+00:00",
     "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
     "note": "codebook, full file"
+  },
+  {
+    "request_fingerprint": "039bbe78181df98adc8295057b6651e37d34301edbb0db3ea3d221fc95fb6cbd",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Intra-State-Wars-v5.1.zip",
+    "file": "039bbe78181df98a.zip",
+    "sha256": "029420d017f5b719ee10893aa8a0800e48c2832e1a12e6cababbdb8db0d800de",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "reduced copy of Intra-State-Wars-v5.1.zip (FIXB): only the member 'INTRA-STATE WARS v5.1 CSV.csv', rows of wars 503, 506, 538, 790, 836, 856, 857 with their original bytes; real zip sha256 b2d1f4892d3cbb02604cf8e506c5c2c3e87fb85df75276f69b1089e67fb25236 (6 members: codebook and description PDFs, wars and state-participant CSV + dta)"
   }
 ]

@@ -1,0 +1,26 @@
+# Budget request from agent FIXB (second causal audit, dataset side: docs/dev/v3_fixb.md). ATLASCORE merge rule:
+# max(current, request) per source, never the sum. The three sources are re-ingested on 2026-10-17 after their
+# first runs the same day; atlas.cowwars 1.1.0 also archives the COW intra-state v5.1 zip (0.9 MB, 1 request).
+agent: FIXB
+requests:
+  - source_key: cow.data
+    # atlas.cowwars 1.1.0: 4 CSVs + 4 codebook PDFs + the v5.1 zip = 9 requests / ~1.4 MB per run (planned 11);
+    # 14 used on 2026-10-17 by atlas.cowwars 1.0.0 / atlas.mid before this run.
+    daily_requests: 44
+    expected_bytes_per_day: 11000000
+    reason: "atlas.cowwars 1.1.0 (FIXB): + COW intra-state v5.1 zip archived as the numbering evidence"
+  - source_key: idmc.gidd
+    # 2 requests / 1.7 MB per run (planned 3): 6/day left room for one more run after the 1.0.0 load (2 used);
+    # 12 leaves room for a corrective same-day re-run.
+    daily_requests: 12
+    expected_bytes_per_day: 8000000
+    reason: "atlas.idmc 1.1.0 (FIXB): same-day re-run (anticipatory displacement, 1 January starts, quote_source)"
+  - source_key: ucdp.downloads
+    # atlas.ucdp_dyadterm 1.1.0 (2 per run, planned 3) and atlas.ucdp_term 1.2.0 (5 per run) re-run the same day
+    # as atlas.ucdp / atlas.ucdp_term 1.1.x (12 used): 40.
+    daily_requests: 40
+    expected_bytes_per_day: 60000000
+    reason: "atlas.ucdp_dyadterm 1.1.0 + atlas.ucdp_term 1.2.0 (FIXB): same-day re-runs"
+daily_totals_increase:
+  http_requests_total: "+0 (existing keys)"
+  http_bytes_total: "+0"

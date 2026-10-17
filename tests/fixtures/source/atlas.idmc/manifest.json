@@ -16,13 +16,13 @@
     "request_fingerprint": "e092018d9e99cec145cfe25ca302ba7a0c89164d1d89e3852ebb9bbb4c4af2d2",
     "url": "https://data.humdata.org/dataset/0b1c4dc1-6ae5-4e2d-8e32-2111d0e10697/resource/2f892d19-a7c9-4b09-be62-fd865fabb80d/download/idmc_gidd_disasters_internal_displacement_data-12.xlsx",
     "file": "e092018d9e99cec1.xlsx",
-    "sha256": "3b7f92d20237cda3cd0ab565f48297eb150d9c972ccc19073773b08b695af86e",
+    "sha256": "e283e0f28ce3f4b1dd673a857ddf3363ab7105856588f0a4c491457b204fb8e8",
     "status": 200,
     "headers": {
       "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     },
     "retrieved_at": "2026-10-17T02:00:00+00:00",
     "licence": "CC BY-NC 4.0 (workbook README); HDX record: CC BY",
-    "note": "slice of IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx: README sheet unchanged, data sheet rows 31 of 22119 kept with their original row numbers and cell XML; real file sha256 60dd7c1ecd76f727bb987ce03e41e309191a9ac4aefadbfb6b1ae7df05f025a2"
+    "note": "slice of IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx: README sheet unchanged, data sheet rows 43 of 22119 kept with their original row numbers and cell XML (FIXB added rows 149, 194-195, 198, 240, 650-652, 5355, 6299, 6842, 8720: 01/01 placeholder names, identical rows without Event ID, hazard-risk and preventive-evacuation rows); real file sha256 60dd7c1ecd76f727bb987ce03e41e309191a9ac4aefadbfb6b1ae7df05f025a2"
   }
 ]

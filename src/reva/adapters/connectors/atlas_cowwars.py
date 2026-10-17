@@ -16,7 +16,10 @@ Correlates of War Project, ``correlatesofwar.org/data-sets/cow-war/`` (no accoun
 Why intra-state v4.1 and not v5.1: the inter-/extra-/non-state v4.0 files code transformations with v4 war numbers,
 ``atlas.cow`` keys its ``cow:war:<n>`` entities by v4 numbers and PA-X's ``CowWar`` cites them; intra-state v5.1
 renumbers wars and reuses numbers for other wars (856 = "Eighth Colombia" in v4.1, "Romanian War of 1989" in v5.1).
-One id namespace must mean one numbering, so v5.1 is left for a separate namespace (follow-up).
+One id namespace must mean one numbering, so v5.1 is left for a separate namespace (follow-up). From 1.1.0 (FIXB,
+audit2 N8) the provider's ``Intra-State-Wars-v5.1.zip`` is fetched and archived as the evidence of that choice and
+:func:`v51_numbering_check` recomputes it from the archived bytes (reported, never loaded); the claims carry
+``codebook.quote_source`` (archived codebook PDF sha256 + page).
 
 Outputs (semantics and reasons: ``registry/causal/relations_causmore.yaml`` datasets ``cow_inter`` ... )
 -------
@@ -39,6 +42,8 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import re
+import zipfile
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -48,7 +53,7 @@ from reva.adapters.connectors import causmore_common as cm
 from reva.adapters.connectors.atlas_geopol_common import KgEntity, KgStatement
 
 NAME = "atlas.cowwars"
-VERSION = "1.0.0"
+VERSION = "1.1.0"  # 1.1.0 (FIXB, audit2 N8): codebook quote_source; COW intra-state v5.1 archived as numbering evidence
 PARSER_VERSION = "atlas_cowwars/1"
 SOURCE_KEY = "cow.data"
 ATLAS_SOURCE = "cow"
@@ -94,6 +99,66 @@ REQUIRED = {
     "intra": (*_COMMON, "CcodeA", "SideA", "CcodeB", "SideB", "StartYear1", "EndYear1", "StartYear2", "EndYear2"),
     "nonstate": (*_COMMON, "SideA1", "SideB1", "StartYear", "EndYear"),
 }
+
+
+#: COW Intra-State War Data v5.1 (Dixon & Sarkees 2016), the provider's zip (data CSV + codebook with its "Changes
+#: since Guide" list): fetched and archived only as the evidence of the v4.1 numbering choice (audit2 N8), never
+#: loaded as wars (it renumbers and reuses war numbers).
+V51_URL = BASE + "Intra-State-Wars-v5.1.zip"
+V51_MEMBER = "INTRA-STATE WARS v5.1 CSV.csv"
+V51_CODEBOOK_MEMBER = "Codebook for Intra-state v5.1 2.9.20.pdf"
+ZIP_MEDIA = ("application/zip", "application/x-zip-compressed", "application/octet-stream")
+#: REVA's normalisation to compare v4.1 and v5.1 war names: v5.1 appends " [War] of <years>" (e.g. "Argentine Indians
+#: War of 1878-1879" vs v4.1 "Argentine Indians"); a heuristic for the report only, never used to link records.
+_V51_SUFFIX = re.compile(r"\s+(?:war\s+)?of\s+\d{4}.*$", re.IGNORECASE)
+
+
+def _norm_name(name: str) -> str:
+    return " ".join(_V51_SUFFIX.sub("", name or "").lower().split())
+
+
+def v51_numbering_check(v41_rows: Sequence[Mapping[str, str]], v51_zip: bytes) -> dict[str, Any]:
+    """Offline check, from the archived bytes, of why intra-state v5.1 is not mixed into the v4 ``cow:war:<n>``
+    namespace: war numbers of v4.1 absent from v5.1, shared numbers whose v5.1 war starts in another year or has
+    another (normalised) name, and the example 856."""
+    try:
+        z = zipfile.ZipFile(io.BytesIO(v51_zip))
+        body = z.read(V51_MEMBER)
+        members = sorted(z.namelist())
+    except (zipfile.BadZipFile, KeyError) as e:
+        raise cd.drift(f"COW intra-state v5.1 zip: unreadable or no {V51_MEMBER}") from e
+    try:
+        text = body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = body.decode("cp1252")
+    v51: dict[str, tuple[str, int | None]] = {}
+    for r in csv.DictReader(io.StringIO(text.replace("\r\n", "\n").replace("\r", "\n"))):
+        n = war_number(r.get("WarNum"))
+        if n is not None:
+            v51.setdefault(n, ((r.get("WarName") or "").strip(), _int(r.get("StartYr1"))))
+    v41: dict[str, tuple[str, int | None]] = {}
+    for row in v41_rows:
+        n = war_number(row["WarNum"])
+        if n is not None:
+            v41.setdefault(n, (row["WarName"].strip(), _int(row.get("StartYear1"))))
+    shared = sorted(set(v41) & set(v51), key=float)
+    other_year = [n for n in shared if v41[n][1] != v51[n][1]]
+    other_name = [n for n in shared if _norm_name(v41[n][0]) != _norm_name(v51[n][0])]
+    return {
+        "v51_members": members,
+        "v41_wars": len(v41),
+        "v51_wars": len(v51),
+        "shared_numbers": len(shared),
+        "v41_numbers_absent_in_v51": sorted(set(v41) - set(v51), key=float),
+        "v51_numbers_not_in_v41": len(set(v51) - set(v41)),
+        "shared_numbers_other_start_year": [
+            {"WarNum": n, "v4.1": list(v41[n]), "v5.1": list(v51[n])} for n in other_year
+        ],
+        "shared_numbers_other_name": [{"WarNum": n, "v4.1": v41[n][0], "v5.1": v51[n][0]} for n in other_name],
+        "example_856": {"v4.1": v41.get("856", ("",))[0] or None, "v5.1": v51.get("856", ("",))[0] or None},
+        "name_comparison": "REVA normalisation (v5.1 ' [War] of <years>' suffix dropped, case folded): a report "
+        "heuristic, never used to link records",
+    }
 
 
 def file_url(kind: str) -> str:
@@ -545,7 +610,7 @@ def atlas_source() -> Any:
         datasets=(DATASET,),
         dataset_ids=tuple(f"cow-{k}-war-v{VERSIONS[k]}" for k in KINDS),
         cadence_seconds=90 * 86400,
-        planned_requests=10,
+        planned_requests=11,
         max_response_bytes=MAX_BYTES,
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
@@ -571,6 +636,24 @@ def build(raws: Mapping[str, Any], *, strict: bool = True) -> dict[str, Any]:
     }
 
 
+async def fetch_v51(run: Any) -> dict[str, Any]:
+    """GET the intra-state v5.1 zip (numbering evidence, audit2 N8). A fetch failure is reported, never invented: the
+    v4 war claims do not depend on it (in fixture mode a missing fixture is reported the same way)."""
+    from reva.kernel.errors import SourceResponseError
+
+    try:
+        raw = await run.get(V51_URL, key="intra_v51_evidence", media_types=ZIP_MEDIA, max_bytes=MAX_BYTES)
+    except SourceResponseError as e:
+        return {"url": V51_URL, "status": "unavailable", "error": str(e)[:300]}
+    return {
+        "url": V51_URL,
+        "status": "archived",
+        "sha256": hashlib.sha256(raw.body).hexdigest(),
+        "bytes": len(raw.body),
+        "raw": raw,
+    }
+
+
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     """Fetch the four war files and their codebooks, archive, load the KG records, deliver the claims."""
     if not run.wants(DATASET):
@@ -582,6 +665,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     for k in KINDS:
         raw = await run.get(codebook_url(k), key=CODEBOOKS[k], media_types=PDF_MEDIA, max_bytes=MAX_BYTES)
         books[k] = {"raw": raw, **cm.check_pdf(CODEBOOKS[k], raw.body)}
+    v51 = await fetch_v51(run)
     out = build(raws, strict=run.origin == "live")
     for raw in [*raws.values(), *(b["raw"] for b in books.values())]:
         run.archive(raw)
@@ -595,6 +679,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "codebooks": {k: {x: v[x] for x in ("sha256", "matches")} for k, v in books.items()},
         "kg_counts": {"entities": len(out["entities"]), "statements": len(out["statements"])},
     }
+    if v51.get("raw") is not None:
+        raw51 = v51.pop("raw")
+        run.archive(raw51)
+        try:
+            v51["check"] = v51_numbering_check(parse("intra", raws["intra"].body, strict=False), raw51.body)
+        except cd.CausdataError as e:
+            v51["check"] = {"error": str(e)}
+    res["v51_numbering_evidence"] = v51
     retrieved = max(r.retrieved_at for r in raws.values())
     if cd.kg_available(run.engine):
         res["kg"] = cm.load_kg(
@@ -603,7 +695,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             out["entities"],
             out["statements"],
             source_key=SOURCE_KEY,
-            source_revision="cow-wars-v4.0+intra-v4.1",
+            source_revision=f"cow-wars-v4.0+intra-v4.1+reva-{VERSION}",
             raw_sha256s=sorted(set(out["shas"].values())),
             retrieved_at=retrieved,
             origin=run.origin,
@@ -621,6 +713,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 retrieved_at=retrieved,
                 origin=run.origin,
                 documents_sha256={CODEBOOKS[k]: books[k]["sha256"]},
+                archived={CODEBOOKS[k]: books[k]["sha256"]},
             )
         )
     res["claims"] = cd.deliver_claims(run, deliveries)

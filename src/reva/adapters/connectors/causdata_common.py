@@ -81,21 +81,50 @@ def value_label(dataset: str, variable: str, code: Any) -> str | None:
         return None
 
 
-def codebook(dataset: str, documents_sha256: Mapping[str, str] | None = None) -> dict[str, Any]:
-    """``Codebook`` fields for ``load_dataset_claims``: name, version (dataset revision + document sha256s), url and
-    the verbatim definitions (term -> text)."""
+def codebook(
+    dataset: str,
+    documents_sha256: Mapping[str, str] | None = None,
+    *,
+    archived: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """``Codebook`` fields for ``load_dataset_claims``: name, version (dataset revision + document sha256s), url, the
+    verbatim definitions (term -> text) and, for the documents in ``archived`` (document key -> sha256 of the file
+    archived by the run, equal to the pinned one), ``sources`` = each term's ``codebook.quote_source`` (audit2 N8)."""
     e = dataset_entry(dataset)
     doc = document(e["codebook_document"])
     shas = dict(documents_sha256 or {})
     version = e["dataset_revision"]
-    if shas:
-        version += " (" + ", ".join(f"{k} sha256 {v[:12]}" for k, v in sorted(shas.items())) + ")"
-    return {
+    if shas:  # full sha256s when the documents are archived (N8), else the 12-hex prefixes of earlier versions
+        version += " (" + ", ".join(f"{k} sha256 {v if archived else v[:12]}" for k, v in sorted(shas.items())) + ")"
+    out: dict[str, Any] = {
         "name": e["codebook_name"],
         "version": version,
         "url": doc.get("url") or doc.get("download_url") or "",
         "definitions": {k: v["text"] for k, v in e["definitions"].items()},
     }
+    sources: dict[str, dict[str, Any]] = {}
+    for term, d in e["definitions"].items():
+        sha = (archived or {}).get(d.get("document", ""))
+        if sha and d.get("pdf_page"):
+            dd = document(d["document"])
+            sources[term] = {
+                "document": dd["title"],
+                "document_key": d["document"],
+                "url": dd.get("download_url") or dd.get("url") or "",
+                "sha256": sha,
+                "page": int(d["pdf_page"]),
+                "extraction": PDF_QUOTE_EXTRACTION,
+            }
+    if sources:
+        out["sources"] = sources
+    return out
+
+
+#: how CAUSDATA / CAUSMORE PDF quotes were taken (``codebook.quote_source.extraction``)
+PDF_QUOTE_EXTRACTION = (
+    "pdftotext -layout of the archived PDF, page by page (1-based physical page); whitespace normalised to single "
+    "spaces, page-number lines dropped, a hyphen at a line end joined to the next line"
+)
 
 
 def check_document(key: str, body: bytes) -> dict[str, Any]:
@@ -351,6 +380,110 @@ def retract_statements(
         )
         inserted += int(rep.retractions_inserted)
     return {"matched": len(gone), "kept": len(gone & keep_set), "retracted": inserted}
+
+
+# ----------------------------------------------------------------------------- UCDP date precision (audit2 N10)
+
+#: UCDP Conflict Termination codebook v4-2024 (pinned ``648c1601…``), precision codes 6 and 7 verbatim: c_ependprec
+#: (physical pp. 6-7), d_ependprec (pp. 8-9) and start prec2 (p. 13). 1-5 are day / month / year precision as before.
+UCDP_PRECISION_TEXT: dict[tuple[str, str, str], str] = {
+    ("end", "conflict", "6"): "6= Year is assigned. There is a wide disagreement between different sources, so that "
+    "not even year can be coded precisely. The end year is assigned based on subjective judgment.",
+    ("end", "conflict", "7"): "7= Year is missing. No information on the end date is available; Enddate is set to 31 "
+    "December of the last year recorded in the conflict.",
+    ("end", "dyad", "6"): "6= Year is assigned. There is a wide disagreement between different sources, so that not "
+    "even year can be coded precisely. The end year is assigned based on subjective judgment.",
+    ("end", "dyad", "7"): "7= Year is missing. No information on the end date is available; Enddate is set to 31 "
+    "December of the last year recorded in the conflict dyad.",
+    ("start", "conflict", "6"): "6= Year is assigned. There is a wide disagreement between different sources, so "
+    "that not even year can be coded precisely. The start year is assigned based on subjective judgment.",
+    ("start", "conflict", "7"): "7= Year is missing. No information on the start date is available; Startdate is set "
+    "to 1 January of the first year recorded in the conflict.",
+}
+UCDP_PRECISION_PAGES = {("end", "conflict"): [6, 7], ("end", "dyad"): [9], ("start", "conflict"): [13]}
+#: UCDP date-precision codes -> Wikibase precision: 1 exact day -> 11; 2 day assigned, 3 day unknown -> 10 (month);
+#: 4 month assigned, 5 year only, 6 year assigned -> 9 (with the typed note ``source_date_certainty``); 7 year
+#: missing -> no date (typed missing).
+UCDP_PREC = {"1": 11, "2": 10, "3": 10, "4": 9, "5": 9, "6": 9}
+
+
+@dataclass(frozen=True)
+class UcdpDate:
+    """A UCDP coded date read with its precision code: ``value`` (ISO, Wikibase precision) or ``None``;
+    ``qualifiers`` to add to the time statement (``source_date_certainty`` for code 6); ``missing`` the typed missing
+    (code 7: the coded value is the codebook's placeholder, not a date)."""
+
+    value: tuple[str, int] | None
+    qualifiers: Mapping[str, Any] = field(default_factory=dict)
+    missing: Mapping[str, Any] | None = None
+
+
+def ucdp_date(text: Any, prec_code: Any, *, which: str = "end", level: str = "conflict") -> UcdpDate:
+    code = str(prec_code or "").strip()
+    iso = iso_date(text)
+    lvl = "conflict" if which == "start" else level
+    doc = {
+        "codebook": "UCDP Conflict Termination Dataset Codebook v.4 2024",
+        "codebook_sha256": "648c1601f41796f1b565ab91616b4e8968ec7e84aca5434ddad8945b2079908d",
+        "pages": UCDP_PRECISION_PAGES[(which, lvl)],
+    }
+    if code == "7":
+        note = UCDP_PRECISION_TEXT[(which, lvl, "7")]
+        return UcdpDate(
+            None,
+            {},
+            {
+                **missing_date_qualifiers(
+                    f"UCDP precision code 7: {note} The coded value {str(text or '').strip() or '(empty)'} is that "
+                    "placeholder, not a date.",
+                    reason="unavailable",
+                ),
+                "source_precision_code": "7",
+                **doc,
+            },
+        )
+    if iso is None:
+        return UcdpDate(None)
+    p = UCDP_PREC.get(code, 9)
+    if p == 10:
+        iso = iso[:8] + "01"
+    elif p == 9:
+        iso = iso[:5] + "01-01"
+    if code == "6":
+        return UcdpDate(
+            (iso, 9),
+            {
+                "source_date_certainty": {
+                    "code": "6",
+                    "certainty": "assigned",
+                    "text": UCDP_PRECISION_TEXT[(which, lvl, "6")],
+                    **doc,
+                }
+            },
+        )
+    return UcdpDate((iso, p))
+
+
+def missing_time_statement(
+    subject: str,
+    key: str,
+    pid: str,
+    missing: Mapping[str, Any],
+    *,
+    raw_sha256: str,
+    selector: Mapping[str, Any],
+    qualifiers: Mapping[str, Any] | None = None,
+) -> KgStatement:
+    """A time statement the source does not code: Wikidata "unknown value" with the typed-missing qualifiers (M3)."""
+    return KgStatement(
+        key=key,
+        subject=subject,
+        property=pid,
+        value=dict(MISSING_DATE_VALUE),
+        qualifiers={**dict(qualifiers or {}), **dict(missing)},
+        raw_sha256=raw_sha256,
+        selector=dict(selector),
+    )
 
 
 # ----------------------------------------------------------------------------- claims (CAUSCORE interface)
@@ -696,6 +829,16 @@ CAUSDATA_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]
         "ucdp_termination_outcome",
         "termination outcome (UCDP c_outcome)",
         "issue de la fin d'épisode (UCDP)",
+        None,
+        None,
+    ),
+    # FIXB (audit2 N6): an episode the source codes with several terminal rows (all kept, none chosen); used by
+    # atlas_ucdp_term (conflict level) and atlas_ucdp_dyadterm (dyad level)
+    "ucdpterm:source_duplicate_terminal_rows": (
+        "string",
+        "ucdp_source_duplicate_terminal_rows",
+        "episode coded with several terminal rows by UCDP (all kept; provenance note)",
+        "épisode codé avec plusieurs lignes de fin par l'UCDP (toutes conservées ; note de provenance)",
         None,
         None,
     ),

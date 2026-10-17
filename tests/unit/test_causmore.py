@@ -243,7 +243,8 @@ def test_ucdp_dyad_termination_claims(dyad: dict[str, Any]) -> None:
     assert claims and {c.relation for c in claims} == {"coded_outcome"}
     defs = cm.codebook("ucdp_term_dyad")["definitions"]
     assert all(c.codebook_term in defs for c in claims)
-    assert all(c.effect_id == c.cause_id + ":termination" for c in claims)
+    # one termination per episode, or one per terminal row when the source codes several (audit2 N6)
+    assert all(c.effect_id.startswith(c.cause_id + ":termination") for c in claims)
     assert "There is no information in this dataset regarding the group-specific circumstance" in defs["d_outcome=5"]
     assert cm.check_pdf(
         "ucdp_term_codebook", _body("atlas.ucdp_dyadterm", cm.document("ucdp_term_codebook")["download_url"]).body

@@ -27,6 +27,11 @@ Outputs (semantics and reasons: ``registry/causal/relations_datasets.yaml`` data
   agreement): REVA's pairing of two datasets, with the rule in the qualifiers.
 * Atlas tables ``ucdp.term_cy`` (COMPUTED: episodes ended per location and year by outcome) and ``ucdp.pa_cy``
   (COMPUTED: peace agreements signed per location and year).
+
+FIXB (1.2.x, second causal audit ``docs/dev/review_v3_causal_audit2.md``): every terminal row of an episode is kept
+(N6, ``…:termination:<year>`` per row, differing outcomes contest each other); UCDP precision code 6 is year precision
+with the typed note ``source_date_certainty`` and 7 a typed missing date (N10, ``causdata_common.ucdp_date``); the
+claims carry ``codebook.quote_source`` (archived PDF sha256 + page, N8); the KG source revision names the version.
 """
 
 from __future__ import annotations
@@ -49,7 +54,9 @@ from reva.ports.connectors import RawAcquisition
 
 SOURCE_KEY = "ucdp.downloads"
 CONNECTOR_NAME = "atlas.ucdp_term"
-CONNECTOR_VERSION = "1.1.1"  # 1.1.0 (AUDFIX M6): peace agreements are context, not reaction_to claims
+CONNECTOR_VERSION = "1.2.1"  # 1.1.0 (AUDFIX M6): peace agreements are context, not reaction_to claims; 1.2.0 (FIXB,
+#: audit2 N6/N8/N10): every terminal row kept, codebook quote_source, UCDP precision 6 (assigned) / 7 (missing); 1.2.1:
+#: superseded single-terminal statements retracted by their stored keys (1.2.0 was registered, never run)
 # 1.1.1: ucdppa:conflict statements keep their 1.0.0 content (the context reading lives in the relation registry)
 PARSER_VERSION = "atlas-ucdp-term-parse-1"
 ATLAS_SOURCE = "ucdp"
@@ -107,10 +114,7 @@ PA_REQUIRED = (
     "pa_type",
     "version",
 )
-#: UCDP date-precision codes (ACD start_prec / termination ependprec) -> Wikibase precision (as KGGEOPOL):
-#: 1 exact day -> 11; 2 day assigned, 3 day unknown -> 10 (month); 4 month assigned, 5 year only, 6 year assigned,
-#: 7 year missing -> 9.
-PREC = {"1": 11, "2": 10, "3": 10, "4": 9, "5": 9, "6": 9, "7": 9}
+#: UCDP date precision: ``causdata_common.ucdp_date`` (6 = year assigned, typed note; 7 = typed missing; N10).
 OUTCOME_SLUG = {
     1: "peace_agreement",
     2: "ceasefire",
@@ -136,18 +140,6 @@ def _codes(field: Any) -> list[int]:
         if s.lstrip("-").isdigit():
             out.append(int(s))
     return out
-
-
-def _dated(text: Any, prec_code: Any) -> tuple[str, int] | None:
-    iso = cd.iso_date(text)
-    if iso is None:
-        return None
-    p = PREC.get(str(prec_code or "").strip(), 9)
-    if p == 10:
-        iso = iso[:8] + "01"
-    elif p == 9:
-        iso = iso[:5] + "01-01"
-    return iso, p
 
 
 def parse_term(body: bytes, *, strict: bool = True) -> list[dict[str, str]]:
@@ -195,7 +187,7 @@ def _yes(v: Any) -> bool | None:
 
 
 def episodes(rows: Sequence[Mapping[str, str]]) -> dict[str, dict[str, Any]]:
-    """c_epid -> {rows [(line, row)], first, terminal (line, row) or None, duplicate_terminals}."""
+    """c_epid -> {rows [(line, row)], terminal_rows [(line, row)], terminal (the last; kept for callers), terminals}."""
     eps: dict[str, dict[str, Any]] = {}
     for i, r in enumerate(rows):
         e = eps.setdefault(r["c_epid"], {"rows": [], "terminal": None, "terminals": 0})
@@ -204,6 +196,7 @@ def episodes(rows: Sequence[Mapping[str, str]]) -> dict[str, dict[str, Any]]:
         e["rows"].sort(key=lambda x: int(x[1]["year"]))
         terms = [x for x in e["rows"] if x[1]["c_epterm"] == "1"]
         e["terminals"] = len(terms)
+        e["terminal_rows"] = terms  # every terminal row (audit2 N6: none is chosen)
         e["terminal"] = terms[-1] if terms else None
     return eps
 
@@ -345,18 +338,24 @@ def kg_and_claims(
         if cur is None or int(r["year"]) < int(cur[1]["year"]):
             first_rows[r["conflict_id"]] = (i + 2, r)
     for cid_s, (ln, r) in sorted(first_rows.items(), key=lambda x: int(x[0])):
-        sd = _dated(r["start_date"], r["start_prec"])
+        ud = cd.ucdp_date(r["start_date"], r["start_prec"], which="start")
+        csel = {"file": TERM_FILE, "row": ln, "conflict_id": int(cid_s), "columns": ["start_date", "start_prec"]}
+        cq = {
+            "definition": "conflict start date (UCDP/PRIO ACD start_date: date of the first battle-related "
+            "death), as replicated in the Conflict Termination Dataset",
+            "ucdp_start_prec": r["start_prec"],
+            **ud.qualifiers,
+        }
+        if ud.missing is not None:  # precision 7: the coded value is a placeholder (typed missing, audit2 N10)
+            add(cd.missing_time_statement(f"ucdp:conflict:{int(cid_s)}", f"conf{int(cid_s)}:start", "P580",
+                                          ud.missing, raw_sha256=st_, selector=csel, qualifiers=cq))  # fmt: skip
         for s in cd.event_times(
             f"ucdp:conflict:{int(cid_s)}",
             f"conf{int(cid_s)}",
-            start=sd,
+            start=ud.value,
             raw_sha256=st_,
-            selector={"file": TERM_FILE, "row": ln, "conflict_id": int(cid_s), "columns": ["start_date", "start_prec"]},
-            qualifiers={
-                "definition": "conflict start date (UCDP/PRIO ACD start_date: date of the first battle-related "
-                "death), as replicated in the Conflict Termination Dataset",
-                "ucdp_start_prec": r["start_prec"],
-            },
+            selector=csel,
+            qualifiers=cq,
         ):
             add(s)
     prev_ep: dict[str, tuple[int, str]] = {}
@@ -401,19 +400,32 @@ def kg_and_claims(
                 selector=dict(sel),
             )
         )
-        start = _dated(first["start_date2"], first["start_prec2"]) or cd.coded_date(first["c_ep_startyear"])
-        term_row = e["terminal"]
-        end = _dated(term_row[1]["c_ependdate"], term_row[1]["c_ependprec"]) if term_row else None
+        sd = cd.ucdp_date(first["start_date2"], first["start_prec2"], which="start")
+        start, start_q = sd.value, dict(sd.qualifiers)
+        if start is None:
+            start = cd.coded_date(first["c_ep_startyear"])
+            if sd.missing is not None and start is not None:
+                start_q["start_date2_missing"] = dict(sd.missing)
+                start_q["note"] = (
+                    "start_date2 is the codebook's placeholder (start_prec2 = 7): the start year is the episode's "
+                    "first active year (c_ep_startyear)"
+                )
+        terms = e["terminal_rows"]
+        multi = len(terms) > 1
+        ends = [cd.ucdp_date(tr_["c_ependdate"], tr_["c_ependprec"], which="end") for _, tr_ in terms]
+        # an ordinary episode (one terminal row, precision codes 1-5) keeps exactly the 1.1.x time statements
+        plain = not multi and not start_q and not any(x.qualifiers or x.missing for x in ends)
         for s in cd.event_times(
             eid,
             f"ep{epid}",
             start=start,
-            end=end,
+            end=ends[0].value if plain and ends else None,
             raw_sha256=st_,
             selector={**sel, "columns": ["start_date2", "start_prec2", "c_ependdate", "c_ependprec"]},
             qualifiers={
                 "definition": "start = episode start (start_date2, first year of the episode); "
-                "end = c_ependdate (termination)"
+                "end = c_ependdate (termination)",
+                **start_q,
             },
         ):
             add(s)
@@ -445,95 +457,169 @@ def kg_and_claims(
                 )
             )
         prev_ep[str(cid)] = (int(first["c_epno"] or 0), epid)
-        if term_row is None:
-            continue
-        tl, tr = term_row
-        oc = int(tr["c_outcome"]) if tr["c_outcome"].isdigit() else None
-        olabel = cd.value_label("term_conflict", "c_outcome", oc)
-        if oc is None or olabel is None:
-            anomalies.setdefault("terminated_without_outcome", []).append(epid)
-            continue
-        tid = f"{eid}:termination"
-        tsel = {"file": TERM_FILE, "row": tl, "c_epid": epid}
-        ents[tid] = KgEntity(
-            qid=tid,
-            kind="conflict_termination",
-            labels={"en": f"End of {label}: {olabel}"},
-            descriptions={
-                "en": f"Termination of conflict episode {epid} coded as outcome {oc} "
-                "(UCDP Conflict Termination Dataset v4-2024, c_outcome)"
-            },
-        )
-        add(
-            cd.string_stmt(
-                f"ep{epid}:t:event_type",
-                tid,
-                "causdata:event_type",
-                "conflict_termination",
-                raw_sha256=st_,
-                selector=tsel,
+        # Every terminal row the source codes is kept (audit2 N6): one termination record and one claim per row when
+        # the episode has several; claims whose coded outcomes differ contest each other.
+        recs = []
+        for (tl, tr), ed in zip(terms, ends, strict=True):
+            oc = int(tr["c_outcome"]) if tr["c_outcome"].isdigit() else None
+            recs.append((tl, tr, oc, cd.value_label("term_conflict", "c_outcome", oc), ed))
+        dup_note: dict[str, Any] | None = None
+        if multi:
+            dup_note = {
+                "flag": "source_duplicate_terminal_rows",
+                "terminal_rows": [
+                    {"row": tl, "year": int(tr["year"]), "c_outcome": tr["c_outcome"],
+                     "c_ependdate": tr["c_ependdate"], "c_ependprec": tr["c_ependprec"]}
+                    for tl, tr, _, _, _ in recs
+                ],
+                "outcomes_differ": len({oc for _, _, oc, _, _ in recs}) > 1,
+                "note": "UCDP codes this conflict episode with several terminal rows (c_epterm = 1); REVA keeps every "
+                "one as the source states and chooses none",
+            }  # fmt: skip
+            add(
+                cd.string_stmt(
+                    f"ep{epid}:dup_terminal",
+                    eid,
+                    "ucdpterm:source_duplicate_terminal_rows",
+                    f"{len(recs)} terminal rows coded by UCDP: "
+                    + "; ".join(
+                        f"{tr['year']} (c_outcome {tr['c_outcome']}: {lab or 'no outcome'})"
+                        for _, tr, _, lab, _ in recs
+                    ),
+                    raw_sha256=st_,
+                    selector={**sel, "rows": [tl for tl, _, _, _, _ in recs], "column": "c_epterm"},
+                    outcomes_differ=dup_note["outcomes_differ"],
+                )
             )
-        )
-        for s in cd.event_times(
-            tid,
-            f"ep{epid}:t",
-            point=end,
-            raw_sha256=st_,
-            selector={**tsel, "columns": ["c_ependdate", "c_ependprec"]},
-            qualifiers={
+            ents[f"{eid}:termination"] = KgEntity(
+                qid=f"{eid}:termination",
+                kind="superseded_record",
+                labels={
+                    "en": f"Superseded record: termination of UCDP conflict episode {epid} (see its per-row records)"
+                },
+                descriptions={
+                    "en": "atlas.ucdp_term up to 1.1.1 kept only the last of the episode's terminal rows here; from "
+                    "1.2.0 every terminal row has its own record ucdp:episode:<c_epid>:termination:<year>"
+                },
+            )
+        keys = {tr["year"]: f"{epid}:{tr['year']}:c_outcome" for _, tr, _, _, _ in recs}
+        for tl, tr, oc, olabel, ed in recs:
+            year = tr["year"]
+            tid = f"{eid}:termination:{year}" if multi else f"{eid}:termination"
+            tp = f"ep{epid}:t{year}" if multi else f"ep{epid}:t"
+            tsel = {"file": TERM_FILE, "row": tl, "c_epid": epid}
+            tcols = {**tsel, "columns": ["c_ependdate", "c_ependprec"]}
+            tq: dict[str, Any] = {**dict(ed.qualifiers)}
+            if dup_note is not None:
+                tq["source_duplicate_terminal_rows"] = dup_note
+            if not plain:  # the episode's end, per terminal row, with its typed note (or typed missing)
+                eq = {"definition": "end = c_ependdate (termination)", **tq}
+                ekey = f"ep{epid}:t{year}" if multi else f"ep{epid}"
+                if ed.value is not None:
+                    for s in cd.event_times(eid, ekey, end=ed.value, raw_sha256=st_, selector=tcols, qualifiers=eq):
+                        add(s)
+                elif ed.missing is not None:
+                    add(cd.missing_time_statement(eid, f"{ekey}:end", "P582", ed.missing, raw_sha256=st_,
+                                                  selector=tcols, qualifiers=eq))  # fmt: skip
+            if oc is None or olabel is None:
+                anomalies.setdefault("terminated_without_outcome", []).append(epid)
+                continue
+            ents[tid] = KgEntity(
+                qid=tid,
+                kind="conflict_termination",
+                labels={"en": f"End of {label}: {olabel}" + (f" (terminal row {year})" if multi else "")},
+                descriptions={
+                    "en": f"Termination of conflict episode {epid} coded as outcome {oc} "
+                    "(UCDP Conflict Termination Dataset v4-2024, c_outcome)"
+                    + (f"; the source codes {len(recs)} terminal rows for this episode, all kept" if multi else "")
+                },
+            )
+            add(
+                cd.string_stmt(
+                    f"{tp}:event_type",
+                    tid,
+                    "causdata:event_type",
+                    "conflict_termination",
+                    raw_sha256=st_,
+                    selector=tsel,
+                )
+            )
+            tdef = {
                 "definition": "The date, as precise as possible, when the conflict is terminated.",
                 "ucdp_ependprec": tr["c_ependprec"],
-            },
-        ):
-            add(s)
-        add(
-            cd.coded_stmt(
-                f"ep{epid}:t:outcome",
-                tid,
-                "ucdpterm:outcome",
-                "term_conflict",
-                "c_outcome",
-                oc,
-                raw_sha256=st_,
-                selector={**tsel, "column": "c_outcome"},
-            )
-        )
-        claims["term_conflict"].append(
-            cd.ClaimRecord(
-                cause_id=eid,
-                effect_id=tid,
-                relation="coded_outcome",
-                selector={
-                    "file": TERM_FILE,
-                    "row": tl,
-                    "c_epid": epid,
-                    "columns": ["c_outcome", "c_ependdate", "c_ependprec", "c_epterm"],
-                },
-                raw_sha256=st_,
-                codebook_term=f"c_outcome={oc}",
-                source_claim_id=f"{epid}:c_outcome",
-            )
-        )
-        if oc == 1:
-            ey = int(tr["c_ep_endyear"] or tr["year"])
-            cands = sorted({p for y, p in pa_by_conflict.get(cid, []) if y in (ey, ey + 1)})
-            for p in cands:
-                sts.append(
-                    KgStatement(
-                        key=f"ep{epid}:t:pa:{p.rsplit(':', 1)[1]}",
-                        subject=tid,
-                        property="causdata:agreement_in_termination_window",
-                        object_qid=p,
-                        qualifiers={
-                            "rule": "same conflict_id; agreement year = last active year or first inactive year "
-                            "(termination codebook, outcome 1); REVA pairing, not a causal claim",
-                            "candidates": len(cands),
-                            "c_ep_endyear": ey,
-                        },
-                        raw_sha256=st_,
-                        selector={**tsel, "columns": ["conflict_id", "c_ep_endyear", "c_outcome"]},
-                    )
+                **tq,
+            }
+            if ed.value is not None:
+                for s in cd.event_times(tid, tp, point=ed.value, raw_sha256=st_, selector=tcols, qualifiers=tdef):
+                    add(s)
+            elif ed.missing is not None:
+                add(cd.missing_time_statement(tid, f"{tp}:point", "P585", ed.missing, raw_sha256=st_, selector=tcols,
+                                              qualifiers=tdef))  # fmt: skip
+            add(
+                cd.coded_stmt(
+                    f"{tp}:outcome",
+                    tid,
+                    "ucdpterm:outcome",
+                    "term_conflict",
+                    "c_outcome",
+                    oc,
+                    raw_sha256=st_,
+                    selector={**tsel, "column": "c_outcome"},
                 )
+            )
+            scope: dict[str, Any] = {}
+            contests: tuple[str, ...] = ()
+            if dup_note is not None:
+                scope["source_duplicate_terminal_rows"] = dup_note
+                if dup_note["outcomes_differ"]:
+                    scope["contested_by_source"] = True
+                    contests = tuple(
+                        f"ds:{SOURCE_KEY}:term_conflict:{keys[tr2['year']]}"
+                        for _, tr2, o2, _, _ in recs
+                        if tr2 is not tr and o2 != oc
+                    )
+            if ed.missing is not None:
+                scope["effect_time"] = dict(ed.missing)
+            elif "source_date_certainty" in tq:
+                scope["effect_time_certainty"] = tq["source_date_certainty"]
+            claims["term_conflict"].append(
+                cd.ClaimRecord(
+                    cause_id=eid,
+                    effect_id=tid,
+                    relation="coded_outcome",
+                    selector={
+                        "file": TERM_FILE,
+                        "row": tl,
+                        "c_epid": epid,
+                        "columns": ["c_outcome", "c_ependdate", "c_ependprec", "c_epterm"],
+                    },
+                    raw_sha256=st_,
+                    codebook_term=f"c_outcome={oc}",
+                    source_claim_id=keys[year] if multi else f"{epid}:c_outcome",
+                    scope=scope,
+                    contests=contests,
+                )
+            )
+            if oc == 1:
+                ey = int(tr["c_ep_endyear"] or tr["year"])
+                cands = sorted({p for y, p in pa_by_conflict.get(cid, []) if y in (ey, ey + 1)})
+                for p in cands:
+                    sts.append(
+                        KgStatement(
+                            key=f"{tp}:pa:{p.rsplit(':', 1)[1]}",
+                            subject=tid,
+                            property="causdata:agreement_in_termination_window",
+                            object_qid=p,
+                            qualifiers={
+                                "rule": "same conflict_id; agreement year = last active year or first inactive year "
+                                "(termination codebook, outcome 1); REVA pairing, not a causal claim",
+                                "candidates": len(cands),
+                                "c_ep_endyear": ey,
+                            },
+                            raw_sha256=st_,
+                            selector={**tsel, "columns": ["conflict_id", "c_ep_endyear", "c_outcome"]},
+                        )
+                    )
     return {"entities": list(ents.values()), "statements": sts, "claims": claims, "anomalies": anomalies}
 
 
@@ -708,11 +794,27 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             out["entities"],
             out["statements"],
             source_key=SOURCE_KEY,
-            source_revision=f"ucdp-term-v4-2024+pa-{PA_VERSION}",
+            source_revision=f"ucdp-term-v4-2024+pa-{PA_VERSION}+reva-{CONNECTOR_VERSION}",
             raw_sha256s=sorted(set(shas.values())),
             retrieved_at=retrieved,
             origin=run.origin,
         )
+        # an episode with several terminal rows has per-row keys ``ep<c_epid>:t<year>:*`` from 1.2.0: its earlier
+        # single-row statements (``ep<c_epid>:end``, ``ep<c_epid>:t:*``) are retracted (append-only)
+        multi = sorted(out["anomalies"].get("episodes_with_several_terminal_rows", {}))
+        if multi:
+            res["kg"]["superseded_single_terminal"] = cd.retract_statements(
+                run.engine,
+                run.store,
+                source_key=SOURCE_KEY,
+                origin=run.origin,
+                # stored statement keys are "<source key>:<connector key>" (atlas_geopol_common.to_kg_model)
+                like_patterns=[f"{SOURCE_KEY}:{x}" for e in multi for x in (f"ep{e}:end", f"ep{e}:t:%")],
+                keep={f"{SOURCE_KEY}:{st.key}" for st in out["statements"]},
+                raw_sha256s=[shas["term"]],
+                retrieved_at=retrieved,
+                parameters={"connector": CONNECTOR_NAME, "connector_version": CONNECTOR_VERSION},
+            )
     deliveries = []
     for ds, raw_key in (("term_conflict", "term"), ("peace_agreements", "pa")):
         if not books[ds]["matches"]:
@@ -724,8 +826,10 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 source_key=SOURCE_KEY,
                 dataset=ds,
                 dataset_revision=e["dataset_revision"],
-                codebook=cd.codebook(ds, {CODEBOOKS[ds]: books[ds]["sha256"]}),
-                raw_sha256s=[shas[raw_key]],
+                codebook=cd.codebook(
+                    ds, {CODEBOOKS[ds]: books[ds]["sha256"]}, archived={CODEBOOKS[ds]: books[ds]["sha256"]}
+                ),
+                raw_sha256s=[shas[raw_key], books[ds]["sha256"]],
                 retrieved_at=retrieved,
                 origin=run.origin,
                 claims=out["claims"][ds],

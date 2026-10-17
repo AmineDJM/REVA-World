@@ -75,9 +75,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   esrb.fcdb 3 -> 8, ties.unc 8 -> 16); same caps.
 # * budgets.yaml -> budgets-1.3.12 (2026-10-17, AUDFIX): noaa.ncei_hazards 600 -> 800 (corrective same-day re-run of
 #   atlas.noaa_hazards after a registry label-quoting fix); same caps.
+# * budgets.yaml -> budgets-1.3.13 (2026-10-17, FIXB): merge of fixb.yaml (same-day re-runs of the audit2 dataset
+#   fixes: idmc.gidd 6 -> 12, ucdp.downloads 30 -> 40; cow.data unchanged at 44); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "208319085d872fcee186b1cb8593c88f742ac41d64850b56005e0502dbdea97b",
+    "budgets.yaml": "7d251ff40a7c3cfce33558535a4b62562fff76bdf9d76ef9e743f37f731b74a4",
 }
 
 
