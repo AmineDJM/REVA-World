@@ -365,3 +365,15 @@ taken after 02:03 may differ.
   flock /tmp/reva-devdb.lock uv run reva links prune
   flock /tmp/reva-devdb.lock uv run reva causal refresh --origin live
   ```
+
+## 9. Lead rebuild (2026-10-17, 02:10–02:40 UTC)
+
+* Freed disk: the local remote-tracking refs `origin/reva-data-*` (a 5.6 GB pack fetched by a stray
+  `git fetch`) were deleted locally and `git gc` run; the 16 data branches stay on GitHub. The clone's fetch
+  refspec is now limited to `claude/kind-darwin-kyy8re` so data branches are never fetched again.
+* `reva atlas snapshot --origin live --warm --skip-unchanged`: query file of snapshot `717e8452…` built.
+* `reva links materialise --atlas-origin live --kg-origin live`: materialisation 2, 1,151,759 links (KG
+  watermark 373); `submarine_cable` now 1,188 links.
+* `reva links prune --keep 1 --vacuum full`: materialisation 1 (snapshot `1d9b950f…`, 1,147,110 rows) pruned
+  because free disk fell to 4.4 GB; it is preserved in the `reva-data-20261017-*` dump. DB 5.88 → 4.47 GB;
+  free disk 5.9 GB.
