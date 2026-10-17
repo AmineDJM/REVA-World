@@ -107,3 +107,80 @@ Fixtures: the CC0 codebooks (NAVCO, MEC, MMP) and ESRB OP13 ("free use with cita
 every quote against them (poppler `pdftotext`; docx parsed in Python). The TIES and Archigos files state no
 redistribution grant, so they have no fixture; in fixture mode a codebook without a captured fixture is reported
 (`fixture_missing`) and the claims carry no `quote_source`. Live, a missing or changed codebook stops the claims.
+
+## Dev-DB re-ingest and results (2026-10-17, origin `live`)
+
+Connector versions were bumped, `reva seed` registered them (the registration check reports `ok` for every touched
+connector: `atlas.noaa_hazards(_wikidata)` 1.1.0, `atlas.icb` 1.1.0, `atlas.mid` 1.0.1, `atlas.ucdp_term` 1.1.1,
+`atlas.navco` / `atlas.mec` 1.1.1, `atlas.massmob` 1.1.1, `atlas.archigos` 1.1.1, `atlas.ecrises.*` 1.1.0,
+`atlas.ties` / `atlas.eusanct` 1.1.0), then each source was ingested alone with
+`flock /tmp/reva-devdb.lock uv run reva atlas ingest <source>`, and finally `reva causal refresh --origin live`.
+Budgets: `audfix.yaml` merged as budgets 1.3.11 / 1.3.12 (digest re-pinned in `src/reva/autonomy/policy.py`).
+
+| source | requests | claims: new revision / retracted | KG |
+|---|---:|---|---|
+| `atlas.ucdp_term` | 5 | term 0 / 0 (505 unchanged); **peace_agreements 0 / 382** | 382 PA statements conflicting in the 1.1.0 run (not stored), content restored in 1.1.1 |
+| `atlas.icb` | 5 | icb2: **5 retracted** (MAJRES = 1) | unchanged |
+| `atlas.mid` | 3 | **23 new revisions** (completed `outcome` quote) | unchanged |
+| `atlas.navco` (×2: 1.1.0, 1.1.1) | 11 + 11 | navco12 704 / **37**, navco13 558 / **62**, navco21 2,907 / 0 | 5,285 new revisions (typed-missing dates, L1 qualifier) |
+| `atlas.mec` | 3 | 3,414 / **90** | 2,230 new revisions |
+| `atlas.massmob` | 3 | 7,221 / 0 | 14,442 new revisions |
+| `atlas.archigos` | 4 | 0 / **327** | 1,926 new revisions, 327 superseded entities, **1,635 coup statements retracted** |
+| `atlas.ecrises.esrb` | 2 | 69 / **27** | unchanged |
+| `atlas.ties` | 3 | 1,024 / 0 | unchanged |
+| `atlas.noaa_hazards` (×2) | 239 + 239 | 2,186 + 3 (label fix) / 0 | unchanged |
+| `reva causal refresh` | — | Wikidata 1,672 new revisions (refs/qualifiers verbatim), 0 retracted; unknown endpoints counted: 846 claims (659 entities) | — |
+
+The second NOAA run fixed a registry error found in the first: the YAML flow mapping split the label "Volcano,
+Earthquake and Landslide", so 3 cause-code-5 claims were `unclassified`; labels are now quoted and a test checks every
+registry label against the archived descriptor.
+
+**Before / after per defect** (current live claims; before = 52,376 claims at 02:40 UTC, after = 51,446):
+
+| # | before | after |
+|---|---|---|
+| H4 | 2,186 NOAA claims, none with NCEI's codes; doubtful (validity 0–2: 788, cause code 2: 23) graded B (2,171 B, 15 E) | 2,186 with `source_validity`; 791 have a `doubtful` entry → **783 D** (CAUSFIX rule) + 8 E (temporal), 1,388 B, 15 E |
+| M2 | Wikidata loader: not counted | **846** of 1,672 Wikidata claims (659 entities) reported by `load_kg_claims` (`unknown_endpoint_claims` + sample); the audit's 324 was at 1,002 claims |
+| M3 | 9,015 `overlapping` on copied dates (MMP 7,221, MEC 1,115, NAVCO 1.2 352, Archigos 327) | **0**: 8,688 `undetermined` with `undated: ["effect"]` + `effect_time_missing`; Archigos claims gone (M5) |
+| M4 | 16,440 claims quoting unarchived codebooks | 0: all 15,897 remaining claims of these sources carry `codebook.quote_source` (NAVCO 4,169, MEC 3,414, MMP 7,221, TIES 1,024, ESRB 69); Archigos quotes on the KG removal events; 8 codebooks archived live (`evidence.acquisition`) |
+| M5 | 327 coup → removal claims; 1,635 coup statements | **0** claims, 0 current coup statements |
+| M6 | 382 `reaction_to` | **0** (context `ucdppa:conflict`) |
+| M7 | 96 regex claims; 6 silently cut at 4,000 | **69** list-coded claims; 4 marked `mechanism_truncated` |
+| L1 | 180 `success = 0` citing `success` | 0 (180 cite `progress`) |
+| L2 | 189 outcome claims for ONGOING (MEC 90, NAVCO 1.2 37, 1.3 62) | **0** |
+| L3 | ICB 5 inaction reactions; MMP "ignore" dropped from 296 claims | ICB **0**; MMP 296 claims keep the full list, inaction marked |
+| L4 | 1,672 Wikidata claims with the allow-listed refs only (T3 179, T4 1,491) | 1,672 verbatim from the raw JSON (T3 190, T4 1,480: +11 T3, the audit's 11) |
+| L5 | MID `outcome` cut (23 claims cite it); NOAA help prefix on 2,186 | **0 / 0** |
+| L8 | retractions exercised only in tests | **930** claim retractions through the loader this run (382 + 5 + 37 + 62 + 90 + 327 + 27), 1,635 KG statement retractions; tests on throwaway DBs |
+
+Totals: grades B 50,692 → 48,979, C 154 → 160, D 1,482 → 2,259, E 48 → 48; temporal overlapping 38,759 → 29,726,
+undetermined 1,586 → 10,247. (Other agents' loads ran in between: CAUSMORE's claims are in both snapshots.)
+
+## Tests
+
+* `tests/integration/test_audfix_loader.py` (throwaway DB): unknown-endpoint counting; somevalue → `no_longer_causal`
+  + `value_not_an_item`; a complete delivery minus one row retracts that row (append-only, reinstated when it comes
+  back); `complete_requested/effective`; an empty complete delivery retracts all; `quote_source`; verbatim refs and
+  qualifiers from raw (L4).
+* `tests/integration/test_atlas_coups_ingest.py`: a database holding the 1.0.0 Archigos coup statement and claim is
+  cleaned by the 1.1.x run (statement and claim retracted, rows kept).
+* `tests/unit/test_audfix_codebooks.py`: every quote verbatim at its declared page / paragraph in the archived codebook
+  bytes (fixtures), pins and locations of TIES / Archigos.
+* Connector tests updated: NOAA `source_validity` and label registry, ICB inaction, UCDP PA context, NAVCO/MEC/MMP
+  (typed-missing dates, ONGOING, L1, L3, codebook delivery), Archigos one-event model, ESRB strict lists and truncation
+  marker, event-kind test (no `archigos:coup` events).
+* Unit suite: 2,259 passed. One unrelated failure deselected: `tests/unit/nlqa/test_nlqa_causal.py::
+  test_ui_fixture_is_the_current_pipeline_output` (the NLQA catalog digest changed with new atlas catalog concepts;
+  the UI fixture in `ui/src/v3/causal/`, being edited by the UI agent, needs regenerating).
+
+## Not done / residuals
+
+* M2: frontier entities are counted, not harvested; claims with a missing endpoint are not kept out of chains here
+  (CAUSFIX's chain rules apply). KG entity retraction does not exist, so retracted endpoints are only visible as
+  unknown endpoints.
+* M5: the Powell & Thyne coup page answers HTTP 403 to the platform client, so the context link to P&T events is not
+  in the dev DB (it was not there before either).
+* M7 candidates: the 27 dropped ESRB cells are listed in the build report, not inserted into `kg.causal_candidate`
+  (the candidate space is for Wikipedia text / models, T5/T6).
+* CAUSMORE's PA-X `reaction_to` (UCDP conflict → PA-X agreement) has the same shape as M6; CAUSMORE already moved it to
+  context (`atlas.pax` 1.1.0).

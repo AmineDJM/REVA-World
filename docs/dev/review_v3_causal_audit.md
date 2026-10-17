@@ -66,7 +66,7 @@ dates, temporal check, grade arithmetic and verbatim text all held. The populati
 | L5 | Low | Quoted definitions truncated or not from archived bytes: MID `outcome` ends mid-sentence; the NOAA "help" prefix | 2,419 / 2,186 (text only) | fixed — AUDFIX: MID quote completed; NOAA help prefix dropped |
 | L6 | Low | `coded_outcome` (an event → its own REVA-made outcome entity) makes up 36 % of the "causal claims" and counts in chains | 9,912 | decided — CAUSFIX: `coded_outcome` not traversed by chains (`v3_causfix.md`) |
 | L7 | Low | A self-loop and five cycles are loaded as ordinary claims. The consistency report shows them, but nothing quarantines them | 1 + 13 edges | fixed — CAUSFIX: self-loop / cycle flags, chain quarantine |
-| L8 | Low | Retraction is never exercised on live data; the KG retraction reason is mislabelled when a value becomes somevalue or novalue; complete → partial downgrade is silent | 0 retractions | fixed — AUDFIX: retraction exercised live (1,005 retractions through the loader) and in throwaway-DB tests; `value_not_an_item` detail; `complete_requested/effective` |
+| L8 | Low | Retraction is never exercised on live data; the KG retraction reason is mislabelled when a value becomes somevalue or novalue; complete → partial downgrade is silent | 0 retractions | fixed — AUDFIX: retraction exercised live (930 claim retractions through the loader, 1,635 KG statement retractions) and in throwaway-DB tests; `value_not_an_item` detail; `complete_requested/effective` |
 
 ## 2. Method
 
