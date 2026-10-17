@@ -131,7 +131,7 @@ owner decision before archiving it) joined to the ICD-10 xrefs already loaded fr
 
 ## Drugs, vaccines, Wikidata bridges (specs, not harvested: WDQS throttled)
 
-`registry/kg/queries/health/`: `disease_ontology_ids` (P699), `mondo_ids` (P5270), `uberon_ids` (P1554) —
+`registry/kg/queries/health/wikidata/`: `disease_ontology_ids` (P699), `mondo_ids` (P5270), `uberon_ids` (P1554) —
 the identifier bridges Wikidata QID ↔ `doid:`/`mondo:`/`uberon:` entities (V4LINK joins them; that also links the
 V3 `science.vaccines` items: vaccine `—P1924 vaccine for→` disease Q `—P699→ doid:n`);
 `disease_treatments_symptoms` (P2176, P780 for items with P699); `essential_medicines` (seeds items pointing to the
@@ -189,7 +189,7 @@ flock /tmp/reva-devdb.lock uv run reva seed                     # if connector v
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.who_ghe   # ~186 requests, ~48 MB raw
 flock /tmp/reva-devdb.lock uv run reva causal refresh --origin live # grade the 14,508 ontology T1 claims (lead)
 uv run python -m reva.kg.harvest merge-property-requests          # WDHARVEST: P699 P5270 P1554 P2176 P2175 P494 P7807
-uv run python -m reva.kg.harvest run registry/kg/queries/science/health --via api
+uv run python -m reva.kg.harvest run registry/kg/queries/health --via api
 # monthly refresh (retracts what a new release drops):
 for s in atlas.uberon atlas.doid atlas.mondo atlas.clingen; do flock /tmp/reva-devdb.lock uv run reva atlas ingest $s; done
 ```
