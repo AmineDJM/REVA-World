@@ -152,6 +152,20 @@ _p(
 # UCDP uses GW codes but keeps 345 ("Serbia (Yugoslavia)") for Serbia after 2006 instead of GW 340
 # (UCDP Country-Year Dataset 26.1 rows 2006-2025 for country_id 345).
 _p(("ucdp",), 345, date(2006, 6, 5), _FUTURE, "SRB", "Serbia", "UCDP keeps GW 345 for Serbia after 2006")
+# GW 260 after unification (FIX6, PRED-CONFLICT): Gleditsch & Ward continue code 260 for unified Germany (the FRG
+# continued as the state; GW 255 is pre-1945 Germany), and UCDP uses 260 for Germany 1990-2025. The countrycode
+# panel publishes gwn 260 -> DEU for those years. Without this window the undated historical entry 260 "West
+# Germany" (registry/entities/historical_states_qids.json, a COW-shared code) answered every date. Before
+# 1990-10-03 the GW window above (FRG, no ISO entity) still applies.
+_p(
+    ("gw",),
+    260,
+    date(1990, 10, 3),
+    _FUTURE,
+    "DEU",
+    "Germany",
+    "GW 260 = unified Germany from 1990-10-03 (countrycode gwn 260 -> DEU)",
+)
 # Taiwan: crosswalk entity TWN since crosswalk 1.1.0 (ISO 3166-1). COW State System 2024 (statelist2024.csv,
 # States2024.zip sha256 c11689e8c0aa70ede855f6b605c4dd71c7b04122b71d5827dab5ba06b32e2015): "TAW,713,Taiwan,1949,12,8,
 # 2024,12,31"; the countrycode panel gives cown/gwn 713 -> TWN for 1949-2020. Before 1949-12-08 there is no window:
@@ -382,6 +396,9 @@ class KgStatement:
     qualifiers: Mapping[str, Any] = field(default_factory=dict)
     raw_sha256: str = ""
     selector: Mapping[str, Any] = field(default_factory=dict)
+    #: further references after the statement's own raw selector, e.g. a second input artifact with its own
+    #: licence (``{"raw_sha256", "role", "licence"}``; AUDIT4 L2: the Natural Earth polygons of GED placements)
+    extra_refs: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         if (self.object_qid is None) == (self.value is None):
@@ -871,7 +888,10 @@ def to_kg_model(
                 end=_kg_time(s.end, s.end_precision),
                 point_in_time=_kg_time(s.point_in_time, s.pit_precision),
                 qualifiers=dict(s.qualifiers),
-                references=({"raw_sha256": s.raw_sha256, "selector": dict(s.selector)},),
+                references=(
+                    {"raw_sha256": s.raw_sha256, "selector": dict(s.selector)},
+                    *(dict(r) for r in s.extra_refs),
+                ),
                 source_key=source_key,
                 source_revision=source_revision,
                 statement_id=s.key,

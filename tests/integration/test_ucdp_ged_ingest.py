@@ -48,3 +48,34 @@ async def test_ucdp_ged_fixture_ingest(registered) -> None:  # type: ignore[no-u
     again = await g.atlas_ingest(make_run(g.atlas_source(), db.worker, db.store, FixtureHttp(g.NAME)))
     assert not any(t["created"] for t in again["tables"])
     assert again["kg"]["load"]["statements_inserted"] == 0
+    # FIX6 (AUDIT4 M1): GED statistics the new build no longer derives are retracted, append-only, with the
+    # loader's derived reason (the statement's raw GED zip is in the delivery -> reclassified_by_reva)
+    with db.worker.connect() as c:
+        keys = set(
+            c.execute(
+                text("SELECT statement_key FROM kg.statement_current WHERE source_key = :s AND statement_key LIKE :p"),
+                {"s": g.SOURCE_KEY, "p": "ucdp.ged:ged:%:adm1:%"},
+            ).scalars()
+        )
+        ged_sha, ret_at = c.execute(
+            text("SELECT raw_sha256, retrieved_at FROM kg.statement_current WHERE statement_key = ANY(:k) LIMIT 1"),
+            {"k": sorted(keys)},
+        ).one()
+    drop = sorted(keys)[:2]
+    with db.worker.connect() as c:
+        everything = set(
+            c.execute(
+                text("SELECT statement_key FROM kg.statement_current WHERE source_key = :s AND statement_key LIKE :p"),
+                {"s": g.SOURCE_KEY, "p": "ucdp.ged:ged:%"},
+            ).scalars()
+        )
+    rep = g.retract_absent_ged_statements(
+        db.worker, db.store, everything - set(drop), raw_sha256s=[ged_sha], retrieved_at=ret_at, origin="test_fixture"
+    )
+    assert rep["absent"] == 2 and rep["retractions_inserted"] == 2
+    with db.worker.connect() as c:
+        rows = c.execute(
+            text("SELECT reason, detail->>'basis' FROM kg.statement_retraction WHERE statement_key = ANY(:k)"),
+            {"k": drop},
+        ).all()
+    assert sorted(rows) == [("reclassified_by_reva", "raw_unchanged")] * 2

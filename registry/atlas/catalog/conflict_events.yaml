@@ -24,7 +24,7 @@ concepts:
   source_order:
   - ucdp_ged.country_month.deaths_best|tov=all
   provider_declared: true
-  notes: Low/high bounds deaths_low|tov=all / deaths_high|tov=all; events spanning months are counted in the start month (flags.spanning).
+  notes: 'Low/high bounds deaths_low|tov=all / deaths_high|tov=all; events spanning months are counted in the start month (flags.spanning). ISR rows (FIX6, AUDIT4 M2): GED codes events in Gaza and the West Bank under Israel (country_id 666), so the Israel country-month values include them (GED''s coding, kept verbatim); each such cell carries flags.events_placed_in_other_territory / deaths_best_placed_in_other_territory / other_territory_iso3 [PSE] (REVA-placed events, where_prec 1-4: a lower bound). Same flag on SDN before 2011-07-09 (SSD), IDN before 2002-05-20 (TLS), ETH before 1993-05-24 (ERI), ZAF before 1990-03-21 (NAM); registry/conflict/territory_exceptions.yaml.'
 - id: conflict_events.deaths_month_state_based
   labels:
     fr: Morts dans les conflits étatiques, par mois (UCDP GED, calculé)
@@ -39,6 +39,7 @@ concepts:
   source_order:
   - ucdp_ged.country_month.deaths_best|tov=sb
   provider_declared: true
+  notes: 'ISR rows (FIX6, AUDIT4 M2): GED codes events in Gaza and the West Bank under Israel (country_id 666), so the Israel country-month values include them (GED''s coding, kept verbatim); each such cell carries flags.events_placed_in_other_territory / deaths_best_placed_in_other_territory / other_territory_iso3 [PSE] (REVA-placed events, where_prec 1-4: a lower bound). Same flag on SDN before 2011-07-09 (SSD), IDN before 2002-05-20 (TLS), ETH before 1993-05-24 (ERI), ZAF before 1990-03-21 (NAM); registry/conflict/territory_exceptions.yaml.'
 - id: conflict_events.deaths_month_non_state
   labels:
     fr: Morts dans les conflits non étatiques, par mois (UCDP GED, calculé)
@@ -53,6 +54,7 @@ concepts:
   source_order:
   - ucdp_ged.country_month.deaths_best|tov=ns
   provider_declared: true
+  notes: 'ISR rows (FIX6, AUDIT4 M2): GED codes events in Gaza and the West Bank under Israel (country_id 666), so the Israel country-month values include them (GED''s coding, kept verbatim); each such cell carries flags.events_placed_in_other_territory / deaths_best_placed_in_other_territory / other_territory_iso3 [PSE] (REVA-placed events, where_prec 1-4: a lower bound). Same flag on SDN before 2011-07-09 (SSD), IDN before 2002-05-20 (TLS), ETH before 1993-05-24 (ERI), ZAF before 1990-03-21 (NAM); registry/conflict/territory_exceptions.yaml.'
 - id: conflict_events.deaths_month_one_sided
   labels:
     fr: Victimes de la violence unilatérale contre les civils, par mois (UCDP GED, calculé)
@@ -67,6 +69,7 @@ concepts:
   source_order:
   - ucdp_ged.country_month.deaths_best|tov=os
   provider_declared: true
+  notes: 'ISR rows (FIX6, AUDIT4 M2): GED codes events in Gaza and the West Bank under Israel (country_id 666), so the Israel country-month values include them (GED''s coding, kept verbatim); each such cell carries flags.events_placed_in_other_territory / deaths_best_placed_in_other_territory / other_territory_iso3 [PSE] (REVA-placed events, where_prec 1-4: a lower bound). Same flag on SDN before 2011-07-09 (SSD), IDN before 2002-05-20 (TLS), ETH before 1993-05-24 (ERI), ZAF before 1990-03-21 (NAM); registry/conflict/territory_exceptions.yaml.'
 - id: conflict_events.events_month_all
   labels:
     fr: Événements de violence organisée, par mois (UCDP GED, calculé)
@@ -82,3 +85,4 @@ concepts:
   source_order:
   - ucdp_ged.country_month.events|tov=all
   provider_declared: true
+  notes: 'ISR rows (FIX6, AUDIT4 M2): GED codes events in Gaza and the West Bank under Israel (country_id 666), so the Israel country-month values include them (GED''s coding, kept verbatim); each such cell carries flags.events_placed_in_other_territory / deaths_best_placed_in_other_territory / other_territory_iso3 [PSE] (REVA-placed events, where_prec 1-4: a lower bound). Same flag on SDN before 2011-07-09 (SSD), IDN before 2002-05-20 (TLS), ETH before 1993-05-24 (ERI), ZAF before 1990-03-21 (NAM); registry/conflict/territory_exceptions.yaml.'

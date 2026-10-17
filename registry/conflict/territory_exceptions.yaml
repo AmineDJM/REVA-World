@@ -1,0 +1,53 @@
+# UCDP GED ADM1 placement: reviewed territory exceptions (agent FIX6, 2026-10-17; AUDIT4 M1/M2).
+#
+# Rule (src/reva/adapters/connectors/atlas_ucdp_ged.py, place_adm1): an event with where_prec 1-4 is placed in
+# the Natural Earth admin-1 polygon that covers its GED coordinates only when the polygon's country (ISO 3166-2
+# prefix) is GED's own country for the event (country_id -> ISO3 through the Gleditsch-Ward crosswalk at the
+# event date). When the two differ, the event is NOT placed (status not_placed:border_generalisation; the polygon
+# code is kept in the event row's flags as adm1_polygon) -- Natural Earth 1:10m borders are generalised, so a
+# point a few hundred metres inside one state can fall in the neighbour's polygon (AUDIT4 M1: Kobane -> TR-63,
+# Goma -> RW, "Egyptian side of Rafah" -> PS-GZZ).
+#
+# The ONLY exceptions are the pairs below: territories GED codes under another state (the state that
+# controlled / administered the territory, or the predecessor state before an independence). Such an event is
+# placed (status placed:territory_exception) and counted in the aggregate flags (events_ged_country_differs,
+# events_placed_in_other_territory), never re-coded: GED's country_id and REVA's ISO3 of the event are kept
+# verbatim. Matching is by identifiers only (ISO3 of GED's GW code, ISO 3166-2 prefix of the polygon) and dates;
+# never by place names.
+#
+# `before`: the exception applies to events with date_start strictly before this date (the independence date
+# of the territory's state in the Gleditsch-Ward state list); absent = no end.
+#
+# STATUS: curator decision, pending owner review (owner decision 2 of docs/dev/v6_conflict.md). In particular
+# the ISR -> PSE entry is a coding fact about GED (Gaza / West Bank events carry country_id 666 Israel), not a
+# statement about sovereignty; REVA places those events in the Palestinian ADM1 polygons that contain them and
+# flags the Israel country cells (events_placed_in_other_territory) so country totals are never read as events
+# in Israel's ADM1 units.
+schema: reva.conflict.territory_exceptions/1
+review: pending_owner
+decided_by: FIX6 (curator)
+exceptions:
+  - ged_iso3: ISR
+    polygon_iso3: PSE
+    before: null
+    basis: >-
+      GED codes events in Gaza and the West Bank under Israel (country_id 666). Natural Earth admin-1 gives these
+      areas PS-* codes. AUDIT4 M2: 10,846 events (69,843 best deaths) in GED 26.1.
+  - ged_iso3: SDN
+    polygon_iso3: SSD
+    before: "2011-07-09"
+    basis: South Sudan independent 2011-07-09 (GW 626 from that date); earlier events are coded Sudan (GW 625).
+  - ged_iso3: IDN
+    polygon_iso3: TLS
+    before: "2002-05-20"
+    basis: Timor-Leste independent 2002-05-20 (GW 860 from that date); earlier events are coded Indonesia.
+  - ged_iso3: ETH
+    polygon_iso3: ERI
+    before: "1993-05-24"
+    basis: Eritrea independent 1993-05-24 (GW 531 from that date); earlier events are coded Ethiopia.
+  - ged_iso3: ZAF
+    polygon_iso3: NAM
+    before: "1990-03-21"
+    basis: >-
+      Namibia independent 1990-03-21 (GW 565 from that date); earlier events (South African administration of
+      South West Africa) are coded South Africa.

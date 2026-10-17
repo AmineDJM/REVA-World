@@ -14,6 +14,7 @@ causal properties (P828…) belong to no family and are not traversed by a famil
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable, Mapping
 from typing import Any
 
@@ -112,13 +113,58 @@ def _rights(r: Mapping[str, Any], by_sha: Mapping[str, dict[str, Any] | None]) -
     by the GHCN-M run under NOAA's terms, AUDIT3 L2): then the licence the statement's own reference states."""
     if kq.is_community_edited(r.get("source_key")):
         return dict(WIKIDATA_RIGHTS)
+    base = _own_rights(r, by_sha)
+    inputs = _input_licences(r)
+    if base is None or not inputs:
+        return base
+    return {**base, "inputs": inputs}
+
+
+def _input_licences(r: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Further inputs a statement cites with their own licence (references to *another* raw artifact carrying a
+    ``licence``), e.g. the Natural Earth polygons of a UCDP GED ADM1 placement (AUDIT4 L2). Served next to the
+    statement's rights, never instead of them (the statement's own source terms still apply)."""
+    out = []
+    refs = r.get("refs")
+    for ref in refs if isinstance(refs, list) else []:
+        if (
+            isinstance(ref, Mapping)
+            and ref.get("raw_sha256")
+            and ref.get("raw_sha256") != r.get("raw_sha256")
+            and isinstance(ref.get("licence"), str)
+        ):
+            out.append({k: ref[k] for k in ("raw_sha256", "role", "licence", "attribution") if ref.get(k)})
+    # statements loaded before the second reference existed name the polygons only in a qualifier (UCDP GED
+    # ``ucdpged:events_in_adm1`` of connector 1.0.0): the Natural Earth artifact's terms are served from it
+    q = r.get("qualifiers")
+    ne = q.get("natural_earth_sha256") if isinstance(q, Mapping) else None
+    if isinstance(ne, str) and re.fullmatch(r"[0-9a-f]{64}", ne) and all(x.get("raw_sha256") != ne for x in out):
+        out.append(
+            {
+                "raw_sha256": ne,
+                "role": "adm1_polygons",
+                "licence": NATURAL_EARTH_LICENCE,
+                "attribution": "Made with Natural Earth",
+                "basis": "qualifier natural_earth_sha256",
+            }
+        )
+    return out
+
+
+#: registry/sources/naturalearth_admin1_10m.yaml (FIX4C L2)
+NATURAL_EARTH_LICENCE = "Public domain (Natural Earth)"
+
+
+def _own_rights(r: Mapping[str, Any], by_sha: Mapping[str, dict[str, Any] | None]) -> dict[str, Any] | None:
     art = by_sha.get(str(r.get("raw_sha256")))
     rec = (art or {}).get("recorded_for_source_key")
     own = _statement_licence(r)
     if own and rec and r.get("source_key") and rec != r.get("source_key"):
         from reva.atlas.snapshot import normalise_rights
 
-        fixed = normalise_rights({"licence": own}, basis=f"statement_reference (raw artifact rights recorded for {rec})")
+        fixed = normalise_rights(
+            {"licence": own}, basis=f"statement_reference (raw artifact rights recorded for {rec})"
+        )
         if fixed is not None:
             return fixed
     return None if art is None else {k: v for k, v in art.items() if k != "recorded_for_source_key"}

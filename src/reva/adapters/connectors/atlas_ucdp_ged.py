@@ -39,10 +39,13 @@ Atlas source ``ucdp_ged`` (tables documented in ``docs/dev/v6_conflict.md`` sect
 ADM1 placement is a REVA computation: the event coordinates (only ``where_prec`` 1-4: exact point, <= 25 km, ADM2 or
 ADM1 representative point) are tested against the Natural Earth admin-1 polygons (shapely STRtree, ``covered_by``);
 the subdivision is identified only by the ISO 3166-2 code Natural Earth publishes for the polygon (placeholder and
-ambiguous codes are not used, as in ``atlas_ghcnm``). Geometry decides; when the code's country (ISO 3166-1 prefix)
-is not the country GED gives the event (Gaza / West Bank events GED codes under Israel, pre-2011 Sudan events in
-present-day South Sudan, border points at the 1:10m generalisation) the event is still placed, with status
-``placed:ged_country_differs`` and a count in the aggregate flags. GED's own ``adm_1`` *names* are never used.
+ambiguous codes are not used, as in ``atlas_ghcnm``). When the code's country (ISO 3166-1 prefix) is not the
+country GED gives the event, the event is placed only if the pair is a reviewed territory exception
+(``registry/conflict/territory_exceptions.yaml``: Gaza / West Bank events GED codes under Israel, Sudan events before
+2011-07-09 in present-day South Sudan, ...; status ``placed:territory_exception``); any other cross-border hit is the
+1:10m border generalisation and the event is not placed (``not_placed:border_generalisation``, polygon kept in the
+event flags as ``adm1_polygon``; FIX6, AUDIT4 M1). Country-month cells count their events placed in another
+territory (``events_placed_in_other_territory``, AUDIT4 M2). GED's own ``adm_1`` *names* are never used.
 
 KG (source key ``ucdp.ged``): conflict-level entities only -- ``ucdp:nonstate:<conflict_id>`` (kind
 ``non_state_conflict``) and ``ucdp:onesided:<conflict_id>`` (kind ``one_sided_violence``) from the Non-State /
@@ -86,7 +89,7 @@ from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.ucdp_ged"
 CONNECTOR_NAME = NAME
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # FIX6: border rule + territory exceptions (AUDIT4 M1/M2), left-censoring (L1), NE ref (L2)
 SOURCE_KEY = "ucdp.ged"
 ATLAS_SOURCE = "ucdp_ged"
 PARSER_VERSION = "atlas-ucdp-ged/1"
@@ -94,7 +97,7 @@ GED_VERSION = "26.1"
 #: final GED coverage end: Candidate events dated on or before it are not used (the final release covers them)
 GED_COVERAGE_END = date(2025, 12, 31)
 CANDIDATE_YEAR = 26  # Candidate releases of this UCDP year (2026) follow the final 26.1 release
-KG_REVISION = "ucdp-26.1+v6conflict.1"  # provider release + REVA's representation
+KG_REVISION = "ucdp-26.1+v6conflict.2"  # provider release + REVA's representation
 HOST = "ucdp.uu.se"
 NE_HOST = "naciscdn.org"
 BASE = f"https://{HOST}/downloads/"
@@ -137,6 +140,13 @@ RIGHTS: dict[str, str] = {
     "one-sided)",
 }
 NE_LICENCE = "Public domain (Natural Earth)"
+#: GED's first date (1989-01-01) + one quarter: a conflict's first GED event before it is left-censored (AUDIT4 L1)
+LEFT_CENSORED_BEFORE = date(1989, 4, 1)
+LEFT_CENSORED_NOTE = (
+    "left-censored: UCDP GED coverage starts 1989-01-01 and this conflict's first GED event falls in GED's first "
+    "quarter, so the conflict may have had events before GED's start; the date is the earliest GED event, not the "
+    "conflict's start"
+)
 
 TOV = {"1": "sb", "2": "ns", "3": "os"}
 TOV_LABEL = {"sb": "state-based conflict", "ns": "non-state conflict", "os": "one-sided violence"}
@@ -164,6 +174,11 @@ DEFINITIONS: dict[str, str] = {
     "active years (years that have crossed the 25 battle related deaths threshold) and non-active years (the "
     "remainder).",
 }
+OTHER_TERRITORY_NOTE = (
+    "GED codes these events under this country (country_id kept verbatim); REVA's point-in-polygon places them in "
+    "another territory's ADM1 polygon (reviewed territory exception, registry/conflict/territory_exceptions.yaml); "
+    "only events with where_prec 1-4 are placed, so the count is a lower bound"
+)
 CM_METHOD = (
     "REVA sum over GED events by calendar month of date_start (events whose date_end falls in a later month are "
     "counted in the start month; their number is in flags.spanning); tov = type_of_violence (sb 1, ns 2, os 3)"
@@ -171,9 +186,12 @@ CM_METHOD = (
 ADM1_METHOD = (
     "REVA point-in-polygon of GED coordinates (where_prec 1-4) against Natural Earth 1:10m admin-1 polygons, "
     "subdivision identified by the polygon's published iso_3166_2 code (placeholder codes and codes Natural Earth "
-    "gives to several polygons are not used); flags.country_iso3 = the code's ISO 3166-1 prefix, "
-    "flags.events_ged_country_differs = events whose GED country is another state (e.g. Gaza/West Bank events "
-    "GED codes under Israel, pre-2011 Sudan events in present-day South Sudan); " + CM_METHOD
+    "gives to several polygons are not used); an event is placed only when the polygon's country is GED's own "
+    "country for the event, or the pair is a reviewed territory exception (registry/conflict/"
+    "territory_exceptions.yaml: Gaza/West Bank events GED codes under Israel, Sudan before 2011-07-09 in present-day "
+    "South Sudan, ...); other cross-border hits are border generalisation and are not placed; flags.country_iso3 = "
+    "the code's ISO 3166-1 prefix, flags.events_ged_country_differs = placed events whose GED country is another "
+    "(territory exception) or a historical state; " + CM_METHOD
 )
 
 PREDICATES: dict[str, tuple[str, str, str, str]] = {
@@ -488,22 +506,85 @@ def adm1_index(body: bytes, *, origin: str) -> Adm1Index:
     )
 
 
-def place_adm1(df: Any, idx: Adm1Index, iso3_of: Sequence[str | None]) -> tuple[list[str | None], list[str]]:
-    """Per event: (ISO 3166-2 code or None, status). Vectorised STRtree query over the placeable events."""
+@dataclass(frozen=True)
+class TerritoryException:
+    """A reviewed (GED country, polygon country) pair placed despite the countries differing (see the YAML)."""
+
+    ged_iso3: str
+    polygon_iso3: str
+    before: date | None
+
+    def applies(self, ged_iso3: str | None, polygon_iso3: str | None, when: date) -> bool:
+        return (
+            ged_iso3 == self.ged_iso3
+            and polygon_iso3 == self.polygon_iso3
+            and (self.before is None or when < self.before)
+        )
+
+    @property
+    def label(self) -> str:
+        return f"{self.ged_iso3}->{self.polygon_iso3}"
+
+
+def territory_exceptions_file() -> Path:
+    return Path(__file__).resolve().parents[4] / "registry" / "conflict" / "territory_exceptions.yaml"
+
+
+def load_territory_exceptions(path: Path | None = None) -> tuple[TerritoryException, ...]:
+    """The reviewed territory list (``registry/conflict/territory_exceptions.yaml``); ISO3 codes and dates only."""
+    import yaml
+
+    doc = yaml.safe_load((path or territory_exceptions_file()).read_text(encoding="utf-8"))
+    if not isinstance(doc, dict) or doc.get("schema") != "reva.conflict.territory_exceptions/1":
+        raise _err("territory_exceptions.yaml: unknown schema", kind="request_shape")
+    out = []
+    for e in doc.get("exceptions") or ():
+        a, b = str(e["ged_iso3"]), str(e["polygon_iso3"])
+        if not (re.fullmatch(r"[A-Z]{3}", a) and re.fullmatch(r"[A-Z]{3}", b)) or a == b:
+            raise _err(f"territory_exceptions.yaml: bad pair {a}->{b}", kind="request_shape")
+        before = e.get("before")
+        out.append(TerritoryException(a, b, date.fromisoformat(str(before)) if before else None))
+    return tuple(out)
+
+
+TERRITORY_EXCEPTIONS: tuple[TerritoryException, ...] = load_territory_exceptions()
+
+
+@dataclass
+class Placement:
+    codes: list[str | None]  # ISO 3166-2 code of the placed events (None = not placed)
+    status: list[str]
+    polygon: list[str | None]  # covering polygon code of events NOT placed for border generalisation
+    exception: list[str | None]  # territory-exception label ("ISR->PSE") of events placed under one
+
+
+def place_adm1(
+    df: Any,
+    idx: Adm1Index,
+    iso3_of: Sequence[str | None],
+    exceptions: Sequence[TerritoryException] | None = None,
+) -> Placement:
+    """Per event: ISO 3166-2 code (or None) and status. Vectorised STRtree query over the placeable events.
+
+    AUDIT4 M1: a polygon of another country than GED's own (a current state) places the event only for a reviewed
+    territory exception; otherwise the hit is border generalisation (status ``not_placed:border_generalisation``,
+    polygon code kept apart for audit)."""
     import numpy as np
     import shapely
 
     from reva.atlas.tables import country_iso3
 
+    exc = TERRITORY_EXCEPTIONS if exceptions is None else tuple(exceptions)
     n = df.height
-    codes: list[str | None] = [None] * n
-    status = ["not_placed:where_prec_" + str(w) for w in df["where_prec"].to_list()]
+    out = Placement([None] * n, ["not_placed:where_prec_" + str(w) for w in df["where_prec"].to_list()], [None] * n,
+                    [None] * n)  # fmt: skip
     wp = df["where_prec"].to_list()
     cand = [i for i in range(n) if wp[i] in ADM1_WHERE_PREC]
     if not cand:
-        return codes, status
+        return out
     lat = df["latitude"].to_list()
     lon = df["longitude"].to_list()
+    d0 = df["d0"].to_list()
     pts = shapely.points(np.array([float(lon[i]) for i in cand]), np.array([float(lat[i]) for i in cand]))
     inp, hit = idx.tree.query(pts, predicate="covered_by")
     hits: dict[int, list[int]] = defaultdict(list)
@@ -513,23 +594,32 @@ def place_adm1(df: Any, idx: Adm1Index, iso3_of: Sequence[str | None]) -> tuple[
     for j, i in enumerate(cand):
         h = hits.get(j, [])
         if not h:
-            status[i] = "not_placed:outside_polygons"
+            out.status[i] = "not_placed:outside_polygons"
             continue
         if len(h) != 1 or idx.codes[h[0]] not in idx.usable:
-            status[i] = "not_placed:ambiguous_or_placeholder_code"
+            out.status[i] = "not_placed:ambiguous_or_placeholder_code"
             continue
         code = idx.codes[h[0]]
         if code[:2] not in prefix_iso3:
             prefix_iso3[code[:2]] = country_iso3(code[:2], "iso2")
         ev_iso3 = iso3_of[i]
-        codes[i] = code
+        poly_iso3 = prefix_iso3[code[:2]]
         if ev_iso3 is None:
-            status[i] = "placed:ged_country_historical_or_unmapped"
-        elif prefix_iso3[code[:2]] != ev_iso3:
-            status[i] = "placed:ged_country_differs"
+            out.codes[i] = code
+            out.status[i] = "placed:ged_country_historical_or_unmapped"
+        elif poly_iso3 == ev_iso3:
+            out.codes[i] = code
+            out.status[i] = "placed"
         else:
-            status[i] = "placed"
-    return codes, status
+            te = next((t for t in exc if t.applies(ev_iso3, poly_iso3, d0[i])), None)
+            if te is not None:
+                out.codes[i] = code
+                out.status[i] = "placed:territory_exception"
+                out.exception[i] = te.label
+            else:
+                out.status[i] = "not_placed:border_generalisation"
+                out.polygon[i] = code
+    return out
 
 
 # --------------------------------------------------------------------------- atlas rows
@@ -555,6 +645,8 @@ class Prepared:
     release: list[str] | None = None  # candidate file name per event
     release_sha: list[str] | None = None  # candidate raw sha256 per event
     checks: dict[str, int] = field(default_factory=dict)
+    adm1_polygon: list[str | None] | None = None  # polygon of events not placed for border generalisation
+    adm1_exception: list[str | None] | None = None  # territory exception of events placed under one
 
     def sha_of(self, i: int) -> str:
         return self.release_sha[i] if self.release_sha else self.sha
@@ -584,8 +676,23 @@ def prepare(
         iso3.append(r.iso3)
         qid.append(r.qid)
         reason.append(r.reason)
-    adm1, st = place_adm1(df, idx, iso3)
-    return Prepared(df, iso3, qid, reason, adm1, st, sha, file, candidate, release, release_sha, check_events(df))
+    pl_ = place_adm1(df, idx, iso3)
+    return Prepared(
+        df,
+        iso3,
+        qid,
+        reason,
+        pl_.codes,
+        pl_.status,
+        sha,
+        file,
+        candidate,
+        release,
+        release_sha,
+        check_events(df),
+        adm1_polygon=pl_.polygon,
+        adm1_exception=pl_.exception,
+    )
 
 
 def event_rows(p: Prepared, dataset: str) -> AtlasRows:
@@ -678,6 +785,8 @@ def event_rows(p: Prepared, dataset: str) -> AtlasRows:
             "relid": relid,
             "adm1": p.adm1[i],
             "adm1_status": p.adm1_status[i],
+            "adm1_polygon": p.adm1_polygon[i] if p.adm1_polygon else None,
+            "territory_exception": p.adm1_exception[i] if p.adm1_exception else None,
         }
         if p.reason[i] != "panel":
             flags["code_resolution"] = p.reason[i]
@@ -719,8 +828,13 @@ def _agg_rows(
     method: str,
     extra_flags: Sequence[Mapping[str, Any]] | None = None,
     differs: Sequence[bool] | None = None,
+    differs_flag: str = "events_ged_country_differs",
+    other_iso3: Sequence[str | None] | None = None,
 ) -> AtlasRows:
-    """keys[i] = (provider_geo, iso3, entity_qid) of event i (provider_geo '' = event not in this table)."""
+    """keys[i] = (provider_geo, iso3, entity_qid) of event i (provider_geo '' = event not in this table).
+
+    ``differs[i]``: event i is counted in the cell flag ``differs_flag``; ``other_iso3[i]`` (with it): the other
+    territory's ISO3, listed per cell with the best deaths of those events (country cells, AUDIT4 M2)."""
     acc: dict[tuple[str, date, str], list[int]] = {}
     geo_of: dict[str, tuple[str | None, str | None]] = {}
     ef: dict[str, Mapping[str, Any]] = {}
@@ -734,6 +848,7 @@ def _agg_rows(
     civ = p.df["deaths_civilians"].to_list()
     eids = p.df["id"].to_list()
     first_ids: dict[tuple[str, date], list[int]] = defaultdict(list)
+    others: dict[tuple[str, date, str], set[str]] = defaultdict(set)
     for i, (geo, iso3, qid) in enumerate(keys):
         if not geo:
             continue
@@ -744,7 +859,7 @@ def _agg_rows(
         span = 1 if (d1[i].year, d1[i].month) != (d0[i].year, d0[i].month) else 0
         dif = 1 if differs is not None and differs[i] else 0
         for t in ("all", TOV[str(tov[i])]):
-            a = acc.setdefault((geo, m0, t), [0, 0, 0, 0, 0, 0, 0])
+            a = acc.setdefault((geo, m0, t), [0, 0, 0, 0, 0, 0, 0, 0])
             a[0] += 1
             a[1] += best[i]
             a[2] += low[i]
@@ -752,6 +867,10 @@ def _agg_rows(
             a[4] += civ[i]
             a[5] += span
             a[6] += dif
+            if dif:
+                a[7] += best[i]
+                if other_iso3 is not None and other_iso3[i]:
+                    others[(geo, m0, t)].add(str(other_iso3[i]))
         shas[(geo, m0)].add(p.sha_of(i))
         if len(first_ids[(geo, m0)]) < 20:
             first_ids[(geo, m0)].append(eids[i])
@@ -762,7 +881,11 @@ def _agg_rows(
         iso3, qid = geo_of[geo]
         flags: dict[str, Any] = {"computed": method, "events": a[0], "spanning": a[5] or None, **dict(ef.get(geo, {}))}
         if a[6]:
-            flags["events_ged_country_differs"] = a[6]
+            flags[differs_flag] = a[6]
+            if other_iso3 is not None:
+                flags["deaths_best_placed_in_other_territory"] = a[7]
+                flags["other_territory_iso3"] = sorted(others[(geo, m0, t)])
+                flags["other_territory_note"] = OTHER_TERRITORY_NOTE
         if p.candidate:
             flags["candidate"] = True
         sh = sorted(shas[(geo, m0)])
@@ -808,7 +931,20 @@ def country_month_rows(p: Prepared, dataset: str) -> AtlasRows:
         if k not in cache:
             cache[k] = (p.iso3[i], p.qid[i])
         keys.append((f"gw:{gw}", cache[k][0], cache[k][1]))
-    rows = _agg_rows(p, dataset, keys, with_civilians=True, method=CM_METHOD)
+    # AUDIT4 M2: events GED codes under this country that REVA placed in another territory's ADM1 polygon
+    # (reviewed territory exceptions, e.g. Gaza / West Bank events under ISR); GED's coding is kept verbatim
+    exc = p.adm1_exception or [None] * p.df.height
+    other = [e.split("->", 1)[1] if e else None for e in exc]
+    rows = _agg_rows(
+        p,
+        dataset,
+        keys,
+        with_civilians=True,
+        method=CM_METHOD,
+        differs=[e is not None for e in exc],
+        differs_flag="events_placed_in_other_territory",
+        other_iso3=other,
+    )
     return _withhold_clashes(rows)
 
 
@@ -836,7 +972,7 @@ def adm1_month_rows(p: Prepared, dataset: str) -> AtlasRows:
 
     keys = [(f"iso3166_2:{a}" if a else "", None, None) for a in p.adm1]
     extra = [{"country_iso3": country_iso3(a[:2], "iso2") if a else None} for a in p.adm1]
-    differs = [s != "placed" for s in p.adm1_status]
+    differs = [s.startswith("placed:") for s in p.adm1_status]
     return _agg_rows(p, dataset, keys, with_civilians=True, method=ADM1_METHOD, extra_flags=extra, differs=differs)
 
 
@@ -914,11 +1050,12 @@ def ged_kg_statements(p: Prepared, ne_sha: str) -> list[KgStatement]:
             s[1], s[3] = d1[i], eids[i]
         code = p.adm1[i]
         if code:
-            b = adm.setdefault((tov[i], cid[i], code), [0, 0, set(), 0])
+            b = adm.setdefault((tov[i], cid[i], code), [0, 0, set(), 0, 0])
             b[0] += 1
             b[1] += best[i]
             b[2].add(yr[i].year)
             b[3] += p.adm1_status[i] != "placed"
+            b[4] += p.adm1_status[i] == "placed:territory_exception"
     out: list[KgStatement] = []
     sel = {"file": p.file}
     deriv = {"derived": f"REVA aggregation of UCDP GED {GED_VERSION} events by conflict_new_id"}
@@ -959,7 +1096,13 @@ def ged_kg_statements(p: Prepared, ne_sha: str) -> list[KgStatement]:
                 subject=subj,
                 property="ucdpged:first_event_date",
                 value={"type": "time", "time": s[0].isoformat(), "precision": 11},
-                qualifiers={**deriv, "event_id": s[2], "basis": "min date_start"},
+                qualifiers={
+                    **deriv,
+                    "event_id": s[2],
+                    "basis": "min date_start",
+                    # AUDIT4 L1: GED starts 1989-01-01; a first event in GED's first quarter may continue earlier
+                    **({"left_censored": True, "censoring": LEFT_CENSORED_NOTE} if s[0] < LEFT_CENSORED_BEFORE else {}),
+                },
                 raw_sha256=p.sha,
                 selector={**sel, "id": s[2], "column": "date_start"},
             )
@@ -995,9 +1138,19 @@ def ged_kg_statements(p: Prepared, ne_sha: str) -> list[KgStatement]:
                     "years": years,
                     "natural_earth_sha256": ne_sha,
                     **({"events_ged_country_differs": b[3]} if b[3] else {}),
+                    **({"events_territory_exception": b[4]} if b[4] else {}),
                 },
                 raw_sha256=p.sha,
                 selector={**sel, "conflict_new_id": c, "adm1": code},
+                # AUDIT4 L2: the polygons are a second input with their own (public-domain) terms
+                extra_refs=(
+                    {
+                        "raw_sha256": ne_sha,
+                        "role": "adm1_polygons",
+                        "licence": NE_LICENCE,
+                        "attribution": "Made with Natural Earth",
+                    },
+                ),
             )
         )
     return out
@@ -1249,6 +1402,47 @@ def predicates_file() -> Path:
     return Path(__file__).resolve().parents[4] / "registry" / "kg" / "predicates_conflict.yaml"
 
 
+GED_KEY_PREFIX = "ged:"
+
+
+def retract_absent_ged_statements(
+    engine: Any,
+    store: Any,
+    new_keys: set[str],
+    *,
+    raw_sha256s: Sequence[str],
+    retrieved_at: Any,
+    origin: str,
+) -> dict[str, Any]:
+    """Retract the current ``ged:*`` statements (REVA-derived GED statistics) the new build no longer emits, e.g.
+    ``ucdpged:events_in_adm1`` edges made only of border-generalisation events (AUDIT4 M1). The loader derives the
+    reason: the statements cite the GED zip of this delivery, so ``reclassified_by_reva`` (basis ``raw_unchanged``:
+    GED still has the events, REVA no longer places them there). Append-only."""
+    from reva.adapters.connectors.atlas_industry_common import current_keys
+    from reva.kg.model import MAX_RETRACTIONS_PER_BATCH, load_batch
+
+    gone = sorted(current_keys(engine, SOURCE_KEY, origin, GED_KEY_PREFIX) - new_keys)
+    done = 0
+    for i in range(0, len(gone), MAX_RETRACTIONS_PER_BATCH):
+        rep = load_batch(
+            engine,
+            store,
+            source_key=SOURCE_KEY,
+            raw_sha256s=sorted(set(raw_sha256s)),
+            retrieved_at=retrieved_at,
+            origin=origin,
+            retract_keys=gone[i : i + MAX_RETRACTIONS_PER_BATCH],
+            parameters={
+                "connector": NAME,
+                "version": VERSION,
+                "kg_revision": KG_REVISION,
+                "why": "GED statistics no longer derived (FIX6: ADM1 border rule, AUDIT4 M1)",
+            },
+        )
+        done += rep.retractions_inserted
+    return {"absent": len(gone), "retractions_inserted": done, "sample": gone[:5]}
+
+
 # --------------------------------------------------------------------------- ingest
 @dataclass
 class Got:
@@ -1315,11 +1509,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     def reg(dataset: str, rows: AtlasRows, raws: list[str], note: str) -> None:
         if not run.wants(dataset) or len(rows) == 0:
             return
+        geo = {"geometry_licence": f"{NE_LICENCE}, admin-1 1:10m sha256 {idx.sha256}"} if "adm1" in dataset else {}
         out = run.register(
             dataset=dataset,
             frame=rows.frame(),
             raw_sha256s=sorted(set(raws)),
-            rights={**RIGHTS, "source_key": SOURCE_KEY},
+            rights={**RIGHTS, "source_key": SOURCE_KEY, **geo},
             coverage_note=note,
         )
         tables.append(
@@ -1395,5 +1590,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             origin=run.origin,
         )
         kg = {"loaded": True, "entities": len(ents), "statements": len(sts), "report": nsrep, "load": load}
+        if strict:  # complete final-GED delivery: GED statistics REVA no longer derives are retracted
+            kg["retracted"] = retract_absent_ged_statements(
+                run.engine,
+                run.store,
+                {f"{SOURCE_KEY}:{s.key}" for s in sts if s.key.startswith(GED_KEY_PREFIX)},
+                raw_sha256s=[got["ged"].sha],
+                retrieved_at=got["ged"].retrieved_at,
+                origin=run.origin,
+            )
     res["kg"] = kg
     return res
