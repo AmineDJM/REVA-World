@@ -134,7 +134,7 @@ def test_eml_pages_and_build() -> None:
     imat = eml.parse_medicine(body(src, "/medicines/95"), "95")
     recs = [eml.parse_recommendation(body(src, f"/recommendations/{r}"), r) for r in imat.recommendations]
     raws = {f"medicine:{imat.id}": "c" * 64, **{f"recommendation:{r.id}": "c" * 64 for r in recs}}
-    ents, sts, rep = eml.build(
+    _ents, sts, _rep = eml.build(
         [imat], recs, raws, revision="eEML test", drugbank_to_chembl={"DB00619": ["chembl:CHEMBL941"]}
     )
     by = {(s.subject_qid, s.property_pid, s.object_qid) for s in sts if s.object_qid}
@@ -178,7 +178,7 @@ def test_openfda_counts_reports_not_causation() -> None:
     rec = fda.parse_count(body(src, "enforcement.json?count=openfda.unii.exact"), "recalls")
     ser = fda.parse_count(body(src, "8A1O1M485B"), "imatinib mesylate serious")
     assert ser[0] is not None
-    ents, sts, rep = fda.build_kg(
+    _ents, sts, _rep = fda.build_kg(
         top_events=(top[0] or [], top[1], "e" * 64),
         labels=(lab[0] or [], lab[1], "e" * 64),
         recalls=(rec[0] or [], rec[1], "e" * 64),
@@ -205,7 +205,7 @@ def test_ctgov_stats_counts_and_aggregates() -> None:
     g = ct.global_rows(stats, ts=ts, raw="f" * 64)
     assert any(r["indicator"] == "studies.registered|field=Phase|value=__field_missing__" for r in g)
     d3 = ct.parse_total(body(src, ct.count_url(ct.condition_term("D003924", "PHASE3")), exact=True), "d")
-    ents, sts, rep = ct.build_kg(stats, {("D003924", "PHASE3"): (d3, "f" * 64)}, ts=ts, stats_raw="f" * 64)
+    ents, sts, _rep = ct.build_kg(stats, {("D003924", "PHASE3"): (d3, "f" * 64)}, ts=ts, stats_raw="f" * 64)
     assert {e.kind for e in ents} == {"clinical_trial"}
     assert any(s.subject_qid == "ctgov:condition_mesh:D003924" and s.object_qid == "mesh:D003924" for s in sts)
     ph = [s for s in sts if s.subject_qid == "ctgov:condition_mesh:D003924" and s.qualifiers.get("phase") == "PHASE3"]
