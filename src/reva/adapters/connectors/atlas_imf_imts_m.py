@@ -173,13 +173,14 @@ def parse_response(
     if msg.dataset_attrs.get("UPDATE_DATE"):
         rep.update_dates.add(msg.dataset_attrs["UPDATE_DATE"])
     seen: set[str] = set()
+    names = {g["INDICATOR"]: g["SERIES_NAME"] for g in msg.groups if g.get("INDICATOR") and g.get("SERIES_NAME")}
     pmap: dict[str, str | None] = {}
     for sattrs, obs in msg.series:
         rep.series += 1
         missing = [d for d in DIMS if d not in sattrs]
         if missing:
             raise ImtsMError(f"IMF {FLOW}: series without dimension(s)", missing=missing)
-        ind, geo, partner, freq = (sattrs[d] for d in DIMS)
+        geo, ind, partner, freq = (sattrs[d] for d in DIMS)
         if ind not in INDICATORS:
             raise ImtsMError(f"IMF {FLOW}: unrequested indicator", indicator=ind[:40])
         if freq != "M":
@@ -197,6 +198,8 @@ def parse_response(
             "flow_valuation": "FOB" if ind.startswith("XG") else "CIF",
             "flow_label": INDICATORS[ind],
         }
+        if ind in names:
+            base["series_name"] = names[ind]  # the IMF's own series name (group attribute SERIES_NAME)
         if pmap[partner] is None:
             base["partner_unmapped"] = True
         scale = sattrs.get("SCALE")
