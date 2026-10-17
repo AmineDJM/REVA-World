@@ -1,0 +1,33 @@
+# Forecasters that beat their benchmark with significance on the locked holdout (agent PRED-MODELS).
+# Each entry is a scope (task, variable, horizon) - the model is registered for that scope only.
+schema: reva-pred-models-registered/1
+protocol_sha256: 3116db108443245ed29b3266b60d249f50cb35ae6de92269b550c91e792df89c
+holdout_json_sha256: f73d8afa628c0ddc83d0da12737c186d310c476bfcc7082483306b5d7ce0999e
+registered:
+- task: weo
+  variable: real_gdp_growth
+  horizon: h0
+  candidate: forecast.weo_conformal
+  benchmark: benchmark.imf_weo_gauss
+  loss: crps
+  holdout_p_better: 0.00052982
+  holdout_relative: 0.765334
+  holdout_coverage80: 0.745404
+- task: weo
+  variable: real_gdp_growth
+  horizon: h0
+  candidate: forecast.weo_bias_corrected
+  benchmark: benchmark.imf_weo_gauss
+  loss: crps
+  holdout_p_better: 0.000385357
+  holdout_relative: 0.763467
+  holdout_coverage80: 0.745803
+- task: us
+  variable: real_gdp_growth
+  horizon: spf2
+  candidate: forecast.spf_conformal
+  benchmark: benchmark.spf_gauss
+  loss: crps
+  holdout_p_better: 1.82139e-05
+  holdout_relative: 0.914068
+  holdout_coverage80: 0.888889

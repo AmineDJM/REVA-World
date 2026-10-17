@@ -1,0 +1,42 @@
+# Append-only: one entry per opening of a locked holdout (agent PRED-MODELS). Never edit past entries.
+schema: reva-pred-models-holdout-ledger/1
+openings:
+- protocol_sha256: 3116db108443245ed29b3266b60d249f50cb35ae6de92269b550c91e792df89c
+  model_version: 1.0.0
+  opened_at: '2026-10-17T20:20:35.111697+00:00'
+  holdout_json_sha256: f73d8afa628c0ddc83d0da12737c186d310c476bfcc7082483306b5d7ce0999e
+  hypotheses:
+  - weo|cpi_inflation|h0|forecast.weo_conformal|benchmark.imf_weo_gauss|crps
+  - weo|cpi_inflation|h1|forecast.weo_conformal|benchmark.imf_weo_gauss|crps
+  - weo|real_gdp_growth|h0|forecast.weo_conformal|benchmark.imf_weo_gauss|crps
+  - weo|unemployment_rate|h0|forecast.weo_conformal|benchmark.imf_weo_gauss|crps
+  - weo|cpi_inflation|h0|forecast.weo_bias_corrected|benchmark.imf_weo_gauss|crps
+  - weo|cpi_inflation|h1|forecast.weo_bias_corrected|benchmark.imf_weo_gauss|crps
+  - weo|real_gdp_growth|h0|forecast.weo_bias_corrected|benchmark.imf_weo_gauss|crps
+  - weo|unemployment_rate|h0|forecast.weo_bias_corrected|benchmark.imf_weo_gauss|crps
+  - weo|cpi_inflation|h0|forecast.direct_ar|benchmark.persistence|crps
+  - weo|cpi_inflation|h1|forecast.direct_ar|benchmark.persistence|crps
+  - weo|real_gdp_growth|h0|forecast.direct_ar|benchmark.persistence|crps
+  - weo|real_gdp_growth|h1|forecast.direct_ar|benchmark.persistence|crps
+  - weo|real_gdp_growth|h0|forecast.weo_conformal|benchmark.persistence|crps
+  - weo|unemployment_rate|h0|forecast.weo_conformal|benchmark.persistence|crps
+  - us|real_gdp_growth|spf2|forecast.spf_conformal|benchmark.spf_gauss|crps
+  - us|real_gdp_growth|spf3|forecast.spf_conformal|benchmark.spf_gauss|crps
+  - us|unemployment_rate|spf2|forecast.spf_conformal|benchmark.spf_gauss|crps
+  - us|unemployment_rate|spf3|forecast.spf_conformal|benchmark.spf_gauss|crps
+  - us|real_gdp_growth|spf6|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|unemployment_rate|spf2|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|unemployment_rate|spf3|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|unemployment_rate|spf4|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|unemployment_rate|spf5|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|unemployment_rate|spf6|forecast.bvar_minnesota|benchmark.persistence|crps
+  - us|real_gdp_growth|spf2|forecast.direct_ar|benchmark.persistence|crps
+  - us|real_gdp_growth|spf4|forecast.direct_ar|benchmark.persistence|crps
+  - us|real_gdp_growth|spf5|forecast.direct_ar|benchmark.persistence|crps
+  - us|real_gdp_growth|spf6|forecast.direct_ar|benchmark.persistence|crps
+  - us|real_gdp_growth|spf5|forecast.pool_bvar_ar|benchmark.persistence|crps
+  - us|real_gdp_growth|spf6|forecast.pool_bvar_ar|benchmark.persistence|crps
+  confirmed:
+  - weo|real_gdp_growth|h0|forecast.weo_conformal|benchmark.imf_weo_gauss|crps
+  - weo|real_gdp_growth|h0|forecast.weo_bias_corrected|benchmark.imf_weo_gauss|crps
+  - us|real_gdp_growth|spf2|forecast.spf_conformal|benchmark.spf_gauss|crps
