@@ -320,10 +320,19 @@ class Engine:
             notes.append(f"undated estimate applied to the upstream value at {self.periods[ok[-1]]} (last available)")
         return None, [], b * x1, notes
 
-    def _out_geos(self, node: Node, effect: VarRef) -> list[str]:
+    def _out_geos(self, node: Node, effect: VarRef, hop: es.Hop | None = None) -> list[str]:
+        """Geographies an estimate's effect is computed for.
+
+        A variable declared ``global`` lives at WLD only. From a world-level node (WLD), an estimate whose scope is
+        the world itself (``countries == ["WLD"]``, no country group) gives a world-level effect, computed once at
+        WLD; only an estimate with a country-level scope (listed countries or a country group) carries the change
+        to each country of interest (lead / EFFECTS-MORE finding, FIX4B: world oil consumption and production were
+        copied onto every country). A country-level node feeds its own country."""
         if self.vars.geo_kind(effect) == "global":
             return ["WLD"]
         if node.geo == "WLD":
+            if hop is not None and es.world_scope(hop.scope):
+                return ["WLD"]
             return list(self.d.countries) or []
         return [node.geo]
 
@@ -378,9 +387,16 @@ class Engine:
                 self.excluded.append(self._excl(node, hop, "not_propagatable", ", ".join(hop.problems)))
                 continue
             groups.setdefault(hop.effect.key, []).append(hop)
-        for _, hops in sorted(groups.items()):
-            effect = hops[0].effect
-            for g in self._out_geos(node, effect):
+        for _, hops_all in sorted(groups.items()):
+            effect = hops_all[0].effect
+            by_geo: dict[str, list[es.Hop]] = {}
+            for h in hops_all:
+                for g in self._out_geos(node, effect, h):
+                    by_geo.setdefault(g, []).append(h)
+            for g in [x for x in [*self.d.countries, "WLD"] if x in by_geo] + sorted(
+                x for x in by_geo if x not in (*self.d.countries, "WLD")
+            ):
+                hops = by_geo[g]
                 cands: list[tuple[es.Hop, str, list[str], str | None]] = []
                 for h in hops:
                     app, app_notes = es.applicability(

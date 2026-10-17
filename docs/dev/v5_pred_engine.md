@@ -396,13 +396,14 @@ simulations and text-quoted responses publish no uncertainty), so every fan is f
 
 ## 7c. Re-run after the FIX4B corrections (agent FIX4B, 2026-10-17 ~20:50 UTC)
 
-`uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` (read-only) after the audit fixes M3, M4,
-M5, L3 (`docs/dev/v6_fix4b.md`), with **301 current effect estimates** (296 published — EFFECTS-MORE's loads landed
+`uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` (read-only, re-run ~21:10 UTC after the
+world-geography fix) after the audit fixes M3, M4, M5, L3 (`docs/dev/v6_fix4b.md`), with **301 current effect estimates** (296 published — EFFECTS-MORE's loads landed
 in the meantime — and 5 REVA event-study runs, re-written as new revisions). Every result: « scénario non validé —
 pas une probabilité ». What changed in the engine: level vs growth consistency gate (a level response on a growth
 concept is excluded, never converted), declared variant preferences (`registry/predict/estimate_preferences.yaml`)
 instead of the alphabetical last rule, an unresolved tie is a gap `unresolved_tie` (no estimate chosen),
-applicability `panel_member` for pooled panels that list the country, h = 0 = onset year.
+applicability `panel_member` for pooled panels that list the country, h = 0 = onset year, world-level variables
+computed once at WLD.
 
 * **EU ban on Russian oil (2027Q1), RUS** — two *different* variables now (they were crossed before):
   * `output.real_gdp_per_capita` (level, % vs country-years without onset) from REVA run
@@ -428,13 +429,21 @@ applicability `panel_member` for pooled panels that list the country, h = 0 = on
     the gap with both keys; the engine does not pick one.
   * Unemployment rate and consumption deflator: van Els et al. country rows (degenerate draws, no published
     uncertainty).
-* **OPEC+ −2 mb/d**: now propagates through EFFECTS-MORE's Caldara–Cavallo–Iacoviello price response (+12.5 % in
-  2027Q1, later quarters `lag_not_published`) and Baumeister–Hamilton elasticities (not changed by FIX4B; note:
-  `oil.world_consumption` / `oil.world_production` / `output.world_industrial_production` are world quantities but
-  are expanded per country of interest — they are not declared `global` in `registry/predict/variables.yaml`;
-  owner: PRED-ENGINE / EFFECTS-MORE).
+* **OPEC+ −2 mb/d** (EFFECTS-MORE's estimates; geography fix by FIX4B): Caldara–Cavallo–Iacoviello price response
+  `oil_price.global@WLD` +12.5 % in 2027Q1 (scaled from their 0.8 mb/d supply decline; later quarters
+  `lag_not_published`), then Baumeister–Hamilton elasticities **computed once at WLD**: `oil.world_consumption@WLD`
+  −4.27 log points (5–95 % −6.98…−1.64), `oil.world_production@WLD` +1.90 (+0.51…+3.22), 2027Q1 only;
+  `output.world_industrial_production@WLD` missing (12-month horizon only, lag 0 not published). Before this fix the
+  three world quantities were copied onto each of the 6 countries of interest (FRA, DEU, USA, IND, CHN, JPN). Rule
+  now: a variable declared `global` (`registry/predict/variables.yaml`, + the three world variables) lives at WLD
+  only; from a WLD node a world-scope estimate (`countries = ["WLD"]`, no group) stays at WLD, and only a
+  country-level scope (listed countries or a country group) reaches the countries. Caldara et al.'s IP responses
+  (country groups) are excluded: 1-SD shocks, the cause's SD is unknown. Note for EFFECTS-MORE / owner: the
+  supply-elasticity hop makes world production *respond* to the price change that the decided production cut
+  caused; the engine keeps it as a separate variable (not netted against the −2 mb/d decision), which may read as
+  a partial offset of the cut.
 * **India rice export ban**, **France 65 in 2027**: unchanged (no estimate for `trade.export_restriction`;
   retirement inputs not pinned).
-* Exclusions: 317 `out_of_scope`, 21 `not_propagatable` (std-dev shocks), 6 `unit_mismatch`; **0** estimate
+* Exclusions: 317 `out_of_scope`, 6 `not_propagatable` (std-dev shocks), 1 `unit_mismatch`; **0** estimate
   excluded for level/growth inconsistency (all 301 current rows pass the new rule; the 4 mislabelled REVA rows were
   re-written on level variables before the run).

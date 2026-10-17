@@ -11,6 +11,10 @@ variables:
      note: "the decision engine uses this concept at geography WLD for world crude production (EIA world aggregate)"}
   - {kind: variable, id: oil_price.global, geo: global,
      note: "PRED-EFFECT variable: world crude oil price in USD (registry/effects/variables.yaml)"}
+  # FIX4B: world quantities of the effects vocabulary (one world value; never copied onto each country)
+  - {kind: variable, id: oil.world_production, geo: global, note: "world crude oil production (registry/effects/variables.yaml)"}
+  - {kind: variable, id: oil.world_consumption, geo: global, note: "world crude oil consumption (registry/effects/variables.yaml)"}
+  - {kind: variable, id: output.world_industrial_production, geo: global, note: "world industrial production index (registry/effects/variables.yaml)"}
 plugins:
   economic.io_price:
     label_fr: "Modèle de prix entrées-sorties (FIGARO), poussée des coûts au premier tour"

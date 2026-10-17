@@ -135,3 +135,33 @@ def test_preference_file_rules_are_declared() -> None:
     p = es.preference("pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:inflation_peak_median")
     assert p and p["rule"] == "median_over_mean" and p["rule_fr"]
     assert es.preference("pub:test.synthetic:unknown") is None
+
+
+def test_world_level_effects_are_computed_once_at_wld_never_copied_onto_countries() -> None:
+    """Lead / EFFECTS-MORE finding: from a world node, a world-scope estimate gives a world value (WLD only);
+    only a country-level scope (listed countries or a country group) reaches the countries of interest."""
+    oil = ("variable", "oil_price.global", "percent_change")
+    world_q = ("variable", "oil.world_supply_synthetic", "percent_change")  # not declared global: scope decides
+    cpi = ("atlas_concept", "imf.inflation_cpi_avg", "pp_change")
+    to_world = est(
+        "w", oil, world_q, measure="elasticity", unit="ratio", sign="positive", point=0.1, scope={"countries": ["WLD"]}
+    )
+    to_cpi = est(
+        "c",
+        oil,
+        cpi,
+        measure="slope",
+        unit="pp_per_percent",
+        sign="positive",
+        point=0.04,
+        scope={"country_group": "72 economies"},
+    )
+    d = decision(
+        instrument="oil_price_assumption", magnitude={"value": "10", "unit": "percent"}, countries=["FRA", "DEU"]
+    )
+    r = run(d, [to_world, to_cpi], draws=200)
+    ids = {v["id"] for v in r["variables"]}
+    assert "variable:oil.world_supply_synthetic@WLD" in ids
+    assert not {i for i in ids if i.startswith("variable:oil.world_supply_synthetic@") and not i.endswith("@WLD")}
+    assert {"atlas_concept:imf.inflation_cpi_avg@FRA", "atlas_concept:imf.inflation_cpi_avg@DEU"} <= ids
+    assert not es.world_scope({"countries": ["WLD"], "country_group": "advanced economies"})

@@ -526,6 +526,13 @@ def preference(estimate_key: str, path: Path | None = None) -> dict[str, Any] | 
     return _preferences(str(path or PREFERENCES_PATH)).get(estimate_key)
 
 
+def world_scope(scope: Mapping[str, Any]) -> bool:
+    """The estimate's scope is the world itself (``countries == ["WLD"]``, no country group): its effect is a
+    world-level quantity, not a country's."""
+    countries = [str(c) for c in (scope.get("countries") or [])]
+    return countries == ["WLD"] and not scope.get("country_group")
+
+
 def choice_key(h: Hop, app_status: str, prefs: Path | None = None) -> tuple[Any, ...]:
     dated_rank = 2 if (h.dated is not None and len(h.dated) > 1) else 1 if h.dated is not None else 0
     as_of = h.as_of.toordinal() if h.as_of else 0

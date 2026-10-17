@@ -16,6 +16,7 @@ work captured by the lead's WIP snapshots), `e44317a`, `fd04e85` and the report 
 | **M5c** | REVA pooled-panel run marked `exact` for RUS | Applicability `exact` only for a single-country scope; `panel_member` = "pooled panel (205 countries; RUS is in the listed sample): an average over the panel, not an estimate specific to RUS"; country group = "pooled panel ('158 countries', verbatim); RUS membership not checked" | — |
 | **M6** | 1,978 STEO cells (`estimate_kind = unknown_boundary`, 16 series, 85 after the fetch month) escaped the projection filter | `PROJECTION_SQL` and the engine's baseline filter treat `unknown_boundary` / `published_history_boundary_unknown` as never-observations (the boundary is unknown, so no period can be asserted as observed); same rule as the registry's `PROJECTION_KINDS`. No re-ingest needed (query-time rule) | — |
 | **M7** | 6,956 WEO cells of fiscal-year economies (CPI, unemployment, current account, trade volumes; `latest_actual = FY…`, no reporting months on the series) placed on calendar years; 5 sealed questions affected | `atlas.imf` 1.3.0 / parser `atlas_imf/3`: such a series takes the reporting months the same country's GDP series declares (`flags.reporting_year_from`), else `period_basis = fiscal_year_labelled_as_calendar` — never a plain calendar year (`atlas.vintage_weo` 1.0.2 shares the parser); the registry never builds or resolves a calendar-year question from a fiscal-year cell; `void_questions` closes a sealed question as void with a reason by an appended resolution | 5 questions **void** (`fiscal_year_basis_mismatch`), resolution `39b404b0…`, 30 `registry_score` rows (`n_void = 5`, no scores); WEO re-ingest: see §M7 |
+| lead note | Engine copied world-level second-hop variables (world oil consumption / production, world IP) onto every country of the decision | `_out_geos`: a `global` variable lives at WLD; from a WLD node a world-scope estimate (`countries = ["WLD"]`, no group) stays at WLD; only country-level scopes reach the countries; `oil.world_production`, `oil.world_consumption`, `output.world_industrial_production` declared `global` in `registry/predict/variables.yaml` | — |
 | **L3** | 5 REVA-run rows without `shock_profile` | `shock_profile = one_time_impulse` (onset dummy) on every run estimate | in the 5 revisions above |
 
 ## M3 — level vs growth
@@ -85,7 +86,7 @@ The connector already keeps them out of `steo_observed`; no connector change or 
 | File | What |
 |---|---|
 | `tests/unit/effects/test_fix4b_consistency.py` (8) | growth links, 4 rejection codes, consistent rows pass, unlinked variables unconstrained, event-study level mapping + refusal + shock profile |
-| `tests/unit/predict/test_fix4b_engine.py` (7) | level response on a growth concept excluded (never converted); level response propagates with h = 0 in the start year; growth-on-level refused; `panel_member` / group wording; unresolved tie → gap; declared preference picks the bias-corrected median and names it (−0.16 % at 50 bp); preference file rules |
+| `tests/unit/predict/test_fix4b_engine.py` (8) | level response on a growth concept excluded (never converted); level response propagates with h = 0 in the start year; growth-on-level refused; `panel_member` / group wording; unresolved tie → gap; declared preference picks the bias-corrected median and names it (−0.16 % at 50 bp); preference file rules; world-level effects computed once at WLD, group-scope estimates reach the countries |
 | `tests/unit/test_fix4b_projection_sql.py` (1) | `unknown_boundary` and `published_history_boundary_unknown` never observations (DuckDB on the real SQL; engine baseline filter) |
 | `tests/unit/test_atlas_imf.py` (+2) | FY series never on plain calendar years (fixture), country reporting-year selection |
 | `tests/unit/test_forecast_registry.py` (+1) | fiscal-year cells dropped from calendar questions with a note |
@@ -111,9 +112,9 @@ PRED-REGISTRY.
    `fiscal_year_labelled_as_calendar` without a window.
 6. **Edits to EFFECTS-MORE curation** (`dell_jones_olken_2008.yaml`, `laudati_pesaran_2021.yaml`): only the effect
    id moved to the growth variables (required by the new loader rule); EFFECTS-MORE should confirm.
-7. Engine expands world quantities (`oil.world_consumption`, `oil.world_production`,
-   `output.world_industrial_production`) per country of interest: declare them `global` in
-   `registry/predict/variables.yaml` (not changed here).
+7. OPEC+ chain: the Baumeister–Hamilton supply elasticity makes world production respond to the price rise the
+   decided cut caused; it is shown as its own variable, not netted against the −2 mb/d decision (EFFECTS-MORE /
+   PRED-ENGINE to decide whether that hop belongs in a supply-cut scenario).
 
 ## Commands
 
