@@ -844,7 +844,7 @@ def build_idmc_national(body: bytes, sha: str) -> tuple[pl.DataFrame, dict[str, 
 
     try:
         xl = Xlsx(body)
-    except Exception as e:  # noqa: BLE001 - any unreadable workbook is a typed provider error
+    except Exception as e:
         raise _err("IDMC workbook unreadable", kind="decoding_error") from e
     if IDMC_SHEET not in xl.sheets or "README" not in xl.sheets:
         raise _err("IDMC workbook sheets changed", sheets=sorted(xl.sheets))
