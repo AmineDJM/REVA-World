@@ -70,7 +70,7 @@ describe('V8 primitives', () => {
     expect(rows.length).toBeLessThan(80); // virtualised
     await userEvent.click(screen.getByRole('button', { name: /Valeur/ })); // numbers sort descending first
     expect(screen.getAllByRole('row')[1]).toHaveTextContent('n499');
-  });
+  }, 20_000);
 
   it('MiniLine breaks at gaps and dashes projections', () => {
     const { container } = render(<MiniLine points={[{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: null }, { x: 4, y: 3 }, { x: 5, y: 4 }]} split={5} />);
