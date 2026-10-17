@@ -1,0 +1,14 @@
+# V4 (agent V4CLIMATE): Natural Earth 1:10m Admin-1 states/provinces, read by src/reva/adapters/connectors/atlas_ghcnm.py
+# (point-in-polygon placement of GHCN stations; KG region_adm1 entities iso3166_2:<code>). Fetched within the atlas.ghcnm
+# run (budget key noaa.ghcnm); this entry records the KG source key naturalearth.admin1_10m.
+source_key: naturalearth.admin1_10m
+title: Natural Earth 1:10m Admin 1 – States, Provinces (release 5.1.x)
+provider_url: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/
+lineage_family: natural_earth
+rights:
+  licence: Public domain (Natural Earth terms of use)
+  attribution: "Made with Natural Earth"
+metadata:
+  allowed_hosts: [naciscdn.org]
+  files: [https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip]
+  political_view: "Natural Earth default (de facto) view; iso_a2 may differ from the ISO 3166-2 code prefix (kept as ne_iso_a2)"

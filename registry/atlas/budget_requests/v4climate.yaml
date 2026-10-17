@@ -1,0 +1,35 @@
+# Budget request from agent V4CLIMATE (weather & climate series, projections, stations, attribution studies).
+# Merged by `python -m reva.atlas.budget_merge` (largest request per source, never the sum).
+agent: V4CLIMATE
+requests:
+  - source_key: worldbank.cckp
+    # atlas.cckp_series: 36 all_countries requests (~31 MB: CRU monthly 11.5 MB, ERA5 monthly 7 MB, CMIP6 ~10 MB)
+    # + the V3 atlas.cckp_climatology 3 requests (0.22 MB).
+    daily_requests: 80
+    expected_bytes_per_day: 70000000
+    reason: "existing 6 (A-GEO) + V4CLIMATE 36 per run, one retry"
+  - source_key: climate.global_indices
+    # atlas.climate_indices: 36 small files (~1.6 MB) from NOAA GML/CPC/PSL/STAR/NSIDC, NASA GISS, Met Office,
+    # Berkeley Earth, US EPA.
+    daily_requests: 80
+    expected_bytes_per_day: 5000000
+    reason: "36 requests per run, one retry"
+  - source_key: noaa.ghcnm
+    # atlas.ghcnm: readme + countries (16 kB) + QCF tarball (~44 MB) + Natural Earth admin-1 ZIP (~15 MB).
+    daily_requests: 10
+    expected_bytes_per_day: 130000000
+    reason: "4 requests / ~60 MB per run, one retry"
+  - source_key: carbonbrief.attribution
+    # atlas.attribution_cb: page (1.5 MB, licence + revision) + CSV (0.6 MB).
+    daily_requests: 6
+    expected_bytes_per_day: 7000000
+    reason: "2 requests per run, two runs"
+  - source_key: naturalearth.admin1_10m
+    # KG source key of the region_adm1 entities; the ZIP itself is fetched in the atlas.ghcnm run (budget noaa.ghcnm).
+    # Pinned so every registered source has a budget (invariant 30).
+    daily_requests: 2
+    expected_bytes_per_day: 30000000
+    reason: "registered source; one ZIP per run if fetched on its own"
+notes: >-
+  Raw archive of one full V4CLIMATE run: ~95 MB (cap 150 MB for this agent). naturalearth.admin1_10m is a KG source key
+  only (fetched in the atlas.ghcnm run under noaa.ghcnm).

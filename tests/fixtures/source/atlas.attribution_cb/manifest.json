@@ -1,0 +1,36 @@
+[
+  {
+    "request_fingerprint": "68801617fcca3c960e93080bdeafb6b557cf60e9132126a1d84b92d594b01f32",
+    "url": "https://interactive.carbonbrief.org/attribution-studies/data/papers-download.csv",
+    "file": "68801617fcca3c96.csv",
+    "sha256": "d8d96750860430bd9039294cad7ef91a58c11b1a2980788977aee581a15df565",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:51:22.859947+00:00",
+    "licence": "CC BY-NC-ND 4.0 (Carbon Brief); test use, unadapted rows",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.attribution_cb/cut_excerpt.py",
+      "source_sha256": "1270d5e6582ae893c692a2cd296fc5154f21e97c6cb44afdadfa72bacedab711"
+    }
+  },
+  {
+    "request_fingerprint": "6e4b376f78bacc51a5d2aea726d32ec3138656956a39d121f9cc5e68f72fa60c",
+    "url": "https://interactive.carbonbrief.org/attribution-studies/index.html",
+    "file": "6e4b376f78bacc51.html",
+    "sha256": "7ab9be7e4db3b14f4151d74665f1c24a3a3e375e6632d51de6d4959f8ab6aacd",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:51:22.853541+00:00",
+    "licence": "CC BY-NC-ND 4.0 (Carbon Brief); test use, unadapted rows",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.attribution_cb/cut_excerpt.py",
+      "source_sha256": "bb784eb01e72877062c31e49d034391f46e6b1900ba7db9ddb9be4583a0b0816"
+    }
+  }
+]

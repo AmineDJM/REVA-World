@@ -1,0 +1,22 @@
+version: 1
+agent: V4CLIMATE
+note: >-
+  Weather & climate (docs/dev/v4_v4climate.md). Entity-valued predicates only. Station/event countries also use
+  Wikidata P17 under the GHCN source key (already mapped by V4CORE). Literal predicates (ghcnm:valid_months,
+  climind:atlas_series, cbattr:finding ...) carry values, not edges, and are not mapped. Attribution findings are
+  causal claims in the causal store (T2, attributed to the cited study), never a family.
+mappings:
+  - property: "ghcnm:in_adm1"
+    family: located_in
+    subtype: station_in_subdivision
+    source: noaa.ghcnm
+    subject_kinds: [weather_station]
+    object_kinds: [region_adm1]
+    note: "REVA point-in-polygon of GHCN coordinates against the Natural Earth 1:10m admin-1 polygon whose published iso_3166_2 code names the subdivision; omitted when the FIPS country disagrees"
+  - property: "cbattr:country"
+    family: located_in
+    subtype: extreme_event_country
+    source: carbonbrief.attribution
+    subject_kinds: [extreme_event, climate_trend]
+    object_kinds: [country]
+    note: "ISO alpha-3 code(s) published by Carbon Brief for the extreme or trend"

@@ -1,0 +1,18 @@
+# V4 (agent V4CLIMATE): NOAA NCEI GHCN-Monthly v4 (src/reva/adapters/connectors/atlas_ghcnm.py, atlas.ghcnm ->
+# atlas table ghcnm.tavg_qcf_monthly; KG weather_station entities ghcnm:<ID>).
+source_key: noaa.ghcnm
+title: NOAA NCEI Global Historical Climatology Network - Monthly v4 (QCF mean temperature, station inventory)
+provider_url: https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-monthly
+lineage_family: noaa_ghcn
+rights:
+  licence: US Government work (NOAA NCEI), public domain in the US; cite GHCN-M v4
+  attribution: "Menne, M. J. et al. (2018): The Global Historical Climatology Network Monthly Temperature Dataset, Version 4. J. Climate"
+metadata:
+  allowed_hosts: [www.ncei.noaa.gov, naciscdn.org]
+  files:
+    - https://www.ncei.noaa.gov/pub/data/ghcn/v4/readme.txt
+    - https://www.ncei.noaa.gov/pub/data/ghcn/v4/ghcnm-countries.txt
+    - https://www.ncei.noaa.gov/pub/data/ghcn/v4/ghcnm.tavg.latest.qcf.tar.gz  # ~44 MB
+    - https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip  # ~15 MB, ADM1 polygons
+  authentication: none
+  cadence: quarterly re-download (the tarball is regenerated daily)

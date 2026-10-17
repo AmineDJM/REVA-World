@@ -1,0 +1,60 @@
+[
+  {
+    "request_fingerprint": "9a5a66e5468b9b0a9be9fd4ba291f4f18526c80cafb997f4c57ba4e7dc37b26b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
+    "file": "9a5a66e5468b9b0a.zip",
+    "sha256": "4ec6b894fcb17cf787272d1d0ad89bc4bc190630ba4a7c23e4f5f81a396ecdf1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T13:48:13.386584+00:00",
+    "licence": "Public domain (Natural Earth)",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.ghcnm/cut_excerpt.py",
+      "source_sha256": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05"
+    }
+  },
+  {
+    "request_fingerprint": "fb4b472e9c2e3c093477b9719cdc9aedff2f54a76212cc2dee3c0fe55f60d4e0",
+    "url": "https://www.ncei.noaa.gov/pub/data/ghcn/v4/ghcnm-countries.txt",
+    "file": "fb4b472e9c2e3c09.txt",
+    "sha256": "662b18052a0ba1f7222bff7eec3c8f4af9b891375d5ba3e8f19bdaf9c7ed87a5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:48:10.137781+00:00",
+    "licence": "US Government work (NOAA NCEI)"
+  },
+  {
+    "request_fingerprint": "f80e8514b191d58184ef10c6ad74ad6886a3f006a8d354373f30111d77716e84",
+    "url": "https://www.ncei.noaa.gov/pub/data/ghcn/v4/ghcnm.tavg.latest.qcf.tar.gz",
+    "file": "f80e8514b191d581.tar.gz",
+    "sha256": "858e11cfaaf013a0afd34e0c5fb76522d63ef22f63d3047b0427442892a6c715",
+    "status": 200,
+    "headers": {
+      "content-type": "application/gzip"
+    },
+    "retrieved_at": "2026-10-17T13:48:12.532689+00:00",
+    "licence": "US Government work (NOAA NCEI)",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.ghcnm/cut_excerpt.py",
+      "source_sha256": "c0b687d35e84171909c4ad4eeec74bf8075f0c179fd788b7c3038454aa1eda11"
+    }
+  },
+  {
+    "request_fingerprint": "e1b432fd6c5b2852378dcd364b5c92b20c9461aa53e5aa6059e1afd3d49ee96e",
+    "url": "https://www.ncei.noaa.gov/pub/data/ghcn/v4/readme.txt",
+    "file": "e1b432fd6c5b2852.txt",
+    "sha256": "67cf48bd81bb8a3c3a7a193020ce6c2b62d95e03768af26cfc4b1d908825bd91",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:48:09.181770+00:00",
+    "licence": "US Government work (NOAA NCEI)"
+  }
+]

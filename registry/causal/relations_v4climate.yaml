@@ -1,0 +1,47 @@
+# Attributed causal claims of the V4CLIMATE sources (owner: agent V4CLIMATE). Loaded by
+# src/reva/adapters/connectors/atlas_attribution.py through reva.causal.load_dataset_claims (dataset
+# carbonbrief.attribution_studies). REVA asserts nothing: each claim names the study (DOI, citation verbatim) that
+# concluded it, as coded by Carbon Brief's attribution map; the study's summary statement is the mechanism, verbatim.
+#
+# Policy (docs/roadmap/v3_causality.md, docs/roadmap/v4_world_model.md):
+#   * tier T2 = a scholarly reference with its DOI stored verbatim; rows without a DOI (mostly World Weather
+#     Attribution rapid-study web pages) give no claim -- counted in the run report;
+#   * "Insufficient data/inconclusive" gives no claim (the finding stays a KG record, cbattr:finding);
+#   * no claim is ever extracted from free text (IPCC reports, Carbon Brief prose) and none is created by joining
+#     datasets (e.g. GHCN station anomalies near an event are context, never evidence of attribution);
+#   * licence: CC BY-NC-ND 4.0 -- every claim carries scope.licence; owner decision pending (docs/dev/v4_v4climate.md).
+version: 1
+owner: V4CLIMATE
+connector: src/reva/adapters/connectors/atlas_attribution.py
+rules:
+  - id: cb_attr_more_likely
+    source_key: carbonbrief.attribution
+    dataset: carbonbrief.attribution_studies
+    field: "Classification = 'More severe or more likely to occur'"
+    relation: contributing_factor
+    polarity: promotes
+    stance: asserts
+    tier: T2
+    cause: "cbattr:human_caused_climate_change"
+    effect: "cbattr:extreme:<sha256(Name)[:16]> or cbattr:trend:<...> (the extreme or trend the study examined)"
+  - id: cb_attr_less_likely
+    source_key: carbonbrief.attribution
+    dataset: carbonbrief.attribution_studies
+    field: "Classification = 'Decrease, less severe or less likely to occur'"
+    relation: contributing_factor
+    polarity: inhibits
+    stance: asserts
+    tier: T2
+  - id: cb_attr_no_influence
+    source_key: carbonbrief.attribution
+    dataset: carbonbrief.attribution_studies
+    field: "Classification = 'No discernible human influence'"
+    relation: contributing_factor
+    polarity: null
+    stance: denies
+    tier: T2
+  - id: cb_attr_inconclusive
+    source_key: carbonbrief.attribution
+    field: "Classification = 'Insufficient data/inconclusive'"
+    reva_kind: context
+    note: "no claim; KG statement cbattr:finding only"

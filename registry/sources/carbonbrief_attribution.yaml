@@ -1,0 +1,22 @@
+# V4 (agent V4CLIMATE): Carbon Brief attribution-studies map (src/reva/adapters/connectors/atlas_attribution.py,
+# atlas.attribution_cb -> atlas table attribution_cb.findings; KG extreme_event / climate_trend entities cbattr:*;
+# T2 causal claims dataset carbonbrief.attribution_studies).
+source_key: carbonbrief.attribution
+title: "Carbon Brief: Mapped - How climate change affects extreme weather around the world (attribution studies CSV)"
+provider_url: https://interactive.carbonbrief.org/attribution-studies/
+lineage_family: carbonbrief
+rights:
+  licence: CC BY-NC-ND 4.0
+  licence_url: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+  non_commercial: true
+  no_derivatives: true
+  terms_quote: "Published under a CC license. You are welcome to reproduce unadapted material in full for non-commercial use, credited 'Carbon Brief' with a link to the article. Please contact us for commercial use."
+  owner_decision: "licence review: REVA restructures rows (KG entities, claims, counts); ND may forbid adapted redistribution"
+metadata:
+  allowed_hosts: [interactive.carbonbrief.org]
+  files:
+    - https://interactive.carbonbrief.org/attribution-studies/index.html
+    - https://interactive.carbonbrief.org/attribution-studies/data/papers-download.csv
+  authentication: none
+  editorial_status: compiled by Carbon Brief journalists from published attribution studies; each row cites its study
+  cadence: monthly
