@@ -164,7 +164,25 @@ Reading (associations, not established effects):
 
 ## 5. Effect-estimate layer
 
-ESTIMATES_PLACEHOLDER
+Writer: `reva.estimation.run.write_effect_estimates` → `reva.effects.load_effect_estimates` with
+`source_kind = "reva_run"`, `source_key = "reva.eventstudy"`, one `dataset` per (treatment, outcome)
+(`eventstudy.<treatment>.<concept>`), the archived run document (artifact namespace `evaluation`, schema
+`reva-eventstudy-run/1`) as the delivery's raw artifact, `complete = True` (a re-run with other numbers retracts
+the old row for that dataset). One estimate per run: key `run:<run_id>:h5`, `cause_kind = event_type`
+(`banking_crisis`, `coup`, `earthquake`, `sanction_episode`), `effect_kind = atlas_concept`, `measure = response`,
+`shock = 1 occurrence`, unit `percent` (cumsum) or `percentage_points` (diff), SE + 95 % CI, full `irf` h = 0..5,
+scope (treated countries ISO3, period, n_obs, n_countries), `method = local_projection`, identification text with
+the pre-trend p-value and seed, `run = {run_id, code_version, data_snapshot "atlas:<sha>", as_of, spec_sha256}`,
+`transcription = computed`, rights flags, curation `maintainer_review_pending`, applicability note labelled REVA's
+with the causation caveat. Validated by `reva.effects.validate_estimate` in the unit tests and written/reloaded
+(idempotent) in the throwaway-DB test.
+
+**Writing rule (declared before the first write, enforced in code):** a run is written only if its replication gate
+is open on the same snapshot and its pre-trend diagnostics pass (event-study F-test p ≥ 0.10 and no placebo lead
+significant at 5 %). Null results are written like any other (no publication bias). Hence 5 of the 6 runs qualify;
+`banking_crisis_lv → GDP` is archived and documented but not written.
+
+EFFECT_STATUS_PLACEHOLDER
 
 ## 6. What is missing / owner decisions
 
