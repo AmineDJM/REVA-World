@@ -31,7 +31,9 @@ export const AlertChange = z.looseObject({
   summary: z.string().nullish(),
   source: z.string().nullish(),
   links: z.array(z.looseObject({ label: z.string(), href: z.string() })).default([]),
+  refs: z.array(z.looseObject({ type: z.string(), id: z.string() })).default([]),
 });
+export type AlertChange = z.output<typeof AlertChange>;
 
 export const Alert = z.looseObject({
   rule_id: z.string(),
@@ -116,4 +118,28 @@ export function serviceAbsent(err: unknown): boolean {
   if (err.status !== 404) return false;
   const d = typeof err.problem.detail === 'string' ? err.problem.detail : '';
   return d === '' || d === 'Not Found' || d === 'no such endpoint';
+}
+
+/** Change feed (§2) — used to evaluate the watch rules of a browser-local board. */
+export async function getChangesFor(q: { since?: string; kinds?: string; limit?: number }, signal?: AbortSignal): Promise<AlertChange[]> {
+  const r = await v3get('/v1/v8/changes', envelopeOf(z.looseObject({ items: z.array(AlertChange) })), { ...q }, signal);
+  return r.data.items;
+}
+
+/** Universal search (§1), for adding items to a board. */
+export const SearchHit = z.looseObject({
+  id: z.string(),
+  kind: z.string(),
+  label: z.string(),
+  sublabel: z.string().nullish(),
+  href: z.string(),
+  group: z.string().nullish(),
+  entity_kind: z.string().nullish(),
+  extra: z.record(z.string(), z.unknown()).nullish(),
+});
+export type SearchHit = z.output<typeof SearchHit>;
+
+export async function searchV8(q: string, signal?: AbortSignal): Promise<SearchHit[]> {
+  const r = await v3get('/v1/v8/search', envelopeOf(z.looseObject({ hits: z.array(SearchHit) })), { q, limit: 12 }, signal);
+  return r.data.hits;
 }

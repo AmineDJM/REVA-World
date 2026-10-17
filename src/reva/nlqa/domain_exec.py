@@ -16,6 +16,7 @@ from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any
 
+from reva.nlqa.bridges import STRICT_BRIDGE_MATCHES
 from reva.nlqa.domains import match_terms
 from reva.nlqa.ports import AtlasCell, CapabilityUnavailable, FamilyNeighbour, FamilyView
 
@@ -276,11 +277,23 @@ class DomainOps:
                 if any(g[3] for g in more):
                     via.append((idn, ev_family_edge(ev, idn)))
                     groups.extend(more)
+        bridge = None
+        if not any(g[3] for g in groups) and not via and not _literals(view, a["families"]):
+            # V8ASK: the other records carrying one of the chosen record's own labels (reva.nlqa.bridges)
+            for other, via_lang, via_label in _label_bridges(self.b, r):
+                more_view = port.families(other.qid, families=a["families"], per_family=MAX_FAMILY_NEIGHBOURS)
+                more = _kept_groups(more_view, a["reading"])
+                if any(g[3] for g in more):
+                    view, groups, answered_by = more_view, more, other
+                    bridge = {"lang": via_lang, "label": via_label}
+                    break
         literals = _literals(view, a["families"])
         data: dict[str, Any] = {
             "entity": answered_by or r.entity,
             "chosen": r.entity,
             "answered_by": answered_by,
+            "bridge": bridge,
+            "match": r.match,
             "families": a["families"],
             "reading": a["reading"],
             "count": a["count"],
@@ -514,6 +527,18 @@ class DomainOps:
         return OpResult(op, "ok", data=data, consulted=consulted)
 
 
+def _label_bridges(b: Any, r: Any) -> list[tuple[Any, str, str]]:
+    """Records carrying one of the chosen record's own labels (only after an exact or strict match)."""
+    kg = getattr(b, "kg", None)
+    fn = getattr(kg, "label_bridges", None)
+    if not callable(fn) or r.entity is None or r.match not in STRICT_MATCHES:
+        return []
+    try:
+        return list(fn(r.entity.qid, exclude=[x.qid for x in r.alternatives]))
+    except CapabilityUnavailable:
+        return []
+
+
 def _same(a: Any, b: Any) -> bool:
     try:
         return Decimal(str(a)) == Decimal(str(b))
@@ -552,7 +577,7 @@ def _literals(view: FamilyView, families: Sequence[str]) -> list[tuple[Any, Mapp
 
 #: Matches the V6 domain operations accept: a family answer about an entity found only by the beginning of a
 #: label ("wolf" → "Wolfiporia cocos") or a fuzzy match would be an answer about another thing.
-STRICT_MATCHES = frozenset({"label_exact", "alias_exact", "label_words", "crosswalk_label"})
+STRICT_MATCHES = frozenset({"label_exact", "alias_exact", "label_words", "crosswalk_label"}) | STRICT_BRIDGE_MATCHES
 
 
 def _approximate(op: Any, r: Any, ev: Any, consulted: list[str]) -> OpResult | None:

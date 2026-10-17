@@ -33,6 +33,11 @@ class Domain:
     themes: tuple[str, ...] = ()
     sources: tuple[str, ...] = ()
     kg_kinds: tuple[str, ...] = ()
+    kg_kind_sources: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+
+
+def _match(pattern: str, value: str) -> bool:
+    return pattern == value or (pattern.endswith("*") and value.startswith(pattern[:-1]))
 
 
 @dataclass(frozen=True)
@@ -59,6 +64,7 @@ class DomainRegistry:
     by_theme: Mapping[str, str] = field(default_factory=dict)
     by_source: Mapping[str, str] = field(default_factory=dict)
     by_table: Mapping[str, str] = field(default_factory=dict)
+    by_connector: Mapping[str, str] = field(default_factory=dict)
     sha256: str = ""
 
     @property
@@ -70,17 +76,26 @@ class DomainRegistry:
             return self.other
         return next((d for d in self.domains if d.id == domain_id), None)
 
-    def domain_of_kind(self, kind: str) -> str:
-        for d in self.domains:
-            for k in d.kg_kinds:
-                if k == kind or (k.endswith("*") and kind.startswith(k[:-1])):
+    def domain_of_kind(self, kind: str, source_key: str | None = None) -> str:
+        if source_key is not None:
+            for d in self.domains:
+                if any(_match(p, source_key) for p in d.kg_kind_sources.get(kind, ())):
                     return d.id
+        for d in self.domains:
+            if any(_match(k, kind) for k in d.kg_kinds):
+                return d.id
         return self.other.id
 
-    def domain_of_table(self, dataset_key: str, source: str, themes: Iterable[str] = ()) -> tuple[str, str]:
-        """(domain id, basis) of one atlas table: explicit table, explicit source, majority catalog theme, other."""
+    def domain_of_table(
+        self, dataset_key: str, source: str, themes: Iterable[str] = (), connectors: Iterable[str] = ()
+    ) -> tuple[str, str]:
+        """(domain id, basis) of one atlas table: explicit table, declaring connector, atlas source, majority catalog
+        theme, other."""
         if dataset_key in self.by_table:
             return self.by_table[dataset_key], "table"
+        for c in connectors:
+            if c in self.by_connector:
+                return self.by_connector[c], "connector"
         if source in self.by_source:
             return self.by_source[source], "source"
         counts = Counter(self.by_theme[t] for t in themes if t in self.by_theme)
@@ -96,7 +111,7 @@ def problems(doc: Any, known_themes: Iterable[str] | None = None) -> list[str]:
     out: list[str] = []
     if not isinstance(doc, dict) or doc.get("schema") != "reva-v8-coverage-domains/1":
         return ["schema must be reva-v8-coverage-domains/1"]
-    seen: dict[str, dict[str, str]] = {"id": {}, "theme": {}, "source": {}, "kind": {}, "table": {}}
+    seen: dict[str, dict[str, str]] = {"id": {}, "theme": {}, "source": {}, "kind": {}, "table": {}, "connector": {}}
     for d in doc.get("domains") or []:
         did = d.get("id")
         if not isinstance(did, str) or not did or not d.get("fr") or not d.get("en"):
@@ -108,6 +123,7 @@ def problems(doc: Any, known_themes: Iterable[str] | None = None) -> list[str]:
             ("source", d.get("sources") or []),
             ("kind", d.get("kg_kinds") or []),
             ("table", d.get("tables") or []),
+            ("connector", d.get("connectors") or []),
         ):
             for v in vals:
                 if v in seen[key]:
@@ -120,6 +136,12 @@ def problems(doc: Any, known_themes: Iterable[str] | None = None) -> list[str]:
         unknown = sorted(set(seen["theme"]) - set(known_themes))
         if unknown:
             out.append(f"unknown atlas themes: {unknown}")
+        for kind, srcs in (d.get("kg_kind_sources") or {}).items():
+            for src in srcs:
+                k = f"{kind}|{src}"
+                if k in seen.setdefault("kind_source", {}):
+                    out.append(f"kind/source {k!r} is in two domains ({seen['kind_source'][k]}, {did})")
+                seen["kind_source"][k] = did
     other = doc.get("other") or {}
     if other.get("id") != OTHER:
         out.append("other.id must be 'other'")
@@ -151,6 +173,7 @@ def load_domains(path: Path = DOMAINS_PATH) -> DomainRegistry:
             themes=tuple(d.get("themes") or ()),
             sources=tuple(d.get("sources") or ()),
             kg_kinds=tuple(d.get("kg_kinds") or ()),
+            kg_kind_sources={k: tuple(v) for k, v in (d.get("kg_kind_sources") or {}).items()},
         )
         for d in doc["domains"]
     )
@@ -164,6 +187,7 @@ def load_domains(path: Path = DOMAINS_PATH) -> DomainRegistry:
         by_theme={t: d.id for d in domains for t in d.themes},
         by_source={s: d.id for d in domains for s in d.sources},
         by_table={t: dd["id"] for dd in doc["domains"] for t in (dd.get("tables") or [])},
+        by_connector={c: dd["id"] for dd in doc["domains"] for c in (dd.get("connectors") or [])},
         sha256=_sha(path),
     )
 

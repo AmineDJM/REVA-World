@@ -4,11 +4,14 @@
 #
 # How an atlas table gets its domain (first match wins, see reva.v8.coverage.domains):
 #   1. `tables`: an exact atlas dataset key ("atlas.<source>.<dataset>") listed under a domain;
-#   2. `sources`: the table's atlas source key ("ucdp_ged") listed under a domain;
-#   3. the majority theme (registry/atlas/themes.yaml) of the catalog concepts whose source order cites the table,
+#   2. `connectors`: the atlas connector declaring the table (spec `datasets`, e.g. "atlas.eurostat_asylum") listed
+#      under a domain (for atlas source keys shared by several connectors: eurostat, imf, oecd, wb);
+#   3. `sources`: the table's atlas source key ("ucdp_ged") listed under a domain;
+#   4. the majority theme (registry/atlas/themes.yaml) of the catalog concepts whose source order cites the table,
 #      mapped through `themes` below (ties: domain order of this file);
-#   4. otherwise `other` ("Non classé"), reported as such.
-# A KG entity kind gets the domain whose `kg_kinds` lists it (exact kind, or a prefix ending in "*"); else `other`.
+#   5. otherwise `other` ("Non classé"), reported as such.
+# A KG entity gets the domain whose `kg_kind_sources` lists its (kind, source key) pair (source key exact or a prefix
+# ending in "*"), else the domain whose `kg_kinds` lists its kind (exact, or a prefix ending in "*"), else `other`.
 # Every theme of themes.yaml must belong to exactly one domain (tests/unit/v8/test_v8_coverage_registry.py).
 schema: reva-v8-coverage-domains/1
 domains:
@@ -17,12 +20,14 @@ domains:
     en: Population and demography
     themes: [population]
     sources: [un_wpp, un_wup, hyde, cbs, insee, statsjersey, spc]
+    tables: [atlas.eurostat.nuts_pop, atlas.oecd.reg_pop]
     kg_kinds: [survey_wave]
   - id: macro
     fr: Macroéconomie et travail
     en: Macroeconomy and labour
     themes: [economy, labour]
     sources: [maddison, vintage_weo, vintage_us, vintage_ea, vintage_oecd, wid, ilostat, gapminder]
+    tables: [atlas.eurostat.nuts_gdp, atlas.eurostat.nuts_une, atlas.oecd.reg_gdp, atlas.oecd.reg_une]
     kg_kinds: [occupation, isic_code, crisis_trigger, crisis_outcome, crisis_response]
   - id: prices
     fr: Prix et matières premières
@@ -34,37 +39,41 @@ domains:
     fr: Finance, monnaie et budgets publics
     en: Finance, money and public budgets
     themes: [finance]
-    sources: [bis, ecb, boe, nyfed, ust, kfrench, cbcal, jst, laeven_valencia, reinhart_rogoff, esrb]
+    sources: [bis, ecb, boe, nyfed, ust, kfrench, cbcal, jst, laeven_valencia, reinhart_rogoff, esrb, frb]
+    connectors: [atlas.imf_fin, atlas.oecd.fiscal]
     kg_kinds: [fund]
+    kg_kind_sources: {event: [reinhart_rogoff.*, laeven_valencia.*, esrb.*, jst.*]}
   - id: trade
     fr: Commerce et chaînes de valeur
     en: Trade and value chains
     themes: [trade]
-    sources: [baci, unctad]
+    sources: [baci, unctad, unsd_classif]
+    connectors: [atlas.imf_imts_m, atlas.eurostat_comext, atlas.oecd.batis]
     kg_kinds: [hs_code, sitc_code, cpc_code]
   - id: industry
     fr: Industrie et entreprises
     en: Industry and companies
     themes: [industry, companies]
     sources: [gleif]
+    tables: [atlas.oecd.tiva_fdva, atlas.oecd.tiva_principal]
     kg_kinds: [legal_entity, sole_proprietor, facility, government_entity]
   - id: energy
     fr: Énergie
     en: Energy
     themes: [energy]
-    sources: [eia, eia_steo, vintage_steo, eia_wpsr]
+    sources: [eia, eia_steo, vintage_steo, eia_wpsr, wri_gppd]
     kg_kinds: [energy_source]
   - id: chemistry
     fr: Chimie et matériaux
     en: Chemistry and materials
     themes: [chemistry, materials]
-    sources: [chebi, codata, pubchem, usgs]
+    sources: [chebi, codata, pubchem, usgs, usgs_myb_fac]
     kg_kinds: [chemical_element, isotope, compound, chemical_class, chemical_role, physical_constant, mineral, food_material]
   - id: agriculture
     fr: Agriculture, pêche et alimentation
     en: Agriculture, fisheries and food
     themes: []
-    sources: [fao, fishstat, usda, ifpri, usda_psd, usda_wasde, fao_tm]
+    sources: [fao, fishstat, usda, ifpri_er, usda_psd, usda_wasde, fao_tm]
     kg_kinds: []
   - id: climate
     fr: Climat et météo
@@ -88,61 +97,69 @@ domains:
     fr: Biologie (espèces, gènes, protéines)
     en: Biology (species, genes, proteins)
     themes: [biology]
-    sources: [hgnc, uniprot, ensembl, ncbi, col, gbif]
+    sources: [bio, gbif]
     kg_kinds: [taxon, gene, protein, genome_assembly, chromosome, sequence_feature, cell_type]
   - id: health
     fr: Santé et maladies
     en: Health and diseases
     themes: [health, health_body]
-    sources: [who, cdc, ecdc]
+    sources: [who, cdc, ecdc, clingen, doid, mondo, uberon]
     kg_kinds: [disease, disease_or_phenotype, phenotype, symptom, anatomical_structure, icd11_category, mesh_descriptor,
                transmission_process, genetic_inheritance_pattern, disease_driver, condition, reva_altered_state]
   - id: drugs
     fr: Médicaments
     en: Medicines
     themes: []
-    sources: [openfda, chembl, ctgov, who_eml, unichem]
+    sources: [openfda, chembl, ctgov, eeml, unichem]
     kg_kinds: [drug, drug_substance, drug_target, eml_section, essential_medicines_list]
   - id: society
     fr: Société, esprit et comportement
     en: Society, mind and behaviour
     themes: [society, behaviour]
     sources: [hofstede, whr, undp, sscp, hief, cdpd]
+    connectors: [atlas.oecd.wellbeing, atlas.oecd_sigi]
     kg_kinds: []
   - id: education
     fr: Éducation et science
     en: Education and science
     themes: [education, science]
-    sources: [uis, wipo, nobel]
+    sources: [uis, wipo, nobel, openalex]
     kg_kinds: [research_topic, research_subfield, research_field, research_domain]
   - id: politics
     fr: Politique, institutions et droit
     en: Politics, institutions and law
     themes: [politics, law]
     sources: [vdem, bmr, lied, ipu, parlgov, constitute, ccp, untc, unga, ohchr, eusanct, eusanctionsmap, ofac, ties,
-              ti, archigos, wbl, ssa, nelda, whogov, oxcgrt]
+              ti, archigos, wbl, ssa, nelda, whogov, oxcgrt, powell_thyne, reign]
     kg_kinds: [un_roll_call, treaty, treaty_participant, sanction_episode, sanction_regime, sanction_program,
                polity_relation, international_organisation, organization]
+    kg_kind_sources: {event: [harvard.dataverse.*, archigos.*], superseded_record: [archigos.*]}
   - id: conflict
     fr: Conflits et sécurité
     en: Conflict and security
     themes: []
-    sources: [ucdp, ucdp_ged, cow, icb, navco, mmp, mec, views, unpk, gdelt]
+    sources: [ucdp, ucdp_ged, cow, icb, navco, mmp, mec, views, unpk, gdelt, pax]
     kg_kinds: [war, war_outcome, armed_conflict, armed_conflict_episode, armed_group, non_state_conflict,
                one_sided_violence, militarized_incident, militarized_interstate_dispute, dispute_outcome,
                foreign_policy_crisis, international_crisis, protracted_conflict, peace_agreement, peace_process,
                conflict_termination, campaign_outcome, un_peace_operation, coded_outcome]
+    kg_kind_sources: {superseded_record: [ucdp.*]}
   - id: migration
     fr: Migrations et déplacements
     en: Migration and displacement
     themes: []
-    sources: [unhcr, idmc, iom, un_ims, eurostat_asylum]
+    sources: [unhcr, idmc, iom, un_desa]
+    connectors: [atlas.eurostat_asylum]
     kg_kinds: [disaster_displacement]
   - id: infrastructure
     fr: Infrastructures et transports
     en: Infrastructure and transport
     themes: []
-    sources: [ourairports, openflights, nga, unlocode, imf_portwatch, wikidata, gcat]
+    sources: [ourairports, openflights, nga, unlocode, portwatch, wikidata, gcat]
+    tables: [atlas.eurostat.transport_air_pass_m, atlas.eurostat.transport_iww_goods, atlas.eurostat.transport_nuts2_air_pass,
+             atlas.eurostat.transport_nuts2_sea_goods, atlas.eurostat.transport_rail_goods,
+             atlas.eurostat.transport_rail_pass, atlas.eurostat.transport_road_goods]
+    connectors: [atlas.eurostat_transport]
     kg_kinds: [airport]
   - id: digital
     fr: Numérique
@@ -154,14 +171,15 @@ domains:
     fr: Culture, langues et religions
     en: Culture, languages and religions
     themes: [culture]
-    sources: [glottolog, wrp, unesco_ich, unesco_whc, olympics, musicbrainz, openlibrary]
+    sources: [glottolog, grambank, wals, wrp, rcs, unesco_ich, unesco_whc, olympics, musicbrainz, openlibrary]
     kg_kinds: [language, dialect, family, heritage_site, intangible_heritage_element, heritage_list, olympic_team]
   - id: history
     fr: Histoire (séries longues, États historiques)
     en: History (long series, historical states)
     themes: [history]
-    sources: [clio, coldat, icow, cowtc, cshapes]
+    sources: [clio, coldat, icow, cowtc, cshapes, cliopatria]
     kg_kinds: [historical_state, polity, territory, state_code, international_system, person]
+    kg_kind_sources: {event: [icow.*, cow.terrchange, coldat.*]}
   - id: geography
     fr: Géographie et territoires
     en: Geography and territories

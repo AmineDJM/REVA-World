@@ -31,6 +31,7 @@ from sqlalchemy import Engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from reva.kernel.errors import RevaError
+from reva.nlqa.bridges import bridge_matches, label_bridges, needs_bridge, refine
 from reva.nlqa.ports import (
     AtlasCell,
     AtlasResult,
@@ -183,12 +184,31 @@ class KgDbAdapter:
                 res = kq.search(conn, text_, langs=tuple(dict.fromkeys(langs)), kind=None, limit=limit)
                 hits = res.get("results") or []
                 if not hits:
-                    return self._words_search(conn, kq, text_, limit)
+                    words = self._words_search(conn, kq, text_, limit)
+                    # V8ASK: accents/case, legal form, parenthesised qualifier (reva.nlqa.bridges)
+                    return words or bridge_matches(conn, kq, text_, iso_of=self._iso3_of, limit=limit)
                 iso = self._iso3_of(conn, [h["qid"] for h in hits])
         except RevaError as e:
             if isinstance(e, CapabilityUnavailable):
                 raise
             return []  # invalid search text for the KG (length): no match
+        out = self._hits_to_matches(hits, iso)
+        refined = refine(out, text_)
+        if needs_bridge(refined):
+            with self._conn() as conn:
+                more = bridge_matches(conn, kq, text_, iso_of=self._iso3_of, limit=limit)
+            if more:
+                return more
+        return refined
+
+    def label_bridges(self, qid: str, exclude: Sequence[str] = ()) -> list[tuple[Entity, str, str]]:
+        """Other records carrying one of ``qid``'s own fr/en labels (:func:`reva.nlqa.bridges.label_bridges`)."""
+        kq = self._kq()
+        with self._conn() as conn:
+            return label_bridges(conn, kq, qid, exclude=exclude)
+
+    @staticmethod
+    def _hits_to_matches(hits: Sequence[Mapping[str, Any]], iso: Mapping[str, str]) -> list[EntityMatch]:
         out = []
         for h in hits:
             matched = h.get("matched") or []

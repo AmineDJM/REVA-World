@@ -27,6 +27,8 @@ from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any
 
+from reva.nlqa.bridges import MATCH_TEXT as BRIDGE_MATCH_TEXT
+from reva.nlqa.bridges import bridge_sentence, same_rule_sentence
 from reva.nlqa.domain_compose import DOMAIN_OPS, DomainComposer
 from reva.nlqa.executor import Execution, OpResult, Resolved, _dec
 from reva.nlqa.plan import in_question
@@ -580,7 +582,9 @@ class Composer(DomainComposer):
                     if fr
                     else "every word of the question is in its fr/en labels or aliases"
                 ),
-            }.get(r.match or "", r.match or "")
+            }.get(r.match or "") or (
+                BRIDGE_MATCH_TEXT[r.match][0 if fr else 1] if r.match in BRIDGE_MATCH_TEXT else (r.match or "")
+            )
             where = (
                 (
                     "recherche Wikidata en ligne, absente du graphe REVA"
@@ -1194,7 +1198,18 @@ class Composer(DomainComposer):
         fr = self.fr()
         d = res.data
         e = d["entity"]
-        if d.get("answered_by") is not None:
+        if d.get("answered_by") is not None and (d.get("bridge") or d.get("match") in BRIDGE_MATCH_TEXT):
+            ch, br = d["chosen"], d.get("bridge")
+            what = "question causale" if fr else "causal question"
+            self.add(
+                bridge_sentence(self.lang, ch, e, br["lang"], br["label"], what)
+                if br
+                else str(same_rule_sentence(self.lang, ch, e, d.get("match"), what)),
+                [d.get("answered_by_eid") or ""],
+                "identification",
+                res.op.id,
+            )
+        elif d.get("answered_by") is not None:
             ch = d["chosen"]
             self.add(
                 f"Aucune affirmation sur {self.entity(ch)} ({ch.qid}) ; affirmations lues sur {self.entity(e)} "

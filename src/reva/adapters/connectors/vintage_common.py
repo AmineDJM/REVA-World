@@ -93,6 +93,34 @@ AVAILABILITY_RULES: dict[str, str] = {
         "USDA OCE WASDE CSV whose Last-Modified header is after the report's ReleaseDate (posted or replaced after "
         "release, e.g. the '-V2' files): available_at = the first instant of the day after Last-Modified (UTC)"
     ),
+    "fed_nowcast_publication_day": (
+        "Federal Reserve Bank nowcast file (Atlanta Fed GDPNow archives 'Forecast Date', New York Fed Staff Nowcast "
+        "'Forecast Date', Cleveland Fed inflation nowcasting chart date label): the value was published on that day "
+        "(no time stated); available_at = the day after, 00:00 UTC (end of the publication day)"
+    ),
+    "rtdsm_monthly_vintage_month_end": (
+        "Philadelphia Fed RTDSM monthly vintages yyMmm: 'the observations available in June 1989 are those given in "
+        "the column, EMPLOY89M6' (vintage day = the agency's release day within that month, not stated); "
+        "available_at = first instant of the following month (UTC)"
+    ),
+    "bea_release_recorded_by_atlanta_fed": (
+        "Atlanta Fed GDPNow archives 'Publication Date of Advance Estimate' of the quarter (BEA's release day as "
+        "recorded by the Atlanta Fed); available_at = the day after, 00:00 UTC"
+    ),
+    "bea_release_fourth_month_bound": (
+        "upper bound for BEA's first (advance/initial) GDP estimate whose release day is not stated: every first "
+        "estimate since 1996 (incl. the 2013, 2018-19 and 2025 shutdown delays) was released within three months "
+        "after the quarter; available_at = first instant of the fourth month after the quarter (UTC)"
+    ),
+    "bea_release_sixth_month_bound": (
+        "upper bound for BEA's second/third GDP estimates whose release day is not stated (normally within three "
+        "months; shutdown-delayed releases within five); available_at = first instant of the sixth month after the "
+        "quarter (UTC)"
+    ),
+    "philfed_file_last_updated": (
+        "Philadelphia Fed first/second/third-release file NOTES 'Last updated on: <date>'; available_at = the day "
+        "after, 00:00 UTC (the 'Most_Recent' column is the value in the latest vintage at that date)"
+    ),
 }
 
 #: REVA vintage variables: id -> definition (the source's own definition is quoted per cell source in
@@ -125,6 +153,12 @@ VARIABLES: dict[str, str] = {
     "housing_starts": "housing starts, millions of units, annual rate (SPF)",
     "nonfarm_payroll_employment": "nonfarm payroll employment, thousands (SPF)",
     "hicp_inflation": "HICP inflation, year-on-year percent (ECB SPF)",
+    "cpi_inflation_m": "CPI-U inflation, month on month, percent, seasonally adjusted (Cleveland Fed nowcasts)",
+    "core_cpi_inflation_m": "core CPI-U inflation (less food and energy), month on month, percent, SA",
+    "pce_inflation_m": "PCE price index inflation, month on month, percent, SA",
+    "core_pce_inflation_m": "core PCE price index inflation, month on month, percent, SA",
+    "aggregate_weekly_hours_index": "index of aggregate weekly hours, total private, SA (Philadelphia Fed RTDSM 'H')",
+    "real_pce_monthly_level": "real personal consumption expenditures, monthly, SA (Philadelphia Fed RTDSM 'RCONM')",
 }
 
 #: Namespaced variable ids: prefix -> meaning. ``eia_steo:<CODE>`` = the EIA STEO series code (upper case; EIA's
@@ -176,6 +210,11 @@ FAMILIES: dict[str, str] = {
     "oecd_mei_rt": "OECD Main Economic Indicators original release data and revisions (monthly editions)",
     "eia_steo": "EIA Short-Term Energy Outlook monthly issues (archived Excel data files of each release)",
     "usda_wasde": "USDA World Agricultural Supply and Demand Estimates monthly reports (OCE historical CSV per report)",
+    "atl_gdpnow": "Atlanta Fed GDPNow model nowcasts of current-quarter real GDP growth (one vintage per update date)",
+    "nyfed_nowcast": "New York Fed Staff Nowcast of real GDP growth (one vintage per weekly forecast date)",
+    "clev_inflation_nowcast": "Cleveland Fed inflation nowcasting (CPI, core CPI, PCE, core PCE; one vintage per day)",
+    "philfed_rtdsm_monthly": "Philadelphia Fed Real-Time Data Set, monthly vintages of monthly indicators",
+    "philfed_release_values": "Philadelphia Fed first-, second-, third-release and most-recent values (BEA GDP)",
 }
 
 

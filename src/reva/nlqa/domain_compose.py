@@ -12,6 +12,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any
 
+from reva.nlqa.bridges import MATCH_TEXT as BRIDGE_MATCH_TEXT
+from reva.nlqa.bridges import bridge_sentence, same_rule_sentence
 from reva.nlqa.ports import Entity, FamilyNeighbour
 
 MAX_LISTED = 12
@@ -146,7 +148,18 @@ class DomainComposer:
                 "note",
                 op.id,
             )
-        if d.get("answered_by") is not None:
+        if d.get("answered_by") is not None and (d.get("bridge") or d.get("match") in BRIDGE_MATCH_TEXT):
+            ab, ch, br = d["answered_by"], d["chosen"], d.get("bridge")
+            what = "relation"
+            self.add(
+                bridge_sentence(self.lang, ch, ab, br["lang"], br["label"], what)
+                if br
+                else str(same_rule_sentence(self.lang, ch, ab, d.get("match"), what)),
+                [d.get("answered_by_eid") or ""],
+                "identification",
+                op.id,
+            )
+        elif d.get("answered_by") is not None:
             ab, ch = d["answered_by"], d["chosen"]
             self.add(
                 self._t(

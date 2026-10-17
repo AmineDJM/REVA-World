@@ -25,8 +25,9 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from reva.nlqa.bridges import MATCH_RANK as BRIDGE_MATCH_RANK
 from reva.nlqa.catalog import QaCatalog, fold
-from reva.nlqa.domain_exec import DomainOps
+from reva.nlqa.domain_exec import DomainOps, _label_bridges
 from reva.nlqa.plan import PlanOp, QueryPlan
 from reva.nlqa.ports import (
     CLAIM_TIERS,
@@ -65,6 +66,7 @@ TIME_BUDGET_S = 45.0
 BFS_MAX_CALLS = 60
 BFS_MAX_FRONTIER = 150
 _MATCH_RANK = {"label_exact": 0, "alias_exact": 1, "label_prefix": 2, "search": 3, "fuzzy": 4, "label_words": 5}
+_MATCH_RANK.update(BRIDGE_MATCH_RANK)  # V8ASK bridge rules (reva.nlqa.bridges): after the exact matches
 
 
 _WD_QID = re.compile(r"^Q[1-9][0-9]*$")
@@ -550,6 +552,7 @@ class Executor(DomainOps):
         answered_by = None
         # the chosen record first, then the records with the same label match (one taxon published by several
         # sources under one exact label: the claims may sit on another record); the answer names it (NLQA6)
+        bridge = None
         for cand in [r.entity, *r.alternatives[:3]]:
             res = port.explain(cand.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
             claims = [c for c in res.claims if _is_claim(c)]
@@ -559,12 +562,24 @@ class Executor(DomainOps):
                 break
             if r.match not in ("label_exact", "alias_exact"):
                 break
+        if not claims and not dissent:
+            # V8ASK: the other records carrying one of the chosen record's own labels (reva.nlqa.bridges)
+            for other, via_lang, via_label in _label_bridges(self.b, r):
+                more = port.explain(other.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
+                mc = [c for c in more.claims if _is_claim(c)]
+                if mc:
+                    res, claims, answered_by = more, mc, other
+                    dissent = [c for c in more.dissent if _is_claim(c) and c.claim_key not in {x.claim_key for x in mc}]
+                    bridge = {"lang": via_lang, "label": via_label}
+                    break
         data: dict[str, Any] = {
             "entity": answered_by or r.entity,
             "direction": a["direction"],
             "truncated": res.truncated,
         }
         if answered_by is not None:
+            data["bridge"] = bridge
+            data["match"] = r.match
             data["answered_by"] = answered_by
             data["chosen"] = r.entity
             data["answered_by_eid"] = ev.entity(answered_by, query=r.text, match=r.match or "")

@@ -180,7 +180,6 @@
     --v8-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --v8-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
     --v8-shadow-lg: 0 18px 56px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
-    color-scheme: dark;
   }
 }
 
@@ -239,11 +238,20 @@
   --v8-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --v8-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   --v8-shadow-lg: 0 18px 56px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
-  color-scheme: dark;
 }
 
-:root[data-theme='light'] {
+/* color-scheme (native controls, scrollbars) only while the V8 console is mounted (html.v8-active),
+   so the old screens keep their light look after visiting /v8. */
+html.v8-active {
   color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  html.v8-active:not([data-theme='light']) {
+    color-scheme: dark;
+  }
+}
+html.v8-active[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {

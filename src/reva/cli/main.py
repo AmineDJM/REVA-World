@@ -42,6 +42,25 @@ from reva.qa.cli import qa_app  # noqa: E402  (V6 QA-DATA)
 
 app.add_typer(qa_app, name="qa")
 
+# V8: every module reva.cli.v8_<name> exposing ``cli`` (and optionally NAME) becomes ``reva v8 <name>``.
+v8_app = typer.Typer(no_args_is_help=True, help="V8 console back-office commands (coverage, ...)")
+app.add_typer(v8_app, name="v8")
+
+
+def _v8_commands() -> None:
+    import importlib
+    import pkgutil
+
+    import reva.cli as _cli_pkg
+
+    for _m in sorted(m.name for m in pkgutil.iter_modules(_cli_pkg.__path__) if m.name.startswith("v8_")):
+        mod = importlib.import_module(f"reva.cli.{_m}")
+        if hasattr(mod, "cli"):
+            v8_app.add_typer(mod.cli, name=getattr(mod, "NAME", _m[3:]))
+
+
+_v8_commands()
+
 
 def _out(obj: Any) -> None:
     typer.echo(json.dumps(obj, indent=2, default=str))
