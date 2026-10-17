@@ -45,7 +45,7 @@ def identity(conn: Connection, qid: str, origin: str | None) -> dict[str, Any] |
             {"i": row["id"]},
         ).all():
             labels[lang] = lab
-    deg = kq._degree(conn, qid, cap=DEGREE_CAP)
+    deg = degree(conn, qid)
     if row is None and not (deg["statements_out"] or deg["statements_in"]):
         return None
     desc = (row["descriptions"] if row else None) or {}
@@ -100,6 +100,17 @@ def identity(conn: Connection, qid: str, origin: str | None) -> dict[str, Any] |
         if row is not None
         else None,
     }
+
+
+def degree(conn: Connection, qid: str, cap: int = DEGREE_CAP) -> dict[str, int]:
+    """Statement counts around the record, capped, read on the indexed base table (all recorded versions: an
+    approximation shown as such, never used as a value)."""
+    out_n, in_n = conn.execute(
+        text("""SELECT (SELECT count(*) FROM (SELECT 1 FROM kg.statement WHERE subject_qid = :q LIMIT :cap) a),
+                       (SELECT count(*) FROM (SELECT 1 FROM kg.statement WHERE object_qid = :q LIMIT :cap) b)"""),
+        {"q": qid, "cap": cap},
+    ).one()
+    return {"statements_out": int(out_n), "statements_in": int(in_n)}
 
 
 def own_id(qid: str, kg_kind: str | None, source_key: str | None) -> dict[str, Any]:

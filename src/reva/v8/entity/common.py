@@ -217,9 +217,16 @@ def period_label(start: str | None, end: str | None, basis: str | None = None) -
     if s.endswith("-01") and e.endswith("-01") and _months_between(s, e) == 3:
         q = (int(s[5:7]) - 1) // 3 + 1
         return f"{s[:4]}-T{q}"
-    if s == e or not e:
+    if s == e or not e or _days_between(s, e) == 1:
         return s
     return f"{s} → {e}"
+
+
+def _days_between(a: str, b: str) -> int:
+    try:
+        return (date.fromisoformat(b) - date.fromisoformat(a)).days
+    except ValueError:
+        return -1
 
 
 def _years_between(a: str, b: str) -> int:

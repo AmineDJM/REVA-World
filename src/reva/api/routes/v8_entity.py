@@ -15,6 +15,8 @@ neither); forecasts carry their judged status (a pending question is not judged)
 
 from __future__ import annotations
 
+import threading
+from collections import OrderedDict
 from contextlib import AbstractContextManager
 from typing import Any, Literal
 
@@ -478,6 +480,28 @@ class V8FicheRelationPageResponse(s.Envelope):
 
 
 # ---------------------------------------------------------------------------------------------- helpers
+_VALID_LOCK = threading.Lock()
+_VALID: OrderedDict[tuple[str, str, str], V8FicheBundle] = OrderedDict()
+
+
+def _validated(data: dict[str, Any]) -> V8FicheBundle:
+    """Validated bundle; a cache hit reuses the model validated when the bundle was built (only meta changes)."""
+    key = (data["canonical"]["kind"], data["canonical"]["id"], str(data["meta"]["generated_at"]))
+    with _VALID_LOCK:
+        hit = _VALID.get(key)
+    if hit is not None:
+        meta = hit.meta.model_copy(
+            update={"cached": data["meta"]["cached"], "served_ms": data["meta"].get("served_ms")}
+        )
+        return hit.model_copy(update={"meta": meta})
+    model = V8FicheBundle.model_validate(data)
+    with _VALID_LOCK:
+        _VALID[key] = model
+        while len(_VALID) > 128:
+            _VALID.popitem(last=False)
+    return model
+
+
 def _origin(request: Request, origin: str | None) -> str | None:
     if origin is None:
         prod = getattr(getattr(request.app.state, "settings", None), "reva_env", "") == "production"
@@ -578,7 +602,7 @@ def get_entity_bundle(
         "warnings": warnings,
         "cost": t.cost(rows, cached=data["meta"]["cached"]),
     }
-    return V8FicheBundleResponse(data=V8FicheBundle.model_validate(data), **env)
+    return V8FicheBundleResponse(data=_validated(data), **env)
 
 
 @router.get(

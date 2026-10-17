@@ -52,6 +52,37 @@ def data_version(conn: Connection) -> tuple[Any, ...]:
 def cache_clear() -> None:
     with _CACHE_LOCK:
         _CACHE.clear()
+        _RES.clear()
+        _Q.clear()
+
+
+ATLAS_TTL_S = 120.0
+_Q: dict[str | None, tuple[float, Any]] = {}
+_RES: OrderedDict[tuple[str, str], tuple[float, Resolved]] = OrderedDict()
+
+
+def _atlas(factory: Callable[[], Any], origin: str | None) -> Any:
+    """The atlas query of the latest snapshot, re-resolved at most every two minutes (the manifest read is costly)."""
+    hit = _Q.get(origin)
+    if hit and time.monotonic() - hit[0] < ATLAS_TTL_S:
+        return hit[1]
+    q = factory()
+    _Q[origin] = (time.monotonic(), q)
+    return q
+
+
+def _resolve_cached(conn: Connection, kind: str, ident: str) -> Resolved:
+    key = (kind.strip().lower(), ident.strip())
+    with _CACHE_LOCK:
+        hit = _RES.get(key)
+        if hit and time.monotonic() - hit[0] < CACHE_TTL_S:
+            return hit[1]
+    res = resolve(conn, kind, ident)
+    with _CACHE_LOCK:
+        _RES[key] = (time.monotonic(), res)
+        while len(_RES) > 4 * CACHE_SIZE:
+            _RES.popitem(last=False)
+    return res
 
 
 class Section:
@@ -124,7 +155,7 @@ def build(
 ) -> dict[str, Any]:
     t0 = time.perf_counter()
     with conn_factory() as conn:
-        res = resolve(conn, kind, ident)
+        res = _resolve_cached(conn, kind, ident) if use_cache else resolve(conn, kind, ident)
         version = data_version(conn)
     key = (res.kind, res.id, origin, version)
     if use_cache:
@@ -179,7 +210,7 @@ def _fill_entity(
     # ---- atlas work runs beside the KG work (DuckDB, no Postgres connection held)
     q = None
     with Section(meta, "atlas_open"):
-        q = atlas_factory()
+        q = _atlas(atlas_factory, origin)
         meta["atlas_snapshot"] = q.snapshot.sha256
         meta["atlas_cutoff"] = q.snapshot.cutoff.isoformat()
     recorded: dict[str, Any] = {}

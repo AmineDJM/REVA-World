@@ -78,8 +78,8 @@ def _claim(c: Mapping[str, Any]) -> dict[str, Any]:
 def causal(conn: Connection, qid: str, origin: str | None) -> dict[str, Any]:
     ocond = " AND origin = :o" if origin else ""
     n_in, n_out = conn.execute(
-        text(f"""SELECT count(*) FILTER (WHERE effect_id = :q), count(*) FILTER (WHERE cause_id = :q)
-                   FROM kg.causal_claim_current WHERE (cause_id = :q OR effect_id = :q){ocond}"""),
+        text(f"""SELECT (SELECT count(*) FROM kg.causal_claim_current WHERE effect_id = :q{ocond}),
+                        (SELECT count(*) FROM kg.causal_claim_current WHERE cause_id = :q{ocond})"""),
         {"q": qid, "o": origin},
     ).one()
     inc = cg.causes(conn, qid, origin=origin, limit=PER_SIDE)["claims"] if n_in else []

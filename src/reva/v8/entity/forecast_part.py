@@ -153,6 +153,9 @@ def _ensure_index(conn: Connection, store: Any, origin: str | None, wait_s: floa
 
 
 def warm(conn: Connection, store: Any, origin: str | None = None) -> None:
+    """Start indexing the registry in the background (first fiche of the process), without waiting."""
+    if _BATCH or (_STATE["thread"] is not None and _STATE["thread"].is_alive()):
+        return
     try:
         _ensure_index(conn, store, origin, 0.0)
     except IndexWarming:
