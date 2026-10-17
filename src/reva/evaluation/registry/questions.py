@@ -102,8 +102,13 @@ def country_label(iso3: str) -> tuple[str, str]:
     return _LABELS.get(iso3, (iso3, iso3))
 
 
-def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Series], list[dict[str, Any]]]:
-    """Per-geography observed series (and projection cells, kept apart) of one family in one atlas table."""
+def extract_series(
+    frame: pl.DataFrame, family: Family, recorded: Any = None
+) -> tuple[dict[str, Series], list[dict[str, Any]]]:
+    """Per-geography observed series (and projection cells, kept apart) of one family in one atlas table.
+
+    ``recorded``: when the table version was recorded (pin ``recorded_at``): a cell whose period starts after it is
+    never an observation (FIX5, ``registry/atlas/projection_kinds.yaml``)."""
     notes: list[dict[str, Any]] = []
     if family.value_rule in DAILY_FAMILY_RULES:
         return _extract_daily_family(frame, family), notes
@@ -153,6 +158,7 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
                 "raw_sha256": r["raw_sha256"],
                 "selector": _flags(r["selector"]),
                 "period_start": start,
+                "recorded": recorded,
             }
         )
     if dropped:
@@ -224,7 +230,9 @@ def _ref(c: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _is_projection(c: Mapping[str, Any]) -> bool:
-    return is_projection(c["flags"], period_start=c.get("period_start"))
+    return is_projection(
+        c["flags"], period_start=c.get("period_start"), recorded=c.get("recorded"), today_fallback=False
+    )
 
 
 def _fill(s: Series, raw_cells: list[dict[str, Any]], family: Family, by_idx: Any) -> None:

@@ -123,11 +123,13 @@ def is_projection(
     recorded: Any = None,
     table: str | None = None,
     as_of: date | None = None,
+    today_fallback: bool = True,
 ) -> bool:
     """True when the cell is not an observation (rules 1-5 of ``projection_kinds.yaml``).
 
     ``period_start``: the cell's period start (date or ISO text); ``recorded``: the date its table was recorded
-    (fetched), else ``as_of`` (default: today) bounds the date rule; ``table``: ``"<source>.<dataset>"``."""
+    (fetched), else ``as_of``, else today (``today_fallback=False``: no record-date rule without a date) bounds the
+    date rule; ``table``: ``"<source>.<dataset>"``."""
     f = flags or {}
     if flags_say_projection(f):
         return True
@@ -143,8 +145,8 @@ def is_projection(
         rel = _as_date(f.get(k))
         if rel is not None and start > rel:
             return True
-    bound = _as_date(recorded) or as_of or date.today()
-    return start > bound
+    bound = _as_date(recorded) or as_of or (date.today() if today_fallback else None)
+    return bound is not None and start > bound
 
 
 def estimate_status(flags: Mapping[str, Any] | None, **kw: Any) -> str | None:
