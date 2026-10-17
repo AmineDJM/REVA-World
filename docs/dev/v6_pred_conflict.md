@@ -27,7 +27,7 @@ log loss on the preliminary 2026 Candidate months because its probabilities are 
 | Question families (verbatim UCDP definitions, risk wording) | `src/reva/evaluation/conflict/families.py` |
 | Country-year panel (UCDP orgvio/ACD, V-Dem, WDI, CShapes borders from the KG) | `src/reva/evaluation/conflict/panel.py` |
 | Forecasters (baselines, KG candidate, VIEWS reference) | `src/reva/evaluation/conflict/models.py` |
-| DM (cluster-robust by country) + Holm | `src/reva/evaluation/conflict/stats.py` |
+| DM (two-way cluster-robust by country and year since FIX7; was country only) + Holm | `src/reva/evaluation/conflict/stats.py` |
 | As-of back-test + VIEWS country-year comparison | `src/reva/evaluation/conflict/backtest.py` |
 | Country-month VIEWS benchmark on GED final / Candidate | `src/reva/evaluation/conflict/monthly.py` |
 | VIEWS run parsing, annual sums, run choice by release date | `src/reva/evaluation/conflict/views.py` |
@@ -153,3 +153,24 @@ uv run pytest tests/unit/test_atlas_views.py tests/unit/test_conflict_forecastin
 Each new VIEWS release: add its run id to the `runs` option (or `DEFAULT_RUNS`), ingest, re-run `issue` in the next
 quarterly cycle. Pre-existing failures seen, not from this agent: invariant 11 (`reva.evaluation.health_registry.__main__`
 imports the object-store factory), invariant 30 (pending `musicbrainz.stats` / `openlibrary.api` budgets).
+
+## FIX7 addendum (2026-10-17, QA-PRED X2 / X9 / X13 / §3.F, `docs/dev/v6_fix7.md`)
+
+* **DM dependence (X13):** `stats.dm_test(d, clusters, time_clusters)` now uses a two-way cluster-robust variance
+  (country and origin year; Cameron-Gelbach-Miller, falling back to the larger one-way variance when the two-way
+  estimate is not positive); the country-only z is kept as `z_country_only`. The back-test and the country-month
+  VIEWS comparison (time cluster = VIEWS run) pass both clusters. The DM tables above were computed with country
+  clusters only, so their z statistics are too large; since no candidate was significant even then, "0 winners"
+  stands. Re-run on the next back-test (`run_backtest` writes the new statistics).
+* **VIEWS comparison (X2):** the country-year REVA-vs-VIEWS tests now use point losses only (`abs_error`, `msle`):
+  VIEWS is a point mass, whose CRPS is its absolute error.
+* **Near-nowcasts (§3.F):** batch `ef57141a…` sealed its 765 questions on **2026** on 2026-10-17, with 79 % of the
+  year elapsed — they are near-nowcasts, not 1-year-ahead forecasts (the back-test's h = 1 assumed an end-of-year
+  origin). An annotation is appended to the sealed batch (batch unchanged; `scripts/fix7/annotate_sealed_batches.py`),
+  and every new conflict question carries `timing` (`kind` = forecast / nowcast / near_nowcast, elapsed fraction) and
+  `issue_horizon` (years from the seal) in its own metadata. Score and report them separately from the 765 questions
+  on 2027.
+* **Revised inputs (X9):** the KG candidate alone uses V-Dem v16 and current WDI, both re-estimated / revised back in
+  time; the baselines use UCDP history only. Any future candidate advantage on this back-test would be inflated: the
+  candidate needs origin-dated V-Dem / WDI versions (archived releases) before it can be admitted (stated in the
+  back-test output, `input_vintage_note`).

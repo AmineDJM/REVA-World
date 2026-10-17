@@ -147,16 +147,31 @@ bias (+1.2 pp) is the known WEO bias. **B. WEO CPI inflation** (same design): me
 vs 172): cross-country inflation panels must be scored with medians or by country, never pooled means.
 
 **C. US SPF median real GDP growth (annualised q/q) vs no change** (145 surveys 1990Q3–2026Q3 with their true
-release dates; outcome = first release from the RTDSM; baseline = last quarter's growth in the RTDSM vintage in
-force at the release, which under the conservative RTDSM rule is one quarter staler than what forecasters had):
+release dates; outcome = first release from the RTDSM). **Corrected by FIX7 (QA-PRED X8, 2026-10-17):** the
+no-change baseline now uses the **RTDSM vintage of the survey quarter** — the data "as known in the middle month"
+of that quarter, i.e. the information set SPF panellists had at their mid-quarter deadline — instead of the vintage
+in force under the conservative availability rule, which was one quarter staler than what forecasters had and
+inflated the SPF's advantage (`spf_backtest(baseline_vintage="survey_quarter")`, the default; the V5 rule stays
+available as `baseline_vintage="available_then"`):
 
-| horizon | n | MAE SPF | MAE no-change | median AE | rel. MAE |
-|---|---|---|---|---|---|
-| current quarter (2) | 145 | 1.29 | 2.80 | 0.95 / 1.34 | 0.46 |
-| +1 quarter (3) | 143 | 1.83 | 2.85 | 1.09 / 1.39 | 0.64 |
-| +2 (4) | 142 | 1.98 | 2.96 | 1.22 / 1.51 | 0.67 |
-| +3 (5) | 141 | 1.97 | 3.03 | 1.06 / 1.67 | 0.65 |
-| +4 (6) | 140 | 1.97 | 3.17 | 1.18 / 1.85 | 0.62 |
+| horizon | n | MAE SPF | MAE no-change | median AE SPF / no-change | rel. MAE (corrected) | rel. MAE (V5, stale baseline) |
+|---|---|---|---|---|---|---|
+| current quarter (2) | 145 | 1.29 | 2.54 | 0.95 / 1.35 | **0.51** | 0.46 |
+| +1 quarter (3) | 143 | 1.83 | 2.83 | 1.09 / 1.40 | **0.65** | 0.64 |
+| +2 (4) | 142 | 1.98 | 2.82 | 1.22 / 1.36 | **0.70** | 0.67 |
+| +3 (5) | 141 | 1.97 | 2.92 | 1.06 / 1.52 | **0.67** | 0.65 |
+| +4 (6) | 140 | 1.97 | 3.07 | 1.18 / 1.71 | **0.64** | 0.62 |
+
+The SPF still beats no change at every horizon, by less (current quarter −49 % instead of −54 %). QA-PRED's
+independent re-run gave 0.509 / 0.648 / 0.705 / 0.680 / 0.644 (same rule; third-digit differences only).
+
+**B'. WEO CPI headline (FIX7, QA-PRED X6).** Pooled cross-country inflation is reported on the **ratio of median
+absolute errors** (`relative_median_ae`, `headline_metric` in the result): h0 **0.38**, h1 **0.70** (WEO closer in
+76 % / 64 % of cases). The pooled-mean ratio (h0 10.0, h1 16.7 — WEO *worse*, driven by hyperinflation outliers)
+must never be quoted as a headline in either direction. **Scoring vintage (X7):** WEO outcomes are the WEO's own
+October t+1 estimate (same institution; for many low-capacity countries an IMF staff estimate), which flatters the
+WEO and any WEO-wrapped model; an independent-outturn robustness run (national accounts first releases for
+advanced economies) is not done yet.
 
 Further backtests the layer supports now (no new data needed): any REVA model for the 5 WEO variables × ~190
 countries at 1–2 years ahead, scored against WEO as the strong baseline (the roadmap's "IMF WEO, SPF" baselines for

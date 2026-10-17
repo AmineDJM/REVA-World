@@ -62,8 +62,9 @@ def build(store: Any) -> dict[str, dict[str, Any]]:
         "questions carry this in their own metadata (question.timing, FIX7). Inputs note: the KG candidate's V-Dem "
         "v16 / current WDI covariates are final-vintage (revised back in time); baselines use UCDP history only.",
         "timing_counts": dict(kinds),
-        "elapsed_fraction_at_issue": issue_timing(date(issued_on.year, 1, 1), date(issued_on.year + 1, 1, 1),
-                                                  issued_on)["elapsed_fraction_at_issue"],  # fmt: skip
+        "elapsed_fraction_at_issue": issue_timing(
+            date(issued_on.year, 1, 1), date(issued_on.year + 1, 1, 1), issued_on
+        )["elapsed_fraction_at_issue"],
         "question_ids": sorted(near),
     }
     m = load_frozen_manifest(store, HEALTH)
@@ -78,7 +79,9 @@ def build(store: Any) -> dict[str, dict[str, Any]]:
         "release, 11 annual origins). Their scores are final-vintage-admitted results, not evidence of real-time "
         "skill; GHE questions forecast the next WHO GHE release (a model estimate), not registered deaths. New "
         "health batches carry this in question.candidate_admission (FIX7).",
-        "families": {k: {"winners": v["winners"], "backtest": (v.get("backtest") or {}).get("kind")} for k, v in fams.items()},
+        "families": {
+            k: {"winners": v["winners"], "backtest": (v.get("backtest") or {}).get("kind")} for k, v in fams.items()
+        },
         "issued_candidate_forecasts": dict(cand),
     }
     return out
@@ -97,7 +100,9 @@ def main() -> int:
     ann = build(store)
     res = {}
     for sha, doc in ann.items():
-        summary = {k: v for k, v in doc.items() if k != "question_ids"} | {"n_question_ids": len(doc.get("question_ids") or [])}
+        summary = {k: v for k, v in doc.items() if k != "question_ids"} | {
+            "n_question_ids": len(doc.get("question_ids") or [])
+        }
         res[sha] = summary
         if a.write:
             res[sha]["annotation_sha256"] = annotate_batch(make_engine("worker", get_settings()), store, sha, doc,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from datetime import UTC, datetime
+from typing import Any, ClassVar
 
 import pytest
 
@@ -105,7 +106,7 @@ def test_health_final_vintage_admission_is_labelled() -> None:
 
     class F:
         key = "ghe.deaths"
-        raw = {"backtest": {"kind": "final_vintage"}}
+        raw: ClassVar[dict[str, Any]] = {"backtest": {"kind": "final_vintage"}}
 
     a = HS.admission_basis(F(), ["forecast.health_blend"])  # type: ignore[arg-type]
     assert a is not None and a["final_vintage"] and "FINAL-VINTAGE RESULT" in a["note"]

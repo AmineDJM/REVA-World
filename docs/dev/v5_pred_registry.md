@@ -57,6 +57,21 @@ STEO forecasts — are never outcomes); checked from the end of the reference pe
 scored). The outcome keeps its provenance (table version, artifact sha256, raw sha256 + selector + flags of every
 source cell).
 
+**Prospectivity, FIX7 (QA-PRED X10/X11, 2026-10-17).** Checked against the **issue date and the provider's
+publication date**, not only REVA's pinned table: (1) at issue, a target period that has **ended** at `issued_at` is
+refused (skipped with a reason) unless the family declares `nowcast: true`; every new question records
+`issue_horizon` (periods from the issue period; `cycle_horizon` stays the cycle-anchored label) and `timing`
+(`forecast` / `nowcast` / `near_nowcast` / `ended`, elapsed fraction of the target period at issue); (2) at
+resolution, `not_prospective` also when the period had ended at issue (older batches), or when the outcome cell's
+provider publication date (flags `release_date`, `publication_date`, `published_at`, `last_updated`, `data_update`;
+ISO dates only, labels never guessed) is on or before the seal date. Where no cell declares such a date only the
+table-relative check applies (stated). **Voids:** `void_questions` closes a question by rule only **before its
+period ends**; after that, `counterfactual=True` is required and the counterfactual scores (against the first value
+published after the seal) are logged in the void resolution and in each model's `registry_score` row
+(`metrics.counterfactual_scores` / `counterfactual_summary`) for the leaderboard audit; with no outcome published
+yet the void is refused. **Annotations:** `annotate_batch` appends a content-addressed note to a sealed batch
+(provenance input = the batch) without touching it.
+
 ## 4. Sealing (freeze before resolution)
 
 `issue_cycle` (worker credentials, advisory lock): DB clock `issued_at` → cycle; pins, per family, the latest

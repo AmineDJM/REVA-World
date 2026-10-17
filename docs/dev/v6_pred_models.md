@@ -4,6 +4,17 @@ Agent PRED-MODELS, 2026-10-17. Plan: `docs/roadmap/v6_plan.md`; method rules: `d
 (decisions 2 and 4), `docs/strategy/world_map.md` §5. Data: PRED-VINTAGE's vintage tables (`docs/dev/v5_pred_vintage.md`).
 Registry: PRED-REGISTRY (`docs/dev/v5_pred_registry.md`). Not financial advice.
 
+> **FIX7 correction (2026-10-17, QA-PRED X1/X5/X6/X7, `docs/dev/v6_fix7.md`).** The three registered models are
+> **calibrated intervals around the IMF WEO / SPF point — not better point forecasts**, and their holdout "win" was
+> against a **weak benchmark**: `benchmark.imf_weo_gauss` / `benchmark.spf_gauss` = N(official point, spread of
+> REVA's *persistence* predictive), whose 80 % interval covered 93–100 % (WEO) / 96 % (SPF) of holdout outcomes.
+> Against the **fair benchmark** N(official point, RMS of the official forecaster's own past errors known at the
+> origin), re-run on the **development sample only** (the holdout is spent): WEO GDP h0 conformal CRPS ×0.985
+> (p 0.033, not Holm-significant), bias-corrected ×0.992 (p 0.18), SPF current quarter ×1.018 (worse) — §12. They
+> stay registered but on **probation**: future issuance requires beating the fair benchmark
+> (`forecast.weo_error_fan`, now sealed next to them) on the next prospective evaluation. Never write "REVA beats
+> the IMF/SPF".
+
 ## 1. Result in one paragraph
 
 Sixteen candidate models (direct AR, Minnesota BVAR, two dynamic-factor nowcasts, equal-weight combinations,
@@ -136,6 +147,10 @@ hypothesis).
 | `forecast.weo_bias_corrected@1.0.0` | weo / real GDP growth / h0 | same: CRPS ×0.763, p = 0.0004, cov80 0.75 | `weo.gdp_growth`, horizon 0 |
 | `forecast.spf_conformal@1.0.0` | us / real GDP growth / SPF horizon 2 (current quarter) | naive Gaussian around SPF: CRPS ×0.914, p = 2e-5, cov80 0.89 | none yet (awaiting a US quarterly GDP family) |
 
+*FIX7:* "benchmark beaten" above is the weak N(point, persistence spread) benchmark (QA-PRED X1); against the fair
+error-fan benchmark none of the three wins on development (§12). Status: WEO densities on probation (issue with the
+fair benchmark `forecast.weo_error_fan` sealed next to them; gate `issue.fair_gate`); SPF density issues nothing.
+
 What these models are: **REVA's calibrated uncertainty around the IMF's / SPF panel's point forecast** (points are
 the IMF's and the SPF's, attributed; the WEO bias correction moves the point by a median past error, AE ×0.999 —
 equal to the WEO). They do not make REVA a better point forecaster than the IMF or the SPF.
@@ -208,6 +223,57 @@ flock /tmp/reva-devdb.lock uv run reva seed                          # model ver
 flock /tmp/reva-devdb.lock uv run reva forecasts issue               # baselines + registered-model supplements
 flock /tmp/reva-devdb.lock uv run reva forecasts resolve
 ```
+
+## 12. FIX7 addendum — fair density benchmark (development only), overlap, CPI, scoring vintage
+
+**Fair benchmark** (`src/reva/evaluation/pred_models/fair_benchmark.py`, outside the protocol's `SOURCE_FILES`, so
+the protocol code digest is unchanged): `own` = N(official point, RMS of that series' own past official errors at
+the same horizon with `outcome_known_at <= origin`, ≥ 8 errors); `pooled` = N(official point, series scale × RMS of
+the pooled normalised past official errors, ≥ 15) — the Gaussian twin of the conformal density. Re-run with
+`uv run python -m reva.cli.pred_models fair-dev` on **development origins only** (`build_cases(stage="development")`
+never forecasts a holdout origin); result `registry/forecasts/pred_models/fair_benchmark_development.json`. CRPS
+ratios candidate / benchmark, one-sided DM-HLN by origin, Holm per benchmark over the task's 3 density candidates ×
+cells (WEO m = 18, US m = 45):
+
+| scope | candidate | vs old (persistence spread) | vs fair `own` error fan | vs fair `pooled` error fan |
+|---|---|---|---|---|
+| WEO GDP h0 | `weo_conformal` | ×0.663, p 2e-8, Holm ✓ (19 origins) | ×0.985, p 0.033, Holm ✗ (13 origins) | ×0.924, p 0.049, Holm ✗ |
+| WEO GDP h0 | `weo_bias_corrected` | ×0.654, p 7e-11, Holm ✓ | ×0.992, p 0.18, Holm ✗ | ×0.912, p 0.002, Holm ✓ |
+| US GDP current quarter | `spf_conformal` | ×0.726, p 2e-14, Holm ✓ (74 origins) | **×1.018**, p 0.70 (worse) | ×1.009, p 0.62 |
+| same, purged (X5) | `weo_conformal` / `weo_bias_corrected` / `spf_conformal` | ×0.678 / ×0.668 / ×0.720 | ×0.988 (p 0.095) / ×0.996 / ×1.015 | ×0.934 / ×0.921 (p 0.006, Holm ✗) / ×1.007 |
+
+80 % coverage on development, WEO GDP h0: old benchmark 0.98, fair `own` 0.87, `pooled` 0.92, conformal 0.82; US
+current quarter: old 1.00, `own` 0.79, conformal 0.74. **Reading:** the registered densities are about as good as the
+standard error-based fan of the official forecaster; the large holdout gain was mostly the strawman's over-wide
+spread. Their only remaining edge is shape/scale pooling across countries (the bias-corrected WEO variant beats the
+pooled Gaussian fan on the unpurged development sample, not after the purge) — not established.
+
+**Issuance rule (registered_models.yaml, `issuance`):** the two WEO densities are on `probation`; the fair benchmark
+`forecast.weo_error_fan@1.0.0` (methods.yaml) is issued in the same supplementary batches on the same questions;
+once ≥ 30 common questions resolve, `issue.fair_gate` (CRPS, one-sided country-clustered DM, p < 0.05) decides
+`confirmed` or `suspended`, appended to `registry/forecasts/pred_models/issuance_decisions.yaml`; `suspended` models
+issue nothing (`issue.issuing_scopes`). The SPF density (no registry family) must beat `benchmark.spf_errfan`
+prospectively before any issuance.
+
+**X5 — dev/holdout target overlap (documented, not re-tested):** the split is on the origin date only, so
+development cases can target periods whose outcomes were published after the split (dev origin 2018-12 h1 targets
+2019, also targeted by the holdout's 2019-06/12 h0 cases; US dev SPF h6 from 2012 targets 2013–14). The locked
+holdout is spent and is not re-opened; any future protocol must purge development cases with
+`outcome_known_at >= split` (`fair_benchmark.compare(purge=True)` does it; the purged rows are in the table above).
+
+**X6 — pooled CPI:** pooled cross-country inflation means are dominated by hyperinflation (direct AR CPI CRPS
+1,399× persistence on the holdout; WEO CPI h0 MAE 10× persistence while its median AE is 0.38×): quote medians
+(`gate.summary.median_ae`; `vintage_backtests` `relative_median_ae` headline) or per-country ratios, never a pooled
+mean ratio, for every CPI cell of this report.
+
+**X7 — WEO scoring vintage:** WEO cases are scored against the target year in the first WEO vintage available on/after
+1 October of the next year — the IMF's own estimate (for many low-capacity countries an IMF staff estimate), which
+flatters the WEO and every WEO-wrapped density. An independent-outturn robustness run is not done (owner decision).
+
+**X8 (not changed here):** `realtime.us_cases` still gives REVA's US models the conservative RTDSM vintage (one
+quarter staler than the SPF panellists); changing it would change the protocol code digest. It handicaps REVA, it does
+not inflate any claim; a future protocol should use the survey-quarter vintage (as `vintage_backtests.spf_backtest`
+now does).
 
 ## Appendix A — development stage, full tables (summaries and every tested comparison)
 

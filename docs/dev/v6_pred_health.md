@@ -127,3 +127,18 @@ flock /tmp/reva-devdb.lock uv run python -m reva.cli.health_registry issue      
 flock /tmp/reva-devdb.lock uv run python -m reva.cli.health_registry backtest   # after each ingest season
 ```
 Not scheduled as worker jobs yet (would touch the shared `operations/jobs.py`/`schedules.py`; lead decision).
+
+## FIX7 addendum (2026-10-17, QA-PRED §7 / X9, `docs/dev/v6_fix7.md`)
+
+* The FluNet `blend` and WHO GHE `log_drift` / `blend` "winners" are **final-vintage results**: admitted on
+  back-tests run on revised / backfilled data (FluNet late reports favour AR-type candidates over climatology), and
+  for GHE on 11 annual origins of a *modelled* series that WHO re-estimates in every release. They are not evidence of
+  real-time skill; skill will only come from resolved prospective questions (or archived FluNet / RespiCast vintages).
+* Registry metadata (going forward): every new health batch carries `candidate_admission` on the family and on each
+  question (`backtest_kind`, `final_vintage: true`, note "FINAL-VINTAGE RESULT …"), an `admission` note on every
+  candidate forecast record, and on GHE questions `target_note` = "forecast of the next WHO Global Health Estimates
+  release (a modelled estimate …), not of registered deaths" (`health_registry.service.admission_basis`).
+* Sealed batch `0ab8fcc2…` (612 blend + 504 log-drift candidate forecasts) is unchanged; an annotation with the same
+  wording is appended to it (`scripts/fix7/annotate_sealed_batches.py`).
+* Multiplicity (X3, minor): the FluNet and GHE p-values (≤ 3e-5) survive a Bonferroni correction over the 18
+  candidate × family cells; the winner rule should still declare that family before the next run.

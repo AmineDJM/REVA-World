@@ -182,7 +182,6 @@ def test_fix7_one_holm_family_per_run_and_eia_combination_never_a_winner() -> No
     recs = []
     for code in ("COPRPUS", "PAPR_WORLD"):
         for i in range(30):
-            y = 10.0 + (i % 5)
             for m, err in (("rw", 1.0), ("steo", 0.5), ("combo_steo_rw", 0.6), ("ar_diff", 0.7)):
                 if m not in em.models_for(code):
                     continue
