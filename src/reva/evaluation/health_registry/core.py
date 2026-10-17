@@ -315,7 +315,7 @@ def extract_cells(frame: pl.DataFrame, fam: Family) -> tuple[Series, dict[str, s
         if not _geo_ok(fam, geo):
             continue
         flags = _json(r["flags"])
-        if is_projection(flags, period_start=r["period_start"]):
+        if is_projection(flags, period_start=r["period_start"], today_fallback=False):
             continue
         idx = idx_of_cell(fam, r["period_start"], r["period_end"])
         if idx is None:

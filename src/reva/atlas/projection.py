@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
@@ -94,6 +94,8 @@ def _truthy(v: Any) -> bool:
 def _as_date(v: Any) -> date | None:
     if v is None:
         return None
+    if isinstance(v, datetime):
+        return v.date()
     if isinstance(v, date):
         return v
     m = _ISO.match(str(v))

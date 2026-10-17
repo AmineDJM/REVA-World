@@ -150,7 +150,8 @@ def test_readers_share_the_vocabulary() -> None:
     steo = AtlasCell("eia_steo", "steo_observed", "STEO.COPRAP.M", "", "2026-11-01", "2026-12-01", "0.2", flags=STEO)
     assert cell_is_projection(steo)
     assert _is_projection(STEO, "2026-11-01") and not _is_projection(STEO, "2026-09-01")
-    assert questions._is_projection({"flags": ILO, "period_start": date(2099, 1, 1)})
+    assert questions._is_projection({"flags": ILO, "period_start": date(2099, 1, 1), "recorded": "2026-10-10T08:00:00"})
+    assert not questions._is_projection({"flags": ILO, "period_start": date(2099, 1, 1)})  # registry: pin date only
 
 
 def test_energy_outcomes_skip_steo_cells_after_the_release() -> None:

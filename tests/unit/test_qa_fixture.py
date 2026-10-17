@@ -254,11 +254,15 @@ def test_units(report: dict[str, Any]) -> None:
 
 
 def test_time(report: dict[str, Any]) -> None:
-    # QA.SHARE 2030 and the unflagged 2051 cell of the projection table
-    assert _check(report, "time.future_observation")["count"] == 2
-    assert _check(report, "time.projection_table_unflagged")["count"] == 1
+    # FIX5: QA.SHARE 2030 and the unflagged 2051 cell of the projection table start after their table's record
+    # date: read as not observed by the shared date rule (registry/atlas/projection_kinds.yaml), reported apart
+    assert _check(report, "time.future_observation")["count"] == 0
+    assert _check(report, "time.projection_by_date_rule")["count"] == 2
+    assert _check(report, "time.projection_table_unflagged")["count"] == 1  # provider flags only
     assert _check(report, "time.forecast_as_observation")["count"] == 1
-    assert _check(report, "time.projection_word_unflagged")["count"] == 1  # estimate_kind "forecast"
+    # estimate_kind "forecast" is a projection kind now (QA-DATA D1): no longer an observation
+    assert _check(report, "time.projection_word_unflagged")["count"] == 0
+    assert _check(report, "time.estimate_kind_unclassified")["count"] == 0
     kg = _check(report, "time.kg_future_statement")
     assert kg["count"] == 1 and kg["breakdown"][0]["predicate"] == "P571"
 

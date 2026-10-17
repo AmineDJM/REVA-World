@@ -107,15 +107,13 @@ def projection_frame(df: pl.DataFrame, recorded: date | None = None, table: str 
     con = duckdb.connect()
     try:
         con.register("x", part.to_arrow())
-        sub = pl.from_arrow(
-            con.execute(
-                f"SELECT _r, {projection_sql('x')} AS flag_proj, {projection_sql('x', period=True)} AS rel_proj, "
-                "json_extract_string(x.flags, '$.estimate_kind') AS _ek, "
-                "json_extract_string(x.flags, '$.flag_meaning') AS _fm, "
-                "TRY_CAST(substr(json_extract_string(x.flags, '$.available_at'), 1, 10) AS DATE) AS available_at "
-                "FROM x"
-            ).arrow()
-        )
+        sub = con.execute(
+            f"SELECT _r, {projection_sql('x')} AS flag_proj, {projection_sql('x', period=True)} AS rel_proj, "
+            "json_extract_string(x.flags, '$.estimate_kind') AS _ek, "
+            "json_extract_string(x.flags, '$.flag_meaning') AS _fm, "
+            "TRY_CAST(substr(json_extract_string(x.flags, '$.available_at'), 1, 10) AS DATE) AS available_at "
+            "FROM x"
+        ).pl()
     finally:
         con.close()
     assert isinstance(sub, pl.DataFrame)
@@ -415,7 +413,9 @@ class AtlasScan:
         if t.key in self.proj_tables:
             a = self.acc["time.projection_table_unflagged"]
             a.checked += df.height
-            a.add(t.key, obs.height, [_cell(t.key, r, "flags") for r in obs.head(2).iter_rows(named=True)])
+            # provider flags only: a cell read as not observed by the date rule alone is still unflagged
+            unf = df.filter(~pl.col("is_proj") | pl.col("by_date"))
+            a.add(t.key, unf.height, [_cell(t.key, r, "flags") for r in unf.head(2).iter_rows(named=True)])
         days = (pl.col("period_end") - pl.col("period_start")).dt.total_days()
         for suf, (lo, hi) in self.suffixes.items():
             if t.dataset.endswith(suf):
