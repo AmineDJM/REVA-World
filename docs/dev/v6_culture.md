@@ -173,4 +173,14 @@ Raw archive per full refresh: ~0.7 MB (MusicBrainz) + ~3 MB (Open Library) + ~0.
 
 ## 7. Live outcome
 
-(filled in below when the queued chain finished)
+Run 2026-10-17 20:32–21:21 UTC (after the container restart; `reva seed` registered 1.0.1 of both connectors —
+1.0.0 had been registered from a WIP copy, so the versions were bumped):
+
+| Source | Result |
+|---|---|
+| `atlas.musicbrainz_stats` 1.0.1 | **loaded live**: `atlas.musicbrainz.country_stats` 1,295 rows, `atlas.musicbrainz.language_stats` 834 rows (2 requests, ~0.7 MB raw) |
+| `atlas.openlibrary_subjects` 1.0.1 | **not run**: free disk 2.96 GB < 5 GB at its turn (guard) |
+| `atlas.uis_culture` (A-CULTURE) | **not run**: 4.61 GB free |
+| `atlas.olympics_medals` (A-CULTURE) | **not run**: 4.30 GB free |
+
+Still to run when ≥ 5 GB are free: the last three lines of the loop in §6.
