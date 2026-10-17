@@ -1,0 +1,27 @@
+# Values outside a quantity's definitional range (FIX5, QA-DATA D6). Values are NEVER altered.
+#
+# `range` entries: a cell of the series whose numeric value lies outside [min, max] is served as published, with
+# a read-time QA flag added to a copy of its flags (reva.atlas.value_notes.qa_flag; key `reva_qa`, by the atlas
+# query layer for every cell it returns: headline answers, table / series reads, NLQA, API, UI). The QA check
+# `units.bounded_share` keeps counting them (warn).
+# `signed` entries: the provider definition makes negative values legitimate (a net flow); the QA
+# `units.negative_count` check does not count them and the note is reported instead.
+# Definitions are quoted verbatim from the provider metadata recorded in registry/atlas/catalog/worldbank.yaml.
+version: 1
+series:
+  wb.wdi_social.EG.ELC.RNWX.ZS:
+    range: [0, 100]
+    definition: "The share of electricity production from renewable sources of total electricity production. Electricity production from renewable sources, excluding hydroelectric, includes geothermal, solar, tides, wind, biomass, and biofuels."
+    note: "A share of total production cannot exceed 100 by this definition; 453 WDI cells exceed it (QA-DATA D6). Kept as published by the World Bank (upstream: IEA); flagged, not corrected."
+  wb.wdi_social.ER.H2O.FWDM.ZS:
+    range: [0, 100]
+    definition: "Annual freshwater withdrawals refer to total water withdrawals, not counting evaporation losses from storage basins. Withdrawals also include water from desalination plants in countries where they are a significant source. Withdrawals can exceed 100 percent of total renewable resources where extraction from nonrenewable aquifers or desalination plants is considerable or where there is significant water reuse. Withdrawals for domestic uses include drinking water, municipal use or supply, and use for public services, commercial establishments, and homes."
+    note: "The 'can exceed 100 percent' clause is about withdrawals as a share of renewable resources; this series is domestic withdrawals as a share of total withdrawals, a part of a whole: > 100 is outside the definition (27 cells, e.g. BRN 2004-2006; upstream AQUASTAT). Flagged, not corrected."
+  wb.wdi_social.ER.H2O.FWAG.ZS:
+    range: [0, 100]
+    definition: "Annual freshwater withdrawals refer to total water withdrawals, not counting evaporation losses from storage basins. Withdrawals also include water from desalination plants in countries where they are a significant source. Withdrawals can exceed 100 percent of total renewable resources where extraction from nonrenewable aquifers or desalination plants is considerable or where there is significant water reuse. Withdrawals for agriculture are total withdrawals for irrigation and livestock production. Data are for the most recent year available for 1987-2002."
+    note: "Agricultural withdrawals as a share of total withdrawals: > 100 is outside the definition (4 cells; upstream AQUASTAT). Flagged, not corrected."
+  wb.edstats.UIS.MENF.56:
+    signed: true
+    definition: "Number of tertiary students from abroad (inbound students) studying in a given country minus the number of students at the same level from a given country studying abroad (outbound students)."
+    note: "A net flow (inbound - outbound): a negative value means more outbound than inbound students and is within the definition (942 cells). The unit 'number' is not a count of persons; not a data error."

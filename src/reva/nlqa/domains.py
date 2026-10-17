@@ -268,11 +268,12 @@ def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, cou
                 effect = re.split(r"\s+(?:en|au|aux|dans|in|for|pour)\s+", effect)[0]
             return [{"op": "effects", "cause_text": cause, "effect_text": _x(effect), "country": country}]
     if _FORECAST_WORD.search(q):
+        names = {fold(n) for n in _country_names(catalog, countries)}
         for rx in _FORECAST_TOPIC:
-            m = rx.search(q)
-            if m and _x(m.group("t")):
+            for m in rx.finditer(q):
                 topic = _x(m.group("t"))
-                return [{"op": "forecast", "text": topic, "country": countries[0] if countries else None}]
+                if topic and fold(topic) not in names and content_words(topic):
+                    return [{"op": "forecast", "text": topic, "country": countries[0] if countries else None}]
     for rx in _CAUSED_BY:
         m = rx.search(q)
         if m and _x(m.group("x")):
@@ -298,8 +299,6 @@ def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, cou
                 ops = _family_ops(_x(m.group("x")), families, reading, count, catalog)
                 if ops:
                     return ops
-    if concept_matched:
-        return None
     for rx in _COUNT:
         m = rx.search(q)
         if m and _x(m.group("x")):
@@ -325,6 +324,8 @@ def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, cou
                     "limit": 25,
                 },
             ]
+    if concept_matched:
+        return None
     for rx in _CONTENTS:
         m = rx.search(q)
         if m and _x(m.group("x")):
@@ -392,3 +393,21 @@ def match_terms(
         return []
     top = max(s for s, _, _ in scored)
     return [tid for _, _, tid in sorted((x for x in scored if x[0] == top), key=lambda x: (x[1], x[2]))][:limit]
+
+
+def covering_concepts(question: str, catalog: QaCatalog, countries: Sequence[str], *, limit: int = 5) -> list[str]:
+    """Catalog concepts whose fr/en labels hold *every* content word of the question (country names and numbers
+    aside): "prix du Brent en 2020" → the Brent price concepts. Used only when no concept matches by the usual
+    label-share rule; ties are all returned (each queried and answered separately)."""
+    names = " ".join(fold(n) for n in _country_names(catalog, countries))
+    words = [w for w in dict.fromkeys(content_words(question)) if not w.isdigit() and w not in names.split()]
+    if not words:
+        return []
+    out = []
+    for c in catalog.concepts.values():
+        lw: set[str] = set()
+        for v in c.labels.values():
+            lw.update(content_words(re.sub(r"\(.*?\)", " ", str(v))))
+        if all(_hit(w, lw) for w in words):
+            out.append((len(lw), c.id))
+    return [cid for _, cid in sorted(out)][:limit]

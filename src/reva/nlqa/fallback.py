@@ -15,7 +15,7 @@ import re
 from typing import Any
 
 from reva.nlqa.catalog import QaCatalog, fold
-from reva.nlqa.domains import domain_plan
+from reva.nlqa.domains import covering_concepts, domain_plan
 from reva.nlqa.plan import detect_language
 
 _RANK_DESC = re.compile(
@@ -453,6 +453,20 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
         assert ambiguity is not None
         ambiguity["resolution"] = "each_queried"
         ambiguous = []
+    elif not ambiguous and (covering := covering_concepts(question, catalog, countries)):
+        # V6 (NLQA6): every content word of the question is in the labels of these concepts ("prix du Brent en
+        # 2020"); a concept without a country (a world price, a benchmark) is read by period, never ranked
+        for cid in covering:
+            if countries:
+                for iso in countries[:2]:
+                    op(op="atlas_value", concept=cid, country=iso, year=years[0] if years else None)
+            else:
+                op(
+                    op="atlas_period",
+                    concept=cid,
+                    from_year=min(years) if years else None,
+                    to_year=max(years) if years else None,
+                )
     elif not ambiguous:
         spans = _spans(question)
         lookups = [op(op="entity_lookup", text=s, kind=None)["id"] for s in spans]

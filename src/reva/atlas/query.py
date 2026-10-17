@@ -41,6 +41,7 @@ import threading
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from datetime import date
 from decimal import Context, Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
@@ -51,6 +52,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from reva.atlas.catalog import Catalog, Series
+from reva.atlas.projection import PROJECTION_SQL as PROJECTION_SQL  # re-export (FIX4B tests, docs)
+from reva.atlas.projection import projection_sql, vocabulary
 from reva.atlas.snapshot import AtlasSnapshot, normalise_rights
 from reva.atlas.source_order import CellRule, HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
@@ -369,6 +372,7 @@ class AtlasQuery:
             for sha, t in self.tables.items()
         }
         self._memo: dict[Any, Any] = {}
+        self._tr: pa.Table | None = None
         rows = self._rows("SELECT sid, source, dataset, indicator FROM series")
         self.series_of: dict[int, tuple[str, str, str]] = {
             r["sid"]: (r["source"], r["dataset"], r["indicator"]) for r in rows
@@ -913,6 +917,8 @@ class AtlasQuery:
         sidf = "TRUE" if len(sids) > 64 else "x.sid IN (" + ",".join(str(x) for x in sids) + ")"
         table = "cells" if iso3 is not None else "cells_s"
         ok = "num AND NOT noneq AND NOT bad_unit AND (NOT isproj OR allow)"
+        # FIX5: kinds + flags, a provider release date in the flags, and periods starting after the table's record date
+        proj_sql = projection_sql("x", period=True, recorded_sql="tr.recorded")
         rule_sql = (
             """,
             m AS (SELECT c0.ci, c0.rank, c0.iso3, c0.year, min(r.ri) AS ri
@@ -928,7 +934,7 @@ class AtlasQuery:
         sql = f"""
             WITH c0 AS (
               SELECT h.ci, h.rank, h.allow, x.iso3, x.year, x.flags,
-                     {PROJECTION_SQL} AS own_proj,
+                     {proj_sql} AS own_proj,
                      (h.unit IS NOT NULL AND x.unit <> h.unit) AS bad_unit,
                      (x.value IS NOT NULL) AS num,
                      {{'sid': x.sid, 'value': x.value, 'value_text': x.value_text, 'unit': x.unit,
@@ -936,7 +942,7 @@ class AtlasQuery:
                        'period_start': {iso_date_sql("x.period_start")}, 'period_end': {iso_date_sql("x.period_end")},
                        'raw_sha256': x.raw_sha256, 'selector': x.selector, 'table_sha': x.table_sha,
                        'period_basis': x.period_basis}} AS cell
-              FROM {table} x JOIN hs h ON x.sid = h.sid
+              FROM {table} x JOIN hs h ON x.sid = h.sid LEFT JOIN tr ON tr.table_sha = x.table_sha
               WHERE {sidf} AND {" AND ".join(where)}){rule_sql},
             c AS (
               SELECT c0.*, m.ri, (hx.iso3 IS NOT NULL) AS noneq, (c0.own_proj OR m.ri IS NOT NULL) AS isproj,
@@ -958,7 +964,7 @@ class AtlasQuery:
                    arg_min(ri, sortkey) FILTER (WHERE {ok}) AS best_rule,
                    arg_min(isproj, sortkey) FILTER (WHERE {ok}) AS best_proj
             FROM c GROUP BY ci, iso3, year"""
-        for r in self._rows(sql, params, extra={"hs": tbl, "hr": rules, "hx": excl}):
+        for r in self._rows(sql, params, extra={"hs": tbl, "hr": rules, "hx": excl, "tr": self._table_recorded()}):
             out[specs[r.pop("ci")].key][(r["iso3"], int(r["year"]))] = r
         return out
 
@@ -996,6 +1002,24 @@ class AtlasQuery:
                 st = "no_value"
             out.append({"series": ser.key, "source_rank": rank, "status": st, **extra})
         return out
+
+    def _table_recorded(self) -> pa.Table:
+        """table artifact sha256 -> date the table was recorded (fetched); exempt tables (announced future dates,
+        ``registry/atlas/projection_kinds.yaml``) are left out, which turns the period-after-record rule off."""
+        if self._tr is None:
+            exempt = {f"atlas.{t}" for t in vocabulary().date_rule_exempt_tables}
+            rows = [
+                (sha, str(t["recorded_at"])[:10])
+                for sha, t in self.tables.items()
+                if t.get("recorded_at") and str(t.get("dataset_key")) not in exempt
+            ]
+            self._tr = pa.table(
+                {
+                    "table_sha": pa.array([r[0] for r in rows], pa.string()),
+                    "recorded": pa.array([date.fromisoformat(r[1]) for r in rows], pa.date32()),
+                }
+            )
+        return self._tr
 
     def _reported_cell(self, sp: _Spec, unit: str | None, key: tuple[str, int], row: dict[str, Any]) -> dict[str, Any]:
         rank = int(row["best_rank"])
@@ -1328,18 +1352,8 @@ class AtlasQuery:
 
 
 # --------------------------------------------------------------------------- headline concepts (ATLASOPS)
-#: A cell is a projection when its provider says so: WEO/ILO-style estimate_kind, a truthy
-#: ``projection`` flag (WPP/WHO booleans, ILO text) or the WDI's ``period_after_vintage``.
-#: Cells that are not observations. ``estimate_kind = unknown_boundary`` (a provider series published without a
-#: history/forecast boundary, e.g. 16 EIA STEO series) is never an observation either: the boundary is unknown, so
-#: no period of it can be asserted as observed (FIX4B, audit AUDIT3 M6; same rule as
-#: ``reva.evaluation.registry.questions.PROJECTION_KINDS``).
-PROJECTION_SQL = (
-    "(coalesce(json_extract_string(x.flags, '$.estimate_kind'), '') IN ('projection', 'unknown_boundary', "
-    "'published_history_boundary_unknown') "
-    "OR coalesce(json_extract_string(x.flags, '$.projection'), 'false') NOT IN ('false', '') "
-    "OR coalesce(json_extract_string(x.flags, '$.period_after_vintage'), 'false') = 'true')"
-)
+#: Cells that are not observations: see :mod:`reva.atlas.projection` (``registry/atlas/projection_kinds.yaml``,
+#: the single vocabulary every reader uses; FIX5). ``PROJECTION_SQL`` = rules on ``x.flags`` only.
 DERIVED_PRECISION = 12  # significant digits of a derived ratio (an exact formula, rounded once)
 
 
