@@ -29,13 +29,13 @@ def test_statement_licence_wins_when_artifact_was_recorded_for_another_source() 
     }
     r = fq._rights(row, _by_sha(NOAA_RIGHTS))
     assert r is not None and r["licence"] == "Public domain (Natural Earth)"
-    assert r["basis"] == "statement_reference" and r["artifact_recorded_for_source_key"] == "noaa.ghcnm"
+    assert r["basis"] == "statement_reference (raw artifact rights recorded for noaa.ghcnm)"
 
 
 def test_artifact_rights_kept_for_the_source_that_recorded_them() -> None:
     row = {"source_key": "noaa.ghcnm", "raw_sha256": NE_SHA, "refs": [{"licence": "anything else"}]}
     r = fq._rights(row, _by_sha(NOAA_RIGHTS))
-    assert r is not None and r["licence"].startswith("US Government work")
+    assert r is not None and r["licence"].startswith("US Government work") and "recorded_for_source_key" not in r
     # no statement licence: the artifact's (possibly more restrictive) rights stay
     r2 = fq._rights({"source_key": "naturalearth.admin1_10m", "raw_sha256": NE_SHA, "refs": []}, _by_sha(NOAA_RIGHTS))
     assert r2 is not None and r2["licence"].startswith("US Government work")

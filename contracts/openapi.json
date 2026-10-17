@@ -16593,7 +16593,7 @@
             "$ref": "#/components/schemas/FamilyMappingRef"
           },
           "neighbour": {
-            "$ref": "#/components/schemas/KgRef"
+            "$ref": "#/components/schemas/FamilyNeighbourRef"
           },
           "reading": {
             "$ref": "#/components/schemas/FamilyReading"
@@ -16648,6 +16648,45 @@
           "statement"
         ],
         "title": "FamilyNeighbour",
+        "type": "object"
+      },
+      "FamilyNeighbourRef": {
+        "additionalProperties": false,
+        "properties": {
+          "entity_loaded": {
+            "description": "False: the source names an entity the KG has not loaded (no label or statements of its own yet)",
+            "title": "Entity Loaded",
+            "type": "boolean"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Entity kind of the current snapshot (null: no snapshot loaded)",
+            "title": "Kind"
+          },
+          "label": {
+            "description": "English label, else French, else the id itself",
+            "title": "Label",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "kind",
+          "entity_loaded"
+        ],
+        "title": "FamilyNeighbourRef",
         "type": "object"
       },
       "FamilyOut": {

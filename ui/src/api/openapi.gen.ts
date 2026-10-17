@@ -7339,7 +7339,7 @@ export interface components {
              */
             identity: boolean;
             mapping: components["schemas"]["FamilyMappingRef"];
-            neighbour: components["schemas"]["KgRef"];
+            neighbour: components["schemas"]["FamilyNeighbourRef"];
             reading: components["schemas"]["FamilyReading"];
             /** @description Licence of the raw artifact the statement was parsed from */
             rights: components["schemas"]["ValueRights"] | null;
@@ -7348,6 +7348,26 @@ export interface components {
             statement: components["schemas"]["KgStatementOut"];
             /** Subtype */
             subtype: string | null;
+        };
+        /** FamilyNeighbourRef */
+        FamilyNeighbourRef: {
+            /**
+             * Entity Loaded
+             * @description False: the source names an entity the KG has not loaded (no label or statements of its own yet)
+             */
+            entity_loaded: boolean;
+            /**
+             * Kind
+             * @description Entity kind of the current snapshot (null: no snapshot loaded)
+             */
+            kind: string | null;
+            /**
+             * Label
+             * @description English label, else French, else the id itself
+             */
+            label: string;
+            /** Qid */
+            qid: string;
         };
         /** FamilyOut */
         FamilyOut: {

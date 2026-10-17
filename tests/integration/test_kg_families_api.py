@@ -135,7 +135,11 @@ def test_entity_families(api) -> None:  # type: ignore[no-untyped-def]
     d = r.json()["data"]
     fams = {g["family"]: g for g in d["families"]}
     made = fams["made_of"]["neighbours"][0]
-    assert made["neighbour"]["qid"] == "syn:fam_alkane"
+    assert made["neighbour"]["qid"] == "syn:fam_alkane" and made["neighbour"]["entity_loaded"] is True
+    # AUDIT3 L7: an edge to an id no source loaded is kept and marked, with a note
+    mb = fams["measured_by"]["neighbours"][0]["neighbour"]
+    assert mb["qid"] == "atlas:energy.oil_production" and mb["entity_loaded"] is False
+    assert any("entity_loaded = false" in n for n in d["notes"])
     assert made["share"] == {
         "value": "0.25",
         "fraction": "0.25",

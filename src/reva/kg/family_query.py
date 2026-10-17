@@ -118,10 +118,10 @@ def _rights(r: Mapping[str, Any], by_sha: Mapping[str, dict[str, Any] | None]) -
     if own and rec and r.get("source_key") and rec != r.get("source_key"):
         from reva.atlas.snapshot import normalise_rights
 
-        fixed = normalise_rights({"licence": own}, basis="statement_reference")
+        fixed = normalise_rights({"licence": own}, basis=f"statement_reference (raw artifact rights recorded for {rec})")
         if fixed is not None:
-            return {**fixed, "artifact_recorded_for_source_key": rec}
-    return art
+            return fixed
+    return None if art is None else {k: v for k, v in art.items() if k != "recorded_for_source_key"}
 
 
 # ---------------------------------------------------------------------------------------------- families

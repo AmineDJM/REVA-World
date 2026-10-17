@@ -153,8 +153,14 @@ class ValueRights(s.ApiModel):
     )
 
 
+class FamilyNeighbourRef(KgRef):
+    entity_loaded: bool = Field(
+        description="False: the source names an entity the KG has not loaded (no label or statements of its own yet)"
+    )
+
+
 class FamilyNeighbour(s.ApiModel):
-    neighbour: KgRef
+    neighbour: FamilyNeighbourRef
     reading: FamilyReading
     subtype: str | None
     mapping: FamilyMappingRef
