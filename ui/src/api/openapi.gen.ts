@@ -533,6 +533,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/effects/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compare Effect Estimates
+         * @description Every current estimate of (cause, effect), grouped by comparability key; never pooled.
+         */
+        get: operations["compare_effect_estimates_v1_effects_compare_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/effects/estimates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Effect Estimates
+         * @description Current effect estimates, newest first (each attributed to its source).
+         */
+        get: operations["list_effect_estimates_v1_effects_estimates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/effects/estimates/{estimate_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Effect Estimate
+         * @description One current estimate by key (``pub:…`` / ``run:…`` / ``idn:…``).
+         */
+        get: operations["get_effect_estimate_v1_effects_estimates__estimate_key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/effects/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Effect Variables
+         * @description Effect variables (``registry/effects/variables.yaml``) with their curated atlas links.
+         */
+        get: operations["list_effect_variables_v1_effects_variables_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/entities": {
         parameters: {
             query?: never;
@@ -690,6 +770,147 @@ export interface paths {
         };
         /** Get Evidence */
         get: operations["get_evidence_v1_evidence__evidence_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/backtests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Backtests
+         * @description Pseudo-real-time back-tests of the baselines on FINAL-VINTAGE data (labelled; never real-time skill).
+         */
+        get: operations["get_backtests_v1_forecasts_backtests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Batches
+         * @description Sealed issue batches (one per issue run), newest first.
+         */
+        get: operations["get_batches_v1_forecasts_batches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/calibration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Calibration
+         * @description PIT histogram, reliability table (binary) and empirical interval coverage of one forecaster.
+         */
+        get: operations["get_calibration_v1_forecasts_calibration_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/families": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Families
+         * @description Question families (``registry/forecasts/question_specs.yaml``) and whether their source table has landed.
+         */
+        get: operations["get_families_v1_forecasts_families_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Leaderboard
+         * @description Scores of resolved questions per forecaster (MAE, CRPS, log score, Brier, interval coverage), with skill
+         *     relative to persistence on the questions both scored. Empty until questions resolve.
+         */
+        get: operations["get_leaderboard_v1_forecasts_leaderboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Questions
+         * @description Registry questions with their status (pending / resolved / void / not prospective) and outcome.
+         */
+        get: operations["get_questions_v1_forecasts_questions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forecasts/questions/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Question
+         * @description One sealed question: its frozen forecasts (seal re-verified), outcome and scores.
+         */
+        get: operations["get_question_v1_forecasts_questions__question_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1110,6 +1331,47 @@ export interface paths {
          * @description Versioned concepts and source mappings.
          */
         get: operations["get_ontology_v1_ontology_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/predict/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Predict Decision
+         * @description Propagate one decision (read-only). Distributions reflect only the published uncertainty of the
+         *     estimates used; the result is an unvalidated scenario, not a probability or a forecast.
+         */
+        post: operations["predict_decision_v1_predict_decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/predict/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Decisions
+         * @description Reference decisions and the instruments a decision can be composed from.
+         */
+        get: operations["list_decisions_v1_predict_decisions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2517,6 +2779,29 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** Backtest */
+        Backtest: {
+            /** Backtest Sha256 */
+            backtest_sha256: string;
+            /** Data Tables */
+            data_tables: {
+                [key: string]: unknown;
+            };
+            /** Families */
+            families: {
+                [key: string]: unknown;
+            }[];
+            /** Label */
+            label: string;
+            /** Origin */
+            origin: string | null;
+            /** Run At */
+            run_at: string | null;
+            /** Vintage Mode */
+            vintage_mode: string | null;
+            /** Years */
+            years: number | null;
+        };
         /**
          * BacktestRequest
          * @description Start a back-test of a V2 model against a published release (revised-data retrospective) as a job.
@@ -2532,6 +2817,82 @@ export interface components {
              * @description Published release (default: the current one)
              */
             release_id?: string | null;
+        };
+        /** BacktestsResponse */
+        BacktestsResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["Backtest"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** BaselineReleaseRef */
         BaselineReleaseRef: {
@@ -2559,6 +2920,125 @@ export interface components {
              * @description Publication sequence (commit order)
              */
             sequence: number | null;
+        };
+        /** Batch */
+        Batch: {
+            /**
+             * Batch Sha256
+             * @description Seal: sha256 of the canonical batch manifest (questions + forecasts + pins)
+             */
+            batch_sha256: string;
+            /** By Type */
+            by_type: {
+                [key: string]: number;
+            };
+            /** Context Id */
+            context_id: string;
+            /** Cycle */
+            cycle: string | null;
+            /**
+             * Issued At
+             * @description Database-clock time the forecasts were frozen
+             */
+            issued_at: string | null;
+            /** Label */
+            label: string | null;
+            /** Models */
+            models: components["schemas"]["BatchModel"][];
+            /** N Questions */
+            n_questions: number | null;
+            /** Origin */
+            origin: string | null;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+        };
+        /** BatchModel */
+        BatchModel: {
+            /** Model */
+            model: string | null;
+            /** N Abstained */
+            n_abstained: number | null;
+            /** N Issued */
+            n_issued: number | null;
+        };
+        /** BatchesResponse */
+        BatchesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["Batch"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** BeliefEstimate */
         BeliefEstimate: {
@@ -2929,6 +3409,102 @@ export interface components {
             release_id?: string | null;
             /** Subject Ids */
             subject_ids?: string[];
+        };
+        /** Calibration */
+        Calibration: {
+            /** Family */
+            family: string | null;
+            /** Interval Coverage */
+            interval_coverage: {
+                [key: string]: unknown;
+            };
+            /** Model */
+            model: string;
+            /** N Scored */
+            n_scored: number;
+            /** Pit Histogram */
+            pit_histogram: {
+                [key: string]: unknown;
+            };
+            /** Reliability */
+            reliability: {
+                [key: string]: unknown;
+            };
+        };
+        /** CalibrationResponse */
+        CalibrationResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["Calibration"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** CandidateSource */
         CandidateSource: {
@@ -4503,6 +5079,146 @@ export interface components {
             [key: string]: unknown;
         };
         /**
+         * Decision
+         * @description A decision to propagate (who, what, when, how much).
+         */
+        Decision: {
+            actor: components["schemas"]["Party"];
+            /** Anchor Labels */
+            anchor_labels?: {
+                [key: string]: string;
+            };
+            /** Anchors */
+            anchors?: string[];
+            /** Countries */
+            countries?: string[];
+            /** Countries Note Fr */
+            countries_note_fr?: string | null;
+            /**
+             * Duration Quarters
+             * @description None = held over the whole horizon
+             */
+            duration_quarters?: number | null;
+            /**
+             * Horizon Quarters
+             * @default 8
+             */
+            horizon_quarters?: number;
+            /** Id */
+            id: string;
+            /** Instrument */
+            instrument: string;
+            /** Label En */
+            label_en?: string | null;
+            /** Label Fr */
+            label_fr: string;
+            magnitude: components["schemas"]["Magnitude"];
+            /** Plugin Options */
+            plugin_options?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /**
+             * Start
+             * @description First quarter the decision applies, e.g. 2027Q1
+             */
+            start: string;
+            target: components["schemas"]["Party"];
+        };
+        /** DecisionsData */
+        DecisionsData: {
+            /**
+             * Decisions
+             * @description Reference decisions (registry/predict/reference_decisions.yaml)
+             */
+            decisions: {
+                [key: string]: unknown;
+            }[];
+            /** Instruments */
+            instruments: components["schemas"]["InstrumentOut"][];
+            /**
+             * Label
+             * @description Label every propagation result carries until its chain is validated
+             */
+            label: string;
+        };
+        /** DecisionsResponse */
+        DecisionsResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["DecisionsData"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /**
          * DiscoveryCandidate
          * @description A source candidate surfaced by a completed discovery job, or a connector proposal.
          *
@@ -4741,6 +5457,587 @@ export interface components {
             quote?: string | null;
             /** Value */
             value: unknown;
+        };
+        /** EffectComparison */
+        EffectComparison: {
+            /** Cause */
+            cause: string;
+            /** Effect */
+            effect: string;
+            /** Groups */
+            groups: components["schemas"]["EffectGroup"][];
+            /** N Estimates */
+            n_estimates: number;
+            /** Note */
+            note: string;
+            /** Truncated */
+            truncated: boolean;
+        };
+        /** EffectComparisonResponse */
+        EffectComparisonResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["EffectComparison"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** EffectEstimate */
+        EffectEstimate: {
+            /**
+             * Applicability
+             * @description REVA curator's transportability note (REVA's words)
+             */
+            applicability: string | null;
+            /**
+             * As Of
+             * @description Knowledge date: when the estimate became knowable (as-of replays: as_of <= t)
+             */
+            as_of: string;
+            /** As Printed */
+            as_printed: string | null;
+            /** Causal Claim Keys */
+            causal_claim_keys: string[];
+            cause: components["schemas"]["EffectRef"];
+            /** Curation */
+            curation: {
+                [key: string]: unknown;
+            };
+            effect: components["schemas"]["EffectRef"];
+            /** Estimate Key */
+            estimate_key: string;
+            horizon: components["schemas"]["EffectHorizon"];
+            /** Identification */
+            identification: string | null;
+            /**
+             * Irf
+             * @description Lag profile [{h, unit, point, se?, ci_low?, ci_high?}]
+             */
+            irf: {
+                [key: string]: unknown;
+            }[];
+            /** Load Id */
+            load_id: number;
+            /**
+             * Matched Via
+             * @description 'variable:<id>' when matched through a curated atlas link
+             */
+            matched_via: string | null;
+            /** Measure */
+            measure: string;
+            /** Meta */
+            meta: {
+                [key: string]: unknown;
+            } | null;
+            /** Method */
+            method: string;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture";
+            /** Point */
+            point: number | null;
+            /** Point Kind */
+            point_kind: string | null;
+            /** Recorded At */
+            recorded_at: string | null;
+            /** Row Id */
+            row_id: number;
+            /** Scope */
+            scope: {
+                [key: string]: unknown;
+            };
+            /**
+             * Shock
+             * @description {size, unit} of the shock a 'response' refers to
+             */
+            shock: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Sign
+             * @enum {string}
+             */
+            sign: "positive" | "negative" | "zero" | "ambiguous";
+            source: components["schemas"]["EffectSource"];
+            /**
+             * Source Caveats
+             * @description Caveats verbatim from the source
+             */
+            source_caveats: string | null;
+            uncertainty: components["schemas"]["EffectUncertainty"];
+            /** Unit */
+            unit: string;
+            /** Wording */
+            wording: string;
+            /** Wording Fr */
+            wording_fr: string;
+        };
+        /** EffectEstimateResponse */
+        EffectEstimateResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["EffectEstimate"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** EffectEstimatesResponse */
+        EffectEstimatesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["EffectEstimate"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** EffectGroup */
+        EffectGroup: {
+            /** Comparability Key */
+            comparability_key: {
+                [key: string]: unknown;
+            };
+            /** Countries */
+            countries: string[];
+            /** Estimates */
+            estimates: components["schemas"]["EffectEstimate"][];
+            /** Max */
+            max: number | null;
+            /**
+             * Median
+             * @description Descriptive median of the group's points (not a pooled estimate)
+             */
+            median: number | null;
+            /** Methods */
+            methods: string[];
+            /** Min */
+            min: number | null;
+            /** N */
+            n: number;
+            /** N With Point */
+            n_with_point: number;
+            /** Signs */
+            signs: string[];
+            /** Source Kinds */
+            source_kinds: string[];
+        };
+        /** EffectHorizon */
+        EffectHorizon: {
+            /** Kind */
+            kind: string;
+            /** Unit */
+            unit: string | null;
+            /** Value */
+            value: number | null;
+        };
+        /** EffectRef */
+        EffectRef: {
+            /**
+             * Definition
+             * @description The variable as the SOURCE defines it, verbatim
+             */
+            definition: string;
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @description atlas_concept | variable | event_type | event
+             */
+            kind: string;
+            /**
+             * Label
+             * @description English label; '<id> (label not loaded)' when REVA has none
+             */
+            label: string;
+            /** Label Fr */
+            label_fr: string;
+            /** Label Loaded */
+            label_loaded: boolean;
+            /**
+             * Transform
+             * @description log_change, percent_change, pp_change, level_change, gap, occurrence, ...
+             */
+            transform: string;
+        };
+        /** EffectSource */
+        EffectSource: {
+            /**
+             * Citation
+             * @description Reference verbatim (text, short, doi, url, year, ...)
+             */
+            citation: {
+                [key: string]: unknown;
+            } | null;
+            /** Dataset */
+            dataset: string;
+            /** Identity */
+            identity: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "publication" | "reva_run" | "identity";
+            /**
+             * Locator
+             * @description Table / figure / page of the number
+             */
+            locator: string | null;
+            /**
+             * Quote
+             * @description Verbatim passage containing the number as printed
+             */
+            quote: string | null;
+            /**
+             * Raw Sha256
+             * @description Archived source file the number was read from
+             */
+            raw_sha256: string | null;
+            /** Retrieved At */
+            retrieved_at: string | null;
+            /** Rights */
+            rights: {
+                [key: string]: unknown;
+            } | null;
+            /** Run */
+            run: {
+                [key: string]: unknown;
+            } | null;
+            /** Selector */
+            selector: {
+                [key: string]: unknown;
+            } | null;
+            /** Source Key */
+            source_key: string;
+            /**
+             * Transcription
+             * @enum {string}
+             */
+            transcription: "machine_readable" | "transcribed" | "transcribed_double_checked" | "computed";
+        };
+        /** EffectUncertainty */
+        EffectUncertainty: {
+            /** Ci High */
+            ci_high: number | null;
+            /** Ci Level */
+            ci_level: number | null;
+            /** Ci Low */
+            ci_low: number | null;
+            /** Draws */
+            draws: {
+                [key: string]: unknown;
+            } | null;
+            /** Interval Kind */
+            interval_kind: string | null;
+            /** Se */
+            se: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "reported" | "partial" | "not_reported";
+        };
+        /** EffectVariable */
+        EffectVariable: {
+            /**
+             * Atlas Concepts
+             * @description Curated links to atlas concepts measuring the same quantity
+             */
+            atlas_concepts: string[];
+            /** Atlas Note */
+            atlas_note: string | null;
+            /** Definition */
+            definition: string;
+            /**
+             * Definition By
+             * @constant
+             */
+            definition_by: "reva";
+            /** Id */
+            id: string;
+            /** Labels */
+            labels: {
+                [key: string]: string;
+            };
+            /** Unit */
+            unit: string;
+        };
+        /** EffectVariablesResponse */
+        EffectVariablesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["EffectVariable"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /**
          * EntityComponent
@@ -5712,6 +7009,82 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** FamiliesResponse */
+        FamiliesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["ForecastFamily"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /** FamilyGroup */
         FamilyGroup: {
             /**
@@ -6087,6 +7460,59 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** ForecastFamily */
+        ForecastFamily: {
+            /** Concept Id */
+            concept_id: string | null;
+            /** Countries */
+            countries: string[];
+            /**
+             * Dataset Key
+             * @description Declared resolution source (atlas table); null while awaited
+             */
+            dataset_key: string | null;
+            /**
+             * Definition
+             * @description Verbatim definition (or REVA's derivation rule) of the variable
+             */
+            definition: string | null;
+            /** Definition Source */
+            definition_source: string | null;
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "M" | "Q" | "A";
+            /** Horizons */
+            horizons: number[];
+            /** Indicator */
+            indicator: string | null;
+            /** Key */
+            key: string;
+            /** Label En */
+            label_en: string;
+            /** Label Fr */
+            label_fr: string;
+            /** Question Types */
+            question_types: string[];
+            /** Reference Forecasters */
+            reference_forecasters: string[];
+            /** Resolution Note */
+            resolution_note: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "awaiting_table" | "awaiting_source";
+            /** Status Reason */
+            status_reason: string | null;
+            /** Table Latest Recorded At */
+            table_latest_recorded_at: string | null;
+            /** Unit */
+            unit: string;
+            /** Value Rule */
+            value_rule: string;
+        };
         /** Freshness */
         Freshness: {
             /** Latest Recorded At */
@@ -6304,6 +7730,23 @@ export interface components {
              * @enum {string}
              */
             status: "ready" | "not_ready";
+        };
+        /** InstrumentOut */
+        InstrumentOut: {
+            /** Direct Changes */
+            direct_changes: {
+                [key: string]: unknown;
+            }[];
+            /** Id */
+            id: string;
+            /** Label En */
+            label_en: string;
+            /** Label Fr */
+            label_fr: string;
+            /** Magnitude Units */
+            magnitude_units: string[];
+            /** Plugins */
+            plugins: string[];
         };
         /** Interval */
         Interval: {
@@ -7383,6 +8826,142 @@ export interface components {
             /** Fr */
             fr: string;
         };
+        /** Leaderboard */
+        Leaderboard: {
+            /** Baseline For Skill */
+            baseline_for_skill: string;
+            /** Label */
+            label: string;
+            /** Models */
+            models: components["schemas"]["LeaderboardRow"][];
+            /**
+             * Questions
+             * @description Question counts by status (pending, resolved, void, not_prospective)
+             */
+            questions: {
+                [key: string]: number;
+            };
+        };
+        /** LeaderboardResponse */
+        LeaderboardResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["Leaderboard"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** LeaderboardRow */
+        LeaderboardRow: {
+            /** Binary Log Score */
+            binary_log_score: number | null;
+            /** Brier */
+            brier: number | null;
+            brier_vs_persistence: components["schemas"]["Relative"];
+            /** By Type */
+            by_type: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Coverage */
+            coverage: number | null;
+            /** Crps */
+            crps: number | null;
+            crps_vs_persistence: components["schemas"]["Relative"];
+            /** Description */
+            description: string;
+            /** Interval Score */
+            interval_score: number | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "baseline" | "external_reference";
+            /** Log Score */
+            log_score: number | null;
+            /** Mae */
+            mae: number | null;
+            mae_vs_persistence: components["schemas"]["Relative"];
+            /** Model */
+            model: string;
+            /** N Abstained */
+            n_abstained: number;
+            /** N Intervals */
+            n_intervals: number;
+            /** N Issued */
+            n_issued: number;
+            /** N Scored */
+            n_scored: number;
+            /** Version */
+            version: string;
+        };
         /** LinksPathResponse */
         LinksPathResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -7582,6 +9161,16 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /** Magnitude */
+        Magnitude: {
+            /** Unit */
+            unit: string;
+            /**
+             * Value
+             * @description Decimal string as decided, e.g. '-2' (mb/d) or '50' (bp)
+             */
+            value: string;
         };
         /** MappingOut */
         MappingOut: {
@@ -8445,6 +10034,56 @@ export interface components {
              */
             verification: "community_edited_not_verified" | "source_reported_not_verified" | "derived";
         };
+        /** Party */
+        Party: {
+            /**
+             * Geo
+             * @description ISO3 or WLD
+             */
+            geo?: string | null;
+            /**
+             * Kg Id
+             * @description KG entity id (QID or provider key)
+             */
+            kg_id?: string | null;
+            /** Label En */
+            label_en?: string | null;
+            /** Label Fr */
+            label_fr: string;
+        };
+        /** PeriodValue */
+        PeriodValue: {
+            /** Degenerate */
+            degenerate: boolean | null;
+            /** Mean */
+            mean: number | null;
+            /**
+             * Missing Reason
+             * @description Why this period has no value (e.g. lag_not_published)
+             */
+            missing_reason: string | null;
+            /** P05 */
+            p05: number | null;
+            /** P25 */
+            p25: number | null;
+            /** P50 */
+            p50: number | null;
+            /** P75 */
+            p75: number | null;
+            /** P95 */
+            p95: number | null;
+            /** Period */
+            period: string;
+            /**
+             * Scenario Level
+             * @description Baseline (persistence of the latest observation) plus the change, when units compose
+             */
+            scenario_level: {
+                [key: string]: unknown;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** Place */
         Place: {
             place: components["schemas"]["EventRef"] | null;
@@ -8480,6 +10119,176 @@ export interface components {
             statement_key: string | null;
             /** Via */
             via: string | null;
+        };
+        /** PredictRequest */
+        PredictRequest: {
+            /**
+             * As Of Max
+             * @description Use only estimates knowable at this date (replays)
+             */
+            as_of_max?: string | null;
+            /** @description A composed decision (instead of reference_id) */
+            decision?: components["schemas"]["Decision"] | null;
+            /**
+             * Draws
+             * @description Monte-Carlo draws
+             * @default 2000
+             */
+            draws?: number;
+            /**
+             * Origin
+             * @default any
+             * @enum {string}
+             */
+            origin?: "live" | "test_fixture" | "any";
+            /**
+             * Reference Id
+             * @description A reference decision
+             */
+            reference_id?: string | null;
+            /**
+             * Seed
+             * @description Run seed of the named counter-based streams
+             * @default 0
+             */
+            seed?: number;
+        };
+        /** PredictResponse */
+        PredictResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["PredictionData"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** PredictionData */
+        PredictionData: {
+            /** Alternative Paths */
+            alternative_paths: {
+                [key: string]: unknown;
+            }[];
+            /** Chain */
+            chain: string[];
+            /** Decision */
+            decision: {
+                [key: string]: unknown;
+            };
+            /** Direct Changes */
+            direct_changes: {
+                [key: string]: unknown;
+            }[];
+            /** Disclaimers Fr */
+            disclaimers_fr: string[];
+            /** Effect Layer */
+            effect_layer: {
+                [key: string]: unknown;
+            };
+            /** Engine */
+            engine: string;
+            /** Excluded Links */
+            excluded_links: {
+                [key: string]: unknown;
+            }[];
+            /** Gaps */
+            gaps: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Hops
+             * @description Every hop: decision, estimate (key, source, coefficient) or plugin
+             */
+            hops: {
+                [key: string]: unknown;
+            }[];
+            /** Label */
+            label: string;
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            } | null;
+            /** Settings */
+            settings: {
+                [key: string]: unknown;
+            };
+            /**
+             * Unquantified Links
+             * @description Liens non chiffrés: never given a number
+             */
+            unquantified_links: {
+                [key: string]: unknown;
+            }[];
+            validation: components["schemas"]["Validation"];
+            /** Variables */
+            variables: components["schemas"]["VariableResult"][];
+        } & {
+            [key: string]: unknown;
         };
         /**
          * Problem
@@ -8793,6 +10602,258 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** QuestionDetail */
+        QuestionDetail: {
+            /**
+             * Forecasts
+             * @description Frozen forecasts (or abstentions with their reason) + score
+             */
+            forecasts: {
+                [key: string]: unknown;
+            }[];
+            /** Outcome */
+            outcome: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Question
+             * @description The sealed question, verbatim from the batch manifest
+             */
+            question: {
+                [key: string]: unknown;
+            };
+            /** Seal */
+            seal: {
+                [key: string]: unknown;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "resolved" | "void" | "not_prospective";
+        };
+        /** QuestionResponse */
+        QuestionResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["QuestionDetail"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** QuestionSummary */
+        QuestionSummary: {
+            /** Batch Sha256 */
+            batch_sha256: string;
+            /** Concept Id */
+            concept_id: string | null;
+            /** Cycle */
+            cycle: string;
+            /** Expected Resolution */
+            expected_resolution: string;
+            /** Family */
+            family: string;
+            /** Geo */
+            geo: string;
+            /** Geo Label En */
+            geo_label_en: string;
+            /** Geo Label Fr */
+            geo_label_fr: string;
+            /** Issued At */
+            issued_at: string | null;
+            /** Label En */
+            label_en: string;
+            /** Label Fr */
+            label_fr: string;
+            /** N Forecasts */
+            n_forecasts: number;
+            /**
+             * Outcome
+             * @description Resolved value (decimal string) as published by the declared source
+             */
+            outcome: string | null;
+            /** Question Id */
+            question_id: string;
+            /** Question Key */
+            question_key: string;
+            /** Reference Period */
+            reference_period: string;
+            /** Resolution Source */
+            resolution_source: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "resolved" | "void" | "not_prospective";
+            /** Text En */
+            text_en: string;
+            /** Text Fr */
+            text_fr: string;
+            /**
+             * Threshold
+             * @description Binary questions: 'strictly above' threshold (decimal string)
+             */
+            threshold: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "quantity" | "interval" | "binary";
+            /** Unit */
+            unit: string;
+            /** Void After */
+            void_after: string;
+        };
+        /** QuestionsPage */
+        QuestionsPage: {
+            /** Offset */
+            offset: number;
+            /** Questions */
+            questions: components["schemas"]["QuestionSummary"][];
+            /** Total */
+            total: number;
+        };
+        /** QuestionsResponse */
+        QuestionsResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["QuestionsPage"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /** Reason */
         Reason: {
             /** En */
@@ -8985,6 +11046,21 @@ export interface components {
              * @description Pin to a published belief release (excludes as_of)
              */
             release_id?: string | null;
+        };
+        /** Relative */
+        Relative: {
+            /** N Common */
+            n_common: number;
+            /**
+             * Ratio
+             * @description mean(metric of model) / mean(metric of persistence) on common questions
+             */
+            ratio: number | null;
+            /**
+             * Skill
+             * @description 1 - ratio (positive = better than persistence)
+             */
+            skill: number | null;
         };
         /** ReleaseArtifact */
         ReleaseArtifact: {
@@ -10261,6 +12337,20 @@ export interface components {
             /** Pid */
             pid: string;
         };
+        /** Validation */
+        Validation: {
+            /** Chain Signature */
+            chain_signature: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "unvalidated" | "validated";
+        } & {
+            [key: string]: unknown;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -10298,6 +12388,60 @@ export interface components {
             restriction: string | null;
             /** Share Alike */
             share_alike: boolean;
+        };
+        /** VariableResult */
+        VariableResult: {
+            /** Baseline */
+            baseline: {
+                [key: string]: unknown;
+            } | null;
+            /** Depth */
+            depth: number;
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "quarter" | "year" | "undated";
+            /** Geo */
+            geo: string;
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "estimate_chain" | "plugin_output";
+            /** Notes */
+            notes: string[];
+            /**
+             * Path
+             * @description Hop ids from the decision to this variable
+             */
+            path: string[];
+            /** Periods */
+            periods: components["schemas"]["PeriodValue"][];
+            /**
+             * Point Estimates
+             * @description Estimates on the path without published uncertainty
+             */
+            point_estimates: string[];
+            /** Uncertainty Complete */
+            uncertainty_complete: boolean;
+            /** Undated */
+            undated: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Unit
+             * @description Change unit: percent, pp, log_points, pp_gdp, level:<unit>
+             */
+            unit: string;
+            /** Variable */
+            variable: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
         };
         /** WhyLane */
         WhyLane: {
@@ -11564,6 +13708,172 @@ export interface operations {
             };
         };
     };
+    compare_effect_estimates_v1_effects_compare_get: {
+        parameters: {
+            query: {
+                cause: string;
+                effect: string;
+                cause_kind?: ("atlas_concept" | "variable" | "event_type" | "event") | null;
+                effect_kind?: ("atlas_concept" | "variable") | null;
+                /** @description ISO 3166-1 alpha-3 in the estimate scope (or WLD) */
+                country?: string | null;
+                method?: ("meta_analysis" | "rct" | "iv" | "did" | "rdd" | "synthetic_control" | "event_study" | "local_projection" | "var" | "svar" | "bvar" | "dsge" | "structural_model" | "input_output" | "panel_regression" | "time_series_regression" | "cross_section_regression" | "gravity" | "calibration" | "accounting_identity" | "physical_law" | "other") | null;
+                measure?: ("elasticity" | "pass_through" | "semi_elasticity" | "slope" | "multiplier" | "response" | "identity_coefficient") | null;
+                source_kind?: ("publication" | "reva_run" | "identity") | null;
+                /** @description Only estimates knowable at this date (as_of <= as_of_max) */
+                as_of_max?: string | null;
+                /** @description An atlas concept id also matches variables curated as measuring it */
+                include_variables?: boolean;
+                /** @description Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectComparisonResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_effect_estimates_v1_effects_estimates_get: {
+        parameters: {
+            query?: {
+                /** @description Cause id (atlas concept, variable, ...) */
+                cause?: string | null;
+                /** @description Effect id (atlas concept or variable) */
+                effect?: string | null;
+                cause_kind?: ("atlas_concept" | "variable" | "event_type" | "event") | null;
+                effect_kind?: ("atlas_concept" | "variable") | null;
+                /** @description ISO 3166-1 alpha-3 in the estimate scope (or WLD) */
+                country?: string | null;
+                method?: ("meta_analysis" | "rct" | "iv" | "did" | "rdd" | "synthetic_control" | "event_study" | "local_projection" | "var" | "svar" | "bvar" | "dsge" | "structural_model" | "input_output" | "panel_regression" | "time_series_regression" | "cross_section_regression" | "gravity" | "calibration" | "accounting_identity" | "physical_law" | "other") | null;
+                measure?: ("elasticity" | "pass_through" | "semi_elasticity" | "slope" | "multiplier" | "response" | "identity_coefficient") | null;
+                source_kind?: ("publication" | "reva_run" | "identity") | null;
+                /** @description Only estimates knowable at this date (as_of <= as_of_max) */
+                as_of_max?: string | null;
+                /** @description An atlas concept id also matches variables curated as measuring it */
+                include_variables?: boolean;
+                limit?: number;
+                cursor?: string | null;
+                /** @description Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectEstimatesResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_effect_estimate_v1_effects_estimates__estimate_key__get: {
+        parameters: {
+            query?: {
+                /** @description Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path: {
+                estimate_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectEstimateResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_effect_variables_v1_effects_variables_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectVariablesResponse"];
+                };
+            };
+        };
+    };
     list_entities_v1_entities_get: {
         parameters: {
             query?: {
@@ -11895,6 +14205,250 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EvidenceDetailResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_backtests_v1_forecasts_backtests_get: {
+        parameters: {
+            query?: {
+                /** @description Include PIT / reliability tables */
+                calibration?: boolean;
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacktestsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_batches_v1_forecasts_batches_get: {
+        parameters: {
+            query?: {
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_calibration_v1_forecasts_calibration_get: {
+        parameters: {
+            query?: {
+                model?: string;
+                family?: string | null;
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalibrationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_families_v1_forecasts_families_get: {
+        parameters: {
+            query?: {
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamiliesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_leaderboard_v1_forecasts_leaderboard_get: {
+        parameters: {
+            query?: {
+                family?: string | null;
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_questions_v1_forecasts_questions_get: {
+        parameters: {
+            query?: {
+                family?: string | null;
+                geo?: string | null;
+                type?: ("quantity" | "interval" | "binary") | null;
+                status?: ("pending" | "resolved" | "void" | "not_prospective") | null;
+                cycle?: string | null;
+                limit?: number;
+                offset?: number;
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_question_v1_forecasts_questions__question_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionResponse"];
                 };
             };
             /** @description Not Found */
@@ -12962,6 +15516,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    predict_decision_v1_predict_decision_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PredictRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PredictResponse"];
+                };
+            };
+            /** @description Unknown reference id */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_decisions_v1_predict_decisions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionsResponse"];
                 };
             };
         };

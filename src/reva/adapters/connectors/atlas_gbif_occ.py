@@ -59,7 +59,7 @@ from reva.adapters.connectors.eco_common import canon, country_node, guarded_loa
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.gbif_occ"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered from an in-flight snapshot with different code
 PARSER_VERSION = "atlas-gbif-occ-1"
 SOURCE_KEY = "gbif.occurrence"
 ATLAS_SOURCE = "gbif_occ"

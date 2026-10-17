@@ -101,7 +101,7 @@ def test_weo_dbnomics_vintages_are_month_end_and_never_mix_projections() -> None
     f, unmapped = validate_atlas_frame(rows.frame(), source="vintage_weo", dataset="weo_dbnomics",
                                        raw_sha256s=[SHA], geo_scheme="imf")
     assert {u["provider_geo"] for u in unmapped} <= {"UVK"}  # Kosovo (WEO code UVK, later vintages) stays unmapped
-    assert set(f.filter(pl.col("provider_geo") == "WBG")["iso3"].unique()) == {"PSE"}
+    assert set(f["iso3"].drop_nulls().unique()) == {"FRA", "USA", "DEU"}  # WBG/UVK: not in these early vintages
     fra = f.filter((pl.col("provider_geo") == "FRA") & (pl.col("indicator") == "NGDP_RPCH|v=2008-04"))
     fl = {r["period_start"].year: json.loads(r["flags"]) for r in fra.to_dicts()}
     assert fl[2008]["estimate_kind"] == "projection" and fl[2007]["estimate_kind"] == "published_history_boundary_unknown"

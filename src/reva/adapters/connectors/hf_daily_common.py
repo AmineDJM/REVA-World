@@ -283,6 +283,7 @@ def base_flags(rights: Mapping[str, Any], f: Fetched, **extra: Any) -> dict[str,
         "as_of": f.as_of,
         "publication": rights["publication"],
         "revision_policy": rights["revision_policy"],
+        "pub_lag": rights.get("pub_lag", "not_stated"),
         "precision": "day",
         "estimate_kind": "observation",
     }

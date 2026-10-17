@@ -40,7 +40,7 @@ branch_labels = None
 depends_on = None
 
 SOURCE_KEY = r"'^[a-z0-9][a-z0-9_.-]*$'"
-ESTIMATE_KEY = r"'^(pub|run|idn):[A-Za-z0-9_.:-]{3,300}$'"
+ESTIMATE_KEY = r"'^(pub|run|idn):[A-Za-z0-9_.:-]+$'"  # + 3..300 chars after the prefix (length CHECK)
 ENTITY_ID = r"'^(Q[1-9][0-9]*|[a-z][a-z0-9_]*:[A-Za-z0-9_.:-]+)$'"
 VAR_ID = r"'^[a-z0-9][a-z0-9_.-]{0,199}$'"
 TRANSFORMS = (
@@ -150,7 +150,7 @@ CREATE TABLE kg.effect_load (
 CREATE TABLE kg.effect_estimate (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   load_id bigint NOT NULL REFERENCES kg.effect_load,
-  estimate_key text NOT NULL CHECK (estimate_key ~ {ESTIMATE_KEY}),
+  estimate_key text NOT NULL CHECK (estimate_key ~ {ESTIMATE_KEY} AND length(estimate_key) BETWEEN 7 AND 304),
   origin text NOT NULL CHECK (origin IN ('live','test_fixture')),
   content_sha256 text NOT NULL CHECK {_sha("content_sha256")},
   cause_kind text NOT NULL CHECK (cause_kind IN ('atlas_concept','variable','event_type','event')),

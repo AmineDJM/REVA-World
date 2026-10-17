@@ -160,7 +160,7 @@ def test_run_archive_and_effect_estimate(kg, tmp_path: Path, monkeypatch: pytest
     sha = runmod.archive_run(db.worker, db.store, doc)
     assert len(sha) == 64
     rep = runmod.write_effect_estimates(db.worker, db.store, doc, sha, origin="test_fixture")
-    assert rep["inserted"] == 1, rep
+    assert rep["inserted"] == 1, json.dumps(rep, default=str)
     again = runmod.write_effect_estimates(db.worker, db.store, doc, sha, origin="test_fixture")
     assert again["inserted"] == 0
     from reva.effects import get_estimate

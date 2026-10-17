@@ -190,7 +190,6 @@ def parse_page(s: Series, f: hc.Fetched, rows: hc.DailyRows, report: dict[str, A
                                          value_normalised=True))  # fmt: skip
     notation: Counter[str] = Counter()
     weeks = 0
-    pos, line = 0, 1
     for m in ROW_RE.finditer(t):
         label = html.unescape(m.group(1)).replace("\xa0", " ").strip()
         w = WEEK_RE.match(label)
@@ -204,8 +203,6 @@ def parse_page(s: Series, f: hc.Fetched, rows: hc.DailyRows, report: dict[str, A
         if start.weekday() != 0 or (end.month, end.day) != (MONTHS[m2], int(d2)):
             raise hc.err(f"{s.sid}: week {label!r} is not Monday..Friday")
         weeks += 1
-        line += t.count("\n", pos, m.start())
-        pos = m.start()
         for k, cell in enumerate(CELL_RE.findall(m.group(2))):
             c = html.unescape(cell).replace("\xa0", " ").strip()
             if not c:
@@ -219,7 +216,7 @@ def parse_page(s: Series, f: hc.Fetched, rows: hc.DailyRows, report: dict[str, A
                 raise hc.err(f"{s.sid}: cell {c!r} in week {label!r} is neither a number nor EIA notation")
             rows.add(indicator=f"EIA_SPOT|series={s.sid}", provider_geo=s.location, day=start + timedelta(days=k),
                      value=v, unit=unit, flags=fl_norm if normalised else fl, raw_sha256=f.sha256,
-                     selector={"file": f.key, "line": line, "week": label, "column": WEEKDAYS[k]})  # fmt: skip
+                     selector={"file": f.key, "char_offset": m.start(), "week": label, "column": WEEKDAYS[k]})  # fmt: skip
     if not weeks:
         raise hc.err(f"{s.sid}: no week rows", kind="incomplete")
     report.setdefault("series", {})[s.sid] = {"weeks": weeks, "no_row_cells": dict(notation), "unit": unit,
