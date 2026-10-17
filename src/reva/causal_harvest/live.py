@@ -171,6 +171,24 @@ def wbapi_cap(
     }
 
 
+def causwd_usage_today(engine: Any) -> int:
+    """Wikibase-host requests CAUSWD sessions booked today in the shared ledger (settled or reserved)."""
+    from sqlalchemy import text
+
+    from reva.operations.budgets import DAY_START_SQL
+
+    with engine.connect() as c:
+        return int(
+            c.execute(
+                text(
+                    "SELECT COALESCE(sum(COALESCE(consumed, reserved)), 0) FROM ops.budget_ledger "
+                    "WHERE operation_id LIKE 'ingest:kgcauswd-%-wbapi:%:requests' "
+                    f"AND recorded_at >= {DAY_START_SQL}"
+                )
+            ).scalar_one()
+        )
+
+
 @dataclass
 class Session:
     client: WikidataClient
@@ -194,6 +212,7 @@ async def causal_session(
     cap_wdqs: int = 0,
     wbapi_retries: int = 3,
     mode: str = "auto",
+    state: State | None = None,
 ) -> AsyncIterator[Session]:
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
     from reva.adapters.postgres.engine import make_engine
@@ -207,6 +226,13 @@ async def causal_session(
     store = FilesystemArtifactStore(OBJECT_ROOT, settings.reva_s3_prefix)
     run_id = f"kgcauswd-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
     computed, basis = wbapi_cap(ledger_usage_today(ledger_engine), wikidata_usage_today())
+    if state is not None:  # the 30 % share is per UTC day across all CAUSWD sessions of that day
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
+        allowance = int(state.data.setdefault("day_allowance", {}).setdefault(today, computed))
+        mine = causwd_usage_today(ledger_engine)
+        basis.update(day_allowance=allowance, causwd_used_today=mine)
+        computed = max(0, min(computed, allowance - mine))
+        state.save()
     cap = computed if cap_wbapi is None else min(cap_wbapi, computed)
     caps: dict[str, Any] = {"wbapi": cap, "wbapi_basis": basis, "wdqs": 0}
     inner = live_http()
@@ -561,7 +587,9 @@ class CausalHarvest:
     # -- CirrusSearch discovery -------------------------------------------------------------------------
     async def discover(self, pid: str, *, pages: int = 1) -> dict[str, Any]:
         d = self.state.data["discovery"].setdefault(pid, {"pages": 0, "hits": 0})
-        query = f"haswbstatement:{pid}" + (" -haswbstatement:P279" if pid in ("P828", "P1542") else "")
+        # events only: the item must carry a start time or a point in time (CirrusSearch OR on property ids);
+        # classes (P279) excluded. Without this filter the top hits are diseases and concepts.
+        query = f"haswbstatement:{pid} haswbstatement:P580|P585 -haswbstatement:P279"
         tier = TIER_DISCOVERY_SPECIFIC if pid not in ("P828", "P1542") else TIER_DISCOVERY_GENERAL
         while d["pages"] < pages:
             offset = d["pages"] * 500
@@ -735,7 +763,9 @@ async def run(
     state = State()
     out: dict[str, Any] = {"started_at": datetime.now(UTC).isoformat(), "db": db}
     day = datetime.now(UTC).date()
-    async with causal_session(db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs, mode=mode) as sess:
+    async with causal_session(
+        db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs, mode=mode, state=state
+    ) as sess:
         out["run_id"], out["caps"] = sess.run_id, sess.caps
         log.info("CAUSWD session %s caps %s", sess.run_id, sess.caps)
         sess.sink.register_properties(load_allowlist())
