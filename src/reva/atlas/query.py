@@ -53,10 +53,11 @@ import pyarrow.parquet as pq
 
 from reva.atlas.catalog import Catalog, Series
 from reva.atlas.projection import PROJECTION_SQL as PROJECTION_SQL  # re-export (FIX4B tests, docs)
-from reva.atlas.projection import projection_sql, vocabulary
+from reva.atlas.projection import is_projection, projection_sql, vocabulary
 from reva.atlas.snapshot import AtlasSnapshot, normalise_rights
 from reva.atlas.source_order import CellRule, HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
+from reva.atlas.value_notes import with_qa_flag
 from reva.kernel.errors import IntegrityFailure, RevaError, ValidationProblem
 from reva.ports.storage import ArtifactStore
 
@@ -457,7 +458,8 @@ class AtlasQuery:
             "period_start": r["period_start"],  # ISO text, astronomical years (BCE-safe)
             "period_end": r["period_end"],
             "period_basis": r.get("period_basis"),
-            "flags": _json(r["flags"]),
+            # FIX5 (QA-DATA D6): a value outside its definitional range is served unchanged, flagged on a copy
+            "flags": with_qa_flag(key, r["value"], _json(r["flags"])),
             "provenance": {
                 "raw_sha256": r["raw_sha256"],
                 "selector": _json(r["selector"]),
@@ -469,6 +471,13 @@ class AtlasQuery:
         }
         if r.get("year") is not None:
             out["year"] = int(r["year"])
+        if is_projection(
+            out["flags"] if isinstance(out["flags"], dict) else {},
+            period_start=r["period_start"],
+            recorded=t.get("recorded_at"),
+            table=f"{src}.{ds}",
+        ):
+            out["projection"] = True  # FIX5: not an observation (registry/atlas/projection_kinds.yaml)
         if "rank" in r:
             out["source_rank"] = int(r["rank"])
         if "n_sources" in r:

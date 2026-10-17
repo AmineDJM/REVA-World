@@ -43,7 +43,7 @@ from reva.nlqa.ports import (
     PairLinkGroup,
     PairLinks,
     PathHop,
-    is_projection,
+    cell_is_projection,
     per_country_unit,
 )
 
@@ -674,7 +674,7 @@ class Executor:
                 n_non_numeric=n_non_numeric,
                 rows=[(c, ev.cell(c)) for c in rows],
                 other_sources=sorted({_src(c) for c in res.cells} - {source}),
-                n_projection=sum(1 for c in rows if is_projection(c.flags)),
+                n_projection=sum(1 for c in rows if cell_is_projection(c)),
                 year_asked=a["year"] is not None,
             )
             return OpResult(op, "ok", data=data, consulted=consulted)
@@ -732,7 +732,7 @@ class Executor:
                 year_asked=a["year"] is not None,
                 n=len({c.iso3 for c in chosen}),
                 units=sorted({c.unit or "" for c in chosen}),
-                n_projection=sum(1 for c in chosen if is_projection(c.flags)),
+                n_projection=sum(1 for c in chosen if cell_is_projection(c)),
                 truncated=len(chosen) > MAX_ALL_CELLS,
                 cells=[(c, ev.cell(c)) for c in chosen[:MAX_ALL_CELLS]],
                 other_sources=[s for s, _ in groups[1:]],
@@ -867,7 +867,7 @@ def latest_actual_year(cells: Sequence[AtlasCell]) -> int | None:
     :data:`RANK_LATEST_COVERAGE` of the best-covered year's; ``None`` when there is no actual cell."""
     by_year: dict[int, int] = {}
     for c in cells:
-        if c.year is not None and _dec(c.value) is not None and not is_projection(c.flags):
+        if c.year is not None and _dec(c.value) is not None and not cell_is_projection(c):
             by_year[c.year] = by_year.get(c.year, 0) + 1
     if not by_year:
         return None
@@ -903,7 +903,7 @@ def rank_cells(
             y = latest_actual_year(group)
             if y is None:
                 only_projections = only_projections or any(
-                    _dec(c.value) is not None and is_projection(c.flags) for c in group
+                    _dec(c.value) is not None and cell_is_projection(c) for c in group
                 )
                 continue
         same_year = [c for c in group if c.year == y]

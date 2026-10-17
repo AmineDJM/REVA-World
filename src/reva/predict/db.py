@@ -23,6 +23,7 @@ from typing import Any
 
 from sqlalchemy import Connection, text
 
+from reva.atlas.projection import is_projection
 from reva.predict.context import PluginData
 from reva.predict.decision import Decision, VarRef
 
@@ -140,14 +141,9 @@ class DbClaimSource:
 
 
 # ------------------------------------------------------------------------------------------- baseline
-def _is_projection(flags: Mapping[str, Any] | None) -> bool:
-    f = flags or {}
-    proj = str(f.get("projection", "false")).lower()
-    return (
-        str(f.get("estimate_kind") or "") in ("projection", "unknown_boundary", "published_history_boundary_unknown")
-        or proj not in ("false", "")
-        or str(f.get("period_after_vintage", "false")).lower() == "true"
-    )
+def _is_projection(flags: Mapping[str, Any] | None, period_start: Any = None) -> bool:
+    """FIX5: the shared rule (``registry/atlas/projection_kinds.yaml``)."""
+    return is_projection(flags, period_start=period_start)
 
 
 class AtlasBaseline:
@@ -175,7 +171,12 @@ class AtlasBaseline:
             except Exception:
                 log.exception("atlas baseline for %s %s unavailable", cid, geo)
                 return None
-            actual = [c for c in cells if c.get("value") is not None and not _is_projection(c.get("flags"))]
+            actual = [
+                c
+                for c in cells
+                if c.get("value") is not None
+                and not (c.get("projection") or _is_projection(c.get("flags"), c.get("period_start")))
+            ]
             if not actual:
                 continue
             c = max(actual, key=lambda c: c.get("year") or 0)

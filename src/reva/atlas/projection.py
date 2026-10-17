@@ -73,7 +73,7 @@ def vocabulary(path: Path = PROJECTION_KINDS_FILE) -> ProjectionVocabulary:
 
 def kind_class(kind: Any) -> KindClass | None:
     """``observation`` | ``estimate`` | ``projection`` | ``unknown`` (set but unlisted); ``None`` when no kind."""
-    k = str(kind or "").strip()
+    k = str(kind or "").strip().lower()
     if not k:
         return None
     for c, kinds in vocabulary().classes.items():
@@ -135,7 +135,9 @@ def is_projection(
     if start is None:
         return False
     v = vocabulary()
-    if str(f.get("estimate_kind") or "") in v.date_rule_exempt_kinds or (table and table in v.date_rule_exempt_tables):
+    if str(f.get("estimate_kind") or "").strip().lower() in v.date_rule_exempt_kinds or (
+        table and table in v.date_rule_exempt_tables
+    ):
         return False
     for k in v.release_date_flags:
         rel = _as_date(f.get(k))

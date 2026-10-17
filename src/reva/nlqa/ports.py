@@ -19,6 +19,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
+from reva.atlas.projection import is_projection as _is_projection
+from reva.atlas.projection import kind_class
 from reva.kernel.errors import RevaError
 
 #: Wikidata properties whose statements assert causation (shown only as "asserted by <source>").
@@ -245,35 +247,26 @@ def per_country_unit(unit: str | None) -> bool:
     return bool(unit) and bool(_PER_COUNTRY_UNIT.search(str(unit)))
 
 
-_PROJECTION_KINDS = frozenset({"projection", "forecast", "projected"})
-_ESTIMATE_KINDS = frozenset({"estimated", "estimate", "imputed", "modelled", "modeled", "nowcast"})
 _ESTIMATE_TYPES = frozenset({"ilo_modelled", "ilo_estimate_in_national_series"})
 
 
-def _truthy(v: Any) -> bool:
-    if v is None or v is False:
-        return False
-    return str(v).strip().lower() not in ("", "false", "0", "no", "none")
+def is_projection(flags: Mapping[str, Any] | None, *, period_start: Any = None, table: str | None = None) -> bool:
+    """A cell that is not an observation — the shared rule of ``reva.atlas.projection`` (FIX5;
+    ``registry/atlas/projection_kinds.yaml``: projection / forecast / unknown-boundary kinds, unknown kinds,
+    projection flags, periods starting after a release date in the flags or after today)."""
+    return _is_projection(flags, period_start=period_start, table=table)
 
 
-def is_projection(flags: Mapping[str, Any] | None) -> bool:
-    """A cell is a projection when its provider says so — the semantics of the atlas query layer's
-    ``PROJECTION_SQL`` (``estimate_kind = projection``, a truthy ``projection`` flag, the WDI's
-    ``period_after_vintage``) plus FAO's ``estimate_kind = forecast``."""
-    f = flags or {}
-    return (
-        str(f.get("estimate_kind") or "").strip().lower() in _PROJECTION_KINDS
-        or _truthy(f.get("projection"))
-        or str(f.get("period_after_vintage") or "").strip().lower() == "true"
-    )
+def cell_is_projection(c: AtlasCell) -> bool:
+    return _is_projection(c.flags, period_start=c.period_start, table=f"{c.source}.{c.dataset}")
 
 
-def estimate_status(flags: Mapping[str, Any] | None) -> str | None:
+def estimate_status(flags: Mapping[str, Any] | None, *, period_start: Any = None) -> str | None:
     """``projection``, ``estimate`` (provider-estimated, imputed or modelled) or ``None`` (as reported)."""
     f = flags or {}
-    if is_projection(f):
+    if is_projection(f, period_start=period_start):
         return "projection"
-    if str(f.get("estimate_kind") or "").strip().lower() in _ESTIMATE_KINDS:
+    if kind_class(f.get("estimate_kind")) == "estimate":
         return "estimate"
     if str(f.get("estimate_type") or "").strip().lower() in _ESTIMATE_TYPES:
         return "estimate"

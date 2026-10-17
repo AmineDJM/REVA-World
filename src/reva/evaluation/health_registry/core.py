@@ -21,6 +21,8 @@ from typing import Any
 import polars as pl
 import yaml
 
+from reva.atlas.projection import PROJECTION_KINDS as PROJECTION_KINDS  # FIX5: one vocabulary (re-export)
+from reva.atlas.projection import is_projection
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import logical_hash
 from reva.models.forecasting import health_quantile as HQ
@@ -31,7 +33,6 @@ QUESTION_SCHEMA = "reva-health-question/1"
 FORECAST_SCHEMA = "reva-health-forecast/1"
 RESOLUTION_RULE = "first_observed_release_after_seal"
 LEVELS = HQ.HUB_LEVELS
-PROJECTION_KINDS = ("projection", "unknown_boundary")
 STALE_WEEKS = 26
 STALE_YEARS = 5
 DM_LAG = 3
@@ -314,7 +315,7 @@ def extract_cells(frame: pl.DataFrame, fam: Family) -> tuple[Series, dict[str, s
         if not _geo_ok(fam, geo):
             continue
         flags = _json(r["flags"])
-        if flags.get("estimate_kind") in PROJECTION_KINDS:
+        if is_projection(flags, period_start=r["period_start"]):
             continue
         idx = idx_of_cell(fam, r["period_start"], r["period_end"])
         if idx is None:

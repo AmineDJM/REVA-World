@@ -19,6 +19,8 @@ from typing import Any
 
 import polars as pl
 
+from reva.atlas.projection import PROJECTION_KINDS as PROJECTION_KINDS  # FIX5: one vocabulary (re-export)
+from reva.atlas.projection import is_projection
 from reva.evaluation.registry import periods as P
 from reva.evaluation.registry.specs import Family
 from reva.kernel.ids import logical_hash
@@ -26,7 +28,6 @@ from reva.kernel.ids import logical_hash
 QUESTION_SCHEMA = "reva-forecast-question/1"
 RESOLUTION_RULE = "first_observed_release_after_seal"
 MAX_STALE = {"M": 12, "Q": 6, "A": 2}
-PROJECTION_KINDS = ("projection", "unknown_boundary")
 DERIVED_QUANT = Decimal("1e-8")
 
 
@@ -151,6 +152,7 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
                 "flags": _flags(r["flags"]),
                 "raw_sha256": r["raw_sha256"],
                 "selector": _flags(r["selector"]),
+                "period_start": start,
             }
         )
     if dropped:
@@ -222,7 +224,7 @@ def _ref(c: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _is_projection(c: Mapping[str, Any]) -> bool:
-    return c["flags"].get("estimate_kind") in PROJECTION_KINDS
+    return is_projection(c["flags"], period_start=c.get("period_start"))
 
 
 def _fill(s: Series, raw_cells: list[dict[str, Any]], family: Family, by_idx: Any) -> None:

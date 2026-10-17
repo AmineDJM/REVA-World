@@ -48,7 +48,7 @@ from reva.nlqa.ports import (
     PathHop,
     PredecessorLink,
     TimeValue,
-    is_projection,
+    cell_is_projection,
     pick_label,
 )
 
@@ -399,7 +399,7 @@ def _atlas_cell(c: Mapping[str, Any], concept_id: str, snapshot: str | None) -> 
 
 def _latest_key(c: AtlasCell) -> tuple[bool, int]:
     """Order for "the latest value": any actual cell before any projection, then by year."""
-    return (not is_projection(c.flags), c.year if c.year is not None else -(10**6))
+    return (not cell_is_projection(c), c.year if c.year is not None else -(10**6))
 
 
 class AtlasQueryAdapter:

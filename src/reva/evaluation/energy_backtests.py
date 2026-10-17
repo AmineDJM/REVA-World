@@ -41,6 +41,7 @@ from typing import Any
 
 import polars as pl
 
+from reva.atlas.projection import is_projection
 from reva.evaluation.cutoff import CutoffMode
 from reva.evaluation.vintages import VintageAccessor
 from reva.models.forecasting import energy_models as em
@@ -130,7 +131,7 @@ def outcomes_from_frame(frame: pl.DataFrame, codes: Sequence[str] = em.TARGET_CO
     f = frame.filter(pl.col("indicator").is_in(list(want)) & pl.col("value").is_not_null())
     out: dict[str, dict[int, float]] = defaultdict(dict)
     for ind, ps, v, fl in f.select("indicator", "period_start", "value", "flags").iter_rows():
-        if json.loads(fl or "{}").get("estimate_kind") in ("projection", "unknown_boundary"):
+        if is_projection(json.loads(fl or "{}"), period_start=ps):  # FIX5: incl. periods after the STEO release
             continue
         out[want[ind]][month_idx(ps)] = float(v)
     return dict(out)

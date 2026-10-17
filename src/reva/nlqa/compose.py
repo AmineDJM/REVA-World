@@ -29,7 +29,7 @@ from typing import Any
 
 from reva.nlqa.executor import Execution, OpResult, Resolved, _dec
 from reva.nlqa.plan import in_question
-from reva.nlqa.ports import AtlasCell, Entity, KgStatement, estimate_status, pick_label
+from reva.nlqa.ports import AtlasCell, Entity, KgStatement, cell_is_projection, estimate_status, pick_label
 
 MAX_SENTENCE_STATEMENTS = 12
 MAX_RANK_LIST = 50
@@ -359,7 +359,7 @@ def _flags(c: AtlasCell, lang: str) -> str:
 
 def _status(c: AtlasCell, lang: str) -> str:
     """`` (projection)`` / `` (estimate)`` next to a value the source projects or estimates."""
-    st = estimate_status(c.flags)
+    st = "projection" if cell_is_projection(c) else estimate_status(c.flags)
     if st == "projection":
         return " (projection de la source)" if lang == "fr" else " (source projection)"
     if st == "estimate":
