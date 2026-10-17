@@ -33,3 +33,44 @@ Registered per-country inputs (complete windows only; an incomplete table is nev
 (`demography.population.jan1_age_sex`, 72,306 rows), `demo_magec` (`demography.deaths.age_sex`, 69,525),
 `demo_fasec` (`demography.live_births.mother_age_newborn_sex`, 22,356), each for 9 countries: AUT BEL BGR CHE CYP
 CZE DEU DNK EST. **FRA is not yet covered** (the cycle is alphabetical, 282 requests, 100 per run).
+
+## Not run (free disk 4.3 GB, below the 5 GB floor)
+
+A 30-minute bounded wait (21:19–21:49 UTC) did not bring free disk back to 5 GB; `reva objects compress` had
+nothing left to compress. Steps 2–5 are therefore **not done**:
+
+* 2a (rest): `eurostat.demography` — ~200 of 282 requests remain (FRA among them); resumable, two more runs.
+* 2b: `eurostat.labour_pensions` — not started (LFS employment/activity, ESSPROS beneficiaries/expenditure).
+* 3: `reva beliefs publish --origin live` — not run, so **no release pins FIGARO 2024 yet** (it is registered and
+  eligible) and the retirement inputs are incomplete anyway.
+* 4: V4ECO `atlas.gbif_occ` (~267 requests, ~5 MB raw), `atlas.un_sdg`, `atlas.owid`, `atlas.fao --dataset qcl` — not run.
+* 5: `reva.predict.run` — not re-run: without a new release its output is identical to
+  `docs/dev/v5_pred_engine.md` §7b (France 65 and the IO plugin still stop on `missing_input` /
+  `plugin_data_missing`). No numbers appended there.
+
+### Commands to finish (each under the lock, `df -h /` ≥ 5 GB first)
+
+```sh
+flock /tmp/reva-devdb.lock uv run reva ingest --live --connector eurostat.demography      # repeat until the cursor is complete (≈2 runs)
+flock /tmp/reva-devdb.lock uv run reva ingest --live --connector eurostat.labour_pensions
+flock /tmp/reva-devdb.lock uv run reva beliefs publish --origin live                       # pins FIGARO 2024 + retirement inputs
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gbif_occ
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.un_sdg
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.owid
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.fao --dataset qcl
+uv run python -m reva.predict.run --reference all --draws 2000 --seed 0 --out var/predict/reference.json
+```
+
+Check after the demography runs: `SELECT count(*) FROM evidence.dataset WHERE concept_id =
+'demography.population.jan1_age_sex' AND subject_key = 'FRA'` must be 1 before publishing, otherwise the retirement
+model still refuses France. If a step meets `policy_integrity` again, another agent is mid-way through a budgets
+merge: wait for the re-pin (`sha256sum registry/policies/budgets.yaml` = the `budgets.yaml` digest in
+`src/reva/autonomy/policy.py`) and resume — the cursor keeps completed items.
+
+## Owner decisions
+
+* Disk: the dev box cannot keep 5 GB free with ~11 agents writing; the DB volume is 9.1 GB (`reva` 7.9 GB) and
+  `/tmp` 9.2 GB (includes the atlas query cache, not touched). The remaining loads need roughly 60–120 MB of raw +
+  Parquet; they are blocked by the floor, not by their own size.
+* Shared `budgets.yaml` edits invalidate the policy pin for any concurrently running ingest (18 demography items
+  refused here); merges should be serialised with the dev-DB lock or done between runs.
