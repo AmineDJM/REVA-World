@@ -22,6 +22,7 @@ from sqlalchemy import Connection, text
 from reva.kernel.errors import ValidationProblem
 from reva.kg import query as kq
 from reva.kg.families import FamilyError, FamilyRegistry, load_registry, share_of
+from reva.kg.model import CAUSAL_PIDS
 
 MAX_PER_FAMILY = 200
 #: Rows of family edges read around one entity (a hub such as a country can have 100k+ incoming statements).
@@ -170,9 +171,9 @@ def entity_families(
         )
     out_groups = []
     for fid, fam in reg.families.items():
-        g = groups.get(fid)
-        if g is None:
+        if fid not in groups:
             continue
+        g = groups[fid]
         out_groups.append(
             {
                 "family": fid,
@@ -257,7 +258,7 @@ def _unmapped(
             "count": int(n),
             "label_fr": (props.get(pid) or {}).get("label_fr"),
             "label_en": (props.get(pid) or {}).get("label_en"),
-            "causal_assertion": pid in kq.CAUSAL_PIDS,
+            "causal_assertion": pid in CAUSAL_PIDS,
         }
         for pid, is_out, n in rows
     ]

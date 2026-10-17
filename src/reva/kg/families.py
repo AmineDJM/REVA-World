@@ -60,6 +60,27 @@ class FamilyError(ValueError):
     pass
 
 
+def _measured_by_property() -> Any:
+    from reva.kg.model import KgProperty
+
+    return KgProperty(
+        pid="atlas:measured_by",
+        value_kind="item",
+        reva_predicate="atlas_measured_by",
+        label_en="is measured by the atlas series",
+        label_fr="est mesuré par la série de l'atlas",
+        inverse_name="atlas_series_about",
+        inverse_label_en="atlas series about",
+        inverse_label_fr="série de l'atlas portant sur",
+    )
+
+
+#: Dataset predicate "entity -> atlas series" (family ``measured_by``): object ``atlas:<catalog concept id>``,
+#: qualifiers ``concept`` (catalog id), ``iso3`` (geography of the series, when one) and ``table``. A loader
+#: registers it with :func:`reva.kg.model.register_properties` before loading such statements.
+ATLAS_MEASURED_BY = _measured_by_property()
+
+
 @dataclass(frozen=True)
 class Family:
     id: str

@@ -298,6 +298,8 @@ mappings:
   - {property: P927, family: located_in, subtype: anatomical_location, source: wikidata}
   - {property: P183, family: located_in, subtype: endemic_to, source: wikidata}
   - {property: P9714, family: located_in, subtype: taxon_range, source: wikidata}
+  - {property: "place:located_in", family: located_in, subtype: administrative_unit, source: any,
+     note: "evidenced place containment (reva.kg.spacetime.PLACE_LOCATED_IN): ADM2 -> ADM1 -> country"}
   # ---------------------------------------------------------------- time
   - {property: P2348, family: occurs_during, subtype: time_period, source: wikidata}
   # ---------------------------------------------------------------- production / ownership
@@ -317,6 +319,9 @@ mappings:
   - {property: P780, family: associated_with, subtype: symptoms_and_signs, source: wikidata,
      note: "a listed symptom is an association reported by Wikidata, not a causal claim"}
   - {property: P2283, family: associated_with, subtype: uses, source: wikidata}
+  # ---------------------------------------------------------------- data series
+  - {property: "atlas:measured_by", family: measured_by, subtype: atlas_series, source: any,
+     note: "entity -> atlas:<concept>; qualifiers concept, iso3, table (reva.kg.families.ATLAS_MEASURED_BY)"}
   # ---------------------------------------------------------------- discovery / invention
   - {property: P61, family: discovered_by, subtype: discoverer_or_inventor, source: wikidata}
   - {property: P178, family: invented_by, subtype: developer, source: wikidata}
