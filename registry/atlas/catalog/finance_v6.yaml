@@ -1,0 +1,215 @@
+# Atlas catalog 'finance_v6' (agent V6FINDATA, V6, 2026-10-17). Provider-declared concepts (not human-reviewed) for
+# atlas_bis_fin.py, atlas_imf_fin.py, atlas_cb_balance.py, atlas_ff_factors.py; one source each (no cross-provider
+# equivalence asserted). See docs/dev/v6_findata.md.
+domain: finance_v6
+labels:
+  en: Finance - balance sheets, debt, reserves, banking
+  fr: Finance - bilans, dette, réserves, banques
+maintainer: V6FINDATA
+concepts:
+- id: finance.cb.total_assets_usd_monthly
+  labels:
+    en: 'Central bank total assets, US dollars (monthly, BIS)'
+    fr: 'Actif total de la banque centrale, dollars US (mensuel, BRI)'
+  definition: 'BIS WS_CBTA "Central bank, assets, total, BIS-spliced, break-adjusted" in US dollars (billions), monthly.'
+  unit: US dollar (USD) x10^9
+  domain: finance_v6
+  subdomain: central_banks
+  theme: finance
+  source_order: ['bis.cbta.CBTA|freq=M|unit_measure=USD|transformation=B|comp_method=B']
+  provider_declared: true
+  notes: Monthly, quarterly and annual series are distinct indicators; national source per series in flags.data_comp.
+  tags: [monthly, central_bank]
+- id: finance.cb.total_assets_pct_gdp_quarterly
+  labels:
+    en: 'Central bank total assets, % of GDP (quarterly, BIS)'
+    fr: 'Actif total de la banque centrale, % du PIB (trimestriel, BRI)'
+  definition: 'BIS WS_CBTA central bank total assets, BIS-spliced, as a percentage of GDP (unit XDF_R_B1GQ), quarterly.'
+  unit: percent of GDP
+  domain: finance_v6
+  subdomain: central_banks
+  theme: finance
+  source_order: ['bis.cbta.CBTA|freq=Q|unit_measure=XDF_R_B1GQ|transformation=B|comp_method=B']
+  provider_declared: true
+  tags: [quarterly, central_bank]
+- id: finance.cb.eurosystem_total_assets_weekly
+  labels:
+    en: 'Eurosystem total assets (weekly financial statement)'
+    fr: 'Actif total de l''Eurosystème (situation financière hebdomadaire)'
+  definition: 'ECB ILM.W.U2.C.T000000.Z5.Z01 "Total assets/liabilities - Eurosystem", millions of euro.'
+  unit: Euro (EUR) x10^6
+  domain: finance_v6
+  subdomain: central_banks
+  theme: finance
+  source_order: ['ecb.wfs_w.WFS|bs_item=T000000|count_area=Z5|currency_trans=Z01']
+  provider_declared: true
+  tags: [weekly, central_bank]
+- id: finance.cb.fed_total_assets_wednesday
+  labels:
+    en: 'Federal Reserve total assets, Wednesday level (H.4.1)'
+    fr: 'Actif total de la Réserve fédérale, niveau du mercredi (H.4.1)'
+  definition: 'Federal Reserve H.4.1 RESPPMA_N.WW "Assets: Total Assets: Total assets (Less eliminations from consolidation): Wednesday level", millions of dollars.'
+  unit: US dollars (USD) x10^6
+  domain: finance_v6
+  subdomain: central_banks
+  theme: finance
+  source_order: ['frb.h41_w.RESPPMA_N.WW']
+  provider_declared: true
+  tags: [weekly, central_bank]
+- id: finance.cb.boe_reserve_balances_weekly
+  labels:
+    en: 'Bank of England reserve balances (weekly report)'
+    fr: 'Réserves des banques à la Banque d''Angleterre (hebdomadaire)'
+  definition: 'Bank of England RPWB56A "Weekly amounts outstanding of Central Bank sterling reserve balance liabilities (in sterling millions) not seasonally adjusted".'
+  unit: Pounds sterling (GBP) x10^6
+  domain: finance_v6
+  subdomain: central_banks
+  theme: finance
+  source_order: ['boe.weekly_w.RPWB56A']
+  provider_declared: true
+  tags: [weekly, central_bank]
+- id: finance.reserves.usd_share_allocated
+  labels:
+    en: 'US dollar share of allocated FX reserves (COFER, world)'
+    fr: 'Part du dollar US dans les réserves de change allouées (COFER, monde)'
+  definition: 'IMF COFER AFXRA "Allocated foreign exchange reserves", FXR_CURRENCY CI_USD "Claims in US dollar", SHRO_PT "Shares"; world = provider_geo G001.'
+  unit: percent (share)
+  domain: finance_v6
+  subdomain: reserves
+  theme: finance
+  source_order: ['imf.cofer.AFXRA|fxr_currency=CI_USD|type_of_transformation=SHRO_PT']
+  provider_declared: true
+  tags: [quarterly, reserves]
+- id: finance.reserves.total_fx_reserves_usd
+  labels:
+    en: 'Total foreign exchange reserves, US dollars (COFER)'
+    fr: 'Réserves de change totales, dollars US (COFER)'
+  definition: 'IMF COFER TFXRA "Total foreign exchange reserves", CI_T, NV_USD "Nominal value" (US dollars, full units).'
+  unit: US dollars
+  domain: finance_v6
+  subdomain: reserves
+  theme: finance
+  source_order: ['imf.cofer.TFXRA|fxr_currency=CI_T|type_of_transformation=NV_USD']
+  provider_declared: true
+  tags: [quarterly, reserves]
+- id: finance.debt.gg_debt_pct_gdp_gdd
+  labels:
+    en: 'General government debt, % of GDP (IMF Global Debt Database)'
+    fr: 'Dette des administrations publiques, % du PIB (IMF GDD)'
+  definition: 'IMF GDD FL_S13_POGDP_PT "Debt instruments, General government, Percent of GDP".'
+  unit: percent of GDP
+  domain: finance_v6
+  subdomain: sovereign_debt
+  theme: finance
+  source_order: ['imf.gdd.FL_S13_POGDP_PT']
+  provider_declared: true
+  tags: [annual, debt]
+- id: finance.debt.private_debt_pct_gdp_gdd
+  labels:
+    en: 'Private sector debt, % of GDP (IMF Global Debt Database)'
+    fr: 'Dette du secteur privé, % du PIB (IMF GDD)'
+  definition: 'IMF GDD FL_PS_POGDP_PT "Debt instruments, Private sector, Percent of GDP".'
+  unit: percent of GDP
+  domain: finance_v6
+  subdomain: private_debt
+  theme: finance
+  source_order: ['imf.gdd.FL_PS_POGDP_PT']
+  provider_declared: true
+  tags: [annual, debt]
+- id: finance.debt.gg_debt_historical
+  labels:
+    en: 'General government gross debt, % of fiscal-year GDP (IMF HPD)'
+    fr: 'Dette brute des administrations publiques, % du PIB (IMF HPD)'
+  definition: 'IMF HPD G63G_S13_POFYGDP "Gross debt, General government, Percent of fiscal year GDP".'
+  unit: percent of fiscal-year GDP
+  domain: finance_v6
+  subdomain: sovereign_debt
+  theme: finance
+  source_order: ['imf.hpd.G63G_S13_POFYGDP']
+  provider_declared: true
+  tags: [annual, debt, historical]
+- id: finance.debt.gg_debt_securities_usd
+  labels:
+    en: 'General government debt securities outstanding, market value, USD (BIS)'
+    fr: 'Titres de dette des administrations publiques, valeur de marché, USD (BRI)'
+  definition: 'BIS WS_NA_SEC_DSS debt securities (F3) issued by the general government (S13), all markets, all maturities and currencies, market value, closing positions, US dollars (billions).'
+  unit: US dollar (USD) x10^9
+  domain: finance_v6
+  subdomain: sovereign_debt
+  theme: finance
+  source_order: ['bis.dsec_gov.DSEC|ref_sector=S13|valuation=M']
+  provider_declared: true
+  tags: [quarterly, debt]
+- id: finance.banking.crossborder_claims_on_country
+  labels:
+    en: 'Cross-border bank claims on residents of a country (BIS LBS)'
+    fr: 'Créances bancaires transfrontières sur les résidents d''un pays (BRI)'
+  definition: 'BIS WS_LBS_D_PUB amounts outstanding (S) of total claims (C), all instruments and currencies, of banks in all reporting countries (5A) on counterparties resident in the country (L_CP_COUNTRY), cross-border (N), US dollars (millions).'
+  unit: US dollar (USD) x10^6
+  domain: finance_v6
+  subdomain: banking
+  theme: finance
+  source_order: ['bis.lbs_cp.LBS_CP|l_measure=S|l_position=C']
+  provider_declared: true
+  tags: [quarterly, banking]
+- id: finance.banking.crossborder_claims_by_reporting_country
+  labels:
+    en: 'Cross-border claims of banks located in a country (BIS LBS)'
+    fr: 'Créances transfrontières des banques situées dans un pays (BRI)'
+  definition: 'BIS WS_LBS_D_PUB amounts outstanding (S) of total claims (C) of banks located in the reporting country (L_REP_CTY) on all countries (5J), cross-border, US dollars (millions).'
+  unit: US dollar (USD) x10^6
+  domain: finance_v6
+  subdomain: banking
+  theme: finance
+  source_order: ['bis.lbs_rep.LBS_REP|l_measure=S|l_position=C']
+  provider_declared: true
+  tags: [quarterly, banking]
+- id: finance.yields.lt_convergence_10y
+  labels:
+    en: 'Long-term interest rate for convergence purposes (10-year, EU)'
+    fr: 'Taux d''intérêt à long terme aux fins de convergence (10 ans, UE)'
+  definition: 'ECB IRS "Long-term interest rate for convergence purposes - Euro" (debt security issued, 10 years maturity), percent, monthly.'
+  unit: Percent (PC)
+  domain: finance_v6
+  subdomain: yields
+  theme: finance
+  source_order: ['ecb.lty_m.LTIR|currency_trans=EUR']
+  provider_declared: true
+  tags: [monthly, yields]
+- id: finance.yields.ea_aaa_10y_spot
+  labels:
+    en: 'Euro area AAA government yield curve, 10-year spot rate (daily)'
+    fr: 'Courbe des taux souverains AAA de la zone euro, taux au comptant 10 ans (quotidien)'
+  definition: 'ECB YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y "AAA yield curve - 10-year spot rate" (Svensson model, continuous compounding).'
+  unit: Percent per annum (PCPA)
+  domain: finance_v6
+  subdomain: yields
+  theme: finance
+  source_order: ['ecb.yc_d.YC|instrument_fm=G_N_A|data_type_fm=SR_10Y']
+  provider_declared: true
+  tags: [daily, yields]
+- id: finance.liquidity.usd_credit_to_nonbanks_outside_us
+  labels:
+    en: 'US dollar credit to non-banks outside the United States (BIS GLI)'
+    fr: 'Crédit en dollars US aux non-banques hors des États-Unis (BRI)'
+  definition: 'BIS WS_GLI "USD denominated credit (bank loans & debt securities) to non-bank borrowers located outside the US" (provider_geo 3P), US dollars.'
+  unit: US dollar (USD)
+  domain: finance_v6
+  subdomain: liquidity
+  theme: finance
+  source_order: ['bis.gli.GLI|curr_denom=USD|borrowers_sector=N|lenders_sector=A|l_pos_type=I|l_instr=B|unit_measure=USD']
+  provider_declared: true
+  tags: [quarterly, liquidity]
+- id: finance.factors.ff_market_excess_return_monthly
+  labels:
+    en: 'Fama/French market excess return (US, monthly) - restricted'
+    fr: 'Rendement excédentaire du marché Fama/French (É.-U., mensuel) - restreint'
+  definition: 'Kenneth R. French Data Library "Mkt-RF" (value-weight return of US stocks minus the one-month T-bill rate), percent per month.'
+  unit: percent return per period
+  domain: finance_v6
+  subdomain: factors
+  theme: finance
+  source_order: ['kfrench.ff3.FF|factor=Mkt-RF']
+  provider_declared: true
+  notes: No licence granted (copyright Fama and French, CRSP-derived); internal research use only.
+  tags: [monthly, restricted]
