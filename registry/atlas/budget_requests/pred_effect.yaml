@@ -1,0 +1,13 @@
+# Budget request from agent PRED-EFFECT (V5 effect estimates). One request per curated publication PDF.
+agent: PRED-EFFECT
+requests:
+  - source_key: effects.literature
+    # 7 PDFs today (NBER x3, CEPII, IMF, ECB x2), 0.27-2.8 MB each, ~7.6 MB per full run; allow growth and a retry
+    daily_requests: 40
+    expected_bytes_per_day: 40000000
+    reason: "one full run = one request per curated publication (7 today, ~7.6 MB); allow new entries and one retry"
+daily_totals_increase:
+  http_requests_total: "+40"
+  http_bytes_total: "+40_000_000"
+notes: >-
+  Raw archive: ~7.6 MB of PDFs (budget for PRED agents: <= 100 MB).

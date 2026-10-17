@@ -1,0 +1,17 @@
+[
+ {
+  "request_fingerprint": "77b7c08af7f6dc6525bd7eb1e31aacee72af29da682995ccdc3d7bcf561637b7",
+  "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO_2025_OCT_VINTAGE,1.0.0/.BCA_NGDPD+GGXWDG_NGDP+LUR+NGDP_RPCH+PCPIPCH.A",
+  "file": "5d2da2d90f5c7559.xml",
+  "sha256": "5d2da2d90f5c75598461b8796f8b16353bee3f88d8d915cbd1d2f4edb0851393",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.structurespecificdata+xml; version=2.1"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "IMF Copyright and Usage terms",
+  "live_sha256": "386fd8224849bf2a1533e87fc6c4bf3b8af7eb1bc1585a4536a460b586385fb5",
+  "live_bytes": 2411249,
+  "excerpt": "Series/Group elements for ['FRA', 'G001', 'IND', 'USA'] only, verbatim; other elements unchanged"
+ }
+]

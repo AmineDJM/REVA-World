@@ -1,0 +1,32 @@
+[
+ {
+  "request_fingerprint": "aeb14f5bc91f4584378eb47a2ba4fbd5d53db454c16a0aaf7344788e80657c4c",
+  "url": "https://api.db.nomics.world/v22/series/IMF/WEO:2008-04?dimensions=%7B%22weo-subject%22%3A%5B%22BCA_NGDPD%22%2C%22GGXWDG_NGDP%22%2C%22LUR%22%2C%22NGDP_RPCH%22%2C%22PCPIPCH%22%5D%7D&observations=1&limit=1000",
+  "file": "e9f46b1b7c5cb621.json",
+  "sha256": "e9f46b1b7c5cb621a2f6fe6c74cdfbcde5651d303a7a03ac350546983da65501",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "IMF Copyright and Usage terms (via DBnomics)",
+  "live_sha256": "26fc8694fc6e9a2131006f37f88f3747ee39f79952cdcaea0ff16522374cb375",
+  "live_bytes": 962257,
+  "excerpt": "series docs for ['DEU', 'FRA', 'USA', 'UVK', 'WBG'] only (num_found set to the kept count); dataset.dimensions_values_labels dropped; values verbatim"
+ },
+ {
+  "request_fingerprint": "5cb72176e93a9d61a2dc9bad9a792ad385c5f08297a5f35ac89797d521d1d43a",
+  "url": "https://api.db.nomics.world/v22/series/IMF/WEO:2009-10?dimensions=%7B%22weo-subject%22%3A%5B%22BCA_NGDPD%22%2C%22GGXWDG_NGDP%22%2C%22LUR%22%2C%22NGDP_RPCH%22%2C%22PCPIPCH%22%5D%7D&observations=1&limit=1000",
+  "file": "eda624728c6d77d8.json",
+  "sha256": "eda624728c6d77d8f21e921ccfc9a8c64885f9f38530ac38f4fea3bf3fa1ea1a",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "IMF Copyright and Usage terms (via DBnomics)",
+  "live_sha256": "61b44109f4845a537088a6c3f47c1e421a6b49d098efdc50cdd8b62e50a9d99c",
+  "live_bytes": 987040,
+  "excerpt": "series docs for ['DEU', 'FRA', 'USA', 'UVK', 'WBG'] only (num_found set to the kept count); dataset.dimensions_values_labels dropped; values verbatim"
+ }
+]

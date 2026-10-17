@@ -287,8 +287,10 @@ def _scope(s: Any) -> dict[str, Any]:
     if per is not None and (
         not isinstance(per, Mapping)
         or set(per) - {"from", "to"}
-        or not all(isinstance(per.get(k), str) and re.fullmatch(r"-?\d{4}(-\d{2}(-\d{2})?|Q[1-4]|M\d{2})?", per[k])
-                   for k in per)
+        or not all(
+            isinstance(per.get(k), str) and re.fullmatch(r"-?\d{4}(-\d{2}(-\d{2})?|Q[1-4]|M\d{2})?", per[k])
+            for k in per
+        )
     ):
         raise Reject("invalid_scope_period")
     if out.get("frequency") is not None and out["frequency"] not in FREQUENCIES:

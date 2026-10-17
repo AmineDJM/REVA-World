@@ -170,7 +170,7 @@ def pdf_pages_text(body: bytes) -> list[str]:
     exe = shutil.which("pdftotext")
     if exe is None:
         raise RuntimeError("pdftotext is not installed")
-    out = subprocess.run(  # noqa: S603 - fixed binary, bytes on stdin, no shell
+    out = subprocess.run(
         [exe, "-layout", "-enc", "UTF-8", "-", "-"],
         input=body,
         capture_output=True,
@@ -244,9 +244,7 @@ def to_estimates(
             "entry_sha256": entry.sha256,
             "evidence": e.get("evidence", "primary"),
             "printed_transform": e.get("printed_transform"),
-            "text_check": (
-                {"tool": check.tool, "page": page} if check is not None and check.tool else {"tool": None}
-            ),
+            "text_check": ({"tool": check.tool, "page": page} if check is not None and check.tool else {"tool": None}),
             "pdf_page": e.get("pdf_page"),
             "document_version_read": entry.document.get("version_read"),
         }

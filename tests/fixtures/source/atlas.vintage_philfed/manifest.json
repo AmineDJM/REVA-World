@@ -1,0 +1,77 @@
+[
+ {
+  "request_fingerprint": "a1545e3445a354599b28ea5d67bf87ae01af3f7e6d557af717db741c766d9703",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/ROUTPUTQvQd.xlsx",
+  "file": "e654167341d3f1d1.xlsx",
+  "sha256": "e654167341d3f1d19a7264c7a27a48ce7d7cc51443d08b6fdcee79d5f1d3c21c",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia public data",
+  "live_sha256": "25433da00f46764a167590efe5c3e1c20a3e91e98ba0f49e6f92f058bc42c9e3",
+  "live_bytes": 243161,
+  "excerpt": "re-saved workbook: DATE + vintage columns 07Q4..09Q1, observation rows 2006-2008 (RUC: 2007:10-2008:12); cell values verbatim, #N/A kept as text"
+ },
+ {
+  "request_fingerprint": "3d0013fb7ae32b840ab3fe9123aabc4e2bf3c83b77f512026761bb8eab5714be",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/rucQvMd.xlsx",
+  "file": "5bd02aa8f039a3dc.xlsx",
+  "sha256": "5bd02aa8f039a3dcd3611beb8f32e482930e6bf28a6b59f4db7d1c4089657430",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia public data",
+  "live_sha256": "d971e59d3ed5f1322a46631743508fb1ad5eee39bfbe12425a641a277fdd9b9a",
+  "live_bytes": 575288,
+  "excerpt": "re-saved workbook: DATE + vintage columns 07Q4..09Q1, observation rows 2006-2008 (RUC: 2007:10-2008:12); cell values verbatim, #N/A kept as text"
+ },
+ {
+  "request_fingerprint": "81d8ee25faf11e425496f28adc337b466a18901b7f0d0cbc9f59dc2d608d20ac",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/spf-release-dates.txt",
+  "file": "c5f4c4dc349068ba.txt",
+  "sha256": "c5f4c4dc349068ba9dc1f421c68474be26d0fe613fff83f70aa41eed96696ee3",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia public data",
+  "live_sha256": "c5f4c4dc349068ba9dc1f421c68474be26d0fe613fff83f70aa41eed96696ee3",
+  "live_bytes": 8298,
+  "excerpt": "whole file"
+ },
+ {
+  "request_fingerprint": "d49752a9b4654db1a76c5967d4284fa92a6a45a3aba8ceb898b2a48a215bd67c",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/historical-data/medianlevel.xlsx",
+  "file": "91fbeb8125b6b268.xlsx",
+  "sha256": "91fbeb8125b6b268d198d26b146df663feb8f3c004c129c4b7e5c43f127af816",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia public data",
+  "live_sha256": "d296e737331c406f7680414504a0d005472743709387f8fda6d969a1d2200977",
+  "live_bytes": 554444,
+  "excerpt": "re-saved workbook, all sheets, survey rows 1989Q4-1990Q3 and 2008Q1-2009Q1; cell values verbatim"
+ },
+ {
+  "request_fingerprint": "9b8eee8a5179408dd51603fda085ff0ffee240879b1487cae326f33e06577689",
+  "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/historical-data/mediangrowth.xlsx",
+  "file": "1624dcae773f7dea.xlsx",
+  "sha256": "1624dcae773f7deaf5cff6babd306bede33398bbfe52376305ee2d1f51b31681",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "Federal Reserve Bank of Philadelphia public data",
+  "live_sha256": "fdcf9ca0299de022c58f8fc35fd20761d8e52b45e038781ae3c4826d1a3cbb5c",
+  "live_bytes": 144611,
+  "excerpt": "re-saved workbook, all sheets, survey rows 1989Q4-1990Q3 and 2008Q1-2009Q1; cell values verbatim"
+ }
+]

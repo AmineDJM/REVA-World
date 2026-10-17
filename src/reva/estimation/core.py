@@ -279,8 +279,9 @@ def lhs_matrix(y: F64, h: int, mode: LhsMode) -> F64:
     * ``diff``: ``y[t+h] - y[t-1]`` (cumulative change of a level, e.g. unemployment rate in pp);
     * ``logdiff``: ``100 * (ln y[t+h] - ln y[t-1])`` (cumulative % change of a positive level);
     * ``cumsum``: ``sum_{k=0..h} y[t+k]`` (cumulative effect of a growth rate in %, i.e. ~ % level change);
-      for negative ``h`` (placebo leads) ``-sum_{k=h+1..-1} y[t+k]`` (= the pre-event level change from
-      ``t+h`` to ``t-1``, sign-aligned with ``diff``), and ``0`` at ``h = -1`` (excluded)."""
+      for negative ``h`` (placebo leads) ``-sum_{k=h+1..-1} y[t+k]`` = ``Y[t+h] - Y[t-1]`` with ``Y`` the
+      cumulated level, the same convention as ``diff`` (a positive lead = the level ``|h|-1`` years before the
+      baseline year ``t-1`` was higher, i.e. a decline in the run-up), and ``0`` at ``h = -1`` (excluded)."""
     if mode == "level":
         return _shift(y, h)
     if mode == "diff":

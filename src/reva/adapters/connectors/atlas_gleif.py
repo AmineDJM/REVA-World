@@ -85,7 +85,8 @@ from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.gleif"
 WD_NAME = "atlas.gleif_wikidata"
-CONNECTOR_VERSION = "1.0.0"
+# 1.0.1: 1.0.0 was registered in the dev DB from a WIP snapshot taken before the B023 refactor.
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas-gleif-1"
 SOURCE_KEY = "gleif.api"
 WD_SOURCE_KEY = "wikidata.wdqs"

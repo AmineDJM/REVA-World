@@ -1,0 +1,10 @@
+SYNTHETIC TEST DOCUMENT - NOT A REAL PUBLICATION (REVA test fixture, CC0)
+
+Table 1. Synthetic Okun-type estimates (annual data, 1990-2020)
+Equation estimated: Ut - Ut* = beta (Yt - Yt*) + et
+
+                 beta        Obs
+Atlantis      -0.420***    (0.050)    31
+Lemuria       -0.250**     (0.110)    31
+
+A synthetic 10 percent increase in the synthetic oil price raises synthetic inflation by 0.3 percentage point on impact.

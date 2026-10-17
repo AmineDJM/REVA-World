@@ -1,0 +1,56 @@
+# SYNTHETIC test entry (not a real publication): exercises the effects connector in fixture mode.
+schema: reva-effects-literature/1
+id: synthetic_okun_fixture
+source_key: effects.literature
+citation:
+  text: "SYNTHETIC TEST DOCUMENT - NOT A REAL PUBLICATION (REVA test fixture)."
+  short: "Synthetic fixture"
+  year: 2026
+  doi: null
+  url: https://www.nber.org/system/files/reva-fixture/effects-synthetic-paper.txt
+document:
+  url: https://www.nber.org/system/files/reva-fixture/effects-synthetic-paper.txt
+  media_type: text/plain
+  sha256: 05dba7a3eebc0454efd93202b7a6f7f30627a066b80dc47d68a34bfb81c1bd2f
+  bytes: 429
+  version_read: synthetic
+as_of: "2026-10-01"
+rights: {licence: "CC0 (synthetic)", restricted: false}
+curation: {curated_by: test, curated_at: "2026-10-17", review_status: synthetic_fixture}
+defaults:
+  cause: {kind: variable, id: output.gap, transform: gap, definition: "Yt - Yt* (synthetic)"}
+  effect: {kind: variable, id: labour.unemployment_gap, transform: gap, definition: "Ut - Ut* (synthetic)"}
+  measure: slope
+  unit: pp_per_percent
+  sign: negative
+  method: time_series_regression
+  horizon: {kind: impact}
+  pdf_page: 1
+estimates:
+  - id: atlantis
+    point: -0.420
+    as_printed: "-0.420"
+    uncertainty: {se: 0.050, se_as_printed: "0.050", status: reported}
+    scope: {countries: [FRA], period: {from: "1990", to: "2020"}, frequency: annual, n_obs: 31, sample_note: "synthetic country Atlantis mapped to FRA for the test only"}
+    locator: "Table 1, row Atlantis"
+    quote: "Atlantis -0.420*** (0.050) 31"
+  - id: lemuria
+    point: -0.250
+    as_printed: "-0.250"
+    uncertainty: {se: 0.110, se_as_printed: "0.110", status: reported}
+    scope: {countries: [DEU], period: {from: "1990", to: "2020"}, frequency: annual, n_obs: 31}
+    locator: "Table 1, row Lemuria"
+    quote: "Lemuria -0.250** (0.110) 31"
+  - id: oil_impact
+    cause: {kind: variable, id: oil_price.global, transform: percent_change, definition: "synthetic oil price"}
+    effect: {kind: atlas_concept, id: imf.inflation_cpi_avg, transform: pp_change, definition: "synthetic inflation"}
+    measure: response
+    unit: percentage_points
+    shock: {size: 10, unit: percent}
+    sign: positive
+    point: 0.3
+    as_printed: "0.3"
+    uncertainty: {status: not_reported}
+    scope: {countries: [WLD]}
+    locator: "text, last paragraph"
+    quote: "raises synthetic inflation by 0.3 percentage point on impact"

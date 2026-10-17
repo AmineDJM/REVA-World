@@ -29,5 +29,5 @@ daily_totals_increase:
 notes: >-
   V4ECO also adds 5 OWID grapher requests (Living Planet Index chart, csv + chart metadata + 3 indicator metadata)
   to owid.compilations (limit 50, one run uses ~20) and 1-2 UN SDG pages (ER_RSK_LST) to un.sdg (limit 400): both
-  fit the existing limits. Wikidata specs (registry/kg/queries/nature/ecology) run under WDHARVEST's wikidata.wdqs /
+  fit the existing limits. Wikidata specs (registry/kg/queries/geography/ecology) run under WDHARVEST's wikidata.wdqs /
   wikidata.wbapi keys. Disk: raw archive ~35 MB per full refresh of all four sources.

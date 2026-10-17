@@ -61,6 +61,7 @@ export default function V3App() {
           <Route path="relation" element={<RelationPage />} />
           <Route path="causes" element={<CausesPage />} />
           <Route path="demander" element={<DemanderPage />} />
+          <Route path="previsions" element={<PrevisionsPage />} />
           <Route
             path="*"
             element={

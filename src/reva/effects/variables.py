@@ -121,8 +121,10 @@ def _atlas_labels() -> dict[str, dict[str, str]]:
     from reva.atlas.catalog import cached_catalog
 
     cat = cached_catalog()
-    return {cid: {"en": c.labels.get("en", cid), "fr": c.labels.get("fr", c.labels.get("en", cid))}
-            for cid, c in cat.concepts.items()}
+    return {
+        cid: {"en": c.labels.get("en", cid), "fr": c.labels.get("fr", c.labels.get("en", cid))}
+        for cid, c in cat.concepts.items()
+    }
 
 
 @lru_cache(maxsize=1)

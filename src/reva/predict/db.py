@@ -79,6 +79,12 @@ class DbEffectSource:
             # an exact id hit must also be the same kind; a curated variable hit is labelled by the reader
             if r.get("matched_via") or (cause.get("kind") == ref.kind and cause.get("id") == ref.id):
                 out.append(r)
+        if ref.kind == "variable":  # the reverse curated link: estimates stated on an atlas concept of the variable
+            for cid in (self.variable_info(ref) or {}).get("atlas_concepts") or []:
+                for r in self._reader.list_estimates(self.conn, **{**kw, "cause": str(cid), "include_variables": False}):
+                    r = dict(r)
+                    if (r.get("cause") or {}).get("kind") == "atlas_concept":
+                        out.append({**r, "matched_via": f"variable:{ref.id}"})
         self._seen += len(out)
         return out
 
@@ -118,7 +124,8 @@ class DbClaimSource:
         for i in ids:
             for side in (cg.causes, cg.effects):
                 try:
-                    res = side(self.conn, i, origin=self.origin, limit=limit_per_id)
+                    with self.conn.begin_nested():
+                        res = side(self.conn, i, origin=self.origin, limit=limit_per_id)
                 except Exception:
                     log.warning("causal claims for anchor %s unavailable", i)
                     continue
@@ -194,7 +201,8 @@ def atlas_baseline(
         from reva.atlas.query import query_for
         from reva.atlas.snapshot import resolve_snapshot
 
-        snap = resolve_snapshot(conn, store, origin="live")
+        with conn.begin_nested():
+            snap = resolve_snapshot(conn, store, origin="live")
         q = query_for(snap, store, build=False)
         return AtlasBaseline(q, cached_catalog(), effects, snap.sha256), None
     except Exception as e:
@@ -265,7 +273,8 @@ def io_arrays(conn: Connection, store: Any, release: Mapping[str, Any]) -> tuple
 
     req = InputRequirement(io.DATASET_INPUT, io.DATASET_CONCEPT, io.DATASET_SUBJECT, (), "dataset")
     try:
-        inputs = resolve_inputs(conn, dict(release), [req], store)
+        with conn.begin_nested():
+            inputs = resolve_inputs(conn, dict(release), [req], store)
     except Exception as e:
         return None, {}, f"IO table not resolvable: {type(e).__name__}: {str(e)[:200]}"
     d = inputs.dataset(io.DATASET_INPUT, io.DATASET_SUBJECT)
@@ -295,7 +304,8 @@ def retirement_runner(conn: Connection, store: Any, release: Mapping[str, Any]) 
             model = plugins.get(spec["model_key"], spec.get("model_version"))
             model.validate(spec)
             reqs = model.requirements(spec)
-            inputs = resolve_inputs(conn, dict(release), reqs, store)
+            with conn.begin_nested():  # a refused read never aborts the caller's transaction
+                inputs = resolve_inputs(conn, dict(release), reqs, store)
             compiled = model.compile(inputs, spec)
             own = getattr(compiled, "missing", None)
             missing = list(own) if own is not None else inputs.missing_problems()

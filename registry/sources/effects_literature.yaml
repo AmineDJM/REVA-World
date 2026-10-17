@@ -1,0 +1,22 @@
+# V5 (agent PRED-EFFECT): published effect estimates. Connector: src/reva/adapters/connectors/atlas_effects_lit.py
+# (atlas.effects_lit) -> kg.effect_estimate (migration 0019_effect_estimates). One PDF per curated publication
+# (registry/effects/literature/<entry>.yaml); numbers are quoted with locator and page, never redistributed in bulk.
+source_key: effects.literature
+title: Published effect estimates (curated transcriptions of open-access working / occasional papers)
+provider_url: https://www.nber.org/papers
+lineage_family: effects_literature
+rights:
+  licence: "Per publication, recorded on each estimate: NBER working papers (c) the authors (short quotations allowed with full credit and (c) notice); IMF working papers (c) IMF; ECB occasional papers (c) ECB, all rights reserved; CEPII working paper without licence statement. Not an open licence."
+  licence_url: null
+  attribution: "Each estimate carries its citation, locator and verbatim quote."
+  licence_evidence: "Copyright notices read in the archived PDFs (2026-10-17)."
+  open_licence: false
+  review_flag: >-
+    REVA stores single numbers with short verbatim quotes and citations (quotation); the PDFs are archived in the raw
+    store for provenance only and must not be redistributed. A maintainer should confirm this use before any public
+    release.
+metadata:
+  allowed_hosts: [www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu]
+  files: "document.url of each registry/effects/literature/<entry>.yaml"
+  authentication: none
+  cadence: static publications; re-fetch only when an entry is added or changed

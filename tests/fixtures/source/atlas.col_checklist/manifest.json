@@ -1,0 +1,119 @@
+[
+  {
+    "request_fingerprint": "2ca002a4f85c47a397f1abc40ae6368e01d95a5fedc23fbaca6f05e43f8ba983",
+    "url": "https://api.checklistbank.org/dataset/3LR",
+    "file": "col_release.json",
+    "sha256": "5e237e86f2c61ff2de9215bf755fda5bec0ce0c097e38ffdf7a6fc7a4c9b6129",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "67e8a373632e0da2a63313606eb54781cc4fcffe47c8af2ebd3f66f4decb2fce",
+    "url": "https://api.checklistbank.org/dataset/316595/import?limit=1",
+    "file": "col_import.json",
+    "sha256": "7a7eaca5f8957acac642c4ac47c6f18d7c87214e7a645edf8e66d503683bfaac",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "161a01ea4ae18be54aa0be9464d46bdf0d542391b925babaf8ab427ede6d22c7",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=domain&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "col_domain.json",
+    "sha256": "2e13e4544975e3a50e747d8e1d0b3d1c2867f5dafab62c186aa0d8987a861796",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "01357defa2bf7a80f852afaf4293dae606373ac0c477d04e9a1f14c856ca881e",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=realm&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "col_realm.json",
+    "sha256": "ed8582b455378f8db85a095c43a8b9ac697a2cfc565c4ba71ce117c689626746",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "08379b39da1000540e50b7ca3eb1245589d854e75c32b6c0ca9202c93196f912",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=kingdom&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "col_kingdom.json",
+    "sha256": "1bcd3d7e990d01abd9dee009b6b9c275adfd50cab62942856259b9a86cd488fc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "348bf8148cab0e5b8a58aa2050db0bae12752796c084e96504f0d941467204b1",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=phylum&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "col_phylum.json",
+    "sha256": "3ccb085a984f5bcf202f58d3322e3b615297fcb2e87ee010476ff9a329fc9aef",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "f4b877d4f7bca24c7d47d55710c134119c59b90ff608c8fe597ff1f3b944f5d9",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=class&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "col_class.json",
+    "sha256": "75afba2df4b32f8a9dad168de07279fdf959b70358a41d0a94f719ba226d1622",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "a2a7b04e8626e6cfe66a4942ce72fb7abba87b21c69b86e852e95430fd29d3e9",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=species&status=accepted&limit=0&facet=TAXON_ID&facetLimit=50000",
+    "file": "col_facet_all.json",
+    "sha256": "67399b181ddf7a90e359744d8573d1f1f5d47d530b0891860aa80a61c8eebccd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  },
+  {
+    "request_fingerprint": "b8896980495d7d10bf0ca150cc817b79d12fdef40e9a0ede46f8b54f92a3bb3f",
+    "url": "https://api.checklistbank.org/dataset/316595/nameusage/search?rank=species&status=accepted&limit=0&facet=TAXON_ID&facetLimit=50000&extinct=false",
+    "file": "col_facet_extant.json",
+    "sha256": "dc0a1182eb5be5a04de83a9068c732154f411328ce53791ffcaa4cbc4f0d1d05",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: Catalogue of Life latest release subset (Eukaryota/Bacteria; Riboviria; Animalia/Plantae; Chordata/Tracheophyta; Mammalia/Magnoliopsida); search pages total=len(result); facets reduced to these ids with their live counts"
+  }
+]

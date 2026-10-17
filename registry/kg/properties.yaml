@@ -2134,7 +2134,7 @@ properties:
     label_fr: "statut de conservation UICN"
     wikidata_datatype: wikibase-item
     requested_by: V4ECO
-    why: "IUCN conservation status (taxon -> status item, e.g. Panthera leo -> Vulnerable Q278113), as Wikidata copies it; spec registry/kg/queries/nature/ecology/iucn_status.yaml. Family context (V4ECO drop-in)."
+    why: "IUCN conservation status (taxon -> status item, e.g. Panthera leo -> Vulnerable Q278113), as Wikidata copies it; spec registry/kg/queries/geography/ecology/iucn_status.yaml. Family context (V4ECO drop-in)."
   - property: P627
     reva_predicate: iucn_taxon_id
     inverse: null
@@ -2167,7 +2167,7 @@ properties:
     label_fr: "hôte"
     wikidata_datatype: wikibase-item
     requested_by: V4ECO
-    why: "host (parasite / pathogen / symbiont taxon -> host taxon); spec nature/ecology/host.yaml. Family interacts_with."
+    why: "host (parasite / pathogen / symbiont taxon -> host taxon); spec geography/ecology/host.yaml. Family interacts_with."
   - property: P1278
     reva_predicate: legal_entity_identifier
     inverse: null

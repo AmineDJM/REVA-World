@@ -4,7 +4,7 @@
 - property: P141
   why: >-
     IUCN conservation status (taxon -> status item, e.g. Panthera leo -> Vulnerable Q278113), as Wikidata copies
-    it; spec registry/kg/queries/nature/ecology/iucn_status.yaml. Family context (V4ECO drop-in).
+    it; spec registry/kg/queries/geography/ecology/iucn_status.yaml. Family context (V4ECO drop-in).
   reva_predicate: iucn_conservation_status
   inverse: iucn_conservation_status_of
   kind: entity
@@ -28,7 +28,7 @@
   label_en: GBIF taxon ID
   label_fr: identifiant Global Biodiversity Information Facility
 - property: P2975
-  why: host (parasite / pathogen / symbiont taxon -> host taxon); spec nature/ecology/host.yaml. Family interacts_with.
+  why: host (parasite / pathogen / symbiont taxon -> host taxon); spec geography/ecology/host.yaml. Family interacts_with.
   reva_predicate: host_taxon
   inverse: host_of_taxon
   kind: entity

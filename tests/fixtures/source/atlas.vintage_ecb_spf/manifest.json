@@ -1,0 +1,17 @@
+[
+ {
+  "request_fingerprint": "877c7720ccb1c6670929f70e30c42d19457c4cd7ef560451e66a135fbc2d629d",
+  "url": "https://data-api.ecb.europa.eu/service/data/SPF/Q.U2.HICP+RGDP+UNEM.POINT..Q.AVG?format=csvdata",
+  "file": "d258c855627203e3.csv",
+  "sha256": "d258c855627203e3491f74ae528548455c2f462b903bb2df09ff509feff78e9b",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "ECB statistics reuse with source acknowledgement",
+  "live_sha256": "1b1c737515dc360d3fa2aaa37d56fa47486a553f0fc15fd48ccefea7d3da48ae",
+  "live_bytes": 564582,
+  "excerpt": "header + verbatim lines of survey rounds 1999-Q1 and 2008-Q1..2009-Q4"
+ }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "8106a0450168834ff315c0d249aa4d385eacbc251849d508751399731932bab3",
+    "url": "https://www.nber.org/system/files/reva-fixture/effects-synthetic-paper.txt",
+    "file": "8106a0450168834f.txt",
+    "sha256": "05dba7a3eebc0454efd93202b7a6f7f30627a066b80dc47d68a34bfb81c1bd2f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "CC0 (synthetic text written for the test)",
+    "note": "synthetic response, not a real publication"
+  }
+]

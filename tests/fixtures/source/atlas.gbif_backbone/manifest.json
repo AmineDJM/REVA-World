@@ -1,0 +1,145 @@
+[
+  {
+    "request_fingerprint": "fd47146d177db26a4d7f148f29b458f8e4bd8f357548338b56237f10a6565a35",
+    "url": "https://api.gbif.org/v1/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+    "file": "gbif_dataset.json",
+    "sha256": "188dc3026fb91f0ae0bc4b20170b52159ad6beba7ac37fd9e426ff54aee47ef3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "dacc6f2748f15ce19a2f495ca48eb11048b14b9b91021684ebaa8773460d8043",
+    "url": "https://api.checklistbank.org/dataset/53147",
+    "file": "clb_dataset.json",
+    "sha256": "3472d8229e73f07df2cef76d7a7221cb2bea43ef693968a88b3aa63f192ca6c1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "81890db93354365dc9a6fa8f2910249f055062753531900770010a45ce8212cf",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?rank=kingdom&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_kingdom.json",
+    "sha256": "13bf2c927468065855764a62c2375e86d46bcb8c1fdd6e2b162a4d92e0ded8d0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "9a7a46e953cf4427cc7ef14ad36e3b1cece1ca23cd6c7bb837b21daa80967168",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?rank=phylum&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_phylum.json",
+    "sha256": "5af9ed50c1702fb8060e60d8c3898e661a22aff3bf721107f7c0d6e5ed2a9d84",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "97aa231ce14768ecd60486211089b087e650ae2d4b6b49f85c4a59dfa5a86550",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?rank=class&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_class.json",
+    "sha256": "6e5372aff8b00f1423324a4a04087013250d827bd315eaac91bf375d4d46846b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "e3208774a63f823cc924d652e26a350c0eef341aa4cbbeda10949af210a4ac02",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?rank=order&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_order.json",
+    "sha256": "059bb0e014ce9fce07b8a4e408f16d91cd5783e0510cb65642b54b900ba42e19",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "d5d7099864761874dd405f61a7e9e2482246ac28bcd24b44593370ba96278e77",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?rank=family&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_family.json",
+    "sha256": "c0093a35554a3b439f011410e5c5ea7d7f35645b9eefc95875a7e56cc2eb134a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "3d948db799b585a11740d16b3331e008a6cb724800ac04362a32bee62aed5e7f",
+    "url": "https://api.checklistbank.org/dataset/53147/nameusage/search?TAXON_ID=9703&rank=species&status=accepted&sortBy=NAME&limit=1000&offset=0",
+    "file": "clb_species_of_9703.json",
+    "sha256": "d2de2bc5827079c748cc613d6bf866cfe87db02e276721dd3a7fc300560b763e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "badc7936392676c6d82837222e946d5fcd7ebac95ce3cdeed1255748636d9ba0",
+    "url": "https://api.gbif.org/v1/species/2436436",
+    "file": "gbif_species_2436436.json",
+    "sha256": "0b957b3dd108c3ea635d5398d2eb7b0ebb7d42a4104e85aeaeabe057140a7044",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "d609cc6c3531d59125ae1f0bb12f242bf20d355b0b1a777b8c283de2b28368e1",
+    "url": "https://api.gbif.org/v1/species/5290052",
+    "file": "gbif_species_5290052.json",
+    "sha256": "a94360487595e47ff07ddc4d74af06ec585495b481fa3349d1a66c397a9be68c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  },
+  {
+    "request_fingerprint": "9d40b1768ac35b54237238f9a24499ca5c50e141594fbcd01a7f11b8f3f72183",
+    "url": "https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&rank=SPECIES&status=ACCEPTED&limit=0&facet=higherTaxonKey&facetLimit=50000",
+    "file": "gbif_facet_root.json",
+    "sha256": "8c1dc9a91bdf86d4cc81ebfeba2883856cd688b6c5ce5e2c3b0637994de3e0cd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: GBIF Backbone Taxonomy subset (kingdoms; Chordata/Tracheophyta; Mammalia/Liliopsida; Carnivora/Primates/Poales; Felidae/Hominidae/Poaceae; 6 Felidae species; Homo sapiens, Zea mays); search pages rewritten total=len(result), last=true; root facet reduced to the loaded keys with their live counts"
+  }
+]

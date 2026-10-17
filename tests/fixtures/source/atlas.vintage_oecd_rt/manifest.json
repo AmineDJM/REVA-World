@@ -1,0 +1,17 @@
+[
+ {
+  "request_fingerprint": "709d7f64e95ba72cd2458ed2f5ef3517fe934d9d9c8a00b84967f42a2f75fd05",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES_REVISIONS@DF_STES_REVISIONS,4.0/USA+JPN+DEU+FRA+GBR+ITA+CAN.Q+M.B1GQ_Q+CP+UNEMP...200802+200805+200808+200811?startPeriod=2005",
+  "file": "0f5974175388c550.csv",
+  "sha256": "0f5974175388c5502bcc1d909a3e49ae9dd2f336b8ed5af2fc96bbe67084103b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "OECD Terms and Conditions (CC BY 4.0 default)",
+  "live_sha256": "e664ef6a79b0b56f0cd0de9076e456a1629cec4a8bb155dce86bf9c8bc24dc49",
+  "live_bytes": 275617,
+  "excerpt": "header + verbatim lines for FRA and USA, periods 2007 on"
+ }
+]

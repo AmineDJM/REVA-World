@@ -415,8 +415,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
 
     if run.wants(DS_RTDSM):
         rows, stats, raws = Rows(), {}, []
-        _, doc_sha = await get(RTDSM_DOC_URL, "rtdsm:doc", ("application/pdf",))
-        raws.append(doc_sha)
+        if not fixture:  # the documentation PDF is archived as the evidence of the availability rule
+            _, doc_sha = await get(RTDSM_DOC_URL, "rtdsm:doc", ("application/pdf",))
+            raws.append(doc_sha)
         for file in FIXTURE_RTDSM if fixture else tuple(RTDSM_FILES):
             body, sha = await get(f"{BASE}/real-time-data/data-files/xlsx/{file}", f"rtdsm:{file}", XLSX_MEDIA)
             raws.append(sha)
