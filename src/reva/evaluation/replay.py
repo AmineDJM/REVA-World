@@ -17,6 +17,12 @@
 Strict modes never fall back to the retrospective mode: there is no code path
 that downgrades, and the retrospective function must be called explicitly.
 No LLM is used in replay.
+
+Provider vintages (V5, PRED-VINTAGE): :func:`vintage_replay` (from
+:mod:`reva.evaluation.vintages`) is the ``available_then_reconstruction`` of data
+*as published at the time* (IMF WEO, Philadelphia Fed RTDSM / SPF, ECB SPF, OECD
+MEI real-time); :meth:`CutoffRepository.vintages` gives the same selection to
+backtests.
 """
 
 from __future__ import annotations
@@ -47,6 +53,13 @@ OPERATIONAL = "operational_as_known"
 AVAILABLE_THEN = "available_then_reconstruction"
 RETROSPECTIVE = RETROSPECTIVE_LABEL
 REPLAY_MODES = (OPERATIONAL, AVAILABLE_THEN, RETROSPECTIVE)
+
+
+def vintage_replay(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    """Re-export of :func:`reva.evaluation.vintages.vintage_replay` (available_then on provider vintages)."""
+    from reva.evaluation.vintages import vintage_replay as _vr
+
+    return _vr(*args, **kwargs)
 
 HONESTY = {
     OPERATIONAL: (
