@@ -1,0 +1,40 @@
+# V6 (agent V6CONFLICT): UCDP Georeferenced Event Dataset 26.1 + UCDP Candidate 2026 + Non-State / One-Sided 26.1.
+# Connector: src/reva/adapters/connectors/atlas_ucdp_ged.py -> atlas tables ucdp_ged.* (events, country_month,
+# adm1_month, priogrid_month and their cand_* Candidate counterparts) + KG statements (source_key ucdp.ged).
+# Report: docs/dev/v6_conflict.md.
+source_key: ucdp.ged
+title: UCDP Georeferenced Event Dataset (GED) 26.1, UCDP Candidate events 2026, UCDP Non-State and One-Sided Violence 26.1
+provider_url: https://ucdp.uu.se/downloads/
+lineage_family: ucdp
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Uppsala Conflict Data Program (UCDP), Department of Peace and Conflict Research, Uppsala University. Sundberg &
+    Melander (2013), Journal of Peace Research 50(4) (GED); Hegre, Croicu, Eck & Hogbladh (2020), Journal of Peace
+    Research 57(3) (Candidate); Sundberg, Eck & Kreutz (2012), JPR 49(2) (non-state); Eck & Hultman (2007), JPR 44(2)
+    (one-sided).
+  licence_evidence: >-
+    ucdp.uu.se/downloads (read 2026-10-17): "All datasets are free of charge and licensed under CC BY 4.0 - you are
+    free to use and redistribute them provided you cite the relevant publications listed with each dataset."
+metadata:
+  allowed_hosts: [ucdp.uu.se, naciscdn.org, cran.r-project.org]
+  files:
+    - https://ucdp.uu.se/downloads/ged/ged261-csv.zip
+    - https://ucdp.uu.se/downloads/ged/ged261.pdf
+    - https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_*.csv (discovered on the downloads page)
+    - https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf
+    - https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-csv.zip
+    - https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-csv.zip
+    - https://ucdp.uu.se/downloads/actor/ucdp-actor-261-csv.zip
+    - https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip (public domain; ADM1 polygons)
+  access_note: >-
+    The UCDP API (ucdpapi.pcr.uu.se) needs a token (x-ucdp-access-token); the official downloads need none.
+  candidate_note: >-
+    UCDP Candidate is preliminary: "Not all events in UCDP Candidate will make it into the final UCDP GED and new
+    events will be added" (Candidate codebook 1.5). Kept in separate cand_* tables, flagged candidate with code_status.
+  adm1_note: >-
+    ADM1 = REVA point-in-polygon of GED coordinates (where_prec 1-4) against Natural Earth admin-1 polygons, by the
+    polygon's published ISO 3166-2 code. GED's adm_1 names are never used to place events.
+  authentication: none
+  cadence: GED annual (spring); Candidate monthly (around the 20th) and quarterly

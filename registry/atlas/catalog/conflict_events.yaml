@@ -1,0 +1,84 @@
+# Organised violence by month (agent V6CONFLICT). Provider-declared concepts (not human-reviewed), all COMPUTED by
+# REVA from the UCDP Georeferenced Event Dataset 26.1 (atlas ucdp_ged.country_month; CC BY 4.0). ADM1-month,
+# PRIO-GRID-month, event-level and preliminary Candidate (2026) tables are listed in docs/dev/v6_conflict.md.
+domain: conflict_events
+labels:
+  fr: Violence organisée par mois (événements géoréférencés UCDP GED)
+  en: Organised violence by month (UCDP GED georeferenced events)
+maintainer: V6CONFLICT
+concepts:
+- id: conflict_events.deaths_month_all
+  labels:
+    fr: Morts dans la violence organisée, par mois (UCDP GED, estimation centrale, calculé)
+    en: Deaths in organised violence per month (UCDP GED best estimate, computed)
+  definition: 'COMPUTED by REVA from UCDP GED 26.1: sum of the best estimate ("The best (most likely) estimate of total
+    fatalities resulting from an event") over the GED events located in the country (GED country_id), by calendar month
+    of date_start; state-based, non-state and one-sided violence together. 1989-01 to 2025-12. Only months with at least
+    one GED event are listed: an absent month means GED records no event (GED covers the dyads that crossed 25
+    battle-related deaths in at least one year).'
+  unit: deaths
+  domain: conflict_events
+  subdomain: organised_violence
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp_ged.country_month.deaths_best|tov=all
+  provider_declared: true
+  notes: Low/high bounds deaths_low|tov=all / deaths_high|tov=all; events spanning months are counted in the start month (flags.spanning).
+- id: conflict_events.deaths_month_state_based
+  labels:
+    fr: Morts dans les conflits étatiques, par mois (UCDP GED, calculé)
+    en: Deaths in state-based conflict per month (UCDP GED, computed)
+  definition: 'COMPUTED by REVA from UCDP GED 26.1: sum of best estimates of the type_of_violence 1 (state-based conflict)
+    events located in the country, by calendar month of date_start, 1989-2025.'
+  unit: deaths
+  domain: conflict_events
+  subdomain: organised_violence
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp_ged.country_month.deaths_best|tov=sb
+  provider_declared: true
+- id: conflict_events.deaths_month_non_state
+  labels:
+    fr: Morts dans les conflits non étatiques, par mois (UCDP GED, calculé)
+    en: Deaths in non-state conflict per month (UCDP GED, computed)
+  definition: 'COMPUTED by REVA from UCDP GED 26.1: sum of best estimates of the type_of_violence 2 (non-state conflict)
+    events located in the country, by calendar month of date_start, 1989-2025.'
+  unit: deaths
+  domain: conflict_events
+  subdomain: organised_violence
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp_ged.country_month.deaths_best|tov=ns
+  provider_declared: true
+- id: conflict_events.deaths_month_one_sided
+  labels:
+    fr: Victimes de la violence unilatérale contre les civils, par mois (UCDP GED, calculé)
+    en: Deaths from one-sided violence against civilians per month (UCDP GED, computed)
+  definition: 'COMPUTED by REVA from UCDP GED 26.1: sum of best estimates of the type_of_violence 3 (one-sided violence)
+    events located in the country, by calendar month of date_start, 1989-2025.'
+  unit: deaths
+  domain: conflict_events
+  subdomain: organised_violence
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp_ged.country_month.deaths_best|tov=os
+  provider_declared: true
+- id: conflict_events.events_month_all
+  labels:
+    fr: Événements de violence organisée, par mois (UCDP GED, calculé)
+    en: Events of organised violence per month (UCDP GED, computed)
+  definition: 'COMPUTED by REVA from UCDP GED 26.1: number of GED events ("an incident where armed force was used by an
+    organised actor against another organized actor, or against civilians, resulting in at least 1 direct death at a
+    specific location and a specific date") located in the country, by calendar month of date_start, 1989-2025.'
+  unit: count
+  domain: conflict_events
+  subdomain: organised_violence
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ucdp_ged.country_month.events|tov=all
+  provider_declared: true

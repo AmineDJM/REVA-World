@@ -21,7 +21,16 @@ from sqlalchemy import Connection, text
 
 from reva.kernel.errors import ValidationProblem
 from reva.kg import query as kq
-from reva.kg.families import FamilyError, FamilyRegistry, load_registry, measured_by_target, share_of
+from reva.kg.families import (
+    CONCORDANCE_FAMILY,
+    IDENTITY_FAMILY,
+    FamilyError,
+    FamilyRegistry,
+    concordance_flags,
+    load_registry,
+    measured_by_target,
+    share_of,
+)
 from reva.kg.model import CAUSAL_PIDS
 
 MAX_PER_FAMILY = 200
@@ -165,6 +174,8 @@ def entity_families(
                 "mapping": {"origin": m.origin, "agent": m.agent, "direction": m.direction},
                 "share": share_of(m, r.get("qualifiers")) if m.share_qualifier else None,
                 "atlas": _atlas_hint(ef.family, other, r.get("qualifiers"), kinds.get(other)),
+                "identity": ef.family == IDENTITY_FAMILY,
+                "flags": concordance_flags(r.get("qualifiers")) if ef.family == CONCORDANCE_FAMILY else {},
                 "rights": _rights(r, rights),
                 "statement": st,
             }

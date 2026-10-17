@@ -218,7 +218,7 @@ def build_kg(raw: ic.Fetched, idx: vc.Adm1Index | None, qids: dict[str, str]) ->
         q0 = {"wpi_port_number": num}
 
         def st(pid: str, *, obj: str | None = None, value: dict[str, Any] | None = None,
-               quals: dict[str, Any] | None = None, refs: list[dict[str, Any]] = ref, qid: str = qid) -> None:  # fmt: skip
+               quals: dict[str, Any] | None = None, refs: list[dict[str, Any]] = ref, qid: str = qid, q0: dict[str, Any] = q0) -> None:  # fmt: skip
             kb.st(qid, pid, raw=raw.sha256, refs=refs, obj=obj, value=value, quals={**q0, **(quals or {})})
 
         c = r["countryCode"].strip()

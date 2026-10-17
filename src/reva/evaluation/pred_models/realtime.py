@@ -482,7 +482,7 @@ def g7_cases(
                         if isinstance(bv, Abstain)
                         else (bv[step - 1][G7_BVAR_ORDER.index(tv)] if 1 <= step <= 8 else Abstain("beyond horizon"))
                     )
-                    if tv == "real_gdp_growth" and tq == last + 1:
+                    if tv == "real_gdp_growth" and tq <= last + 2:
                         c.preds[DFM] = _run_dfm(dfm_rt, tq)
                         if dfm_x is not None:
                             c.preds[DFM + "_x"] = _run_dfm(dfm_x, tq)

@@ -235,14 +235,31 @@ def top_authors(subjects: Sequence[Subject], per_subject: int) -> list[str]:
 
 
 # ----------------------------------------------------------------------------- atlas rows
-def _row(indicator: str, period: tuple[date, date], n: int, raw_sha256: str, selector: Mapping[str, Any],
-         flags: Mapping[str, Any]) -> dict[str, Any]:  # fmt: skip
+def _row(
+    indicator: str,
+    period: tuple[date, date],
+    n: int,
+    raw_sha256: str,
+    selector: Mapping[str, Any],
+    flags: Mapping[str, Any],
+) -> dict[str, Any]:
     return {
-        "source": ATLAS_SOURCE, "dataset": DATASET, "indicator": indicator, "concept_id": None, "iso3": None,
-        "provider_geo": "world", "entity_qid": None, "period_start": period[0], "period_end": period[1],
-        "value": str(n), "value_text": None, "unit": "count", "flags": canon(flags), "raw_sha256": raw_sha256,
+        "source": ATLAS_SOURCE,
+        "dataset": DATASET,
+        "indicator": indicator,
+        "concept_id": None,
+        "iso3": None,
+        "provider_geo": "world",
+        "entity_qid": None,
+        "period_start": period[0],
+        "period_end": period[1],
+        "value": str(n),
+        "value_text": None,
+        "unit": "count",
+        "flags": canon(flags),
+        "raw_sha256": raw_sha256,
         "selector": canon(selector),
-    }  # fmt: skip
+    }
 
 
 def atlas_rows(subjects: Sequence[tuple[Subject, str, datetime]]) -> list[dict[str, Any]]:
@@ -251,43 +268,109 @@ def atlas_rows(subjects: Sequence[tuple[Subject, str, datetime]]) -> list[dict[s
     for s, sha, at in subjects:
         day = at.astimezone(UTC).date()
         snap = (day, day + timedelta(days=1))
-        base = {"aggregation": "count_by_provider", "computed_by": "Open Library subject engine (Solr work index)",
-                "live_index": True, "retrieved_at": at.isoformat(), "subject_name": s.name,
-                "subject_type": s.subject_type, "geo_scope": "Open Library catalogue (not a country)",
-                **{k: RIGHTS[k] for k in ("licence", "licence_review", "attribution")}}  # fmt: skip
+        base = {
+            "aggregation": "count_by_provider",
+            "computed_by": "Open Library subject engine (Solr work index)",
+            "live_index": True,
+            "retrieved_at": at.isoformat(),
+            "subject_name": s.name,
+            "subject_type": s.subject_type,
+            "geo_scope": "Open Library catalogue (not a country)",
+            **{k: RIGHTS[k] for k in ("licence", "licence_review", "attribution")},
+        }
         sel = {"subject": s.key, "url": subject_url(s.key)}
         rows.append(_row(f"ol_works|subject={s.key}", snap, s.work_count, sha, {**sel, "field": "work_count"}, base))
         if s.ebook_count is not None:
-            rows.append(_row(f"ol_ebooks|subject={s.key}", snap, s.ebook_count, sha,
-                             {**sel, "field": "ebook_count (facet has_fulltext=true)"}, base))  # fmt: skip
+            rows.append(
+                _row(
+                    f"ol_ebooks|subject={s.key}",
+                    snap,
+                    s.ebook_count,
+                    sha,
+                    {**sel, "field": "ebook_count (facet has_fulltext=true)"},
+                    base,
+                )
+            )
         for code, n in s.languages:
-            rows.append(_row(f"ol_works_with_edition_language|subject={s.key}|language={code}", snap, n, sha,
-                             {**sel, "field": "languages", "code": code},
-                             {**base, "code_scheme": "MARC 21 language code",
-                              "facet_top_25_only": len(s.languages) >= LANGUAGE_FACET_LIMIT}))  # fmt: skip
+            rows.append(
+                _row(
+                    f"ol_works_with_edition_language|subject={s.key}|language={code}",
+                    snap,
+                    n,
+                    sha,
+                    {**sel, "field": "languages", "code": code},
+                    {
+                        **base,
+                        "code_scheme": "MARC 21 language code",
+                        "facet_top_25_only": len(s.languages) >= LANGUAGE_FACET_LIMIT,
+                    },
+                )
+            )
         for year, n in s.publishing_history:
-            rows.append(_row(f"ol_works_with_edition_in_year|subject={s.key}", (date(year, 1, 1), date(year + 1, 1, 1)),
-                             n, sha, {**sel, "field": "publishing_history", "year": year},
-                             {**base, "counted_per_edition_year": True}))  # fmt: skip
+            rows.append(
+                _row(
+                    f"ol_works_with_edition_in_year|subject={s.key}",
+                    (date(year, 1, 1), date(year + 1, 1, 1)),
+                    n,
+                    sha,
+                    {**sel, "field": "publishing_history", "year": year},
+                    {**base, "counted_per_edition_year": True},
+                )
+            )
     return rows
 
 
 # ----------------------------------------------------------------------------- KG
 PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]] = {
-    "openlibrary:has_works_in_subject": ("item", "has_works_in_subject", "has works in subject (Open Library)",
-                                         "a des œuvres dans le sujet (Open Library)", "subject_of_works_by",
-                                         "subject of works by (Open Library)"),
-    "openlibrary:wikidata_id": ("external_id", "wikidata_id_per_openlibrary", "Wikidata ID (as Open Library gives it)",
-                                "identifiant Wikidata (selon Open Library)", None, None),
-    "openlibrary:viaf_id": ("external_id", "viaf_id_per_openlibrary", "VIAF ID (as Open Library gives it)",
-                            "identifiant VIAF (selon Open Library)", None, None),
-    "openlibrary:isni": ("external_id", "isni_per_openlibrary", "ISNI (as Open Library gives it)",
-                         "ISNI (selon Open Library)", None, None),
-    "openlibrary:birth_date": ("string", "birth_date_text", "birth date (Open Library text)",
-                               "date de naissance (texte Open Library)", None, None),
-    "openlibrary:death_date": ("string", "death_date_text", "death date (Open Library text)",
-                               "date de décès (texte Open Library)", None, None),
-}  # fmt: skip
+    "openlibrary:has_works_in_subject": (
+        "item",
+        "has_works_in_subject",
+        "has works in subject (Open Library)",
+        "a des œuvres dans le sujet (Open Library)",
+        "subject_of_works_by",
+        "subject of works by (Open Library)",
+    ),
+    "openlibrary:wikidata_id": (
+        "external_id",
+        "wikidata_id_per_openlibrary",
+        "Wikidata ID (as Open Library gives it)",
+        "identifiant Wikidata (selon Open Library)",
+        None,
+        None,
+    ),
+    "openlibrary:viaf_id": (
+        "external_id",
+        "viaf_id_per_openlibrary",
+        "VIAF ID (as Open Library gives it)",
+        "identifiant VIAF (selon Open Library)",
+        None,
+        None,
+    ),
+    "openlibrary:isni": (
+        "external_id",
+        "isni_per_openlibrary",
+        "ISNI (as Open Library gives it)",
+        "ISNI (selon Open Library)",
+        None,
+        None,
+    ),
+    "openlibrary:birth_date": (
+        "string",
+        "birth_date_text",
+        "birth date (Open Library text)",
+        "date de naissance (texte Open Library)",
+        None,
+        None,
+    ),
+    "openlibrary:death_date": (
+        "string",
+        "death_date_text",
+        "death date (Open Library text)",
+        "date de décès (texte Open Library)",
+        None,
+        None,
+    ),
+}
 
 
 def subject_qid(key: str) -> str:
@@ -303,40 +386,69 @@ def kg_records(
     sts: list[Any] = []
     stats = {"subjects": 0, "authors": 0, "author_redirects": 0, "wikidata_ids": 0}
     for s, sha, at in subjects:
-        ents.append(KgEntity(qid=subject_qid(s.key), kind="book_subject", labels={"en": s.name},
-                             descriptions={"en": f"Open Library subject ({s.subject_type}) /subjects/{s.key}"}))  # fmt: skip
+        ents.append(
+            KgEntity(
+                qid=subject_qid(s.key),
+                kind="book_subject",
+                labels={"en": s.name},
+                descriptions={"en": f"Open Library subject ({s.subject_type}) /subjects/{s.key}"},
+            )
+        )
         stats["subjects"] += 1
         day = at.astimezone(UTC).date().isoformat()
         for olid, _name, n in s.authors[:per_subject]:
             got = authors.get(olid)
             if got is None or got[0].redirect_to is not None:
                 continue
-            sts.append(KgStatement(
-                subject_qid=f"openlibrary:{olid}", property_pid="openlibrary:has_works_in_subject",
-                object_qid=subject_qid(s.key), point_in_time=KgTime(f"+{day}T00:00:00Z", 11),
-                qualifiers={"works_in_subject": n, "snapshot_date": day, "live_index": True,
-                            "selection": f"top {per_subject} authors of the subject's author facet"},
-                source_key=SOURCE_KEY, raw_sha256=sha,
-                references=({"raw_sha256": sha, "selector": {"subject": s.key, "field": "authors", "key": olid}},),
-            ))  # fmt: skip
+            sts.append(
+                KgStatement(
+                    subject_qid=f"openlibrary:{olid}",
+                    property_pid="openlibrary:has_works_in_subject",
+                    object_qid=subject_qid(s.key),
+                    point_in_time=KgTime(f"+{day}T00:00:00Z", 11),
+                    qualifiers={
+                        "works_in_subject": n,
+                        "snapshot_date": day,
+                        "live_index": True,
+                        "selection": f"top {per_subject} authors of the subject's author facet",
+                    },
+                    source_key=SOURCE_KEY,
+                    raw_sha256=sha,
+                    references=({"raw_sha256": sha, "selector": {"subject": s.key, "field": "authors", "key": olid}},),
+                )
+            )
     for olid, (a, sha) in authors.items():
         if a.redirect_to is not None:
             stats["author_redirects"] += 1
             continue
-        ents.append(KgEntity(qid=f"openlibrary:{olid}", kind="author", labels={"en": a.name},
-                             descriptions={"en": f"Open Library author record /authors/{olid} (persons and "
-                                                 "corporate authors)"},
-                             source_revision=a.revision))  # fmt: skip
+        ents.append(
+            KgEntity(
+                qid=f"openlibrary:{olid}",
+                kind="author",
+                labels={"en": a.name},
+                descriptions={"en": f"Open Library author record /authors/{olid} (persons and corporate authors)"},
+                source_revision=a.revision,
+            )
+        )
         stats["authors"] += 1
-        common: dict[str, Any] = {"source_key": SOURCE_KEY, "raw_sha256": sha,
-                                  "references": ({"raw_sha256": sha, "selector": {"author": olid}},)}  # fmt: skip
-        for pid, v, typ in (("openlibrary:wikidata_id", a.wikidata, "external_id"),
-                            ("openlibrary:viaf_id", a.viaf, "external_id"), ("openlibrary:isni", a.isni, "external_id"),
-                            ("openlibrary:birth_date", a.birth_date, "string"),
-                            ("openlibrary:death_date", a.death_date, "string")):  # fmt: skip
+        common: dict[str, Any] = {
+            "source_key": SOURCE_KEY,
+            "raw_sha256": sha,
+            "references": ({"raw_sha256": sha, "selector": {"author": olid}},),
+        }
+        for pid, v, typ in (
+            ("openlibrary:wikidata_id", a.wikidata, "external_id"),
+            ("openlibrary:viaf_id", a.viaf, "external_id"),
+            ("openlibrary:isni", a.isni, "external_id"),
+            ("openlibrary:birth_date", a.birth_date, "string"),
+            ("openlibrary:death_date", a.death_date, "string"),
+        ):
             if v:
-                sts.append(KgStatement(subject_qid=f"openlibrary:{olid}", property_pid=pid,
-                                       value={"type": typ, "value": v}, **common))  # fmt: skip
+                sts.append(
+                    KgStatement(
+                        subject_qid=f"openlibrary:{olid}", property_pid=pid, value={"type": typ, "value": v}, **common
+                    )
+                )
         if a.wikidata:
             stats["wikidata_ids"] += 1
     return ents, sts, stats
@@ -362,8 +474,11 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(sys.modules[__name__]),
-        field_mappings={"selection": "subjects linked from openlibrary.org/subjects; top authors per subject facet",
-                        "authors_per_subject": AUTHORS_PER_SUBJECT, "kg_source_key": SOURCE_KEY},  # fmt: skip
+        field_mappings={
+            "selection": "subjects linked from openlibrary.org/subjects; top authors per subject facet",
+            "authors_per_subject": AUTHORS_PER_SUBJECT,
+            "kg_source_key": SOURCE_KEY,
+        },
         notes="~420 small GETs at 1/s (~3 MB). Options: subjects=a,b (restrict), authors_per_subject=N (0-25).",
     )
 
@@ -410,11 +525,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     rows = atlas_rows(subjects)
     shas = sorted({page_sha, *(sha for _, sha, _ in subjects)})
     reg = run.register(
-        dataset=DATASET, frame=atlas_frame(rows), raw_sha256s=shas, rights=dict(RIGHTS),
+        dataset=DATASET,
+        frame=atlas_frame(rows),
+        raw_sha256s=shas,
+        rights=dict(RIGHTS),
         coverage_note=f"Open Library subjects linked from openlibrary.org/subjects ({len(subjects)} subjects): works, "
         "ebooks, works per edition language (top 25) and per edition year; provider_geo 'world' (the catalogue); "
         "licence: no rights asserted by the Internet Archive, review required",
-    )  # fmt: skip
+    )
     out: dict[str, Any] = {"subjects": len(subjects), "authors_fetched": len(authors), "atlas": trim_registration(reg)}
     ents, sts, stats = kg_records(subjects, authors, per)
     out["kg_records"] = stats
@@ -425,17 +543,36 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
 
     register_properties(
         run.engine,
-        [KgProperty(pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv,
-                    inverse_label_en=ile) for p, (k, rp, le, lf, inv, ile) in PROPERTIES.items()],
-    )  # fmt: skip
+        [
+            KgProperty(
+                pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv, inverse_label_en=ile
+            )
+            for p, (k, rp, le, lf, inv, ile) in PROPERTIES.items()
+        ],
+    )
     kg_shas = sorted({*shas, *(sha for _, sha in authors.values())})
-    out["kg"] = kg_load(run.engine, run.store, entities=ents, statements=sts, raw_sha256s=kg_shas,
-                        retrieved_at=max((at for _, _, at in subjects), default=datetime.now(UTC)), origin=run.origin)  # fmt: skip
+    out["kg"] = kg_load(
+        run.engine,
+        run.store,
+        entities=ents,
+        statements=sts,
+        raw_sha256s=kg_shas,
+        retrieved_at=max((at for _, _, at in subjects), default=datetime.now(UTC)),
+        origin=run.origin,
+    )
     return out
 
 
-def kg_load(engine: Any, store: Any, *, entities: Sequence[Any], statements: Sequence[Any],
-            raw_sha256s: Sequence[str], retrieved_at: datetime, origin: str) -> dict[str, Any]:  # fmt: skip
+def kg_load(
+    engine: Any,
+    store: Any,
+    *,
+    entities: Sequence[Any],
+    statements: Sequence[Any],
+    raw_sha256s: Sequence[str],
+    retrieved_at: datetime,
+    origin: str,
+) -> dict[str, Any]:
     """``load_batch`` in bounded batches (entities first); returns summed counters and rejection reasons."""
     from collections import Counter
 
@@ -443,15 +580,33 @@ def kg_load(engine: Any, store: Any, *, entities: Sequence[Any], statements: Seq
 
     totals: Counter[str] = Counter()
     rejected: Counter[str] = Counter()
-    batches = [(list(entities[i : i + MAX_ENTITIES_PER_BATCH]), []) for i in range(0, len(entities), MAX_ENTITIES_PER_BATCH)]
-    batches += [([], list(statements[i : i + MAX_STATEMENTS_PER_BATCH]))
-                for i in range(0, len(statements), MAX_STATEMENTS_PER_BATCH)]  # fmt: skip
+    batches: list[tuple[list[Any], list[Any]]] = [
+        (list(entities[i : i + MAX_ENTITIES_PER_BATCH]), []) for i in range(0, len(entities), MAX_ENTITIES_PER_BATCH)
+    ]
+    batches += [
+        ([], list(statements[i : i + MAX_STATEMENTS_PER_BATCH]))
+        for i in range(0, len(statements), MAX_STATEMENTS_PER_BATCH)
+    ]
     for ents, sts in batches:
         used = sorted({s.raw_sha256 for s in sts if s.raw_sha256} or set(raw_sha256s))
-        rep = load_batch(engine, store, entities=ents, statements=sts, source_key=SOURCE_KEY, raw_sha256s=used,
-                         retrieved_at=retrieved_at, origin=origin)  # fmt: skip
-        for k in ("entities_inserted", "entities_unchanged", "statements_inserted", "statements_unchanged",
-                  "statements_new_revision", "statements_conflicting"):  # fmt: skip
+        rep = load_batch(
+            engine,
+            store,
+            entities=ents,
+            statements=sts,
+            source_key=SOURCE_KEY,
+            raw_sha256s=used,
+            retrieved_at=retrieved_at,
+            origin=origin,
+        )
+        for k in (
+            "entities_inserted",
+            "entities_unchanged",
+            "statements_inserted",
+            "statements_unchanged",
+            "statements_new_revision",
+            "statements_conflicting",
+        ):
             totals[k] += getattr(rep, k)
         rejected.update(rep.rejected_counts)
     return {**totals, "rejected": dict(rejected)}

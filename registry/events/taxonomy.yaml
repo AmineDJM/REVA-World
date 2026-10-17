@@ -342,6 +342,25 @@ types:
     parent: armed_conflict
     wikidata_classes: []
     roles: [belligerent, supporting_party]
+  - id: non_state_conflict
+    label_en: non-state conflict (UCDP coding)
+    label_fr: conflit non étatique (codage UCDP)
+    parent: armed_conflict
+    wikidata_classes: []
+    roles: [belligerent, supporting_party]
+    description: >-
+      UCDP: "the use of armed force between two organized armed groups, neither of which is the government of a
+      state, which results in at least 25 battle-related deaths in a year" (V6CONFLICT, ucdp:nonstate:<id>).
+  - id: one_sided_violence
+    label_en: one-sided violence against civilians (UCDP coding)
+    label_fr: violence unilatérale contre des civils (codage UCDP)
+    parent: event
+    wikidata_classes: []
+    roles: [perpetrator, victim]
+    description: >-
+      UCDP: "the use of armed force by the government of a state or by a formally organized group against civilians
+      which results in at least 25 deaths. Extrajudicial killings in custody are excluded." (V6CONFLICT,
+      ucdp:onesided:<id>, one record per perpetrator and its active years).
   - id: resistance_campaign
     label_en: resistance campaign (NAVCO)
     label_fr: campagne de résistance (NAVCO)
@@ -601,6 +620,7 @@ properties:
   - {pid: P276, family: place, role: location}
   - {pid: P17, family: place, role: country}
   - {pid: P131, family: place, role: admin_area}
+  - {pid: "ucdpged:events_in_adm1", family: place, role: admin_area, note: "V6CONFLICT: first-level subdivision where UCDP GED events of the conflict are located (REVA point in polygon; events, deaths, years in qualifiers)"}
   - {pid: "ucdp:location", family: place, role: country, note: "UCDP location: government(s) whose territory is disputed"}
   - {pid: "unpk:mission_country", family: place, role: country}
   - {pid: "unpk:hq_location", family: place, role: location}
@@ -624,6 +644,7 @@ properties:
   - {pid: "ucdp:primary_party", family: participant, role: belligerent}
   - {pid: "ucdp:secondary_party", family: participant, role: supporting_party}
   - {pid: "ucdp:nonstate_side", family: participant, role: belligerent}
+  - {pid: "ucdpnsos:perpetrator", family: participant, role: perpetrator, note: "UCDP One-Sided Violence: the government or formally organised group coded as killing civilians"}
   - {pid: "unpk:contributed_personnel_to", family: participant, role: contributor, direction: in}
   - {pid: "ties:sender", family: participant, role: sender}
   - {pid: "ties:target", family: participant, role: target}
@@ -660,6 +681,18 @@ dataset_kinds:
                      internationalized intrastate: intrastate_armed_conflict, extrasystemic: extrasystemic_armed_conflict}
     coded_properties: ["ucdp:conflict_type", "ucdp:incompatibility", "ucdp:territory_name", "ucdp:intensity_level"]
     note: UCDP codes a conflict-year when ≥ 25 battle-related deaths occur; types per the UCDP/PRIO codebook.
+  - id_prefix: "ucdp:nonstate:"
+    source_key: ucdp.ged
+    type: non_state_conflict
+    label_en: UCDP non-state conflict
+    coded_properties: ["ucdpnsos:org_level"]
+    note: V6CONFLICT (docs/dev/v6_conflict.md); UCDP Non-State Conflict Dataset 26.1, conflict-level records (GED events stay in the atlas).
+  - id_prefix: "ucdp:onesided:"
+    source_key: ucdp.ged
+    type: one_sided_violence
+    label_en: UCDP one-sided violence
+    coded_properties: []
+    note: V6CONFLICT; UCDP One-Sided Violence Dataset 26.1, one record per perpetrator (UCDP conflict id), GED events stay in the atlas.
   - id_prefix: "cow:war:"
     source_key: cow.data
     type: war

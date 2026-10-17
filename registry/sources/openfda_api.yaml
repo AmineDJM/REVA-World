@@ -1,0 +1,20 @@
+# V6 (agent V6DRUGS): openFDA drug endpoints, count aggregations only.
+# Connector: src/reva/adapters/connectors/atlas_drugs_openfda.py (atlas.openfda).
+source_key: openfda.api
+title: openFDA drug adverse events (FAERS), labels and recall enforcement reports - count aggregations
+provider_url: https://open.fda.gov
+lineage_family: openfda
+rights:
+  licence: CC0 1.0
+  licence_url: https://open.fda.gov/license/
+  terms_url: https://open.fda.gov/terms/
+  attribution: U.S. Food and Drug Administration, openFDA (https://open.fda.gov)
+  caveat: >-
+    FAERS counts are counts of reports. FDA: "There is no certainty that the reported event (adverse event or
+    medication error) was actually due to the product. FDA does not require that a causal relationship between a
+    product and event be proven" (https://open.fda.gov/apis/drug/event/).
+metadata:
+  allowed_hosts: [api.fda.gov]
+  endpoints: [https://api.fda.gov/drug/event.json, https://api.fda.gov/drug/label.json, https://api.fda.gov/drug/enforcement.json]
+  authentication: none (no API key: 240 requests/minute, 1,000/day; event count limit <= 100 without key)
+  release_checked: event last_updated 2026-07-30, label 2026-10-16, enforcement 2026-10-07 (checked 2026-10-17)

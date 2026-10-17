@@ -56,6 +56,7 @@ from typing import Any
 
 import networkx as nx
 
+from reva.kg.families import CONCORDANCE_FAMILY, IDENTITY_FAMILY, concordance_flags
 from reva.links.model import Evidence, Link, LinkError, NoEvidence, Stmt, Temporal, is_wikidata
 from reva.links.taxonomy import Hubs, Taxonomy, load_hubs, load_taxonomy
 
@@ -428,7 +429,12 @@ class Hop:
             "text": self.text,
             "label": self.label,
             "family": e.family,
+            # V6 INTEG: an identity step (same_as) is labelled as identity, not as a relation between two things;
+            # a concordance step (corresponds_to) carries the table's own flags (partial, 1:n)
+            "identity": e.family == IDENTITY_FAMILY,
         }
+        if e.family == CONCORDANCE_FAMILY and e.stmt is not None:
+            d["flags"] = concordance_flags(e.stmt.qualifiers)
         if e.link is not None:
             d["via"] = list(e.link.via)
             if e.link.weight is not None:

@@ -1,0 +1,48 @@
+# V6DRUGS mappings of the medicines-layer predicates (registry/kg/predicates_drugs.yaml) to the universal relation
+# families. Only entity-valued predicates are mapped. Nothing here is causal: an indication or an essential-medicine
+# listing is an association (associated_with); a mechanism of action is "acts on a target" (interacts_with, subtype
+# targets). Efficacy is never read from these edges (effect sizes only through the effects layer, with numbers).
+version: 1
+agent: V6DRUGS
+note: >-
+  Family request to V4CORE (not blocking): a dedicated `targets` family (drug -> molecular target, fr "cible",
+  inverse "est la cible de") would read better than interacts_with/subtype targets; until then interacts_with is
+  used, as the brief allows. Identifier bridges (unichem:chebi, unichem:fda_unii, eml:chembl_molecule) are mapped to
+  context (opt-in traversal) because they say two records describe the same substance (same standard InChI /
+  same DrugBank accession), not a relation between two things.
+mappings:
+  - {property: "chembl:mechanism_target", family: interacts_with, subtype: targets, source: chembl.api,
+     subject_kinds: [drug], object_kinds: [drug_target],
+     note: "ChEMBL mechanism of action: the drug acts on the target (action_type qualifier: INHIBITOR, AGONIST ...)"}
+  - {property: "chembl:target_component", family: has_part, subtype: target_component, source: chembl.api,
+     subject_kinds: [drug_target], object_kinds: [protein]}
+  - {property: "chembl:target_organism", family: context, subtype: in_taxon, source: chembl.api,
+     subject_kinds: [drug_target], object_kinds: [taxon]}
+  - {property: "chembl:parent_molecule", family: context, subtype: parent_molecule, source: chembl.api,
+     subject_kinds: [drug], object_kinds: [drug]}
+  - {property: "chembl:indication", family: associated_with, subtype: indicated_for, source: chembl.api,
+     subject_kinds: [drug], object_kinds: [disease, disease_or_phenotype],
+     note: "approved indication (max_phase_for_ind 4): association, not causation, not an efficacy estimate"}
+  - {property: "chembl:indication_mesh", family: associated_with, subtype: indicated_for, source: chembl.api,
+     subject_kinds: [drug], object_kinds: [mesh_descriptor]}
+  - {property: "unichem:chebi", family: context, subtype: same_structure_chebi, source: unichem.mapping,
+     subject_kinds: [drug], object_kinds: [compound]}
+  - {property: "unichem:fda_unii", family: context, subtype: same_structure_unii, source: unichem.mapping,
+     subject_kinds: [drug], object_kinds: [drug_substance]}
+  - {property: "eml:on_list", family: part_of, subtype: listed_on, source: who.eeml,
+     subject_kinds: [drug], object_kinds: [essential_medicines_list]}
+  - {property: "eml:in_section", family: part_of, subtype: listed_in_section, source: who.eeml,
+     subject_kinds: [drug], object_kinds: [eml_section]}
+  - {property: "eml:section_parent", family: part_of, subtype: subsection_of, source: who.eeml,
+     subject_kinds: [eml_section], object_kinds: [eml_section]}
+  - {property: "eml:recommended_for", family: associated_with, subtype: listed_for_indication, source: who.eeml,
+     subject_kinds: [drug], object_kinds: [icd11_category],
+     note: "WHO essential-medicine listing for an indication: association, not causation"}
+  - {property: "eml:therapeutic_alternative", family: context, subtype: therapeutic_alternative, source: who.eeml,
+     subject_kinds: [drug], object_kinds: [drug]}
+  - {property: "eml:chembl_molecule", family: context, subtype: same_substance_via_drugbank, source: who.eeml,
+     subject_kinds: [drug], object_kinds: [drug]}
+  - {property: "ctgov:condition_mesh", family: context, subtype: studies_of_condition, source: ctgov.api,
+     subject_kinds: [clinical_trial], object_kinds: [mesh_descriptor]}
+  - {property: "ctgov:intervention_mesh", family: context, subtype: studies_of_intervention, source: ctgov.api,
+     subject_kinds: [clinical_trial], object_kinds: [mesh_descriptor]}

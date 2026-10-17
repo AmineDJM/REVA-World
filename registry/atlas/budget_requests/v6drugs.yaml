@@ -1,0 +1,36 @@
+# Budget request from agent V6DRUGS (V6: medicines). Merged into registry/policies/budgets.yaml by
+# python -m reva.atlas.budget_merge --write. Bounded API queries and provider aggregations only (no bulk dump).
+agent: V6DRUGS
+requests:
+  - source_key: chembl.api
+    # www.ebi.ac.uk ChEMBL API: status x2, approved molecules 5 pages, mechanisms 4 pages, approved indications 9 pages
+    # (~2.4 MB each), targets ~16 chunks of 100 ids; ftp.ebi.ac.uk chembl_uniprot_mapping.txt (1.2 MB). CC BY-SA 3.0.
+    daily_requests: 120
+    expected_bytes_per_day: 70000000
+    reason: "one full run ~40 requests (~28 MB); 120/day allows a retried run"
+  - source_key: unichem.mapping
+    # ftp.ebi.ac.uk UniChem src1src7 / src1src2 / src1src14 (0.9 MB together). EMBL-EBI terms.
+    daily_requests: 10
+    expected_bytes_per_day: 5000000
+    reason: "one run = 3 requests"
+  - source_key: who.eeml
+    # list.essentialmeds.org: list page (1.3 MB) + ~650 medicine pages (13 kB) + ~1,130 recommendation pages (12 kB). CC BY 3.0 IGO.
+    daily_requests: 2000
+    expected_bytes_per_day: 30000000
+    reason: "one full run ~1,790 requests (~23 MB) at 1 request/s"
+  - source_key: openfda.api
+    # api.fda.gov count aggregations: ~23 country-year + ~15 recall-year + 3 top lists + <= 600 substances (<= 10 kB each). CC0.
+    daily_requests: 900
+    expected_bytes_per_day: 10000000
+    reason: "one run ~650 requests; openFDA allows 1,000/day without key"
+  - source_key: ctgov.api
+    # clinicaltrials.gov API v2: version + 1 stats request + 226 countries x 4 phases + 250 conditions x 4 phases (count totals, ~160 B each).
+    daily_requests: 2200
+    expected_bytes_per_day: 5000000
+    reason: "one run ~1,910 count requests at 1.3 s (provider rate ~50/min)"
+daily_totals_increase:
+  http_requests_total: "+5230"
+  http_bytes_total: "+120_000_000"
+notes: >-
+  All sources open, no account, no key (openFDA without key: 1,000 requests/day). Raw archive of a full run of all five
+  sources ~53 MB (cap for V6 agents: 100 MB).

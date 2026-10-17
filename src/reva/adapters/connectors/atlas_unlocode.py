@@ -259,7 +259,9 @@ def read_release(body: bytes, tag: str, *, min_locations: int | None = None) -> 
     return Release(tag, ident, locs, labels, subs, dict(rep))
 
 
-def build_atlas(rel: Release, raw: ic.Fetched, terms: ic.Fetched, pub: ic.Fetched) -> tuple[ic.RowBuilder, dict[str, Any]]:
+def build_atlas(
+    rel: Release, raw: ic.Fetched, terms: ic.Fetched, pub: ic.Fetched
+) -> tuple[ic.RowBuilder, dict[str, Any]]:
     from reva.atlas.tables import country_iso3
 
     total: Counter[str] = Counter()
@@ -320,7 +322,7 @@ def build_kg(rel: Release, raw: ic.Fetched, idx: vc.Adm1Index | None, qids: dict
         q0 = {"edition": rel.tag, "rows": len(loc.rows)}
 
         def st(pid: str, *, obj: str | None = None, value: dict[str, Any] | None = None,
-               quals: dict[str, Any] | None = None, refs: list[dict[str, Any]] = ref, qid: str = qid) -> None:  # fmt: skip
+               quals: dict[str, Any] | None = None, refs: list[dict[str, Any]] = ref, qid: str = qid, q0: dict[str, Any] = q0) -> None:  # fmt: skip
             kb.st(qid, pid, raw=raw.sha256, refs=refs, obj=obj, value=value, quals={**q0, **(quals or {})})
 
         iso3 = country_iso3(loc.country, "iso2")
@@ -391,4 +393,3 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
              "artifact_sha256": out["artifact_sha256"],
              "unmapped_provider_geo": [u["provider_geo"] for u in out.get("unmapped_provider_geo") or []]}  # fmt: skip
     return {"ok": True, "tables": [table], "report": report, "edition": tag, "kg": kg}
-

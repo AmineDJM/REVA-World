@@ -160,6 +160,12 @@ class FamilyNeighbour(s.ApiModel):
     mapping: FamilyMappingRef
     share: FamilyShare | None = Field(description="Only when the mapping declares a share; null = Missing, never 0")
     atlas: AtlasHint | None = Field(description="measured_by only: the atlas series to read")
+    identity: bool = Field(
+        False, description="same_as: an identity step (an item holds both identifiers), not a relation; never merged"
+    )
+    flags: dict[str, str] = Field(
+        default_factory=dict, description="corresponds_to: the concordance table's own flags (table, partial, 1:n)"
+    )
     rights: ValueRights | None = Field(description="Licence of the raw artifact the statement was parsed from")
     statement: KgStatementOut
 

@@ -283,3 +283,8 @@ variables:
     definition: Quarter-on-quarter growth rate of real output (GDP), percent per quarter.
     unit: percent per quarter
     atlas_concepts: []
+  - id: output.real_activity
+    labels: {en: Aggregate real output (as measured by each study), fr: Production réelle agrégée (selon la mesure de chaque étude)}
+    definition: Aggregate real economic activity as measured by the cited study (real GDP or an industrial production index); used where a survey reports output effects without naming the measure.
+    unit: index or constant-price currency
+    atlas_concepts: []

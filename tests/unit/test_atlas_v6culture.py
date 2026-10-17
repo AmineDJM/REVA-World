@@ -128,7 +128,11 @@ def test_ol_rows(ol_parsed) -> None:
     assert {r["provider_geo"] for r in rows} == {"world"}
     works = next(r for r in rows if r["indicator"] == "ol_works|subject=poetry")
     assert works["value"] == str(subs[0].work_count) and works["period_start"] == date(2026, 10, 17)
-    lang = [json.loads(r["flags"]) for r in rows if r["indicator"].startswith("ol_works_with_edition_language|subject=poetry")]
+    lang = [
+        json.loads(r["flags"])
+        for r in rows
+        if r["indicator"].startswith("ol_works_with_edition_language|subject=poetry")
+    ]
     assert lang and all(f["facet_top_25_only"] for f in lang)
     years = [r for r in rows if r["indicator"] == "ol_works_with_edition_in_year|subject=poetry"]
     assert len(years) == len(subs[0].publishing_history)
@@ -199,7 +203,9 @@ def test_wikidata_specs_valid_and_pending_properties_requested() -> None:
     from reva.kg import harvest as hv
 
     validator = jsonschema.Draft202012Validator(json.loads((REPO / "registry/kg/queries/_schema.json").read_text()))
-    requested = {r["property"] for r in yaml.safe_load((REPO / "registry/kg/property_requests/v6culture.yaml").read_text())}
+    requested = {
+        r["property"] for r in yaml.safe_load((REPO / "registry/kg/property_requests/v6culture.yaml").read_text())
+    }
     allow = load_allowlist()
     specs = hv.discover_specs([REPO / "registry/kg/queries/culture/v6"])
     known = [s.id for s in hv.discover_specs()]

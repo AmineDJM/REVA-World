@@ -1,0 +1,179 @@
+# Health forecast registry: question families (V6, agent PRED-HEALTH). Code: src/reva/evaluation/health_registry.
+#
+# Every family turns one atlas series into dated questions answered by a predictive distribution given as the 23
+# quantile levels of the US CDC forecast hubs, scored by the weighted interval score (WIS, the hubs' metric), absolute
+# error of the median and 50 % / 90 % interval coverage.
+#
+# Rounds: weekly families are issued once per round (ISO-week families: the ISO week of the issue date; hub families:
+# the hub reference date = the Saturday ending the CDC epiweek that contains the issue date); annual families once per
+# calendar year. Targets: ISO-week families = the `horizons` weeks after the issue week; hub families = reference date
+# + 7 * horizon (the hubs' convention, horizons 0..3); annual families = the `horizons` years after the last year
+# published at issue.
+#
+# Resolution: the value of the declared cell in the FIRST version of the declared atlas table registered AFTER the
+# seal that publishes it as an observation; no value by `void_after_days` after the period end -> void (never scored);
+# a value already observed in the version pinned at issue -> not prospective (never scored).
+#
+# Forecasters issued: the baselines, the attributed reference forecaster (hub ensemble) where declared, and only those
+# candidate models the latest stored back-test of the family flags as significant winners (see `winner_rule`).
+#
+# Disease links (V4HEALTH ontology ids) are declared only from identifiers the source itself publishes. None of these
+# sources publishes a disease or pathogen identifier (FluNet: virus type names; NHSN/hubs: target names; ERVISS:
+# pathogen names; GHE: WHO cause codes without ICD codes in the API), so every family carries `disease_link: null`
+# with the reason; see docs/dev/v6_pred_health.md for the evidenced routes (owner decisions).
+
+schema: reva-health-question-specs/1
+version: "1.0.0"
+winner_rule:
+  description: >-
+    A candidate model is issued for a family only if, on the family's latest stored back-test, its mean WIS is lower
+    than every baseline's on common tasks AND the Diebold-Mariano test (HLN-corrected, Newey-West lag 3, per-origin
+    mean WIS differences) rejects equal accuracy against every baseline at alpha = 0.05 / number of baselines.
+  alpha: 0.05
+panels:
+  flunet: [ARG, AUS, BRA, CAN, CHL, CHN, COL, DEU, EGY, ESP, FRA, GBR, IND, ITA, JPN, KEN, KOR, MAR, MEX, NLD, NOR, NZL, PER, POL, RUS, SWE, THA, USA, ZAF, IRN]
+  g20_plus: [ARG, AUS, BRA, CAN, CHN, DEU, FRA, GBR, IDN, IND, ITA, JPN, KOR, MEX, RUS, SAU, TUR, USA, ZAF, NGA, EGY]
+
+families:
+  - key: flunet.flu_positivity
+    labels: {fr: "Positivité grippe (FluNet, % des échantillons analysés)", en: "Influenza positivity (FluNet, % of specimens processed)"}
+    definition: >-
+      Derived by REVA from WHO FluNet counts of one country and ISO week (all ORIGIN_SOURCE rows of the week in the
+      same table version): 100 x sum(INF_ALL) / sum(SPEC_PROCESSED_NB) over the origin rows where both are published
+      and SPEC_PROCESSED_NB > 0; INF_ALL is read as 0 only where it is null and INF_NEGATIVE = SPEC_PROCESSED_NB
+      (all processed specimens negative). Weeks with fewer than `min_specimens` processed specimens have no value.
+    definition_source: WHO FluNet (xMart FLUMART VIW_FNT) column names verbatim
+    dataset_key: atlas.who.flunet
+    value_rule: flunet_positivity
+    min_specimens: 30
+    frequency: W
+    week_start: monday
+    unit: "% of specimens processed"
+    bounds: [0, 100]
+    panel: flunet
+    horizons: [1, 2, 3, 4]
+    void_after_days: 140
+    backtest: {kind: final_vintage, publication_lag_weeks: 2, first_origin: "2023-01-02", stride_weeks: 1}
+    disease_link: null
+    disease_link_reason: "FluNet publishes influenza virus type names (INF_A, INF_B), no disease or NCBI Taxonomy identifier"
+    resolution_note: First FluNet table version (atlas.who.flunet) registered after the seal with >= 30 processed specimens in the week.
+
+  - key: erviss.ili_rate
+    labels: {fr: "Taux de consultation pour syndrome grippal (ERVISS)", en: "ILI consultation rate (ERVISS)"}
+    definition: 'ERVISS ILIARIRates.csv, indicator "ILIconsultationrate", survtype "primary care syndromic", age "total" (verbatim).'
+    definition_source: ECDC ERVISS data/ILIARIRates.csv
+    dataset_key: atlas.ecdc.erviss_ili
+    indicator: "ILIconsultationrate|survtype=primary care syndromic|age=total"
+    value_rule: cell
+    frequency: W
+    week_start: monday
+    unit: "consultation rate as published by ERVISS (unit not stated in the file)"
+    bounds: [0, null]
+    geos: all
+    horizons: [1, 2, 3, 4]
+    void_after_days: 120
+    backtest: {kind: final_vintage, publication_lag_weeks: 1, first_origin: "2024-01-01", stride_weeks: 1}
+    licence_review: true
+    disease_link: null
+    disease_link_reason: "ERVISS publishes the syndrome name 'ILI' only (no ICD/DOID code)"
+    resolution_note: First ERVISS ILI table version (atlas.ecdc.erviss_ili) registered after the seal publishing the week.
+
+  - key: erviss.flu_positivity_sentinel
+    labels: {fr: "Positivité grippe, médecine sentinelle (ERVISS)", en: "Influenza positivity, primary care sentinel (ERVISS)"}
+    definition: 'ERVISS sentinelTestsDetectionsPositivity.csv, pathogen "Influenza", pathogentype "Influenza", pathogensubtype "total", indicator "positivity", age "total", survtype "primary care sentinel" (verbatim).'
+    definition_source: ECDC ERVISS data/sentinelTestsDetectionsPositivity.csv
+    dataset_key: atlas.ecdc.erviss_sentinel
+    indicator: "influenza.positivity|survtype=primary care sentinel|age=total"
+    value_rule: cell
+    frequency: W
+    week_start: monday
+    unit: "% positive"
+    bounds: [0, 100]
+    geos: all
+    horizons: [1, 2, 3, 4]
+    void_after_days: 120
+    backtest: {kind: final_vintage, publication_lag_weeks: 1, first_origin: "2024-01-01", stride_weeks: 1}
+    licence_review: true
+    disease_link: null
+    disease_link_reason: "ERVISS publishes the pathogen name 'Influenza' only (no taxon/disease identifier)"
+    resolution_note: First ERVISS sentinel table version registered after the seal publishing the week.
+
+  - key: nhsn.flu_hosp
+    labels: {fr: "Hospitalisations grippe confirmées (NHSN, par semaine)", en: "Confirmed influenza hospital admissions (NHSN, weekly)"}
+    definition: >-
+      FluSight target 'wk inc flu hosp': weekly number of new hospital admissions of patients with laboratory-confirmed
+      influenza reported to the NHSN Hospital Respiratory Data, by jurisdiction, CDC epiweek (Sunday-Saturday), as
+      compiled in the hub's target-data/target-hospital-admissions.csv (README of cdcepi/FluSight-forecast-hub).
+    definition_source: cdcepi/FluSight-forecast-hub README (Prediction Targets)
+    dataset_key: atlas.cdc.flusight_target
+    indicator: nhsn.wk_inc_flu_hosp
+    value_rule: cell
+    frequency: W
+    week_start: sunday
+    hub: flusight
+    unit: "hospital admissions (count, epiweek)"
+    bounds: [0, null]
+    geos: all
+    horizons: [0, 1, 2, 3]
+    void_after_days: 70
+    reference_forecaster: {model_key: forecast.reference_flusight_ensemble, dataset_key: atlas.cdc.flusight_ensemble, model_id: FluSight-ensemble, target: wk_inc_flu_hosp}
+    backtest: {kind: as_of_vintages, vintages_dataset_key: atlas.cdc.flusight_vintages, vintage_to_reference_days: 7}
+    disease_link: null
+    disease_link_reason: "NHSN/FluSight publish the target name 'laboratory-confirmed influenza' only"
+    resolution_note: First FluSight target table version (atlas.cdc.flusight_target) registered after the seal publishing the epiweek.
+
+  - key: nhsn.covid_hosp
+    labels: {fr: "Hospitalisations COVID-19 confirmées (NHSN, par semaine)", en: "Confirmed COVID-19 hospital admissions (NHSN, weekly)"}
+    definition: >-
+      COVID-19 Forecast Hub target 'wk inc covid hosp': weekly total COVID-19 admissions counts from the
+      `totalconfc19newadm` column of the NHSN Hospital Respiratory Data (HRD) dataset, by jurisdiction, CDC epiweek
+      (README of CDCgov/covid19-forecast-hub).
+    definition_source: CDCgov/covid19-forecast-hub README
+    dataset_key: atlas.cdc.covidhub_target
+    indicator: nhsn.wk_inc_covid_hosp
+    value_rule: cell
+    frequency: W
+    week_start: sunday
+    hub: covidhub
+    unit: "hospital admissions (count, epiweek)"
+    bounds: [0, null]
+    geos: all
+    horizons: [0, 1, 2, 3]
+    void_after_days: 70
+    reference_forecaster: {model_key: forecast.reference_covidhub_ensemble, dataset_key: atlas.cdc.covidhub_ensemble, model_id: CovidHub-ensemble, target: wk_inc_covid_hosp}
+    backtest: {kind: as_of_vintages, vintages_dataset_key: atlas.cdc.covidhub_vintages, vintage_to_reference_days: 3}
+    disease_link: null
+    disease_link_reason: "NHSN/COVID-19 hub publish the target name only"
+    resolution_note: First COVID-19 hub target table version (atlas.cdc.covidhub_target) registered after the seal publishing the epiweek.
+
+  - key: ghe.deaths
+    labels: {fr: "Décès par cause (WHO GHE, estimation)", en: "Deaths by cause (WHO GHE estimate)"}
+    definition: >-
+      WHO Global Health Estimates, deaths (VAL_DTHS_COUNT_NUMERIC), all ages, both sexes, by GHE cause code, country
+      and year (atlas.who.ghe indicator ghe.deaths|sex=TOTAL|age=TOTAL|cause=<code>). Modelled, comparable estimates
+      (WHO), not registered death counts.
+    definition_source: registry/atlas/catalog/health_body.yaml; WHO xMart DEX_CMS GHE_FULL
+    dataset_key: atlas.who.ghe
+    indicator_template: "ghe.deaths|sex=TOTAL|age=TOTAL|cause={cause}"
+    causes:
+      "0": All Causes
+      "10": Communicable, maternal, perinatal and nutritional conditions
+      "600": Noncommunicable diseases
+      "1510": Injuries
+      "20": Infectious and parasitic diseases
+      "380": Respiratory infections
+      "610": Malignant neoplasms
+      "1100": Cardiovascular diseases
+    value_rule: cell
+    frequency: A
+    unit: deaths (WHO estimate)
+    bounds: [0, null]
+    panel: g20_plus
+    horizons: [1, 2, 3]
+    void_after_days: 2200
+    backtest: {kind: final_vintage, publication_lag_weeks: 0, first_origin: "2010", last_origin: "2020", stride_weeks: 52}
+    disease_link: null
+    disease_link_reason: "the GHE API publishes WHO cause codes and titles, no ICD code (V4HEALTH); the ICD-10 lists are in the CC BY-NC-SA methods annex (owner decision)"
+    resolution_note: >-
+      First WHO GHE release (atlas.who.ghe table version) registered after the seal that publishes the year. GHE
+      releases re-estimate the whole series; the first release publishing the year resolves it.

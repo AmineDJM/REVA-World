@@ -18,6 +18,7 @@ Owner of the format and of the executor: **WDHARVEST** (`src/reva/kg/harvest.py`
 | `causal/` (disabled for `run`; driven by `python -m reva.causal_harvest`, see `docs/dev/v3_causwd.md`) | CAUSWD |
 | `industry/` (LEI-bearing companies, factories) | V4INDUSTRY |
 | `energy/` (energy sources, producing sites and companies by product, mines, power stations) | V4ENERGY |
+| `culture/v6/` (domain `culture`, ids `culture.v6_*`: films, literary works, music artists and groups with MusicBrainz ids, Open Library author ids, museums) | V6CULTURE |
 
 One YAML file = one spec. The machine-checkable contract is [`_schema.json`](_schema.json)
 (JSON Schema 2020-12); the harvester validates every spec against it before running anything.

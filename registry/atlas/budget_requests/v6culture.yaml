@@ -1,0 +1,16 @@
+agent: V6CULTURE
+requests:
+  - source_key: musicbrainz.stats
+    daily_requests: 4
+    expected_bytes_per_day: 2000000
+    reason: >-
+      musicbrainz.org statistics pages (atlas.musicbrainz_stats): /statistics/countries (~0.41 MB) and
+      /statistics/languages-scripts (~0.31 MB) = 2 requests per run at <= 1 request/s; monthly cadence; 4/day allows
+      one retry.
+  - source_key: openlibrary.api
+    daily_requests: 500
+    expected_bytes_per_day: 6000000
+    reason: >-
+      openlibrary.org JSON API (atlas.openlibrary_subjects): 1 browse page (~56 kB) + 70 subjects with details
+      (~15-25 kB each) + <= 350 author records (~0.2-5 kB each) = <= 421 requests (~2.5 MB) per full run at 1 request/s;
+      quarterly cadence.

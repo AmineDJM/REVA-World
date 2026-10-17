@@ -1,0 +1,90 @@
+# Effects of a narrative monetary policy shock on US industrial production and prices (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: romer_romer_2004
+source_key: effects.literature
+citation:
+  text: "Christina D. Romer and David H. Romer. A New Measure of Monetary Shocks: Derivation and Implications. NBER Working Paper No. 9866, July 2003."
+  text_basis: assembled from the title page of the version read (NBER working paper; published in the American Economic Review, 2004)
+  short: "Romer & Romer (2003/2004), NBER WP 9866"
+  authors: [Christina D. Romer, David H. Romer]
+  title: "A New Measure of Monetary Shocks: Derivation and Implications"
+  year: 2003
+  series: NBER Working Paper No. 9866
+  doi: null
+  url: http://www.nber.org/papers/w9866
+document:
+  url: https://www.nber.org/system/files/working_papers/w9866/w9866.pdf
+  media_type: application/pdf
+  sha256: 5121e1017634d01ad1608e19afafa2b117a62732e0801644d5d012c6da8ea482
+  bytes: 492330
+  version_read: "NBER Working Paper 9866, July 2003 (the AER 2004 version prints different numbers, e.g. -4.3% in Ramey 2016's summary)"
+as_of: "2003-07-01"
+rights:
+  licence: "©2003 by Christina D. Romer and David H. Romer. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: one_time_impulse
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+          definition: "a realization of the policy measure of 100 basis points (a one-percentage-point rise in the Federal Reserve's intentions for the funds rate, not taken in response to anticipated developments)"}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  method: time_series_regression
+  point_kind: point
+  scope: {countries: [USA], period: {from: "1970-01", to: "1996-12"}, frequency: monthly}
+  identification: "Narrative measure of intended federal funds rate changes purged of the Federal Reserve's Greenbook forecasts; single-equation regressions of output (prices) on current and lagged values of the shock measure with monthly dummies; cumulative responses"
+estimates:
+  - id: industrial_production_month22_peak
+    pdf_page: 23
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "industrial production relative to its initial value (cumulative impact on log output), maximum effect in month 22"}
+    sign: negative
+    point: -4.8
+    as_printed: "-4.8"
+    uncertainty: {ci_low: -7.6, ci_high: -2.0, ci_level: 0.9545, interval_kind: confidence, status: reported}
+    horizon: {kind: at_horizon, value: 22, unit: month}
+    locator: "Section IV.A (output), discussion of Figure 2 (printed p.20)"
+    quote: "The estimated maximum effect is -4.8%. This means that a one-percentage-point rise in the Federal Reserve’s intentions for the funds rate, not taken in response to anticipated developments, results in a reduction in industrial production relative to its initial value of nearly 5 percent. The impact then weakens gradually, reaching -1.2% at month 48. The estimated cumulative impact in the middle months is highly significant: the t-statistic for the estimated cumulative effect in each of months 12 through 29 exceeds 2.5. The two-standard-error confidence interval for the impact in month 22 is (-7.6%, -2.0%)."
+    applicability: "REVA note: the interval is printed as a two-standard-error interval; REVA records it with level 0.9545 (plus or minus two standard errors under normality)."
+  - id: industrial_production_month48
+    pdf_page: 23
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "industrial production relative to its initial value (cumulative impact on log output), month 48"}
+    sign: negative
+    point: -1.2
+    as_printed: "-1.2"
+    uncertainty: {ci_low: -5.7, ci_high: 3.3, ci_level: 0.9545, interval_kind: confidence, status: reported}
+    horizon: {kind: at_horizon, value: 48, unit: month}
+    locator: "Section IV.A, discussion of Figure 2 (printed p.20); the interval '(-5.7%, +3.3%)' is printed on p.21 (pdf p.24)"
+    quote: "The impact then weakens gradually, reaching -1.2% at month 48."
+    applicability: "REVA note: the interval (printed on the next page as a two-standard-error interval) is recorded with level 0.9545; not statistically different from zero per the authors."
+  - id: price_level_month30
+    pdf_page: 27
+    effect: {kind: variable, id: prices.producer_level, transform: log_level,
+             definition: "price level (producer price index for finished goods, per the authors' baseline price specification), cumulative impact after 30 months"}
+    sign: negative
+    point: -1.9
+    as_printed: "-1.9"
+    uncertainty: {status: not_reported}
+    horizon: {kind: at_horizon, value: 30, unit: month}
+    scope: {countries: [USA], frequency: monthly, sample_note: "Baseline price-level specification (48 lags of the policy measure)"}
+    locator: "Section IV.B (prices), discussion of Figure 4 (printed p.24)"
+    quote: "The estimated impact is -1.9% after 30 months and -5.9% after 48 months."
+  - id: price_level_month48
+    pdf_page: 27
+    effect: {kind: variable, id: prices.producer_level, transform: log_level,
+             definition: "price level (producer price index for finished goods, per the authors' baseline price specification), cumulative impact after 48 months"}
+    sign: negative
+    point: -5.9
+    as_printed: "-5.9"
+    uncertainty: {ci_low: -7.9, ci_high: -3.8, ci_level: 0.9545, interval_kind: confidence, status: reported}
+    horizon: {kind: at_horizon, value: 48, unit: month}
+    scope: {countries: [USA], frequency: monthly, sample_note: "Baseline price-level specification (48 lags of the policy measure)"}
+    locator: "Section IV.B (prices), discussion of Figure 4 (printed p.24)"
+    quote: "The estimated impact is -1.9% after 30 months and -5.9% after 48 months. The effect becomes progressively more statistically significant. The t- statistic reaches 2 (in absolute value) in month 29, 4 in month 37, and 5 in month 43. The two-standard- error confidence interval for the effect after 48 months is (-7.9%, -3.8%)."
+    applicability: "REVA note: two-standard-error interval recorded with level 0.9545."

@@ -1,0 +1,229 @@
+# Sustained policy-rate and exchange-rate shocks in euro-area and US models (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: angeloni_kashyap_mojon_terlizzese_2002
+source_key: effects.literature
+citation:
+  text: "Ignazio Angeloni, Anil Kashyap, Benoît Mojon, Daniele Terlizzese. Monetary transmission in the euro area: where do we stand? European Central Bank Working Paper No. 114, January 2002."
+  text_basis: assembled from the title page of the version read (ECB Working Paper Series)
+  short: "Angeloni, Kashyap, Mojon & Terlizzese (2002), ECB WP 114"
+  authors: [Ignazio Angeloni, Anil Kashyap, Benoît Mojon, Daniele Terlizzese]
+  title: "Monetary transmission in the euro area: where do we stand?"
+  year: 2002
+  series: ECB Working Paper No. 114
+  doi: null
+  url: https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp114.pdf
+document:
+  url: https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp114.pdf
+  media_type: application/pdf
+  sha256: 1d12b34027f0454c1fae0415460435b144188c34155095262e08ccb10f017f5c
+  bytes: 815028
+  version_read: "ECB Working Paper No. 114, January 2002"
+as_of: "2002-01-01"
+rights:
+  licence: "© European Central Bank. 'All rights reserved. Reproduction for educational and non-commercial purposes is permitted provided that the source is acknowledged.' (notice in the document read)"
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  pdf_page: 57
+  shock_profile: sustained
+  measure: response
+  unit: percent
+  method: structural_model
+  point_kind: point
+  uncertainty: {status: not_reported}
+  scope: {frequency: quarterly}
+  identification: "Model simulations of permanent (sustained) shocks: Eurosystem macroeconometric models (EMM, van Els et al. 2001, authors' calculations), the ECB area-wide model (AWM) and the Federal Reserve Board's FRB-US model; deviations from baseline at quarter 4 and quarter 12"
+  applicability: "REVA note: model simulations, not econometric estimates; h = 3 and h = 11 are the source's quarter 4 and quarter 12 deviations from baseline (h counted from 0 = first quarter of the shock); the shock is held permanently."
+estimates:
+- id: policy_rate_50bp_cpi_ea_emm
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: -0.15
+  as_printed: '-0.15'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.02, as_printed: '-0.02'}
+  - {h: 11, unit: quarter, point: -0.15, as_printed: '-0.15'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '50 basis points STR increase' / EMM (Eurosystem macroeconometric models, authors' aggregation) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: EMM (Eurosystem macroeconometric models, authors'' aggregation)'}
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: policy_rate_50bp_real_gdp_ea_emm
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: -0.49
+  as_printed: '-0.49'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.11, as_printed: '-0.11'}
+  - {h: 11, unit: quarter, point: -0.49, as_printed: '-0.49'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '50 basis points STR increase' / EMM (Eurosystem macroeconometric models, authors' aggregation) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: EMM (Eurosystem macroeconometric models, authors'' aggregation)'}
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: policy_rate_50bp_cpi_ea_awm
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: -0.21
+  as_printed: '-0.21'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.03, as_printed: '-0.03'}
+  - {h: 11, unit: quarter, point: -0.21, as_printed: '-0.21'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '50 basis points STR increase' / AWM (ECB area-wide model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: AWM (ECB area-wide model)'}
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: policy_rate_50bp_real_gdp_ea_awm
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: -0.63
+  as_printed: '-0.63'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.24, as_printed: '-0.24'}
+  - {h: 11, unit: quarter, point: -0.63, as_printed: '-0.63'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '50 basis points STR increase' / AWM (ECB area-wide model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: AWM (ECB area-wide model)'}
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: policy_rate_50bp_cpi_us_frbus
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: -0.57
+  as_printed: '-0.57'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.05, as_printed: '-0.05'}
+  - {h: 11, unit: quarter, point: -0.57, as_printed: '-0.57'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '50 basis points STR increase' / FRB-US (Federal Reserve Board model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope:
+    countries: [USA]
+    sample_note: 'Model: FRB-US (Federal Reserve Board model)'
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: policy_rate_50bp_real_gdp_us_frbus
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: -0.52
+  as_printed: '-0.52'
+  sign: negative
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: -0.14, as_printed: '-0.14'}
+  - {h: 11, unit: quarter, point: -0.52, as_printed: '-0.52'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '50 basis points STR increase' / FRB-US (Federal Reserve Board model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope:
+    countries: [USA]
+    sample_note: 'Model: FRB-US (Federal Reserve Board model)'
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: 50 basis points STR increase (sustained shock; STR = short-term rate)}
+  shock: {size: 50, unit: basis points}
+- id: neer_5pct_cpi_ea_emm
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: 0.96
+  as_printed: '-0.96'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.48, as_printed: '-0.48'}
+  - {h: 11, unit: quarter, point: 0.96, as_printed: '-0.96'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '5 % NEER appreciation' / EMM (Eurosystem macroeconometric models, authors' aggregation) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: EMM (Eurosystem macroeconometric models, authors'' aggregation)'}
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'
+- id: neer_5pct_real_gdp_ea_emm
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: 0.81
+  as_printed: '-0.81'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.45, as_printed: '-0.45'}
+  - {h: 11, unit: quarter, point: 0.81, as_printed: '-0.81'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '5 % NEER appreciation' / EMM (Eurosystem macroeconometric models, authors' aggregation) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: EMM (Eurosystem macroeconometric models, authors'' aggregation)'}
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'
+- id: neer_5pct_cpi_ea_awm
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: 1.2
+  as_printed: '-1.20'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.54, as_printed: '-0.54'}
+  - {h: 11, unit: quarter, point: 1.2, as_printed: '-1.20'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '5 % NEER appreciation' / AWM (ECB area-wide model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: AWM (ECB area-wide model)'}
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'
+- id: neer_5pct_real_gdp_ea_awm
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: 1.31
+  as_printed: '-1.31'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.91, as_printed: '-0.91'}
+  - {h: 11, unit: quarter, point: 1.31, as_printed: '-1.31'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '5 % NEER appreciation' / AWM (ECB area-wide model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope: {country_group: euro area, sample_note: 'Model: AWM (ECB area-wide model)'}
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'
+- id: neer_5pct_cpi_us_frbus
+  effect: {kind: variable, id: prices.consumer_level, transform: log_level, definition: 'CPI, deviation from baseline (%)'}
+  point: 0.48
+  as_printed: '-0.48'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.18, as_printed: '-0.18'}
+  - {h: 11, unit: quarter, point: 0.48, as_printed: '-0.48'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'CPI', column '5 % NEER appreciation' / FRB-US (Federal Reserve Board model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope:
+    countries: [USA]
+    sample_note: 'Model: FRB-US (Federal Reserve Board model)'
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'
+- id: neer_5pct_real_gdp_us_frbus
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'Real GDP, deviation from baseline (%)'}
+  point: 1.1
+  as_printed: '-1.10'
+  sign: positive
+  horizon: {kind: at_horizon, value: 11, unit: quarter}
+  irf:
+  - {h: 3, unit: quarter, point: 0.13, as_printed: '-0.13'}
+  - {h: 11, unit: quarter, point: 1.1, as_printed: '-1.10'}
+  locator: Table 3 'Effects of selected sustained shocks on the euro area and the US', panels 'Effects after one year' and 'Effects after three years', row 'Real GDP', column '5 % NEER appreciation' / FRB-US (Federal Reserve Board model) (printed p.55)
+  quote: Effects after one year 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.02 -0.03 -0.05 -0.48 -0.54 -0.18 Real GDP -0.11 -0.24 -0.14 -0.45 -0.91 -0.13 Private consumption -0.10 -0.25 -0.17 -0.22 -0.63 0.07 Contribution to GDP (%) 56 64 81 30 42 -36 Gross fixed capital formation -0.59 -0.68 -0.17 -0.22 -0.97 0.07 Contribution to GDP (%) 115 61 21 11 23 -9 Effects after three years 50 basis points STR increase 5 % NEER appreciation Euro area US Euro area US EMM AWM FRB-US EMM AWM FRB-US CPI -0.15 -0.21 -0.57 -0.96 -1.20 -0.48 Real GDP -0.49 -0.63 -0.52 -0.81 -1.31 -1.10
+  scope:
+    countries: [USA]
+    sample_note: 'Model: FRB-US (Federal Reserve Board model)'
+  cause: {kind: variable, id: exchange_rate.neer_depreciation, transform: percent_change, definition: 5 % NEER appreciation (sustained shock; NEER = nominal effective exchange rate)}
+  shock: {size: 5, unit: percent}
+  printed_transform: negated
+  applicability: 'REVA note: the source simulates a sustained 5 % APPRECIATION; stored as the response to a 5 % depreciation (signs flipped, printed_transform: negated) assuming the models respond linearly. Model simulations, not econometric estimates; h = 3 and h = 11 are the source''s quarter 4 and quarter 12 (h counted from 0 = first quarter of the shock).'

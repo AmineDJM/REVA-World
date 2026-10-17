@@ -39,8 +39,10 @@ Atlas source ``ucdp_ged`` (tables documented in ``docs/dev/v6_conflict.md`` sect
 ADM1 placement is a REVA computation: the event coordinates (only ``where_prec`` 1-4: exact point, <= 25 km, ADM2 or
 ADM1 representative point) are tested against the Natural Earth admin-1 polygons (shapely STRtree, ``covered_by``);
 the subdivision is identified only by the ISO 3166-2 code Natural Earth publishes for the polygon (placeholder and
-ambiguous codes are not used, as in ``atlas_ghcnm``), and only when the code's country (ISO 3166-1 prefix) equals the
-country GED gives the event. GED's own ``adm_1`` *names* are never used to place anything.
+ambiguous codes are not used, as in ``atlas_ghcnm``). Geometry decides; when the code's country (ISO 3166-1 prefix)
+is not the country GED gives the event (Gaza / West Bank events GED codes under Israel, pre-2011 Sudan events in
+present-day South Sudan, border points at the 1:10m generalisation) the event is still placed, with status
+``placed:ged_country_differs`` and a count in the aggregate flags. GED's own ``adm_1`` *names* are never used.
 
 KG (source key ``ucdp.ged``): conflict-level entities only -- ``ucdp:nonstate:<conflict_id>`` (kind
 ``non_state_conflict``) and ``ucdp:onesided:<conflict_id>`` (kind ``one_sided_violence``) from the Non-State /
@@ -59,7 +61,7 @@ import json
 import re
 import sys
 from collections import Counter, defaultdict
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -110,7 +112,9 @@ GED_MEMBER = "GEDEvent_v26_1.csv"
 MAX_BYTES = 60_000_000
 MIN_GED_EVENTS = 400_000  # truncation guard (417,968 in 26.1)
 MAX_CANDIDATE_FILES = 16
-CAND_RE = re.compile(r"https://ucdp\.uu\.se/downloads/candidateged/(GEDEvent_v(\d{2})_(\d{1,2})_(\d{1,2})(?:_(\d{2}))?\.csv)")
+CAND_RE = re.compile(
+    r"https://ucdp\.uu\.se/downloads/candidateged/(GEDEvent_v(\d{2})_(\d{1,2})_(\d{1,2})(?:_(\d{2}))?\.csv)"
+)
 DATASETS = (
     "events",
     "country_month",
@@ -166,8 +170,10 @@ CM_METHOD = (
 )
 ADM1_METHOD = (
     "REVA point-in-polygon of GED coordinates (where_prec 1-4) against Natural Earth 1:10m admin-1 polygons, "
-    "subdivision identified by the polygon's published iso_3166_2 code, only when its ISO 3166-1 prefix is the "
-    "event's country; " + CM_METHOD
+    "subdivision identified by the polygon's published iso_3166_2 code (placeholder codes and codes Natural Earth "
+    "gives to several polygons are not used); flags.country_iso3 = the code's ISO 3166-1 prefix, "
+    "flags.events_ged_country_differs = events whose GED country is another state (e.g. Gaza/West Bank events "
+    "GED codes under Israel, pre-2011 Sudan events in present-day South Sudan); " + CM_METHOD
 )
 
 PREDICATES: dict[str, tuple[str, str, str, str]] = {
@@ -237,14 +243,55 @@ LOCATION_NOTE = (
 _PREC = {"1": 11, "2": 11, "3": 10, "4": 10, "5": 9}
 
 GED_COLUMNS = (
-    "id", "relid", "year", "active_year", "code_status", "type_of_violence", "conflict_new_id", "conflict_name",
-    "dyad_new_id", "dyad_name", "side_a_new_id", "side_a", "side_b_new_id", "side_b", "number_of_sources",
-    "where_prec", "latitude", "longitude", "priogrid_gid", "country", "country_id", "region", "event_clarity",
-    "date_prec", "date_start", "date_end", "deaths_a", "deaths_b", "deaths_civilians", "deaths_unknown", "best",
-    "high", "low", "gwnoa", "gwnob",
-)  # fmt: skip
-INT_COLS = ("id", "type_of_violence", "conflict_new_id", "dyad_new_id", "deaths_a", "deaths_b", "deaths_civilians",
-            "deaths_unknown", "best", "high", "low")  # fmt: skip
+    "id",
+    "relid",
+    "year",
+    "active_year",
+    "code_status",
+    "type_of_violence",
+    "conflict_new_id",
+    "conflict_name",
+    "dyad_new_id",
+    "dyad_name",
+    "side_a_new_id",
+    "side_a",
+    "side_b_new_id",
+    "side_b",
+    "number_of_sources",
+    "where_prec",
+    "latitude",
+    "longitude",
+    "priogrid_gid",
+    "country",
+    "country_id",
+    "region",
+    "event_clarity",
+    "date_prec",
+    "date_start",
+    "date_end",
+    "deaths_a",
+    "deaths_b",
+    "deaths_civilians",
+    "deaths_unknown",
+    "best",
+    "high",
+    "low",
+    "gwnoa",
+    "gwnob",
+)
+INT_COLS = (
+    "id",
+    "type_of_violence",
+    "conflict_new_id",
+    "dyad_new_id",
+    "deaths_a",
+    "deaths_b",
+    "deaths_civilians",
+    "deaths_unknown",
+    "best",
+    "high",
+    "low",
+)
 
 
 class UcdpGedError(SourceResponseError):
@@ -274,8 +321,13 @@ def atlas_source() -> Any:
         licence=f"{RIGHTS['licence']}; Natural Earth: public domain",
         allowed_hosts=(HOST, NE_HOST, "cran.r-project.org"),
         datasets=DATASETS,
-        dataset_ids=(f"ucdp-ged-{GED_VERSION}", "ucdp-candidate-2026", f"ucdp-nonstate-{GED_VERSION}",
-                     f"ucdp-onesided-{GED_VERSION}", "naturalearth-admin1-10m"),  # fmt: skip
+        dataset_ids=(
+            f"ucdp-ged-{GED_VERSION}",
+            "ucdp-candidate-2026",
+            f"ucdp-nonstate-{GED_VERSION}",
+            f"ucdp-onesided-{GED_VERSION}",
+            "naturalearth-admin1-10m",
+        ),
         cadence_seconds=30 * 86400,
         planned_requests=9 + 4,
         max_response_bytes=MAX_BYTES,
@@ -385,8 +437,12 @@ def check_events(df: Any) -> dict[str, int]:
     import polars as pl
 
     s = df.select(
-        (pl.col("best") != pl.col("deaths_a") + pl.col("deaths_b") + pl.col("deaths_civilians")
-         + pl.col("deaths_unknown")).sum().alias("best_not_sum_of_parts"),  # fmt: skip
+        (
+            pl.col("best")
+            != pl.col("deaths_a") + pl.col("deaths_b") + pl.col("deaths_civilians") + pl.col("deaths_unknown")
+        )
+        .sum()
+        .alias("best_not_sum_of_parts"),
         ((pl.col("low") > pl.col("best")) | (pl.col("best") > pl.col("high"))).sum().alias("low_best_high_unordered"),
         ((pl.col("best") == 0) & (pl.col("high") == 0) & (pl.col("low") == 0)).sum().alias("all_estimates_zero"),
         (pl.col("best") == 0).sum().alias("best_zero"),
@@ -427,14 +483,15 @@ def adm1_index(body: bytes, *, origin: str) -> Adm1Index:
     from reva.adapters.connectors.atlas_ghcnm import read_ne_admin1, usable_codes
 
     recs, geoms, rep = read_ne_admin1(body, origin=origin)
-    return Adm1Index([r.code for r in recs], usable_codes(recs), STRtree(list(geoms)), geoms,
-                     hashlib.sha256(body).hexdigest(), rep)  # fmt: skip
+    return Adm1Index(
+        [r.code for r in recs], usable_codes(recs), STRtree(list(geoms)), geoms, hashlib.sha256(body).hexdigest(), rep
+    )
 
 
 def place_adm1(df: Any, idx: Adm1Index, iso3_of: Sequence[str | None]) -> tuple[list[str | None], list[str]]:
     """Per event: (ISO 3166-2 code or None, status). Vectorised STRtree query over the placeable events."""
     import numpy as np
-    import shapely  # type: ignore[import-untyped]
+    import shapely
 
     from reva.atlas.tables import country_iso3
 
@@ -462,17 +519,16 @@ def place_adm1(df: Any, idx: Adm1Index, iso3_of: Sequence[str | None]) -> tuple[
             status[i] = "not_placed:ambiguous_or_placeholder_code"
             continue
         code = idx.codes[h[0]]
-        ev_iso3 = iso3_of[i]
-        if ev_iso3 is None:
-            status[i] = "not_placed:historical_or_unmapped_state"
-            continue
         if code[:2] not in prefix_iso3:
             prefix_iso3[code[:2]] = country_iso3(code[:2], "iso2")
-        if prefix_iso3[code[:2]] != ev_iso3:
-            status[i] = "not_placed:country_mismatch"
-            continue
+        ev_iso3 = iso3_of[i]
         codes[i] = code
-        status[i] = "placed"
+        if ev_iso3 is None:
+            status[i] = "placed:ged_country_historical_or_unmapped"
+        elif prefix_iso3[code[:2]] != ev_iso3:
+            status[i] = "placed:ged_country_differs"
+        else:
+            status[i] = "placed"
     return codes, status
 
 
@@ -504,8 +560,17 @@ class Prepared:
         return self.release_sha[i] if self.release_sha else self.sha
 
 
-def prepare(df: Any, *, resolver: Resolver, idx: Adm1Index, sha: str, file: str, candidate: bool,
-            release: list[str] | None = None, release_sha: list[str] | None = None) -> Prepared:  # fmt: skip
+def prepare(
+    df: Any,
+    *,
+    resolver: Resolver,
+    idx: Adm1Index,
+    sha: str,
+    file: str,
+    candidate: bool,
+    release: list[str] | None = None,
+    release_sha: list[str] | None = None,
+) -> Prepared:
     gws = df["country_id"].to_list()
     d0s = df["d0"].to_list()
     iso3: list[str | None] = []
@@ -526,21 +591,94 @@ def prepare(df: Any, *, resolver: Resolver, idx: Adm1Index, sha: str, file: str,
 def event_rows(p: Prepared, dataset: str) -> AtlasRows:
     rows = AtlasRows()
     cols = p.df.select(
-        "record", "id", "relid", "type_of_violence", "low", "high", "best", "deaths_a", "deaths_b", "deaths_civilians",
-        "deaths_unknown", "conflict_new_id", "dyad_new_id", "side_a_new_id", "side_b_new_id", "gwnoa", "gwnob",
-        "latitude", "longitude", "where_prec", "date_prec", "event_clarity", "active_year", "priogrid_gid",
-        "number_of_sources", "country_id", "code_status", "d0", "d1",
-    ).iter_rows()  # fmt: skip
+        "record",
+        "id",
+        "relid",
+        "type_of_violence",
+        "low",
+        "high",
+        "best",
+        "deaths_a",
+        "deaths_b",
+        "deaths_civilians",
+        "deaths_unknown",
+        "conflict_new_id",
+        "dyad_new_id",
+        "side_a_new_id",
+        "side_b_new_id",
+        "gwnoa",
+        "gwnob",
+        "latitude",
+        "longitude",
+        "where_prec",
+        "date_prec",
+        "event_clarity",
+        "active_year",
+        "priogrid_gid",
+        "number_of_sources",
+        "country_id",
+        "code_status",
+        "d0",
+        "d1",
+    ).iter_rows()
     for i, r in enumerate(cols):
-        (rec, eid, relid, tov, low, high, best, da, db, dc, du, cid, did, sa, sb, gwa, gwb, lat, lon, wp, dp, ec, ay,
-         pg, nsrc, gw, cs, d0, d1) = r  # fmt: skip
+        (
+            rec,
+            eid,
+            relid,
+            tov,
+            low,
+            high,
+            best,
+            da,
+            db,
+            dc,
+            du,
+            cid,
+            did,
+            sa,
+            sb,
+            gwa,
+            gwb,
+            lat,
+            lon,
+            wp,
+            dp,
+            ec,
+            ay,
+            pg,
+            nsrc,
+            gw,
+            cs,
+            d0,
+            d1,
+        ) = r
         flags: dict[str, Any] = {
-            "tov": tov, "low": low, "high": high, "deaths_a": da, "deaths_b": db, "deaths_civilians": dc,
-            "deaths_unknown": du, "conflict_new_id": cid, "dyad_new_id": did, "side_a_new_id": sa,
-            "side_b_new_id": sb, "gwnoa": gwa, "gwnob": gwb, "lat": lat, "lon": lon, "where_prec": wp,
-            "date_prec": dp, "event_clarity": ec, "active_year": ay, "priogrid_gid": pg, "number_of_sources": nsrc,
-            "relid": relid, "adm1": p.adm1[i], "adm1_status": p.adm1_status[i],
-        }  # fmt: skip
+            "tov": tov,
+            "low": low,
+            "high": high,
+            "deaths_a": da,
+            "deaths_b": db,
+            "deaths_civilians": dc,
+            "deaths_unknown": du,
+            "conflict_new_id": cid,
+            "dyad_new_id": did,
+            "side_a_new_id": sa,
+            "side_b_new_id": sb,
+            "gwnoa": gwa,
+            "gwnob": gwb,
+            "lat": lat,
+            "lon": lon,
+            "where_prec": wp,
+            "date_prec": dp,
+            "event_clarity": ec,
+            "active_year": ay,
+            "priogrid_gid": pg,
+            "number_of_sources": nsrc,
+            "relid": relid,
+            "adm1": p.adm1[i],
+            "adm1_status": p.adm1_status[i],
+        }
         if p.reason[i] != "panel":
             flags["code_resolution"] = p.reason[i]
         if p.candidate:
@@ -552,13 +690,23 @@ def event_rows(p: Prepared, dataset: str) -> AtlasRows:
             sel["record"] = rec
         rows.add(
             {
-                "source": ATLAS_SOURCE, "dataset": dataset, "indicator": f"deaths_best|event={eid}",
-                "concept_id": None, "iso3": p.iso3[i], "provider_geo": f"gw:{gw}", "entity_qid": p.qid[i],
-                "period_start": d0, "period_end": d1 + timedelta(days=1), "value": str(best), "value_text": None,
-                "unit": "deaths", "flags": _j(flags), "raw_sha256": p.sha_of(i),
+                "source": ATLAS_SOURCE,
+                "dataset": dataset,
+                "indicator": f"deaths_best|event={eid}",
+                "concept_id": None,
+                "iso3": p.iso3[i],
+                "provider_geo": f"gw:{gw}",
+                "entity_qid": p.qid[i],
+                "period_start": d0,
+                "period_end": d1 + timedelta(days=1),
+                "value": str(best),
+                "value_text": None,
+                "unit": "deaths",
+                "flags": _j(flags),
+                "raw_sha256": p.sha_of(i),
                 "selector": _j(sel),
             }
-        )  # fmt: skip
+        )
     return rows
 
 
@@ -570,6 +718,7 @@ def _agg_rows(
     with_civilians: bool,
     method: str,
     extra_flags: Sequence[Mapping[str, Any]] | None = None,
+    differs: Sequence[bool] | None = None,
 ) -> AtlasRows:
     """keys[i] = (provider_geo, iso3, entity_qid) of event i (provider_geo '' = event not in this table)."""
     acc: dict[tuple[str, date, str], list[int]] = {}
@@ -593,14 +742,16 @@ def _agg_rows(
         if extra_flags is not None:
             ef.setdefault(geo, extra_flags[i])
         span = 1 if (d1[i].year, d1[i].month) != (d0[i].year, d0[i].month) else 0
+        dif = 1 if differs is not None and differs[i] else 0
         for t in ("all", TOV[str(tov[i])]):
-            a = acc.setdefault((geo, m0, t), [0, 0, 0, 0, 0, 0])
+            a = acc.setdefault((geo, m0, t), [0, 0, 0, 0, 0, 0, 0])
             a[0] += 1
             a[1] += best[i]
             a[2] += low[i]
             a[3] += high[i]
             a[4] += civ[i]
             a[5] += span
+            a[6] += dif
         shas[(geo, m0)].add(p.sha_of(i))
         if len(first_ids[(geo, m0)]) < 20:
             first_ids[(geo, m0)].append(eids[i])
@@ -610,6 +761,8 @@ def _agg_rows(
         start, end = _month(m0)
         iso3, qid = geo_of[geo]
         flags: dict[str, Any] = {"computed": method, "events": a[0], "spanning": a[5] or None, **dict(ef.get(geo, {}))}
+        if a[6]:
+            flags["events_ged_country_differs"] = a[6]
         if p.candidate:
             flags["candidate"] = True
         sh = sorted(shas[(geo, m0)])
@@ -617,14 +770,30 @@ def _agg_rows(
             val = a[0] if k == 0 else (a[1], a[2], a[3], a[4])[k - 1]
             rows.add(
                 {
-                    "source": ATLAS_SOURCE, "dataset": dataset, "indicator": f"{ind}|tov={t}", "concept_id": None,
-                    "iso3": iso3, "provider_geo": geo, "entity_qid": qid, "period_start": start, "period_end": end,
-                    "value": str(val), "value_text": None, "unit": "count" if k == 0 else "deaths",
-                    "flags": _j(flags), "raw_sha256": sh[0],
-                    "selector": _j({"file": p.file, "event_ids_sample": first_ids[(geo, m0)], "events": a[0],
-                                    **({"raw_sha256s": sh} if len(sh) > 1 else {})}),
+                    "source": ATLAS_SOURCE,
+                    "dataset": dataset,
+                    "indicator": f"{ind}|tov={t}",
+                    "concept_id": None,
+                    "iso3": iso3,
+                    "provider_geo": geo,
+                    "entity_qid": qid,
+                    "period_start": start,
+                    "period_end": end,
+                    "value": str(val),
+                    "value_text": None,
+                    "unit": "count" if k == 0 else "deaths",
+                    "flags": _j(flags),
+                    "raw_sha256": sh[0],
+                    "selector": _j(
+                        {
+                            "file": p.file,
+                            "event_ids_sample": first_ids[(geo, m0)],
+                            "events": a[0],
+                            **({"raw_sha256s": sh} if len(sh) > 1 else {}),
+                        }
+                    ),
                 }
-            )  # fmt: skip
+            )
     return rows
 
 
@@ -663,15 +832,17 @@ def _withhold_clashes(rows: AtlasRows) -> AtlasRows:
 
 
 def adm1_month_rows(p: Prepared, dataset: str) -> AtlasRows:
+    from reva.atlas.tables import country_iso3
+
     keys = [(f"iso3166_2:{a}" if a else "", None, None) for a in p.adm1]
-    extra = [{"country_iso3": iso3} for iso3 in p.iso3]
-    return _agg_rows(p, dataset, keys, with_civilians=True, method=ADM1_METHOD, extra_flags=extra)
+    extra = [{"country_iso3": country_iso3(a[:2], "iso2") if a else None} for a in p.adm1]
+    differs = [s != "placed" for s in p.adm1_status]
+    return _agg_rows(p, dataset, keys, with_civilians=True, method=ADM1_METHOD, extra_flags=extra, differs=differs)
 
 
 def priogrid_month_rows(p: Prepared, dataset: str) -> AtlasRows:
     keys = [(f"priogrid:{g}" if (g or "").strip() else "", None, None) for g in p.df["priogrid_gid"].to_list()]
-    return _agg_rows(p, dataset, keys, with_civilians=False,
-                     method="GED's own priogrid_gid; " + CM_METHOD)  # fmt: skip
+    return _agg_rows(p, dataset, keys, with_civilians=False, method="GED's own priogrid_gid; " + CM_METHOD)
 
 
 # --------------------------------------------------------------------------- candidate merge
@@ -682,7 +853,9 @@ def merge_candidates(frames: Sequence[tuple[CandFile, Any, str]]) -> tuple[Any, 
 
     parts = []
     for k, (cf, df, sha) in enumerate(sorted(frames, key=lambda x: x[0].order)):
-        parts.append(df.with_columns(pl.lit(cf.name).alias("_release"), pl.lit(sha).alias("_sha"), pl.lit(k).alias("_k")))
+        parts.append(
+            df.with_columns(pl.lit(cf.name).alias("_release"), pl.lit(sha).alias("_sha"), pl.lit(k).alias("_k"))
+        )
     if not parts:
         return None, [], [], {}
     allf = pl.concat(parts, how="vertical")
@@ -691,8 +864,12 @@ def merge_candidates(frames: Sequence[tuple[CandFile, Any, str]]) -> tuple[Any, 
     superseded = n_all - allf.height
     before = allf.filter(pl.col("d0") <= GED_COVERAGE_END).height
     allf = allf.filter(pl.col("d0") > GED_COVERAGE_END).sort(["d0", "id"])
-    rep = {"rows_in_files": n_all, "superseded_by_later_release": superseded, "dated_in_final_coverage": before,
-           "events": allf.height}  # fmt: skip
+    rep = {
+        "rows_in_files": n_all,
+        "superseded_by_later_release": superseded,
+        "dated_in_final_coverage": before,
+        "events": allf.height,
+    }
     return allf, allf["_release"].to_list(), allf["_sha"].to_list(), rep
 
 
@@ -735,59 +912,119 @@ def ged_kg_statements(p: Prepared, ne_sha: str) -> list[KgStatement]:
             s[0], s[2] = yr[i], eids[i]
         if d1[i] > s[1]:
             s[1], s[3] = d1[i], eids[i]
-        if p.adm1[i]:
-            b = adm.setdefault((tov[i], cid[i], p.adm1[i]), [0, 0, set()])
+        code = p.adm1[i]
+        if code:
+            b = adm.setdefault((tov[i], cid[i], code), [0, 0, set(), 0])
             b[0] += 1
             b[1] += best[i]
             b[2].add(yr[i].year)
+            b[3] += p.adm1_status[i] != "placed"
     out: list[KgStatement] = []
     sel = {"file": p.file}
     deriv = {"derived": f"REVA aggregation of UCDP GED {GED_VERSION} events by conflict_new_id"}
     for (t, c, y), a in sorted(cy.items()):
         subj = f"{SUBJECT_PREFIX[t]}{c}"
         q = {**deriv, "type_of_violence": TOV_LABEL[TOV[str(t)]], "definition_best": DEFINITIONS["best"]}
-        out.append(KgStatement(key=f"ged:{c}:events:{y}", subject=subj, property="ucdpged:events", value=_q(a[0]),
-                               point_in_time=f"{y}-01-01", pit_precision=9, qualifiers=q, raw_sha256=p.sha,
-                               selector={**sel, "conflict_new_id": c, "year": y}))  # fmt: skip
-        out.append(KgStatement(key=f"ged:{c}:fatalities:{y}", subject=subj, property="ucdpged:fatalities",
-                               value=_q(a[1], "deaths", a[2], a[3]), point_in_time=f"{y}-01-01", pit_precision=9,
-                               qualifiers={**q, "estimate": "sum of best (bounds: sums of low and high)"},
-                               raw_sha256=p.sha, selector={**sel, "conflict_new_id": c, "year": y}))  # fmt: skip
+        out.append(
+            KgStatement(
+                key=f"ged:{c}:events:{y}",
+                subject=subj,
+                property="ucdpged:events",
+                value=_q(a[0]),
+                point_in_time=f"{y}-01-01",
+                pit_precision=9,
+                qualifiers=q,
+                raw_sha256=p.sha,
+                selector={**sel, "conflict_new_id": c, "year": y},
+            )
+        )
+        out.append(
+            KgStatement(
+                key=f"ged:{c}:fatalities:{y}",
+                subject=subj,
+                property="ucdpged:fatalities",
+                value=_q(a[1], "deaths", a[2], a[3]),
+                point_in_time=f"{y}-01-01",
+                pit_precision=9,
+                qualifiers={**q, "estimate": "sum of best (bounds: sums of low and high)"},
+                raw_sha256=p.sha,
+                selector={**sel, "conflict_new_id": c, "year": y},
+            )
+        )
     for (t, c), s in sorted(span.items()):
         subj = f"{SUBJECT_PREFIX[t]}{c}"
-        out.append(KgStatement(key=f"ged:{c}:first_event", subject=subj, property="ucdpged:first_event_date",
-                               value={"type": "time", "time": s[0].isoformat(), "precision": 11},
-                               qualifiers={**deriv, "event_id": s[2], "basis": "min date_start"}, raw_sha256=p.sha,
-                               selector={**sel, "id": s[2], "column": "date_start"}))  # fmt: skip
-        out.append(KgStatement(key=f"ged:{c}:last_event", subject=subj, property="ucdpged:last_event_date",
-                               value={"type": "time", "time": s[1].isoformat(), "precision": 11},
-                               qualifiers={**deriv, "event_id": s[3], "basis": "max date_end"}, raw_sha256=p.sha,
-                               selector={**sel, "id": s[3], "column": "date_end"}))  # fmt: skip
+        out.append(
+            KgStatement(
+                key=f"ged:{c}:first_event",
+                subject=subj,
+                property="ucdpged:first_event_date",
+                value={"type": "time", "time": s[0].isoformat(), "precision": 11},
+                qualifiers={**deriv, "event_id": s[2], "basis": "min date_start"},
+                raw_sha256=p.sha,
+                selector={**sel, "id": s[2], "column": "date_start"},
+            )
+        )
+        out.append(
+            KgStatement(
+                key=f"ged:{c}:last_event",
+                subject=subj,
+                property="ucdpged:last_event_date",
+                value={"type": "time", "time": s[1].isoformat(), "precision": 11},
+                qualifiers={**deriv, "event_id": s[3], "basis": "max date_end"},
+                raw_sha256=p.sha,
+                selector={**sel, "id": s[3], "column": "date_end"},
+            )
+        )
     for (t, c, code), b in sorted(adm.items()):
         years = sorted(b[2])
         out.append(
             KgStatement(
-                key=f"ged:{c}:adm1:{code}", subject=f"{SUBJECT_PREFIX[t]}{c}", property="ucdpged:events_in_adm1",
-                object_qid=f"iso3166_2:{code}", start=f"{years[0]}-01-01", start_precision=9,
-                end=f"{years[-1]}-12-31", end_precision=9,
-                qualifiers={"derived": "point_in_polygon", "method": ADM1_METHOD.split(";")[0], "events": b[0],
-                            "deaths_best": b[1], "years": years, "natural_earth_sha256": ne_sha},
-                raw_sha256=p.sha, selector={**sel, "conflict_new_id": c, "adm1": code},
+                key=f"ged:{c}:adm1:{code}",
+                subject=f"{SUBJECT_PREFIX[t]}{c}",
+                property="ucdpged:events_in_adm1",
+                object_qid=f"iso3166_2:{code}",
+                start=f"{years[0]}-01-01",
+                start_precision=9,
+                end=f"{years[-1]}-12-31",
+                end_precision=9,
+                qualifiers={
+                    "derived": "point_in_polygon",
+                    "method": ADM1_METHOD.split(";")[0],
+                    "events": b[0],
+                    "deaths_best": b[1],
+                    "years": years,
+                    "natural_earth_sha256": ne_sha,
+                    **({"events_ged_country_differs": b[3]} if b[3] else {}),
+                },
+                raw_sha256=p.sha,
+                selector={**sel, "conflict_new_id": c, "adm1": code},
             )
-        )  # fmt: skip
+        )
     return out
 
 
-def _years_runs(subj: str, pred: str, obj: str, yl: list[tuple[int, int]], key: str, file: str, sha: str,
-                quals: Mapping[str, Any]) -> list[KgStatement]:  # fmt: skip
+def _years_runs(
+    subj: str, pred: str, obj: str, yl: list[tuple[int, int]], key: str, file: str, sha: str, quals: Mapping[str, Any]
+) -> list[KgStatement]:
     out = []
     years = [y for y, _ in yl]
     for a, b in merge_years(years):
         run = [y for y in sorted(set(years)) if a <= y <= b]
-        out.append(KgStatement(key=f"{key}:{a}", subject=subj, property=pred, object_qid=obj, start=f"{a}-01-01",
-                               start_precision=9, end=f"{b}-12-31", end_precision=9,
-                               qualifiers={**quals, "years": run}, raw_sha256=sha,
-                               selector={"file": file, "rows": [ln for y, ln in yl if a <= y <= b][:50]}))  # fmt: skip
+        out.append(
+            KgStatement(
+                key=f"{key}:{a}",
+                subject=subj,
+                property=pred,
+                object_qid=obj,
+                start=f"{a}-01-01",
+                start_precision=9,
+                end=f"{b}-12-31",
+                end_precision=9,
+                qualifiers={**quals, "years": run},
+                raw_sha256=sha,
+                selector={"file": file, "rows": [ln for y, ln in yl if a <= y <= b][:50]},
+            )
+        )
     return out
 
 
@@ -804,6 +1041,7 @@ def nsos_kg(
     ents: list[KgEntity] = []
     sts: list[KgStatement] = []
     used_actors: set[str] = set()
+    ds_names: dict[str, tuple[str, str]] = {}  # actor id -> (name, coalition components) as the dataset gives them
     ns_file, os_file = "NonState_v26_1.csv", "OneSided_v26_1.csv"
     for kind, rows, file, sha in (("ns", ns, ns_file, shas["nonstate"]), ("os", os_, os_file, shas["onesided"])):
         by: dict[str, list[tuple[int, Mapping[str, str]]]] = defaultdict(list)
@@ -823,9 +1061,16 @@ def nsos_kg(
             else:
                 label = f"{last['actor_name']} - civilians (UCDP one-sided violence {cid})"
                 ek, desc = "one_sided_violence", "UCDP One-Sided Violence Dataset"
-            ents.append(KgEntity(qid=subj, kind=ek, labels={"en": label},
-                                 descriptions={"en": f"{desc} {GED_VERSION}, conflict id {cid}, active years "
-                                               f"{min(years)}-{max(years)}"}))  # fmt: skip
+            ents.append(
+                KgEntity(
+                    qid=subj,
+                    kind=ek,
+                    labels={"en": label},
+                    descriptions={
+                        "en": f"{desc} {GED_VERSION}, conflict id {cid}, active years {min(years)}-{max(years)}"
+                    },
+                )
+            )
             rel: dict[tuple[str, str, str], list[tuple[int, int]]] = defaultdict(list)
             for line, r in items:
                 y = int(r["year"])
@@ -837,6 +1082,9 @@ def nsos_kg(
                         aid = (r.get(f"side_{side}_id") or "").strip()
                         if aid:
                             used_actors.add(aid)
+                            ds_names.setdefault(
+                                aid, (r.get(f"side_{side}_name") or "", r.get(f"side_{side}_components") or "")
+                            )
                             rel[("ucdp:nonstate_side", f"ucdp:actor:{aid}", side)].append((y, line))
                         for gw in _codes(r.get(f"gwno_{side}_2nd")):
                             rel[("ucdp:secondary_party", resolver.entity("ucdp", gw, when), side)].append((y, line))
@@ -848,25 +1096,50 @@ def nsos_kg(
                     else:
                         obj = f"ucdp:actor:{aid}"
                         used_actors.add(aid)
+                        ds_names.setdefault(aid, (r.get("actor_name") or "", r.get("coalition_components") or ""))
                     rel[("ucdpnsos:perpetrator", obj, aid)].append((y, line))
                 q = {k: r[k] for k in ("low_fatality_estimate", "high_fatality_estimate") if (r.get(k) or "").strip()}
-                sts.append(KgStatement(
-                    key=f"{kind}:{cid}:fatalities:{y}", subject=subj, property="ucdpnsos:fatalities",
-                    value=_q(int(r["best_fatality_estimate"]), "deaths", int_or_none(q.get("low_fatality_estimate")),
-                             int_or_none(q.get("high_fatality_estimate"))),
-                    point_in_time=f"{y}-01-01", pit_precision=9,
-                    qualifiers={"estimate": "best_fatality_estimate (bounds: low/high_fatality_estimate)",
-                                "definition": "automatic aggregation (summing) of the GED figures of the "
-                                "conflict/dyad-year (UCDP codebook)"},
-                    raw_sha256=sha, selector={"file": file, "row": line, "column": "best_fatality_estimate"}))  # fmt: skip
+                sts.append(
+                    KgStatement(
+                        key=f"{kind}:{cid}:fatalities:{y}",
+                        subject=subj,
+                        property="ucdpnsos:fatalities",
+                        value=_q(
+                            int(r["best_fatality_estimate"]),
+                            "deaths",
+                            int_or_none(q.get("low_fatality_estimate")),
+                            int_or_none(q.get("high_fatality_estimate")),
+                        ),
+                        point_in_time=f"{y}-01-01",
+                        pit_precision=9,
+                        qualifiers={
+                            "estimate": "best_fatality_estimate (bounds: low/high_fatality_estimate)",
+                            "definition": "automatic aggregation (summing) of the GED figures of the "
+                            "conflict/dyad-year (UCDP codebook)",
+                        },
+                        raw_sha256=sha,
+                        selector={"file": file, "row": line, "column": "best_fatality_estimate"},
+                    )
+                )
                 if kind == "ns" and r.get("ep_end") == "1" and iso_date_or_none(r.get("ep_end_date")):
-                    sts.append(KgStatement(
-                        key=f"ns:{cid}:episode_end:{y}", subject=subj, property="ucdp:episode_end",
-                        value={"type": "time", "time": r["ep_end_date"][:10],
-                               "precision": _PREC.get(r.get("ep_end_prec") or "", 9)},
-                        qualifiers={"definition": "the last date of recorded combat (conflict inactive the "
-                                    "following year)", "ucdp_ep_end_prec": r.get("ep_end_prec")},
-                        raw_sha256=sha, selector={"file": file, "row": line, "column": "ep_end_date"}))  # fmt: skip
+                    sts.append(
+                        KgStatement(
+                            key=f"ns:{cid}:episode_end:{y}",
+                            subject=subj,
+                            property="ucdp:episode_end",
+                            value={
+                                "type": "time",
+                                "time": r["ep_end_date"][:10],
+                                "precision": _PREC.get(r.get("ep_end_prec") or "", 9),
+                            },
+                            qualifiers={
+                                "definition": "the last date of recorded combat (conflict inactive the following year)",
+                                "ucdp_ep_end_prec": r.get("ep_end_prec"),
+                            },
+                            raw_sha256=sha,
+                            selector={"file": file, "row": line, "column": "ep_end_date"},
+                        )
+                    )
             for (pred, obj, side), yl in sorted(rel.items()):
                 quals: dict[str, Any] = {}
                 if pred in ("ucdp:nonstate_side", "ucdp:secondary_party"):
@@ -875,35 +1148,85 @@ def nsos_kg(
                     quals["ucdp_actor_id"] = side
                 if pred == "ucdp:location":
                     quals["definition"] = LOCATION_NOTE
-                sts += _years_runs(subj, pred, obj, yl, f"{kind}:{cid}:{pred.split(':')[1]}:{side}:{obj}", file,
-                                   sha, quals)  # fmt: skip
-            sts.append(KgStatement(key=f"{kind}:{cid}:dyad_id", subject=subj, property="ucdpnsos:dyad_id",
-                                   value={"type": "external_id", "value": last["dyad_id"]}, raw_sha256=sha,
-                                   selector={"file": file, "row": items[-1][0], "column": "dyad_id"}))  # fmt: skip
+                sts += _years_runs(
+                    subj, pred, obj, yl, f"{kind}:{cid}:{pred.split(':')[1]}:{side}:{obj}", file, sha, quals
+                )
+            sts.append(
+                KgStatement(
+                    key=f"{kind}:{cid}:dyad_id",
+                    subject=subj,
+                    property="ucdpnsos:dyad_id",
+                    value={"type": "external_id", "value": last["dyad_id"]},
+                    raw_sha256=sha,
+                    selector={"file": file, "row": items[-1][0], "column": "dyad_id"},
+                )
+            )
             if kind == "ns":
                 lvl = ORG_LEVEL.get(last.get("org", ""))
                 if lvl:
-                    sts.append(KgStatement(key=f"ns:{cid}:org", subject=subj, property="ucdpnsos:org_level",
-                                           value={"type": "string", "value": f"{last['org']}: {lvl}"},
-                                           raw_sha256=sha, selector={"file": file, "row": items[-1][0],
-                                                                     "column": "org"}))  # fmt: skip
+                    sts.append(
+                        KgStatement(
+                            key=f"ns:{cid}:org",
+                            subject=subj,
+                            property="ucdpnsos:org_level",
+                            value={"type": "string", "value": f"{last['org']}: {lvl}"},
+                            raw_sha256=sha,
+                            selector={"file": file, "row": items[-1][0], "column": "org"},
+                        )
+                    )
                 sd = iso_date_or_none(first.get("start_date"))
                 if sd:
-                    sts.append(KgStatement(
-                        key=f"ns:{cid}:start_date", subject=subj, property="ucdp:start_date",
-                        value={"type": "time", "time": sd.isoformat(), "precision": _PREC.get(first.get("start_prec")
-                                                                                              or "", 9)},
-                        qualifiers={"definition": "date of the first fatal event of the conflict (start_date)",
-                                    "ucdp_start_prec": first.get("start_prec")},
-                        raw_sha256=sha, selector={"file": file, "row": items[0][0], "column": "start_date"}))  # fmt: skip
+                    sts.append(
+                        KgStatement(
+                            key=f"ns:{cid}:start_date",
+                            subject=subj,
+                            property="ucdp:start_date",
+                            value={
+                                "type": "time",
+                                "time": sd.isoformat(),
+                                "precision": _PREC.get(first.get("start_prec") or "", 9),
+                            },
+                            qualifiers={
+                                "definition": "date of the first fatal event of the conflict (start_date)",
+                                "ucdp_start_prec": first.get("start_prec"),
+                            },
+                            raw_sha256=sha,
+                            selector={"file": file, "row": items[0][0], "column": "start_date"},
+                        )
+                    )
     for aid in sorted(used_actors, key=lambda s: int(s) if s.isdigit() else 0):
         name = actor_name.get(aid)
-        ents.append(KgEntity(qid=f"ucdp:actor:{aid}", kind="armed_group",
-                             labels={"en": (name or "").strip() or f"UCDP actor {aid}"},
-                             descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {GED_VERSION})"}))  # fmt: skip
-    rep = {"nonstate_conflicts": len({r["conflict_id"] for r in ns}),
-           "onesided_instances": len({r["conflict_id"] for r in os_}), "actors": len(used_actors),
-           "actors_without_name": sum(1 for a in used_actors if a not in actor_name)}  # fmt: skip
+        if name is not None:  # exactly KGGEOPOL's form (atlas_ucdp.kg_records): an identical entity is unchanged
+            ents.append(
+                KgEntity(
+                    qid=f"ucdp:actor:{aid}",
+                    kind="armed_group",
+                    labels={"en": name.strip() or f"UCDP actor {aid}"},
+                    descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {GED_VERSION})"},
+                )
+            )
+            continue
+        dname, comps = ds_names.get(aid, ("", ""))
+        desc = (
+            f"UCDP actor {aid}, not in the UCDP Actor Dataset {GED_VERSION}; name as given in the Non-State / "
+            "One-Sided dataset"
+        )
+        if comps.strip():
+            desc += f"; temporary coalition of UCDP actors {comps.strip()}"
+        ents.append(
+            KgEntity(
+                qid=f"ucdp:actor:{aid}",
+                kind="armed_group",
+                labels={"en": dname.strip() or f"UCDP actor {aid}"},
+                descriptions={"en": desc},
+            )
+        )
+    rep = {
+        "nonstate_conflicts": len({r["conflict_id"] for r in ns}),
+        "onesided_instances": len({r["conflict_id"] for r in os_}),
+        "actors": len(used_actors),
+        "actors_without_name": sum(1 for a in used_actors if a not in actor_name),
+    }
     return ents, sts, rep
 
 
@@ -967,8 +1290,16 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     cdf, crel, cshas, crep = merge_candidates(cframes)
     cand = None
     if cdf is not None and cdf.height:
-        cand = prepare(cdf.drop(["_release", "_sha", "_k"]), resolver=resolver, idx=idx, sha=cshas[0],
-                       file="candidate", candidate=True, release=crel, release_sha=cshas)  # fmt: skip
+        cand = prepare(
+            cdf.drop(["_release", "_sha", "_k"]),
+            resolver=resolver,
+            idx=idx,
+            sha=cshas[0],
+            file="candidate",
+            candidate=True,
+            release=crel,
+            release_sha=cshas,
+        )
     ns = read_csv_member(got["nonstate"].body, "NonState_v26_1.csv")
     os_ = read_csv_member(got["onesided"].body, "OneSided_v26_1.csv")
     actors = read_csv_member(got["actor"].body, "Actor_v26_1.csv", encoding="cp1252")
@@ -984,24 +1315,45 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     def reg(dataset: str, rows: AtlasRows, raws: list[str], note: str) -> None:
         if not run.wants(dataset) or len(rows) == 0:
             return
-        out = run.register(dataset=dataset, frame=rows.frame(), raw_sha256s=sorted(set(raws)),
-                           rights={**RIGHTS, "source_key": SOURCE_KEY}, coverage_note=note)  # fmt: skip
-        tables.append({"table": out["dataset_key"].removeprefix("atlas."), "rows": out["row_count"],
-                       "created": out["created"], "artifact_sha256": out["artifact_sha256"]})  # fmt: skip
+        out = run.register(
+            dataset=dataset,
+            frame=rows.frame(),
+            raw_sha256s=sorted(set(raws)),
+            rights={**RIGHTS, "source_key": SOURCE_KEY},
+            coverage_note=note,
+        )
+        tables.append(
+            {
+                "table": out["dataset_key"].removeprefix("atlas."),
+                "rows": out["row_count"],
+                "created": out["created"],
+                "artifact_sha256": out["artifact_sha256"],
+            }
+        )
 
     fin_note = f"UCDP GED {GED_VERSION} (final), 1989-2025"
     ne_note = f"; ADM1 = REVA point-in-polygon, Natural Earth admin-1 sha256 {idx.sha256}"
     reg("events", event_rows(final, "events"), [final.sha], fin_note + "; one row per event, value = best" + ne_note)
     reg("country_month", country_month_rows(final, "country_month"), [final.sha], fin_note + "; COMPUTED: " + CM_METHOD)
-    reg("adm1_month", adm1_month_rows(final, "adm1_month"), [final.sha, idx.sha256],
-        fin_note + "; COMPUTED: " + ADM1_METHOD + ne_note)
+    reg(
+        "adm1_month",
+        adm1_month_rows(final, "adm1_month"),
+        [final.sha, idx.sha256],
+        fin_note + "; COMPUTED: " + ADM1_METHOD + ne_note,
+    )
     reg("priogrid_month", priogrid_month_rows(final, "priogrid_month"), [final.sha], fin_note + "; COMPUTED by cell")
     if cand is not None:
         cn = "UCDP Candidate 2026 (PRELIMINARY; releases " + ", ".join(c.name for c in cands) + ")"
         reg("cand_events", event_rows(cand, "cand_events"), cshas, cn)
-        reg("cand_country_month", country_month_rows(cand, "cand_country_month"), cshas, cn + "; COMPUTED: " + CM_METHOD)
-        reg("cand_adm1_month", adm1_month_rows(cand, "cand_adm1_month"), [*cshas, idx.sha256],
-            cn + "; COMPUTED: " + ADM1_METHOD + ne_note)
+        reg(
+            "cand_country_month", country_month_rows(cand, "cand_country_month"), cshas, cn + "; COMPUTED: " + CM_METHOD
+        )
+        reg(
+            "cand_adm1_month",
+            adm1_month_rows(cand, "cand_adm1_month"),
+            [*cshas, idx.sha256],
+            cn + "; COMPUTED: " + ADM1_METHOD + ne_note,
+        )
         reg("cand_priogrid_month", priogrid_month_rows(cand, "cand_priogrid_month"), cshas, cn + "; COMPUTED by cell")
 
     adm_status = Counter(final.adm1_status)
@@ -1017,8 +1369,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "natural_earth": {"sha256": idx.sha256, **{k: v for k, v in idx.report.items() if k != "codes_invalid"}},
         "codebooks": {k: shas_all[k] for k in ("ged_codebook", "cand_codebook")},
         "tables": tables,
-        "unmapped_state_codes": sorted({f"gw:{g}" for g, i in zip(final.df["country_id"].to_list(), final.iso3,
-                                                                    strict=True) if i is None}),  # fmt: skip
+        "unmapped_state_codes": sorted(
+            {f"gw:{g}" for g, i in zip(final.df["country_id"].to_list(), final.iso3, strict=True) if i is None}
+        ),
     }
     kg: dict[str, Any] = {"loaded": False}
     if run.dataset is None and run.engine is not None and kg_available(run.engine):
@@ -1030,9 +1383,17 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         ents += sres.code_entities()
         sts += code_correspondence(sres, raw_sha256=cc_sha)
         register_predicates(run.engine)
-        load = load_kg(run.engine, run.store, ents, sts, source_key=SOURCE_KEY, source_revision=KG_REVISION,
-                       raw_sha256s=sorted({*shas_all.values(), cc_sha}),
-                       retrieved_at=max(g.retrieved_at for g in got.values()), origin=run.origin)  # fmt: skip
+        load = load_kg(
+            run.engine,
+            run.store,
+            ents,
+            sts,
+            source_key=SOURCE_KEY,
+            source_revision=KG_REVISION,
+            raw_sha256s=sorted({*shas_all.values(), cc_sha}),
+            retrieved_at=max(g.retrieved_at for g in got.values()),
+            origin=run.origin,
+        )
         kg = {"loaded": True, "entities": len(ents), "statements": len(sts), "report": nsrep, "load": load}
     res["kg"] = kg
     return res

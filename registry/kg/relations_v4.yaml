@@ -272,6 +272,40 @@ families:
     description:
       en: "Weak contextual link (main subject, industry, field, significant event): useful for exploring, nothing more."
       fr: "Lien de contexte faible (sujet principal, secteur, domaine, événement marquant) : utile pour explorer, rien de plus."
+  # V6 INTEG (requested by V4LINK, docs/dev/v4_v4link.md section 4): concordance rows and identity evidence.
+  - id: corresponds_to
+    label: {en: "corresponds to (concordance)", fr: "correspond à (table de concordance)"}
+    inverse_label: {en: "corresponds to (concordance)", fr: "correspond à (table de concordance)"}
+    inverse_family: null
+    symmetric: true
+    causal: false
+    group: classification
+    path_cost: 1.5
+    description:
+      en: >-
+        A row of a published correspondence table between two classifications (HS <-> CPC <-> ISIC <-> SITC ...).
+        The table's own flags (partial / relationship, e.g. 1:n, partial 0/1) stay on the statement and are shown:
+        a correspondence is neither a part_of, an is_a nor an identity.
+      fr: >-
+        Une ligne d'une table de correspondance publiée entre deux nomenclatures (SH <-> CPC <-> CITI <-> CTCI ...).
+        Les indicateurs de la table (partielle, relation 1:n ...) restent sur la déclaration et sont affichés : une
+        correspondance n'est ni une inclusion, ni un classement, ni une identité.
+  - id: same_as
+    label: {en: "is the same entity as (identity)", fr: "est la même entité que (identité)"}
+    inverse_label: {en: "is the same entity as (identity)", fr: "est la même entité que (identité)"}
+    inverse_family: null
+    symmetric: true
+    causal: false
+    group: identity
+    path_cost: 0.5
+    description:
+      en: >-
+        Identity evidence: a source item holds both identifiers (e.g. a Wikidata item states the NUTS code and the
+        ISO 3166-2 code). An identity step, not a relation between two things; REVA never merges the entities.
+      fr: >-
+        Preuve d'identité : un élément source porte les deux identifiants (par ex. un élément Wikidata déclare le code
+        NUTS et le code ISO 3166-2). Une étape d'identité, pas une relation entre deux choses ; REVA ne fusionne
+        jamais les entités.
 
 # Properties that must NEVER be mapped to a family (source-asserted causal claims: /v1/causal only).
 # Namespaced predicates whose name contains one of `causal_name_markers` are refused too.

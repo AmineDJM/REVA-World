@@ -5,7 +5,7 @@
  */
 import { z } from "zod";
 import { AtlasRights } from "./atlas";
-import { envelopeOf, JsonRecord, v3get } from "./common";
+import { envelopeOf, JsonRecord, memo, v3get } from "./common";
 import { KgRef, KgStatement } from "./kg";
 
 const enc = encodeURIComponent;
@@ -54,6 +54,10 @@ export const FamilyNeighbour = z.looseObject({
   }),
   share: FamilyShare.nullish().transform((v) => v ?? null),
   atlas: AtlasHint.nullish().transform((v) => v ?? null),
+  /** same_as: an identity step (an item holds both identifiers), not a relation; entities are never merged. */
+  identity: z.boolean().nullish().transform((v) => v ?? false),
+  /** corresponds_to: the concordance table's own flags (table, partial indicators, 1:n). */
+  flags: z.record(z.string(), z.string()).nullish().transform((v) => v ?? {}),
   rights: AtlasRights.nullish().transform((v) => v ?? null),
   statement: KgStatement,
 });
@@ -171,3 +175,33 @@ export const getEntityPlaces = (qid: string, s?: AbortSignal) =>
     undefined,
     s,
   );
+
+/** The family registry (GET /v1/kg/families): property -> family, read once per page load. */
+export const FamilyRegistryResponse = z.looseObject({
+  data: z.looseObject({
+    mappings: z.array(z.looseObject({ property: z.string(), family: z.string() })).default([]),
+  }),
+});
+export const getFamilyRegistry = memo(() => v3get('/v1/kg/families', FamilyRegistryResponse));
+
+/** Properties whose edges are identity steps (family same_as) or concordance rows (corresponds_to). */
+export function specialProperties(reg: z.output<typeof FamilyRegistryResponse> | null): { identity: Set<string>; concordance: Set<string> } {
+  const identity = new Set<string>();
+  const concordance = new Set<string>();
+  for (const m of reg?.data.mappings ?? []) {
+    if (m.family === 'same_as') identity.add(m.property);
+    if (m.family === 'corresponds_to') concordance.add(m.property);
+  }
+  return { identity, concordance };
+}
+
+/** "table CPC21-HS2017 · cpc_partial 1 · hs_partial 0": the concordance flags as the source states them. */
+export function flagsText(flags: Record<string, unknown> | null | undefined): string {
+  const keep = Object.entries(flags ?? {}).filter(
+    ([k, v]) => (k === 'table' || k.endsWith('_partial') || k.startsWith('relationship') || k === 'relation') && v !== null && v !== '',
+  );
+  return keep
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k.replaceAll('_', ' ')} ${Array.isArray(v) ? v.join(', ') : String(v)}`)
+    .join(' · ');
+}

@@ -1,0 +1,22 @@
+# Dataset predicates of the V6 conflict layer (owner: V6CONFLICT; connector
+# src/reva/adapters/connectors/atlas_ucdp_ged.py registers them through reva.kg.model.register_properties). Family
+# mappings: registry/kg/relations_v4.d/v6conflict.yaml. Report: docs/dev/v6_conflict.md.
+#
+# Entity keys: ucdp:nonstate:<conflict_id> (kind non_state_conflict, UCDP Non-State Conflict Dataset 26.1),
+# ucdp:onesided:<conflict_id> (kind one_sided_violence, UCDP One-Sided Violence Dataset 26.1), ucdp:actor:<id>
+# (kind armed_group, same form as KGGEOPOL's), ucdp:conflict:<id> (KGGEOPOL, state-based). UCDP conflict ids are
+# "unique across the dataset ... irrespective of type of violence" (GED codebook 26.1).
+#
+# Honesty: ucdpged:* values are REVA aggregations of UCDP GED events (sums / counts / min-max dates, labelled
+# derived in the qualifiers); ucdpged:events_in_adm1 is a REVA point-in-polygon placement. ucdpnsos:* are the
+# values UCDP publishes. Nothing here is causal.
+predicates:
+  - {pid: "ucdpged:events", value_kind: quantity, reva_predicate: ucdpged_events, label_en: "number of UCDP GED events in the year (computed by REVA)", label_fr: "nombre d'événements UCDP GED dans l'année (calcul REVA)"}
+  - {pid: "ucdpged:fatalities", value_kind: quantity, reva_predicate: ucdpged_fatalities, label_en: "fatalities in UCDP GED events in the year, best (low/high bounds), computed by REVA", label_fr: "morts dans les événements UCDP GED de l'année, estimation centrale (bornes basse/haute), calcul REVA"}
+  - {pid: "ucdpged:first_event_date", value_kind: time, reva_predicate: ucdpged_first_event_date, label_en: "earliest date_start of the UCDP GED events of the conflict", label_fr: "plus ancienne date de début des événements UCDP GED du conflit"}
+  - {pid: "ucdpged:last_event_date", value_kind: time, reva_predicate: ucdpged_last_event_date, label_en: "latest date_end of the UCDP GED events of the conflict", label_fr: "plus récente date de fin des événements UCDP GED du conflit"}
+  - {pid: "ucdpged:events_in_adm1", value_kind: item, reva_predicate: ucdpged_events_in_adm1, label_en: "had UCDP GED events located in first-level subdivision (REVA point in polygon)", label_fr: "a eu des événements UCDP GED situés dans la subdivision (point dans polygone, REVA)"}
+  - {pid: "ucdpnsos:fatalities", value_kind: quantity, reva_predicate: ucdpnsos_fatalities, label_en: "fatalities in the year, best estimate with low/high bounds (UCDP Non-State / One-Sided dataset)", label_fr: "morts dans l'année, estimation centrale et bornes (UCDP Non-State / One-Sided)"}
+  - {pid: "ucdpnsos:perpetrator", value_kind: item, reva_predicate: ucdpnsos_perpetrator, label_en: "perpetrator of one-sided violence against civilians (UCDP)", label_fr: "auteur de violences unilatérales contre des civils (UCDP)"}
+  - {pid: "ucdpnsos:org_level", value_kind: string, reva_predicate: ucdpnsos_org_level, label_en: "organisational level of the warring sides (UCDP Non-State)", label_fr: "niveau d'organisation des parties (UCDP Non-State)"}
+  - {pid: "ucdpnsos:dyad_id", value_kind: external_id, reva_predicate: ucdpnsos_dyad_id, label_en: "UCDP dyad id", label_fr: "identifiant de dyade UCDP"}

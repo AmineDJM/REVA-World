@@ -1,0 +1,22 @@
+# V6 (agent V6DRUGS): UniChem whole-source mapping files ChEMBL -> ChEBI / DrugBank / FDA UNII.
+# Connector: src/reva/adapters/connectors/atlas_drugs_unichem.py (atlas.unichem).
+source_key: unichem.mapping
+title: UniChem whole-source mappings (ChEMBL to ChEBI, DrugBank, FDA SRS/UNII)
+provider_url: https://www.ebi.ac.uk/unichem/
+lineage_family: unichem
+rights:
+  licence: EMBL-EBI terms of use (no licence file with the mapping files)
+  licence_review: true
+  terms_url: https://www.ebi.ac.uk/about/terms-of-use/
+  attribution: >-
+    UniChem, EMBL-EBI; Chambers J et al. UniChem: a unified chemical structure cross-referencing and identifier
+    tracking system. J Cheminform 2013 5:3. Only identifier pairs are used (same standard InChI); DrugBank content
+    (CC BY-NC 4.0) is not fetched.
+metadata:
+  allowed_hosts: [ftp.ebi.ac.uk]
+  files:
+    - https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src7.txt.gz
+    - https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src2.txt.gz
+    - https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/wholeSourceMapping/src_id1/src1src14.txt.gz
+  release_checked: files dated 2026-10-10 (346 kB, 73 kB, 480 kB gzip; 50,123 / ~9,600 / 40,838 rows)
+  authentication: none

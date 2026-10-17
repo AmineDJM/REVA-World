@@ -315,6 +315,28 @@ def measured_by_target(other: str, qualifiers: Any, kind: str | None = None) -> 
     }
 
 
+# ---------------------------------------------------------------------------------------------- identity / concordance
+#: Family of identity steps (an item holding both identifiers): shown as identity, never as a relation; no merge.
+IDENTITY_FAMILY = "same_as"
+#: Family of concordance-table rows; the table's own flags are shown with every such step.
+CONCORDANCE_FAMILY = "corresponds_to"
+
+
+def concordance_flags(qualifiers: Any) -> dict[str, str]:
+    """The flags a correspondence row carries (table id, ``*_partial`` indicators, relationship such as ``1:n``),
+    as the statement's qualifiers state them, so a ``corresponds_to`` step always shows them. Empty if none."""
+    q: Mapping[str, Any] = qualifiers if isinstance(qualifiers, Mapping) else {}
+    out: dict[str, str] = {}
+    for k in sorted(q):
+        if k == "table" or k.endswith("_partial") or k.startswith("relationship") or k == "relation":
+            v = q[k]
+            if isinstance(v, list | tuple):
+                v = ", ".join(str(x) for x in v)
+            if v is not None and str(v) != "":
+                out[str(k)[:40]] = str(v)[:120]
+    return out
+
+
 # ---------------------------------------------------------------------------------------------- loading
 def _load_yaml(path: Path) -> Any:
     with path.open(encoding="utf-8") as f:

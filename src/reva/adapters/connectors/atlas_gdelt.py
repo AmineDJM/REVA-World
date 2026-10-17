@@ -52,6 +52,7 @@ link to this website (https://www.gdeltproject.org/)". Every row carries ``flags
 
 from __future__ import annotations
 
+import asyncio
 import io
 import json
 import re
@@ -156,6 +157,9 @@ THEMES: dict[str, str] = {
     "EPU_UNCERTAINTY": "finance", "EPU_CATS_MONETARY_POLICY": "finance",
 }  # fmt: skip
 DOC_MODES = ("timelinevolraw", "timelinetone")
+DOC_RETRIES = 4  # extra attempts of a request refused with HTTP 429, after cooldown x attempt seconds
+DOC_COOLDOWN_SECONDS = 60.0
+DOC_GIVE_UP_AFTER = 6  # consecutive refused requests: stop asking (the rest is reported, never filled)
 
 _Q_USE = (
     "all datasets released by the GDELT Project are available for unlimited and unrestricted use for any academic, "
@@ -684,15 +688,31 @@ async def ingest_doc(run: Any) -> dict[str, Any]:
     if not all(listed.values()):
         raise hc.err(f"themes not in GDELT's lookup file: {[t for t, ok in listed.items() if not ok]}")
     rows = hc.DailyRows(ATLAS_SOURCE, DS_DOC)
-    report: dict[str, Any] = {"window": [str(w.start), str(w.end)], "failed": {}}
+    report: dict[str, Any] = {"window": [str(w.start), str(w.end)], "failed": {}, "throttle_waits": 0}
+    retries = int(opts.get("doc_retries", DOC_RETRIES)) if run.origin == "live" else 0
+    cooldown = float(opts.get("doc_cooldown", DOC_COOLDOWN_SECONDS))
+    if not (0 <= retries <= 10 and 0 <= cooldown <= 900):
+        raise ValidationProblem("run options doc_retries must be 0..10 and doc_cooldown 0..900 seconds")
+    consecutive = 0
     for theme in themes:
         got: dict[str, hc.Fetched | None] = {}
         for mode in DOC_MODES:
+            key = f"{theme}/{mode}"
+            if consecutive >= DOC_GIVE_UP_AFTER:
+                got[mode] = None
+                report["failed"][key] = f"not requested: {consecutive} consecutive requests refused (API throttling)"
+                continue
             spec = hc.FileSpec(f"doc_{theme}_{mode}", doc_url(theme, mode, w), DATASETS_DOC,
                                ("application/json",), 10_000_000)  # fmt: skip
-            got[mode], why = await _try_fetch(run, spec)
+            for attempt in range(retries + 1):
+                got[mode], why = await _try_fetch(run, spec)
+                if why != "HTTP 429" or attempt == retries:
+                    break
+                report["throttle_waits"] += 1  # GDELT: "Please limit requests to one every 5 seconds"
+                await asyncio.sleep(cooldown * (attempt + 1))
+            consecutive = 0 if got[mode] is not None else consecutive + 1
             if why:
-                report["failed"][f"{theme}/{mode}"] = why
+                report["failed"][key] = why
         if got["timelinevolraw"] is None and got["timelinetone"] is None:
             continue
         parse_doc(rows, theme, got["timelinevolraw"], got["timelinetone"], w, report)

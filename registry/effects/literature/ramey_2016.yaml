@@ -1,0 +1,994 @@
+# Monetary and fiscal shocks: survey tables and the author's own estimates (agent EFFECTS-MORE, V6).
+# Rows marked evidence: secondary are other studies' numbers as summarised in the survey's tables.
+schema: reva-effects-literature/1
+id: ramey_2016
+source_key: effects.literature
+citation:
+  text: "Valerie A. Ramey. Macroeconomic Shocks and Their Propagation. NBER Working Paper No. 21978, February 2016."
+  text_basis: assembled from the title page of the version read (NBER working paper; prepared for the Handbook of Macroeconomics, Vol. 2)
+  short: "Ramey (2016), NBER WP 21978"
+  authors: [Valerie A. Ramey]
+  title: "Macroeconomic Shocks and Their Propagation"
+  year: 2016
+  series: NBER Working Paper No. 21978
+  doi: null
+  url: http://www.nber.org/papers/w21978
+document:
+  url: https://www.nber.org/system/files/working_papers/w21978/w21978.pdf
+  media_type: application/pdf
+  sha256: 4472968d504c386e6aca4a11cafa4c75a9dec47aff7c0f1238c745e6f7e77a3f
+  bytes: 553591
+  version_read: "NBER Working Paper 21978, February 2016 (the Handbook chapter may differ)"
+as_of: "2016-02-01"
+rights:
+  licence: "© 2016 by Valerie A. Ramey. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  point_kind: point
+  uncertainty: {status: not_reported}
+estimates:
+- id: mp_output_trough_cee_1999
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Christiano, Eichenbaum, Evans (1999) - FFR identification)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.7
+  as_printed: '-0.7'
+  sign: negative
+  horizon: {kind: peak, value: 8, unit: quarter}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1965Q3, to: 1995Q3}
+    frequency: quarterly
+    sample_note: 'Christiano, Eichenbaum, Evans (1999) - FFR identification: SVAR, 1965q3 - 1995q3'
+  identification: 'As summarised by Ramey: SVAR, 1965q3 - 1995q3 (Christiano, Eichenbaum, Evans (1999) - FFR identification)'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Christiano, Eichenbaum, Evans (1999) - FFR identification', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Christiano, SVAR, 1965q3 - -0.7% at 8 quarters.
+  applicability: 'REVA note: number of Christiano, Eichenbaum, Evans (1999) - FFR identification as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_faust_swanson_wright_2004
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Faust, Swanson, Wright (2004))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.6
+  as_printed: '-0.6'
+  sign: negative
+  horizon: {kind: peak, value: 10, unit: month}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1991-02, to: 2001-07}
+    frequency: monthly
+    sample_note: 'Faust, Swanson, Wright (2004): HFI, 1991m2 - 2001m7'
+  identification: 'As summarised by Ramey: HFI, 1991m2 - 2001m7 (Faust, Swanson, Wright (2004))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Faust, Swanson, Wright (2004)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Faust, Swanson, HFI, 1991m2 - -0.6% at 10 months
+  applicability: 'REVA note: number of Faust, Swanson, Wright (2004) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_romer_romer_2004
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Romer and Romer (2004))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -4.3
+  as_printed: '-4.3'
+  sign: negative
+  horizon: {kind: peak, value: 24, unit: month}
+  method: time_series_regression
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1970-01, to: 1996-12}
+    frequency: monthly
+    sample_note: 'Romer and Romer (2004): Narrative/Greenbook 1970m1 - 1996m12'
+  identification: 'As summarised by Ramey: Narrative/Greenbook 1970m1 - 1996m12 (Romer and Romer (2004))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Romer and Romer (2004)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Romer and Narrative/Greenbook -4.3% at 24 months
+  applicability: 'REVA note: number of Romer and Romer (2004) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_bernanke_boivin_eliasz_2005
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Bernanke, Boivin, and Eliasz (2005))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.6
+  as_printed: '-0.6'
+  sign: negative
+  horizon: {kind: peak, value: 18, unit: month}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1959-01, to: 2001-07}
+    frequency: monthly
+    sample_note: 'Bernanke, Boivin, and Eliasz (2005): FAVAR, 1959m1 - 2001m7'
+  identification: 'As summarised by Ramey: FAVAR, 1959m1 - 2001m7 (Bernanke, Boivin, and Eliasz (2005))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Bernanke, Boivin, and Eliasz (2005)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Bernanke, Boivin, FAVAR, 1959m1 - -0.6% at 18 months
+  applicability: 'REVA note: number of Bernanke, Boivin, and Eliasz (2005) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_smets_wouters_2007
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Smets-Wouters (2007))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -1.8
+  as_printed: '-1.8'
+  sign: negative
+  horizon: {kind: peak, value: 4, unit: quarter}
+  method: dsge
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1966Q1, to: 2004Q4}
+    frequency: quarterly
+    sample_note: 'Smets-Wouters (2007): Estimated DSGE model 1966Q1 - 2004Q4'
+  identification: 'As summarised by Ramey: Estimated DSGE model 1966Q1 - 2004Q4 (Smets-Wouters (2007))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Smets-Wouters (2007)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Smets-Wouters Estimated DSGE -1.8 at 4 quarter
+  applicability: 'REVA note: number of Smets-Wouters (2007) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_boivin_kiley_mishkin_2010_early
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Boivin, Kiley, Mishkin (2010), early period)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -1.6
+  as_printed: '-1.6'
+  sign: negative
+  horizon: {kind: peak, value: 8, unit: month}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1962-01, to: 1979-09}
+    frequency: monthly
+    sample_note: 'Boivin, Kiley, Mishkin (2010), early period: FAVAR, 1962m1-79m9'
+  identification: 'As summarised by Ramey: FAVAR, 1962m1-79m9 (Boivin, Kiley, Mishkin (2010), early period)'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Boivin, Kiley, Mishkin (2010), early period', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Boivin, Kiley, FAVAR, 1962m1- -1.6% at 8 months in
+  applicability: 'REVA note: number of Boivin, Kiley, Mishkin (2010), early period as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_boivin_kiley_mishkin_2010_later
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Boivin, Kiley, Mishkin (2010), later period)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.7
+  as_printed: '-0.7'
+  sign: negative
+  horizon: {kind: peak, value: 24, unit: month}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1984-01, to: 2008-12}
+    frequency: monthly
+    sample_note: 'Boivin, Kiley, Mishkin (2010), later period: FAVAR, 1984m1-2008m12'
+  identification: 'As summarised by Ramey: FAVAR, 1984m1-2008m12 (Boivin, Kiley, Mishkin (2010), later period)'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Boivin, Kiley, Mishkin (2010), later period', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Boivin, Kiley, FAVAR, 1962m1- -1.6% at 8 months in Only in the early Mishkin (2010) 79m9, 1984m1- early period, period. 2008m12 -0.7% at 24 months in later period
+  applicability: 'REVA note: number of Boivin, Kiley, Mishkin (2010), later period as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_coibion_2012
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Coibion (2012))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -2.0
+  as_printed: '-2'
+  sign: negative
+  horizon: {kind: peak, value: 18, unit: month}
+  method: time_series_regression
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1970-01, to: 1996-12}
+    frequency: monthly
+    sample_note: 'Coibion (2012): “Robust” Romer-Romer methods, 1970m1 - 1996m12'
+  identification: 'As summarised by Ramey: “Robust” Romer-Romer methods, 1970m1 - 1996m12 (Coibion (2012))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Coibion (2012)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Coibion (2012) “Robust” Romer- -2 % at 18 months
+  applicability: 'REVA note: number of Coibion (2012) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_barakchian_crowe_2013
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Barakchian-Crowe (2013))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -5.0
+  as_printed: '-5'
+  sign: negative
+  horizon: {kind: peak, value: 23, unit: month}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1988-12, to: 2008-06}
+    frequency: monthly
+    sample_note: 'Barakchian-Crowe (2013): HFI, Romer hybrid VAR, 1988m12-2008m6'
+  identification: 'As summarised by Ramey: HFI, Romer hybrid VAR, 1988m12-2008m6 (Barakchian-Crowe (2013))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Barakchian-Crowe (2013)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Barakchian- HFI, Romer hybrid -5 % at 23 months
+  applicability: 'REVA note: number of Barakchian-Crowe (2013) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_gertler_karadi_2015
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Gertler-Karadi (2015))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -2.2
+  as_printed: '-2.2'
+  sign: negative
+  horizon: {kind: peak, value: 18, unit: month}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1979-07, to: 2012-06}
+    frequency: monthly
+    sample_note: 'Gertler-Karadi (2015): HFI-Proxy SVAR, 1979m7 - 2012m6 (1991m1-2012m6 for instruments)'
+  identification: 'As summarised by Ramey: HFI-Proxy SVAR, 1979m7 - 2012m6 (1991m1-2012m6 for instruments) (Gertler-Karadi (2015))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Gertler-Karadi (2015)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Gertler-Karadi HFI-Proxy SVAR, -2.2 % at 18 months
+  applicability: 'REVA note: number of Gertler-Karadi (2015) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_output_trough_amir_uhlig_2015
+  pdf_page: 104
+  evidence: secondary
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.real_activity, transform: log_level, definition: 'output, trough effect (output measure as in Amir-Uhlig (2015))'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -1.3
+  as_printed: '-1.3'
+  sign: negative
+  horizon: {kind: peak, value: 9, unit: month}
+  method: bvar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1960-02, to: 2010-06}
+    frequency: monthly
+    sample_note: 'Amir-Uhlig (2015): Bayesian FAVAR with sign restrictions, 1960m2-2010m6'
+  identification: 'As summarised by Ramey: Bayesian FAVAR with sign restrictions, 1960m2-2010m6 (Amir-Uhlig (2015))'
+  locator: Table 3.1 'Summary of Monetary Policy Shock Effects on Output and Prices', row 'Amir-Uhlig (2015)', column 'Trough effect of 100 basis point funds peak' (printed p.102)
+  quote: Amir-Uhlig Bayesian FAVAR -1.3% at 9 months
+  applicability: 'REVA note: number of Amir-Uhlig (2015) as summarised in Ramey''s survey table (secondary evidence, not read in the original study); output measure and shock normalisation as in the original.'
+- id: mp_ip_trough_cee_1965_1996
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.48
+  as_printed: '-0.48'
+  sign: negative
+  horizon: {kind: peak}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1965-01, to: 1996-06}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: CEE: 1965m1 - 1996m6'
+  identification: 'Ramey''s re-estimation (CEE: 1965m1 - 1996m6); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''CEE: 1965m1 - 1996m6'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48'
+- id: mp_ip_trough_cee_1959_2007
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.2
+  as_printed: '-0.20'
+  sign: negative
+  horizon: {kind: peak}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1959-01, to: 2007-12}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: CEE: 1959m1 - 2007m12'
+  identification: 'Ramey''s re-estimation (CEE: 1959m1 - 2007m12); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''CEE: 1959m1 - 2007m12'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20'
+- id: mp_ip_trough_rr_var_1969_1996
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -1.38
+  as_printed: '-1.38'
+  sign: negative
+  horizon: {kind: peak}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1969-03, to: 1996-12}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: R&R VAR: 1969m3 - 1996m12'
+  identification: 'Ramey''s re-estimation (R&R VAR: 1969m3 - 1996m12); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''R&R VAR: 1969m3 - 1996m12'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20 0.5 R&R VAR: 1969m3 - 1996m12 -1.38'
+- id: mp_ip_trough_rr_var_1969_2007
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.83
+  as_printed: '-0.83'
+  sign: negative
+  horizon: {kind: peak}
+  method: var
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1969-03, to: 2007-12}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: R&R VAR: 1969m3 - 2007m12'
+  identification: 'Ramey''s re-estimation (R&R VAR: 1969m3 - 2007m12); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''R&R VAR: 1969m3 - 2007m12'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20 0.5 R&R VAR: 1969m3 - 1996m12 -1.38 8.8 R&R VAR: 1969m3 - 2007m12 -0.83'
+- id: mp_ip_trough_rr_jorda_1969_1996
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.83
+  as_printed: '-0.83'
+  sign: negative
+  horizon: {kind: peak}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1969-03, to: 1996-12}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: R&R, Jordà method: 1969m3 - 1996m12'
+  identification: 'Ramey''s re-estimation (R&R, Jordà method: 1969m3 - 1996m12); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''R&R, Jordà method: 1969m3 - 1996m12'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20 0.5 R&R VAR: 1969m3 - 1996m12 -1.38 8.8 R&R VAR: 1969m3 - 2007m12 -0.83 2.7 R&R, Jordà method: 1969m3 - 1996m12 -0.83'
+- id: mp_ip_trough_rr_jorda_norecursive_1969_1996
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -0.9
+  as_printed: '-0.90'
+  sign: negative
+  horizon: {kind: peak}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1969-03, to: 1996-12}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: R&R, Jordà method, no recursiveness assumption: 1969m3 - 1996m12'
+  identification: 'Ramey''s re-estimation (R&R, Jordà method, no recursiveness assumption: 1969m3 - 1996m12); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''R&R, Jordà method, no recursiveness assumption: 1969m3 - 1996m12'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20 0.5 R&R VAR: 1969m3 - 1996m12 -1.38 8.8 R&R VAR: 1969m3 - 2007m12 -0.83 2.7 R&R, Jordà method: 1969m3 - 1996m12 -0.83 R&R, Jordà method, no recursiveness -0.90 assumption: 1969m3 - 1996m12'
+- id: mp_ip_trough_gk_proxy_svar_1990_2012
+  pdf_page: 105
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change, definition: monetary policy shock scaled to a 100 basis point peak of the federal funds rate ('Trough effect of 100 basis point funds peak')}
+  effect: {kind: variable, id: output.industrial_production, transform: log_level, definition: 'industrial production, trough effect (%)'}
+  measure: response
+  unit: percent
+  shock: {size: 100, unit: basis points}
+  point: -2.2
+  as_printed: '-2.2'
+  sign: negative
+  horizon: {kind: peak}
+  method: svar
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    period: {from: 1990-01, to: 2012-06}
+    frequency: monthly
+    sample_note: 'Ramey''s re-estimation: Gertler-Karadi, proxy SVAR: 1990m1 - 2012m6'
+  identification: 'Ramey''s re-estimation (Gertler-Karadi, proxy SVAR: 1990m1 - 2012m6); CEE = Christiano, Eichenbaum and Evans (1999) recursive VAR, R&R = Romer and Romer (2004) shocks, Gertler-Karadi proxy SVAR'
+  locator: 'Table 3.2 ''Effects of Monetary Policy Shocks on Industrial Production: My Estimates'', row ''Gertler-Karadi, proxy SVAR: 1990m1 - 2012m6'', column ''Trough effect of 100 basis point funds peak (%)'' (printed p.103)'
+  quote: 'Table 3.2. Effects of Monetary Policy Shocks on Industrial Production: My Estimates Method & sample Trough effect of 100 Forecast Error Variance basis point funds peak Decompositions (%) (percentages) 24 months CEE: 1965m1 - 1996m6 -0.48 6.6 CEE: 1959m1 - 2007m12 -0.20 0.5 R&R VAR: 1969m3 - 1996m12 -1.38 8.8 R&R VAR: 1969m3 - 2007m12 -0.83 2.7 R&R, Jordà method: 1969m3 - 1996m12 -0.83 R&R, Jordà method, no recursiveness -0.90 assumption: 1969m3 - 1996m12 Gertler-Karadi, proxy SVAR: 1990m1 - 2012m6 -2.2'
+- id: spending_multiplier_blanchard_perotti_h0
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.65
+  as_printed: '0.65'
+  sign: positive
+  uncertainty: {se: 0.24, se_as_printed: '0.24', status: reported}
+  horizon: {kind: cumulative, value: 0, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 0 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85)
+- id: spending_multiplier_blanchard_perotti_h4
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.37
+  as_printed: '0.37'
+  sign: positive
+  uncertainty: {se: 0.23, se_as_printed: '0.23', status: reported}
+  horizon: {kind: cumulative, value: 4, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 4 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13)
+- id: spending_multiplier_ramey_news_h4
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.37
+  as_printed: '1.37'
+  sign: positive
+  uncertainty: {se: 0.33, se_as_printed: '0.33', status: reported}
+  horizon: {kind: cumulative, value: 4, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ramey news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ramey news shock: narrative changes in the expected present value of military spending; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 4 quarters, column 'Ramey news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13)
+- id: spending_multiplier_ben_zeev_pappa_news_h4
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 2.91
+  as_printed: '2.91'
+  sign: positive
+  uncertainty: {se: 1.13, se_as_printed: '1.13', status: reported}
+  horizon: {kind: cumulative, value: 4, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ben Zeev-Pappa news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ben Zeev-Pappa news shock: shock best explaining future defense spending over five years; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 4 quarters, column 'Ben Zeev-Pappa news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13)
+- id: spending_multiplier_blanchard_perotti_h8
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.39
+  as_printed: '0.39'
+  sign: positive
+  uncertainty: {se: 0.32, se_as_printed: '0.32', status: reported}
+  horizon: {kind: cumulative, value: 8, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 8 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61)
+- id: spending_multiplier_ramey_news_h8
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.8
+  as_printed: '0.80'
+  sign: positive
+  uncertainty: {se: 0.25, se_as_printed: '0.25', status: reported}
+  horizon: {kind: cumulative, value: 8, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ramey news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ramey news shock: narrative changes in the expected present value of military spending; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 8 quarters, column 'Ramey news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61)
+- id: spending_multiplier_ben_zeev_pappa_news_h8
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.41
+  as_printed: '1.41'
+  sign: positive
+  uncertainty: {se: 0.61, se_as_printed: '0.61', status: reported}
+  horizon: {kind: cumulative, value: 8, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ben Zeev-Pappa news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ben Zeev-Pappa news shock: shock best explaining future defense spending over five years; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 8 quarters, column 'Ben Zeev-Pappa news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61)
+- id: spending_multiplier_blanchard_perotti_h12
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.39
+  as_printed: '0.39'
+  sign: positive
+  uncertainty: {se: 0.44, se_as_printed: '0.44', status: reported}
+  horizon: {kind: cumulative, value: 12, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 12 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71)
+- id: spending_multiplier_ramey_news_h12
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.77
+  as_printed: '0.77'
+  sign: positive
+  uncertainty: {se: 0.27, se_as_printed: '0.27', status: reported}
+  horizon: {kind: cumulative, value: 12, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ramey news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ramey news shock: narrative changes in the expected present value of military spending; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 12 quarters, column 'Ramey news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71)
+- id: spending_multiplier_ben_zeev_pappa_news_h12
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.24
+  as_printed: '1.24'
+  sign: positive
+  uncertainty: {se: 0.71, se_as_printed: '0.71', status: reported}
+  horizon: {kind: cumulative, value: 12, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ben Zeev-Pappa news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ben Zeev-Pappa news shock: shock best explaining future defense spending over five years; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 12 quarters, column 'Ben Zeev-Pappa news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71)
+- id: spending_multiplier_blanchard_perotti_h16
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.4
+  as_printed: '0.40'
+  sign: positive
+  uncertainty: {se: 0.58, se_as_printed: '0.58', status: reported}
+  horizon: {kind: cumulative, value: 16, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 16 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01)
+- id: spending_multiplier_ramey_news_h16
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.6
+  as_printed: '0.60'
+  sign: positive
+  uncertainty: {se: 0.36, se_as_printed: '0.36', status: reported}
+  horizon: {kind: cumulative, value: 16, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ramey news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ramey news shock: narrative changes in the expected present value of military spending; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 16 quarters, column 'Ramey news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01)
+- id: spending_multiplier_ben_zeev_pappa_news_h16
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.1
+  as_printed: '1.10'
+  sign: positive
+  uncertainty: {se: 1.01, se_as_printed: '1.01', status: reported}
+  horizon: {kind: cumulative, value: 16, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ben Zeev-Pappa news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ben Zeev-Pappa news shock: shock best explaining future defense spending over five years; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 16 quarters, column 'Ben Zeev-Pappa news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01)
+- id: spending_multiplier_blanchard_perotti_h20
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.44
+  as_printed: '0.44'
+  sign: positive
+  uncertainty: {se: 0.63, se_as_printed: '0.63', status: reported}
+  horizon: {kind: cumulative, value: 20, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Blanchard-Perotti'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Blanchard-Perotti (2002) shock: government purchases ordered first (Cholesky); HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 20 quarters, column 'Blanchard-Perotti' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01) 20 0.44 (0.63) 0.69 (0.48) 1.17 (1.46)
+- id: spending_multiplier_ramey_news_h20
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.69
+  as_printed: '0.69'
+  sign: positive
+  uncertainty: {se: 0.48, se_as_printed: '0.48', status: reported}
+  horizon: {kind: cumulative, value: 20, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ramey news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ramey news shock: narrative changes in the expected present value of military spending; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 20 quarters, column 'Ramey news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01) 20 0.44 (0.63) 0.69 (0.48) 1.17 (1.46)
+- id: spending_multiplier_ben_zeev_pappa_news_h20
+  pdf_page: 107
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: cumulative real government purchases from t to t+h (instrumented by the identified shock)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: cumulative real GDP from t to t+h}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.17
+  as_printed: '1.17'
+  sign: positive
+  uncertainty: {se: 1.46, se_as_printed: '1.46', status: reported}
+  horizon: {kind: cumulative, value: 20, unit: quarter}
+  method: local_projection
+  shock_profile: one_time_impulse
+  scope:
+    countries: [USA]
+    frequency: quarterly
+    sample_note: 'Instrument: Ben Zeev-Pappa news'
+  identification: 'One-step local-projection IV estimate of the integral multiplier (equation 4.2): sum of real GDP over t..t+h regressed on the sum of government purchases, instrumented by the Ben Zeev-Pappa news shock: shock best explaining future defense spending over five years; HAC standard errors'
+  locator: Table 4.2 'Multiplier Estimates (HAC standard errors in parenthesis)', row horizon 20 quarters, column 'Ben Zeev-Pappa news' (printed p.105)
+  quote: Table 4.2. Multiplier Estimates (HAC standard errors in parenthesis) Horizon (in quarters) Blanchard-Perotti Ramey news Ben Zeev-Pappa news 0 0.65 (0.24) -7.53 (7.26) -7.37 (5.85) 4 0.37 (0.23) 1.37 (0.33) 2.91 (1.13) 8 0.39 (0.32) 0.80 (0.25) 1.41 (0.61) 12 0.39 (0.44) 0.77 (0.27) 1.24 (0.71) 16 0.40 (0.58) 0.60 (0.36) 1.10 (1.01) 20 0.44 (0.63) 0.69 (0.48) 1.17 (1.46)
+- id: spending_multiplier_rotemberg_woodford_1992
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.25
+  as_printed: '1.25'
+  sign: positive
+  horizon: {kind: unspecified}
+  method: var
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Rotemberg-Woodford (1992): Quarterly, 1947 - 1989; residuals from regression of military spending on own lags and lags of military employment'
+  identification: 'As summarised by Ramey: Quarterly, 1947 - 1989; residuals from regression of military spending on own lags and lags of military employment (Rotemberg-Woodford (1992))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Rotemberg-Woodford (1992)', column 'Implied spending multiplier' (printed p.104)
+  quote: Rotemberg-Woodford Quarterly, 1947 Residuals from regression of 1.25
+  applicability: 'REVA note: number of Rotemberg-Woodford (1992) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: spending_multiplier_mountford_uhlig_2009
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.65
+  as_printed: '0.65'
+  sign: positive
+  horizon: {kind: unspecified}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Mountford-Uhlig (2009): Quarterly, 1955 - 2000; sign restrictions on an SVAR; deficit-financed increase in spending'
+  identification: 'As summarised by Ramey: Quarterly, 1955 - 2000; sign restrictions on an SVAR; deficit-financed increase in spending (Mountford-Uhlig (2009))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Mountford-Uhlig (2009)', column 'Implied spending multiplier' (printed p.104)
+  quote: Mountford-Uhlig (2009) Quarterly, 1955 Sign restrictions on an SVAR 0.65 for a deficit-
+  applicability: 'REVA note: number of Mountford-Uhlig (2009) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: spending_multiplier_romer_bernstein_2009
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.57
+  as_printed: '1.57'
+  sign: positive
+  horizon: {kind: at_horizon, value: 8, unit: quarter}
+  method: structural_model
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Romer-Bernstein (2009): Average multipliers from the FRB/US model and a private forecasting firm model'
+  identification: 'As summarised by Ramey: Average multipliers from the FRB/US model and a private forecasting firm model (Romer-Bernstein (2009))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Romer-Bernstein (2009)', column 'Implied spending multiplier' (printed p.104)
+  quote: Romer-Bernstein (2009) Quarterly Average multipliers from Rising to 1.57 by the
+  applicability: 'REVA note: number of Romer-Bernstein (2009) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: spending_multiplier_cogan_cwik_taylor_wieland_2010
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 0.64
+  as_printed: '0.64'
+  sign: positive
+  horizon: {kind: peak}
+  method: dsge
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Cogan, Cwik, Taylor, Wieland (2010): Quarterly, 1966 - 2004; estimated Smets-Wouters model'
+  identification: 'As summarised by Ramey: Quarterly, 1966 - 2004; estimated Smets-Wouters model (Cogan, Cwik, Taylor, Wieland (2010))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Cogan, Cwik, Taylor, Wieland (2010)', column 'Implied spending multiplier' (printed p.104)
+  quote: Cogan, Cwik, Taylor, Quarterly, 1966 Estimated Smets-Wouters 0.64 at peak
+  applicability: 'REVA note: number of Cogan, Cwik, Taylor, Wieland (2010) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: spending_multiplier_fisher_peters_2010
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 1.5
+  as_printed: '1.5'
+  sign: positive
+  horizon: {kind: cumulative}
+  method: var
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Fisher-Peters (2010): Quarterly, 1960 - 2007; VAR using shocks to the excess stock returns of military contractors; based on cumulative effects'
+  identification: 'As summarised by Ramey: Quarterly, 1960 - 2007; VAR using shocks to the excess stock returns of military contractors; based on cumulative effects (Fisher-Peters (2010))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Fisher-Peters (2010)', column 'Implied spending multiplier' (printed p.104)
+  quote: Fisher-Peters (2010) Quarterly, 1960 VAR using shocks to the 1.5 based on
+  applicability: 'REVA note: number of Fisher-Peters (2010) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: spending_multiplier_ben_zeev_pappa
+  pdf_page: 106
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change, definition: government spending (as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied spending multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: 2.1
+  as_printed: '2.1'
+  sign: positive
+  horizon: {kind: cumulative, value: 6, unit: quarter}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Ben Zeev and Pappa (forthcoming): Quarterly, 1947-2007; shock orthogonal to current defense spending that best explains future defense spending over five years; integral multiplier at 6 quarters'
+  identification: 'As summarised by Ramey: Quarterly, 1947-2007; shock orthogonal to current defense spending that best explains future defense spending over five years; integral multiplier at 6 quarters (Ben Zeev and Pappa (forthcoming))'
+  locator: Table 4.1 'Summary of Government Spending Multiplier Estimates for the Aggregate U.S.', row 'Ben Zeev and Pappa (forthcoming)', column 'Implied spending multiplier' (printed p.104)
+  quote: Ben Zeev and Pappa Quarterly, 1947- Shock that (i) is orthogonal to 2.1 based on integral
+  applicability: 'REVA note: number of Ben Zeev and Pappa (forthcoming) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_mountford_uhlig_2009
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -5.0
+  as_printed: '-5'
+  sign: negative
+  horizon: {kind: unspecified}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Mountford-Uhlig (2009): Quarterly, 1955 - 2000; sign restrictions on a VAR; tax increase that reduces the deficit'
+  identification: 'As summarised by Ramey: Quarterly, 1955 - 2000; sign restrictions on a VAR; tax increase that reduces the deficit (Mountford-Uhlig (2009))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Mountford-Uhlig (2009)', column 'Implied tax multiplier' (printed p.106)
+  quote: Mountford-Uhlig Quarterly, 1955 - Sign restrictions on a VAR. -5 for a tax increase that
+  applicability: 'REVA note: number of Mountford-Uhlig (2009) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_romer_romer_2010
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -3.0
+  as_printed: '-3'
+  sign: negative
+  horizon: {kind: peak}
+  method: time_series_regression
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Romer-Romer (2010): Quarterly, 1947 - 2007; legislated tax changes driven by an inherited deficit or to promote future growth (narrative)'
+  identification: 'As summarised by Ramey: Quarterly, 1947 - 2007; legislated tax changes driven by an inherited deficit or to promote future growth (narrative) (Romer-Romer (2010))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Romer-Romer (2010)', column 'Implied tax multiplier' (printed p.106)
+  quote: Romer-Romer (2010) Quarterly, 1947 - Legislated tax changes driven -3, based on peak effect.
+  applicability: 'REVA note: number of Romer-Romer (2010) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_barro_redlick_2011
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -1.1
+  as_printed: '-1.1'
+  sign: negative
+  horizon: {kind: unspecified}
+  method: time_series_regression
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Barro-Redlick (2011): Annual, 1917 - 2006 and subsamples; average marginal income tax rate'
+  identification: 'As summarised by Ramey: Annual, 1917 - 2006 and subsamples; average marginal income tax rate (Barro-Redlick (2011))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Barro-Redlick (2011)', column 'Implied tax multiplier' (printed p.106)
+  quote: Barro-Redlick (2011) Annual, 1917 - Average marginal income tax -1.1
+  applicability: 'REVA note: number of Barro-Redlick (2011) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_favero_giavazzi_2011
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -0.5
+  as_printed: '-0.5'
+  sign: negative
+  horizon: {kind: unspecified}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Favero-Giavazzi (2011): Quarterly, 1950-2006; Romer-Romer shocks embedded in an SVAR'
+  identification: 'As summarised by Ramey: Quarterly, 1950-2006; Romer-Romer shocks embedded in an SVAR (Favero-Giavazzi (2011))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Favero-Giavazzi (2011)', column 'Implied tax multiplier' (printed p.106)
+  quote: Favero-Giavazzi Quarterly, 1950- Romer-Romer shocks -0.5
+  applicability: 'REVA note: number of Favero-Giavazzi (2011) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_caldara_kamps_2012
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -0.65
+  as_printed: '-0.65'
+  sign: negative
+  horizon: {kind: unspecified}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Caldara and Kamps (2012): Quarterly, 1947-2006; SVAR using outside elasticities; peak to impact'
+  identification: 'As summarised by Ramey: Quarterly, 1947-2006; SVAR using outside elasticities; peak to impact (Caldara and Kamps (2012))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Caldara and Kamps (2012)', column 'Implied tax multiplier' (printed p.106)
+  quote: Caldara and Kamps Quarterly, 1947- SVAR using outside -0.65 (peak to impact)
+  applicability: 'REVA note: number of Caldara and Kamps (2012) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'
+- id: tax_multiplier_mertens_ravn_2014
+  pdf_page: 108
+  evidence: secondary
+  cause: {kind: variable, id: fiscal.tax_revenue, transform: level_change, definition: taxes (tax increase as identified in the cited study)}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change, definition: output (implied tax multiplier)}
+  measure: multiplier
+  unit: currency_per_currency
+  point: -3.0
+  as_printed: '-3'
+  sign: negative
+  horizon: {kind: at_horizon, value: 6, unit: quarter}
+  method: svar
+  shock_profile: unspecified
+  scope:
+    countries: [USA]
+    sample_note: 'Mertens-Ravn (2014): Quarterly, 1950 - 2006; proxy SVAR using Romer-Romer unanticipated shocks'
+  identification: 'As summarised by Ramey: Quarterly, 1950 - 2006; proxy SVAR using Romer-Romer unanticipated shocks (Mertens-Ravn (2014))'
+  locator: Table 4.4 'Summary of Some Tax Multiplier Estimates for the Aggregate U.S.', row 'Mertens-Ravn (2014)', column 'Implied tax multiplier' (printed p.106)
+  quote: Mertens-Ravn (2014) Quarterly, 1950 - Proxy SVAR using Romer- -3 at 6 quarters
+  applicability: 'REVA note: number of Mertens-Ravn (2014) as summarised in Ramey''s survey table (secondary evidence, not read in the original study).'

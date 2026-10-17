@@ -118,7 +118,17 @@ def parse_ili(body: bytes) -> list[dict[str, Any]]:
 
 
 def parse_sentinel(body: bytes) -> list[dict[str, Any]]:
-    cols = ("survtype", "countryname", "yearweek", "pathogen", "pathogentype", "pathogensubtype", "indicator", "age", "value")
+    cols = (
+        "survtype",
+        "countryname",
+        "yearweek",
+        "pathogen",
+        "pathogentype",
+        "pathogensubtype",
+        "indicator",
+        "age",
+        "value",
+    )
     out = []
     seen: set[tuple[str, str, str, str]] = set()
     for i, r in enumerate(_rows(body, cols), start=2):
@@ -195,7 +205,14 @@ class IliDataset(_Erviss):
 
         rows = parse_ili(bodies["erviss.ili"])
         cells = [
-            _cell("erviss_ili", f"{r['indicator']}|survtype={r['survtype']}|age=total", r, RATE_UNIT, raws["erviss.ili"], "erviss.ili")
+            _cell(
+                "erviss_ili",
+                f"{r['indicator']}|survtype={r['survtype']}|age=total",
+                r,
+                RATE_UNIT,
+                raws["erviss.ili"],
+                "erviss.ili",
+            )
             for r in rows
         ]
         last = max(r["start"] for r in rows)

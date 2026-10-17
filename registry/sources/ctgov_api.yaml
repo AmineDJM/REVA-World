@@ -1,0 +1,16 @@
+# V6 (agent V6DRUGS): ClinicalTrials.gov API v2, aggregate counts only.
+# Connector: src/reva/adapters/connectors/atlas_drugs_ctgov.py (atlas.ctgov).
+source_key: ctgov.api
+title: ClinicalTrials.gov API v2 - registered study counts (field statistics and search totals)
+provider_url: https://clinicaltrials.gov
+lineage_family: ctgov
+rights:
+  licence: public domain (US Government work, NLM) with ClinicalTrials.gov terms and conditions
+  licence_review: true
+  terms_url: https://clinicaltrials.gov/about-site/terms-conditions
+  attribution: ClinicalTrials.gov, U.S. National Library of Medicine; data timestamp per value
+metadata:
+  allowed_hosts: [clinicaltrials.gov]
+  endpoints: [https://clinicaltrials.gov/api/v2/version, https://clinicaltrials.gov/api/v2/stats/field/values, https://clinicaltrials.gov/api/v2/studies]
+  authentication: none
+  release_checked: apiVersion 2.0.5, dataTimestamp 2026-10-16T09:00:05, 607,349 studies

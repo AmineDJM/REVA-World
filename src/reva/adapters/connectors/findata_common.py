@@ -138,8 +138,9 @@ _BIS_NON_ATTR = ("STRUCTURE", "STRUCTURE_ID", "ACTION", "TIME_PERIOD", "OBS_VALU
 
 def stream_bis_flat(
     f: hc.Fetched, member: str, dims: tuple[str, ...]
-) -> Iterator[tuple[int, tuple[str, ...], dict[str, str], dict[str, str]]]:
-    """Observations of a BIS flat CSV: ``(record line, dimension codes, merged attributes, observation cells)``.
+) -> Iterator[tuple[int, tuple[str, ...], tuple[str, ...], dict[str, str], dict[str, str]]]:
+    """Observations of a BIS flat CSV: ``(record line, dimension codes, dimension labels, merged attributes,
+    observation cells)``.
 
     ``merged attributes`` = series-level attribute rows (empty ``TIME_PERIOD``; partial keys match as wildcards)
     overlaid by the observation row's own attribute cells, as ``<code>: <label>`` texts. ``observation cells`` =
@@ -175,6 +176,7 @@ def stream_bis_flat(
         if not rec[tcol].strip():
             continue
         d = tuple(code(rec[col[x]]) for x in dims)
+        labels = tuple(label(rec[col[x]]) for x in dims)
         attrs = cache.get(d)
         if attrs is None:
             attrs = {}
@@ -183,7 +185,7 @@ def stream_bis_flat(
                     attrs.update(ga)
             cache[d] = attrs
         own = {a: rec[col[a]].strip() for a in attr_cols if rec[col[a]].strip()}
-        yield line, d, {**attrs, **own}, {c: rec[col[c]].strip() for c in obs_cols}
+        yield line, d, labels, {**attrs, **own}, {c: rec[col[c]].strip() for c in obs_cols}
 
 
 def counter_report(c: Counter[str]) -> dict[str, int]:

@@ -98,9 +98,16 @@ LANGUAGE_COLUMNS: dict[str, tuple[str, str]] = {
 }
 SCRIPT_COLUMNS: dict[str, tuple[str, str]] = {"Releases": ("mb_releases_by_script", "count.release.script")}
 NOT_CURRENT_COUNTRY = {
-    "XE": "Europe", "XW": "Worldwide", "SU": "Soviet Union", "YU": "Yugoslavia", "CS": "Serbia and Montenegro",
-    "XC": "Czechoslovakia", "XG": "East Germany", "XK": "Kosovo (no ISO 3166-1 code)", "AN": "Netherlands Antilles",
-}  # fmt: skip
+    "XE": "Europe",
+    "XW": "Worldwide",
+    "SU": "Soviet Union",
+    "YU": "Yugoslavia",
+    "CS": "Serbia and Montenegro",
+    "XC": "Czechoslovakia",
+    "XG": "East Germany",
+    "XK": "Kosovo (no ISO 3166-1 code)",
+    "AN": "Netherlands Antilles",
+}
 
 _UPDATED = re.compile(r"Last updated:\s*(\d{4}-\d{2}-\d{2})")
 _STAT = re.compile(r"/statistics/timeline/(count\.[a-z]+\.[a-z]+)\.([A-Za-z0-9]+|null)$")
@@ -310,9 +317,17 @@ def provider_geo(code: str) -> str:
 
 
 def _row(
-    *, dataset: str, indicator: str, concept: str | None, geo: str, day: date, n: int, raw_sha256: str,
-    selector: Mapping[str, Any], flags: Mapping[str, Any],
-) -> dict[str, Any]:  # fmt: skip
+    *,
+    dataset: str,
+    indicator: str,
+    concept: str | None,
+    geo: str,
+    day: date,
+    n: int,
+    raw_sha256: str,
+    selector: Mapping[str, Any],
+    flags: Mapping[str, Any],
+) -> dict[str, Any]:
     return {
         "source": ATLAS_SOURCE,
         "dataset": dataset,
@@ -343,7 +358,9 @@ def _base_flags(updated: date, retrieved_at: datetime) -> dict[str, Any]:
     }
 
 
-def country_rows(rows: Sequence[StatRow], updated: date, *, raw_sha256: str, retrieved_at: datetime) -> list[dict[str, Any]]:  # fmt: skip
+def country_rows(
+    rows: Sequence[StatRow], updated: date, *, raw_sha256: str, retrieved_at: datetime
+) -> list[dict[str, Any]]:
     base = _base_flags(updated, retrieved_at)
     out = []
     for r in rows:
@@ -360,11 +377,18 @@ def country_rows(rows: Sequence[StatRow], updated: date, *, raw_sha256: str, ret
             if stat == "count.release.country":
                 flags["release_events_not_origin"] = True
             out.append(
-                _row(dataset=DS_COUNTRY, indicator=indicator, concept=concept, geo=provider_geo(r.code), day=updated,
-                     n=n, raw_sha256=raw_sha256,
-                     selector={"page": "statistics/countries", "column": header, "code": r.code, "label": r.label},
-                     flags=flags)
-            )  # fmt: skip
+                _row(
+                    dataset=DS_COUNTRY,
+                    indicator=indicator,
+                    concept=concept,
+                    geo=provider_geo(r.code),
+                    day=updated,
+                    n=n,
+                    raw_sha256=raw_sha256,
+                    selector={"page": "statistics/countries", "column": header, "code": r.code, "label": r.label},
+                    flags=flags,
+                )
+            )
     return out
 
 
@@ -373,24 +397,41 @@ def language_rows(
 ) -> list[dict[str, Any]]:
     base = _base_flags(updated, retrieved_at)
     out = []
-    for rows, columns, dim, page_table in ((langs, LANGUAGE_COLUMNS, "language", "languages"),
-                                           (scripts, SCRIPT_COLUMNS, "script", "scripts")):  # fmt: skip
+    for rows, columns, dim, page_table in (
+        (langs, LANGUAGE_COLUMNS, "language", "languages"),
+        (scripts, SCRIPT_COLUMNS, "script", "scripts"),
+    ):
         for r in rows:
             for header, (indicator, stat) in columns.items():
                 n = r.counts[header]
                 if n is None:
                     continue
-                flags = {**base, "statistic": f"{stat}.{r.code}", "code_scheme": "ISO 639-3" if dim == "language"
-                         else "ISO 15924"}  # fmt: skip
+                flags = {
+                    **base,
+                    "statistic": f"{stat}.{r.code}",
+                    "code_scheme": "ISO 639-3" if dim == "language" else "ISO 15924",
+                }
                 if r.code == "null":
                     flags["unknown_" + dim] = True
                 out.append(
-                    _row(dataset=DS_LANGUAGE, indicator=f"{indicator}|{dim}={r.code}", concept=None, geo="world",
-                         day=updated, n=n, raw_sha256=raw_sha256,
-                         selector={"page": "statistics/languages-scripts", "table": page_table, "column": header,
-                                   "code": r.code, "label": r.label},
-                         flags=flags)
-                )  # fmt: skip
+                    _row(
+                        dataset=DS_LANGUAGE,
+                        indicator=f"{indicator}|{dim}={r.code}",
+                        concept=None,
+                        geo="world",
+                        day=updated,
+                        n=n,
+                        raw_sha256=raw_sha256,
+                        selector={
+                            "page": "statistics/languages-scripts",
+                            "table": page_table,
+                            "column": header,
+                            "code": r.code,
+                            "label": r.label,
+                        },
+                        flags=flags,
+                    )
+                )
     return out
 
 
@@ -413,9 +454,11 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=1.0,  # MusicBrainz asks for <= 1 request/s
         parser_version=PARSER_VERSION,
         code_digest=code_digest(sys.modules[__name__]),
-        field_mappings={"country_columns": {h: v[1] for h, v in COUNTRY_COLUMNS.items()},
-                        "language_columns": {h: v[1] for h, v in LANGUAGE_COLUMNS.items()},
-                        "geo": "ISO 3166-1 alpha-2 from count.<entity>.country.<code>"},  # fmt: skip
+        field_mappings={
+            "country_columns": {h: v[1] for h, v in COUNTRY_COLUMNS.items()},
+            "language_columns": {h: v[1] for h, v in LANGUAGE_COLUMNS.items()},
+            "geo": "ISO 3166-1 alpha-2 from count.<entity>.country.<code>",
+        },
         notes="Two HTML statistics pages (~0.7 MB). The /ws/2 search API (release counts per country-year) answered "
         "HTTP 503 'busy' to this egress IP on 2026-10-17 and is not used.",
     )
@@ -434,11 +477,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         sha = run.archive(raw)
         frame = atlas_frame(country_rows(rows, updated, raw_sha256=sha, retrieved_at=raw.retrieved_at))
         reg = run.register(
-            dataset=DS_COUNTRY, frame=frame, raw_sha256s=[sha], geo_scheme="iso2", rights=dict(RIGHTS),
+            dataset=DS_COUNTRY,
+            frame=frame,
+            raw_sha256s=[sha],
+            geo_scheme="iso2",
+            rights=dict(RIGHTS),
             coverage_note=f"MusicBrainz statistics/countries, last updated {updated}: {len(rows)} codes incl. "
             "'Unknown country' (mb:null) and non-current codes (XE, XW, SU, YU, CS, XC, XG, XK, AN) kept unmapped; "
             "release counts are release *events* per country (digital releases list many storefront countries)",
-        )  # fmt: skip
+        )
         out[DS_COUNTRY] = {"stats_last_updated": updated.isoformat(), "codes": len(rows), **trim_registration(reg)}
     if want_l:
         raw = await run.get(LANGUAGES_URL, key="statistics/languages-scripts", media_types=("text/html",))
@@ -449,12 +496,19 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         sha = run.archive(raw)
         frame = atlas_frame(language_rows(langs, scripts, updated, raw_sha256=sha, retrieved_at=raw.retrieved_at))
         reg = run.register(
-            dataset=DS_LANGUAGE, frame=frame, raw_sha256s=[sha], rights=dict(RIGHTS),
+            dataset=DS_LANGUAGE,
+            frame=frame,
+            raw_sha256s=[sha],
+            rights=dict(RIGHTS),
             coverage_note=f"MusicBrainz statistics/languages-scripts, last updated {updated}: {len(langs)} languages "
             f"(ISO 639-3), {len(scripts)} scripts (ISO 15924); provider_geo 'world' (whole database)",
-        )  # fmt: skip
-        out[DS_LANGUAGE] = {"stats_last_updated": updated.isoformat(), "languages": len(langs),
-                            "scripts": len(scripts), **trim_registration(reg)}  # fmt: skip
+        )
+        out[DS_LANGUAGE] = {
+            "stats_last_updated": updated.isoformat(),
+            "languages": len(langs),
+            "scripts": len(scripts),
+            **trim_registration(reg),
+        }
     return out or {"skipped": True}
 
 

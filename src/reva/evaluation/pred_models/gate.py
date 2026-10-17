@@ -159,9 +159,7 @@ def paired_test(rows: Sequence[Scored], cand: str, bench: str, loss: str, lag: i
         res.update(tested=False, p_better=None, p_worse=None, reason="fewer than 6 origins")
         return res
     t = dm_hln_test(d, lag)
-    res.update(
-        tested=True, dm_stat=t.statistic, dm_lag=t.lag, kernel=t.kernel, p_better=t.p_less, p_worse=t.p_greater
-    )
+    res.update(tested=True, dm_stat=t.statistic, dm_lag=t.lag, kernel=t.kernel, p_better=t.p_less, p_worse=t.p_greater)
     return res
 
 

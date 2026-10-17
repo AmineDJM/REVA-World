@@ -1,0 +1,24 @@
+# V6 (agent V6DRUGS): WHO electronic Essential Medicines List (eEML) pages.
+# Connector: src/reva/adapters/connectors/atlas_drugs_eml.py (atlas.who_eml).
+source_key: who.eeml
+title: WHO electronic Essential Medicines List (eEML) - Model Lists of Essential Medicines (EML, EMLc)
+provider_url: https://list.essentialmeds.org
+lineage_family: who_eml
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: https://creativecommons.org/licenses/by/3.0/igo/
+  terms_url: https://list.essentialmeds.org/licencing
+  use_restrictions: >-
+    Not "In conjunction with the advertising or promotion of commercial products, including proprietary medicines";
+    not "In any manner that suggests that WHO endorses any specific organisation or products"; WHO logo not permitted.
+  attribution: >-
+    WHO electronic Essential Medicines List (eEML), World Health Organization, 2020. https://list.essentialmeds.org/
+    (beta version 1.0). Licence: CC BY 3.0 IGO. Adaptations carry WHO's disclaimer ("This is an adaptation of an
+    original work by World Health Organization (WHO). ...").
+metadata:
+  allowed_hosts: [list.essentialmeds.org]
+  pages: ["/", "/medicines/<id>", "/recommendations/<id>"]
+  release_checked: 2026-10-17 list page "Found 1430 recommendations for 667 medicines and 162 therapeutic equivalents"
+  note: the XLSX export (POST /print) has names only (no ids, no ICD-11, no DrugBank), so the HTML pages are read
+  authentication: none
+  cadence: twice a year check (the EML is revised every two years)

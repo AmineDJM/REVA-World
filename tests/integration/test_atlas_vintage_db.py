@@ -102,3 +102,16 @@ def test_vintage_replay_manifest(db, ingested) -> None:  # type: ignore[no-untyp
     assert m["vintage_in_force"]["vintage"] == "2009-10"
     assert all(i["availability_proof"]["source_available_at"] <= "2009-12-01" for i in m["inputs"])
     assert {i["vintage"] for i in m["inputs"]} == {"2009-10"}
+
+
+def test_steo_archive_vintages_as_of(db, ingested) -> None:  # type: ignore[no-untyped-def]
+    """EIA STEO archive issues (V6 PRED-ENERGY): the issue in force and its projections, read as of a date."""
+    with db.worker.connect() as conn:
+        acc = CutoffRepository(
+            conn, datetime(2014, 1, 1, tzinfo=UTC), CutoffMode.available_then, origins=ORIGINS
+        ).vintages(db.store)
+        assert acc.vintage_in_force("eia_steo")["vintage"] == "2013-07"
+        fc = acc.forecasts(family="eia_steo", variable="eia_steo:BREPUUS").rows
+        assert fc.height and fc["period_start"].min() == date(2013, 7, 1)
+        hist = acc.latest(family="eia_steo", variable="eia_steo:BREPUUS").rows
+        assert hist["period_start"].max() == date(2013, 6, 1)

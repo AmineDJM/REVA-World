@@ -104,9 +104,13 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   STEO archive vintages) and of the pending v6signals.yaml (gdelt.doc2 100/day, gdelt.events2 1600/day); same caps.
 # * budgets.yaml -> budgets-1.3.27 (2026-10-17, PRED-CONFLICT): new views.api 60/day (atlas.views, VIEWS conflict
 #   forecasts as an attributed benchmark); same caps.
+# * budgets.yaml -> budgets-1.3.28 (2026-10-17, V6SIGNALS): gdelt.doc2 100 -> 300/day (DOC 2.0 API requests refused with
+#   HTTP 429 are retried after a cooldown, worst case 222 per run); same caps.
+# * budgets.yaml -> budgets-1.3.29 (2026-10-17, merge run by V6CULTURE, pinned by V6SIGNALS): 1.3.28 plus v6culture.yaml
+#   (new musicbrainz.stats 4/day, openlibrary.api 500/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "5eca6a3701f2424e867e39c6f30049cb54b129f94a5579f844e72b8f1ca75614",
+    "budgets.yaml": "472077cd9b57101984527fc9dbf6640cfd9c7adbcc7d11f74660f9dbf0453f3c",
 }
 
 

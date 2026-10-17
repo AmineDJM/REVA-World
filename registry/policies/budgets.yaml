@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.27"
+policy_version: "budgets-1.3.29"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -96,7 +96,7 @@ per_source_daily_requests:
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
   gcat.planet4589: 10
   # gdelt.doc2: requested by V6SIGNALS (v6signals.yaml)
-  gdelt.doc2: 100
+  gdelt.doc2: 300
   # gdelt.events2: requested by V6SIGNALS (v6signals.yaml)
   gdelt.events2: 1600
   # geonames.cities: requested by A-CITIES (a_cities.yaml)
@@ -155,6 +155,8 @@ per_source_daily_requests:
   maddison.mpd: 10
   # mondo.obo: requested by V4HEALTH (v4health.yaml)
   mondo.obo: 8
+  # musicbrainz.stats: requested by V6CULTURE (v6culture.yaml)
+  musicbrainz.stats: 4
   # naturalearth.admin0_10m: requested by A-GEO (a_geo.yaml)
   naturalearth.admin0_10m: 12
   # naturalearth.admin1_10m: requested by V4CLIMATE (v4climate.yaml)
@@ -185,6 +187,8 @@ per_source_daily_requests:
   openalex.snapshot: 30
   # openflights.data: requested by A-INFRA (a_infra.yaml)
   openflights.data: 10
+  # openlibrary.api: requested by V6CULTURE (v6culture.yaml)
+  openlibrary.api: 500
   # ourairports.data: requested by A-INFRA (a_infra.yaml)
   ourairports.data: 6
   # owid.compilations: requested by A-QOL (a_qol.yaml)

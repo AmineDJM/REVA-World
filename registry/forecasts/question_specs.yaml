@@ -413,6 +413,12 @@ families:
     backtest_lag_periods: 1
     resolution_note: >-
       Mean of the daily cells of the first atlas.eia spot_d version registered after sealing that also publishes a
+    finance:
+      kind: oil
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol]
+      candidates: [fin.garch11]
       later day. EIA names Refinitiv (LSEG) as the price source: every cell carries flags.licence_review.
 
   - key: ecb.eurusd_monthly_mean
@@ -436,6 +442,17 @@ families:
     void_after_days: 120
     backtest_lag_periods: 1
     resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: XM, lag_days: 7}
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: US, lag_days: 7}
+        cpi_base: {dataset_key: atlas.eurostat.hicp_m, indicator: "prc_hicp_minr|unit=I25|coicop18=TOTAL", provider_geo: EA, frequency: M, lag_days: 20}
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: USA, frequency: M, lag_days: 45}
 
   - key: ecb.eurcny_monthly_mean
     concept_id: null
@@ -455,6 +472,17 @@ families:
     void_after_days: 120
     backtest_lag_periods: 1
     resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: XM, lag_days: 7}
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: CN, lag_days: 7}
+        cpi_base: {dataset_key: atlas.eurostat.hicp_m, indicator: "prc_hicp_minr|unit=I25|coicop18=TOTAL", provider_geo: EA, frequency: M, lag_days: 20}
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: CHN, frequency: M, lag_days: 45}
 
   - key: ecb.eurjpy_monthly_mean
     concept_id: null
@@ -474,6 +502,17 @@ families:
     void_after_days: 120
     backtest_lag_periods: 1
     resolution_note: Mean of the daily cells of the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: XM, lag_days: 7}
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: JP, lag_days: 7}
+        cpi_base: {dataset_key: atlas.eurostat.hicp_m, indicator: "prc_hicp_minr|unit=I25|coicop18=TOTAL", provider_geo: EA, frequency: M, lag_days: 20}
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: JPN, frequency: M, lag_days: 45}
 
   - key: bis.policy_rate_daily
     concept_id: null
@@ -496,3 +535,418 @@ families:
     void_after_days: 180
     backtest_lag_periods: 1
     resolution_note: Mean of the daily cells of the first atlas.bis cbpol_d version after sealing that publishes a later day.
+
+  # ------------------------------------------------------------------ V6 PRED-FIN: finance families (daily sources)
+  # Research forecasts only: every question carries the disclaimer of reva.models.forecasting.finance_models
+  # (not investment advice, not a trading signal). Benchmarks are issued as baselines (`forecasters`); candidates
+  # (`candidates`) are only back-tested (reva.evaluation.finance_backtest) and join `forecasters` only on a
+  # (family, horizon) cell where they beat the random walk with a Holm-corrected DM-HLN test — see
+  # docs/dev/v6_pred_fin.md. Market forward points, OIS, fed-funds and Brent futures are licensed (CME/ICE/LSEG):
+  # no market-implied benchmark is open, so the forward is a CIP proxy from central-bank policy rates.
+  - key: fin.fx_eurusd_month_end
+    concept_id: finance.daily.eur_ref_usd
+    labels: {fr: "Taux de référence BCE, USD pour un euro (fin de mois)", en: "ECB reference rate, USD per EUR (month end)"}
+    definition: >-
+      ECB euro foreign exchange reference rate: units of US dollar (USD) per 1 euro. ECB: "All currencies quoted
+      against the euro (base currency)"; "The reference rates are published for information purposes only." Value
+      of the month = the rate of the last day of the month the ECB published (derived by REVA, month_end_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.eur_ref_usd)
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=USD
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: EUR-USD, label_fr: "Zone euro (EUR/USD)", label_en: "Euro area (EUR/USD)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "USD per EUR"
+    questions: &fin_level_questions
+      - {type: quantity, horizons: [1, 3, 12]}
+      - {type: interval, horizons: [1, 3, 12]}
+      - {type: binary, horizons: [1, 3, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: >-
+      Rate of the last day of the month published in the first atlas.ecb fx_ref version registered after sealing that
+      also publishes a later day (a TARGET closing day has no rate: the last published day counts).
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: &rate_xm {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: XM, lag_days: 7}
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: US, lag_days: 7}
+        cpi_base: &cpi_ea {dataset_key: atlas.eurostat.hicp_m, indicator: "prc_hicp_minr|unit=I25|coicop18=TOTAL", provider_geo: EA, frequency: M, lag_days: 20}
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: USA, frequency: M, lag_days: 45}
+
+  - key: fin.fx_eurgbp_month_end
+    concept_id: finance.daily.eur_ref_gbp
+    labels: {fr: "Taux de référence BCE, GBP pour un euro (fin de mois)", en: "ECB reference rate, GBP per EUR (month end)"}
+    definition: >-
+      ECB euro foreign exchange reference rate: units of Pound sterling (GBP) per 1 euro, value of the last day of the
+      month the ECB published (derived by REVA, month_end_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.eur_ref_gbp)
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=GBP
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: EUR-GBP, label_fr: "Zone euro (EUR/GBP)", label_en: "Euro area (EUR/GBP)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "GBP per EUR"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Last published day of the month in the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: *rate_xm
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: GB, lag_days: 7}
+        cpi_base: *cpi_ea
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: GBR, frequency: M, lag_days: 45}
+
+  - key: fin.fx_eurjpy_month_end
+    concept_id: finance.daily.eur_ref_jpy
+    labels: {fr: "Taux de référence BCE, JPY pour un euro (fin de mois)", en: "ECB reference rate, JPY per EUR (month end)"}
+    definition: >-
+      ECB euro foreign exchange reference rate: units of Japanese yen (JPY) per 1 euro, value of the last day of the
+      month the ECB published (derived by REVA, month_end_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.eur_ref_jpy)
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=JPY
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: EUR-JPY, label_fr: "Zone euro (EUR/JPY)", label_en: "Euro area (EUR/JPY)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "JPY per EUR"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Last published day of the month in the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: *rate_xm
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: JP, lag_days: 7}
+        cpi_base: *cpi_ea
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: JPN, frequency: M, lag_days: 45}
+
+  - key: fin.fx_eurchf_month_end
+    concept_id: finance.daily.eur_ref_chf
+    labels: {fr: "Taux de référence BCE, CHF pour un euro (fin de mois)", en: "ECB reference rate, CHF per EUR (month end)"}
+    definition: >-
+      ECB euro foreign exchange reference rate: units of Swiss franc (CHF) per 1 euro, value of the last day of the
+      month the ECB published (derived by REVA, month_end_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.eur_ref_chf)
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=CHF
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: EUR-CHF, label_fr: "Zone euro (EUR/CHF)", label_en: "Euro area (EUR/CHF)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "CHF per EUR"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Last published day of the month in the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: *rate_xm
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: CH, lag_days: 7}
+        cpi_base: *cpi_ea
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: CHE, frequency: M, lag_days: 45}
+
+  - key: fin.fx_eurcny_month_end
+    concept_id: null
+    labels: {fr: "Taux de référence BCE, CNY pour un euro (fin de mois)", en: "ECB reference rate, CNY per EUR (month end)"}
+    definition: >-
+      ECB euro foreign exchange reference rate: units of Chinese yuan renminbi (CNY) per 1 euro, value of the last day
+      of the month the ECB published (derived by REVA, month_end_of_daily).
+    definition_source: src/reva/adapters/connectors/atlas_hf_ecb.py
+    dataset_key: atlas.ecb.fx_ref
+    indicator: EUR_REF|currency=CNY
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: EUR-CNY, label_fr: "Zone euro (EUR/CNY)", label_en: "Euro area (EUR/CNY)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "CNY per EUR"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Last published day of the month in the first atlas.ecb fx_ref version after sealing that publishes a later day.
+    finance:
+      kind: fx
+      scale: log
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.fx_forward_cip]
+      candidates: [fin.garch11, fin.ppp_reversion]
+      inputs:
+        rate_base: *rate_xm
+        rate_quote: {dataset_key: atlas.bis.cbpol_d, indicator: CBPOL, provider_geo: CN, lag_days: 7}
+        cpi_base: *cpi_ea
+        cpi_quote: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=IX", provider_geo: CHN, frequency: M, lag_days: 45}
+
+  - key: fin.ust_10y_month_end
+    concept_id: finance.daily.ust_par_10yr
+    labels: {fr: "Rendement au pair du Trésor américain à 10 ans (fin de mois)", en: "US Treasury 10-year par yield (month end)"}
+    definition: >-
+      U.S. Treasury Daily Treasury Par Yield Curve Rates, column "10 Yr": par yield read from the official Treasury
+      yield curve (monotone convex method since December 6, 2021; quasi-cubic hermite spline before). Value of the
+      month = the last day of the month Treasury published (derived by REVA, month_end_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.ust_par_10yr)
+    dataset_key: atlas.ust.par_yield
+    indicator: UST_PAR|tenor=10 Yr
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: US, key: UST-10Y, label_fr: "États-Unis (Trésor, 10 ans)", label_en: "United States (Treasury, 10-year)"}]
+    frequency: M
+    value_rule: month_end_of_daily
+    unit: "percent"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: Last published day of the month in the first atlas.ust par_yield version after sealing that publishes a later day.
+    finance:
+      kind: yield
+      scale: level
+      maturity: 10
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.ust_eh_forward]
+      candidates: [fin.garch11, fin.ns_dl]
+      inputs:
+        curve: &ust_curve {dataset_key: atlas.ust.par_yield, indicator_prefix: "UST_PAR|tenor=", provider_geo: US, lag_days: 0}
+
+  - key: fin.ust_2s10s_month_end
+    concept_id: null
+    labels: {fr: "Écart 10 ans − 2 ans du Trésor américain (fin de mois)", en: "US Treasury 10-year minus 2-year par yield spread (month end)"}
+    definition: >-
+      Derived by REVA: U.S. Treasury Daily Treasury Par Yield Curve Rates, column "10 Yr" minus column "2 Yr" on each
+      day both are published (percentage points); value of the month = the last such day of the month
+      (month_end_spread_of_daily).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.ust_par_10yr, finance.daily.ust_par_2yr)
+    dataset_key: atlas.ust.par_yield
+    indicator: UST_PAR|tenor=10 Yr
+    indicator_minus: UST_PAR|tenor=2 Yr
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: US, key: UST-2S10S, label_fr: "États-Unis (Trésor, 10 ans − 2 ans)", label_en: "United States (Treasury, 10y − 2y)"}]
+    frequency: M
+    value_rule: month_end_spread_of_daily
+    unit: "percentage points"
+    questions: *fin_level_questions
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: 10 Yr minus 2 Yr on the last day of the month both are published, first atlas.ust par_yield version after sealing that publishes a later day.
+    finance:
+      kind: spread
+      scale: level
+      maturity: 10
+      minus_maturity: 2
+      generic_baselines: true
+      forecasters: [fin.rw_histvol, fin.ust_eh_forward]
+      candidates: [fin.garch11, fin.ns_dl]
+      inputs:
+        curve: *ust_curve
+
+  # Policy-rate decisions at the next scheduled meetings (binary). Meeting decision days come from the central
+  # banks' published calendars (atlas.cbcal.meetings, connector atlas.cb_calendars); the question asks whether the
+  # level in force 7 days after the decision day (ECB changes take effect the following Wednesday; Fed and BoE
+  # sooner) moved from the level in force at issue. Value = move in the asked direction (percentage points);
+  # event = strictly above 0. An unscheduled move between issue and that day counts (stated in every question).
+  - key: fin.fomc_hike
+    concept_id: finance.daily.fed_funds_target_upper
+    labels: {fr: "FOMC : hausse de la borne haute de la fourchette cible", en: "FOMC: increase of the upper limit of the target range"}
+    definition: >-
+      New York Fed EFFR record, API field targetRateTo: upper limit of the FOMC target range. Value = level in force on
+      the decision day + 7 days minus the level in force at issue (derived by REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.fed_funds_target_upper)
+    dataset_key: atlas.nyfed.rates_d
+    indicator: EFFR|field=targetRateTo
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: US, key: FOMC, label_fr: "États-Unis (FOMC)", label_en: "United States (FOMC)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 3
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: >-
+      targetRateTo of the latest EFFR record dated on or before the level day, in the first atlas.nyfed rates_d version
+      registered after sealing that also publishes a record dated on or after that day. NY Fed Terms of Use notice applies.
+    finance: &fomc_fin
+      kind: meeting
+      body: FOMC
+      direction: up
+      resolution_offset_days: 7
+      generic_baselines: false
+      forecasters: [fin.meeting_base_rate, fin.meeting_momentum]
+      candidates: [fin.taylor_logit]
+      calendar: {dataset_key: atlas.cbcal.meetings, indicator: "POLICY_DECISION|body=FOMC", provider_geo: US}
+      inputs:
+        # the lower limit (before 2008-12-16: the target rate) gives 2000-2026 history; both limits move together
+        history: {dataset_key: atlas.nyfed.rates_d, indicator: "EFFR|field=targetRateFrom", provider_geo: US, lag_days: 1}
+        inflation: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=YOY_PCH_PA_PT", provider_geo: USA, frequency: M, lag_days: 45}
+
+  - key: fin.fomc_cut
+    concept_id: finance.daily.fed_funds_target_upper
+    labels: {fr: "FOMC : baisse de la borne haute de la fourchette cible", en: "FOMC: decrease of the upper limit of the target range"}
+    definition: >-
+      New York Fed EFFR record, API field targetRateTo: upper limit of the FOMC target range. Value = level in force at
+      issue minus the level in force on the decision day + 7 days (derived by REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.fed_funds_target_upper)
+    dataset_key: atlas.nyfed.rates_d
+    indicator: EFFR|field=targetRateTo
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: US, key: FOMC, label_fr: "États-Unis (FOMC)", label_en: "United States (FOMC)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 3
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: As fin.fomc_hike (move counted downwards). NY Fed Terms of Use notice applies.
+    finance:
+      <<: *fomc_fin
+      direction: down
+
+  - key: fin.ecb_dfr_hike
+    concept_id: finance.daily.ecb_deposit_facility
+    labels: {fr: "BCE : hausse du taux de la facilité de dépôt", en: "ECB: increase of the deposit facility rate"}
+    definition: >-
+      ECB series FM.D.U2.EUR.4F.KR.DFR.LEV: Deposit facility - date of changes (raw data) - Level (series title
+      verbatim). Value = level in force on the decision day + 7 days minus the level in force at issue (derived by
+      REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.ecb_deposit_facility)
+    dataset_key: atlas.ecb.key_rates
+    indicator: FM.D.U2.EUR.4F.KR.DFR.LEV
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: ECB-GC, label_fr: "Zone euro (Conseil des gouverneurs de la BCE)", label_en: "Euro area (ECB Governing Council)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 3
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: >-
+      Deposit facility rate in force on the level day in the first atlas.ecb key_rates version registered after sealing
+      that publishes that day (the ECB series gives the level in force on every calendar day).
+    finance: &ecb_fin
+      kind: meeting
+      body: ECB Governing Council
+      direction: up
+      resolution_offset_days: 7
+      generic_baselines: false
+      forecasters: [fin.meeting_base_rate, fin.meeting_momentum]
+      candidates: [fin.taylor_logit]
+      calendar: {dataset_key: atlas.cbcal.meetings, indicator: "POLICY_DECISION|body=ECB_GC", provider_geo: U2}
+      inputs:
+        history: {dataset_key: atlas.ecb.key_rates, indicator: FM.D.U2.EUR.4F.KR.DFR.LEV, provider_geo: U2, lag_days: 0}
+        inflation: {dataset_key: atlas.eurostat.hicp_m, indicator: "prc_hicp_minr|unit=RCH_A|coicop18=TOTAL", provider_geo: EA, frequency: M, lag_days: 20}
+
+  - key: fin.ecb_dfr_cut
+    concept_id: finance.daily.ecb_deposit_facility
+    labels: {fr: "BCE : baisse du taux de la facilité de dépôt", en: "ECB: decrease of the deposit facility rate"}
+    definition: >-
+      ECB series FM.D.U2.EUR.4F.KR.DFR.LEV: Deposit facility - date of changes (raw data) - Level (series title
+      verbatim). Value = level in force at issue minus the level in force on the decision day + 7 days (derived by
+      REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.ecb_deposit_facility)
+    dataset_key: atlas.ecb.key_rates
+    indicator: FM.D.U2.EUR.4F.KR.DFR.LEV
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: U2, key: ECB-GC, label_fr: "Zone euro (Conseil des gouverneurs de la BCE)", label_en: "Euro area (ECB Governing Council)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 3
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: As fin.ecb_dfr_hike (move counted downwards).
+    finance:
+      <<: *ecb_fin
+      direction: down
+
+  - key: fin.boe_bank_rate_hike
+    concept_id: finance.daily.uk_bank_rate
+    labels: {fr: "Banque d'Angleterre : hausse du Bank Rate", en: "Bank of England: increase of Bank Rate"}
+    definition: >-
+      Bank of England series IUDBEDR: Official Bank Rate (series description verbatim). Value = level in force on the
+      announcement day + 7 days minus the level in force at issue (derived by REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.uk_bank_rate)
+    dataset_key: atlas.boe.rates_d
+    indicator: IUDBEDR
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: GB, key: BOE-MPC, label_fr: "Royaume-Uni (MPC de la Banque d'Angleterre)", label_en: "United Kingdom (Bank of England MPC)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 4
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: >-
+      Bank Rate of the latest business day on or before the level day in the first atlas.boe rates_d version registered
+      after sealing that also publishes a day on or after it.
+    finance: &boe_fin
+      kind: meeting
+      body: Bank of England MPC
+      direction: up
+      resolution_offset_days: 7
+      generic_baselines: false
+      forecasters: [fin.meeting_base_rate, fin.meeting_momentum]
+      candidates: [fin.taylor_logit]
+      calendar: {dataset_key: atlas.cbcal.meetings, indicator: "POLICY_DECISION|body=BOE_MPC", provider_geo: GB}
+      inputs:
+        history: {dataset_key: atlas.boe.rates_d, indicator: IUDBEDR, provider_geo: GB, lag_days: 0}
+        inflation: {dataset_key: atlas.imf.cpi_m, indicator: "CPI|coicop_1999=_T|type_of_transformation=YOY_PCH_PA_PT", provider_geo: GBR, frequency: M, lag_days: 45}
+
+  - key: fin.boe_bank_rate_cut
+    concept_id: finance.daily.uk_bank_rate
+    labels: {fr: "Banque d'Angleterre : baisse du Bank Rate", en: "Bank of England: decrease of Bank Rate"}
+    definition: >-
+      Bank of England series IUDBEDR: Official Bank Rate (series description verbatim). Value = level in force at issue
+      minus the level in force on the announcement day + 7 days (derived by REVA, meeting_change).
+    definition_source: registry/atlas/catalog/daily_markets.yaml (finance.daily.uk_bank_rate)
+    dataset_key: atlas.boe.rates_d
+    indicator: IUDBEDR
+    owner_agent: PRED-FIN
+    geos: [{provider_geo: GB, key: BOE-MPC, label_fr: "Royaume-Uni (MPC de la Banque d'Angleterre)", label_en: "United Kingdom (Bank of England MPC)"}]
+    frequency: M
+    value_rule: meeting_change
+    threshold: "0"
+    unit: "percentage points"
+    questions: [{type: binary, horizons: [1, 2], threshold_rule: above_fixed}]
+    publication_lag_days: 4
+    void_after_days: 120
+    backtest_lag_periods: 1
+    resolution_note: As fin.boe_bank_rate_hike (move counted downwards).
+    finance:
+      <<: *boe_fin
+      direction: down

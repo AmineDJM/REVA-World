@@ -1,0 +1,928 @@
+# Eurosystem macroeconometric models: common monetary policy experiment, country results (agent EFFECTS-MORE, V6).
+# Estimates generated from the annex tables (rows read from the text of the archived PDF, every row checked by eye
+# against the printed table); every quote is re-found on its page at load time.
+schema: reva-effects-literature/1
+id: van_els_locarno_morgan_villetelle_2001
+source_key: effects.literature
+citation:
+  text: "Peter van Els, Alberto Locarno, Julian Morgan and Jean-Pierre Villetelle. Monetary policy transmission in the euro area: what do aggregate and national structural models tell us? European Central Bank Working Paper No. 94, December 2001."
+  text_basis: assembled from the title page of the version read (ECB Working Paper Series)
+  short: "van Els, Locarno, Morgan & Villetelle (2001), ECB WP 94"
+  authors: [Peter van Els, Alberto Locarno, Julian Morgan, Jean-Pierre Villetelle]
+  title: "Monetary policy transmission in the euro area: what do aggregate and national structural models tell us?"
+  year: 2001
+  series: ECB Working Paper No. 94
+  doi: null
+  url: https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp094.pdf
+document:
+  url: https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp094.pdf
+  media_type: application/pdf
+  sha256: e34641d3a6e251c900bb0a6035c575c18f5f389c2e28bd16317d8637c3f3d16d
+  bytes: 1005317
+  version_read: "ECB Working Paper No. 94, December 2001"
+as_of: "2001-12-01"
+rights:
+  licence: "© European Central Bank, 2001. 'All rights reserved. Reproduction for educational and non-commercial purposes is permitted provided that the source is acknowledged.' (notice in the document read)"
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: sustained
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+          definition: "a 100 basis point rise in the policy interest rate for two years accompanied by common assumptions regarding the path of long-term interest rates and the exchange rate"}
+  measure: response
+  shock: {size: 100, unit: basis points}
+  method: structural_model
+  point_kind: point
+  uncertainty: {status: not_reported}
+  identification: "Common simulation experiment run on the macroeconometric models of the Eurosystem national central banks (and the ECB Area-Wide Model) by the Working Group on Econometric Modelling; deviations from each model's baseline"
+  applicability: "REVA note: model simulations (not econometric estimates of a shock's effect), deviations from baseline in the simulation years 2001-2005 (h = 0 is 2001, the first year of the rate rise); the rate is raised for two years and the long-term rate and exchange rate follow common assumptions; models of the early 2000s, before the euro area's later structural changes."
+estimates:
+- id: consumption_deflator_bel
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.18
+  as_printed: '-0.18'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.1, as_printed: '-0.10'}
+  - {h: 1, unit: year, point: -0.18, as_printed: '-0.18'}
+  - {h: 2, unit: year, point: -0.21, as_printed: '-0.21'}
+  - {h: 3, unit: year, point: -0.17, as_printed: '-0.17'}
+  - {h: 4, unit: year, point: -0.12, as_printed: '-0.12'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Belgium'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12
+  scope:
+    countries: [BEL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Belgium'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_deu
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.19
+  as_printed: '-0.19'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.05, as_printed: '-0.05'}
+  - {h: 1, unit: year, point: -0.19, as_printed: '-0.19'}
+  - {h: 2, unit: year, point: -0.38, as_printed: '-0.38'}
+  - {h: 3, unit: year, point: -0.56, as_printed: '-0.56'}
+  - {h: 4, unit: year, point: -0.56, as_printed: '-0.56'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Germany'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56
+  scope:
+    countries: [DEU]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Germany'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_grc
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.24
+  as_printed: '-0.24'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.16, as_printed: '-0.16'}
+  - {h: 1, unit: year, point: -0.24, as_printed: '-0.24'}
+  - {h: 2, unit: year, point: -0.29, as_printed: '-0.29'}
+  - {h: 3, unit: year, point: -0.35, as_printed: '-0.35'}
+  - {h: 4, unit: year, point: -0.38, as_printed: '-0.38'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Greece'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38
+  scope:
+    countries: [GRC]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Greece'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_esp
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.25
+  as_printed: '-0.25'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.04, as_printed: '-0.04'}
+  - {h: 1, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 2, unit: year, point: -0.46, as_printed: '-0.46'}
+  - {h: 3, unit: year, point: -0.68, as_printed: '-0.68'}
+  - {h: 4, unit: year, point: -0.86, as_printed: '-0.86'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Spain'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86
+  scope:
+    countries: [ESP]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Spain'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_fra
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.1
+  as_printed: '-0.10'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.07, as_printed: '-0.07'}
+  - {h: 1, unit: year, point: -0.1, as_printed: '-0.10'}
+  - {h: 2, unit: year, point: -0.12, as_printed: '-0.12'}
+  - {h: 3, unit: year, point: -0.14, as_printed: '-0.14'}
+  - {h: 4, unit: year, point: -0.16, as_printed: '-0.16'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''France'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16
+  scope:
+    countries: [FRA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''France'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_irl
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.15
+  as_printed: '-0.15'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.09, as_printed: '-0.09'}
+  - {h: 1, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 2, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 3, unit: year, point: -0.17, as_printed: '-0.17'}
+  - {h: 4, unit: year, point: -0.22, as_printed: '-0.22'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Ireland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22
+  scope:
+    countries: [IRL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Ireland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_ita
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.33
+  as_printed: '-0.33'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 1, unit: year, point: -0.33, as_printed: '-0.33'}
+  - {h: 2, unit: year, point: -0.47, as_printed: '-0.47'}
+  - {h: 3, unit: year, point: -0.5, as_printed: '-0.50'}
+  - {h: 4, unit: year, point: -0.37, as_printed: '-0.37'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Italy'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37
+  scope:
+    countries: [ITA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Italy'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_lux
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.05
+  as_printed: '-0.05'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.02, as_printed: '-0.02'}
+  - {h: 1, unit: year, point: -0.05, as_printed: '-0.05'}
+  - {h: 2, unit: year, point: -0.06, as_printed: '-0.06'}
+  - {h: 3, unit: year, point: -0.09, as_printed: '-0.09'}
+  - {h: 4, unit: year, point: -0.13, as_printed: '-0.13'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Luxembourg'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13
+  scope:
+    countries: [LUX]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Luxembourg'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_nld
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.2
+  as_printed: '-0.20'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.12, as_printed: '-0.12'}
+  - {h: 1, unit: year, point: -0.2, as_printed: '-0.20'}
+  - {h: 2, unit: year, point: -0.22, as_printed: '-0.22'}
+  - {h: 3, unit: year, point: -0.3, as_printed: '-0.30'}
+  - {h: 4, unit: year, point: -0.38, as_printed: '-0.38'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Netherlands'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38
+  scope:
+    countries: [NLD]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Netherlands'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_aut
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.14
+  as_printed: '-0.14'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.1, as_printed: '-0.10'}
+  - {h: 1, unit: year, point: -0.14, as_printed: '-0.14'}
+  - {h: 2, unit: year, point: -0.14, as_printed: '-0.14'}
+  - {h: 3, unit: year, point: -0.13, as_printed: '-0.13'}
+  - {h: 4, unit: year, point: -0.12, as_printed: '-0.12'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Austria'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38 Austria -0.10 -0.14 -0.14 -0.13 -0.12
+  scope:
+    countries: [AUT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Austria'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_prt
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.22
+  as_printed: '-0.22'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.07, as_printed: '-0.07'}
+  - {h: 1, unit: year, point: -0.22, as_printed: '-0.22'}
+  - {h: 2, unit: year, point: -0.26, as_printed: '-0.26'}
+  - {h: 3, unit: year, point: -0.27, as_printed: '-0.27'}
+  - {h: 4, unit: year, point: -0.35, as_printed: '-0.35'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Portugal'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38 Austria -0.10 -0.14 -0.14 -0.13 -0.12 Portugal -0.07 -0.22 -0.26 -0.27 -0.35
+  scope:
+    countries: [PRT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Portugal'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_fin
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.5
+  as_printed: '-0.50'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.53, as_printed: '-0.53'}
+  - {h: 1, unit: year, point: -0.5, as_printed: '-0.50'}
+  - {h: 2, unit: year, point: -0.17, as_printed: '-0.17'}
+  - {h: 3, unit: year, point: -0.02, as_printed: '-0.02'}
+  - {h: 4, unit: year, point: -0.08, as_printed: '-0.08'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Finland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38 Austria -0.10 -0.14 -0.14 -0.13 -0.12 Portugal -0.07 -0.22 -0.26 -0.27 -0.35 Finland -0.53 -0.50 -0.17 -0.02 -0.08
+  scope:
+    countries: [FIN]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Finland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: consumption_deflator_euro_area_aggregate
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.21
+  as_printed: '-0.21'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.09, as_printed: '-0.09'}
+  - {h: 1, unit: year, point: -0.21, as_printed: '-0.21'}
+  - {h: 2, unit: year, point: -0.31, as_printed: '-0.31'}
+  - {h: 3, unit: year, point: -0.4, as_printed: '-0.40'}
+  - {h: 4, unit: year, point: -0.4, as_printed: '-0.40'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''Aggregate'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38 Austria -0.10 -0.14 -0.14 -0.13 -0.12 Portugal -0.07 -0.22 -0.26 -0.27 -0.35 Finland -0.53 -0.50 -0.17 -0.02 -0.08 Aggregate -0.09 -0.21 -0.31 -0.40 -0.40
+  scope:
+    country_group: euro area (aggregate of the national central bank models, row 'Aggregate')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: Weighted aggregate of the 12 national model results
+- id: consumption_deflator_euro_area_awm
+  pdf_page: 57
+  effect: {kind: variable, id: prices.consumption_deflator, transform: log_level, definition: 'consumption deflator, % deviation from baseline'}
+  unit: percent
+  point: -0.3
+  as_printed: '-0.30'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 1, unit: year, point: -0.3, as_printed: '-0.30'}
+  - {h: 2, unit: year, point: -0.38, as_printed: '-0.38'}
+  - {h: 3, unit: year, point: -0.49, as_printed: '-0.49'}
+  - {h: 4, unit: year, point: -0.66, as_printed: '-0.66'}
+  locator: 'Table A.1 ''Effects on prices'', panel ''Consumption deflator'', row ''AWM'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.56)'
+  quote: Consumption deflator 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.10 -0.18 -0.21 -0.17 -0.12 Germany -0.05 -0.19 -0.38 -0.56 -0.56 Greece -0.16 -0.24 -0.29 -0.35 -0.38 Spain -0.04 -0.25 -0.46 -0.68 -0.86 France -0.07 -0.10 -0.12 -0.14 -0.16 Ireland -0.09 -0.15 -0.15 -0.17 -0.22 Italy -0.15 -0.33 -0.47 -0.50 -0.37 Luxembourg -0.02 -0.05 -0.06 -0.09 -0.13 Netherlands -0.12 -0.20 -0.22 -0.30 -0.38 Austria -0.10 -0.14 -0.14 -0.13 -0.12 Portugal -0.07 -0.22 -0.26 -0.27 -0.35 Finland -0.53 -0.50 -0.17 -0.02 -0.08 Aggregate -0.09 -0.21 -0.31 -0.40 -0.40 AWM -0.15 -0.30 -0.38 -0.49 -0.66
+  scope:
+    country_group: euro area (ECB Area-Wide Model, row 'AWM')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: ECB Area-Wide Model simulation
+  method: structural_model
+- id: real_gdp_bel
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.2
+  as_printed: '-0.20'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 1, unit: year, point: -0.2, as_printed: '-0.20'}
+  - {h: 2, unit: year, point: -0.1, as_printed: '-0.10'}
+  - {h: 3, unit: year, point: -0.05, as_printed: '-0.05'}
+  - {h: 4, unit: year, point: -0.03, as_printed: '-0.03'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Belgium'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03
+  scope:
+    countries: [BEL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Belgium'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_deu
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.33
+  as_printed: '-0.33'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.28, as_printed: '-0.28'}
+  - {h: 1, unit: year, point: -0.33, as_printed: '-0.33'}
+  - {h: 2, unit: year, point: -0.09, as_printed: '-0.09'}
+  - {h: 3, unit: year, point: 0.15, as_printed: '0.15'}
+  - {h: 4, unit: year, point: 0.26, as_printed: '0.26'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Germany'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26
+  scope:
+    countries: [DEU]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Germany'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_grc
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.78
+  as_printed: '-0.78'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.41, as_printed: '-0.41'}
+  - {h: 1, unit: year, point: -0.78, as_printed: '-0.78'}
+  - {h: 2, unit: year, point: -0.69, as_printed: '-0.69'}
+  - {h: 3, unit: year, point: -0.72, as_printed: '-0.72'}
+  - {h: 4, unit: year, point: -0.74, as_printed: '-0.74'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Greece'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74
+  scope:
+    countries: [GRC]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Greece'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_esp
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.43
+  as_printed: '-0.43'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.12, as_printed: '-0.12'}
+  - {h: 1, unit: year, point: -0.43, as_printed: '-0.43'}
+  - {h: 2, unit: year, point: -0.62, as_printed: '-0.62'}
+  - {h: 3, unit: year, point: -0.56, as_printed: '-0.56'}
+  - {h: 4, unit: year, point: -0.39, as_printed: '-0.39'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Spain'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39
+  scope:
+    countries: [ESP]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Spain'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_fra
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.28
+  as_printed: '-0.28'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 1, unit: year, point: -0.28, as_printed: '-0.28'}
+  - {h: 2, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 3, unit: year, point: -0.16, as_printed: '-0.16'}
+  - {h: 4, unit: year, point: -0.08, as_printed: '-0.08'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''France'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08
+  scope:
+    countries: [FRA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''France'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_irl
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.48
+  as_printed: '-0.48'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 1, unit: year, point: -0.48, as_printed: '-0.48'}
+  - {h: 2, unit: year, point: -0.43, as_printed: '-0.43'}
+  - {h: 3, unit: year, point: -0.38, as_printed: '-0.38'}
+  - {h: 4, unit: year, point: -0.32, as_printed: '-0.32'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Ireland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32
+  scope:
+    countries: [IRL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Ireland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_ita
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.6
+  as_printed: '-0.60'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.26, as_printed: '-0.26'}
+  - {h: 1, unit: year, point: -0.6, as_printed: '-0.60'}
+  - {h: 2, unit: year, point: -0.55, as_printed: '-0.55'}
+  - {h: 3, unit: year, point: -0.21, as_printed: '-0.21'}
+  - {h: 4, unit: year, point: 0.05, as_printed: '0.05'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Italy'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05
+  scope:
+    countries: [ITA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Italy'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_lux
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.25
+  as_printed: '-0.25'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.17, as_printed: '-0.17'}
+  - {h: 1, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 2, unit: year, point: -0.27, as_printed: '-0.27'}
+  - {h: 3, unit: year, point: -0.23, as_printed: '-0.23'}
+  - {h: 4, unit: year, point: -0.15, as_printed: '-0.15'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Luxembourg'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15
+  scope:
+    countries: [LUX]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Luxembourg'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_nld
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.27
+  as_printed: '-0.27'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.2, as_printed: '-0.20'}
+  - {h: 1, unit: year, point: -0.27, as_printed: '-0.27'}
+  - {h: 2, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 3, unit: year, point: -0.22, as_printed: '-0.22'}
+  - {h: 4, unit: year, point: -0.16, as_printed: '-0.16'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Netherlands'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16
+  scope:
+    countries: [NLD]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Netherlands'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_aut
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.47
+  as_printed: '-0.47'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.25, as_printed: '-0.25'}
+  - {h: 1, unit: year, point: -0.47, as_printed: '-0.47'}
+  - {h: 2, unit: year, point: -0.49, as_printed: '-0.49'}
+  - {h: 3, unit: year, point: -0.36, as_printed: '-0.36'}
+  - {h: 4, unit: year, point: -0.32, as_printed: '-0.32'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Austria'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16 Austria -0.25 -0.47 -0.49 -0.36 -0.32
+  scope:
+    countries: [AUT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Austria'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_prt
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.56
+  as_printed: '-0.56'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.12, as_printed: '-0.12'}
+  - {h: 1, unit: year, point: -0.56, as_printed: '-0.56'}
+  - {h: 2, unit: year, point: -0.81, as_printed: '-0.81'}
+  - {h: 3, unit: year, point: -0.74, as_printed: '-0.74'}
+  - {h: 4, unit: year, point: -0.61, as_printed: '-0.61'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Portugal'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16 Austria -0.25 -0.47 -0.49 -0.36 -0.32 Portugal -0.12 -0.56 -0.81 -0.74 -0.61
+  scope:
+    countries: [PRT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Portugal'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_fin
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.24
+  as_printed: '-0.24'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.34, as_printed: '-0.34'}
+  - {h: 1, unit: year, point: -0.24, as_printed: '-0.24'}
+  - {h: 2, unit: year, point: -0.15, as_printed: '-0.15'}
+  - {h: 3, unit: year, point: -0.22, as_printed: '-0.22'}
+  - {h: 4, unit: year, point: -0.25, as_printed: '-0.25'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Finland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16 Austria -0.25 -0.47 -0.49 -0.36 -0.32 Portugal -0.12 -0.56 -0.81 -0.74 -0.61 Finland -0.34 -0.24 -0.15 -0.22 -0.25
+  scope:
+    countries: [FIN]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Finland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: real_gdp_euro_area_aggregate
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.38
+  as_printed: '-0.38'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.22, as_printed: '-0.22'}
+  - {h: 1, unit: year, point: -0.38, as_printed: '-0.38'}
+  - {h: 2, unit: year, point: -0.31, as_printed: '-0.31'}
+  - {h: 3, unit: year, point: -0.14, as_printed: '-0.14'}
+  - {h: 4, unit: year, point: -0.02, as_printed: '-0.02'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''Aggregate'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16 Austria -0.25 -0.47 -0.49 -0.36 -0.32 Portugal -0.12 -0.56 -0.81 -0.74 -0.61 Finland -0.34 -0.24 -0.15 -0.22 -0.25 Aggregate -0.22 -0.38 -0.31 -0.14 -0.02
+  scope:
+    country_group: euro area (aggregate of the national central bank models, row 'Aggregate')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: Weighted aggregate of the 12 national model results
+- id: real_gdp_euro_area_awm
+  pdf_page: 59
+  effect: {kind: variable, id: output.real_gdp_level, transform: log_level, definition: 'real GDP, % deviation from baseline'}
+  unit: percent
+  point: -0.71
+  as_printed: '-0.71'
+  sign: negative
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: -0.34, as_printed: '-0.34'}
+  - {h: 1, unit: year, point: -0.71, as_printed: '-0.71'}
+  - {h: 2, unit: year, point: -0.71, as_printed: '-0.71'}
+  - {h: 3, unit: year, point: -0.63, as_printed: '-0.63'}
+  - {h: 4, unit: year, point: -0.57, as_printed: '-0.57'}
+  locator: 'Table A.2 ''Effects on real activity'', panel ''Real GDP'', row ''AWM'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.58)'
+  quote: Real GDP 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium -0.15 -0.20 -0.10 -0.05 -0.03 Germany -0.28 -0.33 -0.09 0.15 0.26 Greece -0.41 -0.78 -0.69 -0.72 -0.74 Spain -0.12 -0.43 -0.62 -0.56 -0.39 France -0.15 -0.28 -0.25 -0.16 -0.08 Ireland -0.25 -0.48 -0.43 -0.38 -0.32 Italy -0.26 -0.60 -0.55 -0.21 0.05 Luxembourg -0.17 -0.25 -0.27 -0.23 -0.15 Netherlands -0.20 -0.27 -0.25 -0.22 -0.16 Austria -0.25 -0.47 -0.49 -0.36 -0.32 Portugal -0.12 -0.56 -0.81 -0.74 -0.61 Finland -0.34 -0.24 -0.15 -0.22 -0.25 Aggregate -0.22 -0.38 -0.31 -0.14 -0.02 AWM -0.34 -0.71 -0.71 -0.63 -0.57
+  scope:
+    country_group: euro area (ECB Area-Wide Model, row 'AWM')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: ECB Area-Wide Model simulation
+  method: structural_model
+- id: unemployment_rate_bel
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.06
+  as_printed: '0.06'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.02, as_printed: '0.02'}
+  - {h: 1, unit: year, point: 0.06, as_printed: '0.06'}
+  - {h: 2, unit: year, point: 0.06, as_printed: '0.06'}
+  - {h: 3, unit: year, point: 0.03, as_printed: '0.03'}
+  - {h: 4, unit: year, point: 0.02, as_printed: '0.02'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Belgium'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02
+  scope:
+    countries: [BEL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Belgium'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_deu
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.09
+  as_printed: '0.09'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.05, as_printed: '0.05'}
+  - {h: 1, unit: year, point: 0.09, as_printed: '0.09'}
+  - {h: 2, unit: year, point: 0.14, as_printed: '0.14'}
+  - {h: 3, unit: year, point: 0.13, as_printed: '0.13'}
+  - {h: 4, unit: year, point: 0.03, as_printed: '0.03'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Germany'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03
+  scope:
+    countries: [DEU]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Germany'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_grc
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.2
+  as_printed: '0.20'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.11, as_printed: '0.11'}
+  - {h: 1, unit: year, point: 0.2, as_printed: '0.20'}
+  - {h: 2, unit: year, point: 0.23, as_printed: '0.23'}
+  - {h: 3, unit: year, point: 0.28, as_printed: '0.28'}
+  - {h: 4, unit: year, point: 0.31, as_printed: '0.31'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Greece'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31
+  scope:
+    countries: [GRC]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Greece'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_esp
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.31
+  as_printed: '0.31'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.06, as_printed: '0.06'}
+  - {h: 1, unit: year, point: 0.31, as_printed: '0.31'}
+  - {h: 2, unit: year, point: 0.52, as_printed: '0.52'}
+  - {h: 3, unit: year, point: 0.52, as_printed: '0.52'}
+  - {h: 4, unit: year, point: 0.38, as_printed: '0.38'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Spain'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38
+  scope:
+    countries: [ESP]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Spain'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_fra
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.07
+  as_printed: '0.07'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.02, as_printed: '0.02'}
+  - {h: 1, unit: year, point: 0.07, as_printed: '0.07'}
+  - {h: 2, unit: year, point: 0.11, as_printed: '0.11'}
+  - {h: 3, unit: year, point: 0.08, as_printed: '0.08'}
+  - {h: 4, unit: year, point: 0.04, as_printed: '0.04'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''France'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04
+  scope:
+    countries: [FRA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''France'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_irl
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.05
+  as_printed: '0.05'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.01, as_printed: '0.01'}
+  - {h: 1, unit: year, point: 0.05, as_printed: '0.05'}
+  - {h: 2, unit: year, point: 0.1, as_printed: '0.10'}
+  - {h: 3, unit: year, point: 0.13, as_printed: '0.13'}
+  - {h: 4, unit: year, point: 0.15, as_printed: '0.15'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Ireland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15
+  scope:
+    countries: [IRL]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Ireland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_ita
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.06
+  as_printed: '0.06'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.01, as_printed: '0.01'}
+  - {h: 1, unit: year, point: 0.06, as_printed: '0.06'}
+  - {h: 2, unit: year, point: 0.16, as_printed: '0.16'}
+  - {h: 3, unit: year, point: 0.2, as_printed: '0.20'}
+  - {h: 4, unit: year, point: 0.15, as_printed: '0.15'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Italy'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15
+  scope:
+    countries: [ITA]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Italy'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_lux
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.0
+  as_printed: '0.00'
+  sign: zero
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.0, as_printed: '0.00'}
+  - {h: 1, unit: year, point: 0.0, as_printed: '0.00'}
+  - {h: 2, unit: year, point: 0.0, as_printed: '0.00'}
+  - {h: 3, unit: year, point: 0.0, as_printed: '0.00'}
+  - {h: 4, unit: year, point: 0.0, as_printed: '0.00'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Luxembourg'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00
+  scope:
+    countries: [LUX]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Luxembourg'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_nld
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.12
+  as_printed: '0.12'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.05, as_printed: '0.05'}
+  - {h: 1, unit: year, point: 0.12, as_printed: '0.12'}
+  - {h: 2, unit: year, point: 0.14, as_printed: '0.14'}
+  - {h: 3, unit: year, point: 0.12, as_printed: '0.12'}
+  - {h: 4, unit: year, point: 0.08, as_printed: '0.08'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Netherlands'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08
+  scope:
+    countries: [NLD]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Netherlands'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_aut
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.22
+  as_printed: '0.22'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.08, as_printed: '0.08'}
+  - {h: 1, unit: year, point: 0.22, as_printed: '0.22'}
+  - {h: 2, unit: year, point: 0.32, as_printed: '0.32'}
+  - {h: 3, unit: year, point: 0.31, as_printed: '0.31'}
+  - {h: 4, unit: year, point: 0.28, as_printed: '0.28'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Austria'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08 Austria 0.08 0.22 0.32 0.31 0.28
+  scope:
+    countries: [AUT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Austria'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_prt
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.07
+  as_printed: '0.07'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.01, as_printed: '0.01'}
+  - {h: 1, unit: year, point: 0.07, as_printed: '0.07'}
+  - {h: 2, unit: year, point: 0.16, as_printed: '0.16'}
+  - {h: 3, unit: year, point: 0.16, as_printed: '0.16'}
+  - {h: 4, unit: year, point: 0.1, as_printed: '0.10'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Portugal'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08 Austria 0.08 0.22 0.32 0.31 0.28 Portugal 0.01 0.07 0.16 0.16 0.10
+  scope:
+    countries: [PRT]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Portugal'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_fin
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.26
+  as_printed: '0.26'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.17, as_printed: '0.17'}
+  - {h: 1, unit: year, point: 0.26, as_printed: '0.26'}
+  - {h: 2, unit: year, point: 0.08, as_printed: '0.08'}
+  - {h: 3, unit: year, point: 0.05, as_printed: '0.05'}
+  - {h: 4, unit: year, point: 0.07, as_printed: '0.07'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Finland'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08 Austria 0.08 0.22 0.32 0.31 0.28 Portugal 0.01 0.07 0.16 0.16 0.10 Finland 0.17 0.26 0.08 0.05 0.07
+  scope:
+    countries: [FIN]
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: 'Row ''Finland'': the national central bank''s macroeconometric model of that country (simulation years 2001-2005)'
+- id: unemployment_rate_euro_area_aggregate
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.11
+  as_printed: '0.11'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.04, as_printed: '0.04'}
+  - {h: 1, unit: year, point: 0.11, as_printed: '0.11'}
+  - {h: 2, unit: year, point: 0.17, as_printed: '0.17'}
+  - {h: 3, unit: year, point: 0.17, as_printed: '0.17'}
+  - {h: 4, unit: year, point: 0.11, as_printed: '0.11'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''Aggregate'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08 Austria 0.08 0.22 0.32 0.31 0.28 Portugal 0.01 0.07 0.16 0.16 0.10 Finland 0.17 0.26 0.08 0.05 0.07 Aggregate 0.04 0.11 0.17 0.17 0.11
+  scope:
+    country_group: euro area (aggregate of the national central bank models, row 'Aggregate')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: Weighted aggregate of the 12 national model results
+- id: unemployment_rate_euro_area_awm
+  pdf_page: 60
+  effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change, definition: 'unemployment rate, deviation from baseline in % points'}
+  unit: percentage_points
+  point: 0.39
+  as_printed: '0.39'
+  sign: positive
+  horizon: {kind: at_horizon, value: 1, unit: year}
+  irf:
+  - {h: 0, unit: year, point: 0.1, as_printed: '0.10'}
+  - {h: 1, unit: year, point: 0.39, as_printed: '0.39'}
+  - {h: 2, unit: year, point: 0.58, as_printed: '0.58'}
+  - {h: 3, unit: year, point: 0.62, as_printed: '0.62'}
+  - {h: 4, unit: year, point: 0.58, as_printed: '0.58'}
+  locator: 'Table A.2 ''Effects on real activity (ctd.)'', panel ''Unemployment rate (% points)'', row ''AWM'', columns 2001-2005 (main value: 2002, the second simulation year) (printed p.59)'
+  quote: Unemployment rate (% points) 2001 2002 2003 2004 2005 ________ ________ ________ ________ ________ Belgium 0.02 0.06 0.06 0.03 0.02 Germany 0.05 0.09 0.14 0.13 0.03 Greece 0.11 0.20 0.23 0.28 0.31 Spain 0.06 0.31 0.52 0.52 0.38 France 0.02 0.07 0.11 0.08 0.04 Ireland 0.01 0.05 0.10 0.13 0.15 Italy 0.01 0.06 0.16 0.20 0.15 Luxembourg 0.00 0.00 0.00 0.00 0.00 Netherlands 0.05 0.12 0.14 0.12 0.08 Austria 0.08 0.22 0.32 0.31 0.28 Portugal 0.01 0.07 0.16 0.16 0.10 Finland 0.17 0.26 0.08 0.05 0.07 Aggregate 0.04 0.11 0.17 0.17 0.11 AWM 0.10 0.39 0.58 0.62 0.58
+  scope:
+    country_group: euro area (ECB Area-Wide Model, row 'AWM')
+    period: {from: '2001', to: '2005'}
+    frequency: annual
+    sample_note: ECB Area-Wide Model simulation
+  method: structural_model

@@ -1,0 +1,14 @@
+# Budget request from agent V6CONFLICT (UCDP GED 26.1 + Candidate 2026 + Non-State / One-Sided; docs/dev/v6_conflict.md).
+# Merged by `python -m reva.atlas.budget_merge` (largest request per source, never the sum).
+agent: V6CONFLICT
+requests:
+  - source_key: ucdp.ged
+    # atlas.ucdp_ged: countrycode (CRAN, 0.5 MB) + downloads page (0.14 MB) + GED 26.1 zip (39 MB) + GED codebook
+    # (0.9 MB) + Candidate codebook (0.7 MB) + Non-State / One-Sided / Actor zips (0.2 MB) + Natural Earth admin-1 ZIP
+    # (15 MB) + 3 Candidate CSVs (~11 MB; one more each month): 12-16 requests, ~68 MB per run.
+    daily_requests: 40
+    expected_bytes_per_day: 150000000
+    reason: "12-16 requests / ~68 MB per run, one retry"
+notes: >-
+  Raw archive of one full run ~68 MB; the Natural Earth ZIP and the actor / countrycode files are byte-identical to
+  files V4CLIMATE / KGGEOPOL already archived (content-addressed, stored once). Cap for this agent: 100 MB.

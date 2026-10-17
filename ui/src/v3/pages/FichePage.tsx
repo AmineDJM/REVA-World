@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router";
 import { getAtlasSeries, getAtlasTableCells, conceptLabel, type AtlasCell } from "../api/atlas";
 import {
+  flagsText,
   getEntityFamilies,
   getEntityPlaces,
   type AtlasHint,
@@ -284,13 +285,36 @@ function Families({
               {g.count_is_lower_bound ? " au moins" : ""})
             </span>
           </h3>
+          {g.family === "same_as" && (
+            <p className="field-hint" data-testid="identity-note">
+              Identité, pas une relation : un élément source (Wikidata) porte
+              les deux identifiants. REVA ne fusionne pas les fiches ; chacune
+              garde ses propres sources.
+            </p>
+          )}
+          {g.family === "corresponds_to" && (
+            <p className="field-hint">
+              Lignes de tables de correspondance publiées entre nomenclatures :
+              une correspondance peut être partielle (indicateurs de la table
+              affichés), ce n’est ni une inclusion ni une identité.
+            </p>
+          )}
           <ul>
             {g.neighbours.map((n) => {
               const share = shareFr(n.share);
               return (
                 <li key={n.statement.row_id}>
+                  {n.identity && (
+                    <span className="v3-badge v3-badge-identity">identité</span>
+                  )}{" "}
                   <span className="v3-reading">{n.reading.label.fr}</span>{" "}
                   <Link to={fiche(n.neighbour.qid)}>{n.neighbour.label}</Link>
+                  {Object.keys(n.flags).length > 0 && (
+                    <span className="v3-flags" data-testid="concordance-flags">
+                      {" "}
+                      · {flagsText(n.flags)}
+                    </span>
+                  )}
                   {n.neighbour.kind ? (
                     <span className="v3-chip">
                       {kindLabel(n.neighbour.kind)}

@@ -121,7 +121,11 @@ def dfm_nowcast(
         sel = month_quarter == qi
         if sel.sum() == 3:
             F[qi] = float(fs[sel].mean())
-    rows = [qi for qi in range(1, Q) if qi != target_q and np.isfinite(g[qi]) and np.isfinite(g[qi - 1]) and np.isfinite(F[qi])]
+    rows = [
+        qi
+        for qi in range(1, Q)
+        if qi != target_q and np.isfinite(g[qi]) and np.isfinite(g[qi - 1]) and np.isfinite(F[qi])
+    ]
     if len(rows) < MIN_QUARTERS:
         return Abstain(f"fewer than {MIN_QUARTERS} quarters for the bridge equation")
     Xb = np.column_stack([np.ones(len(rows)), F[rows], g[[r - 1 for r in rows]]])
@@ -132,13 +136,30 @@ def dfm_nowcast(
     if n - kk < 8:
         return Abstain("too few degrees of freedom for the bridge equation")
     s2 = float(res @ res) / (n - kk)
-    prev = g[target_q - 1]
-    if not np.isfinite(prev) or not np.isfinite(F[target_q]):
-        return Abstain("previous quarter not published or target quarter months missing")
-    x0 = np.array([1.0, F[target_q], prev])
-    lev = float(x0 @ np.linalg.solve(Xb.T @ Xb, x0))
-    point = float(x0 @ coef)
-    sigma = math.sqrt(s2 * (1 + lev))
+
+    def one(q: int, depth: int) -> tuple[float, float] | None:
+        """(point, variance) of g[q]. A previous quarter not yet published (an edition compiled before the last
+        quarter's GDP) is nowcast first, one level deep; its variance is propagated through the AR term."""
+        if q < 1 or not np.isfinite(F[q]):
+            return None
+        if np.isfinite(g[q - 1]):
+            prev, vprev = float(g[q - 1]), 0.0
+        elif depth > 0:
+            r = one(q - 1, depth - 1)
+            if r is None:
+                return None
+            prev, vprev = r
+        else:
+            return None
+        x0 = np.array([1.0, F[q], prev])
+        lev = float(x0 @ np.linalg.solve(Xb.T @ Xb, x0))
+        return float(x0 @ coef), s2 * (1 + lev) + float(coef[2]) ** 2 * vprev
+
+    r = one(target_q, 1)
+    if r is None:
+        return Abstain("previous quarters not published and not nowcastable, or target quarter months missing")
+    point, var = r
+    sigma = math.sqrt(var)
     if not (math.isfinite(point) and sigma > 0):
         return Abstain("non-finite nowcast")
     return Predictive(

@@ -97,8 +97,8 @@ def test_vintage_flags_refuse_unknown_terms_and_half_availability() -> None:
         vintage_flags(**ok, available_at=None, basis="weo_release_month_end")
     with pytest.raises(ValueError):
         vintage_flags(**{**ok, "family": "made_up"}, available_at=None, basis=None)
-    assert set(FAMILIES) == {"imf_weo", "philfed_rtdsm", "philfed_spf", "ecb_spf", "oecd_mei_rt"}
-    assert len(AVAILABILITY_RULES) == 6
+    assert set(FAMILIES) == {"imf_weo", "philfed_rtdsm", "philfed_spf", "ecb_spf", "oecd_mei_rt", "eia_steo"}
+    assert len(AVAILABILITY_RULES) == 8  # + the two STEO archive rules (V6 PRED-ENERGY)
 
 
 # ---------------------------------------------------------------------------------------------- WEO

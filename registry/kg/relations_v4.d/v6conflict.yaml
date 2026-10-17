@@ -1,0 +1,17 @@
+version: 1
+agent: V6CONFLICT
+note: >-
+  UCDP GED / Non-State / One-Sided (docs/dev/v6_conflict.md). Entity-valued predicates only; literals (counts,
+  fatalities, dates, dyad ids, organisational level) are values, not edges. KGGEOPOL predicates reused on the new
+  ucdp:nonstate / ucdp:onesided entities (ucdp:location, ucdp:nonstate_side, ucdp:secondary_party) keep their
+  existing mappings. Participant predicates (ucdpnsos:perpetrator, like ucdp:primary_party / ucdp:nonstate_side)
+  are event roles read by the events taxonomy (registry/events/taxonomy.yaml, role perpetrator), not families.
+  No family is causal.
+mappings:
+  - property: "ucdpged:events_in_adm1"
+    family: located_in
+    subtype: conflict_events_in_subdivision
+    source: ucdp.ged
+    subject_kinds: [armed_conflict, non_state_conflict, one_sided_violence]
+    object_kinds: [region_adm1]
+    note: "REVA point-in-polygon of UCDP GED event coordinates (where_prec 1-4) against the Natural Earth 1:10m admin-1 polygon whose published iso_3166_2 code names the subdivision; events, deaths and years in the qualifiers"

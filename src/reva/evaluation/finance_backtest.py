@@ -346,17 +346,34 @@ def holm_by_model(tests: Mapping[tuple[str, str, int], dict[str, Any]], alpha: f
                 tests[k][flag] = i in rej
 
 
+def _benchmarks_in(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+    bench = {k for k, (_, kind, _) in F.FIN_MODELS.items() if kind == "benchmark"}
+    return sorted({str(r["model"]) for r in rows} & bench)
+
+
 def evaluate(level_rows: Sequence[Mapping[str, Any]], meeting_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """Summaries per (family, model, h), DM-HLN tests with Holm, significant winners."""
+    """Summaries per (family, model, h); DM-HLN tests with Holm against the reference (random walk / base rate) and
+    against every other benchmark; significant winners.
+
+    A candidate wins a (family, horizon) cell only if it is significantly better (one-sided DM-HLN, Holm per model
+    and benchmark across cells, 5 %) than **every** benchmark scored on that cell (intersection-union rule: no
+    further multiplicity correction needed, and a candidate cannot win by beating only the weakest benchmark)."""
     summary: list[dict[str, Any]] = []
     groups: dict[tuple[str, str, int], list[Mapping[str, Any]]] = defaultdict(list)
     for r in [*level_rows, *meeting_rows]:
         groups[(r["family"], r["model"], int(r["h"]))].append(r)
     for (fam, mk, h), rs in sorted(groups.items()):
         summary.append({"family": fam, "model": mk, "h": h, **summarise(rs)})
-    primary = compare(level_rows, LEVEL_REF, "crps")
-    primary.update(compare(meeting_rows, MEETING_REF, "brier", dm_horizon=2))
-    holm_by_model(primary)
+    vs: dict[str, dict[tuple[str, str, int], dict[str, Any]]] = {}
+    for ref in _benchmarks_in(level_rows):
+        t = compare(level_rows, ref, "crps")
+        holm_by_model(t)
+        vs[ref] = t
+    for ref in _benchmarks_in(meeting_rows):
+        t = compare(meeting_rows, ref, "brier", dm_horizon=2)
+        holm_by_model(t)
+        vs[ref] = t
+    primary = {**vs.get(LEVEL_REF, {}), **vs.get(MEETING_REF, {})}
     secondary: dict[str, list[dict[str, Any]]] = {}
     for metric in ("se", "brier", "is"):
         t = compare(level_rows, LEVEL_REF, metric)
@@ -365,15 +382,27 @@ def evaluate(level_rows: Sequence[Mapping[str, Any]], meeting_rows: Sequence[Map
     t = compare(meeting_rows, MEETING_REF, "logs", dm_horizon=2)
     holm_by_model(t)
     secondary["meeting_log_score"] = list(t.values())
+    others = [t for ref, tt in sorted(vs.items()) if ref not in (LEVEL_REF, MEETING_REF) for t in tt.values()]
     candidates = {k for k, (_, kind, _) in F.FIN_MODELS.items() if kind == "candidate"}
-    winners = [
-        {k: v[k] for k in ("family", "model", "h", "metric", "ratio", "p_better")}
-        for v in primary.values()
-        if v.get("holm_better") and v["model"] in candidates
-    ]
+    winners: list[dict[str, Any]] = []
+    for key, v in sorted(primary.items()):
+        if v["model"] not in candidates:
+            continue
+        refs = {ref: tt[key] for ref, tt in vs.items() if key in tt}
+        if refs and all(x.get("holm_better") for x in refs.values()):
+            winners.append(
+                {
+                    "family": v["family"],
+                    "model": v["model"],
+                    "h": v["h"],
+                    "metric": v["metric"],
+                    "vs": {ref: {"ratio": x["ratio"], "p_better": x["p_better"], "n": x["n"]} for ref, x in refs.items()},
+                }
+            )
     return {
         "summary": summary,
         "tests_primary": list(primary.values()),
+        "tests_vs_other_benchmarks": others,
         "tests_secondary": secondary,
         "winners": winners,
     }
@@ -401,8 +430,9 @@ def run(
         "vintage_mode": "final_vintage_pseudo_real_time",
         "start_year": start_year,
         "reference": {"levels": LEVEL_REF, "meetings": MEETING_REF},
-        "tests": "Diebold-Mariano with HLN correction, one-sided, Holm step-down per model across (family, horizon) "
-        f"cells at {ALPHA}; primary metric CRPS (levels) / Brier (meetings)",
+        "tests": "Diebold-Mariano with HLN correction, one-sided, Holm step-down per model and benchmark across "
+        f"(family, horizon) cells at {ALPHA}; primary metric CRPS (levels) / Brier (meetings); a candidate wins a "
+        "cell only if significantly better than every benchmark scored on it",
         "meeting_window_days": MEETING_WINDOW_DAYS,
         "families": {
             c.family: {"models": list(c.models), "horizons": list(c.horizons), "target": c.target_kind,
@@ -435,3 +465,86 @@ __all__ = [
     "run_meeting_case",
     "summarise",
 ]
+
+
+# --------------------------------------------------------------------------- database runner
+
+
+def input_dataset_keys(specs: SpecSet, families: Sequence[str] | None = None) -> list[str]:
+    """Every table a finance family reads (its own table and its inputs)."""
+    keys: set[str] = set()
+    for fam in specs.families:
+        if fam.finance is None or fam.dataset_key is None or (families and fam.key not in families):
+            continue
+        keys.add(fam.dataset_key)
+        for inp in (fam.finance.get("inputs") or {}).values():
+            keys.add(inp["dataset_key"])
+    return sorted(keys)
+
+
+def run_recorded(
+    engine: Any,
+    store: Any,
+    *,
+    origin: str = "live",
+    start_year: int = 2000,
+    families: Sequence[str] | None = None,
+    record: bool = True,
+    actor: str = "worker:forecast_registry",
+) -> dict[str, Any]:
+    """Pin the latest version of every input table, run the back-test and (``record``) store the manifest
+    content-addressed with a provenance activity and one ``model.evaluation`` row per finance model
+    (``metrics.kind = 'finance_backtest'``, replay mode ``revised_data_retrospective``)."""
+    from datetime import datetime
+
+    from sqlalchemy import text
+
+    from reva.evaluation.registry.data import FrameCache, latest_version
+    from reva.evaluation.registry.service import _code_digest, _insert_eval, _short_pin, model_version_ids
+    from reva.evaluation.registry.specs import load_specs
+
+    specs = load_specs()
+    with engine.connect() as conn:
+        cutoff: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+        pins = {k: latest_version(conn, k, origin=origin, cutoff=cutoff) for k in input_dataset_keys(specs, families)}
+    cache = FrameCache(store, size=len(pins) + 1)
+    frames = {k: cache.get(p["artifact_sha256"]) for k, p in pins.items() if p}
+    manifest = run(specs, frames, start_year=start_year, families=families)
+    manifest["origin"] = origin
+    manifest["run_at"] = cutoff.isoformat()
+    manifest["data"] = {"tables": {k: _short_pin(p) for k, p in pins.items() if p},
+                        "missing_tables": sorted(k for k, p in pins.items() if not p)}  # fmt: skip
+    manifest["specs"] = {"version": specs.version, "sha256": specs.sha256}
+    manifest["code_digest"] = _code_digest()
+    if not record:
+        return manifest
+    from reva.adapters.postgres import repositories as repo
+
+    with engine.connect() as conn:
+        mv = model_version_ids(conn)
+    with engine.begin() as conn:
+        sha = repo.store_json_artifact(conn, store, manifest, "evaluation", schema_version="finance-backtest/1")
+        act = repo.simple_activity(
+            "evaluation.finance_backtest", "evaluation", actor, {"label": LABEL, "sha256": sha, "disclaimer": DISCLAIMER}
+        )
+        repo.record_activity(
+            conn,
+            act,
+            inputs=[(t["artifact_sha256"], {"role": "atlas_table", "dataset_key": k})
+                    for k, t in sorted(manifest["data"]["tables"].items())],  # fmt: skip
+            outputs=[sha],
+        )
+        ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=cutoff)
+        scope = {"kind": "finance_backtest", "origin": origin, "vintage_mode": "final_vintage_pseudo_real_time",
+                 "families": sorted(manifest["families"])}  # fmt: skip
+        for mk, (ver, kind, _d) in sorted(F.FIN_MODELS.items()):
+            per = [r for r in manifest["summary"] if r["model"] == mk]
+            tests = [t for t in manifest["tests_primary"] if t["model"] == mk]
+            _insert_eval(
+                conn, mv[mk], ctx, sha, "revised_data_retrospective", scope,
+                {"kind": "finance_backtest", "label": LABEL, "disclaimer": DISCLAIMER, "model": f"{mk}@{ver}",
+                 "model_role": kind, "backtest_sha256": sha, "summary": per, "tests": tests,
+                 "winner_cells": [w for w in manifest["winners"] if w["model"] == mk]},
+                act.id,
+            )  # fmt: skip
+    return {**manifest, "backtest_sha256": sha}

@@ -9,6 +9,7 @@
  * has-cause/has-effect property), and it is always attributed to the asserting source.
  */
 import type { KgPathResult } from '../api/kg';
+import { flagsText } from '../api/families';
 import { linkNodeLabel, LINK_TYPE_LABEL, type LinksPathData, type LinkTemporal } from '../api/links';
 import { citeKgStatement, citeLinkEvidence, isWikidataSource, type Citation } from './citations';
 import { formatYear, temporalLabel, temporalOf, yearOfPartial } from './time';
@@ -27,6 +28,10 @@ export interface HopView {
   /** The server's own sentence for this hop (LINKS fr text), shown as a secondary line. */
   serverText: string | null;
   via: string[];
+  /** same_as step: an item holds both identifiers (identity, not a relation; never merged). */
+  identity: boolean;
+  /** corresponds_to step: the concordance table's own flags ("table HS2022-HS2017 · hs partial 0"). */
+  flags: string;
 }
 
 export interface PathView {
@@ -94,6 +99,11 @@ export function connectedSentence(relation: string): string {
   return `relié via « ${relation} »`;
 }
 
+/** An identity step is worded as identity (same entity per a published identifier), never as a relation. */
+export function identitySentence(relation: string): string {
+  return `même entité (identité selon « ${relation} »)`;
+}
+
 export function fromLinks(d: LinksPathData): PathsView {
   const L = (id: string) => ({ id, label: linkNodeLabel(d.labels, id) });
   return {
@@ -118,19 +128,25 @@ export function fromLinks(d: LinksPathData): PathsView {
         const from = L(h.from);
         const to = L(h.to);
         const causal = isCausal ? { assertedBy: sourceLabel(stmtEvidence!.source), statement: stmtEvidence!.statement_id ?? null } : null;
+        const fam = (h as { family?: unknown }).family;
+        const identity = !causal && ((h as { identity?: unknown }).identity === true || fam === 'same_as');
         return {
           from,
           to,
           relation,
           sentence: causal
             ? `selon ${causal.assertedBy}, ${from.label} — ${relation} — ${to.label} (relation causale affirmée par la source, non établie par REVA)`
-            : connectedSentence(relation),
+            : identity
+              ? identitySentence(relation)
+              : connectedSentence(relation),
           causal,
           dates: dates.text,
           undated: dates.undated,
           citations,
           serverText: h.text.fr ?? null,
           via: (h.via ?? []).map((v) => L(v).label),
+          identity,
+          flags: fam === 'corresponds_to' ? flagsText((h as { flags?: Record<string, unknown> }).flags) : '',
         };
       }),
     })),
@@ -157,12 +173,16 @@ export function fromKg(d: KgPathResult): PathsView {
           const causal = isCausal
             ? { assertedBy: sourceLabel(asserted), statement: String((h.causal_assertion as Record<string, unknown>).statement_key ?? h.provenance.statement_key) }
             : null;
+          const fam = (h as { family?: unknown }).family;
+          const identity = !causal && fam === 'same_as';
           return {
             from: { id: h.from.qid, label: h.from.label },
             to: { id: h.to.qid, label: h.to.label },
             relation,
             sentence: causal
               ? `selon ${causal.assertedBy}, ${h.subject.label} — ${h.property.label_fr || h.property.label_en || h.property.pid} — ${h.object?.label ?? ''} (relation causale affirmée par la source, non établie par REVA)`
+              : identity
+              ? identitySentence(relation)
               : connectedSentence(relation),
             causal,
             dates: temporalLabel(t),
@@ -170,6 +190,8 @@ export function fromKg(d: KgPathResult): PathsView {
             citations: [citeKgStatement(h)],
             serverText: null,
             via: [],
+            identity,
+            flags: fam === 'corresponds_to' ? flagsText(h.qualifiers as Record<string, unknown> | null) : '',
           };
         }),
       };

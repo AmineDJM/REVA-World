@@ -336,6 +336,12 @@ function PathChain({ path, index }: { path: PathView; index: number }) {
               <span className={h.undated ? 'v3-undated' : ''}>{h.dates || 'dates non précisées'}</span>
               {h.via.length > 0 && <span> · via {h.via.join(', ')}</span>}
               {h.causal && <span className="v3-badge v3-badge-causal">affirmé par {h.causal.assertedBy}</span>}
+              {h.identity && (
+                <span className="v3-badge v3-badge-identity" data-testid="identity-hop">
+                  identité (identifiants publiés, pas une relation)
+                </span>
+              )}
+              {h.flags && <span data-testid="concordance-flags"> · {h.flags}</span>}
             </p>
             <div className="v3-hop-cites">
               {h.citations.length ? h.citations.map((c, j) => <CitationChip key={j} c={c} />) : <span className="v3-missing">aucune citation fournie par le serveur</span>}

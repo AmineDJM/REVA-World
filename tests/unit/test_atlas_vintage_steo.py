@@ -55,7 +55,7 @@ def _cell(df: pl.DataFrame, code: str, period: date) -> dict[str, Any]:
 
 
 def test_source_is_discovered_and_registered_as_vintage_family() -> None:
-    found, problems = discover([st.NAME])
+    found, problems = discover([st.__name__])
     assert st.NAME in found and not problems
     assert "eia_steo" in FAMILIES
     assert {"steo_archive_release_date", "steo_archive_file_last_modified"} <= set(AVAILABILITY_RULES)
@@ -77,11 +77,11 @@ def test_archives_page_rows_release_dates_and_files() -> None:
 
 def test_irregular_markup_rows_without_tr_are_read_in_cell_order() -> None:
     html = (
-        "<h1>STEO Archives</h1><table><tr><td>May 2019</td><td>5/7/2019</td><td>x</td>"
-        '<td><a href="archives/may19_base.xlsx">may19_base.xlsx</a></td><td></td></tr>'
-        "<td>April 2019</td><td>4/9/2019</td><td>x</td>"
-        '<td><a href="archives/apr19_base.xlsx">apr19_base.xlsx</a></td><td></td></tr></table>'
-    ).encode()
+        b"<h1>STEO Archives</h1><table><tr><td>May 2019</td><td>5/7/2019</td><td>x</td>"
+        b'<td><a href="archives/may19_base.xlsx">may19_base.xlsx</a></td><td></td></tr>'
+        b"<td>April 2019</td><td>4/9/2019</td><td>x</td>"
+        b'<td><a href="archives/apr19_base.xlsx">apr19_base.xlsx</a></td><td></td></tr></table>'
+    )
     issues, _ = st.parse_archive_page(html)
     assert [(i.label, i.release) for i in issues] == [("April 2019", date(2019, 4, 9)), ("May 2019", date(2019, 5, 7))]
     with pytest.raises(st.SteoArchiveError):
@@ -148,10 +148,12 @@ def test_forecast_month_must_match_the_archives_page() -> None:
 def test_vintage_accessor_reads_issues_as_of() -> None:
     a, _ = _parse("jul13_base", "July 2013")
     b, _ = _parse("oct26_base", "October 2026")
-    cells = cells_from_atlas_frame(pl.concat([a, b]), dataset_key="atlas.vintage_steo.steo_archive",
-                                   table_recorded_at=None)
-    before = VintageAccessor(cells, datetime(2013, 7, 10, tzinfo=UTC) - timedelta(microseconds=1),
-                             CutoffMode.available_then)
+    cells = cells_from_atlas_frame(
+        pl.concat([a, b]), dataset_key="atlas.vintage_steo.steo_archive", table_recorded_at=None
+    )
+    before = VintageAccessor(
+        cells, datetime(2013, 7, 10, tzinfo=UTC) - timedelta(microseconds=1), CutoffMode.available_then
+    )
     assert before.vintage_in_force("eia_steo") is None
     acc = VintageAccessor(cells, datetime(2014, 1, 1, tzinfo=UTC), CutoffMode.available_then)
     assert acc.vintage_in_force("eia_steo")["vintage"] == "2013-07"

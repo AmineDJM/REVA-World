@@ -9,12 +9,13 @@ requests:
     expected_bytes_per_day: 180000000
     reason: "one-off 730-day backfill of one 15-minute GDELT update per day (~80 MB), then ~3 requests/day; no key"
   - source_key: gdelt.doc2
-    # atlas.gdelt_doc: 22 GKG themes x 2 timeline modes (~0.2-0.3 MB each) + about page + theme lookup (2 MB) = 46.
-    daily_requests: 100
+    # atlas.gdelt_doc: 22 GKG themes x 2 timeline modes (~0.2-0.3 MB each) + about page + theme lookup (2 MB) = 46;
+    # a request refused with HTTP 429 is retried up to 4 times after a cooldown (worst case 44 x 5 + 2 = 222).
+    daily_requests: 300
     expected_bytes_per_day: 40000000
-    reason: "46 requests (~15 MB) per run plus one retry; GDELT DOC 2.0 API, no key, throttled (one request / 5 s)"
+    reason: "46 requests (~15 MB) per run, up to 222 with 429 retries; GDELT DOC 2.0 API, no key, throttled (one request / 5 s)"
 daily_totals_increase:
-  http_requests_total: "+1700"
+  http_requests_total: "+1900"
   http_bytes_total: "+220_000_000"
 notes: >-
   data.gdeltproject.org answered every update file with 200 on 2026-10-17; api.gdeltproject.org answered 429

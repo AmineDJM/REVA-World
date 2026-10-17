@@ -127,9 +127,7 @@ VARIABLE_PREFIXES: dict[str, str] = {
 
 
 def known_variable(variable: str) -> bool:
-    return variable in VARIABLES or any(
-        variable.startswith(p) and len(variable) > len(p) for p in VARIABLE_PREFIXES
-    )
+    return variable in VARIABLES or any(variable.startswith(p) and len(variable) > len(p) for p in VARIABLE_PREFIXES)
 
 
 ESTIMATE_KINDS = ("projection", "actual", "published_history", "published_history_boundary_unknown")
