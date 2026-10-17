@@ -84,7 +84,20 @@ ingests sequentially (several sources peak at 3–5 GB RAM).
    `docs/final_report.md` covers V1/V2).
 5. Full test sweep on a quiet machine (`uv run pytest -m "not live and not perf"`), full e2e
    (`uv run python scripts/e2e_stack.py --run --v3-fixtures`), UI vitest/build.
-6. Cleanup of leftover throwaway databases (`reva_test_*`).
+6. ~~Cleanup of leftover throwaway databases (`reva_test_*`)~~ done 2026-10-17 by DAYOPS (23 dropped, ~0.45 GB);
+   test runs create new ones.
+7. **Dev DB has no atlas query file (DAYOPS, 2026-10-17 02:03 UTC).** Live snapshot `717e8452…` (221 tables,
+   93,495,663 rows, +`wikidata.submarine_cables`) is recorded and pinned, but its warm build was interrupted at
+   ~4.2 GB because free disk fell to 2.7 GB: a 5.2 GiB git pack of the `reva-data-*` snapshot branches appeared in
+   `.git/objects/pack` at 01:56 while the build ran. The superseded `1d9b950f…` file had been deleted to make room,
+   so **the next atlas read (API, `reva links materialise`) builds `717e8452…` (~7.1 GB + ~1.5 GB spill)**. Free
+   ~9 GB first (e.g. drop the local `origin/reva-data-*` remote-tracking refs and `git gc --prune=now`; the data is
+   on GitHub), then: `reva atlas snapshot --origin live --warm --skip-unchanged`, `reva links materialise
+   --atlas-origin live --kg-origin live` (+~1.4 GB), `reva links prune`, `reva causal refresh --origin live`.
+   Until then the `submarine_cable` link kind stays at 0 links.
+8. **Sources still not loaded** (2026-10-17, two attempts each): `atlas.ourairports` (HTTP 503 on the licence page
+   `ourairports.com/data/`; the data mirror on `davidmegginson.github.io` answers) and `atlas.rcs_dem`
+   (`api.osf.io` 503: "OSF is currently unavailable for scheduled maintenance"). Retry on the next budget day.
 
 ## Decisions only the owner can take
 

@@ -269,3 +269,99 @@ All answered 200 in 0.02–0.3 s.
 
 Free disk after the run was 5.7 GB. The 7.1 GB query file is the pinned live snapshot; it must stay, or the
 API rebuilds it on the next atlas read (about 15 min). `var/objects` is 4.1 GB.
+
+## 8. Next budget day — agent DAYOPS, 2026-10-17 01:32–02:05 UTC
+
+Every dev-DB write ran under `flock /tmp/reva-devdb.lock`. Scripts and raw JSON outputs are in the session
+scratchpad (`dayops/`).
+
+### Retried sources
+
+| source | 01:32–01:41 UTC | 01:50 UTC (retry) | ledger |
+|---|---|---|---|
+| `atlas.ourairports` | HTTP 503 from `ourairports.com` | HTTP 503 again | 2 requests, 0 bytes |
+| `atlas.rcs_dem` | HTTP 503 from `api.osf.io` | HTTP 503 again | 2 requests, 0 bytes |
+| `atlas.wikidata_cables` | **completed** | — | `wikidata.wbapi`: 34 requests, 0.9 MB |
+
+* **OurAirports.** The data files are served from `davidmegginson.github.io`, and that host answers. The connector
+  fails on its licence check: every run reads the terms page `ourairports.com/data/`, and that page returns 503.
+  The check was not bypassed.
+* **RCS.** OSF's 503 page says "The OSF is currently unavailable for scheduled maintenance".
+* **Cables.** There was no WDQS cool-down. The connector does not use WDQS: it uses `Special:WhatLinksHere` and
+  `Special:EntityData` under the machine-wide Wikidata lock. I ran it with `--option reuse_archived_hours=48`, so
+  the snapshots archived by the interrupted 2026-10-16 run were reused; 109 raw responses are archived.
+  * Result: table `wikidata.submarine_cables`, 5,600 rows.
+  * Content: 190 cables (75 without a country, 128 with a service year), 135 countries and 1,263 undirected
+    country pairs.
+  * Unmapped P17 values: 8 (historical states and similar; kept as `provider_geo`).
+
+### Wikidata causal statements (CAUSWD)
+
+CAUSWD's run 6 stopped at 01:43:05 UTC (`"stop": "budget:causwd_session_cap"`, 219 wbapi requests). It did not
+run until 03:50. `reva_kg_causwd` now holds 1,406 entities and 1,675 causal statements.
+
+**`reva kg import-harvest --from-db reva_kg_causwd`** (01:43 UTC):
+
+* Loads: 177 seen, 40 imported, 137 already imported.
+* Inserted: 400 entities, 3,630 statements and 3,562 labels; 391 raw responses copied.
+* Verification: 13,868 source statements, 13,865 identical and 3 differing. These are the same 3 as before:
+  1 conflict where WDHARVEST's version was kept, and 2 that gained ISBN references.
+
+**`reva causal refresh --origin live`** (01:43 UTC, 13 s, causal loads 22/23):
+
+* Wikidata claims: 1,672 scanned, **670 new**, 1,002 unchanged, 0 rejected and 0 unknown entities.
+* Grades: 676 written. That is the 670 new claims plus 6 existing claims re-graded.
+* The DOI/T2 loader bug that CAUSFIX is fixing did not occur in this run.
+
+### Counts (dev DB `reva`, origin live, 02:03 UTC)
+
+* **KG:** 120,040 current entities (+400) and 2,450,528 current statements (+3,630).
+* **Causal claims (current, live): 28,461 (+670).**
+  * By tier: T1 26,789; T2 2; T3 366; T4 1,304.
+  * By grade (rules v1): B 26,792; C 311; D 1,280; E 78; A 0. No claim is ungraded.
+  * Temporal check: overlapping 16,384; consistent 10,474; undetermined 1,530; **inconsistent 73**.
+  * By relation:
+
+    | relation | claims |
+    |---|---:|
+    | reaction_to | 12,825 |
+    | coded_outcome | 9,912 |
+    | coded_trigger | 3,823 |
+    | immediate_cause | 502 |
+    | contributing_factor | 480 |
+    | has_effect | 476 |
+    | has_cause | 443 |
+
+  * `wikidata.wbapi`: 1,672 claims (B 22, C 311, D 1,280, E 59; 54 temporally inconsistent). The dataset sources
+    are unchanged from § 5.
+* **Sources loaded on 2026-10-17:** 41 sources, the 40 from § 2 plus `atlas.wikidata_cables`. `atlas.ourairports`
+  and `atlas.rcs_dem` are still missing.
+
+Other agents (CAUSMORE, SAMEAS, CAUSFIX) were changing causal sources and grading rules at the same time. Counts
+taken after 02:03 may differ.
+
+### Atlas snapshot, query file and links: snapshot recorded, warm build aborted
+
+* **Snapshot.** `reva atlas snapshot --origin live --skip-unchanged` recorded
+  `717e8452dc07da895570b0b46f5aa6e731b5320efdc29d2f711dbbabf8fcecfa`: 221 tables, 93,495,663 rows, cutoff
+  2026-10-17T01:52:03Z.
+* **Freeing space.** Before the build I dropped 23 leftover `reva_test_*` databases (~0.45 GB). I then deleted the
+  superseded `atlas-1d9b950f…-v6.duckdb` (7.1 GB), as LOADALL had done for its predecessor. Free disk went to 14 GB.
+* **Warm build.** I started `--warm` at 01:52. At 01:56 a **5.2 GiB git pack**
+  (`.git/objects/pack/pack-51252f95…`, holding the `origin/reva-data-*` snapshot branches) appeared. It came from
+  another process's git operation, not this agent's. Free disk dropped to 2.7 GB while the build was at
+  4.2 GB of its 7.1 GB. I interrupted the build (SIGINT); it removed its build directory. Free disk is now 8.1 GB.
+* **Not run:** `reva links materialise` (~1.4 GB) and `reva links prune`. Both need the query file, and a finished
+  build would have left about 1 GB free. Without materialise, the `submarine_cable` link kind still has 0 links
+  (materialisation 1, 1,147,110 links, is unchanged).
+* **Current state:** the pin (`live-snapshot.pin`) names `717e8452…`, but **no atlas query file exists**. The
+  next atlas read (API, links materialise) starts a ~7.1 GB build (+~1.5 GB DuckDB spill). Free about 9 GB
+  before that build. For example, drop the local `origin/reva-data-*` remote-tracking refs and gc: the data is
+  on GitHub, and this is an owner/lead decision. Then run:
+
+  ```bash
+  flock /tmp/reva-devdb.lock uv run reva atlas snapshot --origin live --warm --skip-unchanged
+  flock /tmp/reva-devdb.lock uv run reva links materialise --atlas-origin live --kg-origin live
+  flock /tmp/reva-devdb.lock uv run reva links prune
+  flock /tmp/reva-devdb.lock uv run reva causal refresh --origin live
+  ```
