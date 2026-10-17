@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "563b2f106fdf1834ec06523eef815a1062d0408ab64b33072c88dc8fd8398f6e",
+    "url": "https://qlever.dev/api/wikidata?cmd=stats",
+    "file": "stats.json",
+    "sha256": "30e4ec601c3c316ce6da964772384982acbb5523db61e23ddb45799f3853d45c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T15:20:00+00:00",
+    "licence": "CC0-1.0 (Wikidata data, via QLever qlever.dev)",
+    "fixture_note": "live QLever index stats of 2026-10-17, verbatim"
+  },
+  {
+    "request_fingerprint": "228b0bdfebc7399f4fb19fc8cdd767e9f7dc8450711b5f1458c5f03a02752027",
+    "url": "https://qlever.dev/api/wikidata?query=PREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0APREFIX+p%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2F%3E%0APREFIX+ps%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fstatement%2F%3E%0APREFIX+wikibase%3A+%3Chttp%3A%2F%2Fwikiba.se%2Fontology%23%3E%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0ASELECT+%3Fitem+%3Fprop+%3Fst+%3Fv+%3Frank+%3Fen+%3Ffr+WHERE+%7B%0A++%7B+SELECT+DISTINCT+%3Fitem+WHERE+%7B%0A++++VALUES+%3Fpd+%7B+wdt%3AP300+wdt%3AP605+%7D%0A++++%3Fitem+%3Fpd+%5B%5D+.%0A++%7D+%7D%0A++%7B+%3Fitem+p%3AP300+%3Fst+.+%3Fst+ps%3AP300+%3Fv+%3B+wikibase%3Arank+%3Frank+.+BIND%28%22P300%22+AS+%3Fprop%29+%7D%0A++UNION%0A++%7B+%3Fitem+p%3AP605+%3Fst+.+%3Fst+ps%3AP605+%3Fv+%3B+wikibase%3Arank+%3Frank+.+BIND%28%22P605%22+AS+%3Fprop%29+%7D%0A++OPTIONAL+%7B+%3Fitem+rdfs%3Alabel+%3Fen+.+FILTER%28LANG%28%3Fen%29+%3D+%22en%22%29+%7D%0A++OPTIONAL+%7B+%3Fitem+rdfs%3Alabel+%3Ffr+.+FILTER%28LANG%28%3Ffr%29+%3D+%22fr%22%29+%7D%0A%7D",
+    "file": "places.json",
+    "sha256": "b1b641e1e1a3325e964b76fbd7cc96f638ceec53893ab62052cd714cb13c3dcc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-17T15:20:00+00:00",
+    "licence": "CC0-1.0 (Wikidata data, via QLever qlever.dev)",
+    "fixture_note": "trimmed by V4LINK from the live QLever response of 2026-10-17 (items holding FR-IDF, SA-04, DE-BY/DE2, FR1, FR10; query-time meta removed)"
+  },
+  {
+    "request_fingerprint": "18e398198e093a77e8a94465e7cb6d9806c9e5189fd4eb8ec1731e82b188410d",
+    "url": "https://qlever.dev/api/wikidata?query=PREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0APREFIX+p%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2F%3E%0APREFIX+ps%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fstatement%2F%3E%0APREFIX+wikibase%3A+%3Chttp%3A%2F%2Fwikiba.se%2Fontology%23%3E%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0ASELECT+%3Fitem+%3Fst+%3Fcountry+%3Frank+WHERE+%7B%0A++%7B+%3Fitem+wdt%3AP300+%5B%5D+%7D+UNION+%7B+%3Fitem+wdt%3AP605+%5B%5D+%7D%0A++%3Fitem+p%3AP17+%3Fst+.+%3Fst+ps%3AP17+%3Fcountry+%3B+wikibase%3Arank+%3Frank+.%0A%7D",
+    "file": "places_country.json",
+    "sha256": "10938c6aee4afd6cc2cd931f853af5fa83cea8a8de5c17a86d6fb5872731da2a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-17T15:20:00+00:00",
+    "licence": "CC0-1.0 (Wikidata data, via QLever qlever.dev)",
+    "fixture_note": "trimmed by V4LINK from the live QLever response of 2026-10-17 (items holding FR-IDF, SA-04, DE-BY/DE2, FR1, FR10; query-time meta removed)"
+  }
+]

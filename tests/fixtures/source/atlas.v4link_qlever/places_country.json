@@ -1,0 +1,230 @@
+{
+"head": {
+"vars": [
+"item",
+"st",
+"country",
+"rank"
+]
+},
+"results": {
+"bindings": [
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q13917-79F039AE-B79F-41CC-BC8B-94778E5B11AD"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q142"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q13917-79F039AE-B79F-41CC-BC8B-94778E5B11AD"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q142"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q13917-79F039AE-B79F-41CC-BC8B-94778E5B11AD"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q142"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q953508"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q953508-4af6c691-4b70-7f9e-37e8-bc555b1ed30f"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q851"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-7173721a-45ee-fc1a-d7cd-928763b01396"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q41304"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-7173721a-45ee-fc1a-d7cd-928763b01396"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q41304"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-779eafe7-453c-16b5-4bb7-3a1623c4378c"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q713750"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-779eafe7-453c-16b5-4bb7-3a1623c4378c"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q713750"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q980-C16FD416-F13F-4B0E-AC6B-1A9A94610D12"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q183"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#PreferredRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q980-C16FD416-F13F-4B0E-AC6B-1A9A94610D12"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q183"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#PreferredRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-c4a88edc-4fe7-82ee-f5a1-e7b6b5bf1cc0"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q7318"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-c4a88edc-4fe7-82ee-f5a1-e7b6b5bf1cc0"
+},
+"country": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q7318"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+}
+}
+]
+}
+}

@@ -227,8 +227,7 @@ To archive the six run documents and write the five qualifying estimates from sa
 for this report):
 
 ```bash
-for r in banking_gdp banking_unemp coup_gdp eqm7_gdp eq1000_gdp sanctions_gdppc; do   # saved with --out runs/$r.json
-  :; done
+# runs/<name>.json saved by `reva estimate event-study ... --out runs/<name>.json`
 flock /tmp/reva-devdb.lock uv run python - <<'PY'
 import json, pathlib
 from reva.adapters.objects.factory import get_store

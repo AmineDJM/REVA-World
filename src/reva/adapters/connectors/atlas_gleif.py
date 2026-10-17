@@ -86,7 +86,9 @@ from reva.kernel.errors import SourceResponseError
 CONNECTOR_NAME = "atlas.gleif"
 WD_NAME = "atlas.gleif_wikidata"
 # 1.0.1: 1.0.0 was registered in the dev DB from a WIP snapshot taken before the B023 refactor.
-CONNECTOR_VERSION = "1.0.1"
+# 1.0.2: groups also attach the ELF names to gleif:legal_form (1.0.1 live run: 200 group legal-form statements
+#        conflicted with the entities dataset's richer version under the same Golden Copy revision).
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas-gleif-1"
 SOURCE_KEY = "gleif.api"
 WD_SOURCE_KEY = "wikidata.wdqs"
@@ -968,7 +970,10 @@ async def ingest_groups(run: Any) -> dict[str, Any]:
             total, pd = parse_count(cr.body, f"{which} {r.lei}")
             counts.setdefault(r.lei, {})[which] = (total, pd, csha)
             shas.append(csha)
-    ents, sts, info = kg_records([page], [sha], counts=counts)
+    # same ELF names as the entities dataset: a Level 1 statement must not differ between datasets of one revision
+    forms, elf_shas = await fetch_elf(run)
+    shas += elf_shas
+    ents, sts, info = kg_records([page], [sha], counts=counts, elf=forms)
     kg = load_kg(
         run.engine,
         run.store,

@@ -1,0 +1,241 @@
+{
+"head": {
+"vars": [
+"item",
+"prop",
+"st",
+"v",
+"rank",
+"en",
+"fr"
+]
+},
+"results": {
+"bindings": [
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"prop": {
+"type": "literal",
+"value": "P605"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q13917-84B1BEAC-BF75-4352-BD73-9740DC7E37C1"
+},
+"v": {
+"type": "literal",
+"value": "FR1"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"prop": {
+"type": "literal",
+"value": "P605"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q13917-E4A15568-7832-4D7B-BC1A-D0AD9A86D610"
+},
+"v": {
+"type": "literal",
+"value": "FR10"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"prop": {
+"type": "literal",
+"value": "P300"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q13917-5d5ff952-4059-f040-d720-acf31e28bb4f"
+},
+"v": {
+"type": "literal",
+"value": "FR-J"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q13917"
+},
+"prop": {
+"type": "literal",
+"value": "P300"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q13917-92B44999-361E-4109-8F1F-22A81DD9838F"
+},
+"v": {
+"type": "literal",
+"value": "FR-IDF"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#PreferredRank"
+},
+"en": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Île-de-France",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q953508"
+},
+"prop": {
+"type": "literal",
+"value": "P300"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q953508-0F0483E7-548A-46F8-8ABD-F952EEDFD99C"
+},
+"v": {
+"type": "literal",
+"value": "SA-04"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Eastern Province",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Ach-Charqiya",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"prop": {
+"type": "literal",
+"value": "P605"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/Q980-fe032218-4ce4-e862-de84-3d75008be4a7"
+},
+"v": {
+"type": "literal",
+"value": "DE2"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Bavaria",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Bavière",
+"xml:lang": "fr"
+}
+},
+{
+"item": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/Q980"
+},
+"prop": {
+"type": "literal",
+"value": "P300"
+},
+"st": {
+"type": "uri",
+"value": "http://www.wikidata.org/entity/statement/q980-07850B1C-E6CC-42F4-AD38-2C9672066947"
+},
+"v": {
+"type": "literal",
+"value": "DE-BY"
+},
+"rank": {
+"type": "uri",
+"value": "http://wikiba.se/ontology#NormalRank"
+},
+"en": {
+"type": "literal",
+"value": "Bavaria",
+"xml:lang": "en"
+},
+"fr": {
+"type": "literal",
+"value": "Bavière",
+"xml:lang": "fr"
+}
+}
+]
+}
+}
