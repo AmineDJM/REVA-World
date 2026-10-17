@@ -192,3 +192,25 @@ rate-cycle momentum for BoE hikes.
 * Pass 1 (≈ 20:30–21:00 UTC): V5 reports, PRED-MODELS protocol + holdout (`4975837`), PRED-ENERGY code and
   winners (`07e194e`), PRED-FIN report, conflict / health code; re-runs in §1.
 * Pass 2 and pass 3: see the appended sections below (reports landing after pass 1).
+
+## 6. Pass 2 (≈ 21:15 UTC) — reports landed: `v6_pred_models.md`, `v6_pred_energy.md` (filled), `v6_pred_fin_backtest.json`
+
+**PRED-MODELS report.** Headline matches my re-run and is worded honestly ("No REVA model beats the WEO or the SPF
+point forecast"; "what REVA can add is calibrated uncertainty around those strong points"). Remaining wording risk:
+"CRPS −23.5 % vs a naive Gaussian around the WEO" is correct, but the benchmark's spread is the *persistence*
+spread (X1) — the report should say so in the headline sentence, and any downstream text (UI, registry
+leaderboard, roadmap) must not shorten it to "beats the IMF". The two WEO winners now issue sealed forecasts for
+`weo.gdp_growth` h0 through supplementary batches: their point is the WEO projection (attributed) — the issued
+record must carry the IMF attribution of the point, not present it as a REVA forecast. Verdicts in §3.C unchanged.
+
+**PRED-ENERGY report.** Accurate and reproducible (my numbers in §3.D match its table: STEO vs RW MAE ratios,
+Henry Hub −17 to −24 %, U.S. crude −23 to −43 %). Two items stay **overstated**: (1) "17 (series, horizon)
+winners" uses one Holm family per series (60–72 tests); one Holm over the run leaves 10, and 4 without the
+STEO+RW combination (X3); (2) the sealed batch `6d76937c…` issues 18 `combo_steo_rw` forecasts on cells where
+EIA's STEO point alone has the lower MAE (e.g. U.S. crude h4: combo 0.445 vs STEO 0.337 vs RW 0.580) — a
+"winner vs the random walk" that is dominated by the attributed reference. Fix: admit an EIA-derived combination only
+where it also beats STEO's point on AE/SE; report the winners' 80 % coverage (0.61–0.71) next to them. New
+statement verified: "for Brent and WTI, EIA's STEO point forecasts are not better than a random walk" — **credible**
+(my re-run: MAE ratio 0.95–1.05, no significant DM test).
+
+**PRED-FIN backtest JSON** committed; §5 table of the report matches my subset re-run. No change of verdict.
