@@ -1,0 +1,17 @@
+# V4 (agent V4BIO): Ensembl REST API (species / assembly information).
+# Connector: src/reva/adapters/connectors/atlas_bio_molecular.py (atlas.ensembl_genomes) -> KG assemblies, chromosomes.
+source_key: ensembl.rest
+title: Ensembl REST API (rest.ensembl.org)
+provider_url: https://www.ensembl.org
+lineage_family: ensembl
+rights:
+  licence: Ensembl data are available without restriction (disclaimer page)
+  licence_url: https://www.ensembl.org/info/about/legal/disclaimer.html
+  attribution: Ensembl (EMBL-EBI), Harrison et al., Ensembl (release in every revision).
+metadata:
+  allowed_hosts: [rest.ensembl.org]
+  endpoints: info/species (division EnsemblVertebrates), info/assembly/<species> (homo_sapiens, mus_musculus)
+  note: >-
+    Ensembl REST publishes no per-species gene counts and BioMart redirects to an archive host (retired); gene counts
+    come from NCBI Datasets (ncbi.datasets).
+  authentication: none

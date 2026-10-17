@@ -1,0 +1,14 @@
+# V4 (agent V4BIO): NCBI Datasets v2 genome dataset reports (reference genomes with annotation).
+# Connector: src/reva/adapters/connectors/atlas_bio_molecular.py (atlas.ncbi_genomes) -> KG assemblies + gene counts.
+source_key: ncbi.datasets
+title: NCBI Datasets v2 genome dataset reports
+provider_url: https://www.ncbi.nlm.nih.gov/datasets/
+lineage_family: ncbi
+rights:
+  licence: U.S. Government work; NCBI places no restrictions on the use of these data (submitters may hold rights)
+  licence_url: https://www.ncbi.nlm.nih.gov/home/about/policies/
+  attribution: National Center for Biotechnology Information (NCBI), NCBI Datasets.
+metadata:
+  allowed_hosts: [api.ncbi.nlm.nih.gov]
+  endpoint: datasets/v2/genome/taxon/{7742,33090}/dataset_report?filters.reference_only=true&filters.has_annotation=true
+  authentication: none (an API key only raises the rate limit; not used)

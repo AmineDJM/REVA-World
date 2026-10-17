@@ -1,0 +1,47 @@
+[
+ {
+  "request_fingerprint": "18c2dc9046a6791555929bc7574e12fe54bb7ede506f146756335fa5d2d3ba91",
+  "url": "https://www.sciencebase.gov/catalog/item/6a8490171ba49b3133cd8055?format=json",
+  "file": "18c2dc9046a67915.json",
+  "sha256": "bb945220ac58d2471fad36fea36fe34a2f0ac44322a6ab2f3db852cb0d38048b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "U.S. public domain / CC0 1.0 (USGS data release)",
+  "live_sha256": "bb945220ac58d2471fad36fea36fe34a2f0ac44322a6ab2f3db852cb0d38048b",
+  "live_bytes": 31018,
+  "excerpt": "whole item JSON"
+ },
+ {
+  "request_fingerprint": "4c5b90afca566f9a5c3f47c47a3e5470ffbcf9232f76d2d6614df0716e2f25d0",
+  "url": "https://www.sciencebase.gov/catalog/file/get/6a8490171ba49b3133cd8055?f=__disk__56%2F06%2Fce%2F5606ce0dbe32e2ae952385d93b5c634eca508a3a",
+  "file": "4c5b90afca566f9a.xml",
+  "sha256": "734ba58ac0450991553b1b9b942823009b7f22247c9dcf89e39461b6a130b46e",
+  "status": 200,
+  "headers": {
+   "content-type": "application/fgdc+xml"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "U.S. public domain / CC0 1.0 (USGS data release)",
+  "live_sha256": "734ba58ac0450991553b1b9b942823009b7f22247c9dcf89e39461b6a130b46e",
+  "live_bytes": 83730,
+  "excerpt": "whole FGDC metadata"
+ },
+ {
+  "request_fingerprint": "7f9335f733a2707f76ca44572562ee54e0841f14cda10bd2c8352f0e3a5485b5",
+  "url": "https://www.sciencebase.gov/catalog/file/get/6a8490171ba49b3133cd8055?f=__disk__81%2F38%2Feb%2F8138ebd0356ad02efcda21627f8d94f7ef108ae7",
+  "file": "7f9335f733a2707f.csv",
+  "sha256": "76932736a475b309277541885843027a48e8cf2864222d58cbf5dcfb882e7e35",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-17T14:00:00+00:00",
+  "licence": "U.S. public domain / CC0 1.0 (USGS data release)",
+  "live_sha256": "2d6848d75544feca715843a47a031f593bd3310c1cff865deb967486b901f10b",
+  "live_bytes": 7724775,
+  "excerpt": "header + 60 verbatim rows (at most 2 per country x commodity for Li/Co/Cu/Ni/REE/U in CHL, COD, AUS, ARG, IDN, CHN, KAZ; Haiti/Kosovo rows; one shared+estimated capacity row; one -999 capacity row)"
+ }
+]

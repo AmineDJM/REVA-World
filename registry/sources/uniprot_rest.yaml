@@ -1,0 +1,19 @@
+# V4 (agent V4BIO): UniProtKB REST API (reviewed / Swiss-Prot entries).
+# Connector: src/reva/adapters/connectors/atlas_bio_molecular.py (atlas.uniprot) -> KG proteins uniprot:<acc>,
+# reviewed entry counts per NCBI taxon id.
+source_key: uniprot.rest
+title: UniProtKB REST API (rest.uniprot.org)
+provider_url: https://www.uniprot.org
+lineage_family: uniprot
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: The UniProt Consortium. UniProt, the Universal Protein Knowledgebase (release in every revision).
+metadata:
+  allowed_hosts: [rest.uniprot.org]
+  queries: >-
+    uniprotkb/stream?query=reviewed:true&fields=organism_id&format=tsv;
+    taxonomy/stream?query=tax_id:..&fields=id,scientific_name,common_name,rank,parent;
+    uniprotkb/stream?query=reviewed:true AND organism_id:9606&fields=accession,id,gene_primary,protein_name,length,cc_function,xref_hgnc,organism_id
+  release_checked: 2026_03 (02-September-2026), 575,748 reviewed entries in 14,920 organisms
+  authentication: none

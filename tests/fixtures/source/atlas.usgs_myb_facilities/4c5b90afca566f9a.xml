@@ -1,0 +1,1802 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>National Minerals Information Center (NMIC)</origin>
+        <pubdate>20260831</pubdate>
+        <title>2024 Minerals Yearbook, volume III, Area Reports — International: country reports, global production, and global mineral facilities</title>
+        <geoform>tabular digital data</geoform>
+        <pubinfo>
+          <pubplace>12201 Sunrise Valley Drive, Reston, Virginia, 20192, US</pubplace>
+          <publish>National Minerals Information Center</publish>
+        </pubinfo>
+        <othercit>DOI link: https://doi.org/10.5066/P1KEQASH</othercit>
+        <onlink>https://doi.org/10.5066/P1KEQASH</onlink>
+        <lworkcit>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, volume III, Area Reports — International</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>US Geological Survey</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.3133/mybvIII</onlink>
+          </citeinfo>
+        </lworkcit>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>The U.S. Geological Survey's Minerals Yearbook Volume III: Area Reports — International publication provides an annual review of the mineral and materials industries of over 150 countries worldwide. This volume of work includes individual country reports that examine the performance and developments of a country's mineral industry that occurred during a given year. Topics covered in each country report may include mineral production and trade, government policies and programs, industry structure, and developments in the commodity sector. Tabular data include mineral commodity production statistics over a 5-year period and a summary of mineral facilities including annual production capacities, where data are available. The 2024 Minerals Yearbook Volume III: Area Reports — International data release provides a compilation of the Minerals Yearbook country reports discussing information, events, data, and statistics for the year 2024, mineral commodity production data for the years 2020 through 2024, and country-level mineral facilities data. Country reports are compiled into a .txt file and tabular data are provided in .csv format in this data release.</abstract>
+      <purpose>This data release includes country-by-country mineral commodity production statistics for the years 2020 through 2024 as well as locations and production capacities of mineral facilities at yearend 2024. These data accompany the 2024 country reports in the U.S. Geological Survey's Minerals Yearbook Volume III: Area Reports — International (https://doi.org/10.3133/mybvIII); these reports analyze the importance of minerals to the economies of over 150 nations and the United States. Production and facility data are provided in a .csv format and country reports are provided in a .txt file.</purpose>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>20200101</begdate>
+          <enddate>20241231</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>Country reports and tables are current as of the date listed in the “Currentness Date” field in the Production and Facilities tables.</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>None planned</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-180.0000</westbc>
+        <eastbc>180.0000</eastbc>
+        <northbc>90.0000</northbc>
+        <southbc>-90.0000</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>None</themekt>
+        <themekey>commodity</themekey>
+        <themekey>crude</themekey>
+        <themekey>industrial minerals</themekey>
+        <themekey>metals</themekey>
+        <themekey>mine</themekey>
+        <themekey>mineral commodity</themekey>
+        <themekey>mineral production</themekey>
+        <themekey>mineral</themekey>
+        <themekey>minerals</themekey>
+        <themekey>mining</themekey>
+        <themekey>ore</themekey>
+        <themekey>refined</themekey>
+        <themekey>refinery</themekey>
+        <themekey>resources</themekey>
+        <themekey>smelting</themekey>
+        <themekey>abrasives</themekey>
+        <themekey>alumina</themekey>
+        <themekey>aluminum</themekey>
+        <themekey>antimony</themekey>
+        <themekey>arsenic</themekey>
+        <themekey>arsenic trioxide</themekey>
+        <themekey>asbestos</themekey>
+        <themekey>ball clay</themekey>
+        <themekey>barite</themekey>
+        <themekey>bauxite</themekey>
+        <themekey>bentonite</themekey>
+        <themekey>beryl</themekey>
+        <themekey>beryllium</themekey>
+        <themekey>bismuth</themekey>
+        <themekey>boron</themekey>
+        <themekey>bromine</themekey>
+        <themekey>cadmium</themekey>
+        <themekey>celestite</themekey>
+        <themekey>cement</themekey>
+        <themekey>cement and clinker</themekey>
+        <themekey>chromium</themekey>
+        <themekey>clays</themekey>
+        <themekey>clinker</themekey>
+        <themekey>cobalt</themekey>
+        <themekey>common clay</themekey>
+        <themekey>copper</themekey>
+        <themekey>diamond</themekey>
+        <themekey>diamond (industrial)</themekey>
+        <themekey>diatomite</themekey>
+        <themekey>direct-reduced iron</themekey>
+        <themekey>feldspar</themekey>
+        <themekey>ferroalloys</themekey>
+        <themekey>fertilizers</themekey>
+        <themekey>fire clay</themekey>
+        <themekey>fluorspar</themekey>
+        <themekey>fuller's earth</themekey>
+        <themekey>gallium</themekey>
+        <themekey>garnet</themekey>
+        <themekey>gemstones</themekey>
+        <themekey>germanium</themekey>
+        <themekey>gold</themekey>
+        <themekey>graphite</themekey>
+        <themekey>gypsum</themekey>
+        <themekey>helium</themekey>
+        <themekey>indium</themekey>
+        <themekey>iodine</themekey>
+        <themekey>iridium</themekey>
+        <themekey>iron and steel</themekey>
+        <themekey>iron ore</themekey>
+        <themekey>iron oxide pigments</themekey>
+        <themekey>kaolin</themekey>
+        <themekey>kyanite and related materials</themekey>
+        <themekey>lead</themekey>
+        <themekey>leonardite</themekey>
+        <themekey>lime</themekey>
+        <themekey>lithium</themekey>
+        <themekey>magnesite</themekey>
+        <themekey>magnesium</themekey>
+        <themekey>manganese</themekey>
+        <themekey>mercury</themekey>
+        <themekey>methanol</themekey>
+        <themekey>mica</themekey>
+        <themekey>molybdenum</themekey>
+        <themekey>nickel</themekey>
+        <themekey>niobium</themekey>
+        <themekey>niobium and tantalum</themekey>
+        <themekey>nitrogen</themekey>
+        <themekey>osmium</themekey>
+        <themekey>palladium</themekey>
+        <themekey>peat</themekey>
+        <themekey>perlite</themekey>
+        <themekey>phosphate</themekey>
+        <themekey>phosphate rock</themekey>
+        <themekey>pig iron</themekey>
+        <themekey>platinum</themekey>
+        <themekey>platinum-group metals</themekey>
+        <themekey>potash</themekey>
+        <themekey>pumice and related materials</themekey>
+        <themekey>rare earths</themekey>
+        <themekey>raw steel</themekey>
+        <themekey>rhenium</themekey>
+        <themekey>rhodium</themekey>
+        <themekey>ruthenium</themekey>
+        <themekey>salt</themekey>
+        <themekey>sand and gravel, construction</themekey>
+        <themekey>sand and gravel, industrial</themekey>
+        <themekey>sand and gravel, unspecified</themekey>
+        <themekey>scandium</themekey>
+        <themekey>selenium</themekey>
+        <themekey>silicon</themekey>
+        <themekey>silver</themekey>
+        <themekey>soda ash</themekey>
+        <themekey>steel products</themekey>
+        <themekey>stone, crushed</themekey>
+        <themekey>stone, dimension</themekey>
+        <themekey>stone, sand, and gravel</themekey>
+        <themekey>stone, size and shape unspecified</themekey>
+        <themekey>strontium</themekey>
+        <themekey>sulfur</themekey>
+        <themekey>talc and related materials</themekey>
+        <themekey>tantalum</themekey>
+        <themekey>tellurium</themekey>
+        <themekey>thallium</themekey>
+        <themekey>tin</themekey>
+        <themekey>titanium</themekey>
+        <themekey>tungsten</themekey>
+        <themekey>uranium</themekey>
+        <themekey>vanadium</themekey>
+        <themekey>vermiculite</themekey>
+        <themekey>wollastonite</themekey>
+        <themekey>zeolites</themekey>
+        <themekey>zinc</themekey>
+        <themekey>zirconium</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Metadata Identifier</themekt>
+        <themekey>USGS:6a8490171ba49b3133cd8055</themekey>
+      </theme>
+      <place>
+        <placekt>None</placekt>
+        <placekey>Africa</placekey>
+        <placekey>Asia</placekey>
+        <placekey>Central Eurasia</placekey>
+        <placekey>Europe</placekey>
+        <placekey>Latin America</placekey>
+        <placekey>Canada</placekey>
+        <placekey>Middle East</placekey>
+        <placekey>Pacific</placekey>
+        <placekey>Afghanistan</placekey>
+        <placekey>Albania</placekey>
+        <placekey>Algeria</placekey>
+        <placekey>Angola</placekey>
+        <placekey>Argentina</placekey>
+        <placekey>Armenia</placekey>
+        <placekey>Australia</placekey>
+        <placekey>Austria</placekey>
+        <placekey>Azerbaijan</placekey>
+        <placekey>Bahrain</placekey>
+        <placekey>Bangladesh</placekey>
+        <placekey>Barbados</placekey>
+        <placekey>Belarus</placekey>
+        <placekey>Belgium</placekey>
+        <placekey>Belize</placekey>
+        <placekey>Benin</placekey>
+        <placekey>Bhutan</placekey>
+        <placekey>Bhutan and Nepal</placekey>
+        <placekey>Bolivia</placekey>
+        <placekey>Bosnia and Herzegovina</placekey>
+        <placekey>Botswana</placekey>
+        <placekey>Brazil</placekey>
+        <placekey>Brunei</placekey>
+        <placekey>Bulgaria</placekey>
+        <placekey>Burkina Faso</placekey>
+        <placekey>Burma</placekey>
+        <placekey>Burundi</placekey>
+        <placekey>Cabo Verde</placekey>
+        <placekey>Cambodia</placekey>
+        <placekey>Cameroon</placekey>
+        <placekey>Canada</placekey>
+        <placekey>Central African Republic</placekey>
+        <placekey>Central America</placekey>
+        <placekey>Chad</placekey>
+        <placekey>Chile</placekey>
+        <placekey>China</placekey>
+        <placekey>Colombia</placekey>
+        <placekey>Congo (Brazzaville)</placekey>
+        <placekey>Congo (Kinshasa)</placekey>
+        <placekey>Costa Rica</placekey>
+        <placekey>Cote d'Ivoire</placekey>
+        <placekey>Côte d'Ivoire</placekey>
+        <placekey>Croatia</placekey>
+        <placekey>Cuba</placekey>
+        <placekey>Cyprus</placekey>
+        <placekey>Czechia</placekey>
+        <placekey>Denmark</placekey>
+        <placekey>Denmark, the Faroe Islands, and Greenland</placekey>
+        <placekey>Djibouti</placekey>
+        <placekey>Dominican Republic</placekey>
+        <placekey>Ecuador</placekey>
+        <placekey>Egypt</placekey>
+        <placekey>El Salvador</placekey>
+        <placekey>Eritrea</placekey>
+        <placekey>Estonia</placekey>
+        <placekey>Eswatini</placekey>
+        <placekey>Ethiopia</placekey>
+        <placekey>Fiji</placekey>
+        <placekey>Finland</placekey>
+        <placekey>France</placekey>
+        <placekey>French Guiana</placekey>
+        <placekey>Gabon</placekey>
+        <placekey>Georgia</placekey>
+        <placekey>Germany</placekey>
+        <placekey>Ghana</placekey>
+        <placekey>Greece</placekey>
+        <placekey>Greenland</placekey>
+        <placekey>Guatemala</placekey>
+        <placekey>Guinea</placekey>
+        <placekey>Guyana</placekey>
+        <placekey>Haiti</placekey>
+        <placekey>Honduras</placekey>
+        <placekey>Hungary</placekey>
+        <placekey>Iceland</placekey>
+        <placekey>India</placekey>
+        <placekey>Indian Ocean Islands</placekey>
+        <placekey>Indonesia</placekey>
+        <placekey>Iran</placekey>
+        <placekey>Iraq</placekey>
+        <placekey>Ireland</placekey>
+        <placekey>Islands of the Caribbean</placekey>
+        <placekey>Israel</placekey>
+        <placekey>Italy</placekey>
+        <placekey>Jamaica</placekey>
+        <placekey>Japan</placekey>
+        <placekey>Jordan</placekey>
+        <placekey>Kazakhstan</placekey>
+        <placekey>Kenya</placekey>
+        <placekey>Korea, Republic Of</placekey>
+        <placekey>Kosovo</placekey>
+        <placekey>Kuwait</placekey>
+        <placekey>Kyrgyzstan</placekey>
+        <placekey>Laos</placekey>
+        <placekey>Latvia</placekey>
+        <placekey>Lebanon</placekey>
+        <placekey>Lesotho</placekey>
+        <placekey>Liberia</placekey>
+        <placekey>Libya</placekey>
+        <placekey>Lithuania</placekey>
+        <placekey>Luxembourg</placekey>
+        <placekey>Madagascar</placekey>
+        <placekey>Malawi</placekey>
+        <placekey>Malaysia</placekey>
+        <placekey>Mali</placekey>
+        <placekey>Malta</placekey>
+        <placekey>Mauritania</placekey>
+        <placekey>Mauritius</placekey>
+        <placekey>Mexico</placekey>
+        <placekey>Moldova</placekey>
+        <placekey>Mongolia</placekey>
+        <placekey>Montenegro</placekey>
+        <placekey>Morocco</placekey>
+        <placekey>Mozambique</placekey>
+        <placekey>Namibia</placekey>
+        <placekey>Nauru</placekey>
+        <placekey>Nepal</placekey>
+        <placekey>Netherlands</placekey>
+        <placekey>New Caledonia</placekey>
+        <placekey>New Zealand</placekey>
+        <placekey>Nicaragua</placekey>
+        <placekey>Niger</placekey>
+        <placekey>Nigeria</placekey>
+        <placekey>North Korea</placekey>
+        <placekey>North Macedonia</placekey>
+        <placekey>Norway</placekey>
+        <placekey>Oman</placekey>
+        <placekey>Other Countries of Africa</placekey>
+        <placekey>Pakistan</placekey>
+        <placekey>Panama</placekey>
+        <placekey>Papua New Guinea</placekey>
+        <placekey>Paraguay</placekey>
+        <placekey>Paraguay and Uruguay</placekey>
+        <placekey>Peru</placekey>
+        <placekey>Philippines</placekey>
+        <placekey>Poland</placekey>
+        <placekey>Portugal</placekey>
+        <placekey>Qatar</placekey>
+        <placekey>Republic of Korea</placekey>
+        <placekey>Reunion</placekey>
+        <placekey>Romania</placekey>
+        <placekey>Russia</placekey>
+        <placekey>Rwanda</placekey>
+        <placekey>Saudi Arabia</placekey>
+        <placekey>Senegal</placekey>
+        <placekey>Serbia</placekey>
+        <placekey>Seychelles</placekey>
+        <placekey>Sierra Leone</placekey>
+        <placekey>Singapore</placekey>
+        <placekey>Slovakia</placekey>
+        <placekey>Slovenia</placekey>
+        <placekey>Solomon Islands</placekey>
+        <placekey>Somalia</placekey>
+        <placekey>South Africa</placekey>
+        <placekey>South Sudan</placekey>
+        <placekey>Spain</placekey>
+        <placekey>Sri Lanka</placekey>
+        <placekey>Sudan</placekey>
+        <placekey>Suriname</placekey>
+        <placekey>Sweden</placekey>
+        <placekey>Switzerland</placekey>
+        <placekey>Syria</placekey>
+        <placekey>Taiwan</placekey>
+        <placekey>Tajikistan</placekey>
+        <placekey>Tanzania</placekey>
+        <placekey>Thailand</placekey>
+        <placekey>Timor-Leste</placekey>
+        <placekey>Togo</placekey>
+        <placekey>Trinidad and Tobago</placekey>
+        <placekey>Tunisia</placekey>
+        <placekey>Turkey</placekey>
+        <placekey>Turkmenistan</placekey>
+        <placekey>Uganda</placekey>
+        <placekey>Ukraine</placekey>
+        <placekey>United Arab Emirates</placekey>
+        <placekey>United Kingdom</placekey>
+        <placekey>Uruguay</placekey>
+        <placekey>Uzbekistan</placekey>
+        <placekey>Venezuela</placekey>
+        <placekey>Vietnam</placekey>
+        <placekey>Yemen</placekey>
+        <placekey>Zambia</placekey>
+        <placekey>Zimbabwe</placekey>
+      </place>
+    </keywords>
+    <accconst>No access constraints. Please see 'Distribution Information' for details.</accconst>
+    <useconst>These data are marked with a Creative Commons CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints. The U.S. Geological Survey (USGS) provides these data "as is." Unless otherwise stated, all data and metadata are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been processed successfully on USGS computer systems, reviewed for accuracy and completeness, and approved for release by the USGS, no warranty expressed or implied is made regarding the display or utility of the data on any other system or for general or scientific purposes, nor shall the act of distribution constitute any such warranty. The burden for determining fitness for use of these data lies entirely with the user. Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>National Minerals Information Center</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>12201 Sunrise Valley Drive</address>
+          <city>Reston</city>
+          <state>Virginia</state>
+          <postal>20192</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>703-648-4976</cntvoice>
+        <cntfax>703-648-4995</cntfax>
+        <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>This dataset and information was compiled from a variety of sources, including government, industry, and company reports, by Country Specialists at U.S. Geological Survey's National Minerals Information Center. Authorship for each country report is provided under the chapter report title in the accompanying .txt file.</datacred>
+    <native>Microsoft 365 Excel application for enterprise.</native>
+    <crossref>
+      <citeinfo>
+        <origin>National Minerals Information Center</origin>
+        <pubdate>2026</pubdate>
+        <title>U.S. Geological Survey's National Minerals Information Center — International Mineral Statistics and Information</title>
+        <geoform>application/service</geoform>
+        <othercit>Provides access to all available U.S. Geological Survey's National Minerals Information Center international-related publications, organized by country.</othercit>
+        <onlink>https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information</onlink>
+      </citeinfo>
+    </crossref>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>All table attribute values were peer reviewed for accuracy. Values were checked for correct data type and for presence / absence.</attraccr>
+    </attracc>
+    <logic>Data quality assurance and data quality control logic tests were performed for all table attributes.</logic>
+    <complete>Data set is considered complete for the information presented, as described in the abstract. Users are advised to read the rest of the metadata records carefully for additional details.</complete>
+    <posacc>
+      <horizpa>
+        <horizpar>Not applicable.</horizpar>
+      </horizpa>
+      <vertacc>
+        <vertaccr>Not applicable.</vertaccr>
+      </vertacc>
+    </posacc>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, volume III, Area Reports — International — Africa and the Middle East</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes individual Minerals Yearbook country reports that were published independently from the complete volume as "Advanced Release.” Additional information and previous country reports can also be found at https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information.</othercit>
+            <onlink>https://doi.org/10.3133/70178240</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2020</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Africa and the Middle East</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Asia and the Pacific</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes individual Minerals Yearbook country reports that were published independently from the complete volume as "Advanced Release.” Additional information and previous country reports can also be found at https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information.</othercit>
+            <onlink>https://doi.org/10.3133/70178411</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2020</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Asia and the Pacific</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Europe and Central Eurasia</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes individual Minerals Yearbook country reports that were published independently from the complete volume as "Advanced Release.” Additional information and previous country reports can also be found at https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information.</othercit>
+            <onlink>https://doi.org/10.3133/70178412</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2020</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Europe and Central Eurasia</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, Volume III, Area Reports — International — Latin America and Canada</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes individual Minerals Yearbook country reports that were published independently from the complete volume as "Advanced Release.” Additional information and previous country reports can also be found at https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information.</othercit>
+            <onlink>https://doi.org/10.3133/70178419</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2020</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume III: Area Reports — International, Latin America and Canada</srccitea>
+        <srccontr>Data source for international mineral commodity production data included in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>2019</pubdate>
+            <title>Minerals Yearbook, volume I, Metals and Minerals</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <othercit>Includes all individual commodity Minerals Yearbook chapters that were published independently from the complete volume as "Advanced Release."</othercit>
+            <onlink>https://doi.org/10.3133/mybvI</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2020</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Volume I: Metals and Minerals</srccitea>
+        <srccontr>Data source for commodity-specific information referenced in this data release.</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>National Minerals Information Center</origin>
+            <pubdate>20260205</pubdate>
+            <title>Mineral commodity summaries 2026</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>Reston, VA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.3133/mcs2026</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>2021</begdate>
+              <enddate>2025</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Current as of date of publication.</srccurr>
+        </srctime>
+        <srccitea>Mineral Commodity Summaries 2026</srccitea>
+        <srccontr>Data source for commodity-specific information referenced in this data release.</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>Information and data provided in this data release were researched, collected, analyzed, and prepared by National Minerals Information Center Country Specialists. Data are collected from a variety of sources, including USGS surveys sent to government and nongoverment entities throughout the world; government, industry, and company reports, news reports, and industry study groups.  All country reports were compiled into a single .txt file. Tabular data were combined into a single Production table and a single Facilities table, both in .csv format. Sources used for this compilation of work are provided in the country reports, tables, and in the Data Quality Information section of this metadata. Past publications prepared by the U.S. Geological Survey's National Minerals Information Center may have also been referenced.</procdesc>
+        <procdate>20260825</procdate>
+        <proccont>
+          <cntinfo>
+            <cntorgp>
+              <cntorg>U.S. Geological Survey</cntorg>
+              <cntper>National Minerals Information Center</cntper>
+            </cntorgp>
+            <cntaddr>
+              <addrtype>physical</addrtype>
+              <address>12201 Sunrise Valley Drive</address>
+              <city>Reston</city>
+              <state>Virginia</state>
+              <postal>20192</postal>
+              <country>US</country>
+            </cntaddr>
+            <cntvoice>703-648-4976</cntvoice>
+            <cntfax>703-648-4995</cntfax>
+            <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+          </cntinfo>
+        </proccont>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>2024MYBv3_Production_Table</enttypl>
+        <enttypd>This dataset contains the 2024 global mineral commodity production statistics for year 2020 through 2024.</enttypd>
+        <enttypds>U.S. Geological Survey</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>ObjectID</attrlabl>
+        <attrdef>Internal feature number.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Sequential unique whole numbers.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Publication Year</attrlabl>
+        <attrdef>Data are recent to the publication year listed.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>2024</edomv>
+            <edomvd>Year</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Publication Short Name and Volume</attrlabl>
+        <attrdef>Abbreviated USGS publication name and volume number.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>USGS MYB, Vol. III</edomv>
+            <edomvd>Minerals Yearbook, volume III, Area Reports — International</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Country Report Title</attrlabl>
+        <attrdef>Country report titles detail their namesake region. These regions include singular countries (e.g, "Afghanistan"), a country and its overseas territories ("Denmark, the Faroe Islands, and Greenland"), or groupings of countries ("Islands of the Caribbean").</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Minerals Yearbook, volume III, Area Reports — International</codesetn>
+            <codesets>https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Country (Short Form) or Locality</attrlabl>
+        <attrdef>Short form name of the country or locality in which the feature is located, listed in accordance with the U.S. Department of State’s list of Independent States in the World (https://www.state.gov/independent-states-in-the-world/).</attrdef>
+        <attrdefs>U.S. Department of State, Independent States in the World Fact Sheet</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>U.S. Department of State, Independent States in the World Fact Sheet</codesetn>
+            <codesets>https://www.state.gov/independent-states-in-the-world/</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 1 (Commodity Group)</attrlabl>
+        <attrdef>The highest level of commodity name classification. Includes either the commodity name used for a group of commodities, such as "Clays", "Iron and steel", and "Rare earths", or the commodity name itself, such as "Gypsum" and "Tin."</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Commodity group of interest: Abrasives; Aluminum; Antimony; Arsenic; Arsenic trioxide; Asbestos; Barite; Beryllium; Bismuth; Boron; Bromine; Cadmium; Cement and clinker; Chromium; Clays; Cobalt; Copper; Diamond (industrial); Diatomite; Feldspar; Ferroalloys; Fertilizers; Fluorspar; Gallium; Garnet; Gemstones; Germanium; Gold; Graphite; Gypsum; Helium; Indium; Iodine; Iron and steel; Kyanite and related materials; Lead; Leonardite; Lime; Lithium; Magnesium; Manganese; Mercury; Methanol; Mica; Molybdenum; Nickel; Niobium and tantalum; Nitrogen; Peat; Perlite; Phosphate; Platinum-group metals; Potash; Pumice and related materials; Rare earths; Rhenium; Salt; Scandium; Selenium; Silicon; Silver; Soda ash; Stone, sand, and gravel; Strontium; Sulfur; Talc and related materials; Tellurium; Thallium; Tin; Titanium; Tungsten; Uranium; Vanadium; Vermiculite; Wollastonite; Zeolites; Zinc; Zirconium</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 2 (Commodity)</attrlabl>
+        <attrdef>Mineral commodity name.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Commodity group of interest: Abrasives; Aluminum; Antimony; Arsenic; Arsenic trioxide; Asbestos; Ball Clay; Barite; Bauxite; Bentonite; Beryl; Beryllium; Bismuth; Boron; Bromine; Cadmium; Cement; Chromium; Clays; Clinker; Cobalt; Common clay; Copper; Diamond; Diamond (industrial); Diatomite; Direct-reduced iron; Feldspar; Ferroalloys; Fertilizers; Fire clay; Fluorspar; Gallium; Garnet; Gemstones; Germanium; Gold; Graphite; Gypsum; Helium; Indium; Iodine; Iridium; Iron ore; Iron oxide pigments; Kaolin; Kyanite and related materials; Lead; Lime; Lithium; Magnesite; Magnesium; Manganese; Mercury; Methanol; Mica; Molybdenum; Nickel; Niobium; Niobium and tantalum; Nitrogen; Osmium; Palladium; Peat; Perlite; Phosphate; Phosphate rock; Pig iron; Platinum; Potash; Pumice and related materials; Rare earths; Raw steel; Rhenium; Rhodium; Ruthenium; Salt; Sand and gravel, construction; Sand and gravel, industrial; Sand and gravel, unspecified; Scandium; Selenium; Silicon; Silver; Soda ash; Steel products; Stone, crushed; Stone, dimension; Stone, size and shape unspecified; Strontium; Sulfur; Talc and related materials; Tantalum; Tellurium; Thallium; Tin; Titanium; Tungsten; Uranium; Vanadium; Vermiculite; Wollastonite; Zeolites; Zinc; Zirconium</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 3 (Type)</attrlabl>
+        <attrdef>Type of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compounds</edomv>
+            <edomvd>Commodity is compounded</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Mine</edomv>
+            <edomvd>Commodity is mined</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Products</edomv>
+            <edomvd>Commodity is a product</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Refinery</edomv>
+            <edomvd>Commodity is refined</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Smelter</edomv>
+            <edomvd>Commodity is smelted</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 4 (Phase)</attrlabl>
+        <attrdef>Phase of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compounds</edomv>
+            <edomvd>Commodity is compounded</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Natural</edomv>
+            <edomvd>Commodity is naturally occurring</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Primary</edomv>
+            <edomvd>Commodity is from primary feedstock</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Primary and secondary</edomv>
+            <edomvd>Commodity is from primary and secondary feedstock</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Secondary</edomv>
+            <edomvd>Commodity is from secondary feedstock</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Synthetic</edomv>
+            <edomvd>Commodity is manufactured or man-made</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 5 (Form)</attrlabl>
+        <attrdef>Form of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries depending on the mineral commodity.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Descriptor</attrlabl>
+        <attrdef>Additional information describing the commodity, where available.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Unit</attrlabl>
+        <attrdef>Specific designator of how the commodity is measured, includes content of a particular compound or element (e.g., "Au content," "FeMo content"), gross weight, and gross volume. If specific information is unavailable regarding content, the commodity unit is listed simply as gross weight or gross volume.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries. For example: Au content, KCl content, and Gross weight.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Unit Classification</attrlabl>
+        <attrdef>The type of measure in which the commodity is reported in. All commodities are reported in either "Compound content", "Elemental content", "Gross weight," or "Gross volume".</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compound content</edomv>
+            <edomvd>Commodity unit is based on the amount or proportion of a specific chemical compound</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Elemental content</edomv>
+            <edomvd>Commodity unit is based on the amount or proportion of a specific chemical element</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Gross weight</edomv>
+            <edomvd>Commodity unit is based on the total gross weight of the commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Gross volume</edomv>
+            <edomvd>Commodity unit is based on the total gross volume of the commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time Period</attrlabl>
+        <attrdef>The time period that the reported value represents.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2020</rdommin>
+            <rdommax>2024</rdommax>
+            <attrunit>Year</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Timeframe</attrlabl>
+        <attrdef>Frequency of the reported value.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Annual</edomv>
+            <edomvd>Reported value is on a per year basis</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Data Type</attrlabl>
+        <attrdef>Type of data the reported value represents.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Production</edomv>
+            <edomvd>Reported value represents production data; the amount mined, processed, manufactured, etc.</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Value</attrlabl>
+        <attrdef>Reported value of the specified mineral commodity, data type, time period, timeframe, and country.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>16295000000</rdommax>
+            <attrunit>Units vary by country and commodity and are listed separately under the "Unit” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Unit</attrlabl>
+        <attrdef>Unit of measure for the reported mineral commodity data. For example "Cubic meters" and "Metric tons".</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Carats</edomv>
+            <edomvd>Carats</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Cubic meters</edomv>
+            <edomvd>Cubic meters</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Kilograms</edomv>
+            <edomvd>Kilograms</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Metric tons</edomv>
+            <edomvd>Metric tons</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Value Notes</attrlabl>
+        <attrdef>Notes regarding the reported value.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Estimated</edomv>
+            <edomvd>Reported value is estimated</edomvd>
+            <edomvds>Producer Defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Other Notes</attrlabl>
+        <attrdef>Other notes pertaining to the commodity or value reported.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Data Source 1</attrlabl>
+        <attrdef>Source(s) of the materials used to create the global production table for the Minerals Yearbook, volume III, Area Reports — International publication. Additional sources are also listed in the Data Quality Information section of this metadata and in the "References cited" section of the chapter reports included in the supplementary .txt file.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text and URL link entries. Where present, multiple url links are seperated by a "; " delimiter.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Data Source 2</attrlabl>
+        <attrdef>Source(s) of the materials used to create the global production table for the Minerals Yearbook, volume III, Area Reports — International publication. Additional sources are also listed in the Data Quality Information section of this metadata and in the "References cited" section of the chapter reports included in the supplementary .txt file.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text and URL link entries. Where present, multiple url links are seperated by a "; " delimiter.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Currentness Date</attrlabl>
+        <attrdef>Data and URL links are current as of the date listed.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7/23/2025</rdommin>
+            <rdommax>6/5/2026</rdommax>
+            <attrunit>Date in M/D/YYYY format</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>2024MYBv3_Facilities_Table</enttypl>
+        <enttypd>This dataset contains the 2024 locations and production capacities of mineral production and processing facilities globally.</enttypd>
+        <enttypds>U.S. Geological Survey</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>Global Entry</attrlabl>
+        <attrdef>Unique key given to each entry in this dataset.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Alphanumeric combination of "FAC" designation for facility data, USGS Facility ID's, and sequential numbers for each entry per facility.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Publication Short Name and Volume</attrlabl>
+        <attrdef>Abbreviated USGS publication name and volume number.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>USGS MYB, Vol. III</edomv>
+            <edomvd>Minerals Yearbook, volume III, Area Reports — International</edomvd>
+            <edomvds>U.S. Geological Survey</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Publication Year</attrlabl>
+        <attrdef>Data are recent to the publication year listed.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>2024</edomv>
+            <edomvd>Year</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Currentness Date</attrlabl>
+        <attrdef>Data and URL links in this table are current as of the date listed.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7/23/2025</rdommin>
+            <rdommax>6/5/2026</rdommax>
+            <attrunit>Date in M/D/YYYY format</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>USGS Facility ID</attrlabl>
+        <attrdef>Unique identification number (ID) given to each mineral production or processing facility in this dataset; IDs are composed of the 3-character alpha GENC country code combined with an internally assigned number per facility per country.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Alphanumeric combination of GENC country code with a sequentially-assigned facility number.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Country Report Title</attrlabl>
+        <attrdef>Country report titles detail their namesake region. These regions include singular countries (e.g, "Afghanistan"), a country and its overseas territories ("Denmark, the Faroe Islands, and Greenland"), or groupings of countries ("Islands of the Caribbean").</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Minerals Yearbook, volume III, Area Reports — International</codesetn>
+            <codesets>https://www.usgs.gov/centers/national-minerals-information-center/international-minerals-statistics-and-information</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Country (Short Form) or Locality</attrlabl>
+        <attrdef>Short form name of the country or locality in which the feature is located, listed in accordance with the U.S. Department of State’s list of Independent States in the World (https://www.state.gov/independent-states-in-the-world/).</attrdef>
+        <attrdefs>U.S. Department of State, Independent States in the World Fact Sheet</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>U.S. Department of State, Independent States in the World Fact Sheet</codesetn>
+            <codesets>https://www.state.gov/independent-states-in-the-world/</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Facility Name</attrlabl>
+        <attrdef>Name of specific mineral production or processing facility, if available, or a condensed description based on the location description given to the facility in the source data (may be just be a general statement, e.g. "Mine in La Cienega").</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text: names of mineral production or processing facilities or generic descriptions.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Feature Type</attrlabl>
+        <attrdef>Type of facility, based on the mineral commodity(ies) it produces or processes.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Brine</edomv>
+            <edomvd>Operations extracting or processing brine-based mineral solutions</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Mineral Processing Plant</edomv>
+            <edomvd>Metallurgical or industrial plants that process or produce mineral commodities and materials; includes refineries, smelters, or industrial operations such as cement plants</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Mines and Quarries</edomv>
+            <edomvd>Operations where raw minerals and materials are extracted; may produce ore, concentrate, ores and concentrates; includes mills and concentrators</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Oil and Gas Refineries and (or) Petrochemical Complexes</edomv>
+            <edomvd>Oil and gas refineries and (or) petrochemical complexes that process crude oil or natural gas into downstream petrochemical products</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 1 (Commodity Group)</attrlabl>
+        <attrdef>The highest level of commodity name classification. Includes either the commodity name used for a group of commodities, such as "Clays", "Iron and steel", and "Rare earths", or the commodity name itself, such as "Gypsum" and "Tin."</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Commodity group of interest: Abrasives; Aluminum; Antimony; Arsenic; Arsenic trioxide; Asbestos; Barite; Beryllium; Bismuth; Boron; Bromine; Cadmium; Cement and clinker; Chromium; Clays; Cobalt; Copper; Diamond (industrial); Diatomite; Feldspar; Ferroalloys; Fertilizers; Fluorspar; Gallium; Garnet; Gemstones; Germanium; Gold; Graphite; Gypsum; Helium; Indium; Iodine; Iron and steel; Kyanite and related materials; Lead; Lime; Lithium; Magnesium; Manganese; Mercury; Methanol; Mica; Molybdenum; Nickel; Niobium and tantalum; Nitrogen; Peat; Perlite; Phosphate; Platinum-group metals; Potash; Pumice and related materials; Rare earths; Rhenium; Salt; Scandium; Selenium; Silicon; Silver; Soda ash; Stone, sand, and gravel; Strontium; Sulfur; Talc and related materials; Tellurium; Thallium; Tin; Titanium; Tungsten; Uranium; Vanadium; Vermiculite; Wollastonite; Zeolites; Zinc; Zirconium.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 2 (Commodity)</attrlabl>
+        <attrdef>Mineral commodity name.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Commodities of interest: Abrasives; Alumina; Aluminum; Antimony; Arsenic; Arsenic trioxide; Asbestos; Ball clay; Barite; Bauxite; Bentonite; Beryl; Beryllium; Bismuth; Boron; Bromine; Cadmium; Celestite; Cement; Chromium; Clays; Clinker; Cobalt; Common clay; Copper; Diamond; Diamond (industrial); Diatomite; Direct-reduced iron; Feldspar; Ferroalloys; Fertilizers; Fire clay; Fluorspar; Gallium; Garnet; Gemstones; Germanium; Gold; Graphite; Gypsum; Helium; Indium; Iodine; Iridium; Iron ore; Iron oxide pigments; Kaolin; Kyanite and related materials; Lead; Lime; Lithium; Magnesite; Magnesium; Manganese; Mercury; Methanol; Mica; Molybdenum; Nickel; Niobium; Niobium and tantalum; Nitrogen; Osmium; Palladium; Peat; Perlite; Phosphate; Phosphate rock; Pig iron; Platinum; Potash; Pumice and related materials; Rare earths; Raw steel; Rhenium; Rhodium; Ruthenium; Salt; Sand and gravel, construction; Sand and gravel, industrial; Sand and gravel, unspecified; Scandium; Selenium; Silicon; Silver; Soda ash; Steel products; Stone, crushed; Stone, dimension; Stone, size and shape unspecified; Strontium; Sulfur; Talc and related materials; Tantalum; Tellurium; Thallium; Tin; Titanium; Tungsten; Uranium; Vanadium; Vermiculite; Wollastonite; Zeolites; Zinc; Zirconium.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 3 (Type)</attrlabl>
+        <attrdef>Type of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compounds</edomv>
+            <edomvd>Commodity is compounded</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Mine</edomv>
+            <edomvd>Commodity is mined</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Products</edomv>
+            <edomvd>Commodity is a product</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Refinery</edomv>
+            <edomvd>Commodity is refined</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Smelter</edomv>
+            <edomvd>Commodity is smelted</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 4 (Phase)</attrlabl>
+        <attrdef>Phase of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compounds</edomv>
+            <edomvd>Commodity is compounded</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Natural</edomv>
+            <edomvd>Commodity is naturally occurring</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Primary</edomv>
+            <edomvd>Commodity is from primary feedstock</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Secondary</edomv>
+            <edomvd>Commodity is from secondary feedstock</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Synthetic</edomv>
+            <edomvd>Commodity is manufactured or man-made</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Level 5 (Form)</attrlabl>
+        <attrdef>Form of the mineral commodity produced or processed, where applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries depending on the mineral commodity.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Descriptor</attrlabl>
+        <attrdef>Additional information describing the commodity, where available.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Unit</attrlabl>
+        <attrdef>Specific designator of how the commodity is measured, includes content of a particular compound or element (e.g., "Au content," "FeMo content"), gross weight, and gross volume. If specific information is unavailable regarding content, the commodity unit is listed simply as gross weight or gross volume.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries. For example: Au content, KCl content, and Gross weight.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Unit Classification</attrlabl>
+        <attrdef>General designator of how a commodity is measured: compound content, elemental content, gross weight, or gross volume.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Compound content</edomv>
+            <edomvd>Commodity unit is based on the amount or proportion of a specific chemical compound</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Elemental content</edomv>
+            <edomvd>Commodity unit is based on the amount or proportion of a specific chemical element</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Gross weight</edomv>
+            <edomvd>Commodity unit is based on the total gross weight of the commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Gross volume</edomv>
+            <edomvd>Commodity unit is based on the total gross volume of the commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Commodity Footnote</attrlabl>
+        <attrdef>Additional information pertaining to the commodity.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Multiple Commodities</attrlabl>
+        <attrdef>Multiple mineral commodities produced at a single facility; labeled "Y" or "N" to indicate whether two or more different commodities are produced at a single facility.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>N</edomv>
+            <edomvd>"N" means "no"; the facility only produces a single commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Y</edomv>
+            <edomvd>"Y" means "yes." The facility produces more than one commodity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Multiple Products</attrlabl>
+        <attrdef>Multiple products of the mineral commodity listed in field "Level 2 (Commodity)" are produced at a single facility; flagged "Y" or "N" to indicate whether multiple products are produced at a single facility. Note that a facility may produce multiple products from a single mineral commodity, or it may produce single products from more than one mineral commodity (e.g., a facility producing only tantalum concentrate and tin concentrate may be flagged "Y" for producing multiple commodities but "N" for producing single products for each commodity.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>N</edomv>
+            <edomvd>"N" means "no"; the facility only produces a single product</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Y</edomv>
+            <edomvd>"Y" means "yes"; the facility produces more than one product</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Annual Production Capacity</attrlabl>
+        <attrdef>Reported annual production capacity of the specified mineral commodity at a given country's facility. Capacities may repeat several times due to distinct facilities having a combined annual capacity. Care should be taken when adding capacities for the same mineral commodity within a country (see the “Shared Capacity" field description).</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>6570000000</rdommax>
+            <attrunit>Units vary by country, facility, and commodity and are listed separately under the "Capacity Unit” field.</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Capacity Unit</attrlabl>
+        <attrdef>Unit of measure for production capacity. All capacities are reported on an annual basis. For example "cubic meters" and "metric tons".</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>NA</edomv>
+            <edomvd>Not available or not applicable.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Carats</edomv>
+            <edomvd>Carats</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Cubic meters</edomv>
+            <edomvd>Cubic meters</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Kilograms</edomv>
+            <edomvd>Kilograms</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Metric tons</edomv>
+            <edomvd>Metric tons</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Capacity Code</attrlabl>
+        <attrdef>Designation for whether a facility shares its capacity with another facility and (or) production capacity is estimated.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>E</edomv>
+            <edomvd>Reported value is estimated</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>C</edomv>
+            <edomvd>Denotes capacity is a combination of more than one facility (see "Shared Capacity" field)</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>C, E</edomv>
+            <edomvd>Denotes capacity is a combination of more than one facility (see "Shared Capacity" field) and the reported value is estimated</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Shared Capacity</attrlabl>
+        <attrdef>Shared capacity key that specifies which facilities share the reported capacity. The shared capacity key is a combination of "Global Entry" keys, separated by a "," delimiter, for all facilities in which the reported production capacity is shared with that entry. If it is not shared, the reported shared capacity key is the entry's own "Global Entry" key.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>"Global Entry" key(s). Multiple "Global Entry" keys are separated by a "," delimiter.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Capacity Notes</attrlabl>
+        <attrdef>Additional information regarding data used to estimate production capacity, such as reported weight percents or grades.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Facility Status</attrlabl>
+        <attrdef>Facilities are "assumed active" (assumed to be producing mineral commodities) or "inactive" (for 2024, it is not producing mineral commodities).</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>Assumed active</edomv>
+            <edomvd>The facility is assumed to be in production (verified or unverified).</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Inactive</edomv>
+            <edomvd>The facility is not in production, which may include facilities under care-and-maintenance status, suspension, or temporary closed status.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Location Description</attrlabl>
+        <attrdef>Location information given in the source data. May include town/city and region in which a facility is located. Varies by country and precision of data available.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>NA</edomv>
+            <edomvd>Not available or not applicable.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <udom>Variable text entries, standardized by country.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Location Notes</attrlabl>
+        <attrdef>Additional description of the facility's location, including nearby town/city, relationship to a given town or metropolitan area, other local or regional descriptions of the locations, etc.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Location Footnote</attrlabl>
+        <attrdef>Other information pertaining to the location or facility. This may include information related to multiple locations reported under one entry, notes regarding the operation status of the facility, or other information that does not fit in other fields.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>First-Level Administrative Division Type</attrlabl>
+        <attrdef>Type of first-level administrative division.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>NA</edomv>
+            <edomvd>Not available or not applicable.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <udom>Variable text entries, standardized by country.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>First-Level Administrative Division Name</attrlabl>
+        <attrdef>Name of first-level administrative division (the equivalent of States in the United States) in which the feature is located, as listed in the Geographic Names Server.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>NA</edomv>
+            <edomvd>Not available or not applicable.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Geographic Names Server (GNS)</codesetn>
+            <codesets>https://geonames.nga.mil/geonames/GNSHome/index.html</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Major Operating Company</attrlabl>
+        <attrdef>Name of the company operating the facility.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable text entries with a consistent naming convention by company; only one name/spelling is used for a given company regardless of country location.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 1</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if different from the "Major Operating Company" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 1</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 1" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.741</rdommin>
+            <rdommax>100</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 2</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 2</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 2" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.01</rdommin>
+            <rdommax>80</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 3</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 3</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 3" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.1</rdommin>
+            <rdommax>60</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 4</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 4</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 4" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.4</rdommin>
+            <rdommax>50.5</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 5</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 5</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 5" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>53.19</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 6</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 6</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 6" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.01</rdommin>
+            <rdommax>29.25</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 7</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 7</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 7" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.14</rdommin>
+            <rdommax>11.56</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Equity Owner 8</attrlabl>
+        <attrdef>Name of an equity owner of the company that operates the facility, if available or applicable.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Share of Equity Owner 8</attrlabl>
+        <attrdef>Percent share of ownership of company listed in "Equity Owner 8" field.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>-999</edomv>
+            <edomvd>Value is not known or not available.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.1</rdommin>
+            <rdommax>28.17</rdommax>
+            <attrunit>%</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Company Footnote</attrlabl>
+        <attrdef>Additional information on the company, such as data on bankruptcy or licensing information.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Data Source 1</attrlabl>
+        <attrdef>Source(s) of the materials used to create the global facilities table for the Minerals Yearbook, volume III, Area Reports — International publication. Additional sources are also listed in the Data Quality Information section of this metadata and in the "Reference(s) cited" section of the chapter reports included in the supplementary .txt file.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text and URL link entries.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Data Source 2</attrlabl>
+        <attrdef>Source(s) of the materials used to create the global facilities table for the Minerals Yearbook, volume III, Area Reports — International publication. Additional sources are also listed in the Data Quality Information section of this metadata and in the "Reference(s) cited" section of the chapter reports included in the supplementary .txt file.</attrdef>
+        <attrdefs>U.S. Geological Survey</attrdefs>
+        <attrdomv>
+          <udom>Variable and non-standardized text and URL link entries.</udom>
+        </attrdomv>
+      </attr>
+    </detailed>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey - ScienceBase</cntorg>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>mailing</addrtype>
+          <address>Denver Federal Center</address>
+          <address>Building 810</address>
+          <address>Mail Stop 302</address>
+          <city>Denver</city>
+          <state>CO</state>
+          <postal>80225</postal>
+        </cntaddr>
+        <cntvoice>1-888-275-8747</cntvoice>
+        <cntemail>sciencebase@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>https://doi.org/10.5066/P1KEQASH</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>None.</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20260831</metd>
+    <metc>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>National Minerals Information Center</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>12201 Sunrise Valley Drive</address>
+          <city>Reston</city>
+          <state>Virginia</state>
+          <postal>20192</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>703-648-4976</cntvoice>
+        <cntfax>703-648-4995</cntfax>
+        <cntemail>nmicrecordsmgt@usgs.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+    <mettc>local time</mettc>
+  </metainfo>
+</metadata>
