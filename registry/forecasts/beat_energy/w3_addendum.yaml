@@ -1,0 +1,13 @@
+# Addendum to protocol.yaml (not edited): W3 implementation, committed BEFORE W3 is evaluated on data.
+# W3 was declared in protocol.yaml with p = 1 because atlas.eia_wpsr was not loaded at registration (free disk < 5 GB).
+# Free disk rose to 5.5 GB later the same day; the connector was ingested and W3 is evaluated with this code, exactly
+# the declared tests (COPRPUS, COSXPUS x h 0, 1; wpsr_nowcast vs STEO point, AE), replacing their p = 1 in the SAME
+# single Holm family of 127 tests. Deviation from protocol text, stated: availability = week end + 7 days (stricter
+# than the registered "Wednesday + 1 day" = week end + 6 days; holiday-week margin).
+schema: reva-beat-energy-w3-addendum/1
+written_at: '2026-10-17T22:13:23Z'
+code_path: src/reva/evaluation/beat_energy_w3.py
+code_sha256: d7b7a7894f236570827898983d919aaaf645fb08dfa11b97d4d2d3deb243561e
+weekly_table: atlas.eia.wpsr_w (connector atlas.eia_wpsr 1.0.0)
+series: {COPRPUS: WCRFPUS2, COSXPUS: WCESTUS1}
+results_seen_before_this_file: W1 and W2 (docs/dev/v7_beat_energy_result.json); W3 not evaluated
