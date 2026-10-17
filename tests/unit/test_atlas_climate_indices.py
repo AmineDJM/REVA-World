@@ -8,6 +8,7 @@ for Berkeley Earth, NSIDC G02135 citation required).
 from __future__ import annotations
 
 import asyncio
+import itertools
 import json
 from datetime import UTC, date, datetime
 
@@ -96,7 +97,16 @@ def test_sea_ice_and_sea_level(built: tuple[dict, dict]) -> None:
     assert not [r for r in ice if r["provider_geo"] == "NH" and r["period_start"] == date(1987, 12, 1)]
     sl = _rows(built, "sea_level")
     star = [r for r in sl if r["indicator"].startswith("gmsl_anomaly|mission=")]
-    assert star[0]["period_end"] - star[0]["period_start"] == date(2000, 1, 2) - date(2000, 1, 1)
+    # AUDIT3 L9: one row per ~10-day altimetry cycle -> a multi-day interval around the stated time, contiguous
+    topex = sorted((r for r in star if r["indicator"] == "gmsl_anomaly|mission=TOPEX/Poseidon"),
+                   key=lambda r: r["period_start"])  # fmt: skip
+    spans = [(r["period_end"] - r["period_start"]).days for r in topex]
+    assert min(spans) >= 5 and max(spans) <= 20, spans[:10]
+    assert all(a["period_end"] == b["period_start"] for a, b in itertools.pairwise(topex))
+    fl = json.loads(topex[1]["flags"])
+    assert fl["time_precision"].startswith("altimetry cycle") and "no averaging window" in fl["period_basis"]
+    assert topex[1]["period_start"] <= date.fromisoformat(fl["stated_day"]) < topex[1]["period_end"]
+    assert json.loads(topex[0]["flags"])["interval_edge"] == "first"
     assert "decimal_year" in json.loads(star[0]["selector"])
     epa = [r for r in sl if r["indicator"] == "csiro_adjusted_sea_level"]
     assert epa[0]["period_start"] == date(1880, 1, 1) and epa[0]["unit"] == "inches"

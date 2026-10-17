@@ -32,8 +32,8 @@ archived file when the file states it), the baseline of an anomaly, uncertainty 
 Periods: month rows ``[Y-M-01, next month)``; ONI rows the 3-month season (``DJF 1950`` = 1949-12-01..1950-03-01;
 CPC labels a season by the year of its centre month, which REVA checks at every run against PSL's centre-month
 listing); GISTEMP ``J-D`` = calendar year; EPA annual rows = calendar year; STAR rows are dated by the provider's
-decimal year, converted to the day ``Jan 1 + round(fraction x days in year)`` (formula in the flags; the decimal
-year is kept verbatim in the selector).
+decimal year, one value per ~10-day altimetry cycle: the period is the interval half-way to the neighbouring stated
+times of the same mission (basis in the flags; the decimal year is kept verbatim in the selector and flags).
 
 KG: one ``climate_index`` entity per published series (``climind:<key>``) with its atlas series address
 (``climind:atlas_series``), unit, provider definition (verbatim), baseline and licence. Nothing causal: an index
@@ -45,6 +45,7 @@ from __future__ import annotations
 import calendar
 import csv
 import io
+import itertools
 import re
 import sys
 from collections.abc import Mapping
@@ -59,7 +60,8 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.climate_indices"
-VERSION = "1.0.0"
+# 1.0.1 (FIX4C, AUDIT3 L9): NOAA STAR sea-level rows are cycle intervals, not single days.
+VERSION = "1.0.1"
 SOURCE_KEY = "climate.global_indices"
 ATLAS_SOURCE = "climind"
 PARSER_VERSION = "atlas-climate-indices/1"
@@ -648,23 +650,54 @@ def parse_star(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
     cols = next(rdr)
     if cols[0] != "year" or len(cols) < 2:
         raise _err(f"STAR columns {cols}")
-    n = 0
+    per_mission: dict[str, list[tuple[int, str, Decimal, str]]] = {}
     for i, r in enumerate(rdr):
         t = Decimal(r[0])
-        day = decimal_year_day(t)
         for c, x in zip(cols[1:], r[1:], strict=False):
             v = cc.decimal_text(x)
-            if v is None:
-                continue
+            if v is not None:
+                per_mission.setdefault(c, []).append((i, r[0], t, v))
+    n = 0
+    for c, pts in per_mission.items():
+        for (i, stated, t, v), (start, end, edge) in zip(pts, cycle_intervals([p[2] for p in pts]), strict=True):
             fl = _flags("sea_level", mission=c, title=title, trend_note=head.get("trend"),
                         gia="no glacial isostatic adjustment correction (file header)",
-                        period_basis="provider decimal year; day = Jan 1 + round(fraction x days in year)")  # fmt: skip
-            rows.add(indicator=f"gmsl_anomaly|mission={c}", provider_geo="GLOBAL", period=ic.day_span(day), value=v,
+                        stated_time_decimal_year=stated, stated_day=decimal_year_day(t).isoformat(),
+                        period_basis=STAR_PERIOD_BASIS, time_precision="altimetry cycle (one value per cycle)",
+                        **({"interval_edge": edge} if edge else {}))  # fmt: skip
+            rows.add(indicator=f"gmsl_anomaly|mission={c}", provider_geo="GLOBAL", period=(start, end), value=v,
                      unit="mm", raw_sha256=f.sha,
-                     selector={"file": f.key, "data_row": i + 1, "column": c, "decimal_year": r[0]}, flags=fl)  # fmt: skip
+                     selector={"file": f.key, "data_row": i + 1, "column": c, "decimal_year": stated}, flags=fl)  # fmt: skip
             n += 1
     report.setdefault("rows", {})[f.key] = n
     return title
+
+
+#: AUDIT3 L9: a STAR row is one altimetry-cycle mean (~10 days), not a day.
+STAR_PERIOD_BASIS = (
+    "the file states one decimal-year time per altimetry cycle and no averaging window; REVA's interval runs from "
+    "half-way after the previous stated time of the same mission to half-way before the next one (the stated time "
+    "lies inside it); days = Jan 1 + round(fraction x days in year)"
+)
+
+
+def cycle_intervals(times: list[Decimal]) -> list[tuple[date, date, str | None]]:
+    """[start, end) day intervals around strictly increasing decimal-year times (midpoints to the neighbours; the
+    first / last interval mirrors its only neighbour gap, flagged ``first`` / ``last``). Contiguous, never
+    overlapping, at least one day long."""
+    if any(b <= a for a, b in itertools.pairwise(times)):
+        raise _err("STAR times are not strictly increasing within a mission")
+    if len(times) == 1:
+        d = decimal_year_day(times[0])
+        return [(d, d + timedelta(days=1), "single")]
+    mids = [(a + b) / 2 for a, b in itertools.pairwise(times)]
+    bounds = [times[0] - (times[1] - times[0]) / 2, *mids, times[-1] + (times[-1] - times[-2]) / 2]
+    days = [decimal_year_day(b) for b in bounds]
+    for k in range(1, len(days)):
+        if days[k] <= days[k - 1]:
+            days[k] = days[k - 1] + timedelta(days=1)
+    edges = ["first", *([None] * (len(times) - 2)), "last"]
+    return [(days[k], days[k + 1], edges[k]) for k in range(len(times))]
 
 
 def parse_epa(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
