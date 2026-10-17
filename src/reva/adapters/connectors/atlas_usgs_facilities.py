@@ -56,7 +56,7 @@ from reva.atlas.tables import country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.usgs_myb_facilities"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas_usgs_facilities/1"
 SOURCE_KEY = "usgs.sciencebase"
 SOURCE = "usgs_myb_fac"
