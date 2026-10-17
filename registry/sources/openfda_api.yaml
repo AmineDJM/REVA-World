@@ -16,5 +16,5 @@ rights:
 metadata:
   allowed_hosts: [api.fda.gov]
   endpoints: [https://api.fda.gov/drug/event.json, https://api.fda.gov/drug/label.json, https://api.fda.gov/drug/enforcement.json]
-  authentication: none (no API key: 240 requests/minute, 1,000/day; event count limit <= 100 without key)
+  authentication: "none (no API key: 240 requests/minute, 1,000/day; event count limit <= 100 without key)"
   release_checked: event last_updated 2026-07-30, label 2026-10-16, enforcement 2026-10-07 (checked 2026-10-17)

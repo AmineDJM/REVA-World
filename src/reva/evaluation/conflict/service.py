@@ -23,7 +23,7 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 import polars as pl
-import pyarrow.parquet as pq
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 from sqlalchemy import Engine, text
 
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE

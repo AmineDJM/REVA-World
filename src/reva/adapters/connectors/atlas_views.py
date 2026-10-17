@@ -383,8 +383,8 @@ def codebook_quotes(body: bytes, variables: tuple[str, ...]) -> dict[str, str]:
     out: dict[str, str] = {}
     for v in variables:
         if isinstance(d, dict) and isinstance(d.get(v), dict):  # 002/003 layout
-            e = d[v]
-            out[v] = f"{e.get('name', '')}: {e.get('description', '')}".strip()
+            ent = d[v]
+            out[v] = f"{ent.get('name', '')}: {ent.get('description', '')}".strip()
             continue
         found = None
         stack: list[Any] = [d]

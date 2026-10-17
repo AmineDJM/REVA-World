@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from typing import Any
 from urllib.parse import quote

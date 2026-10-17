@@ -215,8 +215,8 @@ def evaluate(
                 d, _ = _pair(rows, pers, prim)
                 if d:
                     common = {(x["geo"], x["origin"]) for x in rows}
-                    base = [x for x in pers if (x["geo"], x["origin"]) in common]
-                    bm = math.fsum(x[prim] for x in base) / len(base)
+                    pbase = [x for x in pers if (x["geo"], x["origin"]) in common]
+                    bm = math.fsum(x[prim] for x in pbase) / len(pbase)
                     r[f"{prim}_vs_persistence"] = (bm + math.fsum(d) / len(d)) / bm if bm else None
             for cand in CANDIDATE_KEYS:
                 for base in BASELINE_KEYS:

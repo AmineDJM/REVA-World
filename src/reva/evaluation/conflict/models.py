@@ -163,15 +163,16 @@ class Design:
             row = [x.get(f) if x.get(f) is not None else self.impute[f] for f in base]
             row += [1.0 if x.get(m) is None else 0.0 for m in self.miss_cols]
             out[i] = row
-        return (out - self.mean) / self.sd
+        res: np.ndarray = (out - self.mean) / self.sd
+        return res
 
 
 def make_design(xs: Sequence[dict[str, float | None]], feats: Sequence[str]) -> Design:
     impute: dict[str, float] = {}
     miss: list[str] = []
     for f in feats:
-        vals = [x[f] for x in xs if x.get(f) is not None]
-        impute[f] = float(np.mean(vals)) if vals else 0.0
+        vals = [float(v) for x in xs if (v := x.get(f)) is not None]
+        impute[f] = math.fsum(vals) / len(vals) if vals else 0.0
         if len(vals) < len(xs) and len(xs) - len(vals) >= 0.01 * len(xs):
             miss.append(f)
     names = tuple(feats) + tuple(f"miss:{m}" for m in miss)
@@ -207,7 +208,8 @@ def fit_logit(x: np.ndarray, y: np.ndarray, lam: float = RIDGE, iters: int = 60)
 
 def logit_prob(b: np.ndarray, x: np.ndarray) -> np.ndarray:
     eta = np.clip(b[0] + x @ b[1:], -35, 35)
-    return 1.0 / (1.0 + np.exp(-eta))
+    res: np.ndarray = 1.0 / (1.0 + np.exp(-eta))
+    return res
 
 
 def fit_ridge(x: np.ndarray, y: np.ndarray, lam: float = RIDGE) -> tuple[np.ndarray, float]:
