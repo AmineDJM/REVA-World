@@ -253,14 +253,15 @@ async def _rephrase(
 ) -> None:
     rep: dict[str, Any] = {"requested": True}
     result.rephrase = rep
-    sentences = result.composed.sentences
+    # the "Sources et licences" list is a deterministic inventory of the evidence: never rephrased
+    sentences = [s for s in result.composed.sentences if s.kind != "sources"]
     if not drafters or ledger is None or budget is None:
         rep["status"] = "skipped_llm_disabled"
         return
     if len(sentences) > MAX_REPHRASE_SENTENCES or len(result.answer_text) > MAX_REPHRASE_CHARS:
         rep["status"] = "skipped_too_long"
         return
-    request = rephrase_request(result.plan.language, result.composed, budget)
+    request = rephrase_request(result.plan.language, Composed(sentences), budget)
     try:
         response, _ = await call_providers(request, drafters, ledger, _sub_key(inp.operation_key, "rephrase"))
     except (LlmProviderError, BudgetExhausted, LlmUnavailable) as e:

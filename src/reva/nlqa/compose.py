@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any
 
+from reva.nlqa.domain_compose import DOMAIN_OPS, DomainComposer
 from reva.nlqa.executor import Execution, OpResult, Resolved, _dec
 from reva.nlqa.plan import in_question
 from reva.nlqa.ports import AtlasCell, Entity, KgStatement, cell_is_projection, estimate_status, pick_label
@@ -367,7 +368,7 @@ def _status(c: AtlasCell, lang: str) -> str:
     return ""
 
 
-class Composer:
+class Composer(DomainComposer):
     def __init__(self, execution: Execution, question: str, catalog: Any) -> None:
         self.x = execution
         self.q = question
@@ -465,7 +466,8 @@ class Composer:
                 "rejected",
             )
         self.licences()
-        if not any(s.kind in ("fact", "path", "causal") for s in self.out.sentences):
+        self.sources()
+        if not any(s.kind in ("fact", "path", "causal", "estimate", "forecast", "scenario") for s in self.out.sentences):
             eid = self.x.evidence.absence(
                 "answer", sorted({c for r in self.x.results for c in r.consulted}) or ["no source"]
             )
@@ -618,6 +620,10 @@ class Composer:
                 "atlas": "l'atlas" if fr else "the atlas",
                 "links": "la couche d'interconnexions" if fr else "the interconnection layer",
                 "causal": "le service des affirmations causales" if fr else "the causal claims service",
+                "families": "l'index des familles de relations" if fr else "the relation-family index",
+                "effects": "la couche d'estimations d'effet" if fr else "the effect-estimate layer",
+                "forecasts": "le registre de prévisions" if fr else "the forecast registry",
+                "decisions": "le moteur de décision" if fr else "the decision engine",
             }.get(str(res.data.get("backend")), str(res.data.get("backend")))
             eid = self.x.evidence.absence("capability_unavailable", [str(res.data.get("backend"))], operation=op.op)
             self.add(
@@ -658,6 +664,9 @@ class Composer:
             )
             return
         # empty
+        if op.op in DOMAIN_OPS:
+            self.domain_empty(res)
+            return
         consulted = ", ".join(res.consulted)
         d = res.data
         if d.get("only_projections"):

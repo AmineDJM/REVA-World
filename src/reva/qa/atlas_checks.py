@@ -5,8 +5,9 @@ ended, forecasts carried as observations, projection tables without projection f
 of the table and provenance of its cells (raw sha256 listed by the table manifest). The cells of the series that
 the cross-source pairs and the per-capita identities need are collected on the way and compared at the end.
 
-Projection rule = :data:`reva.atlas.query.PROJECTION_SQL` (estimate_kind projection / unknown boundary, a truthy
-``projection`` flag, ``period_after_vintage``). Nothing is modified; findings name table, indicator, provider
+Projection rule = :mod:`reva.atlas.projection` (``registry/atlas/projection_kinds.yaml``, the one vocabulary every
+reader uses: projection kinds, unknown kinds, projection flags, a period after a release date in the flags or after
+the date the table was recorded). Nothing is modified; findings name table, indicator, provider
 geography and period, which identify a cell uniquely.
 """
 
@@ -21,16 +22,18 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any
 
+import duckdb
 import polars as pl
 
 from reva.atlas.catalog import Catalog
+from reva.atlas.projection import projection_sql, vocabulary
 from reva.atlas.snapshot import normalise_rights
 from reva.atlas.source_order import HeadlineRegistry
+from reva.atlas.value_notes import signed_series
 from reva.qa.backend import QaBackend, lit
 from reva.qa.config import QaConfig
 from reva.qa.report import CheckResult, status_for
 
-PROJECTION_KINDS = ("projection", "unknown_boundary", "published_history_boundary_unknown")
 READ_COLUMNS = [
     "source",
     "dataset",
@@ -56,6 +59,7 @@ class AtlasTable:
     row_count: int
     rights: dict[str, Any] | None
     raw_sha256s: list[str]
+    recorded: date | None = None  # date the table version was recorded (fetched): FIX5 period-after-record rule
 
     @property
     def key(self) -> str:
@@ -65,8 +69,9 @@ class AtlasTable:
 def atlas_tables(be: QaBackend, origin: str) -> list[AtlasTable]:
     rows = be.rows(
         "SELECT x.dataset_key, x.subject_key, x.artifact_sha256, x.row_count, CAST(x.coverage AS TEXT) AS coverage, "
+        "CAST(x.recorded_at AS TEXT) AS recorded_at, "
         "CAST(a.rights AS TEXT) AS rights FROM (SELECT d.dataset_key, d.subject_key, d.artifact_sha256, d.row_count, "
-        "d.coverage, ROW_NUMBER() OVER (PARTITION BY d.dataset_key ORDER BY d.recorded_at DESC) AS rn "
+        "d.coverage, d.recorded_at, ROW_NUMBER() OVER (PARTITION BY d.dataset_key ORDER BY d.recorded_at DESC) AS rn "
         f"FROM evidence.dataset d WHERE d.concept_id = 'atlas.table' AND d.origin = {lit(origin)}) x "
         "LEFT JOIN meta.artifact a ON a.sha256 = x.artifact_sha256 WHERE x.rn = 1 ORDER BY x.dataset_key"
     )
@@ -84,44 +89,63 @@ def atlas_tables(be: QaBackend, origin: str) -> list[AtlasTable]:
                 int(r["row_count"]),
                 rights,
                 list(cov.get("raw_sha256s") or []),
+                date.fromisoformat(str(r["recorded_at"])[:10]) if r.get("recorded_at") else None,
             )
         )
     return out
 
 
-def projection_frame(df: pl.DataFrame) -> pl.DataFrame:
-    """Adds ``is_proj`` (bool) and ``available_at`` (date or null) parsed only where the flags mention them."""
-    has = pl.col("flags").str.contains("estimate_kind|projection|period_after_vintage|available_at|flag_meaning")
+def projection_frame(df: pl.DataFrame, recorded: date | None = None, table: str | None = None) -> pl.DataFrame:
+    """Adds ``is_proj`` (bool: not an observation, the shared rule of :mod:`reva.atlas.projection`), ``by_date``
+    (not an observation only by the release-date / period-after-record rules), ``unclassified`` (an estimate_kind
+    listed in no class) and ``available_at`` (date or null). Flags are parsed only where they mention a rule key."""
+    v = vocabulary()
+    keys = ["estimate_kind", *v.truthy_flags, *v.true_flags, *v.release_date_flags, "available_at", "flag_meaning"]
+    has = pl.col("flags").str.contains("|".join(sorted(set(keys))))
     df = df.with_row_index("_r")
-    sub = (
-        df.filter(has)
-        .select(
-            "_r",
-            pl.col("flags").str.json_path_match("$.estimate_kind").alias("_ek"),
-            pl.col("flags").str.json_path_match("$.projection").alias("_pj"),
-            pl.col("flags").str.json_path_match("$.period_after_vintage").alias("_pav"),
-            pl.col("flags").str.json_path_match("$.flag_meaning").alias("_fm"),
-            pl.col("flags")
-            .str.json_path_match("$.available_at")
-            .str.slice(0, 10)
-            .str.to_date("%Y-%m-%d", strict=False)
-            .alias("available_at"),
+    part = df.filter(has).select("_r", "flags", "period_start")
+    con = duckdb.connect()
+    try:
+        con.register("x", part.to_arrow())
+        sub = pl.from_arrow(
+            con.execute(
+                f"SELECT _r, {projection_sql('x')} AS flag_proj, {projection_sql('x', period=True)} AS rel_proj, "
+                "json_extract_string(x.flags, '$.estimate_kind') AS _ek, "
+                "json_extract_string(x.flags, '$.flag_meaning') AS _fm, "
+                "TRY_CAST(substr(json_extract_string(x.flags, '$.available_at'), 1, 10) AS DATE) AS available_at "
+                "FROM x"
+            ).arrow()
         )
-        .with_columns(
-            (
-                pl.col("_ek").is_in(PROJECTION_KINDS).fill_null(False)
-                | (pl.col("_pj").is_not_null() & ~pl.col("_pj").is_in(["false", ""])).fill_null(False)
-                | (pl.col("_pav") == "true").fill_null(False)
-            ).alias("is_proj")
-        )
-        .select(
-            "_r",
-            "is_proj",
-            "available_at",
-            pl.concat_str(["_ek", "_fm"], separator=" ", ignore_nulls=True).alias("kind_words"),
-        )
+    finally:
+        con.close()
+    assert isinstance(sub, pl.DataFrame)
+    listed = [*v.listed_non_projection, *v.projection_kinds]
+    sub = sub.select(
+        "_r",
+        pl.col("flag_proj").fill_null(False),
+        pl.col("rel_proj").fill_null(False),
+        "available_at",
+        (pl.col("_ek").is_not_null() & (pl.col("_ek") != "") & ~pl.col("_ek").is_in(listed)).alias("unclassified"),
+        pl.col("_ek").is_in(list(v.date_rule_exempt_kinds)).fill_null(False).alias("_exempt"),
+        pl.concat_str(["_ek", "_fm"], separator=" ", ignore_nulls=True).alias("kind_words"),
     )
-    return df.join(sub, on="_r", how="left").with_columns(pl.col("is_proj").fill_null(False)).drop("_r")
+    out = df.join(sub, on="_r", how="left").with_columns(
+        pl.col("flag_proj").fill_null(False),
+        pl.col("rel_proj").fill_null(False),
+        pl.col("unclassified").fill_null(False),
+        pl.col("_exempt").fill_null(False),
+    )
+    exempt_table = table is not None and table in v.date_rule_exempt_tables
+    after = (
+        (pl.col("period_start") > pl.lit(recorded)) & ~pl.col("_exempt")
+        if recorded is not None and not exempt_table
+        else pl.lit(False)
+    )
+    rel = pl.col("rel_proj") & pl.lit(not exempt_table)
+    return out.with_columns(
+        (pl.col("flag_proj") | rel | after).alias("is_proj"),
+        (~pl.col("flag_proj") & (rel | after)).alias("by_date"),
+    ).drop("_r", "flag_proj", "rel_proj", "_exempt")
 
 
 def _calendar_year(df: pl.DataFrame) -> pl.DataFrame:
@@ -177,6 +201,7 @@ class AtlasScan:
         self.identities = u.get("identities") or []
         self.grace = int(t.get("future_grace_days") or 0)
         self.proj_tables = set(t.get("projection_tables") or [])
+        self.signed = signed_series()
         self.future_ok = set(t.get("future_ok_tables") or [])
         self.proj_words = t.get("projection_word_regex")
         self.suffixes = {k: tuple(v) for k, v in (t.get("precision_suffixes") or {}).items()}
@@ -265,7 +290,7 @@ class AtlasScan:
         self.tables_scanned += 1
         self.rows_scanned += df.height
         self.table_shas[t.sha256] = t.key
-        df = projection_frame(df)
+        df = projection_frame(df, t.recorded, t.key)
         self._units(t, df)
         self._time(t, df)
         self._provenance(t, df)
@@ -293,7 +318,9 @@ class AtlasScan:
                 rule = (b["name"], float(b["min"]), float(b["max"]), eff)
                 break
             cat_only = self.counts.get("catalog_only_unit_regex")
-            if cat_only and concept is None and re.search(cat_only, eff or ""):
+            if f"{t.source}.{t.dataset}.{g['indicator']}" in self.signed:
+                pass  # FIX5 (D6): a net quantity, negative values within the provider definition (value notes)
+            elif cat_only and concept is None and re.search(cat_only, eff or ""):
                 pass  # a generic provider unit ("Number") says nothing about the quantity: catalog units only
             elif rule is None and self.counts and re.search(self.counts["unit_regex"], eff or ""):
                 ex = self.counts.get("exempt_regex")
@@ -352,6 +379,17 @@ class AtlasScan:
         if t.key not in self.future_ok:
             fut = obs.filter(pl.col("period_start") > limit)
             a.add(t.key, fut.height, [_cell(t.key, r, "flags") for r in fut.head(2).iter_rows(named=True)])
+        # FIX5: cells the provider did not flag that the shared rule reads as not observed (a period after a release
+        # date in the flags or after the table's record date) — kept out of observation answers; a connector should
+        # flag them itself.
+        a = self.acc["time.projection_by_date_rule"]
+        a.checked += df.height
+        bd = df.filter(pl.col("by_date"))
+        a.add(t.key, bd.height, [_cell(t.key, r, "flags") for r in bd.head(2).iter_rows(named=True)])
+        a = self.acc["time.estimate_kind_unclassified"]
+        a.checked += df.height
+        un = df.filter(pl.col("unclassified"))
+        a.add(t.key, un.height, [_cell(t.key, r, "kind_words") for r in un.head(2).iter_rows(named=True)])
         if self.proj_words:
             a = self.acc["time.projection_word_unflagged"]
             kw = obs.filter(pl.col("kind_words").is_not_null())
@@ -665,6 +703,15 @@ class AtlasScan:
                 "fail",
             ),
             "time.forecast_as_observation": ("non-projection cells starting at/after their availability date", "fail"),
+            "time.projection_by_date_rule": (
+                "cells not flagged by their provider, read as not observed by the date rule (period after a "
+                "release date in the flags or after the table's record date)",
+                "warn",
+            ),
+            "time.estimate_kind_unclassified": (
+                "cells whose estimate_kind is in no class of registry/atlas/projection_kinds.yaml (read as not observed)",
+                "fail",
+            ),
             "time.period_open_at_publication": (
                 "non-projection cells whose period was still open when published",
                 "info",

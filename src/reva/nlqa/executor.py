@@ -26,6 +26,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from reva.nlqa.catalog import QaCatalog, fold
+from reva.nlqa.domain_exec import DomainOps
 from reva.nlqa.plan import PlanOp, QueryPlan
 from reva.nlqa.ports import (
     CLAIM_TIERS,
@@ -358,7 +359,7 @@ class RankRefused(Exception):
         self.details = details
 
 
-class Executor:
+class Executor(DomainOps):
     def __init__(self, backends: Backends, catalog: QaCatalog, *, time_budget_s: float | None = TIME_BUDGET_S) -> None:
         self.b = backends
         self.catalog = catalog
@@ -526,6 +527,8 @@ class Executor:
             return self._why(op, lookups, ev)
         if op.op == "causal_chain":
             return self._causal_chain(op, lookups, ev)
+        if op.op in ("kg_families", "kg_cross", "effects", "forecast", "decision", "atlas_period"):
+            return getattr(self, f"_{op.op}")(op, lookups, ev)  # type: ignore[no-any-return]
         raise CapabilityUnavailable(f"operation {op.op} has no executor", backend="plan")
 
     # ------------------------------------------------------------------ causality (claims only, never candidates)
