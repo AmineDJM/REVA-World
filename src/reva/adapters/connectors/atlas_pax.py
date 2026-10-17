@@ -55,10 +55,6 @@ DATA_URL = f"https://{HOST}/cms/documents/3957/pax_data_2257_agreements_v10.csv"
 DATA_FILE = "pax_data_2257_agreements_v10.csv"
 CODEBOOK_KEY = "pax_codebook"
 PAX_VERSION = "v10"
-RELATEDNESS = (
-    "context: the conflict / war the agreement addresses (codebook: a peace agreement is a document 'addressing "
-    "conflict with a view to ending it'); not a reaction or a cause"
-)
 MEDIA = ("text/csv", "application/csv", "application/octet-stream", "text/plain")
 PDF_MEDIA = ("application/pdf", "application/octet-stream")
 MAX_BYTES = 12_000_000
@@ -242,7 +238,6 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
                     target,
                     raw_sha256=sha,
                     selector={**sel, "column": "UcdpCon"},
-                    relation=RELATEDNESS,
                 )
             )
         for col_v in coded_ids(r["CowWar"]):
@@ -259,7 +254,6 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
                     raw_sha256=sha,
                     selector={**sel, "column": "CowWar"},
                     numbering="COW v4 (Resort to War, Sarkees and Wayman 2010)",
-                    relation=RELATEDNESS,
                 )
             )
     for pp, names in sorted(processes.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 0):

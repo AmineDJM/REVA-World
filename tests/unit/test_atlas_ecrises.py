@@ -129,11 +129,42 @@ def test_twin_definition_on_a_synthetic_country() -> None:
 def test_accelerator_objectives_read_only_the_coded_part() -> None:
     t = "Mismatches and market illiquidity.\n\nMotivation: All vulnerabilities played a role (except infrastructure resilience)."
     assert m.accelerator_objectives(t) == ["mismatches_and_market_illiquidity"]
-    assert m.accelerator_objectives("Excessive credit growth, misaligned incentives, currency mismatch.") == [
+    assert m.accelerator_objectives(
+        "Excessive credit growth and leverage, exposure concentration, mismatches and market illiquidity, misaligned "
+        "incentives.\n\nMotivation: the narrative may name anything."
+    ) == [
         "excessive_credit_growth_and_leverage",
+        "exposure_concentration",
+        "mismatches_and_market_illiquidity",
         "misaligned_incentives",
     ]
-    assert m.accelerator_objectives("Exogenous health crisis due to Covid-19 outbreak") == []
+    # audit M7 (AUDFIX): no pattern search in free text -- only an exact list of the five objective names
+    for text in (
+        "Excessive credit growth, misaligned incentives, currency mismatch.",  # abbreviated / unknown item
+        "Excessive credit growth and leverage (in particular CRE), mismatches in balance sheets",  # loose mapping
+        "Excessive credit growth and leverage, mismatches.",
+        "Russia's sovereign default ... losses were further amplified by the exposure concentration, adverse ...",
+        'The main vulnerability comes under the heading "mismatches and market illiquidity".',
+        "1) Excessive credit growth and leverage. \n2) High reliance on the market funding",
+        "Exogenous health crisis due to Covid-19 outbreak",
+    ):
+        assert m.accelerator_objectives(text) == [], text
+
+
+def test_esrb_mechanism_is_the_verbatim_cell_or_marked_truncated() -> None:
+    b = build(m.ESRB)
+    rels = [r for r in b.relations if r.family == "causal"]
+    assert rels
+    for r in rels:
+        t = r.qualifiers.get("mechanism_truncated")
+        if t:
+            assert len(r.mechanism) == t["stored_chars"] == m.MECHANISM_MAX < t["full_chars"]
+        else:
+            assert len(r.mechanism) <= m.MECHANISM_MAX
+    claims = m.dataset_claims(b)
+    for c in claims:
+        assert ("mechanism_truncated" in c.scope) == (len(c.mechanism) == m.MECHANISM_MAX)
+    assert m.CODEBOOKS[m.ESRB]["definitions"]["accelerator"].endswith("Format: text.")
 
 
 # ------------------------------------------------------------------------------------------- Laeven-Valencia
