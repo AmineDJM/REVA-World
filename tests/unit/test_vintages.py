@@ -34,7 +34,7 @@ REC = datetime(2026, 10, 17, 12, tzinfo=UTC)
 
 
 def _t(*a: int) -> datetime:
-    return datetime(*a, tzinfo=UTC)  # type: ignore[misc]
+    return datetime(*a, tzinfo=UTC)  # type: ignore[misc,arg-type]
 
 
 def _cells(spec: Sequence[tuple[str, datetime | None, int, str, str]], geo: str = "FRA") -> pl.DataFrame:
@@ -88,7 +88,8 @@ def test_value_changes_exactly_at_the_availability_instant() -> None:
     assert _value(VintageAccessor(cells, _t(2008, 11, 1)).latest(), 2007) == "2.2"
     assert VintageAccessor(cells, _t(2008, 4, 30)).latest().rows.height == 0  # nothing published yet
     acc = VintageAccessor(cells, _t(2008, 6, 1))
-    assert acc.vintage_in_force("imf_weo")["vintage"] == "2008-04"
+    vf = acc.vintage_in_force("imf_weo")
+    assert vf is not None and vf["vintage"] == "2008-04"
     assert acc.latest().exclusions["available_after_cutoff"] == 3
 
 

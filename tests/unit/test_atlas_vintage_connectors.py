@@ -12,6 +12,7 @@ import hashlib
 import json
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 import pytest
@@ -50,10 +51,10 @@ def _fixture(conn: str, url_part: str) -> bytes:
     man = json.loads((FIX / conn / "manifest.json").read_text())
     hits = [e for e in man if url_part in e["url"]]
     assert len(hits) == 1, url_part
-    return (FIX / conn / hits[0]["file"]).read_bytes()
+    return bytes((FIX / conn / hits[0]["file"]).read_bytes())
 
 
-def _flags(df: pl.DataFrame) -> list[dict]:
+def _flags(df: pl.DataFrame) -> list[dict[str, Any]]:
     return [json.loads(f) for f in df["flags"]]
 
 
@@ -103,7 +104,7 @@ def test_vintage_flags_refuse_unknown_terms_and_half_availability() -> None:
 # ---------------------------------------------------------------------------------------------- WEO
 def test_weo_dbnomics_vintages_are_month_end_and_never_mix_projections() -> None:
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     for v in weo.FIXTURE_DBN_VINTAGES:
         docs, n = weo.parse_dbn_page(_fixture("atlas.vintage_weo_dbn", f"WEO:{v}"), v)
         assert n == len(docs)
@@ -134,7 +135,7 @@ def test_weo_dbnomics_vintages_are_month_end_and_never_mix_projections() -> None
 
 def test_weo_imf_portal_vintage_uses_publication_date_and_boundary() -> None:
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     vint = weo.parse_imf(
         _fixture("atlas.vintage_weo_imf", "WEO_2025_OCT_VINTAGE"), SHA, "WEO_2025_OCT_VINTAGE", "1.0.0", rows, stats
     )
@@ -156,7 +157,7 @@ def test_weo_imf_portal_vintage_uses_publication_date_and_boundary() -> None:
 # ---------------------------------------------------------------------------------------------- Philadelphia Fed
 def test_rtdsm_vintage_columns_and_middle_month_rule() -> None:
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     for f in pf.FIXTURE_RTDSM:
         pf.parse_rtdsm(_fixture("atlas.vintage_philfed", f"xlsx/{f}"), f, SHA, rows, stats)
     df, _ = validate_atlas_frame(
@@ -180,7 +181,7 @@ def test_spf_release_dates_verbatim_and_unknown_before_1990q2() -> None:
     assert dates[(1990, 2)] == {"deadline": "8/23/90*", "release": "8/31/90*"}
     assert (1990, 1) not in dates
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     pf.parse_spf(_fixture("atlas.vintage_philfed", "medianlevel.xlsx"), "level", SHA, dates, rows, stats)
     pf.parse_spf(_fixture("atlas.vintage_philfed", "mediangrowth.xlsx"), "growth", SHA, dates, rows, stats)
     df, _ = validate_atlas_frame(
@@ -204,7 +205,7 @@ def test_spf_release_dates_verbatim_and_unknown_before_1990q2() -> None:
 # ---------------------------------------------------------------------------------------------- ECB / OECD
 def test_ecb_spf_calendar_and_longer_term_horizons_only() -> None:
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     ecb.parse_csv(_fixture("atlas.vintage_ecb_spf", "data-api.ecb.europa.eu"), SHA, rows, stats)
     df, _unmapped = validate_atlas_frame(rows.frame(), source="vintage_ea", dataset="ecb_spf", raw_sha256s=[SHA])
     assert stats["rolling_horizon_not_loaded"] > 0
@@ -218,7 +219,7 @@ def test_ecb_spf_calendar_and_longer_term_horizons_only() -> None:
 
 def test_oecd_editions_month_end_and_values_verbatim() -> None:
     rows: Rows = Rows()
-    stats: dict = {}
+    stats: dict[str, int] = {}
     oecd.parse_csv(_fixture("atlas.vintage_oecd_rt", "sdmx.oecd.org"), SHA, rows, stats, year=2008)
     df, _ = validate_atlas_frame(
         rows.frame(), source="vintage_oecd", dataset="stes_revisions", raw_sha256s=[SHA], geo_scheme="iso3"

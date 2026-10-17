@@ -69,7 +69,7 @@ _FLAG_FIELDS: dict[str, Any] = {
     "horizon": pl.String,
 }
 CELL_SCHEMA = pl.Schema(
-    {
+    {  # type: ignore[arg-type]
         "dataset_key": pl.String,
         "table_recorded_at": pl.Datetime("us", "UTC"),
         "family": pl.String,
