@@ -390,13 +390,15 @@ export interface ContextEdge {
   eventIsSubject: boolean;
 }
 
-const sumCounts = (v: unknown): number | null => {
+const sumCounts = (v: unknown, skip?: string): number | null => {
   if (typeof v === 'number') return v;
   if (!isRec(v)) return null;
   let n = 0;
-  for (const x of Object.values(v)) n += typeof x === 'number' ? x : (sumCounts(x) ?? 0);
+  for (const [k, x] of Object.entries(v)) if (k !== skip) n += typeof x === 'number' ? x : (sumCounts(x) ?? 0);
   return n;
 };
+/** The server counts coded outcomes apart (family bucket "outcome", APIFIX): never causes or consequences. */
+const outcomeCount = (...sides: unknown[]): number => sides.reduce<number>((n, v) => n + (isRec(v) ? (sumCounts(v.outcome) ?? 0) : 0), 0);
 
 /** Context (non-causal) relations giving the event's places and participants (KG statements). */
 const PLACE_PIDS = new Set(['P276', 'P17', 'P30', 'P131']);
@@ -453,8 +455,9 @@ export const CausalEvent = JsonRecord.transform((o0, ctx) => {
     partOf: refs(o.part_of),
     context,
     contextTruncated: o.context_truncated === true,
-    nCauses: sumCounts(counts.causes),
-    nEffects: sumCounts(counts.effects),
+    nCauses: sumCounts(counts.causes, 'outcome'),
+    nEffects: sumCounts(counts.effects, 'outcome'),
+    nOutcomes: outcomeCount(counts.causes, counts.effects),
     nCandidates: typeof cand === 'number' ? cand : null,
     source: optStr(o.source_key) ?? optStr(prov.source_key),
     origin: optStr(o.origin) ?? optStr(prov.origin) ?? (Array.isArray(o.origins) && o.origins.length === 1 ? optStr(o.origins[0]) : null),
@@ -665,6 +668,10 @@ export interface ChainResult {
 
 /** Known server "not found" reasons in French (the server text is kept when unknown). */
 const NOT_FOUND_FR: [RegExp, (m: RegExpExecArray) => string][] = [
+  [
+    /^(.+?) (?:is a coded outcome record|are coded outcome records)\b/i,
+    (m) => `${m[1]} : issue codée (comment un événement s’est terminé selon un jeu de données) — une issue n’est jamais composée dans une chaîne causale`,
+  ],
   [/^no causal chain within max_hops among claims graded at least ([A-E])/i, (m) => `aucune chaîne d’affirmations causales dans la limite de maillons parmi les affirmations de grade ${m[1]} ou mieux`],
   [/records of the same event/i, () => 'les deux extrémités sont deux enregistrements du même événement (lien same_as fondé sur une preuve) : il n’y a pas de chaîne causale à chercher'],
   [/unknown (event|entity|id)/i, () => 'identifiant inconnu des affirmations causales chargées'],
@@ -737,7 +744,8 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
     notFoundReason: notFoundReasonFr(optStr(d.not_found_reason)),
     truncated: d.truncated === true || search.truncated === true,
     warnings,
-    duplicatesMerged: allChains.length - chains.length,
+    // identical paths: merged by the server since APIFIX (search.duplicate_paths_merged), still merged here too
+    duplicatesMerged: allChains.length - chains.length + num(search.duplicate_paths_merged),
     skipped: {
       classNodes: num(search.class_nodes_skipped),
       quarantined: num(search.quarantined_skipped),

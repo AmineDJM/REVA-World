@@ -4902,6 +4902,7 @@
             "description": "Null until the grader has run on this claim row"
           },
           "lane": {
+            "description": "registry/causal/relations.yaml lane; 'outcome' = coded outcome, never a cause",
             "title": "Lane",
             "type": "string"
           },
@@ -5632,7 +5633,7 @@
               },
               "type": "object"
             },
-            "description": "family -> grade (or 'ungraded') -> count",
+            "description": "family ('cause' / 'prevention', or 'outcome' for coded outcomes, counted apart: how an event ended, never a cause or a consequence) -> grade (or 'ungraded') -> count",
             "title": "Causes",
             "type": "object"
           },
@@ -6361,6 +6362,12 @@
       "CausalWhy": {
         "additionalProperties": false,
         "properties": {
+          "causal_claims": {
+            "default": 0,
+            "description": "Claims in the causal lanes (every lane but 'outcome')",
+            "title": "Causal Claims",
+            "type": "integer"
+          },
           "dissent": {
             "items": {
               "$ref": "#/components/schemas/CausalClaim"
@@ -6394,6 +6401,12 @@
             "title": "Note",
             "type": "string"
           },
+          "outcome_claims": {
+            "default": 0,
+            "description": "Claims in the 'outcome' lane: this record is how an event ended (coded outcome), not a cause",
+            "title": "Outcome Claims",
+            "type": "integer"
+          },
           "summary": {
             "title": "Summary",
             "type": "string"
@@ -6414,6 +6427,8 @@
           "mechanisms",
           "dissent",
           "truncated",
+          "causal_claims",
+          "outcome_claims",
           "summary",
           "summary_fr",
           "note"
@@ -6853,6 +6868,12 @@
             "title": "Class Nodes Skipped",
             "type": "integer"
           },
+          "duplicate_paths_merged": {
+            "default": 0,
+            "description": "Enumerated paths made of the same hops (claim / same_as keys) as a path already returned",
+            "title": "Duplicate Paths Merged",
+            "type": "integer"
+          },
           "edges_scanned": {
             "title": "Edges Scanned",
             "type": "integer"
@@ -6929,6 +6950,7 @@
           "class_nodes_sample",
           "node_rule",
           "identity",
+          "duplicate_paths_merged",
           "truncated",
           "truncation_reasons",
           "time_budget_ms",
@@ -23876,6 +23898,7 @@
             "type": "object"
           },
           "lane": {
+            "description": "immediate / underlying / contributing / general / coded (triggers) / reaction / prevention / outcome (coded outcomes: not causes)",
             "title": "Lane",
             "type": "string"
           }
@@ -26715,7 +26738,7 @@
     },
     "/v1/causal/events/{id}/why": {
       "get": {
-        "description": "Causes by lane (immediate / underlying / contributing / general / coded / reaction / prevention),\nmechanisms quoted verbatim, and dissent — every claim attributed to its source.",
+        "description": "Causes by lane (immediate / underlying / contributing / general / coded / reaction / prevention),\nmechanisms quoted verbatim, and dissent — every claim attributed to its source. Coded outcomes (this record is\nhow an event ended, according to a dataset) are in their own lane, ``outcome``: never a cause.",
         "operationId": "get_why_v1_causal_events__id__why_get",
         "parameters": [
           {

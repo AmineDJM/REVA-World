@@ -104,7 +104,7 @@ class CausalClaim(s.ApiModel):
     relation_label: Labels
     relation_inverse_label: Labels
     family: Literal["cause", "prevention"]
-    lane: str
+    lane: str = Field(description="registry/causal/relations.yaml lane; 'outcome' = coded outcome, never a cause")
     polarity: Literal["promotes", "inhibits"] | None
     stance: Literal["asserts", "denies"]
     asserted_on: Literal["cause", "effect"] | None
@@ -143,7 +143,10 @@ class CausalEvent(s.ApiModel):
     id: str
     event: CausalRef
     dates: dict[str, Any] = Field(description="start / end windows from KG dates (astronomical years)")
-    causes: dict[str, dict[str, int]] = Field(description="family -> grade (or 'ungraded') -> count")
+    causes: dict[str, dict[str, int]] = Field(
+        description="family ('cause' / 'prevention', or 'outcome' for coded outcomes, counted apart: how an event "
+        "ended, never a cause or a consequence) -> grade (or 'ungraded') -> count"
+    )
     effects: dict[str, dict[str, int]]
     context: list[ContextEdge]
     context_truncated: bool
@@ -176,7 +179,10 @@ class Mechanism(s.ApiModel):
 
 
 class WhyLane(s.ApiModel):
-    lane: str
+    lane: str = Field(
+        description="immediate / underlying / contributing / general / coded (triggers) / reaction / prevention / "
+        "outcome (coded outcomes: not causes)"
+    )
     label: dict[str, str]
     claims: list[CausalClaim]
 
@@ -188,6 +194,10 @@ class CausalWhy(s.ApiModel):
     mechanisms: list[Mechanism]
     dissent: list[CausalClaim]
     truncated: bool
+    causal_claims: int = Field(0, description="Claims in the causal lanes (every lane but 'outcome')")
+    outcome_claims: int = Field(
+        0, description="Claims in the 'outcome' lane: this record is how an event ended (coded outcome), not a cause"
+    )
     summary: str
     summary_fr: str
     note: str
@@ -244,6 +254,9 @@ class ChainSearch(s.ApiModel):
     class_nodes_sample: list[str] = Field(default_factory=list, max_length=20)
     node_rule: str = ""
     identity: dict[str, Any] = Field(default_factory=dict, description="same_as links loaded for identity hops")
+    duplicate_paths_merged: int = Field(
+        0, description="Enumerated paths made of the same hops (claim / same_as keys) as a path already returned"
+    )
     truncated: bool
     truncation_reasons: list[str]
     time_budget_ms: int
@@ -479,7 +492,8 @@ def get_why(
     request: Request, id: str = IdPath, min_grade: Grade | None = None, origin: OriginParam | None = ORIGIN_QUERY
 ) -> CausalWhyResponse:
     """Causes by lane (immediate / underlying / contributing / general / coded / reaction / prevention),
-    mechanisms quoted verbatim, and dissent — every claim attributed to its source."""
+    mechanisms quoted verbatim, and dissent — every claim attributed to its source. Coded outcomes (this record is
+    how an event ended, according to a dataset) are in their own lane, ``outcome``: never a cause."""
     t = Timer()
     with read_conn(request) as conn:
         _known(conn, id)

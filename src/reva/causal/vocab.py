@@ -33,7 +33,9 @@ RELATIONS = (
     "coded_outcome",
 )
 FAMILIES = ("cause", "prevention")
-LANES = ("immediate", "underlying", "contributing", "general", "coded", "reaction", "prevention")
+LANES = ("immediate", "underlying", "contributing", "general", "coded", "reaction", "prevention", "outcome")
+#: Lane of the dataset-coded outcomes (how an event ended): never causes, counted apart, never chained.
+OUTCOME_LANE = "outcome"
 POLARITIES = ("promotes", "inhibits")
 STANCES = ("asserts", "denies")
 #: Causal Wikidata properties (the same set as ``reva.kg.model.CAUSAL_PIDS``).
@@ -70,6 +72,11 @@ class Vocabulary:
     context: Mapping[str, Mapping[str, str]]
     #: relations never composed into chains nor counted in cycles (relations.yaml ``chain_excluded``)
     chain_excluded: frozenset[str] = frozenset()
+
+    @property
+    def outcome_relations(self) -> frozenset[str]:
+        """Relations of the ``outcome`` lane (``coded_outcome``): counted apart from causes and effects."""
+        return frozenset(r.name for r in self.relations.values() if r.lane == OUTCOME_LANE)
 
     def relation(self, name: str) -> Relation:
         return self.relations[name]
@@ -115,6 +122,9 @@ def _parse(doc: Mapping[str, Any], sha: str) -> Vocabulary:
     excluded = frozenset(str(x) for x in doc.get("chain_excluded") or [])
     if not excluded <= set(RELATIONS):
         raise ValueError(f"chain_excluded names unknown relations {sorted(excluded - set(RELATIONS))}")
+    outcomes = {n for n, r in rels.items() if r.lane == OUTCOME_LANE}
+    if not outcomes <= excluded:
+        raise ValueError(f"outcome-lane relations must be chain_excluded: {sorted(outcomes - excluded)}")
     return Vocabulary(
         str(doc.get("version")),
         sha,

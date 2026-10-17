@@ -128,7 +128,7 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
       )}
       {r.duplicatesMerged > 0 && (
         <p className="field-hint" data-testid="chain-duplicates">
-          {r.duplicatesMerged} chemin(s) identique(s) renvoyé(s) en double par le serveur (mêmes maillons, mêmes affirmations, mêmes liens d’identité) : affiché(s) une seule fois.
+          {r.duplicatesMerged} chemin(s) identique(s) trouvé(s) en double par la recherche (mêmes maillons, mêmes affirmations, mêmes liens d’identité) : affiché(s) une seule fois.
         </p>
       )}
       <ol className="v3-chain-list">

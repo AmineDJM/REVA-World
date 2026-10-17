@@ -19,9 +19,13 @@ lanes:
   underlying: {en: "underlying causes", fr: "causes profondes"}
   contributing: {en: "contributing factors", fr: "facteurs contributifs"}
   general: {en: "causes (unqualified)", fr: "causes (non qualifiées)"}
-  coded: {en: "dataset-coded triggers and outcomes", fr: "déclencheurs et issues codés par des jeux de données"}
+  coded: {en: "dataset-coded triggers", fr: "déclencheurs codés par des jeux de données"}
   reaction: {en: "reactions", fr: "réactions"}
   prevention: {en: "prevented or delayed", fr: "empêché ou retardé"}
+  # APIFIX: a dataset's coded outcome is how the event ended, never a cause; it has its own lane and its own count
+  # bucket (`outcome`) in the API, and every relation of this lane must be in `chain_excluded` (checked on load).
+  outcome: {en: "coded outcomes (how the event ended according to a dataset; not causes)",
+            fr: "issues codées (comment l'événement s'est terminé selon un jeu de données ; pas des causes)"}
 relations:
   has_cause:
     family: cause
@@ -86,7 +90,7 @@ relations:
     wikidata: []
   coded_outcome:
     family: cause
-    lane: coded
+    lane: outcome
     label: {en: "has coded outcome", fr: "a pour issue codée"}
     inverse_label: {en: "is the coded outcome of", fr: "est l'issue codée de"}
     wikidata: []
@@ -94,8 +98,8 @@ relations:
 # "coded outcome" (ICB OUTCOM, MID outcome, UCDP termination outcome, NAVCO success/progress, TIES/EUSANCT
 # final outcome, COW war outcome) codes HOW the event ended, linked to an outcome record REVA keys under the
 # event (`<event>:outcome`): the codebooks define it as the event's result, not as a separate event that the
-# first one brought about. It stays a sourced T1 claim (family `cause` in storage, lane `coded`, worded "has
-# coded outcome"), but a chain never passes through it.
+# first one brought about. It stays a sourced T1 claim (family `cause` in storage, lane `outcome` since APIFIX,
+# worded "has coded outcome"), but a chain never passes through it.
 chain_excluded: [coded_outcome]
 # Context edges: shown alongside causal claims, never counted, never worded causally.
 context:

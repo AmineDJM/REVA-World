@@ -221,3 +221,18 @@ def test_self_loops_and_cycles_are_flagged() -> None:
     ]
     flags = structural_flags(claims, {"coded_outcome"})
     assert flags == {1: "consistency.self_loop", 2: "consistency.cycle", 3: "consistency.cycle", 4: "consistency.cycle"}
+
+
+def test_outcome_lane_must_be_chain_excluded() -> None:
+    """APIFIX: coded outcomes have their own lane; a relation of that lane must never be composed into chains."""
+    import yaml
+
+    from reva.causal import vocab as vb
+
+    v = vb.vocabulary()
+    assert v.outcome_relations == frozenset({"coded_outcome"}) <= v.chain_excluded
+    assert v.relation("coded_outcome").lane == vb.OUTCOME_LANE and "outcome" in v.lanes
+    doc = yaml.safe_load(vb.RELATIONS_FILE.read_text())
+    doc["chain_excluded"] = []
+    with pytest.raises(ValueError, match="outcome-lane relations must be chain_excluded"):
+        vb._parse(doc, "x")

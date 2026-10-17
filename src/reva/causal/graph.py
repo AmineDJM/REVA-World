@@ -26,7 +26,7 @@ from sqlalchemy import Connection, text
 from reva.causal import grading as gr
 from reva.causal import identity as idn
 from reva.causal.grader import fetch_event_dates
-from reva.causal.vocab import FAMILIES, LANES, RELATIONS, Vocabulary, vocabulary
+from reva.causal.vocab import FAMILIES, LANES, OUTCOME_LANE, RELATIONS, Vocabulary, vocabulary
 from reva.kernel.errors import ValidationProblem
 from reva.kg.model import QID_RE
 from reva.kg.query import is_community_edited, kinds_for, labels_for, verification_of
@@ -385,15 +385,17 @@ def event(conn: Connection, qid: str, *, origin: str | None = None) -> dict[str,
     dates = fetch_event_dates(conn, [qid], origin).get(qid)
     counts: dict[str, dict[str, dict[str, int]]] = {"causes": {}, "effects": {}}
     origin_sql = " AND c.origin = :origin" if origin else ""
+    v = vocabulary()
+    # coded outcomes (how an event ended) are never causes nor consequences: their own bucket, "outcome"
     for side, col in (("causes", "effect_id"), ("effects", "cause_id")):
         for fam, grade, n in conn.execute(
-            text(f"""SELECT c.family, COALESCE(g.grade, 'ungraded'), count(*)
+            text(f"""SELECT CASE WHEN c.relation = ANY(CAST(:outc AS text[])) THEN 'outcome' ELSE c.family END,
+                            COALESCE(g.grade, 'ungraded'), count(*)
                        FROM kg.causal_claim_current c LEFT JOIN kg.causal_grade_current g ON g.claim_row_id = c.id
                       WHERE c.{col} = :q{origin_sql} GROUP BY 1, 2"""),
-            {"q": qid, "origin": origin},
+            {"q": qid, "origin": origin, "outc": sorted(v.outcome_relations)},
         ).all():
             counts[side].setdefault(fam, {})[grade] = int(n)
-    v = vocabulary()
     ctx_pids = sorted(v.context)
     ctx_rows = (
         conn.execute(
@@ -504,7 +506,19 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
     labels = labels_for(conn, [qid])
     lab = labels.get(qid, {})
     name_en, name_fr = lab.get("en") or lab.get("fr") or qid, lab.get("fr") or lab.get("en") or qid
-    n = sum(len(x) for x in lanes.values())
+    k = len(lanes[OUTCOME_LANE])  # this record is the coded outcome of k events: how they ended, not caused by them
+    n = sum(len(x) for lane, x in lanes.items() if lane != OUTCOME_LANE)
+    out_en = (
+        f" {k} coded outcome claim(s): a dataset codes {name_en} as how an event ended; an outcome is not a cause."
+        if k
+        else ""
+    )
+    out_fr = (
+        f" {k} issue(s) codée(s) : un jeu de données code {name_fr} comme la façon dont un événement s'est terminé ; "
+        "une issue n'est pas une cause."
+        if k
+        else ""
+    )
     return {
         "id": qid,
         "label": name_en,
@@ -514,10 +528,14 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
         "mechanisms": mechanisms,
         "dissent": dissent,
         "truncated": truncated,
+        "causal_claims": n,
+        "outcome_claims": k,
         "summary": f"{n} sourced causal claim(s) about {name_en}; each is attributed to its source. "
-        + ("No cause is asserted by any loaded source." if n == 0 else CLAIM_NOTE),
+        + ("No cause is asserted by any loaded source." if n == 0 else CLAIM_NOTE)
+        + out_en,
         "summary_fr": f"{n} affirmation(s) causale(s) sourcée(s) sur {name_fr} ; chacune est attribuée à sa source."
-        + (" Aucune cause n'est affirmée par les sources chargées." if n == 0 else " REVA n'établit pas de causalité."),
+        + (" Aucune cause n'est affirmée par les sources chargées." if n == 0 else " REVA n'établit pas de causalité.")
+        + out_fr,
         "note": CLAIM_NOTE,
     }
 
@@ -725,6 +743,14 @@ def chain(
             reason += " (claims in cycles, self-loops, or attributed/qualified by Wikidata are not composed)"
         if skipped_classes:
             reason += f" ({len(skipped_classes)} class node(s) were not traversed)"
+        outcome_ends = _outcome_records(conn, [frm, to], origin)
+        if outcome_ends:
+            reason = (
+                f"{' and '.join(outcome_ends)} "
+                f"{'is a coded outcome record' if len(outcome_ends) == 1 else 'are coded outcome records'} "
+                "(how an event ended according to a dataset): outcomes are never composed into causal chains "
+                "(registry/causal/relations.yaml chain_excluded); " + reason
+            )
         return {
             "from": _ref(frm, lab, {}),
             "to": _ref(to, lab, {}),
@@ -797,6 +823,10 @@ def chain(
         by_pair[(c["cause"]["id"], c["effect"]["id"])].append(c)
     labels, kinds = labels_for(conn, {x for p in paths for x in p}), kinds_for(conn, {x for p in paths for x in p})
     built: list[tuple[tuple[int, int, list[str]], dict[str, Any]]] = []
+    # Two meeting nodes joined by an identity hop (both records of one event reached from both sides) enumerate the
+    # same chain twice; a chain is identified by its sequence of hops (claim keys / same_as statement keys).
+    seen: set[tuple[tuple[str, ...], ...]] = set()
+    duplicates = 0
     for p in paths:
         hops: list[dict[str, Any]] = []
         for i in range(len(p) - 1):
@@ -820,6 +850,11 @@ def chain(
         causal = [h for h in hops if h["kind"] == "claim"]
         if not causal:
             continue
+        signature = tuple(_hop_signature(h) for h in hops)
+        if signature in seen:
+            duplicates += 1
+            continue
+        seen.add(signature)
         grades: list[str] = [h["hop_grade"] for h in causal]
         cg = gr.weakest(grades)
         n_id = len(hops) - len(causal)
@@ -855,6 +890,7 @@ def chain(
             )
         )
     built.sort(key=lambda x: x[0])
+    search["duplicate_paths_merged"] = duplicates
     lab = labels_for(conn, labels_ids)
     return {
         "from": _ref(frm, lab, kinds),
@@ -867,6 +903,29 @@ def chain(
         "not_found_reason": None if built else "claims changed during the search",
         "search": search,
     }
+
+
+def _outcome_records(conn: Connection, ids: Sequence[str], origin: str | None) -> list[str]:
+    """Those of ``ids`` that are the outcome end of a coded-outcome claim (``<event>:outcome`` records)."""
+    v = vocabulary()
+    found = {
+        q
+        for (q,) in conn.execute(
+            text(f"""SELECT DISTINCT c.effect_id FROM kg.causal_claim_current c
+                      WHERE c.effect_id = ANY(CAST(:ids AS text[])) AND c.relation = ANY(CAST(:outc AS text[]))
+                            {" AND c.origin = :origin" if origin else ""}"""),
+            {"ids": list(ids), "outc": sorted(v.outcome_relations), "origin": origin},
+        ).all()
+    }
+    return [q for q in ids if q in found]
+
+
+def _hop_signature(hop: Mapping[str, Any]) -> tuple[str, ...]:
+    """What a hop is made of: its claims (claim keys), or its two records and identity links (same_as keys)."""
+    if hop["kind"] == "identity":
+        keys = sorted(str(x.get("statement_key") or x) for x in hop["same_as"])
+        return ("identity", hop["from"]["id"], hop["to"]["id"], *keys)
+    return ("claim", *sorted(c["claim_key"] for c in hop["claims"]))
 
 
 IDENTITY_HOP_NOTE = (

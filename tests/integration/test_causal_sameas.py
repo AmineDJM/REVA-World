@@ -83,6 +83,7 @@ def setup(db) -> Iterator[tuple[TestClient, str, Any]]:  # type: ignore[no-untyp
         ],
     )
     ids = ["pre", "conflict", "pa:1", "agt:9", "end", "case:1", "dcase:1", "outcome", "agt:7", "agt:8", "pa:2", "pa:3"]
+    ids += ["result:1"]
     ents = [KgEntity(f"sxt:{x}", "event", {"en": f"Synthetic {x}"}) for x in ids]
     raw = db.store.put_bytes(b"sxt kg v1", "raw", "application/json").sha256
     sts = [
@@ -93,6 +94,7 @@ def setup(db) -> Iterator[tuple[TestClient, str, Any]]:  # type: ignore[no-untyp
         _date("sxt:end", "P585", 1999, "d4"),
         _date("sxt:case:1", "P580", 1980, "d5"),
         _date("sxt:outcome", "P585", 1982, "d6"),
+        _date("sxt:result:1", "P585", 1983, "d7"),
         # the provider crosswalk: agreement 9 of source B is agreement 1 of source A
         KgStatement("sxt:agt:9", "sxt:agreement_id", value={"type": "string", "value": "1"}, statement_id="x1"),
         # a record citing two records of the other dataset: ambiguous, never linked
@@ -145,6 +147,17 @@ def setup(db) -> Iterator[tuple[TestClient, str, Any]]:  # type: ignore[no-untyp
         "sxtd.data",
         [DatasetClaim("sxt:dcase:1", "sxt:outcome", "coded_outcome", {"r": 1}, codebook_term=c, source_claim_id="d1")],
         b"d",
+    )
+    # the TIES/EUSANCT shape (APIFIX): derived record ≡ case, the case -> its policy result
+    _claims(
+        db,
+        "sxte.data",
+        [
+            DatasetClaim(
+                "sxt:case:1", "sxt:result:1", "contributing_factor", {"r": 1}, codebook_term=c, source_claim_id="e1"
+            )
+        ],
+        b"e",
     )
     grade_claims(db.worker, origin=ORIGIN)
     tok, sha = new_api_token()
@@ -229,3 +242,44 @@ def test_chain_crosses_identity_hop_with_evidence(setup) -> None:  # type: ignor
     )
     d = r.json()["data"]
     assert not d["found"] and "same event" in d["not_found_reason"] and d["same_as"]
+
+
+def test_chain_through_identity_is_returned_once(setup) -> None:  # type: ignore[no-untyped-def]
+    """``ties:case:X -> eusanct:policy_result:X`` came back twice (UICHECK §4.2): both records of the case meet the
+    two search fronts, and each meeting node enumerated the same identity hop + claim. Paths are deduplicated by
+    their sequence of hops (claim keys / same_as statement keys), and the merge is counted."""
+    client, tok, _ = setup
+    r = client.get(
+        "/v1/causal/chain",
+        params={"from": "sxt:dcase:1", "to": "sxt:result:1", "origin": "test_fixture", "max_hops": 4},
+        headers={"Authorization": f"Bearer {tok}"},
+    )
+    assert r.status_code == 200, r.text
+    d = r.json()["data"]
+    assert d["found"] and d["paths_found"] == 1 and len(d["paths"]) == 1, d
+    assert [h["kind"] for h in d["paths"][0]["hops"]] == ["identity", "claim"]
+    assert d["search"]["duplicate_paths_merged"] == 1
+
+
+def test_outcomes_have_their_own_lane_count_and_chain_reason(setup) -> None:  # type: ignore[no-untyped-def]
+    """A coded outcome is how the event ended, never a cause (relations.yaml lane ``outcome``, ``chain_excluded``):
+    the why view files it in lane ``outcome`` and does not count it as causal; the event counts put it in the
+    ``outcome`` bucket; a chain to an outcome record says why none is composed (APIFIX, UICHECK §4.3)."""
+    client, tok, _ = setup
+    h = {"Authorization": f"Bearer {tok}"}
+    o = {"origin": "test_fixture"}
+    d = client.get("/v1/causal/events/sxt:outcome/why", params=o, headers=h).json()["data"]
+    assert [lane["lane"] for lane in d["lanes"]] == ["outcome"]
+    assert d["causal_claims"] == 0 and d["outcome_claims"] == 2
+    assert d["summary_fr"].startswith("0 affirmation(s) causale(s)") and "pas une cause" in d["summary_fr"]
+    assert all(c["lane"] == "outcome" for c in d["lanes"][0]["claims"])
+    ev = client.get("/v1/causal/events/sxt:case:1", params=o, headers=h).json()["data"]
+    assert set(ev["effects"]) == {"outcome", "cause"} and sum(ev["effects"]["outcome"].values()) == 1
+    assert sum(ev["effects"]["cause"].values()) == 1  # the contributing factor -> sxt:result:1
+    out = client.get("/v1/causal/events/sxt:outcome", params=o, headers=h).json()["data"]
+    assert set(out["causes"]) == {"outcome"}
+    r = client.get("/v1/causal/chain", params={**o, "from": "sxt:case:1", "to": "sxt:outcome"}, headers=h)
+    d = r.json()["data"]
+    assert not d["found"]
+    assert d["not_found_reason"].startswith("sxt:outcome is a coded outcome record")
+    assert "never composed into causal chains" in d["not_found_reason"]

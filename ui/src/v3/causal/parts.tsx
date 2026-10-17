@@ -526,10 +526,11 @@ export function EventCard({ e, card, loaded, fallbackLabel }: { e: CausalEvent |
               ) : (
                 <>
                   {e.nCauses ?? '?'} cause(s) · {e.nEffects ?? '?'} conséquence(s) affirmées
+                  {e.nOutcomes > 0 ? ` · ${e.nOutcomes} issue(s) codée(s) (comment l’événement s’est terminé, pas des conséquences)` : ''}
                 </>
               )}
               {e.nCandidates !== null ? ` · ${e.nCandidates} candidat(s) en quarantaine` : ''}
-              {loaded && e.nEffects !== null && e.nEffects !== loaded.effects + loaded.outcomes && (
+              {loaded && e.nEffects !== null && e.nEffects + e.nOutcomes !== loaded.effects + loaded.outcomes && (
                 <span className="muted"> (décompte du serveur : {e.nCauses ?? '?'} / {e.nEffects} ; les listes ci-dessous sont bornées)</span>
               )}
             </dd>
