@@ -190,6 +190,44 @@ def test_groups_and_child_counts():
     assert all(s.point_in_time is not None and s.point_in_time.precision == 11 for s in q)
 
 
+def test_parent_edges_carry_relationship_fields_not_child_registration(pages):
+    """AUDIT3 L1: a parent edge states the relationship record's own fields (or says it was not fetched)."""
+    p1, p2 = pages
+    rr = {
+        (SIEMENS_PK, w): (g.parse_relationship(gl(g.relationship_url(SIEMENS_PK, w)), SIEMENS_PK), "c" * 64)
+        for w in ("direct", "ultimate")
+    }
+    child = {r.lei: r for r in p1.records}[SIEMENS_PK]
+    assert child.corroboration == "PARTIALLY_CORROBORATED"  # the child record ...
+    assert rr[(SIEMENS_PK, "direct")][0].corroboration_level == "FULLY_CORROBORATED"  # ... is not the relationship
+    _, sts, info = g.kg_records([p1, p2], [SHA, "b" * 64], relationships=rr)
+    st = {(s.subject_qid, s.property_pid): s for s in sts}
+    d = st[(f"lei:{SIEMENS_PK}", "gleif:direct_parent")]
+    assert d.qualifiers["relationship_record"] == "fetched"
+    assert d.qualifiers["relationship_type"] == "IS_DIRECTLY_CONSOLIDATED_BY"
+    assert d.qualifiers["relationship_status"] == "ACTIVE"
+    assert d.qualifiers["relationship_registration_status"] == "PUBLISHED"
+    assert d.qualifiers["relationship_corroboration_level"] == "FULLY_CORROBORATED"
+    assert {x["type"] for x in d.qualifiers["relationship_periods"]} >= {"RELATIONSHIP_PERIOD", "ACCOUNTING_PERIOD"}
+    assert "registration_status" not in d.qualifiers and "corroboration_level" not in d.qualifiers
+    assert d.raw_sha256 == "c" * 64 and d.references[0]["url"] == g.relationship_url(SIEMENS_PK, "direct")
+    assert info["stats"]["direct_relationship_record_used"] == 1
+    # without the record: no relationship fields at all, and it says so
+    _, sts2, _ = g.kg_records([p1, p2], [SHA, "b" * 64])
+    u = {(s.subject_qid, s.property_pid): s for s in sts2}[(f"lei:{SIEMENS_PK}", "gleif:ultimate_parent")]
+    assert u.qualifiers["relationship_record"] == "not_fetched"
+    assert not {"registration_status", "corroboration_level", "relationship_type"} & set(u.qualifiers)
+    # other statements of the record still carry the record's own registration (they describe the record)
+    assert st[(f"lei:{SIEMENS_PK}", "gleif:legal_address_country")].qualifiers["corroboration_level"] == (
+        "PARTIALLY_CORROBORATED"
+    )
+
+
+def test_relationship_record_of_another_child_is_refused():
+    with pytest.raises(SourceResponseError):
+        g.parse_relationship(gl(g.relationship_url(SIEMENS_PK, "direct")), TOYOTA)
+
+
 # ----------------------------------------------------------------------------- Wikidata P1278
 def test_wikidata_p1278_bridge():
     from urllib.parse import urlencode
@@ -204,6 +242,40 @@ def test_wikidata_p1278_bridge():
     assert by[f"lei:{TOYOTA}"].qualifiers["item_sitelinks"] > 100
     assert rep["skipped"]["value_not_a_valid_lei"] == 3  # real invalid values are skipped, never repaired
     assert all(s.statement_id.startswith(g.WD_PREFIX) for s in sts)
+    # AUDIT3 M8: V4LINK identity rules -- Siemens AG's LEI is held by two items in the capture: not linked, reported
+    assert "lei:W38RGI023J3WT1HWRP32" not in by
+    ir = rep["identity_rules"]
+    assert ir["ambiguous_value_lei_on_several_items"] == 2 and ir["linked"] == len(sts) == rep["statements"]
+    assert ir["samples"]["ambiguous_value"][0]["items"] == ["Q16984598", "Q81230"]
+
+
+def _b(item: str, sid: str, lei: str, rank: str = "Normal") -> dict:
+    return {
+        "item": {"value": f"http://www.wikidata.org/entity/{item}"},
+        "statement": {"value": f"http://www.wikidata.org/entity/statement/{item}-{sid}"},
+        "lei": {"value": lei},
+        "rank": {"value": f"http://wikiba.se/ontology#{rank}Rank"},
+    }
+
+
+def test_wikidata_identity_rules_ambiguity_and_rank():
+    rows = [
+        _b("Q1", "a", TOYOTA),
+        _b("Q2", "b", APPLE),  # Q2 holds two LEIs: ambiguous holder
+        _b("Q2", "c", GM),
+        _b("Q3", "d", SIEMENS_PK),  # an LEI on two items: ambiguous value
+        _b("Q4", "e", SIEMENS_PK),
+        _b("Q5", "f", "529900QBVWXMWANH7H45", "Preferred"),  # best rank: the normal one is not read
+        _b("Q5", "g", "W38RGI023J3WT1HWRP32"),
+    ]
+    sts, rep = g.wikidata_statements(rows, raw_sha256=SHA, retrieved_at=T0, query_sha256=SHA)
+    assert sorted((s.subject_qid, s.object_qid) for s in sts) == [
+        ("lei:529900QBVWXMWANH7H45", "Q5"),
+        (f"lei:{TOYOTA}", "Q1"),
+    ]
+    ir = rep["identity_rules"]
+    assert ir["ambiguous_holder_item_with_several_leis"] == 2 and ir["ambiguous_value_lei_on_several_items"] == 2
+    assert ir["not_best_rank"] == 1 and rep["candidate_statements"] == 7
 
 
 # ----------------------------------------------------------------------------- OECD TiVA

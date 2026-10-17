@@ -88,7 +88,10 @@ WD_NAME = "atlas.gleif_wikidata"
 # 1.0.1: 1.0.0 was registered in the dev DB from a WIP snapshot taken before the B023 refactor.
 # 1.0.2: groups also attach the ELF names to gleif:legal_form (1.0.1 live run: 200 group legal-form statements
 #        conflicted with the entities dataset's richer version under the same Golden Copy revision).
-CONNECTOR_VERSION = "1.0.2"
+# 1.0.3 (FIX4C, AUDIT3 M8 + L1): P1278 bridges go through V4LINK's identity rules (ambiguous LEI <-> item links are
+#        not linked, reported); run option replay_raw_sha256 re-derives from an archived WDQS response; parent edges
+#        no longer carry the child's registration as relationship qualifiers; relationship records are fetched.
+CONNECTOR_VERSION = "1.0.3"
 PARSER_VERSION = "atlas-gleif-1"
 SOURCE_KEY = "gleif.api"
 WD_SOURCE_KEY = "wikidata.wdqs"
@@ -127,6 +130,7 @@ LEGAL_FORM_COUNTRIES: tuple[str, ...] = (
     "SE", "CH", "AU", "BR", "KR", "DK", "PL", "AT", "NO", "SA",
 )  # fmt: skip
 TOP_GROUPS = 200
+MAX_RELATIONSHIP_RECORDS = 1000  # one request per child with an LEI parent (455 on 2026-10-17)
 MIN_SITELINKS = 20
 MIN_COUNTRIES_LIVE = 200  # GLEIF lists 250 ISO countries (2026-10-17)
 
@@ -218,6 +222,11 @@ def records_url(leis: Sequence[str], *, with_parents: bool = True) -> str:
     return url("lei-records", ps)
 
 
+def relationship_url(lei: str, which: str) -> str:
+    """The Level 2 relationship record of a child (``which`` = ``direct`` | ``ultimate``)."""
+    return url(f"lei-records/{quote(lei)}/{which}-parent-relationship")
+
+
 def top_groups_url(n: int) -> str:
     return url("lei-records", [("sort", "-ultimateChildCount"), ("page[size]", str(n))])
 
@@ -229,7 +238,7 @@ def children_count_url(lei: str, which: str) -> str:
 
 
 # ============================================================================================== parsing
-def _doc(body: bytes, what: str) -> dict[str, Any]:
+def _doc(body: bytes, what: str, *, single: bool = False) -> dict[str, Any]:
     try:
         doc = json.loads(body)
     except ValueError as e:
@@ -238,8 +247,8 @@ def _doc(body: bytes, what: str) -> dict[str, Any]:
         raise _err(f"{what}: not a JSON object")
     if doc.get("errors"):
         raise _err(f"{what}: API errors {str(doc['errors'])[:300]}", kind="api_error")
-    if not isinstance(doc.get("data"), list) or not isinstance(doc.get("meta"), dict):
-        raise _err(f"{what}: expected JSON:API 'data' list and 'meta'")
+    if not isinstance(doc.get("data"), dict if single else list) or not isinstance(doc.get("meta"), dict):
+        raise _err(f"{what}: expected JSON:API 'data' {'object' if single else 'list'} and 'meta'")
     return doc
 
 
@@ -429,6 +438,55 @@ def _parent(rel: Any, exceptions: Mapping[str, Mapping[str, Any]]) -> Parent | N
     return None
 
 
+@dataclass(frozen=True)
+class RelationshipRecord:
+    """A GLEIF relationship record (RR-CDF): the fields that describe the *relationship*, not the child record."""
+
+    start: str
+    end: str
+    type: str
+    status: str | None
+    registration_status: str | None
+    corroboration_level: str | None
+    corroboration_documents: str | None
+    last_update: str | None
+    periods: tuple[tuple[str, str | None, str | None], ...]  # (type, start, end) verbatim
+    publish_date: str
+    record_id: str
+
+
+def parse_relationship(body: bytes, child: str) -> RelationshipRecord:
+    doc = _doc(body, "relationship-record", single=True)
+    pd = _publish(doc, "relationship-record")
+    d = doc.get("data")
+    if not isinstance(d, Mapping) or d.get("type") != "relationship-records":
+        raise _err("relationship-record: data is not a relationship-records object")
+    a = d.get("attributes") or {}
+    rel = a.get("relationship") or {}
+    reg = a.get("registration") or {}
+    sn, en = rel.get("startNode") or {}, rel.get("endNode") or {}
+    if sn.get("id") != child or not _s(en.get("id")) or not _s(rel.get("type")):
+        raise _err(f"relationship-record of {child}: start node / end node / type missing or not the child")
+    periods = tuple(
+        (str(x.get("type")), _s(x.get("startDate")), _s(x.get("endDate")))
+        for x in rel.get("periods") or []
+        if isinstance(x, Mapping) and _s(x.get("type"))
+    )
+    return RelationshipRecord(
+        start=child,
+        end=str(en["id"]),
+        type=str(rel["type"]),
+        status=_s(rel.get("status")),
+        registration_status=_s(reg.get("status")),
+        corroboration_level=_s(reg.get("corroborationLevel")),
+        corroboration_documents=_s(reg.get("corroborationDocuments")),
+        last_update=_s(reg.get("lastUpdateDate")),
+        periods=periods,
+        publish_date=pd,
+        record_id=str(d.get("id") or "")[:300],
+    )
+
+
 @dataclass
 class RecordsPage:
     records: list[LeiRecord]
@@ -527,10 +585,15 @@ def kg_records(
     *,
     elf: Mapping[str, LegalForm] | None = None,
     counts: Mapping[str, Mapping[str, tuple[int, str, str]]] | None = None,
+    relationships: Mapping[tuple[str, str], tuple[RelationshipRecord, str]] | None = None,
 ) -> tuple[list[Any], list[Any], dict[str, Any]]:
     """KG entities + statements of record pages (``raws[i]`` = raw sha256 of ``pages[i]``).
 
-    ``counts``: LEI -> {"ultimate-children"|"direct-children": (total, publish date, raw sha256)}."""
+    ``counts``: LEI -> {"ultimate-children"|"direct-children": (total, publish date, raw sha256)}.
+    ``relationships``: (child LEI, "direct"|"ultimate") -> (relationship record, its raw sha256). A parent edge
+    carries only fields of the relationship (AUDIT3 L1): with the record, its type / status / registration status /
+    corroboration level / periods verbatim (the statement cites the record's bytes); without it, the parent LEI from
+    ``include`` and ``relationship_record: not_fetched`` -- never the child record's registration fields."""
     from reva.kg.model import KgEntity, KgStatement, KgTime
 
     ents: dict[str, Any] = {}
@@ -658,9 +721,8 @@ def kg_records(
                     stats[f"{which}_parent_not_stated"] += 1
                     continue
                 if par.kind == "lei" and par.lei and lei_valid(par.lei):
-                    item(f"{which}_parent", f"{which}_parent", lei_key(par.lei), f"relationships.{which}-parent",
-                         {"relationship_type": "IS_DIRECTLY_CONSOLIDATED_BY" if which == "direct"
-                          else "IS_ULTIMATELY_CONSOLIDATED_BY", "as_of_golden_copy": page.publish_date})  # fmt: skip
+                    add(_parent_statement(r.lei, which, par.lei, page.publish_date, rev, raw,
+                                          (relationships or {}).get((r.lei, which)), stats))  # fmt: skip
                     stats[f"{which}_parent_lei"] += 1
                 elif par.kind == "exception":
                     lit("exception", f"{which}_exception",
@@ -701,6 +763,76 @@ def kg_records(
         "stats": dict(stats),
     }
     return list(ents.values()), list(sts.values()), info
+
+
+def _parent_statement(
+    child: str,
+    which: str,
+    parent: str,
+    publish: str,
+    rev: str,
+    raw: str,
+    rr: tuple[RelationshipRecord, str] | None,
+    stats: Counter[str],
+) -> Any:
+    from reva.kg.model import KgStatement
+
+    page_ref = {
+        "stated_in": "GLEIF Global LEI Index (Golden Copy via api.gleif.org)",
+        "url": f"{API}/lei-records/{child}",
+        "golden_copy_publish_date": publish,
+        "selector": {"lei": child, "path": f"relationships.{which}-parent"},
+    }
+    if rr is not None and rr[0].end != parent:
+        stats[f"{which}_relationship_record_end_node_differs"] += 1
+        rr = None  # the two Golden Copy answers disagree: keep the include answer, say the record was not used
+    if rr is None:
+        return KgStatement(
+            subject_qid=lei_key(child),
+            property_pid=P[f"{which}_parent"],
+            object_qid=lei_key(parent),
+            qualifiers={
+                "relationship_record": "not_fetched",
+                "as_of_golden_copy": publish,
+                "relationship_named_by": f"api relationship {which}-parent (include)",
+            },
+            references=(page_ref,),
+            source_revision=rev,
+            statement_id=f"{child}:{which}_parent",
+            raw_sha256=raw,
+        )
+    rec, rsha = rr
+    stats[f"{which}_relationship_record_used"] += 1
+    q: dict[str, Any] = {
+        "relationship_record": "fetched",
+        "relationship_type": rec.type,
+        "relationship_status": rec.status,
+        "relationship_registration_status": rec.registration_status,
+        "relationship_corroboration_level": rec.corroboration_level,
+        "as_of_golden_copy": rec.publish_date,
+    }
+    if rec.corroboration_documents:
+        q["relationship_corroboration_documents"] = rec.corroboration_documents
+    if rec.periods:
+        q["relationship_periods"] = [{"type": t, "start": a, "end": b} for t, a, b in rec.periods]
+    return KgStatement(
+        subject_qid=lei_key(child),
+        property_pid=P[f"{which}_parent"],
+        object_qid=lei_key(parent),
+        qualifiers=q,
+        references=(
+            {
+                "stated_in": "GLEIF relationship record (RR-CDF via api.gleif.org)",
+                "url": relationship_url(child, which),
+                "golden_copy_publish_date": rec.publish_date,
+                "selector": {"relationship_record_id": rec.record_id, "path": "data.attributes.relationship"},
+            },
+            page_ref,
+        ),
+        source_revision=f"gc:{rec.publish_date[:19]}",
+        statement_id=f"{child}:{which}_parent",
+        raw_sha256=rsha,
+    )
 
 
 # ============================================================================================== Wikidata P1278
@@ -769,16 +901,58 @@ def wikidata_statements(
         )
     by_lei = Counter(s.subject_qid for s in out)
     by_item = Counter(s.object_qid for s in out)
+    linked, rules_report = apply_identity_rules(out)
     report = {
         "rows": len(bindings),
-        "statements": len(out),
-        "leis": len(by_lei),
-        "items": len(by_item),
-        "leis_on_several_items": sum(1 for v in by_lei.values() if v > 1),
-        "items_with_several_leis": sum(1 for v in by_item.values() if v > 1),
+        "candidate_statements": len(out),
+        "statements": len(linked),
+        "leis": len({s.subject_qid for s in linked}),
+        "items": len({s.object_qid for s in linked}),
+        "candidates_leis_on_several_items": sum(1 for v in by_lei.values() if v > 1),
+        "candidates_items_with_several_leis": sum(1 for v in by_item.values() if v > 1),
+        "identity_rules": rules_report,
         "skipped": dict(counters),
     }
-    return out, report
+    return linked, report
+
+
+def apply_identity_rules(candidates: Sequence[Any]) -> tuple[list[Any], dict[str, Any]]:
+    """V4LINK's identity rules (``registry/kg/identity_rules_v4.yaml``, rule P1278, engine
+    :func:`reva.adapters.connectors.v4link_common.derive_bridges`) on the P1278 candidates (AUDIT3 M8).
+
+    Best rank only (an item's preferred P1278 statements when it has one, else its normal ones); an LEI held by
+    several items (``ambiguous_value``) and an item holding several LEIs (``ambiguous_holder``) are **not linked**
+    and are reported with samples -- linking them would merge distinct items or distinct legal entities. The WDQS
+    query reads every non-deprecated P1278 statement of Wikidata, so the ambiguity check is complete."""
+    from reva.adapters.connectors.v4link_common import Held, derive_bridges, load_rules
+
+    rule = load_rules().rules["P1278"]
+    held = [
+        Held(
+            item=str(s.object_qid),
+            property="P1278",
+            value=str(s.qualifiers["lei_as_stated"]),
+            statement_id=str(s.qualifiers["wikidata_statement_id"]),
+            rank=str(s.rank),
+        )
+        for s in candidates
+    ]
+    br = derive_bridges(held, {"P1278": rule})
+    keep = {h.statement_id for h, _k in br.links}
+    linked = [s for s in candidates if s.qualifiers["wikidata_statement_id"] in keep]
+    prop = dict(br.report.get("by_property", {}).get("P1278", {}))
+    best = prop.get("statements", 0)
+    rep = {
+        "rules": "registry/kg/identity_rules_v4.yaml#P1278",
+        "candidates": len(candidates),
+        "not_best_rank": len(candidates) - int(best),
+        "ambiguous_value_lei_on_several_items": int(prop.get("ambiguous_value", 0)),
+        "ambiguous_holder_item_with_several_leis": int(prop.get("ambiguous_holder", 0)),
+        "malformed": int(prop.get("malformed", 0)),
+        "linked": len(linked),
+        "samples": prop.get("samples", {}),
+    }
+    return linked, rep
 
 
 async def ingest_wikidata(run: Any) -> dict[str, Any]:
@@ -789,12 +963,18 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
 
     if not run.wants(WD_DATASET):
         return {"skipped": True}
-    with tempfile.TemporaryDirectory(prefix="reva-v4industry-lock-") as tmp:
-        lock = None
-        if run.origin != "live":  # fixture replay: never wait on the machine-wide Wikidata cool-down
-            lock = MachineLock(Path(tmp), min_interval=0.0)
-        client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
-        res = await client.sparql(WD_QUERY, meta={"purpose": "lei_xref", "connector": WD_NAME})
+    replay = (run.options or {}).get("replay_raw_sha256")
+    client_stats: dict[str, Any] = {}
+    if replay:
+        res = replay_archived(run, str(replay))
+    else:
+        with tempfile.TemporaryDirectory(prefix="reva-v4industry-lock-") as tmp:
+            lock = None
+            if run.origin != "live":  # fixture replay: never wait on the machine-wide Wikidata cool-down
+                lock = MachineLock(Path(tmp), min_interval=0.0)
+            client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
+            res = await client.sparql(WD_QUERY, meta={"purpose": "lei_xref", "connector": WD_NAME})
+        client_stats = client.stats.as_dict()
     sts, report = wikidata_statements(
         res.bindings, raw_sha256=res.raw_sha256, retrieved_at=res.retrieved_at, query_sha256=res.query_sha256
     )
@@ -807,12 +987,59 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
         raw_sha256s=[res.raw_sha256],
         retrieved_at=res.retrieved_at,
         origin=run.origin,
-        parameters={"connector": WD_NAME, "parser": PARSER_VERSION, "query_sha256": res.query_sha256},
+        parameters={
+            "connector": WD_NAME,
+            "parser": PARSER_VERSION,
+            "query_sha256": res.query_sha256,
+            "identity_rules": "registry/kg/identity_rules_v4.yaml#P1278",
+            **({"replay_of_archived_raw": res.raw_sha256} if replay else {}),
+        },
         predicate_prefix="gleif:",
         retract_prefix=WD_PREFIX,
     )
     return {"raw_sha256": res.raw_sha256, "query_sha256": res.query_sha256, "build": report, "kg": kg,
-            "client": client.stats.as_dict()}  # fmt: skip
+            "replayed": bool(replay), "client": client_stats}  # fmt: skip
+
+
+def replay_archived(run: Any, sha: str) -> Any:
+    """Re-derive from an already archived WDQS response (run option ``replay_raw_sha256``): no request is made.
+
+    The raw object is the archive's gzip of the response; its retrieval time and query hash are read from the
+    statements that cite it, so the re-derived statements keep their revision and identical ones are
+    ``unchanged``. Statements the new rules no longer emit are then retracted with the loader's derived reason
+    ``reclassified_by_reva`` (basis ``raw_unchanged``: the source still states them, REVA no longer links them)."""
+    import gzip
+    import hashlib
+
+    from sqlalchemy import text
+
+    from reva.adapters.connectors.wikidata import SparqlResult
+
+    if not re.fullmatch(r"[0-9a-f]{64}", sha):
+        raise _err("replay_raw_sha256 must be a sha256 hex digest", kind="request_shape")
+    with run.engine.connect() as c:
+        row = c.execute(
+            text("""SELECT retrieved_at, refs->0->>'query_sha256' FROM kg.statement
+                    WHERE raw_sha256 = :sha AND source_key = :sk AND origin = :o LIMIT 1"""),
+            {"sha": sha, "sk": WD_SOURCE_KEY, "o": run.origin},
+        ).first()
+    if row is None:
+        raise _err(f"no {WD_SOURCE_KEY} statement of origin {run.origin} cites raw {sha[:12]}", kind="request_shape")
+    stored = run.store.get("raw", sha)
+    if hashlib.sha256(stored).hexdigest() != sha:
+        raise _err("archived raw does not re-hash to its address", kind="integrity")
+    body = gzip.decompress(stored) if stored[:2] == b"\x1f\x8b" else stored
+    doc = json.loads(body)
+    run.archived.append(sha)
+    return SparqlResult(
+        variables=tuple(doc.get("head", {}).get("vars", [])),
+        bindings=list(doc["results"]["bindings"]),
+        query_sha256=str(row[1] or ""),
+        raw_sha256=sha,
+        bytes=len(body),
+        retrieved_at=row[0],
+        elapsed_seconds=0.0,
+    )
 
 
 # ============================================================================================== fetch helpers
@@ -1065,14 +1292,33 @@ async def ingest_entities(run: Any) -> dict[str, Any]:
         pages.append(page)
         shas.append(sha)
         missing += page.missing
-    ents, sts, info = kg_records(pages, shas, elf=forms)
+    rels: dict[tuple[str, str], tuple[RelationshipRecord, str]] = {}
+    rel_shas: list[str] = []
+    rel_errors: Counter[str] = Counter()
+    if str((run.options or {}).get("relationship_records", "true")).lower() in ("1", "true", "yes"):
+        todo = [
+            (r.lei, which)
+            for p in pages
+            if not p.parents_page
+            for r in p.records
+            for which, par in (("direct", r.direct_parent), ("ultimate", r.ultimate_parent))
+            if par is not None and par.kind == "lei"
+        ][: _opt_int(run, "max_relationship_records", MAX_RELATIONSHIP_RECORDS)]
+        for child, which in todo:
+            raw, sha = await _get(run, relationship_url(child, which), f"rr:{which}:{child}")
+            try:
+                rels[(child, which)] = (parse_relationship(raw.body, child), sha)
+                rel_shas.append(sha)
+            except GleifParseError as e:
+                rel_errors[str(e)[:120]] += 1
+    ents, sts, info = kg_records(pages, shas, elf=forms, relationships=rels)
     kg = load_kg(
         run.engine,
         run.store,
         entities=ents,
         statements=sts,
         source_key=SOURCE_KEY,
-        raw_sha256s=[*shas, *elf_shas],
+        raw_sha256s=[*shas, *elf_shas, *rel_shas],
         retrieved_at=datetime.fromisoformat(max(p.publish_date for p in pages).replace("Z", "+00:00")),
         origin=run.origin,
         parameters={"connector": CONNECTOR_NAME, "parser": PARSER_VERSION, "dataset": DS_ENTITIES},
@@ -1085,6 +1331,8 @@ async def ingest_entities(run: Any) -> dict[str, Any]:
         "missing_from_index": missing[:100],
         "missing_count": len(missing),
         "parents_fetched": len(parents),
+        "relationship_records": len(rels),
+        "relationship_record_errors": dict(rel_errors),
         "build": info,
         "kg": kg,
     }
@@ -1108,7 +1356,7 @@ def atlas_source() -> list[Any]:
             datasets=(DS_COUNTS, DS_FORMS, DS_GROUPS, DS_ENTITIES),
             dataset_ids=("GLEIF Golden Copy (LEI-CDF 3.1, RR-CDF 2.1, reporting exceptions)",),
             cadence_seconds=30 * DAY,
-            planned_requests=2600,
+            planned_requests=2600,  # + one relationship record per child with an LEI parent (~460)
             max_response_bytes=MAX_BYTES,
             min_interval_seconds=1.1,
             parser_version=PARSER_VERSION,

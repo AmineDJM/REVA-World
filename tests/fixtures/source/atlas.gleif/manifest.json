@@ -481,5 +481,31 @@
     "retrieved_at": "2026-10-17T13:45:02+00:00",
     "licence": "CC0-1.0",
     "note": "real live response (top 3 LEI records by ultimateChildCount)"
+  },
+  {
+    "request_fingerprint": "b510671551dbe6b5f08edaabf8145e05fc4882aa7cc61fefe571593a30b9c66e",
+    "url": "https://api.gleif.org/api/v1/lei-records/529900IR3Y1XBIR1GX29/direct-parent-relationship",
+    "file": "b510671551dbe6b5.json",
+    "sha256": "b4d546da2621dc22b9102ef4f0480e291cf9de3d5ab43a78c9594e077853b425",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T20:22:13+00:00",
+    "licence": "CC0-1.0",
+    "note": "FIX4C: complete live relationship record (AUDIT3 L1), captured unmodified"
+  },
+  {
+    "request_fingerprint": "feba483201b23d98850cffa5b367f85f884b75abdf7c4d1f82f936b3f885532b",
+    "url": "https://api.gleif.org/api/v1/lei-records/529900IR3Y1XBIR1GX29/ultimate-parent-relationship",
+    "file": "feba483201b23d98.json",
+    "sha256": "2e7e7a3157f027538dc77db544feddd1aa5257b30e5bc72c8e92deed4b27494a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T20:22:13+00:00",
+    "licence": "CC0-1.0",
+    "note": "FIX4C: complete live relationship record (AUDIT3 L1), captured unmodified"
   }
 ]

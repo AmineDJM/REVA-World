@@ -62,6 +62,14 @@ async def test_gleif_wikidata_then_entities(db):
         "gleif:direct_parent": "lei:529900QBVWXMWANH7H45",
         "gleif:ultimate_parent": "lei:W38RGI023J3WT1HWRP32",
     }
+    assert ent["relationship_records"] == 2 and ent["relationship_record_errors"] == {}
+    (q,) = _current(
+        db,
+        """SELECT qualifiers FROM kg.statement_current WHERE subject_qid = :s AND origin = 'test_fixture'
+           AND property_pid = 'gleif:direct_parent'""",
+        s=f"lei:{SIEMENS_PK}",
+    )
+    assert q[0]["relationship_corroboration_level"] == "FULLY_CORROBORATED" and "registration_status" not in q[0]
     # Toyota: GLEIF record -> GEM id; Wikidata Q53268 -> same LEI (P1278): a 2-hop identifier chain, no name match
     bridge = _current(
         db,
@@ -133,3 +141,36 @@ async def test_tiva(db):
     fd = read_atlas_table(db.store, s["tiva_fdva"]["atlas"]["artifact_sha256"])
     sec = fd.filter(pl.col("indicator") == "FDVA|fd_area=FRA|va_activity=C")
     assert set(sec["iso3"]) == {"FRA", "DEU", "CHN"} and sec["period_start"].dt.year().unique().to_list() == [2022]
+
+
+async def test_gleif_wikidata_replay_retracts_ambiguous_links(db, monkeypatch):
+    """AUDIT3 M8: links loaded before the identity rules are retracted on a replay of the same archived bytes,
+    with the derived reason ``reclassified_by_reva`` (the source still states them; REVA no longer links them)."""
+    from reva.adapters.connectors import atlas_gleif as g
+
+    _reg(db, "atlas.gleif_wikidata")
+    real = g.apply_identity_rules
+    monkeypatch.setattr(g, "apply_identity_rules", lambda c: (list(c), {"linked": len(c)}))  # pre-fix behaviour
+    first = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.gleif_wikidata", mode="fixture")
+    assert first["status"] == "completed", first
+    sha = first["summary"]["raw_sha256"]
+    monkeypatch.setattr(g, "apply_identity_rules", real)
+    again = await run_atlas_ingest(
+        db.settings, db.worker, db.store, "atlas.gleif_wikidata", mode="fixture",
+        options={"replay_raw_sha256": sha},
+    )  # fmt: skip
+    assert again["status"] == "completed", again
+    s = again["summary"]
+    assert s["replayed"] and s["kg"]["statements_inserted"] == 0 and s["kg"]["retractions_inserted"] == 2
+    rows = _current(
+        db,
+        """SELECT r.reason, r.detail->>'basis' FROM kg.statement_retraction r JOIN kg.statement st
+           ON st.id = r.statement_row_id WHERE st.subject_qid = 'lei:W38RGI023J3WT1HWRP32' AND r.origin = 'test_fixture'""",
+    )
+    assert sorted(rows) == [("reclassified_by_reva", "raw_unchanged")] * 2
+    left = _current(
+        db,
+        """SELECT count(*) FROM kg.statement_current WHERE property_pid = 'gleif:wikidata_item'
+           AND subject_qid = 'lei:W38RGI023J3WT1HWRP32' AND origin = 'test_fixture'""",
+    )
+    assert left == [(0,)]
