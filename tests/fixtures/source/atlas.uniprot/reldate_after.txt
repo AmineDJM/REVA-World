@@ -1,0 +1,3 @@
+UniProt Knowledgebase Release 2026_03 consists of:
+UniProtKB/Swiss-Prot Release 2026_03 of 02-Sep-2026
+UniProtKB/TrEMBL Release 2026_03 of 02-Sep-2026

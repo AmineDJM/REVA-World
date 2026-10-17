@@ -36,6 +36,7 @@ import polars as pl
 from reva.evaluation.cutoff import _GUARD_FOR, CutoffMode
 from reva.evaluation.leakage import (
     RETROSPECTIVE_DISCLAIMER,
+    GuardMode,
     InputRef,
     LeakageGuard,
     RefKind,
@@ -209,7 +210,9 @@ class VintageAccessor:
         if set(cells.columns) != set(CELL_SCHEMA.names()):
             raise ValidationProblem("vintage cells must have CELL_SCHEMA (use cells_from_atlas_frame)")
         self._cells = cells.select(CELL_SCHEMA.names())
-        self._guard = LeakageGuard(self._cutoff, _GUARD_FOR[self._mode])
+        # final_vintage() is the labelled downgrade: its guard labels, never silently admits as real-time
+        gm = GuardMode.revised_data_retrospective if self._mode is CutoffMode.revised_data_retrospective else None
+        self._guard = LeakageGuard(self._cutoff, gm or _GUARD_FOR[self._mode])
 
     @property
     def cutoff(self) -> datetime:

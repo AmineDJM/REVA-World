@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "2862d43f5c1b32491b53df165ca953fbc596a006e20b252b25e9dd73f0b39309",
+    "url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/7742/dataset_report?filters.reference_only=true&filters.has_annotation=true&page_size=500",
+    "file": "genomes_7742.json",
+    "sha256": "447090349a36f244b31f7f513ea7a560f418fddafda0e536b16c1345172369bb",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "NCBI: U.S. Government work, no restriction",
+    "fixture_note": "trimmed: first page of each taxon reduced to 3 (Vertebrata) / 2 (Viridiplantae) reports, assembly_info.biosample and organelle_info dropped, next_page_token removed"
+  },
+  {
+    "request_fingerprint": "a428488be912dcc90a4e585791294c0ab30cb4ef83c68ecda8378809894f85b9",
+    "url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/33090/dataset_report?filters.reference_only=true&filters.has_annotation=true&page_size=500",
+    "file": "genomes_33090.json",
+    "sha256": "5b4c23bde5f82f4dd5f2531364b2dd2d79c0e5ecfef1f634018032d23daa1867",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "NCBI: U.S. Government work, no restriction",
+    "fixture_note": "trimmed: first page of each taxon reduced to 3 (Vertebrata) / 2 (Viridiplantae) reports, assembly_info.biosample and organelle_info dropped, next_page_token removed"
+  }
+]

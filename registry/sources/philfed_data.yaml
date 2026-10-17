@@ -1,0 +1,20 @@
+# V5 (agent PRED-VINTAGE): Federal Reserve Bank of Philadelphia public data downloads.
+# Connector src/reva/adapters/connectors/atlas_vintage_philfed.py (atlas.vintage_philfed -> vintage_us.rtdsm,
+# vintage_us.spf_median).
+source_key: philfed.data
+title: Philadelphia Fed Real-Time Data Set for Macroeconomists and Survey of Professional Forecasters
+provider_url: https://www.philadelphiafed.org/surveys-and-data/real-time-data-research
+lineage_family: philfed
+rights:
+  licence: "Federal Reserve Bank of Philadelphia public data (no explicit open licence on the data pages)"
+  terms_url: https://www.philadelphiafed.org/privacy-and-terms-of-use
+  attribution: "Federal Reserve Bank of Philadelphia, Real-Time Data Set for Macroeconomists; Survey of Professional Forecasters"
+  open_licence: null
+metadata:
+  allowed_hosts: [www.philadelphiafed.org]
+  files:
+    rtdsm: https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/<file>
+    spf: https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/historical-data/<file>
+    spf_release_dates: https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/spf-release-dates.txt
+  authentication: none
+  cadence: "RTDSM updated at the end of each month; SPF quarterly"

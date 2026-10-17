@@ -14,6 +14,7 @@ const DemanderPage = lazy(() => import("./pages/DemanderPage"));
 const RelationPage = lazy(() => import("./pages/RelationPage"));
 const CausesPage = lazy(() => import("./causal/CausesPage"));
 const FichePage = lazy(() => import("./pages/FichePage"));
+const PrevisionsPage = lazy(() => import("./pages/PrevisionsPage"));
 
 /** All V3 screens under /v3/* (one lazy chunk per screen), with their own sub-navigation. */
 export default function V3App() {

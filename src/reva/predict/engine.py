@@ -328,6 +328,20 @@ class Engine:
         return [node.geo]
 
     def _expand(self, node: Node, queue: deque[Node]) -> None:
+        if (
+            node.decision_change is not None
+            and node.ref.kind == "variable"
+            and self.effects.status().get("layer") == "present"
+            and self.effects.variable_info(node.ref) is None
+        ):
+            self.gaps.append(
+                {
+                    "code": "variable_not_in_effect_vocabulary",
+                    "node": node.id,
+                    "message_fr": f"la variable {node.ref.id} n'est pas dans le vocabulaire des effets "
+                    "(registry/effects/variables.yaml) : aucune estimation ne peut la citer comme cause",
+                }
+            )
         ests = self._estimates_for(node.ref)
         if not ests:
             self.gaps.append(

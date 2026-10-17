@@ -35,6 +35,25 @@ instruments:
         basis_en: >-
           Scenario assumption: the decided quota change applies in full to world crude production (full
           compliance, no offsetting supply from other producers, no stock draw).
+  - id: oil_price_assumption
+    label_fr: "Hypothèse de prix mondial du pétrole (choc supposé par l'utilisateur)"
+    label_en: "World oil-price assumption (shock stated by the user)"
+    magnitude_units:
+      "percent": "1"
+      "%": "1"
+    direct_changes:
+      - variable: {kind: variable, id: oil_price.global}
+        geo: WLD
+        transform: percent_change
+        unit: percent
+        sign: 1
+        timing: step
+        basis_fr: >-
+          Hypothèse posée par l'utilisateur : le prix mondial du pétrole brut varie du pourcentage indiqué pendant
+          la durée de la décision. Ce n'est pas une estimation de REVA de l'effet d'une décision sur le prix.
+        basis_en: >-
+          Assumption stated by the user: the world crude oil price changes by the stated percentage for the
+          decision's duration. This is not a REVA estimate of any decision's effect on the price.
   - id: export_ban
     label_fr: "Interdiction d'exporter un produit"
     label_en: "Export ban on a product"

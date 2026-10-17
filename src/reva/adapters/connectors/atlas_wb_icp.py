@@ -43,7 +43,7 @@ from reva.atlas.tables import ATLAS_SCHEMA, country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.wb_icp"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.1: 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_wb_icp/1"
 SOURCE = "wb"
 DATASET = "icp2021"

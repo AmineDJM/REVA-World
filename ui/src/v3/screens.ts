@@ -68,6 +68,13 @@ export const V3_SCREENS: V3Screen[] = [
       "Affirmations causales sourcées et graduées, « pourquoi ? », chaînes, désaccords ; jamais une causalité établie par REVA.",
   },
   {
+    to: "/v3/previsions",
+    short: "Prévisions",
+    label: "Prévisions — registre prospectif scellé",
+    description:
+      "Questions datées, prévisions de référence gelées avant la résolution, scores et calibration ; pas un conseil.",
+  },
+  {
     to: "/v3/demander",
     short: "Demander",
     label: "Demander — question en langage naturel",

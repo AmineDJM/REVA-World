@@ -9,22 +9,13 @@ schema_version: "1.0.0"
 variables:
   - {kind: atlas_concept, id: resources.energy.eia.crude_oil_production, geo: global,
      note: "the decision engine uses this concept at geography WLD for world crude production (EIA world aggregate)"}
-  - {kind: variable, id: oil_price.crude_real, geo: global}
-  - {kind: variable, id: oil_price.crude_nominal, geo: global}
-  - {kind: variable, id: oil_price.brent, geo: global}
-  - {kind: variable, id: oil_price.crude, geo: global}
-  - {kind: variable, id: oil_supply.world, geo: global}
-  - {kind: variable, id: food_price.rice_world, geo: global}
-  - {kind: variable, id: food_price.world_index, geo: global}
-  - {kind: variable, id: commodity_price.rice, geo: global}
+  - {kind: variable, id: oil_price.global, geo: global,
+     note: "PRED-EFFECT variable: world crude oil price in USD (registry/effects/variables.yaml)"}
 plugins:
   economic.io_price:
     label_fr: "Modèle de prix entrées-sorties (FIGARO), poussée des coûts au premier tour"
     inputs:
-      - {kind: variable, id: oil_price.crude_real, unit: percent}
-      - {kind: variable, id: oil_price.crude_nominal, unit: percent}
-      - {kind: variable, id: oil_price.brent, unit: percent}
-      - {kind: variable, id: oil_price.crude, unit: percent}
+      - {kind: variable, id: oil_price.global, unit: percent}
     assumption_fr: >-
       Le prix de sortie de toute la branche B « Industries extractives » (NACE B05-B09) de chaque économie du
       tableau varie comme le prix du brut : borne haute, car B contient aussi le charbon, les minerais métalliques
@@ -32,10 +23,7 @@ plugins:
   economic.crude_exposure:
     label_fr: "Exposition comptable à la valeur frontière du brut (HS 2709)"
     inputs:
-      - {kind: variable, id: oil_price.crude_real, unit: percent}
-      - {kind: variable, id: oil_price.crude_nominal, unit: percent}
-      - {kind: variable, id: oil_price.brent, unit: percent}
-      - {kind: variable, id: oil_price.crude, unit: percent}
+      - {kind: variable, id: oil_price.global, unit: percent}
     assumption_fr: >-
       Les prix frontière du brut importé et exporté varient comme le prix du brut (multiplicateur 1 + Δ %),
       quantités fixes, une période comptable annuelle ; ce n'est ni une perte de PIB ni une inflation.

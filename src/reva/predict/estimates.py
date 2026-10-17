@@ -362,6 +362,8 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
         notes.append("uncertainty from a published range only: sd = half-range / 2 (heuristic, labelled)")
     elif basis == "ci":
         notes.append("sd derived from the published interval assuming symmetry (normal approximation)")
+    elif basis == "dispersion_across_estimates":
+        notes.append("sd = dispersion across the published estimates summarised (heterogeneity, not sampling error)")
     coef = None if point is None else point * scale
     sd_s = None if sd is None else abs(float(sd) * scale)
     unc = est.get("uncertainty") or {}
@@ -381,25 +383,29 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
                 )
         else:
             undated_kind = str(hz.get("kind") or "unspecified")
-    elif hz.get("kind") == "impact" and coef is not None:
-        dated = {0: ProfilePoint(coef, sd_s)}
-    elif hz.get("kind") == "at_horizon" and coef is not None and _f(hz.get("value")) is not None:
-        v = float(hz["value"])
-        u = hz.get("unit")
-        q = {"quarter": int(v), "month": int(v) // 3, "year": 4 * int(v)}.get(str(u))
-        if q is None:
+    elif hz.get("kind") in ("impact", "at_horizon") and coef is not None:
+        u = str(hz.get("unit") or "quarter")
+        v = 0 if hz.get("kind") == "impact" else _f(hz.get("value"))
+        if v is None or u not in ("quarter", "month", "year"):
             undated_kind = "unspecified"
-            notes.append(f"horizon unit {u!r} is not read on the quarterly grid")
+            notes.append(f"horizon {hz.get('value')!r} {u!r} is not read on the quarterly grid")
+        elif u == "year":
+            # an annual response (e.g. inflation in the year of the shock) covers the four quarters of that year
+            dated = {4 * int(v) + k: ProfilePoint(coef, sd_s) for k in range(4)}
+            notes.append(
+                f"annual response of year {int(v)} after the shock applied to the four quarters of that year; "
+                "other horizons are not computed (never interpolated)"
+            )
         else:
+            q = int(v) if u == "quarter" else int(v) // 3
             dated = {q: ProfilePoint(coef, sd_s)}
+            notes.append("single published horizon: values at other horizons are not computed (never interpolated)")
             if u == "month":
                 notes.append(f"horizon of {int(v)} months read as quarter offset {q}")
     else:
         undated_kind = str(hz.get("kind") or "unspecified")
         if undated_kind not in UNDATED_KINDS:
             undated_kind = "unspecified"
-    if dated is not None and len(dated) > 0 and not irf and len(dated) == 1:
-        notes.append("single published horizon: values at other horizons are not computed (never interpolated)")
     as_of = None
     try:
         as_of = date.fromisoformat(str(est.get("as_of"))[:10]) if est.get("as_of") else None

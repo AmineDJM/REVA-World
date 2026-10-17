@@ -326,7 +326,7 @@ def test_io_plugin_matches_the_leontief_formula() -> None:
     oil = est(
         "oil",
         ("atlas_concept", "imf.policy_rate", "pp_change"),
-        ("variable", "oil_price.crude_real", "percent_change"),
+        ("variable", "oil_price.global", "percent_change"),
         measure="semi_elasticity",
         unit="percent_per_pp",
         point=10.0,
@@ -346,7 +346,7 @@ def test_crude_exposure_plugin_is_the_accounting_identity() -> None:
     oil = est(
         "oil",
         RATE,
-        ("variable", "oil_price.crude_real", "percent_change"),
+        ("variable", "oil_price.global", "percent_change"),
         measure="semi_elasticity",
         unit="percent_per_pp",
         point=10.0,
@@ -396,3 +396,35 @@ def test_retirement_plugin_runs_once_and_reports_failures_as_gaps() -> None:
 def test_engine_rejects_unreasonable_draw_counts() -> None:
     with pytest.raises(ValueError):
         Engine(decision(), StaticEffectSource([]), NoClaims(), NoBaseline(), draws=10)
+
+
+def test_annual_impact_response_to_a_user_stated_oil_price_assumption() -> None:
+    """Shape of a published panel estimate (synthetic number): +0.4 pp inflation for +10 % oil in the year of the
+    shock, no SE. A user-stated +10 % assumption gives +0.4 pp in the four quarters of year 0, nothing after."""
+    e = est(
+        "oil_cpi",
+        ("variable", "oil_price.global", "percent_change"),
+        INFL,
+        measure="response",
+        unit="percentage_points",
+        shock={"size": 10, "unit": "percent"},
+        point=0.4,
+        sign="positive",
+        uncertainty={"status": "not_reported"},
+        horizon={"kind": "impact", "value": 0, "unit": "year"},
+        scope={
+            "country_group": "72 advanced and developing economies (synthetic)",
+            "period": {"from": "1970", "to": "2015"},
+        },
+    )
+    d = decision(
+        instrument="oil_price_assumption", magnitude={"value": "10", "unit": "percent"}, countries=["FRA", "DEU"]
+    )
+    r = run(d, [e], draws=200)
+    v = var(r, "atlas_concept:imf.inflation_cpi_avg@DEU")
+    assert [p.get("p50") for p in v["periods"][:4]] == pytest.approx([0.4] * 4)
+    assert all(p["missing_reason"] for p in v["periods"][4:])
+    hop = next(h for h in r["hops"] if h["kind"] == "estimate")
+    assert hop["applicability"]["status"] == "group_unverified"
+    assert not v["uncertainty_complete"] and all(p["degenerate"] for p in v["periods"][:4])
+    assert r["direct_changes"][0]["basis_fr"].startswith("Hypothèse posée par l'utilisateur")

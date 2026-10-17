@@ -63,7 +63,7 @@ from reva.atlas.tables import ATLAS_SCHEMA, country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.oecd_macro"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"  # 1.0.1: 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_oecd_macro/1"
 SOURCE = "oecd"
 SOURCE_KEY = "oecd.sdmx"

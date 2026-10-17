@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.20"
+policy_version: "budgets-1.3.21"
 daily:
-  http_requests_total: 18388
+  http_requests_total: 18562
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -49,8 +49,14 @@ per_source_daily_requests:
   cow.terrchange: 6
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
   cshapes.cran: 8
+  # dbnomics.api: requested by PRED-VINTAGE (pred_vintage.yaml)
+  dbnomics.api: 80
   # doid.obo: requested by V4HEALTH (v4health.yaml)
   doid.obo: 8
+  # ecb.data_api: requested by PRED-VINTAGE (pred_vintage.yaml)
+  ecb.data_api: 6
+  # effects.literature: requested by PRED-EFFECT (pred_effect.yaml)
+  effects.literature: 40
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)
   eia.opendata_bulk: 12
   # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml), AUDFIX (audfix.yaml)
@@ -109,7 +115,7 @@ per_source_daily_requests:
   idmc.gidd: 12
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml), V4MIND (v4mind.yaml)
   ilostat.rplumber: 75
-  # imf.sdmx: requested by A-IMF (a_imf.yaml), V4ECON (v4econ.yaml)
+  # imf.sdmx: requested by A-IMF (a_imf.yaml), PRED-VINTAGE (pred_vintage.yaml), V4ECON (v4econ.yaml)
   imf.sdmx: 76
   # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
   insee.bdm: 6
@@ -141,8 +147,8 @@ per_source_daily_requests:
   noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
-  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), V4ECON (v4econ.yaml), V4INDUSTRY (v4industry.yaml), V4MIND (v4mind.yaml)
-  oecd.sdmx: 92
+  # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml), PRED-VINTAGE (pred_vintage.yaml), V4ECON (v4econ.yaml), V4INDUSTRY (v4industry.yaml), V4MIND (v4mind.yaml)
+  oecd.sdmx: 120
   # ofac.programs: requested by A-SANCTIONS (a_sanctions.yaml)
   ofac.programs: 4
   # ohchr.indicators: requested by A-TREATIES (a_treaties.yaml)
@@ -161,6 +167,8 @@ per_source_daily_requests:
   parlgov.dataverse: 6
   # pax.peaceagreements: requested by CAUSMORE (causmore.yaml), SAMEAS (sameas.yaml)
   pax.peaceagreements: 12
+  # philfed.data: requested by PRED-VINTAGE (pred_vintage.yaml)
+  philfed.data: 20
   # powell_thyne.coups: requested by A-COUPS (a_coups.yaml)
   powell_thyne.coups: 6
   # pubchem.pug: requested by V4CHEM (v4chem.yaml)

@@ -46,7 +46,9 @@ class InstrumentOut(s.ApiModel):
 
 
 class DecisionsData(s.ApiModel):
-    decisions: list[dict[str, Any]] = Field(description="Reference decisions (registry/predict/reference_decisions.yaml)")
+    decisions: list[dict[str, Any]] = Field(
+        description="Reference decisions (registry/predict/reference_decisions.yaml)"
+    )
     instruments: list[InstrumentOut]
     label: str = Field(description="Label every propagation result carries until its chain is validated")
 
@@ -141,17 +143,18 @@ class PredictResponse(s.Envelope):
 @router.get("/decisions", response_model=DecisionsResponse)
 def list_decisions() -> DecisionsResponse:
     """Reference decisions and the instruments a decision can be composed from."""
-    return DecisionsResponse(
-        data=DecisionsData(
-            decisions=[d.model_dump(mode="json") for d in reference_decisions().values()],
-            instruments=[InstrumentOut(**i.as_json()) for i in instruments().values()],
-            label=pe.LABEL_UNVALIDATED,
-        ),
-        context_mode="registry",
-        origin="none",
-        modality="metadata",
-        warnings=[UNVALIDATED_WARNING],
+    env: dict[str, Any] = {
+        "context_mode": "registry",
+        "origin": "none",
+        "modality": "metadata",
+        "warnings": [UNVALIDATED_WARNING],
+    }
+    data = DecisionsData(
+        decisions=[d.model_dump(mode="json") for d in reference_decisions().values()],
+        instruments=[InstrumentOut(**i.as_json()) for i in instruments().values()],
+        label=pe.LABEL_UNVALIDATED,
     )
+    return DecisionsResponse(data=data, **env)
 
 
 def _store(request: Request) -> Any:
@@ -193,11 +196,11 @@ def predict_decision(body: PredictRequest, request: Request) -> PredictResponse:
                 message="No effect-estimate layer on this server: nothing beyond the simulators can be quantified.",
             )
         )
-    return PredictResponse(
-        data=PredictionData.model_validate(out),
-        context_mode="simulation",
-        origin="mixed" if body.origin == "any" else body.origin,
-        modality="assumption_conditioned_scenario",
-        assumptions=[dc["basis_en"] for dc in out["direct_changes"]],
-        warnings=warnings,
-    )
+    env: dict[str, Any] = {
+        "context_mode": "simulation",
+        "origin": "mixed" if body.origin == "any" else body.origin,
+        "modality": "assumption_conditioned_scenario",
+        "assumptions": [dc["basis_en"] for dc in out["direct_changes"]],
+        "warnings": warnings,
+    }
+    return PredictResponse(data=PredictionData.model_validate(out), **env)

@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "078996cac2df44cd8415ff3f2df8ff5146a9705f1a2632aabb5658667ec0a530",
+    "url": "https://rest.ensembl.org/info/species?content-type=application/json;division=EnsemblVertebrates",
+    "file": "info_species.json",
+    "sha256": "25d8df5ae765d4cbc8c06c70a342fbe2794b88c535deb7fe9a2c4fca11d12595",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "Ensembl: no restrictions",
+    "fixture_note": "trimmed: info/species reduced to homo_sapiens, mus_musculus, danio_rerio; info/assembly top_level_region reduced to chromosome regions"
+  },
+  {
+    "request_fingerprint": "c1508148ba0c42f08a3bd44429265d36fa722d816cb789668e08cd2d00ad4e70",
+    "url": "https://rest.ensembl.org/info/assembly/homo_sapiens?content-type=application/json",
+    "file": "info_assembly_homo_sapiens.json",
+    "sha256": "1d59736fe5424139d7b04fdce9f6cff9c297ef13278b11ee17ff5bb62d742f82",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "Ensembl: no restrictions",
+    "fixture_note": "trimmed: info/species reduced to homo_sapiens, mus_musculus, danio_rerio; info/assembly top_level_region reduced to chromosome regions"
+  },
+  {
+    "request_fingerprint": "beb5a952f8c8e76025042e59a6e9103825315a2081f337051f878dc5220126d7",
+    "url": "https://rest.ensembl.org/info/assembly/mus_musculus?content-type=application/json",
+    "file": "info_assembly_mus_musculus.json",
+    "sha256": "49b8c2feaad97670129e5110a028e2d10a4db2a8c05553f5dbe26ac0d1329930",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "Ensembl: no restrictions",
+    "fixture_note": "trimmed: info/species reduced to homo_sapiens, mus_musculus, danio_rerio; info/assembly top_level_region reduced to chromosome regions"
+  }
+]

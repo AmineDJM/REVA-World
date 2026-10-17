@@ -1,0 +1,17 @@
+[
+  {
+    "request_fingerprint": "3e02ecafb443b26b1e7d95f904db0d386617c03ad028abf1df63c234ac6bd6d3",
+    "url": "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt",
+    "file": "hgnc_complete_set.txt",
+    "sha256": "95abfa1aa02f0e978570239e796f979fefb727f79d21d58d4da57e38064356f1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain;charset=utf-8",
+      "etag": "\"142f7b5a2d3add9b7484dd12d1e67c77\"",
+      "last-modified": "Fri, 16 Oct 2026 13:36:15 GMT"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC0 1.0",
+    "fixture_note": "trimmed: hgnc_complete_set.txt header + 12 genes (TP53, BRCA1, A1BG, MT-CO1, CFTR, HBB, INS, HLA-A, SHOX (PAR, X and Y), and rows with non-chromosome locations); ETag = md5 of the trimmed file"
+  }
+]

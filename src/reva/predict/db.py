@@ -81,7 +81,9 @@ class DbEffectSource:
                 out.append(r)
         if ref.kind == "variable":  # the reverse curated link: estimates stated on an atlas concept of the variable
             for cid in (self.variable_info(ref) or {}).get("atlas_concepts") or []:
-                for r in self._reader.list_estimates(self.conn, **{**kw, "cause": str(cid), "include_variables": False}):
+                for r in self._reader.list_estimates(
+                    self.conn, **{**kw, "cause": str(cid), "include_variables": False}
+                ):
                     r = dict(r)
                     if (r.get("cause") or {}).get("kind") == "atlas_concept":
                         out.append({**r, "matched_via": f"variable:{ref.id}"})

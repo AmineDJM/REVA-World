@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "15425f5556811ac9857d7be12a0e7f1f02bea8dc480886aa764cc6a27989ee2a",
+    "url": "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt",
+    "file": "reldate.txt",
+    "sha256": "733913b362b641ac2d8de42a6220e794abde0e47d57d6feb57e442c6bf3dac6e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: reldate.txt verbatim; reviewed organism-id stream reduced to 3 organisms (9606, 10090, 83333) with a few rows each; taxonomy records of these 3; human stream reduced to 8 entries"
+  },
+  {
+    "request_fingerprint": "21cedbf09c202ecb3266415103a63f6566ad73b43d9b97d194972d3bedc26b72",
+    "url": "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt?after=1",
+    "file": "reldate_after.txt",
+    "sha256": "733913b362b641ac2d8de42a6220e794abde0e47d57d6feb57e442c6bf3dac6e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: reldate.txt verbatim; reviewed organism-id stream reduced to 3 organisms (9606, 10090, 83333) with a few rows each; taxonomy records of these 3; human stream reduced to 8 entries"
+  },
+  {
+    "request_fingerprint": "5abb8537882b7f99117d120952fef3408c5f1a1eabb1803795509ca9e909c664",
+    "url": "https://rest.uniprot.org/uniprotkb/stream?query=reviewed%3Atrue&fields=organism_id&format=tsv",
+    "file": "organisms.tsv",
+    "sha256": "6b3396aa2d035a4eb447109b882487b853e6c6d2d3adbefc9cef9994719bee45",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain;format=tsv"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: reldate.txt verbatim; reviewed organism-id stream reduced to 3 organisms (9606, 10090, 83333) with a few rows each; taxonomy records of these 3; human stream reduced to 8 entries"
+  },
+  {
+    "request_fingerprint": "7839763b7d839a9e10f11378a7f5fb02ddd929c221e7ea45f8ba8b840d26f5ea",
+    "url": "https://rest.uniprot.org/taxonomy/stream?query=tax_id%3A9606%20OR%20tax_id%3A10090%20OR%20tax_id%3A83333&fields=id,scientific_name,common_name,rank,parent&format=tsv",
+    "file": "taxonomy_0.tsv",
+    "sha256": "f4db02f6562cfe60239700231f2ddf590002092fbc5b2818e8f90daafec5a59c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain;format=tsv"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: reldate.txt verbatim; reviewed organism-id stream reduced to 3 organisms (9606, 10090, 83333) with a few rows each; taxonomy records of these 3; human stream reduced to 8 entries"
+  },
+  {
+    "request_fingerprint": "f6b431ab7fff33c900ba6e94ea1a55775fc0ceae77d71c65532db70132367734",
+    "url": "https://rest.uniprot.org/uniprotkb/stream?query=reviewed%3Atrue+AND+organism_id%3A9606&fields=accession%2Cid%2Cgene_primary%2Cprotein_name%2Clength%2Ccc_function%2Cxref_hgnc%2Corganism_id&format=tsv",
+    "file": "human.tsv",
+    "sha256": "f7493eabd9c68912c89c04a6ed9ad8afbcca58e187a5181748d515bdf0416641",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain;format=tsv"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "trimmed: reldate.txt verbatim; reviewed organism-id stream reduced to 3 organisms (9606, 10090, 83333) with a few rows each; taxonomy records of these 3; human stream reduced to 8 entries"
+  }
+]
