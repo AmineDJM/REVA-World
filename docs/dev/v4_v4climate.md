@@ -20,7 +20,9 @@ Existing coverage was **extended, not duplicated**:
 
 * Code, fixtures, tests: done and committed (`5c8bdf2`, `0d79123`, `48dbc0d`, `de23725`, `dd7d577`, catalog in a WIP
   snapshot `4150e4e`).
-* Live load into the dev DB: LIVE_STATUS
+* **Live load into the dev DB: done** (2026-10-17, 14:06-15:50 UTC, free disk 6.7→5.1 GB, checked before each run): all four
+  sources `completed`, 0 refused requests, 0 rejected statements/claims. Bytes on the wire: CCKP 31.9 MB, GHCN+NE 59.1 MB,
+  indices 0.75 MB, Carbon Brief 2.1 MB (×2: 1.0.1 then 1.0.2). Connector versions registered with `reva seed`.
 * Tests: `tests/unit/test_atlas_cckp_series.py` (6), `test_atlas_climate_indices.py` (7), `test_atlas_ghcnm.py` (4),
   `test_atlas_attribution.py` (5) and `tests/integration/test_v4climate_ingest.py` (4: fixture ingest of the four
   sources into a throwaway DB, KG loads, T2 claims, idempotent re-runs) — all pass; ruff / ruff format / mypy clean on
@@ -55,7 +57,7 @@ naturalearth.admin1_10m 2) and the digest re-pinned in `src/reva/autonomy/policy
 | `climind.enso_oni` | `oni_anomaly`, `nino34_sst_3month_mean` per 3-month season 1950-2026 | 1,840 |
 | `climind.sea_ice` | `extent`, `area` (10^6 km²) NH/SH monthly 1978-2026 | 2,291 |
 | `climind.sea_level` | `gmsl_anomaly|mission=<TOPEX/Poseidon…Sentinel-6MF>` (~10-day, mm), EPA `csiro_adjusted_sea_level` / `noaa_adjusted_sea_level` (annual, inches) | 1,822 |
-| `ghcnm.tavg_qcf_monthly` | QCF TAVG (°C) of the selected stations | GHCN_ROWS |
+| `ghcnm.tavg_qcf_monthly` | QCF TAVG (°C) of the selected stations (GHCN-M `ghcnm.v4.0.1.20261016`) | 710,272 |
 | `attribution_cb.findings` | `FINDINGS|class=<…>` per country × single event year (derived count) | 371 |
 
 Catalog: `registry/atlas/catalog/climate.yaml` (domain/theme `climate`): observed annual temperature and precipitation
@@ -63,7 +65,7 @@ Catalog: `registry/atlas/catalog/climate.yaml` (domain/theme `climate`): observe
 flagged projections), attribution findings count.
 
 **Honesty rules applied.** Provider sentinels (`***`, `NaN`, `-9999`, `-99.9`, `-9.99` uncertainties) are never rows
-(16 dropped in the indices run) — never zero. Every CMIP6 row carries `flags.estimate_kind` (`projection`, or
+(9 dropped in the indices run) — never zero. Every CMIP6 row carries `flags.estimate_kind` (`projection`, or
 `model_simulation` for the historical experiment) **and** a truthy `flags.projection`, so `PROJECTION_SQL` keeps them out
 of observation answers; `flags.projection_upstream` = scenario, model ensemble, percentile, product code, period.
 Checks that block a run: CCKP annual `pr` = Σ monthly (±max(1 mm, 0.5 %)) and annual `tas` = day-weighted monthly mean
@@ -80,8 +82,8 @@ says it comes from the provider documentation.
 | source key | entities | statements |
 |---|---|---|
 | `climate.global_indices` | 14 `climate_index` (`climind:co2_mlo`, `climind:oni`, `climind:sea_ice_extent_arctic`, …) | 69 (atlas series address, unit, verbatim definition, baseline, licence, provider file) |
-| `noaa.ghcnm` | GHCN_ENTS `weather_station` (`ghcnm:<GHCN id>`, every inventory station) | GHCN_STS: `P625`, `P2044`, `P17` (FIPS prefix → ISO3 → QID), `ghcnm:fips_country_code`, `ghcnm:in_adm1` → `iso3166_2:<code>`, `ghcnm:valid_months` / `first_year` / `last_year`, `ghcnm:tavg_series` |
-| `naturalearth.admin1_10m` | ADM1_ENTS `region_adm1` (`iso3166_2:<code>`) | ADM1_STS: `P17`, `naturalearth:adm1_code`, `naturalearth:type_en`, `naturalearth:wikidataid` |
+| `noaa.ghcnm` | 27,898 `weather_station` (`ghcnm:<GHCN id>`, every inventory station) | 221,012: `P625`, `P2044`, `P17` (FIPS prefix → ISO3 → QID), `ghcnm:fips_country_code`, `ghcnm:in_adm1` → `iso3166_2:<code>`, `ghcnm:valid_months` / `first_year` / `last_year`, `ghcnm:tavg_series` |
+| `naturalearth.admin1_10m` | 4,253 `region_adm1` (`iso3166_2:<code>`) | 16,721: `P17`, `naturalearth:adm1_code`, `naturalearth:type_en`, `naturalearth:wikidataid` |
 | `carbonbrief.attribution` | 948: 1 `climate_driver` (`cbattr:human_caused_climate_change`), extremes `cbattr:extreme:<h>` (`extreme_event`), trends `cbattr:trend:<h>` (`climate_trend`) | 5,383: event type, period (`P585` / `P580`+`P582`, verbatim text), `cbattr:country` → country QID, region, one `cbattr:finding` per study (classification + citation, link, summary statement as qualifiers) |
 
 Relation families (`registry/kg/relations_v4.d/v4climate.yaml`): `ghcnm:in_adm1` → `located_in`
@@ -92,7 +94,8 @@ Relation families (`registry/kg/relations_v4.d/v4climate.yaml`): `ghcnm:in_adm1`
 Earth admin-1 polygons; the subdivision is identified **only** by the ISO 3166-2 code Natural Earth publishes for the
 polygon (never by name). Placeholder codes (`-99-X..`, `XK-X..`, 188 features) and codes Natural Earth uses for several
 polygons (60 codes) are not used. 25,885 of 27,898 stations fall in a usable polygon (offshore/islands outside the
-polygons get none). When the FIPS-prefix country and the subdivision's country disagree (179 stations, e.g. RQ Puerto
+polygons get none); 25,708 get an `in_adm1` edge. When the FIPS-prefix country and the subdivision's country disagree
+(177 stations — border stations at the 1:10m generalisation, e.g. Canadian stations inside US-NY/US-MI polygons, e.g. RQ Puerto
 Rico vs `US-PR`, SU Sudan stations now in South Sudan `SS-*`, FG/GP French overseas vs `FR-*`, and GHCN-Daily
 `ACW00011604` "SAVE" coded AC=Antigua but at 57.77 N 11.87 E in Sweden) the station gets **no** ADM1 link and its `P17`
 carries `coordinates_fall_in`. ADM1 entities keep Natural Earth's `iso_a2` beside the ISO prefix when its de facto view
@@ -107,7 +110,9 @@ Example paths (ids from the live dev DB):
 
 * `ghcnm:ACW00011604` (SAVE) —P17 (FIPS AC → ATG, `coordinates_fall_in: SE-…`)→ Antigua and Barbuda: the GHCN code
   is kept as GHCN asserts it, the contradiction is shown, no ADM1 edge is drawn.
-* GHCN_EXAMPLE
+* `ghcnm:FR000007190` STRASBOURG_ENTZHEIM (48.55 N, 7.6331 E; TAVG 1801-2026, 2,335 valid months) —`ghcnm:in_adm1`
+  (`located_in`, point in polygon)→ `iso3166_2:FR-67` Bas-Rhin (Metropolitan department) —P17→ Q142 France; the station
+  —P17 (FIPS FR)→ Q142; its series: `ghcnm.tavg_qcf_monthly.TAVG @ provider_geo=FR000007190`.
 * `climind:co2_mlo` —`climind:atlas_series`→ `climind.noaa_gml.co2_mlo|average @ provider_geo=MLO` (1958-03: 315.71
   ppm; flagged interpolated months quote GML's note); `climind:oni` definition "represents 3 month running mean of
   ERSST.v6 SST anomalies in the Niño 3.4 region (5N-5oS, 120o-170oW)".
@@ -132,7 +137,8 @@ DOI stored verbatim; Carbon Brief is the compiler, the study is the asserting re
 739 claims loaded (0 unknown endpoints). The study's summary statement is the claim `mechanism` (verbatim). DOIs from
 the citation text (649) or, failing that, from a DOI link (90; `scope.doi_basis = link` with a note: a BAMS
 "Explaining Extreme Events" link names the whole supplement, so several studies share that DOI and count once as an
-upstream). 1.0.2 strips publisher URL tails (`/abstract`) from link DOIs (8 claims): re-ingest pending (see commands).
+upstream). 1.0.2 strips publisher URL tails (`/abstract`) from link DOIs (8 claims) and notes link-derived DOIs: the live re-run
+stored 90 new claim revisions, 649 unchanged.
 Event typing: `registry/events/taxonomy.yaml` dataset kind `cbattr:extreme:` → `disaster`; "Impact" records excluded
 (impacts, not weather events); trends never events. Nothing is extracted from IPCC or other prose; no claim is made by
 joining datasets (a GHCN anomaly near an event is never evidence).
@@ -174,13 +180,13 @@ joining datasets (a GHCN anomaly near an event is never evidence).
 3. Whether to keep all 27.9 k stations as KG entities (current) or only the selected 646.
 4. Review of the ADM1 point-in-polygon rule (derived `located_in`, labelled `derived: point_in_polygon`).
 
-## Commands (bigger machine / later run)
+## Commands (re-run / bigger machine)
 
 ```bash
 df -h /                                                    # >= 5 GB free first
 flock /tmp/reva-devdb.lock uv run reva seed                # registers connector versions (code digests)
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.climate_indices
-flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.attribution_cb      # 1.0.2 (DOI tail fix)
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.attribution_cb
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.cckp_series
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ghcnm
 # then (lead): reva atlas snapshot --skip-unchanged; reva links materialise; reva causal refresh --origin live
