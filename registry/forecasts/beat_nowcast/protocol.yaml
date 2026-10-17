@@ -107,4 +107,4 @@ code_files: [src/reva/evaluation/beat_nowcast/__init__.py, src/reva/evaluation/b
              src/reva/evaluation/beat_nowcast/service.py, src/reva/models/forecasting/dfm.py,
              src/reva/evaluation/pred_models/gate.py, src/reva/adapters/connectors/atlas_fed_nowcasts.py,
              src/reva/cli/beat_nowcast.py]
-code_sha256: PLACEHOLDER
+code_sha256: 11ad0b60acd40b41f79e8537183ba34d8fe578ae69286a5c3b98280a69536896
