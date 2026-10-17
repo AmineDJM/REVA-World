@@ -69,7 +69,7 @@ from reva.adapters.connectors import hf_daily_common as hc
 from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError, ValidationProblem
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 ATLAS_SOURCE = "gdelt"
 NAME_EVENTS = "atlas.gdelt_events"
 NAME_DOC = "atlas.gdelt_doc"

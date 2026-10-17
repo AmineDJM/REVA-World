@@ -39,7 +39,7 @@ no live ingest below 5 GB free disk).
 
 | Piece | File |
 |---|---|
-| Connector (two atlas sources in one module) | `src/reva/adapters/connectors/atlas_gdelt.py` (`atlas.gdelt_events` 1.0.0, `atlas.gdelt_doc` 1.0.0) |
+| Connector (two atlas sources in one module) | `src/reva/adapters/connectors/atlas_gdelt.py` (`atlas.gdelt_events` 1.0.1, `atlas.gdelt_doc` 1.0.1 (1.0.0 was seeded from an earlier draft that flagged reused archive files)) |
 | Source registry (rights, verbatim terms quote) | `registry/sources/gdelt_events2.yaml`, `registry/sources/gdelt_doc2.yaml` (`lineage_family: gdelt`) |
 | Atlas concepts (58) | `registry/atlas/catalog/media_signals.yaml` (domain `media_signals`) |
 | Budgets | `registry/atlas/budget_requests/v6signals.yaml` → `gdelt.events2` 1600/day, `gdelt.doc2` 300/day (merged in budgets-1.3.26 / 1.3.28; file now budgets-1.3.29, digest re-pinned in `src/reva/autonomy/policy.py`) |
@@ -216,7 +216,7 @@ Probes of 2026-10-17, from the shared egress, with a generic UA and no personal 
 
 ```bash
 df -h /                                                     # must show >= 5 GB free
-flock /tmp/reva-devdb.lock uv run reva seed                  # registers atlas.gdelt_events / atlas.gdelt_doc 1.0.0
+flock /tmp/reva-devdb.lock uv run reva seed                  # registers atlas.gdelt_events / atlas.gdelt_doc 1.0.1
 # events: 730-day backfill (~730 requests, ~80 MB raw); later daily runs fetch ~1 new update file
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gdelt_events
 #   options: --option days=1095 --option end=2026-10-16 --option slot=120000 (--option refetch=1 to re-download)
