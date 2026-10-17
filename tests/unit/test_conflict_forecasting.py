@@ -201,3 +201,30 @@ def test_issue_build_freezes_registry_compatible_records() -> None:
         if q["family"] == "ucdp.sb_onset25_cy":
             assert float(q["last_observed"]["value"]) < 25
         assert "not a prediction of any specific attack" in q["risk_note"]
+
+
+def test_country_month_benchmark_reads_absent_months_as_zero_and_scores_views() -> None:
+    from reva.evaluation.conflict import monthly as MO
+
+    rows = [
+        {"indicator": MO.INDICATOR, "provider_geo": "gw:625", "period_start": date(y, m, 1), "value": "40"}
+        for y in range(2015, 2026)
+        for m in range(1, 13)
+        if m % 2 == 0
+    ]
+    frame = pl.DataFrame(rows)
+    universe = {y: {"gw:625", "gw:385"} for y in range(2010, 2027)}
+    p = MO.build_monthly(frame, universe, (MO.midx(2010, 1), MO.midx(2025, 12)))
+    assert p.y("gw:385", MO.midx(2020, 5)) == 0.0  # in the universe, no GED event: 0 under GED's definition
+    assert p.y("gw:625", MO.midx(2020, 4)) == 40.0
+    assert p.y("gw:625", MO.midx(2026, 1)) is None  # outside the vintage's coverage
+    vr = ViewsRun("fatalities002_2024_12_t01", "2025-01-27", (2024, 12), "main_mean")
+    for m in range(1, 13):
+        for g in ("gw:625", "gw:385"):
+            vr.monthly[(g, 2025, m)] = 20.0 if g == "gw:625" else 0.1
+            vr.prob[(g, 2025, m)] = 0.5 if g == "gw:625" else 0.0
+    res = MO.evaluate_runs({vr.run: vr}, p, p, label="t")
+    v = next(s for s in res["summary"] if s["model"] == "forecast.reference_views" and s["steps"] == "1-3")
+    assert v["n"] == 6 and v["event_rate"] == pytest.approx(1 / 6)
+    assert res["runs"][0]["n"] == 24
+    assert any(t["metric"] == "brier" for t in res["tests"].values())

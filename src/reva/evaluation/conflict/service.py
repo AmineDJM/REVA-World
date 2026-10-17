@@ -28,6 +28,7 @@ from sqlalchemy import Engine, text
 
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE
 from reva.evaluation.conflict import families as F
+from reva.evaluation.conflict import monthly as MO
 from reva.evaluation.conflict.backtest import LABEL as BACKTEST_LABEL
 from reva.evaluation.conflict.backtest import build_examples, run_backtest
 from reva.evaluation.conflict.models import (
@@ -114,6 +115,7 @@ def load_inputs(engine: Engine, store: Any, *, origin: str, with_views: bool = T
         cutoff: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
         pins = {dk: latest_version(conn, dk, origin=origin, cutoff=cutoff) for dk in tables_used()}
         vpin = latest_version(conn, VIEWS_TABLE, origin=origin, cutoff=cutoff) if with_views else None
+        gpins = {k: latest_version(conn, k, origin=origin, cutoff=cutoff) for k in (MO.FINAL_TABLE, MO.CAND_TABLE)}
         brd = borders(conn, origin)
     if pins[OUTCOME[0]] is None:
         raise MissingInput("the outcome table is not registered", dataset_key=OUTCOME[0])
@@ -129,8 +131,43 @@ def load_inputs(engine: Engine, store: Any, *, origin: str, with_views: bool = T
         "views_pin": vpin,
         "panel": panel,
         "views_runs": runs,
+        "ged_pins": {k: v for k, v in gpins.items() if v},
+        "ged_frames": {k: read_filtered(store, v["artifact_sha256"], [MO.INDICATOR]) for k, v in gpins.items() if v},
         "n_borders": len(brd),
     }
+
+
+def country_month_benchmark(inp: Mapping[str, Any]) -> dict[str, Any]:
+    """VIEWS vs the country-month baselines on GED final (2023-2025 targets) and on Candidate 2026 (real-time
+    vintage, preliminary outcomes); see :mod:`reva.evaluation.conflict.monthly`."""
+    frames, runs, panel = inp["ged_frames"], inp["views_runs"], inp["panel"]
+    if MO.FINAL_TABLE not in frames or not runs:
+        return {"status": "unavailable", "reason": "GED country-month table or VIEWS forecasts not registered"}
+    universe = {y: {g for g, d in panel.deaths.items() if y in d} for y in range(panel.first_year, panel.last_year + 1)}
+    cov = MO.coverage_of(frames[MO.FINAL_TABLE])
+    assert cov is not None
+    final = MO.build_monthly(frames[MO.FINAL_TABLE], universe, (MO.midx(1989, 1), cov[1]))
+    out: dict[str, Any] = {
+        "final": MO.evaluate_runs(
+            runs,
+            final,
+            final,
+            label="GED 26.1 final (revised vintage) outcomes; baselines read GED final up to each run's last input "
+            "month (information VIEWS did not have at release)",
+        )
+    }
+    if MO.CAND_TABLE in frames:
+        ccov = MO.coverage_of(frames[MO.CAND_TABLE])
+        if ccov is not None:
+            cu = {**universe, **{y: universe[panel.last_year] for y in range(panel.last_year + 1, ccov[1] // 12 + 1)}}
+            cand = MO.build_monthly(frames[MO.CAND_TABLE], cu, (cov[1] + 1, ccov[1]))
+            out["candidate"] = MO.evaluate_runs(
+                runs,
+                cand,
+                final,
+                label="UCDP Candidate 2026 (real-time vintage, PRELIMINARY outcomes, may be revised by GED 27.1)",
+            )
+    return out
 
 
 def _model_ids(conn: Any) -> dict[str, str]:
@@ -149,9 +186,12 @@ def record_backtest(
     _check_origin(origin)
     inp = load_inputs(engine, store, origin=origin)
     res = run_backtest(inp["panel"], views_runs=inp["views_runs"])
+    res["country_month"] = country_month_benchmark(inp)
     used = {k: _short_pin(v) for k, v in inp["pins"].items()}
     if inp["views_pin"] is not None:
         used[VIEWS_TABLE] = _short_pin(inp["views_pin"])
+    for k, v in inp["ged_pins"].items():
+        used[k] = _short_pin(v)
     manifest = {
         "schema": "reva-forecast-registry-backtest/1",
         "conflict": True,
