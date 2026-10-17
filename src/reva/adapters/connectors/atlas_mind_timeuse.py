@@ -114,7 +114,9 @@ def parse(bodies: dict[str, bytes], shas: dict[str, str]) -> tuple[Any, dict[str
         doc = _doc(bodies[key], code)
         total, pages = doc.get("totalElements"), doc.get("totalPages")
         if pages != 1 or total != len(doc["data"]):
-            rep["left_out"].append({"series": code, "reason": f"{total} records in {pages} pages, {len(doc['data'])} read"})
+            rep["left_out"].append(
+                {"series": code, "reason": f"{total} records in {pages} pages, {len(doc['data'])} read"}
+            )
             continue
         start = len(buf)
         seen: set[tuple[str, str, int]] = set()
@@ -197,7 +199,7 @@ def kg_records(waves: list[dict[str, Any]]) -> tuple[list[Any], list[Any], dict[
                 descriptions={"en": f"time-use survey round, {w['geo_label']} {w['year']} (as named by UNSD)"},
             )
         )
-        common = {"source_key": KG_SOURCE_KEY, "references": (ref,), "raw_sha256": w["raw_sha256"]}
+        common: dict[str, Any] = {"source_key": KG_SOURCE_KEY, "references": (ref,), "raw_sha256": w["raw_sha256"]}
         sts.append(KgStatement(subject_qid=w["qid"], property_pid="unsd_tus:source_text",
                                value={"type": "string", "value": w["source"][:2000]}, **common))  # fmt: skip
         sts.append(KgStatement(subject_qid=w["qid"], property_pid="unsd_tus:reference_year",
@@ -253,7 +255,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         + "; every dimension folded into the indicator; period = survey reference year; provider source text "
         "(national time-use survey) in flags.provider_source. Left out: "
         + (json.dumps(rep["left_out"]) if rep["left_out"] else "none")
-        + "." + ("" if live else f" Fixture subset M49 {','.join(FIXTURE_AREAS)}.")
+        + "."
+        + ("" if live else f" Fixture subset M49 {','.join(FIXTURE_AREAS)}.")
     )
     reg = run.register(
         dataset=DATASET, frame=frame, raw_sha256s=sorted(set(got.shas.values())), coverage_note=note,

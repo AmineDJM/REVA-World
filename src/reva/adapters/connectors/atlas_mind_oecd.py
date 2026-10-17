@@ -155,9 +155,7 @@ def build(flow: Flow, files: list[tuple[str, bytes, str]]) -> tuple[pl.DataFrame
     frame = frame.with_columns(
         pl.col("indicator").replace_strict(hints, default=None, return_dtype=pl.String).alias("concept_id"),
         pl.struct(flags=pl.col("flags"), name=names)
-        .map_elements(
-            lambda s: fc.canon({**json.loads(s["flags"]), "measure_name": s["name"]}), return_dtype=pl.String
-        )
+        .map_elements(lambda s: fc.canon({**json.loads(s["flags"]), "measure_name": s["name"]}), return_dtype=pl.String)
         .alias("flags"),
     )
     return frame, rep, note
@@ -187,7 +185,7 @@ def atlas_source() -> AtlasSourceSpec:
         code_digest=fc.module_digest(of, sys.modules[__name__]),
         field_mappings={
             "geo_scheme": of.GEO_SCHEME,
-            "measures": {f.dataset: list((CWB_MEASURES if f is FLOW_CURRENT else FWB_MEASURES)) for f in FLOWS},
+            "measures": {f.dataset: list(CWB_MEASURES if f is FLOW_CURRENT else FWB_MEASURES) for f in FLOWS},
         },
         notes="Two SDMX-CSV (with labels) requests (~20 MB in all).",
     )

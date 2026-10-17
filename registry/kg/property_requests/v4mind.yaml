@@ -1,0 +1,45 @@
+# Property requests from V4MIND (psychology, behaviour, sociology). WDHARVEST merges them into
+# registry/kg/properties.yaml (`python -m reva.kg.harvest merge-property-requests` checks every id, datatype and the
+# en/fr labels against the property entity itself; the labels below are the expected ones).
+# Ids written from the agent's knowledge on 2026-10-17 while Wikidata answered HTTP 429 to every request: the merge
+# check is what confirms them.
+- property: P672
+  why: MeSH tree code (selects psychological constructs F01/F02 and mental disorders F03 by identifier).
+  reva_predicate: mesh_tree_code
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: MeSH tree code
+  label_fr: code de l'arborescence MeSH
+- property: P486
+  why: MeSH descriptor ID (psychological constructs, mental disorders); identifier for cross-source links.
+  reva_predicate: mesh_descriptor_id
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: MeSH descriptor ID
+  label_fr: identifiant Medical Subject Headings
+- property: P1930
+  why: DSM-5 classification code (mental disorders); only the code Wikidata holds, the DSM text is proprietary.
+  reva_predicate: dsm5_code
+  inverse: null
+  kind: external_id
+  group: health
+  label_en: DSM-5 classification code
+  label_fr: code DSM-5
+- property: P952
+  why: ISCO-08 occupation class (occupation -> ISCO-08 code); links Wikidata occupations to ILOSTAT ISCO groups by code.
+  reva_predicate: isco08_code
+  inverse: null
+  kind: external_id
+  group: economy
+  label_en: ISCO-08 occupation class
+  label_fr: code CITP-08
+- property: P425
+  why: field of this occupation (occupation -> field), read as the context family.
+  reva_predicate: field_of_occupation
+  inverse: occupation_in_field
+  kind: entity
+  group: economy
+  label_en: field of this occupation
+  label_fr: domaine de cette profession

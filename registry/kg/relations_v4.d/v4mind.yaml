@@ -1,0 +1,25 @@
+version: 1
+agent: V4MIND
+note: >-
+  Psychology, behaviour, sociology (docs/dev/v4_v4mind.md). Dataset predicates registered by the atlas_mind_* loaders
+  (reva.kg.model.register_properties) plus two Wikidata properties used by the society/mind_* specs. No mapping is
+  causal: measured_by says a table holds values about the subject; survey/occupation/topic links are structure
+  or context. Correlations between the atlas series these entities point to are associations, never causes.
+mappings:
+  - {property: "unsd_tus:survey_in", family: located_in, subtype: time_use_survey_in, source: un.sdg,
+     subject_kinds: [survey_wave], object_kinds: [country]}
+  - {property: "unsd_tus:data_source_for", family: context, subtype: data_source_for, source: un.sdg,
+     subject_kinds: [survey_wave], object_kinds: [atlas_table],
+     note: "the survey round is named by UNSD as the source of cells of this atlas table"}
+  - {property: "isco:part_of", family: part_of, subtype: isco_group_part_of, source: ilostat,
+     subject_kinds: [occupation], object_kinds: [occupation],
+     note: "ISCO-08 coding rule: the first digit of a group code is its major group"}
+  - {property: "ilostat:measured_by", family: measured_by, subtype: measured_by_atlas_table, source: ilostat,
+     subject_kinds: [occupation], object_kinds: [atlas_table],
+     note: "qualifier classif1 names the ILOSTAT classification code of the cells about this occupation"}
+  - {property: "openalex:part_of", family: part_of, subtype: openalex_taxonomy, source: openalex,
+     subject_kinds: [research_topic, research_subfield, research_field], object_kinds: [research_subfield, research_field, research_domain]}
+  - {property: P2579, family: context, subtype: studied_by, source: wikidata,
+     note: "studied by (phenomenon -> discipline), e.g. a psychological construct -> psychology"}
+  - {property: P425, family: context, subtype: field_of_occupation, source: wikidata}
+  - {property: P1269, family: context, subtype: facet_of, source: wikidata}

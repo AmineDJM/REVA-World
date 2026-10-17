@@ -1,0 +1,25 @@
+id: society.mind_mental_disorders
+domain: society
+owner: V4MIND
+description: >-
+  Mental disorders as Wikidata items that carry a MeSH tree code in category F03 "Mental Disorders" (P672) or a
+  DSM-5 classification code (P1930). Only identifiers and names Wikidata holds are kept (the DSM text itself is
+  proprietary and never fetched). Disease-layer links (MONDO / Disease Ontology / ICD) are V4HEALTH's; same-as
+  links between these QIDs and MONDO ids go through V4LINK via the identifiers Wikidata publishes (P5270 MONDO ID).
+purpose: seed_entities
+entity_kind: mental_disorder
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      ?item p:P672 ?st . ?st ps:P672 ?tree ; wikibase:rank ?r .
+      FILTER(?r != wikibase:DeprecatedRank)
+      FILTER(STRSTARTS(?tree, "F03"))
+    }
+    UNION
+    { ?item p:P1930 ?d . ?d wikibase:rank ?dr . FILTER(?dr != wikibase:DeprecatedRank) }
+  }
+max_rows: 6000
+expand_hops: 1
+notes: >-
+  Symptoms (P780) and genetic association (P2293) map to the associated_with family (never causation); causal
+  properties (P828/P1542) on these items go to the causal loader only. Not harvested yet (Wikidata 429 on 2026-10-17).

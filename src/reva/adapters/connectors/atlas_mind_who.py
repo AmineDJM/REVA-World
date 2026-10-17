@@ -170,7 +170,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "WHO GHO mental health: Mental Health Atlas country questionnaire items (MH_*; policy/plan/legislation answers "
         "kept as text, workforce/facilities/beds per 100,000), depression prevalence estimate (GDO_q35), alcohol and "
         "drug use disorder prevalence by sex (RSUD_1/RSUD_2); country rows, "
-        "parsed with A-HEALTHEDU's GHO rules. Empty indicators: " + (", ".join(rep["empty_indicators"]) or "none") + "."
+        "parsed with A-HEALTHEDU's GHO rules. Empty indicators: "
+        + (", ".join(rep["empty_indicators"]) or "none")
+        + "."
         + ("" if live else f" Fixture subset {','.join(FIXTURE_COUNTRIES)}.")
     )
     data_shas = sorted({got.shas[k] for k in got.shas if k.startswith("gho.data:")})

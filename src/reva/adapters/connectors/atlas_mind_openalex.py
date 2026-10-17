@@ -43,7 +43,7 @@ from typing import Any
 
 from reva.adapters.connectors import atlas_mind_common as mc
 from reva.adapters.connectors import atlas_openalex as oa
-from reva.adapters.connectors.atlas_sci_common import atlas_frame, code_digest, trim_registration
+from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_digest, trim_registration
 from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
@@ -127,7 +127,7 @@ def _tail(url: str | None, marker: str) -> str:
     return rest
 
 
-def entity_key(entity: str, url: str) -> str:
+def entity_key(entity: str, url: str | None) -> str:
     if entity == "topics":
         return f"openalex:{_tail(url, '')}"
     sid = _tail(url, entity)
@@ -195,7 +195,7 @@ def taxonomy_kg(tax: Taxonomy) -> tuple[list[Any], list[Any], dict[str, Any]]:
         for r, sha, line in tax.records[entity]:
             k = entity_key(entity, r["id"])
             ref = {"raw_sha256": sha, "selector": {"entity": entity, "line": line, "id": r["id"]}}
-            common = {"source_key": TAX_SOURCE_KEY, "references": (ref,), "raw_sha256": sha}
+            common: dict[str, Any] = {"source_key": TAX_SOURCE_KEY, "references": (ref,), "raw_sha256": sha}
             desc = (r.get("description") or "").strip()
             ents.append(KgEntity(qid=k, kind=KINDS[entity], labels={"en": str(r.get("display_name"))[:480]},
                                  descriptions={"en": desc[:480]} if desc else {}))  # fmt: skip
@@ -235,7 +235,7 @@ def taxonomy_kg(tax: Taxonomy) -> tuple[list[Any], list[Any], dict[str, Any]]:
 
 
 TAX_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]] = {
-    "openalex:part_of": ("entity", "openalex_part_of", "part of (OpenAlex taxonomy)", "fait partie de (taxonomie OpenAlex)",
+    "openalex:part_of": ("item", "openalex_part_of", "part of (OpenAlex taxonomy)", "fait partie de (taxonomie OpenAlex)",
                          "openalex_has_part", "has part (OpenAlex taxonomy)"),
     "openalex:wikidata_id": ("external_id", "wikidata_id_per_openalex", "Wikidata ID (as OpenAlex gives it)",
                              "identifiant Wikidata (selon OpenAlex)", None, None),
@@ -351,7 +351,7 @@ def mind_rows(q: SubfieldQuery, pages: Sequence[Any], *, retrieved_at: datetime)
     for r in rows:
         f = json.loads(r["flags"])
         f["subfield"] = SUBFIELDS.get(q.dim_id or "", str(q.dim_id))
-        r["flags"] = oa.canon(f)
+        r["flags"] = canon(f)
         r["concept_id"] = None
     return rows
 
@@ -401,7 +401,7 @@ async def _ingest_mind(run: Any) -> dict[str, Any]:
             if status in (429, 401, 403):
                 stopped = f"provider refused (HTTP {status}); no further requests this run"
             continue
-        except Exception as e:  # noqa: BLE001 - A-SCI's _StopRun (request cap) and parse drift end the plan
+        except Exception as e:
             stopped = f"{type(e).__name__}: {str(e)[:200]}"
             incomplete.append({"query": q.key, "status": "not_attempted", "reason": stopped})
             continue

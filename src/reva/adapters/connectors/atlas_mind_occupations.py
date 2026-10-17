@@ -121,7 +121,7 @@ def kg_records(
     from reva.kg.model import KgEntity, KgStatement
 
     ref = {"raw_sha256": dic_sha, "selector": {"item": CLASSIF1_KEY, "dictionary": "classif1"}}
-    common = {"source_key": KG_SOURCE_KEY, "references": (ref,), "raw_sha256": dic_sha}
+    common: dict[str, Any] = {"source_key": KG_SOURCE_KEY, "references": (ref,), "raw_sha256": dic_sha}
     ents: list[Any] = []
     sts: list[Any] = []
     for ds in sorted(tables):
@@ -134,7 +134,9 @@ def kg_records(
                 qid=qid,
                 kind="occupation",
                 labels={"en": g["title"]},
-                descriptions={"en": f"ISCO-08 {g['level'].replace('_', '-')} group {g['isco']} (ILOSTAT: {g['label']})"},
+                descriptions={
+                    "en": f"ISCO-08 {g['level'].replace('_', '-')} group {g['isco']} (ILOSTAT: {g['label']})"
+                },
             )
         )
         sts.append(KgStatement(subject_qid=qid, property_pid="isco:code", value={"type": "external_id", "value": g["isco"]},

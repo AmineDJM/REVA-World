@@ -27,22 +27,22 @@ from typing import Any
 #: pid -> (value kind, reva predicate, label en, label fr, inverse name, inverse label en)
 PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]] = {
     "unsd_tus:survey_in": (
-        "entity", "time_use_survey_in", "time-use survey conducted in", "enquête emploi du temps menée dans",
+        "item", "time_use_survey_in", "time-use survey conducted in", "enquête emploi du temps menée dans",
         "has_time_use_survey", "has time-use survey",
     ),
     "unsd_tus:reference_year": ("time", "reference_year", "reference year", "année de référence", None, None),
     "unsd_tus:source_text": ("string", "provider_source_text", "source (provider text)", "source (texte du fournisseur)", None, None),
     "unsd_tus:data_source_for": (
-        "entity", "data_source_for", "data source for (atlas table)", "source de données pour (table de l'atlas)",
+        "item", "data_source_for", "data source for (atlas table)", "source de données pour (table de l'atlas)",
         "has_data_source", "has data source",
     ),
     "isco:part_of": (
-        "entity", "isco_group_part_of", "ISCO-08 group part of", "groupe CITP-08 inclus dans",
+        "item", "isco_group_part_of", "ISCO-08 group part of", "groupe CITP-08 inclus dans",
         "isco_group_has_part", "ISCO-08 group has part",
     ),
     "isco:code": ("external_id", "isco08_code", "ISCO-08 code", "code CITP-08", None, None),
     "ilostat:measured_by": (
-        "entity", "measured_by_atlas_table", "measured by (atlas table)", "mesuré par (table de l'atlas)",
+        "item", "measured_by_atlas_table", "measured by (atlas table)", "mesuré par (table de l'atlas)",
         "measures", "measures",
     ),
 }  # fmt: skip

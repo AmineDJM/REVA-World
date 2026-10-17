@@ -1,0 +1,23 @@
+id: society.mind_psychological_phenomena
+domain: society
+owner: V4MIND
+description: >-
+  Psychological constructs as Wikidata items that carry a MeSH tree code (P672) in MeSH category F01 "Behavior and
+  Behavior Mechanisms" or F02 "Psychological Phenomena" (e.g. emotions, motivation, cognition, personality,
+  attitudes, social behaviour). Selection by an identifier the item publishes (the MeSH tree number), never by
+  label. Snapshots keep classification (instance/subclass of, part of, facet of), "studied by" and the external
+  identifiers that are allow-listed (MeSH descriptor, ICD, DSM once merged).
+purpose: seed_entities
+entity_kind: psych_construct
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item p:P672 ?st . ?st ps:P672 ?tree ; wikibase:rank ?r .
+    FILTER(?r != wikibase:DeprecatedRank)
+    FILTER(STRSTARTS(?tree, "F01") || STRSTARTS(?tree, "F02"))
+  }
+max_rows: 6000
+expand_hops: 1
+notes: >-
+  P672 (MeSH tree code) is used only in the WHERE clause; its values are stored once the property request in
+  registry/kg/property_requests/v4mind.yaml is merged. Not harvested yet (Wikidata API/WDQS answered 429 on
+  2026-10-17): run with `python -m reva.kg.harvest run registry/kg/queries/society/mind_psychological_phenomena.yaml`.
