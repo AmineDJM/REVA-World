@@ -81,13 +81,34 @@ def test_tampering_is_caught(doc: dict[str, Any], mutate: Any, expect: str) -> N
     assert any(expect in p for p in problems), problems
 
 
-def test_load_refuses_an_invalid_file(tmp_path: Path, doc: dict[str, Any]) -> None:
+def test_load_quarantines_rows_whose_source_no_longer_supports_them(tmp_path: Path, doc: dict[str, Any]) -> None:
     d = copy.deepcopy(doc)
-    _row(d, lambda r: r["verdict"] == "ne_bat_pas" and "pointer" in r["source"])["verdict"] = "bat"
+    bad = _row(d, lambda r: r["verdict"] == "ne_bat_pas" and "pointer" in r["source"] and r["benchmark_kind"]
+               in C.HEADLINE_BENCHMARKS)  # fmt: skip
+    bad["verdict"] = "bat"
     (tmp_path / "registry/scoreboard").mkdir(parents=True)
     (tmp_path / REG.PATH).write_text(yaml.safe_dump(d), encoding="utf-8")
+    for f in {s["file"] for s in d["sources"]} | {r["source"]["file"] for r in d["rows"]}:
+        (tmp_path / f).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / f).write_bytes((REPO / f).read_bytes())
+    for r in d["rows"]:
+        for k in ("report",):
+            if r.get(k):
+                (tmp_path / r[k]).parent.mkdir(parents=True, exist_ok=True)
+                (tmp_path / r[k]).write_bytes((REPO / r[k]).read_bytes())
+        for q in (r.get("verdict_quote"), (r.get("resolution") or {}).get("quote"), r.get("protocol")):
+            if q and q.get("file"):
+                (tmp_path / q["file"]).parent.mkdir(parents=True, exist_ok=True)
+                (tmp_path / q["file"]).write_bytes((REPO / q["file"]).read_bytes())
+    for q in [n["quote"] for n in d["no_track"]] + [e["quote"] for e in d["events"]]:
+        (tmp_path / q["file"]).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / q["file"]).write_bytes((REPO / q["file"]).read_bytes())
     with pytest.raises(REG.ScoreboardInvalid):
-        REG._load_cached(str(tmp_path / REG.PATH), 0.0)
+        REG.load(tmp_path, strict=True)
+    loaded = REG.load(tmp_path)
+    q = next(r for r in loaded["rows"] if r["id"] == bad["id"])
+    assert q["quarantined"] and q["problems"]
+    assert REG.headline(loaded["rows"])["bat"] == REG.headline(doc["rows"])["bat"]
 
 
 def test_holm_adjust_matches_the_step_down_rule() -> None:

@@ -156,3 +156,22 @@ def test_point_only_display_keeps_the_sealed_interval() -> None:
     assert "quantiles" in f  # the sealed record itself is unchanged
     other = {"model": "x", "quantiles": {"0.1": 1.0}}
     assert SE.mask_for_display(other) == other
+
+
+def test_issue_job_runs_beat_macro_before_the_ensemble(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from reva.evaluation.beat_macro import seal as SE
+    from reva.evaluation.pred_models import issue as PI
+    from reva.evaluation.registry import ensemble as EN
+    from reva.evaluation.registry import service as RS
+
+    calls: list[str] = []
+    monkeypatch.setattr(RS, "issue_cycle", lambda *a, **k: calls.append("cycle") or {})
+    monkeypatch.setattr(PI, "issue_supplements", lambda *a, **k: calls.append("pred_models") or {})
+    monkeypatch.setattr(SE, "issue_monthly", lambda *a, **k: calls.append("beat_macro") or {})
+    monkeypatch.setattr(EN, "issue_ensemble", lambda *a, **k: calls.append("ensemble") or {})
+    ctx = SimpleNamespace(worker_engine=None, store=None)
+    res = RS.handle_forecast_registry({"action": "issue", "origin": "live"}, ctx)
+    assert calls == ["cycle", "pred_models", "beat_macro", "ensemble"]
+    assert set(res) >= {"pred_models", "beat_macro", "ensemble"}

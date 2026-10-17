@@ -158,7 +158,7 @@ function ItemCard(p: CardProps) {
             <span className="muted">non surveillé</span>
           )}
           {p.editable && item.kind !== 'note' && item.kind !== 'decision' && (
-            <button type="button" className="v8b-btn v8b-btn-ghost" onClick={() => p.onWatch(item.uid)}>
+            <button type="button" className="v8-btn v8-btn-ghost v8-btn-sm" onClick={() => p.onWatch(item.uid)}>
               Surveiller…
             </button>
           )}
@@ -478,24 +478,24 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
         <div className="v8b-actions" role="toolbar" aria-label="Actions du tableau">
           {editable && (
             <>
-              <button type="button" className={`v8b-btn${panel === 'add' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'add' ? 'none' : 'add')} aria-expanded={panel === 'add'}>
+              <button type="button" className={`v8-btn${panel === 'add' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'add' ? 'none' : 'add')} aria-expanded={panel === 'add'}>
                 Ajouter <kbd>a</kbd>
               </button>
-              <button type="button" className="v8b-btn" onClick={addNote}>
+              <button type="button" className="v8-btn" onClick={addNote}>
                 Note <kbd>n</kbd>
               </button>
-              <button type="button" className={`v8b-btn${panel === 'rules' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'rules' ? 'none' : 'rules')} aria-expanded={panel === 'rules'}>
+              <button type="button" className={`v8-btn${panel === 'rules' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'rules' ? 'none' : 'rules')} aria-expanded={panel === 'rules'}>
                 Veille <kbd>r</kbd>
               </button>
             </>
           )}
-          <button type="button" className={`v8b-btn${panel === 'share' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'share' ? 'none' : 'share')} aria-expanded={panel === 'share'}>
+          <button type="button" className={`v8-btn${panel === 'share' ? ' is-on' : ''}`} onClick={() => setPanel(panel === 'share' ? 'none' : 'share')} aria-expanded={panel === 'share'}>
             Partager <kbd>s</kbd>
           </button>
           {origin === 'shared' && (
             <button
               type="button"
-              className="v8b-btn v8b-btn-primary"
+              className="v8-btn v8-btn-primary"
               onClick={async () => {
                 const r = await importBoard(board, 'server');
                 navigate(v8Links.board(r.board.id));
@@ -507,7 +507,7 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
           {origin === 'local' && serverMode === 'server' && (
             <button
               type="button"
-              className="v8b-btn"
+              className="v8-btn"
               title="Copier ce tableau sur le serveur (puis le retirer de ce navigateur)"
               onClick={async () => {
                 try {
@@ -528,7 +528,7 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
           {editable && (
             <button
               type="button"
-              className="v8b-btn v8b-btn-danger"
+              className="v8-btn v8b-danger"
               onClick={async () => {
                 if (!window.confirm(`Supprimer le tableau « ${board.title} » ? (les éléments épinglés ne sont que des références ; aucune donnée n’est supprimée)`)) return;
                 await deleteBoard(board.id, origin as Origin);
@@ -551,7 +551,7 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
           {conflict && (
             <button
               type="button"
-              className="v8b-btn"
+              className="v8-btn"
               onClick={() => {
                 latest.current = conflict;
                 version.current = conflict.version ?? null;
@@ -574,7 +574,7 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
       {undo && (
         <div className="v8b-banner v8b-banner-undo" role="status">
           « {undo.label} » retiré.{' '}
-          <button type="button" className="v8b-btn" onClick={doUndo}>
+          <button type="button" className="v8-btn" onClick={doUndo}>
             Annuler <kbd>Ctrl</kbd>+<kbd>Z</kbd>
           </button>
         </div>
@@ -591,10 +591,10 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
             <label className="sr-only" htmlFor="v8b-share">
               Lien de partage
             </label>
-            <input id="v8b-share" className="v8b-input v8b-share-in" readOnly value={share} onFocus={(e) => e.currentTarget.select()} />
+            <input id="v8b-share" className="v8-input v8b-share-in" readOnly value={share} onFocus={(e) => e.currentTarget.select()} />
             <button
               type="button"
-              className="v8b-btn v8b-btn-primary"
+              className="v8-btn v8-btn-primary"
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(share);
@@ -652,10 +652,10 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
           </p>
           {editable && (
             <div className="v8b-row">
-              <button type="button" className="v8b-btn v8b-btn-primary" onClick={() => setPanel('add')}>
+              <button type="button" className="v8-btn v8-btn-primary" onClick={() => setPanel('add')}>
                 Ajouter un élément <kbd>a</kbd>
               </button>
-              <button type="button" className="v8b-btn" onClick={addNote}>
+              <button type="button" className="v8-btn" onClick={addNote}>
                 Écrire une note <kbd>n</kbd>
               </button>
             </div>

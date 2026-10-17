@@ -1,0 +1,14 @@
+# Budget request from agent BEAT-NOWCAST (V7, 2026-10-17). Merged by `uv run python -m reva.atlas.budget_merge --write`.
+agent: BEAT-NOWCAST
+requests:
+  - source_key: fed.nowcasts
+    # atlas.fed_nowcasts: GDPNow workbook (~11 MB), 2 NY Fed workbooks (~0.3 MB), 2 Cleveland JSON (~12.6 MB),
+    # 5 RTDSM monthly-vintage workbooks (~9.5 MB), 1 first/second/third file (16 kB) = 10 requests, ~34 MB per run.
+    daily_requests: 30
+    expected_bytes_per_day: 80000000
+    reason: "10 requests (~34 MB) per full run, one retry; weekly refresh"
+daily_totals_increase:
+  http_requests_total: "+30"
+  http_bytes_total: "+80_000_000"
+notes: >-
+  Raw archive of one full run ~34 MB (xlsx already deflated; JSON compresses ~10x).

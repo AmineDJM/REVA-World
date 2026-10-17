@@ -86,8 +86,8 @@ function BoardsIndex() {
           <label htmlFor="v8b-new" className="sr-only">
             Titre du nouveau tableau
           </label>
-          <input id="v8b-new" ref={newRef} className="v8b-input" placeholder="Nouveau tableau…" value={title} maxLength={200} onChange={(e) => setTitle(e.target.value)} />
-          <button type="submit" className="v8b-btn v8b-btn-primary">
+          <input id="v8b-new" ref={newRef} className="v8-input" placeholder="Nouveau tableau…" value={title} maxLength={200} onChange={(e) => setTitle(e.target.value)} />
+          <button type="submit" className="v8-btn v8-btn-primary">
             Créer <kbd>n</kbd>
           </button>
         </form>
@@ -184,5 +184,5 @@ function OneBoard({ id }: { id: string }) {
 export default function TableauxPage() {
   const { pathname } = useLocation();
   const id = boardIdFrom(pathname);
-  return <div className="v8b-page">{id === null ? <BoardsIndex /> : id === SHARE_ID ? <SharedBoard /> : <OneBoard id={id} />}</div>;
+  return <div className="v8-page v8b-page">{id === null ? <BoardsIndex /> : id === SHARE_ID ? <SharedBoard /> : <OneBoard id={id} />}</div>;
 }

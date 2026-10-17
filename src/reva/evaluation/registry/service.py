@@ -1138,14 +1138,15 @@ def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any
             from reva.evaluation.pred_models.issue import issue_supplements
 
             res["pred_models"] = issue_supplements(ctx.worker_engine, ctx.store, origin=origin)
-        # V7 BEAT-ENSEMBLE: the REVA ensemble on every recently sealed open question, after all its components
-        from reva.evaluation.registry.ensemble import issue_ensemble
-
-        res["ensemble"] = issue_ensemble(ctx.worker_engine, ctx.store, origin=origin)
         if not fams:  # V7 BEAT-MACRO: monthly batch of the holdout-confirmed combination (idempotent per month)
             from reva.evaluation.beat_macro.seal import issue_monthly
 
             res["beat_macro"] = issue_monthly(ctx.worker_engine, ctx.store, origin=origin)
+        # V7 BEAT-ENSEMBLE: the REVA ensemble on every recently sealed open question, after all its components -
+        # must stay the LAST step (one ensemble forecast per question and version)
+        from reva.evaluation.registry.ensemble import issue_ensemble
+
+        res["ensemble"] = issue_ensemble(ctx.worker_engine, ctx.store, origin=origin)
         return res
     if action == "resolve":
         return resolve_due(ctx.worker_engine, ctx.store, origin=origin)

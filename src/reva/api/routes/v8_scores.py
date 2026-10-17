@@ -107,6 +107,8 @@ class ScoresPage(s.OpenModel):
     vocab: dict[str, Any]
     sources: list[dict[str, Any]]
     stale_sources: list[dict[str, Any]]
+    problems: list[str] = Field(description="Validation problems of rows against their sources (rows quarantined)")
+    quarantined: list[str]
     sealed_models: dict[str, int] | None
 
 

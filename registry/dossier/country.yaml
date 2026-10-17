@@ -1,0 +1,224 @@
+# Dossier pays (V8DOSSIER). Declarative brief template: sections -> blocks -> one data query each; every sentence
+# below is a template whose {placeholders} are filled with sourced values (footnoted) or stated missing.
+# {$subject} = the country (REVA country registry); {name} = a value of the block's query; {block.name} = a value
+# of another block (summary only). No number is written here; the generator never writes free text.
+kind: country
+label: Pays
+resolver: country
+id_pattern: "^[A-Za-z]{3}$"
+title: "{$subject}"
+subtitle: "Dossier pays · {$iso3}"
+honesty:
+  - "Chaque nombre est la valeur que publie sa source (note en bas de page : source, licence, période, référence de l'artefact) ; la meilleure source disponible suit l'ordre déclaré par l'atlas, sans mélange ni imputation."
+  - "Une valeur absente est écrite « manquant » avec sa raison : elle n'est jamais remplacée par zéro."
+  - "Les liens de cause sont des affirmations attribuées à leur source, avec leur niveau et leur note ; REVA n'établit aucune causalité."
+  - "Les prévisions du registre sont scellées avant l'issue et jugées seulement quand elles sont résolues ; tant qu'aucune n'est résolue, elles sont « non jugées »."
+not_covered:
+  - what: "Données infranationales (régions, départements)"
+    reason: "ce dossier s'arrête au niveau du pays ; les régions sont dans la vue Monde (ADM1)"
+  - what: "Opinion, actualité du jour, programmes politiques"
+    reason: "hors du périmètre des sources chargées (aucune source d'actualité ou de sondage n'alimente les dossiers)"
+  - what: "Commerce bilatéral détaillé par produit"
+    reason: "les flux BACI sont chargés au niveau HS2 et servis par la vue Liens, pas résumés ici"
+summary:
+  - id: pop
+    text: "{$subject} compte {eco.pop} habitants ({eco.pop_year})."
+  - id: gdp
+    text: "Son PIB atteint {eco.gdp} ({eco.gdp_year}), soit {eco.gdppc_ppp} par habitant en parité de pouvoir d'achat ({eco.gdppc_ppp_year})."
+  - id: macro
+    text: "Croissance du PIB réel : {eco.growth} ; inflation : {eco.cpi} ; chômage : {eco.unemp} (dernières années publiées : {eco.growth_year}, {eco.cpi_year}, {eco.unemp_year})."
+  - id: life
+    text: "Espérance de vie à la naissance : {soc.life} ({soc.life_year}) ; indice de développement humain : {soc.hdi} ({soc.hdi_year})."
+  - id: fc
+    text: "Le registre prospectif de REVA contient {fc.n_questions} questions scellées sur ce pays ({fc.n_families} familles, {fc.n_resolved} résolues)."
+sections:
+  - id: identite
+    title: Identité
+    lede: "Ce que les sources de référence déclarent sur l'État : capitale, dirigeants, monnaie, appartenances."
+    blocks:
+      - id: ident
+        query: kg.literals
+        params:
+          ids: $ids
+          properties: {capital: P36, head_state: P35, head_gov: P6, currency: P38, inception: P571}
+        sentences:
+          - id: capital
+            what: "Capitale"
+            text: "Capitale : {capital}."
+          - id: leaders
+            what: "Chef de l'État et chef du gouvernement"
+            text: "Chef de l'État : {head_state} ; chef du gouvernement : {head_gov} (déclarations courantes de la source)."
+          - id: currency
+            what: "Monnaie"
+            text: "Monnaie : {currency}."
+        empty: {what: "Fiche d'identité de l'État"}
+      - id: area
+        query: atlas.headline
+        params: {iso3: $iso3, concepts: {area: reva.geography.surface_area, density: reva.population.density}}
+        sentences:
+          - id: area
+            what: "Superficie et densité"
+            text: "Superficie : {area} ({area_year}) ; densité : {density} ({density_year})."
+        empty: {what: "Superficie"}
+      - id: members
+        query: kg.edges
+        params: {ids: $ids, properties: [P463], limit: 14, current: true}
+        list:
+          title: "Membre de (déclarations courantes)"
+          item: "{name}"
+        empty: {what: "Appartenances à des organisations"}
+      - id: borders
+        query: kg.edges
+        params: {ids: $ids, properties: [P47], limit: 20}
+        list:
+          title: "Frontières terrestres partagées avec"
+          item: "{name}"
+        empty: {what: "Pays frontaliers"}
+  - id: economie
+    title: Économie
+    lede: "Les grands agrégats, chacun tel que le publie la première source de l'ordre déclaré."
+    blocks:
+      - id: eco
+        query: atlas.headline
+        params:
+          iso3: $iso3
+          concepts:
+            pop: reva.population.total
+            gdp: reva.economy.gdp_usd
+            gdppc_ppp: reva.economy.gdp_per_capita_ppp
+            growth: reva.economy.gdp_real_growth
+            cpi: reva.economy.inflation_cpi
+            unemp: reva.labour.unemployment_rate
+            deficit: reva.finance.government_net_lending_gdp
+            ca: reva.trade.current_account_gdp
+            trade: reva.trade.merchandise_balance_imts
+          charts: [growth, cpi]
+        sentences:
+          - id: gdp
+            what: "PIB"
+            text: "Le PIB s'établit à {gdp} en {gdp_year} ; par habitant et en parité de pouvoir d'achat, il atteint {gdppc_ppp} ({gdppc_ppp_year})."
+          - id: growth
+            what: "Croissance et inflation"
+            text: "La croissance du PIB réel est de {growth} en {growth_year} et l'inflation des prix à la consommation de {cpi} en {cpi_year}."
+          - id: unemp
+            what: "Chômage"
+            text: "Le taux de chômage (estimation modélisée de l'OIT) est de {unemp} en {unemp_year}."
+          - id: public
+            what: "Finances publiques et compte courant"
+            text: "Solde des administrations publiques : {deficit} ({deficit_year}) ; solde courant : {ca} ({ca_year})."
+          - id: trade
+            what: "Commerce de marchandises"
+            text: "Solde du commerce de marchandises (douanes) : {trade} en {trade_year}."
+        chart: {type: line, title: "Croissance du PIB réel et inflation, séries annuelles publiées", note: "Valeurs observées ; aucune projection n'est tracée."}
+        empty: {what: "Agrégats économiques"}
+      - id: energy
+        query: atlas.country_series
+        params:
+          iso3: $iso3
+          since: 1990
+          concepts: {oil_cons: resources.energy.eia.petroleum_consumption, oil_prod: resources.energy.eia.crude_oil_production, elec: resources.energy.eia.electricity_generation}
+        sentences:
+          - id: oil
+            what: "Pétrole"
+            text: "Consommation de pétrole et autres liquides : {oil_cons} ({oil_cons_year}) ; production de brut : {oil_prod} ({oil_prod_year})."
+          - id: elec
+            what: "Électricité"
+            text: "Production d'électricité : {elec} ({elec_year})."
+        empty: {what: "Énergie"}
+  - id: societe
+    title: Société
+    blocks:
+      - id: soc
+        query: atlas.headline
+        params:
+          iso3: $iso3
+          concepts:
+            life: reva.health.life_expectancy
+            hdi: reva.society.hdi
+            gini: reva.society.gini_income
+            literacy: reva.education.literacy_rate_adult
+            internet: reva.science.internet_users
+            homicide: reva.law.homicide_rate
+            co2: reva.environment.co2_per_capita
+          charts: [life]
+        sentences:
+          - id: life
+            what: "Espérance de vie et développement humain"
+            text: "L'espérance de vie à la naissance est de {life} ({life_year}) ; l'indice de développement humain vaut {hdi} ({hdi_year})."
+          - id: gini
+            what: "Inégalités"
+            text: "Indice de Gini des revenus ou de la consommation : {gini} ({gini_year})."
+          - id: literacy
+            what: "Alphabétisation"
+            text: "Taux d'alphabétisation des adultes : {literacy} ({literacy_year})."
+          - id: internet
+            what: "Internet"
+            text: "Part de la population utilisant Internet : {internet} ({internet_year})."
+          - id: security
+            what: "Homicides"
+            text: "Taux d'homicides volontaires : {homicide} ({homicide_year})."
+          - id: co2
+            what: "Émissions de CO2"
+            text: "Émissions territoriales de CO2 : {co2} ({co2_year})."
+        chart: {type: line, title: "Espérance de vie à la naissance", note: "Série annuelle de la meilleure source disponible."}
+        empty: {what: "Indicateurs sociaux"}
+  - id: histoire
+    title: Repères datés
+    lede: "Déclarations datées du graphe de connaissances (les plus récentes d'abord) ; ce sont des faits rapportés, pas une chronologie complète."
+    blocks:
+      - id: timeline
+        query: kg.timeline
+        when: qid
+        params: {id: $qid, limit: 12, properties: [P35, P6, P36, P463, P38, P1344, P793]}
+        list:
+          item: "{when} — {property} : {what}"
+        empty: {what: "Repères datés"}
+  - id: causes
+    title: Causes et effets attribués
+    lede: "Affirmations causales et estimations d'effet publiées qui portent sur ce pays ; chacune reste attribuée à sa source."
+    blocks:
+      - id: claims
+        query: causal.claims
+        params: {ids: $ids, side: effects, limit: 6}
+        list:
+          title: "Ce pays comme cause, selon les sources"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Affirmations causales dont ce pays est la cause"}
+      - id: effects
+        query: effects.estimates
+        params: {country: $iso3, limit: 6}
+        list:
+          title: "Estimations d'effet publiées couvrant ce pays"
+          item: "{citation} : effet de « {cause} » sur « {effect} » — {measure} {point} (intervalle publié : {ci_low} à {ci_high})."
+        empty: {what: "Estimations d'effet couvrant ce pays"}
+  - id: previsions
+    title: Prévisions et jugement
+    lede: "Questions scellées du registre prospectif sur ce pays : prévision REVA, prochaine résolution. Une prévision n'est jugée qu'après sa résolution."
+    blocks:
+      - id: fc
+        query: forecasts.geo
+        params: {geo: $iso3, limit: 8}
+        sentences:
+          - id: count
+            text: "{n_questions} questions scellées sur ce pays, réparties en {n_families} familles ; {n_resolved} sont résolues."
+        table:
+          caption: "Prochaines questions par famille (prévision ponctuelle du modèle indiqué ; non jugée tant que non résolue)"
+          columns:
+            - {header: "Variable", cell: "{family}"}
+            - {header: "Questions", cell: "{n}", numeric: true}
+            - {header: "Prochaine période", cell: "{next_period}"}
+            - {header: "Prévision", cell: "{forecast}", numeric: true}
+            - {header: "Modèle", cell: "{model}"}
+            - {header: "Résolution attendue", cell: "{resolution}"}
+        empty: {what: "Prévisions scellées sur ce pays"}
+  - id: couverture
+    title: Ce que l'atlas ne renseigne pas pour ce pays
+    blocks:
+      - id: cov
+        query: atlas.coverage
+        params: {iso3: $iso3}
+        missing_list: true
+        sentences:
+          - id: cov
+            text: "{n_with} des {n_total} indicateurs phares de l'atlas ont une valeur pour ce pays ; les autres sont listés ci-dessous avec les sources consultées."
+        empty: {what: "Couverture des indicateurs phares"}

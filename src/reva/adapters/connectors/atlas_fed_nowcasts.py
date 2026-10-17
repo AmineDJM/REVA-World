@@ -13,10 +13,13 @@ Source ``atlas.fed_nowcasts`` (open downloads, no key, generic project User-Agen
   in the archives (``Advance Estimate From BEA``, ``Publication Date of Advance Estimate``) ->
   ``GDPNOW_BEA_ADVANCE|v=advance`` (``published_history``, rule ``bea_release_recorded_by_atlanta_fed``).
 * ``fed_nowcasts.nyfed`` (family ``nyfed_nowcast``) — New York Fed Staff Nowcast, workbook
-  ``new-york-fed-staff-nowcast_data_2002-present.xlsx`` sheet ``Forecasts By Quarter`` (``Forecast Date`` x quarter
-  columns). The workbook states: "Forecasts for GDP growth in quarters 2016Q1 to present were made in real-time"
-  and "Forecasts ... 2002Q1 through 2015Q4 are historical reconstructions based on real-time data": reconstructed
-  cells are loaded with ``reconstruction = true`` and **no availability** (never selected as of a date).
+  ``new-york-fed-staff-nowcast_data_2002-present.xlsx`` (first model, suspended after 2021-08-27) and
+  ``New-York-Fed-Staff-Nowcast_download_data.xlsx`` (the model reintroduced on 2023-09-08), sheet ``Forecasts By
+  Quarter`` (``Forecast Date`` x quarter columns). The first workbook states: "Forecasts for GDP growth in quarters
+  2016Q1 to present were made in real-time" and "Forecasts ... 2002Q1 through 2015Q4 are historical reconstructions
+  based on real-time data"; the second lists "Reintroducing the New York Fed Staff Nowcast, September 8, 2023" and
+  starts on 2022-12-02. Reconstructed / pre-relaunch cells are loaded with ``reconstruction = true`` and **no
+  availability** (never selected as of a date).
 * ``fed_nowcasts.cleveland`` (family ``clev_inflation_nowcast``) — Cleveland Fed inflation nowcasting chart data
   ``nowcast_month.json`` (month-over-month percent change) and ``nowcast_quarter.json`` (quarterly annualized
   percent change): one chart per target period (``subcaption`` ``2013-7`` / ``2013:Q3``), series CPI, core CPI,
@@ -86,7 +89,11 @@ GDPNOW_URL = (
     f"https://{ATL_HOST}/-/media/Project/Atlanta/FRBA/Documents/research-and-data/data/gdpnow/"
     "GDPTrackingModelDataAndForecasts.xlsx"
 )
-NYFED_URL = f"https://{NY_HOST}/medialibrary/media/research/policy/nowcast/new-york-fed-staff-nowcast_data_2002-present.xlsx"
+NYFED_URLS = {
+    "2016": f"https://{NY_HOST}/medialibrary/media/research/policy/nowcast/new-york-fed-staff-nowcast_data_2002-present.xlsx",
+    "2023": f"https://{NY_HOST}/medialibrary/Research/Interactives/Data/NowCast/downloads/"
+    "New-York-Fed-Staff-Nowcast_download_data.xlsx",
+}
 CLEV_URL = f"https://{CLE_HOST}/-/media/files/webcharts/inflationnowcasting/nowcast_{{freq}}.json?sc_lang=en"
 PHL_XLSX = f"https://{PHL_HOST}/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/{{file}}"
 XLSX_MEDIA = ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/octet-stream")
@@ -127,6 +134,11 @@ CLEV_VARIABLE = {
 }
 NYFED_REALTIME_NOTE = "Forecasts for GDP growth in quarters 2016Q1 to present were made in real-time"
 NYFED_FIRST_REALTIME = (2016, 1)
+NYFED_RELAUNCH_NOTE = "Reintroducing the New York Fed Staff Nowcast, September 8, 2023"
+NYFED_RELAUNCH = date(2023, 9, 8)
+#: "Revision: The March 1, 2024, update to the New York Fed Staff Nowcast omitted certain data, and as a result the
+#: GDP figure was revised post-publication to 2.1%." -> the file holds the revised value for that date (flagged).
+NYFED_REVISED = frozenset({date(2024, 3, 1)})
 EXCEL_EPOCH = date(1899, 12, 30)
 
 _Q_RE = re.compile(r"^([0-9]{4})Q([1-4])$")
@@ -281,16 +293,25 @@ def parse_gdpnow(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
 
 
 # ----------------------------------------------------------------------------------------------- NY Fed
-def parse_nyfed(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
+def parse_nyfed(body: bytes, *, edition: str, raw_sha256: str, rows: Rows) -> Report:
+    """``edition`` ``2016`` (workbook 2002-present of the first model, real-time from 2016Q1) or ``2023`` (the
+    reintroduced model's workbook, real-time from its relaunch day; earlier rows are pre-relaunch model output)."""
     rep = Report()
     try:
         wb = Workbook(body)
     except XlsxError as e:
         raise FedNowcastError(f"NY Fed workbook unreadable: {e}") from e
     t = wb.table("Forecasts By Quarter")
-    text = " ".join(str(c) for r in t[:14] for c in r if c)
-    if NYFED_REALTIME_NOTE not in text:
-        raise FedNowcastError("NY Fed: the real-time / reconstruction statement changed; re-read the workbook notes")
+    if edition == "2016":
+        text = " ".join(str(c) for r in t[:14] for c in r if c)
+        if NYFED_REALTIME_NOTE not in text:
+            raise FedNowcastError("NY Fed: the real-time / reconstruction statement changed; re-read the notes")
+    elif edition == "2023":
+        text = " ".join(str(c) for r in wb.table("New York Fed Nowcast") for c in r if c)
+        if NYFED_RELAUNCH_NOTE not in text:
+            raise FedNowcastError("NY Fed: the relaunch note changed; re-read the workbook notes")
+    else:
+        raise ValueError(edition)
     hi = next((i for i, r in enumerate(t) if r and str(r[0] or "").strip() == "Forecast Date"), None)
     if hi is None:
         raise FedNowcastError("NY Fed: no 'Forecast Date' header row")
@@ -313,7 +334,7 @@ def parse_nyfed(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
             val = decimal_or_none(r[i])
             if val is None:
                 continue
-            realtime = yq >= NYFED_FIRST_REALTIME
+            realtime = yq >= NYFED_FIRST_REALTIME if edition == "2016" else d >= NYFED_RELAUNCH
             s, e = quarter_bounds(*yq)
             fl = vintage_flags(
                 family="nyfed_nowcast", vintage=d.isoformat(),
@@ -321,12 +342,13 @@ def parse_nyfed(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
                 basis="fed_nowcast_publication_day" if realtime else None,
                 variable="real_gdp_growth_q_ann", provider_variable="New York Fed Staff Nowcast",
                 estimate_kind="projection", vintage_date_text=str(r[0]), reconstruction=not realtime,
-                target_quarter=quarter_label(*yq),
+                model_edition=edition, target_quarter=quarter_label(*yq),
+                revised_after_publication=(d in NYFED_REVISED) or None,
             )  # fmt: skip
             _cell(rows, DS_NYFED, f"NYFED_NOWCAST|v={d.isoformat()}", s, e, val, unit, fl, raw_sha256,
-                  {"sheet": "Forecasts By Quarter", "row": n, "column": quarter_label(*yq)})  # fmt: skip
+                  {"sheet": "Forecasts By Quarter", "row": n, "column": quarter_label(*yq), "edition": edition})  # fmt: skip
             rep.cells += 1
-            rep.skipped["reconstructed_cells_loaded_without_availability"] += not realtime
+            rep.skipped[f"{edition}_not_real_time_loaded_without_availability"] += not realtime
     return rep
 
 
@@ -607,10 +629,11 @@ def atlas_source() -> AtlasSourceSpec:
         licence="per table: Atlanta and Cleveland non-commercial; New York licence; Philadelphia all rights reserved",
         allowed_hosts=(ATL_HOST, NY_HOST, CLE_HOST, PHL_HOST),
         datasets=DATASETS,
-        dataset_ids=("GDPTrackingModelDataAndForecasts", "new-york-fed-staff-nowcast", "nowcast_month",
+        dataset_ids=("GDPTrackingModelDataAndForecasts", "new-york-fed-staff-nowcast_data_2002-present",
+                     "New-York-Fed-Staff-Nowcast_download_data", "nowcast_month",
                      "nowcast_quarter", *RTDSM_MONTHLY, RELEASE_FILE),  # fmt: skip
         cadence_seconds=7 * 86_400,
-        planned_requests=12,
+        planned_requests=14,
         max_response_bytes=MAX_BYTES,
         min_interval_seconds=2.0,
         parser_version=PARSER_VERSION,
@@ -648,12 +671,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                  "2011Q4-2014Q1 made before the public launch) + current quarter; BEA advance estimates as recorded.",
                  {"cells": rep.cells, **rep.notes, "skipped": dict(rep.skipped)})  # fmt: skip
     if run.wants(DS_NYFED):
-        body, sha = await _get(run, NYFED_URL, "nyfed:workbook", XLSX_MEDIA)
-        rows = Rows()
-        rep = parse_nyfed(body, raw_sha256=sha, rows=rows)
-        register(DS_NYFED, rows, [sha], "New York Fed Staff Nowcast, Forecasts By Quarter (weekly). Quarters before "
-                 "2016Q1 are historical reconstructions: loaded without availability (never selected as of a date).",
-                 {"cells": rep.cells, "skipped": dict(rep.skipped)})  # fmt: skip
+        rows, shas, sk = Rows(), [], Counter()
+        for ed, url in NYFED_URLS.items():
+            body, sha = await _get(run, url, f"nyfed:workbook_{ed}", XLSX_MEDIA)
+            shas.append(sha)
+            sk.update(parse_nyfed(body, edition=ed, raw_sha256=sha, rows=rows).skipped)
+        register(DS_NYFED, rows, shas, "New York Fed Staff Nowcast, Forecasts By Quarter (weekly): first model "
+                 "(2002-2021Q3; quarters before 2016Q1 are historical reconstructions) and the model reintroduced on "
+                 "2023-09-08 (rows before the relaunch are pre-launch output). Non-real-time cells carry no "
+                 "availability (never selected as of a date).", {"cells": len(rows), "skipped": dict(sk)})  # fmt: skip
     if run.wants(DS_CLEV):
         rows, shas, notes, sk = Rows(), [], {}, Counter()
         for freq in ("month", "quarter"):

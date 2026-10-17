@@ -1,0 +1,35 @@
+# V7 (agent BEAT-NOWCAST): official nowcasts of the Federal Reserve Banks with every published update, plus the
+# Philadelphia Fed real-time data used to judge them. Connector src/reva/adapters/connectors/atlas_fed_nowcasts.py
+# (atlas.fed_nowcasts -> fed_nowcasts.gdpnow, .nyfed, .cleveland, .rtdsm_monthly, .release_values).
+source_key: fed.nowcasts
+title: Federal Reserve Bank nowcasts (Atlanta GDPNow, New York Staff Nowcast, Cleveland inflation nowcasting) and Philadelphia Fed real-time data
+provider_url: https://www.atlantafed.org/research-and-data/data/gdpnow
+lineage_family: fed_nowcasts
+rights:
+  licence: "per table (verbatim in each table's rights): Atlanta Fed and Cleveland Fed non-commercial reproduction with attribution; New York Fed licence to use, copy and distribute for personal or business purposes; Philadelphia Fed no stated licence (all rights reserved)"
+  terms_quotes:
+    atlanta: "The Bank hereby grants permission to reproduce Bank-owned content (print and digital) offered through our website without limitation as to number, provided that such reproductions are not for commercial gain or monetary profit and that appropriate attribution to the Federal Reserve Bank of Atlanta is made on all such reproductions."
+    new_york: "The New York Fed grants you a non-exclusive license, subject to the Terms, to use, copy, and distribute Content for your personal or business purposes."
+    cleveland: "you are authorized to reproduce Federal Reserve Bank of Cleveland publications, or portions thereof, appearing on the Bank's Website without limitation as to number so long as both of the following apply: The information is used for noncommercial, personal, or educational purposes only (i.e., not for private gain) The information is appropriately credited to the Federal Reserve Bank of Cleveland"
+    philadelphia: "Copyright 2026. All rights reserved. Federal Reserve Bank of Philadelphia"
+  non_commercial: [gdpnow, cleveland]
+  restricted: [rtdsm_monthly, release_values]
+  open_licence: false
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [www.atlantafed.org, www.newyorkfed.org, www.clevelandfed.org, www.philadelphiafed.org]
+  files:
+    gdpnow: https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/research-and-data/data/gdpnow/GDPTrackingModelDataAndForecasts.xlsx
+    nyfed_2016_model: https://www.newyorkfed.org/medialibrary/media/research/policy/nowcast/new-york-fed-staff-nowcast_data_2002-present.xlsx
+    nyfed_2023_model: https://www.newyorkfed.org/medialibrary/Research/Interactives/Data/NowCast/downloads/New-York-Fed-Staff-Nowcast_download_data.xlsx
+    cleveland: https://www.clevelandfed.org/-/media/files/webcharts/inflationnowcasting/nowcast_<month|quarter>.json
+    rtdsm_monthly: https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/<var>MvMd.xlsx
+    release_values: https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routput_first_second_third.xlsx
+  authentication: none
+  cadence: "GDPNow several updates a month; NY Fed weekly (Fridays); Cleveland daily; RTDSM monthly"
+  not_used: >-
+    FRED / ALFRED (St. Louis Fed, incl. the Economic News Index STLENI and ALFRED vintages of BLS/BEA series) is
+    reachable but its Terms of Use prohibit using "the FRED® Services or FRED® Content in connection with the
+    development or training of any software program or system or machine learning ... or any other program or
+    process commonly known as artificial intelligence" (fred.stlouisfed.org/legal, read 2026-10-17): not fetched
+    (owner decision). No euro-area official nowcast with a published update history was found.

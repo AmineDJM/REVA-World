@@ -78,7 +78,7 @@ export function AddPanel({ onAdd, onClose }: { onAdd: (p: PinItem) => boolean; o
         <input
           id="v8b-add-q"
           ref={input}
-          className="v8b-input v8b-grow"
+          className="v8-input v8b-grow"
           role="combobox"
           aria-expanded={options.length > 0}
           aria-controls={listId}
@@ -114,7 +114,7 @@ export function AddPanel({ onAdd, onClose }: { onAdd: (p: PinItem) => boolean; o
             </label>
             <input
               id="v8b-add-geo"
-              className="v8b-input v8b-geo"
+              className="v8-input v8b-geo"
               value={geo}
               maxLength={3}
               onChange={(e) => setGeo(e.target.value.toUpperCase())}
@@ -122,7 +122,7 @@ export function AddPanel({ onAdd, onClose }: { onAdd: (p: PinItem) => boolean; o
             />
           </>
         )}
-        <button type="button" className="v8b-btn" onClick={onClose}>
+        <button type="button" className="v8-btn" onClick={onClose}>
           Fermer <kbd>Échap</kbd>
         </button>
       </div>

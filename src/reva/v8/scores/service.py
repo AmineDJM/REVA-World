@@ -120,6 +120,8 @@ def page(doc: Mapping[str, Any], *, sealed: Mapping[str, int] | None = None, roo
         },
         "sources": doc["sources"],
         "stale_sources": stale_sources(doc, root),
+        "problems": list(doc.get("problems") or []),
+        "quarantined": [r["id"] for r in rows if r.get("quarantined")],
         "sealed_models": dict(sealed) if sealed is not None else None,
     }
 

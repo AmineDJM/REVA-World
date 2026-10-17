@@ -78,7 +78,7 @@ export function RulesPanel({
         <h2 id="v8b-rules-h" className="v8b-h2">
           Veille
         </h2>
-        <button type="button" className="v8b-btn" onClick={onClose}>
+        <button type="button" className="v8-btn" onClick={onClose}>
           Fermer
         </button>
       </div>
@@ -109,7 +109,7 @@ export function RulesPanel({
         >
           <label>
             <span className="v8b-label">Élément</span>
-            <select className="v8b-input" value={uid} onChange={(e) => setUid(e.target.value)}>
+            <select className="v8-input" value={uid} onChange={(e) => setUid(e.target.value)}>
               {watchable.map((i) => (
                 <option key={i.uid} value={i.uid}>
                   {itemTitle(i)}
@@ -119,7 +119,7 @@ export function RulesPanel({
           </label>
           <label>
             <span className="v8b-label">Quand</span>
-            <select className="v8b-input" value={kind} onChange={(e) => setKind(e.target.value as RuleKind)}>
+            <select className="v8-input" value={kind} onChange={(e) => setKind(e.target.value as RuleKind)}>
               {kinds.map((k) => (
                 <option key={k} value={k}>
                   {RULE_LABEL_FR[k]}
@@ -131,7 +131,7 @@ export function RulesPanel({
             <>
               <label>
                 <span className="v8b-label">Opérateur</span>
-                <select className="v8b-input" value={op} onChange={(e) => setOp(e.target.value as ThresholdOp)}>
+                <select className="v8-input" value={op} onChange={(e) => setOp(e.target.value as ThresholdOp)}>
                   {THRESHOLD_OPS.map((o) => (
                     <option key={o} value={o}>
                       {o.replace('>=', '≥').replace('<=', '≤')}
@@ -141,11 +141,11 @@ export function RulesPanel({
               </label>
               <label>
                 <span className="v8b-label">Seuil{item?.kind === 'series' && item.unit ? ` (${item.unit})` : ''}</span>
-                <input className="v8b-input v8b-num-in" inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder="ex. 2,5" />
+                <input className="v8-input v8b-num-in" inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} placeholder="ex. 2,5" />
               </label>
             </>
           )}
-          <button type="submit" className="v8b-btn v8b-btn-primary">
+          <button type="submit" className="v8-btn v8-btn-primary">
             Ajouter la règle
           </button>
           <p className="v8b-meta muted v8b-full">{RULE_HELP[kind]}</p>

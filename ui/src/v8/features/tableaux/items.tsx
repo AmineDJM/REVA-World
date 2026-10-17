@@ -9,9 +9,9 @@ import { v8Links } from '../../contract';
 import { classifyV3Error } from '../../../v3/api/common';
 import { getForecastQuestion, type ForecastRecord } from '../../../v3/api/forecasts';
 import { getKgEntity } from '../../../v3/api/kg';
-import { LicenceBadge } from '../../../v3/components/Licence';
-import { frDecimal, frValue, missingReasonFr } from '../../../v3/lib/format';
+import { frDecimal, frValue } from '../../../v3/lib/format';
 import { useApi } from '../../../lib/useApi';
+import { Badge, MissingValue, Skeleton as ShellSkeleton, SourceChip } from '../../shell/ui';
 import { isKgId, latestObserved, readSeries, referenceDecisions } from './live';
 import { Markdown } from './Markdown';
 import { MiniSeries } from './MiniSeries';
@@ -39,11 +39,7 @@ export function useInView<T extends Element>(): [React.RefObject<T | null>, bool
 }
 
 export function Missing({ reason }: { reason: string }) {
-  return (
-    <span className="v8b-missing" data-testid="missing">
-      manquant : {reason}
-    </span>
-  );
+  return <MissingValue reason={reason} />;
 }
 
 function Failure({ error, what }: { error: unknown; what: string }) {
@@ -58,7 +54,7 @@ function Failure({ error, what }: { error: unknown; what: string }) {
 }
 
 function Skeleton() {
-  return <div className="v8b-skel" aria-hidden="true" />;
+  return <ShellSkeleton lines={3} />;
 }
 
 const fmtDate = (iso: string | null | undefined) => {
@@ -85,25 +81,27 @@ export function SeriesBody({ item, visible }: { item: Extract<BoardItem, { kind:
             {frValue(last.value!, v.unit)}
           </span>
         ) : (
-          <Missing reason={lastAny?.missingReason ? missingReasonFr(lastAny.missingReason) : 'aucune valeur observée'} />
+          <Missing reason={lastAny?.missingReason ?? 'aucune valeur observée sur la période chargée'} />
         )}
         <span className="v8b-unit">{v.unit}</span>
         {last && <span className="v8b-when">{last.year} · observé</span>}
       </div>
       <MiniSeries points={v.points} breaks={v.breaks} />
       <p className="v8b-meta">
-        <span className="v8b-src" title="Série qui répond pour la dernière valeur observée">
-          source : <code>{last?.source ?? '—'}</code>
-        </span>
+        {last && (
+          <SourceChip
+            source={last.source}
+            licence={v.licences.find((l) => last.source === l.source || last.source.startsWith(`${l.source}.`)) ?? v.licences[0] ?? null}
+            period={String(last.year)}
+            details={[`concept ${item.concept}`, `pays ${item.geo}`, ...(v.snapshot ? [`instantané atlas ${v.snapshot.slice(0, 16)}…`] : [])]}
+          />
+        )}
         {proj.length > 0 && (
-          <span className="v8-badge v8b-badge-proj" title="Valeurs publiées comme projections par la source : jamais traitées comme observations">
+          <Badge kind="projection" title="Valeurs publiées comme projections par la source : jamais traitées comme observations">
             projection {proj[0]!.year}–{proj[proj.length - 1]!.year}
-          </span>
+          </Badge>
         )}
         {v.breaks.length > 0 && <span className="v8b-badge-warn">changement de source {v.breaks.join(', ')}</span>}
-        {v.licences.map((l) => (
-          <LicenceBadge key={`${l.source}|${l.licence}`} rights={l} />
-        ))}
       </p>
       {v.sourcesWithoutData.length > 0 && <p className="v8b-meta muted">Sans donnée ici : {v.sourcesWithoutData.join(', ')}</p>}
     </div>
@@ -136,11 +134,7 @@ export function EntityBody({ item, visible }: { item: Extract<BoardItem, { kind:
                 · source <code>{st.data.data.provenance.source_key}</code>
               </>
             )}
-            {st.data.data.provenance?.source_key.startsWith('wikidata') && (
-              <span className="v8-badge v8b-badge-community" title="Wikidata est collaboratif ; REVA ne vérifie pas ces déclarations.">
-                communautaire, non vérifié
-              </span>
-            )}
+            {st.data.data.provenance?.source_key.startsWith('wikidata') && <Badge kind="community" />}
           </p>
         </>
       )}
@@ -186,7 +180,7 @@ export function ForecastBody({ item, visible, compact = false }: { item: Extract
     <div className="v8b-forecast">
       <p className="v8b-qtext">{str(q.text_fr) ?? item.label}</p>
       <p className="v8b-meta">
-        <span className={`v8-badge v8b-status v8b-status-${d.status}`}>{STATUS_FR[d.status] ?? d.status}</span>
+        {d.status === 'resolved' ? <Badge kind="judged">résolue · jugée</Badge> : d.status === 'void' ? <Badge kind="missing">annulée</Badge> : <Badge kind="info">{STATUS_FR[d.status] ?? d.status}</Badge>}
         {d.status === 'pending' && <span>résolution prévue le {fmtDate(str(res.expected_date))}</span>}
         {d.status === 'resolved' && outcome && (
           <span>
@@ -261,7 +255,7 @@ export function DecisionBody({ item, visible }: { item: Extract<BoardItem, { kin
   return (
     <div className="v8b-decision">
       <p className="v8b-meta">
-        <span className="v8-badge v8b-badge-scenario">scénario non validé — pas une probabilité</span>
+        <Badge kind="scenario">scénario non validé — pas une probabilité</Badge>
       </p>
       {item.summary && <p className="v8b-desc">{item.summary}</p>}
       {ref && (
@@ -332,12 +326,12 @@ export function NoteBody({ item, editable, onSave }: { item: Extract<BoardItem, 
           placeholder="# Titre&#10;- un point&#10;**gras**, *italique*, [lien](/v8/…)"
         />
         <div className="v8b-row">
-          <button type="submit" className="v8b-btn v8b-btn-primary">
+          <button type="submit" className="v8-btn v8-btn-primary">
             Enregistrer <kbd>Ctrl</kbd>+<kbd>Entrée</kbd>
           </button>
           <button
             type="button"
-            className="v8b-btn"
+            className="v8-btn"
             onClick={() => {
               setDraft(item.markdown);
               setEditing(false);
@@ -352,7 +346,7 @@ export function NoteBody({ item, editable, onSave }: { item: Extract<BoardItem, 
     <div className="v8b-note">
       {item.markdown.trim() ? <Markdown source={item.markdown} /> : <p className="muted">Note vide.</p>}
       {editable && (
-        <button type="button" className="v8b-btn v8b-btn-ghost" onClick={() => setEditing(true)}>
+        <button type="button" className="v8-btn v8-btn-ghost v8-btn-sm" onClick={() => setEditing(true)}>
           Modifier la note
         </button>
       )}

@@ -1,6 +1,6 @@
 /**
  * Tableaux — personal boards of pinned items with watch rules and alerts (owner V8BOARDS).
- * Routes: /v8/tableaux, /v8/tableaux/:id, /v8/tableaux/partage#b=… (path "tableaux/*").
+ * Routes: /v8/tableaux, /v8/tableaux/:id, /v8/tableaux/partage#b=… (path "tableaux"; the shell adds /*).
  * Public cross-feature API: ./pin.ts (pinItem) — see docs/dev/v8_v8boards.md.
  */
 import { lazy } from 'react';
@@ -16,8 +16,7 @@ const norm = (s: string) =>
 export const feature: V8Feature = {
   id: 'tableaux',
   title: 'Tableaux',
-  path: 'tableaux/*',
-  navPath: 'tableaux',
+  path: 'tableaux', // the shell mounts tableaux/* : /v8/tableaux, /v8/tableaux/:id, /v8/tableaux/partage#b=…
   order: 70,
   icon: '▦',
   goKey: 't',

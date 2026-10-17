@@ -212,7 +212,7 @@ def _check_source(r: Mapping[str, Any], f: _Files) -> list[str]:
 
 # --------------------------------------------------------------------------------------------- read side
 def counts_in_headline(r: Mapping[str, Any]) -> bool:
-    return r.get("benchmark_kind") in C.HEADLINE_BENCHMARKS
+    return r.get("benchmark_kind") in C.HEADLINE_BENCHMARKS and not r.get("quarantined")
 
 
 def headline(rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
@@ -279,16 +279,47 @@ def stale_sources(doc: Mapping[str, Any], root: Path = REPO) -> list[dict[str, A
     return out
 
 
+_Loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
 @lru_cache(maxsize=4)
-def _load_cached(path: str, mtime: float) -> dict[str, Any]:
-    doc = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
-    problems = validate(doc, REPO)
-    if problems:
+def _parse(path: str, mtime: float) -> dict[str, Any]:
+    return dict(yaml.load(Path(path).read_text(encoding="utf-8"), Loader=_Loader))  # noqa: S506 - safe loader
+
+
+@lru_cache(maxsize=8)
+def _load_cached(path: str, mtime: float, sources_key: tuple[float, ...], strict: bool, root: str) -> dict[str, Any]:
+    doc = _parse(path, mtime)
+    problems = validate(doc, Path(root))
+    if problems and strict:
         raise ScoreboardInvalid(problems)
-    return dict(doc)
+    by_row: dict[str, list[str]] = defaultdict(list)
+    general: list[str] = []
+    ids = {r.get("id") for r in doc.get("rows", [])}
+    for pr in problems:
+        rid = pr.split(":", 1)[0]
+        (by_row[rid] if rid in ids else general).append(pr)
+    rows = [{**r, "problems": by_row[r["id"]], "quarantined": True} if r.get("id") in by_row else r
+            for r in doc.get("rows", [])]  # fmt: skip
+    return {**doc, "rows": rows, "problems": problems, "general_problems": general}
 
 
-def load(root: Path = REPO) -> dict[str, Any]:
-    """The validated scoreboard (cached until the file changes). Raises ScoreboardInvalid."""
+def _mtime(p: Path) -> float:
+    try:
+        return p.stat().st_mtime
+    except OSError:
+        return -1.0
+
+
+def load(root: Path = REPO, *, strict: bool = False) -> dict[str, Any]:
+    """The scoreboard, validated against its sources (cached until the file or a source changes).
+
+    ``strict`` raises ScoreboardInvalid on any problem. Otherwise rows with a problem (their source changed and no
+    longer supports them, a quote vanished, ...) are kept but ``quarantined``: shown with their problems and
+    never counted in the headline; the problems are listed in ``problems``.
+    """
     p = root / PATH
-    return _load_cached(str(p), p.stat().st_mtime)
+    mt = _mtime(p)
+    doc = _parse(str(p), mt)
+    files = sorted({str(s["file"]) for s in doc.get("sources", [])})
+    return _load_cached(str(p), mt, tuple(_mtime(root / f) for f in files), strict, str(root))
