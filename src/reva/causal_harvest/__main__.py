@@ -44,6 +44,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     r.add_argument("--batch-size", type=int, default=10)
     r.add_argument("--linger", action="store_true", help="with --minutes: stay for hourly WDQS attempts")
+    r.add_argument(
+        "--share",
+        type=float,
+        default=None,
+        help="share of today's global remaining wbapi budget (replaces the per-day 30%% CAUSWD share; WDOPS)",
+    )
     rp = sub.add_parser("report", help="consistency report over the loaded causal statements")
     rp.add_argument("--db", default=live.DEFAULT_DB)
     rp.add_argument("--chains", type=int, default=12)
@@ -97,6 +103,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     mode=args.mode,
                     batch_size=args.batch_size,
                     linger=args.linger,
+                    share=args.share,
                 )
             )
         except BudgetExhausted as e:

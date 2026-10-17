@@ -1339,6 +1339,7 @@ async def budgeted_client(
     planned_wbapi: int = 1,
     mode: str = "api",
     reuse_hours: float = 0.0,
+    ledger_db: str | None = None,
 ) -> AsyncIterator[BudgetedSession]:
     """The only live Wikidata entry point (invariant 30): reserve -> meter every request -> settle.
 
@@ -1355,6 +1356,9 @@ async def budgeted_client(
 
     settings = ensure_database(db_name)
     engine = make_engine("worker", settings)
+    # ``ledger_db`` (WDOPS): book the requests in one shared harvest ledger (default: the load database) so the
+    # daily wikidata.* budgets are enforced across every throwaway load database, not per database.
+    ledger = engine if ledger_db in (None, db_name) else make_engine("worker", harvest_settings(str(ledger_db)))
     store = FilesystemArtifactStore(OBJECT_ROOT, settings.reva_s3_prefix)
     run_id = f"kg{purpose}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
     inner = live_http()
@@ -1366,7 +1370,7 @@ async def budgeted_client(
         # operation_id (the wbapi row was dropped by ON CONFLICT DO NOTHING and every wbapi request was
         # charged to the wdqs account; settling overwrote one count with the other) -- WDRUN 2026-10-16.
         res_q = reserve_ingest(
-            engine,
+            ledger,
             job_id=f"{run_id}-wdqs",
             attempt=1,
             source_key=SOURCE_WDQS,
@@ -1374,15 +1378,15 @@ async def budgeted_client(
             budget=budget,
         )
         res_a = reserve_ingest(
-            engine,
+            ledger,
             job_id=f"{run_id}-wbapi",
             attempt=1,
             source_key=SOURCE_WBAPI,
             planned_requests=planned_wbapi,
             budget=budget,
         )
-        wdqs = metered(inner, engine, res_q, budget=budget)
-        wbapi = metered(inner, engine, res_a, budget=budget)
+        wdqs = metered(inner, ledger, res_q, budget=budget)
+        wbapi = metered(inner, ledger, res_a, budget=budget)
         client = WikidataClient(
             wdqs,
             wbapi,
@@ -1393,11 +1397,13 @@ async def budgeted_client(
         session = BudgetedSession(client, engine, store, run_id)
         yield session
     finally:
-        settled = [settle_metered(engine, h) for h in (wdqs, wbapi) if h is not None]
+        settled = [settle_metered(ledger, h) for h in (wdqs, wbapi) if h is not None]
         if session is not None:
             session.usage["budget"] = settled
         await inner.aclose()
         engine.dispose()
+        if ledger is not engine:
+            ledger.dispose()
 
 
 async def run_into_db(
@@ -1411,6 +1417,7 @@ async def run_into_db(
     expand: bool = True,
     mode: str = "api",
     reuse_hours: float = 0.0,
+    ledger_db: str | None = None,
 ) -> dict[str, Any]:
     """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
@@ -1432,6 +1439,7 @@ async def run_into_db(
         planned_wbapi=planned_wbapi,
         mode=mode,
         reuse_hours=reuse_hours,
+        ledger_db=ledger_db,
     ) as sess:
         out["run_id"] = sess.run_id
         report_path = REPORT_DIR / f"{sess.run_id}.json"
@@ -2044,6 +2052,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=24.0,
         help="reuse archived Special:EntityData snapshots younger than this (cites their sha/time)",
     )
+    r.add_argument(
+        "--ledger-db",
+        default=None,
+        help="throwaway database holding the budget ledger (default: --db); WDOPS books every run in one ledger",
+    )
     for sp in (r, mc):
         sp.add_argument(
             "--api-mode",
@@ -2130,6 +2143,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     expand=not args.no_expand,
                     mode=args.api_mode,
                     reuse_hours=args.reuse_hours,
+                    ledger_db=args.ledger_db,
                 )
             )
         except BudgetExhausted as e:

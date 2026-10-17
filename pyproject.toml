@@ -32,6 +32,7 @@ dependencies = [
   "networkx>=3.3",  # small extracted world subgraphs (src/reva/world/graph.py, capped size)
   "rfc3339-validator>=0.1.4",
   "shapely==2.1.2",  # polygon overlay of historical polities with present-day countries (src/reva/kg/overlay.py)
+  "zstandard>=0.23",  # BSD-3-Clause; transparent compression of the filesystem object store (adapters/objects)
 ]
 
 [project.optional-dependencies]

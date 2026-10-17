@@ -215,6 +215,7 @@ async def causal_session(
     wbapi_retries: int = 3,
     mode: str = "auto",
     state: State | None = None,
+    share: float | None = None,
 ) -> AsyncIterator[Session]:
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
     from reva.adapters.postgres.engine import make_engine
@@ -227,8 +228,19 @@ async def causal_session(
     ledger_engine = make_engine("worker", harvest_settings(ledger_db))  # ledger rows only, no migration run
     store = FilesystemArtifactStore(OBJECT_ROOT, settings.reva_s3_prefix)
     run_id = f"kgcauswd-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
-    computed, basis = wbapi_cap(ledger_usage_today(ledger_engine), wikidata_usage_today())
-    if state is not None:  # the 30 % share is per UTC day across all CAUSWD sessions of that day
+    computed, basis = wbapi_cap(
+        ledger_usage_today(ledger_engine),
+        wikidata_usage_today(),
+        share=SHARE_OF_REMAINING if share is None else share,
+    )
+    if share is not None:
+        # WDOPS (V6): one harvest manager schedules all Wikidata work, so the per-day 30 % fairness share between
+        # parallel agents is replaced by an explicit share of today's *global* remaining wbapi budget (the ledger
+        # still refuses anything beyond the daily budget).
+        if not 0.0 < share <= 1.0:
+            raise ValueError("share must be in (0, 1]")
+        basis.update(share_override_percent=round(share * 100))
+    elif state is not None:  # the 30 % share is per UTC day across all CAUSWD sessions of that day
         today = datetime.now(UTC).strftime("%Y-%m-%d")
         allowance = int(state.data.setdefault("day_allowance", {}).setdefault(today, computed))
         mine = causwd_usage_today(ledger_engine)
@@ -760,6 +772,7 @@ async def run(
     mode: str = "auto",
     batch_size: int = 10,
     linger: bool = False,
+    share: float | None = None,
 ) -> dict[str, Any]:
     """One budget session (ends at the UTC day boundary, the cap, ``until`` or an empty frontier)."""
     task = asyncio.current_task()
@@ -772,7 +785,7 @@ async def run(
     out: dict[str, Any] = {"started_at": datetime.now(UTC).isoformat(), "db": db}
     day = datetime.now(UTC).date()
     async with causal_session(
-        db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs, mode=mode, state=state
+        db=db, ledger_db=ledger_db, cap_wbapi=cap_wbapi, cap_wdqs=cap_wdqs, mode=mode, state=state, share=share
     ) as sess:
         out["run_id"], out["caps"] = sess.run_id, sess.caps
         log.info("CAUSWD session %s caps %s", sess.run_id, sess.caps)
