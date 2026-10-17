@@ -564,6 +564,37 @@ def links_materialise_cmd(
         raise typer.Exit(code)
 
 
+@links_app.command("prune")
+def links_prune_cmd(
+    keep: int = typer.Option(2, "--keep", help="newest materialisations kept (the current one included), >= 1"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="report what would be pruned; write nothing"),
+    vacuum: str = typer.Option(
+        "plain", "--vacuum", help="after pruning: none, plain (space reusable) or full (returns disk; locks the table)"
+    ),
+    reason: str = typer.Option("link store retention policy", "--reason", help="recorded with each prune"),
+) -> None:
+    """Prune old link store materialisations (owner credentials, migration 0017): deletes the derived link rows
+    of materialisations nothing serves, pins or references; keeps every materialisation row (its inputs), records
+    `kg.link_prune` + an `ops.audit` row (`links.prune`) per pruned materialisation."""
+    from reva.adapters.postgres.engine import make_engine
+    from reva.links.retention import RetentionError, prune
+    from reva.settings import get_settings
+
+    try:
+        out = prune(
+            make_engine("migration", get_settings()),
+            keep=keep,
+            dry_run=dry_run,
+            reason=reason,
+            vacuum_mode=vacuum,
+            log_fn=lambda s: typer.echo(s, err=True),
+        )
+    except RetentionError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(2) from e
+    _out(out)
+
+
 # --------------------------------------------------------------------------- causal (V3, CAUSOPS)
 @causal_app.command("refresh")
 def causal_refresh_cmd(

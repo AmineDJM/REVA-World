@@ -1,0 +1,467 @@
+# Dataset variable -> REVA relation for the CAUSMORE sources (agent CAUSMORE, 2026-10-17).
+#
+# Read by src/reva/adapters/connectors/causmore_common.py and the connectors atlas_cowwars.py (COW War Data v4),
+# atlas_pax.py (PA-X Peace Agreements Database v10) and atlas_idmc.py (IDMC GIDD disaster events). Same conventions
+# as registry/causal/relations_datasets.yaml (CAUSDATA): every mapping says whether a variable becomes a T1 causal
+# claim (reva_kind: claim, closed vocabulary of registry/causal/relations.yaml) or a non-causal context statement,
+# and WHY, with the codebook's own words. `definitions` are passed verbatim as Codebook.definitions to
+# reva.causal.load_dataset_claims.
+#
+# Rules applied (owner, 2026-10-17: "ne force pas ce lien"):
+#   * a claim only where the codebook itself defines the coded field as the outcome / effect / what the record
+#     addresses; never from co-occurrence, date order or REVA's own join of two datasets;
+#   * a transformation, a sequence, a part-of, a participant or an initiator is context, never causal;
+#   * a codebook (PDF sha256, or the README sheet text for IDMC) that differs from the pinned one withholds the
+#     dataset's claims (events and context still load).
+version: 1
+maintainer: CAUSMORE
+updated: '2026-10-17'
+conventions:
+  quotes: 'Codebook text quoted verbatim from the provider document (pdftotext -layout of the pinned PDF, page by page):
+    whitespace normalised to single spaces, page-number lines dropped, a hyphen at a line end joined to the next line
+    (the hyphen is kept). pdf_page is the 1-based physical page. IDMC: the README sheet cell text of the workbook, verbatim.'
+  claim: reva_kind 'claim' = a T1 causal claim delivered through reva.causal.load_dataset_claims; codebook_term names the
+    definitions entry the claim rests on.
+  context: reva_kind 'context' = a KG statement that is NOT causal (transformation, part of, participant, initiator,
+    identifier, attribute); never shown with causal wording.
+documents:
+  cow_inter_codebook:
+    title: 'Inter-state Wars (Version 4.0): Definitions and Variables'
+    authors: Meredith Reid Sarkees
+    url: https://correlatesofwar.org/data-sets/cow-war/
+    download_url: https://correlatesofwar.org/wp-content/uploads/Inter-StateWars_Codebook.pdf
+    sha256: 875bf75f8f3df5f1ac418a03eeaa6dd9b9a81a3b4d112bd6832040cffc26a1be
+  cow_extra_codebook:
+    title: 'Extra-state Wars (Version 4.0): Definitions and Variables'
+    authors: Meredith Reid Sarkees
+    url: https://correlatesofwar.org/data-sets/cow-war/
+    download_url: https://correlatesofwar.org/wp-content/uploads/Extra-StateWars_Codebook.pdf
+    sha256: 0746a2f16a7fa9d04458ea046ae8bef00835cf3522a16a3dc5dc041a2a03adfc
+  cow_intra_codebook:
+    title: 'Intra-state Wars (Version 4.1): Definitions and Variables'
+    authors: Meredith Reid Sarkees
+    url: https://correlatesofwar.org/data-sets/cow-war/
+    download_url: https://correlatesofwar.org/wp-content/uploads/Intra-StateWars_Codebook.pdf
+    sha256: 7a15ea58a926a7bc14c0f17d1855e2fb65f40eec0c19c6f7691f8da887798d17
+  cow_nonstate_codebook:
+    title: 'Non-state Wars (Version 4.0): Definitions and Variables'
+    authors: Meredith Reid Sarkees
+    url: https://correlatesofwar.org/data-sets/cow-war/
+    download_url: https://correlatesofwar.org/wp-content/uploads/Non-StateWars_Codebook.pdf
+    sha256: 821647646d9a67230e9c24a6d4a06085b409f136c0ac0c5d87c574650fb49a0c
+  pax_codebook:
+    title: PA-X Codebook, Version 10
+    authors: Bell, Badanjak, Farquhar, Beaujouan, Epple, Forster, Jamar, McNicholl, Molloy, Nash, Pospisil, Wilson, Wise
+    date: '2026'
+    url: https://www.peaceagreements.org/downloads/
+    download_url: https://www.peaceagreements.org/cms/documents/3956/PA_X_codebook_v10.pdf
+    sha256: eaf9191148ce91a38c81df3b721835c15305de099542d4ef98295b2c2a8ac42f
+  idmc_readme:
+    title: 'Global Internal Displacement Database (GIDD) - Disasters: README sheet of IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx'
+    authors: Internal Displacement Monitoring Centre (IDMC)
+    date: '2025-05-13'
+    url: https://data.humdata.org/dataset/idmc_internal_displacement_conflict-violence_disasters
+    kind: xlsx_sheet
+    sheet: README
+    check: every definition text below must be a README cell verbatim (the workbook bytes change with each data
+      release, so no file sha256 is pinned for this document)
+datasets:
+  # ------------------------------------------------------------------------------------------------ COW wars v4
+  cow_inter:
+    source_key: cow.data
+    dataset: cow_inter
+    dataset_revision: '4.0'
+    file: Inter-StateWarData_v4.0.csv
+    codebook_document: cow_inter_codebook
+    codebook_name: COW Inter-State War Data v4.0 codebook (Sarkees)
+    citation: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816-2007. Washington DC: CQ Press.'
+    definitions:
+      Outcome:
+        text: 'Outcome: coded as: 1 = Winner 2 = Loser 3 = Compromise/Tied 4 = The war was transformed into another type
+          of war 5 = The war is ongoing as of 12/31/2007 6 = Stalemate 7 = Conflict continues at below war level 8 = changed
+          sides'
+        document: cow_inter_codebook
+        pdf_page: 4
+      transformation:
+        text: Thus, if a war changes so that one or more of the parties doing the bulk of the fighting changes, the initial
+          war ends and the conflict is transformed into a war of a second type.
+        document: cow_inter_codebook
+        pdf_page: 2
+      TransFrom:
+        text: 'TransFrom - the War# of a preceding war that was transformed into this inter-state war: -8 = Not applicable'
+        document: cow_inter_codebook
+        pdf_page: 4
+      TransTo:
+        text: TransTo - the WarNum of the war that this war transformed into, -8=Not applicable
+        document: cow_inter_codebook
+        pdf_page: 4
+      Initiator:
+        text: Initiator - whether the state initiated the war 1 = Yes 2 = No
+        document: cow_inter_codebook
+        pdf_page: 4
+    values:
+      Outcome: {1: Winner, 2: Loser, 3: Compromise/Tied, 4: The war was transformed into another type of war,
+                5: The war is ongoing as of 12/31/2007, 6: Stalemate, 7: Conflict continues at below war level,
+                8: changed sides}
+      WarType: {1: Inter-state war}
+    mappings:
+      - variables: [Outcome]
+        reva_kind: claim
+        causal: true
+        relation: coded_outcome
+        codebook_term: Outcome
+        cause: cow:war:<WarNum>
+        effect: cowwar:outcome:<WarNum>:<ccode>:<k> (outcome of the war for one state participant record)
+        why: The codebook codes the outcome of the war for each state participant record (one record per participant,
+          two when the state changed sides). Same treatment as the MID dispute outcome and the ICB actor outcome
+          (CAUSDATA). Code 5 (ongoing as of 12/31/2007) is no outcome -> no claim; -9 / missing -> no claim.
+      - variables: [TransTo, TransFrom]
+        reva_kind: context
+        causal: false
+        predicate: cowwar:transformed_into / cowwar:transformed_from
+        why: '"the initial war ends and the conflict is transformed into a war of a second type": a change of category of
+          the same conflict (who does the bulk of the fighting), i.e. continuity and sequence, not one war causing another.
+          Stored as context (structure family: followed_by / follows), each direction from the row that codes it.'
+      - variables: [Initiator]
+        reva_kind: context
+        causal: false
+        predicate: qualifier initiator_code on the outcome record; atlas_cow's P1344 participation qualifiers
+        why: Which participant began the war is a participant role, not a cause of the war.
+  cow_extra:
+    source_key: cow.data
+    dataset: cow_extra
+    dataset_revision: '4.0'
+    file: Extra-StateWarData_v4.0.csv
+    codebook_document: cow_extra_codebook
+    codebook_name: COW Extra-State War Data v4.0 codebook (Sarkees)
+    citation: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816-2007. Washington DC: CQ Press.'
+    definitions:
+      Outcome:
+        text: 'Outcome: coded as: 1 – Side A wins 2 - Side B wins 3 - Compromise 4 - The war was transformed into another
+          type of war 5 - The war is ongoing as of 12/31/2007 6 - Stalemate 7 - Conflict continues at below war level'
+        document: cow_extra_codebook
+        pdf_page: 8
+      TransFrom:
+        text: 'TransFrom - the War# of a preceding war that was transformed into this extra-state war: -8 = Not applicable'
+        document: cow_extra_codebook
+        pdf_page: 8
+      TransTo:
+        text: TransTo - the War# of the war that this war transformed into, -8=Not applicable
+        document: cow_extra_codebook
+        pdf_page: 8
+      Initiator:
+        text: Initiator – Did the participant on Side A initiate the war? 0=no, 1=yes
+        document: cow_extra_codebook
+        pdf_page: 8
+    values:
+      Outcome: {1: Side A wins, 2: Side B wins, 3: Compromise, 4: The war was transformed into another type of war,
+                5: The war is ongoing as of 12/31/2007, 6: Stalemate, 7: Conflict continues at below war level}
+      WarType: {2: Colonial War, 3: Imperial War}
+    mappings:
+      - variables: [Outcome]
+        reva_kind: claim
+        causal: true
+        relation: coded_outcome
+        codebook_term: Outcome
+        cause: cow:war:<WarNum>
+        effect: cowwar:outcome:<WarNum>
+        why: War-level outcome (identical on every participant record of the war in v4.0; checked, a disagreement is
+          reported and withholds the claim). Code 5 (ongoing) -> no claim.
+      - variables: [TransTo, TransFrom]
+        reva_kind: context
+        causal: false
+        predicate: cowwar:transformed_into / cowwar:transformed_from
+        why: Category change of the same conflict (see cow_inter), context only.
+      - variables: [Initiator]
+        reva_kind: context
+        causal: false
+        predicate: attribute only
+        why: Participant role, not a cause.
+  cow_intra:
+    source_key: cow.data
+    dataset: cow_intra
+    dataset_revision: '4.1'
+    file: Intra-StateWarData_v4.1.csv
+    codebook_document: cow_intra_codebook
+    codebook_name: COW Intra-State War Data v4.1 codebook (Sarkees)
+    citation: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816-2007. Washington DC: CQ Press.'
+    version_note: v4.1, not v5.1. Intra-state v5.1 (Dixon and Sarkees 2016) renumbers wars and reuses numbers for other
+      wars (e.g. 856 is "Eighth Colombia" in v4.1 and "Romanian War of 1989" in v5.1), while the inter-/extra-/non-state
+      v4.0 files, atlas_cow's cow:war:<n> entities and PA-X's CowWar all use the v4 numbering. Mixing would join
+      different wars under one id; v5.1 is a follow-up under its own namespace.
+    definitions:
+      Outcome:
+        text: 'Outcome: coded as: 1 - Side A wins 2 - Side B wins 3 - Compromise 4 - The war was transformed into another
+          type of war 5 - The war is ongoing as of 12/31/2007 6 - Stalemate 7 - Conflict continues at below war level'
+        document: cow_intra_codebook
+        pdf_page: 8
+      transformation:
+        text: However if the intervener takes over the bulk of the fighting, the war ceases to be an intra-state war and
+          is transformed into a war of a different classification.
+        document: cow_intra_codebook
+        pdf_page: 4
+      TransFrom:
+        text: 'TransFrom - the WarNum of a preceding war that was transformed into this intra-state war: -8 = Not applicable'
+        document: cow_intra_codebook
+        pdf_page: 7
+      TransTo:
+        text: TransTo - the WarNum of the war that this war transformed into, -8=Not applicable
+        document: cow_intra_codebook
+        pdf_page: 8
+      Initiator:
+        text: Initiator - the name of the participant that began the war
+        document: cow_intra_codebook
+        pdf_page: 7
+    values:
+      Outcome: {1: Side A wins, 2: Side B wins, 3: Compromise, 4: The war was transformed into another type of war,
+                5: The war is ongoing as of 12/31/2007, 6: Stalemate, 7: Conflict continues at below war level}
+      WarType: {4: Civil war for central control, 5: Civil war over local issues, 6: Regional internal, 7: Intercommunal}
+    mappings:
+      - variables: [Outcome]
+        reva_kind: claim
+        causal: true
+        relation: coded_outcome
+        codebook_term: Outcome
+        cause: cow:war:<WarNum>
+        effect: cowwar:outcome:<WarNum>
+        why: War-level outcome (identical on every record of the war; checked). Code 5 (ongoing) -> no claim.
+      - variables: [TransTo, TransFrom]
+        reva_kind: context
+        causal: false
+        predicate: cowwar:transformed_into / cowwar:transformed_from
+        why: '"the war ceases to be an intra-state war and is transformed into a war of a different classification":
+          continuity of one conflict under another category, context only.'
+      - variables: [CcodeA, CcodeB]
+        reva_kind: context
+        causal: false
+        predicate: P710 participant (cow:<ccode>, side qualifier)
+        why: State participants of the intra-state war (participation, not causation).
+      - variables: [Initiator]
+        reva_kind: context
+        causal: false
+        predicate: cowwar:initiator_name (string)
+        why: Participant role, not a cause.
+  cow_nonstate:
+    source_key: cow.data
+    dataset: cow_nonstate
+    dataset_revision: '4.0'
+    file: Non-StateWarData_v4.0.csv
+    codebook_document: cow_nonstate_codebook
+    codebook_name: COW Non-State War Data v4.0 codebook (Sarkees)
+    citation: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816-2007. Washington DC: CQ Press.'
+    definitions:
+      Outcome:
+        text: 'Outcome: coded as: 1 - Side A wins 2 - Side B wins 3 - Compromise 4 - The war was transformed into another
+          type of war 5 - The war is ongoing as of 12/31/2007 6 - Stalemate 7 - Conflict continues at below war level'
+        document: cow_nonstate_codebook
+        pdf_page: 3
+      TransFrom:
+        text: TransFrom - the WarNum of a preceding war which was transformed into this war, -8=Not applicable
+        document: cow_nonstate_codebook
+        pdf_page: 3
+      TransTo:
+        text: TransTo - the WarNum of the war that this war transformed into, -8=Not applicable
+        document: cow_nonstate_codebook
+        pdf_page: 3
+      Initiator:
+        text: 'Initiator - the side, which began combat: A or B'
+        document: cow_nonstate_codebook
+        pdf_page: 3
+    values:
+      Outcome: {1: Side A wins, 2: Side B wins, 3: Compromise, 4: The war was transformed into another type of war,
+                5: The war is ongoing as of 12/31/2007, 6: Stalemate, 7: Conflict continues at below war level}
+      WarType: {8: wars between or among non-state entities that take place in non-state territory,
+                9: wars between NSAs that take place across state borders}
+    mappings:
+      - variables: [Outcome]
+        reva_kind: claim
+        causal: true
+        relation: coded_outcome
+        codebook_term: Outcome
+        cause: cow:war:<WarNum>
+        effect: cowwar:outcome:<WarNum>
+        why: War-level outcome. Code 5 (ongoing) -> no claim.
+      - variables: [TransTo, TransFrom]
+        reva_kind: context
+        causal: false
+        predicate: cowwar:transformed_into / cowwar:transformed_from
+        why: Category change of the same conflict, context only.
+  # ------------------------------------------------------------------------------------------------ PA-X v10
+  pax:
+    source_key: pax.peaceagreements
+    dataset: pax
+    dataset_revision: v10
+    file: pax_data_2257_agreements_v10.csv
+    codebook_document: pax_codebook
+    codebook_name: PA-X Codebook, Version 10 (PeaceRep, University of Edinburgh)
+    citation: 'Bell, C., & Badanjak, S. (2019). Introducing PA-X: A new peace agreement database and dataset. Journal of
+      Peace Research, 56(3), 452-466.'
+    definitions:
+      peace_agreement:
+        text: 'Peace Agreement: formal, publicly available document, produced after discussion with conflict protagonists
+          and mutually agreed to by some or all of them, addressing conflict with a view to ending it'
+        document: pax_codebook
+        pdf_page: 15
+      conflict:
+        text: 'Conflict: armed violence, causing more than 25 conflict-related deaths in one year'
+        document: pax_codebook
+        pdf_page: 15
+      UcdpCon:
+        text: UcdpCon Uppsala Conflict Data Program Conflict ID. Note that the Conflict IDs applied are from 2017 and onward,
+          after the UCDP introduced a new system of conflict designation. It is possible that this field is empty this
+          happens in cases of conflicts not registered in the UCDP conflict data.
+        document: pax_codebook
+        pdf_page: 24
+      CowWar:
+        text: 'CowWar Correlates of War: War Number. Many PA-X agreements come from peace processes in conflicts that do
+          not meet the high battle-related deaths criterion of the Correlates of War project, so the war numbers are not
+          provided for many of the agreements.'
+        document: pax_codebook
+        pdf_page: 25
+      UcdpAgr:
+        text: UcdpAgr Uppsala Conflict Data Program peace agreement ID.
+        document: pax_codebook
+        pdf_page: 24
+      peace_process:
+        text: 'Peace or Transition Process: a formal attempt to bring political and/or military protagonists of conflict,
+          to some sort of mutual agreement as to how to end the conflict, defined broadly as continuing through phases of
+          mediation, unless formally terminated, or a new process has been formally created, taking context into account.'
+        document: pax_codebook
+        pdf_page: 15
+      PP:
+        text: 'PP: Peace Process Number The number code for the peace process'
+        document: pax_codebook
+        pdf_page: 17
+      Dat:
+        text: 'Dat: Date Signed Listed in the dataset as YYYY-MM-DD The date on which the agreement was signed or agreed.'
+        document: pax_codebook
+        pdf_page: 18
+      Stage_imp:
+        text: 'Imp: Implementation/renegotiation. Aiming to implement an earlier agreement. Note that this category does
+          not include ceasefires.'
+        document: pax_codebook
+        pdf_page: 20
+      Stage_pre:
+        text: 'Pre: Pre-negotiation/process. Agreements that aim to get parties to the point of negotiating over the
+          incompatibilities at the heart of the conflict. Note that these agreements can happen at any time in a process
+          (even after a comprehensive peace agreement has been signed), if parties have moved back into ‘talking about
+          how they are going to talk’. Therefore, this characterization does not imply temporal precedence.'
+        document: pax_codebook
+        pdf_page: 20
+      OthAgr:
+        text: 'OthAgr: Other Agreement Names of any other agreements that the document in question mentions, as found in
+          the text.'
+        document: pax_codebook
+        pdf_page: 23
+      Contp:
+        text: 'Contp: Conflict type Type of conflict the agreement is addressing:'
+        document: pax_codebook
+        pdf_page: 16
+    mappings:
+      - variables: [UcdpCon]
+        reva_kind: claim
+        causal: true
+        relation: reaction_to
+        codebook_term: peace_agreement
+        cause: ucdp:conflict:<UcdpCon> (KGGEOPOL's UCDP/PRIO conflict ids, the post-2017 designation the codebook names)
+        effect: pax:agt:<AgtId>
+        why: 'A PA-X peace agreement is by definition "addressing conflict with a view to ending it" and UcdpCon codes
+          which (UCDP) conflict. Same mapping as the UCDP Peace Agreement Dataset in CAUSDATA (conflict -> agreement,
+          reaction_to): the agreement is a response to the conflict. Empty / NA -> no claim.'
+      - variables: [CowWar]
+        reva_kind: claim
+        causal: true
+        relation: reaction_to
+        codebook_term: peace_agreement
+        cause: cow:war:<CowWar> (COW v4 war numbering, the numbering of Resort to War cited by the codebook)
+        effect: pax:agt:<AgtId>
+        why: 'Same definition; CowWar codes which COW war the agreement''s conflict is. PA-X cites Sarkees & Wayman (2010):
+          the v4 numbering (checked: e.g. 856 "Eighth Colombia" in COW intra-state v4.1). A number absent from the COW v4
+          files (wars not loaded, e.g. 836 "Second South Sudan" is in v4.1) still makes the claim; the entity is then an
+          unknown entity of the loader until COW is loaded.'
+      - variables: [UcdpAgr]
+        reva_kind: context
+        causal: false
+        predicate: pax:ucdp_agreement_id (identifier; same_as rule pax_ucdp_agreement_id in registry/events/same_as_rules.yaml)
+        why: PA-X's own coding of the UCDP Peace Agreement Dataset id of the same document - identity evidence (same_as),
+          not a causal link.
+      - variables: [PP, PPName]
+        reva_kind: context
+        causal: false
+        predicate: P361 part of pax:process:<PP>
+        why: Membership of a peace process, structure only.
+      - variables: [Stage, StageSub]
+        reva_kind: context
+        causal: false
+        predicate: pax:stage (string)
+        why: '"Imp: Aiming to implement an earlier agreement" names no agreement (OthAgr gives free-text names "as found
+          in the text"); "Pre" explicitly "does not imply temporal precedence". No link between agreements is coded, so
+          none is made (no name matching).'
+      - variables: [Contp]
+        reva_kind: context
+        causal: false
+        predicate: causdata:coded_issue
+        why: Type of conflict the agreement addresses (government / territory ...), a coded issue, not a cause.
+  # ------------------------------------------------------------------------------------------------ IDMC GIDD
+  idmc_disasters:
+    source_key: idmc.gidd
+    dataset: idmc_disasters
+    dataset_revision: GIDD disasters 2025-05-13
+    file: IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx (sheet 1_Disaster_Displacement_data)
+    codebook_document: idmc_readme
+    codebook_name: 'IDMC Global Internal Displacement Database (GIDD) - Disasters, README sheet'
+    citation: 'Internal Displacement Monitoring Centre. Global Internal Displacement Database - Disasters. IDMC.
+      https://www.internal-displacement.org/database/displacement-data/'
+    definitions:
+      disaster_displacement:
+        text: 'Disaster displacement: Refers to situations where people are forced to leave their homes or places of
+          habitual residence as a result, or in anticipation of the negative impact of natural hazards.'
+        document: idmc_readme
+        cell: README!A24
+      disaster_internal_displacements:
+        text: 'Disaster Internal Displacements raw: Total number of internal displacements reported (not rounded), as a
+          result of disasters over the reporting year. Units are recorded as ''internal displacement flows'' or ''internal
+          displacement movements''.'
+        document: idmc_readme
+        cell: README!A46
+      displacement_occurred:
+        text: 'Displacement Occurred: This field contains values that represent if preventive evacuations were reported.
+          These evacuations are the result of existing early warning systems.'
+        document: idmc_readme
+        cell: README!A52
+      event_id:
+        text: 'Event ID: Unique identifier for events as assigned by IDMC.'
+        document: idmc_readme
+        cell: README!A51
+      event_codes:
+        text: 'Event Codes (Code:Type): Unique codes such as the GLIDE number and other database-specific codes used to
+          identify and track specific events across various databases.'
+        document: idmc_readme
+        cell: README!A50
+      date_of_event:
+        text: 'Date of Event (Start): Approximate start date of the event.'
+        document: idmc_readme
+        cell: README!A44
+    mappings:
+      - variables: [Event ID, Disaster Internal Displacements (Raw), ISO3, Year]
+        reva_kind: claim
+        causal: true
+        relation: has_effect
+        codebook_term: disaster_displacement
+        cause: idmc:event:<Event ID> (the disaster event; idmc:event:r<row key> when IDMC gives no Event ID)
+        effect: idmc:displacement:<event key>:<ISO3>:<Year> (the internal displacements the row reports)
+        why: 'The README defines the figure as internal displacements "as a result of disasters" and disaster displacement
+          as people "forced to leave their homes ... as a result, or in anticipation of the negative impact of natural
+          hazards": the source attributes the displacement to the event (has_effect, polarity promotes). Rows reporting
+          preventive evacuations (displacement in anticipation) keep that flag in the claim scope. A row without a positive
+          figure would give no claim (none in the 2025-05-13 file).'
+      - variables: [Event Codes (Code:Type)]
+        reva_kind: context
+        causal: false
+        predicate: idmc:glide_number / idmc:event_code (identifiers)
+        why: Cross-database identifiers (GLIDE, IFRC appeal ids, government ids) - identity evidence, never causal.
+      - variables: [Hazard Category, Hazard Type, Hazard Sub Type]
+        reva_kind: context
+        causal: false
+        predicate: idmc:hazard (string, CRED EM-DAT classification)
+        why: Attribute of the event (its type), not a cause.

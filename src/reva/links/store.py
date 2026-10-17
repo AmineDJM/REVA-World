@@ -403,7 +403,8 @@ def latest_materialisation(
     conn: Connection, *, atlas_origin: str | None = None, atlas_sha256: str | None = None, live_only: bool = False
 ) -> dict[str, Any] | None:
     """The latest materialisation (optionally for one atlas snapshot / origin). ``live_only`` (production):
-    a materialisation built from a fixture snapshot or fixture KG is never served."""
+    a materialisation built from a fixture snapshot or fixture KG is never served. A pruned materialisation
+    (``kg.link_prune``, ``reva links prune``; its link rows are gone) is never returned."""
     try:
         row = (
             conn.execute(
@@ -412,6 +413,8 @@ def latest_materialisation(
                          WHERE (CAST(:sha AS text) IS NULL OR atlas_snapshot_sha256 = :sha)
                            AND (CAST(:ao AS text) IS NULL OR atlas_origin = :ao)
                            AND (NOT :live OR (coalesce(atlas_origin, 'live') = 'live' AND kg_origin = 'live'))
+                           AND NOT EXISTS (SELECT 1 FROM kg.link_prune p
+                                            WHERE p.materialisation_id = kg.link_materialisation.id)
                          ORDER BY id DESC LIMIT 1"""
                 ),
                 {"sha": atlas_sha256, "ao": atlas_origin, "live": live_only},

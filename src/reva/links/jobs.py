@@ -53,7 +53,8 @@ def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
 def existing_materialisation(
     conn: Any, *, atlas_sha256: str | None, kg_origin: str | None, kg_watermark: int | None, top_k: int
 ) -> int | None:
-    """Id of a materialisation of exactly these inputs (method, taxonomy, snapshot, KG origin + watermark, top-k)."""
+    """Id of a materialisation of exactly these inputs (method, taxonomy, snapshot, KG origin + watermark, top-k);
+    a pruned one (its link rows deleted by ``reva links prune``) is never reused."""
     try:
         row = conn.execute(
             text(
@@ -63,6 +64,8 @@ def existing_materialisation(
                       AND kg_origin IS NOT DISTINCT FROM :ko
                       AND kg_load_watermark IS NOT DISTINCT FROM :wm
                       AND (parameters->>'top_k')::int = :k
+                      AND NOT EXISTS (SELECT 1 FROM kg.link_prune p
+                                       WHERE p.materialisation_id = kg.link_materialisation.id)
                     ORDER BY id DESC LIMIT 1"""
             ),
             {
