@@ -512,8 +512,10 @@ __all__ = [
     "MeetingCase",
     "build_cases",
     "compare",
+    "compute",
     "evaluate",
     "holm_by_model",
+    "record",
     "run",
     "run_level_case",
     "run_meeting_case",
@@ -536,25 +538,21 @@ def input_dataset_keys(specs: SpecSet, families: Sequence[str] | None = None) ->
     return sorted(keys)
 
 
-def run_recorded(
+def compute(
     engine: Any,
     store: Any,
     *,
     origin: str = "live",
     start_year: int = 2000,
     families: Sequence[str] | None = None,
-    record: bool = True,
-    actor: str = "worker:forecast_registry",
 ) -> dict[str, Any]:
-    """Pin the latest version of every input table, run the back-test and (``record``) store the manifest
-    content-addressed with a provenance activity and one ``model.evaluation`` row per finance model
-    (``metrics.kind = 'finance_backtest'``, replay mode ``revised_data_retrospective``)."""
+    """Pin the latest version of every input table and run the back-test (read-only)."""
     from datetime import datetime
 
     from sqlalchemy import text
 
     from reva.evaluation.registry.data import FrameCache, latest_version
-    from reva.evaluation.registry.service import _code_digest, _insert_eval, _short_pin, model_version_ids
+    from reva.evaluation.registry.service import _code_digest, _short_pin
     from reva.evaluation.registry.specs import load_specs
 
     specs = load_specs()
@@ -570,9 +568,20 @@ def run_recorded(
                         "missing_tables": sorted(k for k, p in pins.items() if not p)}  # fmt: skip
     manifest["specs"] = {"version": specs.version, "sha256": specs.sha256}
     manifest["code_digest"] = _code_digest()
-    if not record:
-        return manifest
+    return manifest
+
+
+def record(
+    engine: Any, store: Any, manifest: dict[str, Any], *, origin: str = "live", actor: str = "worker:forecast_registry"
+) -> dict[str, Any]:
+    """Store the manifest content-addressed with a provenance activity and one ``model.evaluation`` row per finance
+    model (``metrics.kind = 'finance_backtest'``, replay mode ``revised_data_retrospective``)."""
+    from datetime import datetime
+
     from reva.adapters.postgres import repositories as repo
+    from reva.evaluation.registry.service import _insert_eval, model_version_ids
+
+    cutoff = datetime.fromisoformat(manifest["run_at"])
 
     with engine.connect() as conn:
         mv = model_version_ids(conn)
@@ -607,3 +616,8 @@ def run_recorded(
                 act.id,
             )  # fmt: skip
     return {**manifest, "backtest_sha256": sha}
+
+
+def run_recorded(engine: Any, store: Any, **kw: Any) -> dict[str, Any]:
+    origin = kw.get("origin", "live")
+    return record(engine, store, compute(engine, store, **kw), origin=origin)
