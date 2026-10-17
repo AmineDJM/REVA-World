@@ -1,4 +1,4 @@
-"""CLI of the V6 PRED-MODELS evaluation: ``uv run python -m reva.evaluation.pred_models.cli dev|holdout``.
+"""CLI of the V6 PRED-MODELS evaluation: ``uv run python -m reva.cli.pred_models dev|holdout``.
 
 Reads the vintage atlas tables of the dev DB (read-only, API credentials). ``--store`` also records the manifest in
 the DB (evaluation namespace): run that under ``flock /tmp/reva-devdb.lock``.

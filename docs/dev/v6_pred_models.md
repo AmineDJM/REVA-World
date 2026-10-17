@@ -35,7 +35,7 @@ winner has no registry family yet. **No validated chain** was recorded for PRED-
 | Real-time cases per origin (WEO panel, US RTDSM+SPF, G7 OECD MEI editions; transforms inside each edition) | `src/reva/evaluation/pred_models/realtime.py` |
 | Second pass: combinations/conformal/bias using only errors published at the origin | `src/reva/evaluation/pred_models/derived.py` |
 | Scores (AE, CRPS, log, PIT, 80 % coverage, interval score), DM-HLN by origin, Holm | `src/reva/evaluation/pred_models/gate.py` (reuses `reva.models.tournament.dm_hln_test`, `holm_rejections`) |
-| Development stage, protocol, locked holdout (opened once, ledger), registration, DB manifest | `src/reva/evaluation/pred_models/service.py`, `cli.py` |
+| Development stage, protocol, locked holdout (opened once, ledger), registration, DB manifest | `src/reva/evaluation/pred_models/service.py`, CLI `src/reva/cli/pred_models.py` |
 | Issuance of registered models in the registry (supplementary sealed batches) | `src/reva/evaluation/pred_models/issue.py`; hooks: `registry/forecasts.py::pred_models()`, `registry/service.py` (issue action), `registry/read.py` (dedup, merged forecasts) |
 | Evidence | `registry/forecasts/pred_models/{development.json, protocol.yaml, holdout.json, holdout_ledger.yaml, registered_models.yaml}` |
 | Model entries (16, `candidate`) | `registry/models/methods.yaml` (seeded in the dev DB) |
@@ -201,9 +201,9 @@ can append an entry for a chain that uses it (back-test record = `holdout.json` 
 
 ```bash
 uv run pytest -q tests/unit/forecasting/test_pred_models.py
-uv run python -m reva.evaluation.pred_models.cli dev                 # development stage -> protocol.yaml (commit it!)
-uv run python -m reva.evaluation.pred_models.cli holdout             # opens the locked holdout ONCE (ledger)
-flock /tmp/reva-devdb.lock uv run python -m reva.evaluation.pred_models.cli holdout --store   # (with DB manifest)
+uv run python -m reva.cli.pred_models dev                 # development stage -> protocol.yaml (commit it!)
+uv run python -m reva.cli.pred_models holdout             # opens the locked holdout ONCE (ledger)
+flock /tmp/reva-devdb.lock uv run python -m reva.cli.pred_models holdout --store   # (with DB manifest)
 flock /tmp/reva-devdb.lock uv run reva seed                          # model versions (done)
 flock /tmp/reva-devdb.lock uv run reva forecasts issue               # baselines + registered-model supplements
 flock /tmp/reva-devdb.lock uv run reva forecasts resolve
