@@ -239,6 +239,14 @@ def create_app(
         __import__("reva.api.routes.forecasts", fromlist=["router"]).router
     )  # V5 registry (PRED-REGISTRY)
     app.include_router(__import__("reva.api.routes.predict", fromlist=["router"]).router)  # V5 decisions (PRED-ENGINE)
+    # V8: every module reva.api.routes.v8_<name> exposing ``router`` is included (no shared-file edits per agent).
+    import importlib
+    import pkgutil
+
+    import reva.api.routes as _routes_pkg
+
+    for _mod in sorted(m.name for m in pkgutil.iter_modules(_routes_pkg.__path__) if m.name.startswith("v8_")):
+        app.include_router(importlib.import_module(f"reva.api.routes.{_mod}").router)
 
     # Added before the header middleware so that it runs inside it: its 413 responses get headers/metrics.
     app.add_middleware(BodySizeLimit, max_bytes=max_body_bytes)
