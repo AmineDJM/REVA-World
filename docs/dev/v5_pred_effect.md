@@ -15,7 +15,7 @@ attributed numbers). Contract for other agents: `docs/dev/v5_effect_interface.md
 | Curated publications (10 entries, 73 estimates; every estimate states its `shock_profile`) | `registry/effects/literature/*.yaml` |
 | Connector `atlas.effects_lit@1.0.1` (source `effects.literature`, metered through `run_atlas_ingest`, raw PDFs archived, pinned sha256, quote re-check, load per publication) | `src/reva/adapters/connectors/atlas_effects_lit.py`, `registry/sources/effects_literature.yaml`, `registry/atlas/budget_requests/pred_effect.yaml` (merged: 40 req/day) |
 | API `/v1/effects/estimates`, `/v1/effects/estimates/{key}`, `/v1/effects/compare`, `/v1/effects/variables` (read scope, envelope warnings `attributed_estimates`, `no_pooling`, `licence_restricted`) | `src/reva/api/routes/effects.py` (+1 router line in `app.py`), `contracts/openapi.json` |
-| Tests: 37 unit (vocab = migration, every curated entry validates, 27 rejection rules, quote re-check, pdftotext on stdin, uncertainty bases, connector spec) + 6 integration on a throwaway DB (loader idempotence / revision / retraction / reinstatement / partial delivery, DB CHECKs and append-only, grants, sealed loads, REVA-run rows and readers, connector fixture run, API) | `tests/unit/effects/`, `tests/integration/test_effects_store.py`, synthetic fixture `tests/fixtures/effects/`, `tests/fixtures/source/atlas.effects_lit/` |
+| Tests: 39 unit (vocab = migration, every curated entry validates, 27 rejection rules, quote re-check, pdftotext on stdin, uncertainty bases, connector spec) + 6 integration on a throwaway DB (45 in all, passing) (loader idempotence / revision / retraction / reinstatement / partial delivery, DB CHECKs and append-only, grants, sealed loads, REVA-run rows and readers, connector fixture run, API) | `tests/unit/effects/`, `tests/integration/test_effects_store.py`, synthetic fixture `tests/fixtures/effects/`, `tests/fixtures/source/atlas.effects_lit/` |
 
 ### Honesty rules as implemented
 
@@ -58,7 +58,22 @@ store (provenance) and are **not** committed (fixture tests use a synthetic CC0 
 
 ## Load (dev DB)
 
-LOAD_RESULTS
+Dev DB `reva` (migration applied with `flock /tmp/reva-devdb.lock uv run reva db bootstrap`, schema fingerprint
+`d2fe2f92…`, head `0019_effect_estimates`; connector `atlas.effects_lit` registered with `reva seed`, now 1.0.3):
+
+* **72 current `publication` estimates in 9 loads** (one per publication), all `transcribed_double_checked`
+  (every quote re-found on its declared page in the archived bytes; 0 refused by the text check; every pinned
+  sha256 matched): Ball-Leigh-Loungani 24, Bobasu-Ciccarelli-Notarpietro 10, Head-Mayer 8, Ortega-Osbat 8,
+  Hazell et al. 6, Ramey-Zubairy 6, ECB OP 113 4, Baumeister-Hamilton 3, Gutmann et al. 3.
+* **Choi et al. (IMF WP/17/196) not loaded live**: `www.imf.org` answered HTTP 403 to the project's metered client
+  (a plain download of the same URL worked during curation). Not worked around: reported as `fetch_failed`
+  (connector 1.0.3 continues with the other entries; 1.0.2 aborted the run at that entry, after loading the first
+  three). The curated entry stays in the registry; owner decision below.
+* A second full run (connector 1.0.3) re-fetched the 9 reachable PDFs (10 requests, 16.3 MB metered,
+  budget `budgets-1.3.25`) and wrote nothing: 72 unchanged (idempotent; identical raw bytes are deduplicated).
+* PRED-EVENTSTUDY has already written 5 `reva_run` estimates (`run:es-…:h5`) through the same loader.
+* Disk: 6.7 GB free at the first live run; the last idempotent run started at 4.9 GB free (just under the 5 GB
+  rule; it added no new raw bytes).
 
 ## Examples (ids)
 
@@ -116,6 +131,10 @@ whose text does not say how the depreciation path is defined).
 2. Curator-assigned ISO3 codes from printed country names (kept verbatim beside the code): acceptable, or should a
    maintainer review each?
 3. Whether a maintainer review (`curation.review_status`) is required before PRED-ENGINE may use an estimate.
+4. `www.imf.org` refuses the project client (HTTP 403) for IMF working-paper PDFs: request access / an allowed
+   download route, or drop IMF sources (Choi et al. oil pass-through stays curated but unloaded).
+5. Contribution-share numbers (e.g. "45 percent of the 2006-8 rice price increase was due to insulating
+   behaviour"): add a `contribution_share` measure (new migration) or keep them out of the effects layer.
 
 ## Commands (to repeat or extend)
 
