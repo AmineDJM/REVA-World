@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import random
+from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -36,7 +37,7 @@ def _t(*a: int) -> datetime:
     return datetime(*a, tzinfo=UTC)  # type: ignore[misc]
 
 
-def _cells(spec: list[tuple[str, datetime | None, int, str, str]], geo: str = "FRA") -> pl.DataFrame:
+def _cells(spec: Sequence[tuple[str, datetime | None, int, str, str]], geo: str = "FRA") -> pl.DataFrame:
     """(vintage, available_at, year, value, estimate_kind) -> CELL_SCHEMA frame of family imf_weo."""
     rows = Rows()
     for v, avail, y, val, kind in spec:
@@ -93,7 +94,8 @@ def test_value_changes_exactly_at_the_availability_instant() -> None:
 
 def test_later_vintages_never_change_an_earlier_answer() -> None:
     a = VintageAccessor(_cells(BASE), _t(2008, 12, 15)).latest(include_projections=True).rows
-    more = BASE + [
+    more = [
+        *BASE,
         ("2009-10", _t(2009, 11, 1), 2007, "9.9", "published_history_boundary_unknown"),
         ("2009-10", _t(2009, 11, 1), 2008, "-9.9", "published_history_boundary_unknown"),
     ]
@@ -170,7 +172,7 @@ def test_inputs_are_validated() -> None:
 def _fixture(conn: str, url_part: str) -> bytes:
     man = json.loads((FIX / conn / "manifest.json").read_text())
     (hit,) = [e for e in man if url_part in e["url"]]
-    return (FIX / conn / hit["file"]).read_bytes()
+    return bytes((FIX / conn / hit["file"]).read_bytes())
 
 
 def _real_cells() -> pl.DataFrame:
@@ -222,7 +224,8 @@ def test_spf_as_of_a_release_date_uses_that_survey_not_the_next() -> None:
 
 
 def test_weo_backtest_uses_only_the_vintage_in_force() -> None:
-    spec = BASE + [
+    spec = [
+        *BASE,
         ("2009-10", _t(2009, 11, 1), 2008, "0.4", "published_history_boundary_unknown"),
         ("2009-10", _t(2009, 11, 1), 2009, "-2.0", "published_history_boundary_unknown"),
         ("2008-10", _t(2008, 11, 1), 2009, "0.5", "projection"),

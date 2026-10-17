@@ -57,7 +57,7 @@ FINAL_VINTAGE_DISCLAIMER = (
     "final-vintage pseudo-real-time: the latest published vintage is used at every origin; " + RETROSPECTIVE_DISCLAIMER
 )
 SERIES_KEY = ("family", "variable", "provider_geo", "period_start", "period_end")
-_FLAG_FIELDS = {
+_FLAG_FIELDS: dict[str, Any] = {
     "family": pl.String,
     "vintage": pl.String,
     "vintage_date_text": pl.String,

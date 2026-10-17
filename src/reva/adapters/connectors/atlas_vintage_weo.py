@@ -304,8 +304,8 @@ def parse_imf(body: bytes, raw_sha: str, flow: str, version: str, rows: Rows, st
             dataset=DS_IMF,
             indicator=indicator(r["indicator"], vintage),
             provider_geo=r["provider_geo"],
-            start=s,
-            end=e,
+            start=p0,
+            end=p1,
             value=r["value"],
             unit=r["unit"],
             flags=vintage_flags(

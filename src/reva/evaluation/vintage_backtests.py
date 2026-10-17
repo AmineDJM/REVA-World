@@ -135,7 +135,7 @@ def weo_backtest(
                 counts[f"h{h}_no_outcome_vintage_yet"] += fc.height
                 continue
             ov, oa, ovals = oc
-            for g, s, fv in fc.select("provider_geo", "value", "vintage").iter_rows():
+            for g, s, _fv in fc.select("provider_geo", "value", "vintage").iter_rows():
                 f = _f(s)
                 if f is None:
                     continue

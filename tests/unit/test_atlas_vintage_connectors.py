@@ -206,7 +206,7 @@ def test_ecb_spf_calendar_and_longer_term_horizons_only() -> None:
     rows: Rows = Rows()
     stats: dict = {}
     ecb.parse_csv(_fixture("atlas.vintage_ecb_spf", "data-api.ecb.europa.eu"), SHA, rows, stats)
-    df, unmapped = validate_atlas_frame(rows.frame(), source="vintage_ea", dataset="ecb_spf", raw_sha256s=[SHA])
+    df, _unmapped = validate_atlas_frame(rows.frame(), source="vintage_ea", dataset="ecb_spf", raw_sha256s=[SHA])
     assert stats["rolling_horizon_not_loaded"] > 0
     lt = df.filter(pl.col("indicator") == "HICP.LT|v=2008-Q3").to_dicts()[0]
     assert lt["period_start"] == date(2013, 1, 1)  # 5 calendar years ahead in Q3 rounds
