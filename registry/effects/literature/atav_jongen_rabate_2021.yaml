@@ -1,0 +1,361 @@
+# Pension-age reforms and employment / retirement at the affected ages: comparison tables of a Dutch study
+# (agent EFFECTS-MORE, V6; archives a source already curated in registry/assumptions/retirement_employment_response.yaml).
+# Rows marked evidence: secondary are other studies' numbers as reported in Tables B.1 / B.2.
+schema: reva-effects-literature/1
+id: atav_jongen_rabate_2021
+source_key: effects.literature
+citation:
+  text: "Tilbe Atav, Egbert Jongen, Simon Rabaté. Increasing the Effective Retirement Age: Key Factors and Interaction Effects. IZA Discussion Paper No. 14150, February 2021."
+  text_basis: assembled from the title page of the version read (IZA discussion paper)
+  short: "Atav, Jongen & Rabaté (2021), IZA DP 14150"
+  authors: [Tilbe Atav, Egbert Jongen, Simon Rabaté]
+  title: "Increasing the Effective Retirement Age: Key Factors and Interaction Effects"
+  year: 2021
+  series: IZA Discussion Paper No. 14150
+  doi: null
+  url: https://docs.iza.org/dp14150.pdf
+document:
+  url: https://docs.iza.org/dp14150.pdf
+  media_type: application/pdf
+  sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+  bytes: 646046
+  version_read: "IZA DP No. 14150, February 2021"
+as_of: "2021-02-01"
+rights:
+  licence: "No licence statement in the document read (IZA discussion paper, free download); treated as all rights reserved; short quotation with credit."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: permanent_level_shift
+  measure: response
+  unit: percentage_points
+  point_kind: point
+  uncertainty: {status: not_reported}
+  horizon: {kind: unspecified}
+estimates:
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♂: ERA 60 → 62'' (Staubli & Zweimüller (2013); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: years}
+  scope:
+    countries: [AUT]
+    population: men at the affected ages
+    sample_note: 'Staubli & Zweimüller (2013): ♂: ERA 60 → 62'
+  identification: DID as reported in Table B.1 for Staubli & Zweimüller (2013)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Staubli & Zweimüller (2013)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Staubli & AUT ♂: ERA 60 → 62 DID +9.8 -24.8 28 0.50 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Staubli & Zweimüller (2013) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_staubli_zweimuller_2013_men
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 9.8
+  as_printed: '+9.8'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♂: ERA 60 → 62'' (Staubli & Zweimüller (2013); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: years}
+  scope:
+    countries: [AUT]
+    population: men at the affected ages
+    sample_note: 'Staubli & Zweimüller (2013): ♂: ERA 60 → 62'
+  identification: DID as reported in Table B.1 for Staubli & Zweimüller (2013)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Staubli & Zweimüller (2013)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Staubli & AUT ♂: ERA 60 → 62 DID +9.8 -24.8 28 0.50 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Staubli & Zweimüller (2013) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_staubli_zweimuller_2013_men
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -24.8
+  as_printed: '-24.8'
+  sign: negative
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 55 → 58+3m'' (Staubli & Zweimüller (2013); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 39, unit: months}
+  scope:
+    countries: [AUT]
+    population: women at the affected ages
+    sample_note: 'Staubli & Zweimüller (2013): ♀: ERA 55 → 58+3m'
+  identification: DID as reported in Table B.1 for Staubli & Zweimüller (2013)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Staubli & Zweimüller (2013)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Staubli & AUT ♂: ERA 60 → 62 DID +9.8 -24.8 28 0.50 14 Zweimüller (2013) ♀: ERA 55 → 58+3m +11.0 -25.4 57 0.25 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Staubli & Zweimüller (2013) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_staubli_zweimuller_2013_women
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 11.0
+  as_printed: '+11.0'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 55 → 58+3m'' (Staubli & Zweimüller (2013); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 39, unit: months}
+  scope:
+    countries: [AUT]
+    population: women at the affected ages
+    sample_note: 'Staubli & Zweimüller (2013): ♀: ERA 55 → 58+3m'
+  identification: DID as reported in Table B.1 for Staubli & Zweimüller (2013)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Staubli & Zweimüller (2013)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Staubli & AUT ♂: ERA 60 → 62 DID +9.8 -24.8 28 0.50 14 Zweimüller (2013) ♀: ERA 55 → 58+3m +11.0 -25.4 57 0.25 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Staubli & Zweimüller (2013) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_staubli_zweimuller_2013_women
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -25.4
+  as_printed: '-25.4'
+  sign: negative
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: NRA 60 → 65'' (Atalay & Barrett (2015); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 5, unit: years}
+  scope:
+    countries: [AUS]
+    population: women at the affected ages
+    sample_note: 'Atalay & Barrett (2015): ♀: NRA 60 → 65'
+  identification: DID as reported in Table B.1 for Atalay & Barrett (2015)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Atalay & Barrett (2015)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Atalay & Barrett (2015) AUS ♀: NRA 60 → 65 DID +7.7 × 30-50 × ×'
+  evidence: secondary
+  applicability: 'REVA note: number of Atalay & Barrett (2015) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_atalay_barrett_2015_women
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 7.7
+  as_printed: '+7.7'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 60 → 62'' (Cribb et al. (2016); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: years}
+  scope:
+    countries: [GBR]
+    population: women at the affected ages
+    sample_note: 'Cribb et al. (2016): ♀: ERA 60 → 62'
+  identification: DID as reported in Table B.1 for Cribb et al. (2016)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Cribb et al. (2016)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Cribb et al. (2016) UK ♀: ERA 60 → 62 DID +6.3 -11.5 55 0.25 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Cribb et al. (2016) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_cribb_et_al_2016_women
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 6.3
+  as_printed: '+6.3'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 60 → 62'' (Cribb et al. (2016); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: years}
+  scope:
+    countries: [GBR]
+    population: women at the affected ages
+    sample_note: 'Cribb et al. (2016): ♀: ERA 60 → 62'
+  identification: DID as reported in Table B.1 for Cribb et al. (2016)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Cribb et al. (2016)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Cribb et al. (2016) UK ♀: ERA 60 → 62 DID +6.3 -11.5 55 0.25 14'
+  evidence: secondary
+  applicability: 'REVA note: number of Cribb et al. (2016) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_cribb_et_al_2016_women
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -11.5
+  as_printed: '-11.5'
+  sign: negative
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''SRA 65 → 65+6m'' (De Vos et al. (2018); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 6, unit: months}
+  scope:
+    countries: [NLD]
+    population: persons at the affected ages
+    sample_note: 'De Vos et al. (2018): SRA 65 → 65+6m'
+  identification: DID as reported in Table B.1 for De Vos et al. (2018)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'De Vos et al. (2018)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: De Vos et al. (2018) NLD SRA 65 → 65+6m DID +10 × 43 0.35 15
+  evidence: secondary
+  applicability: 'REVA note: number of De Vos et al. (2018) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_de_vos_et_al_2018
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 10.0
+  as_printed: '+10'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''NRA 60 → 61'' (Rabaté & Rochut (2019); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 1, unit: years}
+  scope:
+    countries: [FRA]
+    population: persons at the affected ages
+    sample_note: 'Rabaté & Rochut (2019): NRA 60 → 61'
+  identification: DID as reported in Table B.1 for Rabaté & Rochut (2019)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Rabaté & Rochut (2019)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: Rabaté & Rochut (2019) FRA NRA 60 → 61 DID +20.9 -47.8 45 0.50 23
+  evidence: secondary
+  applicability: 'REVA note: number of Rabaté & Rochut (2019) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_rabate_rochut_2019
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 20.9
+  as_printed: '+20.9'
+  sign: positive
+- pdf_page: 38
+  method: did
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''NRA 60 → 61'' (Rabaté & Rochut (2019); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 1, unit: years}
+  scope:
+    countries: [FRA]
+    population: persons at the affected ages
+    sample_note: 'Rabaté & Rochut (2019): NRA 60 → 61'
+  identification: DID as reported in Table B.1 for Rabaté & Rochut (2019)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Rabaté & Rochut (2019)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: Rabaté & Rochut (2019) FRA NRA 60 → 61 DID +20.9 -47.8 45 0.50 23
+  evidence: secondary
+  applicability: 'REVA note: number of Rabaté & Rochut (2019) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_rabate_rochut_2019
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -47.8
+  as_printed: '-47.8'
+  sign: negative
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 60 → 63'' (Geyer & Welteke (2019); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 3, unit: years}
+  scope:
+    countries: [DEU]
+    population: women at the affected ages
+    sample_note: 'Geyer & Welteke (2019): ♀: ERA 60 → 63'
+  identification: RDD as reported in Table B.1 for Geyer & Welteke (2019)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Geyer & Welteke (2019)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Geyer & Welteke (2019) GER ♀: ERA 60 → 63 RDD +13.5 -27.6 62 0.19 12'
+  evidence: secondary
+  applicability: 'REVA note: number of Geyer & Welteke (2019) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_geyer_welteke_2019_women
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 13.5
+  as_printed: '+13.5'
+  sign: positive
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''♀: ERA 60 → 63'' (Geyer & Welteke (2019); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 3, unit: years}
+  scope:
+    countries: [DEU]
+    population: women at the affected ages
+    sample_note: 'Geyer & Welteke (2019): ♀: ERA 60 → 63'
+  identification: RDD as reported in Table B.1 for Geyer & Welteke (2019)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Geyer & Welteke (2019)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: 'Geyer & Welteke (2019) GER ♀: ERA 60 → 63 RDD +13.5 -27.6 62 0.19 12'
+  evidence: secondary
+  applicability: 'REVA note: number of Geyer & Welteke (2019) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence; Table C.1 of their online appendix gives the primary locators). Effects concern people at the ages affected by the reform and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_geyer_welteke_2019_women
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -27.6
+  as_printed: '-27.6'
+  sign: negative
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''SRA 65 → 65+2m'' (Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: months}
+  scope:
+    countries: [NLD]
+    population: persons at the affected ages
+    sample_note: 'Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2): SRA 65 → 65+2m'
+  identification: RDD as reported in Table B.1 for Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: This paper NLD More generous ERe SRA 65 → 65+2m RDD +4.5 -13.5 15 0.50 8
+  applicability: 'REVA note: averages over the authors'' cutoffs as stated in the table notes; effects concern people at the ages affected and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_this_paper_more_generous_er
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 4.5
+  as_printed: '+4.5'
+  sign: positive
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''SRA 65 → 65+2m'' (Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 2, unit: months}
+  scope:
+    countries: [NLD]
+    population: persons at the affected ages
+    sample_note: 'Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2): SRA 65 → 65+2m'
+  identification: RDD as reported in Table B.1 for Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Atav, Jongen & Rabaté (this paper), more generous early retirement (averages for cutoffs 1 and 2)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: This paper NLD More generous ERe SRA 65 → 65+2m RDD +4.5 -13.5 15 0.50 8
+  applicability: 'REVA note: averages over the authors'' cutoffs as stated in the table notes; effects concern people at the ages affected and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_this_paper_more_generous_er
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -13.5
+  as_printed: '-13.5'
+  sign: negative
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''SRA 65+3m → 66+4m'' (Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 13, unit: months}
+  scope:
+    countries: [NLD]
+    population: persons at the affected ages
+    sample_note: 'Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6): SRA 65+3m → 66+4m'
+  identification: RDD as reported in Table B.1 for Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: This paper NLD More generous ERe SRA 65 → 65+2m RDD +4.5 -13.5 15 0.50 8 Less generous ERf SRA 65+3m → 66+4m RDD +20.3 -58.6 29 0.70 20
+  applicability: 'REVA note: averages over the authors'' cutoffs as stated in the table notes; effects concern people at the ages affected and are not proportional to the size of the age change: do not scale linearly.'
+  id: employment_this_paper_less_generous_er
+  effect: {kind: variable, id: labour.employment_rate_affected_ages, transform: pp_change, definition: employment rate at the ages affected (percentage points)}
+  point: 20.3
+  as_printed: '+20.3'
+  sign: positive
+- pdf_page: 38
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: 'pension-age reform ''SRA 65+3m → 66+4m'' (Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6); ERA = early, NRA = normal, SRA = statutory retirement age)'}
+  shock: {size: 13, unit: months}
+  scope:
+    countries: [NLD]
+    population: persons at the affected ages
+    sample_note: 'Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6): SRA 65+3m → 66+4m'
+  identification: RDD as reported in Table B.1 for Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6)
+  locator: Appendix B, Table B.1 'Comparison with results of related studies on effects near ERA, NRA or SRA', row 'Atav, Jongen & Rabaté (this paper), less generous early retirement (averages for cutoffs 3 to 6)', columns 'Employm. rate pp' / 'Retirem. rate pp' (pdf p.38, printed p.35)
+  quote: This paper NLD More generous ERe SRA 65 → 65+2m RDD +4.5 -13.5 15 0.50 8 Less generous ERf SRA 65+3m → 66+4m RDD +20.3 -58.6 29 0.70 20
+  applicability: 'REVA note: averages over the authors'' cutoffs as stated in the table notes; effects concern people at the ages affected and are not proportional to the size of the age change: do not scale linearly.'
+  id: retirement_this_paper_less_generous_er
+  effect: {kind: variable, id: pension.receipt_rate_affected_ages, transform: pp_change, definition: retirement rate at the ages affected (percentage points)}
+  point: -58.6
+  as_printed: '-58.6'
+  sign: negative
+- id: retirement_age_per_month_nra_mastrobuoni_2009_men
+  pdf_page: 38
+  evidence: secondary
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: increase of the normal retirement age (NRA 62 → 65 reform; per month of NRA increase)}
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average retirement age (men), months per month of NRA increase'}
+  measure: slope
+  unit: unit_per_unit
+  point: 0.8
+  as_printed: '+0.8'
+  sign: positive
+  scope:
+    countries: [USA]
+    population: men
+    sample_note: Mastrobuoni (2009), NRA 62 → 65, regression kink design
+  identification: RKD as reported in Table B.2 for Mastrobuoni (2009)
+  locator: Appendix B, Table B.2 'Comparison with related studies looking at average retirement age', row 'Mastrobuoni (2009)', column 'Ave. retirement age per month ERA/NRA/SRA' (pdf p.38)
+  quote: 'Mastrobuoni (2009) USA NRA 62 → 65 RKD ♂: +0.8, ♀: +0.6'
+  applicability: 'REVA note: number of Mastrobuoni (2009) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence).'
+- id: retirement_age_per_month_nra_mastrobuoni_2009_women
+  pdf_page: 38
+  evidence: secondary
+  method: rdd
+  cause: {kind: variable, id: pension.minimum_pension_age, transform: level_change, definition: increase of the normal retirement age (NRA 62 → 65 reform; per month of NRA increase)}
+  effect: {kind: variable, id: labour.labour_market_exit_age, transform: level_change, definition: 'average retirement age (women), months per month of NRA increase'}
+  measure: slope
+  unit: unit_per_unit
+  point: 0.6
+  as_printed: '+0.6'
+  sign: positive
+  scope:
+    countries: [USA]
+    population: women
+    sample_note: Mastrobuoni (2009), NRA 62 → 65, regression kink design
+  identification: RKD as reported in Table B.2 for Mastrobuoni (2009)
+  locator: Appendix B, Table B.2 'Comparison with related studies looking at average retirement age', row 'Mastrobuoni (2009)', column 'Ave. retirement age per month ERA/NRA/SRA' (pdf p.38)
+  quote: 'Mastrobuoni (2009) USA NRA 62 → 65 RKD ♂: +0.8, ♀: +0.6'
+  applicability: 'REVA note: number of Mastrobuoni (2009) as reported in Atav, Jongen & Rabaté''s comparison table (secondary evidence).'
