@@ -1,57 +1,137 @@
 [
   {
-    "request_fingerprint": "9d1acbc435d712c4251df356aa9f545b14ac2dd369a29ffef3619019749c813b",
-    "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/CPC_Ver_2_1_english_structure.txt",
-    "file": "9d1acbc435d712c4.txt",
-    "sha256": "a3d03290054ddb3f974be6a40f1a2273baf3e5373db0073fadcfc3b4374fd31b",
+    "request_fingerprint": "55d2c0b12dfdbf39899398a624554a6b5b4c23d1a37df02e0eb7b800bdc6073a",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/download/In%20Text/HSCodeandDescription.xlsx",
+    "file": "hs_codes.xlsx",
+    "sha256": "35ace18fea9c3fd709638e64c5572da54e39b44ab92f78379a9c32224b3e96e1",
     "status": 200,
     "headers": {
-      "content-type": "text/plain"
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "last-modified": "Thu, 04 Aug 2022 14:36:00 GMT"
     },
-    "retrieved_at": "2026-10-17T13:32:58+00:00",
-    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
-    "note": "EXCERPT: header + every row of CPC section 0 (ISO-8859-1 bytes verbatim)",
-    "excerpt_of_sha256": "1c3e88e5fa67b9ba0d27594cb3363f717321f58fe0308be60b326ebf927c1b92"
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "b087d2849c69bc51f04f5a5084ad10e75c426fe4490eec60601817a6f57108b6",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/SITCCodeandDescription.xlsx",
+    "file": "sitc_codes.xlsx",
+    "sha256": "d208c034b393d002b809cc6eb587ca16c82a62063465efd3388861590db2bd2d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "9d1acbc435d712c4251df356aa9f545b14ac2dd369a29ffef3619019749c813b",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/CPC_Ver_2_1_english_structure.txt",
+    "file": "cpc21_structure.txt",
+    "sha256": "25e844129f444830a32baab92c1270473d0e6a4726cce0163bb3ba27d728e4f5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain",
+      "last-modified": "Sat, 22 Aug 2015 00:05:22 GMT"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
   },
   {
     "request_fingerprint": "133b31fea4c3f483404eeaad6801cba593842f469d4463bc18063cf37384136c",
     "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt",
-    "file": "133b31fea4c3f483.txt",
-    "sha256": "0d38ddb7e31697fffe086ba47ec04f5bee9ccedcac2e5bdcd392a3e1cb349371",
+    "file": "isic4_structure.txt",
+    "sha256": "414b7d6f2612049ee710ca9ea0d7f1ad7eca611ab39428ff940a7babc110b070",
     "status": 200,
     "headers": {
-      "content-type": "text/plain"
+      "content-type": "text/plain",
+      "last-modified": "Wed, 13 Aug 2008 01:34:10 GMT"
     },
-    "retrieved_at": "2026-10-17T13:32:56+00:00",
-    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
-    "note": "EXCERPT: header + sections A and B (all their divisions/groups/classes), verbatim lines of the live file",
-    "excerpt_of_sha256": "18b645efc5a0b001fda5852cfd0690eb579011651e405631e50cb2d271ee2cc6"
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "8d19a55098d7786aff04026f672404d4f81001043d43823e07fc280c4406dd83",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/CPC/CPCv21_HS2017/CPC21-HS2017.csv",
+    "file": "hs2017_cpc21.txt",
+    "sha256": "a2c2ef601af8496c41fbe5ffae33202f2c994b4e8cf81eeb93ada87ca09fc906",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain",
+      "last-modified": "Fri, 27 Mar 2020 13:40:23 GMT"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
   },
   {
     "request_fingerprint": "99a5887ac043a493c7e9ec1be47dbca4367177e9732fa2cbb4fb3552aa231be1",
     "url": "https://unstats.un.org/unsd/classifications/Econ/tables/CPC/CPCv21_ISIC4/cpc21-isic4.txt",
-    "file": "99a5887ac043a493.txt",
-    "sha256": "0fe09f86bf53070ee1f29bd9c59e58c47ae65ae3a245fb1911c269e47cc8af95",
+    "file": "cpc21_isic4.txt",
+    "sha256": "878ebb560ed43a55598819e926d35fa6e1e155170c30262c68814612038ccfa6",
     "status": 200,
     "headers": {
-      "content-type": "text/plain"
+      "content-type": "text/plain",
+      "last-modified": "Wed, 19 Aug 2015 19:17:40 GMT"
     },
-    "retrieved_at": "2026-10-17T13:33:00+00:00",
-    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
-    "note": "EXCERPT: header + every correspondence row of CPC section 0",
-    "excerpt_of_sha256": "0272188c086fb5d8efa3923749cc7b5a1bd5a12e7719843d26c2f2b38ea2f392"
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
   },
   {
     "request_fingerprint": "675b985a299b27b04ba61d814209d20339b0a39c9c197f03b88cc5aeb367891e",
     "url": "https://unstats.un.org/unsd/classifications/Econ/tables/CPC/CPCv21_ISIC4/readme.txt",
-    "file": "675b985a299b27b0.txt",
+    "file": "cpc21_isic4_readme.txt",
     "sha256": "213503bb85da882a79de1e1b5e37e5347323d9194c809690d014469c979ddd67",
     "status": 200,
     "headers": {
       "content-type": "text/plain"
     },
-    "retrieved_at": "2026-10-17T13:33:02+00:00",
-    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
-    "note": "full live file"
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "20e6ab492a237081cfe9cf3907a7f4c8d72ce1ce8d830f74608d87af2957de3c",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/HS2022toHS2017ConversionAndCorrelationTables.xlsx",
+    "file": "hs2022_hs2017.xlsx",
+    "sha256": "02a6e7c624fdbae6076e88f8298ea06c9823f43ad750c53cfe55b87b6fec765b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "a944513c6bd6da55fe948db767b53728fb20c47dd2ad14a19619503031b395b3",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/HS2022toHS1992ConversionAndCorrelationTables.xlsx",
+    "file": "hs2022_hs1992.xlsx",
+    "sha256": "081caf9aad6826b2cc8ba8a5986da741968157de303779e43fb17684a73f4c71",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
+  },
+  {
+    "request_fingerprint": "d86a5b2da497e49863e6448797453e9057ab4c2f5a96003aa12fdcdee8719cff",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/HS2022toSITC4ConversionAndCorrelationTables.xlsx",
+    "file": "hs2022_sitc4.xlsx",
+    "sha256": "6173122c4206b8fbf35c62cdbe654c309cac62fd06035d6bd4df3828e1952171",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-17T12:00:00+00:00",
+    "licence": "UNSD files, free download under the United Nations terms of use (https://www.un.org/en/about-us/terms-of-use); HS descriptions reproduce the Harmonized System nomenclature (c) World Customs Organization -- redistribution licence not stated (flagged)",
+    "fixture_note": "trimmed by V4LINK from the live UNSD file of 2026-10-17 (HS chapters 26-27, SITC section 3 and division 28, CPC 1/12/14/3/33, ISIC B/C 05-09/19; xlsx rebuilt with the same sheets and rows, cell texts verbatim)"
   }
 ]

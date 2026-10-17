@@ -1,0 +1,21 @@
+# Atlas indicator dimensions that name a KG classification entity (owner: V4LINK). Read by people and by the
+# links/Neurones layer: an atlas cell whose folded indicator carries `<dimension>=<code>` is about the KG entity
+# `<kg_prefix><code>` -- the provider's own code, no mapping table, no name matching. Checked by
+# tests/unit/test_v4link.py against the loaded classification structure (the code must exist in the scheme).
+version: 1
+dimensions:
+  - atlas: baci.hs92_pair_hs2
+    dimension: hs2
+    kg_prefix: "hs1992:"
+    level: chapter
+    evidence: >-
+      CEPII BACI is built on the HS 1992 nomenclature (file BACI_HS92_V202601.zip, product_codes_HS92_V202601.csv);
+      atlas_baci folds the first two digits of BACI's HS 1992 6-digit product code as `hs2=<CC>`, i.e. the HS 1992
+      chapter. The chapter entity is loaded by atlas.unsd_classif from UNSD's HS 1992 code list (sheet HS92).
+  - atlas: baci.hs92_country
+    dimension: section
+    kg_prefix: null
+    level: section
+    evidence: >-
+      BACI sections (I..XXI) are atlas_baci's grouping of HS chapters (its HS_SECTIONS table); UNSD's HS code list has
+      no section rows, so no KG entity is claimed for them (chapters are reached through hs2 instead).

@@ -1,0 +1,22 @@
+# V4LINK mappings of the bridge predicates (src/reva/adapters/connectors/v4link_common.py) to the universal relation
+# families. Classification hierarchies read as part_of (a subheading is a subdivision of its heading); a code that
+# Wikidata states for an item reads as is_a (the item is classified under the code).
+#
+# Deliberately unmapped until V4CORE adds a fitting family (request in docs/dev/v4_v4link.md section 6):
+# * v4link:corresponds_to (a row of a published concordance table, HS <-> CPC <-> ISIC <-> SITC): not part_of, not
+#   is_a, not an identity; requested family `corresponds_to` (symmetric, group classification).
+# * v4link:wikidata_item (identifier held by a Wikidata item: identity evidence, like V4BIO's bio:wikidata_item):
+#   requested family `same_as` (symmetric, group identity, never merges entities).
+# Both predicates stay traversable as plain KG edges (/v1/kg/path, links statement_edges).
+version: 1
+agent: V4LINK
+note: >-
+  Sources: UNSD classification files (source unsd.classifications) and Wikidata external-identifier statements
+  (source wikidata.wdqs). No family here is causal; concordance rows carry the table's own partial / relationship
+  flags as qualifiers.
+mappings:
+  - {property: "v4link:class_parent", family: part_of, subtype: classification_subdivision, source: unsd.classifications,
+     subject_kinds: [hs_code, cpc_code, isic_code, sitc_code], object_kinds: [hs_code, cpc_code, isic_code, sitc_code]}
+  - {property: "v4link:classified_as", family: is_a, subtype: classified_under_code, source: wikidata.wdqs,
+     object_kinds: [hs_code, cpc_code, isic_code, nace_code, isco_code],
+     note: "Wikidata states the classification code of the item (crude oil -> HS 2022 2709); community-edited."}
