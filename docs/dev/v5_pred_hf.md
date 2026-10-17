@@ -71,4 +71,83 @@ No migration, no KG entity (the concepts live in the atlas catalog; the series a
   unmapped). EIA rows carry the trading location printed in the EIA title (`Cushing, OK`, `Europe`, `New York
   Harbor`, `U.S. Gulf Coast`, `Los Angeles`, `Mont Belvieu, TX`, `Henry Hub`) — never mapped to a country by name.
 
-LIVE_SECTION_PLACEHOLDER
+## 3. Live load (dev DB `reva`, 2026-10-17, under `flock /tmp/reva-devdb.lock`)
+
+All six sources ingested live (budget policy `budgets-1.3.24`, 94 requests, **35.3 MB raw archived** — well under
+the 100 MB cap), 11 atlas tables, **2,023,365 rows**, every policy quote found (29/29):
+
+| table | rows | span | content / notes |
+|---|---:|---|---|
+| `ecb.fx_ref` | 221,412 | 1999-01-04 … 2026-10-16 | 41 currencies (30 still quoted); 70,344 `N/A` cells → no row |
+| `ecb.estr` | 12,628 | 2019-10-01 … 2026-10-15 | 7 series (WT rate, R25/R75, TT volume in EUR millions, NT, NB, VL) |
+| `ecb.key_rates` | 30,456 | 1999-01-01 … 2026-10-17 | DFR, MLFR, MRR_FR, MRR_MBR (level in force per calendar day) |
+| `bis.cbpol_d` | 638,911 | 1945 … 2026-10-13 | 49 areas; 69,861 status-M cells dropped |
+| `bis.cbpol_d_series` | 167 | per series | COMPILATION / SOURCE_REF / SUPP_INFO_BREAKS / TITLE texts (`value_text`) |
+| `bis.eer_d` | 801,278 | 1983-10-03 … 2026-10-13 | 90 nominal EER series (64 broad, 26 narrow); 320,516 status-H cells dropped |
+| `ust.par_yield` | 99,824 | 1990-01-02 … 2026-10-16 | 37 yearly files, 14 tenors over time; 1,019 empty cells |
+| `ust.real_yield` | 27,584 | 2003-01-02 … 2026-10-16 | 24 yearly files, 5 tenors |
+| `eia.spot_d` | 90,255 | 1986-01-02 … 2026-10-14 | 12 series, release 2026-10-15 (next 2026-10-21); licence review flagged |
+| `boe.rates_d` | 29,190 | 1975-01-02 … 2026-10-15 | Bank Rate 13,092; SONIA 7,526; 4 percentiles × 2,143 |
+| `nyfed.rates_d` | 71,660 | 2000-07-03 … 2026-10-15 | EFFR 6,606 records (35 revised, `r`), OBFR 2,670 (1 revised), SOFR 2,133 (8 `NA` percentiles → no row) |
+
+Examples (ids as stored): `ecb.fx_ref` `EUR_REF|currency=USD` / `U2` / 2026-10-16 = `1.1253` `USD per EUR`
+(`flags.pub_lag = same_day`, `as_of = 2026-10-17`); `eia.spot_d` `EIA_SPOT|series=RWTC` / `Cushing, OK` / 2020-04-20
+= `-36.98` `Dollars per Barrel` (selector: week "2020 Apr-20 to Apr-24", column Mon, byte offset in the archived
+page); `bis.cbpol_d` `CBPOL` / `US` (iso3 USA) / 1954-07-01 = `1.13`, whose meaning is in `bis.cbpol_d_series`
+`CBPOL_SERIES|attr=COMPILATION` / `US` ("From 19 Dec 1985 onwards: mid-point of the Federal Reserve target rate; from
+1 Jul 1954 to 18 Dec 1985: US Fed Funds effective rate."); `nyfed.rates_d` `EFFR|field=percentRate` rows with
+`flags.revision_indicator = "r"` are the NY Fed's same-day revised values. Catalog concepts point at these series,
+e.g. `prices.daily.brent_spot` → `eia.spot_d.EIA_SPOT|series=RBRTE`, `finance.daily.policy_rate` →
+`bis.cbpol_d.CBPOL`, `finance.daily.ust_par_10yr` → `ust.par_yield.UST_PAR|tenor=10 Yr`. PRED-REGISTRY already
+resolves questions on `atlas.eia.spot_d` (Brent monthly mean) and `atlas.ecb.fx_ref` (USD/CNY/JPY monthly means)
+and on `bis.cbpol_d`.
+
+Not run here (lead's job): `reva atlas snapshot`, `reva links materialise`.
+
+## 4. Missing, and why
+
+* **Gold, silver, platinum, palladium daily prices: not taken.** The LBMA Gold/Silver Prices (ICE Benchmark
+  Administration) and LPPM platinum/palladium prices are licensed benchmarks (FRED withdrew the LBMA series in 2022
+  for that reason); no open, redistributable daily source was found. COMEX/NYMEX futures (CME) and the NYMEX
+  natural-gas futures EIA republishes are likewise exchange-licensed: not taken. Monthly precious-metal prices exist
+  in the World Bank Pink Sheet (V4ENERGY, `wb_cmo.*`, CC BY 4.0).
+* **Other daily commodities** (metals, grains): no open daily source with clear redistribution terms identified;
+  monthly prices are V4ENERGY's / V4ECON's.
+* **BIS daily real EERs** do not exist (monthly only, A-FISCAL's `bis.eer`). BIS bulk files carry no
+  per-observation publication date.
+* **EIA spot prices: XLS workbooks not used** (BIFF8, no reader in the project); the HTML history pages carry the
+  same numbers as printed. `PET.zip` bulk (55 MB) not used (disk). The EIA API v2 needs a key: not used.
+* **US Treasury all-years CSV** answers 403 to non-browser clients; the documented per-year CSVs are used (62
+  requests per run). Bill rates and long-term rates (`daily_treasury_bill_rates`, `daily_treasury_long_term_rate`)
+  not taken yet (same connector pattern).
+* **SONIA total volume (IUDZLT2)** not taken: its unit is not stated in the export.
+* **No per-row availability instant.** Rows carry the provider rule (`publication`, `pub_lag`) and `as_of`; a
+  timestamp per row would defeat flag interning (2 M rows). Consumers derive availability from `pub_lag`; vintages
+  are table versions.
+* Other open central-bank daily series (Federal Reserve H.15, Bank of Canada Valet, Riksbank, Norges Bank, SNB) are
+  candidates for a later run with the same `hf_daily_common` plumbing.
+
+## 5. Owner decisions
+
+1. **EIA spot prices (Refinitiv/LSEG source)**: EIA's public-domain statement vs. its warning on licensed
+   third-party material. Every `eia.spot_d` row carries `flags.licence_review`; decide whether REVA may redistribute
+   these values (or show them only internally).
+2. **NY Fed Terms of Use notice**: any page or export that shows `nyfed.rates_d` values must display the notice in
+   `flags.required_notice` (UI/API work, not done here).
+3. **LBMA / CME data**: a licence would be needed for gold/silver/futures daily prices.
+
+## 6. Commands (re-run / bigger machine)
+
+```bash
+uv run pytest -q tests/unit/test_atlas_hf_daily.py tests/invariants/test_invariant_30_budgets.py
+uv run pytest -q tests/integration/test_atlas_hf_daily_ingest.py         # throwaway DB, fixture mode
+df -h /                                                                 # >= 5 GB free before a live run
+for s in atlas.ecb_daily atlas.ust_yields atlas.eia_spot atlas.boe_daily atlas.nyfed_rates atlas.bis_daily; do
+  flock /tmp/reva-devdb.lock uv run reva atlas ingest "$s"
+done
+# one table only: uv run reva atlas ingest atlas.bis_daily --dataset eer_d
+```
+
+Daily cadence (ECB, Treasury, BoE, NY Fed) and weekly (BIS, EIA) are declared in the specs; budgets allow one run
+per day plus a retry. `atlas.bis_daily` streams 772 MB of inflated CSV twice (~2.5 min, ~1 GB RAM peak): run it
+alone. Treasury requests grow by 2 per calendar year (budget 130/day).
