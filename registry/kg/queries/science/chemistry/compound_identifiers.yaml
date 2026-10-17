@@ -1,0 +1,32 @@
+id: science.chem_compound_identifiers
+domain: science
+owner: V4CHEM
+description: >-
+  Wikidata items carrying a ChEBI ID (P683) for the ChEBI seeds of registry/chem/seeds.yaml (VALUES list kept in
+  sync by hand: the same ids), with the statement node so P683 / P662 (PubChem CID) / P231 (CAS) claims are
+  re-read from wbgetentities. This is the identifier bridge Wikidata QID <-> chebi:<n> <-> pubchem:cid:<n>
+  (an external-id statement Wikidata publishes; community-edited). P683 is requested; rows are skipped until it is
+  allow-listed.
+purpose: statements
+entity_kind: compound
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    VALUES ?object { "16183" "42266" "32879" "37808" "30363" "37830" "29021" "43098" "17590" "41808" "28817"
+      "45296" "29005" "23492" "16716" "17578" "28063" "27417" "16101" "16482" "18153" "16052" "27518" "39478"
+      "27452" "30856" "23681" "16227" "132140" "17790" "16236" "18276" "16526" "17045" "25812" "30496" "15377"
+      "48236" "38825" "30231" "17245" "18422" "33101" "16136" "17997" "15379" "16134" "16199" "63038" "62946"
+      "32588" "63051" "62982" "26078" "48107" "26836" "32145" "29310" "15366" "16842" "3311" "30563" "50819"
+      "30187" "26710" "31346" "23414" "31344" "35150" "32234" "6504" "50818" "46726" "46719" "46727" "46715"
+      "48838" "86471" "86202" "52254" "46713" "33418" "33417" "53227" "53550" "53276" "53243" "61452" "28509"
+      "15702" "30742" "33216" "18248" "28694" "28984" "29287" "30512" "25016" "27363" "28112" "33341" "30145"
+      "27638" "27214" "33364" "27007" "28073" "18291" "27698" "27594" "49637" "25805" "25555" "26833" "27573"
+      "36927" "29237" "29238" "15365" "46195" "5855" "18208" "2676" "17303" "16714" "6801" "3638" "15854"
+      "6078" "41879" "39548" "2549" "27732" "18723" "17234" "17992" "17754" "15422" }
+    ?item p:P683 ?statement .
+    ?statement ps:P683 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    BIND(wd:P683 AS ?prop)
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+max_rows: 500
+expand_hops: 0

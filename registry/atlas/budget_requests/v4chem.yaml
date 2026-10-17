@@ -1,0 +1,27 @@
+# Budget request from agent V4CHEM (chemistry & physics of matter). Merged by
+# `uv run python -m reva.atlas.budget_merge --write` into registry/policies/budgets.yaml.
+agent: V4CHEM
+requests:
+  - source_key: pubchem.pug
+    # atlas.chem_elements: periodic table (44 kB) + 118 element pages (~150 kB each, ~18 MB) per full run;
+    # atlas.chem_pubchem: periodic table + 2-6 substance lookups + 1-2 property tables (< 1 MB);
+    # atlas.chem_chebi fetches the periodic table once more. PubChem asks <= 5 requests/s.
+    daily_requests: 300
+    expected_bytes_per_day: 60000000
+    reason: "one full element run (119 requests, ~18 MB) + compounds (~10) + one retry of the element run"
+  - source_key: chebi.release
+    # ftp.ebi.ac.uk: chebi_lite.obo.gz (7.9 MB) + chemical_data.tsv.gz (3.8 MB) per run (monthly releases).
+    daily_requests: 8
+    expected_bytes_per_day: 40000000
+    reason: "2 release files per run (~12 MB) + periodic table; allow two retries"
+  - source_key: nist.codata
+    # physics.nist.gov/cuu/Constants/Table/allascii.txt (41 kB), one request per run.
+    daily_requests: 4
+    expected_bytes_per_day: 1000000
+    reason: "one 41 kB listing per run (quadrennial adjustments)"
+daily_totals_increase:
+  http_requests_total: "+312"
+  http_bytes_total: "+101_000_000"
+notes: >-
+  Wikidata specs in registry/kg/queries/science/chemistry run through WDHARVEST's harvester under the existing
+  wikidata.wdqs / wikidata.wbapi budgets. The IAEA LiveChart API is not requested (Cloudflare browser challenge).

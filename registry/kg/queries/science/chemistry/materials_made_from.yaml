@@ -1,0 +1,25 @@
+id: science.chem_materials_made_from
+domain: science
+owner: V4CHEM
+description: >-
+  What materials are made of, as Wikidata states it: made from material (P186) and has part(s) (P527) of every
+  subclass of alloy (Q37756), steel (Q11427), plastic (Q11474), cement (Q45190), concrete (Q22657), glass (Q11469),
+  fertilizer (Q83323) and fuel (Q42501): e.g. bronze -> copper, tin; Portland cement -> clinker, gypsum. Statement
+  nodes bound (references re-read from wbgetentities). A share, when Wikidata gives one, is a qualifier of the
+  claim (e.g. proportion P1107) and is kept verbatim.
+purpose: statements
+entity_kind: material
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    VALUES ?root { wd:Q37756 wd:Q11427 wd:Q11474 wd:Q45190 wd:Q22657 wd:Q11469 wd:Q83323 wd:Q42501 }
+    ?item wdt:P279* ?root .
+    VALUES ?p { p:P186 p:P527 }
+    ?item ?p ?statement .
+    ?statement wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?prop wikibase:claim ?p ; wikibase:statementProperty ?ps .
+    ?statement ?ps ?object .
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+max_rows: 20000
+expand_hops: 1

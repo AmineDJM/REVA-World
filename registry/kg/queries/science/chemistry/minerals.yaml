@@ -1,0 +1,15 @@
+id: science.chem_minerals
+domain: science
+owner: V4CHEM
+description: >-
+  Mineral species (instance of mineral species, Q12089225) with their chemical formula (P274, requested), IMA status
+  (P579, requested), crystal system and type locality when allow-listed. mindat.org is restricted (account), so
+  Wikidata is the open source for the mineral list; ChEBI covers the ~190 minerals it classifies (atlas.chem_chebi).
+  Split by QID prefix to keep each WDQS request small.
+purpose: seed_entities
+entity_kind: mineral
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31 wd:Q12089225 . {{qid_filter}} }
+split: {by: qid_prefix}
+max_rows: 12000
+expand_hops: 0

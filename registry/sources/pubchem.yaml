@@ -1,0 +1,18 @@
+# V4 (agent V4CHEM): PubChem PUG-REST / PUG-View — periodic table, element pages (elements, nuclides, abundances,
+# history; contributed by IUPAC CIAAW, AMDC/IAEA, NIST PML, Jefferson Lab, LANL) and compound properties of the
+# ChEBI seeds. Connectors atlas.chem_elements, atlas.chem_pubchem (and the periodic table in atlas.chem_chebi).
+source_key: pubchem.pug
+title: PubChem PUG-REST and PUG-View (NCBI/NLM)
+provider_url: https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest
+lineage_family: pubchem
+rights:
+  licence: "PubChem: NLM/US Government content (public domain in the US); contributed data under each contributor's terms"
+  licence_url: https://www.ncbi.nlm.nih.gov/home/about/policies/
+  attribution: "PubChem, National Center for Biotechnology Information, https://pubchem.ncbi.nlm.nih.gov"
+  terms: "<= 5 requests/s, <= 400 requests/min; per-contributor licence URLs recorded on every element-page value; IUPAC IPTEI content is CC BY-NC-ND 4.0 (flagged licence_noncommercial)"
+metadata:
+  allowed_hosts: [pubchem.ncbi.nlm.nih.gov]
+  api_docs: https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest
+  authentication: none
+  editorial_status: database aggregating depositors and contributors; values attributed per contributor
+  cadence: continuous; element pages change rarely

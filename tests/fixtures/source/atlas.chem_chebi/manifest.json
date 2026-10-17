@@ -1,0 +1,43 @@
+[
+  {
+    "request_fingerprint": "92010603beb14957db5c7aca7c6e3dbedaa7c73a835563dc671efe5d7db7972e",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/chebi/flat_files/chemical_data.tsv.gz",
+    "file": "92010603beb14957.gz",
+    "sha256": "75c0318a0d409b600e55fb9b9d64f3ee771e2691bbaebb4383059be3c44b7b9c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "CC-BY-4.0 (ChEBI release 256)",
+    "note": "EXCERPT of chemical_data.tsv.gz: header + the rows of the subset (verbatim lines)",
+    "excerpt_of_sha256": "5c5d6d4b2c84d7bcf8e6c0cdd5b2eb05650886c78977bae8771dff959ada3b80"
+  },
+  {
+    "request_fingerprint": "019f3817d04021ee37f531dc17c273105b08d0fe552354d9c9ad23cb301d5d4c",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi_lite.obo.gz",
+    "file": "019f3817d04021ee.gz",
+    "sha256": "d9e0c2b287eab1b09bba5f78f3dfeb4c9161e7974ecc0a0aadb28e802102f291",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "CC-BY-4.0 (ChEBI release 256)",
+    "note": "EXCERPT of chebi_lite.obo.gz release 256: header, typedefs and the 110 terms of the subset of seeds [16183, 50818, 16526, 76413, 46719, 15377] (verbatim stanzas)",
+    "excerpt_of_sha256": "9244f8d10bc29d5aba81de248bf63cc94a4a8ca90e644c703508e9c18272b61b"
+  },
+  {
+    "request_fingerprint": "3ea4f96cd215e94a798cf8b9590001ad3bd0b6380d13b67a0b2b70e06c80e749",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON",
+    "file": "3ea4f96cd215e94a.json",
+    "sha256": "ff0f75976583b8a6493b18d0b42e83e1b68bd6e112b45d33578d98494ed5d321",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "CC-BY-4.0 (ChEBI release 256)",
+    "note": "real live capture: the whole periodic table"
+  }
+]

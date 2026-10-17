@@ -1,0 +1,16 @@
+# V4 (agent V4CHEM): ChEBI release files (ontology lite OBO + chemical data TSV). Connector atlas.chem_chebi.
+source_key: chebi.release
+title: ChEBI — Chemical Entities of Biological Interest (EMBL-EBI), monthly release files
+provider_url: https://www.ebi.ac.uk/chebi
+lineage_family: chebi
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "ChEBI data is from https://www.ebi.ac.uk/chebi (release number recorded per statement)"
+  terms: "ontology header states CC BY 4.0; flat_files/README also mentions CC BY-SA 4.0 (owner to confirm)"
+metadata:
+  allowed_hosts: [ftp.ebi.ac.uk]
+  downloads: https://ftp.ebi.ac.uk/pub/databases/chebi/
+  authentication: none
+  editorial_status: curated by the ChEBI team (3-star entries) and third parties (2-star)
+  cadence: monthly releases

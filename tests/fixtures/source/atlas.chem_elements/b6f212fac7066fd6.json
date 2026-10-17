@@ -1,0 +1,1675 @@
+{
+ "Record": {
+  "RecordType": "AtomicNumber",
+  "RecordNumber": 92,
+  "RecordTitle": "Uranium",
+  "Reference": [
+   {
+    "ReferenceNumber": 1,
+    "SourceName": "PubChem",
+    "SourceID": "PubChem",
+    "Description": "Data deposited in or computed by PubChem",
+    "URL": "https://pubchem.ncbi.nlm.nih.gov"
+   },
+   {
+    "ReferenceNumber": 2,
+    "SourceName": "Atomic Mass Data Center (AMDC), International Atomic Energy Agency (IAEA)",
+    "SourceID": "e92",
+    "Name": "U",
+    "Description": "The half-life and atomic mass data was provided by the Atomic Mass Data Center at the International Atomic Energy Agency.",
+    "URL": "https://www-nds.iaea.org/amdc/",
+    "LicenseURL": "https://www-nds.iaea.org/disclaimer.html",
+    "ANID": 6590319
+   },
+   {
+    "ReferenceNumber": 3,
+    "SourceName": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+    "SourceID": "a92",
+    "Name": "Uranium",
+    "Description": "Element data are cited from the Atomic weights of the elements (an IUPAC Technical Report). The IUPAC periodic table of elements can be found at https://iupac.org/what-we-do/periodic-table-of-elements/. Additional information can be found within IUPAC publication doi:10.1515/pac-2015-0703 Copyright © 2020 International Union of Pure and Applied Chemistry.",
+    "URL": "https://www.ciaaw.org/uranium.htm",
+    "LicenseURL": "http://www.ciaaw.org/bylaws.htm",
+    "ANID": 2292473
+   },
+   {
+    "ReferenceNumber": 5,
+    "SourceName": "Jefferson Lab, U.S. Department of Energy",
+    "SourceID": "jlab92",
+    "Name": "Uranium",
+    "Description": "Thomas Jefferson National Accelerator Facility (Jefferson Lab) is one of 17 national laboratories funded by the U.S. Department of Energy. The lab's primary mission is to conduct basic research of the atom's nucleus using the lab's unique particle accelerator, known as the Continuous Electron Beam Accelerator Facility (CEBAF). For more information visit https://www.jlab.org/",
+    "URL": "https://education.jlab.org/itselemental/ele092.html",
+    "LicenseNote": "Please see citation and linking information: https://education.jlab.org/faq/index.html",
+    "LicenseURL": "https://www.jlab.org/privacy-and-security-notice",
+    "ANID": 507154
+   },
+   {
+    "ReferenceNumber": 6,
+    "SourceName": "Los Alamos National Laboratory, U.S. Department of Energy",
+    "SourceID": "lanl92",
+    "Name": "Uranium",
+    "Description": "The periodic table at the LANL (Los Alamos National Laboratory) contains basic element information together with the history, source, properties, use, handling and more. The provenance data may be found from the link under the source name.",
+    "URL": "https://periodic.lanl.gov/92.shtml",
+    "ANID": 507272
+   },
+   {
+    "ReferenceNumber": 7,
+    "SourceName": "NIST Physical Measurement Laboratory",
+    "SourceID": "e92",
+    "Name": "Uranium",
+    "Description": "The periodic table contains NIST's critically-evaluated data on atomic properties of the elements. The provenance data that include data for atomic spectroscopy, X-ray and gamma ray, radiation dosimetry, nuclear physics, and condensed matter physics may be found from the link under the source name. Ref: https://www.nist.gov/pml/atomic-spectra-database",
+    "URL": "https://physics.nist.gov/cgi-bin/Elements/elInfo.pl?element=92",
+    "LicenseURL": "https://www.nist.gov/pml/database-disclaimer",
+    "ANID": 2292709
+   },
+   {
+    "ReferenceNumber": 4,
+    "SourceName": "IUPAC Periodic Table of the Elements and Isotopes (IPTEI)",
+    "SourceID": "p92",
+    "Description": "The information are cited from Pure Appl. Chem. 2018; 90(12): 1833-2092, https://doi.org/10.1515/pac-2015-0703.",
+    "URL": "https://doi.org/10.1515/pac-2015-0703",
+    "LicenseNote": "Copyright (c) 2020 International Union of Pure and Applied Chemistry.\n\nThe International Union of Pure and Applied Chemistry (IUPAC) contribution within Pubchem is provided under a CC-BY-NC-ND 4.0 license, unless otherwise stated.",
+    "LicenseURL": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "ANID": 13296497
+   },
+   {
+    "ReferenceNumber": 9,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ep_92",
+    "Name": "Uranium",
+    "Description": "The element property data was retrieved from publications.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834220
+   },
+   {
+    "ReferenceNumber": 8,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ef_92",
+    "Name": "Uranium",
+    "Description": "This section provides all form of data related to element Uranium.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834020
+   }
+  ],
+  "Section": [
+   {
+    "TOCHeading": "Properties",
+    "Description": "Characteristics of this element, such as atomic number, atomic mass, density, melting point, boiling point and so on.",
+    "Section": [
+     {
+      "TOCHeading": "Atomic Weight",
+      "Description": "Also called relative atomic mass, is the ratio of the average mass of the atom to the unified atomic mass unit, defined as one twelfth of the mass of a carbon-12 atom in its ground state and used to express masses of atomic particles, u=1.660 5402(10) * 10**(-27) kg. The Standard atomic weights refer to recommended values of relative atomic masses of the elements revised biennially by the IUPAC Commission on Atomic Weights and Isotopic Abundances and applicable to elements in any normal sample with a high level of confidence. The number in the parenthesis refers to an uncertainty when exists. The unit of atomic weight is the dalton or unified atomic mass unit (symbol: Da or u).",
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Weight",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "238.028 91(3)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "238.02891"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 6,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "238"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "238.02891(3)"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Crustal Abundance",
+      "Description": "The estimated element abundance in the earth's crust.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2.7 milligrams per kilogram"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Oceanic Abundance",
+      "Description": "The estimated element abundance in the earth's oceans.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "3.2×10-3 milligrams per liter",
+           "Markup": [
+            {
+             "Start": 6,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "TOCHeading": "History",
+    "Description": "The history of the discovery and use of this element.",
+    "Information": [
+     {
+      "ReferenceNumber": 3,
+      "Name": "History",
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The name derives from the planet Uranus, which in Roman mythology was \"Father Heaven\". The German chemist Martin-Heinrich Klaproth discovered the element in 1789, following William Hershel's discovery of the planet in 1781. The metallic uranium was first isolated by the French chemist Eugène-Melchior Peligot in 1841."
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 5,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Uranium was discovered by Martin Heinrich Klaproth, a German chemist, in the mineral pitchblende (primarily a mix of uranium oxides) in 1789. Although Klaproth, as well as the rest of the scientific community, believed that the substance he extracted from pitchblende was pure uranium, it was actually uranium dioxide (UO2). After noticing that 'pure' uranium reacted oddly with uranium tetrachloride (UCl4), Eugène-Melchoir Péligot, a French chemist isolated pure uranium by heating uranium dioxide with potassium in a platinum crucible. Radioactivity was first discovered in 1896 when Antoine Henri Becquerel, a French physicist, detected it from a sample of uranium. Today, uranium is obtained from uranium ores such as pitchblende, uraninite (UO2), carnotite (K2(UO2)2VO4·1-3H2O) and autunite (Ca(UO2)2(PO4)2·10H2O) as well as from phosphate rock (Ca3(PO4)2), lignite (brown coal) and monazite sand ((Ce, La, Th, Nd, Y)PO4). Since there is little demand for uranium metal, uranium is usually sold in the form of sodium diuranate (Na2U2O7·6H2O), also known as yellow cake, or triuranium octoxide (U3O8).",
+         "Markup": [
+          {
+           "Start": 321,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 405,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 749,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 765,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 769,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 771,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 774,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 780,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 803,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 805,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 809,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 811,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 816,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 854,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 858,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 860,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 925,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1036,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1038,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1040,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1044,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1101,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 1103,
+           "Length": 1,
+           "Type": "Subscript"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 6,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The use of uranium in its natural oxide form dates back to 79 A.D. when it was used as a yellow coloring agent in ceramic glazes. Yellow glass with 1% uranium oxide was found in an ancient Roman villa near Naples, Italy. In the late Middle Ages, pitchblende was extracted from the silver mines and was used as a coloring agent in the glassmaking industry. The identification of uranium as an element is generally credited to Martin H. Klaproth. While experimenting with pitchblende in 1789, he concluded that it contained a new element, which he named after the newly discovered planet Uranus (named after the Greek god of the sky or heaven). What Klaproth actually identified was not the pure element but uranium oxide. The pure metal was first isolated in 1841 by Eugène-Melchior Péligot, who reduced anhydrous uranium tetrachloride with potassium metal."
+        },
+        {
+         "String": "In 1896 Antoine H. Becquerel discovered that uranium exhibited invisible light or rays; it was radioactivity. In 1934 research by Enrico Fermi and others eventually led to the use of uranium fission in the first nuclear weapon used in war and later in the peaceful use of uranium as fuel in nuclear power production. An ensuing arms race during the Cold War between the United States and the Soviet Union produced tens of thousands of nuclear weapons that used uranium metal and uranium-derived plutonium-239. The security of those weapons and their fissile material following the breakup of the Soviet Union in 1991 is an ongoing concern."
+        },
+        {
+         "String": "In 1972 French physicist Francis Perrin discovered ancient and no longer active prehistoric natural nuclear fission reactors in uranium ore deposits at the Oklo mine in Gabon, West Africa, collectively known as the Oklo Fossil Reactors. The ore deposit is 1.7 billion years old; at that time, uranium-235 constituted about 3% of the total uranium on Earth (0.72% today). This is high enough to permit a sustained nuclear fission chain reaction to occur, provided other supporting geologic conditions exist."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "TOCHeading": "Isotopes",
+    "Description": "Isotopes are nuclides having the same atomic number but different mass numbers.  This section provides information on the isotopes of this element and their uses in various fields.",
+    "URL": "https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.05%3A_Isotopes",
+    "Section": [
+     {
+      "TOCHeading": "Isotope Mass and Abundance",
+      "Description": "Atomic mass and abundance (composition) information for a given isotope/nuclide. The number in the parenthesis refers to an uncertainty when exist. The unit of atomic weight is the unified atomic mass unit (u) or dalton (Da). ",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 3,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Isotope",
+          "Atomic Mass (uncertainty) [u]",
+          "Abundance (uncertainty)"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": " 234U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 4,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 235U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 4,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 238U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 4,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Mass (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "234.040 950(8)"
+          },
+          {
+           "String": "235.043 928(8)"
+          },
+          {
+           "String": "238.050 79(1)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.000 054(5)"
+          },
+          {
+           "String": "0.007 204(6)"
+          },
+          {
+           "String": "0.992 742(10)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "233U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "234U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "235U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "236U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "238U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Atomic Mass (uncertainty) [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "233.0396355(29)"
+          },
+          {
+           "String": "234.0409523(19)"
+          },
+          {
+           "String": "235.0439301(19)"
+          },
+          {
+           "String": "236.0455682(19)"
+          },
+          {
+           "String": "238.0507884(20)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": ""
+          },
+          {
+           "String": "0.000054(5)"
+          },
+          {
+           "String": "0.007204(6)"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "0.992742(10)"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Atomic Mass, Half Life, and Decay",
+      "Description": "Information on the atomic mass, half life, and decay for this element, from the the Atomic Mass Data Center. The number after the ± refers to an uncertainty when exists.",
+      "URL": "https://pubchem.ncbi.nlm.nih.gov/docs/atomic-mass/",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 5,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Nuclide",
+          "Atomic Mass and Uncertainty [u]",
+          "Half Life and Uncertainty",
+          "Discovery Year",
+          "Decay Modes, Intensities and Uncertainties [%]"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 2,
+        "Name": "Nuclide",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "215U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "216U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "216Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "217U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "218U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "218Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "219U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "220U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "221U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "222U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "223U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "224U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "225U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "226U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "227U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "228U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "229U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "230U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "231U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "232U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "233U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "234U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "234Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "235U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "235Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "235Un",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "236U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "236Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "236Un",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "237U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "237Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "238U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "238Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "239U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "239Um",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "239Un",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "240U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "241U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "242U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "243U",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Atomic Mass and Uncertainty [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "215.026719774 ± 0.000111794"
+          },
+          {
+           "String": "216.024762829 ± 0.000030158"
+          },
+          {
+           "String": "216.024762829 ± 0.000030158"
+          },
+          {
+           "String": "217.024660 ± 0.000086 [Estimated]"
+          },
+          {
+           "String": "218.023504877 ± 0.000014722"
+          },
+          {
+           "String": "218.023504877 ± 0.000014722"
+          },
+          {
+           "String": "219.025009233 ± 0.000014319"
+          },
+          {
+           "String": "220.024706 ± 0.000108 [Estimated]"
+          },
+          {
+           "String": "221.026323297 ± 0.00007744"
+          },
+          {
+           "String": "222.026057957 ± 0.000055817"
+          },
+          {
+           "String": "223.027960754 ± 0.000063396"
+          },
+          {
+           "String": "224.027635913 ± 0.000016383"
+          },
+          {
+           "String": "225.029385050 ± 0.000010664"
+          },
+          {
+           "String": "226.029338669 ± 0.000011884"
+          },
+          {
+           "String": "227.031181124 ± 0.000009136"
+          },
+          {
+           "String": "228.031368959 ± 0.000014465"
+          },
+          {
+           "String": "229.033505976 ± 0.000006374"
+          },
+          {
+           "String": "230.033940114 ± 0.000004841"
+          },
+          {
+           "String": "231.036292180 ± 0.000002866"
+          },
+          {
+           "String": "232.037154765 ± 0.000001941"
+          },
+          {
+           "String": "233.039634294 ± 0.00000242"
+          },
+          {
+           "String": "234.040950296 ± 0.000001212"
+          },
+          {
+           "String": "234.040950296 ± 0.000001212"
+          },
+          {
+           "String": "235.043928117 ± 0.000001198"
+          },
+          {
+           "String": "235.043928117 ± 0.000001198"
+          },
+          {
+           "String": "235.043928117 ± 0.000001198"
+          },
+          {
+           "String": "236.045566130 ± 0.000001193"
+          },
+          {
+           "String": "236.045566130 ± 0.000001193"
+          },
+          {
+           "String": "236.045566130 ± 0.000001193"
+          },
+          {
+           "String": "237.048728309 ± 0.00000129"
+          },
+          {
+           "String": "237.048728309 ± 0.00000129"
+          },
+          {
+           "String": "238.050786936 ± 0.000001601"
+          },
+          {
+           "String": "238.050786936 ± 0.000001601"
+          },
+          {
+           "String": "239.054291989 ± 0.000001612"
+          },
+          {
+           "String": "239.054291989 ± 0.000001612"
+          },
+          {
+           "String": "239.054291989 ± 0.000001612"
+          },
+          {
+           "String": "240.056592411 ± 0.00000274"
+          },
+          {
+           "String": "241.060330 ± 0.00021 [Estimated]"
+          },
+          {
+           "String": "242.062931 ± 0.000215 [Estimated]"
+          },
+          {
+           "String": "243.067075 ± 0.000322 [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Half Life and Uncertainty",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.4 ms ± 0.9"
+          },
+          {
+           "String": "6.9 ms ± 2.9"
+          },
+          {
+           "String": "1.4 ms ± 0.9"
+          },
+          {
+           "String": "850 us ± 710"
+          },
+          {
+           "String": "354 us ± 91"
+          },
+          {
+           "String": "408 us ± 125"
+          },
+          {
+           "String": "60 us ± 7"
+          },
+          {
+           "String": "60 ns [Estimated]"
+          },
+          {
+           "String": "660 ns ± 140"
+          },
+          {
+           "String": "4.7 us ± 0.7"
+          },
+          {
+           "String": "65 us ± 12"
+          },
+          {
+           "String": "396 us ± 17"
+          },
+          {
+           "String": "62 ms ± 4"
+          },
+          {
+           "String": "269 ms ± 6"
+          },
+          {
+           "String": "1.1 m ± 0.1"
+          },
+          {
+           "String": "9.1 m ± 0.2"
+          },
+          {
+           "String": "57.8 m ± 0.5"
+          },
+          {
+           "String": "20.23 d ± 0.02"
+          },
+          {
+           "String": "4.2 d ± 0.1"
+          },
+          {
+           "String": "68.9 y ± 0.4"
+          },
+          {
+           "String": "159.19 ky ± 0.15"
+          },
+          {
+           "String": "245.5 ky ± 0.6"
+          },
+          {
+           "String": "33.5 us ± 2.0"
+          },
+          {
+           "String": "704 My ± 1"
+          },
+          {
+           "String": "25.7 m ± 0.1"
+          },
+          {
+           "String": "3.6 ms ± 1.8"
+          },
+          {
+           "String": "23.42 My ± 0.04"
+          },
+          {
+           "String": "100 ns ± 4"
+          },
+          {
+           "String": "120 ns ± 2"
+          },
+          {
+           "String": "6.752 d ± 0.002"
+          },
+          {
+           "String": "155 ns ± 6"
+          },
+          {
+           "String": "4.463 Gy ± 0.003"
+          },
+          {
+           "String": "280 ns ± 6"
+          },
+          {
+           "String": "23.45 m ± 0.02"
+          },
+          {
+           "String": "780 ns ± 40"
+          },
+          {
+           "String": ">250 ns"
+          },
+          {
+           "String": "14.1 h ± 0.1"
+          },
+          {
+           "String": "4 m [Estimated]"
+          },
+          {
+           "String": "16.8 m ± 0.5"
+          },
+          {
+           "String": "16 m [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Discovery Year",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2015"
+          },
+          {
+           "String": "2015"
+          },
+          {
+           "String": "2015"
+          },
+          {
+           "String": "2000"
+          },
+          {
+           "String": "1992"
+          },
+          {
+           "String": "2005"
+          },
+          {
+           "String": "1993"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "2015"
+          },
+          {
+           "String": "1983"
+          },
+          {
+           "String": "1991"
+          },
+          {
+           "String": "1991"
+          },
+          {
+           "String": "1989"
+          },
+          {
+           "String": "1973"
+          },
+          {
+           "String": "1952"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1948"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1947"
+          },
+          {
+           "String": "1912"
+          },
+          {
+           "String": "1963"
+          },
+          {
+           "String": "1935"
+          },
+          {
+           "String": "1966"
+          },
+          {
+           "String": "2007"
+          },
+          {
+           "String": "1951"
+          },
+          {
+           "String": "1973"
+          },
+          {
+           "String": "1969"
+          },
+          {
+           "String": "1940"
+          },
+          {
+           "String": "1968"
+          },
+          {
+           "String": "1896"
+          },
+          {
+           "String": "1979"
+          },
+          {
+           "String": "1937"
+          },
+          {
+           "String": "1975"
+          },
+          {
+           "String": "1994"
+          },
+          {
+           "String": "1953"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "1979"
+          },
+          {
+           "String": ""
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Decay Modes, Intensities and Uncertainties [%]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "α=?; β+ ?",
+           "Markup": [
+            {
+             "Start": 6,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%"
+          },
+          {
+           "String": "α=100%"
+          },
+          {
+           "String": "α≈100%; β- ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%"
+          },
+          {
+           "String": "α≈100%; IT=?"
+          },
+          {
+           "String": "α=100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α ?; β+ ?",
+           "Markup": [
+            {
+             "Start": 6,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α≈100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%"
+          },
+          {
+           "String": "α=100%"
+          },
+          {
+           "String": "α=100%; β+ ?",
+           "Markup": [
+            {
+             "Start": 9,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=97.5±0.14%; ε=2.5±1.4%"
+          },
+          {
+           "String": "β+≈80%; α≈20%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "α=100%; 22Ne=4.8e-12±2%; SF ?"
+          },
+          {
+           "String": "ε≈100%; α=0.004±0.1%"
+          },
+          {
+           "String": "α=100%; 24Ne=8.9e-10±0.7%; SF=2.7e-12±0.6%; 28Mg<5e-12%"
+          },
+          {
+           "String": "α=100%; SF<6e-11%; 24Ne=7.2e-11±0.9%; 28Mg<1.3e-13%"
+          },
+          {
+           "String": "IS=0.0054±0.5%; α=100%; SF=1.64e-9±2.2%; 28Mg=1.4e-11±0.3%; 24Ne+26Ne=9e-12±0.7%",
+           "Markup": [
+            {
+             "Start": 64,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "IS=0.7204±0.6%; α=100%; SF=7e-9±0.2%; 20Ne=8e-10±0.4%; 25Ne≈8e-10%; 28Mg=8e-10%"
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "SF≈100%; IT ?"
+          },
+          {
+           "String": "α=100%; SF=9.4e-8±0.4%"
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "IT=87±0.6%; SF=13±0.6%; α ?"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "IS=99.2742±1%; α=100%; SF=5.44e-5±0.7%; 2β-=2.2e-10±0.3%",
+           "Markup": [
+            {
+             "Start": 42,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=97.4±0.4%; SF=2.6±0.4%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "SF ?; IT ?"
+          },
+          {
+           "String": "β-=100%; α ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β- ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β- ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

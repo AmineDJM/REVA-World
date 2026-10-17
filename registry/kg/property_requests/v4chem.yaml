@@ -1,0 +1,110 @@
+# Property requests from V4CHEM (chemistry & physics of matter). WDHARVEST merges them into registry/kg/properties.yaml
+# (`python -m reva.kg.harvest merge-property-requests` checks every id, datatype and the en/fr labels against the
+# property entity itself; the labels below are the expected ones). Ids written from the agent's knowledge on
+# 2026-10-17 (Wikidata wbgetentities answered HTTP 429): the merge check is what confirms them.
+# P186 (made from material) is already requested by another agent and mapped by V4CORE; it is used by
+# science/chemistry/petroleum_composition.yaml and materials_made_from.yaml.
+- property: P1086
+  why: atomic number (element -> Z); the identifier that links Wikidata element items to REVA element:<Z> nodes.
+  reva_predicate: atomic_number
+  inverse: null
+  kind: quantity
+  group: science
+  label_en: atomic number
+  label_fr: numéro atomique
+- property: P246
+  why: element symbol (element -> "Fe"); a second identifier check of the element <-> element:<Z> link.
+  reva_predicate: element_symbol
+  inverse: null
+  kind: string
+  group: science
+  label_en: element symbol
+  label_fr: symbole chimique
+- property: P189
+  why: location of discovery (element/compound/mineral -> place), for "who discovered it, when, where".
+  reva_predicate: location_of_discovery
+  inverse: discovery_location_of
+  kind: entity
+  group: science
+  label_en: location of discovery
+  label_fr: lieu de découverte
+- property: P274
+  why: chemical formula (compound/mineral -> formula string); minerals have no PubChem CID, Wikidata gives the formula.
+  reva_predicate: chemical_formula
+  inverse: null
+  kind: string
+  group: science
+  label_en: chemical formula
+  label_fr: formule chimique
+- property: P2067
+  why: mass (compound/element -> molar mass with unit), compared with PubChem/ChEBI masses (never merged).
+  reva_predicate: mass
+  inverse: null
+  kind: quantity
+  group: science
+  label_en: mass
+  label_fr: masse
+- property: P2114
+  why: half-life (isotope -> duration with unit).
+  reva_predicate: half_life
+  inverse: null
+  kind: quantity
+  group: science
+  label_en: half-life
+  label_fr: demi-vie
+- property: P817
+  why: decay mode (isotope -> decay mode item, with proportion qualifier).
+  reva_predicate: decay_mode
+  inverse: decay_mode_of
+  kind: entity
+  group: science
+  label_en: decay mode
+  label_fr: mode de désintégration
+- property: P2374
+  why: natural abundance (isotope -> fraction).
+  reva_predicate: natural_abundance
+  inverse: null
+  kind: quantity
+  group: science
+  label_en: natural abundance
+  label_fr: abondance naturelle
+- property: P1148
+  why: neutron number (isotope -> N).
+  reva_predicate: neutron_number
+  inverse: null
+  kind: quantity
+  group: science
+  label_en: neutron number
+  label_fr: nombre de neutrons
+- property: P683
+  why: ChEBI ID (Wikidata item -> ChEBI accession); the identifier bridge chebi:<n> <-> Wikidata QID.
+  reva_predicate: chebi_id
+  inverse: null
+  kind: external_id
+  group: science
+  label_en: ChEBI ID
+  label_fr: identifiant ChEBI
+- property: P662
+  why: PubChem CID (Wikidata item -> CID); the identifier bridge pubchem:cid:<n> <-> Wikidata QID.
+  reva_predicate: pubchem_cid
+  inverse: null
+  kind: external_id
+  group: science
+  label_en: PubChem CID
+  label_fr: identifiant PubChem CID
+- property: P231
+  why: CAS Registry Number (compound -> CAS RN), an identifier shared by trade/regulatory datasets.
+  reva_predicate: cas_registry_number
+  inverse: null
+  kind: external_id
+  group: science
+  label_en: CAS Registry Number
+  label_fr: numéro CAS
+- property: P579
+  why: IMA status and/or rank (mineral species -> IMA status item), to select approved mineral species.
+  reva_predicate: ima_status
+  inverse: null
+  kind: entity
+  group: science
+  label_en: IMA status and/or rank
+  label_fr: statut IMA

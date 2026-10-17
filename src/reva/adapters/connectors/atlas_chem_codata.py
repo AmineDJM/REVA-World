@@ -47,7 +47,7 @@ from reva.adapters.connectors.atlas_chem_common import (
 )
 
 CONNECTOR_NAME = "atlas.chem_codata"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas-chem-codata-1"
 SOURCE_KEY = "nist.codata"
 ATLAS_SOURCE = "codata"

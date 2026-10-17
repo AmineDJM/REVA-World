@@ -1,0 +1,46 @@
+{
+  "PropertyTable": {
+    "Properties": [
+      {
+        "CID": 280,
+        "MolecularFormula": "CO2",
+        "MolecularWeight": "44.009",
+        "InChIKey": "CURLTUGMZLYLDI-UHFFFAOYSA-N",
+        "IUPACName": "carbon dioxide",
+        "ExactMass": "43.989829239",
+        "Charge": 0,
+        "Title": "Carbon Dioxide"
+      },
+      {
+        "CID": 297,
+        "MolecularFormula": "CH4",
+        "MolecularWeight": "16.043",
+        "InChIKey": "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+        "IUPACName": "methane",
+        "ExactMass": "16.0313001276",
+        "Charge": 0,
+        "Title": "Methane"
+      },
+      {
+        "CID": 962,
+        "MolecularFormula": "H2O",
+        "MolecularWeight": "18.015",
+        "InChIKey": "XLYOFNOQVPJJNP-UHFFFAOYSA-N",
+        "IUPACName": "oxidane",
+        "ExactMass": "18.010564683",
+        "Charge": 0,
+        "Title": "Water"
+      },
+      {
+        "CID": 518696,
+        "MolecularFormula": "Fe2O3",
+        "MolecularWeight": "159.69",
+        "InChIKey": "JEIPFZHSYJVQDO-UHFFFAOYSA-N",
+        "IUPACName": "oxo(oxoferriooxy)iron",
+        "ExactMass": "159.854615",
+        "Charge": 0,
+        "Title": "Iron oxide (Fe2O3)"
+      }
+    ]
+  }
+}

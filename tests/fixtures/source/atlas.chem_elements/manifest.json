@@ -1,0 +1,85 @@
+[
+  {
+    "request_fingerprint": "3ea4f96cd215e94a798cf8b9590001ad3bd0b6380d13b67a0b2b70e06c80e749",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON",
+    "file": "3ea4f96cd215e94a.json",
+    "sha256": "ff0f75976583b8a6493b18d0b42e83e1b68bd6e112b45d33578d98494ed5d321",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture: the whole periodic table (118 rows)"
+  },
+  {
+    "request_fingerprint": "060d614244dd81bc8ac22e88a067e99750a8134c7f5930fd2e63d3f5415a5999",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/1/JSON",
+    "file": "060d614244dd81bc.json",
+    "sha256": "59d27f598fad771ee292a987dbe49e9237a578ba4fd00cb7365ed2840f508e9b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "EXCERPT of the live element page: sections other than atomic weight, abundances, history and the two isotope tables removed (structure kept verbatim)",
+    "excerpt_of_sha256": "8832fa85dedb2ac957f24461914043604752014e8d12a292404e6f0900cc7e9e"
+  },
+  {
+    "request_fingerprint": "90e398519c7423343fb36325586fee3aa45c0b62c562064ed8237adc4c4d5951",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/26/JSON",
+    "file": "90e398519c742334.json",
+    "sha256": "66734bcae227f831a564084c8a652f1e5f379eed727656bbd13f9cfdfe3ce2b2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "EXCERPT of the live element page: sections other than atomic weight, abundances, history and the two isotope tables removed (structure kept verbatim)",
+    "excerpt_of_sha256": "3dc7c34f7686c90401f4fcd5cd7edd94bc6d18262cdf2566eab5fdde4f1562b2"
+  },
+  {
+    "request_fingerprint": "e0d7440b2b3cfc8ed348c34354d2bc6938cbff16382b7e95b8e698a06f911b2c",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/6/JSON",
+    "file": "e0d7440b2b3cfc8e.json",
+    "sha256": "72d119ee921efe59892d4994127dd9399ed6fd9f16fdc0de51220bfced273394",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "EXCERPT of the live element page: sections other than atomic weight, abundances, history and the two isotope tables removed (structure kept verbatim)",
+    "excerpt_of_sha256": "52de82d399d5101cb949e84549a5d4e179eca6705a66d7587b59f57574d76957"
+  },
+  {
+    "request_fingerprint": "5634257a5b9bc085a62e2b5e860a9aa7c280069e48f3c802ed6e9cd177bba07e",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/8/JSON",
+    "file": "5634257a5b9bc085.json",
+    "sha256": "11ae70d5957f640af2a55bfce6955ffe41f3a5a1bf2574b49711cdc0b19fbbc7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "EXCERPT of the live element page: sections other than atomic weight, abundances, history and the two isotope tables removed (structure kept verbatim)",
+    "excerpt_of_sha256": "d0d38d99dea5accc4b7f6d0086b7346f68c73c2d8833d93b9389322652cb61b1"
+  },
+  {
+    "request_fingerprint": "b6f212fac7066fd6394c5be0645e56b9e61acd66ed8b5bf356b833e66352baa7",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/92/JSON",
+    "file": "b6f212fac7066fd6.json",
+    "sha256": "12712d82187471e4ad7ee252209f31c32380451f447efcaad3390082858aac73",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "EXCERPT of the live element page: sections other than atomic weight, abundances, history and the two isotope tables removed (structure kept verbatim)",
+    "excerpt_of_sha256": "88e93bf66dc5584c85da22b5b897fa9a3bb7ce86fafa5e73be13ff2ceeb625a2"
+  }
+]

@@ -1,0 +1,16 @@
+# V4 (agent V4CHEM): CODATA recommended values of the fundamental physical constants (NIST). Connector atlas.chem_codata.
+source_key: nist.codata
+title: Fundamental Physical Constants — Complete Listing (CODATA, NIST)
+provider_url: https://physics.nist.gov/cuu/Constants/
+lineage_family: nist_codata
+rights:
+  licence: "NIST Standard Reference Data (SRD 121): cite 'Source: NIST'; may be copyrighted in the US under 15 U.S.C. 290e"
+  licence_url: https://www.nist.gov/open/license
+  attribution: "CODATA Internationally recommended values of the Fundamental Physical Constants, NIST"
+  terms: "licence review needed before redistribution (owner decision)"
+metadata:
+  allowed_hosts: [physics.nist.gov]
+  downloads: https://physics.nist.gov/cuu/Constants/Table/allascii.txt
+  authentication: none
+  editorial_status: CODATA Task Group on Fundamental Constants adjustment (every 4 years)
+  cadence: quadrennial

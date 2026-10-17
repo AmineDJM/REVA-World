@@ -1,0 +1,1835 @@
+{
+ "Record": {
+  "RecordType": "AtomicNumber",
+  "RecordNumber": 26,
+  "RecordTitle": "Iron",
+  "Reference": [
+   {
+    "ReferenceNumber": 1,
+    "SourceName": "PubChem",
+    "SourceID": "PubChem",
+    "Description": "Data deposited in or computed by PubChem",
+    "URL": "https://pubchem.ncbi.nlm.nih.gov"
+   },
+   {
+    "ReferenceNumber": 2,
+    "SourceName": "Atomic Mass Data Center (AMDC), International Atomic Energy Agency (IAEA)",
+    "SourceID": "e26",
+    "Name": "Fe",
+    "Description": "The half-life and atomic mass data was provided by the Atomic Mass Data Center at the International Atomic Energy Agency.",
+    "URL": "https://www-nds.iaea.org/amdc/",
+    "LicenseURL": "https://www-nds.iaea.org/disclaimer.html",
+    "ANID": 6590253
+   },
+   {
+    "ReferenceNumber": 3,
+    "SourceName": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+    "SourceID": "a26",
+    "Name": "Iron",
+    "Description": "Element data are cited from the Atomic weights of the elements (an IUPAC Technical Report). The IUPAC periodic table of elements can be found at https://iupac.org/what-we-do/periodic-table-of-elements/. Additional information can be found within IUPAC publication doi:10.1515/pac-2015-0703 Copyright © 2020 International Union of Pure and Applied Chemistry.",
+    "URL": "https://www.ciaaw.org/iron.htm",
+    "LicenseURL": "http://www.ciaaw.org/bylaws.htm",
+    "ANID": 2292407
+   },
+   {
+    "ReferenceNumber": 5,
+    "SourceName": "Jefferson Lab, U.S. Department of Energy",
+    "SourceID": "jlab26",
+    "Name": "Iron",
+    "Description": "Thomas Jefferson National Accelerator Facility (Jefferson Lab) is one of 17 national laboratories funded by the U.S. Department of Energy. The lab's primary mission is to conduct basic research of the atom's nucleus using the lab's unique particle accelerator, known as the Continuous Electron Beam Accelerator Facility (CEBAF). For more information visit https://www.jlab.org/",
+    "URL": "https://education.jlab.org/itselemental/ele026.html",
+    "LicenseNote": "Please see citation and linking information: https://education.jlab.org/faq/index.html",
+    "LicenseURL": "https://www.jlab.org/privacy-and-security-notice",
+    "ANID": 507088
+   },
+   {
+    "ReferenceNumber": 6,
+    "SourceName": "Los Alamos National Laboratory, U.S. Department of Energy",
+    "SourceID": "lanl26",
+    "Name": "Iron",
+    "Description": "The periodic table at the LANL (Los Alamos National Laboratory) contains basic element information together with the history, source, properties, use, handling and more. The provenance data may be found from the link under the source name.",
+    "URL": "https://periodic.lanl.gov/26.shtml",
+    "ANID": 507206
+   },
+   {
+    "ReferenceNumber": 7,
+    "SourceName": "NIST Physical Measurement Laboratory",
+    "SourceID": "e26",
+    "Name": "Iron",
+    "Description": "The periodic table contains NIST's critically-evaluated data on atomic properties of the elements. The provenance data that include data for atomic spectroscopy, X-ray and gamma ray, radiation dosimetry, nuclear physics, and condensed matter physics may be found from the link under the source name. Ref: https://www.nist.gov/pml/atomic-spectra-database",
+    "URL": "https://physics.nist.gov/cgi-bin/Elements/elInfo.pl?element=26",
+    "LicenseURL": "https://www.nist.gov/pml/database-disclaimer",
+    "ANID": 2292643
+   },
+   {
+    "ReferenceNumber": 4,
+    "SourceName": "IUPAC Periodic Table of the Elements and Isotopes (IPTEI)",
+    "SourceID": "p26",
+    "Description": "The information are cited from Pure Appl. Chem. 2018; 90(12): 1833-2092, https://doi.org/10.1515/pac-2015-0703.",
+    "URL": "https://doi.org/10.1515/pac-2015-0703",
+    "LicenseNote": "Copyright (c) 2020 International Union of Pure and Applied Chemistry.\n\nThe International Union of Pure and Applied Chemistry (IUPAC) contribution within Pubchem is provided under a CC-BY-NC-ND 4.0 license, unless otherwise stated.",
+    "LicenseURL": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "ANID": 13296431
+   },
+   {
+    "ReferenceNumber": 9,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ep_26",
+    "Name": "Iron",
+    "Description": "The element property data was retrieved from publications.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834088
+   },
+   {
+    "ReferenceNumber": 8,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ef_26",
+    "Name": "Iron",
+    "Description": "This section provides all form of data related to element Iron.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24833954
+   }
+  ],
+  "Section": [
+   {
+    "TOCHeading": "Properties",
+    "Description": "Characteristics of this element, such as atomic number, atomic mass, density, melting point, boiling point and so on.",
+    "Section": [
+     {
+      "TOCHeading": "Atomic Weight",
+      "Description": "Also called relative atomic mass, is the ratio of the average mass of the atom to the unified atomic mass unit, defined as one twelfth of the mass of a carbon-12 atom in its ground state and used to express masses of atomic particles, u=1.660 5402(10) * 10**(-27) kg. The Standard atomic weights refer to recommended values of relative atomic masses of the elements revised biennially by the IUPAC Commission on Atomic Weights and Isotopic Abundances and applicable to elements in any normal sample with a high level of confidence. The number in the parenthesis refers to an uncertainty when exists. The unit of atomic weight is the dalton or unified atomic mass unit (symbol: Da or u).",
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Weight",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "55.845(2)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "55.845"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 6,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "55.85"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "55.845(2)"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Crustal Abundance",
+      "Description": "The estimated element abundance in the earth's crust.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "5.63×104 milligrams per kilogram",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Oceanic Abundance",
+      "Description": "The estimated element abundance in the earth's oceans.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2×10-3 milligrams per liter",
+           "Markup": [
+            {
+             "Start": 4,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "TOCHeading": "History",
+    "Description": "The history of the discovery and use of this element.",
+    "Information": [
+     {
+      "ReferenceNumber": 3,
+      "Name": "History",
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The name derives from the Anglo-Saxon iron of unknown origin. The element has been known from prehistoric times. The symbol Fe is derived from the Latin ferrum for \"firmness\". It is of interest to note that 56Fe requires more energy to be formed than any other nuclide. It is, therefore, the ultimate endproduct of stellar nuclear fusion.",
+         "Markup": [
+          {
+           "Start": 38,
+           "Length": 4,
+           "Type": "Italics"
+          },
+          {
+           "Start": 153,
+           "Length": 6,
+           "Type": "Italics"
+          },
+          {
+           "Start": 207,
+           "Length": 2,
+           "Type": "Superscript"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 5,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Archaeological evidence suggests that people have been using iron for at least 5000 years. Iron is the cheapest and one of the most abundant of all metals, comprising nearly 5.6% of the earth's crust and nearly all of the earth's core. Iron is primarily obtained from the minerals hematite (Fe2O3) and magnetite (Fe3O4). The minerals taconite, limonite (FeO(OH)·nH2O) and siderite (FeCO3) are other important sources.",
+         "Markup": [
+          {
+           "Start": 293,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 295,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 315,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 317,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 364,
+           "Length": 1,
+           "Type": "Subscript"
+          },
+          {
+           "Start": 386,
+           "Length": 1,
+           "Type": "Subscript"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 6,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Latin ferrum. Iron was used prehistorically:"
+        },
+        {
+         "String": "▸ Iron is mentioned numerous times in the Old Testament of the Bible."
+        },
+        {
+         "String": "▸ A remarkable iron pillar, dating to about A.D. 400, remains standing today in Delhi, India. This solid shaft of wrought iron is about 7 1/4 m high by 40 cm in diameter. Corrosion to the pillar has been minimal although it has been exposed to the weather since its creation."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "TOCHeading": "Isotopes",
+    "Description": "Isotopes are nuclides having the same atomic number but different mass numbers.  This section provides information on the isotopes of this element and their uses in various fields.",
+    "URL": "https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.05%3A_Isotopes",
+    "Section": [
+     {
+      "TOCHeading": "Isotope Mass and Abundance",
+      "Description": "Atomic mass and abundance (composition) information for a given isotope/nuclide. The number in the parenthesis refers to an uncertainty when exist. The unit of atomic weight is the unified atomic mass unit (u) or dalton (Da). ",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 3,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Isotope",
+          "Atomic Mass (uncertainty) [u]",
+          "Abundance (uncertainty)"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": " 54Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 56Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 57Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 58Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Mass (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "53.939 608(3)"
+          },
+          {
+           "String": "55.934 936(2)"
+          },
+          {
+           "String": "56.935 392(2)"
+          },
+          {
+           "String": "57.933 274(3)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.058 45(105)"
+          },
+          {
+           "String": "0.917 54(106)"
+          },
+          {
+           "String": "0.021 19(29)"
+          },
+          {
+           "String": "0.002 82(12)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "54Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "56Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "57Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "58Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Atomic Mass (uncertainty) [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "53.93960899(53)"
+          },
+          {
+           "String": "55.93493633(49)"
+          },
+          {
+           "String": "56.93539284(49)"
+          },
+          {
+           "String": "57.93327443(53)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.05845(35)"
+          },
+          {
+           "String": "0.91754(36)"
+          },
+          {
+           "String": "0.02119(10)"
+          },
+          {
+           "String": "0.00282(4)"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Atomic Mass, Half Life, and Decay",
+      "Description": "Information on the atomic mass, half life, and decay for this element, from the the Atomic Mass Data Center. The number after the ± refers to an uncertainty when exists.",
+      "URL": "https://pubchem.ncbi.nlm.nih.gov/docs/atomic-mass/",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 5,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Nuclide",
+          "Atomic Mass and Uncertainty [u]",
+          "Half Life and Uncertainty",
+          "Discovery Year",
+          "Decay Modes, Intensities and Uncertainties [%]"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 2,
+        "Name": "Nuclide",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "45Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "46Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "47Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "47Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "48Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "49Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "50Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "51Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "52Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "52Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "53Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "53Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "54Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "54Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "55Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "56Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "57Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "58Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "59Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "60Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "61Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "61Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "62Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "63Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "64Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "65Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "65Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "65Fen",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "66Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "67Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "67Fem",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "67Fen",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 4,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "68Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "69Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "70Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "71Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "72Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "73Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "74Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "75Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "76Fe",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Atomic Mass and Uncertainty [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "45.015467 ± 0.000304 [Estimated]"
+          },
+          {
+           "String": "46.001299 ± 0.000322 [Estimated]"
+          },
+          {
+           "String": "46.992346 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "46.992346 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "47.980667000 ± 0.000099"
+          },
+          {
+           "String": "48.973429000 ± 0.000026"
+          },
+          {
+           "String": "49.962988000 ± 0.000009"
+          },
+          {
+           "String": "50.956855137 ± 0.000001501"
+          },
+          {
+           "String": "51.948113364 ± 0.000000192"
+          },
+          {
+           "String": "51.948113364 ± 0.000000192"
+          },
+          {
+           "String": "52.945305629 ± 0.000001792"
+          },
+          {
+           "String": "52.945305629 ± 0.000001792"
+          },
+          {
+           "String": "53.939608189 ± 0.000000368"
+          },
+          {
+           "String": "53.939608189 ± 0.000000368"
+          },
+          {
+           "String": "54.938291158 ± 0.00000033"
+          },
+          {
+           "String": "55.934935537 ± 0.000000287"
+          },
+          {
+           "String": "56.935391950 ± 0.000000287"
+          },
+          {
+           "String": "57.933273575 ± 0.000000339"
+          },
+          {
+           "String": "58.934873492 ± 0.000000354"
+          },
+          {
+           "String": "59.934070249 ± 0.000003656"
+          },
+          {
+           "String": "60.936746241 ± 0.0000028"
+          },
+          {
+           "String": "60.936746241 ± 0.0000028"
+          },
+          {
+           "String": "61.936791809 ± 0.000003"
+          },
+          {
+           "String": "62.940272698 ± 0.000004618"
+          },
+          {
+           "String": "63.940987761 ± 0.000005386"
+          },
+          {
+           "String": "64.945015323 ± 0.000005487"
+          },
+          {
+           "String": "64.945015323 ± 0.000005487"
+          },
+          {
+           "String": "64.945015323 ± 0.000005487"
+          },
+          {
+           "String": "65.946249958 ± 0.0000044"
+          },
+          {
+           "String": "66.950930000 ± 0.0000041"
+          },
+          {
+           "String": "66.950930000 ± 0.0000041"
+          },
+          {
+           "String": "66.950930000 ± 0.0000041"
+          },
+          {
+           "String": "67.952875 ± 0.000207 [Estimated]"
+          },
+          {
+           "String": "68.957918 ± 0.000215 [Estimated]"
+          },
+          {
+           "String": "69.960397 ± 0.000322 [Estimated]"
+          },
+          {
+           "String": "70.965722 ± 0.000429 [Estimated]"
+          },
+          {
+           "String": "71.968599 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "72.974246 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "73.977821 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "74.984219 ± 0.000644 [Estimated]"
+          },
+          {
+           "String": "75.988631 ± 0.000644 [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Half Life and Uncertainty",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2.5 ms ± 0.2"
+          },
+          {
+           "String": "13.0 ms ± 2.0"
+          },
+          {
+           "String": "21.9 ms ± 0.2"
+          },
+          {
+           "String": "Not-specified"
+          },
+          {
+           "String": "45.3 ms ± 0.6"
+          },
+          {
+           "String": "64.7 ms ± 0.3"
+          },
+          {
+           "String": "152.0 ms ± 0.6"
+          },
+          {
+           "String": "305.4 ms ± 2.3"
+          },
+          {
+           "String": "8.275 h ± 0.008"
+          },
+          {
+           "String": "45.9 s ± 0.6"
+          },
+          {
+           "String": "8.51 m ± 0.02"
+          },
+          {
+           "String": "2.54 m ± 0.02"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "364 ns ± 7"
+          },
+          {
+           "String": "2.7562 y ± 0.0004"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "44.500 d ± 0.012"
+          },
+          {
+           "String": "2.62 My ± 0.04"
+          },
+          {
+           "String": "5.98 m ± 0.06"
+          },
+          {
+           "String": "238 ns ± 5"
+          },
+          {
+           "String": "68 s ± 2"
+          },
+          {
+           "String": "6.1 s ± 0.6"
+          },
+          {
+           "String": "2.0 s ± 0.2"
+          },
+          {
+           "String": "805 ms ± 10"
+          },
+          {
+           "String": "1.12 s ± 0.15"
+          },
+          {
+           "String": "418 ns ± 12"
+          },
+          {
+           "String": "467 ms ± 29"
+          },
+          {
+           "String": "394 ms ± 9"
+          },
+          {
+           "String": "64 us ± 17"
+          },
+          {
+           "String": "75 us ± 21"
+          },
+          {
+           "String": "188 ms ± 4"
+          },
+          {
+           "String": "162 ms ± 7"
+          },
+          {
+           "String": "61.4 ms ± 0.7"
+          },
+          {
+           "String": "34.3 ms ± 2.6"
+          },
+          {
+           "String": "17.0 ms ± 1.0"
+          },
+          {
+           "String": "12.9 ms ± 1.6"
+          },
+          {
+           "String": "5 ms ± 5"
+          },
+          {
+           "String": "9 ms >620ns [Estimated]"
+          },
+          {
+           "String": "3 ms >410ns [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Discovery Year",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1996"
+          },
+          {
+           "String": "1992"
+          },
+          {
+           "String": "1992"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "1987"
+          },
+          {
+           "String": "1970"
+          },
+          {
+           "String": "1977"
+          },
+          {
+           "String": "1972"
+          },
+          {
+           "String": "1948"
+          },
+          {
+           "String": "1979"
+          },
+          {
+           "String": "1938"
+          },
+          {
+           "String": "1967"
+          },
+          {
+           "String": "1923"
+          },
+          {
+           "String": "1983"
+          },
+          {
+           "String": "1939"
+          },
+          {
+           "String": "1923"
+          },
+          {
+           "String": "1935"
+          },
+          {
+           "String": "1935"
+          },
+          {
+           "String": "1938"
+          },
+          {
+           "String": "1957"
+          },
+          {
+           "String": "1957"
+          },
+          {
+           "String": "1998"
+          },
+          {
+           "String": "1975"
+          },
+          {
+           "String": "1980"
+          },
+          {
+           "String": "1980"
+          },
+          {
+           "String": "1980"
+          },
+          {
+           "String": "2008"
+          },
+          {
+           "String": "1998"
+          },
+          {
+           "String": "1985"
+          },
+          {
+           "String": "1985"
+          },
+          {
+           "String": "1998"
+          },
+          {
+           "String": "2008"
+          },
+          {
+           "String": "1985"
+          },
+          {
+           "String": "1992"
+          },
+          {
+           "String": "1997"
+          },
+          {
+           "String": "1997"
+          },
+          {
+           "String": "1997"
+          },
+          {
+           "String": "2010"
+          },
+          {
+           "String": "2010"
+          },
+          {
+           "String": "2013"
+          },
+          {
+           "String": "2017"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Decay Modes, Intensities and Uncertainties [%]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2p=70±0.4%; β+=30±0.4%; β+p=18.9±3.5%; β+2p=7.8±2.3%",
+           "Markup": [
+            {
+             "Start": 13,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 25,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 40,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%; β+p=78.7±3.8%; β+2p=?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 25,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%; β+p=88.4±0.9%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT ?"
+          },
+          {
+           "String": "β+=100%; β+p=15.3±0.5%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%; β+p=56.7±0.4%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%; β+p≈0%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=99.979±0.5%; IT=0.021±0.5%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "IS=5.845±10.5%; 2β+ ?",
+           "Markup": [
+            {
+             "Start": 18,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "ε=100%"
+          },
+          {
+           "String": "IS=91.754±10.6%"
+          },
+          {
+           "String": "IS=2.119±2.9%"
+          },
+          {
+           "String": "IS=0.282±1.2%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β- ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "β-=100%; β-n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "IT=100%"
+          },
+          {
+           "String": "β-=100%; β-n>0%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 17,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 17,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 17,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 17,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 17,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β- ?; β-n ?; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 14,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β- ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

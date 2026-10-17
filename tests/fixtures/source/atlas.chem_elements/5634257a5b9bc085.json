@@ -1,0 +1,1019 @@
+{
+ "Record": {
+  "RecordType": "AtomicNumber",
+  "RecordNumber": 8,
+  "RecordTitle": "Oxygen",
+  "Reference": [
+   {
+    "ReferenceNumber": 1,
+    "SourceName": "PubChem",
+    "SourceID": "PubChem",
+    "Description": "Data deposited in or computed by PubChem",
+    "URL": "https://pubchem.ncbi.nlm.nih.gov"
+   },
+   {
+    "ReferenceNumber": 2,
+    "SourceName": "Atomic Mass Data Center (AMDC), International Atomic Energy Agency (IAEA)",
+    "SourceID": "e8",
+    "Name": "O",
+    "Description": "The half-life and atomic mass data was provided by the Atomic Mass Data Center at the International Atomic Energy Agency.",
+    "URL": "https://www-nds.iaea.org/amdc/",
+    "LicenseURL": "https://www-nds.iaea.org/disclaimer.html",
+    "ANID": 6590235
+   },
+   {
+    "ReferenceNumber": 3,
+    "SourceName": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+    "SourceID": "a8",
+    "Name": "Oxygen",
+    "Description": "Element data are cited from the Atomic weights of the elements (an IUPAC Technical Report). The IUPAC periodic table of elements can be found at https://iupac.org/what-we-do/periodic-table-of-elements/. Additional information can be found within IUPAC publication doi:10.1515/pac-2015-0703 Copyright © 2020 International Union of Pure and Applied Chemistry.",
+    "URL": "https://www.ciaaw.org/oxygen.htm",
+    "LicenseURL": "http://www.ciaaw.org/bylaws.htm",
+    "ANID": 2292389
+   },
+   {
+    "ReferenceNumber": 5,
+    "SourceName": "Jefferson Lab, U.S. Department of Energy",
+    "SourceID": "jlab8",
+    "Name": "Oxygen",
+    "Description": "Thomas Jefferson National Accelerator Facility (Jefferson Lab) is one of 17 national laboratories funded by the U.S. Department of Energy. The lab's primary mission is to conduct basic research of the atom's nucleus using the lab's unique particle accelerator, known as the Continuous Electron Beam Accelerator Facility (CEBAF). For more information visit https://www.jlab.org/",
+    "URL": "https://education.jlab.org/itselemental/ele008.html",
+    "LicenseNote": "Please see citation and linking information: https://education.jlab.org/faq/index.html",
+    "LicenseURL": "https://www.jlab.org/privacy-and-security-notice",
+    "ANID": 507070
+   },
+   {
+    "ReferenceNumber": 6,
+    "SourceName": "Los Alamos National Laboratory, U.S. Department of Energy",
+    "SourceID": "lanl8",
+    "Name": "Oxygen",
+    "Description": "The periodic table at the LANL (Los Alamos National Laboratory) contains basic element information together with the history, source, properties, use, handling and more. The provenance data may be found from the link under the source name.",
+    "URL": "https://periodic.lanl.gov/8.shtml",
+    "ANID": 507188
+   },
+   {
+    "ReferenceNumber": 7,
+    "SourceName": "NIST Physical Measurement Laboratory",
+    "SourceID": "e8",
+    "Name": "Oxygen",
+    "Description": "The periodic table contains NIST's critically-evaluated data on atomic properties of the elements. The provenance data that include data for atomic spectroscopy, X-ray and gamma ray, radiation dosimetry, nuclear physics, and condensed matter physics may be found from the link under the source name. Ref: https://www.nist.gov/pml/atomic-spectra-database",
+    "URL": "https://physics.nist.gov/cgi-bin/Elements/elInfo.pl?element=8",
+    "LicenseURL": "https://www.nist.gov/pml/database-disclaimer",
+    "ANID": 2292625
+   },
+   {
+    "ReferenceNumber": 4,
+    "SourceName": "IUPAC Periodic Table of the Elements and Isotopes (IPTEI)",
+    "SourceID": "p8",
+    "Description": "The information are cited from Pure Appl. Chem. 2018; 90(12): 1833-2092, https://doi.org/10.1515/pac-2015-0703.",
+    "URL": "https://doi.org/10.1515/pac-2015-0703",
+    "LicenseNote": "Copyright (c) 2020 International Union of Pure and Applied Chemistry.\n\nThe International Union of Pure and Applied Chemistry (IUPAC) contribution within Pubchem is provided under a CC-BY-NC-ND 4.0 license, unless otherwise stated.",
+    "LicenseURL": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "ANID": 13296413
+   },
+   {
+    "ReferenceNumber": 9,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ep_8",
+    "Name": "Oxygen",
+    "Description": "The element property data was retrieved from publications.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834052
+   },
+   {
+    "ReferenceNumber": 8,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ef_8",
+    "Name": "Oxygen",
+    "Description": "This section provides all form of data related to element Oxygen.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24833936
+   }
+  ],
+  "Section": [
+   {
+    "TOCHeading": "Properties",
+    "Description": "Characteristics of this element, such as atomic number, atomic mass, density, melting point, boiling point and so on.",
+    "Section": [
+     {
+      "TOCHeading": "Atomic Weight",
+      "Description": "Also called relative atomic mass, is the ratio of the average mass of the atom to the unified atomic mass unit, defined as one twelfth of the mass of a carbon-12 atom in its ground state and used to express masses of atomic particles, u=1.660 5402(10) * 10**(-27) kg. The Standard atomic weights refer to recommended values of relative atomic masses of the elements revised biennially by the IUPAC Commission on Atomic Weights and Isotopic Abundances and applicable to elements in any normal sample with a high level of confidence. The number in the parenthesis refers to an uncertainty when exists. The unit of atomic weight is the dalton or unified atomic mass unit (symbol: Da or u).",
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Weight",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[15.999 03, 15.999 77]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "15.9994"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 6,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "16.00"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[15.99903,15.99977]"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Crustal Abundance",
+      "Description": "The estimated element abundance in the earth's crust.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "4.61×105 milligrams per kilogram",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Oceanic Abundance",
+      "Description": "The estimated element abundance in the earth's oceans.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "8.57×105 milligrams per liter",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "TOCHeading": "History",
+    "Description": "The history of the discovery and use of this element.",
+    "Information": [
+     {
+      "ReferenceNumber": 3,
+      "Name": "History",
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The name derives from the Greek oxys for \"acid\" and genes for \"forming\" because the French chemist Antoine-Laurent Lavoisier once thought that oxygen was integral to all acids.",
+         "Markup": [
+          {
+           "Start": 32,
+           "Length": 4,
+           "Type": "Italics"
+          },
+          {
+           "Start": 52,
+           "Length": 5,
+           "Type": "Italics"
+          }
+         ]
+        },
+        {
+         "String": "Oxygen was discovered independently by the Swedish pharmacist and chemist Carl-Wilhelm Scheele in 1771, and the English clergyman and chemist Joseph Priestley in 1774. Scheele's Chemical Treatise on Air and Fire was delayed in publication until 1777, so Priestley is credited with the discovery because he published first.",
+         "Markup": [
+          {
+           "Start": 178,
+           "Length": 33,
+           "Type": "Italics"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 5,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Oxygen had been produced by several chemists prior to its discovery in 1774, but they failed to recognize it as a distinct element. Joseph Priestley and Carl Wilhelm Scheele both independently discovered oxygen, but Priestly is usually given credit for the discovery. They were both able to produce oxygen by heating mercuric oxide (HgO). Priestley called the gas produced in his experiments 'dephlogisticated air' and Scheele called his 'fire air'. The name oxygen was created by Antoine Lavoisier who incorrectly believed that oxygen was necessary to form all acids. Oxygen is the third most abundant element in the universe and makes up nearly 21% of the earth's atmosphere. Oxygen accounts for nearly half of the mass of the earth's crust, two thirds of the mass of the human body and nine tenths of the mass of water. Large amounts of oxygen can be extracted from liquefied air through a process known as fractional distillation. Oxygen can also be produced through the electrolysis of water or by heating potassium chlorate (KClO3).",
+         "Markup": [
+          {
+           "Start": 1035,
+           "Length": 1,
+           "Type": "Subscript"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 6,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "From the Greek word oxys, acid, and genes, forming. The behavior of oxygen and nitrogen as components of air led to the advancement of the phlogiston theory of combustion, which captured the minds of chemists for a century."
+        },
+        {
+         "String": "Joseph Priestley is generally credited with its discovery, although Scheele also discovered it independently."
+        },
+        {
+         "String": "Its atomic weight was used as a standard of comparison for each of the other elements until 1961 when the International Union of Pure and Applied Chemistry adopted carbon 12 as the new basis."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "TOCHeading": "Isotopes",
+    "Description": "Isotopes are nuclides having the same atomic number but different mass numbers.  This section provides information on the isotopes of this element and their uses in various fields.",
+    "URL": "https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.05%3A_Isotopes",
+    "Section": [
+     {
+      "TOCHeading": "Isotope Mass and Abundance",
+      "Description": "Atomic mass and abundance (composition) information for a given isotope/nuclide. The number in the parenthesis refers to an uncertainty when exist. The unit of atomic weight is the unified atomic mass unit (u) or dalton (Da). ",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 3,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Isotope",
+          "Atomic Mass (uncertainty) [u]",
+          "Abundance (uncertainty)"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": " 16O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 17O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 18O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Mass (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "15.994 914 619(1)"
+          },
+          {
+           "String": "16.999 131 757(5)"
+          },
+          {
+           "String": "17.999 159 613(5)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[0.997 38, 0.997 76]"
+          },
+          {
+           "String": "[0.000 367, 0.000 400]"
+          },
+          {
+           "String": "[0.001 87, 0.002 22]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "16O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "17O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "18O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Atomic Mass (uncertainty) [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "15.99491461957(17)"
+          },
+          {
+           "String": "16.99913175650(69)"
+          },
+          {
+           "String": "17.99915961286(76)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.99757(16)"
+          },
+          {
+           "String": "0.00038(1)"
+          },
+          {
+           "String": "0.00205(14)"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Atomic Mass, Half Life, and Decay",
+      "Description": "Information on the atomic mass, half life, and decay for this element, from the the Atomic Mass Data Center. The number after the ± refers to an uncertainty when exists.",
+      "URL": "https://pubchem.ncbi.nlm.nih.gov/docs/atomic-mass/",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 5,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Nuclide",
+          "Atomic Mass and Uncertainty [u]",
+          "Half Life and Uncertainty",
+          "Discovery Year",
+          "Decay Modes, Intensities and Uncertainties [%]"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 2,
+        "Name": "Nuclide",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "11O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "12O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "13O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "14O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "15O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "16O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "16Op",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 3,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "17O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "18O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "19O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "20O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "21O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "22O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "23O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "24O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "25O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "26O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "27O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "28O",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Atomic Mass and Uncertainty [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "11.051249828 ± 0.000064453"
+          },
+          {
+           "String": "12.034367726 ± 0.000012882"
+          },
+          {
+           "String": "13.024815435 ± 0.000010226"
+          },
+          {
+           "String": "14.008596706 ± 0.000000027"
+          },
+          {
+           "String": "15.003065636 ± 0.000000526"
+          },
+          {
+           "String": "15.99491461926 ± 0.00000000032"
+          },
+          {
+           "String": "15.99491461926 ± 0.00000000032"
+          },
+          {
+           "String": "16.99913175595 ± 0.00000000069"
+          },
+          {
+           "String": "17.99915961214 ± 0.00000000069"
+          },
+          {
+           "String": "19.003577969 ± 0.00000283"
+          },
+          {
+           "String": "20.004075357 ± 0.00000095"
+          },
+          {
+           "String": "21.008654948 ± 0.000012882"
+          },
+          {
+           "String": "22.009965744 ± 0.000061107"
+          },
+          {
+           "String": "23.015696686 ± 0.000130663"
+          },
+          {
+           "String": "24.019861000 ± 0.000177"
+          },
+          {
+           "String": "25.029338919 ± 0.000177225"
+          },
+          {
+           "String": "26.037210155 ± 0.000177081"
+          },
+          {
+           "String": "27.047955 ± 0.000537 [Estimated]"
+          },
+          {
+           "String": "28.055910 ± 0.00075 [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Half Life and Uncertainty",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "198 ys ± 12"
+          },
+          {
+           "String": "8.9 zs ± 3.3"
+          },
+          {
+           "String": "8.58 ms ± 0.05"
+          },
+          {
+           "String": "70.621 s ± 0.011"
+          },
+          {
+           "String": "122.266 s ± 0.043"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Not-specified"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "26.470 s ± 0.006"
+          },
+          {
+           "String": "13.51 s ± 0.05"
+          },
+          {
+           "String": "3.42 s ± 0.10"
+          },
+          {
+           "String": "2.25 s ± 0.09"
+          },
+          {
+           "String": "97 ms ± 8"
+          },
+          {
+           "String": "77.4 ms ± 4.5"
+          },
+          {
+           "String": "5.18 zs ± 0.35"
+          },
+          {
+           "String": "4.2 ps ± 3.3"
+          },
+          {
+           "String": "Not-specified <260ns"
+          },
+          {
+           "String": "Not-specified <100ns"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Discovery Year",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2019"
+          },
+          {
+           "String": "1978"
+          },
+          {
+           "String": "1963"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1934"
+          },
+          {
+           "String": "1919"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "1925"
+          },
+          {
+           "String": "1929"
+          },
+          {
+           "String": "1936"
+          },
+          {
+           "String": "1959"
+          },
+          {
+           "String": "1968"
+          },
+          {
+           "String": "1969"
+          },
+          {
+           "String": "1970"
+          },
+          {
+           "String": "1970"
+          },
+          {
+           "String": "2008"
+          },
+          {
+           "String": "2012"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": ""
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Decay Modes, Intensities and Uncertainties [%]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2p=100%"
+          },
+          {
+           "String": "2p=100%"
+          },
+          {
+           "String": "β+=100%; β+p=10.9±0.2%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IS=99.757±1.1%"
+          },
+          {
+           "String": "p=78±0.4%; α=22±0.4%; IT=0.28±0.3%"
+          },
+          {
+           "String": "IS=0.03835±9.6%"
+          },
+          {
+           "String": "IS=0.2045±10.2%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n<22%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=7±0.2%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=43±0.4%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "n=100%"
+          },
+          {
+           "String": "2n=100%"
+          },
+          {
+           "String": "n ?; 2n ?"
+          },
+          {
+           "String": "2n ?; β-=0%",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

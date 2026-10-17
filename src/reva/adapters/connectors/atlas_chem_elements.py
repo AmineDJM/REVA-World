@@ -70,7 +70,7 @@ from reva.adapters.connectors.atlas_chem_common import (
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.chem_elements"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas-chem-elements-1"
 SOURCE_KEY = "pubchem.pug"
 ATLAS_SOURCE = "pubchem"
@@ -1082,46 +1082,46 @@ def kg_build(
                             "mode": re.split(r"[=≈<>~ ]", mode, maxsplit=1)[0],
                         },
                     )
-            for ref, mc, ab in nu.compositions:
+            for cref, mc, ab in nu.compositions:
                 if mc is not None and (pu := parse_uncertain(mc.text)) is not None:
-                    q = {"provided_by": ref.source_name, "verbatim": mc.text}
+                    q = {"provided_by": cref.source_name, "verbatim": mc.text}
                     if pu[1]:
                         q["uncertainty"] = pu[1]
                     st(
-                        f"{sid}:mass:{ref.key}",
+                        f"{sid}:mass:{cref.key}",
                         nk,
                         "pubchem:nuclide_mass",
                         p.raw_sha256,
-                        [_ref_entry(url, retrieved_at, _sel(mc), ref)],
+                        [_ref_entry(url, retrieved_at, _sel(mc), cref)],
                         value=quantity(pu[0], "u"),
                         quals=q,
                     )
                 if ab is not None and parse_uncertain(ab.text) is None and (ia := parse_interval(ab.text)) is not None:
                     q = {
-                        "provided_by": ref.source_name,
+                        "provided_by": cref.source_name,
                         "verbatim": ab.text,
                         "interval": [kg_decimal(ia[0]), kg_decimal(ia[1])],
                     }
                     st(
-                        f"{sid}:abundance:{ref.key}",
+                        f"{sid}:abundance:{cref.key}",
                         nk,
                         "pubchem:isotopic_abundance_interval",
                         p.raw_sha256,
-                        [_ref_entry(url, retrieved_at, _sel(ab), ref)],
+                        [_ref_entry(url, retrieved_at, _sel(ab), cref)],
                         value=string_value(ab.text.strip()),
                         quals=q,
                     )
-                if ab is not None and (pa := parse_uncertain(ab.text)) is not None:
-                    q = {"provided_by": ref.source_name, "verbatim": ab.text}
-                    if pa[1]:
-                        q["uncertainty"] = pa[1]
+                if ab is not None and (pab := parse_uncertain(ab.text)) is not None:
+                    q = {"provided_by": cref.source_name, "verbatim": ab.text}
+                    if pab[1]:
+                        q["uncertainty"] = pab[1]
                     st(
-                        f"{sid}:abundance:{ref.key}",
+                        f"{sid}:abundance:{cref.key}",
                         nk,
                         "pubchem:isotopic_abundance",
                         p.raw_sha256,
-                        [_ref_entry(url, retrieved_at, _sel(ab), ref)],
-                        value=quantity(pa[0], "mole fraction"),
+                        [_ref_entry(url, retrieved_at, _sel(ab), cref)],
+                        value=quantity(pab[0], "mole fraction"),
                         quals=q,
                     )
     return ents, stmts

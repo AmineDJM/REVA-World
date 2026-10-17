@@ -231,8 +231,18 @@ def load_kg(
     }
 
 
+_KG_DECIMAL_RE = re.compile(r"^[+-]?[0-9]{1,40}(\.[0-9]{1,40})?$")
+
+
 def quantity(amount: Decimal, unit: str | None = None, **extra: str) -> dict[str, Any]:
-    v: dict[str, Any] = {"type": "quantity", "amount": kg_decimal(amount), "unit": unit}
+    """A KG quantity. The KG stores plain decimals of <= 40 integer and <= 40 fraction digits; a value outside
+    that range (e.g. Planck's constant, 6.62607015e-34) is kept exactly in scientific notation under its own value
+    type ``quantity_scientific`` (never rounded into range)."""
+    plain = kg_decimal(amount)
+    if _KG_DECIMAL_RE.match(plain):
+        v: dict[str, Any] = {"type": "quantity", "amount": plain, "unit": unit}
+    else:
+        v = {"type": "quantity_scientific", "amount_scientific": atlas_decimal(amount), "unit": unit}
     v.update(extra)
     return v
 
@@ -315,7 +325,7 @@ def parse_periodic_table(body: bytes, *, min_elements: int = 118) -> list[Elemen
 
 # ============================================================================================== formulas
 _TOKEN_RE = re.compile(r"([A-Z][a-z]?)([0-9]*)|(\()|(\))([0-9]*)")
-_CHARGE_RE = re.compile(r"([0-9]*[+-])$")
+_CHARGE_RE = re.compile(r"([+-][0-9]*)$")  # PubChem ion notation: "C2H3O2-", "O4S-2"
 _MULT_RE = re.compile(r"^([0-9]+)(?=[A-Z(])")
 
 

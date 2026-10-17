@@ -1,0 +1,15 @@
+id: science.chem_isotopes
+domain: science
+owner: V4CHEM
+description: >-
+  Isotopes (nuclides) as Wikidata items: every item that is an instance of a subclass of isotope (Q25276), e.g.
+  carbon-14 (instance of "isotope of carbon"). Seeded entities keep the allow-listed claims; once the requested
+  properties are allow-listed that includes half-life (P2114), decay mode (P817), natural abundance (P2374),
+  atomic number (P1086) and neutron number (P1148), so REVA's nuclide:<Z>-<A> nodes (AMDC data via PubChem) can be
+  bridged by identifiers (Z and A), never by name.
+purpose: seed_entities
+entity_kind: isotope
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279 wd:Q25276 . }
+max_rows: 6000
+expand_hops: 0

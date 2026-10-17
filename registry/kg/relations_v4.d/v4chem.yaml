@@ -1,0 +1,44 @@
+# V4CHEM mappings of the chemistry-layer predicates (registry/kg/predicates_chem.yaml) to the universal relation
+# families. Wikidata properties used by the chemistry specs that link entities (P31, P279, P361, P527 has part,
+# P186 made from material, P61 discoverer) are mapped by V4CORE in relations_v4.yaml; P189 and P817 are mapped here.
+# Deliberately unmapped: literal predicates (masses, formulas, half-lives, abundances, CODATA values, definitions,
+# history texts, discovery years) -- they are values on an entity, not edges.
+version: 1
+agent: V4CHEM
+note: >-
+  made_of edges from formulas: atom counts are the source formula's; mass_share is computed by REVA (count x PubChem
+  periodic-table atomic mass / formula total) and carries computed_by=reva. Element nodes are element:<Z> (atomic
+  number); ChEBI atoms, PubChem compounds and element:<Z> are never merged -- formulas link them through IUPAC symbols.
+mappings:
+  - {property: "chebi:is_a", family: is_a, subtype: is_a, source: chebi.release,
+     subject_kinds: [compound, chemical_class, chemical_element, isotope, mineral, chemical_role], object_kinds: [chemical_class, compound, chemical_element, mineral, chemical_role]}
+  - {property: "chebi:has_part", family: has_part, subtype: has_part, source: chebi.release,
+     note: "ChEBI has part: the object is a structural part (e.g. a salt has the cation and the anion as parts); no share given"}
+  - {property: "chebi:has_role", family: is_a, subtype: has_role, source: chebi.release,
+     object_kinds: [chemical_role],
+     note: "ChEBI role classification (e.g. methane has role greenhouse gas / fossil fuel): what ChEBI says the entity is used as or does, not a causal claim"}
+  - {property: "chebi:has_functional_parent", family: context, subtype: has_functional_parent, source: chebi.release}
+  - {property: "chebi:has_parent_hydride", family: context, subtype: has_parent_hydride, source: chebi.release}
+  - {property: "chebi:is_conjugate_acid_of", family: context, subtype: is_conjugate_acid_of, source: chebi.release}
+  - {property: "chebi:is_conjugate_base_of", family: context, subtype: is_conjugate_base_of, source: chebi.release}
+  - {property: "chebi:is_enantiomer_of", family: context, subtype: is_enantiomer_of, source: chebi.release}
+  - {property: "chebi:is_tautomer_of", family: context, subtype: is_tautomer_of, source: chebi.release}
+  - {property: "chebi:is_substituent_group_from", family: context, subtype: is_substituent_group_from, source: chebi.release}
+  - {property: "chebi:formula_element", family: made_of, subtype: formula_element, source: chebi.release,
+     share: {qualifier: mass_share, scale: fraction},
+     subject_kinds: [compound, mineral, chemical_element, isotope], object_kinds: [chemical_element],
+     note: "from the ChEBI formula; atom_count qualifier from the formula, mass_share computed by REVA"}
+  - {property: "pubchem:formula_element", family: made_of, subtype: formula_element, source: pubchem.pug,
+     share: {qualifier: mass_share, scale: fraction},
+     subject_kinds: [compound], object_kinds: [chemical_element],
+     note: "from the PubChem MolecularFormula; atom_count qualifier from the formula, mass_share computed by REVA"}
+  - {property: "pubchem:isotope_of", family: is_a, subtype: isotope_of, source: pubchem.pug,
+     subject_kinds: [isotope], object_kinds: [chemical_element],
+     note: "nuclide listed on the element's PubChem page (AMDC/CIAAW/NIST tables); Z from the page, A from the nuclide symbol"}
+  - {property: "pubchem:chebi_deposit", family: context, subtype: standardises_chebi_deposit, source: pubchem.pug,
+     subject_kinds: [compound], object_kinds: [compound, mineral, chemical_element],
+     note: "PubChem's own identifier link (ChEBI deposit SID -> standardised CID); an identifier crosswalk, not a merge"}
+  - {property: P189, family: context, subtype: location_of_discovery, source: wikidata,
+     note: "Wikidata P189 location of discovery (requested in property_requests/v4chem.yaml): where the discovery was made"}
+  - {property: P817, family: context, subtype: decay_mode, source: wikidata,
+     note: "Wikidata P817 decay mode (requested): isotope -> decay mode item"}

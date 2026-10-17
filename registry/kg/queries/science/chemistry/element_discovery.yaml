@@ -1,0 +1,26 @@
+id: science.chem_element_discovery
+domain: science
+owner: V4CHEM
+description: >-
+  Who discovered each chemical element, when and where, as Wikidata states it, plus the identifiers that tie the
+  Wikidata element item to REVA's element:<Z> node: discoverer or inventor (P61, with its point-in-time
+  qualifier), time of discovery or invention (P575), location of discovery (P189), atomic number (P1086), element
+  symbol (P246). Statement nodes are bound so the harvester re-reads each claim with its references and exact
+  time precision from wbgetentities (community-edited, labelled as such). P189/P1086/P246 are requested in
+  registry/kg/property_requests/v4chem.yaml; their rows are skipped until allow-listed.
+purpose: statements
+entity_kind: chemical_element
+depends_on: [science.chemical_elements]
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    ?item wdt:P31 wd:Q11344 .
+    VALUES ?p { p:P61 p:P575 p:P189 p:P1086 p:P246 }
+    ?item ?p ?statement .
+    ?statement wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?prop wikibase:claim ?p ; wikibase:statementProperty ?ps .
+    ?statement ?ps ?object .
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+max_rows: 2000
+expand_hops: 1

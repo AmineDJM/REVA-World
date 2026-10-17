@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "48dd7c60bb06292b50436bef3df6b7d26c75d8934ac247ea261484c6160c5eb6",
+    "url": "https://physics.nist.gov/cuu/Constants/Table/allascii.txt",
+    "file": "48dd7c60bb06292b.txt",
+    "sha256": "77fb90e66c40db3e6eb16630bc9c88e4c7c8beddbe5e71be406f2f26e3f67e67",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "NIST SRD 121 (cite 'Source: NIST'; licence review)",
+    "note": "real live capture: the complete 2022 CODATA listing"
+  }
+]

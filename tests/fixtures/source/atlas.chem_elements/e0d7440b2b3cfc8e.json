@@ -1,0 +1,957 @@
+{
+ "Record": {
+  "RecordType": "AtomicNumber",
+  "RecordNumber": 6,
+  "RecordTitle": "Carbon",
+  "Reference": [
+   {
+    "ReferenceNumber": 1,
+    "SourceName": "PubChem",
+    "SourceID": "PubChem",
+    "Description": "Data deposited in or computed by PubChem",
+    "URL": "https://pubchem.ncbi.nlm.nih.gov"
+   },
+   {
+    "ReferenceNumber": 2,
+    "SourceName": "Atomic Mass Data Center (AMDC), International Atomic Energy Agency (IAEA)",
+    "SourceID": "e6",
+    "Name": "C",
+    "Description": "The half-life and atomic mass data was provided by the Atomic Mass Data Center at the International Atomic Energy Agency.",
+    "URL": "https://www-nds.iaea.org/amdc/",
+    "LicenseURL": "https://www-nds.iaea.org/disclaimer.html",
+    "ANID": 6590233
+   },
+   {
+    "ReferenceNumber": 3,
+    "SourceName": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+    "SourceID": "a6",
+    "Name": "Carbon",
+    "Description": "Element data are cited from the Atomic weights of the elements (an IUPAC Technical Report). The IUPAC periodic table of elements can be found at https://iupac.org/what-we-do/periodic-table-of-elements/. Additional information can be found within IUPAC publication doi:10.1515/pac-2015-0703 Copyright © 2020 International Union of Pure and Applied Chemistry.",
+    "URL": "https://www.ciaaw.org/carbon.htm",
+    "LicenseURL": "http://www.ciaaw.org/bylaws.htm",
+    "ANID": 2292387
+   },
+   {
+    "ReferenceNumber": 5,
+    "SourceName": "Jefferson Lab, U.S. Department of Energy",
+    "SourceID": "jlab6",
+    "Name": "Carbon",
+    "Description": "Thomas Jefferson National Accelerator Facility (Jefferson Lab) is one of 17 national laboratories funded by the U.S. Department of Energy. The lab's primary mission is to conduct basic research of the atom's nucleus using the lab's unique particle accelerator, known as the Continuous Electron Beam Accelerator Facility (CEBAF). For more information visit https://www.jlab.org/",
+    "URL": "https://education.jlab.org/itselemental/ele006.html",
+    "LicenseNote": "Please see citation and linking information: https://education.jlab.org/faq/index.html",
+    "LicenseURL": "https://www.jlab.org/privacy-and-security-notice",
+    "ANID": 507068
+   },
+   {
+    "ReferenceNumber": 6,
+    "SourceName": "Los Alamos National Laboratory, U.S. Department of Energy",
+    "SourceID": "lanl6",
+    "Name": "Carbon",
+    "Description": "The periodic table at the LANL (Los Alamos National Laboratory) contains basic element information together with the history, source, properties, use, handling and more. The provenance data may be found from the link under the source name.",
+    "URL": "https://periodic.lanl.gov/6.shtml",
+    "ANID": 507186
+   },
+   {
+    "ReferenceNumber": 7,
+    "SourceName": "NIST Physical Measurement Laboratory",
+    "SourceID": "e6",
+    "Name": "Carbon",
+    "Description": "The periodic table contains NIST's critically-evaluated data on atomic properties of the elements. The provenance data that include data for atomic spectroscopy, X-ray and gamma ray, radiation dosimetry, nuclear physics, and condensed matter physics may be found from the link under the source name. Ref: https://www.nist.gov/pml/atomic-spectra-database",
+    "URL": "https://physics.nist.gov/cgi-bin/Elements/elInfo.pl?element=6",
+    "LicenseURL": "https://www.nist.gov/pml/database-disclaimer",
+    "ANID": 2292623
+   },
+   {
+    "ReferenceNumber": 4,
+    "SourceName": "IUPAC Periodic Table of the Elements and Isotopes (IPTEI)",
+    "SourceID": "p6",
+    "Description": "The information are cited from Pure Appl. Chem. 2018; 90(12): 1833-2092, https://doi.org/10.1515/pac-2015-0703.",
+    "URL": "https://doi.org/10.1515/pac-2015-0703",
+    "LicenseNote": "Copyright (c) 2020 International Union of Pure and Applied Chemistry.\n\nThe International Union of Pure and Applied Chemistry (IUPAC) contribution within Pubchem is provided under a CC-BY-NC-ND 4.0 license, unless otherwise stated.",
+    "LicenseURL": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "ANID": 13296411
+   },
+   {
+    "ReferenceNumber": 9,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ep_6",
+    "Name": "Carbon",
+    "Description": "The element property data was retrieved from publications.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834048
+   },
+   {
+    "ReferenceNumber": 8,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ef_6",
+    "Name": "Carbon",
+    "Description": "This section provides all form of data related to element Carbon.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24833934
+   }
+  ],
+  "Section": [
+   {
+    "TOCHeading": "Properties",
+    "Description": "Characteristics of this element, such as atomic number, atomic mass, density, melting point, boiling point and so on.",
+    "Section": [
+     {
+      "TOCHeading": "Atomic Weight",
+      "Description": "Also called relative atomic mass, is the ratio of the average mass of the atom to the unified atomic mass unit, defined as one twelfth of the mass of a carbon-12 atom in its ground state and used to express masses of atomic particles, u=1.660 5402(10) * 10**(-27) kg. The Standard atomic weights refer to recommended values of relative atomic masses of the elements revised biennially by the IUPAC Commission on Atomic Weights and Isotopic Abundances and applicable to elements in any normal sample with a high level of confidence. The number in the parenthesis refers to an uncertainty when exists. The unit of atomic weight is the dalton or unified atomic mass unit (symbol: Da or u).",
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Weight",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[12.0096, 12.0116]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "12.0107"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 6,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "12.01"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[12.0096,12.0116]"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Crustal Abundance",
+      "Description": "The estimated element abundance in the earth's crust.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2.00×102 milligrams per kilogram",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Oceanic Abundance",
+      "Description": "The estimated element abundance in the earth's oceans.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2.8×101 milligrams per liter",
+           "Markup": [
+            {
+             "Start": 6,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "TOCHeading": "History",
+    "Description": "The history of the discovery and use of this element.",
+    "Information": [
+     {
+      "ReferenceNumber": 3,
+      "Name": "History",
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The name derives from the Latin carbo for \"charcoal\". It was known in prehistoric times in the form of charcoal and soot. In 1797, the English chemist Smithson Tennant proved that diamond is pure carbon.",
+         "Markup": [
+          {
+           "Start": 32,
+           "Length": 5,
+           "Type": "Italics"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 5,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Carbon, the sixth most abundant element in the universe, has been known since ancient times. Carbon is most commonly obtained from coal deposits, although it usually must be processed into a form suitable for commercial use. Three naturally occurring allotropes of carbon are known to exist: amorphous, graphite and diamond."
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 6,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "From the Latin word carbo: charcoal. Carbon, an element of prehistoric discovery, is very widely distributed in nature. It is found in abundance in the sun, stars, comets, and atmospheres of most planets. Carbon in the form of microscopic diamonds is found in some meteorites."
+        },
+        {
+         "String": "Natural diamonds are found in kimberlite of ancient volcanic \"pipes,\" found in South Africa, Arkansas, and elsewhere. Diamonds are now also being recovered from the ocean floor off the Cape of Good Hope. About 30% of all industrial diamonds used in the U.S. are now made synthetically."
+        },
+        {
+         "String": "The energy of the sun and stars can be attributed at least in part to the well-known carbon-nitrogen cycle."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "TOCHeading": "Isotopes",
+    "Description": "Isotopes are nuclides having the same atomic number but different mass numbers.  This section provides information on the isotopes of this element and their uses in various fields.",
+    "URL": "https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.05%3A_Isotopes",
+    "Section": [
+     {
+      "TOCHeading": "Isotope Mass and Abundance",
+      "Description": "Atomic mass and abundance (composition) information for a given isotope/nuclide. The number in the parenthesis refers to an uncertainty when exist. The unit of atomic weight is the unified atomic mass unit (u) or dalton (Da). ",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 3,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Isotope",
+          "Atomic Mass (uncertainty) [u]",
+          "Abundance (uncertainty)"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": " 12C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 13C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 3,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Mass (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "12(exact)"
+          },
+          {
+           "String": "13.003 354 835(2)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[0.9884, 0.9904]"
+          },
+          {
+           "String": "[0.0096, 0.0116]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "12C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "13C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "14C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Atomic Mass (uncertainty) [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "12.0000000(00)"
+          },
+          {
+           "String": "13.00335483507(23)"
+          },
+          {
+           "String": "14.0032419884(40)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.9893(8)"
+          },
+          {
+           "String": "0.0107(8)"
+          },
+          {
+           "String": ""
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Atomic Mass, Half Life, and Decay",
+      "Description": "Information on the atomic mass, half life, and decay for this element, from the the Atomic Mass Data Center. The number after the ± refers to an uncertainty when exists.",
+      "URL": "https://pubchem.ncbi.nlm.nih.gov/docs/atomic-mass/",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 5,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Nuclide",
+          "Atomic Mass and Uncertainty [u]",
+          "Half Life and Uncertainty",
+          "Discovery Year",
+          "Decay Modes, Intensities and Uncertainties [%]"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 2,
+        "Name": "Nuclide",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "8C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "9C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "10C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "11C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "12C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "13C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "14C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "15C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "16C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "17C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "18C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "19C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "20C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "21C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "22C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "23C",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Atomic Mass and Uncertainty [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "8.037643039 ± 0.000019584"
+          },
+          {
+           "String": "9.031037202 ± 0.000002293"
+          },
+          {
+           "String": "10.016853217 ± 0.000000075"
+          },
+          {
+           "String": "11.011432597 ± 0.000000064"
+          },
+          {
+           "String": "12.0000000 ± 0."
+          },
+          {
+           "String": "13.00335483534 ± 0.00000000025"
+          },
+          {
+           "String": "14.00324198862 ± 0.00000000403"
+          },
+          {
+           "String": "15.010599256 ± 0.000000858"
+          },
+          {
+           "String": "16.014701255 ± 0.00000384"
+          },
+          {
+           "String": "17.022578650 ± 0.000018641"
+          },
+          {
+           "String": "18.026751930 ± 0.000032206"
+          },
+          {
+           "String": "19.034797594 ± 0.000105625"
+          },
+          {
+           "String": "20.040261732 ± 0.000247585"
+          },
+          {
+           "String": "21.049000 ± 0.00064 [Estimated]"
+          },
+          {
+           "String": "22.057553990 ± 0.000248515"
+          },
+          {
+           "String": "23.068890 ± 0.00107 [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Half Life and Uncertainty",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "3.5 zs ± 1.4"
+          },
+          {
+           "String": "126.5 ms ± 0.9"
+          },
+          {
+           "String": "19.3011 s ± 0.0015"
+          },
+          {
+           "String": "20.3402 m ± 0.0053"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "5.70 ky ± 0.03"
+          },
+          {
+           "String": "2.449 s ± 0.005"
+          },
+          {
+           "String": "750 ms ± 6"
+          },
+          {
+           "String": "193 ms ± 6"
+          },
+          {
+           "String": "92 ms ± 2"
+          },
+          {
+           "String": "46.2 ms ± 2.3"
+          },
+          {
+           "String": "16 ms ± 3"
+          },
+          {
+           "String": "Not-specified <30ns"
+          },
+          {
+           "String": "6.2 ms ± 1.3"
+          },
+          {
+           "String": "Not-specified"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Discovery Year",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1974"
+          },
+          {
+           "String": "1964"
+          },
+          {
+           "String": "1949"
+          },
+          {
+           "String": "1934"
+          },
+          {
+           "String": "1919"
+          },
+          {
+           "String": "1929"
+          },
+          {
+           "String": "1936"
+          },
+          {
+           "String": "1950"
+          },
+          {
+           "String": "1961"
+          },
+          {
+           "String": "1968"
+          },
+          {
+           "String": "1969"
+          },
+          {
+           "String": "1974"
+          },
+          {
+           "String": "1981"
+          },
+          {
+           "String": ""
+          },
+          {
+           "String": "1986"
+          },
+          {
+           "String": ""
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Decay Modes, Intensities and Uncertainties [%]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "2p=100%"
+          },
+          {
+           "String": "β+=100%; β+p=7.5±0.6%; β+α=38.4±1.6%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 24,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β+=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "IS=98.94±0.6%"
+          },
+          {
+           "String": "IS=1.06±0.6%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=99.0±0.3%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=28.4±1.3%; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 25,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=31.5±1.5%; β-2n ?",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 25,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=47±0.3%; β-2n=7±0.3%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 23,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "β-=100%; β-n=70±1.1%; β-2n<18.6%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 23,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "n ?"
+          },
+          {
+           "String": "β-=100%; β-n=61±1.4%; β-2n<37%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 10,
+             "Length": 1,
+             "Type": "Superscript"
+            },
+            {
+             "Start": 23,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "n ?"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,132 @@
+[
+  {
+    "request_fingerprint": "7b7c0485d8fb6303146a5c7af38de74353de63a16a8c407d48e185082237387d",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/280,297,962,518696/property/Title,MolecularFormula,MolecularWeight,ExactMass,IUPACName,InChIKey,Charge/JSON",
+    "file": "7b7c0485d8fb6303.json",
+    "sha256": "1ee91a54fc3572f0c3c22696c96365d9e9a459b450951a83f88e6a24cb92f06e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (properties)"
+  },
+  {
+    "request_fingerprint": "3ea4f96cd215e94a798cf8b9590001ad3bd0b6380d13b67a0b2b70e06c80e749",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON",
+    "file": "3ea4f96cd215e94a.json",
+    "sha256": "ff0f75976583b8a6493b18d0b42e83e1b68bd6e112b45d33578d98494ed5d321",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture: the whole periodic table"
+  },
+  {
+    "request_fingerprint": "5451236d49fe960058663cfe7d868304250fa92a5c1d0eef4d13a295fdd74b37",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:15377,CHEBI:16183,CHEBI:16526,CHEBI:50819,CHEBI:99999999/xrefs/RegistryID/JSON",
+    "file": "5451236d49fe9600.json",
+    "sha256": "c4db6e6b5e33c3e3cb4b11cbe798b3ec6b1d4aa0af11555333363d6c3b1e84ad",
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 5 ids, HTTP 400)"
+  },
+  {
+    "request_fingerprint": "1e9646842cafc5f7d814c5ca627990ef7fcb28e9e1e932dad4342822806c1e27",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:15377,CHEBI:16183,CHEBI:16526,CHEBI:50819/cids/JSON",
+    "file": "1e9646842cafc5f7.json",
+    "sha256": "0b6d1616bd8789ed42b450a5b61e0c0601e96f77a82c9ea0b13cb8a16f9d63b2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (cids)"
+  },
+  {
+    "request_fingerprint": "acda99063183be659b65ada46b2109d0cbcfd6c55a1df681a48e608b238eaf3a",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:15377,CHEBI:16183/xrefs/RegistryID/JSON",
+    "file": "acda99063183be65.json",
+    "sha256": "a8893cce39e1a69a0e66e87104aa15d9467ef2ec86e4fdd804373a6067cb77fd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 2 ids, HTTP 200)"
+  },
+  {
+    "request_fingerprint": "5848f4c879a012d41589988eb8b2255684f0483a817aabe38044de8664ef7d7c",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:16526,CHEBI:50819,CHEBI:99999999/xrefs/RegistryID/JSON",
+    "file": "5848f4c879a012d4.json",
+    "sha256": "c4db6e6b5e33c3e3cb4b11cbe798b3ec6b1d4aa0af11555333363d6c3b1e84ad",
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 3 ids, HTTP 400)"
+  },
+  {
+    "request_fingerprint": "03452c79d1f130c1467228491b2ce41c3fd771d7c8fa575eec445e15aae6e0c0",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:16526/xrefs/RegistryID/JSON",
+    "file": "03452c79d1f130c1.json",
+    "sha256": "4e351a21629670f55abf70032ddabab9e7c61696064992313fb23d48d1e1b3e8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 1 ids, HTTP 200)"
+  },
+  {
+    "request_fingerprint": "e8f570a1222bf9810371b143ddb2773f2035f3e450c380442621da9e1946f436",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:50819,CHEBI:99999999/xrefs/RegistryID/JSON",
+    "file": "e8f570a1222bf981.json",
+    "sha256": "c4db6e6b5e33c3e3cb4b11cbe798b3ec6b1d4aa0af11555333363d6c3b1e84ad",
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 2 ids, HTTP 400)"
+  },
+  {
+    "request_fingerprint": "53518a214117296986bd38610c303fc05beca79c37abc19c2b4441cb6d247c9c",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:50819/xrefs/RegistryID/JSON",
+    "file": "53518a2141172969.json",
+    "sha256": "05a56e62bfb8b77d40123b24adf993d1a79043eb72ef1775024d3971dfcb3143",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 1 ids, HTTP 200)"
+  },
+  {
+    "request_fingerprint": "60c71f3f4dc0cdf7e46599b86ed1ceb5013c5020b3e9540499fce8218196af78",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/sourceid/ChEBI/CHEBI:99999999/xrefs/RegistryID/JSON",
+    "file": "60c71f3f4dc0cdf7.json",
+    "sha256": "c4db6e6b5e33c3e3cb4b11cbe798b3ec6b1d4aa0af11555333363d6c3b1e84ad",
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:46:38+00:00",
+    "licence": "PubChem (NLM, US Government work); contributed sections under each contributor's terms (see Reference.LicenseURL)",
+    "note": "real live capture (xrefs, 1 ids, HTTP 400)"
+  }
+]

@@ -1,0 +1,641 @@
+{
+ "Record": {
+  "RecordType": "AtomicNumber",
+  "RecordNumber": 1,
+  "RecordTitle": "Hydrogen",
+  "Reference": [
+   {
+    "ReferenceNumber": 1,
+    "SourceName": "PubChem",
+    "SourceID": "PubChem",
+    "Description": "Data deposited in or computed by PubChem",
+    "URL": "https://pubchem.ncbi.nlm.nih.gov"
+   },
+   {
+    "ReferenceNumber": 2,
+    "SourceName": "Atomic Mass Data Center (AMDC), International Atomic Energy Agency (IAEA)",
+    "SourceID": "e1",
+    "Name": "H",
+    "Description": "The half-life and atomic mass data was provided by the Atomic Mass Data Center at the International Atomic Energy Agency.",
+    "URL": "https://www-nds.iaea.org/amdc/",
+    "LicenseURL": "https://www-nds.iaea.org/disclaimer.html",
+    "ANID": 6590228
+   },
+   {
+    "ReferenceNumber": 3,
+    "SourceName": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+    "SourceID": "a1",
+    "Name": "Hydrogen",
+    "Description": "Element data are cited from the Atomic weights of the elements (an IUPAC Technical Report). The IUPAC periodic table of elements can be found at https://iupac.org/what-we-do/periodic-table-of-elements/. Additional information can be found within IUPAC publication doi:10.1515/pac-2015-0703 Copyright © 2020 International Union of Pure and Applied Chemistry.",
+    "URL": "https://www.ciaaw.org/hydrogen.htm",
+    "LicenseURL": "http://www.ciaaw.org/bylaws.htm",
+    "ANID": 2292382
+   },
+   {
+    "ReferenceNumber": 5,
+    "SourceName": "Jefferson Lab, U.S. Department of Energy",
+    "SourceID": "jlab1",
+    "Name": "Hydrogen",
+    "Description": "Thomas Jefferson National Accelerator Facility (Jefferson Lab) is one of 17 national laboratories funded by the U.S. Department of Energy. The lab's primary mission is to conduct basic research of the atom's nucleus using the lab's unique particle accelerator, known as the Continuous Electron Beam Accelerator Facility (CEBAF). For more information visit https://www.jlab.org/",
+    "URL": "https://education.jlab.org/itselemental/ele001.html",
+    "LicenseNote": "Please see citation and linking information: https://education.jlab.org/faq/index.html",
+    "LicenseURL": "https://www.jlab.org/privacy-and-security-notice",
+    "ANID": 507063
+   },
+   {
+    "ReferenceNumber": 6,
+    "SourceName": "Los Alamos National Laboratory, U.S. Department of Energy",
+    "SourceID": "lanl1",
+    "Name": "Hydrogen",
+    "Description": "The periodic table at the LANL (Los Alamos National Laboratory) contains basic element information together with the history, source, properties, use, handling and more. The provenance data may be found from the link under the source name.",
+    "URL": "https://periodic.lanl.gov/1.shtml",
+    "ANID": 507181
+   },
+   {
+    "ReferenceNumber": 7,
+    "SourceName": "NIST Physical Measurement Laboratory",
+    "SourceID": "e1",
+    "Name": "Hydrogen",
+    "Description": "The periodic table contains NIST's critically-evaluated data on atomic properties of the elements. The provenance data that include data for atomic spectroscopy, X-ray and gamma ray, radiation dosimetry, nuclear physics, and condensed matter physics may be found from the link under the source name. Ref: https://www.nist.gov/pml/atomic-spectra-database",
+    "URL": "https://physics.nist.gov/cgi-bin/Elements/elInfo.pl?element=1",
+    "LicenseURL": "https://www.nist.gov/pml/database-disclaimer",
+    "ANID": 2292618
+   },
+   {
+    "ReferenceNumber": 4,
+    "SourceName": "IUPAC Periodic Table of the Elements and Isotopes (IPTEI)",
+    "SourceID": "p1",
+    "Description": "The information are cited from Pure Appl. Chem. 2018; 90(12): 1833-2092, https://doi.org/10.1515/pac-2015-0703.",
+    "URL": "https://doi.org/10.1515/pac-2015-0703",
+    "LicenseNote": "Copyright (c) 2020 International Union of Pure and Applied Chemistry.\n\nThe International Union of Pure and Applied Chemistry (IUPAC) contribution within Pubchem is provided under a CC-BY-NC-ND 4.0 license, unless otherwise stated.",
+    "LicenseURL": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "ANID": 13296406
+   },
+   {
+    "ReferenceNumber": 9,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ep_1",
+    "Name": "Hydrogen",
+    "Description": "The element property data was retrieved from publications.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24834038
+   },
+   {
+    "ReferenceNumber": 8,
+    "SourceName": "PubChem Elements",
+    "SourceID": "ef_1",
+    "Name": "Hydrogen",
+    "Description": "This section provides all form of data related to element Hydrogen.",
+    "LicenseURL": "https://www.nlm.nih.gov/copyright.html",
+    "ANID": 24833929
+   }
+  ],
+  "Section": [
+   {
+    "TOCHeading": "Properties",
+    "Description": "Characteristics of this element, such as atomic number, atomic mass, density, melting point, boiling point and so on.",
+    "Section": [
+     {
+      "TOCHeading": "Atomic Weight",
+      "Description": "Also called relative atomic mass, is the ratio of the average mass of the atom to the unified atomic mass unit, defined as one twelfth of the mass of a carbon-12 atom in its ground state and used to express masses of atomic particles, u=1.660 5402(10) * 10**(-27) kg. The Standard atomic weights refer to recommended values of relative atomic masses of the elements revised biennially by the IUPAC Commission on Atomic Weights and Isotopic Abundances and applicable to elements in any normal sample with a high level of confidence. The number in the parenthesis refers to an uncertainty when exists. The unit of atomic weight is the dalton or unified atomic mass unit (symbol: Da or u).",
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Weight",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[1.007 84, 1.008 11]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.00794"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 6,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.008"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[1.00784,1.00811]"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Crustal Abundance",
+      "Description": "The estimated element abundance in the earth's crust.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.40×103 milligrams per kilogram",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Estimated Oceanic Abundance",
+      "Description": "The estimated element abundance in the earth's oceans.",
+      "Information": [
+       {
+        "ReferenceNumber": 5,
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.08×105 milligrams per liter",
+           "Markup": [
+            {
+             "Start": 7,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "TOCHeading": "History",
+    "Description": "The history of the discovery and use of this element.",
+    "Information": [
+     {
+      "ReferenceNumber": 3,
+      "Name": "History",
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "The name derives from the Greek hydro for \"water\" and genes for \"forming\" because it burned in air to form water. Hydrogen was discovered by the English physicist Henry Cavendish in 1766.",
+         "Markup": [
+          {
+           "Start": 32,
+           "Length": 5,
+           "Type": "Italics"
+          },
+          {
+           "Start": 54,
+           "Length": 5,
+           "Type": "Italics"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 5,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "Scientists had been producing hydrogen for years before it was recognized as an element. Written records indicate that Robert Boyle produced hydrogen gas as early as 1671 while experimenting with iron and acids. Hydrogen was first recognized as a distinct element by Henry Cavendish in 1766. Composed of a single proton and a single electron, hydrogen is the simplest and most abundant element in the universe. It is estimated that 90% of the visible universe is composed of hydrogen."
+        },
+        {
+         "String": "Hydrogen is the raw fuel that most stars 'burn' to produce energy. The same process, known as fusion, is being studied as a possible power source for use on earth. The sun's supply of hydrogen is expected to last another 5 billion years."
+        }
+       ]
+      }
+     },
+     {
+      "ReferenceNumber": 6,
+      "Value": {
+       "StringWithMarkup": [
+        {
+         "String": "From the Greek word hydro (water), and genes (forming). Hydrogen was recognized as a distinct substance by Henry Cavendish in 1776. Diagram of a simple hydrogen atom.",
+         "Markup": [
+          {
+           "Start": 20,
+           "Length": 5,
+           "Type": "Italics"
+          },
+          {
+           "Start": 39,
+           "Length": 5,
+           "Type": "Italics"
+          }
+         ]
+        },
+        {
+         "String": "Hydrogen is the most abundant of all elements in the universe. The heavier elements were originally made from hydrogen atoms or from other elements that were originally made from hydrogen atoms."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "TOCHeading": "Isotopes",
+    "Description": "Isotopes are nuclides having the same atomic number but different mass numbers.  This section provides information on the isotopes of this element and their uses in various fields.",
+    "URL": "https://chem.libretexts.org/Courses/Furman_University/CHM101%3A_Chemistry_and_Global_Awareness_(Gordon)/03%3A_Atoms_and_the_Periodic_Table/3.05%3A_Isotopes",
+    "Section": [
+     {
+      "TOCHeading": "Isotope Mass and Abundance",
+      "Description": "Atomic mass and abundance (composition) information for a given isotope/nuclide. The number in the parenthesis refers to an uncertainty when exist. The unit of atomic weight is the unified atomic mass unit (u) or dalton (Da). ",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 3,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Isotope",
+          "Atomic Mass (uncertainty) [u]",
+          "Abundance (uncertainty)"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 3,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": " 1H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": " 2H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 2,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Atomic Mass (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.007 825 0322(6)"
+          },
+          {
+           "String": "2.014 101 7781(8)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 3,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "[0.999 72, 0.999 99]"
+          },
+          {
+           "String": "[0.000 01, 0.000 28]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Isotope",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "2D",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "3T",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Atomic Mass (uncertainty) [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.00782503223(9)"
+          },
+          {
+           "String": "2.01410177812(12)"
+          },
+          {
+           "String": "3.0160492779(24)"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 7,
+        "Name": "Abundance (uncertainty)",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "0.999885(70)"
+          },
+          {
+           "String": "0.000115(70)"
+          },
+          {
+           "String": ""
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "TOCHeading": "Atomic Mass, Half Life, and Decay",
+      "Description": "Information on the atomic mass, half life, and decay for this element, from the the Atomic Mass Data Center. The number after the ± refers to an uncertainty when exists.",
+      "URL": "https://pubchem.ncbi.nlm.nih.gov/docs/atomic-mass/",
+      "DisplayControls": {
+       "CreateTable": {
+        "FromInformationIn": "ThisSection",
+        "NumberOfColumns": 5,
+        "ColumnsFromNamedLists": {
+         "Name": [
+          "Nuclide",
+          "Atomic Mass and Uncertainty [u]",
+          "Half Life and Uncertainty",
+          "Discovery Year",
+          "Decay Modes, Intensities and Uncertainties [%]"
+         ],
+         "UseNamesAsColumnHeadings": true
+        }
+       }
+      },
+      "Information": [
+       {
+        "ReferenceNumber": 2,
+        "Name": "Nuclide",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "2H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "3H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "4H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "5H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "6H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "7H",
+           "Markup": [
+            {
+             "Start": 0,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Atomic Mass and Uncertainty [u]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1.007825031898 ± 0.000000000014"
+          },
+          {
+           "String": "2.014101777844 ± 0.000000000015"
+          },
+          {
+           "String": "3.01604928132 ± 0.00000000008"
+          },
+          {
+           "String": "4.026431867 ± 0.000107354"
+          },
+          {
+           "String": "5.035311492 ± 0.00009602"
+          },
+          {
+           "String": "6.044955437 ± 0.000272816"
+          },
+          {
+           "String": "7.052749 ± 0.001078 [Estimated]"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Half Life and Uncertainty",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "Stable"
+          },
+          {
+           "String": "12.32 y ± 0.02"
+          },
+          {
+           "String": "139 ys ± 10"
+          },
+          {
+           "String": "86 ys ± 6"
+          },
+          {
+           "String": "294 ys ± 67"
+          },
+          {
+           "String": "652 ys ± 558"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Discovery Year",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "1920"
+          },
+          {
+           "String": "1932"
+          },
+          {
+           "String": "1934"
+          },
+          {
+           "String": "1981"
+          },
+          {
+           "String": "1987"
+          },
+          {
+           "String": "1984"
+          },
+          {
+           "String": "2003"
+          }
+         ]
+        }
+       },
+       {
+        "ReferenceNumber": 2,
+        "Name": "Decay Modes, Intensities and Uncertainties [%]",
+        "Value": {
+         "StringWithMarkup": [
+          {
+           "String": "IS=99.9855±7.8%"
+          },
+          {
+           "String": "IS=0.0145±7.8%"
+          },
+          {
+           "String": "β-=100%",
+           "Markup": [
+            {
+             "Start": 1,
+             "Length": 1,
+             "Type": "Superscript"
+            }
+           ]
+          },
+          {
+           "String": "n=100%"
+          },
+          {
+           "String": "2n=100%"
+          },
+          {
+           "String": "n ?; 3n ?"
+          },
+          {
+           "String": "2n ?"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}
