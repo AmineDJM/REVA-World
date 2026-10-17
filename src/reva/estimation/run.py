@@ -15,7 +15,6 @@ labelled ``final_vintage_pseudo_real_time`` and must never be reported as real-t
 from __future__ import annotations
 
 import hashlib
-import subprocess
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime
@@ -115,21 +114,37 @@ class EventStudyRequest:
             raise ValidationProblem("n_perm must be 0..2000")
 
 
+def git_head(start: Path) -> str | None:
+    """The checked-out commit, read from ``.git`` files (no subprocess); ``None`` outside a git checkout."""
+    for d in (start, *start.parents):
+        g = d / ".git"
+        if not g.is_dir():
+            continue
+        try:
+            head = (g / "HEAD").read_text().strip()
+            if not head.startswith("ref: "):
+                return head or None
+            ref = head[5:]
+            p = g / ref
+            if p.exists():
+                return p.read_text().strip() or None
+            packed = g / "packed-refs"
+            if packed.exists():
+                for line in packed.read_text().splitlines():
+                    if line.endswith(" " + ref):
+                        return line.split(" ", 1)[0]
+        except OSError:
+            return None
+        return None
+    return None
+
+
 def code_digest() -> dict[str, Any]:
-    files = sorted(PKG_DIR.glob("*.py")) + [TREATMENTS_PATH, REPLICATIONS_PATH]
+    files = [*sorted(PKG_DIR.glob("*.py")), TREATMENTS_PATH, REPLICATIONS_PATH]
     h = hashlib.sha256()
     for f in files:
         h.update(f.name.encode() + b"\0" + f.read_bytes() + b"\0")
-    commit = None
-    try:
-        commit = (
-            subprocess.run(
-                ["git", "rev-parse", "HEAD"], cwd=PKG_DIR, capture_output=True, text=True, timeout=5, check=False
-            ).stdout.strip()
-            or None
-        )
-    except (OSError, subprocess.SubprocessError):  # pragma: no cover
-        commit = None
+    commit = git_head(PKG_DIR)
     return {"code_sha256": h.hexdigest(), "git_commit": commit, "files": [f.name for f in files]}
 
 
@@ -395,7 +410,7 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
     unit_time = "year" if req["frequency"] == "annual" else "quarter"
     lhs = req["lhs"]
     unit = "percentage_points" if lhs in ("diff", "level") else "percent"
-    point = float(head["point"])
+    point = round(float(head["point"]), 6)
     sign = "negative" if point < 0 else ("positive" if point > 0 else "zero")
     ev = doc["inputs"]["events"]
     sample = lp["sample"]
@@ -409,16 +424,16 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
             "effect_kind": "atlas_concept",
             "effect_id": str(req["outcome"]).split(":", 1)[1],
             "effect_definition": f"{out_s.get('label') or ''}: {out_s.get('definition') or ''} -- REVA LHS: "
-            + doc["interpretation"]["unit_note"][lhs],
+            + doc["interpretation"]["unit_note"],
             "effect_transform": EFFECT_TRANSFORM[lhs],
             "measure": "response",
             "unit": unit,
             "shock_size": 1,
             "shock_unit": "occurrence",
             "sign": sign,
-            "point": round(point, 6),
+            "point": point,
             "point_kind": "point",
-            "as_printed": f"{point:.6g}",
+            "as_printed": repr(point),
             "se": round(float(head["se"]), 6),
             "ci_low": round(float(head["ci_low"]), 6),
             "ci_high": round(float(head["ci_high"]), 6),
@@ -472,17 +487,10 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
     ]
 
 
-def write_effect_estimates(
-    engine: Any, store: Any, doc: Mapping[str, Any], run_sha: str, *, origin: str
-) -> dict[str, Any]:
-    """Write the run's estimate(s) through PRED-EFFECT's loader (``reva.effects``). Raises ``CapabilityGap``
-    when the loader is not installed yet."""
-    from reva.kernel.errors import CapabilityGap
+def build_effect_inputs(doc: Mapping[str, Any]) -> list[Any]:
+    """``reva.effects.EffectEstimateIn`` objects for a run document (PRED-EFFECT's data model)."""
+    from reva import effects as fx
 
-    try:
-        from reva import effects as fx  # type: ignore[attr-defined]
-    except ImportError as e:
-        raise CapabilityGap("reva.effects (PRED-EFFECT loader) is not available in this checkout") from e
     items = []
     for kw in effect_estimates(doc):
         kw = dict(kw)
@@ -496,29 +504,58 @@ def write_effect_estimates(
             status=kw.pop("uncertainty_status"),
         )
         hz = kw.pop("horizon")
-        irf = [fx.IrfPoint(**p) for p in kw.pop("irf")]
-        run = fx.RevaRun(**kw.pop("run"))
+        irf = tuple(fx.IrfPoint(**p) for p in kw.pop("irf"))
+        r = kw.pop("run")
+        run = fx.RevaRun(
+            run_id=r["run_id"],
+            code_version=r["code_version"],
+            data_snapshot=r["data_snapshot"],
+            as_of=r["as_of"],
+            spec_sha256=r["spec_sha256"],
+            replicates=tuple(r["replicates"]),
+        )
         items.append(
             fx.EffectEstimateIn(
                 **kw,
-                entry_id=None,
                 uncertainty=unc,
                 horizon=fx.Horizon(kind=hz["kind"], value=hz["value"], unit=hz["unit"]),
                 irf=irf,
                 run=run,
+                transcription="computed",
+                rights={
+                    "licence": "internal-derived",
+                    "restricted": bool(doc["rights"]["restricted_sources"]),
+                    "non_commercial": bool(doc["rights"]["non_commercial"]),
+                },
+                curation={"curated_by": "agent PRED-EVENTSTUDY", "review_status": "maintainer_review_pending"},
             )
         )
+    return items
+
+
+def effect_dataset(doc: Mapping[str, Any]) -> str:
+    return f"eventstudy.{doc['request']['treatment']}.{doc['request']['outcome'].split(':', 1)[1]}".lower()
+
+
+def write_effect_estimates(
+    engine: Any, store: Any, doc: Mapping[str, Any], run_sha: str, *, origin: str
+) -> dict[str, Any]:
+    """Write the run's estimate(s) through PRED-EFFECT's loader (``reva.effects.load_effect_estimates``) as
+    ``source_kind="reva_run"`` with the archived run document as the delivery's raw artifact."""
+    from reva import effects as fx
+
     rep = fx.load_effect_estimates(
         engine,
         store,
         source_kind="reva_run",
         source_key=SOURCE_KEY,
-        dataset=f"eventstudy.{doc['request']['treatment']}.{doc['request']['outcome'].split(':', 1)[1]}".lower(),
+        dataset=effect_dataset(doc),
         raw_sha256s=[run_sha],
         retrieved_at=datetime.now(UTC),
         origin=origin,
         complete=True,
         retraction_reason="absent_from_delivery",
-        estimates=items,
+        estimates=build_effect_inputs(doc),
+        parameters={"run_id": doc["run_id"], "spec_sha256": doc["spec_sha256"], "result_sha256": doc["result_sha256"]},
     )
     return dict(rep.as_dict())
