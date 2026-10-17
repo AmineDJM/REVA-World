@@ -117,16 +117,47 @@ TEMPORAL_TEXT = {
         "consistent": "la cause précède l'effet, à la précision des dates",
         "overlapping": "périodes qui se chevauchent, antériorité non établie",
         "inconsistent": "incohérence temporelle signalée : la cause commence après l'effet",
-        "undetermined": "dates manquantes, antériorité non vérifiable",
+        "undetermined": "antériorité non vérifiable : date absente ou hors de la plage prise en charge",
     },
     "en": {
         "consistent": "the cause precedes the effect, at date precision",
         "overlapping": "overlapping periods, precedence not established",
         "inconsistent": "temporal inconsistency flagged: the cause starts after the effect",
-        "undetermined": "dates missing, precedence not checkable",
+        "undetermined": "precedence not checkable: a date is missing or outside the supported range",
     },
 }
-LANE_ORDER = ("immediate", "underlying", "contributing", "coded", "general", "reaction", "prevention")
+#: ``undetermined`` by its reason (CAUSCORE ``grade.temporal``): an entity dated by inception (a state, a polity) is
+#: compared through its existence span — its dates are not missing; an undated side is named.
+TEMPORAL_UNDETERMINED_TEXT = {
+    "fr": {
+        "entity": "{who} datée par sa création (P571) : une entité, pas un événement ; sa période d'existence est "
+        "comparée, antériorité non établie",
+        "undated": "pas de date de début dans le graphe pour {who}, antériorité non vérifiable",
+        "who": {"cause": "la cause", "effect": "l'effet", "both": "la cause et l'effet"},
+    },
+    "en": {
+        "entity": "{who} dated by its inception (P571): an entity, not an event; its existence span is compared, "
+        "precedence not established",
+        "undated": "no start date in the knowledge graph for {who}, precedence not checkable",
+        "who": {"cause": "the cause", "effect": "the effect", "both": "the cause and the effect"},
+    },
+}
+
+
+def temporal_text(c: Any, lang: str) -> str:
+    """The temporal check of a claim in words, with its reason when the check is ``undetermined``."""
+    fr = lang == "fr"
+    check = c.temporal_check or ""
+    if check == "undetermined":
+        u = TEMPORAL_UNDETERMINED_TEXT[lang]
+        for key, sides in (("entity", c.temporal_entity_sides), ("undated", c.temporal_undated_sides)):
+            if sides:
+                who = u["who"]["both"] if len(set(sides)) > 1 else u["who"].get(sides[0], sides[0])
+                return str(u[key]).format(who=who)
+    return TEMPORAL_TEXT[lang].get(check, "vérification temporelle non calculée" if fr else "temporal check not computed")
+
+
+LANE_ORDER = ("immediate", "underlying", "contributing", "coded", "general", "reaction", "prevention", "outcome")
 _RELATION_LANE = {
     "immediate_cause": "immediate",
     "precipitated": "immediate",
@@ -134,7 +165,7 @@ _RELATION_LANE = {
     "contributing_factor": "contributing",
     "enabled": "contributing",
     "coded_trigger": "coded",
-    "coded_outcome": "coded",
+    "coded_outcome": "outcome",
     "reaction_to": "reaction",
     "prevented_or_delayed": "prevention",
 }
@@ -1094,9 +1125,7 @@ class Composer:
                 if fr
                 else f"; mechanism quoted from the source: “{c.mechanism}”"
             )
-        tt = TEMPORAL_TEXT[lang].get(
-            c.temporal_check or "", "vérification temporelle non calculée" if fr else "temporal check not computed"
-        )
+        tt = temporal_text(c, lang)
         corr = ""
         if c.corroboration is not None:
             corr = (
@@ -1126,14 +1155,24 @@ class Composer:
             key=lambda r: (LANE_ORDER.index(claim_lane(r[0])), _grade_rank(r[0].grade), int(r[1][1:])),
         )
         effects = d["direction"] == "effects"
-        n = len(rows)
+        # coded outcomes (how an event ended, according to a dataset) are listed, never counted as causes/effects
+        k = sum(1 for c, _ in rows if claim_lane(c) == "outcome")
+        n = len(rows) - k
         what = ("conséquences" if effects else "causes") if fr else ("consequences" if effects else "causes")
+        outc = ""
+        if k:
+            outc = (
+                f" ; s'y ajoutent {k} issue(s) codée(s) par des jeux de données (comment l'événement s'est terminé), "
+                f"qui ne sont pas des {what}"
+                if fr
+                else f"; plus {k} dataset-coded outcome(s) (how the event ended), which are not {what}"
+            )
         self.add(
-            f"{n} affirmation(s) de sources sur les {what} de {self.entity(e)} ({e.qid}) ; REVA n'établit aucune "
+            f"{n} affirmation(s) de sources sur les {what} de {self.entity(e)} ({e.qid}){outc} ; REVA n'établit aucune "
             f"causalité : chaque lien ci-dessous est attribué à la source qui l'affirme, avec son niveau de source et "
             f"son grade de preuve (ordinal, pas une probabilité)."
             if fr
-            else f"{n} claim(s) by sources about the {what} of {self.entity(e)} ({e.qid}); REVA establishes no "
+            else f"{n} claim(s) by sources about the {what} of {self.entity(e)} ({e.qid}){outc}; REVA establishes no "
             f"causation: each link below is attributed to the source asserting it, with its source tier and evidence "
             f"grade (ordinal, not a probability).",
             [eid for _, eid in rows],

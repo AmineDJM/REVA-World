@@ -252,10 +252,28 @@ class Evidence:
                 "grade_rules": list(c.grade_rules),
                 "rules_version": c.rules_version,
                 "temporal_check": c.temporal_check,
+                # why the check is what it is (an entity dated by inception is not "missing dates")
+                "temporal": {
+                    "check": c.temporal_check,
+                    "reason": c.temporal_reason,
+                    "entity_dated_by_inception": list(c.temporal_entity_sides),
+                    "undated": list(c.temporal_undated_sides),
+                },
                 "corroboration": c.corroboration,
                 "contested_by": list(c.contested_by),
                 "review_status": c.review_status,
                 "origin": c.origin,
+                # who Wikidata records as asserting the claim (P3680): the answer sentence names them (audit H3)
+                "supported_by": [dict(x) for x in c.supported_by_refs]
+                or [{"id": "", "label": w} for w in c.supported_by],
+                "attribution": {
+                    "supported_by": [dict(x) for x in c.supported_by_refs],
+                    "nature_of_statement": [dict(x) for x in c.nature_of_statement],
+                    "note": dict(c.attribution_note),
+                    "source_asserts_it_itself": not c.supported_by,
+                }
+                if (c.supported_by or c.nature_of_statement or c.attribution_note)
+                else None,
                 "citation": {
                     "source": c.source_key,
                     "tier": c.tier,

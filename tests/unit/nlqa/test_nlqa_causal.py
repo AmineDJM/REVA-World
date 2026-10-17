@@ -337,3 +337,72 @@ def test_adapter_reads_why_lanes_as_causcore_returns_them() -> None:
     res = a.explain("Q361", direction="causes", limit=10)
     assert [c.claim_key for c in res.claims] == [C.SARAJEVO["claim_key"], C.JULY["claim_key"]]
     assert [c.stance for c in res.dissent] == ["denies"]
+
+
+# --------------------------------------------------------------------------- APIFIX (docs/dev/v3_apifix.md §4)
+def _attributed_inception_claim() -> dict[str, Any]:
+    """Shape of dev-DB claim 27009 (P3680 on Q15860072) with the inception rule of grading v2 (WWI → an empire):
+    synthetic ids, the attribution and temporal objects exactly as reva.causal.graph.claim_out writes them."""
+    c = C.claim("kg:wd:FIXTURE-0201", "Q91000004", "Q361", "has_cause", "T4", "D", temporal="undetermined")
+    c["attribution"] = {
+        "supported_by": [{"id": "Q91000901", "label": "party one", "label_fr": "partie un", "kind": None}],
+        "nature_of_statement": [],
+        "source_validity": [],
+        "note_en": None,
+        "note_fr": None,
+    }
+    c["grade"]["temporal"] = {
+        "check": "undetermined",
+        "entity_dated_by_inception": ["effect"],
+        "reason": "entity dated by inception (P571), not an event: its existence span is compared, not its founding",
+    }
+    return c
+
+
+def test_causal_evidence_carries_attribution_and_temporal_reason() -> None:
+    svc = C.FakeCausalService(causes=[_attributed_inception_claim()])
+    _, x, out = run("Pourquoi la Première Guerre mondiale a-t-elle éclaté ?", C.backends(causal=C.adapter(svc)))
+    items = [e for e in x.evidence.items if e["kind"] == "causal_claim"]
+    assert len(items) == 1
+    e = items[0]
+    assert e["supported_by"] == [{"id": "Q91000901", "label": "party one", "label_fr": "partie un"}]
+    assert (
+        e["attribution"]["supported_by"] == e["supported_by"] and e["attribution"]["source_asserts_it_itself"] is False
+    )
+    assert e["temporal"]["entity_dated_by_inception"] == ["effect"] and "inception" in e["temporal"]["reason"]
+    s = next(s.text for s in out.sentences if s.kind == "causal")
+    assert "qui attribue cette affirmation à party one (Wikidata ne l'affirme pas lui-même)" in s
+    assert "l'effet datée par sa création (P571) : une entité, pas un événement" in s
+    assert "dates manquantes" not in s and "date absente" not in s
+
+
+def test_unattributed_evidence_says_nothing_is_attributed() -> None:
+    _, x, _ = run("Pourquoi la Première Guerre mondiale a-t-elle éclaté ?")
+    items = [e for e in x.evidence.items if e["kind"] == "causal_claim"]
+    assert items and all(e["supported_by"] == [] and e["attribution"] is None for e in items)
+
+
+def test_undated_side_is_named() -> None:
+    c = C.claim("kg:wd:FIXTURE-0202", "Q91000004", "Q361", "has_cause", "T4", "D", temporal="undetermined")
+    c["grade"]["temporal"] = {
+        "check": "undetermined",
+        "undated": ["cause"],
+        "reason": "no start date in the KG for the cause",
+    }
+    svc = C.FakeCausalService(causes=[c])
+    _, _, out = run("Pourquoi la Première Guerre mondiale a-t-elle éclaté ?", C.backends(causal=C.adapter(svc)))
+    s = next(s.text for s in out.sentences if s.kind == "causal")
+    assert "pas de date de début dans le graphe pour la cause, antériorité non vérifiable" in s
+
+
+def test_coded_outcomes_are_not_counted_as_causes() -> None:
+    o = C.claim(
+        "ds:icb.data:icb2:FIXTURE-0203", "Q91000002", "Q361", "coded_outcome", "T1", "B", lane="outcome", dataset="icb2"
+    )
+    svc = C.FakeCausalService(causes=[C.SARAJEVO, o])
+    _, _, out = run("Pourquoi la Première Guerre mondiale a-t-elle éclaté ?", C.backends(causal=C.adapter(svc)))
+    note = next(s.text for s in out.sentences if s.kind == "note" and "affirmation(s) de sources" in s.text)
+    assert note.startswith("1 affirmation(s) de sources sur les causes")
+    assert "s'y ajoutent 1 issue(s) codée(s) par des jeux de données (comment l'événement s'est terminé)" in note
+    causal = [s.text for s in out.sentences if s.kind == "causal"]
+    assert "a pour cause immédiate" in causal[0] and "est l'issue codée de" in causal[-1]  # outcome lane last

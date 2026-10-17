@@ -434,6 +434,15 @@ class CausalClaim:
     supported_by: tuple[str, ...] = ()
     #: nature-of-statement / doubtful-certainty note from CAUSCORE's ``attribution`` (``{"en": ..., "fr": ...}``)
     attribution_note: Mapping[str, str] = field(default_factory=dict)
+    #: the parties of ``supported_by`` with their ids (``{"id", "label"}``), for the evidence item (APIFIX)
+    supported_by_refs: tuple[Mapping[str, str], ...] = ()
+    #: P5102 nature-of-statement values (``{"id", "label"}``), verbatim
+    nature_of_statement: tuple[Mapping[str, str], ...] = ()
+    #: why the temporal check is what it is (CAUSCORE ``grade.temporal``): ``reason``, ``entity_dated_by_inception``
+    #: (sides dated by P571: entities, not events), ``undated`` (sides with no start date in the KG)
+    temporal_reason: str | None = None
+    temporal_entity_sides: tuple[str, ...] = ()
+    temporal_undated_sides: tuple[str, ...] = ()
 
     def cause_label(self, lang: str) -> str:
         return pick_label(self.cause_labels, lang, self.cause_id)

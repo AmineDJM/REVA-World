@@ -118,7 +118,34 @@ def claim_from_json(d: Mapping[str, Any]) -> CausalClaim | None:
         review_status=d.get("review_status") if isinstance(d.get("review_status"), str) else None,
         origin=d.get("origin") if isinstance(d.get("origin"), str) else None,
         **_attribution(d.get("attribution")),
+        **_temporal(grade_obj.get("temporal")),
     )
+
+
+def _strs(v: Any) -> tuple[str, ...]:
+    return tuple(str(x) for x in v) if isinstance(v, list | tuple) else ()
+
+
+def _temporal(t: Any) -> dict[str, Any]:
+    """CAUSCORE ``grade.temporal`` detail -> the reason of the check (entity dated by inception, undated side)."""
+    if not isinstance(t, Mapping):
+        return {}
+    return {
+        "temporal_reason": t["reason"] if isinstance(t.get("reason"), str) and t["reason"] else None,
+        "temporal_entity_sides": _strs(t.get("entity_dated_by_inception")),
+        "temporal_undated_sides": _strs(t.get("undated")),
+    }
+
+
+def _refs(v: Any) -> tuple[dict[str, str], ...]:
+    out = []
+    for x in v or ():
+        if isinstance(x, Mapping) and (x.get("id") or x.get("label")):
+            ref = {"id": str(x.get("id") or ""), "label": str(x.get("label") or x.get("id"))}
+            if isinstance(x.get("label_fr"), str) and x["label_fr"]:
+                ref["label_fr"] = x["label_fr"]
+            out.append(ref)
+    return tuple(out)
 
 
 def _attribution(a: Any) -> dict[str, Any]:
@@ -127,7 +154,12 @@ def _attribution(a: Any) -> dict[str, Any]:
         return {}
     who = tuple(str(x.get("label") or x.get("id")) for x in a.get("supported_by") or () if isinstance(x, Mapping))
     note = {k: str(a[f"note_{k}"]) for k in ("en", "fr") if isinstance(a.get(f"note_{k}"), str) and a[f"note_{k}"]}
-    return {"supported_by": who, "attribution_note": note}
+    return {
+        "supported_by": who,
+        "attribution_note": note,
+        "supported_by_refs": _refs(a.get("supported_by")),
+        "nature_of_statement": _refs(a.get("nature_of_statement")),
+    }
 
 
 def _claims(raw: Any) -> list[CausalClaim]:
