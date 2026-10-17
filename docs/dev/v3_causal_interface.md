@@ -28,7 +28,9 @@ Relations (closed): `has_cause`, `immediate_cause`, `underlying_cause`, `contrib
 `enabled`, `precipitated`, `prevented_or_delayed`, `reaction_to`, `coded_trigger`, `coded_outcome`.
 Each has en/fr labels read cause→effect and effect→cause, a *family* (`cause` or `prevention`; corroboration
 is counted per (cause, effect, family)) and a *lane* for the "why" view (`immediate`, `underlying`,
-`contributing`, `general`, `prevention`, `reaction`, `coded`).
+`contributing`, `general`, `prevention`, `reaction`, `coded`, `outcome`). Since APIFIX (`docs/dev/v3_apifix.md`)
+`coded_outcome` has its own lane `outcome` (how the event ended, never a cause); every relation of that lane must
+be in `chain_excluded` (checked when the registry is loaded).
 
 Direction is always normalised: a claim row has `cause_id` and `effect_id`. "X has effect Y" (P1542 on X) and
 "Y has cause X" (P828 on Y) are both stored as cause X, effect Y; `asserted_on` says on which side the
@@ -181,10 +183,10 @@ Dataset agents call `grade_claims` (or `refresh`) after their loads, or leave it
 
 | Endpoint | Data |
 |---|---|
-| `GET /v1/causal/events/{id}` | event: labels, kind, dates (start/end windows), counts of causes/effects by family and grade, context edges (labelled *not causal*), candidate count |
+| `GET /v1/causal/events/{id}` | event: labels, kind, dates (start/end windows), counts of causes/effects by family and grade (coded outcomes in their own bucket `outcome`, APIFIX), context edges (labelled *not causal*), candidate count |
 | `GET /v1/causal/events/{id}/causes` | claims with effect = id (`relation`, `family`, `min_grade`, `valid_from/valid_to` on the cause start, `limit` ≤ 500) |
 | `GET /v1/causal/events/{id}/effects` | claims with cause = id (same filters) |
-| `GET /v1/causal/events/{id}/why` | causes by lane (immediate / underlying / contributing / general / coded / reaction / prevention), mechanisms quoted, dissent |
+| `GET /v1/causal/events/{id}/why` | causes by lane (immediate / underlying / contributing / general / coded / reaction / prevention; `outcome` apart), mechanisms quoted, dissent; `causal_claims` / `outcome_claims` counts |
 | `GET /v1/causal/chain?from&to&max_hops≤6&min_grade&max_paths≤10` | causal chains from cause `from` to effect `to`, only causal edges |
 | `GET /v1/causal/consistency` | self-loops, cycles, temporal violations, contested claims (counts + capped samples) |
 | `GET /v1/causal/candidates?event=` | quarantined candidates, labelled "non sourcé — candidats" |
@@ -277,7 +279,9 @@ grade = weakest hop. Only minimal-length chains are returned (≤ `max_paths`, b
 Ungraded claims are not traversed (`search.ungraded_skipped`). Only `asserts` claims of the `cause` family are
 traversed (prevention and denials never compose into a chain); self-loops are skipped. Bounds: `max_hops` ≤ 6,
 `max_paths` ≤ 10, 5 s time budget, 5,000 frontier nodes and 20,000 edges per level, 2,000 enumerated paths;
-hitting one sets `search.truncated` with the reason and an envelope `truncated` warning.
+hitting one sets `search.truncated` with the reason and an envelope `truncated` warning. Paths made of the same hops
+(claim keys / same_as statement keys) are returned once (`search.duplicate_paths_merged`, APIFIX); a search to or
+from a coded outcome record says that outcomes are never composed into chains.
 
 ### NLQA
 
