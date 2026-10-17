@@ -2649,7 +2649,7 @@
      }
     }
    },
-   "evaluated_at": "2026-10-17T21:58:16.550848+00:00",
+   "evaluated_at": "2026-10-17T22:00:47.654963+00:00",
    "pins": {
     "atlas.cdc.covidhub_ensemble": {
      "artifact_sha256": "a09cd400cee80fd38e84649d30adbbe6b3a3b8331d4fd5c1887b593cef2ef704",
@@ -4177,7 +4177,7 @@
      }
     }
    },
-   "evaluated_at": "2026-10-17T21:57:43.846950+00:00",
+   "evaluated_at": "2026-10-17T22:00:20.444617+00:00",
    "pins": {
     "atlas.cdc.flusight_ensemble": {
      "artifact_sha256": "d42714f0693ef2767a5e9ec67a6e5a245a98eaa86579350530ce1ab2d92eb805",
@@ -4212,7 +4212,7 @@
   }
  },
  "label": "DEVELOPMENT: rounds already used by the V6 back-test; selection data, not evidence",
- "module_sha256": "4e7f9dc73896e03709bef1fdc28a50c40c5c97a4f2513d80b2ce3a2793166bb7",
+ "module_sha256": "19578136de476b7052499f4d912fe61fc07a5709135efd234a235cf5442170d3",
  "protocol_version": "1.0.0",
  "schema": "reva-beat-health-result/1",
  "set": "dev",
