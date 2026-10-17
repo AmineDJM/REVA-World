@@ -1658,6 +1658,8 @@ def esrb_codebook() -> Any:
         extraction="poppler pdftotext -layout, whitespace normalised",
         quotes=ESRB_OP13_PAGES,
     )
+
+
 ESRB_NOTE_PREFIX = "Notes:"
 
 

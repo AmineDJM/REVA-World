@@ -1013,7 +1013,12 @@ def archigos_kg_records(
         e = r.pt_event
         if e is not None:
             day = s.end.isoformat()
-            sel = {"file": ARCHIGOS_FILE, "row": s.row, "obsid": s.obsid, "columns": ["ccode", "enddate", "exit", "exitcode"]}
+            sel = {
+                "file": ARCHIGOS_FILE,
+                "row": s.row,
+                "obsid": s.obsid,
+                "columns": ["ccode", "enddate", "exit", "exitcode"],
+            }
             sts.append(
                 KgStatement(key=f"exit:{s.obsid}:pt", subject=s.exit_event_id, property="coup:same_state_and_day_as",
                             object_qid=e.event_id, point_in_time=day, pit_precision=11,

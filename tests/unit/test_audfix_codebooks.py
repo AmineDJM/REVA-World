@@ -138,3 +138,24 @@ def test_navco21_repression_levels_are_verbatim(tmp_path: Path) -> None:
     body = _fixture("atlas.navco", N.pinned_codebook(N.FILES["n21"]).url)
     quotes = {k: v for k, v in N.N21_REPRESSION_DEF.items()}
     _check(body, tmp_path, quotes, {k: {"pages": N.N21_REPRESSION_DEF_PAGES} for k in quotes}, False)
+
+
+def test_esrb_annex_a_quote_is_verbatim(tmp_path: Path) -> None:
+    from reva.adapters.connectors import atlas_ecrises as E
+
+    book = E.esrb_codebook()
+    body = _fixture("atlas.ecrises.esrb", book.url)
+    assert hashlib.sha256(body).hexdigest() == E.ESRB_OP13_SHA256 == book.sha256
+    _check(body, tmp_path, dict(E.CODEBOOKS[E.ESRB]["definitions"]), book.quotes, False)
+
+
+def test_unshipped_codebooks_are_pinned_and_located() -> None:
+    """TIES and Archigos codebooks grant no redistribution: no fixture; their quotes were checked against the same
+    pinned bytes (docs/dev/v3_audfix.md) and every quoted term is located."""
+    from reva.adapters.connectors import atlas_leaders as L
+    from reva.adapters.connectors import atlas_sanctions as S
+
+    t = S.ties_manual()
+    assert t.sha256 in str(S.TIES_CODEBOOK["version"]) and set(t.quotes) == set(S.TIES_CODEBOOK["definitions"])
+    a = L.archigos_codebook()
+    assert a.sha256 == L.ARCHIGOS_CODEBOOK_SHA256 and set(a.quotes) == set(L.CODEBOOK_DEFINITIONS)

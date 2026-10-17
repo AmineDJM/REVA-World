@@ -27,21 +27,27 @@ rules:
     cause: "condition entity ecrises:condition:esrb_objective:<objective> (one of the five ESRB intermediate macroprudential objectives)"
     effect: "the ESRB event (ecrises:esrb:<systemic|residual>:<ISO3>:<YYYY-MM>)"
     codebook: >-
-      ESRB Occasional Paper No 13 (2017), Annex A: "Accelerator and motivation - Indicator of one or more of the five
-      ESRB intermediate macroprudential objectives (excessive credit growth and leverage, mismatches and market
-      illiquidity, exposure concentration, misaligned incentives, infrastructure resilience) - see the Recommendation
-      of the ESRB of 4 April 2013 on intermediate objectives and instruments of macroprudential policy (ESRB/2013/1)."
+      ESRB Occasional Paper No 13 (2017), Annex A (esrb.op13.en.pdf sha256 18a5343d72c1..., physical page 44, archived
+      by the connector): "Accelerator and motivation Indicator of one or more of the five ESRB intermediate
+      macroprudential objectives (excessive credit growth and leverage, mismatches and market illiquidity, exposure
+      concentration, misaligned incentives, infrastructure resilience) – see the Recommendation of the ESRB of 4 April
+      2013 on intermediate objectives and instruments of macroprudential policy (ESRB/2013/1) (OJ 2013/C 170/01).
+      Format: text."
     rationale: >-
       The codebook defines the field as the coded set of vulnerabilities that accelerated the event (assessed by the
       national authorities). "Accelerator" is weaker than a cause: it maps to the weakest causal relation of the
       closed vocabulary, contributing_factor (polarity promotes), never to has_cause / immediate_cause.
     extraction: >-
-      Only the part of the cell before "Motivation:" is read; an objective is coded when its name appears there
-      (case-insensitive patterns: "excessive credit growth", the word "mismatches", "exposure concentration",
-      "misaligned incentives", "infrastructure resilience"). Cells naming no objective (e.g. "Exogenous health crisis
-      due to Covid-19 outbreak", "External shock.", "Transition crisis.", "Accelerator: tensions in sovereign bonds
-      markets in the euro area.") produce no claim and are listed in the build report (accelerator_not_coded).
-    mechanism: the whole cell text, verbatim (accelerator and motivation)
+      AUDFIX (audit M7, connector 1.1.0): the field is "Format: text", so REVA never searches it for patterns. A cell
+      gives claims only when its first paragraph (before "Motivation:" and before the first blank line) is exactly a
+      comma-separated list of the five objective NAMES (case and a final full stop aside). Cells that name an
+      objective only inside narrative text, abbreviate it ("excessive credit growth", "mismatches in balance sheets")
+      or number it give no claim and are listed in the build report (accelerator_not_a_list); cells naming no
+      objective are listed as accelerator_not_coded. (Until 1.0.0 a regex search made 96 claims; 27 of them came
+      from such cells.)
+    mechanism: >-
+      the whole cell text, verbatim (accelerator and motivation); a cell longer than the 4,000-character mechanism column
+      is stored as its first 4,000 characters with scope.mechanism_truncated {stored_chars, full_chars, full_text_cell}
     temporal_check: undetermined (the condition is undated in the source)
   - id: lv2020_twin_banking_currency
     source_key: laeven_valencia.sbcd

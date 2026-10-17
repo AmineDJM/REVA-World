@@ -59,6 +59,8 @@ async def test_laeven_valencia_and_esrb_end_to_end(db: Any) -> None:
 
     e = await _run(db, m.ESRB)
     assert e["causal"]["status"] == "loaded", e["causal"]
+    assert e["codebook"]["matches"] and e["codebook"]["archived"]  # OP13 archived + pinned (audit M4, AUDFIX)
+    assert e["report"]["accelerator_not_a_list"]  # narrative cells give no claim (audit M7)
     rep = e["causal"]["report"]
     assert rep["inserted"] == e["relations"]["causal:contributing_factor"] > 50 and not rep["rejected_counts"]
     assert rep["unknown_entities"] == 0  # events and condition entities were loaded into the KG first

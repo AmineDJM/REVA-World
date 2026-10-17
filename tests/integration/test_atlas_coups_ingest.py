@@ -149,9 +149,7 @@ async def test_archigos_ingest_with_coup_links(db: Any) -> None:
     causal = s["causal"]
     if causal["status"] == "loaded":
         assert causal["inserted"] == 0, causal
-        assert (
-            _scalar(db, "SELECT count(*) FROM kg.causal_claim_current WHERE source_key = 'archigos.leaders'") == 0
-        )
+        assert _scalar(db, "SELECT count(*) FROM kg.causal_claim_current WHERE source_key = 'archigos.leaders'") == 0
     else:
         assert causal["reason"]
     again = await _run(db, atlas_leaders.ARCHIGOS_NAME)

@@ -91,7 +91,7 @@ from reva.adapters.connectors.atlas_geopol_common import (
 from reva.kernel.errors import SourceResponseError
 
 PARSER_VERSION = "atlas-sanctions-parse-1"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (AUDFIX M4): the TIES users' manual is fetched, archived and sha256-pinned
 
 
 class SanctionsParseError(SourceResponseError):
@@ -1684,6 +1684,26 @@ TIES_CODEBOOK = {
         "variable to be coded as 1.",
     },
 }
+TIES_MANUAL_SHA256 = "862fe788f0bf24a64d434e0b4e1621c2b7883bf28e9c18366c33a08c8d269540"
+#: where the quote sits in the pinned manual (physical PDF pages; text layer maps the fi/ff ligatures to U+2026/U+00A4)
+TIES_MANUAL_PAGES = {"finaloutcome": {"pages": [12, 13]}}
+
+
+def ties_manual() -> Any:
+    from reva.adapters.connectors.causdata_common import PinnedCodebook
+
+    return PinnedCodebook(
+        key="ties_manual",
+        title="TIES Data 4.0 Users' Manual (tiesusersmanualv4.pdf)",
+        url=str(TIES_CODEBOOK["url"]),
+        sha256=TIES_MANUAL_SHA256,
+        media_types=("application/pdf", "application/octet-stream"),
+        max_bytes=2_000_000,
+        extraction="poppler pdftotext -layout, whitespace normalised, ligature glyphs restored (U+2026 fi, U+00A4 ff)",
+        quotes=TIES_MANUAL_PAGES,
+    )
+
+
 EUSANCT_CODEBOOK = {
     "name": "EUSANCT Dataset – Codebook: Case-level Dataset (Weber & Schneider)",
     "version": "2.0, March 2020 (Codebook_EUSANCT_Case-level-Dataset_01.pdf sha256 "
@@ -1830,11 +1850,22 @@ def _causal_api() -> dict[str, Any] | None:
 
 
 def deliver_claims(
-    run: Any, records: Sequence[Mapping[str, Any]], *, dataset: str, revision: str, raw_sha256: str, retrieved_at: Any
+    run: Any,
+    records: Sequence[Mapping[str, Any]],
+    *,
+    dataset: str,
+    revision: str,
+    raw_sha256: str,
+    retrieved_at: Any,
+    codebook_fetch: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Load the T1 claims through ``reva.causal.load_dataset_claims`` (one complete delivery per dataset) when the
-    causal schema and loader exist; otherwise report them as not delivered (counts only, never silent)."""
+    causal schema and loader exist; otherwise report them as not delivered (counts only, never silent). TIES claims
+    are delivered only when the archived users' manual equals the pinned one (fixture mode: also when it has no
+    captured fixture); their codebook then says where the quote sits in those bytes (audit M4)."""
     from sqlalchemy import text
+
+    from reva.adapters.connectors.causdata_common import codebook_sources
 
     api = _causal_api()
     if api is None:
@@ -1842,7 +1873,16 @@ def deliver_claims(
     with run.engine.connect() as conn:
         if not conn.execute(text("SELECT to_regclass('kg.causal_claim') IS NOT NULL")).scalar_one():
             return {"status": "causal_schema_unavailable", "claims": len(records)}
-    cb = TIES_CODEBOOK if dataset == "ties" else EUSANCT_CODEBOOK
+    cb: dict[str, Any] = dict(TIES_CODEBOOK if dataset == "ties" else EUSANCT_CODEBOOK)
+    raws = [raw_sha256]
+    if dataset == "ties":
+        fetched = dict(codebook_fetch or {})
+        if not (fetched.get("matches") or (run.origin != "live" and fetched.get("status") == "fixture_missing")):
+            return {"status": "claims_withheld", "reason": "TIES manual differs from the pinned sha256", "claims": 0}
+        src = codebook_sources(ties_manual(), fetched)
+        if src:
+            cb["sources"] = src
+            raws.append(str(fetched["sha256"]))
     claims = [
         api["DatasetClaim"](
             cause_id=r["cause"],
@@ -1864,7 +1904,7 @@ def deliver_claims(
         dataset=CLAIM_DATASET[dataset],
         dataset_revision=revision,
         codebook=api["Codebook"](**cb),
-        raw_sha256s=[raw_sha256],
+        raw_sha256s=raws,
         retrieved_at=retrieved_at,
         origin=run.origin,
         claims=claims,
@@ -2348,7 +2388,7 @@ def atlas_source() -> list[Any]:
             datasets=("dyad_year", "country_year"),
             dataset_ids=("TIESv4-1.xls", f"countrycode-{COUNTRYCODE_VERSION}"),
             cadence_seconds=90 * 86400,
-            planned_requests=4,
+            planned_requests=5,  # + the users' manual (AUDFIX)
             max_response_bytes=10_000_000,
             field_mappings={
                 "geo": "COW state codes (1000 = EEC/EU collectively)",
@@ -2500,8 +2540,20 @@ async def _ingest_cases(run: Any, dataset: str) -> dict[str, Any]:
     res["kg_counts"] = {"entities": len(ents), "statements": len(stmts)}
     if run.dataset is None and kg_available(run.engine):
         res["kg"] = _load(run, ents, stmts, revision, [sha, cc_sha], raw.retrieved_at)
+        book = None
+        if dataset == "ties":
+            from reva.adapters.connectors.causdata_common import fetch_codebook
+
+            book = await fetch_codebook(run, ties_manual())  # archived as evidence (audit M4)
+            res["codebook"] = {k: book.get(k) for k in ("sha256", "pinned_sha256", "matches", "archived", "status")}
         res["claims_delivery"] = deliver_claims(
-            run, claims, dataset=dataset, revision=revision, raw_sha256=sha, retrieved_at=raw.retrieved_at
+            run,
+            claims,
+            dataset=dataset,
+            revision=revision,
+            raw_sha256=sha,
+            retrieved_at=raw.retrieved_at,
+            codebook_fetch=book,
         )
     res["unresolved_state_codes"] = {k: sorted(v)[:5] for k, v in resolver.unresolved.items()}
     return res

@@ -11,5 +11,18 @@
     "retrieved_at": "2026-10-16T20:20:00+00:00",
     "licence": "ESRB website copyright terms: free use with accurate reproduction and citation of the ESRB as the source",
     "fixture_note": "live"
+  },
+  {
+    "request_fingerprint": "aba0fb12223116243eff716fad9d54ad1bbcdde38cc6f70020382fef6b55e5aa",
+    "url": "https://www.esrb.europa.eu/pub/pdf/occasional/esrb.op13.en.pdf",
+    "file": "aba0fb1222311624.pdf",
+    "sha256": "18a5343d72c111734f220b4cfce63e7adc322ddfe1b2f647a313423f0d494c76",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-16T20:18:00+00:00",
+    "licence": "ESRB website terms: free use with accurate reproduction and citation of the ESRB as the source",
+    "note": "ESRB Occasional Paper No 13 (2017), complete and byte-identical (AUDFIX: archived codebook, Annex A quote on page 44)"
   }
 ]
