@@ -92,8 +92,12 @@ def check_texts(dataset: str, texts: Iterable[str]) -> dict[str, Any]:
     have = {norm(t) for t in texts if t}
     missing = [k for k, v in dataset_entry(dataset)["definitions"].items() if norm(v["text"]) not in have]
     digest = hashlib.sha256("\n".join(sorted(have)).encode("utf-8")).hexdigest()
-    return {"document": dataset_entry(dataset)["codebook_document"], "sha256": digest, "matches": not missing,
-            "missing_definitions": missing}
+    return {
+        "document": dataset_entry(dataset)["codebook_document"],
+        "sha256": digest,
+        "matches": not missing,
+        "missing_definitions": missing,
+    }
 
 
 def delivery(
@@ -161,7 +165,14 @@ CAUSMORE_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]
         None,
     ),
     "cowwar:war_type": ("string", "cow_war_type", "COW war type (WarType)", "type de guerre COW", None, None),
-    "cowwar:outcome": ("string", "cow_war_outcome", "COW war outcome (Outcome)", "issue de la guerre (COW)", None, None),
+    "cowwar:outcome": (
+        "string",
+        "cow_war_outcome",
+        "COW war outcome (Outcome)",
+        "issue de la guerre (COW)",
+        None,
+        None,
+    ),
     "cowwar:transformed_into": (
         "item",
         "cow_war_transformed_into",

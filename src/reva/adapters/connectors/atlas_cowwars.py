@@ -162,8 +162,10 @@ def _spells(kind: str, r: Mapping[str, str]) -> list[tuple[tuple[str, int] | Non
     if kind == "nonstate":
         keys = [("StartYear", "StartMonth", "StartDay", "EndYear", "EndMonth", "EndDay")]
     else:
-        keys = [(f"StartYear{i}", f"StartMonth{i}", f"StartDay{i}", f"EndYear{i}", f"EndMonth{i}", f"EndDay{i}")
-                for i in (1, 2)]
+        keys = [
+            (f"StartYear{i}", f"StartMonth{i}", f"StartDay{i}", f"EndYear{i}", f"EndMonth{i}", f"EndDay{i}")
+            for i in (1, 2)
+        ]
     out = []
     for sy, sm, sd, ey, em, ed in keys:
         if r.get(sy, "") in ("", "-8"):
@@ -199,9 +201,7 @@ def _int(v: Any) -> int | None:
 # ----------------------------------------------------------------------------- KG + claims
 
 
-def build_kg(
-    data: Mapping[str, Sequence[Mapping[str, str]]], *, shas: Mapping[str, str]
-) -> dict[str, Any]:
+def build_kg(data: Mapping[str, Sequence[Mapping[str, str]]], *, shas: Mapping[str, str]) -> dict[str, Any]:
     ents: dict[str, KgEntity] = {}
     sts: list[KgStatement] = []
     claims: dict[str, list[cd.ClaimRecord]] = {DATASETS[k]: [] for k in KINDS}
@@ -233,22 +233,39 @@ def build_kg(
                     qid=wid,
                     kind="war",
                     labels={"en": name},
-                    descriptions={"en": f"{WAR_KIND_LABEL[kind]} #{n} (COW {WAR_KIND_LABEL[kind]} Data "
-                                        f"v{VERSIONS[kind]})"},
+                    descriptions={
+                        "en": f"{WAR_KIND_LABEL[kind]} #{n} (COW {WAR_KIND_LABEL[kind]} Data v{VERSIONS[kind]})"
+                    },
                 )
             wtype = cm.value_label(ds, "WarType", first["WarType"])
             if wtype:
-                sts.append(cm.string_stmt(f"{p}:war_type", wid, "cowwar:war_type", wtype,
-                                          raw_sha256=sha, selector={**sel, "column": "WarType"},
-                                          code=first["WarType"], war_family=WAR_KIND_LABEL[kind]))
+                sts.append(
+                    cm.string_stmt(
+                        f"{p}:war_type",
+                        wid,
+                        "cowwar:war_type",
+                        wtype,
+                        raw_sha256=sha,
+                        selector={**sel, "column": "WarType"},
+                        code=first["WarType"],
+                        war_family=WAR_KIND_LABEL[kind],
+                    )
+                )
             start, end, ongoing = _interval(kind, wrows)
             for s in cd.event_times(
-                wid, f"{p}:t", start=start, end=end, raw_sha256=sha, selector={**sel, "columns": ["Start*", "End*"]},
+                wid,
+                f"{p}:t",
+                start=start,
+                end=end,
+                raw_sha256=sha,
+                selector={**sel, "columns": ["Start*", "End*"]},
                 qualifiers={
                     "derived": "earliest coded start and latest coded end over the war's records (REVA summary of "
                     "the coded spells); no end when a spell is coded -7 (ongoing at the end of the data)",
                     "ongoing": ongoing or None,
-                } if ongoing else {
+                }
+                if ongoing
+                else {
                     "derived": "earliest coded start and latest coded end over the war's records (REVA summary of "
                     "the coded spells)",
                 },
@@ -259,20 +276,41 @@ def build_kg(
                 for col, pid in (("SideA", "cowwar:side_a"), ("SideB", "cowwar:side_b")):
                     names = sorted({r[col] for r in wrows if r.get(col) and r[col] != "-8"})
                     for j, nm in enumerate(names):
-                        sts.append(cm.string_stmt(f"{p}:{col.lower()}:{j}", wid, pid, nm, raw_sha256=sha,
-                                                  selector={**sel, "column": col}))
+                        sts.append(
+                            cm.string_stmt(
+                                f"{p}:{col.lower()}:{j}", wid, pid, nm, raw_sha256=sha, selector={**sel, "column": col}
+                            )
+                        )
             elif kind == "nonstate":
-                for side, cols in (("a", ("SideA1", "SideA2")), ("b", ("SideB1", "SideB2", "SideB3", "SideB4",
-                                                                       "SideB5"))):
+                for side, cols in (
+                    ("a", ("SideA1", "SideA2")),
+                    ("b", ("SideB1", "SideB2", "SideB3", "SideB4", "SideB5")),
+                ):
                     for j, col in enumerate(cols):
                         v = first.get(col, "")
                         if v and v != "-8":
-                            sts.append(cm.string_stmt(f"{p}:side_{side}:{j}", wid, f"cowwar:side_{side}", v,
-                                                      raw_sha256=sha, selector={**sel, "column": col}))
+                            sts.append(
+                                cm.string_stmt(
+                                    f"{p}:side_{side}:{j}",
+                                    wid,
+                                    f"cowwar:side_{side}",
+                                    v,
+                                    raw_sha256=sha,
+                                    selector={**sel, "column": col},
+                                )
+                            )
             if kind in ("intra", "nonstate") and first.get("Initiator") not in ("", "-8", "-9"):
-                sts.append(cm.string_stmt(f"{p}:initiator", wid, "cowwar:initiator", first["Initiator"],
-                                          raw_sha256=sha, selector={**sel, "column": "Initiator"},
-                                          note="the participant that began the war (a role, not a cause)"))
+                sts.append(
+                    cm.string_stmt(
+                        f"{p}:initiator",
+                        wid,
+                        "cowwar:initiator",
+                        first["Initiator"],
+                        raw_sha256=sha,
+                        selector={**sel, "column": "Initiator"},
+                        note="the participant that began the war (a role, not a cause)",
+                    )
+                )
             if kind == "intra":
                 seen: set[tuple[str, str]] = set()
                 for r in wrows:
@@ -281,11 +319,19 @@ def build_kg(
                         if c is None or c <= 0 or (str(c), side) in seen:
                             continue
                         seen.add((str(c), side))
-                        sts.append(cm.item_stmt(
-                            f"{p}:participant:{c}:{side}", wid, "P710", f"cow:{c}", raw_sha256=sha,
-                            selector={"file": f, "line": int(r["_line"]), "WarNum": n, "column": col},
-                            side=side, state_name_in_source=r.get("Side" + side) or None,
-                            role="state participant (COW intra-state war record)"))
+                        sts.append(
+                            cm.item_stmt(
+                                f"{p}:participant:{c}:{side}",
+                                wid,
+                                "P710",
+                                f"cow:{c}",
+                                raw_sha256=sha,
+                                selector={"file": f, "line": int(r["_line"]), "WarNum": n, "column": col},
+                                side=side,
+                                state_name_in_source=r.get("Side" + side) or None,
+                                role="state participant (COW intra-state war record)",
+                            )
+                        )
             # transformations (context)
             for r in wrows:
                 for col in ("TransTo", "TransFrom"):
@@ -293,7 +339,8 @@ def build_kg(
                         a, b = (n, m) if col == "TransTo" else (m, n)
                         if m not in known:
                             anomalies["transformation_to_unknown_war"].append(
-                                {"file": f, "line": r["_line"], "WarNum": n, col: m})
+                                {"file": f, "line": r["_line"], "WarNum": n, col: m}
+                            )
                             continue
                         trans[(a, b)].append(f"{f}:{r['_line']}:{col}")
             # outcome
@@ -301,35 +348,77 @@ def build_kg(
                 occ: Counter[str] = Counter()
                 for r in wrows:
                     occ[r["ccode"]] += 1
-                    _outcome(r, kind, n, name, sha, ents, sts, claims[ds], anomalies,
-                             suffix=f"{r['ccode']}:{occ[r['ccode']]}", state=r.get("StateName"),
-                             point=_interval(kind, [r])[1])
+                    _outcome(
+                        r,
+                        kind,
+                        n,
+                        name,
+                        sha,
+                        ents,
+                        sts,
+                        claims[ds],
+                        anomalies,
+                        suffix=f"{r['ccode']}:{occ[r['ccode']]}",
+                        state=r.get("StateName"),
+                        point=_interval(kind, [r])[1],
+                    )
             else:
                 codes = {r["Outcome"] for r in wrows}
                 if len(codes) > 1:
-                    anomalies["war_outcome_disagrees_between_records"].append({"file": f, "WarNum": n,
-                                                                               "codes": sorted(codes)})
+                    anomalies["war_outcome_disagrees_between_records"].append(
+                        {"file": f, "WarNum": n, "codes": sorted(codes)}
+                    )
                     continue
-                _outcome(first, kind, n, name, sha, ents, sts, claims[ds], anomalies, suffix=None, state=None,
-                         point=end, lines=lines)
-    # transformation statements: one per (pair, coding row)
+                _outcome(
+                    first,
+                    kind,
+                    n,
+                    name,
+                    sha,
+                    ents,
+                    sts,
+                    claims[ds],
+                    anomalies,
+                    suffix=None,
+                    state=None,
+                    point=end,
+                    lines=lines,
+                )
+    # transformation statements: one per (pair, file, coding column), with every coding row in the selector
     for (a, b), where in sorted(trans.items()):
-        for w in sorted(set(where)):
+        grouped: dict[tuple[str, str], list[int]] = defaultdict(list)
+        for w in set(where):
             fname, line, col = w.rsplit(":", 2)
+            grouped[(fname, col)].append(int(line))
+        for (fname, col), lns in sorted(grouped.items()):
             kind = next(k for k, v in FILES.items() if v == fname)
-            sts.append(cm.item_stmt(
-                f"cwt:{a}:{b}:{kind}:{line}:{col}", f"cow:war:{a}", "cowwar:transformed_into", f"cow:war:{b}",
-                raw_sha256=shas[kind], selector={"file": fname, "line": int(line), "column": col},
-                coded_by=col, coded_on_war=b if col == "TransFrom" else a,
-                note="COW war transformation: the conflict changed category (context, not causal)"))
+            sts.append(
+                cm.item_stmt(
+                    f"cwt:{a}:{b}:{kind}:{col}",
+                    f"cow:war:{a}",
+                    "cowwar:transformed_into",
+                    f"cow:war:{b}",
+                    raw_sha256=shas[kind],
+                    selector={"file": fname, "lines": sorted(lns), "column": col},
+                    coded_by=col,
+                    coded_on_war=b if col == "TransFrom" else a,
+                    note="COW war transformation: the conflict changed category (context, not causal)",
+                )
+            )
     pairs = set(trans)
     report = {
         "transformation_pairs": len(pairs),
-        "coded_by_both_wars": sum(1 for v in trans.values() if {x.rsplit(":", 1)[1] for x in v} >= {"TransTo",
-                                                                                                    "TransFrom"}),
+        "coded_by_both_wars": sum(
+            1 for v in trans.values() if {x.rsplit(":", 1)[1] for x in v} >= {"TransTo", "TransFrom"}
+        ),
     }
-    return {"entities": list(ents.values()), "statements": sts, "claims": claims,
-            "anomalies": {k: v for k, v in anomalies.items()}, "transformations": report}
+    return {
+        "entities": list(ents.values()),
+        "statements": sts,
+        "claims": claims,
+        "anomalies": {k: v for k, v in anomalies.items()},
+        "transformations": report,
+    }
 
 
 def _outcome(
@@ -354,16 +443,27 @@ def _outcome(
     label = cm.value_label(ds, "Outcome", code)
     wid = f"cow:war:{n}"
     ln = [int(r["_line"])] if lines is None else list(lines)
-    sel = {"file": f, "lines": ln[:50], "WarNum": n, "column": "Outcome"}
+    sel: dict[str, Any] = {"file": f, "lines": ln[:50], "WarNum": n, "column": "Outcome"}
     if suffix:
         sel["ccode"] = r.get("ccode")
     if label is None:
         anomalies["outcome_not_in_codebook"].append({"file": f, "WarNum": n, "Outcome": r.get("Outcome")})
         return
     key = f"cw{n}:outcome" + (f":{suffix}" if suffix else "")
-    sts.append(cm.string_stmt(key, wid, "cowwar:outcome", label, raw_sha256=sha, selector=sel, code=str(code),
-                              state=state, ccode=r.get("ccode") if suffix else None,
-                              initiator_code=r.get("Initiator") if kind in ("inter", "extra") else None))
+    sts.append(
+        cm.string_stmt(
+            key,
+            wid,
+            "cowwar:outcome",
+            label,
+            raw_sha256=sha,
+            selector=sel,
+            code=str(code),
+            state=state,
+            ccode=r.get("ccode") if suffix else None,
+            initiator_code=r.get("Initiator") if kind in ("inter", "extra") else None,
+        )
+    )
     if code not in OUTCOME_CLAIM_CODES:
         return  # 5: ongoing at the end of the data -- no outcome
     oid = f"cowwar:outcome:{n}" + (f":{suffix}" if suffix else "")
@@ -372,15 +472,37 @@ def _outcome(
         qid=oid,
         kind="war_outcome",
         labels={"en": f"Outcome of {war_name}{who}: {label}"},
-        descriptions={"en": f"Coded outcome (COW Outcome = {code}) of COW war #{n}{who} "
-                            f"({WAR_KIND_LABEL[kind]} Data v{VERSIONS[kind]})"},
+        descriptions={
+            "en": f"Coded outcome (COW Outcome = {code}) of COW war #{n}{who} "
+            f"({WAR_KIND_LABEL[kind]} Data v{VERSIONS[kind]})"
+        },
     )
-    sts.append(cm.string_stmt(f"cwo{n}" + (f":{suffix}" if suffix else "") + ":type", oid, "causmore:event_type",
-                              "war_outcome", raw_sha256=sha, selector=sel))
-    sts.append(cm.string_stmt(f"cwo{n}" + (f":{suffix}" if suffix else "") + ":outcome", oid, "cowwar:outcome",
-                              label, raw_sha256=sha, selector=sel, code=str(code)))
+    sts.append(
+        cm.string_stmt(
+            f"cwo{n}" + (f":{suffix}" if suffix else "") + ":type",
+            oid,
+            "causmore:event_type",
+            "war_outcome",
+            raw_sha256=sha,
+            selector=sel,
+        )
+    )
+    sts.append(
+        cm.string_stmt(
+            f"cwo{n}" + (f":{suffix}" if suffix else "") + ":outcome",
+            oid,
+            "cowwar:outcome",
+            label,
+            raw_sha256=sha,
+            selector=sel,
+            code=str(code),
+        )
+    )
     for s in cd.event_times(
-        oid, f"cwo{n}" + (f":{suffix}" if suffix else "") + ":t", point=point, raw_sha256=sha,
+        oid,
+        f"cwo{n}" + (f":{suffix}" if suffix else "") + ":t",
+        point=point,
+        raw_sha256=sha,
         selector={**sel, "columns": ["End*"]},
         qualifiers={"definition": "dated at the latest coded end of combat of the record(s) (REVA summary)"},
     ):
@@ -390,8 +512,13 @@ def _outcome(
             cause_id=wid,
             effect_id=oid,
             relation="coded_outcome",
-            selector={"file": f, "lines": ln[:50], "WarNum": n, "columns": ["Outcome"],
-                      **({"ccode": r.get("ccode")} if suffix else {})},
+            selector={
+                "file": f,
+                "lines": ln[:50],
+                "WarNum": n,
+                "columns": ["Outcome"],
+                **({"ccode": r.get("ccode")} if suffix else {}),
+            },
             raw_sha256=sha,
             codebook_term="Outcome",
             source_claim_id=f"{n}:outcome" + (f":{suffix}" if suffix else ""),
@@ -436,16 +563,21 @@ def build(raws: Mapping[str, Any], *, strict: bool = True) -> dict[str, Any]:
     data = {k: parse(k, raws[k].body, strict=strict) for k in KINDS}
     out = build_kg(data, shas=shas)
     cm.check_unique(out["entities"], out["statements"])
-    return {**out, "shas": shas, "row_counts": {k: len(v) for k, v in data.items()},
-            "wars": {k: len({war_number(r["WarNum"]) for r in v}) for k, v in data.items()}}
+    return {
+        **out,
+        "shas": shas,
+        "row_counts": {k: len(v) for k, v in data.items()},
+        "wars": {k: len({war_number(r["WarNum"]) for r in v}) for k, v in data.items()},
+    }
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     """Fetch the four war files and their codebooks, archive, load the KG records, deliver the claims."""
     if not run.wants(DATASET):
         return {"skipped": True}
-    raws = {k: await run.get(file_url(k), key=f"{k}:{VERSIONS[k]}", media_types=MEDIA, max_bytes=MAX_BYTES)
-            for k in KINDS}
+    raws = {
+        k: await run.get(file_url(k), key=f"{k}:{VERSIONS[k]}", media_types=MEDIA, max_bytes=MAX_BYTES) for k in KINDS
+    }
     books: dict[str, dict[str, Any]] = {}
     for k in KINDS:
         raw = await run.get(codebook_url(k), key=CODEBOOKS[k], media_types=PDF_MEDIA, max_bytes=MAX_BYTES)
@@ -456,8 +588,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     res: dict[str, Any] = {
         "row_counts": out["row_counts"],
         "wars": out["wars"],
-        "anomalies": {k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in
-                      out["anomalies"].items()},
+        "anomalies": {
+            k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in out["anomalies"].items()
+        },
         "transformations": out["transformations"],
         "codebooks": {k: {x: v[x] for x in ("sha256", "matches")} for k, v in books.items()},
         "kg_counts": {"entities": len(out["entities"]), "statements": len(out["statements"])},
@@ -480,8 +613,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         if not books[k]["matches"]:
             res.setdefault("claims_withheld", {})[DATASETS[k]] = "codebook PDF differs from the pinned sha256"
             continue
-        deliveries.append(cm.delivery(
-            DATASETS[k], claims=out["claims"][DATASETS[k]], raw_sha256s=[out["shas"][k]], retrieved_at=retrieved,
-            origin=run.origin, documents_sha256={CODEBOOKS[k]: books[k]["sha256"]}))
+        deliveries.append(
+            cm.delivery(
+                DATASETS[k],
+                claims=out["claims"][DATASETS[k]],
+                raw_sha256s=[out["shas"][k]],
+                retrieved_at=retrieved,
+                origin=run.origin,
+                documents_sha256={CODEBOOKS[k]: books[k]["sha256"]},
+            )
+        )
     res["claims"] = cd.deliver_claims(run, deliveries)
     return res

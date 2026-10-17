@@ -1,0 +1,106 @@
+[
+  {
+    "request_fingerprint": "7f4476f9b7f190207987216ebe15b37a6e9a836af707be3d2353640a18367f61",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Inter-StateWarData_v4.0.csv",
+    "file": "7f4476f9b7f19020.csv",
+    "sha256": "ea079916e1b6d559a5c2918f6a476d047106699493c316f575ff68ba0b491786",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "slice of Inter-StateWarData_v4.0.csv (wars ['1', '4', '19', '79', '139', '202', '215']), original header and row bytes (CR line endings, Windows-1252); real file sha256 2535e30b145141c331a07d12d91e498ad8bdd3db32ba8d3bd88c4fda54817731"
+  },
+  {
+    "request_fingerprint": "90f6a25f56eab84379e37156015a5c9b76e7944735dde6df5a607118df580659",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Extra-StateWarData_v4.0.csv",
+    "file": "90f6a25f56eab843.csv",
+    "sha256": "52c99d4eca4d53958dfe48882ee74050904c839e3868baeb627ce159a0d47576",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "slice of Extra-StateWarData_v4.0.csv (wars ['327', '404', '410', '475', '482']), original header and row bytes (CR line endings, Windows-1252); real file sha256 529c325fdf0355ea4e09ce1c0d13d3cb474eaffcfebe13576b7a56207b264104"
+  },
+  {
+    "request_fingerprint": "803dae56ac4a6c047e708d665be5891afb5658f1ace2e7dfeb0d6f8c4526b8e3",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Intra-StateWarData_v4.1.csv",
+    "file": "803dae56ac4a6c04.csv",
+    "sha256": "ebb3189863f62cf7b1e2dcd410c9fb29d707fe64d4ca911e651dc9d1f04afd2f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "slice of Intra-StateWarData_v4.1.csv (wars ['503', '506', '538', '836', '856', '857']), original header and row bytes (CR line endings, Windows-1252); real file sha256 f699298571bd300b3cec5fd873e5fdbfe9b536a3704b0207edf0fc9414d4d963"
+  },
+  {
+    "request_fingerprint": "56d9e4543cd9e9f271f98c746eb59fef593c9bb5d4bd69d07217439139074947",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Non-StateWarData_v4.0.csv",
+    "file": "56d9e4543cd9e9f2.csv",
+    "sha256": "0b4e54f87f301a9c1c01eb07a7d48d9c05d996fbd1d68374dd541468d77baeee",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "slice of Non-StateWarData_v4.0.csv (wars ['1527', '1541']), original header and row bytes (CR line endings, Windows-1252); real file sha256 99d3d9df70a54fd2372fe05e2085216fc85ce1d3a72a7cb9e5c86f3bae4c9b9a"
+  },
+  {
+    "request_fingerprint": "f82e8122b0da820929f891d7244784ca6b47ddf1beed590b048d52392f555fd8",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Inter-StateWars_Codebook.pdf",
+    "file": "f82e8122b0da8209.pdf",
+    "sha256": "875bf75f8f3df5f1ac418a03eeaa6dd9b9a81a3b4d112bd6832040cffc26a1be",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "codebook, full file"
+  },
+  {
+    "request_fingerprint": "bd6589ca6578989ebb674ef80a33669343aa299a9460a9681ea86195373ebcd2",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Extra-StateWars_Codebook.pdf",
+    "file": "bd6589ca6578989e.pdf",
+    "sha256": "0746a2f16a7fa9d04458ea046ae8bef00835cf3522a16a3dc5dc041a2a03adfc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "codebook, full file"
+  },
+  {
+    "request_fingerprint": "b9a052a364c7234dbb06fed158fb382d685f8cafe1a232194340c4f4c0b3cf04",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Intra-StateWars_Codebook.pdf",
+    "file": "b9a052a364c7234d.pdf",
+    "sha256": "7a15ea58a926a7bc14c0f17d1855e2fb65f40eec0c19c6f7691f8da887798d17",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "codebook, full file"
+  },
+  {
+    "request_fingerprint": "cb69be8473191a86ae9aca2a91f36ccc021e78f8bc495fdc4677b70f7ffe08b9",
+    "url": "https://correlatesofwar.org/wp-content/uploads/Non-StateWars_Codebook.pdf",
+    "file": "cb69be8473191a86.pdf",
+    "sha256": "821647646d9a67230e9c24a6d4a06085b409f136c0ac0c5d87c574650fb49a0c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T02:00:00+00:00",
+    "licence": "COW terms of use: cite, users cannot charge for access (not an open licence)",
+    "note": "codebook, full file"
+  }
+]

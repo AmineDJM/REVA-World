@@ -1,0 +1,411 @@
+Con,Contp,PP,PPName,Reg,AgtId,Ver,Agt,Dat,Status,Lgt,N_characters,Agtp,Stage,StageSub,Part,ThrdPart,OthAgr,Loc1ISO,Loc2ISO,Loc1GWNO,Loc2GWNO,UcdpCon,UcdpAgr,PamAgr,CowWar,Interim,ImSrc,GCh,GChRhet,GChAntid,GChSubs,GChOth,GDis,GDisRhet,GDisAntid,GDisSubs,GDisOth,GAge,GAgeRhet,GAgeAntid,GAgeSubs,GAgeOth,GMig,GMigRhet,GMigAntid,GMigSubs,GMigOth,GRa,GRaRhet,GRaAntid,GRaSubs,GRaOth,GRe,GReRhet,GReAntid,GReSubs,GReOth,GInd,GIndRhet,GIndAntid,GIndSubs,GIndOth,GOth,GOthRhet,GOthAntid,GOthSubs,GOthOth,GRef,GRefRhet,GRefSubs,GRefOth,GSoc,GSocRhet,GSocAntid,GSocSubs,GSocOth,GeWom,GeMe,GeMeNu,GeMeOth,GeLgbti,GeLgbtiPos,GeLgbtiNeg,GeFa,StDef,StGen,StCon,StSd,StRef,StSym,StInd,StUni,StBor,StXbor,Pol,PolGen,PolNewInd,PolNewTemp,Ele,ElecComm,PolPar,PolParTrans,PolParOth,Civso,Tral,Pubad,ConGen,ConRen,Cons,Polps,PpsGe,PpsGe:St,PpsGe:Sub,PpsEx,PpsEx:St,PpsEx:Sub,PpsOro,PpsOro:St,PpsOro:Sub,PpsOthPr,PpsOthPr:St,PpsOthPr:Sub,PpsVet,PpsVet:St,PpsVet:Sub,PpsAut,PpsAut:St,PpsAut:Sub,PpsInt,PpsInt:St,PpsInt:Sub,PpsOth,PpsOth:St,PpsOth:Sub,Terps,TpsSub,TpsLoc,TpsAut,TpsOth,Eps,EpsRes,EpsFis,EpsOth,Mps,MpsMe,MpsJt,MpsPro,MpsOth,HrGen,HrBor,HrTrinc,HrCp,CprLife,CprTort,CprEq,CprSlav,CprLib,CprDet,CprFmov,CprFspe,CprFass,CprTria,CprPriv,CprVote,CprReli,CprOth,HrSec,SerProp,SerWork,SerHeal,SerEdu,SerStdl,SerShel,SerSs,SerCult,SerOth,HrCit,CitGen,CitRights,CitDef,CitOth,HrDem,HrDet,Med,MedGov,MedSubs,MedLog,MedOth,HrMob,Prot,ProtCiv,ProtGrp,ProtOth,RiOth,HrNi,HrNiMe,HrNiNe,HrNiOth,HrIi,HrIiMon,HrIiBod,HrIiOth,JusCr,JusCrSp,JusCrSys,JusCrPow,JusEm,JusJu,JusPri,JusTra,Dev,DevSoc,DevHum,DevInfra,NEC,NatRes,IntFu,Bus,Tax,TaxPo,TaxRef,TaxOth,Ban,CenBan,BanPers,BanInt,BanXb,LaRef,LaRefMan,LaRefRet,LaRefOth,LaNom,LaCH,LaCHTa,LaCHIt,LaCHPro,LaCHOth,LaEn,Wat,SsrGua,Ce,CeProv,CeGen,SsrPol,SsrArm,SsrDdr,DdrDemil,DdrProg,SsrInt,SsrPsf,SsrFf,Cor,SsrCrOcr,SsrDrugs,Terr,TjGen,TjAm,TjAmPro,TjSan,TjPower,TjAmBan,TjCou,TjJaNc,TjJaIc,TjMech,TjPrire,TjVet,TjVic,TjMis,TjRep,TjRSym,TjRMa,TjNR,ImUN,ImOth,ImRef,ImPK,ImE
+Argentina/United Kingdom,Territory,7,Argentina-UK: Falklands process,Cross-regional,431,1,"Joint Statement of Confidence-Building Measures, including an Information and Consultation System and Safety Measures for Air and Maritime Navigation",1990-02-15,Multiparty signed/agreed,11,21579,Inter,SubPar,Iss,"Joint statement, not signed, agreement mentions the following parties having produced and agreed to it: [The text of the Joint Statement was agreed by the British and Argentine Delegations at Madrid on 15 February 1990 after two days of negotiation.]",,"Page 1, Introduction: 
+[...] It followed the previous Joint Statement agreed by the British and Argentine Delegations at Madrid on 19 October 1989, which established the 'sovereignty umbrella' whereby the two Governments agreed to put to one side their respective sovereignty claims over the Falkland Islands, South Georgia and the South Sandwich Islands so that they could hold further talks on matters of mutual interest. [...]",ARG,GBR,160,200,346,,,202,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,168,1,"Political Agreement between the National Government, the Political Parties, M-19 and the Catholic Church as Moral and Spiritual Guardian of the ProcessSpanish: Acuerdo Político entre el Gobierno Nacional, los Partidos Políticos, el M-19, y la Iglesia Católica en Calidad de Tutora Moral y Espiritual del Proceso",1990-03-09,Multiparty signed/agreed,4,7902,Intra,SubComp,FrAg,"VIRGILIO BARCO 
+
+President of the Republic 
+
+RAFAEL PARDO RUEDA 
+
+Presidential Adviser 
+
+JULIO CESAR TURBAY AYALA 
+
+Former President of the Republic and National Director of the Colombian Liberal Party 
+
+CARLOS PIZARRO LEONGOMEZ 
+
+Absolute Commander of the M-19 
+
+ANTONIO NAVARRO WOLF 
+
+Commander of the M-19","Monsehor ALVARO FANDINO 
+
+Representative of the Catholic Church, Moral and Spiritual guide of the Process 
+
+Dr. LULS AYALA 
+
+Witness, representative of the Socialist International",,COL,,100,,289,1502,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,1,0,0,0,2,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1
+Guatemala,Government,45,Guatemala peace process,Americas,309,1,Basic Agreement for the Search for Peace by Political Means ('Oslo Agreement'),1990-03-30,Multiparty signed/agreed,3,6508,Intra,Pre,Prin,"Delegation of the National Reconciliation Commission of Guatemala, representing the Guatemalan Government: (Signad) Jorge SERRANO ELIAS; (Signed) Mario PERMUTH; (Signid) Eduardo P. VILLATORO;
+Delegation of the General Command of the Unidad Revolucionaria Nacional Guatemalteca: (Signed) Luis DECKER GUZMAN; (Signed) Francisco VILLAGRAN; (Signed) Jorge E. ROSAL;
+
+For the delegation of the National Reconciliation Commission: (Signed) Jorge SERRANO ELIAS; (Signed) Mario PERMUTH; (Signed) Eduardo P. VILLATORO Executive Secretary of CNR;
+For the delegation of the Unidad Revolucionaria Nacional Guatemalteca: (Signed) Luis BECKER GUZMAN; (Signed) Francisco VILLAGRAN M.; (Signer) Jorge E. ROSAL;","UN (observer), National Reconciliation Commission (conciliator)","Page 2, GOOD OFFICES
+... In accordance with the spirit of the Esquipulas II Agreement, the National Reconciliation Commission shall take steps to facilitate and sustain the peace-seeking activities to which this Agreement refers, through its good offices and the appointment as Conciliator, by agreement with URNG, of Monsignor Rodolfo Quezada Torufio in his capacity as Chairman of the National Reconciliation Commission.
+The National Reconciliation Commission and the Unidad Revolucionaria Nacional Guatemalteca agree to request the Secretary-General of the United Nations, Dr. Javier Perez de Cuellar, to observe the activities to be carried out and to act as guarantor of compliance with the agreements and commitments entered into upon signature of this document.
+
+Page 2-3, ACTIVITIES TO BE CARRIED OUT
+The two delegations agree to launch activities which will generate conditions permitting the definitive attainment of peace and the enhancement of democracy.
+(c) Talks with a view to achieving a political solution of the internal armed confrontation shall be held, on a date to be established by mutual agreement between the Government of Guatemala and the Unidad Revolucionaria Nacional Guatemalteca, between representatives - with decision-making powers - of the Government of the Republic, the Guatemalan Army and the General Command of the Unidad Revolucionaria Nacional Guatemalteca. The National Reconciliation Commission shall take part in these meetings for purposes of confirmation and verification, in accordance with the functions attributed to it under the Esquipulas II Agreement.",GTM,,90,,233,1082,,809,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,920,1,"Acuerdo Gobierno Nacional - Ejécito Popular de Liberacion, Pueblo Nuevo y Juan José",1990-08-26,Multiparty signed/agreed,3,4228,Intra,SubPar,Iss,"Por el Gobierno Nacional
+
+JESÚS ANTONIO BEJARANO
+Consejero Presidencial
+REYNALDO GARY
+
+Consejería
+CARLOS EDUARDO JARA MILLO
+Asesor Consejería TOMAS CONCHA S.
+Sec. Integración Popular
+
+Por el Ejército Popular de Ltberación
+
+BERNARDO GUTIÉRREZ
+Mando Central MARCOS JARA
+Comandante Estado Mayor Central
+ANÍBAL PALACIO
+Partido Comunista de Colombia (M-L)",,,COL,,100,,289,1572,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1097,1,"Acuerdo entre el Gobierno Nacional y el Movimiento Armado Quintín Lame, Cauca",1990-09-14,Multiparty signed/agreed,2,1980,Intra,Pre,PreMix,"Por el Gobierno Nacional
+JESUS ANTONIO BEJARANO
+Consejero Presidencial
+ALVARO HERNJÍNDEZ V.
+Asesor
+CARLOS EDUARDO JARAMILLO
+Asesor
+
+Por el Quintín Lame
+GILDARDO FERNJÍNDEZ COMANDANTE GENERAL CIRO TIQUE
+Comisión Negociadora Q.L.",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1088,1,"Acuerdo entre el PCC M-L, EPL, Quintín Lame y PRT y Partidos Políticos Signatarios del Acuerdo Para la Constituyente",1990-09-24,Multiparty signed/agreed,2,3175,Intra,Pre,Prin,"Por el Movimiento de Salvacion Nacional: RODRIGO MARIN BERNAL. Por el Partido Social Conservador: DIEGO PARDO KOPPEL. Por la Alianza Democrática M-19: DIEGO MONTÑA CUELLAR, CAMILO GONZALEZ, JAMIE FAJARDO, OTTO ÑAÑEZ. 
+
+Por el Mando Central del EPL, BERNARDO GUTiERREZ, OCTAVIO HERNANDEZ, CARLOS ALBERTO RESTREPO Y JAIRO MORALES. Por la direccion nacional del PRT: SERGIO SIERRA Y VÍCTOR CRUZ. Por el Estado Mayor del Quintín Lame: LEONARDO ULCUÉ, MAURICIO PAEZ. 
+
+Por el Partido Comunista Marxista-Leninista: JORGE OCAMPO Y RAÚL TEJADA",,,COL,,100,,289,1573,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1089,1,"Acuerdo Gobierno Nacional-EPL y PCC – ML, Labores, Belmira, Antioquia",1990-09-28,Multiparty signed/agreed,3,4742,Intra,Pre,Proc,"Por el Gobierno Nacional.
+JESÚS ANTONIO BEJARANO
+Consejero Presidencial
+CARLOS EDUARD(l JARAAliLLO
+Asesor Consejería
+REYNALDOGARY
+Asesor Consejería
+
+Por el EPL.
+BERNARDO GUTIÉRREZ
+Mando Central
+JAIRO MORALES
+Mando Central
+
+Por el PCC (M-L)
+ANÍBAL PALACIO",,,COL,,100,,289,1574,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1090,1,"Acuerdo, Normas Fundamentales de los Campamentos de Paz, EPL-Gobierno Nacional",1990-10-10,Multiparty signed/agreed,2,3565,Intra,Pre,Proc,"Por el Mando Central del EPL: BERNARDO GUTIERREZ
+Por la Consejeria Presidencial de Paz: JESUS ANTONIO BEJARANO A.",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1099,1,"Declaración de la CGSB y la Comisión Exploratoria para la Paz, sobre el Diálogo Directo, Uribe, Meta",1990-10-21,Multiparty signed/agreed,2,3154,Intra,Pre,Prin,"Exploratory commission (for the Government):
+Álvaro Leyva, Saulo Arboleada, Juan Gabriel Uribe, Monsignor Enrique Sarmiento, Roeberto Posada, Carlos Alonso Lucio, José Noé Ríos.
+
+This declaration is co-signed by:
+Manuel Marulanda, Alfonso Cano, Adán Izquierdo and Timoleón Jiménez (FARC); Pablo Tejada (UC-ELN); Francisco Caraballo (EPL)
+CGSB",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1094,1,"Declaración Conjunta del Gobierno Nacional y el PRT, Don Gabriel, Ovejas, Sucre",1990-12-28,Multiparty signed/agreed,2,2899,Intra,Pre,PreMix,"Not signed but stated to be the document of:
+
+for the national
+government, Jesús Antonio Bejarano A., of the Presidential Council for Reconciliation,
+Normalisation and Restoration, and Carlos Eduardo Jaramillo C., Gonzalo de Francisco, Tomás Concha, 
+Álvaro Hernández and Gabriel Restrepo, advisers to the Presidential Council; for the Revolutionary 
+Workers Party (Partido Revolucionario de los Trabajadores, PRT),
+leaders and commanders Valentín González, Sergio Sierra and Pablo Roncallo.",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1095,1,"Acuerdo General entre el Gobierno Nacional y el Partido Revolucionario de los Trabajadores, Don Gabriel, Ovejas, Sucre",1990-12-28,Multiparty signed/agreed,3,5161,Intra,SubPar,MultIss,"Por el Gobierno Nacional,
+HUMBERTO DE LA CALLE LOMBANA
+Ministro de Gobierno
+JESÚS ANTONIO BEJARANO
+Consejero Presidencial
+CARLOS EDUARDO JARA MILLO
+Asesor Consejería
+GONZALO DE FRANCISCO
+Asesor Consejería
+ALVARO HERNANDEZ
+Asesor Consejería
+GABRIEL RESTREPO
+Asesor Consejería
+
+Por el PRT,
+VALENTIN GONZALEZ
+SERGIO SIERRA
+PABLO RONCALLO
+RAFAEL GONzALEZ
+ERNESTO FALLA
+IVAN SUAREZ","Witness: Orlando Fals Borda, delegado a la ANC por la lista de la AD M-19",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,2,2,2,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1091,1,Acta de Compromiso entre el Gobierno Nacional y el EPL,1991-01-10,Multiparty signed/agreed,5,6092,Intra,Imp,ImpMod,"Memorandum which is not signed, but stated to be the document of the National Government and the EPL",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,3,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1096,1,"Acta Interna del Acuerdo entre el Gobierno y el PRT, Ovejas, Sucre",1991-01-25,Multiparty signed/agreed,4,4214,Intra,SubPar,MultIss,"Por el Gobierno Nacional:
+JESÚS ANTONIO BEJARANO Consejero Presidencial CARLOS EDUARDO JARAMILLO Asesor Consejería GONZALO DE FRANCISCO Asesor Consejería ALVARO HERNANDEZ Asesor Consejería GABRIEL RESTREPO Asesor Consejería T OMAS CONCHA SANZ Asesor Consejería
+
+Por el PRT:
+VALENTÍN GONZALEZ
+RAFAEL GONZALEZ
+PABLO RONCALLO
+SERGIO SIERRA
+ERNESTO FALLA
+IVAN SUAREZ",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,3,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,152,1,"Acuerdo Final entre el Gobierno Nacional y el Partido Revolucionario de los Trabajadores, don Gabriel, Ovejas, Sucre",1991-01-25,Multiparty signed/agreed,15,22714,Intra,SubComp,FrAg,"On behalf of the national government:
+JESUS ANTONIO BEJARANO Presidential Council
+CARLOS EDUARDO JARAMILLO Council Adviser
+GONZALO DE FRANCISCO Council Adviser
+ALVARO HERNÁNDEZ Council Adviser
+GABRIEL RESTREPO Council Adviser
+TOMAS CONCHA SANZ Council Adviser
+
+On behalf or PRT:
+VALENTIN GONZALEZ
+SERGIO SIERRA
+PABLO RONCALLO
+RAFAEL GONZALEZ
+ERNESTO FALLA",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,3,0,1,1,0,0,2,1,1,0,0,3,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,2,2,2,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,2,1,0,2,2,0,0,0,0,0,0,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1092,1,"Declaración del Gobierno Nacional y el PCC (ML) y el EPL, Juan José, Córdoba",1991-01-29,Multiparty signed/agreed,2,2783,Intra,SubPar,MultIss,"For the EPL and the PCC - ML:
+JAIME FAJARDO LANDAETA
+DA RÍO ANTONIO MEJÍA
+ANÍBAL PALACIO
+FERNANDO PINEDA
+BERNARDO GUTIÉRREZ
+MARCOS JARA
+DOMINGO ROJAS
+JYMY SALCEDO
+JAIME VELASQUEZ
+CAMILOSANTACRUZ
+SALOMÓN BORGES
+For the Presidential Council
+JESÚS A. BEJARANO A.
+CARLOS EDUARDO JARA MILLO
+ALVARO HERNANDEZ
+TOMAS CONCHA SANZ","Agreement is not signed by, but is stated to have been agreed 'in the presence of': in the presence of Manuel Medina, representative of the Spanish Socialist Workers’ Party (Partido Socialista Obrero Español, PSOE) and Socialist International in his capacity as international monitor, Monsignor Flavio Calle, Bishop of Montelíbano and Monsignor Guillermo Vega of the Colombian Episcopal Conference, as representatives of the church and as moral tutors of the peace process, Monsignor Emilio Stehle special guest of the church, Senator Rodrigo Marín Bernal in representation of the National Salvation Movement and Member of Parliament Andrés López,",,COL,,100,,289,1575,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1093,1,Acuerdo entre el Gobierno Nacional y el Ejército Popular de Liberación,1991-02-15,Multiparty signed/agreed,6,10241,Intra,SubPar,MultIss,"Por el Gobierno Nacional:
+JESÚS ANTONIO BEJARANO AVILA Consejero Presidencia, CARLOS EDUARDO JARAMILLO Asesor de la Consejería TOMAS CONCHA Asesor de la Consejería ALVARO HERNANDEZ Asesor de la Consejería
+GABRIEL RESTREPO FORERO Asesor de la Consejería GONZALO DE FRANCISCO Asesor de la Consejería
+
+Por el EPL:
+JAIME FAJARDO Comisión Negociadora ANÍBAL PALACIO Comisión Negociadora FERNANDO PINEDA Comisión Negociadora
+BERNARDO GUTJÉRREZ Comisión Negociadora JAIRO MORALES Comisión Negociadora MARCOS JARA Comisión Negociadora",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,1,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,3,0,1,0,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,2,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,149,1,Acuerdo Final entre el Gobierno Nacional y el Ejército Popular de Liberación – EPL,1991-02-15,Multiparty signed/agreed,16,28107,Intra,SubComp,FrAg,"Por el Gobierno Nacional
+HUMBERTO DE LA CALLE LOMBANA
+Ministro de Gobierno JESUS A. BEJARANO AVILA
+Consejero Presidencial
+CARLOS EDUARDO JARAMILLO C.
+Asesor de la Consejería
+ALVARO HERNANDEZ V.
+Asesor de la Consejería
+TOMAS CONCHA SANZ
+Asesor de la Consejería GABRIEL RESTREPO FORERO
+Asesor de la Consejería
+GONZALO DE FRANCISCO ZAMBRANO
+Asesor de la Consejería
+
+Por el EPL
+JAIME FAJARDO Comisión Negociadora
+ANIBAL PALACIO Comisión Negociadora 
+LUIS FERNANDO PINEDA Comisión Negociadora 
+BERNARDO GUTIÉRREZ Comisión Negociadora 
+JAIRO MORALES Comisión Negociadora 
+MARCOS JARA Comisión Negociadora","Witnesses:
+Moseñor GUILLERMO VEGA
+Conferencia Episcopal Colombiana
+Don MANUEL MEDINA
+Veedor por el Partido Socialista Obrero Español Y la Internacional Socialista",,COL,,100,,289,1079,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,3,0,1,0,0,1,2,0,1,0,0,3,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,2,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,3,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,1,0,1,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1098,1,"Acuerdo entre la Consejería de Paz y la Comisión Negociadora del MAQL, Mesa de Togoima, Páez, Cauca",1991-03-06,Multiparty signed/agreed,2,1555,Intra,SubPar,MultIss,"Por el Gobierno Nacional:
+JESÚS ANTONIO BE]ARANO Consejero para la Paz
+CARLOS EDUARDO JARAMILLO
+Asesor Consejería
+ÁLVARO HERNÁNDEZ
+Asesor Consejería
+HUMBERTO VERGARA PORTELA
+Asesor Consejería
+
+Por el Quintin Lame:
+GILDARDO FERNÁNDEZ
+CIRO TIQUE
+LEONARDO ULCUE
+CARLOS ANDRADE","JORGE MUÑOZ FERNÁNDEZ
+Testigo, Caucanos por la Paz",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,158,1,Acuerdo de Crave Norte: Gobierno Nactional - CGSB,1991-05-17,Multiparty signed/agreed,2,2467,Intra,Pre,Proc,"On behalf of the national government:
+Andrés González Díaz Deputy Minister of the Interior
+Carlos Eduardo Jaramillo Peace Council
+On behalf of the Simón Bolívar Guerrilla Coordinator:
+Lucía González Daniel Aldana Mutis Miguel Suárez Piragua",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,151,1,"Acuerdo Final entre el Gobierno Nacional y el Movimieto Armado Quintin Lame, Campamento de Pueblo Nuevo Caldono-Cauca",1991-05-27,Multiparty signed/agreed,13,23152,Intra,SubComp,FrAg,"For the national government:
+JESUS ANTONIO BEJARANO, Peace Council
+CARLOS EDUARDO JARAMILLO C., Council Adviser
+ALVARO HERNANDEZ, Council Adviser
+TOMAS CONCHA S., Council Adviser
+HUMBERTO VERGARA P. Council Adviser
+GONZALO DE FRANCISCO Z., Council Adviser
+GABRIEL RESTREPO F., Council Adviser
+
+For MAQL:
+Chief of staff:
+
+GILDARDO FERNANDEZ
+CARLOS ANDRADE
+RICARDO ROMERO
+RUBEN DARIO MONROY
+RICHARD SANCHEZ
+FRANKY GUERRERO
+
+Political leadership:
+LEONARDO ULCUE
+CIRO TIQUE
+IVAN QUINTERO
+FERNANDO MUÑOZ
+GABRIEL MARTINEZ","International monitors:
+The World Council of Indigenous Peoples:
+DONALD ROJAS, President
+RODRIGO CONTRERAS
+
+The Spanish Human Rights Association:
+LUIS OTERO FERNANDEZ",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,0,0,0,1,0,1,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,166,1,"Declaración del Gobierno y la CGSB, Primera Ronda de Conversaciones (The Caracas Agenda)",1991-06-06,Multiparty signed/agreed,3,4749,Intra,Pre,PreMix,"On behalf of the government:
+JESUS ANTONIO BEJARANO 
+A. Presidential Adviser 
+ANDRES GONZALEZ D.
+Vice-Minister for the Interior 
+CARLOS EDUARDO JARAMILLO C. 
+Adviser to the Peace Council 
+HUMBERTO VERGARA P.
+Adviser to the Peace Council 
+TOMAS CONCHA S.
+Adviser to the Peace Council 
+REYNALDO GARYP.
+Adviser to the Commission
+
+On behalf of the Simon Bolivar Guerrilla Coordination Body 
+ALFONSO CANO (FARC), TVAN MARQUEZ (FARC), PABLO CATATUMBO (FARC), HUMBERTO 
+ZULANGA (FARC), DANIEL ALDANA (FARC), MIGUEL SUAREZ (FARC), ANDRES PARIS (FARC)
+FRANCISCO GALAN (ELN), LUCIA GONZALEZ (ELN), DIEGO RUIZ (EPL), ASDRUBAL JIMENEZ 
+(EPL)","Observers present:
+ MIGUEL MOTTA C„ RAFAEL SERRANO P., MARIA CRISTINA OCAMPO, 
+HENRY MILLAN, WILLIAM RAMIREZ, OSCAR REYES, JESUS CARVAJAL, ALVARO VASQUEZ, 
+HERNAN MOTTA, NELSON BERRIO",,COL,,100,,289,1503,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,1100,1,"Comunicado Gobierno-CGSB, Finalización de la Primera Ronda de Conversaciones, Caracas",1991-06-15,Multiparty signed/agreed,2,2286,Intra,Pre,PreMix,"For the national government:
+JESÚS ANTONIO BEJARANO A., Presidential Council
+ANDRÉS GONZÁLEZ D., Deputy Minister of the Interior
+CARLOS EDUARDO JARAMILLO C., Council Adviser
+HUMERTO VERGARA P., Council Adviser
+TOMÁS CONCHA S., Council Adviser
+
+For CGSB:
+ALFONSO CANO, FARC
+IVÁN MÁRQUEZ, FARC
+PABLO CATATUMBO, FARC
+GULLERMO ZULUAGA, FARC
+DANIEL ALDANA, FARC
+MIGUEL SUÁREZ, FARC
+ANDRÉS PARÍS, FARC
+FRANCISCO GALÁN, ELN
+LUCÍA CONZÁLEZ, ELN
+DIEGO RUIZ, EPL
+ASDRÚBAL JIMÉNEZ, EPL",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1101,1,"Acuerdo sobre Veedurías, Segunda Ronda de Conversaciones Gobierno-CGSB, Caracas",1991-06-25,Multiparty signed/agreed,3,4495,Intra,Pre,Conf,"Por el Gobierno Nacional:
+JESÚS ANTONIO BEJARANO A. Consejero Presidencial de Paz ANDRÉS GONZÁLEZ D. Viceministro de Gobierno
+PA-X, Peace Agreement Access Tool (Translation © University of Edinburgh)
+www.peaceagreements.org
+3
+CARLOS EDUARDO JARAMILLO C. Asesor de la Consejeria HUMBERTO VERGARA P. Asesor de Ia Consejeria TOMÁS CONCHA S. Asesor de Ia Consejeria ALVARO HERNANDEZ Asesor de la Consejería
+Por la Coordinadora Guerrillera Simón Bolívar
+ALFONSO CANO (FARC-EP) IVÁN MÁRQUEZ (FARC-EP) GUILLERMO ZULUAGA (FARC-EP) ANDRÉS PARIS (FARC-EP) PABLO CATATUMBO (FARC-EP) DANIEL ALDANA (FARC-EP) MIGUEL SUÁREZ (FARC-EP) FRANCISCO GALÁN (UC-ELN) LUCÍA GONZÁLEZ (UC-ELN) DIEGO RUIZ (EPL) ASDRÚBAL JIMÉNEZ (EPL)","Observatores presentes: ÁLVARO VÁSQUEZ, NELSON BERRÍO, WILLIAM RAMÍREZ Y ÓSCAR REYES",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Colombia,Government,97,Colombia I - Gaviria,Americas,163,1,Political Constitution of Colombia,1991-07-01,Multiparty signed/agreed,128,345382,Intra,SubComp,FrCons,"National Constituent Assembly (Political Parties, Guerrilla Groups, Civil Society, Indigenous peoples)",,,COL,,100,,289,,,856,No,0,3,0,0,1,0,3,1,0,1,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,3,0,1,1,0,3,0,0,1,0,0,0,0,0,0,1,0,1,0,2,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,0,0,1,1,3,0,1,1,3,3,1,0,1,1,1,3,1,0,1,2,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1,1,1,3,1,0,0,0,0,0,0,0,1,3,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,3,1,3,0,1,0,0,0,3,0,1,1,1,3,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,1,3,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,0,0,0,2,3,2,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,3,1,1,3,0,0,3,0,1,0,1,1,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1102,1,"Comunicado Conjunto, Gobierno-CGSB: Acuerdo de Garantías para Traslados de la Comisión Negociadora CGSB, Santafé de Bogotá-Caracas",1991-07-19,Multiparty signed/agreed,2,1870,Intra,Ren,Repre,"Por el Gobierno nacional:
+JESUS ANTONIO BEJARANO Consejero Presidencial CARLOS EDUARDO JARAMILLO Asesor de la Consejería TOMAS CONCHA Asesor de la Consejería HUMBERTO VERGARA
+Asesor de la Consejería ALVARO HERNANDEZ Asesor de la Consejería.
+
+Por la CGSB:
+ALFONSO CANO FARC-EP IVÁN MÁRQUEZ FARC -EP PABLO CATATUMBO FARC-EP ANDRÉS PARIS FARC-EP GUILLERMO ZULUAGA FARC EP DANIEL ALDANA FARC-EP MIGUEL SUAREZ FARC-EP FRANCISCO CALAN UC-ELN LUCIA GONZALEZ UC-ELN DIEGO RUIZ EPL ASDRUBAL JIMENEZ EPL",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1103,1,"Comunicado Gobierno-CGSB, Acuerdo sobre Sesiones Prensa, Vocerías y Testigo Internacional, Tercera Ronda, Caracas",1991-09-06,Multiparty signed/agreed,1,1648,Intra,Pre,Proc,"Not signed by stated to be the document of representatives of the Colombian government and the Simón Bolívar Guerrilla Coordinating Board (Coordinadora Guerrillera Simón Bolívar, CGSB).",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1104,1,"Acta de Resumen, Reuniones entre el Gobierno de Colombia y la CGSB",1991-11-10,Multiparty signed/agreed,3,5009,Intra,Pre,Conf,"Por la Delegación del Gobierno: JESUS A. BEJARANO A. Consejero Presidencial HÉCTOR RIVEROS S. Viceministro de Gobierno
+CARLOS JARAMILLO Asesor Consejeria de Paz HUMBERTO VERGARA Asesor Consejeria de Paz ÁLVARO HERNÁNDEZ Asesor Consejeria de Paz TOMÁS CONCHA S. Asesor Consejería de Paz
+
+Por la delegación de la CGSB:
+ALFONSO CANO, FARC-EP IVÁN MÁRQUEZ, FARC-EP PABLO CATA TUMBO, FARC-EP ANTONIO GARCÍA, UC-ELN FRANCISCO GALÁN, UC-ELN DIEGO RUIZ, EPL","En presencia de los miembros de la Comisión Asesora para el Orden Público quienes rubrican la presente declaración, doctors:
+HORACIO SERPA URIBE, OTTY PATIÑO, GILBERTO VIEIRA, SAULO ARBOLEDA, JUAN GABRIEL URIBE, CARLOS RODADO N. Esta acta también es rubricada por el Testigo Internacional, doctor EMILIO FIGUEREOO PLANCHART",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1105,1,"Comunicado Conjunto de las Comisiones Negociadoras del Gobierno y la CGSB, Aplazamiento de las Conversaciones",1992-02-07,Multiparty signed/agreed,1,635,Intra,Ren,Resub,GOVERNMENT NEGOTIATING COMMISSION AND THE CGSB NEGOTIATING COMMISSION,,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1106,1,"Comunicado de las Comisiones Negociadoras del Gobierno y la CGSB, Reinicio del Diálogo en México",1992-03-03,Multiparty signed/agreed,1,982,Intra,Ren,Repre,"Agreement is not signed, but stated to be an agreement of the National Government and the Gobierno Nacional, SIMÓN BOLÍVAR GUERRILLA COORDINATING BOARD(CGSB)",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1107,1,"Comunicado, Comisiones Negociadoras del Gobierno y la CGSB, Agenda de Temas.",1992-03-13,Multiparty signed/agreed,2,1586,Intra,Pre,Proc,"Por el Gobierno nacional:
+HORACIO SERPA URIBE HÉCTOR RIVEROS SERRATO
+Por la Coordinadora Guerrillera Simon Bolívar:
+ALFONSO CANO IVAN MARQUEZ ANTONIO GARCIA DIEGO RUIZ
+PABLO CATATUMBO GUILLERMO ZULUAGA
+TOMAS LINCE
+ANDRES PARIS
+ASDRUBAL JIMENEZ",International witness: Sergio Romero Cuevas,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,547,1,Statement of Principles for New Constitutional Arrangements for Bosnia and Herzegovina (Carrington-Cutiliero Plan of March 1992),1992-03-18,Agreement with subsequent status,4,10379,Intra,Pre,Prin,"Mate Boban, Alija Izetbegovic, Radovan Karadzic","Jose Cutileiro, envoy of the European Community","Page 3, Annex 2, Human rights
+1. The Constitution would include provisions providing for the protection of human rights and rights of minorities as envisaged in article 2 a), b) and d) of the draft convention of the EC Peace Conference on Yugoslavia and full effect would be given to those rights by the authorities of Bosnia and Herzegovina and the authorities of the constituent units.",BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,1,0,3,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,0,1,0,1,0,0,0,0,1,0,2,1,0,1,3,0,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,0,0,1,1,0,1,1,0,2,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,3,0,1,0,1,0,0,0,2,0,0,1,0,3,0,1,0,2,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,2,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,1108,1,"Declaración Conjunta, Comisión de Paz de la Cámara y CGSB, Tlaxcala",1992-03-18,Multiparty signed/agreed,2,2343,Intra,Pre,Prin,"House of Representatives peace delegation:
+•    Jorge Ariel Infante
+•    Dilia Estrada
+•    Ramiro Lucio
+•    Manuel Cepeda
+•    Alfonso López Cossio
+•    Gilberto Flórez
+
+CGSB Negotiating commission:
+
+•    Alfonso Cano, FARC
+•    Iván Márquez, FARC
+•    Pablo Catatumbo, FARC
+•    Guillermo Zuluaga, FARC
+•    Tomas Lince, FARC
+•    Andrés París, FARC
+•    Antonio García, ELN
+•    Luis Carlos Guerrero, ELN
+•    Diego Ruíz, EPL
+•    Asdrúbal Jiménez, EPL",,,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+Colombia,Government,97,Colombia I - Gaviria,Americas,164,1,"Acuerdo entre los Comandos Ernesto Rojas y el Gobierno Nacional, Protocolo de Adhesion al Acuerdo de Paz del EPL",1992-03-20,Multiparty signed/agreed,3,4133,Intra,Imp,ExtPar,"Por el Gobierno Nacional
+GONZALO DE FRANCISCO
+Consejería para la Paz
+EDUARDO DIAZ URIBE
+Consejería para la Paz
+JOSE NOE RIOS
+Consejería para la Paz
+JHON GOMEZ MARTINEZ
+Director Programa Presidencial para la Reinserción
+Por los Comandos Ernesto Rojas
+ALEX CHACON
+HECTOR TANGARIFE","CARLOS ESPINOSA FACCIO LINCE
+Presidente del Senado de la República
+Presbítero FERNANDO GARCÍA
+Secretario Pastoral Social Conferencia Episcopal
+DARÍO MEJÍA
+ExConstituyente
+En la condición de reinsertados de EPL
+JAIRO DE J. ECHEVERRI MONTOYA.
+JOSE MORENO ROJAS.",,COL,,100,,289,,,856,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,1,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1469,1,Sarajevo Declaration on the Humanitarian Treatment of Displaced Persons,1992-04-11,Multiparty signed/agreed,2,3975,Intra,Pre,PreOth,"Alija Izetbegovic, President, Party of Democratic Action; Radovan Karadzic, President, Serbian Democratic Party; Miljenko Brkic, President, Croatian Democratic Community","Under the auspices of: United Nations High Commissioner for Refugees, signed by Jose Maria Mendiluce, Special Envoy of the High Commission",,BIH,,346,,389,,,215,No,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1470,1,Bosnia-Herzegovina Ceasefire Agreement,1992-04-12,Multiparty signed/agreed,1,1451,Intra,Cea,Ceas,"The leaders of the three main parties of Bosnia and Herzegovina [Mate Boban, Alija Izetbegovic, Radovan Karadzic]",,,BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,1,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1587,1,Protocol (Ilidza Ceasefire),1992-04-23,Multiparty signed/agreed,1,564,IntraLocal,Cea,Ceas,"SDS Representative, Nedjeljko PRSTOJEVIC; SDA Representative, [Sefer] HALILOVIC","European Community representative, T.W. MICHELS",,BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1588,1,Ceasefire Agreement,1992-05-05,Multiparty signed/agreed,1,1181,Intra,Cea,Ceas,The Presidency; JNA [signatures illegible],Lord Carrington; ECMM [signatures illegible],,BIH,,346,,389,,,215,No,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,1,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,128,Bosnia Local peace processes,Europe and Eurasia,1472,1,The Public Announcement (Graz Agreement),1992-05-06,Multiparty signed/agreed,1,2006,Intra,SubPar,MultIss,REPRESENTATIVE OF SERBIAN COMMUNITY Radovan Karadzic; REPRESENTATIVE OF CROATIAN COMMUNITY Mate Boban,,"Page 1, 4. 
+Both sides are determined to persevere in the principles adopted at the Conference of EC, regarding BiH, and according to that principles, they are agreed to respect the agreed standards for defining the rational territories, in all disputed points, with the arbitration of EC.",BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1473,1,"Agreement on removal of Commands, Units and Institutions from Garrisons-Barracks of Zenica, Travnik, Konjic and Barracks and Institutions in Sarajevo",1992-05-10,Multiparty signed/agreed,3,5066,Intra,Cea,Rel,"1) For the Presidency of R B&H: Fikret Abdic, Stjepan Kljuic
+2) For the Government of B&H: Jerko Doko
+3) Representative of JNA: Major – General Milan Aksontijevic
+4) ECMM: Mr. Antonio Nunes, Soares dos Santos
+5) Mr. Colm Doyle, Personal Envoy of Lord Carrington",,"Page 2, Article 6
+Status of the Military Hospital in Sarajevo and other Health Institutions will be regulated by a separate agreement between the Parties to the Agreement and the International Red Cross Committee.
+
+Page 2, Article 13
+Realisation of this Agreement begins on the day it is signed, end it will end on the date specified in the Plan for Withdrawal from the Entire Territory of the Republic of B&H which will be sent to the Parties to the Agreement, but to the end of June at the latest.",BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1
+Bosnia and Herzegovina/Yugoslavia (former),Government/territory,125,Bosnia peace process,Europe and Eurasia,1474,1,Sporazum o prekidu vatre u Bosni i Hercegovini,1992-05-18,Multiparty signed/agreed,1,1405,Intra,Cea,Ceas,"For the Presidency: Fikret Abdic, Stjepan Klujic
+For JNA: Major General Branko Cadjo
+For the Serbian side: Biljana Plavsic",,,BIH,,346,,389,,,215,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Somalia/(Puntland),Inter-group,87,Somalia Peace Process,Africa (excl MENA),1710,1,"Conciliation and Peace Conference of the Regions of Bari Nugal and Mudug, SNA, SNDU, SSDF Peace Agreement (Mudug Peace Agreement)",1993-06-04,Multiparty signed/agreed,2,4550,IntraLocal,SubPar,MultIss,"Signature of Somali Salvation Democratic Front delegate;
+Signature of Somali National Alliance delegate;
+Signature of Somali National Democratic Union delegate;",,Peace Agreements signed in Addis Ababa by the Somali factions on January 15th and March 27th 1993; Addis Ababa Agreements of January 15th and March 27th 1993.,SOM,,520,,NA,NA,NA,NA,No,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,3,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,3,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1,0,0,0,1,0
+Mexico,Government/territory,75,Mexico-Chiapas peace process,Americas,327,1,Commitments for Chiapas by the State and Federal Governments and the EZLN under Paragraph 1.3 of the Rules of Procedure,1996-02-16,Multiparty signed/agreed,7,15230,Intra,SubPar,MultIss,"EZLN, Mexican Government",,,MEX,,70,,400,1617,,,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,0,1,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,1,3,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Mexico,Government/territory,75,Mexico-Chiapas peace process,Americas,425,1,Joint Declaration that the Federal Government and the EZLN shall submit to National Debating and Decision-making Bodies,1996-02-16,Multiparty signed/agreed,9,25074,Intra,SubPar,Iss,"EZLN, Mexican Government",,,MEX,,70,,400,1615,,,No,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,2,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Mexico,Government/territory,75,Mexico-Chiapas peace process,Americas,426,1,Joint Proposals that the Federal Goverrment and the EZLN agree to remit to the National Debating and Decision-Making Bodies in accordance with paragraph 1.4 of the Rules of Procedure,1996-02-16,Multiparty signed/agreed,11,29059,Intra,SubPar,Iss,"EZLN, Mexican Government",,,MEX,,70,,400,1070,,,No,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,1,0,0,1,0,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,3,0,1,0,0,0,3,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,2,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Mexico,Government/territory,75,Mexico-Chiapas peace process,Americas,226,1,Agreement Regarding the Joint Proposals between the Federal Government and the EZLN,1996-02-16,Multiparty signed/agreed,3,6490,Intra,Imp,ExtSub,"EZLN, Mexican Government",,"Agreement Regarding the Documents: “Joint Declaration that the Federal
+Government and the EZLN shall submit to National Debating and Decision-Making
+Bodies”; “Joint Proposals that the Federal Government and the EZLN agree to
+submit to National Debating and Decision-Making Bodies, in respect of Point 1.4 of
+the Rules of Procedure”; and “Commitment for Chiapas made by the State and
+Abimael Bohórquez Martínez
+Wilton Martínez Blandón
+
+Technical Team OCCP:
+
+Giorgio Londoño Medina
+Alfonso Mauledoux Varón
+
+Lawyers not belonging to the (a)EGC:
+
+Ricardo Andrés Giraldo Cifuentes
+Enrique del Río González","Observer from the Attorney General's Office (Procuraduría General de la Nación):
+
+Néstor Iván Osuna Patiño, Delegate Prosecutor for Human Rights
+
+Observers from the Public Forces (Fuerza Pública):

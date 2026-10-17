@@ -103,9 +103,7 @@ def coded_ids(text: Any) -> list[str]:
     return out
 
 
-def build_kg(
-    rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mapping[str, str]
-) -> dict[str, Any]:
+def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mapping[str, str]) -> dict[str, Any]:
     from reva.adapters.connectors import atlas_cowwars as W
 
     ents: dict[str, KgEntity] = {}
@@ -128,61 +126,135 @@ def build_kg(
             labels={"en": r["Agt"] or f"PA-X agreement {agt}"},
             descriptions={"en": f"Peace agreement {agt} (PA-X {PAX_VERSION}), {r['Con']}, signed {r['Dat']}"},
         )
-        sts.append(cm.string_stmt(f"{p}:type", aid, "causmore:event_type", "peace_agreement", raw_sha256=sha,
-                                  selector=sel))
+        sts.append(
+            cm.string_stmt(f"{p}:type", aid, "causmore:event_type", "peace_agreement", raw_sha256=sha, selector=sel)
+        )
         iso = cd.iso_date(r["Dat"])
         if iso:
-            sts.extend(cd.event_times(aid, f"{p}:t", point=(iso, 11), raw_sha256=sha,
-                                      selector={**sel, "column": "Dat"},
-                                      qualifiers={"definition": "The date on which the agreement was signed or "
-                                                  "agreed."}))
+            sts.extend(
+                cd.event_times(
+                    aid,
+                    f"{p}:t",
+                    point=(iso, 11),
+                    raw_sha256=sha,
+                    selector={**sel, "column": "Dat"},
+                    qualifiers={"definition": "The date on which the agreement was signed or agreed."},
+                )
+            )
         else:
             anomalies["undated"].append(agt)
         for col, pid in (("Stage", "pax:stage"), ("Status", "pax:status"), ("Agtp", "pax:agreement_type")):
             if r[col]:
                 q = {"stage_sub": r["StageSub"] or None} if col == "Stage" else {}
-                sts.append(cm.string_stmt(f"{p}:{col.lower()}", aid, pid, r[col], raw_sha256=sha,
-                                          selector={**sel, "column": col}, variable=col, **q))
+                sts.append(
+                    cm.string_stmt(
+                        f"{p}:{col.lower()}",
+                        aid,
+                        pid,
+                        r[col],
+                        raw_sha256=sha,
+                        selector={**sel, "column": col},
+                        variable=col,
+                        **q,
+                    )
+                )
         if r["Contp"]:
-            sts.append(cm.string_stmt(f"{p}:issue", aid, "causdata:coded_issue", r["Contp"], raw_sha256=sha,
-                                      selector={**sel, "column": "Contp"}, variable="Contp",
-                                      note="type of conflict the agreement is addressing: a coded issue, not a cause"))
+            sts.append(
+                cm.string_stmt(
+                    f"{p}:issue",
+                    aid,
+                    "causdata:coded_issue",
+                    r["Contp"],
+                    raw_sha256=sha,
+                    selector={**sel, "column": "Contp"},
+                    variable="Contp",
+                    note="type of conflict the agreement is addressing: a coded issue, not a cause",
+                )
+            )
         if r["Part"]:
-            sts.append(cm.string_stmt(f"{p}:parties", aid, "pax:parties", r["Part"], raw_sha256=sha,
-                                      selector={**sel, "column": "Part"}))
+            sts.append(
+                cm.string_stmt(
+                    f"{p}:parties", aid, "pax:parties", r["Part"], raw_sha256=sha, selector={**sel, "column": "Part"}
+                )
+            )
         for col in ("Loc1ISO", "Loc2ISO"):
             code = r[col].strip().upper()
             if not code or code in ("NA", "N/A"):
                 continue
-            q = country_qids.get(code)
-            if q:
-                sts.append(cm.item_stmt(f"{p}:{col.lower()}", aid, "P17", q, raw_sha256=sha,
-                                        selector={**sel, "column": col}, iso3=code))
+            cq = country_qids.get(code)
+            if cq:
+                sts.append(
+                    cm.item_stmt(
+                        f"{p}:{col.lower()}", aid, "P17", cq, raw_sha256=sha, selector={**sel, "column": col}, iso3=code
+                    )
+                )
             else:
-                sts.append(cm.string_stmt(f"{p}:{col.lower()}", aid, "pax:location", code, raw_sha256=sha,
-                                          selector={**sel, "column": col}, note="ISO code not in the crosswalk"))
+                sts.append(
+                    cm.string_stmt(
+                        f"{p}:{col.lower()}",
+                        aid,
+                        "pax:location",
+                        code,
+                        raw_sha256=sha,
+                        selector={**sel, "column": col},
+                        note="ISO code not in the crosswalk",
+                    )
+                )
         pp = r["PP"].strip()
         if pp and pp not in NOT_CODED:
             processes[pp][r["PPName"]] += 1
-            sts.append(cm.item_stmt(f"{p}:process", aid, "P361", f"pax:process:{pp}", raw_sha256=sha,
-                                    selector={**sel, "columns": ["PP", "PPName"]}))
+            sts.append(
+                cm.item_stmt(
+                    f"{p}:process",
+                    aid,
+                    "P361",
+                    f"pax:process:{pp}",
+                    raw_sha256=sha,
+                    selector={**sel, "columns": ["PP", "PPName"]},
+                )
+            )
         for col, pid in (("UcdpAgr", "pax:ucdp_agreement_id"), ("PamAgr", "pax:pam_agreement_id")):
             for j, v in enumerate(coded_ids(r[col])):
-                sts.append(cm.string_stmt(f"{p}:{col.lower()}:{j}", aid, pid, v, raw_sha256=sha,
-                                          selector={**sel, "column": col}, variable=col))
+                sts.append(
+                    cm.string_stmt(
+                        f"{p}:{col.lower()}:{j}",
+                        aid,
+                        pid,
+                        v,
+                        raw_sha256=sha,
+                        selector={**sel, "column": col},
+                        variable=col,
+                    )
+                )
         for cid in coded_ids(r["UcdpCon"]):
             target = f"ucdp:conflict:{cid}"
-            sts.append(cm.item_stmt(f"{p}:ucdpcon:{cid}", aid, "pax:ucdp_conflict", target, raw_sha256=sha,
-                                    selector={**sel, "column": "UcdpCon"}))
+            sts.append(
+                cm.item_stmt(
+                    f"{p}:ucdpcon:{cid}",
+                    aid,
+                    "pax:ucdp_conflict",
+                    target,
+                    raw_sha256=sha,
+                    selector={**sel, "column": "UcdpCon"},
+                )
+            )
             claims.append(_claim(target, aid, sel, sha, "UcdpCon", f"{agt}:ucdp:{cid}"))
         for col_v in coded_ids(r["CowWar"]):
             n = W.war_number(col_v)
             if n is None:
                 continue
             target = f"cow:war:{n}"
-            sts.append(cm.item_stmt(f"{p}:cowwar:{n}", aid, "pax:cow_war", target, raw_sha256=sha,
-                                    selector={**sel, "column": "CowWar"},
-                                    numbering="COW v4 (Resort to War, Sarkees and Wayman 2010)"))
+            sts.append(
+                cm.item_stmt(
+                    f"{p}:cowwar:{n}",
+                    aid,
+                    "pax:cow_war",
+                    target,
+                    raw_sha256=sha,
+                    selector={**sel, "column": "CowWar"},
+                    numbering="COW v4 (Resort to War, Sarkees and Wayman 2010)",
+                )
+            )
             claims.append(_claim(target, aid, sel, sha, "CowWar", f"{agt}:cow:{n}"))
     for pp, names in sorted(processes.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 0):
         name, _ = names.most_common(1)[0]
@@ -193,8 +265,16 @@ def build_kg(
             labels={"en": name or f"PA-X peace process {pp}"},
             descriptions={"en": f"Peace or transition process {pp} (PA-X {PAX_VERSION})"},
         )
-        sts.append(cm.string_stmt(f"pp{pp}:type", pid, "causmore:event_type", "peace_process", raw_sha256=sha,
-                                  selector={"file": DATA_FILE, "columns": ["PP", "PPName"], "PP": pp}))
+        sts.append(
+            cm.string_stmt(
+                f"pp{pp}:type",
+                pid,
+                "causmore:event_type",
+                "peace_process",
+                raw_sha256=sha,
+                selector={"file": DATA_FILE, "columns": ["PP", "PPName"], "PP": pp},
+            )
+        )
         if len(names) > 1:
             anomalies["process_with_several_names"].append({"PP": pp, "names": sorted(names)})
     return {"entities": list(ents.values()), "statements": sts, "claims": claims, "anomalies": dict(anomalies)}
@@ -263,8 +343,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     run.archive(book)
     res: dict[str, Any] = {
         "rows": out["rows"],
-        "anomalies": {k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in
-                      out["anomalies"].items()},
+        "anomalies": {
+            k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in out["anomalies"].items()
+        },
         "codebook": {"sha256": check["sha256"], "matches": check["matches"]},
         "kg_counts": {"entities": len(out["entities"]), "statements": len(out["statements"])},
         "country_qids": len(qids),
@@ -285,7 +366,17 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         res["claims_withheld"] = {CLAIMS_DATASET: "codebook PDF differs from the pinned sha256"}
         res["claims"] = {}
         return res
-    res["claims"] = cd.deliver_claims(run, [cm.delivery(
-        CLAIMS_DATASET, claims=out["claims"], raw_sha256s=[out["sha"]], retrieved_at=raw.retrieved_at,
-        origin=run.origin, documents_sha256={CODEBOOK_KEY: check["sha256"]})])
+    res["claims"] = cd.deliver_claims(
+        run,
+        [
+            cm.delivery(
+                CLAIMS_DATASET,
+                claims=out["claims"],
+                raw_sha256s=[out["sha"]],
+                retrieved_at=raw.retrieved_at,
+                origin=run.origin,
+                documents_sha256={CODEBOOK_KEY: check["sha256"]},
+            )
+        ],
+    )
     return res

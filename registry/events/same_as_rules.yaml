@@ -31,6 +31,16 @@ rules:
       in 1918-21 and 1991) reported ambiguous, never linked. `one_per_source`: two records of ONE dataset with the
       same key are two events of that dataset (e.g. two COW TC independences when ICOW's record is absent), so the
       key is ambiguous, never a link (EVMAP). A linked pair can still disagree on the date (shown).
+  - id: pax_ucdp_agreement_id
+    kind: prefix_vs_property
+    id_prefix: "ucdp:pa:"
+    property: "pax:ucdp_agreement_id"
+    status: active
+    note: >-
+      PA-X (CAUSMORE, atlas.pax) codes for each of its agreements the UCDP Peace Agreement Dataset id of the same
+      document (codebook v10, variable UcdpAgr: "Uppsala Conflict Data Program peace agreement ID"). A PA-X agreement
+      `pax:agt:<AgtId>` carrying value N is the UCDP record `ucdp:pa:N` (CAUSDATA, atlas.ucdp_term) when that record
+      exists. A UCDP id coded on several PA-X agreements (v10: 1113 on 4, 1070 on 2) is reported ambiguous, never linked.
   - id: ucdp_conflict_id_on_wikidata
     kind: prefix_vs_property
     id_prefix: "ucdp:conflict:"

@@ -376,6 +376,15 @@ types:
     description: >-
       Wikidata's class is 'human migration' (Q177626), a general process class; its instances include named
       migration waves (Great Migration, ...) but also generic concepts, so the type is shown with its class chain.
+  - id: disaster_displacement
+    label_en: internal displacement (disaster)
+    label_fr: déplacements internes (catastrophe)
+    parent: event
+    wikidata_classes: []
+    roles: [victim]
+    description: >-
+      Internal displacements a displacement monitor reports for one disaster event, country and year (IDMC GIDD,
+      dataset kind). The source attributes them to the event; REVA keeps that as the source's has_effect claim.
   - id: sanction_episode
     label_en: sanction episode
     label_fr: épisode de sanctions
@@ -638,6 +647,8 @@ properties:
   - {pid: P155, family: structure, role: follows}
   - {pid: P156, family: structure, role: followed_by}
   - {pid: P793, family: structure, role: significant_event}
+  - {pid: "cowwar:transformed_into", family: structure, role: followed_by, note: "COW war transformation (TransTo/TransFrom): the conflict changed category; not causal (CAUSMORE)"}
+  - {pid: "cowwar:transformed_into", family: structure, role: follows, direction: in, note: "COW war transformation, seen from the later war"}
 
 dataset_kinds:
   - id_prefix: "ucdp:conflict:"
@@ -654,7 +665,13 @@ dataset_kinds:
     type: war
     label_en: Correlates of War war
     interval_from_incoming: [P1344]
-    note: COW Inter-/Extra-State War v4.0; event dates are not coded at war level here (participation spells are).
+    coded_type_property: "cowwar:war_type"
+    coded_type_map: {"Civil war for central control": civil_war, "Civil war over local issues": civil_war}
+    coded_properties: ["cowwar:war_type", "cowwar:outcome"]
+    note: >-
+      COW Inter-/Extra-State War v4.0 (atlas.cow: participation spells) and, from atlas.cowwars (CAUSMORE), Intra-State
+      War v4.1 and Non-State War v4.0 wars, war-level P580/P582 (earliest coded start / latest coded end of the war's
+      records), war type and outcome. v4 numbering throughout (intra-state v5.1 renumbers wars: not mixed in).
   - id_prefix: "unpk:mission:"
     source_key: un.psdata
     type: peacekeeping_mission
@@ -758,6 +775,30 @@ dataset_kinds:
                      armed_conflict_episode: armed_conflict_episode, conflict_termination: null,
                      peace_agreement: peace_agreement, state_code: null}
     note: CAUSDATA (docs/dev/v3_causdata.md) types each record with causdata:event_type; outcomes and terminations are coded outcomes, not events.
+  - id_prefix: ""
+    marker_property: "causmore:event_type"
+    source_key: null
+    type: event
+    label_en: CAUSMORE record (COW war outcomes, PA-X peace agreements and processes, IDMC disaster displacements)
+    coded_type_property: "causmore:event_type"
+    coded_type_map: {peace_agreement: peace_agreement, peace_process: null, war_outcome: null,
+                     disaster_displacement: disaster_displacement}
+    note: >-
+      CAUSMORE (docs/dev/v3_causmore.md): `pax:agt:*` PA-X agreements, `pax:process:*` peace processes (a grouping, not
+      an event), `cowwar:outcome:*` coded war outcomes (outcomes, not events, as CAUSDATA's), `idmc:displacement:*`
+      internal displacements IDMC attributes to a disaster event.
+  - id_prefix: ""
+    marker_property: "idmc:hazard_sub_type"
+    source_key: idmc.gidd
+    type: disaster
+    label_en: disaster event (IDMC Global Internal Displacement Database)
+    coded_type_property: "idmc:hazard_sub_type"
+    coded_type_map: {"Flood": flood, "Dam release flood": flood, "Typhoon/Hurricane/Cyclone": tropical_cyclone,
+                     "Earthquake": earthquake, "Tsunami": tsunami, "Volcanic activity": volcanic_eruption}
+    coded_properties: ["idmc:hazard_sub_type", "idmc:glide_number"]
+    note: >-
+      `idmc:event:*` (CAUSMORE). Hazard sub-types as IDMC gives them (CRED EM-DAT classification); the others (storm,
+      tornado, wildfire, landslide, drought, cold wave ...) stay the generic disaster type.
   - id_prefix: ""
     marker_property: "colonial:event_type"
     source_key: null

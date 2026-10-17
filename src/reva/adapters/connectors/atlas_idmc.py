@@ -21,7 +21,7 @@ the claims are withheld (the workbook's bytes change with every data release, so
 What is built
 -------------
 * ``idmc:event:<Event ID>`` -- the disaster event (one per IDMC Event ID; a row without an Event ID is its own event
-  ``idmc:event:r<sha1 of the row's ISO3|Year|Event Name|Date|Hazard Sub Type|raw figure|event codes>`` -- rows are
+  ``idmc:event:r<sha256[:16] of the row's ISO3|Year|Event Name|Date|Hazard Sub Type|raw figure|event codes>`` -- rows are
   never grouped by name; fully identical rows are reported, not loaded twice):
   label = the event name (most frequent over its rows), ``P580`` = "Date of Event (start)" ("Approximate start date of
   the event", kept at day precision with that caveat in the qualifiers), ``idmc:hazard_sub_type`` (CRED EM-DAT
@@ -162,9 +162,19 @@ def event_key(r: Mapping[str, str]) -> str:
     eid = r["Event ID"].strip()
     if eid and eid.replace(".0", "").isdigit():
         return eid.replace(".0", "")
-    basis = "|".join(r[c] for c in ("ISO3", "Year", "Event Name", "Date of Event (start)", "Hazard Sub Type",
-                                    "Disaster Internal Displacements (Raw)", "Event Codes (Code:Type)"))
-    return "r" + hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
+    basis = "|".join(
+        r[c]
+        for c in (
+            "ISO3",
+            "Year",
+            "Event Name",
+            "Date of Event (start)",
+            "Hazard Sub Type",
+            "Disaster Internal Displacements (Raw)",
+            "Event Codes (Code:Type)",
+        )
+    )
+    return "r" + hashlib.sha256(basis.encode("utf-8")).hexdigest()[:16]
 
 
 def event_codes(text: Any) -> list[tuple[str, str]]:
@@ -214,47 +224,97 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
             qid=eid,
             kind="disaster_event",
             labels={"en": name},
-            descriptions={"en": f"Disaster event ({sub or first['Hazard Type'] or 'hazard not given'}) in the IDMC "
-                                f"Global Internal Displacement Database"
-                                + ("" if key.startswith("r") else f", IDMC Event ID {key}")},
+            descriptions={
+                "en": f"Disaster event ({sub or first['Hazard Type'] or 'hazard not given'}) in the IDMC "
+                f"Global Internal Displacement Database" + ("" if key.startswith("r") else f", IDMC Event ID {key}")
+            },
         )
         if len({(r["Hazard Category"], r["Hazard Type"], r["Hazard Sub Type"]) for r in erows}) > 1:
             anomalies["event_with_several_hazards"].append(key)
         if sub:
-            sts.append(cm.string_stmt(f"e{key}:hazard", eid, "idmc:hazard_sub_type", sub, raw_sha256=sha,
-                                      selector={**sel, "columns": ["Hazard Category", "Hazard Type",
-                                                                   "Hazard Sub Type"]},
-                                      hazard_category=first["Hazard Category"] or None,
-                                      hazard_type=first["Hazard Type"] or None))
-        dates = {excel_date(r["Date of Event (start)"]) for r in erows} - {None}
+            sts.append(
+                cm.string_stmt(
+                    f"e{key}:hazard",
+                    eid,
+                    "idmc:hazard_sub_type",
+                    sub,
+                    raw_sha256=sha,
+                    selector={**sel, "columns": ["Hazard Category", "Hazard Type", "Hazard Sub Type"]},
+                    hazard_category=first["Hazard Category"] or None,
+                    hazard_type=first["Hazard Type"] or None,
+                )
+            )
+        dates = sorted({d for d in (excel_date(r["Date of Event (start)"]) for r in erows) if d is not None})
         if len(dates) > 1:
             anomalies["event_with_several_start_dates"].append(key)
         if dates:
-            sts.extend(cd.event_times(eid, f"e{key}:t", start=(min(dates), 11), raw_sha256=sha,  # type: ignore[type-var]
-                                      selector={**sel, "column": "Date of Event (start)"},
-                                      qualifiers={"definition": "Date of Event (Start): Approximate start date of the "
-                                                  "event.", "approximate": True}))
+            sts.extend(
+                cd.event_times(
+                    eid,
+                    f"e{key}:t",
+                    start=(dates[0], 11),
+                    raw_sha256=sha,
+                    selector={**sel, "column": "Date of Event (start)"},
+                    qualifiers={
+                        "definition": "Date of Event (Start): Approximate start date of the event.",
+                        "approximate": True,
+                    },
+                )
+            )
         for iso in sorted({r["ISO3"] for r in erows if r["ISO3"]}):
             q = country_qids.get(iso)
             if q:
-                sts.append(cm.item_stmt(f"e{key}:country:{iso}", eid, "P17", q, raw_sha256=sha,
-                                        selector={**sel, "column": "ISO3"}, iso3=iso))
+                sts.append(
+                    cm.item_stmt(
+                        f"e{key}:country:{iso}",
+                        eid,
+                        "P17",
+                        q,
+                        raw_sha256=sha,
+                        selector={**sel, "column": "ISO3"},
+                        iso3=iso,
+                    )
+                )
             else:
-                sts.append(cm.string_stmt(f"e{key}:country:{iso}", eid, "idmc:country", iso, raw_sha256=sha,
-                                          selector={**sel, "column": "ISO3"}, note="ISO3 not in the crosswalk"))
+                sts.append(
+                    cm.string_stmt(
+                        f"e{key}:country:{iso}",
+                        eid,
+                        "idmc:country",
+                        iso,
+                        raw_sha256=sha,
+                        selector={**sel, "column": "ISO3"},
+                        note="ISO3 not in the crosswalk",
+                    )
+                )
         codes = sorted({c for r in erows for c in event_codes(r["Event Codes (Code:Type)"])})
         for j, (code, typ) in enumerate(codes):
             pid = "idmc:glide_number" if typ.lower() == "glide number" else "idmc:event_code"
-            sts.append(cm.string_stmt(f"e{key}:code:{j}", eid, pid, code, raw_sha256=sha,
-                                      selector={**sel, "column": "Event Codes (Code:Type)"}, code_type=typ or None))
+            sts.append(
+                cm.string_stmt(
+                    f"e{key}:code:{j}",
+                    eid,
+                    pid,
+                    code,
+                    raw_sha256=sha,
+                    selector={**sel, "column": "Event Codes (Code:Type)"},
+                    code_type=typ or None,
+                )
+            )
         for r in erows:
             iso, year = r["ISO3"], r["Year"]
             if not iso or not year.isdigit():
                 anomalies["row_without_country_or_year"].append(r["_row"])
                 continue
             did = f"idmc:displacement:{key}:{iso}:{year}"
-            rsel = {"file": RESOURCE_NAME, "sheet": DATA_SHEET, "row": int(r["_row"]), "event_key": key,
-                    "ISO3": iso, "Year": int(year)}
+            rsel = {
+                "file": RESOURCE_NAME,
+                "sheet": DATA_SHEET,
+                "row": int(r["_row"]),
+                "event_key": key,
+                "ISO3": iso,
+                "Year": int(year),
+            }
             if did in ents:
                 anomalies["duplicate_event_country_year"].append(did)
                 continue
@@ -263,55 +323,112 @@ def build_kg(rows: Sequence[Mapping[str, str]], *, sha: str, country_qids: Mappi
                 qid=did,
                 kind="disaster_displacement",
                 labels={"en": f"Internal displacements in {r['Country / Territory'] or iso} ({year}): {name}"},
-                descriptions={"en": f"Disaster internal displacements reported by IDMC for {iso} in {year}"
-                                    + (f" ({raw_n})" if raw_n else "")},
+                descriptions={
+                    "en": f"Disaster internal displacements reported by IDMC for {iso} in {year}"
+                    + (f" ({raw_n})" if raw_n else "")
+                },
             )
-            sts.append(cm.string_stmt(f"d{key}:{iso}:{year}:type", did, "causmore:event_type",
-                                      "disaster_displacement", raw_sha256=sha, selector=rsel))
-            sts.extend(cd.event_times(did, f"d{key}:{iso}:{year}:t", point=(f"{int(year):04d}-01-01", 9),
-                                      raw_sha256=sha, selector={**rsel, "column": "Year"},
-                                      qualifiers={"definition": "Year: Indicates the year for which displacement "
-                                                  "data are reported."}))
+            sts.append(
+                cm.string_stmt(
+                    f"d{key}:{iso}:{year}:type",
+                    did,
+                    "causmore:event_type",
+                    "disaster_displacement",
+                    raw_sha256=sha,
+                    selector=rsel,
+                )
+            )
+            sts.extend(
+                cd.event_times(
+                    did,
+                    f"d{key}:{iso}:{year}:t",
+                    point=(f"{int(year):04d}-01-01", 9),
+                    raw_sha256=sha,
+                    selector={**rsel, "column": "Year"},
+                    qualifiers={"definition": "Year: Indicates the year for which displacement data are reported."},
+                )
+            )
             q = country_qids.get(iso)
             if q:
-                sts.append(cm.item_stmt(f"d{key}:{iso}:{year}:country", did, "P17", q, raw_sha256=sha,
-                                        selector={**rsel, "column": "ISO3"}, iso3=iso))
+                sts.append(
+                    cm.item_stmt(
+                        f"d{key}:{iso}:{year}:country",
+                        did,
+                        "P17",
+                        q,
+                        raw_sha256=sha,
+                        selector={**rsel, "column": "ISO3"},
+                        iso3=iso,
+                    )
+                )
             else:
-                sts.append(cm.string_stmt(f"d{key}:{iso}:{year}:country", did, "idmc:country", iso, raw_sha256=sha,
-                                          selector={**rsel, "column": "ISO3"}))
+                sts.append(
+                    cm.string_stmt(
+                        f"d{key}:{iso}:{year}:country",
+                        did,
+                        "idmc:country",
+                        iso,
+                        raw_sha256=sha,
+                        selector={**rsel, "column": "ISO3"},
+                    )
+                )
             occurred = r["Displacement occurred"] or None
             if raw_n is not None:
-                sts.append(KgStatement(
-                    key=f"d{key}:{iso}:{year}:n",
-                    subject=did,
-                    property="idmc:internal_displacements",
-                    value={"type": "quantity", "amount": raw_n, "unit": "internal displacements"},
-                    qualifiers={k: v for k, v in {
-                        "column": "Disaster Internal Displacements (Raw)",
-                        "rounded": _amount(r["Disaster Internal Displacements"]),
-                        "displacement_occurred": occurred,
-                    }.items() if v is not None},
-                    raw_sha256=sha,
-                    selector={**rsel, "column": "Disaster Internal Displacements (Raw)"},
-                ))
+                sts.append(
+                    KgStatement(
+                        key=f"d{key}:{iso}:{year}:n",
+                        subject=did,
+                        property="idmc:internal_displacements",
+                        value={"type": "quantity", "amount": raw_n, "unit": "internal displacements"},
+                        qualifiers={
+                            k: v
+                            for k, v in {
+                                "column": "Disaster Internal Displacements (Raw)",
+                                "rounded": _amount(r["Disaster Internal Displacements"]),
+                                "displacement_occurred": occurred,
+                            }.items()
+                            if v is not None
+                        },
+                        raw_sha256=sha,
+                        selector={**rsel, "column": "Disaster Internal Displacements (Raw)"},
+                    )
+                )
             if raw_n is None or float(raw_n) <= 0:
                 anomalies["no_positive_figure"].append(r["_row"])
                 continue
-            claims.append(cd.ClaimRecord(
-                cause_id=eid,
-                effect_id=did,
-                relation="has_effect",
-                polarity="promotes",
-                selector={**rsel, "columns": ["Event ID", "ISO3", "Year", "Disaster Internal Displacements (Raw)",
-                                              "Displacement occurred"]},
-                raw_sha256=sha,
-                codebook_term="disaster_displacement",
-                source_claim_id=f"{key}:{iso}:{year}",
-                scope={k: v for k, v in {"place_iso3": iso, "year": int(year),
-                                         "displacement_occurred": occurred}.items() if v is not None},
-            ))
-    return {"entities": list(ents.values()), "statements": sts, "claims": claims, "anomalies": dict(anomalies),
-            "events": len(by_event)}
+            claims.append(
+                cd.ClaimRecord(
+                    cause_id=eid,
+                    effect_id=did,
+                    relation="has_effect",
+                    polarity="promotes",
+                    selector={
+                        **rsel,
+                        "columns": [
+                            "Event ID",
+                            "ISO3",
+                            "Year",
+                            "Disaster Internal Displacements (Raw)",
+                            "Displacement occurred",
+                        ],
+                    },
+                    raw_sha256=sha,
+                    codebook_term="disaster_displacement",
+                    source_claim_id=f"{key}:{iso}:{year}",
+                    scope={
+                        k: v
+                        for k, v in {"place_iso3": iso, "year": int(year), "displacement_occurred": occurred}.items()
+                        if v is not None
+                    },
+                )
+            )
+    return {
+        "entities": list(ents.values()),
+        "statements": sts,
+        "claims": claims,
+        "anomalies": dict(anomalies),
+        "events": len(by_event),
+    }
 
 
 def atlas_source() -> Any:
@@ -334,7 +451,7 @@ def atlas_source() -> Any:
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         field_mappings={
-            "kg": "idmc:event:<Event ID | r<row sha1>>, idmc:displacement:<event>:<ISO3>:<Year>",
+            "kg": "idmc:event:<Event ID | r<row sha256[:16]>>, idmc:displacement:<event>:<ISO3>:<Year>",
             "claims": "registry/causal/relations_causmore.yaml dataset idmc_disasters (has_effect)",
         },
         notes="KG-only source (no atlas table). Codebook = the workbook's README sheet (verbatim check).",
@@ -364,8 +481,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         "hdx": meta,
         "rows": out["rows"],
         "events": out["events"],
-        "anomalies": {k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in
-                      out["anomalies"].items()},
+        "anomalies": {
+            k: (v if len(v) <= 30 else [*v[:30], f"... {len(v)} in total"]) for k, v in out["anomalies"].items()
+        },
         "codebook": {k: out["readme"][k] for k in ("sha256", "matches", "missing_definitions")},
         "kg_counts": {"entities": len(out["entities"]), "statements": len(out["statements"])},
     }
@@ -385,7 +503,17 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         res["claims_withheld"] = {CLAIMS_DATASET: "README definitions differ from the quoted ones"}
         res["claims"] = {}
         return res
-    res["claims"] = cd.deliver_claims(run, [cm.delivery(
-        CLAIMS_DATASET, claims=out["claims"], raw_sha256s=[out["sha"]], retrieved_at=raw.retrieved_at,
-        origin=run.origin, documents_sha256={"idmc_readme": out["readme"]["sha256"]})])
+    res["claims"] = cd.deliver_claims(
+        run,
+        [
+            cm.delivery(
+                CLAIMS_DATASET,
+                claims=out["claims"],
+                raw_sha256s=[out["sha"]],
+                retrieved_at=raw.retrieved_at,
+                origin=run.origin,
+                documents_sha256={"idmc_readme": out["readme"]["sha256"]},
+            )
+        ],
+    )
     return res
