@@ -803,7 +803,8 @@ async def run(
                 if hv.wdqs_due():
                     out.setdefault("wdqs", []).append(await hv.wdqs_listings())
                 batch = hv.next_batch(batch_size)
-                if not batch and pending_discovery:
+                seeds_left = any(int(f.get("tier", 9)) < TIER_DISCOVERY_SPECIFIC for f in state.frontier.values())
+                if pending_discovery and not seeds_left:  # all discovery listings first, then fetch by rank
                     await wait_for_wbapi(sess.client)
                     pid = pending_discovery[0]
                     try:
