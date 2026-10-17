@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -823,6 +823,7 @@ def paths(
     max_edges_per_level: int = MAX_EDGES_PER_LEVEL,
     origin: str | None = None,
     time_budget_s: float | None = PATH_TIME_BUDGET_S,
+    edge_filter: Callable[[Mapping[str, Any], str], bool] | None = None,
 ) -> dict[str, Any]:
     """Shortest connections between two entities (bidirectional breadth-first search over entity-valued
     statements, either direction), bounded:
@@ -835,6 +836,10 @@ def paths(
       flagged unless ``include_undated`` is false);
     * per-level frontier/edge caps and a wall-clock budget (``time_budget_s``, checked between levels and
       hub-test batches); hitting one sets ``truncated`` with the reason.
+
+    * ``edge_filter(statement_row, start_qid)`` (V4 relation families, :mod:`reva.kg.family_query`): a hop is
+      kept only when it returns true, ``start_qid`` being the hop's end nearer to ``from`` in path order (so a
+      directed reading such as "part of" vs "has part" can be enforced).
 
     Returns up to ``max_paths`` shortest paths (all of the same, minimal length), each hop with its property
     labels, direction, dates and its statement's provenance.
@@ -886,6 +891,8 @@ def paths(
         for e in edges:
             for here, there in ((e["subject_qid"], e["object_qid"]), (e["object_qid"], e["subject_qid"])):
                 if here in fset and there not in side.parent:
+                    if edge_filter is not None and not edge_filter(e, here if side is fwd else there):
+                        continue
                     candidates.setdefault(there, []).append((here, e))
         # hub test on newly reached nodes (endpoints and explicitly allowed hubs are always traversable)
         test = [q for q in candidates if q not in endpoints and q not in allowed_hubs]

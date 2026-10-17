@@ -1,0 +1,25 @@
+id: science.chem_petroleum_composition
+domain: science
+owner: V4CHEM
+description: >-
+  What petroleum is made of, as Wikidata states it: has part(s) (P527) and made from material (P186) of
+  petroleum (Q22656) and of every subclass of it (crude oil grades, petroleum products), with the statement
+  node so the harvester re-reads each claim (and its references) from the wbgetentities snapshot. Answers
+  "petroleum -> has_part -> hydrocarbons/alkanes/cycloalkanes/aromatics" where Wikidata says so
+  (community-edited: labelled as such; never REVA's assertion). P186 is requested in
+  registry/kg/property_requests/v4chem.yaml; its rows are skipped until allow-listed.
+purpose: statements
+entity_kind: material
+sparql: |
+  SELECT ?item ?statement ?prop ?object ?rank WHERE {
+    ?item wdt:P279* wd:Q22656 .
+    VALUES ?p { p:P527 p:P186 }
+    ?item ?p ?statement .
+    ?statement wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?prop wikibase:claim ?p ; wikibase:statementProperty ?ps .
+    ?statement ?ps ?object .
+  }
+columns: {subject: item, property_var: prop, object: object, statement: statement, rank: rank}
+max_rows: 3000
+expand_hops: 1

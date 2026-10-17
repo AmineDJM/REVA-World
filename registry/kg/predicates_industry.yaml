@@ -1,0 +1,221 @@
+# Dataset predicates of the industry / companies layer (owner: V4INDUSTRY). Not Wikidata properties: registered in
+# the KG allow-list (kg.property / kg.property_version) by the connectors themselves through
+# reva.kg.model.register_properties (same mechanism as registry/kg/predicates_lang.yaml). WDHARVEST's
+# registry/kg/properties.yaml (Wikidata only) is not touched. Relation families: registry/kg/relations_v4.d/v4industry.yaml.
+#
+# Honesty:
+# * gleif:* statements are what the GLEIF LEI records state (Golden Copy as served by api.gleif.org, CC0 1.0), record by
+#   record. "Parent" in GLEIF Level 2 means *accounting consolidation* (IS_DIRECTLY_CONSOLIDATED_BY /
+#   IS_ULTIMATELY_CONSOLIDATED_BY, IFRS/US GAAP sense) as reported by the child entity -- not a share percentage and not
+#   control in any other sense. A reporting exception (NATURAL_PERSONS, NON_CONSOLIDATING, NO_KNOWN_PERSON, ...) is the
+#   entity's stated reason for having no parent record; it is kept verbatim, never read as "no owner".
+# * Entities are keyed by the LEI itself (`lei:<LEI>`), the identifier GLEIF publishes. A company is joined to a Wikidata
+#   item only through Wikidata's own P1278 (LEI) statements (gleif:wikidata_item, source key wikidata.wdqs), to a GEM
+#   entity only through the GEM id GLEIF publishes in the record (`gem` field). Never by name.
+# * unsd:* statements are what the UN Statistics Division structure and correspondence files state: the ISIC Rev.4
+#   hierarchy (section > division > group > class, as listed in the structure file) and the CPC Ver.2.1 -> ISIC Rev.4
+#   correspondence (the activity in which the product is typically produced, with UNSD's partial flags verbatim).
+# * A connection through these statements is a connection, not a cause.
+
+version: 1
+owner: V4INDUSTRY
+predicates:
+  # ------------------------------------------------------------------ GLEIF Level 1 / Level 2 (source key gleif.api)
+  - pid: "gleif:direct_parent"
+    value_kind: item
+    reva_predicate: gleif_direct_parent
+    label_en: "is directly consolidated by (GLEIF Level 2 relationship)"
+    label_fr: "est directement consolidée par (relation GLEIF de niveau 2)"
+    inverse_name: gleif_direct_child
+    inverse_label_en: "directly consolidates (GLEIF Level 2 relationship)"
+    inverse_label_fr: "consolide directement (relation GLEIF de niveau 2)"
+    description: >-
+      The record's direct accounting-consolidation parent as published by GLEIF (relationship IS_DIRECTLY_CONSOLIDATED_BY,
+      the child LEI's `direct-parent` link). Consolidation in the accounting sense; not a share percentage.
+  - pid: "gleif:ultimate_parent"
+    value_kind: item
+    reva_predicate: gleif_ultimate_parent
+    label_en: "is ultimately consolidated by (GLEIF Level 2 relationship)"
+    label_fr: "est consolidée en dernier ressort par (relation GLEIF de niveau 2)"
+    inverse_name: gleif_ultimate_child
+    inverse_label_en: "ultimately consolidates (GLEIF Level 2 relationship)"
+    inverse_label_fr: "consolide en dernier ressort (relation GLEIF de niveau 2)"
+    description: >-
+      The record's ultimate accounting-consolidation parent (relationship IS_ULTIMATELY_CONSOLIDATED_BY, the child LEI's
+      `ultimate-parent` link): the highest-level entity that prepares consolidated financial statements.
+  - pid: "gleif:parent_reporting_exception"
+    value_kind: string
+    reva_predicate: gleif_parent_reporting_exception
+    label_en: "parent reporting exception (GLEIF)"
+    label_fr: "exception de déclaration de la société mère (GLEIF)"
+    description: >-
+      `<category>: <reason>` of a GLEIF reporting exception record, e.g. `DIRECT_ACCOUNTING_CONSOLIDATION_PARENT:
+      NATURAL_PERSONS` (the entity is controlled by natural persons, so no parent LEI is reported). Verbatim codes.
+  - pid: "gleif:successor"
+    value_kind: item
+    reva_predicate: gleif_successor
+    label_en: "has successor entity (GLEIF record)"
+    label_fr: "a pour entité successeure (fiche GLEIF)"
+    inverse_name: gleif_predecessor
+    inverse_label_en: "is the successor of (GLEIF record)"
+    inverse_label_fr: "succède à (fiche GLEIF)"
+    description: The successor LEI(s) the record names (entity.successorEntity / successorEntities), e.g. after a merger.
+  - pid: "gleif:legal_address_country"
+    value_kind: item
+    reva_predicate: gleif_legal_address_country
+    label_en: "legal address in country (GLEIF record)"
+    label_fr: "adresse légale dans le pays (fiche GLEIF)"
+    inverse_name: gleif_legal_address_of
+    inverse_label_en: "is the legal-address country of (GLEIF record)"
+    inverse_label_fr: "est le pays de l'adresse légale de (fiche GLEIF)"
+    description: >-
+      ISO 3166-1 alpha-2 country of the record's legal address, joined to the country's Wikidata item through the REVA
+      country crosswalk (ISO codes) and registry/entities/country_qids.json -- an identifier join, never a name match.
+  - pid: "gleif:headquarters_country"
+    value_kind: item
+    reva_predicate: gleif_headquarters_country
+    label_en: "headquarters in country (GLEIF record)"
+    label_fr: "siège dans le pays (fiche GLEIF)"
+    inverse_name: gleif_headquarters_country_of
+    inverse_label_en: "is the headquarters country of (GLEIF record)"
+    inverse_label_fr: "est le pays du siège de (fiche GLEIF)"
+    description: ISO 3166-1 alpha-2 country of the record's headquarters address (same join as gleif:legal_address_country).
+  - pid: "gleif:legal_address_region"
+    value_kind: string
+    reva_predicate: gleif_legal_address_region
+    label_en: "legal address region, ISO 3166-2 (GLEIF record)"
+    label_fr: "région de l'adresse légale, ISO 3166-2 (fiche GLEIF)"
+    description: The ISO 3166-2 subdivision code of the legal address as stated (e.g. US-CA); literal until ADM1 entities exist.
+  - pid: "gleif:headquarters_region"
+    value_kind: string
+    reva_predicate: gleif_headquarters_region
+    label_en: "headquarters region, ISO 3166-2 (GLEIF record)"
+    label_fr: "région du siège, ISO 3166-2 (fiche GLEIF)"
+    description: The ISO 3166-2 subdivision code of the headquarters address as stated.
+  - pid: "gleif:headquarters_city"
+    value_kind: string
+    reva_predicate: gleif_headquarters_city
+    label_en: "headquarters city as written (GLEIF record)"
+    label_fr: "ville du siège telle qu'écrite (fiche GLEIF)"
+    description: The city string of the headquarters address, verbatim (not resolved to a place entity -- no name matching).
+  - pid: "gleif:legal_jurisdiction"
+    value_kind: string
+    reva_predicate: gleif_legal_jurisdiction
+    label_en: "legal jurisdiction (GLEIF record)"
+    label_fr: "juridiction légale (fiche GLEIF)"
+    description: ISO 3166-1 / 3166-2 code of the jurisdiction under which the entity is organised (entity.jurisdiction).
+  - pid: "gleif:legal_form"
+    value_kind: string
+    reva_predicate: gleif_legal_form
+    label_en: "legal form, ISO 20275 ELF code (GLEIF record)"
+    label_fr: "forme juridique, code ELF ISO 20275 (fiche GLEIF)"
+    description: >-
+      The ISO 20275 Entity Legal Form code of the record (entity.legalForm.id), with the local name(s) GLEIF's ELF code
+      list gives for it when that list was fetched in the same run (qualifiers elf_names); `8888` + `other` text verbatim.
+  - pid: "gleif:entity_category"
+    value_kind: string
+    reva_predicate: gleif_entity_category
+    label_en: "entity category (GLEIF record)"
+    label_fr: "catégorie d'entité (fiche GLEIF)"
+    description: GENERAL, FUND, BRANCH, SOLE_PROPRIETOR, RESIDENT_GOVERNMENT_ENTITY or INTERNATIONAL_ORGANIZATION, verbatim.
+  - pid: "gleif:entity_status"
+    value_kind: string
+    reva_predicate: gleif_entity_status
+    label_en: "entity status (GLEIF record)"
+    label_fr: "statut de l'entité (fiche GLEIF)"
+    description: ACTIVE or INACTIVE (entity.status), verbatim; with the expiration reason when the record gives one.
+  - pid: "gleif:registration_status"
+    value_kind: string
+    reva_predicate: gleif_registration_status
+    label_en: "LEI registration status (GLEIF record)"
+    label_fr: "statut d'enregistrement du LEI (fiche GLEIF)"
+    description: ISSUED, LAPSED, RETIRED, MERGED, ANNULLED, ... (registration.status), verbatim.
+  - pid: "gleif:entity_creation_date"
+    value_kind: time
+    reva_predicate: gleif_entity_creation_date
+    label_en: "legal entity creation date (GLEIF record)"
+    label_fr: "date de création de l'entité juridique (fiche GLEIF)"
+    description: entity.creationDate as published (day precision); absent when the record has none (never imputed).
+  - pid: "gleif:gem_entity"
+    value_kind: item
+    reva_predicate: gleif_gem_entity
+    label_en: "Global Energy Monitor entity (GEM id published in the GLEIF record)"
+    label_fr: "entité Global Energy Monitor (identifiant GEM publié dans la fiche GLEIF)"
+    inverse_name: gleif_lei_of_gem_entity
+    inverse_label_en: "has LEI (GEM id published in the GLEIF record)"
+    inverse_label_fr: "a pour LEI (identifiant GEM publié dans la fiche GLEIF)"
+    description: >-
+      The record's `gem` field (GLEIF's LEI-to-GEM mapping), e.g. E100001016208, as the entity key `gem:<id>` -- the key
+      the GEM ownership tracker uses for the same id. The mapping is GLEIF's; REVA does not create it.
+  - pid: "gleif:opencorporates_id"
+    value_kind: external_id
+    reva_predicate: gleif_opencorporates_id
+    label_en: "OpenCorporates id (published in the GLEIF record)"
+    label_fr: "identifiant OpenCorporates (publié dans la fiche GLEIF)"
+    description: The record's `ocid` field (GLEIF's LEI-to-OpenCorporates mapping), e.g. us_de/4718317.
+  - pid: "gleif:ultimate_child_count"
+    value_kind: quantity
+    reva_predicate: gleif_ultimate_child_count
+    label_en: "number of LEI records ultimately consolidated by this entity (GLEIF)"
+    label_fr: "nombre de fiches LEI consolidées en dernier ressort par cette entité (GLEIF)"
+    description: >-
+      Total of the `ultimate-children` collection of the LEI (api.gleif.org pagination total) on the Golden Copy publish
+      date: entities *with an LEI* that report this LEI as ultimate parent. A count of LEI records, not of all
+      subsidiaries and not an economic size.
+  - pid: "gleif:direct_child_count"
+    value_kind: quantity
+    reva_predicate: gleif_direct_child_count
+    label_en: "number of LEI records directly consolidated by this entity (GLEIF)"
+    label_fr: "nombre de fiches LEI directement consolidées par cette entité (GLEIF)"
+    description: Total of the `direct-children` collection of the LEI on the Golden Copy publish date (LEI records only).
+  # ------------------------------------------------------------------ Wikidata P1278 bridge (source key wikidata.wdqs)
+  - pid: "gleif:wikidata_item"
+    value_kind: item
+    reva_predicate: lei_wikidata_item
+    label_en: "is described by Wikidata item (Wikidata P1278 Legal Entity Identifier)"
+    label_fr: "est décrite par l'élément Wikidata (Wikidata P1278, identifiant d'entité juridique)"
+    inverse_name: wikidata_item_has_lei
+    inverse_label_en: "has Legal Entity Identifier (Wikidata P1278)"
+    inverse_label_fr: "a pour identifiant d'entité juridique (Wikidata P1278)"
+    description: >-
+      A non-deprecated Wikidata P1278 statement re-expressed as an edge from `lei:<LEI>` to the item that carries it
+      (community-edited, CC0). The only way a GLEIF record and a Wikidata company are joined.
+  # ------------------------------------------------------------------ UNSD classifications (source key unsd.classifications)
+  - pid: "unsd:isic4_parent"
+    value_kind: item
+    reva_predicate: isic4_broader
+    label_en: "is a subdivision of (ISIC Rev.4 structure)"
+    label_fr: "est une subdivision de (structure CITI Rév.4)"
+    inverse_name: isic4_narrower
+    inverse_label_en: "has subdivision (ISIC Rev.4 structure)"
+    inverse_label_fr: "a pour subdivision (structure CITI Rév.4)"
+    description: >-
+      Class -> group -> division -> section, as listed in the UNSD ISIC Rev.4 structure file (a division belongs to the
+      section row that precedes it in the file; groups and classes to the division/group their code starts with).
+  - pid: "unsd:cpc21_parent"
+    value_kind: item
+    reva_predicate: cpc21_broader
+    label_en: "is a subdivision of (CPC Ver.2.1 structure)"
+    label_fr: "est une subdivision de (structure CPC version 2.1)"
+    inverse_name: cpc21_narrower
+    inverse_label_en: "has subdivision (CPC Ver.2.1 structure)"
+    inverse_label_fr: "a pour subdivision (structure CPC version 2.1)"
+    description: Subclass -> class -> group -> division -> section of the UNSD CPC Ver.2.1 structure (code prefixes).
+  - pid: "unsd:cpc21_isic4_origin"
+    value_kind: item
+    reva_predicate: cpc21_produced_in_isic4
+    label_en: "is produced in activity (UNSD CPC 2.1 - ISIC Rev.4 correspondence)"
+    label_fr: "est produit dans l'activité (correspondance CPC 2.1 - CITI Rév.4 de la DSNU)"
+    inverse_name: isic4_produces_cpc21
+    inverse_label_en: "produces product (UNSD CPC 2.1 - ISIC Rev.4 correspondence)"
+    inverse_label_fr: "produit le produit (correspondance CPC 2.1 - CITI Rév.4 de la DSNU)"
+    description: >-
+      One row of UNSD's cpc21-isic4 correspondence: CPC subclass -> ISIC class. CPC classes products by industry of
+      origin, so the row states the activity in which the product is (typically) produced. Qualifiers cpc21_partial /
+      isic4_partial keep UNSD's 0/1 flags verbatim (1 = only part of the category corresponds).
+  - pid: "unsd:classification_level"
+    value_kind: string
+    reva_predicate: classification_level
+    label_en: "level in the classification (UNSD structure)"
+    label_fr: "niveau dans la nomenclature (structure DSNU)"
+    description: section, division, group, class (ISIC) / section, division, group, class, subclass (CPC), from the code shape.
