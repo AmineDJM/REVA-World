@@ -26,12 +26,12 @@ from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.objects.filesystem import FilesystemArtifactStore
 from reva.adapters.postgres.engine import make_engine
 from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
-from reva.evaluation.registry import periods as P
 from reva.evaluation.ledger import load_frozen_manifest
 from reva.evaluation.registry import ensemble as E
+from reva.evaluation.registry import periods as P
 from reva.evaluation.registry import service as svc
-from reva.models.forecasting import online_combination as OC
 from reva.evidence.runner import FixtureHttp, run_connector
+from reva.models.forecasting import online_combination as OC
 from reva.settings import Settings
 
 pytestmark = pytest.mark.db
@@ -180,7 +180,8 @@ def test_02_resolution_scores_the_ensemble_and_weights_use_only_resolved_scores(
     for geo in ("FRA", "DEU"):
         for h in range(1, 20):
             data[(geo, lm + h)] = format(3.5 + 0.01 * h, ".6f")
-    register(env, data)
+    v2 = register(env, data)
+    assert v2["created"], v2
     out = svc.resolve_due(env.worker, env.store, origin="test_fixture")
     assert sorted(b["status"] for b in out["batches"]) == ["scored", "scored"], out
     with env.worker.connect() as c:

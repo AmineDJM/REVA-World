@@ -33,6 +33,7 @@ from reva.evaluation.ledger import load_frozen_manifest, manifest_sha256
 from reva.evaluation.registry import energy as EN
 from reva.evaluation.registry import finance as FN
 from reva.evaluation.registry import periods as P
+from reva.evaluation.registry.absence import absence_coverage, absence_rule_of
 from reva.evaluation.registry.data import FrameCache, latest_version, versions_between
 from reva.evaluation.registry.forecasts import (
     REFERENCE_WEO,
@@ -504,8 +505,12 @@ def resolve_batch(
     later: Mapping[str, Sequence[tuple[Mapping[str, Any], Mapping[str, Series]]]],
     *,
     today: date,
+    coverage: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Pure: outcomes and scores of the pending questions of one sealed batch.
+
+    ``coverage`` (FIX6): table artifact sha256 -> covered periods (:func:`absence.absence_coverage`), used only by
+    questions sealed with ``absence_rule: zero_within_coverage`` (absent cell in a covered period = labelled 0).
 
     ``issue_series``: family -> series of the pinned issue version; ``later``: family -> [(version pin, series)]
     of versions registered after the seal, oldest first.
@@ -516,6 +521,7 @@ def resolve_batch(
     cell's provider publication date (``questions.PUBLICATION_FLAGS``) is at or before the seal date."""
     issued_day = datetime.fromisoformat(str(manifest["issued_at"])).date()
     fam_docs: Mapping[str, Any] = manifest.get("families") or {}
+    cov = coverage or {}
     outcomes: list[dict[str, Any]] = []
     by_q = defaultdict(list)
     for f in manifest["forecasts"]:
@@ -535,7 +541,8 @@ def resolve_batch(
                 }
             )
             continue
-        if resolution_value(q, issue_series.get(fam, {})) is not None:
+        issue_sha = str(((q.get("resolution") or {}).get("issue_table") or {}).get("artifact_sha256") or "")
+        if resolution_value(q, issue_series.get(fam, {}), cov.get(issue_sha)) is not None:
             outcomes.append(
                 {
                     "question_id": qid,
@@ -546,7 +553,7 @@ def resolve_batch(
             continue
         found = None
         for pin, series in later.get(fam, ()):
-            cell = resolution_value(q, series)
+            cell = resolution_value(q, series, cov.get(str(pin.get("artifact_sha256") or "")))
             if cell is not None:
                 found = (pin, cell)
                 break
@@ -695,6 +702,22 @@ def _series_for(
     return issue_series, later
 
 
+def _coverage_for(
+    manifest: Mapping[str, Any], versions: Mapping[str, Sequence[Mapping[str, Any]]], cache: FrameCache
+) -> dict[str, dict[str, Any]]:
+    """Covered periods of every table version of the families sealed with a zero-by-absence rule (FIX6)."""
+    out: dict[str, dict[str, Any]] = {}
+    for fk, vs in versions.items():
+        fam = _family_of(manifest["families"][fk])
+        if not absence_rule_of(fam.raw) or not fam.indicator:
+            continue
+        for v in [manifest["data"]["tables"][fam.dataset_key], *vs]:
+            c = absence_coverage(cache.get(v["artifact_sha256"]), fam.indicator, fam.frequency)
+            if c is not None:
+                out[str(v["artifact_sha256"])] = c
+    return out
+
+
 def resolve_due(
     engine: Engine, store: Any, *, origin: str = "live", actor: str = "worker:forecast_registry"
 ) -> dict[str, Any]:
@@ -730,7 +753,9 @@ def resolve_due(
                 for fk in fams
             }
         issue_series, later = _series_for(manifest, versions, cache)
-        res = resolve_batch(manifest, handled, issue_series, later, today=now.date())
+        res = resolve_batch(
+            manifest, handled, issue_series, later, today=now.date(), coverage=_coverage_for(manifest, versions, cache)
+        )
         if not res["outcomes"]:
             out.append({"batch_sha256": b["sha"], "status": "awaiting_outcomes", "due": len(due)})
             continue

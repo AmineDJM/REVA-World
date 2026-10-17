@@ -443,6 +443,7 @@ def generate_questions(
                         "void_after": (pend + timedelta(days=family.void_after_days)).isoformat(),
                         "note": family.resolution_note,
                         "issue_table": dict(source_pin),
+                        **_absence_fields(family),
                     },
                 }
                 if issued_on is not None:
@@ -615,8 +616,26 @@ def generate_meeting_questions(
     return questions, skipped
 
 
-def resolution_value(q: Mapping[str, Any], series: Mapping[str, Series]) -> Cell | None:
-    """The observed cell answering ``q`` in one table version's extracted series (None when absent)."""
+def resolution_value(
+    q: Mapping[str, Any], series: Mapping[str, Series], coverage: Mapping[str, Any] | None = None
+) -> Cell | None:
+    """The observed cell answering ``q`` in one table version's extracted series (None when absent).
+
+    ``coverage`` (FIX6): the table version's covered periods, for a question sealed under ``absence_rule:
+    zero_within_coverage`` (:mod:`reva.evaluation.registry.absence`): an absent cell in a covered period then
+    resolves as a labelled 0 (``refs[0].absent_cell``), which is never written into the atlas."""
+    cell = _observed_value(q, series)
+    if cell is not None or coverage is None:
+        return cell
+    from reva.evaluation.registry.absence import absence_cell_ref
+
+    ref = absence_cell_ref(q, coverage)
+    if ref is None:
+        return None
+    return Cell(P.parse_label(str(q["frequency"]), str(q["reference_period"])), "0", (ref,))
+
+
+def _observed_value(q: Mapping[str, Any], series: Mapping[str, Series]) -> Cell | None:
     s = series.get(str(q["geo"]))
     if s is None:
         return None
@@ -632,6 +651,15 @@ def resolution_value(q: Mapping[str, Any], series: Mapping[str, Series]) -> Cell
         move = (Decimal(v) - Decimal(str(res["basis"]))) * int(res["sign"])
         return Cell(day.toordinal(), format(move, "f"), (ref,))
     return s.observed_at(P.parse_label(str(q["frequency"]), str(q["reference_period"])))
+
+
+def _absence_fields(family: Family) -> dict[str, Any]:
+    """Sealed with the question only when the family declares a zero-by-absence rule (FIX6): questions of other
+    families keep their exact definition (and id)."""
+    from reva.evaluation.registry.absence import ABSENCE_RULE_TEXT, absence_rule_of
+
+    rule = absence_rule_of(family.raw)
+    return {"absence_rule": rule, "absence_rule_text": ABSENCE_RULE_TEXT} if rule else {}
 
 
 def binary_outcome(q: Mapping[str, Any], value: float) -> int:

@@ -269,6 +269,9 @@ def test_only_holdout_confirmed_scopes_with_a_family_issue() -> None:
     from reva.evaluation.pred_models import issue as I
 
     scopes = I.issuing_scopes()
+    # FIX7: the fair benchmark issues on the union of the registered densities' scopes (not a registered model)
+    bench = scopes.pop(I.FAIR_BENCHMARK, [])
+    assert set(bench) == {f for fams in scopes.values() for f in fams}
     for mk, fams in scopes.items():
         assert mk in I.ISSUERS and all(f in I.FAMILY_OF.values() for f in fams)
     reg = {(r["candidate"], r["task"], r["variable"], r["horizon"]) for r in I.registered()}
