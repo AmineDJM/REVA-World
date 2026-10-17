@@ -86,6 +86,9 @@ class Rules:
     facts: Mapping[str, Mapping[str, str]]
 
     index: Mapping[str, Mapping[str, str]] = field(default_factory=dict, compare=False, repr=False)
+    #: grading.yaml ``identity.resolve_same_as``: corroboration resolves evidenced ``events:same_as`` clusters
+    #: (reva.causal.identity) -- the same pair of events coded under two sources' own record ids is one link.
+    resolve_same_as: bool = False
 
     def reason(self, rule_id: str) -> dict[str, str]:
         return dict(self.index.get(rule_id) or {"rule_id": rule_id, "en": rule_id, "fr": rule_id})
@@ -123,6 +126,7 @@ def parse_rules(doc: Mapping[str, Any], sha256: str) -> Rules:
         tuple(rules),
         facts,
         _reason_index(rules, facts),
+        bool((doc.get("identity") or {}).get("resolve_same_as", False)),
     )
     for rid in _fact_ids():
         if rid not in facts:
@@ -144,6 +148,7 @@ NOTE_FACTS = (
     "tier.T4.wikimedia_import_only",
     "temporal.entity_dated_by_inception",
     "temporal.claim_time_qualifier",
+    "corroboration.via_same_as",
 )
 
 

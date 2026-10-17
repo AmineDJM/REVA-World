@@ -16,6 +16,7 @@ from typing import Any
 from sqlalchemy import Connection, Engine, text
 
 from reva.causal import grading as gr
+from reva.causal import identity as idn
 from reva.causal.model import _json, _new_load
 from reva.causal.temporal import DATE_PIDS, EventDates, claim_time_window, dates_from_rows, temporal_detail
 from reva.kernel.errors import ValidationProblem
@@ -36,6 +37,7 @@ class GradeReport:
     load_ids: list[int] = field(default_factory=list)
     rules_version: str = ""
     by_grade: dict[str, int] = field(default_factory=dict)
+    identity: dict[str, Any] = field(default_factory=dict)
     elapsed_s: float = 0.0
 
     def as_dict(self) -> dict[str, Any]:
@@ -92,26 +94,54 @@ def _notes(c: Mapping[str, Any], tdetail: Mapping[str, Any]) -> list[str]:
     return notes
 
 
-def compute(claims: Sequence[Mapping[str, Any]], dates: Mapping[str, EventDates], rules: gr.Rules) -> list[Computed]:
-    """Grades of ``claims`` (current claim rows of ONE origin) — pure, deterministic."""
+def compute(
+    claims: Sequence[Mapping[str, Any]],
+    dates: Mapping[str, EventDates],
+    rules: gr.Rules,
+    identity: idn.Identity | None = None,
+) -> list[Computed]:
+    """Grades of ``claims`` (current claim rows of ONE origin) — pure, deterministic.
+
+    With ``identity`` (evidenced ``same_as`` clusters, used when ``rules.resolve_same_as``) the cause and the effect
+    are resolved to their clusters: two sources coding the same pair of events under their own record ids assert the
+    same link. Records joined by a link declared not independent share a ``lineage:`` upstream key (count once)."""
+    ident = identity if (identity is not None and rules.resolve_same_as) else None
+
+    def canon(x: str) -> str:
+        return ident.canon(x) if ident is not None else x
+
+    def upstream(x: Mapping[str, Any]) -> tuple[str, ...]:
+        ups = tuple(x["upstream_keys"] or ())
+        if ident is None:
+            return ups
+        return tuple(sorted({*ups, *ident.lineage(x["cause_id"]), *ident.lineage(x["effect_id"])}))
+
     # Claims on the same (cause, effect, family) with the same stance corroborate each other; the opposite
     # stance (a source denying the link vs one asserting it) contests them, symmetrically.
     by_stance: dict[tuple[str, str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
     contests_of: dict[str, list[str]] = defaultdict(list)
     for c in claims:
-        by_stance[(c["cause_id"], c["effect_id"], c["family"], c["stance"])].append(c)
+        by_stance[(canon(c["cause_id"]), canon(c["effect_id"]), c["family"], c["stance"])].append(c)
         for target in c.get("contests") or []:
             contests_of[target].append(c["claim_key"])
     corr_cache: dict[tuple[str, str, str, str], gr.Corroboration] = {}
     out: list[Computed] = []
     for c in claims:
-        k = (c["cause_id"], c["effect_id"], c["family"], c["stance"])
+        k = (canon(c["cause_id"]), canon(c["effect_id"]), c["family"], c["stance"])
         if k not in corr_cache:
             corr_cache[k] = gr.corroboration(
-                [gr.ClaimRef(x["claim_key"], x["source_key"], tuple(x["upstream_keys"] or ())) for x in by_stance[k]]
+                [gr.ClaimRef(x["claim_key"], x["source_key"], upstream(x)) for x in by_stance[k]]
             )
         corr = corr_cache[k]
         corroborating = sorted(x["claim_key"] for x in by_stance[k] if x["claim_key"] != c["claim_key"])
+        # other records of the same events (joined by same_as) whose claims were counted with this one
+        via_identity = sorted(
+            {
+                f"{x['cause_id']}->{x['effect_id']}"
+                for x in by_stance[k]
+                if (x["cause_id"], x["effect_id"]) != (c["cause_id"], c["effect_id"])
+            }
+        )
         opposite = (k[0], k[1], k[2], "denies" if c["stance"] == "asserts" else "asserts")
         contested = sorted(
             {x["claim_key"] for x in by_stance.get(opposite, [])}
@@ -121,16 +151,20 @@ def compute(claims: Sequence[Mapping[str, Any]], dates: Mapping[str, EventDates]
         tcheck, tdetail = temporal_detail(
             dates.get(c["cause_id"]), dates.get(c["effect_id"]), claim_time_window((c.get("scope") or {}).get("period"))
         )
-        g = gr.decide(gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested)), rules, _notes(c, tdetail))
-        sha = gr.inputs_sha256(
-            {
-                "rules": [rules.version, rules.sha256],
-                "claim": [c["id"], c["content_sha256"]],
-                "temporal": tdetail,
-                "corroboration": [corr.count, corr.groups, corroborating],
-                "contested_by": contested,
-            }
-        )
+        notes = _notes(c, tdetail)
+        if via_identity:
+            notes.append("corroboration.via_same_as")
+        g = gr.decide(gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested)), rules, notes)
+        sha_inputs: dict[str, Any] = {
+            "rules": [rules.version, rules.sha256],
+            "claim": [c["id"], c["content_sha256"]],
+            "temporal": tdetail,
+            "corroboration": [corr.count, corr.groups, corroborating],
+            "contested_by": contested,
+        }
+        if via_identity:
+            sha_inputs["identity"] = via_identity
+        sha = gr.inputs_sha256(sha_inputs)
         out.append(Computed(c["id"], c["claim_key"], g, tcheck, tdetail, corr, corroborating, contested, sha))
     return out
 
@@ -161,7 +195,10 @@ def grade_claims(engine: Engine, *, origin: str | None = None, rules: gr.Rules |
             if not claims:
                 continue
             dates = fetch_event_dates(conn, [c["cause_id"] for c in claims] + [c["effect_id"] for c in claims], o)
-            computed = compute([dict(c) for c in claims], dates, rules)
+            identity = idn.load(conn, origin=o) if rules.resolve_same_as else None
+            if identity is not None:
+                total.identity[o] = identity.summary()
+            computed = compute([dict(c) for c in claims], dates, rules, identity)
             latest: dict[int, str] = dict(
                 conn.execute(
                     text("""SELECT claim_row_id, inputs_sha256 FROM kg.causal_grade_current

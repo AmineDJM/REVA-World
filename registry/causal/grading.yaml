@@ -25,6 +25,13 @@
 #        Event-to-event claims are unchanged.
 #      * the loader rejects a row the database refuses (per statement, with the constraint as reason) instead of
 #        aborting the whole load; chain search does not traverse class items (reva.causal.graph.class_nodes).
+#      * (SAMEAS, report docs/dev/v3_sameas.md) corroboration resolves evidenced event identity: claims whose
+#        cause and effect are in the same `events:same_as` clusters (registry/events/same_as_rules.yaml; shared
+#        identifier or provider-published crosswalk, never name/date matching) assert the same link, so two
+#        independent sources coding the same pair of events under their own record ids corroborate each other
+#        (fact corroboration.via_same_as). Records joined by a link declared `independent_sources: false` (one
+#        record derived from the other, e.g. EUSANCT cases taken over from TIES) share the upstream key
+#        `lineage:<link>` and count once. Section `identity` below.
 #
 # Inputs of a claim:
 #   tier            T1..T4 (T5/T6 never reach this table: candidates are not graded)
@@ -33,6 +40,13 @@
 #   contested       a denying claim, an explicit `contests`, or a source qualifier (P1310 statement disputed by)
 version: "2"
 corroborated_min: 2
+
+# Event identity used by corroboration (reva.causal.identity): the grader reads the current `events:same_as`
+# statements of the origin and resolves each claim's cause and effect to their cluster (connected component,
+# at most reva.causal.identity.MAX_CLUSTER records; a larger one is left unresolved and reported).
+identity:
+  resolve_same_as: true
+  same_as_property: "events:same_as"
 
 # Rules are evaluated in order; the first whose `when` matches decides the grade. Each condition key must
 # hold (lists = one of). Every combination of inputs must be decided (checked by the unit tests).
@@ -121,6 +135,9 @@ facts:
   corroboration.corroborated:
     en: "Several independent source groups assert this link (sources sharing an upstream count once)."
     fr: "Plusieurs groupes de sources indépendantes affirment ce lien (les sources partageant une origine comptent une fois)."
+  corroboration.via_same_as:
+    en: "Corroboration counted a claim made about another record of the same events, joined by an evidenced same_as link (shared identifier or provider crosswalk, never name or date matching)."
+    fr: "La corroboration compte une affirmation portant sur un autre enregistrement des mêmes événements, relié par un lien same_as fondé sur une preuve (identifiant partagé ou table de correspondance du fournisseur, jamais par nom ou date)."
   contest.none:
     en: "No source contests this claim."
     fr: "Aucune source ne conteste cette affirmation."
