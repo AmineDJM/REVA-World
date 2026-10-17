@@ -34,7 +34,19 @@ P141 IUCN conservation status, P627 IUCN taxon ID, P846 GBIF taxon ID (Wikidata 
 
 ## What is loaded
 
-LIVE_NUMBERS
+Live loads in the dev DB `reva` (origin `live`, 2026-10-17):
+
+| Source | Result |
+|---|---|
+| `atlas.ecoregions` | KG load 444: **869 entities** (847 `resolve_eco:*` ecoregions, 14 `resolve_biome:*`, 8 `resolve_realm:*`), **2,538 statements** (in_biome 846, in_realm 846, nature_needs_half 846), 0 rejected; 2 requests, 121,980 bytes |
+| `atlas.fishstat` | atlas table `fishstat.production`: **136,317 rows** (country x production source x Yearbook / Major group x measure x year, 1950-2024) from 1,159,616 FAO cells; unmapped (kept): ANT, CSK, EAZ, SCG, SUN, YUG (former entities with FAO ISO3) and un:230 Ethiopia PDR, un:736 Sudan [former], un:896 Other NEI; 78 sums flagged lower_bound (suppressed `Q` cells), 8 all-missing sums Missing; 1 request, 6,382,577 bytes |
+| `atlas.globi`, `atlas.gbif_occ` | GLOBI_GBIF |
+| `atlas.un_sdg` (RLI), `atlas.owid` (LPI), `atlas.fao` QCL (9 items) | code + fixtures + tests done; not re-ingested live (each re-fetches the whole existing source: run the commands below) |
+
+Fixture replays (tests, origin `test_fixture`): GBIF excerpt 4 tables (1,006 + 496 + 494 + 293 rows; 2 groups, 1 year,
+1 IUCN category, 2 seeds), GloBI 4 queries -> 2,664 interaction edges + 6 resolutions (351 rows without usable id,
+93 rows of type `visits` not mapped), ecoregions 847, FishStat excerpt.
+
 
 ## Relation families (`registry/kg/relations_v4.d/v4eco.yaml`, predicates `registry/kg/predicates_eco.yaml`)
 
@@ -56,7 +68,28 @@ LIVE_NUMBERS
 
 ## Examples (ids)
 
-EXAMPLES
+* **Ecoregion -> biome -> realm** (live): `resolve_eco:686` Western European broadleaf forests --part_of
+  (resolve:in_biome)--> `resolve_biome:4` Temperate Broadleaf & Mixed Forests; `resolve_eco:686` --part_of
+  (resolve:in_realm)--> `resolve_realm:Palearctic`. `resolve_eco:219` Borneo lowland rain forests -> `resolve_biome:1`
+  Tropical & Subtropical Moist Broadleaf Forests, `resolve_realm:Indomalayan`. `resolve_eco:822` East Sahara
+  Desert -> `resolve_biome:13` Deserts & Xeric Shrublands.
+* **Who eats whom** (GloBI, fixture replay of real responses): `col:4CGXP` (Panthera leo, as GloBI indexes it)
+  --is_a (globi:resolved_within)--> `gbif:5219404` (lion, GBIF backbone); `col:4CGXP` --eats--> `col:MLQ5` (Bos
+  taurus) and `ncbi:59532` (Kobus megaceros); Apis mellifera (`eol:1045608` --resolved_within--> `gbif:1341976`)
+  --interacts_with (globi:pollinates)--> `ncbi:237863` Passiflora ligularis; `eol:13677906` Crithidia mellificae
+  --interacts_with (globi:parasite_of)--> `eol:1045608` Apis mellifera.
+* **Where it lives / how threatened** (GBIF, fixture replay): `gbif:5219404` Panthera leo --located_in
+  (gbif_occ:recorded_in, >= 10 records)--> Kenya (Q114), ...; `gbif:iucn_red_list_category` = VU (IUCN taxon
+  15951); `gbif:5219404` --measured_by--> `atlas:gbif_occ.taxon_country` (indicator `occurrences.gbif_5219404`).
+  Country series: `gbif_occ.country_group.distinct_species.mammalia` for FRA, `gbif_occ.country_iucn.distinct_species.cr`
+  (e.g. snapshot 2026-10-17: 1,155 CR species with records in the US, 209 in France; global: 9,712).
+* **How many fish** (live): `fishstat.production` `capture.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes`
+  NOR 2023 = 2,353,574.223 t live weight (165 FAO cells summed, 149 species codes).
+* **Population trends**: `owid.g_living_planet_index.lpi_final` World 2022 = 0.27 x 1970 level (LPI 2026), with
+  `ci_low` / `ci_high`; regions (Africa, Latin America and the Caribbean, ...) and systems (Freshwater, Marine,
+  Terrestrial) as LPI aggregates.
+* **Livestock**: `fao.qcl.1181|5114` beehives, `fao.qcl.1068|5112` ducks ... next to A-FAO's cattle/sheep/chickens.
+
 
 ## Honesty notes
 
