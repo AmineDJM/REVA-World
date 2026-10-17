@@ -84,7 +84,42 @@ No migration, no KG statements (measurements only; nothing causal).
 
 ## 4. Live load (dev DB `reva`)
 
-LIVE_RESULTS
+Connector versions 1.0.1 (1.0.0 had been registered from an earlier working-tree state by a concurrent seed),
+budget policy `budgets-1.3.39` at run time. **Loaded live (2026-10-17, under `flock /tmp/reva-devdb.lock`)**: 3 sources,
+10 tables, **166,268 rows**, 12 requests, **13.1 MB raw archived**, 0 refused, every policy quote found:
+
+| source | table | rows | span / notes |
+|---|---|---:|---|
+| `atlas.boe_balance` | `boe.weekly_w` | 6,362 | 2014-01-01 … 2026-10-07, 11 series (975 empty cells no row) |
+| | `boe.bs_q` | 1,096 | 2014-03-31 … 2025-06-30 (5-quarter publication lag), 26 series |
+| `atlas.imf_fin` | `imf.cofer` | 2,308 | 1999-Q1 … 2026-Q2, 58 series, G001/G110/G200 (release 2026-09-30) |
+| | `imf.gdd` | 30,187 | 190 economies, 10 debt ratios (release 2025-09-17; 112,313 empty observations no row) |
+| | `imf.hpd` | 9,628 | 191 economies (release 2025-03-31), from 1800s |
+| `atlas.ff_factors` | `kfrench.ff3` / `ff3_d` / `ff5` / `mom` | 5,204 / 105,268 / 4,920 / 1,295 | CRSP vintage 202608; restricted rights |
+
+**Not loaded live — free disk fell to 4.7 GB (< 5 GB) while the next run waited for the dev-DB lock**; the queued
+runs were stopped per the disk rule. Built, fixture-tested and measured on the real 2026-10-17 bytes offline
+(same parser, row counts exact for those bytes); to run on a machine with ≥ 5 GB free (commands in §7):
+
+| source | table | rows (measured) | raw bytes per run |
+|---|---|---:|---|
+| `atlas.bis_fin` | `bis.lbs_rep` / `bis.lbs_cp` / `bis.dsec_gov` | 25,730 / 83,465 / 12,554 | 1.7 + 5.7 + 3.2 MB CSV + 0.35 MB terms page |
+| `atlas.bis_fin_bulk` | `bis.cbta` / `bis.gli` | 146,700 (580 series, 53 areas) / 24,378 | 2.5 + 0.26 MB zips |
+| `atlas.ecb_fin` | `ecb.wfs_w` / `ecb.lty_m` / `ecb.yc_d` | 49,886 (1998-W53 … 2026-W41) / 12,139 / 22,612 (2004-09-06 … 2026-10-15) | 15.7 + 5.7 + 12.7 MB CSV + 0.43 MB pages |
+| `atlas.frb_h41` | `frb.h41_w` | 355,994 (338 series; 64,478 NA cells no row) | 9.1 MB zip + 0.17 MB pages |
+
+Total once all run: 899,726 rows, ~72 MB raw per full set of runs (under the 100 MB cap; stored zstd-compressed by
+the DISKZ object store).
+
+Examples (ids as stored): `imf.cofer` `AFXRA|fxr_currency=CI_USD|type_of_transformation=SHRO_PT` / `G001` /
+2026-Q2 = `56.704761505127` `percent (share)` (`derivation_type` "O: Reported official data"); `TFXRA_IMP|fxr_currency=CI_T|type_of_transformation=SHRO_PT`
+/ `G001` / 2026-Q2 = `10.58` (derivation "SC: IMF Staff calculations"); `imf.gdd` `FL_S1311MIXED_POGDP_PT` / `ZWE` /
+2024 = `94.586704` `percent of GDP` (`flags.data_source` "UN (1964-1982); IFS+IDS (1983-2003); WEO 2025 (2005-2024)");
+`boe.weekly_w` `RPWZ4TN` / `GB` / 2026-10-07 = `23631` `Pounds sterling (GBP) x10^6`; `kfrench.ff3` `FF|factor=Mkt-RF` /
+1926-07 = `2.89` (restricted). Offline (real bytes): `ecb.wfs_w` `WFS|bs_item=T000000|count_area=Z5|currency_trans=Z01`
+/ `U2` / 2026-W41 (2026-10-05…12) = `5943911` `Euro (EUR) x10^6`; `frb.h41_w` `RESPPMA_N.WW` / `US` / 2026-10-14 =
+`6755639` `US dollars (USD) x10^6`; `bis.dsec_gov` `DSEC|ref_sector=S1311|valuation=M` / `CH` / 1999-Q4 = `41.17227350962`
+`US dollar (USD) x10^9`.
 
 ## 5. Not taken, and why
 
