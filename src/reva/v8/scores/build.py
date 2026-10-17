@@ -290,6 +290,8 @@ def beat_energy(src: Sources) -> list[Row]:
     adj = holm_adjust([t.get("p_challenger_better") for t in tests])
     rep = report_of(src, "beat_energy")
     void_ok = rep is not None and ENERGY_VOID_QUOTE in " ".join(src.text(rep).split())
+    base_rel = "docs/dev/v7_beat_energy_result.json"
+    covs = doc.get("coverage_80") or (src.load(base_rel).get("coverage_80") if src.has(base_rel) else None)
     rows: list[Row] = []
     for i, (t, a) in enumerate(zip(tests, adj, strict=True)):
         w, code, h = t["window"], t["code"], int(t["h"])
@@ -337,7 +339,7 @@ def beat_energy(src: Sources) -> list[Row]:
         }  # fmt: skip
         if vq:
             row["verdict_quote"] = vq
-        cov = (doc.get("coverage_80") or {}).get(f"{w}|{code}|{t['challenger']}")
+        cov = (covs or {}).get(f"{w}|{code}|{t['challenger']}")
         if cov is not None:
             row["coverage"] = {"0.8": cov}
         rows.append(row)

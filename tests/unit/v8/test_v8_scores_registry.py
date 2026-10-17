@@ -47,6 +47,8 @@ def test_committed_rows_equal_a_rebuild_when_their_source_is_unchanged(doc: dict
         if not src.is_file() or B.Sources(REPO, tracked_only=False).sha(r["source"]["file"]) != r["source"]["sha256"]:
             continue  # the source moved on: the API flags it stale; a rebuild refreshes it
         assert r["id"] in fresh, f"{r['id']} is not produced by the builder (hand-added?)"
+        if fresh[r["id"]]["source"] != r["source"]:
+            continue  # the builder now reads a newer result file (e.g. a merged family): a rebuild refreshes it
         assert r == fresh[r["id"]], f"{r['id']} differs from a rebuild (hand-edited?)"
         checked += 1
     assert checked > 50
