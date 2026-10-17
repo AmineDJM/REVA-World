@@ -1,53 +1,53 @@
 # REVA data-quality report (`reva qa run`)
 
-Generated 2026-10-17T21:03:04+00:00 · as of 2026-10-17 · origin `live` · mode `db` · config `registry/qa/checks.yaml` sha256 `3e80e5fb961d…`
+Generated 2026-10-17T21:09:12+00:00 · as of 2026-10-17 · origin `live` · mode `db` · config `registry/qa/checks.yaml` sha256 `3e80e5fb961d…`
 
 Read-only: every finding is reported, nothing is fixed, retracted or rewritten. A cross-source divergence is a difference between two publishers to review, never a reason to blend or pick a value.
 
 Summary: fail 2, warn 16, info 5, pass 15
 
-Context: atlas_tables 327, atlas_rows 107457717, kg_statements 4919393, causal_claims 61680, seconds 334.0
+Context: atlas_tables 331, atlas_rows 108175861, kg_statements 4975018, causal_claims 61680, seconds 326.9
 
 | domain | check | status | issues | checked |
 |---|---|---|---:|---:|
 | cross_source | `cross_source.catalog` catalog concepts listing several sources | **warn** | 4,086 | 208,498 |
 | cross_source | `cross_source.explicit` declared source pairs (registry/qa/checks.yaml) | **warn** | 5,217 | 29,390 |
 | cross_source | `cross_source.headline` headline concepts (source_order series of one quantity) | **warn** | 12,876 | 147,797 |
-| units | `units.bounded_share` shares / bounded indices outside their declared range | **warn** | 697 | 7,799,344 |
+| units | `units.bounded_share` shares / bounded indices outside their declared range | **warn** | 531 | 7,788,151 |
 | units | `units.negative_count` negative values in count-like units | **warn** | 942 | 15,579,743 |
 | units | `units.per_capita_identity` per-capita × population vs published total | **warn** | 217 | 29,965 |
 | time | `time.forecast_as_observation` non-projection cells starting at/after their availability date | **pass** | 0 | 507,569 |
-| time | `time.future_observation` non-projection cells starting after today | **fail** | 15,329 | 96,485,063 |
-| time | `time.kg_future_statement` KG statements dated after today | **pass** | 0 | 4,919,393 |
-| time | `time.mixed_precision_indicator` indicators mixing period lengths (day/month/quarter/year…) | **info** | 167 | 1,098,789 |
-| time | `time.period_not_ended` non-projection cells for a period that has not ended | **info** | 37,710 | 96,485,063 |
+| time | `time.future_observation` non-projection cells starting after today | **fail** | 15,329 | 96,754,615 |
+| time | `time.kg_future_statement` KG statements dated after today | **pass** | 0 | 4,975,018 |
+| time | `time.mixed_precision_indicator` indicators mixing period lengths (day/month/quarter/year…) | **info** | 167 | 1,101,007 |
+| time | `time.period_not_ended` non-projection cells for a period that has not ended | **info** | 37,710 | 96,754,615 |
 | time | `time.period_open_at_publication` non-projection cells whose period was still open when published | **info** | 37 | 507,569 |
 | time | `time.precision_mismatch` period length differs from the table's declared frequency | **pass** | 0 | 5,904,549 |
 | time | `time.projection_table_unflagged` cells of projection tables without a projection flag | **pass** | 0 | 4,090,991 |
 | time | `time.projection_word_unflagged` non-projection cells whose estimate kind / flag says forecast or projection | **fail** | 10,804 | 25,071,385 |
 | graph | `graph.cycles.is_a` cycles in is_a (child → parent edges) | **warn** | 1 | 162,380 |
 | graph | `graph.cycles.part_of` cycles in part_of (child → parent edges) | **pass** | 0 | 119,874 |
-| graph | `graph.dangling_object` edges whose object is not a KG entity (by predicate) | **warn** | 121,079 | 2,188,726 |
-| graph | `graph.dangling_subject` statements whose subject is not a KG entity | **warn** | 75,217 | 4,919,393 |
-| graph | `graph.located_in_no_country` located_in chains that never reach a country | **warn** | 921 | 159,546 |
-| licence | `licence.atlas_restricted` atlas tables under restricted terms (must be named with values) | **info** | 16,631,319 | 107,457,717 |
-| licence | `licence.atlas_review_pending` atlas tables whose licence review is pending | **info** | 30 | 327 |
-| licence | `licence.atlas_tables` atlas tables without a licence | **pass** | 0 | 327 |
+| graph | `graph.dangling_object` edges whose object is not a KG entity (by predicate) | **warn** | 121,597 | 2,201,685 |
+| graph | `graph.dangling_subject` statements whose subject is not a KG entity | **warn** | 75,217 | 4,975,018 |
+| graph | `graph.located_in_no_country` located_in chains that never reach a country | **warn** | 921 | 165,878 |
+| licence | `licence.atlas_restricted` atlas tables under restricted terms (must be named with values) | **info** | 16,631,319 | 108,175,861 |
+| licence | `licence.atlas_review_pending` atlas tables whose licence review is pending | **info** | 30 | 331 |
+| licence | `licence.atlas_tables` atlas tables without a licence | **pass** | 0 | 331 |
 | licence | `licence.causal_raw` causal rows whose raw object carries no licence | **pass** | 0 | 61,680 |
 | licence | `licence.effects_raw` effects rows whose raw object carries no licence | **pass** | 0 | 301 |
-| licence | `licence.kg_raw` kg rows whose raw object carries no licence | **pass** | 0 | 4,919,393 |
-| provenance | `provenance.atlas_cell_raw` atlas cells whose raw_sha256 is not a raw object of the table | **pass** | 0 | 107,457,717 |
+| licence | `licence.kg_raw` kg rows whose raw object carries no licence | **pass** | 0 | 4,975,018 |
+| provenance | `provenance.atlas_cell_raw` atlas cells whose raw_sha256 is not a raw object of the table | **pass** | 0 | 108,175,861 |
 | provenance | `provenance.causal_no_raw` causal rows without a raw object (null or not archived) | **pass** | 0 | 61,680 |
 | provenance | `provenance.effects_no_raw` effects rows without a raw object (null or not archived) | **warn** | 5 | 301 |
-| provenance | `provenance.kg_no_raw` kg rows without a raw object (null or not archived) | **pass** | 0 | 4,919,393 |
-| provenance | `provenance.objects` archived objects missing or corrupt (store API, decoded) | **pass** | 0 | 13,532 |
-| provenance | `provenance.referenced_not_archived` raw sha256 cited by atlas cells / tables without an archived location | **pass** | 0 | 4,387 |
+| provenance | `provenance.kg_no_raw` kg rows without a raw object (null or not archived) | **pass** | 0 | 4,975,018 |
+| provenance | `provenance.objects` archived objects missing or corrupt (store API, decoded) | **pass** | 0 | 13,799 |
+| provenance | `provenance.referenced_not_archived` raw sha256 cited by atlas cells / tables without an archived location | **pass** | 0 | 4,486 |
 | causal | `causal.disruption_axioms_unqualified` 'disruption / dysfunction / alteration of X' axioms stored as 'X causes' without the source relation | **warn** | 823 | 61,680 |
-| causal | `causal.missing_endpoint` claim endpoints (cause / effect) that are not KG entities | **warn** | 3,101 | 123,360 |
+| causal | `causal.missing_endpoint` claim endpoints (cause / effect) that are not KG entities | **warn** | 2,361 | 123,360 |
 | causal | `causal.self_loop` claims whose cause is their effect | **warn** | 1 | 61,680 |
 | causal | `causal.ungraded` current causal claims without a grade for their row | **warn** | 11,435 | 61,680 |
 | causal | `causal.wording_leak_labels` non-causal family / link-type labels worded causally | **pass** | 0 |  |
-| causal | `causal.wording_leak_predicates` causal-worded KG predicates read as a non-causal family | **warn** | 1 | 1,039 |
+| causal | `causal.wording_leak_predicates` causal-worded KG predicates read as a non-causal family | **warn** | 1 | 1,047 |
 
 ## cross_source
 
@@ -58,27 +58,27 @@ Cell pairs (country, calendar year, non-projection) beyond tolerance; status war
 | concept | a | b | overlap | diverging | share | max_rel | sign_flips | rel_tol | abs_tol | status | top_countries | units |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | history.population_persons | gapminder.fasttrack.pop | hyde.hyde321.popc | 6,878 | 1,404 | 0.2041 | 0.9863 | 0 | 0.15 | 0 | warn | ISR×38, ERI×34, GNQ×33, TON×33, DJI×32 | persons / inhabitants |
-| water.stress.total | fao.sdgb.24027-_T\|6121 | wb.wdi_social.ER.H2O.FWST.ZS | 3,953 | 484 | 0.1224 | 0.9999 | 0 | 0.1 | 1 | warn | MLT×23, BLZ×23, MWI×23, YEM×22, ATG×22 | % / % (ratio) |
+| water.stress.total | fao.sdgb.24027-_T\|6121 | wb.wdi_social.ER.H2O.FWST.ZS | 3,953 | 484 | 0.1224 | 0.9999 | 0 | 0.1 | 1 | warn | MLT×23, BLZ×23, MWI×23, ATG×22, YEM×22 | % / % (ratio) |
 | politics.parliament.women_lower_chamber_pct | ipu.parline.current_women_percent\|chamber=lower\|at=year_end | vdem.institutions.v2lgfemleg | 9,611 | 801 | 0.0833 | 1 | 0 | 0.05 | 0 | info | TCD×27, GUY×26, ESP×20, BRA×19, NLD×18 | % / % |
-| history.life_expectancy_at_birth | clio.infra.Total_life_expectancy-historical | gapminder.fasttrack.lex | 12,756 | 874 | 0.0685 | 0.7786 | 0 | 0.15 | 0 | info | SLE×47, MOZ×40, TLS×36, SOM×35, AFG×35 | years / years |
-| politics.voting_age_minimum | ipu.parline.min_age_vote_elect\|chamber=lower\|at=year_end | vdem.institutions.v2elage | 1,026 | 42 | 0.0409 | 0.1667 | 0 | 0.05 | 0 | info | IRN×10, KGZ×10, KWT×6, ARG×4, JPN×4 | years / years |
-| food_agriculture.land.forest_share | fao.sdgb.24034\|6121 | wb.wdi_social.AG.LND.FRST.ZS | 1,017 | 26 | 0.0256 | 1 | 0 | 0.05 | 0 | info | EGY×5, OMN×5, NOR×5, GRL×5, JAM×1 | % / % (share) of land area |
-| food_agriculture.land.irrigated_share_agri | fao.rl.6611\|7208 | wb.wdi_social.AG.LND.IRIG.AG.ZS | 1,321 | 31 | 0.0235 | 1 | 0 | 0.05 | 0 | info | BWA×10, ISL×7, MNG×5, LTU×4, LVA×2 | % / % (share) of total agricultural land |
+| history.life_expectancy_at_birth | clio.infra.Total_life_expectancy-historical | gapminder.fasttrack.lex | 12,756 | 874 | 0.0685 | 0.7786 | 0 | 0.15 | 0 | info | SLE×47, MOZ×40, TLS×36, AFG×35, SOM×35 | years / years |
+| politics.voting_age_minimum | ipu.parline.min_age_vote_elect\|chamber=lower\|at=year_end | vdem.institutions.v2elage | 1,026 | 42 | 0.0409 | 0.1667 | 0 | 0.05 | 0 | info | KGZ×10, IRN×10, KWT×6, ARG×4, JPN×4 | years / years |
+| food_agriculture.land.forest_share | fao.sdgb.24034\|6121 | wb.wdi_social.AG.LND.FRST.ZS | 1,017 | 26 | 0.0256 | 1 | 0 | 0.05 | 0 | info | NOR×5, EGY×5, GRL×5, OMN×5, ETH×1 | % / % (share) of land area |
+| food_agriculture.land.irrigated_share_agri | fao.rl.6611\|7208 | wb.wdi_social.AG.LND.IRIG.AG.ZS | 1,321 | 31 | 0.0235 | 1 | 0 | 0.05 | 0 | info | BWA×10, ISL×7, MNG×5, LTU×4, LSO×2 | % / % (share) of total agricultural land |
 | history.population_thousands | maddison.mpd2023.pop | clio.infra.Total_Population-historical | 1,730 | 30 | 0.0173 | 0.8997 | 0 | 0.15 | 0 | info | DMA×7, PER×5, DJI×4, SRB×3, MEX×2 | thousands (mid-year population) / in thousands |
-| food_agriculture.land.forest_share | fao.rl.6646\|7209 | wb.wdi_social.AG.LND.FRST.ZS | 7,135 | 105 | 0.0147 | 1 | 0 | 0.05 | 0 | info | EGY×35, GRL×35, OMN×35 | % / % (share) of land area |
-| health.immunization_hepb3 | who.gho.WHS4_117 | wb.wdi_social.SH.IMM.HEPB | 4,208 | 46 | 0.0109 | 0.4433 | 0 | 0.1 | 0.5 | info | KAZ×9, COG×6, HND×5, TJK×5, GNB×4 | % / Percentage |
-| food_agriculture.employment_agriculture_share | fao.oea.21156\|6121\|sex=1\|src=3043 | wb.wdi_social.SL.AGR.EMPL.ZS | 6,528 | 59 | 0.009 | 0.3172 | 0 | 0.05 | 0 | info | SGP×31, HKG×22, LUX×2, GBR×2, MAC×1 | % / % of total employment |
-| health.immunization_dtp3 | who.gho.WHS4_100 | wb.wdi_social.SH.IMM.IDPT | 4,805 | 42 | 0.0087 | 0.449 | 0 | 0.1 | 0.5 | info | KAZ×9, TJK×5, HND×5, GNB×4, ETH×3 | % / Percentage |
+| food_agriculture.land.forest_share | fao.rl.6646\|7209 | wb.wdi_social.AG.LND.FRST.ZS | 7,135 | 105 | 0.0147 | 1 | 0 | 0.05 | 0 | info | GRL×35, OMN×35, EGY×35 | % / % (share) of land area |
+| health.immunization_hepb3 | who.gho.WHS4_117 | wb.wdi_social.SH.IMM.HEPB | 4,208 | 46 | 0.0109 | 0.4433 | 0 | 0.1 | 0.5 | info | KAZ×9, COG×6, TJK×5, HND×5, GNB×4 | % / Percentage |
+| food_agriculture.employment_agriculture_share | fao.oea.21156\|6121\|sex=1\|src=3043 | wb.wdi_social.SL.AGR.EMPL.ZS | 6,528 | 59 | 0.009 | 0.3172 | 0 | 0.05 | 0 | info | SGP×31, HKG×22, GBR×2, LUX×2, ISR×1 | % / % of total employment |
+| health.immunization_dtp3 | who.gho.WHS4_100 | wb.wdi_social.SH.IMM.IDPT | 4,805 | 42 | 0.0087 | 0.449 | 0 | 0.1 | 0.5 | info | KAZ×9, HND×5, TJK×5, GNB×4, ETH×3 | % / Percentage |
 
 … 26 more rows in the JSON report.
 
 Examples:
 
-* `{"concept": "food_agriculture.land.forest_share", "iso3": "GRL", "year": 2020, "a": "fao.rl.6646|7209", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.0005359970763795834, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
-* `{"concept": "food_agriculture.land.forest_share", "iso3": "EGY", "year": 1995, "a": "fao.rl.6646|7209", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.003927871816766287, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
-* `{"concept": "food_agriculture.land.forest_share", "iso3": "GRL", "year": 2015, "a": "fao.sdgb.24034|6121", "a_value": 0.0, "a_raw": "ef0358f2cc8cb786", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.0005359970763795834, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
-* `{"concept": "food_agriculture.land.forest_share", "iso3": "GRL", "year": 2000, "a": "fao.sdgb.24034|6121", "a_value": 0.0, "a_raw": "ef0358f2cc8cb786", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.0005359970763795834, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
-* `{"concept": "food_agriculture.land.irrigated_share_agri", "iso3": "ISL", "year": 2018, "a": "fao.rl.6611|7208", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.IRIG.AG.ZS", "b_value": 0.002670940170940171, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
+* `{"concept": "food_agriculture.land.forest_share", "iso3": "GRL", "year": 1992, "a": "fao.rl.6646|7209", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.0006438396254023998, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
+* `{"concept": "food_agriculture.land.forest_share", "iso3": "GRL", "year": 2019, "a": "fao.rl.6646|7209", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.0005359970763795834, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
+* `{"concept": "food_agriculture.land.forest_share", "iso3": "EGY", "year": 2000, "a": "fao.sdgb.24034|6121", "a_value": 0.0, "a_raw": "ef0358f2cc8cb786", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.003927871816766287, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
+* `{"concept": "food_agriculture.land.forest_share", "iso3": "EGY", "year": 2015, "a": "fao.sdgb.24034|6121", "a_value": 0.0, "a_raw": "ef0358f2cc8cb786", "b": "wb.wdi_social.AG.LND.FRST.ZS", "b_value": 0.004098648852277864, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
+* `{"concept": "food_agriculture.land.irrigated_share_agri", "iso3": "BWA", "year": 2012, "a": "fao.rl.6611|7208", "a_value": 0.0, "a_raw": "39b739fbfb694971", "b": "wb.wdi_social.AG.LND.IRIG.AG.ZS", "b_value": 0.004249237068799011, "b_raw": "1cbb81b7e8e656e0", "rel_diff": 1.0}`
 
 ### `cross_source.explicit` — declared source pairs (registry/qa/checks.yaml) (warn, 5,217 issues)
 
@@ -86,8 +86,8 @@ Cell pairs (country, calendar year, non-projection) beyond tolerance; status war
 
 | concept | a | b | overlap | diverging | share | max_rel | sign_flips | rel_tol | abs_tol | status | top_countries | units |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| population.weo_vs_wdi | imf.weo.LP | wb.wdi_social.SP.POP.TOTL | 7,695 | 2,024 | 0.263 | 0.55 | 0 | 0.03 | 0 | warn | ETH×46, EGY×46, CYP×46, PAK×45, UGA×45 | persons / Unit |
-| unemployment.ilo_vs_weo | ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT\|sex=SEX_T\|classif1=AGE_YTHADULT_YGE15 | imf.weo.LUR | 3,536 | 813 | 0.2299 | 0.926 | 0 | 0.15 | 1 | warn | PHL×35, JAM×34, PER×33, PAK×33, SGP×30 | % / % of labour force |
+| population.weo_vs_wdi | imf.weo.LP | wb.wdi_social.SP.POP.TOTL | 7,695 | 2,024 | 0.263 | 0.55 | 0 | 0.03 | 0 | warn | ETH×46, CYP×46, EGY×46, UGA×45, PAK×45 | persons / Unit |
+| unemployment.ilo_vs_weo | ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT\|sex=SEX_T\|classif1=AGE_YTHADULT_YGE15 | imf.weo.LUR | 3,536 | 813 | 0.2299 | 0.926 | 0 | 0.15 | 1 | warn | PHL×35, JAM×34, PAK×33, PER×33, SGP×30 | % / % of labour force |
 | co2.owid_vs_wdi_edgar | owid.co2.co2 | wb.wdi_social.EN.GHG.CO2.MT.CE.AR5 | 10,604 | 2,259 | 0.213 | 0.9988 | 0 | 0.1 | 0.5 | warn | PLW×55, BHS×54, MDA×51, MNG×50, TTO×50 | million tonnes (Mt) / Mt CO2eq |
 | unemployment.ilo_vs_eurostat | ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT\|sex=SEX_T\|classif1=AGE_YTHADULT_YGE15 | eurostat.une_m.une_rt_m\|s_adj=NSA\|age=TOTAL\|unit=PC_ACT\|sex=T | 1,024 | 121 | 0.1182 | 0.3919 | 0 | 0.1 | 0.5 | warn | NLD×27, ROU×17, PRT×12, ISL×10, FIN×10 | % / Percentage of population in the labour force |
 | unemployment.ilo_vs_wdi | ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT\|sex=SEX_T\|classif1=AGE_YTHADULT_YGE15 | wb.wdi_social.SL.UEM.TOTL.ZS | 6,531 | 0 | 0 | 0 | 0 | 0.02 | 0.1 | pass |  | % / % of total labor force |
@@ -107,16 +107,16 @@ Cell pairs (country, calendar year, non-projection) beyond tolerance; status war
 | concept | a | b | overlap | diverging | share | max_rel | sign_flips | rel_tol | abs_tol | status | top_countries | units |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | reva.economy.gdp_per_capita_usd | imf.weo.NGDPDPC | spc.pocket.GDPCPCUSD | 109 | 85 | 0.7798 | 0.9044 | 0 | 0.05 | 0 | warn | KIR×19, PNG×17, VUT×15, TUV×14, FJI×12 | US dollars per person (current prices) / USD per person |
-| reva.finance.government_net_lending_gdp | imf.gfs_soo.GNLB_T\|sector=S13 | imf.weo.GGXCNL_NGDP | 2,206 | 1,150 | 0.5213 | 1.984 | 0 | 0.05 | 0 | warn | GBR×42, SGP×34, MNG×28, ISL×28, ROU×26 | % of GDP / % of GDP |
+| reva.finance.government_net_lending_gdp | imf.gfs_soo.GNLB_T\|sector=S13 | imf.weo.GGXCNL_NGDP | 2,206 | 1,150 | 0.5213 | 1.984 | 0 | 0.05 | 0 | warn | GBR×42, SGP×34, ISL×28, MNG×28, ROU×26 | % of GDP / % of GDP |
 | reva.economy.gdp_usd | imf.weo.NGDPD | spc.pocket.GDPCUSD | 109 | 42 | 0.3853 | 0.9045 | 0 | 0.05 | 0 | warn | VUT×17, FJI×9, TUV×6, KIR×6, SLB×4 | US dollars (current prices) / thousand USD |
 | reva.economy.gdp_per_capita_usd | wb.wdi_econ.NY.GDP.PCAP.CD | imf.weo.NGDPDPC | 7,232 | 2,551 | 0.3527 | 0.9483 | 0 | 0.05 | 0 | warn | KEN×46, GNQ×45, GAB×45, MWI×44, CAF×43 | Current US$ / US dollars per person (current prices) |
-| reva.trade.current_account_gdp | imf.weo.BCA_NGDPD | wb.wdi_econ.BN.CAB.XOKA.GD.ZS | 6,757 | 2,011 | 0.2976 | 1.999 | 3 | 0.1 | 0.5 | warn | PAK×38, NPL×38, STP×38, WSM×36, LSO×33 | % of GDP / % |
+| reva.trade.current_account_gdp | imf.weo.BCA_NGDPD | wb.wdi_econ.BN.CAB.XOKA.GD.ZS | 6,757 | 2,011 | 0.2976 | 1.999 | 3 | 0.1 | 0.5 | warn | NPL×38, PAK×38, STP×38, WSM×36, GIN×33 | % of GDP / % |
 | reva.economy.gdp_usd | wb.wdi_econ.NY.GDP.MKTP.CD | imf.weo.NGDPD | 7,353 | 2,095 | 0.2849 | 0.9465 | 0 | 0.05 | 0 | warn | GIN×44, CAF×43, UGA×39, ZWE×36, SUR×35 | Current US$ / US dollars (current prices) |
 | reva.economy.gdp_real_growth | wb.wdi_econ.NY.GDP.MKTP.KD.ZG | imf.weo.NGDP_RPCH | 7,258 | 1,904 | 0.2623 | 2 | 2 | 0.05 | 0 | warn | BTN×41, NZL×38, SLE×37, UGA×35, KNA×32 | % / % change (constant prices) |
 | reva.economy.gdp_per_capita_usd | wb.wdi_econ.NY.GDP.PCAP.CD | spc.pocket.GDPCPCUSD | 313 | 60 | 0.1917 | 0.9076 | 0 | 0.05 | 0 | warn | NRU×13, VUT×11, FJI×9, WSM×7, TUV×6 | Current US$ / USD per person |
-| reva.economy.gdp_usd | wb.wdi_econ.NY.GDP.MKTP.CD | spc.pocket.GDPCUSD | 313 | 58 | 0.1853 | 0.9077 | 0 | 0.05 | 0 | warn | NRU×12, VUT×11, FJI×9, WSM×8, KIR×5 | Current US$ / thousand USD |
-| reva.economy.inflation_cpi | imf.weo.PCPIPCH | wb.wdi_econ.FP.CPI.TOTL.ZG | 7,146 | 992 | 0.1388 | 1.961 | 0 | 0.1 | 0.5 | warn | ETH×35, NPL×33, TON×30, EGY×28, WSM×28 | % change (CPI, period average) / % |
-| reva.environment.co2_per_capita | owid.co2.co2_per_capita | undp.hdr25.co2_prod | 6,543 | 825 | 0.1261 | 0.9695 | 0 | 0.05 | 0 | warn | GNB×34, SAU×32, ERI×30, CIV×23, SOM×23 | tonnes per person (t/person) / tonnes per capita |
+| reva.economy.gdp_usd | wb.wdi_econ.NY.GDP.MKTP.CD | spc.pocket.GDPCUSD | 313 | 58 | 0.1853 | 0.9077 | 0 | 0.05 | 0 | warn | NRU×12, VUT×11, FJI×9, WSM×8, TON×5 | Current US$ / thousand USD |
+| reva.economy.inflation_cpi | imf.weo.PCPIPCH | wb.wdi_econ.FP.CPI.TOTL.ZG | 7,146 | 992 | 0.1388 | 1.961 | 0 | 0.1 | 0.5 | warn | ETH×35, NPL×33, TON×30, BTN×28, EGY×28 | % change (CPI, period average) / % |
+| reva.environment.co2_per_capita | owid.co2.co2_per_capita | undp.hdr25.co2_prod | 6,543 | 825 | 0.1261 | 0.9695 | 0 | 0.05 | 0 | warn | GNB×34, SAU×32, ERI×30, SOM×23, CIV×23 | tonnes per person (t/person) / tonnes per capita |
 | reva.science.internet_users | wb.wdi_econ.IT.NET.USER.ZS | spc.digital.DD024 | 230 | 14 | 0.0609 | 0.4495 | 0 | 0.05 | 0 | info | FJI×6, SLB×4, MHL×3, NRU×1 | % of population / percent |
 
 … 42 more rows in the JSON report.
@@ -131,16 +131,13 @@ Examples:
 
 ## units
 
-### `units.bounded_share` — shares / bounded indices outside their declared range (warn, 697 issues)
+### `units.bounded_share` — shares / bounded indices outside their declared range (warn, 531 issues)
 
 | where | cells |
 |---|---|
 | wb.wdi_social \| EG.ELC.RNWX.ZS \| % (share) of total electricity production \| share_pct_of_total | 453 |
-| wid.wid_key \| shwealj992\|p0p50 \| share (fraction of total, 0-1) \| fraction_0_1 | 148 |
 | wrp.national \| sumreligpct \| proportion (0-1) \| fraction_0_1 | 42 |
 | wb.wdi_social \| ER.H2O.FWDM.ZS \| % (share) of total freshwater withdrawal \| share_pct_of_total | 27 |
-| wid.wid_key \| ghwealj992\|p0p100 \| Gini coefficient (0-1) \| fraction_0_1 | 12 |
-| whr.whr26_fig21 \| dystopia_plus_residual \| Cantril ladder score (0-10) \| index_0_10 | 6 |
 | wb.wdi_social \| ER.H2O.FWAG.ZS \| % (share) of total freshwater withdrawal \| share_pct_of_total | 4 |
 | sscp.frac_v1 \| language_frac \| index (0-1) \| fraction_0_1 | 2 |
 | wb.gender \| SL.TLF.BASC.MA.ZS \| % of male working-age population with basic education \| share_pct_of_total | 1 |
@@ -235,11 +232,11 @@ Examples:
 
 Examples:
 
-* `{"table": "coldat.dyads_v3", "indicator": "colonial_rule_start|colonizer=portugal|agg=max", "classes": ["other", "year"]}`
+* `{"table": "coldat.dyads_v3", "indicator": "colonial_rule|colonizer=portugal|agg=mean", "classes": ["other", "year"]}`
 * `{"table": "coldat.dyads_v3", "indicator": "colonial_rule|colonizer=portugal|agg=max", "classes": ["other", "year"]}`
-* `{"table": "cowtc.entity_status", "indicator": "status|relation=occupied_by|counterpart=200", "classes": ["other", "year"]}`
-* `{"table": "cowtc.entity_status", "indicator": "status|relation=part_of|counterpart=560", "classes": ["other", "year"]}`
-* `{"table": "cow.wars4", "indicator": "batdeath|type=inter|war=108|side=2", "classes": ["other", "year"]}`
+* `{"table": "cowtc.entity_status", "indicator": "status|relation=claimed_by|counterpart=200", "classes": ["other", "year"]}`
+* `{"table": "cowtc.entity_status", "indicator": "status|relation=part_of|counterpart=810", "classes": ["other", "year"]}`
+* `{"table": "cow.wars4", "indicator": "batdeath|type=inter|war=211|side=1", "classes": ["other", "year"]}`
 
 ### `time.period_not_ended` — non-projection cells for a period that has not ended (info, 37,710 issues)
 
@@ -301,7 +298,7 @@ Examples:
 
 * `{"nodes": ["cl:0000163", "cl:0000164"], "size": 2, "edges": ["cl:0000163 -uberon:subclass_of-> cl:0000164", "cl:0000164 -uberon:subclass_of-> cl:0000163"]}`
 
-### `graph.dangling_object` — edges whose object is not a KG entity (by predicate) (warn, 121,079 issues)
+### `graph.dangling_object` — edges whose object is not a KG entity (by predicate) (warn, 121,597 issues)
 
 Object id has no kg.entity row in this origin (unlabeled node in family pages).
 
@@ -320,7 +317,7 @@ Object id has no kg.entity row in this origin (unlabeled node in family pages).
 | P527 | 2,237 | 2,237 | 1,746 | 0 | row 2444687 → Q130803598 |  | 0.7805 |
 | P1344 | 2,711 | 2,711 | 1,695 | 0 | row 1065923 → Q3249599 |  | 0.6252 |
 
-… 115 more rows in the JSON report.
+… 116 more rows in the JSON report.
 
 Examples:
 
@@ -342,7 +339,7 @@ Examples:
 | P1891 | 5,219 | 444 | Q208645 |
 | chembl:indication_mesh | 8,683 | 200 | chembl:CHEMBL1187724 |
 | chembl:indication | 8,457 | 191 | chembl:CHEMBL1187724 |
-| P17 | 93,842 | 48 | Q8470 |
+| P17 | 100,174 | 48 | Q8470 |
 | untc:mtdsg_number | 55 | 3 | Q208645 |
 | P580 | 69,168 | 1 | ucdp:conflict:16379 |
 | icowcol:cow_system_entry | 217 | 1 | Q165040 |
@@ -355,7 +352,7 @@ Country = one of 498 crosswalk QIDs / iso3: nodes; anatomical/genomic located_in
 
 | predicate | subjects | not_reaching | share |
 |---|---|---|---|
-| P17 | 91,245 | 539 | 0.0059 |
+| P17 | 97,577 | 539 | 0.0055 |
 | P276 | 205 | 170 | 0.8293 |
 | P131 | 277 | 145 | 0.5235 |
 | P706 | 61 | 49 | 0.8033 |
@@ -374,9 +371,9 @@ Examples:
 
 * `{"subject": "Q2465074", "predicate": "P131", "chain": "Q2465074 → Q12548 → Q12548 (loop)"}`
 * `{"subject": "Q21077045", "predicate": "P131", "chain": "Q21077045 → Q12548 → Q12548 (loop)"}`
-* `{"subject": "Q545205", "predicate": "P131", "chain": "Q545205 → Q15180 → Q15180 (loop)"}`
-* `{"subject": "Q153015", "predicate": "P131", "chain": "Q153015 → Q1206012 → Q1206012 (loop)"}`
-* `{"subject": "Q4445623", "predicate": "P131", "chain": "Q4445623 → Q1108445 → Q1108445 (loop)"}`
+* `{"subject": "Q322763", "predicate": "P131", "chain": "Q322763 → Q12548 → Q12548 (loop)"}`
+* `{"subject": "Q42585", "predicate": "P131", "chain": "Q42585 → Q131964 → Q131964 (loop)"}`
+* `{"subject": "Q235030", "predicate": "P131", "chain": "Q235030 → Q207118"}`
 
 ### `graph.cycles.part_of` — cycles in part_of (child → parent edges) (pass, 0 issues)
 
@@ -432,7 +429,7 @@ Licence from the table artifact's rights, else the atlas source spec (as the atl
 
 | basis | tables | rows |
 |---|---|---|
-| table_artifact | 327 | 107,457,717 |
+| table_artifact | 331 | 108,175,861 |
 | atlas_source_spec | 0 | 0 |
 | none | 0 | 0 |
 
@@ -501,8 +498,8 @@ Existence of every meta.artifact_location object via the store (zstd-transparent
 
 | state | objects | bytes |
 |---|---|---|
-| ok | 13,532 |  |
-| fully re-hashed | 200 | 57,830,434 |
+| ok | 13,799 |  |
+| fully re-hashed | 200 | 57,735,324 |
 
 ### `provenance.referenced_not_archived` — raw sha256 cited by atlas cells / tables without an archived location (pass, 0 issues)
 
@@ -520,17 +517,16 @@ Examples:
 
 * `{"source_key": "mondo.obo", "claim_key": "ds:mondo.obo:mondo:MONDO:0000009|RO:0004020|reva_state:dysfunction_of:cl:0000233"}`
 
-### `causal.missing_endpoint` — claim endpoints (cause / effect) that are not KG entities (warn, 3,101 issues)
+### `causal.missing_endpoint` — claim endpoints (cause / effect) that are not KG entities (warn, 2,361 issues)
 
 Shown without a label (label_loaded false) until the endpoint is loaded; not a wrong claim by itself.
 
 | source_key | side | claims | id_prefix |
 |---|---|---|---|
-| mondo.obo | cause | 1,875 | chebi |
+| mondo.obo | cause | 1,226 | chebi |
 | wikidata.wbapi | cause | 509 | wikidata |
 | doid.obo | cause | 335 | mim |
 | wikidata.wbapi | effect | 291 | wikidata |
-| mondo.obo | effect | 91 | cl |
 
 Examples:
 
@@ -538,7 +534,6 @@ Examples:
 * `{"source_key": "wikidata.wbapi", "side": "cause", "example": "Q5365420"}`
 * `{"source_key": "doid.obo", "side": "cause", "example": "mim:102300"}`
 * `{"source_key": "wikidata.wbapi", "side": "effect", "example": "Q19600530"}`
-* `{"source_key": "mondo.obo", "side": "effect", "example": "cl:0000492"}`
 
 ### `causal.self_loop` — claims whose cause is their effect (warn, 1 issues)
 
@@ -561,8 +556,8 @@ Examples:
 * `{"source_key": "carbonbrief.attribution", "claim_key": "ds:carbonbrief.attribution:carbonbrief.attribution_studies:cbattr:00d19c8ba50096775b358b34"}`
 * `{"source_key": "doid.obo", "claim_key": "ds:doid.obo:doid:DOID:0050425|RO:0004005|MIM:102300"}`
 * `{"source_key": "doid.obo", "claim_key": "ds:doid.obo:doid:DOID:0040001|RO:0001022|FOODON:00002239"}`
-* `{"source_key": "mondo.obo", "claim_key": "ds:mondo.obo:mondo:MONDO:0000009|RO:0004020|CL:0000233"}`
-* `{"source_key": "mondo.obo", "claim_key": "ds:mondo.obo:mondo:MONDO:0000004|RO:0004024|GO:0034651"}`
+* `{"source_key": "mondo.obo", "claim_key": "ds:mondo.obo:mondo:MONDO:0000009|RO:0004020|reva_state:dysfunction_of:cl:0000233"}`
+* `{"source_key": "mondo.obo", "claim_key": "ds:mondo.obo:mondo:MONDO:0000004|RO:0004024|reva_state:disruption_of:go:0034651"}`
 
 ### `causal.wording_leak_predicates` — causal-worded KG predicates read as a non-causal family (warn, 1 issues)
 
