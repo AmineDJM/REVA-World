@@ -26,6 +26,7 @@ import contextlib
 import json
 import logging
 import shutil
+import signal
 import time
 import uuid
 from collections.abc import AsyncIterator, Mapping, Sequence
@@ -761,6 +762,12 @@ async def run(
     linger: bool = False,
 ) -> dict[str, Any]:
     """One budget session (ends at the UTC day boundary, the cap, ``until`` or an empty frontier)."""
+    task = asyncio.current_task()
+    if task is not None:  # SIGTERM/SIGINT cancel the session cleanly: the ledger is settled in `finally`
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGTERM, signal.SIGINT):
+            with contextlib.suppress(NotImplementedError, RuntimeError, ValueError):
+                loop.add_signal_handler(sig, task.cancel)
     state = State()
     out: dict[str, Any] = {"started_at": datetime.now(UTC).isoformat(), "db": db}
     day = datetime.now(UTC).date()
@@ -811,7 +818,12 @@ async def run(
                         await hv.discover(pid, pages=int((discover_pages or {})[pid]))
                         pending_discovery.pop(0)
                     except RateLimited:
-                        continue
+                        # every 429 is a metered request: give a throttled listing up after 2 failed rounds
+                        d = state.data["discovery"].setdefault(pid, {"pages": 0, "hits": 0})
+                        d["rate_limited"] = int(d.get("rate_limited", 0)) + 1
+                        if d["rate_limited"] >= 2:
+                            pending_discovery.pop(0)
+                        state.save()
                     continue
                 if not batch and linger and until is not None and hv.wdqs_pending():
                     await asyncio.sleep(60)  # keep the session for the hourly WDQS attempt
