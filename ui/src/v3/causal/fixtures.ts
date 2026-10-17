@@ -367,6 +367,50 @@ export const CHAIN_SARAJEVO_VERSAILLES = envelope({
   search: { levels_expanded: 2, edges_scanned: 14, truncated: false, truncation_reasons: [], elapsed_ms: 3, time_budget_ms: 5000 },
 });
 
+/** A chain that crosses an identity hop: the same event recorded by two sources, joined by an evidenced same_as. */
+const WW1_OTHER_RECORD = { id: 'fixture:ww1_other_record', label: 'World War I (other dataset record)', label_fr: null, kind: 'war' };
+export const CHAIN_WITH_IDENTITY = envelope({
+  from: 'fixture:sarajevo_1914',
+  to: 'fixture:versailles',
+  found: true,
+  max_hops: 4,
+  min_grade: 'D',
+  paths: [
+    {
+      length: 2,
+      identity_hops: 1,
+      cross_source: true,
+      chain_grade: 'C',
+      weakest_hop: 2,
+      hops: [
+        { kind: 'claim', from: SARAJEVO, to: WW1, hop_grade: 'B', claims: [C_SARAJEVO] },
+        {
+          kind: 'identity',
+          from: WW1,
+          to: WW1_OTHER_RECORD,
+          relation: 'same_as',
+          same_as: [
+            {
+              left: 'Q361',
+              right: 'fixture:ww1_other_record',
+              statement_key: 'reva.events.same_as:fixture_rule:Q361=fixture:ww1_other_record',
+              rule: 'fixture_rule',
+              independent_sources: true,
+              evidence: { type: 'shared_identifier', property: 'fixture:war_number', value: '106' },
+            },
+          ],
+          note: 'An identity hop joins two records of the same event; it is not a causal claim.',
+        },
+        { kind: 'claim', from: WW1_OTHER_RECORD, to: VERSAILLES, hop_grade: 'C', claims: [E_VERSAILLES] },
+      ],
+      wording: 'Composition by REVA of 2 separately asserted claim(s); chain grade = weakest hop (C). It crosses 1 identity link(s).',
+    },
+  ],
+  note: 'composition by REVA of separately asserted claims; chain grade = weakest hop',
+  note_fr: 'composition par REVA d’affirmations causales énoncées séparément ; note de la chaîne = maillon le plus faible.',
+  search: { levels_expanded: 2, edges_scanned: 14, truncated: false, truncation_reasons: [], elapsed_ms: 3, time_budget_ms: 5000 },
+});
+
 export const CHAIN_NONE = envelope({
   from: { id: 'Q361', label: 'World War I', label_fr: 'Première Guerre mondiale', kind: 'war' },
   to: { id: 'fixture:unrelated', label: 'fixture:unrelated', label_fr: null, kind: null },

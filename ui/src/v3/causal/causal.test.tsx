@@ -168,6 +168,20 @@ describe('Causes & conséquences', () => {
     expect(call.url).toContain('to=fixture%3Aversailles');
   });
 
+  it('chain finder: an identity hop (same_as) is shown with its evidence, not counted as a causal hop', async () => {
+    mockFetch({ ...ROUTES, 'GET /v1/causal/chain': { body: F.CHAIN_WITH_IDENTITY } });
+    at('/v3/causes?event=Q361&de=fixture%3Asarajevo_1914&vers=fixture%3Aversailles');
+    const chain = await within(await screen.findByTestId('chain-finder')).findByTestId('causal-chain');
+    expect(within(chain).getAllByTestId('chain-hop')).toHaveLength(2);
+    const id = within(chain).getByTestId('chain-identity-hop');
+    expect(id).toHaveTextContent('même événement enregistré par deux sources');
+    expect(id).toHaveTextContent('ce n’est pas une affirmation causale');
+    expect(id).toHaveTextContent('fixture_rule');
+    expect(id).toHaveTextContent('fixture:war_number = 106');
+    expect(chain).toHaveTextContent('2 maillons · 1 lien(s) d’identité');
+    expect(within(chain).getAllByTestId('grade-badge')[0]).toHaveAttribute('data-grade', 'C');
+  });
+
   it('no chain is not "no causal link"', async () => {
     mockFetch({ ...ROUTES, 'GET /v1/causal/chain': { body: F.CHAIN_NONE } });
     at('/v3/causes?event=Q361&vers=fixture%3Aunrelated');

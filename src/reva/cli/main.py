@@ -28,6 +28,8 @@ causal_app = typer.Typer(no_args_is_help=True, help="V3 causality: sourced causa
 app.add_typer(causal_app, name="causal")
 kg_app = typer.Typer(no_args_is_help=True, help="V3 knowledge graph: governed imports")
 app.add_typer(kg_app, name="kg")
+events_app = typer.Typer(no_args_is_help=True, help="V3 events: evidence-based same_as identity links")
+app.add_typer(events_app, name="events")
 
 
 def _out(obj: Any) -> None:
@@ -631,6 +633,34 @@ def kg_import_harvest_cmd(
     from reva.kg.import_harvest import run
 
     _out(run(from_db, sources=tuple(sources), dry_run=dry_run, verify=not no_verify))
+
+
+# --------------------------------------------------------------------------- events (V3, SAMEAS)
+@events_app.command("same-as")
+def events_same_as_cmd(
+    origin: str = typer.Option("live", help="live or test_fixture"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="derive and report, write nothing"),
+) -> None:
+    """Derive `events:same_as` links from the evidence rules (registry/events/same_as_rules.yaml: shared
+    identifiers, provider crosswalks, evidenced mapping tables -- never name or date matching) and load them as KG
+    statements (worker credentials; links whose evidence disappeared are retracted). Then run `reva causal refresh`."""
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.events import same_as as sa
+    from reva.settings import get_settings
+
+    if origin not in ("live", "test_fixture"):
+        typer.echo("--origin must be live or test_fixture", err=True)
+        raise typer.Exit(2)
+    engine = make_engine("worker", get_settings())
+    with engine.connect() as conn:
+        report = sa.derive_links(conn, origin=origin)
+    out: dict[str, Any] = {"origin": origin, "derived": report.as_dict()}
+    if not dry_run:
+        out["loaded"] = sa.load_links(
+            engine, get_store(), report, origin=origin, rules_sha256=sa.rules_sha256()
+        ).as_dict()
+    _out({"status": "dry_run" if dry_run else "completed", **out})
 
 
 def main() -> None:  # pragma: no cover

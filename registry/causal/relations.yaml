@@ -90,6 +90,13 @@ relations:
     label: {en: "has coded outcome", fr: "a pour issue codée"}
     inverse_label: {en: "is the coded outcome of", fr: "est l'issue codée de"}
     wikidata: []
+# Relations never composed into causal chains nor counted in cycle detection (CAUSFIX, audit L6). A dataset's
+# "coded outcome" (ICB OUTCOM, MID outcome, UCDP termination outcome, NAVCO success/progress, TIES/EUSANCT
+# final outcome, COW war outcome) codes HOW the event ended, linked to an outcome record REVA keys under the
+# event (`<event>:outcome`): the codebooks define it as the event's result, not as a separate event that the
+# first one brought about. It stays a sourced T1 claim (family `cause` in storage, lane `coded`, worded "has
+# coded outcome"), but a chain never passes through it.
+chain_excluded: [coded_outcome]
 # Context edges: shown alongside causal claims, never counted, never worded causally.
 context:
   P361: {en: "part of", fr: "fait partie de"}

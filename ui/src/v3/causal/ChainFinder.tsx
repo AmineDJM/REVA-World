@@ -123,11 +123,19 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
       <ol className="v3-chain-list">
         {r.chains.map((ch, i) => {
           const grade = chainGrade(ch);
-          const hopsWeakest = weakestGrade(ch.hops.map(hopGrade).filter((g): g is NonNullable<typeof g> => g !== null));
+          const causalHops = ch.hops.filter((h) => !h.identity);
+          const identityHops = ch.hops.length - causalHops.length;
+          const hopsWeakest = weakestGrade(causalHops.map(hopGrade).filter((g): g is NonNullable<typeof g> => g !== null));
+          let n = 0;
           return (
             <li key={i} className="v3-causal-chain" data-testid="causal-chain">
               <h3>
-                Chaîne {i + 1} <span className="muted">· {ch.hops.length} maillon{ch.hops.length > 1 ? 's' : ''}</span> · force (maillon le plus faible) : <GradeBadge grade={grade} />
+                Chaîne {i + 1}{' '}
+                <span className="muted">
+                  · {causalHops.length} maillon{causalHops.length > 1 ? 's' : ''}
+                  {identityHops > 0 ? ` · ${identityHops} lien(s) d’identité` : ''}
+                </span>{' '}
+                · force (maillon le plus faible) : <GradeBadge grade={grade} />
                 {ch.serverGrade && hopsWeakest && ch.serverGrade !== hopsWeakest && (
                   <span className="v3-notice">
                     {' '}
@@ -136,10 +144,30 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
                 )}
               </h3>
               <ol className="v3-hops">
-                {ch.hops.map((h, j) => (
+                {ch.hops.map((h, j) =>
+                  h.identity ? (
+                    <li key={`${h.from.id}-${h.to.id}-${j}`} className="v3-hop v3-hop-identity" data-testid="chain-identity-hop">
+                      <p className="v3-hop-sentence">
+                        <span className="muted">Identité :</span> {h.from.label} <span className="v3-claim-arrow">≡</span> {h.to.label} · même événement enregistré par deux sources, relié par un lien{' '}
+                        <code>same_as</code> fondé sur une preuve (identifiant partagé ou table de correspondance du fournisseur, jamais par nom ou date) — ce n’est pas une affirmation causale ni
+                        un maillon.
+                      </p>
+                      <ul className="v3-plain">
+                        {h.identity.map((x) => (
+                          <li key={x.statementKey} className="muted">
+                            règle <code>{x.rule}</code>
+                            {x.evidenceType ? ` · preuve : ${x.evidenceType}` : ''}
+                            {typeof x.evidence.property === 'string' ? ` · ${x.evidence.property}` : ''}
+                            {typeof x.evidence.value === 'string' ? ` = ${x.evidence.value}` : ''}
+                            {x.independentSources === false ? ' · sources non indépendantes (comptées une fois)' : ''} · déclaration <code>{x.statementKey}</code>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ) : (
                   <li key={`${h.from.id}-${h.to.id}-${j}`} className="v3-hop" data-testid="chain-hop">
                     <p className="v3-hop-sentence">
-                      <span className="muted">Maillon {j + 1} :</span> {h.from.label} <span className="v3-claim-arrow">→</span> {h.to.label} · grade du maillon (meilleure affirmation) :{' '}
+                      <span className="muted">Maillon {(n += 1)} :</span> {h.from.label} <span className="v3-claim-arrow">→</span> {h.to.label} · grade du maillon (meilleure affirmation) :{' '}
                       <GradeBadge grade={hopGrade(h)} /> <span className="muted">· {h.claims.length} affirmation(s), chacune avec sa source</span>
                     </p>
                     <ul className="v3-plain">
@@ -150,7 +178,8 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
                       ))}
                     </ul>
                   </li>
-                ))}
+                  ),
+                )}
               </ol>
               {ch.wording && (
                 <details className="v3-hop-server">

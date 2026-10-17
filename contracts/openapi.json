@@ -4540,6 +4540,14 @@
             "title": "Paths Found",
             "type": "integer"
           },
+          "same_as": {
+            "description": "When from and to are the same event",
+            "items": {
+              "$ref": "#/components/schemas/SameAsLinkOut"
+            },
+            "title": "Same As",
+            "type": "array"
+          },
           "search": {
             "$ref": "#/components/schemas/ChainSearch"
           },
@@ -4556,6 +4564,7 @@
           "note",
           "note_fr",
           "not_found_reason",
+          "same_as",
           "search"
         ],
         "title": "CausalChain",
@@ -4835,6 +4844,19 @@
             ],
             "title": "Asserted On"
           },
+          "attribution": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who Wikidata records as making the claim (P3680 statement supported by), the nature qualifier (P5102) and the source's doubtful certainty codes; the wording names them (grading.yaml v2)",
+            "title": "Attribution"
+          },
           "cause": {
             "$ref": "#/components/schemas/CausalRef"
           },
@@ -4995,6 +5017,7 @@
           "qualifiers",
           "contests",
           "disputed_by",
+          "attribution",
           "grade",
           "review_status",
           "wording",
@@ -6668,26 +6691,78 @@
             "$ref": "#/components/schemas/CausalRef"
           },
           "hop_grade": {
-            "description": "Best grade among the claims asserting this hop",
-            "enum": [
-              "A",
-              "B",
-              "C",
-              "D",
-              "E"
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "E"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "title": "Hop Grade",
+            "description": "Best grade among the claims asserting this hop (claim hops)",
+            "title": "Hop Grade"
+          },
+          "kind": {
+            "default": "claim",
+            "description": "claim: a causal hop asserted by a source; identity: same event in two sources (same_as)",
+            "enum": [
+              "claim",
+              "identity"
+            ],
+            "title": "Kind",
             "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "relation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "same_as for an identity hop",
+            "title": "Relation"
+          },
+          "same_as": {
+            "description": "Identity evidence of an identity hop",
+            "items": {
+              "$ref": "#/components/schemas/SameAsLinkOut"
+            },
+            "title": "Same As",
+            "type": "array"
           },
           "to": {
             "$ref": "#/components/schemas/CausalRef"
           }
         },
         "required": [
+          "kind",
           "from",
           "to",
           "hop_grade",
-          "claims"
+          "claims",
+          "relation",
+          "same_as",
+          "note"
         ],
         "title": "ChainHop",
         "type": "object"
@@ -6707,6 +6782,12 @@
             "title": "Chain Grade",
             "type": "string"
           },
+          "cross_source": {
+            "default": false,
+            "description": "The claim hops are asserted by more than one source",
+            "title": "Cross Source",
+            "type": "boolean"
+          },
           "hops": {
             "items": {
               "$ref": "#/components/schemas/ChainHop"
@@ -6714,7 +6795,14 @@
             "title": "Hops",
             "type": "array"
           },
+          "identity_hops": {
+            "default": 0,
+            "description": "same_as identity hops crossed (not causal)",
+            "title": "Identity Hops",
+            "type": "integer"
+          },
           "length": {
+            "description": "Number of causal (claim) hops; identity hops are not counted",
             "title": "Length",
             "type": "integer"
           },
@@ -6733,6 +6821,8 @@
         },
         "required": [
           "length",
+          "identity_hops",
+          "cross_source",
           "chain_grade",
           "weakest_hop",
           "hops",
@@ -6771,6 +6861,12 @@
             "title": "Elapsed Ms",
             "type": "integer"
           },
+          "identity": {
+            "additionalProperties": true,
+            "description": "same_as links loaded for identity hops",
+            "title": "Identity",
+            "type": "object"
+          },
           "levels_expanded": {
             "title": "Levels Expanded",
             "type": "integer"
@@ -6794,6 +6890,12 @@
             "default": "",
             "title": "Node Rule",
             "type": "string"
+          },
+          "quarantined_skipped": {
+            "default": 0,
+            "description": "Edges not composed: cycle members, self-loops, attributed or nature-qualified claims",
+            "title": "Quarantined Skipped",
+            "type": "integer"
           },
           "time_budget_ms": {
             "title": "Time Budget Ms",
@@ -6822,9 +6924,11 @@
           "edges_scanned",
           "ungraded_skipped",
           "below_min_grade_skipped",
+          "quarantined_skipped",
           "class_nodes_skipped",
           "class_nodes_sample",
           "node_rule",
+          "identity",
           "truncated",
           "truncation_reasons",
           "time_budget_ms",
@@ -20581,6 +20685,57 @@
           "provenance"
         ],
         "title": "SameAs",
+        "type": "object"
+      },
+      "SameAsLinkOut": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "additionalProperties": true,
+            "description": "Shared identifier / provider crosswalk evidence, raw sha256",
+            "title": "Evidence",
+            "type": "object"
+          },
+          "independent_sources": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "False: one record derived from the other (count once)",
+            "title": "Independent Sources"
+          },
+          "left": {
+            "title": "Left",
+            "type": "string"
+          },
+          "right": {
+            "title": "Right",
+            "type": "string"
+          },
+          "rule": {
+            "description": "Rule of registry/events/same_as_rules.yaml",
+            "title": "Rule",
+            "type": "string"
+          },
+          "statement_key": {
+            "description": "The events:same_as KG statement",
+            "title": "Statement Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "left",
+          "right",
+          "statement_key",
+          "rule",
+          "independent_sources",
+          "evidence"
+        ],
+        "title": "SameAsLinkOut",
         "type": "object"
       },
       "Scenario": {

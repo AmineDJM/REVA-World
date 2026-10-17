@@ -1069,6 +1069,16 @@ class Composer:
         else:
             core = f"{effect} {EFFECT_SIDE[lang].get(c.relation, c.relation)} {cause}"
         selon = self.selon(c)
+        if getattr(c, "supported_by", ()):  # Wikidata records who makes the claim: never "according to Wikidata"
+            who = (" et " if fr else " and ").join(c.supported_by)
+            selon = (
+                f"{selon}, qui attribue cette affirmation à {who} (Wikidata ne l'affirme pas lui-même)"
+                if fr
+                else f"{selon}, which attributes this claim to {who} (Wikidata does not assert it itself)"
+            )
+        note = (getattr(c, "attribution_note", None) or {}).get(lang)
+        if note:
+            core = f"{core} ({note})"
         if c.stance == "denies":
             head = (
                 f"{selon[0].upper()}{selon[1:]}, il est faux que « {core} » (la source conteste ce lien)"

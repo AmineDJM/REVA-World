@@ -19,6 +19,7 @@ from reva.causal import grading as gr
 from reva.causal import identity as idn
 from reva.causal.model import _json, _new_load
 from reva.causal.temporal import DATE_PIDS, EventDates, claim_time_window, dates_from_rows, temporal_detail
+from reva.causal.vocab import vocabulary
 from reva.kernel.errors import ValidationProblem
 
 GRADER_SOURCE = "reva.causal.grader"
@@ -81,12 +82,45 @@ class Computed:
     inputs_sha256: str
 
 
+def _qualified(c: Mapping[str, Any]) -> tuple[bool, bool, bool]:
+    """(attributed P3680, nature-qualified P5102, source codes it doubtful) — audit H3 / H4, grading.yaml v2."""
+    q = c.get("qualifiers") or {}
+    validity = (c.get("scope") or {}).get("source_validity") or []
+    doubtful = any(isinstance(v, Mapping) and v.get("certainty") == "doubtful" for v in validity)
+    return bool(q.get(gr.SUPPORTED_BY_PID)), bool(q.get(gr.NATURE_OF_STATEMENT_PID)), doubtful
+
+
+def structural_flags(claims: Sequence[Mapping[str, Any]], excluded_relations: Iterable[str] = ()) -> dict[int, str]:
+    """``{claim row id: fact}`` for self-loops (``consistency.self_loop``) and for asserted causal claims whose
+    cause and effect lie in the same strongly connected component (``consistency.cycle``) — audit L7. Such claims
+    stay stored, graded and shown; chain composition does not traverse them."""
+    from reva.causal.graph import _sccs  # local import: graph imports this module
+
+    excl = set(excluded_relations)
+    out: dict[int, str] = {}
+    adj: dict[str, set[str]] = defaultdict(set)
+    for c in claims:
+        if c["cause_id"] == c["effect_id"]:
+            out[c["id"]] = "consistency.self_loop"
+        elif c["stance"] == "asserts" and c["family"] == "cause" and c.get("relation") not in excl:
+            adj[c["cause_id"]].add(c["effect_id"])
+    comps, _ = _sccs({k: sorted(v) for k, v in adj.items()}, time.perf_counter() + 60.0)
+    member = {x: i for i, comp in enumerate(comps) for x in comp}
+    for c in claims:
+        if c["id"] in out or c["stance"] != "asserts" or c["family"] != "cause" or c.get("relation") in excl:
+            continue
+        i = member.get(c["cause_id"])
+        if i is not None and member.get(c["effect_id"]) == i:
+            out[c["id"]] = "consistency.cycle"
+    return out
+
+
 def _notes(c: Mapping[str, Any], tdetail: Mapping[str, Any]) -> list[str]:
     """Explanatory fact ids (grading.yaml version 2): why a KG claim is T4 despite references, how time was read."""
     notes = []
     if c.get("statement_key") and c["source_tier"] == "T4" and c.get("refs"):
-        if gr.kg_tier(c["source_key"], c["refs"])[1] == "wikimedia_import_only":
-            notes.append("tier.T4.wikimedia_import_only")
+        if gr.kg_tier(c["source_key"], c["refs"])[1] == "non_source_references_only":
+            notes.append("tier.T4.non_source_references_only")
     if tdetail.get("entity_dated_by_inception"):
         notes.append("temporal.entity_dated_by_inception")
     if (tdetail.get("effect_time") or {}).get("kind") == "claim_time_qualifier":
@@ -106,6 +140,7 @@ def compute(
     are resolved to their clusters: two sources coding the same pair of events under their own record ids assert the
     same link. Records joined by a link declared not independent share a ``lineage:`` upstream key (count once)."""
     ident = identity if (identity is not None and rules.resolve_same_as) else None
+    flags = structural_flags(claims, vocabulary().chain_excluded)
 
     def canon(x: str) -> str:
         return ident.canon(x) if ident is not None else x
@@ -154,7 +189,23 @@ def compute(
         notes = _notes(c, tdetail)
         if via_identity:
             notes.append("corroboration.via_same_as")
-        g = gr.decide(gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested)), rules, notes)
+        attributed, nature, doubtful = _qualified(c)
+        notes += [
+            f
+            for f, on in (
+                ("attribution.supported_by", attributed),
+                ("nature.qualified", nature),
+                ("certainty.doubtful", doubtful),
+            )
+            if on
+        ]
+        if c["id"] in flags:
+            notes.append(flags[c["id"]])
+        g = gr.decide(
+            gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested), attributed, nature, doubtful),
+            rules,
+            notes,
+        )
         sha_inputs: dict[str, Any] = {
             "rules": [rules.version, rules.sha256],
             "claim": [c["id"], c["content_sha256"]],
@@ -164,6 +215,7 @@ def compute(
         }
         if via_identity:
             sha_inputs["identity"] = via_identity
+        sha_inputs["facts"] = list(g.rule_ids)
         sha = gr.inputs_sha256(sha_inputs)
         out.append(Computed(c["id"], c["claim_key"], g, tcheck, tdetail, corr, corroborating, contested, sha))
     return out
@@ -183,7 +235,7 @@ def grade_claims(engine: Engine, *, origin: str | None = None, rules: gr.Rules |
                 conn.execute(
                     text("""SELECT c.id, c.claim_key, c.cause_id, c.effect_id, c.family, c.stance, c.source_key,
                                    c.source_tier, c.upstream_keys, c.contests, c.disputed_by, c.content_sha256,
-                                   c.statement_key, c.refs, c.scope
+                                   c.statement_key, c.refs, c.scope, c.qualifiers, c.relation
                               FROM kg.causal_claim_current c WHERE c.origin = :o ORDER BY c.id LIMIT :cap"""),
                     {"o": o, "cap": MAX_CLAIMS_GRADED + 1},
                 )

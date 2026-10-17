@@ -118,8 +118,9 @@ export function hopGrade(h: { claims: { grade: Grade | null }[]; serverGrade: Gr
  * Grade of a chain: its weakest hop. A summary grade sent by the server can only make it weaker, never
  * stronger; a hop without any graded claim makes the chain ungradable (null).
  */
-export function chainGrade(ch: { hops: { claims: { grade: Grade | null }[]; serverGrade: Grade | null }[]; serverGrade: Grade | null }): Grade | null {
-  const hops = ch.hops.map(hopGrade);
+export function chainGrade(ch: { hops: { claims: { grade: Grade | null }[]; serverGrade: Grade | null; identity?: unknown[] | null }[]; serverGrade: Grade | null }): Grade | null {
+  // identity hops (same event in two sources, same_as) are not causal hops: they carry no grade
+  const hops = ch.hops.filter((h) => !h.identity).map(hopGrade);
   if (hops.length === 0 || hops.some((g) => g === null)) return null;
   return weakestGrade(graded([...hops, ch.serverGrade]));
 }

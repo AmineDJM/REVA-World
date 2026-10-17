@@ -430,6 +430,10 @@ class CausalClaim:
     contested_by: tuple[str, ...] = ()
     review_status: str | None = None
     origin: str | None = None
+    #: who Wikidata records as making the claim (P3680) — labels; the answer names them (audit H3)
+    supported_by: tuple[str, ...] = ()
+    #: nature-of-statement / doubtful-certainty note from CAUSCORE's ``attribution`` (``{"en": ..., "fr": ...}``)
+    attribution_note: Mapping[str, str] = field(default_factory=dict)
 
     def cause_label(self, lang: str) -> str:
         return pick_label(self.cause_labels, lang, self.cause_id)

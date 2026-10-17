@@ -519,12 +519,28 @@ export async function getCausalWhy(id: string, signal?: AbortSignal): Promise<Wh
 
 // ------------------------------------------------------------------ chain
 
-/** One hop of a chain: from → to, asserted by one or more claims (each with its own source and grade). */
+/** Evidence of an identity hop: one `events:same_as` statement (shared identifier or provider crosswalk). */
+export interface SameAsEvidence {
+  left: string;
+  right: string;
+  rule: string;
+  statementKey: string;
+  independentSources: boolean | null;
+  evidenceType: string | null;
+  evidence: Record<string, unknown>;
+}
+
+/**
+ * One hop of a chain: from → to, asserted by one or more claims (each with its own source and grade) — or an
+ * identity hop (`identity` set, no claims): two records of the same event in two sources, joined by an evidenced
+ * same_as link; not a causal claim and not counted as a hop.
+ */
 export interface ChainHop {
   from: NodeRef;
   to: NodeRef;
   claims: CausalClaim[];
   serverGrade: Grade | null;
+  identity?: SameAsEvidence[] | null;
 }
 
 export interface ChainView {
@@ -555,6 +571,22 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
     const hopsRaw = (Array.isArray(c) ? c : Array.isArray(co.hops) ? co.hops : Array.isArray(co.claims) ? co.claims : []) as unknown[];
     const hops: ChainHop[] = hopsRaw.map((h, j) => {
       const hr: Rec = isRec(h) ? h : {};
+      if (hr.kind === 'identity') {
+        // same event in two sources (evidenced same_as): no claim, no grade, shown with its evidence
+        const identity = (Array.isArray(hr.same_as) ? hr.same_as : []).filter(isRec).map((x) => {
+          const ev: Rec = isRec(x.evidence) ? x.evidence : {};
+          return {
+            left: String(x.left ?? ''),
+            right: String(x.right ?? ''),
+            rule: String(x.rule ?? ''),
+            statementKey: String(x.statement_key ?? ''),
+            independentSources: typeof x.independent_sources === 'boolean' ? x.independent_sources : null,
+            evidenceType: optStr(ev.type),
+            evidence: ev,
+          };
+        });
+        return { from: nodeRefOf(hr.from), to: nodeRefOf(hr.to), claims: [], serverGrade: null, identity };
+      }
       // a hop holding its claims (CAUSCORE), or a hop that is itself a claim
       const claims = parseWith(ClaimList, Array.isArray(hr.claims) ? hr.claims : [isRec(hr.claim) ? hr.claim : h], `${path} (chaîne ${i + 1}, maillon ${j + 1})`);
       const first = claims[0];

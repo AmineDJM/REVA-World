@@ -11,9 +11,25 @@
 #   1  (2026-10-16, CAUSCORE) initial table.
 #   2  (2026-10-17, CAUSFIX, findings of the Wikidata causal harvest docs/dev/v3_causwd.md; report
 #      docs/dev/v3_causfix.md):
-#      * tier: a reference made only of "imported from Wikimedia project" (P143) / "Wikimedia import URL"
-#        (P4656) snaks (and P813 retrieval dates) is a pointer to another wiki, not a source -> T4, with the
-#        fact rule tier.T4.wikimedia_import_only (reva.causal.grading.kg_tier; was T3).
+#      * tier (audit H1, docs/dev/review_v3_causal_audit.md): a reference made only of non-source snaks —
+#        "imported from Wikimedia project" (P143), "Wikimedia import URL" (P4656), "inferred from" (P3452),
+#        "based on heuristic" (P887), plus P813 retrieval dates — is a pointer, not a source -> T4, with the fact
+#        rule tier.T4.non_source_references_only (reva.causal.grading.NON_SOURCE_REF_PIDS / kg_tier; was T3).
+#      * corroboration (audit H2): such a reference's upstream key is `community:<source root>` (the editing
+#        community, never independent; was imported_from:<Q> / refhash); a verbatim quotation (P1683) is keyed
+#        `quote:<sha of the text>`, so two references quoting the same text count once.
+#      * attribution (audit H3): a claim qualified "statement supported by" (P3680) is asserted by that party,
+#        not by Wikidata (rule grade.D.attributed, fact attribution.supported_by; the wording names the party);
+#        a "nature of statement" (P5102) qualifier (allegedly, hypothetically, rarely ...: values kept verbatim
+#        and shown, not interpreted) caps the claim likewise (grade.D.nature_qualified, fact nature.qualified).
+#        Both are kept out of chain composition.
+#      * certainty (audit H4): a claim whose source codes the event or link as doubtful (scope.source_validity[]
+#        entry with certainty: doubtful — generic interface declared by AUDFIX, docs/dev/v3_audfix.md; e.g. NCEI
+#        tsunami validity 0-2, cause code 2) is graded D (grade.D.source_doubtful, fact certainty.doubtful).
+#      * structure (audit L7): self-loops (consistency.self_loop) and claims inside a causal cycle
+#        (consistency.cycle, strongly connected component of the asserted causal graph of the origin) carry a
+#        fact; their grade is unchanged, chain composition does not traverse them. Relations listed in
+#        relations.yaml `chain_excluded` (coded_outcome, audit L6) are neither traversed nor cycle-checked.
 #      * tier: WDQS rows (source key wikidata.wdqs) were read without their references: "references unknown",
 #        not "unreferenced". The loader defers them (no claim, no tier invented; ClaimLoadReport.deferred_counts
 #        ["references_unknown"]) until an entity snapshot of the statement (wikidata.wbapi) is loaded.
@@ -38,6 +54,9 @@
 #   temporal_check  consistent | overlapping | inconsistent | undetermined
 #   corroborated    corroboration >= corroborated_min (independent source groups, the claim's own included)
 #   contested       a denying claim, an explicit `contests`, or a source qualifier (P1310 statement disputed by)
+#   attributed      a P3680 "statement supported by" qualifier (version 2)
+#   nature_qualified a P5102 "nature of statement" qualifier (version 2)
+#   doubtful        scope.source_validity has an entry with certainty: doubtful (version 2)
 version: "2"
 corroborated_min: 2
 
@@ -63,6 +82,24 @@ rules:
     reason:
       en: "The claim is contested by a source and not corroborated by an independent one."
       fr: "L'affirmation est contestée par une source et n'est pas corroborée par une source indépendante."
+  - id: grade.D.attributed
+    grade: D
+    when: {attributed: true}
+    reason:
+      en: "Wikidata records this claim as made by a named party (P3680 statement supported by): it is that party's assertion, not a sourced finding."
+      fr: "Wikidata indique que cette affirmation est le fait d'une partie nommée (P3680 déclaration soutenue par) : c'est l'affirmation de cette partie, pas un constat sourcé."
+  - id: grade.D.nature_qualified
+    grade: D
+    when: {nature_qualified: true}
+    reason:
+      en: "Wikidata qualifies the nature of this statement (P5102: e.g. alleged, hypothetical, rare); REVA does not grade it above D."
+      fr: "Wikidata qualifie la nature de cette déclaration (P5102 : par ex. allégation, hypothèse, rareté) ; REVA ne la note pas au-dessus de D."
+  - id: grade.D.source_doubtful
+    grade: D
+    when: {doubtful: true}
+    reason:
+      en: "The source itself codes the event or the link as doubtful (its own validity / certainty code)."
+      fr: "La source elle-même code l'événement ou le lien comme douteux (son propre code de validité / certitude)."
   - id: grade.A.expert_consistent_corroborated
     grade: A
     when: {tier: [T1, T2], temporal_check: [consistent], corroborated: true}
@@ -108,9 +145,9 @@ facts:
   tier.T4:
     en: "Tier T4: Wikidata causal statement without a source reference."
     fr: "Niveau T4 : déclaration causale Wikidata sans référence à une source."
-  tier.T4.wikimedia_import_only:
-    en: "Its only references say it was imported from a Wikimedia project (P143 / P4656): a pointer to another wiki, not a source."
-    fr: "Ses seules références indiquent une importation depuis un projet Wikimedia (P143 / P4656) : un renvoi vers un autre wiki, pas une source."
+  tier.T4.non_source_references_only:
+    en: "Its only references are pointers, not sources: imported from a Wikimedia project (P143 / P4656), inferred from another item (P3452) or based on a heuristic (P887)."
+    fr: "Ses seules références sont des renvois, pas des sources : importation depuis un projet Wikimedia (P143 / P4656), inférence depuis un autre élément (P3452) ou heuristique (P887)."
   temporal.consistent:
     en: "The cause starts before the effect, beyond date precision."
     fr: "La cause commence avant l'effet, au-delà de la précision des dates."
@@ -138,6 +175,21 @@ facts:
   corroboration.via_same_as:
     en: "Corroboration counted a claim made about another record of the same events, joined by an evidenced same_as link (shared identifier or provider crosswalk, never name or date matching)."
     fr: "La corroboration compte une affirmation portant sur un autre enregistrement des mêmes événements, relié par un lien same_as fondé sur une preuve (identifiant partagé ou table de correspondance du fournisseur, jamais par nom ou date)."
+  attribution.supported_by:
+    en: "Wikidata names who makes this claim (P3680 statement supported by); Wikidata does not assert it itself."
+    fr: "Wikidata nomme l'auteur de cette affirmation (P3680 déclaration soutenue par) ; Wikidata ne l'affirme pas lui-même."
+  nature.qualified:
+    en: "Wikidata qualifies the nature of this statement (P5102); the qualifier is shown verbatim."
+    fr: "Wikidata qualifie la nature de cette déclaration (P5102) ; le qualificatif est montré tel quel."
+  certainty.doubtful:
+    en: "The source codes the event or the link as doubtful; its code and label are shown."
+    fr: "La source code l'événement ou le lien comme douteux ; son code et son libellé sont montrés."
+  consistency.self_loop:
+    en: "The claim says an item causes itself (self-loop): reported in the consistency report, never composed into a chain."
+    fr: "L'affirmation dit qu'un élément se cause lui-même (boucle) : signalée dans le rapport de cohérence, jamais composée dans une chaîne."
+  consistency.cycle:
+    en: "The claim lies on a causal cycle asserted by the sources: reported, kept, and never composed into a chain."
+    fr: "L'affirmation fait partie d'un cycle causal affirmé par les sources : signalée, conservée, jamais composée dans une chaîne."
   contest.none:
     en: "No source contests this claim."
     fr: "Aucune source ne conteste cette affirmation."

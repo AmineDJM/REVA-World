@@ -24,6 +24,7 @@ from typing import Any
 from sqlalchemy import Connection, text
 
 from reva.causal import grading as gr
+from reva.causal import identity as idn
 from reva.causal.grader import fetch_event_dates
 from reva.causal.vocab import FAMILIES, LANES, RELATIONS, Vocabulary, vocabulary
 from reva.kernel.errors import ValidationProblem
@@ -119,8 +120,60 @@ def _name(ref: Mapping[str, Any], lang: str = "en") -> str:
     return str((ref.get("label_fr") if lang == "fr" else None) or ref["label"])
 
 
+def _qual_items(r: Mapping[str, Any], pid: str) -> list[str]:
+    vals = (r.get("qualifiers") or {}).get(pid) or []
+    out = []
+    for x in vals if isinstance(vals, list) else [vals]:
+        q = gr._item(x)
+        if q and QID_RE.match(q):
+            out.append(q)
+    return out
+
+
+def _and(names: Sequence[str], fr: bool) -> str:
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + (" et " if fr else " and ") + names[-1]
+
+
+def attribution_of(r: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]]) -> dict[str, Any] | None:
+    """Who Wikidata says makes the claim (P3680 statement supported by), how it qualifies it (P5102 nature of
+    statement), and the source's own doubtful certainty codes (``scope.source_validity``) — audit H3 / H4. ``None``
+    when the claim carries none of them."""
+    sup, nat = _qual_items(r, gr.SUPPORTED_BY_PID), _qual_items(r, gr.NATURE_OF_STATEMENT_PID)
+    validity = [
+        x for x in (r.get("scope") or {}).get("source_validity") or [] if isinstance(x, Mapping) and x.get("certainty")
+    ]
+    doubtful = [x for x in validity if x.get("certainty") == "doubtful"]
+    if not (sup or nat or doubtful):
+        return None
+    sup_refs, nat_refs = [_ref(q, labels, {}) for q in sup], [_ref(q, labels, {}) for q in nat]
+    en, fr = [], []
+    if nat_refs:
+        en.append("Wikidata qualifies the nature of this statement as: " + _and([x["label"] for x in nat_refs], False))
+        fr.append(
+            "Wikidata qualifie la nature de cette déclaration : "
+            + _and([x["label_fr"] or x["label"] for x in nat_refs], True)
+        )
+    for x in doubtful:
+        code = f"{x.get('field')} = {x.get('code')}"
+        en.append(f"the source codes it as doubtful: {x.get('label')} ({code})")
+        fr.append(f"la source le code comme douteux : {x.get('label')} ({code})")
+    return {
+        "supported_by": sup_refs,
+        "nature_of_statement": nat_refs,
+        "source_validity": validity,
+        "note_en": "; ".join(en) or None,
+        "note_fr": " ; ".join(fr) or None,
+    }
+
+
 def _wording(
-    r: Mapping[str, Any], cause: Mapping[str, Any], effect: Mapping[str, Any], v: Vocabulary
+    r: Mapping[str, Any],
+    cause: Mapping[str, Any],
+    effect: Mapping[str, Any],
+    v: Vocabulary,
+    attribution: Mapping[str, Any] | None = None,
 ) -> tuple[str, str]:
     rel = v.relation(r["relation"])
     src, ref, ref_fr = _source_name(r["source_key"]), _source_ref(r), _source_ref(r, "fr")
@@ -131,14 +184,27 @@ def _wording(
     else:
         en = f"{_name(cause)} {rel.label_en} {_name(effect)}"
         fr = f"{_name(cause, 'fr')} {rel.label_fr} {_name(effect, 'fr')}"
+    att = attribution or {}
+    note_en = f" ({att['note_en']})" if att.get("note_en") else ""
+    note_fr = f" ({att['note_fr']})" if att.get("note_fr") else ""
+    if att.get("supported_by"):
+        who_en = _and([x["label"] for x in att["supported_by"]], False)
+        who_fr = _and([x["label_fr"] or x["label"] for x in att["supported_by"]], True)
+        verb_en, verb_fr = ("denies", "nie") if r["stance"] == "denies" else ("asserts", "affirme")
+        return (
+            f"{src} ({ref}) records that {who_en} {verb_en} that {en}{note_en}; {src} does not assert it itself, "
+            "and REVA does not establish causation.",
+            f"{src} ({ref_fr}) indique que {who_fr} {verb_fr} que : {fr}{note_fr} ; {src} ne l'affirme pas lui-même et "
+            "REVA n'établit pas de causalité.",
+        )
     if r["stance"] == "denies":
         return (
-            f"{src} ({ref}) denies that {en}; REVA does not settle the disagreement.",
-            f"{src} ({ref_fr}) nie que : {fr} ; REVA ne tranche pas le désaccord.",
+            f"{src} ({ref}) denies that {en}{note_en}; REVA does not settle the disagreement.",
+            f"{src} ({ref_fr}) nie que : {fr}{note_fr} ; REVA ne tranche pas le désaccord.",
         )
     return (
-        f"According to {src} ({ref}), {en}; REVA does not establish causation.",
-        f"Selon {src} ({ref_fr}), {fr} ; REVA n'établit pas de causalité.",
+        f"According to {src} ({ref}), {en}{note_en}; REVA does not establish causation.",
+        f"Selon {src} ({ref_fr}), {fr}{note_fr} ; REVA n'établit pas de causalité.",
     )
 
 
@@ -183,7 +249,8 @@ def claim_out(
 ) -> dict[str, Any]:
     rel = v.relation(r["relation"])
     cause, effect = _ref(r["cause_id"], labels, kinds), _ref(r["effect_id"], labels, kinds)
-    en, fr = _wording(r, cause, effect, v)
+    attribution = attribution_of(r, labels)
+    en, fr = _wording(r, cause, effect, v, attribution)
     verification, _, _ = verification_of(r["source_key"], r["qualifiers"])
     return {
         "claim_key": r["claim_key"],
@@ -219,6 +286,7 @@ def claim_out(
         "qualifiers": r["qualifiers"],
         "contests": list(r["contests"] or []),
         "disputed_by": r["disputed_by"],
+        "attribution": attribution,
         "grade": _grade_out(r, rules),
         "review_status": r["review_status"],
         "wording": en,
@@ -279,6 +347,7 @@ def _claims(
 
 def _render(conn: Connection, rows: Sequence[Mapping[str, Any]], extra_ids: Iterable[str] = ()) -> list[dict[str, Any]]:
     ids = {r["cause_id"] for r in rows} | {r["effect_id"] for r in rows} | set(extra_ids)
+    ids |= {q for r in rows for p in (gr.SUPPORTED_BY_PID, gr.NATURE_OF_STATEMENT_PID) for q in _qual_items(r, p)}
     labels, kinds = labels_for(conn, ids), kinds_for(conn, ids)
     v, rules = vocabulary(), gr.load_rules()
     return [claim_out(r, labels, kinds, v, rules) for r in rows]
@@ -452,17 +521,28 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
 # ---------------------------------------------------------------------------------------------- chain
 def _edges(
     conn: Connection, nodes: Sequence[str], *, forward: bool, origin: str | None, cap: int
-) -> tuple[list[tuple[str, str, str | None]], bool]:
+) -> tuple[list[tuple[str, str, str | None, bool]], bool]:
+    """Causal edges out of (forward) / into ``nodes``: (cause, effect, grade, quarantined). Relations excluded from
+    chains (relations.yaml ``chain_excluded``) and self-loops are not returned; ``quarantined`` marks a claim whose
+    grade carries a chain-quarantine fact (cycle member, attributed or nature-qualified statement)."""
     col = "cause_id" if forward else "effect_id"
     rows = conn.execute(
-        text(f"""SELECT DISTINCT c.cause_id, c.effect_id, g.grade
+        text(f"""SELECT DISTINCT c.cause_id, c.effect_id, g.grade,
+                        COALESCE(g.rule_ids && CAST(:qf AS text[]), false) AS quarantined
                    FROM kg.causal_claim_current c LEFT JOIN kg.causal_grade_current g ON g.claim_row_id = c.id
                   WHERE c.{col} = ANY(:n) AND c.stance = 'asserts' AND c.family = 'cause'
+                    AND c.relation <> ALL(CAST(:nx AS text[]))
                     AND c.cause_id <> c.effect_id{" AND c.origin = :origin" if origin else ""}
                   LIMIT :cap"""),
-        {"n": list(nodes), "origin": origin, "cap": cap + 1},
+        {
+            "n": list(nodes),
+            "origin": origin,
+            "cap": cap + 1,
+            "qf": list(gr.CHAIN_QUARANTINE_FACTS),
+            "nx": sorted(vocabulary().chain_excluded),
+        },
     ).all()
-    return [(a, b, g) for a, b, g in rows[:cap]], len(rows) > cap
+    return [(a, b, g, bool(q)) for a, b, g, q in rows[:cap]], len(rows) > cap
 
 
 CLASS_NODE_RULE = (
@@ -529,6 +609,7 @@ def chain(
         "edges_scanned": 0,
         "ungraded_skipped": 0,
         "below_min_grade_skipped": 0,
+        "quarantined_skipped": 0,
         "class_nodes_skipped": 0,
         "class_nodes_sample": [],
         "node_rule": CLASS_NODE_RULE,
@@ -540,6 +621,42 @@ def chain(
     meet: set[str] = set()
     is_class: dict[str, bool] = {}
     skipped_classes: set[str] = set()
+    # Identity hops: records of the same event joined by evidenced same_as links (reva.causal.identity) are
+    # crossed at no causal cost, so a chain can continue from one source's record of an event to another's.
+    ident = idn.load(conn, origin=origin)
+    id_pred: tuple[dict[str, str], dict[str, str]] = ({}, {})
+    search["identity"] = {
+        "same_as_links_loaded": len(ident.links),
+        "identity_hops_note": IDENTITY_HOP_NOTE,
+    }
+    if ident.canon(frm) == ident.canon(to):
+        lab = labels_for(conn, {frm, to})
+        return {
+            "from": _ref(frm, lab, {}),
+            "to": _ref(to, lab, {}),
+            "found": False,
+            "paths": [],
+            "note": CHAIN_NOTE,
+            "note_fr": CHAIN_NOTE_FR,
+            "not_found_reason": "from and to are records of the same event (evidenced same_as link)",
+            "same_as": [x.as_dict() for x in ident.links_of(frm) if to in (x.left, x.right)],
+            "search": search,
+        }
+
+    def close(side: int, nodes: Iterable[str], d: int) -> set[str]:
+        """Add the same_as cluster members of ``nodes`` at distance ``d`` (identity predecessor recorded)."""
+        added: set[str] = set()
+        for n in sorted(nodes):
+            for m in ident.members(n):
+                if m not in dist[side]:
+                    dist[side][m] = d
+                    id_pred[side][m] = n
+                    added.add(m)
+        return added
+
+    close(0, [frm], 0)
+    close(1, [to], 0)
+    frontier = (set(dist[0]), set(dist[1]))
     while depth[0] + depth[1] < max_hops and frontier[0] and frontier[1]:
         if time.perf_counter() - t0 > time_budget_s:
             search["truncated"] = True
@@ -560,9 +677,11 @@ def chain(
         d = depth[side]
         nxt: set[str] = set()
         usable: set[tuple[str, str]] = set()
-        for a, b, g in edges:
+        for a, b, g, quarantined in edges:
             if g is None:
                 search["ungraded_skipped"] += 1
+            elif quarantined:
+                search["quarantined_skipped"] += 1
             elif g not in allowed:
                 search["below_min_grade_skipped"] += 1
             else:
@@ -580,6 +699,7 @@ def chain(
                 nxt.add(w)
             if dist[side][w] == d + 1:
                 links[side][w].add(u)
+        nxt |= close(side, nxt, d + 1)
         depth[side] += 1
         frontier = (nxt, frontier[1]) if side == 0 else (frontier[0], nxt)
         common = set(dist[0]) & set(dist[1])
@@ -596,6 +716,8 @@ def chain(
         reason = "no causal chain within max_hops among claims graded at least " + min_grade
         if search["truncated"] or search["ungraded_skipped"] or search["below_min_grade_skipped"]:
             reason += " (bounds, ungraded claims or the grade filter may hide one)"
+        if search["quarantined_skipped"]:
+            reason += " (claims in cycles, self-loops, or attributed/qualified by Wikidata are not composed)"
         if skipped_classes:
             reason += f" ({len(skipped_classes)} class node(s) were not traversed)"
         return {
@@ -611,14 +733,18 @@ def chain(
 
     # enumerate minimal paths through the meeting nodes (bounded)
     def walk(node: str, side: int) -> list[list[str]]:
+        root = frm if side == 0 else to
         out: list[list[str]] = []
         stack: list[tuple[str, list[str]]] = [(node, [node])]
         while stack and len(out) < MAX_PATH_CANDIDATES:
             n, acc = stack.pop()
-            if dist[side][n] == 0:
+            if n == root:
                 out.append(acc)
                 continue
-            for p in sorted(links[side][n], reverse=True):
+            preds = set(links[side][n])
+            if n in id_pred[side]:
+                preds.add(id_pred[side][n])
+            for p in sorted(preds - set(acc), reverse=True):
                 stack.append((p, [*acc, p]))
         return out
 
@@ -632,7 +758,11 @@ def chain(
     if len(paths) >= MAX_PATH_CANDIDATES:
         search["truncated"] = True
         search["truncation_reasons"].append(f"path enumeration capped at {MAX_PATH_CANDIDATES}")
-    pairs = sorted({(p[i], p[i + 1]) for p in paths for i in range(len(p) - 1)})
+
+    def same_event(a: str, b: str) -> bool:
+        return a != b and ident.canon(a) == ident.canon(b)
+
+    pairs = sorted({(p[i], p[i + 1]) for p in paths for i in range(len(p) - 1) if not same_event(p[i], p[i + 1])})
     rows = (
         conn.execute(
             text(f"""SELECT {_CLAIM_SELECT}
@@ -641,9 +771,17 @@ def chain(
                        JOIN unnest(CAST(:a AS text[]), CAST(:b AS text[])) AS h(cause_id, effect_id)
                          ON h.cause_id = c.cause_id AND h.effect_id = c.effect_id
                       WHERE c.stance = 'asserts' AND c.family = 'cause' AND g.grade = ANY(:grades)
+                        AND NOT (g.rule_ids && CAST(:qf AS text[])) AND c.relation <> ALL(CAST(:nx AS text[]))
                             {" AND c.origin = :origin" if origin else ""}
                       ORDER BY {_GRADE_ORDER}, c.id"""),
-            {"a": [p[0] for p in pairs], "b": [p[1] for p in pairs], "grades": sorted(allowed), "origin": origin},
+            {
+                "a": [p[0] for p in pairs],
+                "b": [p[1] for p in pairs],
+                "grades": sorted(allowed),
+                "origin": origin,
+                "qf": list(gr.CHAIN_QUARANTINE_FACTS),
+                "nx": sorted(vocabulary().chain_excluded),
+            },
         )
         .mappings()
         .all()
@@ -657,11 +795,15 @@ def chain(
     for p in paths:
         hops: list[dict[str, Any]] = []
         for i in range(len(p) - 1):
+            if same_event(p[i], p[i + 1]):
+                hops.append(_identity_hop(p[i], p[i + 1], ident, labels, kinds))
+                continue
             cl = by_pair.get((p[i], p[i + 1]), [])
             if not cl:
                 break
             hops.append(
                 {
+                    "kind": "claim",
                     "from": _ref(p[i], labels, kinds),
                     "to": _ref(p[i + 1], labels, kinds),
                     "hop_grade": gr.best(c["grade"]["grade"] for c in cl),
@@ -670,20 +812,40 @@ def chain(
             )
         if len(hops) != len(p) - 1:
             continue  # a claim changed between the search and the read
-        grades: list[str] = [h["hop_grade"] for h in hops]
+        causal = [h for h in hops if h["kind"] == "claim"]
+        if not causal:
+            continue
+        grades: list[str] = [h["hop_grade"] for h in causal]
         cg = gr.weakest(grades)
+        n_id = len(hops) - len(causal)
+        sources = sorted({c["source"]["source_key"] for h in causal for c in h["claims"]})
+        id_en = (
+            f" It crosses {n_id} identity link(s): records of the same event in two sources, joined by an evidenced "
+            "same_as link (shown with its evidence) -- an identity, not a causal claim."
+            if n_id
+            else ""
+        )
+        id_fr = (
+            f" Elle traverse {n_id} lien(s) d'identité : enregistrements du même événement dans deux sources, reliés "
+            "par un lien same_as fondé sur une preuve (montrée) -- une identité, pas une affirmation causale."
+            if n_id
+            else ""
+        )
         built.append(
             (
                 (gr.GRADES.index(cg), sum(gr.GRADES.index(g) for g in grades), p),
                 {
-                    "length": len(hops),
+                    "length": len(causal),
+                    "identity_hops": n_id,
+                    "cross_source": len(sources) > 1,
                     "chain_grade": cg,
-                    "weakest_hop": grades.index(cg),
+                    "weakest_hop": hops.index(causal[grades.index(cg)]),
                     "hops": hops,
-                    "wording": f"Composition by REVA of {len(hops)} separately asserted claim(s); chain grade = "
-                    f"weakest hop ({cg}). Each hop is asserted by its own source; REVA does not assert the chain.",
-                    "wording_fr": f"Composition par REVA de {len(hops)} affirmation(s) énoncée(s) séparément ; note de "
-                    f"la chaîne = maillon le plus faible ({cg}). REVA n'affirme pas la chaîne.",
+                    "wording": f"Composition by REVA of {len(causal)} separately asserted claim(s); chain grade = "
+                    f"weakest hop ({cg}). Each hop is asserted by its own source; REVA does not assert the chain."
+                    + id_en,
+                    "wording_fr": f"Composition par REVA de {len(causal)} affirmation(s) énoncée(s) séparément ; note "
+                    f"de la chaîne = maillon le plus faible ({cg}). REVA n'affirme pas la chaîne." + id_fr,
                 },
             )
         )
@@ -699,6 +861,29 @@ def chain(
         "note_fr": CHAIN_NOTE_FR,
         "not_found_reason": None if built else "claims changed during the search",
         "search": search,
+    }
+
+
+IDENTITY_HOP_NOTE = (
+    "An identity hop joins two records of the same event (an evidenced events:same_as link: shared identifier or "
+    "provider crosswalk, never name or date matching); it is not a causal claim and adds no causal hop."
+)
+
+
+def _identity_hop(
+    a: str, b: str, ident: idn.Identity, labels: Mapping[str, Mapping[str, str]], kinds: Mapping[str, str]
+) -> dict[str, Any]:
+    """An identity hop of a chain: the same_as links between ``a`` and ``b`` (direct, else the cluster's links)."""
+    direct = [x for x in ident.links if {x.left, x.right} == {a, b}]
+    members = set(ident.members(a))
+    used = direct or [x for x in ident.links if x.left in members and x.right in members]
+    return {
+        "kind": "identity",
+        "from": _ref(a, labels, kinds),
+        "to": _ref(b, labels, kinds),
+        "relation": "same_as",
+        "same_as": [x.as_dict() for x in used],
+        "note": IDENTITY_HOP_NOTE,
     }
 
 

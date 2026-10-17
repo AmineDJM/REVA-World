@@ -114,6 +114,11 @@ class CausalClaim(s.ApiModel):
     qualifiers: dict[str, Any]
     contests: list[str]
     disputed_by: list[dict[str, Any]]
+    attribution: dict[str, Any] | None = Field(
+        None,
+        description="Who Wikidata records as making the claim (P3680 statement supported by), the nature qualifier"
+        " (P5102) and the source's doubtful certainty codes; the wording names them (grading.yaml v2)",
+    )
     grade: CausalGrade | None = Field(description="Null until the grader has run on this claim row")
     review_status: str = Field(description="unreviewed until a maintainer review (agents cannot record reviews)")
     wording: str
@@ -192,15 +197,32 @@ class CausalWhyResponse(s.Envelope):
     data: CausalWhy
 
 
+class SameAsLinkOut(s.ApiModel):
+    left: str
+    right: str
+    statement_key: str = Field(description="The events:same_as KG statement")
+    rule: str = Field(description="Rule of registry/events/same_as_rules.yaml")
+    independent_sources: bool | None = Field(description="False: one record derived from the other (count once)")
+    evidence: dict[str, Any] = Field(description="Shared identifier / provider crosswalk evidence, raw sha256")
+
+
 class ChainHop(s.ApiModel):
+    kind: Literal["claim", "identity"] = Field(
+        "claim", description="claim: a causal hop asserted by a source; identity: same event in two sources (same_as)"
+    )
     from_: CausalRef = Field(alias="from")
     to: CausalRef
-    hop_grade: Grade = Field(description="Best grade among the claims asserting this hop")
-    claims: list[CausalClaim]
+    hop_grade: Grade | None = Field(None, description="Best grade among the claims asserting this hop (claim hops)")
+    claims: list[CausalClaim] = Field(default_factory=list)
+    relation: str | None = Field(None, description="same_as for an identity hop")
+    same_as: list[SameAsLinkOut] = Field(default_factory=list, description="Identity evidence of an identity hop")
+    note: str | None = None
 
 
 class ChainPath(s.ApiModel):
-    length: int
+    length: int = Field(description="Number of causal (claim) hops; identity hops are not counted")
+    identity_hops: int = Field(0, description="same_as identity hops crossed (not causal)")
+    cross_source: bool = Field(False, description="The claim hops are asserted by more than one source")
     chain_grade: Grade = Field(description="Weakest hop")
     weakest_hop: int
     hops: list[ChainHop]
@@ -215,9 +237,13 @@ class ChainSearch(s.ApiModel):
     edges_scanned: int
     ungraded_skipped: int
     below_min_grade_skipped: int
+    quarantined_skipped: int = Field(
+        0, description="Edges not composed: cycle members, self-loops, attributed or nature-qualified claims"
+    )
     class_nodes_skipped: int = Field(0, description="Class items (KG P279 / P31-only targets) not traversed")
     class_nodes_sample: list[str] = Field(default_factory=list, max_length=20)
     node_rule: str = ""
+    identity: dict[str, Any] = Field(default_factory=dict, description="same_as links loaded for identity hops")
     truncated: bool
     truncation_reasons: list[str]
     time_budget_ms: int
@@ -233,6 +259,7 @@ class CausalChain(s.ApiModel):
     note: str
     note_fr: str
     not_found_reason: str | None
+    same_as: list[SameAsLinkOut] = Field(default_factory=list, description="When from and to are the same event")
     search: ChainSearch
 
 

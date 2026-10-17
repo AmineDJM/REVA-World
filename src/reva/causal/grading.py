@@ -7,9 +7,11 @@ Independence (spec: "sources sharing an upstream count once")
 -------------------------------------------------------------
 Each claim yields *upstream keys*:
 
-* a Wikidata reference -> ``url:<normalised URL>`` (P854), ``item:<Q>`` (P248 stated in),
-  ``imported_from:<Q>`` (P143), ``doi:<doi>`` (P356), ``isbn:<digits>`` (P212/P957); a reference with none of
-  these -> ``refhash:<sha256 of the reference without its retrieval date P813>``;
+* a Wikidata reference -> ``url:<normalised URL>`` (P854), ``item:<Q>`` (P248 stated in), ``quote:<sha of the
+  P1683 text>``, ``doi:<doi>`` (P356), ``isbn:<digits>`` (P212/P957); a reference with none of these ->
+  ``refhash:<sha256 of the reference without its retrieval date P813>``; a reference made only of non-source
+  pointers (P143 / P4656 imported from Wikimedia, P3452 inferred from, P887 heuristic; version 2) ->
+  ``community:<source root>``: the editing community, not an independent source;
 * a statement without references -> ``community:<source root>`` (e.g. ``community:wikidata``: the
   community of editors is one source, however many unreferenced statements it wrote);
 * a dataset claim -> ``dataset:<source_key>/<dataset>`` plus its citation's DOI/ISBN.
@@ -38,21 +40,32 @@ GRADING_FILE = REPO_ROOT / "registry" / "causal" / "grading.yaml"
 GRADES = ("A", "B", "C", "D", "E")
 TIERS = ("T1", "T2", "T3", "T4")
 TEMPORAL = ("consistent", "overlapping", "inconsistent", "undetermined")
-_CONDITION_KEYS = {"tier", "temporal_check", "corroborated", "contested"}
+_CONDITION_KEYS = {"tier", "temporal_check", "corroborated", "contested", "attributed", "nature_qualified", "doubtful"}
 #: Reference properties that identify a scholarly work verbatim (T2 when they arrive in a source's references).
 DOI_PIDS = ("P356",)
 ISBN_PIDS = ("P212", "P957")
 RETRIEVAL_PIDS = ("P813",)
-#: "Imported from Wikimedia project" (P143) and "Wikimedia import URL" (P4656) point at another wiki: they say
-#: where an editor copied the statement from, not who asserts it. A reference made only of these (and retrieval
-#: dates) is a pointer, not a source: it does not raise a statement to T3 (grading.yaml version 2).
-WIKIMEDIA_IMPORT_PIDS = ("P143", "P4656")
+#: Reference properties that are not sources (grading.yaml version 2, audit H1): "imported from Wikimedia
+#: project" (P143) and "Wikimedia import URL" (P4656) point at another wiki — where an editor copied the
+#: statement from —, "inferred from" (P3452) points at another Wikidata item, "based on heuristic" (P887) names a
+#: Wikidata editing heuristic. A reference made only of these (and P813 retrieval dates) does not raise a
+#: statement to T3, and as an upstream it is the Wikidata community itself (``community:wikidata``), never an
+#: independent source (audit H2).
+NON_SOURCE_REF_PIDS = ("P143", "P4656", "P3452", "P887")
+WIKIMEDIA_IMPORT_PIDS = NON_SOURCE_REF_PIDS  # name kept for callers
+#: Verbatim quotation of the source (P1683): two references quoting the same text are one upstream (audit H2).
+QUOTE_PIDS = ("P1683",)
+#: Claim qualifiers that change who asserts the link / how (audit H3): "statement supported by" (P3680) names
+#: the party Wikidata records as making the claim; "nature of statement" (P5102) qualifies it (allegedly,
+#: hypothetically, rarely ...). Their values are kept verbatim and shown; the grade is capped (grading.yaml).
+SUPPORTED_BY_PID = "P3680"
+NATURE_OF_STATEMENT_PID = "P5102"
 #: KG source keys whose statements were read without their references (WDQS listings select statement id,
 #: object and rank only; ``reva.kg.harvest`` stores them with ``references=[]``): "references unknown", never
 #: "unreferenced". Their tier is left pending until an entity snapshot of the statement is loaded.
 REFERENCES_UNREAD_SOURCE_KEYS = ("wikidata.wdqs",)
 #: Tier basis of a KG claim (why it has its tier); ``references_unknown`` means no tier (claim deferred).
-TIER_BASES = ("citation", "references", "wikimedia_import_only", "no_references", "references_unknown")
+TIER_BASES = ("citation", "references", "non_source_references_only", "no_references", "references_unknown")
 
 
 # ---------------------------------------------------------------------------------------------- rules
@@ -72,6 +85,9 @@ class Rule:
             return False
         if "corroborated" in w and (inp.corroboration >= corroborated_min) != bool(w["corroborated"]):
             return False
+        for key in ("attributed", "nature_qualified", "doubtful"):
+            if key in w and bool(getattr(inp, key)) != bool(w[key]):
+                return False
         if "contested" in w and inp.contested != bool(w["contested"]):
             return False
         return True
@@ -145,11 +161,19 @@ def _fact_ids() -> list[str]:
 
 #: Explanatory fact rules (version 2) attached when they apply, after the four base facts.
 NOTE_FACTS = (
-    "tier.T4.wikimedia_import_only",
+    "tier.T4.non_source_references_only",
     "temporal.entity_dated_by_inception",
     "temporal.claim_time_qualifier",
     "corroboration.via_same_as",
+    "attribution.supported_by",
+    "nature.qualified",
+    "certainty.doubtful",
+    "consistency.self_loop",
+    "consistency.cycle",
 )
+#: Facts that keep a claim out of chain composition (reva.causal.graph.chain): a self-loop or a cycle member
+#: (audit L7), a claim Wikidata attributes to a named party or qualifies by its nature (audit H3).
+CHAIN_QUARANTINE_FACTS = ("consistency.self_loop", "consistency.cycle", "attribution.supported_by", "nature.qualified")
 
 
 @lru_cache(maxsize=4)
@@ -169,6 +193,12 @@ class GradeInputs:
     temporal_check: str
     corroboration: int
     contested: bool
+    #: P3680 "statement supported by": Wikidata records that a named party makes the claim (audit H3)
+    attributed: bool = False
+    #: P5102 "nature of statement" qualifier present (audit H3)
+    nature_qualified: bool = False
+    #: the source codes the event / link as doubtful (``scope.source_validity[].certainty``, audit H4)
+    doubtful: bool = False
 
 
 @dataclass(frozen=True)
@@ -273,11 +303,14 @@ def citation_of(refs: Sequence[Mapping[str, Any]]) -> dict[str, list[str]] | Non
     return out or None
 
 
-def is_wikimedia_import_only(ref: Mapping[str, Any]) -> bool:
-    """A reference made only of "imported from Wikimedia project" / "Wikimedia import URL" snaks (and retrieval
-    dates): a pointer to another wiki, not a source."""
+def is_non_source_reference(ref: Mapping[str, Any]) -> bool:
+    """A reference made only of non-source snaks (:data:`NON_SOURCE_REF_PIDS`: Wikimedia import, inferred from,
+    heuristic) and retrieval dates: a pointer, not a source."""
     keys = set(ref)
-    return bool(keys & set(WIKIMEDIA_IMPORT_PIDS)) and keys <= set(WIKIMEDIA_IMPORT_PIDS) | set(RETRIEVAL_PIDS)
+    return bool(keys & set(NON_SOURCE_REF_PIDS)) and keys <= set(NON_SOURCE_REF_PIDS) | set(RETRIEVAL_PIDS)
+
+
+is_wikimedia_import_only = is_non_source_reference  # name kept for callers
 
 
 def kg_tier(source_key: str, refs: Sequence[Mapping[str, Any]]) -> tuple[str | None, str]:
@@ -285,22 +318,28 @@ def kg_tier(source_key: str, refs: Sequence[Mapping[str, Any]]) -> tuple[str | N
 
     * ``wikidata.wdqs`` rows (references not read) -> ``(None, "references_unknown")``: no tier is invented;
     * a DOI/ISBN in a reference -> T2 (``citation``);
-    * at least one reference that is not a Wikimedia-import pointer -> T3 (``references``);
-    * only Wikimedia-import pointers -> T4 (``wikimedia_import_only``); no references -> T4 (``no_references``).
+    * at least one reference that is not a non-source pointer -> T3 (``references``);
+    * only non-source pointers (:data:`NON_SOURCE_REF_PIDS`) -> T4 (``non_source_references_only``); no
+      references -> T4 (``no_references``).
     """
     if source_key in REFERENCES_UNREAD_SOURCE_KEYS:
         return None, "references_unknown"
     mrefs = [r for r in refs if isinstance(r, Mapping)]
     if citation_of(mrefs):
         return "T2", "citation"
-    if any(r and not is_wikimedia_import_only(r) for r in mrefs):
+    if any(r and not is_non_source_reference(r) for r in mrefs):
         return "T3", "references"
     if mrefs and any(mrefs):
-        return "T4", "wikimedia_import_only"
+        return "T4", "non_source_references_only"
     return "T4", "no_references"
 
 
-def reference_keys(ref: Mapping[str, Any]) -> list[str]:
+def reference_keys(ref: Mapping[str, Any], community: str = "community:wikidata") -> list[str]:
+    """Upstream keys of one reference. A non-source reference (Wikimedia import, inferred from, heuristic: audit
+    H1/H2) is the editing community itself (``community``), never an independent upstream; a verbatim quotation
+    (P1683) is keyed by its text, so two references quoting the same text count once."""
+    if is_non_source_reference(ref):
+        return [community]
     keys: list[str] = []
     for v in _vals(ref, "P854"):
         t = _text(v)
@@ -310,10 +349,10 @@ def reference_keys(ref: Mapping[str, Any]) -> list[str]:
         q = _item(v)
         if q:
             keys.append("item:" + q)
-    for v in _vals(ref, "P143"):
-        q = _item(v)
-        if q:
-            keys.append("imported_from:" + q)
+    for pid in QUOTE_PIDS:
+        for t in map(_text, _vals(ref, pid)):
+            if t and t.strip():
+                keys.append("quote:" + canonical_sha(" ".join(t.split()).casefold())[:32])
     for pid in DOI_PIDS:
         keys += ["doi:" + t.strip().lower() for t in map(_text, _vals(ref, pid)) if t]
     for pid in ISBN_PIDS:
@@ -340,7 +379,7 @@ def upstream_keys(
         keys.append(f"dataset:{source_key}/{dataset}")
     for ref in refs:
         if isinstance(ref, Mapping):
-            keys += reference_keys(ref)
+            keys += reference_keys(ref, "community:" + source_root(source_key))
     for doi in (citation or {}).get("doi", []):
         keys.append("doi:" + str(doi).strip().lower())
     for isbn in (citation or {}).get("isbn", []):

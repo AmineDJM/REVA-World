@@ -68,6 +68,8 @@ class Vocabulary:
     wikidata: Mapping[str, WikidataMapping]
     lanes: Mapping[str, Mapping[str, str]]
     context: Mapping[str, Mapping[str, str]]
+    #: relations never composed into chains nor counted in cycles (relations.yaml ``chain_excluded``)
+    chain_excluded: frozenset[str] = frozenset()
 
     def relation(self, name: str) -> Relation:
         return self.relations[name]
@@ -110,8 +112,17 @@ def _parse(doc: Mapping[str, Any], sha: str) -> Vocabulary:
     for pid in CONTEXT_ONLY_PIDS:
         if pid in wd:
             raise ValueError(f"{pid} is context only")
+    excluded = frozenset(str(x) for x in doc.get("chain_excluded") or [])
+    if not excluded <= set(RELATIONS):
+        raise ValueError(f"chain_excluded names unknown relations {sorted(excluded - set(RELATIONS))}")
     return Vocabulary(
-        str(doc.get("version")), sha, rels, wd, dict(doc.get("lanes") or {}), dict(doc.get("context") or {})
+        str(doc.get("version")),
+        sha,
+        rels,
+        wd,
+        dict(doc.get("lanes") or {}),
+        dict(doc.get("context") or {}),
+        excluded,
     )
 
 

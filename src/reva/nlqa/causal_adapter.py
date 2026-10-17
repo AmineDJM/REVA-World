@@ -117,7 +117,17 @@ def claim_from_json(d: Mapping[str, Any]) -> CausalClaim | None:
         contested_by=_ids(grade_obj.get("contested_by")),
         review_status=d.get("review_status") if isinstance(d.get("review_status"), str) else None,
         origin=d.get("origin") if isinstance(d.get("origin"), str) else None,
+        **_attribution(d.get("attribution")),
     )
+
+
+def _attribution(a: Any) -> dict[str, Any]:
+    """CAUSCORE ``attribution`` (P3680 supported by, P5102 nature, doubtful source codes) -> CausalClaim fields."""
+    if not isinstance(a, Mapping):
+        return {}
+    who = tuple(str(x.get("label") or x.get("id")) for x in a.get("supported_by") or () if isinstance(x, Mapping))
+    note = {k: str(a[f"note_{k}"]) for k in ("en", "fr") if isinstance(a.get(f"note_{k}"), str) and a[f"note_{k}"]}
+    return {"supported_by": who, "attribution_note": note}
 
 
 def _claims(raw: Any) -> list[CausalClaim]:

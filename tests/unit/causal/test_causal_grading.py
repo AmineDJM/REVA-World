@@ -23,8 +23,11 @@ RULES = gr.load_rules()
 # ---------------------------------------------------------------------------------------------- rules
 def test_rule_table_is_versioned_and_complete() -> None:
     assert RULES.version == "2" and len(RULES.sha256) == 64 and RULES.corroborated_min == 2
-    for tier, tc, corr, contested in itertools.product(gr.TIERS, gr.TEMPORAL, (1, 2, 3), (False, True)):
-        g = gr.decide(gr.GradeInputs(tier, tc, corr, contested), RULES)
+    flags = (False, True)
+    for tier, tc, corr, contested, att, nat, doubt in itertools.product(
+        gr.TIERS, gr.TEMPORAL, (1, 2, 3), flags, flags, flags, flags
+    ):
+        g = gr.decide(gr.GradeInputs(tier, tc, corr, contested, att, nat, doubt), RULES)
         assert g.grade in gr.GRADES and len(g.rule_ids) == 5
         assert all(r["en"] and r["fr"] for r in g.reasons)
 
@@ -76,11 +79,19 @@ def test_reference_keys_and_url_normalisation() -> None:
     a = gr.reference_keys({"P854": ["http://www.Example.org/Page/#x"], "P813": [{"time": "+2025-01-01"}]})
     b = gr.reference_keys({"P854": ["https://example.org/Page"], "P813": [{"time": "+2026-01-01"}]})
     assert a == b == ["url:https://example.org/Page"]
-    assert gr.reference_keys({"P248": ["Q36578"], "P143": ["Q328"]}) == ["item:Q36578", "imported_from:Q328"]
+    # version 2: a Wikimedia import beside a real source adds nothing; alone it is the community (audit H2)
+    assert gr.reference_keys({"P248": ["Q36578"], "P143": ["Q328"]}) == ["item:Q36578"]
+    assert gr.reference_keys({"P143": ["Q328"], "P4656": ["https://en.wikipedia.org/?oldid=1"]}) == [
+        "community:wikidata"
+    ]
     # a reference with no identifying property hashes its content, retrieval date (P813) excluded
-    r1 = gr.reference_keys({"P1683": ["quote"], "P813": [{"time": "+2025-01-01"}]})
-    r2 = gr.reference_keys({"P1683": ["quote"], "P813": [{"time": "+2026-06-06"}]})
+    r1 = gr.reference_keys({"P1476": ["title"], "P813": [{"time": "+2025-01-01"}]})
+    r2 = gr.reference_keys({"P1476": ["title"], "P813": [{"time": "+2026-06-06"}]})
     assert r1 == r2 and r1[0].startswith("refhash:")
+    # version 2: a verbatim quotation is keyed by its (whitespace / case normalised) text
+    q1 = gr.reference_keys({"P1683": ["The  Act of Independence"], "P813": [{"time": "+2025-01-01"}]})
+    q2 = gr.reference_keys({"P1683": ["the act of independence"], "P1476": ["another title"]})
+    assert q1[0].startswith("quote:") and q1[0] in q2
     assert gr.reference_keys({"P356": ["10.1000/ABC"]}) == ["doi:10.1000/abc"]
     assert gr.citation_of([{"P212": ["978-0-00-000000-2"]}]) == {"isbn": ["978-0-00-000000-2"]}
     assert gr.citation_of([{"P854": ["https://x"]}]) is None

@@ -65,6 +65,8 @@ ProxyMode = Literal["direct", "env"]
 METADATA_ADDRESSES = {ipaddress.ip_address("169.254.169.254"), ipaddress.ip_address("fd00:ec2::254")}
 MAX_COMPRESSION_RATIO = 200
 ALLOWED_CODINGS = frozenset({"identity", "gzip", "x-gzip", "deflate"})
+#: Non-standard labels some servers send for an unencoded body; read as ``identity`` (no decoding, same byte bound).
+IDENTITY_ALIASES = frozenset({"none"})
 #: Query parameters treated as secrets in fingerprints and persisted metadata.
 SECRET_QUERY_PARAMS = frozenset(
     {
@@ -385,6 +387,8 @@ def content_codings(headers: httpx.Headers) -> str:
         return "identity"
     if len(codings) > 1:
         raise UnsafeRequest(f"stacked content-encoding {codings} is not accepted")
+    if codings[0] in IDENTITY_ALIASES:  # e.g. www.peaceagreements.org sends "Content-Encoding: none"
+        return "identity"
     if codings[0] not in ALLOWED_CODINGS:
         raise UnsafeRequest(f"unsupported content-encoding {codings[0]!r}")
     return codings[0]

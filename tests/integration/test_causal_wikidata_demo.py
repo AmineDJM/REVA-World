@@ -101,7 +101,7 @@ def test_entity_effects_dated_by_inception_and_import_pointers(real) -> None:  #
     assert c["source"]["tier"] == "T4" and c["grade"]["grade"] == "D"
     assert c["grade"]["temporal_check"] == "undetermined"
     ids = c["grade"]["rule_ids"]
-    assert "tier.T4.wikimedia_import_only" in ids and "temporal.entity_dated_by_inception" in ids
+    assert "tier.T4.non_source_references_only" in ids and "temporal.entity_dated_by_inception" in ids
     t = c["grade"]["temporal"]
     # Russian Empire inception 1721-10-22 (Julian) is read as 1721-11-02 (proleptic Gregorian); the span ends at
     # its dissolution (P576 1917-09-01 Julian -> 1917-09-14)
