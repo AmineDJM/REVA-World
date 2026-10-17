@@ -252,8 +252,14 @@ DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwar
 | UI build | `npm run build` | **pass**. The maplibre chunk is 1.03 MB (278 kB gzip) |
 | UI e2e (V3 stack) | `uv run python scripts/e2e_stack.py --run --v3-fixtures` | **81 passed, 1 failed, 8 skipped** (Playwright 2.1 min; stack 3 min 41 s in total). The stack replayed 18 atlas fixture sources (all `completed`), the 76-entity Wikidata links fixture, the 37 causal fixture statements, a fixture snapshot and one link materialisation. V3 specs: `v3_live_stack` 13/13, `v3_planet` 10/10, `v3_causal` 7/7, `v3_causal_live` 6/6. The 8 skipped are V2 composer/runs specs that need `--recorded-drafter --v2-fixtures` |
 | live-marked tests, Docker build, performance | — | **not run** for V3 |
+| FIX3: the 5 affected files + link unit tests, **one session** | `uv run pytest -q tests/integration/test_links_db.py tests/integration/test_events_datasets.py tests/integration/test_events_dataset_kinds.py tests/integration/test_links_ops.py tests/integration/test_wikidata_kg_load.py tests/unit/links` | **170 passed, 0 failed** (4 min 6 s) |
+| FIX3: same, after the files that polluted the shared DB in the sweep | the same files preceded by `test_causal_{api,ops,store,wikidata_demo}.py`, `test_kg_{api,import_harvest_db,lang_ingest,paths,polity_ingest,store}.py`, `test_atlas_treaties_ingest.py`, `test_events_view.py` | **260 passed, 0 failed** (5 min 7 s). The synthetic `czapi` claims and other `same_as` / materialisation / property loads are in the DB before the fixed tests run |
+| FIX3: UI unit tests, typecheck, build | `npx vitest run`, `npm run typecheck`, `npm run build` | **225 passed, 1 skipped** (+4: `src/v3/screens.test.ts` 3, `CommandPalette.test.tsx` 1); typecheck **pass**; build **pass** |
+| FIX3: palette e2e | `uv run python scripts/e2e_stack.py --run --v3-fixtures -- e2e/v2_runs.spec.ts e2e/v3_live_stack.spec.ts` | **15 passed, 0 failed, 4 skipped** (41 s). "⌘K palette" passes; `v3_live_stack` 13/13 (incl. `/v1/links/path` "Chemin advanced options"). The 4 skipped are V2 runs specs that need `--v2-fixtures` |
 
-**The 12 pytest failures.** None of them is a stale version or count in a test, so no test was edited.
+**The 12 pytest failures.** None of them is a stale version or count in a test. **Status after FIX3:** the 3 link
+failures and the UI palette defect are fixed in the product, and the 4 isolation failures are fixed in the tests.
+See the FIX3 rows above.
 
 * **Test isolation: the session-scoped test database is shared by every test file (4 failures).** Each test passes
   alone. They fail after other files load KG or link data into the same database:
@@ -265,8 +271,16 @@ DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwar
     test got a new materialisation (`4 == 3`) instead of a reuse.
   * `test_wikidata_kg_load.py::test_seed_spec_loads_into_kg_tables`: properties already registered by other files
     give `163 == 186`.
-  Fix (owners EVENTS, LINKWIRE, WDHARVEST): make the assertions relative to the test's own loads, or give these
-  files a private database.
+  **Fixed (FIX3), tests only; no product bug behind them.** Each test now asserts on its own data:
+  * `same_as`: the test looks only at derived links that touch its own pair, and checks that nothing else links
+    to either end. It loads only that report, and counts retractions against the active `same_as` statements.
+  * `causal_claims`: claims are filtered to the `source_key`s of the ingests the module fixture ran.
+  * `links_ops`: materialisations are counted from the test's first `materialisation_id`.
+  * `wikidata_kg_load`: the check is `versions_inserted + unchanged == len(allow.properties)`. The property
+    registry is append-only and versioned. A pid that was already registered with another definition gets a new
+    version: neither inserted nor unchanged, but correct. None of the connectors that register Wikidata pids
+    define them differently: all derive from `registry/kg/properties.yaml`. The 23 extra versions came from that
+    file changing during the sweep.
 * **Tree changed during the run (5 failures).** `test_kg_lang_ingest.py` (2) and `test_kg_polity_ingest.py` (3)
   failed with `ImmutableRecordViolation: connector atlas.glottolog@1.1.0 / atlas.cliopatria@1.0.0 is registered
   with different content`. Commit `8ff853d` bumped these connectors on disk while the pytest process held the old
@@ -281,8 +295,14 @@ DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwar
   * Impact: any materialisation that holds a month-precision link (here from the dataset fixtures loaded by other
     tests, e.g. the sanctions and hazard kinds) makes stored-link reads fail. `/v1/links/path` answers **500**.
   * The tests pass alone only because no such link is materialised then.
-  * Fix: parse `YYYY` and `YYYY-MM` in `PartialDate.parse` (or serialise with an explicit precision), plus a
-    round-trip test.
+  * **Fixed (FIX3).** `PartialDate.parse` now reads `YYYY`, `YYYY-MM` and `YYYY-MM-DD`, with signed and
+    astronomical years and Wikidata `00` unknowns. It rejects month > 12 and day > 31.
+  * `PartialDate.iso()` writes BCE years with 4 digits (`-0043`, was `-043`).
+  * New `PartialDate.from_iso` and `Temporal.from_json` are the exact inverses of `iso()` / `to_json()`.
+    `to_json` adds `<field>_precision` only for decade/century precisions, which a year string cannot carry.
+  * `store.temporal_from_json` delegates to `Temporal.from_json`.
+  * Round-trip unit tests in `tests/unit/links/test_links_model.py` cover year, month, day, BCE, year 0,
+    5-digit years and precisions 6–8.
 
 **Also found.**
 
@@ -293,7 +313,12 @@ DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwar
   * Cause: `ui/src/v3/screens.ts` puts `/v3/relation?a=BRA&b=PRT` in `V3_PALETTE` twice: once as the screen entry
     and once as the example entry. The palette keys its options by `${kind}:${id}` (`CommandPalette.tsx`), so two
     items share one React key and React leaves a stale node behind.
-  * Fix: a distinct `to` for the example, or de-duplicated ids.
+  * **Fixed (FIX3).** The duplicate example entry is removed. `V3_PALETTE` is built through `uniqueByRoute`
+    (first entry per route wins). `CommandPalette` also drops repeated screen routes, so no caller can produce a
+    duplicate key.
+  * Tests: vitest `src/v3/screens.test.ts` checks that palette routes are unique.
+    `CommandPalette.test.tsx` renders a duplicated route, expects one option and no React "same key" warning.
+    The second test fails without the dedupe.
 * **`ruff format` leftovers (owners):**
   * 14 atlas connector modules and `src/reva/adapters/connectors/wikidata.py` / `src/reva/kg/harvest.py`. These were
     *not* reformatted: a reformat changes the connector code digest, and the code-identity check would then refuse
