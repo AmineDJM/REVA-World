@@ -27,7 +27,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict, deque
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import pairwise
 from typing import Any
 
@@ -213,20 +213,25 @@ def _chains(graph: ClassGraph, start: str, targets: Mapping[str, Sequence[str]])
 
 
 def _dataset_kind(conn: Connection, event_id: str, tax: Taxonomy, origin: str | None) -> Any:
-    """The dataset kind of a record: by id prefix, else by a marker statement of the kind's source."""
+    """The dataset kind of a record: by id prefix, else by a marker statement of the kind's source.
+
+    A marker kind declared for any source (``source_key: null`` in the taxonomy: CAUSDATA, A-CONTENTION, A-ECRISES …
+    write the same marker from several connectors) is returned with the source key of the marker statement that
+    recognised the record, so the card always names the source that typed it (never ``None``)."""
     kind = tax.dataset_kind_for(event_id)
     if kind is not None:
         return kind
     for d in tax.marker_kinds():
         hit = conn.execute(
             text(
-                f"""SELECT 1 FROM kg.statement_current s WHERE s.subject_qid = :q AND s.property_pid = :p
-                     AND (CAST(:sk AS text) IS NULL OR s.source_key = :sk){kq._origin_sql(origin)} LIMIT 1"""
+                f"""SELECT s.source_key FROM kg.statement_current s WHERE s.subject_qid = :q AND s.property_pid = :p
+                     AND (CAST(:sk AS text) IS NULL OR s.source_key = :sk){kq._origin_sql(origin)}
+                     ORDER BY s.source_key LIMIT 1"""
             ),
             {"q": event_id, "p": d.marker_property, "sk": d.source_key, "origin": origin},
         ).first()
         if hit is not None:
-            return d
+            return d if d.source_key is not None else replace(d, source_key=hit[0])
     return None
 
 
