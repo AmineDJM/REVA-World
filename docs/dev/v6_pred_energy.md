@@ -11,7 +11,7 @@ bulk file: observed and forecast tables kept apart), PRED-VINTAGE (vintage conve
 `VintageAccessor`. A real-time backtest (23,690 scored forecasts; inputs and EIA's forecasts as published at each
 release, outcomes = EIA's current declared history) shows: **for Brent and WTI, EIA's STEO point forecasts are not
 better than a random walk** (MAE ratio 0.95–1.05, no DM-HLN test significant at any horizon); STEO beats the random
-walk significantly for **Henry Hub at 3–12 months** (MAE −17 to −24 %), **U.S. crude production at all horizons**
+walk significantly (unadjusted one-sided DM-HLN p < 0.05, no multiplicity correction) for **Henry Hub at 3–12 months** (MAE −17 to −24 %), **U.S. crude production at all horizons**
 (−23 to −43 %) and **world liquids production at 3–12 months** (−17 to −31 %); OECD stocks −10 to −14 % (not
 significant). No REVA price model (inventory gap, ARDL with fundamentals, combinations) beats the random walk after
 Holm correction; ~~17~~ **4 (series, horizon) winners** exist after FIX7 (one Holm family over the whole run, 260
@@ -68,14 +68,15 @@ forecasts (generic baselines, `forecast.energy_rw`, 80 attributed EIA STEO point
   AE, which a density centred on the same point always beats, **EIA's points are compared with the random walk on
   AE/SE**; densities among themselves on CRPS. DM test with HLN correction (rectangular HAC with k−1 lags, k =
   overlap in quarterly origin steps), t(n−1). Winners: CRPS gain over `rw`, one-sided p, **one Holm
-  family over every (series, issuable candidate, horizon) test of the run** (FIX7; 260 tests; was 60–72 per series),
+  family over every (series, issuable candidate, horizon) test of the run** (FIX7; 260 tests; was one family per series of 48 tests for each price series, 60 for each quantity series and 10
+  for `COPR_WORLD`, STEO excluded — the V6 text's "60–72" was wrong; AUDIT4 L3, corrected by FIX6),
   α = 5 %; `combo_steo_rw` is tested and reported but never a winner (`energy_models.NOT_ISSUABLE`).
 
 ## 4. Results (digest `4debaf21…`, `docs/dev/v6_pred_energy_backtest.json`; n ≈ 53 origins at h=1, fewer at h=12)
 
 MAE ratio vs random walk (h = 1 / 3 / 6 / 9 / 12; < 1 better), and DM-HLN on AE for STEO:
 
-| series | random-walk MAE (h1…h12) | **EIA STEO** | STEO vs RW (one-sided p, AE) | combo STEO+RW | best REVA model |
+| series | random-walk MAE (h1…h12) | **EIA STEO** | STEO vs RW (one-sided p, AE, **unadjusted**: no multiplicity correction; bold = p < 0.05 unadjusted) | combo STEO+RW | best REVA model |
 |---|---|---|---|---|---|
 | Brent `BREPUUS` ($/bbl) | 6.1 / 11.0 / 15.1 / 18.6 / 21.6 | 1.01 / 1.05 / 0.97 / 0.99 / 0.95 | 0.52 / 0.78 / 0.35 / – / 0.25 (n.s.) | 0.93–0.99 | none (inventory 1.09–1.20, ARDL 1.00–1.20) |
 | WTI `WTIPUUS` | 5.9 / 10.5 / 13.9 / 16.7 / 19.7 | 0.96 / 1.01 / 0.96 / 1.01 / 0.95 | 0.36 / 0.58 / 0.31 / – / 0.26 (n.s.) | 0.94–0.99 | none |
