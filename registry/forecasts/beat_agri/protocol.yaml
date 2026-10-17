@@ -1,0 +1,136 @@
+# BEAT-AGRI pre-registration (V7, agent BEAT-AGRI). Committed BEFORE any evaluation window below was opened: no
+# development or holdout case of this protocol had been built or scored when this file was committed (the WASDE
+# archive was not even loaded in the dev DB yet: disk < 5 GB at writing time).
+# Binding rules: docs/roadmap/v7_beat_official.md; standard: docs/dev/review_v6_predictions.md (QA-PRED X1-X13).
+# Do not edit after commit. Code changes after this commit are allowed only BEFORE the holdout is opened and only
+# as logged amendments (amendments.yaml: new code_sha256 + reason); the holdout ledger keys on hypotheses.yaml.
+schema: reva-beat-agri-protocol/1
+written_at: '2026-10-17T23:05:00+00:00'
+agent: BEAT-AGRI
+code_sha256: 60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d
+code_files: [src/reva/evaluation/beat_agri/cases.py, src/reva/evaluation/beat_agri/service.py]
+goal: >-
+  Beat USDA's WASDE monthly projections of production, yield and ending stocks of corn, soybeans, wheat and rice
+  (United States and World), judged honestly: same-date comparison on every WASDE release, points (AE) and
+  densities (CRPS) against the fair benchmark, pre-registered, one Holm family.
+
+data:
+  official: >-
+    atlas.usda_wasde_esmis.headline: every WASDE report as published (USDA ESMIS archive; TXT 1998-01..2010-06,
+    XML 2010-07..), headline cells only: us.<crop>.{yield,production,ending_stocks}, world.<crop>.{production,
+    ending_stocks}, crop in {corn, soybeans, wheat, rice}; the projection year's value is the report month's column.
+  weather: >-
+    atlas.ncei_cag.agbelt_monthly: NOAA NCEI Climate at a Glance, Corn Belt (261) and Soybean Belt (262)
+    area-weighted monthly average temperature and precipitation since 1990 (final vintage, nClimDiv). Usable for
+    month m from day 12 of month m+1 (NCEI's September 2026 data were released 2026-10-06); labelled
+    final_vintage_with_publication_lag (QA-PRED X9: candidate-only final-vintage input; nClimDiv revisions are
+    small re-computations of monthly means, stated in the report).
+  not_used: >-
+    futures prices (licensed - owner decision); NASS QuickStats crop condition (API key - owner decision);
+    satellite NDVI (no small open country-month aggregate with a clear licence found); FAO AMIS Market Monitor
+    (no machine-readable vintage archive); World Bank Pink Sheet / FAO FFPI price forecasts (no official numeric
+    forecast vintages for these prices that REVA holds; out of scope of this family, see not_tested).
+
+comparison_rule: >-
+  Origin = each WASDE release (the first release of each calendar month that prints the marketing year as the
+  series' projection year); information set = everything published by the release day + 1 (00:00 UTC). The
+  benchmark is WASDE's number in that same release. Report-month offset k = months since May of the marketing
+  year's first calendar year.
+
+truth: >-
+  Declared in advance, USDA's own later estimate as published: the series' value for marketing year Y in the FIRST
+  WASDE released on or after (a) 1 January Y+1 for U.S. production and yield (incorporates NASS's annual Crop
+  Production summary / Small Grains summary), (b) 1 November Y+1 for U.S. ending stocks and all World series
+  (after the U.S. September/June stocks surveys; one year after the first projection). A case whose truth is not
+  printed is dropped and listed (dropped_cases).
+
+windows_of_origins:
+  us_corn_soybeans_rice_production_yield: k 0..7 (May..December)
+  us_wheat_production_yield: k 0..4 (May..September)
+  ending_stocks_and_world: k 0..11 (May..April)
+  cells: {early: k 0-2, mid: k 3-5, late: k 6-11}
+
+splits:
+  burn_in: marketing years 1998-2004 (training / error history only, never scored)
+  development: marketing years 2005-2016
+  holdout: marketing years 2017-2024 (untouched; opened once, ledger)
+  not_evaluated: marketing year 2025 (truths of ending stocks / World arrive in November 2026)
+  prospective: marketing year 2026/27 (sealed in the forecast registry, see prospective)
+
+candidates:
+  bc: >-
+    WASDE bias correction (uses WASDE): point = W (1 + w e_bar), e_bar = mean relative error (truth - W)/W of the
+    same series at the same k over past marketing years whose truth was published by the origin, w = n/(n+5);
+    needs n >= 3.
+  rev: >-
+    WASDE revision smoothing (uses WASDE): point = W (1 + a + b D), D = relative revision of W since the previous
+    release (0 at the first projection); b = pooled within-(series,k) slope of past relative errors on past
+    revisions over the series of the group and the k of the window (k >= 1), times m/(m+20), clipped [-1, 2]
+    (0 if fewer than 10 rows); a = (n/(n+5)) mean(e - b D) at the same series and k; needs n >= 3.
+  wx: >-
+    weather-adjusted WASDE (uses WASDE + NCEI weather), U.S. corn and soybeans yield and production only: point =
+    W (1 + (n/(n+5)) e_bar + (x - x_bar) beta), x = standardised June/July/August temperature and precipitation
+    anomalies of the crop's belt (reference years 1990..Y-1) for the months usable at the origin; beta = ridge
+    (lambda = 1 x n, centred) of past relative errors at the same series and k on the same features; needs >= 6
+    past years and >= 1 usable month, else no forecast.
+  trend: pure REVA (no WASDE input), U.S. yields only - linear trend of the last 20 truths known at the origin (>= 10); DESCRIPTIVE ONLY (not in any family).
+  densities: >-
+    each candidate (and WASDE) = Gaussian N(point, |point| x RMS of the model's OWN past relative errors at the same
+    series and k), >= 5 past own errors, else no density (point only).
+
+benchmarks:
+  point: WASDE's number in the same release (loss AE in percent of the truth).
+  density_fair: >-
+    N(WASDE point, |W| x RMS of WASDE's own past relative errors at the same series and k, truths published by the
+    origin, >= 5) - the error-based fan of QA-PRED X1 (never a persistence-spread strawman). Loss CRPS in percent
+    of the truth.
+  never: CRPS of a point forecast (X2); WASDE is compared on AE as a point and on CRPS only through its fair fan.
+
+scores_and_tests:
+  losses: {points: "AE % of truth", densities: "CRPS % of truth (closed form)"; descriptive: 80% coverage, PIT}
+  cells: >-
+    group x window. groups: us_yield, us_production, us_ending_stocks, world_production, world_ending_stocks
+    (4 crops each) for bc and rev (15 cells each); us_cornsoy_yield, us_cornsoy_production x {mid, late} for wx
+    (4 cells). Each cell x {AE vs WASDE point, CRPS vs WASDE fair fan}: 68 development comparisons.
+  inference: >-
+    unit = marketing year: per cell, loss differentials (candidate - benchmark) on common cases are averaged within
+    each marketing year; Diebold-Mariano with HLN correction, h = 1, one-sided (candidate better); >= 6 marketing
+    years. (Cases of one marketing year share the outcome: they are never treated as independent.)
+  development_selection: >-
+    per (group, window, loss): among development comparisons with relative loss < 1 and one-sided p < 0.10, the
+    candidate with the lowest relative loss -> at most one holdout hypothesis per (group, window, loss);
+    hypotheses.yaml records this file's sha256, the development.json sha256 and the code sha256 and is committed
+    before the holdout is opened. Development Holm (all 68) is reported, descriptive.
+  holdout_family: ONE Holm (alpha 0.05) over all holdout hypotheses jointly (family size printed with every result).
+  confirmation: >-
+    Holm-rejected AND relative < 1 AND, for CRPS hypotheses, holdout 80 % central-interval coverage in [0.70, 0.90].
+  holdout_opened_once: holdout_ledger.yaml (append-only) refuses a second opening of the same hypotheses.
+  descriptive_only: >-
+    the full unselected grid on the holdout, per-series x window summaries, WASDE's revision path (MAE % and mean
+    signed error by k), pure-REVA trend vs WASDE on U.S. yields.
+
+wording_rules:
+  - A confirmed bc / rev / wx hypothesis is reported as "REVA's correction of the WASDE projection beats the WASDE
+    projection alone on the same release date" - never "REVA beats USDA" without saying it uses USDA's number.
+  - wx is reported with its input labelled final-vintage weather with a publication-lag rule.
+  - Wins and losses are reported exactly (family size, n cases, n marketing years, relative, p, coverage).
+
+prospective:
+  rule: >-
+    For marketing year 2026/27, on the WASDE release in force at sealing (and each later release while it is in
+    the series' window), one quantity question per series inside its window, resolved by the truth rule above;
+    sealed forecasts: WASDE point (attributed reference), WASDE fair fan (benchmark), and bc, rev, wx (points and
+    densities), each labelled with its holdout status (confirmed / not confirmed). Scored with the same losses when
+    the truth is published (U.S. production/yield: January 2027; ending stocks and World: November 2027).
+    Prospective skill claims need >= 6 resolved marketing years; until then results are descriptive.
+
+not_tested_here_and_why:
+  pure_reva_vs_wasde: >-
+    no pure-REVA model has an information edge over USDA's own survey-based estimates at a WASDE release (trend is
+    what WASDE does early in the season); the trend comparison is descriptive.
+  between_release_nowcasts: owner asked for same-date comparison on each WASDE release date; not in this family.
+  prices: >-
+    FAO FFPI / World Bank Pink Sheet: no official numeric forecast vintage in REVA (FAO Food Outlook / AMIS give
+    narrative outlooks; World Bank CMO price forecasts are semi-annual PDFs/xlsx not loaded) and futures are
+    licensed; not tested.
+  enso_world: ENSO-conditioned world corrections not pre-registered (no development evidence and small n).
