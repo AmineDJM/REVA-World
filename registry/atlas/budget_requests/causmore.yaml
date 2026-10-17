@@ -10,7 +10,8 @@ requests:
     reason: "atlas.cowwars (COW war data v4: inter/extra/intra v4.1/non-state + codebooks): 8 requests per run"
   - source_key: pax.peaceagreements
     # NEW source (registry/sources/pax.yaml): data CSV (3.6 MB) + codebook PDF (0.85 MB) = 2 requests (planned 3).
-    daily_requests: 6
+    # 10/day (was 6): room for a corrective re-run on the same day (1.1.0 retraction run, 2026-10-17).
+    daily_requests: 10
     expected_bytes_per_day: 10000000
     reason: "atlas.pax (PA-X v10 CSV + codebook): 2 requests / 4.5 MB per run"
   - source_key: idmc.gidd
