@@ -18,7 +18,8 @@ from any V4 source is ``located_in`` its country.
 Fetch: one WDQS query per *pack* of properties (``packs`` in the rules file; run option ``packs=a,b`` restricts a
 run) through WDHARVEST's :class:`~reva.adapters.connectors.wikidata.WikidataClient` (machine-wide lock, pacing,
 Retry-After back-off; query text and raw response archived), budget key ``wikidata.wdqs`` (no new budget). Huge
-packs are bounded by ``min_sitelinks`` (documented size filter, never a judgement on the items left out).
+packs are bounded by ``max_items`` (the N items with most sitelinks: a documented size bound, never a judgement on the
+items left out).
 
 KG: source key ``wikidata.wdqs`` (CC0, community-edited), statement ids ``v4xref:<pack>:<Wikidata statement id>``
 (country statements ``v4xref:<pack>:c:<id>``); a pack's statements that a new run no longer finds are retracted.
@@ -76,17 +77,25 @@ def code_digest() -> str:
 
 # ============================================================================================== queries
 def _selector(pack: Pack) -> str:
-    sl = f"\n    ?item wikibase:sitelinks ?sl . FILTER(?sl >= {int(pack.min_sitelinks)})" if pack.min_sitelinks else ""
+    """The items of a pack. ``max_items``: the N items with the most sitelinks (ORDER BY/LIMIT, not a FILTER: QLever
+    answered numeric and IRI FILTERs inconsistently on 2026-10-17 -- 0 rows for ``FILTER(?sl >= 10)``)."""
     if pack.require_two and len(pack.properties) == 2:
         a, b = pack.properties
-        return f"{{ SELECT DISTINCT ?item WHERE {{\n    ?item wdt:{a} [] ; wdt:{b} [] .{sl}\n  }} }}"
+        if pack.max_items:
+            return (
+                f"{{ SELECT DISTINCT ?item ?sl WHERE {{\n    ?item wdt:{a} [] ; wdt:{b} [] ; wikibase:sitelinks ?sl .\n  }}"
+                f" ORDER BY DESC(?sl) ?item LIMIT {int(pack.max_items)} }}"
+            )
+        return f"{{ SELECT DISTINCT ?item WHERE {{\n    ?item wdt:{a} [] ; wdt:{b} [] .\n  }} }}"
+    if pack.max_items:
+        raise ValueError(f"pack {pack.id}: max_items is supported for two-property require_two packs only")
     values = " ".join(f"wdt:{p}" for p in pack.properties)
     if pack.require_two:
         return (
-            f"{{ SELECT ?item WHERE {{\n    VALUES ?pd {{ {values} }}\n    ?item ?pd [] .{sl}\n  }}"
+            f"{{ SELECT ?item WHERE {{\n    VALUES ?pd {{ {values} }}\n    ?item ?pd [] .\n  }}"
             " GROUP BY ?item HAVING (COUNT(DISTINCT ?pd) >= 2) }"
         )
-    return f"{{ SELECT DISTINCT ?item WHERE {{\n    VALUES ?pd {{ {values} }}\n    ?item ?pd [] .{sl}\n  }} }}"
+    return f"{{ SELECT DISTINCT ?item WHERE {{\n    VALUES ?pd {{ {values} }}\n    ?item ?pd [] .\n  }} }}"
 
 
 def pack_query(pack: Pack) -> str:
@@ -416,7 +425,7 @@ class QleverFetcher:
 async def global_duplicates(
     client: Any, rules: Rules, pack: Pack, raws: list[str]
 ) -> tuple[dict[str, set[str]], dict[str, Any]]:
-    """For a filtered pack (``require_two`` / ``min_sitelinks``) the fetched items are a subset of Wikidata: ask WDQS
+    """For a filtered pack (``require_two`` / ``max_items``) the fetched items are a subset of Wikidata: ask WDQS
     which values of each identity property are held by several items anywhere. A query that fails (WDQS timeout on
     a very large property) leaves that property's check ``incomplete`` -- recorded, the run continues."""
     from reva.adapters.connectors.wikidata import WikidataError
@@ -424,7 +433,7 @@ async def global_duplicates(
 
     out: dict[str, set[str]] = {}
     check: dict[str, Any] = {}
-    filtered = pack.require_two or bool(pack.min_sitelinks)
+    filtered = pack.require_two or bool(pack.max_items)
     for pid in pack.properties:
         rule = rules.rules[pid]
         if rule.relation != "identity" or rule.status != "active":

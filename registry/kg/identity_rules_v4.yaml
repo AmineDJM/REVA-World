@@ -28,7 +28,8 @@
 version: 1
 packs:
   # One WDQS query per pack (budget key wikidata.wdqs). `require_two` = the item must hold values of at least two
-  # DIFFERENT properties of the pack (only bridging items are fetched); `min_sitelinks` bounds the size of huge
+  # DIFFERENT properties of the pack (only bridging items are fetched); `max_items` (the N items with the most
+  # sitelinks) bounds the size of huge
   # packs (a size filter, documented in the report: items below it are simply not fetched, never "not the same").
   - id: places
     properties: [P300, P605]
@@ -50,18 +51,18 @@ packs:
   - id: chemistry
     properties: [P683, P662]
     require_two: true
-    min_sitelinks: 10
-    note: "Compounds holding ChEBI and PubChem CID with >= 10 sitelinks (152k items hold both; bounded for disk)."
+    max_items: 15000
+    note: "The 15,000 compounds with most sitelinks among the 152k items holding ChEBI and PubChem CID (bounded for disk)."
   - id: taxa
     properties: [P846, P685]
     require_two: true
-    min_sitelinks: 30
-    note: "Taxa holding GBIF (legacy backbone key) and NCBI taxon with >= 30 sitelinks (596k hold both; bounded)."
+    max_items: 20000
+    note: "The 20,000 taxa with most sitelinks among the 596k items holding GBIF (legacy key) and NCBI taxon (bounded)."
   - id: genes
     properties: [P354, P351]
     require_two: true
-    min_sitelinks: 3
-    note: "Human genes holding HGNC and NCBI Gene ids with >= 3 sitelinks (43.6k hold both; bounded)."
+    max_items: 10000
+    note: "The 10,000 genes with most sitelinks among the 43.6k items holding HGNC and NCBI Gene ids (bounded)."
   - id: companies
     properties: [P1278, P5531]
     require_two: true

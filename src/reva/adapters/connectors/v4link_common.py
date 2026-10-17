@@ -234,7 +234,7 @@ class Pack:
     id: str
     properties: tuple[str, ...]
     require_two: bool = False
-    min_sitelinks: int | None = None
+    max_items: int | None = None
     with_country: bool = False
     note: str = ""
 
@@ -286,7 +286,7 @@ def load_rules(path: Path = RULES_PATH) -> Rules:
             id=str(p["id"]),
             properties=props,
             require_two=bool(p.get("require_two", False)),
-            min_sitelinks=p.get("min_sitelinks"),
+            max_items=p.get("max_items"),
             with_country=bool(p.get("with_country", False)),
             note=str(p.get("note", "")),
         )
@@ -328,7 +328,7 @@ def derive_bridges(
     """Apply the identity rules to best-rank statements: malformed values, ambiguous holders (an item with several
     values of one property) and ambiguous values (a value on several items) are reported, never linked.
 
-    ``rows`` may be a filtered subset of Wikidata (a pack with ``min_sitelinks``): ``global_duplicates`` (property ->
+    ``rows`` may be a filtered subset of Wikidata (a pack with ``max_items``): ``global_duplicates`` (property ->
     KG keys held by several items anywhere in Wikidata) then completes the ambiguity check for values whose other
     holders were not fetched."""
     dups = global_duplicates or {}
