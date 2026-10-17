@@ -120,3 +120,17 @@ async def test_massmob_ingest(db: Any, tmp_path: Path) -> None:
                 text("SELECT count(*) FROM evidence.acquisition WHERE raw_sha256 = :s"), {"s": src["sha256"]}
             ).scalar_one()
             assert archived >= 1
+        # audit M3: the response has no date of its own -> undetermined with the reason, never "overlapping"
+        from reva.causal import grade_claims
+
+        grade_claims(db.worker, origin="test_fixture")
+        with db.owner.connect() as c:
+            rows = c.execute(
+                text(
+                    "SELECT g.temporal_check, g.temporal FROM kg.causal_grade_current g "
+                    "JOIN kg.causal_claim_current k ON k.id = g.claim_row_id "
+                    "WHERE k.source_key = 'harvard.dataverse.massmob'"
+                )
+            ).all()
+        assert rows and {r[0] for r in rows} == {"undetermined"}
+        assert all(r[1]["undated"] == ["effect"] and r[1]["effect_time_missing"]["kind"] == "missing" for r in rows)

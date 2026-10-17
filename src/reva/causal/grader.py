@@ -186,6 +186,10 @@ def compute(
         tcheck, tdetail = temporal_detail(
             dates.get(c["cause_id"]), dates.get(c["effect_id"]), claim_time_window((c.get("scope") or {}).get("period"))
         )
+        missing = (c.get("scope") or {}).get("effect_time")
+        if tcheck == "undetermined" and isinstance(missing, Mapping) and missing.get("kind") == "missing":
+            # the source codes no date for the effect: typed missing, never a date copied from the cause (M3)
+            tdetail = {**tdetail, "effect_time_missing": dict(missing)}
         notes = _notes(c, tdetail)
         if via_identity:
             notes.append("corroboration.via_same_as")

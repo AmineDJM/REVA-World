@@ -171,7 +171,12 @@ def temporal_detail(
     entity_effect = es is not None and es.basis == INCEPTION_PID
     if not (entity_cause or entity_effect) or cs is None or es is None:
         plain = check(cs, es)
-        return plain, {"check": plain, **out, "rule": RULE_EVENTS}
+        detail = {"check": plain, **out, "rule": RULE_EVENTS}
+        if plain == "undetermined":  # say which endpoint has no usable start (AUDFIX, audit M3)
+            undated = [n for n, w in (("cause", cs), ("effect", es)) if w is None]
+            detail["undated"] = undated
+            detail["reason"] = "no start date in the KG for the " + " and the ".join(undated)
+        return plain, detail
     assert cause is not None and effect is not None
     if entity_cause:
         c_lo, c_hi, c_desc = _span(cause)
