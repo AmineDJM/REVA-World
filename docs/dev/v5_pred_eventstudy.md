@@ -182,7 +182,7 @@ is open on the same snapshot and its pre-trend diagnostics pass (event-study F-t
 significant at 5 %). Null results are written like any other (no publication bias). Hence 5 of the 6 runs qualify;
 `banking_crisis_lv → GDP` is archived and documented but not written.
 
-EFFECT_STATUS_PLACEHOLDER
+**Status in the dev DB:** pending — the archive/write step waits for the shared dev-DB lock (command in §7).
 
 ## 6. What is missing / owner decisions
 
@@ -221,4 +221,23 @@ flock /tmp/reva-devdb.lock uv run reva estimate event-study ... --write-effects 
 uv run reva estimate event-study --treatment banking_crisis_lv --outcome vintage:imf_weo.real_gdp_growth \
     --as-of 2009-12-31 --vintage-mode available_then                                 # PRED-VINTAGE panels
 uv run pytest tests/unit/estimation tests/integration/test_estimation_db.py
+```
+
+To archive the six run documents and write the five qualifying estimates from saved run JSON files (what was done
+for this report):
+
+```bash
+for r in banking_gdp banking_unemp coup_gdp eqm7_gdp eq1000_gdp sanctions_gdppc; do   # saved with --out runs/$r.json
+  :; done
+flock /tmp/reva-devdb.lock uv run python - <<'PY'
+import json, pathlib
+from reva.adapters.objects.factory import get_store
+from reva.adapters.postgres.engine import make_engine
+from reva.estimation.run import archive_run, write_effect_estimates
+eng, store = make_engine("worker"), get_store()
+for f in sorted(pathlib.Path("runs").glob("*.json")):
+    doc = json.loads(f.read_text()); sha = archive_run(eng, store, doc)
+    try: print(f.name, write_effect_estimates(eng, store, doc, sha, origin="live"))
+    except Exception as e: print(f.name, "not written:", e)
+PY
 ```
