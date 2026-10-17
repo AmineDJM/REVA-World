@@ -50,6 +50,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
         help="share of today's global remaining wbapi budget (replaces the per-day 30%% CAUSWD share; WDOPS)",
     )
+    r.add_argument(
+        "--min-free-mb",
+        type=int,
+        default=live.MIN_FREE_BYTES // 1024**2,
+        help="stop when free disk falls below this many MiB (default 5 GiB)",
+    )
     rp = sub.add_parser("report", help="consistency report over the loaded causal statements")
     rp.add_argument("--db", default=live.DEFAULT_DB)
     rp.add_argument("--chains", type=int, default=12)
@@ -104,6 +110,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     batch_size=args.batch_size,
                     linger=args.linger,
                     share=args.share,
+                    min_free_bytes=args.min_free_mb * 1024**2,
                 )
             )
         except BudgetExhausted as e:

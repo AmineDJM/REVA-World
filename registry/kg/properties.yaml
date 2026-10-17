@@ -2411,6 +2411,18 @@ properties:
     wikidata_datatype: external-id
     requested_by: V4HEALTH
     why: "ICD-11 (foundation) id on disease items -- bridge to Mondo icd11.foundation xrefs"
+# merged property requests (wbgetentities labels|datatype 2026-10-17T16:29:19.726714+00:00 raw e0e3d8a60703)
+  - property: P8283
+    reva_predicate: isco08_code
+    inverse: null
+    kind: string
+    group: economy
+    expected_en: "ISCO-08 occupation class"
+    label_en: "ISCO-08 occupation class"
+    label_fr: "code dans la Classification internationale type des professions 2008"
+    wikidata_datatype: string
+    requested_by: V4MIND
+    why: "ISCO-08 occupation class (occupation -> ISCO-08 code); links Wikidata occupations to ILOSTAT ISCO groups by code."
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:

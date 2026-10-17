@@ -2,7 +2,7 @@ id: society.mind_isco08_occupations
 domain: society
 owner: V4MIND
 description: >-
-  Occupations as Wikidata items that carry an ISCO-08 occupation class (P952), at every ISCO level Wikidata holds
+  Occupations as Wikidata items that carry an ISCO-08 occupation class (P8283), at every ISCO level Wikidata holds
   (major, sub-major, minor and unit groups, and occupations classified into them). Complements the ILOSTAT
   classif1 groups loaded by atlas.ilostat_occupation (isco08:<code>, 1-2 digits): the two meet only through the
   ISCO-08 code value (identifier), via V4LINK, never by label.
@@ -10,11 +10,12 @@ purpose: seed_entities
 entity_kind: occupation
 sparql: |
   SELECT DISTINCT ?item WHERE {
-    ?item p:P952 ?st . ?st wikibase:rank ?r .
+    ?item p:P8283 ?st . ?st wikibase:rank ?r .
     FILTER(?r != wikibase:DeprecatedRank)
   }
 max_rows: 12000
 expand_hops: 0
 notes: >-
-  Needs the P952 property request (registry/kg/property_requests/v4mind.yaml) merged for the code values to be
-  stored. Not harvested yet (Wikidata 429 on 2026-10-17).
+  Needs the P8283 property request (registry/kg/property_requests/v4mind.yaml) merged for the code values to be
+  stored. WDOPS 2026-10-17: the spec first selected P952, which Wikidata labels "ISCO-88 occupation class"
+  (checked by the merge); ISCO-08 is P8283.

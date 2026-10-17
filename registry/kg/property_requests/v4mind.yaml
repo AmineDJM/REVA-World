@@ -27,11 +27,13 @@
   group: health
   label_en: DSM-5 classification code
   label_fr: code DSM-5
-- property: P952
+# WDOPS 2026-10-17: the merge check found P952 = "ISCO-88 occupation class" (datatype string), not ISCO-08;
+# the ISCO-08 property is P8283 ("ISCO-08 occupation class", datatype string). Request moved to P8283.
+- property: P8283
   why: ISCO-08 occupation class (occupation -> ISCO-08 code); links Wikidata occupations to ILOSTAT ISCO groups by code.
   reva_predicate: isco08_code
   inverse: null
-  kind: external_id
+  kind: string
   group: economy
   label_en: ISCO-08 occupation class
   label_fr: code CITP-08

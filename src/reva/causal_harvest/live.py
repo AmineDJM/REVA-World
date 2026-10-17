@@ -755,8 +755,8 @@ async def wait_for_wbapi(client: WikidataClient, *, poll: float = 15.0, max_wait
     return waited
 
 
-def disk_ok() -> bool:
-    return shutil.disk_usage(REPO_ROOT).free >= MIN_FREE_BYTES
+def disk_ok(min_free_bytes: int = MIN_FREE_BYTES) -> bool:
+    return shutil.disk_usage(REPO_ROOT).free >= min_free_bytes
 
 
 async def run(
@@ -773,6 +773,7 @@ async def run(
     batch_size: int = 10,
     linger: bool = False,
     share: float | None = None,
+    min_free_bytes: int = MIN_FREE_BYTES,
 ) -> dict[str, Any]:
     """One budget session (ends at the UTC day boundary, the cap, ``until`` or an empty frontier)."""
     task = asyncio.current_task()
@@ -814,8 +815,8 @@ async def run(
                 if datetime.now(UTC).date() != day:
                     stop = "day_boundary"
                     break
-                if not disk_ok():
-                    stop = "disk_free_below_5GB"
+                if not disk_ok(min_free_bytes):
+                    stop = "disk_free_below_floor"
                     break
                 if footprint_bytes(sess.kg_engine, db) > MAX_FOOTPRINT_BYTES:
                     stop = "footprint_cap"
