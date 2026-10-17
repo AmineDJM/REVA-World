@@ -50,6 +50,7 @@ export function normaliseRights(source: string, raw: unknown): AtlasLicence | nu
     restricted: nc || sa || nd || charge || open === false,
     basis: 'source_registry',
     restriction: null,
+    required_notice: typeof r.required_notice === 'string' && r.required_notice ? r.required_notice : null,
   };
 }
 

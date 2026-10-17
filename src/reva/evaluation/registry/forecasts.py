@@ -124,8 +124,16 @@ def forecast_reference(
     return out
 
 
+def finance_models() -> dict[str, tuple[str, str]]:
+    """Finance benchmarks and candidates (V6 PRED-FIN); every one is registered so that a batch or a resolution can
+    record a row for it, issued or not."""
+    from reva.models.forecasting.finance_models import FIN_MODELS
+
+    return {k: (v, f"{kind}: {d}") for k, (v, kind, d) in FIN_MODELS.items()}
+
+
 def all_models() -> dict[str, tuple[str, str]]:
-    return {**BASELINES, **REFERENCE_MODELS}
+    return {**BASELINES, **REFERENCE_MODELS, **finance_models()}
 
 
 __all__ = [
@@ -135,6 +143,7 @@ __all__ = [
     "REFERENCE_WEO",
     "abstention",
     "all_models",
+    "finance_models",
     "forecast_baseline",
     "forecast_reference",
     "num",

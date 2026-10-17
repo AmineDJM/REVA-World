@@ -35,6 +35,9 @@ from reva.estimation.cli import estimate_app  # noqa: E402  (V5 PRED-EVENTSTUDY)
 app.add_typer(estimate_app, name="estimate")
 forecasts_app = typer.Typer(no_args_is_help=True, help="V5 prospective forecast registry (PRED-REGISTRY)")
 app.add_typer(forecasts_app, name="forecasts")
+from reva.cli.objects import objects_app  # noqa: E402  (V6 DISKZ)
+
+app.add_typer(objects_app, name="objects")
 
 
 def _out(obj: Any) -> None:
@@ -777,7 +780,9 @@ def forecasts_status_cmd(origin: str = typer.Option("live", help="live, test_fix
         {
             "batches": [{k: str(v) if k == "recorded_at" else v for k, v in b.items()} for b in bs],
             "questions": lb["questions"],
-            "leaderboard": [{k: r[k] for k in ("model", "n_issued", "n_scored", "mae", "crps", "brier")} for r in lb["models"]],
+            "leaderboard": [
+                {k: r[k] for k in ("model", "n_issued", "n_scored", "mae", "crps", "brier")} for r in lb["models"]
+            ],
             "families": {f["key"]: f["status"] for f in fams},
         }
     )

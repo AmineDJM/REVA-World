@@ -21,7 +21,7 @@ from sqlalchemy import Connection, text
 
 from reva.kernel.errors import ValidationProblem
 from reva.kg import query as kq
-from reva.kg.families import FamilyError, FamilyRegistry, load_registry, share_of
+from reva.kg.families import FamilyError, FamilyRegistry, load_registry, measured_by_target, share_of
 from reva.kg.model import CAUSAL_PIDS
 
 MAX_PER_FAMILY = 200
@@ -164,7 +164,7 @@ def entity_families(
                 "subtype": m.subtype,
                 "mapping": {"origin": m.origin, "agent": m.agent, "direction": m.direction},
                 "share": share_of(m, r.get("qualifiers")) if m.share_qualifier else None,
-                "atlas": _atlas_hint(ef.family, other, r.get("qualifiers")),
+                "atlas": _atlas_hint(ef.family, other, r.get("qualifiers"), kinds.get(other)),
                 "rights": _rights(r, rights),
                 "statement": st,
             }
@@ -224,18 +224,13 @@ def _count_scanned(rows: list[dict[str, Any]]) -> int:
     return sum(seen.values())
 
 
-def _atlas_hint(family: str, other: str, qualifiers: Any) -> dict[str, Any] | None:
-    """For ``measured_by``: the atlas concept (object id ``atlas:<concept>`` or qualifier ``concept``) and the
-    geography (qualifier ``iso3``) the UI fetches the series for. ``None`` otherwise."""
+def _atlas_hint(family: str, other: str, qualifiers: Any, kind: str | None = None) -> dict[str, Any] | None:
+    """For ``measured_by``: where the series lives in the atlas (:func:`reva.kg.families.measured_by_target`):
+    a catalog concept (``kind: concept``, geography ``iso3``) or an atlas table entity (``kind: table``, with the
+    ``provider_geo`` / indicator filters the statement carries). ``None`` otherwise."""
     if family != "measured_by":
         return None
-    q = qualifiers if isinstance(qualifiers, Mapping) else {}
-    concept = q.get("concept") or (other.split(":", 1)[1] if other.startswith("atlas:") else None)
-    if not concept:
-        return None
-    iso3 = q.get("iso3")
-    return {"concept": str(concept)[:200], "iso3": str(iso3)[:3].upper() if iso3 else None,
-            "table": q.get("table")}  # fmt: skip
+    return measured_by_target(other, qualifiers, kind)
 
 
 def _unmapped(

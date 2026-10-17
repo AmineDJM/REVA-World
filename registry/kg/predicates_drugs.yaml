@@ -1,0 +1,119 @@
+# Dataset predicates of the medicines layer (owner: V6DRUGS). Not Wikidata properties: the connectors register
+# them in the KG allow-list through reva.kg.model.register_properties (src/reva/adapters/connectors/drugs_common.py).
+# Family mappings: registry/kg/relations_v4.d/v6drugs.yaml. Report: docs/dev/v6_drugs.md.
+#
+# Entity keys (provider identifiers; REVA-composed keys say so):
+#   chembl:<CHEMBLn>          a ChEMBL molecule (approved drugs, max_phase 4)            kind drug
+#                             or a ChEMBL target (target_chembl_id)                       kind drug_target
+#   efo:<n>, mondo:<n>, doid:<n>, hp:<n>, orphanet:<n>  the indication term ChEMBL gives (efo_id column, prefix as
+#                             published); mondo/doid entities belong to V4HEALTH and are not created here; the others
+#                             are created with ChEMBL's efo_term as label                  kind disease_or_phenotype
+#   mesh:<Dn>                 a MeSH descriptor id, labelled with the heading ChEMBL publishes next to it
+#                                                                                         kind mesh_descriptor
+#   unii:<code>               an FDA Unique Ingredient Identifier (FDA Global Substance Registration System)
+#                                                                                         kind drug_substance
+#   eml:medicine:<n>          a medicine of the WHO electronic Essential Medicines List (eEML medicine id)
+#                                                                                         kind drug
+#   eml:section:<n>           an eEML list section (eEML section id, e.g. 444 = "21.5 ... Mydriatics")
+#                                                                                         kind eml_section
+#   eml:list:eml, eml:list:emlc  REVA-composed keys of the two WHO lists (adults / children) kind essential_medicines_list
+#   icd11mms:<code>           an ICD-11 MMS code as eEML links it to a recommendation       kind icd11_category
+#   ctgov:condition_mesh:<Dn>, ctgov:intervention_mesh:<Dn>  REVA-composed AGGREGATE entities: "studies registered on
+#                             ClinicalTrials.gov whose derived condition / intervention MeSH terms include <Dn>"
+#                             (counts only; no individual trial record is loaded)          kind clinical_trial
+#
+# Honesty:
+# * An indication (ChEMBL drug_indication, eEML recommendation) is an association "drug is used / studied / listed
+#   for this condition" with the phase the source gives. It is not a causal claim and says nothing about efficacy
+#   size: no predicate here is causal (families: associated_with).
+# * A mechanism of action (ChEMBL) is "molecule acts on target as <action_type>", family interacts_with.
+# * FAERS counts (openFDA) are counts of spontaneous adverse-event REPORTS that mention a substance. A report is not
+#   evidence that the substance caused the event (FDA: "a causal relationship cannot be established"); counts
+#   depend on exposure, publicity and reporting rules. Stated in every statement's qualifiers.
+# * ATC codes are published by the WHO Collaborating Centre for Drug Statistics Methodology, whose terms say
+#   "Copying and distribution for commercial purposes is not allowed. Changing or manipulating the material is not
+#   allowed." They are kept verbatim as identifiers and flagged licence_noncommercial on every statement.
+predicates:
+  # ------------------------------------------------------------------ ChEMBL (chembl.api, CC BY-SA 3.0)
+  - {pid: "chembl:molecule_type", value_kind: string, reva_predicate: chembl_molecule_type,
+     label_en: "molecule type (ChEMBL)", label_fr: "type de molécule (ChEMBL)"}
+  - {pid: "chembl:first_approval", value_kind: time, reva_predicate: chembl_first_approval,
+     label_en: "year of first approval (ChEMBL)", label_fr: "année de première autorisation (ChEMBL)"}
+  - {pid: "chembl:max_phase", value_kind: quantity, reva_predicate: chembl_max_phase,
+     label_en: "maximum development phase (ChEMBL)", label_fr: "phase de développement maximale (ChEMBL)"}
+  - {pid: "chembl:atc_code", value_kind: external_id, reva_predicate: chembl_atc_code,
+     label_en: "ATC code (WHOCC, as listed by ChEMBL)", label_fr: "code ATC (WHOCC, listé par ChEMBL)"}
+  - {pid: "chembl:route", value_kind: string, reva_predicate: chembl_route,
+     label_en: "route of administration flag (ChEMBL)", label_fr: "voie d'administration (indicateur ChEMBL)"}
+  - {pid: "chembl:black_box_warning", value_kind: string, reva_predicate: chembl_black_box_warning,
+     label_en: "boxed warning on a label (ChEMBL flag)", label_fr: "avertissement encadré (indicateur ChEMBL)"}
+  - {pid: "chembl:withdrawn", value_kind: string, reva_predicate: chembl_withdrawn,
+     label_en: "withdrawn in at least one country (ChEMBL flag)", label_fr: "retiré dans au moins un pays (indicateur ChEMBL)"}
+  - {pid: "chembl:parent_molecule", value_kind: item, reva_predicate: chembl_parent_molecule,
+     label_en: "parent molecule (ChEMBL hierarchy: salt / form -> parent)", label_fr: "molécule parente (hiérarchie ChEMBL)",
+     inverse_name: chembl_form_of_parent, inverse_label_en: "salt or form (ChEMBL)", inverse_label_fr: "sel ou forme (ChEMBL)"}
+  - {pid: "chembl:mechanism_target", value_kind: item, reva_predicate: chembl_mechanism_target,
+     label_en: "acts on target (ChEMBL mechanism of action)", label_fr: "agit sur la cible (mécanisme d'action ChEMBL)",
+     inverse_name: chembl_target_of_drug, inverse_label_en: "target of drug (ChEMBL)", inverse_label_fr: "cible du médicament (ChEMBL)"}
+  - {pid: "chembl:target_type", value_kind: string, reva_predicate: chembl_target_type,
+     label_en: "target type (ChEMBL)", label_fr: "type de cible (ChEMBL)"}
+  - {pid: "chembl:target_organism", value_kind: item, reva_predicate: chembl_target_organism,
+     label_en: "target organism (ChEMBL tax_id)", label_fr: "organisme de la cible (tax_id ChEMBL)"}
+  - {pid: "chembl:target_component", value_kind: item, reva_predicate: chembl_target_component,
+     label_en: "target component protein (ChEMBL-UniProt mapping)", label_fr: "protéine composante de la cible (correspondance ChEMBL-UniProt)",
+     inverse_name: chembl_component_of_target, inverse_label_en: "component of ChEMBL target", inverse_label_fr: "composante de la cible ChEMBL"}
+  - {pid: "chembl:indication", value_kind: item, reva_predicate: chembl_indication,
+     label_en: "indication (ChEMBL drug_indication, EFO term)", label_fr: "indication (ChEMBL, terme EFO)",
+     inverse_name: chembl_indication_of, inverse_label_en: "indication of (ChEMBL)", inverse_label_fr: "indication de (ChEMBL)"}
+  - {pid: "chembl:indication_mesh", value_kind: item, reva_predicate: chembl_indication_mesh,
+     label_en: "indication (ChEMBL drug_indication, MeSH heading)", label_fr: "indication (ChEMBL, descripteur MeSH)",
+     inverse_name: chembl_indication_mesh_of, inverse_label_en: "indication of (ChEMBL, MeSH)", inverse_label_fr: "indication de (ChEMBL, MeSH)"}
+  # ------------------------------------------------------------------ UniChem (unichem.mapping)
+  - {pid: "unichem:chebi", value_kind: item, reva_predicate: unichem_chebi,
+     label_en: "same standard structure as ChEBI entry (UniChem ChEMBL-ChEBI mapping)", label_fr: "même structure standard que l'entrée ChEBI (UniChem)"}
+  - {pid: "unichem:drugbank_id", value_kind: external_id, reva_predicate: unichem_drugbank_id,
+     label_en: "DrugBank id with the same standard structure (UniChem)", label_fr: "identifiant DrugBank de même structure (UniChem)"}
+  - {pid: "unichem:fda_unii", value_kind: item, reva_predicate: unichem_fda_unii,
+     label_en: "same standard structure as FDA UNII (UniChem ChEMBL-FDA SRS mapping)", label_fr: "même structure standard que l'UNII FDA (UniChem)"}
+  # ------------------------------------------------------------------ WHO eEML (who.eeml, CC BY 3.0 IGO)
+  - {pid: "eml:on_list", value_kind: item, reva_predicate: eml_on_list,
+     label_en: "listed on (WHO Model List)", label_fr: "inscrit sur (Liste modèle OMS)",
+     inverse_name: eml_lists, inverse_label_en: "lists medicine", inverse_label_fr: "inscrit le médicament"}
+  - {pid: "eml:in_section", value_kind: item, reva_predicate: eml_in_section,
+     label_en: "listed in section (WHO eEML)", label_fr: "inscrit dans la section (eEML OMS)"}
+  - {pid: "eml:section_parent", value_kind: item, reva_predicate: eml_section_parent,
+     label_en: "subsection of (WHO eEML)", label_fr: "sous-section de (eEML OMS)"}
+  - {pid: "eml:recommended_for", value_kind: item, reva_predicate: eml_recommended_for,
+     label_en: "listed for indication (WHO eEML recommendation, ICD-11)", label_fr: "inscrit pour l'indication (recommandation eEML, CIM-11)",
+     inverse_name: eml_indication_of, inverse_label_en: "indication of essential medicine", inverse_label_fr: "indication du médicament essentiel"}
+  - {pid: "eml:indication_text", value_kind: string, reva_predicate: eml_indication_text,
+     label_en: "indication as written (WHO eEML)", label_fr: "indication telle qu'écrite (eEML OMS)"}
+  - {pid: "eml:atc_code", value_kind: external_id, reva_predicate: eml_atc_code,
+     label_en: "ATC code (WHOCC, as listed by WHO eEML)", label_fr: "code ATC (WHOCC, listé par l'eEML OMS)"}
+  - {pid: "eml:medicine_type", value_kind: string, reva_predicate: eml_medicine_type,
+     label_en: "medicine type (WHO eEML)", label_fr: "type de médicament (eEML OMS)"}
+  - {pid: "eml:drugbank_id", value_kind: external_id, reva_predicate: eml_drugbank_id,
+     label_en: "DrugBank id (link published by WHO eEML)", label_fr: "identifiant DrugBank (lien publié par l'eEML OMS)"}
+  - {pid: "eml:status_history", value_kind: time, reva_predicate: eml_status_history,
+     label_en: "EML status change (year, Technical Report Series)", label_fr: "changement de statut sur la LME (année, série de rapports techniques)"}
+  - {pid: "eml:therapeutic_alternative", value_kind: item, reva_predicate: eml_therapeutic_alternative,
+     label_en: "therapeutic alternative (WHO eEML square box)", label_fr: "alternative thérapeutique (carré eEML OMS)"}
+  - {pid: "eml:chembl_molecule", value_kind: item, reva_predicate: eml_chembl_molecule,
+     label_en: "ChEMBL molecule with the eEML medicine's DrugBank id (UniChem)", label_fr: "molécule ChEMBL ayant l'identifiant DrugBank du médicament eEML (UniChem)"}
+  - {pid: "eml:icd11_uri", value_kind: url, reva_predicate: eml_icd11_uri,
+     label_en: "ICD-11 entity URI (as linked by WHO eEML)", label_fr: "URI d'entité CIM-11 (lien eEML OMS)"}
+  # ------------------------------------------------------------------ openFDA (openfda.api, CC0)
+  - {pid: "openfda:faers_reports", value_kind: quantity, reva_predicate: openfda_faers_reports,
+     label_en: "FAERS adverse-event reports mentioning the substance (openFDA count; reports, not causation)",
+     label_fr: "déclarations d'effets indésirables FAERS mentionnant la substance (openFDA ; déclarations, pas causalité)"}
+  - {pid: "openfda:label_count", value_kind: quantity, reva_predicate: openfda_label_count,
+     label_en: "drug labels (SPL) listing the substance (openFDA count)", label_fr: "notices (SPL) mentionnant la substance (openFDA)"}
+  - {pid: "openfda:recall_count", value_kind: quantity, reva_predicate: openfda_recall_count,
+     label_en: "drug recall enforcement reports listing the substance (openFDA count)", label_fr: "rappels de médicaments mentionnant la substance (openFDA)"}
+  # ------------------------------------------------------------------ ClinicalTrials.gov (ctgov.api)
+  - {pid: "ctgov:studies_count", value_kind: quantity, reva_predicate: ctgov_studies_count,
+     label_en: "registered studies (ClinicalTrials.gov count)", label_fr: "études enregistrées (ClinicalTrials.gov)"}
+  - {pid: "ctgov:condition_mesh", value_kind: item, reva_predicate: ctgov_condition_mesh,
+     label_en: "studies of condition (MeSH, ClinicalTrials.gov derived)", label_fr: "études sur la condition (MeSH, ClinicalTrials.gov)"}
+  - {pid: "ctgov:intervention_mesh", value_kind: item, reva_predicate: ctgov_intervention_mesh,
+     label_en: "studies of intervention (MeSH, ClinicalTrials.gov derived)", label_fr: "études de l'intervention (MeSH, ClinicalTrials.gov)"}

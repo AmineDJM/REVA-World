@@ -20,7 +20,7 @@ from reva.api.auth import require_scope
 from reva.api.deps import origin_warnings, read_conn
 from reva.api.errors import NotFound
 from reva.atlas.catalog import Catalog, cached_catalog
-from reva.atlas.query import AtlasQuery, query_for, request_snapshot
+from reva.atlas.query import AtlasQuery, query_for, request_snapshot, required_notices
 from reva.atlas.source_order import HeadlineRegistry, cached_headlines
 from reva.atlas.tables import geo_index
 
@@ -76,6 +76,11 @@ class AtlasRights(_M):
     restricted: bool = Field(description="Any non-commercial, share-alike, no-derivatives or not-open term")
     basis: str = Field(description="table_artifact (recorded with the table) | atlas_source_spec (source default)")
     restriction: str | None = None
+    required_notice: str | None = Field(
+        None,
+        description="Notice the provider's terms require with any presentation or distribution of the values "
+        "(verbatim; e.g. New York Fed reference rates): show it wherever these values are shown",
+    )
 
 
 class AtlasLicence(AtlasRights):
@@ -300,6 +305,38 @@ class AtlasSeriesResponse(_M):
     warnings: list[s.ApiWarning] = []
 
 
+class AtlasTableIndicator(_M):
+    indicator: str
+    series: str = Field(description="<source>.<dataset>.<indicator>")
+    cells: int
+    values: int = Field(description="Cells with a value (the others are flagged missing rows)")
+    geographies: int = Field(description="Distinct provider geographies (regions are never countries)")
+    countries: int = Field(description="Distinct ISO3 countries among them")
+    period_first: str
+    period_last: str = Field(description="Exclusive end of the last period")
+    unit: str | None
+
+
+class AtlasTableCells(_M):
+    table: str = Field(description="<source>.<dataset>")
+    source: str
+    dataset: str
+    in_snapshot: bool = Field(description="false: the table is not pinned by this atlas snapshot (absent, not empty)")
+    filters: dict[str, Any]
+    concepts: list[str] = Field(description="Catalog concepts whose source order reads this table")
+    indicators: list[AtlasTableIndicator]
+    cells: list[AtlasCell] = Field(description="Only when a geography (provider_geo or iso3) is given")
+    truncated: bool
+    licences: list[AtlasLicence] = []
+
+
+class AtlasTableCellsResponse(_M):
+    data: AtlasTableCells
+    snapshot: AtlasSnapshotRef
+    notes: list[str]
+    warnings: list[s.ApiWarning] = []
+
+
 class AtlasMap(_M):
     concept: AtlasConcept
     year: int
@@ -487,7 +524,16 @@ def _query(request: Request, origin: str | None, snapshot: str | None) -> AtlasQ
 
 
 def _licence_warnings(licences: list[dict[str, Any]]) -> list[s.ApiWarning]:
-    """LIC-1: one warning naming every restricted licence among the sources of the answer."""
+    """LIC-1: one warning naming every restricted licence among the sources of the answer, plus one
+    ``required_notice`` warning per source whose terms require a notice next to its values (verbatim)."""
+    notices = [
+        s.ApiWarning(code="required_notice", message=f"{n['source']}: {n['notice']}")
+        for n in required_notices(licences)
+    ]
+    return _restricted_warnings(licences) + notices
+
+
+def _restricted_warnings(licences: list[dict[str, Any]]) -> list[s.ApiWarning]:
     bad = [x for x in licences if x.get("restricted")]
     if not bad:
         return []
@@ -643,6 +689,46 @@ def concept_series(
         snapshot=_snap(q),
         notes=[CELL_NOTE],
         warnings=origin_warnings(q.snapshot.origin) + _licence_warnings(data["licences"]),
+    )
+
+
+TABLE_NOTE = (
+    "Cells of one atlas table as the provider published them (every period, monthly/quarterly included), selected by "
+    "the identifiers a KG measured_by statement carries (provider geography, indicator). Region codes are the "
+    "provider's own; a region is never a country. Nothing is aggregated, converted or filled."
+)
+
+
+@router.get("/tables/{source}/{dataset}/cells", response_model=AtlasTableCellsResponse)
+def table_cells(
+    request: Request,
+    source: str = Path(..., pattern="^[a-z0-9][a-z0-9_-]{0,23}$"),
+    dataset: str = Path(..., pattern="^[a-z0-9][a-z0-9_-]{0,38}$"),
+    provider_geo: str | None = Query(None, pattern="^[A-Za-z0-9_.-]{1,40}$", description="Provider geography code"),
+    iso3: str | None = Query(None, pattern="^[A-Za-z]{3}$"),
+    indicator: list[str] | None = Query(None, max_length=50, description="Exact indicator ids (repeatable)"),
+    indicator_contains: str | None = Query(None, min_length=1, max_length=100, description="Indicator substring"),
+    limit: int = Query(2000, ge=1, le=5000),
+    origin: str | None = ORIGIN_Q,
+    snapshot: str | None = SNAPSHOT_Q,
+) -> AtlasTableCellsResponse:
+    inds = [i for i in (indicator or []) if 0 < len(i) <= 200]
+    q = _query(request, origin, snapshot)
+    data = q.table_cells(
+        _catalog(), source, dataset, provider_geo=provider_geo, iso3=iso3.upper() if iso3 else None,
+        indicators=inds, indicator_contains=indicator_contains, limit=limit,
+    )  # fmt: skip
+    warnings = origin_warnings(q.snapshot.origin) + _licence_warnings(data["licences"])
+    if not data["in_snapshot"]:
+        warnings.append(
+            s.ApiWarning(
+                code="table_not_in_snapshot",
+                message=f"atlas table {data['table']} is not pinned by atlas snapshot {q.snapshot.sha256[:12]}: "
+                "its values are absent from this snapshot (not zero); a later snapshot may pin it",
+            )
+        )
+    return AtlasTableCellsResponse(
+        data=AtlasTableCells(**data), snapshot=_snap(q), notes=[TABLE_NOTE], warnings=warnings
     )
 
 

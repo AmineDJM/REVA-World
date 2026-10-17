@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "9ef5bab5f6dd933b18a53a03607e6de7192f0751acdebee0af8521efb0cc1d6e",
+    "url": "https://covid19-forecast-hub.s3.amazonaws.com/target-data/covid-hospital-admissions.csv",
+    "file": "target.csv",
+    "sha256": "c703909a33f1f730b6daa2e5ba4f3f7c2546d6daf89e5244168cdacf0f45031a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC0 1.0 / US public domain (README 'Public Domain Standard Notice'); attribution requested (covidhub@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged"
+  },
+  {
+    "request_fingerprint": "4e9df08a9b6cd713409bb05a996175d6fcf4be47432fd847440d171a8e5215cd",
+    "url": "https://covid19-forecast-hub.s3.amazonaws.com/?list-type=2&prefix=model-output/CovidHub-ensemble/&max-keys=1000",
+    "file": "ensemble_list.xml",
+    "sha256": "93bc17ce4cbf9f1b29f27a8ba118fcf8457f084e9e03198364a2b62b048c38a8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC0 1.0 / US public domain (README 'Public Domain Standard Notice'); attribution requested (covidhub@cdc.gov)",
+    "fixture_note": "S3 ListObjectsV2 response as served, trimmed to the files captured for this fixture"
+  },
+  {
+    "request_fingerprint": "fc04c094a258ad7920de3ccd2094946d534bc6820f58197748fef0243ca5f34e",
+    "url": "https://covid19-forecast-hub.s3.amazonaws.com/model-output/CovidHub-ensemble/2026-10-10-CovidHub-ensemble.parquet",
+    "file": "ensemble_2026-10-10.parquet",
+    "sha256": "b5b170ba854303bbf74529e56555091732479ffe7e4062efab68c20a1492748a",
+    "status": 200,
+    "headers": {
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC0 1.0 / US public domain (README 'Public Domain Standard Notice'); attribution requested (covidhub@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged (re-written as parquet)"
+  },
+  {
+    "request_fingerprint": "cba921a691d31ad9c18b243f152ac3e1c0382c9362c389eedaff0a6d160b01b7",
+    "url": "https://covid19-forecast-hub.s3.amazonaws.com/model-output/CovidHub-ensemble/2026-10-17-CovidHub-ensemble.parquet",
+    "file": "ensemble_2026-10-17.parquet",
+    "sha256": "544815b5bc774ae396f0c443d2a0eaa210e64f29ef432c0bae1d18a7bc896a56",
+    "status": 200,
+    "headers": {
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC0 1.0 / US public domain (README 'Public Domain Standard Notice'); attribution requested (covidhub@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged (re-written as parquet)"
+  },
+  {
+    "request_fingerprint": "ae20dab2b3b8a9bb116dc464501f6d53225c26c6183d8073d9de605c30223749",
+    "url": "https://covid19-forecast-hub.s3.amazonaws.com/target-data/time-series.parquet",
+    "file": "time_series.parquet",
+    "sha256": "3e0de42c114bae7637c3bfa890ce5506775518f0a3a54fc8ed2944d90f353ff9",
+    "status": 200,
+    "headers": {
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC0 1.0 / US public domain (README 'Public Domain Standard Notice'); attribution requested (covidhub@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged; as_of >= 2026-09-01, target 'wk inc covid hosp' only (re-written as parquet)"
+  }
+]

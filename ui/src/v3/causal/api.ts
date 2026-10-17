@@ -206,6 +206,7 @@ function rightsOf(key: string, v: unknown): AtlasLicence | null {
     restricted: b(v.restricted),
     basis: optStr(v.basis) ?? 'causal_api',
     restriction: optStr(v.restriction),
+    required_notice: optStr(v.required_notice),
   };
 }
 

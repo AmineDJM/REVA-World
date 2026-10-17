@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from "react-router";
-import { getAtlasSeries, conceptLabel } from "../api/atlas";
+import { getAtlasSeries, getAtlasTableCells, conceptLabel, type AtlasCell } from "../api/atlas";
 import {
   getEntityFamilies,
   getEntityPlaces,
@@ -13,7 +13,7 @@ import { useApi } from "../../lib/useApi";
 import { CitationChip } from "../components/CitationChip";
 import { EntityCard } from "../components/EntityCard";
 import { EntityPicker, type PickedEntity } from "../components/EntityPicker";
-import { LicenceBadge, LicenceList } from "../components/Licence";
+import { LicenceBadge, LicenceList, RequiredNotices } from "../components/Licence";
 import { Sparkline } from "../components/Sparkline";
 import { V3Empty, V3Error, V3Loading } from "../components/States";
 import { citeKgStatement } from "../lib/citations";
@@ -343,26 +343,35 @@ function Series({ groups }: { groups: FamilyGroup[] }) {
     <section aria-labelledby="fiche-series">
       <h2 id="fiche-series">Séries de l’atlas</h2>
       <ul data-testid="fiche-series">
-        {hints.map((h) => (
-          <SeriesRow key={`${h.concept}|${h.iso3 ?? ""}`} hint={h} />
-        ))}
+        {hints.map((h) =>
+          h.kind === "table" && h.source && h.dataset ? (
+            <TableSeriesRow key={hintKey(h)} hint={h} />
+          ) : (
+            <SeriesRow key={hintKey(h)} hint={h} />
+          ),
+        )}
       </ul>
     </section>
   );
 }
 
+const hintKey = (h: AtlasHint) =>
+  [h.kind, h.concept, h.table, h.provider_geo, h.iso3, h.indicator_contains, ...h.indicators].join("|");
+
 function SeriesRow({ hint }: { hint: AtlasHint }) {
   const iso3 = hint.iso3;
+  const concept = hint.concept ?? "";
   const s = useApi(
-    (sig) => getAtlasSeries(hint.concept, iso3!, sig),
-    [hint.concept, iso3],
-    !!iso3,
+    (sig) => getAtlasSeries(concept, iso3!, sig),
+    [concept, iso3],
+    !!iso3 && !!concept,
   );
+  if (!concept) return null;
   if (!iso3) {
     return (
       <li>
-        <Link to={`/v3/atlas?concept=${encodeURIComponent(hint.concept)}`}>
-          {hint.concept}
+        <Link to={`/v3/atlas?concept=${encodeURIComponent(concept)}`}>
+          {concept}
         </Link>{" "}
         <span className="muted">
           (série par pays : voir la carte de l’atlas)
@@ -370,11 +379,11 @@ function SeriesRow({ hint }: { hint: AtlasHint }) {
       </li>
     );
   }
-  if (s.status === "loading") return <li>Chargement de {hint.concept}…</li>;
+  if (s.status === "loading") return <li>Chargement de {concept}…</li>;
   if (s.status === "error") {
     return (
       <li>
-        <V3Error error={s.error} what={`La série ${hint.concept} (${iso3})`} />
+        <V3Error error={s.error} what={`La série ${concept} (${iso3})`} />
       </li>
     );
   }
@@ -405,6 +414,130 @@ function SeriesRow({ hint }: { hint: AtlasHint }) {
           <LicenceBadge rights={last.rights} />
         </span>
       )}
+      <RequiredNotices licences={s.data.data.licences} />
+    </li>
+  );
+}
+
+/** A table entity (atlas:<source>.<dataset>): the subject's cells read with the filters its statement carries. */
+function TableSeriesRow({ hint }: { hint: AtlasHint }) {
+  const s = useApi(
+    (sig) =>
+      getAtlasTableCells(
+        {
+          source: hint.source!,
+          dataset: hint.dataset!,
+          provider_geo: hint.provider_geo,
+          iso3: hint.iso3,
+          indicators: hint.indicators,
+          indicator_contains: hint.indicator_contains,
+        },
+        sig,
+      ),
+    [hintKey(hint)],
+  );
+  const where = hint.provider_geo
+    ? `code ${hint.provider_geo}`
+    : hint.iso3
+      ? hint.iso3
+      : hint.indicator_contains
+        ? hint.indicator_contains
+        : null;
+  const title = (
+    <>
+      Table <code>{hint.table}</code>
+      {where && <> — {where}</>}
+    </>
+  );
+  if (s.status === "loading") return <li>Chargement de la table {hint.table}…</li>;
+  if (s.status === "error") {
+    return (
+      <li>
+        <V3Error error={s.error} what={`La table ${hint.table}`} />
+      </li>
+    );
+  }
+  if (s.status !== "ok") return null;
+  const d = s.data.data;
+  if (!d.in_snapshot) {
+    return (
+      <li data-testid="fiche-table-absent">
+        {title} :{" "}
+        <span className="v3-missing">
+          table pas encore dans l’instantané de l’atlas (absente, pas zéro)
+        </span>
+      </li>
+    );
+  }
+  if (d.indicators.length === 0) {
+    return (
+      <li>
+        {title} :{" "}
+        <span className="v3-missing">
+          aucune cellule pour ce sujet (absente, pas zéro)
+        </span>
+      </li>
+    );
+  }
+  const byInd = new Map<string, AtlasCell[]>();
+  for (const c of d.cells) {
+    const k = c.indicator;
+    if (!byInd.has(k)) byInd.set(k, []);
+    byInd.get(k)!.push(c);
+  }
+  return (
+    <li data-testid="fiche-table-series">
+      {title}
+      {d.concepts.length > 0 && (
+        <span className="muted">
+          {" "}
+          (concepts :{" "}
+          {d.concepts.slice(0, 3).map((c, i) => (
+            <span key={c}>
+              {i ? ", " : ""}
+              <Link to={`/v3/atlas?concept=${encodeURIComponent(c)}`}>{c}</Link>
+            </span>
+          ))}
+          )
+        </span>
+      )}
+      <ul>
+        {d.indicators.map((ind) => {
+          const cells = (byInd.get(ind.indicator) ?? []).filter(
+            (c) => c.value !== null || c.value_text !== null,
+          );
+          const annual = cells
+            .filter((c) => c.year != null && c.period_basis === "calendar_year")
+            .map((c) => ({
+              year: c.year!,
+              value: c.value,
+              value_text: c.value_text,
+              series: c.series,
+              flags: c.flags,
+            }));
+          const last = cells[cells.length - 1];
+          return (
+            <li key={ind.indicator}>
+              <code>{ind.indicator}</code> :{" "}
+              {annual.length > 1 && <Sparkline points={annual} latestSeries={last?.series} />}
+              {last ? (
+                <span>
+                  {" "}
+                  {last.period_start.slice(0, 10)} : {last.value ?? last.value_text} {last.unit}{" "}
+                  <LicenceBadge rights={last.rights} />
+                </span>
+              ) : (
+                <span className="muted">
+                  {ind.values} valeur(s) sur {ind.geographies} géographie(s), {ind.period_first.slice(0, 10)} →{" "}
+                  {ind.period_last.slice(0, 10)}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {d.truncated && <p className="muted">Cellules tronquées (limite de la réponse).</p>}
+      <RequiredNotices licences={d.licences} />
     </li>
   );
 }

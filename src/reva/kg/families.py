@@ -250,6 +250,71 @@ def share_of(mapping: Mapping_, qualifiers: Mapping[str, Any] | None) -> dict[st
     }
 
 
+# ---------------------------------------------------------------------------------------------- measured_by
+#: KG kinds of the ``atlas:<source>.<dataset>`` table entities the V4 loaders create (V4ECON ``data_series``,
+#: V4MIND ``atlas_table``, V4ECO ``atlas_dataset``). Catalog concepts are never KG entities of these kinds.
+ATLAS_TABLE_KINDS = frozenset({"atlas_table", "data_series", "atlas_dataset"})
+#: ``<source>.<dataset>`` atlas table key (same alphabet as ``reva.atlas.catalog.SERIES_KEY_RE``).
+ATLAS_TABLE_RE = re.compile(r"^([a-z0-9][a-z0-9_-]{0,23})\.([a-z0-9][a-z0-9_-]{0,38})$")
+_CLASSIF_RE = re.compile(r"^[A-Z0-9_]{1,60}$")
+_GEO_RE = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
+_IND_RE = re.compile(r"^[^\s][^\n]{0,199}$")
+
+
+def measured_by_target(other: str, qualifiers: Any, kind: str | None = None) -> dict[str, Any] | None:
+    """What a ``measured_by`` edge points at in the atlas, for both conventions the V4 loaders use.
+
+    * ``kind: "concept"`` — V4CORE's :data:`ATLAS_MEASURED_BY`: object ``atlas:<catalog concept id>`` (or qualifier
+      ``concept``), geography in qualifier ``iso3``; read with ``/v1/atlas/series``.
+    * ``kind: "table"`` — V4ECON / V4MIND / V4ECO: object ``atlas:<source>.<dataset>`` (a table entity of kind
+      ``data_series`` / ``atlas_table`` / ``atlas_dataset``), with the qualifiers that select the subject's cells:
+      ``table`` or ``atlas_table`` (table key), ``provider_geo`` (the provider's region code: regions are never
+      countries), ``indicators`` (exact indicator ids), ``classif1`` (ILOSTAT classification folded into the
+      indicator as ``classif1=<code>``); read with ``/v1/atlas/tables/{source}/{dataset}/cells``.
+
+    Only identifiers the statement carries are used (no name matching). ``None`` when nothing usable is given.
+    """
+    q: Mapping[str, Any] = qualifiers if isinstance(qualifiers, Mapping) else {}
+    oid = other.split(":", 1)[1] if other.startswith("atlas:") else None
+    concept = q.get("concept")
+    table = q.get("table") or q.get("atlas_table")
+    iso3 = q.get("iso3")
+    iso3_s = str(iso3)[:3].upper() if isinstance(iso3, str) and iso3 else None
+    if not concept and not table and oid and kind in ATLAS_TABLE_KINDS:
+        table = oid
+    if not concept and isinstance(table, str) and (m := ATLAS_TABLE_RE.match(table)):
+        geo = q.get("provider_geo")
+        inds = q.get("indicators")
+        ind_list = [str(i) for i in inds if isinstance(i, str) and _IND_RE.match(i)] if isinstance(inds, list) else []
+        classif = q.get("classif1")
+        contains = f"classif1={classif}" if isinstance(classif, str) and _CLASSIF_RE.match(classif) else None
+        return {
+            "kind": "table",
+            "concept": None,
+            "table": table,
+            "source": m.group(1),
+            "dataset": m.group(2),
+            "provider_geo": str(geo) if isinstance(geo, str) and _GEO_RE.match(geo) else None,
+            "iso3": iso3_s,
+            "indicators": ind_list[:50],
+            "indicator_contains": contains,
+        }
+    concept = concept or oid
+    if not concept:
+        return None
+    return {
+        "kind": "concept",
+        "concept": str(concept)[:200],
+        "table": str(table)[:100] if table else None,
+        "source": None,
+        "dataset": None,
+        "provider_geo": None,
+        "iso3": iso3_s,
+        "indicators": [],
+        "indicator_contains": None,
+    }
+
+
 # ---------------------------------------------------------------------------------------------- loading
 def _load_yaml(path: Path) -> Any:
     with path.open(encoding="utf-8") as f:

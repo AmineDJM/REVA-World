@@ -16,8 +16,17 @@ from reva.ontology.registry import REGISTRY_ROOT
 SPECS_PATH = REGISTRY_ROOT / "forecasts" / "question_specs.yaml"
 QuestionType = Literal["quantity", "interval", "binary"]
 TYPES = ("quantity", "interval", "binary")
-VALUE_RULES = ("cell", "yoy_pct_from_index", "monthly_mean_of_daily")
-THRESHOLD_RULES = ("above_last_observed",)
+VALUE_RULES = (
+    "cell",
+    "yoy_pct_from_index",
+    "monthly_mean_of_daily",
+    "month_end_of_daily",
+    "month_end_spread_of_daily",
+    "meeting_change",
+)
+#: ``above_fixed``: strictly above the family's declared ``threshold`` (finance meeting families: a move > 0)
+THRESHOLD_RULES = ("above_last_observed", "above_fixed")
+FIN_KINDS = ("fx", "yield", "spread", "oil", "meeting")
 REFERENCE_FORECASTERS = ("forecast.reference_imf_weo",)
 MAX_HORIZON = {"M": 12, "Q": 8, "A": 1}
 MIN_HORIZON = {"M": 1, "Q": 1, "A": 0}
@@ -64,6 +73,9 @@ class Family:
     resolution_note: str | None = None
     owner_agent: str | None = None
     awaiting: str | None = None
+    indicator_minus: str | None = None
+    threshold: str | None = None
+    finance: dict[str, Any] | None = None
     raw: dict[str, Any] = field(default_factory=dict, compare=False, repr=False)
 
     def matches_indicator(self, indicator: str) -> bool:
@@ -71,6 +83,10 @@ class Family:
             return indicator == self.indicator
         parts = set(indicator.split("|"))
         return bool(self.indicator_parts) and all(p in parts for p in self.indicator_parts)
+
+    @property
+    def runs_generic_baselines(self) -> bool:
+        return self.finance is None or bool(self.finance.get("generic_baselines", True))
 
     @property
     def source(self) -> tuple[str, str] | None:
@@ -130,6 +146,15 @@ def _family(doc: dict[str, Any], panels: dict[str, list[str]]) -> Family:
         qs.append(QuestionRule(t, hs, tr))
     if not qs:
         _fail("family without questions", family=key)
+    if rule == "month_end_spread_of_daily" and not doc.get("indicator_minus"):
+        _fail("month_end_spread_of_daily needs indicator_minus", family=key)
+    if any(q.threshold_rule == "above_fixed" for q in qs) and doc.get("threshold") is None:
+        _fail("threshold_rule above_fixed needs a family threshold", family=key)
+    fin = doc.get("finance")
+    if fin is not None:
+        _check_finance(key, rule, fin)
+    elif rule == "meeting_change":
+        _fail("meeting_change families need a finance block", family=key)
     refs = tuple(doc.get("reference_forecasters") or ())
     if any(r not in REFERENCE_FORECASTERS for r in refs):
         _fail("unknown reference forecaster", family=key)
@@ -165,8 +190,49 @@ def _family(doc: dict[str, Any], panels: dict[str, list[str]]) -> Family:
         resolution_note=doc.get("resolution_note"),
         owner_agent=doc.get("owner_agent"),
         awaiting=doc.get("awaiting"),
+        indicator_minus=doc.get("indicator_minus"),
+        threshold=None if doc.get("threshold") is None else str(doc.get("threshold")),
+        finance=dict(fin) if fin is not None else None,
         raw=dict(doc),
     )
+
+
+def _check_finance(key: str, rule: str, fin: Any) -> None:
+    from reva.models.forecasting.finance_models import FIN_MODELS
+
+    if not isinstance(fin, dict):
+        _fail("finance must be a mapping", family=key)
+    kind = fin.get("kind")
+    if kind not in FIN_KINDS:
+        _fail("unknown finance kind", family=key, kind=kind)
+    if (kind == "meeting") != (rule == "meeting_change"):
+        _fail("finance kind meeting <=> value_rule meeting_change", family=key)
+    if kind != "meeting" and fin.get("scale") not in ("log", "level"):
+        _fail("finance scale must be log or level", family=key)
+    for group in ("forecasters", "candidates"):
+        ms = fin.get(group) or []
+        if any(m not in FIN_MODELS for m in ms):
+            _fail(f"unknown finance model in {group}", family=key)
+    if not fin.get("forecasters"):
+        _fail("a finance family needs forecasters", family=key)
+    for name, inp in (fin.get("inputs") or {}).items():
+        dk = inp.get("dataset_key") if isinstance(inp, dict) else None
+        if not isinstance(dk, str) or not dk.startswith("atlas.") or dk.count(".") < 2:
+            _fail("finance input dataset_key must be atlas.<source>.<dataset>", family=key, input=name)
+        if not (inp.get("indicator") or inp.get("indicator_prefix")) or not inp.get("provider_geo"):
+            _fail("finance input needs indicator (or indicator_prefix) and provider_geo", family=key, input=name)
+    if kind == "meeting":
+        cal = fin.get("calendar") or {}
+        if not all(cal.get(k) for k in ("dataset_key", "indicator", "provider_geo")):
+            _fail("meeting family needs calendar dataset_key / indicator / provider_geo", family=key)
+        if fin.get("direction") not in ("up", "down"):
+            _fail("meeting direction must be up or down", family=key)
+        if "history" not in (fin.get("inputs") or {}):
+            _fail("meeting family needs a history input", family=key)
+    if kind in ("yield", "spread") and fin.get("maturity") is None:
+        _fail("yield/spread family needs maturity", family=key)
+    if kind == "spread" and fin.get("minus_maturity") is None:
+        _fail("spread family needs minus_maturity", family=key)
 
 
 def parse_specs(doc: dict[str, Any]) -> SpecSet:

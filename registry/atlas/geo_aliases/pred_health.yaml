@@ -1,0 +1,16 @@
+# Provider geography schemes of the PRED-HEALTH sources (agent PRED-HEALTH, V6, 2026-10-17).
+#
+# cdc_hub: the `location` column of the US CDC respiratory forecast hubs (FluSight, COVID-19 Forecast Hub) is a
+#   2-digit US state FIPS code or "US". Only "US" is a country: hub auxiliary-data/locations.csv row
+#   (abbreviation "US", location "US", location_name "US", population 340110988 = the United States). State codes stay
+#   unmapped on purpose (they are not countries; no ADM1 code is invented).
+schemes:
+  cdc_hub:
+    aliases:
+      - code: "US"
+        iso3: USA
+        source: "FluSight auxiliary-data/locations.csv: location 'US' = national total (location_name 'US', population 340110988)"
+    source:
+      kind: provider_data
+      url: "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/auxiliary-data/locations.csv"
+      retrieved_at: "2026-10-17"

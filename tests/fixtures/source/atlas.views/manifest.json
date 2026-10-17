@@ -1,0 +1,106 @@
+[
+ {
+  "request_fingerprint": "8cae5f25e05ef00d00ef2e09f81f67dbd1f79561eb42d59f81f8d385c24907c8",
+  "url": "https://raw.githubusercontent.com/wiki/prio-data/views_api/Available-datasets.md",
+  "file": "8cae5f25e05ef00d.md",
+  "sha256": "7b7568695487cc32a3e503432eb0994bc674044fc85af6c51eaff32ca1cf4789",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "b28d114e5edb48c30a26ea153a1912ccf6765badfce12ea5b8443dc8f8f4729a",
+  "url": "https://api.viewsforecasting.org/",
+  "file": "b28d114e5edb48c3.json",
+  "sha256": "c6ac7817c252444102d0a7df07d828b078f0d0e34a47e6e1d9ed2c7fdfc6eabc",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "aba6319cfab2ee30e20a4a73ce6efc7f95d2eaafc0670ade52b5eb6c7e1e623d",
+  "url": "https://api.viewsforecasting.org/fatalities001_2022_12_t01/codebook",
+  "file": "aba6319cfab2ee30.json",
+  "sha256": "7f2619b55f935a75b6335dd8ec88481bda739f455e633a903cd11368185c9f1c",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "c2643852f364f961e088703a97b99f2620c13a28293e431a217a24981e1ef999",
+  "url": "https://api.viewsforecasting.org/fatalities001_2022_12_t01/cm/sb/sc_cm_sb_main?pagesize=10000&iso=SDN&iso=COL&iso=NOR",
+  "file": "c2643852f364f961.json",
+  "sha256": "cafa00916a8ade93b31da59ca769c567d8d0a7566282bc2d79259e2662e8c818",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "03f4508d9b940da6684eedfc38779a048e7dfa4b3d2d02716599df85e7b4b409",
+  "url": "https://api.viewsforecasting.org/fatalities001_2022_12_t01/cm/sb/sc_cm_sb_dich_main?pagesize=10000&iso=SDN&iso=COL&iso=NOR",
+  "file": "03f4508d9b940da6.json",
+  "sha256": "23925ecc82192e349b52bdd5294f48f7e9df394e472fea0aed13891476a4a5d4",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "068e550db027359a2ba71db0e021cfc03e8221059a3098656b3749f5b199f83f",
+  "url": "https://api.viewsforecasting.org/fatalities003_2026_08_t01/codebook",
+  "file": "068e550db027359a.json",
+  "sha256": "5acc09d67284f6d611afcf847433e9fb33b66bd46ccd461a069e2ee0fde4e653",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "7e57f5713685ce1f5446d4fdb068eb1251a9ce7bcf2aa367acf496a48b3a8307",
+  "url": "https://api.viewsforecasting.org/fatalities003_2026_08_t01/cm/sb/main_mean?pagesize=10000&iso=SDN&iso=COL&iso=NOR",
+  "file": "7e57f5713685ce1f.json",
+  "sha256": "b1cbde016b16aa73ef100b48a181d983f383ed1a8449b3df298c9fcbe89439d6",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ },
+ {
+  "request_fingerprint": "e5fc289c58a50b9071b7afcc07dbdcd5851a960aeac526a4fc74fb144ededd46",
+  "url": "https://api.viewsforecasting.org/fatalities003_2026_08_t01/cm/sb/main_dich?pagesize=10000&iso=SDN&iso=COL&iso=NOR",
+  "file": "e5fc289c58a50b90.json",
+  "sha256": "3b07a81147bfef49908dce586e51c9c12220afd3fa370ebeb639ad20c42db28c",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "VIEWS: no licence stated by the provider (citation requested: Hegre et al. 2021, 2022); GitHub wiki page of prio-data/views_api",
+  "excerpt": "real provider bytes downloaded 2026-10-17; data pages restricted by the API's own iso filter (SDN, COL, NOR)"
+ }
+]

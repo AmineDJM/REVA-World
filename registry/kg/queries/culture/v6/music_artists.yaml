@@ -1,0 +1,28 @@
+id: culture.v6_music_artists
+domain: culture
+owner: V6CULTURE
+description: >-
+  Music artists who are humans with an occupation (P106) among singer, musician, singer-songwriter, rapper,
+  songwriter, guitarist, pianist, disc jockey, composer, conductor, that carry a MusicBrainz artist ID (P434) and
+  at least 40 sitelinks: citizenship, birth/death, occupations, genres, record labels, awards and nominations,
+  languages, memberships, movement, influences, notable works. P434 is the join key to MusicBrainz (CC0 core data),
+  never a name match. KGPEOPLE's people.writers_artists already seeds composers; overlapping items are de-duplicated
+  by the harvester. The sitelink threshold is a size bound.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?occupation { {{values}} }
+    ?item wdt:P106 ?occupation ; wdt:P434 ?mbid ; wikibase:sitelinks ?links .
+    FILTER(?links >= 40)
+    ?item wdt:P31 wd:Q5 .
+  }
+split:
+  by: values
+  source: list
+  qids: [Q177220, Q639669, Q488205, Q2252262, Q753110, Q855091, Q486748, Q130857, Q36834, Q158852]
+  chunk_size: 1
+max_rows: 20000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P27, P19, P20, P569, P570, P106, P136, P264, P166, P1411, P1412, P434, P463, P135, P737, P800]

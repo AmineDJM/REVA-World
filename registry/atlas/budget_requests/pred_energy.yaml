@@ -1,0 +1,12 @@
+# Budget request from agent PRED-ENERGY (V6, 2026-10-17). Merged by `uv run python -m reva.atlas.budget_merge --write`.
+agent: PRED-ENERGY
+requests:
+  - source_key: eia.steo_archive
+    # atlas.vintage_steo: STEO Archives page (~0.18 MB) + one Excel data file per selected issue (54 quarterly
+    # issues 2013-07..2026-10, 0.83-1.1 MB each, ~48 MB) = 55 requests per full run; +1 file per quarter.
+    daily_requests: 70
+    expected_bytes_per_day: 70000000
+    reason: "55 requests (~48 MB) per full run of the STEO archive vintages, plus headroom; public domain, no key"
+daily_totals_increase:
+  http_requests_total: "+70"
+  http_bytes_total: "+70_000_000"

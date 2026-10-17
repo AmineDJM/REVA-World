@@ -1,0 +1,1214 @@
+# Atlas catalog 'media_signals' (agent V6SIGNALS, V6, 2026-10-17). Provider-declared concepts (not human-reviewed)
+# for atlas_gdelt.py: GDELT 2.0 event-record aggregates (gdelt.events_cd) and DOC 2.0 theme timelines
+# (gdelt.doc_theme_d). MEDIA-COVERAGE SIGNALS, NOT EVENT COUNTS: predictors only. Generated from the connector
+# constants (codebook definitions verbatim). See docs/dev/v6_signals.md.
+domain: media_signals
+labels:
+  en: Media-coverage signals (GDELT)
+  fr: Signaux de couverture médiatique (GDELT)
+maintainer: V6SIGNALS
+concepts:
+- id: media.daily.gdelt_event_records
+  labels:
+    en: GDELT coded event records located in the country (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements codés par GDELT localisés dans le pays (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of GDELT 2.0 event records whose ActionGeo_CountryCode is the
+    country (codebook: "This is the 2-character FIPS10-4 country code for the location.") in the sampled 15-minute update
+    of the day.'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_all
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+- id: media.daily.gdelt_quad1_records
+  labels:
+    en: 'GDELT event records: Verbal Cooperation (daily sample, media-coverage signal)'
+    fr: 'Enregistrements d''événements GDELT : coopération verbale (échantillon quotidien, signal de couverture médiatique)'
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with QuadClass=1 (Verbal Cooperation). Codebook: "The entire
+    CAMEO event taxonomy is ultimately organized under four primary classifications: Verbal Cooperation, Material Cooperation,
+    Verbal Conflict, and Material Conflict. [...] 1=Verbal Cooperation, 2=Material Cooperation, 3=Verbal Conflict, 4=Material
+    Conflict."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_quad1
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+- id: media.daily.gdelt_quad2_records
+  labels:
+    en: 'GDELT event records: Material Cooperation (daily sample, media-coverage signal)'
+    fr: 'Enregistrements d''événements GDELT : coopération matérielle (échantillon quotidien, signal de couverture médiatique)'
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with QuadClass=2 (Material Cooperation). Codebook: "The entire
+    CAMEO event taxonomy is ultimately organized under four primary classifications: Verbal Cooperation, Material Cooperation,
+    Verbal Conflict, and Material Conflict. [...] 1=Verbal Cooperation, 2=Material Cooperation, 3=Verbal Conflict, 4=Material
+    Conflict."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_quad2
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+- id: media.daily.gdelt_quad3_records
+  labels:
+    en: 'GDELT event records: Verbal Conflict (daily sample, media-coverage signal)'
+    fr: 'Enregistrements d''événements GDELT : conflit verbal (échantillon quotidien, signal de couverture médiatique)'
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with QuadClass=3 (Verbal Conflict). Codebook: "The entire
+    CAMEO event taxonomy is ultimately organized under four primary classifications: Verbal Cooperation, Material Cooperation,
+    Verbal Conflict, and Material Conflict. [...] 1=Verbal Cooperation, 2=Material Cooperation, 3=Verbal Conflict, 4=Material
+    Conflict."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_quad3
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_quad4_records
+  labels:
+    en: 'GDELT event records: Material Conflict (daily sample, media-coverage signal)'
+    fr: 'Enregistrements d''événements GDELT : conflit matériel (échantillon quotidien, signal de couverture médiatique)'
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with QuadClass=4 (Material Conflict). Codebook: "The entire
+    CAMEO event taxonomy is ultimately organized under four primary classifications: Verbal Cooperation, Material Cooperation,
+    Verbal Conflict, and Material Conflict. [...] 1=Verbal Cooperation, 2=Material Cooperation, 3=Verbal Conflict, 4=Material
+    Conflict."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_quad4
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_cameo14_records
+  labels:
+    en: GDELT event records, CAMEO root 14 PROTEST (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements GDELT, racine CAMEO 14 PROTEST (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with EventRootCode=14 (CAMEO "PROTEST"). Codebook: "Similar
+    to EventBaseCode, this defines the root-level category the event code falls under."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_root14
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_cameo17_records
+  labels:
+    en: GDELT event records, CAMEO root 17 COERCE (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements GDELT, racine CAMEO 17 COERCE (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with EventRootCode=17 (CAMEO "COERCE"). Codebook: "Similar
+    to EventBaseCode, this defines the root-level category the event code falls under."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_root17
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_cameo18_records
+  labels:
+    en: GDELT event records, CAMEO root 18 ASSAULT (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements GDELT, racine CAMEO 18 ASSAULT (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with EventRootCode=18 (CAMEO "ASSAULT"). Codebook: "Similar
+    to EventBaseCode, this defines the root-level category the event code falls under."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_root18
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_cameo19_records
+  labels:
+    en: GDELT event records, CAMEO root 19 FIGHT (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements GDELT, racine CAMEO 19 FIGHT (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with EventRootCode=19 (CAMEO "FIGHT"). Codebook: "Similar
+    to EventBaseCode, this defines the root-level category the event code falls under."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_root19
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_cameo20_records
+  labels:
+    en: GDELT event records, CAMEO root 20 USE UNCONVENTIONAL MASS VIOLENCE (daily sample, media-coverage signal)
+    fr: Enregistrements d'événements GDELT, racine CAMEO 20 USE UNCONVENTIONAL MASS VIOLENCE (échantillon quotidien, signal
+      de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: records with EventRootCode=20 (CAMEO "USE UNCONVENTIONAL MASS VIOLENCE").
+    Codebook: "Similar to EventBaseCode, this defines the root-level category the event code falls under."'
+  unit: event records
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.records_root20
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_goldstein_mean
+  labels:
+    en: GDELT mean Goldstein score of the country's event records (daily sample, media-coverage signal)
+    fr: Score Goldstein moyen des enregistrements GDELT du pays (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: arithmetic mean of GoldsteinScale over the records (flags.n), 4 decimals.
+    Codebook: "Each CAMEO event code is assigned a numeric score from -10 to +10, capturing the theoretical potential impact
+    that type of event will have on the stability of a country. [...] NOTE: this score is based on the type of event, not
+    the specifics of the actual event record being recorded"'
+  unit: Goldstein scale points (-10..+10)
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.goldstein_mean
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_avgtone_mean
+  labels:
+    en: GDELT mean article tone of the country's event records (daily sample, media-coverage signal)
+    fr: Tonalité moyenne des articles des enregistrements GDELT du pays (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: arithmetic mean of AvgTone over the records (flags.n), 4 decimals.
+    Codebook: "This is the average “tone” of all documents containing one or more mentions of this event during the 15 minute
+    update in which it was first seen. The score ranges from -100 (extremely negative) to +100 (extremely positive)."'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.avgtone_mean
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+- id: media.daily.gdelt_mentions_sum
+  labels:
+    en: GDELT mentions of the country's event records (daily sample, media-coverage signal)
+    fr: Mentions des enregistrements GDELT du pays (échantillon quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: sum of NumMentions over the records. Codebook: "This is the total
+    number of mentions of this event across all source documents during the 15 minute update in which it was first seen."'
+  unit: mentions
+  domain: media_signals
+  subdomain: gdelt_events
+  theme: politics
+  source_order:
+  - gdelt.events_cd.mentions_sum
+  provider_declared: true
+  notes: GDELT 2.0, one 15-minute update per UTC day (slot 12:00 UTC; 1/96 sample of the records added that day), aggregated
+    by ActionGeo_CountryCode (FIPS 10-4) and update day. Zero counts are no row; the day's _ALL row proves the file was read.
+    Predictor only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+- id: media.daily.gdelt_doc_armedconflict_articles
+  labels:
+    en: News articles with GDELT theme ARMEDCONFLICT (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ARMEDCONFLICT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ARMEDCONFLICT (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_armedconflict).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_armedconflict
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_armedconflict_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ARMEDCONFLICT (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ARMEDCONFLICT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ARMEDCONFLICT
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_armedconflict
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_kill_articles
+  labels:
+    en: News articles with GDELT theme KILL (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT KILL (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme KILL (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_kill).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_kill
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_kill_tone
+  labels:
+    en: Average tone of news articles with GDELT theme KILL (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT KILL (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme KILL that day
+    (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_kill
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_terror_articles
+  labels:
+    en: News articles with GDELT theme TERROR (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT TERROR (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme TERROR (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_terror).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_terror
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_terror_tone
+  labels:
+    en: Average tone of news articles with GDELT theme TERROR (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT TERROR (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme TERROR that day
+    (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_terror
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_protest_articles
+  labels:
+    en: News articles with GDELT theme PROTEST (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT PROTEST (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme PROTEST (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_protest).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_protest
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_protest_tone
+  labels:
+    en: Average tone of news articles with GDELT theme PROTEST (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT PROTEST (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme PROTEST that day
+    (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_protest
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_military_articles
+  labels:
+    en: News articles with GDELT theme MILITARY (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT MILITARY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme MILITARY (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_military).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_military
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_military_tone
+  labels:
+    en: Average tone of news articles with GDELT theme MILITARY (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT MILITARY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme MILITARY that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_military
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_rebellion_articles
+  labels:
+    en: News articles with GDELT theme REBELLION (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT REBELLION (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme REBELLION (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_rebellion).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_rebellion
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_rebellion_tone
+  labels:
+    en: Average tone of news articles with GDELT theme REBELLION (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT REBELLION (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme REBELLION that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_rebellion
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_unrest_belligerent_articles
+  labels:
+    en: News articles with GDELT theme UNREST_BELLIGERENT (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT UNREST_BELLIGERENT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme UNREST_BELLIGERENT (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_unrest_belligerent).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_unrest_belligerent
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_unrest_belligerent_tone
+  labels:
+    en: Average tone of news articles with GDELT theme UNREST_BELLIGERENT (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT UNREST_BELLIGERENT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme UNREST_BELLIGERENT
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_unrest_belligerent
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_ceasefire_articles
+  labels:
+    en: News articles with GDELT theme CEASEFIRE (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT CEASEFIRE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme CEASEFIRE (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_ceasefire).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_ceasefire
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_ceasefire_tone
+  labels:
+    en: Average tone of news articles with GDELT theme CEASEFIRE (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT CEASEFIRE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme CEASEFIRE that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_ceasefire
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_sanctions_articles
+  labels:
+    en: News articles with GDELT theme SANCTIONS (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT SANCTIONS (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme SANCTIONS (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_sanctions).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_sanctions
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_sanctions_tone
+  labels:
+    en: Average tone of news articles with GDELT theme SANCTIONS (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT SANCTIONS (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme SANCTIONS that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_sanctions
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_refugees_articles
+  labels:
+    en: News articles with GDELT theme REFUGEES (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT REFUGEES (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme REFUGEES (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_refugees).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.articles_refugees
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_refugees_tone
+  labels:
+    en: Average tone of news articles with GDELT theme REFUGEES (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT REFUGEES (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme REFUGEES that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: politics
+  source_order:
+  - gdelt.doc_theme_d.tone_refugees
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - conflict
+- id: media.daily.gdelt_doc_food_security_articles
+  labels:
+    en: News articles with GDELT theme FOOD_SECURITY (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT FOOD_SECURITY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme FOOD_SECURITY (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_food_security).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: society
+  source_order:
+  - gdelt.doc_theme_d.articles_food_security
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - society
+- id: media.daily.gdelt_doc_food_security_tone
+  labels:
+    en: Average tone of news articles with GDELT theme FOOD_SECURITY (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT FOOD_SECURITY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme FOOD_SECURITY
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: society
+  source_order:
+  - gdelt.doc_theme_d.tone_food_security
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - society
+- id: media.daily.gdelt_doc_econ_inflation_articles
+  labels:
+    en: News articles with GDELT theme ECON_INFLATION (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_INFLATION (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_INFLATION (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_inflation).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_inflation
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_inflation_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_INFLATION (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_INFLATION (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_INFLATION
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_inflation
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_interest_rates_articles
+  labels:
+    en: News articles with GDELT theme ECON_INTEREST_RATES (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_INTEREST_RATES (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_INTEREST_RATES (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_interest_rates).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_interest_rates
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_interest_rates_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_INTEREST_RATES (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_INTEREST_RATES (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_INTEREST_RATES
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_interest_rates
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_centralbank_articles
+  labels:
+    en: News articles with GDELT theme ECON_CENTRALBANK (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_CENTRALBANK (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_CENTRALBANK (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_centralbank).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_centralbank
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_centralbank_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_CENTRALBANK (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_CENTRALBANK (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_CENTRALBANK
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_centralbank
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_stockmarket_articles
+  labels:
+    en: News articles with GDELT theme ECON_STOCKMARKET (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_STOCKMARKET (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_STOCKMARKET (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_stockmarket).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_stockmarket
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_stockmarket_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_STOCKMARKET (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_STOCKMARKET (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_STOCKMARKET
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_stockmarket
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_currency_exchange_rate_articles
+  labels:
+    en: News articles with GDELT theme ECON_CURRENCY_EXCHANGE_RATE (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_CURRENCY_EXCHANGE_RATE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_CURRENCY_EXCHANGE_RATE (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored,
+    monitored_econ_currency_exchange_rate).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_currency_exchange_rate
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_currency_exchange_rate_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_CURRENCY_EXCHANGE_RATE (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_CURRENCY_EXCHANGE_RATE (quotidien, signal de couverture
+      médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_CURRENCY_EXCHANGE_RATE
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_currency_exchange_rate
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_debt_articles
+  labels:
+    en: News articles with GDELT theme ECON_DEBT (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_DEBT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_DEBT (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_debt).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_debt
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_debt_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_DEBT (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_DEBT (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_DEBT that
+    day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_debt
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_bankruptcy_articles
+  labels:
+    en: News articles with GDELT theme ECON_BANKRUPTCY (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_BANKRUPTCY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_BANKRUPTCY (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_bankruptcy).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_bankruptcy
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_bankruptcy_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_BANKRUPTCY (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_BANKRUPTCY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_BANKRUPTCY
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_bankruptcy
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_oilprice_articles
+  labels:
+    en: News articles with GDELT theme ECON_OILPRICE (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_OILPRICE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_OILPRICE (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_oilprice).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_oilprice
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_oilprice_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_OILPRICE (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_OILPRICE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_OILPRICE
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_oilprice
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_trade_dispute_articles
+  labels:
+    en: News articles with GDELT theme ECON_TRADE_DISPUTE (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT ECON_TRADE_DISPUTE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme ECON_TRADE_DISPUTE (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_econ_trade_dispute).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_econ_trade_dispute
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_econ_trade_dispute_tone
+  labels:
+    en: Average tone of news articles with GDELT theme ECON_TRADE_DISPUTE (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT ECON_TRADE_DISPUTE (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme ECON_TRADE_DISPUTE
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_econ_trade_dispute
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_epu_uncertainty_articles
+  labels:
+    en: News articles with GDELT theme EPU_UNCERTAINTY (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT EPU_UNCERTAINTY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme EPU_UNCERTAINTY (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored, monitored_epu_uncertainty).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_epu_uncertainty
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_epu_uncertainty_tone
+  labels:
+    en: Average tone of news articles with GDELT theme EPU_UNCERTAINTY (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT EPU_UNCERTAINTY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme EPU_UNCERTAINTY
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_epu_uncertainty
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_epu_cats_monetary_policy_articles
+  labels:
+    en: News articles with GDELT theme EPU_CATS_MONETARY_POLICY (daily, media-coverage signal)
+    fr: Articles de presse portant le thème GDELT EPU_CATS_MONETARY_POLICY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: number of articles monitored by the GDELT DOC 2.0 API that day carrying
+    the GKG theme EPU_CATS_MONETARY_POLICY (timelinevolraw ''value''; the same response''s ''norm'' is the total monitored,
+    monitored_epu_cats_monetary_policy).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.articles_epu_cats_monetary_policy
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_epu_cats_monetary_policy_tone
+  labels:
+    en: Average tone of news articles with GDELT theme EPU_CATS_MONETARY_POLICY (daily, media-coverage signal)
+    fr: Tonalité moyenne des articles portant le thème GDELT EPU_CATS_MONETARY_POLICY (quotidien, signal de couverture médiatique)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: average tone of the articles carrying the GKG theme EPU_CATS_MONETARY_POLICY
+    that day (DOC 2.0 API timelinetone).'
+  unit: tone score (-100..+100)
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: finance
+  source_order:
+  - gdelt.doc_theme_d.tone_epu_cats_monetary_policy
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt
+  - finance
+- id: media.daily.gdelt_doc_monitored_articles
+  labels:
+    en: News articles monitored by the GDELT DOC 2.0 API (daily total)
+    fr: Articles de presse surveillés par l'API GDELT DOC 2.0 (total quotidien)
+  definition: 'MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: the DOC 2.0 API timelinevolraw ''norm'': total number of articles
+    monitored that day (the denominator of every articles_<theme> series; repeated per theme request as monitored_<theme>).'
+  unit: articles
+  domain: media_signals
+  subdomain: gdelt_doc
+  theme: society
+  source_order:
+  - gdelt.doc_theme_d.monitored_armedconflict
+  - gdelt.doc_theme_d.monitored_kill
+  - gdelt.doc_theme_d.monitored_terror
+  - gdelt.doc_theme_d.monitored_protest
+  - gdelt.doc_theme_d.monitored_military
+  - gdelt.doc_theme_d.monitored_rebellion
+  - gdelt.doc_theme_d.monitored_unrest_belligerent
+  - gdelt.doc_theme_d.monitored_ceasefire
+  - gdelt.doc_theme_d.monitored_sanctions
+  - gdelt.doc_theme_d.monitored_refugees
+  - gdelt.doc_theme_d.monitored_food_security
+  - gdelt.doc_theme_d.monitored_econ_inflation
+  - gdelt.doc_theme_d.monitored_econ_interest_rates
+  - gdelt.doc_theme_d.monitored_econ_centralbank
+  - gdelt.doc_theme_d.monitored_econ_stockmarket
+  - gdelt.doc_theme_d.monitored_econ_currency_exchange_rate
+  - gdelt.doc_theme_d.monitored_econ_debt
+  - gdelt.doc_theme_d.monitored_econ_bankruptcy
+  - gdelt.doc_theme_d.monitored_econ_oilprice
+  - gdelt.doc_theme_d.monitored_econ_trade_dispute
+  - gdelt.doc_theme_d.monitored_epu_uncertainty
+  - gdelt.doc_theme_d.monitored_epu_cats_monetary_policy
+  provider_declared: true
+  notes: GDELT DOC 2.0 API timeline over all monitored sources worldwide (provider_geo ALL_SOURCES), since 2017. Predictor
+    only. Cite The GDELT Project (https://www.gdeltproject.org/).
+  tags:
+  - daily
+  - media_signal
+  - gdelt

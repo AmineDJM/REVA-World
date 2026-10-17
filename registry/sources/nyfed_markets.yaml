@@ -17,6 +17,12 @@ rights:
     Broad General Collateral Rate (BGCR) Data are calculated using data provided under a license granted to the New
     York Fed by DTCC Solutions LLC.
   licence_checked: "2026-10-17"
+  # The notice REVA shows wherever nyfed.rates_d values are presented (API: rights.required_notice on every cell,
+  # licences and a `required_notice` warning; UI: LicenceList / RequiredNotices). Filled from the terms_quote template.
+  required_notice: >-
+    The EFFR, OBFR and SOFR data are subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not
+    responsible for publication of the EFFR, OBFR and SOFR data by REVA World, does not sanction or endorse any
+    particular republication, and has no liability for your use.
 metadata:
   allowed_hosts: [markets.newyorkfed.org, www.newyorkfed.org]
   files:

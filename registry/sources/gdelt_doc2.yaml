@@ -1,0 +1,26 @@
+# V6 (agent V6SIGNALS): GDELT DOC 2.0 API daily timelines (article volume and tone per GKG theme, all sources).
+# Connector src/reva/adapters/connectors/atlas_gdelt.py (atlas source atlas.gdelt_doc, table gdelt.doc_theme_d).
+# MEDIA-COVERAGE SIGNAL, NOT EVENT COUNTS: share of monitored news coverage, used only as predictors.
+source_key: gdelt.doc2
+title: GDELT DOC 2.0 API — daily theme timelines (article volume, monitored total, tone; media-coverage signal)
+provider_url: https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/
+lineage_family: gdelt
+rights:
+  licence: "GDELT Project terms of use (unlimited and unrestricted use; citation and link required)"
+  licence_url: https://www.gdeltproject.org/about.html#termsofuse
+  attribution: "Source: The GDELT Project (https://www.gdeltproject.org/)."
+  terms_quote: >-
+    The GDELT Project is an open platform for research and analysis of global society and thus all datasets
+    released by the GDELT Project are available for unlimited and unrestricted use for any academic, commercial,
+    or governmental use of any kind without fee. [...] You may redistribute, rehost, republish, and mirror any of
+    the GDELT datasets in any form. However, any use or redistribution of the data must include a citation to the
+    GDELT Project and a link to this website (https://www.gdeltproject.org/).
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [api.gdeltproject.org, data.gdeltproject.org, gdeltproject.org]
+  files:
+    timeline: "https://api.gdeltproject.org/api/v2/doc/doc?query=theme:<THEME>&mode=timelinevolraw|timelinetone&format=json&startdatetime=...&enddatetime=..."
+    theme_lookup: "https://data.gdeltproject.org/api/v2/guides/LOOKUP-GKGTHEMES.TXT"
+  authentication: none
+  rate_limit: "429 body: 'Please limit requests to one every 5 seconds' (connector spaces requests 10 s apart)"
+  signal_kind: "media-coverage signal, not event counts"

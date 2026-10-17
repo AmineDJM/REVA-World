@@ -1,0 +1,30 @@
+version: 1
+agent: V6CULTURE
+note: >-
+  Culture (films, literary works, music, books; docs/dev/v6_culture.md). Wikidata properties used by the
+  registry/kg/queries/culture/v6 specs (requested in registry/kg/property_requests/v6culture.yaml where not yet
+  allow-listed) and the Open Library dataset predicate of atlas.openlibrary_subjects. Creators are mapped to
+  produced_by (a work is produced by the people and companies Wikidata names), genre / awards / languages / story
+  settings to context. Nothing here is causal; an award, a genre or a co-occurrence in a catalogue explains nothing.
+mappings:
+  - {property: P50, family: produced_by, subtype: author, source: wikidata, note: "work -> author"}
+  - {property: P57, family: produced_by, subtype: director, source: wikidata, note: "film -> director"}
+  - {property: P58, family: produced_by, subtype: screenwriter, source: wikidata}
+  - {property: P86, family: produced_by, subtype: composer, source: wikidata}
+  - {property: P272, family: produced_by, subtype: production_company, source: wikidata,
+     note: "film -> company (meets the V4INDUSTRY company layer through the company's Wikidata item)"}
+  - {property: P495, family: located_in, subtype: country_of_origin, source: wikidata,
+     note: "country of origin of a work or group as Wikidata states it (where it comes from, not where it is kept)"}
+  - {property: P740, family: located_in, subtype: location_of_formation, source: wikidata}
+  - {property: P136, family: context, subtype: genre, source: wikidata}
+  - {property: P364, family: context, subtype: original_language, source: wikidata}
+  - {property: P407, family: context, subtype: language_of_work, source: wikidata}
+  - {property: P840, family: context, subtype: narrative_location, source: wikidata,
+     note: "where the story is set: never a production or storage location"}
+  - {property: P144, family: context, subtype: based_on, source: wikidata}
+  - {property: P166, family: context, subtype: award_received, source: wikidata}
+  - {property: P1411, family: context, subtype: nominated_for, source: wikidata}
+  - {property: P264, family: context, subtype: record_label, source: wikidata}
+  - {property: "openlibrary:has_works_in_subject", family: context, subtype: works_in_subject, source: openlibrary.api,
+     subject_kinds: [author], object_kinds: [book_subject],
+     note: "the author is among the subject's most catalogued authors in Open Library (count qualifier, snapshot date)"}

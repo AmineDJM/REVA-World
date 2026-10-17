@@ -1,0 +1,132 @@
+[
+  {
+    "request_fingerprint": "500374532a9b4d9e37cc00988a9ca1c0d9e7785bf878ed9f6e8ca0b8303a22bd",
+    "url": "https://openlibrary.org/authors/OL192707A.json",
+    "file": "500374532a9b4d9e.json",
+    "sha256": "364e47b633acb1ca6c964d0f6a84b05c2f025bd1b0d6ff0e56fb7a6389001518",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:25.364015+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "5e18954a1a811316d434500b802610caef2dba71674e58d84e2e6d98db5d597f",
+    "url": "https://openlibrary.org/authors/OL28294A.json",
+    "file": "5e18954a1a811316.json",
+    "sha256": "10950b68a72a85950977323e083faaae0165c9ad0f4f28405787afd5301c9bb5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:22.538138+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "a69f92031c222194121747c8d6ce76624cfc817e9e8a7fcd46044f2dcec41254",
+    "url": "https://openlibrary.org/authors/OL382069A.json",
+    "file": "a69f92031c222194.json",
+    "sha256": "4d94b4d6c5b4cd0f8ca3f67f73867f6088df0fdabce96b3789729e10b098118f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:26.829149+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "3f3f7695854bdc9aaf1e2b6b473b72cacb8095716e5c2e29b370e3fd255b5540",
+    "url": "https://openlibrary.org/authors/OL4530637A.json",
+    "file": "3f3f7695854bdc9a.json",
+    "sha256": "fcff131ceaf94e9618bf781a6b4e927d14850daff4a83dc1e7441c5a9a9b47ed",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:29.768904+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "d2cc8c9ad90155ad1020813b0d0b51f29364ff9f32205a12be6a560dabb00ad8",
+    "url": "https://openlibrary.org/authors/OL79796A.json",
+    "file": "d2cc8c9ad90155ad.json",
+    "sha256": "b660f4d65a3b1326dd899229132a3ddc25ee6da31b7d16d381bff35c606dcffc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:28.413894+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "b37f74d89e329c658e3f4875de022b8b2a71b3d17aabe5f39eba753861f89963",
+    "url": "https://openlibrary.org/authors/OL9409719A.json",
+    "file": "b37f74d89e329c65.json",
+    "sha256": "5262a71c1593e3cfe4f3b4e826f4d98fd1fdfb3064b5169a4a14ff8f85485f24",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:23.903501+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "71801039aa5b4f0885565627a6faed8f0933a19ea528e1b564ff374856833151",
+    "url": "https://openlibrary.org/subjects",
+    "file": "71801039aa5b4f08.html",
+    "sha256": "7c39a1db5282a9f86caa582fa43611a17de9171bf5cbf0b3825251662b2f4020",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:33:05.855531+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "bba0c9b01f9df637e836a29128c4db08b4e0640ff56d35d31a21336ed6a882aa",
+    "url": "https://openlibrary.org/subjects/film.json?details=true&limit=1",
+    "file": "bba0c9b01f9df637.json",
+    "sha256": "c2fbf3cca03294ae965262709742b566be658345f2898be87ecd7de6b2ab3f3f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:15.856605+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "8668ae9d370d7efa131a0ef7105f70f36bd5973814014bd23c4859482e8c4813",
+    "url": "https://openlibrary.org/subjects/place%3Abrazil.json?details=true&limit=1",
+    "file": "8668ae9d370d7efa.json",
+    "sha256": "682e03d3743aaf32cba6c8b5775722ffae6372f9649b31433561f46065eec4b9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:21.181026+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  },
+  {
+    "request_fingerprint": "3e7582c6a2b7e0b87765ee5b7e16979fdcc90d048f0116f1651080ca158b835b",
+    "url": "https://openlibrary.org/subjects/poetry.json?details=true&limit=1",
+    "file": "3e7582c6a2b7e0b8.json",
+    "sha256": "97760aaf53907fab33132c943a439dbee96d03204d429715a29f5fa6c1718521",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T16:33:13.696707+00:00",
+    "licence": "no rights asserted by the Internet Archive (review required)",
+    "note": "real live capture (SafeHttpClient, V6CULTURE 2026-10-17)"
+  }
+]

@@ -24,10 +24,22 @@ export const FamilyShare = z.looseObject({
 });
 export type FamilyShare = z.output<typeof FamilyShare>;
 
+/**
+ * Where a `measured_by` edge points in the atlas (src/reva/kg/families.py measured_by_target):
+ * `concept` = a catalog concept read with /v1/atlas/series (V4CORE convention, object atlas:<concept>);
+ * `table` = an atlas table entity atlas:<source>.<dataset> (V4ECON/V4MIND/V4ECO) read with
+ * /v1/atlas/tables/{source}/{dataset}/cells and the filters the statement carries.
+ */
 export const AtlasHint = z.looseObject({
-  concept: z.string(),
+  kind: z.enum(['concept', 'table']).default('concept'),
+  concept: nullishString,
   iso3: nullishString,
   table: nullishString,
+  source: nullishString,
+  dataset: nullishString,
+  provider_geo: nullishString,
+  indicators: z.array(z.string()).nullish().transform((v) => v ?? []),
+  indicator_contains: nullishString,
 });
 export type AtlasHint = z.output<typeof AtlasHint>;
 

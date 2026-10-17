@@ -82,10 +82,15 @@ def archived_entitydata(eid: str) -> tuple[bytes, str, datetime] | None:
     p = ARCHIVE_ROOT / "reva" / "raw" / "sha256" / sha[:2] / sha[2:4] / sha
     if not p.exists():
         return None
-    return gzip.decompress(p.read_bytes()), sha, datetime.fromisoformat(best["retrieved_at"])
+    from reva.adapters.objects.filesystem import FilesystemArtifactStore
+
+    # Through the store: decodes zstd-compressed objects (V6 DISKZ) and verifies the sha256.
+    raw = FilesystemArtifactStore(ARCHIVE_ROOT, "reva/").get("raw", sha)
+    return gzip.decompress(raw), sha, datetime.fromisoformat(best["retrieved_at"])
 
 
 def _copy_raw(sha: str, store_root: Path) -> None:
+    # A byte copy of the stored file (raw or zstd-wrapped): the target FilesystemArtifactStore decodes both.
     src = ARCHIVE_ROOT / "reva" / "raw" / "sha256" / sha[:2] / sha[2:4] / sha
     dst = store_root / "reva" / "raw" / "sha256" / sha[:2] / sha[2:4] / sha
     if src.exists() and not dst.exists():

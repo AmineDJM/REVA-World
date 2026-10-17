@@ -43,6 +43,8 @@ export const AtlasRights = z.looseObject({
   restricted: z.boolean().default(false),
   basis: z.string().default('table_artifact'),
   restriction: nullishString,
+  /** Notice the provider's terms require next to any presentation of the values (verbatim; e.g. New York Fed). */
+  required_notice: nullishString,
 });
 export type AtlasRights = z.output<typeof AtlasRights>;
 
@@ -64,6 +66,7 @@ export const AtlasCell = z.looseObject({
   entity_qid: nullishString,
   period_start: z.string(),
   period_end: z.string(),
+  period_basis: nullishString,
   flags: JsonRecord.default({}),
   provenance: AtlasProvenance,
   rights: AtlasRights.nullish().transform((v) => v ?? null),
@@ -176,6 +179,38 @@ export const AtlasSeriesResponse = z.looseObject({
   warnings,
 });
 
+/** One atlas table read through a KG measured_by statement (GET /v1/atlas/tables/{source}/{dataset}/cells). */
+export const AtlasTableIndicator = z.looseObject({
+  indicator: z.string(),
+  series: z.string(),
+  cells: z.number(),
+  values: z.number(),
+  geographies: z.number(),
+  countries: z.number(),
+  period_first: z.string(),
+  period_last: z.string(),
+  unit: nullishString,
+});
+export type AtlasTableIndicator = z.output<typeof AtlasTableIndicator>;
+
+export const AtlasTableCellsResponse = z.looseObject({
+  data: z.looseObject({
+    table: z.string(),
+    source: z.string(),
+    dataset: z.string(),
+    in_snapshot: z.boolean(),
+    concepts: z.array(z.string()).default([]),
+    indicators: z.array(AtlasTableIndicator).default([]),
+    cells: z.array(AtlasCell).default([]),
+    truncated: z.boolean().default(false),
+    licences,
+  }),
+  snapshot: AtlasSnapshotRef,
+  notes: z.array(z.string()).default([]),
+  warnings,
+});
+export type AtlasTableCellsResponse = z.output<typeof AtlasTableCellsResponse>;
+
 export const AtlasConceptCoverage = z.looseObject({
   concept_id: z.string(),
   domain: z.string(),
@@ -212,6 +247,18 @@ export const getAtlasDossier = (iso3: string, q: { domain?: string; series?: boo
 export const getAtlasMap = (concept: string, year: number, s?: AbortSignal) => v3get('/v1/atlas/map', AtlasMapResponse, { concept, year }, s);
 
 export const getAtlasSeries = (concept: string, iso3: string, s?: AbortSignal) => v3get('/v1/atlas/series', AtlasSeriesResponse, { concept, iso3 }, s);
+
+export const getAtlasTableCells = (
+  t: { source: string; dataset: string; provider_geo?: string | null; iso3?: string | null; indicators?: readonly string[]; indicator_contains?: string | null },
+  s?: AbortSignal,
+) => {
+  const q: Record<string, string | string[]> = {};
+  if (t.provider_geo) q.provider_geo = t.provider_geo;
+  if (t.iso3) q.iso3 = t.iso3;
+  if (t.indicators?.length) q.indicator = [...t.indicators];
+  if (t.indicator_contains) q.indicator_contains = t.indicator_contains;
+  return v3get(`/v1/atlas/tables/${enc(t.source)}/${enc(t.dataset)}/cells`, AtlasTableCellsResponse, q, s);
+};
 
 export const getAtlasCoverage = (q: { domain?: string; concept?: string } = {}, s?: AbortSignal) => v3get('/v1/atlas/coverage', AtlasCoverageResponse, { ...q }, s);
 

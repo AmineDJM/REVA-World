@@ -1,0 +1,20 @@
+id: culture.v6_musical_groups
+domain: culture
+owner: V6CULTURE
+description: >-
+  Musical groups (non-deprecated P31 in musical group, rock band, musical ensemble, musical duo) with a MusicBrainz
+  artist ID (P434) and at least 30 sitelinks: country of origin, location of formation, inception/dissolution,
+  genres, record labels, awards and nominations, members (has part), influences. Size bound, not a ranking.
+purpose: seed_entities
+entity_kind: organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q215380 wd:Q5741069 wd:Q2088357 wd:Q9212979 }
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31 ?class ; wikibase:rank ?item_p31r .
+    FILTER(?item_p31r != wikibase:DeprecatedRank)
+    ?item wdt:P434 ?mbid ; wikibase:sitelinks ?links .
+    FILTER(?links >= 30)
+  }
+max_rows: 6000
+expand_hops: 1
+properties: [P31, P495, P740, P571, P576, P136, P264, P166, P1411, P434, P527, P737]

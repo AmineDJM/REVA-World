@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "c6a3c7fc8505c8b8c438fe60e985f19c2223052579d2e002b42082b64acc985b",
+    "url": "https://raw.githubusercontent.com/EU-ECDC/Respiratory_viruses_weekly_data/main/data/ILIARIRates.csv",
+    "file": "ILIARIRates.csv",
+    "sha256": "830d91f7d3a25d2198d8eb12450ff8e9d4489465a39aaf423863907c91aad03f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "licence_review: ECDC reuse terms not archived (repository has no reachable LICENSE)",
+    "fixture_note": "file as served, lines trimmed to countryname France and Spain, age total, influenza totals (line text unchanged)"
+  },
+  {
+    "request_fingerprint": "3c18afe959c54508b88734c54f7dc6920fbc98872c23efad4706d5b4db133344",
+    "url": "https://raw.githubusercontent.com/EU-ECDC/Respiratory_viruses_weekly_data/main/data/sentinelTestsDetectionsPositivity.csv",
+    "file": "sentinelTestsDetectionsPositivity.csv",
+    "sha256": "c3ac114985fdc7da75fe3bdbe4f80c10063a4c04b693bdc9ffdf3b862ebf5742",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "licence_review: ECDC reuse terms not archived (repository has no reachable LICENSE)",
+    "fixture_note": "file as served, lines trimmed to countryname France and Spain, age total, influenza totals (line text unchanged)"
+  }
+]

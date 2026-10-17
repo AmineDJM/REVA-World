@@ -1,0 +1,29 @@
+id: culture.v6_films
+domain: culture
+owner: V6CULTURE
+description: >-
+  Films (non-deprecated P31 in film, feature film, animated film, animated feature film, documentary film,
+  television film) with at least 40 sitelinks: country of origin, publication date, director, screenwriter,
+  composer, genre, original language, awards and nominations, duration, cost and box office as Wikidata states
+  them, production company, narrative location, main subject, based on, IMDb ID (identifier only). The sitelink
+  threshold is a size bound (articles in 40+ Wikimedia projects), not a judgement of quality or importance.
+purpose: seed_entities
+entity_kind: work
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q11424 wd:Q24869 wd:Q202866 wd:Q29168811 wd:Q93204 wd:Q506240 }
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31 ?class ; wikibase:rank ?item_p31r .
+    FILTER(?item_p31r != wikibase:DeprecatedRank)
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 40)
+    {{qid_filter}}
+  }
+split: {by: qid_prefix, variable: item}
+max_rows: 15000
+expand_hops: 1
+properties: [P31, P495, P577, P57, P58, P86, P136, P364, P166, P1411, P2047, P2130, P2142, P272, P840, P921, P144, P345]
+notes: >-
+  Box office (P2142) and cost (P2130) are figures with currency units and point-in-time / place qualifiers: kept as
+  stated, never converted or summed by the harvest. IMDb ID (P345) is a join key only; IMDb data itself is not
+  loaded (non-commercial terms). Counts of films per country of origin and year would be a REVA aggregation over
+  community-edited data: not an atlas table here (see docs/dev/v6_culture.md, hand-off to WDOPS).

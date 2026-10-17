@@ -1,0 +1,175 @@
+# Oil price elasticities and the effects of oil supply shocks (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: caldara_cavallo_iacoviello_2016
+source_key: effects.literature
+citation:
+  text: "Caldara, Dario, Michele Cavallo, and Matteo Iacoviello (2016). Oil Price Elasticities and Oil Price Fluctuations. International Finance Discussion Papers 1173. http://dx.doi.org/10.17016/IFDP.2016.1173"
+  text_basis: verbatim 'Please cite paper as' block on the first page of the version read
+  short: "Caldara, Cavallo & Iacoviello (2016), Federal Reserve IFDP 1173"
+  authors: [Dario Caldara, Michele Cavallo, Matteo Iacoviello]
+  title: "Oil Price Elasticities and Oil Price Fluctuations"
+  year: 2016
+  series: International Finance Discussion Papers 1173 (Board of Governors of the Federal Reserve System)
+  doi: "10.17016/IFDP.2016.1173"
+  url: https://www.federalreserve.gov/econres/ifdp/oil-price-elasticities-and-oil-price-fluctuations.htm
+document:
+  url: https://www.federalreserve.gov/econresdata/ifdp/2016/files/ifdp1173.pdf
+  media_type: application/pdf
+  sha256: e12cbd0b400fc97b0f134f504cbd1f6f66e9cec0169d4029c05c3a8681d54322
+  bytes: 1665888
+  version_read: "IFDP 1173, July 2016 (a later journal version, Journal of Monetary Economics 2019, may differ)"
+as_of: "2016-07-01"
+rights:
+  licence: "No licence statement captured in the document read (Federal Reserve Board discussion paper, free download); treated as all rights reserved; short quotation with credit."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  method: svar
+  point_kind: point
+  uncertainty: {status: not_reported}
+  scope: {countries: [WLD], period: {from: "1985-01", to: "2015-12"}, frequency: monthly,
+          sample_note: "Global oil market; activity of a group of advanced and a group of emerging economies (industrial production); 1985:M1-2015:M12"}
+  identification: "Structural VAR (oil production, oil prices, inventories, IP of advanced and of emerging economies, metal prices) identified by selecting the VAR-admissible pair of short-run oil supply and demand elasticities closest to the medians of a literature compilation (table A.4)"
+estimates:
+  - id: oil_price_response_to_supply_decline_08mbd
+    pdf_page: 15
+    shock_profile: one_time_impulse
+    cause: {kind: variable, id: oil.world_production, transform: level_change,
+            definition: "an exogenous decline in global crude oil supply of 1 percent (approximately 0.8 million barrels per day)"}
+    effect: {kind: variable, id: oil_price.global, transform: percent_change,
+             definition: "oil prices, increase over a one-month horizon"}
+    measure: response
+    unit: percent
+    shock: {size: 0.8, unit: million barrels per day}
+    sign: negative
+    point: -5
+    as_printed: "5"
+    printed_transform: negated
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 3 (identification), text after equation (9): sentence starting on printed p.13 and ending on printed p.14 (pdf p.15)"
+    quote: "(approximately 0.8 million barrels per day) should lead, over a one-month horizon, to an increase in oil prices of 5 percent"
+    applicability: "REVA note: the source states the response to a supply DECLINE of 1 percent (+5 percent oil price); it is stored as the response to an increase of the same size (-5 percent) under the VAR's linearity (printed_transform: negated). The shock is recorded in million barrels per day using the authors' own printed equivalence (1 percent of global supply = approximately 0.8 mb/d at the sample's production level). Short-run (one-month) response implied by the identified elasticities; no uncertainty printed for it."
+  - id: oil_supply_elasticity_identified
+    pdf_page: 14
+    shock_profile: contemporaneous_relation
+    cause: {kind: variable, id: oil_price.global, transform: log_change, definition: "oil prices (short-run price elasticity of oil supply ηS)"}
+    effect: {kind: variable, id: oil.world_production, transform: log_change, definition: "global oil production (supply)"}
+    measure: elasticity
+    unit: ratio
+    sign: positive
+    point: 0.11
+    as_printed: "0.11"
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 3, paragraph after equation (9) (printed p.13)"
+    quote: "Such identification yields, for Σε evaluated at its OLS estimate, an oil supply elasticity of 0.11 and an oil demand elasticity of -0.11."
+  - id: oil_demand_elasticity_identified
+    pdf_page: 14
+    shock_profile: contemporaneous_relation
+    cause: {kind: variable, id: oil_price.global, transform: log_change, definition: "oil prices (short-run price elasticity of oil demand ηD)"}
+    effect: {kind: variable, id: oil.world_consumption, transform: log_change, definition: "global oil demand"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -0.11
+    as_printed: "-0.11"
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 3, paragraph after equation (9) (printed p.13)"
+    quote: "Such identification yields, for Σε evaluated at its OLS estimate, an oil supply elasticity of 0.11 and an oil demand elasticity of -0.11."
+  - id: oil_supply_elasticity_literature_median
+    pdf_page: 14
+    shock_profile: contemporaneous_relation
+    method: meta_analysis
+    point_kind: median
+    meta: {n_studies: 6, correction: "none (median of the elasticities listed in table A.4)"}
+    identification: "Median of the short-run price elasticities of oil supply estimated by six studies compiled in table A.4"
+    scope: {countries: [WLD], sample_note: "Studies compiled in table A.4 (various samples)"}
+    cause: {kind: variable, id: oil_price.global, transform: log_change, definition: "oil price (short-run price elasticity of oil supply)"}
+    effect: {kind: variable, id: oil.world_production, transform: log_change, definition: "oil supply"}
+    measure: elasticity
+    unit: ratio
+    sign: positive
+    point: 0.13
+    as_printed: "0.13"
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 3, paragraph on the literature compilation (table A.4) (printed p.13)"
+    quote: "The “consensus” in the literature, as summarized by the median elasticity, is that the supply elasticity is 0.13 and the demand elasticity is -0.13."
+  - id: oil_demand_elasticity_literature_median
+    pdf_page: 14
+    shock_profile: contemporaneous_relation
+    method: meta_analysis
+    point_kind: median
+    meta: {n_studies: 30, correction: "none (median of the elasticities listed in table A.4)"}
+    identification: "Median of the short-run price elasticities of oil demand estimated by thirty studies compiled in table A.4"
+    scope: {countries: [WLD], sample_note: "Studies compiled in table A.4 (various samples)"}
+    cause: {kind: variable, id: oil_price.global, transform: log_change, definition: "oil price (short-run price elasticity of oil demand)"}
+    effect: {kind: variable, id: oil.world_consumption, transform: log_change, definition: "oil demand"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -0.13
+    as_printed: "-0.13"
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 3, paragraph on the literature compilation (table A.4) (printed p.13)"
+    quote: "The “consensus” in the literature, as summarized by the median elasticity, is that the supply elasticity is 0.13 and the demand elasticity is -0.13."
+  - id: oil_price_impact_of_1sd_supply_shock
+    pdf_page: 18
+    shock_profile: one_time_impulse
+    point_kind: median
+    cause: {kind: variable, id: oil.world_production, transform: std_dev_shock,
+            definition: "one standard-deviation oil supply shock (an unanticipated disruption in oil supply that reduces production by about 0.75 percent)"}
+    effect: {kind: variable, id: oil_price.global, transform: percent_change, definition: "oil prices, response on impact"}
+    measure: response
+    unit: percent
+    shock: {size: 1, unit: std_dev}
+    sign: negative
+    point: -6
+    as_printed: "6"
+    printed_transform: negated
+    horizon: {kind: impact, value: 0, unit: month}
+    locator: "Section 4.2 'Impulse Responses', first paragraph (printed p.17); figure 4 left column (bands in the figure only)"
+    quote: "An unanticipated disruption in oil supply reduces production by about 0.75 percent and elicits a persistent increase in oil prices, which rise by 6 percent on impact and remain elevated thereafter."
+    applicability: "REVA note: response to a supply DISRUPTION (+6 percent) stored as the response to a favourable supply shock of the same size (-6 percent) under linearity; credible bands are drawn in figure 4 only (not read off the chart)."
+  - id: advanced_ip_trough_after_1sd_supply_shock
+    pdf_page: 18
+    shock_profile: one_time_impulse
+    point_kind: median
+    cause: {kind: variable, id: oil.world_production, transform: std_dev_shock,
+            definition: "one standard-deviation oil supply shock (an unanticipated disruption in oil supply that reduces production by about 0.75 percent)"}
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "IP in advanced economies (the authors' group of advanced economies), trough of the response"}
+    measure: response
+    unit: percent
+    shock: {size: 1, unit: std_dev}
+    sign: positive
+    point: 0.35
+    as_printed: "-0.35"
+    printed_transform: negated
+    horizon: {kind: peak, value: 30, unit: month}
+    scope: {countries: [WLD], country_group: "advanced economies (group used by the authors)", period: {from: "1985-01", to: "2015-12"}, frequency: monthly}
+    locator: "Section 4.2 'Impulse Responses', first paragraph (printed p.17)"
+    quote: "IP in advanced economies declines gradually, bottoming out at -0.35 percent two and a half years after the shock."
+    applicability: "REVA note: trough response to a supply DISRUPTION (-0.35 percent) stored as the response to a favourable supply shock (+0.35 percent) under linearity."
+  - id: emerging_ip_peak_after_1sd_supply_shock
+    pdf_page: 18
+    shock_profile: one_time_impulse
+    point_kind: median
+    cause: {kind: variable, id: oil.world_production, transform: std_dev_shock,
+            definition: "one standard-deviation oil supply shock (an unanticipated disruption in oil supply that reduces production by about 0.75 percent)"}
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "IP in emerging economies (the authors' group of emerging economies), peak of the response"}
+    measure: response
+    unit: percent
+    shock: {size: 1, unit: std_dev}
+    sign: negative
+    point: -0.2
+    as_printed: "0.2"
+    printed_transform: negated
+    horizon: {kind: peak, value: 6, unit: month}
+    scope: {countries: [WLD], country_group: "emerging economies (group used by the authors)", period: {from: "1985-01", to: "2015-12"}, frequency: monthly}
+    locator: "Section 4.2 'Impulse Responses', first paragraph (printed p.17)"
+    quote: "In contrast, IP in emerging economies raises rapidly, peaking after six months at 0.2 percent above baseline."
+    applicability: "REVA note: peak response to a supply DISRUPTION (+0.2 percent) stored as the response to a favourable supply shock (-0.2 percent) under linearity."

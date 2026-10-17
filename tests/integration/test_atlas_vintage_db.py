@@ -16,6 +16,7 @@ from reva.adapters.connectors import (
     atlas_vintage_ecb_spf,
     atlas_vintage_oecd,
     atlas_vintage_philfed,
+    atlas_vintage_steo,
     atlas_vintage_weo,
 )
 from reva.atlas.ingest import run_atlas_ingest
@@ -30,6 +31,7 @@ SPECS = [
     atlas_vintage_philfed.atlas_source(),
     atlas_vintage_ecb_spf.atlas_source(),
     atlas_vintage_oecd.atlas_source(),
+    atlas_vintage_steo.atlas_source(),
 ]
 ORIGINS = ("test_fixture",)
 

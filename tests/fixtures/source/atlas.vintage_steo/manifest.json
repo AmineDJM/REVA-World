@@ -1,0 +1,49 @@
+[
+ {
+  "request_fingerprint": "2373f81c11cdb6446a0522131023628963042600ed7695d9e1e52098bb4f0252",
+  "url": "https://www.eia.gov/outlooks/steo/outlook.php",
+  "file": "2373f81c11cdb644.html",
+  "sha256": "1d2dcbbd43a92267fdfd5e1f159b90f72eaaadf1e2eed1d26e06741a86e1e2ed",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "ea477d8493157497676aaa47012828251194c9c899c1a51bb2265b84c810e2c5",
+  "live_bytes": 174964,
+  "excerpt": "STEO Archives heading + the issue rows of October 2026, September 2026, July 2013 and June 2013 verbatim (tr elements copied from the live page)"
+ },
+ {
+  "request_fingerprint": "981f5ae6d57d1779e78da53e0cd1eb198f64e7b0882f0de4bb4f306c96670371",
+  "url": "https://www.eia.gov/outlooks/steo/archives/jul13_base.xlsx",
+  "file": "981f5ae6d57d1779.xlsx",
+  "sha256": "521a12710be6d797e83f69cca7a6b902f6cc3af258c0b62a7f835545ea4829aa",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "last-modified": "Mon, 08 Jul 2013 12:50:30 GMT"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "583f092aa05de77d7e482161a94984f4fa56de64f887d33d90e539f62a6df901",
+  "live_bytes": 827771,
+  "excerpt": "workbook reduced to sheets ['Dates', '2tab', '3atab']: members [Content_Types].xml, _rels/.rels, xl/_rels/workbook.xml.rels, xl/sharedStrings.xml and ['xl/worksheets/sheet1.xml', 'xl/worksheets/sheet4.xml', 'xl/worksheets/sheet5.xml'] copied verbatim from the live file; xl/workbook.xml = the live part with the <sheets> list cut to these sheets"
+ },
+ {
+  "request_fingerprint": "167caca72944e84f7fb572683612659a1b89f15dfb223fefb7518a1ab407c0a4",
+  "url": "https://www.eia.gov/outlooks/steo/archives/oct26_base.xlsx",
+  "file": "167caca72944e84f.xlsx",
+  "sha256": "703d0e5b4eda4d3c6e112f10c85749d1fb5031d6d4eaaed35ce3cc64e49d3d22",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "last-modified": "Thu, 01 Oct 2026 21:37:23 GMT"
+  },
+  "retrieved_at": "2026-10-17T16:00:00+00:00",
+  "licence": "U.S. public domain",
+  "live_sha256": "54989362410da4aff5673580396380c3a8f4f111fa6d01c6d4fab05ef90efbf4",
+  "live_bytes": 1098385,
+  "excerpt": "workbook reduced to sheets ['Dates', '2tab', '3atab']: members [Content_Types].xml, _rels/.rels, xl/_rels/workbook.xml.rels, xl/sharedStrings.xml and ['xl/worksheets/sheet1.xml', 'xl/worksheets/sheet4.xml', 'xl/worksheets/sheet5.xml'] copied verbatim from the live file; xl/workbook.xml = the live part with the <sheets> list cut to these sheets"
+ }
+]

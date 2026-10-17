@@ -118,7 +118,8 @@ variables:
     labels: {en: World crude oil production, fr: Production mondiale de pétrole brut}
     definition: Quantity of crude oil produced worldwide per period.
     unit: barrels per day
-    atlas_concepts: []
+    atlas_concepts: [resources.energy.eia.crude_oil_production]
+    atlas_note: "Curated by agent EFFECTS-MORE (2026-10-17): the EIA series INTL.57-1-TBPD.A (crude oil incl. lease condensate, thousand b/d) at the world aggregate measures world crude oil production; sources' own definitions (e.g. 'global crude oil supply') are kept verbatim on each estimate and may differ in coverage (NGLs, condensate)."
   - id: oil.world_consumption
     labels: {en: World oil consumption, fr: Consommation mondiale de pétrole}
     definition: Quantity of crude oil (or oil products) consumed worldwide per period (oil demand).
@@ -133,4 +134,152 @@ variables:
     labels: {en: Minimum pension age, fr: Âge minimum de départ à la retraite}
     definition: Statutory minimum (earliest eligibility) age at which an old-age pension can be claimed.
     unit: years of age
+    atlas_concepts: []
+  # --- added by agent EFFECTS-MORE (V6, 2026-10-17) ---
+  - id: output.industrial_production
+    labels: {en: Industrial production, fr: Production industrielle}
+    definition: Index of the volume of industrial production (manufacturing, mining, utilities) of an economy or group of economies.
+    unit: index
+    atlas_concepts: [macro_hf.industrial_production_m_sa]
+    atlas_note: "Curated by agent EFFECTS-MORE: the IMF seasonally adjusted industrial production index measures the same quantity; a source's national IP index (e.g. Federal Reserve, ONS) may differ in coverage and base."
+  - id: prices.consumption_deflator
+    labels: {en: Private consumption deflator, fr: Déflateur de la consommation privée}
+    definition: Implicit price deflator of household (private) consumption expenditure in the national accounts.
+    unit: index
+    atlas_concepts: []
+  - id: labour.employment_rate_affected_ages
+    labels: {en: Employment rate at the ages affected by a pension-age change, fr: Taux d'emploi aux âges concernés par un changement d'âge de la retraite}
+    definition: Share of persons employed among those whose age lies between the old and the new pension eligibility age (or just below the eligibility age), as defined by each study.
+    unit: percent of the age group
+    atlas_concepts: []
+  - id: pension.receipt_rate_affected_ages
+    labels: {en: Pension receipt (retirement) rate at the affected ages, fr: Taux de retraités aux âges concernés}
+    definition: Share of persons receiving an old-age pension (or classified as retired) among those whose age lies between the old and the new pension eligibility age, as defined by each study.
+    unit: percent of the age group
+    atlas_concepts: []
+  - id: labour.labour_market_exit_age
+    labels: {en: Average labour-market exit age, fr: Âge moyen de sortie du marché du travail}
+    definition: Average age at which members of a cohort leave employment (exit the labour market), as defined by each study.
+    unit: years of age
+    atlas_concepts: []
+  - id: pension.claiming_age
+    labels: {en: Average pension claiming age, fr: Âge moyen de liquidation de la pension}
+    definition: Average age at which members of a cohort start drawing an old-age pension.
+    unit: years of age
+    atlas_concepts: []
+  - id: climate.country_temperature
+    labels: {en: Country annual mean temperature, fr: Température moyenne annuelle du pays}
+    definition: Annual mean near-surface air temperature of a country (area- or population-weighted average of gridded data), degrees Celsius.
+    unit: degrees Celsius
+    atlas_concepts: [environment.temperature_anomaly]
+    atlas_note: "Curated by agent EFFECTS-MORE: the OWID/ERA5 country temperature anomaly differs from the country mean temperature only by a constant (the 1991-2020 mean), so its year-to-year changes in °C equal temperature changes; estimates here use changes (level_change), never levels. Weighting (area vs population) may differ from the source's."
+  - id: climate.global_mean_temperature
+    labels: {en: Global mean surface temperature, fr: Température moyenne mondiale de surface}
+    definition: Global (land and ocean) mean surface temperature, degrees Celsius.
+    unit: degrees Celsius
+    atlas_concepts: []
+  - id: output.agricultural_value_added
+    labels: {en: Agricultural value added, fr: Valeur ajoutée agricole}
+    definition: Real value added of agriculture (national accounts); its growth rate is the annual percent change.
+    unit: constant-price currency
+    atlas_concepts: []
+  - id: output.industrial_value_added
+    labels: {en: Industrial value added, fr: Valeur ajoutée industrielle}
+    definition: Real value added of industry (national accounts); its growth rate is the annual percent change.
+    unit: constant-price currency
+    atlas_concepts: []
+  - id: investment.real_investment
+    labels: {en: Real investment, fr: Investissement réel}
+    definition: Real gross (fixed) investment of an economy; its growth rate is the annual percent change.
+    unit: constant-price currency
+    atlas_concepts: []
+  - id: disaster.cyclone_wind_exposure
+    labels: {en: Tropical cyclone wind exposure, fr: Exposition aux vents de cyclones tropicaux}
+    definition: Annual nationally averaged maximum wind speed experienced from tropical cyclones (meters per second).
+    unit: m/s
+    atlas_concepts: []
+  - id: trade.import_tariff_factor
+    labels: {en: Import tariff factor (one plus the tariff), fr: Facteur tarifaire à l'importation (un plus le droit)}
+    definition: One plus the ad valorem import tariff rate on a product (variety); its log change is the tariff shock of trade-war studies.
+    unit: factor (1 + rate)
+    atlas_concepts: []
+  - id: trade.import_tariff_rate
+    labels: {en: Import tariff rate, fr: Taux de droit de douane à l'importation}
+    definition: Ad valorem import tariff rate applied to a product, in percent (percentage points when it changes).
+    unit: percent
+    atlas_concepts: []
+  - id: trade.export_tariff_factor_abroad
+    labels: {en: Foreign retaliatory tariff factor on a country's exports, fr: Facteur tarifaire de rétorsion appliqué à l'étranger sur les exportations}
+    definition: One plus the ad valorem tariff that foreign countries apply to a country's exports of a product.
+    unit: factor (1 + rate)
+    atlas_concepts: []
+  - id: prices.import_price_before_duty
+    labels: {en: Import price before duty, fr: Prix à l'importation hors droits}
+    definition: Price (unit value) charged by foreign exporters for an imported product, excluding import duties.
+    unit: currency per unit
+    atlas_concepts: []
+  - id: prices.import_price_duty_inclusive
+    labels: {en: Duty-inclusive import price, fr: Prix à l'importation droits compris}
+    definition: Price (unit value or price index) paid by importers for an imported product, including import duties.
+    unit: currency per unit or index
+    atlas_concepts: []
+  - id: trade.import_quantity
+    labels: {en: Import quantity, fr: Quantité importée}
+    definition: Quantity (volume) of imports of a product (variety) or aggregate.
+    unit: physical units
+    atlas_concepts: []
+  - id: trade.import_value
+    labels: {en: Import value, fr: Valeur des importations}
+    definition: Value of imports of a product (variety) or aggregate.
+    unit: currency
+    atlas_concepts: []
+  - id: prices.export_price
+    labels: {en: Export price, fr: Prix à l'exportation}
+    definition: Price (unit value) charged by a country's exporters for an exported product, excluding foreign duties.
+    unit: currency per unit
+    atlas_concepts: []
+  - id: trade.export_quantity
+    labels: {en: Export quantity, fr: Quantité exportée}
+    definition: Quantity (volume) of exports of a product (variety) or aggregate.
+    unit: physical units
+    atlas_concepts: []
+  - id: trade.export_value
+    labels: {en: Export value, fr: Valeur des exportations}
+    definition: Value of exports of a product (variety) or aggregate.
+    unit: currency
+    atlas_concepts: []
+  - id: exchange_rate.bilateral_depreciation
+    labels: {en: Bilateral depreciation of the importer's currency, fr: Dépréciation bilatérale de la monnaie de l'importateur}
+    definition: Percent depreciation of the importing country's currency against the exporter's currency (a positive value is a depreciation).
+    unit: percent
+    atlas_concepts: []
+  - id: trade.export_restriction_share
+    labels: {en: Share of world trade covered by export restrictions, fr: Part du commerce mondial couverte par des restrictions à l'exportation}
+    definition: Share of world trade in a product that is covered by export restrictions (bans, taxes, quotas, licensing) of exporting countries.
+    unit: percent of world trade
+    atlas_concepts: []
+  - id: trade.price_insulation_global
+    labels: {en: Price-insulating trade policy of all countries, fr: Politiques commerciales d'isolement des prix de tous les pays}
+    definition: Changes in trade measures (export restrictions or taxes, import tariff cuts) by which governments insulate domestic from international food prices, aggregated over all countries in a period.
+    unit: as the estimate states
+    atlas_concepts: []
+  - id: prices.international_food_commodity
+    labels: {en: International price of a food commodity, fr: Prix international d'un produit alimentaire}
+    definition: Price of a food commodity on international markets (e.g. a benchmark export price for rice, wheat, maize or edible oils), U.S. dollars.
+    unit: USD per tonne
+    atlas_concepts: []
+  - id: fiscal.tax_revenue
+    labels: {en: Tax revenue (tax change), fr: Recettes fiscales (variation des impôts)}
+    definition: Government tax revenue; as a cause, an exogenous (legislated) change in taxes, usually measured in percent of GDP.
+    unit: currency or percent of GDP
+    atlas_concepts: []
+  - id: sanctions.intensity_newspaper
+    labels: {en: Sanctions intensity (newspaper coverage), fr: Intensité des sanctions (couverture de presse)}
+    definition: Index of the intensity of international sanctions on a target country measured from daily newspaper coverage of sanctions (Laudati and Pesaran).
+    unit: index
+    atlas_concepts: []
+  - id: output.real_gdp_growth_quarterly
+    labels: {en: Real output growth (quarterly), fr: Croissance trimestrielle de la production réelle}
+    definition: Quarter-on-quarter growth rate of real output (GDP), percent per quarter.
+    unit: percent per quarter
     atlas_concepts: []

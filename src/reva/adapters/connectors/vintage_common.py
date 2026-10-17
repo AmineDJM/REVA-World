@@ -76,6 +76,14 @@ AVAILABILITY_RULES: dict[str, str] = {
         "OECD STES revisions EDITION YYYYMM (monthly MEI edition, CL_EDITION name e.g. 'February 1999'); the "
         "day is not in the data, so available_at = first instant of the following month (UTC)"
     ),
+    "steo_archive_release_date": (
+        "EIA STEO Archives page 'Release Date' (MM/DD/YYYY) of the issue, the archived file's Last-Modified "
+        "header being on/before that day; available_at = the day after the release date, 00:00 UTC"
+    ),
+    "steo_archive_file_last_modified": (
+        "EIA STEO archive file whose Last-Modified header is after the issue's release date (the file may have "
+        "been replaced after release): available_at = the first instant of the day after Last-Modified (UTC)"
+    ),
 }
 
 #: REVA vintage variables: id -> definition (the source's own definition is quoted per cell source in
@@ -110,6 +118,20 @@ VARIABLES: dict[str, str] = {
     "hicp_inflation": "HICP inflation, year-on-year percent (ECB SPF)",
 }
 
+#: Namespaced variable ids: prefix -> meaning. ``eia_steo:<CODE>`` = the EIA STEO series code (upper case; EIA's
+#: codes are case-insensitive: the workbooks write ``papr_world``, the bulk file ``STEO.PAPR_WORLD.M``); the
+#: definition is EIA's row label and table heading, quoted per cell in ``flags.series_label`` / ``flags.table``.
+VARIABLE_PREFIXES: dict[str, str] = {
+    "eia_steo:": "EIA Short-Term Energy Outlook series, by EIA series code (label quoted in each cell's flags)",
+}
+
+
+def known_variable(variable: str) -> bool:
+    return variable in VARIABLES or any(
+        variable.startswith(p) and len(variable) > len(p) for p in VARIABLE_PREFIXES
+    )
+
+
 ESTIMATE_KINDS = ("projection", "actual", "published_history", "published_history_boundary_unknown")
 
 
@@ -141,6 +163,7 @@ FAMILIES: dict[str, str] = {
     "philfed_spf": "Philadelphia Fed Survey of Professional Forecasters (median responses per survey)",
     "ecb_spf": "ECB Survey of Professional Forecasters (average of point forecasts per round)",
     "oecd_mei_rt": "OECD Main Economic Indicators original release data and revisions (monthly editions)",
+    "eia_steo": "EIA Short-Term Energy Outlook monthly issues (archived Excel data files of each release)",
 }
 
 
@@ -159,7 +182,7 @@ def vintage_flags(
     """Canonical flags JSON of one vintage cell (see the module docstring)."""
     if family not in FAMILIES:
         raise ValueError(f"unknown vintage family {family!r}")
-    if variable not in VARIABLES:
+    if not known_variable(variable):
         raise ValueError(f"unknown vintage variable {variable!r}")
     if estimate_kind not in ESTIMATE_KINDS:
         raise ValueError(f"unknown estimate_kind {estimate_kind!r}")

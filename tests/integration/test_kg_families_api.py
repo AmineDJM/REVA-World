@@ -41,11 +41,14 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
             KgProperty("syn:unrelated", "item", "unrelated", "unrelated", "sans rapport"),
             PLACE_LOCATED_IN,
             ATLAS_MEASURED_BY,
+            # V4ECON's region -> atlas table predicate (registry/kg/relations_v4.d/v4econ.yaml: measured_by)
+            KgProperty("econ:measured_by", "item", "econ_measured_by", "measured by (atlas table)", "mesuré par"),
         ],
     )
     raw = db.store.put_bytes(b"kg families test synthetic graph v1", "raw", "application/json").sha256
     names = ["petroleum", "alkane", "hydrocarbon", "firm", "field", "adm1", "country", "war", "other"]
     ents = [KgEntity(f"syn:fam_{n}", "test_thing", {"en": n.title(), "fr": f"{n} (fr)"}) for n in names]
+    ents.append(KgEntity("atlas:kgfamtest.reg_pop", "data_series", {"en": "Regional population (test table)"}))
     share = {"P1107": [{"amount": "+0.25", "unit": "1"}]}
     sts = [
         KgStatement("syn:fam_petroleum", "P186", "syn:fam_alkane", statement_id="pa", qualifiers=share),
@@ -62,6 +65,13 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
             "atlas:energy.oil_production",
             statement_id="pm",
             qualifiers={"concept": "energy.oil_production", "iso3": "sau"},
+        ),
+        KgStatement(
+            "syn:fam_adm1",
+            "econ:measured_by",
+            "atlas:kgfamtest.reg_pop",
+            statement_id="adm1m",
+            qualifiers={"table": "kgfamtest.reg_pop", "provider_geo": "XX01"},
         ),
         KgStatement(
             "syn:fam_adm1",
@@ -126,14 +136,26 @@ def test_entity_families(api) -> None:  # type: ignore[no-untyped-def]
     fams = {g["family"]: g for g in d["families"]}
     made = fams["made_of"]["neighbours"][0]
     assert made["neighbour"]["qid"] == "syn:fam_alkane"
-    assert made["share"] == {"value": "0.25", "fraction": "0.25", "unit": "1", "scale": "fraction", "qualifier": "P1107"}
+    assert made["share"] == {
+        "value": "0.25",
+        "fraction": "0.25",
+        "unit": "1",
+        "scale": "fraction",
+        "qualifier": "P1107",
+    }
     assert made["statement"]["provenance"]["source_key"] == SRC and made["rights"] is not None
     # read from the product: the firm's "product or material produced" becomes produced_by
     assert fams["produced_by"]["neighbours"][0]["neighbour"]["qid"] == "syn:fam_firm"
     assert fams["measured_by"]["neighbours"][0]["atlas"] == {
+        "kind": "concept",
         "concept": "energy.oil_production",
         "iso3": "SAU",
         "table": None,
+        "source": None,
+        "dataset": None,
+        "provider_geo": None,
+        "indicators": [],
+        "indicator_contains": None,
     }
     # the causal statement and the unmapped property are not in any family, but are counted
     unm = {(u["pid"], u["direction"]): u for u in d["unmapped"]}
@@ -198,3 +220,13 @@ def test_plain_path_hops_carry_family(api) -> None:  # type: ignore[no-untyped-d
     assert r.status_code == 200, r.text
     hops = r.json()["data"]["paths"][0]["hops"]
     assert [h["family"]["id"] for h in hops] == ["made_of", "part_of"]
+
+
+def test_measured_by_table_entity_bridge(api) -> None:  # type: ignore[no-untyped-def]
+    """V6 INTEG: an atlas table entity (V4ECON convention) resolves to the table + provider geography."""
+    r = get(api, "/v1/kg/entities/syn:fam_adm1/families", family="measured_by")
+    assert r.status_code == 200, r.text
+    (g,) = r.json()["data"]["families"]
+    hint = g["neighbours"][0]["atlas"]
+    assert hint["kind"] == "table" and hint["concept"] is None
+    assert (hint["source"], hint["dataset"], hint["provider_geo"]) == ("kgfamtest", "reg_pop", "XX01")

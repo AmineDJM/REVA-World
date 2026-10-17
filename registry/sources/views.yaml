@@ -1,0 +1,32 @@
+# V6 (agent PRED-CONFLICT): VIEWS (Violence & Impacts Early-Warning System) public forecast API. Connector
+# src/reva/adapters/connectors/atlas_views.py (atlas table views.cm_sb: country-month state-based conflict FORECASTS,
+# estimate_kind=projection). Used as an attributed benchmark forecaster by reva.evaluation.conflict.
+source_key: views.api
+title: VIEWS conflict forecasts - country-month state-based fatalities and probability of >= 25 BRDs (per monthly run)
+provider_url: https://viewsforecasting.org/data/
+lineage_family: views
+rights:
+  licence: "not stated by the provider (licence_review); citation requested"
+  licence_url: https://viewsforecasting.org/data/
+  attribution: >-
+    VIEWS -- Violence & Impacts Early-Warning System, Uppsala University (Department of Peace and Conflict Research)
+    and PRIO. Hegre, H. et al. (2021) 'ViEWS2020: Revising and evaluating the ViEWS political Violence Early-Warning
+    System', Journal of Peace Research 58(3), 599-611; Hegre, H. et al. (2022) 'Forecasting fatalities', Uppsala
+    University, urn:nbn:se:uu:diva-476476.
+  licence_evidence: >-
+    Checked 2026-10-17: viewsforecasting.org/data/ (Data Access page: download, dashboard and API links, no licence
+    text), github.com/prio-data/views_api README and wiki (no licence text), github.com/prio-data/viewsforecasting
+    README section "How to cite" (asks for the two references above). The V6 brief describes VIEWS forecasts as
+    CC BY; no provider page fetched states it.
+  open_licence: false
+  redistribution: not stated by the provider; forecasts are shown attributed to VIEWS; flagged for owner review
+metadata:
+  allowed_hosts: [api.viewsforecasting.org, raw.githubusercontent.com]
+  files:
+    runs: https://api.viewsforecasting.org/
+    release_dates: https://raw.githubusercontent.com/wiki/prio-data/views_api/Available-datasets.md
+    codebook: https://api.viewsforecasting.org/{run}/codebook
+    country_month_sb: https://api.viewsforecasting.org/{run}/cm/sb/{variable}?pagesize=10000
+  authentication: none
+  cadence: monthly data releases (about 4 weeks after the last input month; release dates in the API wiki)
+  review_flag: no licence stated -- owner to confirm redistribution of VIEWS forecasts inside REVA

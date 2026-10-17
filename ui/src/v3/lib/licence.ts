@@ -12,6 +12,7 @@ export interface RightsLike {
   restricted?: boolean;
   attribution?: string | null;
   licence_url?: string | null;
+  required_notice?: string | null;
 }
 
 /** French badges of the restrictive terms of one licence (empty for an open, attribution-only licence). */
@@ -37,4 +38,11 @@ export function restrictedLicences<T extends RightsLike & { source: string }>(ls
     out.push(l);
   }
   return out;
+}
+
+/** Notices the providers' terms require next to their values (one per source, verbatim; e.g. New York Fed). */
+export function requiredNotices<T extends RightsLike & { source: string }>(ls: readonly T[]): { source: string; notice: string }[] {
+  const seen = new Map<string, string>();
+  for (const l of ls) if (l.required_notice && !seen.has(l.source)) seen.set(l.source, l.required_notice);
+  return [...seen.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([source, notice]) => ({ source, notice }));
 }

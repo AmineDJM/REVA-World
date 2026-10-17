@@ -363,7 +363,10 @@ class AtlasQuery:
         self.tables = {t["artifact_sha256"]: t for t in snapshot.tables}
         # LIC-1: rights recorded with each pinned table artifact (manifest / meta.artifact)
         self._table_rights = {
-            sha: normalise_rights(t.get("rights"), basis="table_artifact") for sha, t in self.tables.items()
+            sha: with_required_notice(
+                normalise_rights(t.get("rights"), basis="table_artifact"), _table_source(t.get("dataset_key"))
+            )
+            for sha, t in self.tables.items()
         }
         self._memo: dict[Any, Any] = {}
         rows = self._rows("SELECT sid, source, dataset, indicator FROM series")
@@ -567,6 +570,101 @@ class AtlasQuery:
             "sources_without_data": [k for k in declared if k not in per_source],
             "licences": licence_summary([*best, *(c for e in per_source.values() for c in e["cells"])]),
         }
+
+    # ------------------------------------------------------------------ one table (KG measured_by bridge)
+    def table_cells(
+        self,
+        catalog: Catalog,
+        source: str,
+        dataset: str,
+        *,
+        provider_geo: str | None = None,
+        iso3: str | None = None,
+        indicators: Sequence[str] = (),
+        indicator_contains: str | None = None,
+        limit: int = 2000,
+    ) -> dict[str, Any]:
+        """Cells of one atlas table ``<source>.<dataset>`` selected by what a KG ``measured_by`` statement names
+        (provider geography, ISO3, exact indicators or an indicator substring), every period as published.
+
+        Per indicator: cell count, geographies, first/last period; cells (sorted by indicator then period) only when
+        a geography is given (``provider_geo`` or ``iso3``), at most ``limit`` in all (``truncated``). A table that
+        is not in this snapshot is ``in_snapshot: false`` (absent, never empty-as-zero). ``concepts`` lists the
+        catalog concepts whose source order reads this table."""
+        sids = [
+            sid
+            for sid, (src, ds, ind) in self.series_of.items()
+            if src == source
+            and ds == dataset
+            and (not indicators or ind in indicators)
+            and (indicator_contains is None or indicator_contains in ind)
+        ]
+        in_snapshot = any(src == source and ds == dataset for src, ds, _ in self.series_of.values())
+        concepts = sorted({cid for cid, _r, src, ds, _i in catalog.series_rows() if src == source and ds == dataset})
+        out: dict[str, Any] = {
+            "table": f"{source}.{dataset}",
+            "source": source,
+            "dataset": dataset,
+            "in_snapshot": in_snapshot,
+            "filters": {
+                "provider_geo": provider_geo,
+                "iso3": iso3,
+                "indicators": list(indicators),
+                "indicator_contains": indicator_contains,
+            },
+            "concepts": concepts,
+            "indicators": [],
+            "cells": [],
+            "truncated": False,
+            "licences": [],
+        }
+        if not sids:
+            return out
+        where = [f"x.sid IN ({','.join(str(int(x)) for x in sorted(sids))})"]
+        params: list[Any] = []
+        if provider_geo is not None:
+            where.append("x.provider_geo = ?")
+            params.append(provider_geo)
+        if iso3 is not None:
+            where.append("x.iso3 = ?")
+            params.append(iso3)
+        cond = " AND ".join(where)
+        summary = self._rows(
+            f"""SELECT x.sid, count(*) AS n_cells, count(*) FILTER (WHERE x.has_value) AS n_values,
+                       count(DISTINCT x.provider_geo) AS n_geos, count(DISTINCT x.iso3) AS n_countries,
+                       {iso_date_sql("min(x.period_start)")} AS period_first,
+                       {iso_date_sql("max(x.period_end)")} AS period_last, min(x.unit) AS unit
+                FROM cells_s x WHERE {cond} GROUP BY x.sid ORDER BY x.sid""",
+            params,
+        )
+        for r in summary:
+            _src, _ds, ind, key = self._series_key(r["sid"])
+            out["indicators"].append(
+                {
+                    "indicator": ind,
+                    "series": key,
+                    "cells": int(r["n_cells"]),
+                    "values": int(r["n_values"]),
+                    "geographies": int(r["n_geos"]),
+                    "countries": int(r["n_countries"]),
+                    "period_first": r["period_first"],
+                    "period_last": r["period_last"],
+                    "unit": r["unit"],
+                }
+            )
+        if provider_geo is None and iso3 is None:
+            sample = self._rows(f"SELECT DISTINCT x.table_sha FROM cells_s x WHERE {cond} LIMIT 20", params)
+            out["licences"] = licence_summary({"source": source, "rights": self.rights_of(t["table_sha"], source)}
+                                              for t in sample)  # fmt: skip
+            return out
+        rows = self._rows(
+            f"SELECT {CELL_SELECT} FROM cells_s x WHERE {cond} ORDER BY x.sid, x.period_start, x.period_end LIMIT ?",
+            [*params, int(limit) + 1],
+        )
+        out["truncated"] = len(rows) > limit
+        out["cells"] = [self._cell(r) for r in rows[:limit]]
+        out["licences"] = licence_summary(out["cells"])
+        return out
 
     # ------------------------------------------------------------------ coverage
     def coverage(self, catalog: Catalog, domain: str | None = None, theme: str | None = None) -> list[dict[str, Any]]:
@@ -1240,6 +1338,22 @@ PROJECTION_SQL = (
 DERIVED_PRECISION = 12  # significant digits of a derived ratio (an exact formula, rounded once)
 
 
+def _table_source(dataset_key: Any) -> str:
+    """``atlas.<source>.<dataset>`` -> ``<source>``."""
+    parts = str(dataset_key or "").split(".")
+    return parts[1] if len(parts) >= 3 else ""
+
+
+def required_notices(licences: Iterable[dict[str, Any]]) -> list[dict[str, str]]:
+    """The distinct notices that must be shown with an answer (one per source), from its licence summary."""
+    seen: dict[str, dict[str, str]] = {}
+    for x in licences:
+        n = x.get("required_notice")
+        if n and str(x.get("source")) not in seen:
+            seen[str(x.get("source"))] = {"source": str(x.get("source")), "notice": str(n)}
+    return sorted(seen.values(), key=lambda d: d["source"])
+
+
 def _dec_text(d: Decimal) -> str:
     """A finite Decimal as a strict decimal string (no exponent, no trailing zeros)."""
     if d == d.to_integral_value():
@@ -1460,10 +1574,50 @@ def source_spec_rights(source: str) -> dict[str, Any] | None:
         for sp in sorted(specs, key=lambda sp: sp.name)
         if (x := normalise_rights({"licence": sp.licence, "provider": sp.provider}, basis="atlas_source_spec"))
     ]
-    out = next((x for x in cands if x["restricted"]), cands[0] if cands else None)
+    out = with_required_notice(next((x for x in cands if x["restricted"]), cands[0] if cands else None), source)
     with _SPEC_LOCK:
         _SPEC_RIGHTS[source] = out
     return out
+
+
+_NOTICES: dict[str, dict[str, str]] = {}
+
+
+def registry_notices() -> dict[str, str]:
+    """Atlas source key -> the notice its source registry entry (``registry/sources/*.yaml`` ``rights.
+    required_notice``) says must accompany any presentation of the data. Cached per process; empty on error."""
+    with _SPEC_LOCK:
+        if "v" in _NOTICES:
+            return _NOTICES["v"]
+    out: dict[str, str] = {}
+    try:
+        import yaml
+
+        from reva.atlas.sources import atlas_sources
+
+        root = Path(__file__).resolve().parents[3] / "registry" / "sources"
+        by_key: dict[str, str] = {}
+        for f in sorted(root.glob("*.yaml")):
+            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            notice = (doc.get("rights") or {}).get("required_notice") if isinstance(doc, dict) else None
+            if isinstance(notice, str) and notice.strip() and doc.get("source_key"):
+                by_key[str(doc["source_key"])] = " ".join(notice.split())
+        for e in atlas_sources().values() if by_key else ():
+            if e.spec.source_key in by_key:
+                out.setdefault(e.spec.atlas_source, by_key[e.spec.source_key])
+    except Exception:  # pragma: no cover - a broken registry file never breaks a read
+        out = {}
+    with _SPEC_LOCK:
+        _NOTICES["v"] = out
+    return out
+
+
+def with_required_notice(rights: dict[str, Any] | None, source: str) -> dict[str, Any] | None:
+    """``rights`` plus the source registry's required notice when the recorded rights carry none."""
+    if rights is None or rights.get("required_notice"):
+        return rights
+    notice = registry_notices().get(source)
+    return {**rights, "required_notice": notice} if notice else rights
 
 
 def licence_summary(cells: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:

@@ -1,0 +1,77 @@
+# Culture: music and books catalogues (agent V6CULTURE, 2026-10-17). Provider-declared, not human-reviewed.
+# Source: MusicBrainz database statistics (CC0 core data), atlas table musicbrainz.country_stats built by
+# src/reva/adapters/connectors/atlas_musicbrainz.py. Counts are computed daily by the MusicBrainz server over its
+# volunteer-edited catalogue: they measure what has been catalogued, not national music output, and coverage is
+# very uneven between countries. The 'Unknown country' row (provider_geo mb:null) stays in the table so the share
+# without a country is visible. Open Library (atlas table openlibrary.subjects) and the MusicBrainz language/script
+# counts are world-level tables (provider_geo 'world') without catalog concepts (one series per subject/language).
+domain: culture_media
+labels: {fr: "Culture (musique et livres : catalogues ouverts)", en: "Culture (music and books: open catalogues)"}
+maintainer: V6CULTURE
+concepts:
+  - id: culture_media.mb_artists
+    labels: {fr: "Artistes catalogués dans MusicBrainz", en: "Artists catalogued in MusicBrainz"}
+    definition: >-
+      Number of artists (persons, groups, orchestras, choirs, characters, other) in the MusicBrainz database whose
+      area is the country or an area contained in it (MusicBrainz statistic count.artist.country, "Distribution of
+      artists per country"), on the day the statistics were last updated.
+    unit: count
+    domain: culture_media
+    subdomain: music
+    theme: culture
+    source_order:
+      - "musicbrainz.country_stats.mb_artists"
+    provider_declared: true
+    notes: "Catalogue coverage, not the number of musicians in the country; 1.5 M of ~2.6 M artists had no country on 2026-10-17."
+  - id: culture_media.mb_release_events
+    labels: {fr: "Sorties musicales avec un événement de sortie dans le pays (MusicBrainz)", en: "Music releases with a release event in the country (MusicBrainz)"}
+    definition: >-
+      Number of releases in the MusicBrainz database with a release event in the country (MusicBrainz statistic
+      count.release.country, "Distribution of releases per country"; a release counts once for each release-event
+      country), on the day the statistics were last updated.
+    unit: count
+    domain: culture_media
+    subdomain: music
+    theme: culture
+    source_order:
+      - "musicbrainz.country_stats.mb_release_events"
+    provider_declared: true
+    notes: "Not releases originating from the country: digital releases often list ~200 storefront countries (Kiribati: 35,563 on 2026-10-17)."
+  - id: culture_media.mb_labels
+    labels: {fr: "Labels catalogués dans MusicBrainz", en: "Record labels catalogued in MusicBrainz"}
+    definition: >-
+      Number of labels in the MusicBrainz database whose area is the country or an area contained in it (statistic
+      count.label.country, "Distribution of labels per country"), on the day the statistics were last updated.
+    unit: count
+    domain: culture_media
+    subdomain: music
+    theme: culture
+    source_order:
+      - "musicbrainz.country_stats.mb_labels"
+    provider_declared: true
+  - id: culture_media.mb_events
+    labels: {fr: "Événements musicaux catalogués dans MusicBrainz", en: "Music events catalogued in MusicBrainz"}
+    definition: >-
+      Number of events (concerts, festivals, ...) in the MusicBrainz database linked to an area or a place in the
+      country (statistic count.event.country, "Distribution of events per country"), on the day the statistics were
+      last updated.
+    unit: count
+    domain: culture_media
+    subdomain: music
+    theme: culture
+    source_order:
+      - "musicbrainz.country_stats.mb_events"
+    provider_declared: true
+  - id: culture_media.mb_places
+    labels: {fr: "Lieux musicaux catalogués dans MusicBrainz", en: "Music places catalogued in MusicBrainz"}
+    definition: >-
+      Number of places (venues, studios, ...) in the MusicBrainz database whose area is the country or an area
+      contained in it (statistic count.place.country, "Distribution of places per country"), on the day the
+      statistics were last updated.
+    unit: count
+    domain: culture_media
+    subdomain: music
+    theme: culture
+    source_order:
+      - "musicbrainz.country_stats.mb_places"
+    provider_declared: true

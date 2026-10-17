@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "51af5959752b45447c7d98cf0985eb419ce5bb9cbf8c8ba945c6b31d3020672e",
+    "url": "https://xmart-api-public.who.int/FLUMART/VIW_FNT?$filter=COUNTRY_CODE%20eq%20'FRA'%20and%20ISO_YEAR%20ge%202015&$select=COUNTRY_CODE,COUNTRY_AREA_TERRITORY,WHOREGION,HEMISPHERE,ISO_WEEKSTARTDATE,ISO_YEAR,ISO_WEEK,ORIGIN_SOURCE,SPEC_PROCESSED_NB,SPEC_RECEIVED_NB,INF_A,INF_B,INF_ALL,INF_NEGATIVE",
+    "file": "flunet_FRA.json",
+    "sha256": "72965377b5ebe6581ca970d958b514ae18b3d590c8b6c303918cd4b05d6108ee",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "FluNet slice as served (2015+), trimmed to ISO_YEAR >= 2021; rows and numbers unchanged"
+  },
+  {
+    "request_fingerprint": "3718ca4a46f1a1007cba7e8b95956de81e1db15d461f8d00501490d8f24a806b",
+    "url": "https://xmart-api-public.who.int/FLUMART/VIW_FNT?$filter=COUNTRY_CODE%20eq%20'AUS'%20and%20ISO_YEAR%20ge%202015&$select=COUNTRY_CODE,COUNTRY_AREA_TERRITORY,WHOREGION,HEMISPHERE,ISO_WEEKSTARTDATE,ISO_YEAR,ISO_WEEK,ORIGIN_SOURCE,SPEC_PROCESSED_NB,SPEC_RECEIVED_NB,INF_A,INF_B,INF_ALL,INF_NEGATIVE",
+    "file": "flunet_AUS.json",
+    "sha256": "0cd776d4da3d4a996fe5a86dc6fd5f4262aae76eb865b3f363a8476e2fc0e0a9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "FluNet slice as served (2015+), trimmed to ISO_YEAR >= 2021; rows and numbers unchanged"
+  }
+]

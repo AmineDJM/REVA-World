@@ -1,0 +1,135 @@
+# Property requests from V6CULTURE (films, literary works, music artists, museums; registry/kg/queries/culture/v6/**).
+# Merged into registry/kg/properties.yaml by WDOPS/WDHARVEST (`python -m reva.kg.harvest merge-property-requests`,
+# which checks each id and datatype against Wikidata and takes the en/fr labels from the property entity).
+# Ids and English labels written from the Wikidata property pages as known to V6CULTURE; not re-checked live here
+# (V6CULTURE does not query Wikidata: WDOPS owns the harvest), so the merge check is authoritative.
+- property: P57
+  why: director of a film (film -> person); the film's makers as Wikidata states them.
+  reva_predicate: director
+  inverse: directed
+  kind: entity
+  group: culture
+  label_en: director
+  label_fr: réalisateur ou metteur en scène
+- property: P58
+  why: screenwriter of a film.
+  reva_predicate: screenwriter
+  inverse: screenwriter_of
+  kind: entity
+  group: culture
+  label_en: screenwriter
+  label_fr: scénariste
+- property: P86
+  why: composer of a film score or musical work.
+  reva_predicate: composer
+  inverse: composer_of
+  kind: entity
+  group: culture
+  label_en: composer
+  label_fr: compositeur
+- property: P136
+  why: genre of films, literary works and music artists (genre items are classification context, not quality).
+  reva_predicate: genre
+  inverse: genre_of
+  kind: entity
+  group: culture
+  label_en: genre
+  label_fr: genre artistique
+- property: P364
+  why: original language of a film (joins films to the language layer of KGCULT).
+  reva_predicate: original_language
+  inverse: original_language_of
+  kind: entity
+  group: culture
+  label_en: original language of film or TV show
+  label_fr: langue originale de l'œuvre
+- property: P1411
+  why: award nominations of films and works (with point-in-time / statement-is-subject-of qualifiers).
+  reva_predicate: nominated_for
+  inverse: nominee
+  kind: entity
+  group: culture
+  label_en: nominated for
+  label_fr: nommé pour
+- property: P2047
+  why: running time of films (quantity with unit).
+  reva_predicate: duration
+  inverse: null
+  kind: quantity
+  group: culture
+  label_en: duration
+  label_fr: durée
+- property: P2130
+  why: production budget of films as Wikidata states it (quantity with currency unit; never converted here).
+  reva_predicate: cost
+  inverse: null
+  kind: quantity
+  group: culture
+  label_en: cost
+  label_fr: coût
+- property: P2142
+  why: box-office gross of films (quantity with currency, qualifiers point in time / valid in place); a reported figure, never a REVA estimate.
+  reva_predicate: box_office
+  inverse: null
+  kind: quantity
+  group: culture
+  label_en: box office
+  label_fr: box-office
+- property: P272
+  why: production company of a film (film -> company; links culture to the V4INDUSTRY company layer).
+  reva_predicate: production_company
+  inverse: produced_film
+  kind: entity
+  group: culture
+  label_en: production company
+  label_fr: société de production
+- property: P840
+  why: narrative location of films and literary works (place where the story is set; context, not production location).
+  reva_predicate: narrative_location
+  inverse: narrative_location_of
+  kind: entity
+  group: culture
+  label_en: narrative location
+  label_fr: lieu de l'action
+- property: P345
+  why: >-
+    IMDb ID as an external identifier only (join key; REVA does not load IMDb data: the IMDb datasets are for
+    personal and non-commercial use, see docs/dev/v6_culture.md).
+  reva_predicate: imdb_id
+  inverse: null
+  kind: external_id
+  group: culture
+  label_en: IMDb ID
+  label_fr: identifiant IMDb
+- property: P434
+  why: MusicBrainz artist ID (join key between Wikidata music artists and MusicBrainz CC0 core data; never by name).
+  reva_predicate: musicbrainz_artist_id
+  inverse: null
+  kind: external_id
+  group: culture
+  label_en: MusicBrainz artist ID
+  label_fr: identifiant MusicBrainz de l'artiste
+- property: P648
+  why: Open Library ID (join key between Wikidata authors/works and the openlibrary:<OLID> KG entities of atlas.openlibrary_subjects).
+  reva_predicate: open_library_id
+  inverse: null
+  kind: external_id
+  group: culture
+  label_en: Open Library ID
+  label_fr: identifiant Open Library
+- property: P264
+  why: record label of music artists (artist -> label company).
+  reva_predicate: record_label
+  inverse: record_label_of
+  kind: entity
+  group: culture
+  label_en: record label
+  label_fr: label discographique
+- property: P1174
+  why: visitors per year of museums (quantity with point-in-time qualifier; a reported figure per year).
+  reva_predicate: visitors_per_year
+  inverse: null
+  kind: quantity
+  group: culture
+  label_en: visitors per year
+  label_fr: nombre de visiteurs par an

@@ -1,18 +1,25 @@
-"""Filesystem ArtifactStore for local development and tests."""
+"""Filesystem ArtifactStore for local development and tests.
+
+Objects are content-addressed by the sha256 of their **raw** bytes. Since V6 (DISKZ) a stored
+file may hold a zstd-compressed wrapper of those bytes (``compression.py``): new objects are
+written compressed when it frees space, existing ones are migrated by ``reva objects compress``.
+Every read path decodes transparently and re-verifies the sha256 of the decoded bytes.
+"""
 
 from __future__ import annotations
 
 import hashlib
 import io
 import os
+import tempfile
 from collections.abc import Iterator
 from pathlib import Path
 from typing import BinaryIO
 
+from reva.adapters.objects import compression as cz
 from reva.adapters.objects.common import (
     CHUNK,
     check_namespace,
-    hash_file,
     object_key,
     spool_and_hash,
     verify,
@@ -22,10 +29,22 @@ from reva.ports.storage import ObjectHead, StoredObject
 
 
 class FilesystemArtifactStore:
-    def __init__(self, root: Path | str, prefix: str = "reva/", default_max_bytes: int = 1 << 30):
+    def __init__(
+        self,
+        root: Path | str,
+        prefix: str = "reva/",
+        default_max_bytes: int = 1 << 30,
+        *,
+        compress: bool = True,
+        compression_level: int = cz.DEFAULT_LEVEL,
+        min_saving_pct: float = cz.DEFAULT_MIN_SAVING_PCT,
+    ):
         self.root = Path(root).resolve()
         self.prefix = prefix
         self.default_max_bytes = default_max_bytes
+        self.compress = compress
+        self.compression_level = compression_level
+        self.min_saving_pct = min_saving_pct
         self.staging = self.root / ".staging"
         self.staging.mkdir(parents=True, exist_ok=True)
 
@@ -35,17 +54,45 @@ class FilesystemArtifactStore:
     def uri(self, namespace: str, sha256: str) -> str:
         return f"file://{self._path(namespace, sha256)}"
 
+    def _maybe_compress(self, tmp: str, sha: str, size: int) -> str | None:
+        """A staged compressed copy of ``tmp`` when it pays off (or is required), else None."""
+        with open(tmp, "rb") as f:
+            head = f.read(cz.SAMPLE_BYTES)
+        forced = cz.must_wrap(head)
+        if not forced and not (self.compress and cz.worth_trying(head, size, self.min_saving_pct)):
+            return None
+        fd, ctmp = tempfile.mkstemp(prefix="reva-zst-", dir=str(self.staging))
+        try:
+            with open(tmp, "rb") as src, os.fdopen(fd, "wb") as out:
+                got_sha, got_size = cz.compress_into(src, out, size, sha, self.compression_level)
+            verify(sha, size, got_sha, got_size)
+            if not forced and not cz.pays_off(size, os.path.getsize(ctmp), self.min_saving_pct):
+                os.unlink(ctmp)
+                return None
+            # Verify the staged wrapper decodes to exactly the raw bytes before it can be linked.
+            dec_sha, dec_size = cz.hash_object_file(ctmp)
+            verify(sha, size, dec_sha, dec_size)
+        except BaseException:
+            try:
+                os.unlink(ctmp)
+            except FileNotFoundError:
+                pass
+            raise
+        return ctmp
+
     def put(self, stream: BinaryIO, namespace: str, media_type: str, *, max_bytes: int | None = None) -> StoredObject:
         check_namespace(namespace)
         tmp, sha, size = spool_and_hash(stream, str(self.staging), max_bytes or self.default_max_bytes)
+        ctmp: str | None = None
         try:
             final = self._path(namespace, sha)
             final.parent.mkdir(parents=True, exist_ok=True)
             created = False
             if not final.exists():
+                ctmp = self._maybe_compress(tmp, sha, size)
                 # link() fails if the target exists: an atomic conditional create.
                 try:
-                    os.link(tmp, final)
+                    os.link(ctmp or tmp, final)
                     created = True
                 except FileExistsError:
                     pass
@@ -59,40 +106,44 @@ class FilesystemArtifactStore:
                     os.utime(final)
                 except PermissionError:
                     pass
-            # Verify the actual bytes at the address (never metadata), also for reuse.
-            got_sha, got_size = hash_file(str(final))
+            # Verify the actual (decoded) bytes at the address (never metadata), also for reuse.
+            got_sha, got_size = cz.hash_object_file(final)
             verify(sha, size, got_sha, got_size)  # never overwrite; mismatch is an IntegrityFailure
         finally:
             os.unlink(tmp)
+            if ctmp is not None:
+                os.unlink(ctmp)
         return StoredObject(sha, size, namespace, self.uri(namespace, sha), media_type)
 
     def put_bytes(self, data: bytes, namespace: str, media_type: str) -> StoredObject:
         return self.put(io.BytesIO(data), namespace, media_type, max_bytes=max(len(data), 1))
 
     def head(self, namespace: str, sha256: str) -> ObjectHead | None:
+        """Raw byte size (the size the address was computed over), also for compressed objects."""
         p = self._path(namespace, sha256)
-        if not p.exists():
+        try:
+            size = cz.object_raw_size(p)
+        except FileNotFoundError:
             return None
-        return ObjectHead(sha256, p.stat().st_size, self.uri(namespace, sha256))
+        return ObjectHead(sha256, size, self.uri(namespace, sha256))
 
     def get(self, namespace: str, sha256: str) -> bytes:
         p = self._path(namespace, sha256)
         if not p.exists():
             raise FileNotFoundError(f"object {namespace}/{sha256} not found")
-        data = p.read_bytes()
-        import hashlib
-
+        data = cz.decode_bytes(p.read_bytes())
         if hashlib.sha256(data).hexdigest() != sha256:
             raise IntegrityFailure("stored object bytes do not match their address", sha256=sha256)
         return data
 
     def open(self, namespace: str, sha256: str) -> Iterator[bytes]:
-        """Stream the object; raises IntegrityFailure after the last chunk if the bytes don't hash to
-        their address (callers must not commit anything derived before the iterator is exhausted)."""
+        """Stream the (decoded) object; raises IntegrityFailure after the last chunk if the bytes don't hash
+        to their address (callers must not commit anything derived before the iterator is exhausted)."""
         p = self._path(namespace, sha256)
         h = hashlib.sha256()
         with open(p, "rb") as f:
-            while chunk := f.read(CHUNK):
+            hdr = cz.read_header(f)
+            for chunk in cz.iter_raw_from(f, hdr, CHUNK):
                 h.update(chunk)
                 yield chunk
         if h.hexdigest() != sha256:
@@ -102,8 +153,25 @@ class FilesystemArtifactStore:
         if start < 0 or length < 0:
             raise ValueError("invalid range")
         with open(self._path(namespace, sha256), "rb") as f:
-            f.seek(start)
-            return f.read(length)
+            hdr = cz.read_header(f)
+            if hdr is None:
+                f.seek(start)
+                return f.read(length)
+            # Compressed: decode sequentially up to the range (bounded memory, O(start)).
+            out = bytearray()
+            pos = 0
+            end = start + length
+            for chunk in cz.iter_raw_from(f, hdr, CHUNK):
+                nxt = pos + len(chunk)
+                if nxt > start and pos < end:
+                    out += chunk[max(0, start - pos) : min(len(chunk), end - pos)]
+                pos = nxt
+                if pos >= end:
+                    break
+            return bytes(out)
+
+    def is_compressed(self, namespace: str, sha256: str) -> bool:
+        return cz.is_wrapped(self._path(namespace, sha256))
 
     def list_uris(self, namespace: str) -> Iterator[tuple[str, float]]:
         base = self.root / self.prefix / namespace

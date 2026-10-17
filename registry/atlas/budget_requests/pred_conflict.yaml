@@ -1,0 +1,9 @@
+# Budget request from agent PRED-CONFLICT (V6, 2026-10-17). Merged by `python -m reva.atlas.budget_merge --write`.
+# atlas.views: wiki release-date table + run list + per run (8 by default) one codebook and two variables
+# (country-month, pagesize 10,000 = one page each) = 26 requests, ~20 MB.
+agent: PRED-CONFLICT
+requests:
+  - source_key: views.api
+    daily_requests: 60
+    expected_bytes_per_day: 45000000
+    reason: "26 requests (~20 MB) per default run plus one retry; VIEWS public API, no key"

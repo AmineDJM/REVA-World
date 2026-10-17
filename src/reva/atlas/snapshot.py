@@ -116,6 +116,10 @@ def normalise_rights(raw: Any, *, basis: str) -> dict[str, Any] | None:
     }
     if raw.get("restriction"):
         out["restriction"] = str(raw["restriction"])[:300]
+    if isinstance(raw.get("required_notice"), str) and raw["required_notice"].strip():
+        # A notice the provider's terms require next to any presentation of the data (e.g. New York Fed reference
+        # rates): served verbatim with every cell and listed per answer; never shortened.
+        out["required_notice"] = raw["required_notice"].strip()[:2000]
     return out
 
 

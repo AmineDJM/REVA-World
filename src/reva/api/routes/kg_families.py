@@ -118,9 +118,22 @@ class FamilyShare(s.ApiModel):
 
 
 class AtlasHint(s.ApiModel):
-    concept: str = Field(description="Atlas catalog concept the series belongs to (GET /v1/atlas/series)")
+    kind: Literal["concept", "table"] = Field(
+        description="concept: object atlas:<catalog concept> (GET /v1/atlas/series); table: object "
+        "atlas:<source>.<dataset> table entity (GET /v1/atlas/tables/{source}/{dataset}/cells)"
+    )
+    concept: str | None = Field(description="Atlas catalog concept (kind concept); null for a table entity")
     iso3: str | None
-    table: str | None
+    table: str | None = Field(description="Atlas table key <source>.<dataset> when the statement names one")
+    source: str | None = Field(None, description="kind table: atlas source key")
+    dataset: str | None = Field(None, description="kind table: atlas dataset key")
+    provider_geo: str | None = Field(
+        None, description="kind table: the provider's geography code of the subject's cells (regions are not countries)"
+    )
+    indicators: list[str] = Field(default_factory=list, description="kind table: exact indicator ids of the subject")
+    indicator_contains: str | None = Field(
+        None, description="kind table: indicator substring selecting the subject's cells (e.g. classif1=OCU_ISCO08_2)"
+    )
 
 
 class ValueRights(s.ApiModel):
@@ -135,6 +148,9 @@ class ValueRights(s.ApiModel):
     restricted: bool
     basis: str
     restriction: str | None = None
+    required_notice: str | None = Field(
+        None, description="Notice the provider's terms require next to any presentation of the value (verbatim)"
+    )
 
 
 class FamilyNeighbour(s.ApiModel):

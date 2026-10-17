@@ -1,0 +1,23 @@
+id: culture.v6_museums
+domain: culture
+owner: V6CULTURE
+description: >-
+  Museums (non-deprecated P31 in museum, art museum, science museum, national museum, history museum, art gallery)
+  with at least 20 sitelinks: country, administrative location, coordinates, inception, visitors per year (with
+  point in time), heritage designation, owner, founder. Size bound, not a ranking.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q33506 wd:Q207694 wd:Q588140 wd:Q17431399 wd:Q16735822 wd:Q1007870 }
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31 ?class ; wikibase:rank ?item_p31r .
+    FILTER(?item_p31r != wikibase:DeprecatedRank)
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+  }
+max_rows: 8000
+expand_hops: 1
+properties: [P31, P17, P131, P625, P571, P1174, P1435, P127, P112]
+notes: >-
+  Visitors per year (P1174) are reported figures with a point-in-time qualifier; values from different years or
+  references are never compared silently.

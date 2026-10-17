@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.25"
+policy_version: "budgets-1.3.27"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -69,6 +69,8 @@ per_source_daily_requests:
   eia.dnav: 32
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)
   eia.opendata_bulk: 12
+  # eia.steo_archive: requested by PRED-ENERGY (pred_energy.yaml)
+  eia.steo_archive: 70
   # ensembl.rest: requested by V4BIO (v4bio.yaml)
   ensembl.rest: 15
   # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml), AUDFIX (audfix.yaml)
@@ -93,6 +95,10 @@ per_source_daily_requests:
   gbif.occurrence: 600
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
   gcat.planet4589: 10
+  # gdelt.doc2: requested by V6SIGNALS (v6signals.yaml)
+  gdelt.doc2: 100
+  # gdelt.events2: requested by V6SIGNALS (v6signals.yaml)
+  gdelt.events2: 1600
   # geonames.cities: requested by A-CITIES (a_cities.yaml)
   geonames.cities: 6
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
@@ -257,6 +263,8 @@ per_source_daily_requests:
   ustreasury.rates: 130
   # vdem.vdemdata: requested by A-POL (a_pol.yaml)
   vdem.vdemdata: 9
+  # views.api: requested by PRED-CONFLICT (pred_conflict.yaml)
+  views.api: 60
   # wals.cldf: requested by KGLANG (kglang.yaml)
   wals.cldf: 6
   # who.ghe: requested by V4HEALTH (v4health.yaml)

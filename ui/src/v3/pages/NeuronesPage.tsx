@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { entityLabel, getKgEntity, getKgNeighbours, type KgEntity } from '../api/kg';
 import { useApi } from '../../lib/useApi';
@@ -402,6 +402,14 @@ function StatementList({ qid, edges, model, visibleEdges, onSelect }: { qid: str
                   </>
                 )}
                 {e.causal && <span className="v3-badge v3-badge-causal">cause affirmée par la source</span>}
+                {(out ? otherId : qid).startsWith('atlas:') && (
+                  <>
+                    {' '}
+                    <Link className="v3-atlas-link" to={`/v3/fiche?qid=${encodeURIComponent(out ? qid : otherId)}#fiche-series`}>
+                      voir la série (Fiche)
+                    </Link>
+                  </>
+                )}
               </p>
               <p className="v3-statement-meta">
                 <span className={e.temporal.kind === 'undated' ? 'v3-undated' : ''}>{e.dates}</span>

@@ -1,0 +1,27 @@
+# V6 (agent V6CULTURE): MusicBrainz database statistics pages -> atlas tables musicbrainz.country_stats and
+# musicbrainz.language_stats (connector src/reva/adapters/connectors/atlas_musicbrainz.py, source atlas.musicbrainz_stats).
+source_key: musicbrainz.stats
+title: MusicBrainz database statistics (countries, languages and scripts)
+provider_url: https://musicbrainz.org/statistics
+lineage_family: musicbrainz
+rights:
+  licence: CC0-1.0
+  licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+  attribution: "MusicBrainz database statistics (MetaBrainz Foundation), musicbrainz.org/statistics"
+  terms: >-
+    MusicBrainz Data License (https://musicbrainz.org/doc/About/Data_License): "The core data of the database is
+    licensed under the CC0, which is effectively placing the data into the Public Domain"; supplementary data
+    (tags, ratings, annotations) is CC BY-NC-SA 3.0 and is not used. The statistics pages carry no separate
+    licence statement; they are counts over core entities (licence_basis counts_of_cc0_core_data).
+metadata:
+  allowed_hosts: [musicbrainz.org]
+  pages: [https://musicbrainz.org/statistics/countries, https://musicbrainz.org/statistics/languages-scripts]
+  definitions: https://github.com/metabrainz/musicbrainz-server/blob/master/lib/MusicBrainz/Server/Data/Statistics.pm
+  authentication: none
+  rate_limit: "MusicBrainz asks for <= 1 request per second per client; 2 requests per run"
+  editorial_status: community-edited (volunteer catalogue); counts measure catalogue coverage, not national output
+  cadence: statistics recomputed daily by MusicBrainz; REVA reads them monthly
+  not_used: >-
+    /ws/2 search API (release counts per country-year) answered HTTP 503 "The MusicBrainz web server is currently
+    busy" to this egress IP on 2026-10-17 (shared proxy IP over the per-IP limit); JSON data dumps (several GB) are
+    out of scope for this machine.

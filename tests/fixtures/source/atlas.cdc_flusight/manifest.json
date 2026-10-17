@@ -1,0 +1,106 @@
+[
+  {
+    "request_fingerprint": "6fa667049d50ece86506f582214f539af9ef6118751dbdff3ed1bd7103ec7b91",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/target-data/target-hospital-admissions.csv",
+    "file": "target.csv",
+    "sha256": "3fc7aaf43d87445167f5d6479ab2d0e592e6bc4603346b93de7a2afffd2a3009",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged"
+  },
+  {
+    "request_fingerprint": "88f74de11d8abd2679adeadd3da207164f41989a9e108a588f6b88f14ae38799",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/?list-type=2&prefix=model-output/FluSight-ensemble/&max-keys=1000",
+    "file": "ensemble_list.xml",
+    "sha256": "4a7d4164a050f74416a30de1862caa699e0bd5e927c77116e706a4e80151bf59",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "S3 ListObjectsV2 response as served, trimmed to the files captured for this fixture"
+  },
+  {
+    "request_fingerprint": "17841e64692513019cf145a23639c040e50de1c4ebaf53ea2592c99e63ca2d42",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/model-output/FluSight-ensemble/2025-12-06-FluSight-ensemble.parquet",
+    "file": "ensemble_2025-12-06.parquet",
+    "sha256": "5a47ff660213c55363c31b1010175466fa8d74115f16683b04bb92a6743a1d3b",
+    "status": 200,
+    "headers": {
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged (re-written as parquet)"
+  },
+  {
+    "request_fingerprint": "72762993914ed6bdf1874c6de5b66a5612db0f0f80e2da8d11519c3864e1992c",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/model-output/FluSight-ensemble/2025-12-13-FluSight-ensemble.parquet",
+    "file": "ensemble_2025-12-13.parquet",
+    "sha256": "2a1e314f71c19b689016f2bf131a87cf294723fa54b3928cca2f96adc083a311",
+    "status": 200,
+    "headers": {
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged (re-written as parquet)"
+  },
+  {
+    "request_fingerprint": "3008cb398ead51e20aef5f26345d30fbb4a872c0a29550c6c14a8cd73cb057fe",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/?list-type=2&prefix=auxiliary-data/target-data-archive/target-hospital-admissions_&max-keys=1000",
+    "file": "vintages_list.xml",
+    "sha256": "f0185ae848906d8e3203944da46fc1e4aafe35619c832c91eafb01068a36b07c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "S3 ListObjectsV2 response as served, trimmed to the files captured for this fixture"
+  },
+  {
+    "request_fingerprint": "52afdfa5f8e4a0e93b8196feddf04696af8a7886cb6dba2d0d9575ab3a0b7bcb",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/auxiliary-data/target-data-archive/target-hospital-admissions_2025-11-29.csv",
+    "file": "vintage_2025-11-29.csv",
+    "sha256": "66874b0650658cb92b22410cd60fd069bbe9d27ce7230329e6bf763c41fb9883",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged"
+  },
+  {
+    "request_fingerprint": "cc15f8472f5db86401149daea33ef75d8ed93093fd6e82a73746e992925332f4",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/auxiliary-data/target-data-archive/target-hospital-admissions_2025-12-06.csv",
+    "file": "vintage_2025-12-06.csv",
+    "sha256": "0d985d876eaaa597824b91162a77ac15ce6e31cffb9c05e84883f13aa0dfe109",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged"
+  },
+  {
+    "request_fingerprint": "70df0a714bb09c2628063ba1e7e0f90307e216277a63937342d2f00b400cf724",
+    "url": "https://cdcepi-flusight-forecast-hub.s3.amazonaws.com/auxiliary-data/target-data-archive/target-hospital-admissions_2025-12-13.csv",
+    "file": "vintage_2025-12-13.csv",
+    "sha256": "3a9055cb7606e48ff9bff99f5bee46d7ac36add9e1e791b5bdf5a9d3f9cb1ce4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T18:00:00+00:00",
+    "licence": "MIT (repository); data use: attribution requested by CDC (flusight@cdc.gov)",
+    "fixture_note": "file as served, trimmed to locations US, 06 (California), 36 (New York); values unchanged"
+  }
+]

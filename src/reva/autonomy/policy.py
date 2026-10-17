@@ -100,9 +100,13 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   12/day, bis.bulk 6/day, ustreasury.rates 130/day, eia.dnav 32/day, boe.iadb 8/day, nyfed.markets 12/day); same caps.
 # * budgets.yaml -> budgets-1.3.24 (2026-10-17, V4LINK): new qlever.wikidata 60/day (atlas.v4link_qlever, the
 #   Wikidata identifier bridges read from QLever while WDQS throttles the shared egress); same caps.
+# * budgets.yaml -> budgets-1.3.26 (2026-10-17, PRED-ENERGY): merge of pred_energy.yaml (new eia.steo_archive 70/day,
+#   STEO archive vintages) and of the pending v6signals.yaml (gdelt.doc2 100/day, gdelt.events2 1600/day); same caps.
+# * budgets.yaml -> budgets-1.3.27 (2026-10-17, PRED-CONFLICT): new views.api 60/day (atlas.views, VIEWS conflict
+#   forecasts as an attributed benchmark); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "71a53b3e1c6c96d4ea4dac90e231180e53e98391a5c37f7618d8e27c090cbf41",
+    "budgets.yaml": "5eca6a3701f2424e867e39c6f30049cb54b129f94a5579f844e72b8f1ca75614",
 }
 
 

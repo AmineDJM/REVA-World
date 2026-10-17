@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "5cf23a94811601fdbcbf161734a9f0f7c0eb7a6cba8712b9ab5a97aedfe2a484",
+    "url": "https://data.gdeltproject.org/gdeltv2/20261013120000.export.CSV.zip",
+    "file": "5cf23a94811601fd.zip",
+    "sha256": "37e1eaf086617c6103295dffdbf21e97ad7b74a9dc89679b2ba19f580eea1a68",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T16:40:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "subset of the real update file downloaded 2026-10-17 (122 of 1186 records kept verbatim, re-zipped; per-country caps {'UK': 25, 'US': 25, 'UP': 25, 'RS': 20, 'IS': 15, 'GZ': 10, 'SY': 10, '': 8})"
+  },
+  {
+    "request_fingerprint": "b90f81fc341e1d41faf253e1c5293544913da5aa6f82e0734f9530798d09211f",
+    "url": "https://data.gdeltproject.org/gdeltv2/20261015120000.export.CSV.zip",
+    "file": "b90f81fc341e1d41.zip",
+    "sha256": "29c5b9ee6d75e77650db82533e7c3e06bf695e193d1cf6be34c5d565ba299327",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T16:40:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "subset of the real update file downloaded 2026-10-17 (128 of 1784 records kept verbatim, re-zipped; per-country caps {'UK': 25, 'US': 25, 'UP': 25, 'RS': 20, 'IS': 15, 'GZ': 10, 'SY': 10, '': 8})"
+  },
+  {
+    "request_fingerprint": "3f0b631e52e30e62c18b281ba46446c9c63ec7b7e3be1267f43ea72de5fb7962",
+    "url": "https://gdeltproject.org/about.html",
+    "file": "3f0b631e52e30e62.html",
+    "sha256": "82c2121d4c129e00a232d640d418ecb52d4e33bdb2524cbdceb8992ff17845dc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:40:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "visible text of the real page downloaded 2026-10-17"
+  },
+  {
+    "request_fingerprint": "84941a54334633df0f74b00b337306fb8f9623d21a00ce2821b9e27ec990f657",
+    "url": "https://gdeltproject.org/data/lookups/CAMEO.eventcodes.txt",
+    "file": "84941a54334633df.txt",
+    "sha256": "ccbfa4f59f62028399363dd8a9458b64128b5044d29df591bad718cdeccc145d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T16:40:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "the real file downloaded 2026-10-17 (complete)"
+  }
+]

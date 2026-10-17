@@ -650,6 +650,10 @@ def object_inventory(settings: Any, *, verify_content: bool = True) -> list[dict
     prefix = settings.reva_s3_prefix
     items: list[dict[str, Any]] = []
     if settings.reva_object_backend == "filesystem":
+        # Objects may be stored zstd-wrapped (V6 DISKZ): sha256/bytes are always those of the *raw*
+        # (decoded) bytes, i.e. of the content the address names.
+        from reva.adapters.objects.compression import hash_object_file, object_raw_size
+
         root = Path(settings.reva_object_root).resolve()
         base = root / prefix
         if base.exists():
@@ -657,13 +661,18 @@ def object_inventory(settings: Any, *, verify_content: bool = True) -> list[dict
                 if not p.is_file() or ".staging" in p.parts:
                     continue
                 key = str(p.relative_to(root))
-                actual = _sha256_file(p) if verify_content else None
+                actual: str | None
+                try:
+                    actual, raw_size = hash_object_file(p) if verify_content else (None, object_raw_size(p))
+                except Exception:  # a broken compressed wrapper is corrupt content, not a crash
+                    actual, raw_size = "undecodable", p.stat().st_size
                 items.append(
                     {
                         "key": key,
                         "address": p.name,
                         "sha256": actual,
-                        "bytes": p.stat().st_size,
+                        "bytes": raw_size,
+                        "stored_bytes": p.stat().st_size,
                         "content_ok": None if actual is None else actual == p.name,
                     }
                 )

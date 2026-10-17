@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation, localcontext
@@ -95,6 +95,8 @@ def country_label(iso3: str) -> tuple[str, str]:
 def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Series], list[dict[str, Any]]]:
     """Per-geography observed series (and projection cells, kept apart) of one family in one atlas table."""
     notes: list[dict[str, Any]] = []
+    if family.value_rule in DAILY_FAMILY_RULES:
+        return _extract_daily_family(frame, family), notes
     if family.indicator is not None:
         f = frame.filter(pl.col("indicator") == family.indicator)
     else:
@@ -157,6 +159,43 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
         if s.observed or s.projections:
             out[s.geo] = s
     return out, notes
+
+
+DAILY_FAMILY_RULES = ("month_end_of_daily", "month_end_spread_of_daily", "meeting_change")
+
+
+def family_daily_cells(frame: pl.DataFrame, family: Family, provider_geo: str) -> list[tuple[date, str, dict[str, Any]]]:
+    """Published day cells of a daily-sourced family for one provider geography (spread families: the day-by-day
+    difference of ``indicator`` and ``indicator_minus`` on the days both are published)."""
+    from reva.evaluation.registry import finance as FN
+
+    assert family.indicator is not None
+    cells = FN.daily_cells(frame, family.indicator, provider_geo)
+    if family.value_rule == "month_end_spread_of_daily":
+        assert family.indicator_minus is not None
+        cells = FN.spread_cells(cells, FN.daily_cells(frame, family.indicator_minus, provider_geo))
+    return cells
+
+
+def _extract_daily_family(frame: pl.DataFrame, family: Family) -> dict[str, Series]:
+    """Month-end values (``month_end_of_daily``, ``month_end_spread_of_daily``: the last published day of each month,
+    the latest month excluded as possibly incomplete) or day cells keyed by ordinal (``meeting_change``)."""
+    out: dict[str, Series] = {}
+    for g in family.geos:
+        cells = family_daily_cells(frame, family, g.provider_geo)
+        s = Series(g.key, None, g.label_en, g.label_fr)
+        if family.value_rule == "meeting_change":
+            s.observed = [Cell(d.toordinal(), v, (r,)) for d, v, r in cells]
+        else:
+            by: dict[int, tuple[str, dict[str, Any]]] = {}
+            for d, v, r in cells:
+                by[P.index_of("M", d)] = (v, {**r, "day": d.isoformat()})
+            if by:
+                by.pop(max(by))
+            s.observed = [Cell(m, v, (r,)) for m, (v, r) in sorted(by.items())]
+        if s.observed:
+            out[g.key] = s
+    return out
 
 
 def _ref(c: Mapping[str, Any]) -> dict[str, Any]:
@@ -228,7 +267,22 @@ def _fmt_threshold(v: str) -> str:
     return format(d.normalize(), "f") if math.isfinite(float(d)) else v
 
 
+def _meeting_text(q: Mapping[str, Any]) -> tuple[str, str]:
+    ev = q["event"]
+    up = ev["direction"] == "up"
+    return (
+        f"« {q['label_fr']} » : le taux en vigueur le {ev['level_day']} (réunion {ev['body']}, décision le "
+        f"{ev['decision_day']}) sera-t-il strictement {'supérieur' if up else 'inférieur'} au niveau en vigueur à "
+        f"l'émission ({ev['basis_value']} {q['unit']}, dernier jour publié {ev['basis_day']}) ?",
+        f"'{q['label_en']}': will the rate in force on {ev['level_day']} ({ev['body']} meeting, decision on "
+        f"{ev['decision_day']}) be strictly {'above' if up else 'below'} the level in force when asked "
+        f"({ev['basis_value']} {q['unit']}, last published day {ev['basis_day']})?",
+    )
+
+
 def question_text(q: Mapping[str, Any]) -> tuple[str, str]:
+    if q.get("event"):
+        return _meeting_text(q)
     var_fr, var_en = q["label_fr"], q["label_en"]
     geo_fr, geo_en, per = q["geo_label_fr"], q["geo_label_en"], q["reference_period"]
     unit = q["unit"]
@@ -343,6 +397,118 @@ def generate_questions(
                         "issue_table": dict(source_pin),
                     },
                 }
+                if family.finance is not None:
+                    q["disclaimer"] = _disclaimer()
+                q["text_fr"], q["text_en"] = question_text(q)
+                q["question_id"] = question_id(q)
+                questions.append(q)
+    return questions, skipped
+
+
+def _disclaimer() -> dict[str, str]:
+    from reva.models.forecasting.finance_models import DISCLAIMER, DISCLAIMER_FR
+
+    return {"en": DISCLAIMER, "fr": DISCLAIMER_FR}
+
+
+def generate_meeting_questions(
+    family: Family,
+    series: Mapping[str, Series],
+    decision_days: Sequence[tuple[date, str, Mapping[str, Any]]],
+    *,
+    cycle: str,
+    today: date,
+    source_pin: Mapping[str, Any],
+    calendar_pin: Mapping[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Binary questions on the next scheduled policy meetings (``finance.kind = meeting``).
+
+    For the ``h``-th decision day ``D`` of the published calendar on or after ``today`` (and after the rate
+    series' last published day): will the level in force on ``R = D + resolution_offset_days`` have moved in the
+    family's direction from the level in force at issue (the latest published day)? The question's value is the
+    move in that direction (``sign x (level(R) - basis)``, percentage points) and the event is "strictly above
+    the family threshold" (0)."""
+    assert family.finance is not None
+    fin = family.finance
+    offset = int(fin.get("resolution_offset_days", 7))
+    sign = 1 if fin["direction"] == "up" else -1
+    questions: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    for g in family.geos:
+        s = series.get(g.key)
+        if s is None or not s.observed:
+            skipped.append({"family": family.key, "geo": g.key, "reason": "no observed value in the pinned table"})
+            continue
+        last = s.observed[-1]
+        last_day = date.fromordinal(last.idx)
+        if (today - last_day).days > 31:
+            skipped.append({"family": family.key, "geo": g.key, "reason": f"stale series: last day {last_day}"})
+            continue
+        upcoming = [x for x in decision_days if x[0] >= today and x[0] > last_day]
+        for rule in family.questions:
+            for h in rule.horizons:
+                if h > len(upcoming):
+                    skipped.append({"family": family.key, "geo": g.key, "horizon": h,
+                                    "reason": "meeting not in the published calendar"})  # fmt: skip
+                    continue
+                d, text, ref = upcoming[h - 1]
+                r_day = d + timedelta(days=offset)
+                idx = P.index_of("M", r_day)
+                q: dict[str, Any] = {
+                    "schema": QUESTION_SCHEMA,
+                    "question_key": f"{cycle}|{family.key}|{g.key}|{d.isoformat()}|{rule.type}",
+                    "cycle": cycle,
+                    "family": family.key,
+                    "concept_id": family.concept_id,
+                    "label_fr": family.label_fr,
+                    "label_en": family.label_en,
+                    "definition": family.definition,
+                    "definition_source": family.definition_source,
+                    "geo": g.key,
+                    "iso3": None,
+                    "geo_label_en": g.label_en,
+                    "geo_label_fr": g.label_fr,
+                    "frequency": "M",
+                    "reference_period": P.label_of("M", idx),
+                    "period_start": P.start_of("M", idx).isoformat(),
+                    "period_end": P.end_of("M", idx).isoformat(),
+                    "cycle_horizon": h,
+                    "type": rule.type,
+                    "unit": family.unit,
+                    "interval_level": None,
+                    "threshold": family.threshold,
+                    "threshold_rule": rule.threshold_rule,
+                    "threshold_basis": {"period": "fixed", "value": family.threshold},
+                    "last_observed": {"period": last_day.isoformat(), "value": last.value},
+                    "event": {
+                        "body": fin.get("body", g.key),
+                        "direction": fin["direction"],
+                        "decision_day": d.isoformat(),
+                        "level_day": r_day.isoformat(),
+                        "basis_day": last_day.isoformat(),
+                        "basis_value": last.value,
+                        "calendar_text": text,
+                        "calendar_cell": dict(ref),
+                        "calendar_table": dict(calendar_pin),
+                    },
+                    "resolution": {
+                        "source": family.dataset_key,
+                        "indicator": family.indicator,
+                        "indicator_parts": None,
+                        "geo_match": "provider_geo",
+                        "provider_geo": g.provider_geo,
+                        "value_rule": "meeting_change",
+                        "level_day": r_day.isoformat(),
+                        "basis": last.value,
+                        "sign": sign,
+                        "rule": RESOLUTION_RULE,
+                        "expected_date": (r_day + timedelta(days=family.publication_lag_days)).isoformat(),
+                        "void_after": (r_day + timedelta(days=family.void_after_days)).isoformat(),
+                        "note": family.resolution_note,
+                        "issue_table": dict(source_pin),
+                    },
+                    "disclaimer": _disclaimer(),
+                }
                 q["text_fr"], q["text_en"] = question_text(q)
                 q["question_id"] = question_id(q)
                 questions.append(q)
@@ -354,6 +520,17 @@ def resolution_value(q: Mapping[str, Any], series: Mapping[str, Series]) -> Cell
     s = series.get(str(q["geo"]))
     if s is None:
         return None
+    res = q.get("resolution") or {}
+    if res.get("value_rule") == "meeting_change":
+        from reva.evaluation.registry.finance import level_in_force
+
+        day = date.fromisoformat(str(res["level_day"]))
+        got = level_in_force([(date.fromordinal(c.idx), c.value, c.refs[0]) for c in s.observed], day)
+        if got is None:
+            return None
+        v, ref = got
+        move = (Decimal(v) - Decimal(str(res["basis"]))) * int(res["sign"])
+        return Cell(day.toordinal(), format(move, "f"), (ref,))
     return s.observed_at(P.parse_label(str(q["frequency"]), str(q["reference_period"])))
 
 
@@ -376,6 +553,8 @@ __all__ = [
     "Series",
     "binary_outcome",
     "extract_series",
+    "family_daily_cells",
+    "generate_meeting_questions",
     "generate_questions",
     "history_until",
     "period_ended",

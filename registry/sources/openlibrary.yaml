@@ -1,0 +1,24 @@
+# V6 (agent V6CULTURE): Open Library subjects and authors API -> atlas table openlibrary.subjects + KG
+# (connector src/reva/adapters/connectors/atlas_openlibrary.py, source atlas.openlibrary_subjects).
+source_key: openlibrary.api
+title: Open Library subjects and authors API (Internet Archive)
+provider_url: https://openlibrary.org/developers/api
+lineage_family: openlibrary
+rights:
+  licence: no rights asserted by the Internet Archive (not an explicit open licence)
+  licence_url: https://openlibrary.org/developers/licensing
+  attribution: "Open Library (Internet Archive), openlibrary.org"
+  terms: >-
+    Verbatim (read 2026-10-17): "The Internet Archive does not assert any new copyright or other proprietary rights
+    over any of the material in the Open Library database. There may be existing rights issues on some
+    contributions and in some jurisdictions." Licence review required (owner decision); only counts, names,
+    free-text dates and identifiers are stored (no biographies, covers or photos).
+  licence_review: required
+metadata:
+  allowed_hosts: [openlibrary.org]
+  endpoints: ["/subjects (browse page)", "/subjects/<key>.json?details=true&limit=1", "/authors/<OLID>.json"]
+  definitions: https://github.com/internetarchive/openlibrary/blob/master/openlibrary/plugins/worksearch/subjects.py
+  authentication: none
+  rate_limit: "<= 1 request per second; ~420 requests per full run"
+  editorial_status: community-edited library catalogue (live Solr index)
+  cadence: quarterly

@@ -56,16 +56,21 @@ def binary_log_score(prob: float, outcome: int) -> float | None:
 def score_forecast(question: Mapping[str, Any], forecast: Mapping[str, Any], outcome: str) -> dict[str, Any]:
     """Scores of one issued forecast; numbers as decimal strings (``num``), ``None`` = not applicable."""
     y = float(Decimal(outcome))
-    p = predictive_from_record(str(forecast["point"]), forecast.get("predictive"))
-    c = crps(p, y)
-    ls = log_score(p, y)
-    pit = p.cdf(y)
+    # probability-only records (finance policy-meeting forecasters) have no point and no predictive distribution
+    p = (
+        predictive_from_record(str(forecast["point"]), forecast.get("predictive"))
+        if forecast.get("point") is not None
+        else None
+    )
+    c = crps(p, y) if p is not None else None
+    ls = log_score(p, y) if p is not None else None
+    pit = p.cdf(y) if p is not None else None
     out: dict[str, Any] = {
         "question_id": question["question_id"],
         "model": forecast["model"],
         "type": question["type"],
         "family": question["family"],
-        "abs_error": num(abs(p.point - y)),
+        "abs_error": num(abs(p.point - y)) if p is not None else None,
         "crps": num(c) if c is not None else None,
         "log_score": num(ls) if ls is not None else None,
         "pit": num(pit) if pit is not None else None,

@@ -1,0 +1,23 @@
+id: culture.v6_literary_works
+domain: culture
+owner: V6CULTURE
+description: >-
+  Literary works (non-deprecated P31 in literary work, novel, poem, play, short story, epic poem) with at least 30
+  sitelinks: author, publication date / inception, country of origin, language of work, genre, awards, Open
+  Library ID (join key to the openlibrary:* KG entities), main subject, narrative location, based on, movement.
+  The sitelink threshold is a size bound, not a literary judgement.
+purpose: seed_entities
+entity_kind: work
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q7725634 wd:Q8261 wd:Q5185279 wd:Q25379 wd:Q49084 wd:Q37484 }
+    ?item p:P31 ?item_p31 . ?item_p31 ps:P31 ?class ; wikibase:rank ?item_p31r .
+    FILTER(?item_p31r != wikibase:DeprecatedRank)
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 30)
+    {{qid_filter}}
+  }
+split: {by: qid_prefix, variable: item}
+max_rows: 10000
+expand_hops: 1
+properties: [P31, P50, P577, P571, P495, P407, P136, P166, P648, P921, P840, P144, P135]

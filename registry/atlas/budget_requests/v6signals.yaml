@@ -1,0 +1,21 @@
+# Budget request from agent V6SIGNALS (V6, 2026-10-17; docs/dev/v6_signals.md). Merged by
+# `python -m reva.atlas.budget_merge --write` (max per source, never the sum).
+agent: V6SIGNALS
+requests:
+  - source_key: gdelt.events2
+    # atlas.gdelt_events: first (backfill) run = 730 daily update files (~70-150 KB each, ~80 MB) + about page +
+    # CAMEO lookup; later runs reuse archived update files, so they fetch ~3 files. 1600 = backfill + one retry.
+    daily_requests: 1600
+    expected_bytes_per_day: 180000000
+    reason: "one-off 730-day backfill of one 15-minute GDELT update per day (~80 MB), then ~3 requests/day; no key"
+  - source_key: gdelt.doc2
+    # atlas.gdelt_doc: 22 GKG themes x 2 timeline modes (~0.2-0.3 MB each) + about page + theme lookup (2 MB) = 46.
+    daily_requests: 100
+    expected_bytes_per_day: 40000000
+    reason: "46 requests (~15 MB) per run plus one retry; GDELT DOC 2.0 API, no key, throttled (one request / 5 s)"
+daily_totals_increase:
+  http_requests_total: "+1700"
+  http_bytes_total: "+220_000_000"
+notes: >-
+  data.gdeltproject.org answered every update file with 200 on 2026-10-17; api.gdeltproject.org answered 429
+  ("Please limit requests to one every 5 seconds") to almost every request from the shared egress.
