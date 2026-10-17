@@ -630,6 +630,7 @@ def chain(
         "identity_hops_note": IDENTITY_HOP_NOTE,
     }
     if ident.canon(frm) == ident.canon(to):
+        search["elapsed_ms"] = int((time.perf_counter() - t0) * 1000)
         lab = labels_for(conn, {frm, to})
         return {
             "from": _ref(frm, lab, {}),
