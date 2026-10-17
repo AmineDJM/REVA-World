@@ -122,9 +122,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   nelda.dataverse 10/day, oxcgrt.github 8/day, whogov.dataverseno 12/day; parlgov.dataverse 6 -> 10); same caps.
 # * budgets.yaml -> budgets-1.3.35 (2026-10-17, merge run and pinned by V6AGRI): 1.3.34 plus v6agri.yaml (new
 #   usda.psd 6/day, usda.wasde 100/day, fao.faostat_tm 4/day, ifpri.export_restrictions 6/day); same caps.
+# * budgets.yaml -> budgets-1.3.36 (2026-10-17, merge run and pinned by V6DIGITAL): 1.3.35 plus v6digital.yaml (new
+#   accessnow.stop 8/day, cfr.cyber_operations 6/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "200140ee77f8c6f2b7be6ef691d520c6e8221f5df09a8b5afe7c0d491443c6c4",
+    "budgets.yaml": "548ca3920d19a7990c58d877729d662f84d33f1ff0d8a126ef743491edc0f03f",
 }
 
 

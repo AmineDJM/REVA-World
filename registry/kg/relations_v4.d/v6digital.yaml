@@ -1,0 +1,16 @@
+version: 1
+agent: V6DIGITAL
+note: >-
+  Digital world (docs/dev/v6_digital.md): Access Now #KeepItOn STOP internet shutdowns (keepiton:*) and the CFR Cyber
+  Operations Tracker (cfr_cyber:*). Entity-valued predicates only; dates, durations and coded categories are values.
+  P17 (shutdown -> country) keeps its core mapping (located_in). cfr_cyber:suspected_state_sponsor is an event role
+  (participant, role suspected_sponsor) read by the events taxonomy, not a family: it is CFR's attribution claim.
+  No family is causal: STOP's actual_cause is a coded circumstance, never an effect estimate.
+mappings:
+  - property: "keepiton:service_affected"
+    family: context
+    subtype: shutdown_affected_service
+    source: accessnow.stop
+    subject_kinds: [internet_shutdown]
+    object_kinds: [communication_service]
+    note: "STOP column <service>_affected = Yes: the platform or service (the provider's column) was blocked or throttled during the instance"

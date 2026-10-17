@@ -35,6 +35,7 @@ roles:
   - {id: sender, label_en: sender (sanctions), label_fr: émetteur (sanctions)}
   - {id: gainer, label_en: gaining state or entity (territory, independence), label_fr: entité bénéficiaire (territoire, indépendance)}
   - {id: challenger, label_en: challenger (territorial claim), label_fr: État revendicateur (revendication territoriale)}
+  - {id: suspected_sponsor, label_en: suspected state sponsor (as attributed by the source), label_fr: État commanditaire présumé (selon l'attribution de la source)}
 
 types:
   - id: event
@@ -434,6 +435,28 @@ types:
       licensing, tax, announcement), as coded by the IFPRI Food Export Restrictions Tracker (ifpri_er:<tracker>:<Code>,
       ODC-By); the imposing country is the actor. No Wikidata class verified. An event, never a cause.
 
+  - id: internet_shutdown
+    label_en: internet shutdown (dataset type)
+    label_fr: coupure d'internet (type de jeu de données)
+    parent: event
+    wikidata_classes: []
+    roles: [actor]
+    description: >-
+      V6DIGITAL (docs/dev/v6_digital.md). A shutdown instance of the Access Now #KeepItOn STOP dataset
+      (keepiton:shutdown:<id>): "an intentional disruption of internet or electronic communications, rendering them
+      inaccessible or effectively unusable, for a specific population or within a location". Dated by P580/P582;
+      the country is P17; who ordered it is Access Now's coded text (keepiton:ordered_by). No Wikidata class verified.
+  - id: cyber_operation
+    label_en: state-sponsored cyber operation (dataset type)
+    label_fr: cyberopération commanditée par un État (type de jeu de données)
+    parent: event
+    wikidata_classes: []
+    roles: [suspected_sponsor]
+    description: >-
+      V6DIGITAL (docs/dev/v6_digital.md). An incident of the CFR Cyber Operations Tracker
+      (cfr_cyber:operation:<id>), dated by P585. The sponsor is CFR's *suspected* state sponsor (an attribution
+      claim of the source, role suspected_sponsor), never established by REVA. No Wikidata class verified.
+
   # -------------------------------------------------------------- diplomacy
   - id: treaty
     label_en: treaty
@@ -671,6 +694,7 @@ properties:
   - {pid: "eusanct:sender", family: participant, role: sender}
   - {pid: "eusanct:target", family: participant, role: target}
   - {pid: "ifpri_er:imposed_by", family: participant, role: actor, note: "V6AGRI: the country applying the food export restriction (IFPRI Country_Alpha3)"}
+  - {pid: "cfr_cyber:suspected_state_sponsor", family: participant, role: suspected_sponsor, note: "V6DIGITAL: the suspected state sponsor as attributed by CFR (an attribution claim of the source)"}
   - {pid: "coup:leader_removed", family: participant, role: target, note: "Archigos: the leader the coup removed"}
   - {pid: "archigos:removal_of", family: participant, role: target, note: "Archigos: the leader removed"}
   - {pid: "icowcol:independence_of", family: participant, role: gainer, note: "ICOW: the state becoming independent"}
@@ -923,6 +947,19 @@ dataset_kinds:
     label_en: government (WhoGov V4)
     coded_properties: []
     note: WhoGov V4 (CC BY 4.0); P580/P582 per WhoGov ("based on Döring (2019) or Bértoa (2020)").
+
+  - id_prefix: "keepiton:shutdown:"
+    source_key: accessnow.stop
+    type: internet_shutdown
+    label_en: internet shutdown (Access Now #KeepItOn STOP)
+    coded_properties: ["keepiton:shutdown_type", "keepiton:shutdown_extent", "keepiton:actual_cause"]
+    note: V6DIGITAL; Access Now STOP 2016-2025 public sheet (no dataset licence; restricted); P580/P582, P17.
+  - id_prefix: "cfr_cyber:operation:"
+    source_key: cfr.cyber_operations
+    type: cyber_operation
+    label_en: state-sponsored cyber operation (CFR Cyber Operations Tracker)
+    coded_properties: ["cfr_cyber:operation_type", "cfr_cyber:victim_category"]
+    note: V6DIGITAL; CFR tracker CSV (CFR Terms of Use, restricted); P585; sponsor = CFR's suspected sponsor.
 
 derived:
   cshapes_independence:

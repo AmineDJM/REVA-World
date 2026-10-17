@@ -1,0 +1,18 @@
+# Budget request from agent V6DIGITAL (V6, 2026-10-17). Merged by `uv run python -m reva.atlas.budget_merge --write`.
+agent: V6DIGITAL
+requests:
+  - source_key: accessnow.stop
+    # atlas.keepiton: methodology page (~0.4 MB) + media-usage page (~0.2 MB) + gviz header (3 kB) + gviz CSV (2.2 MB).
+    daily_requests: 8
+    expected_bytes_per_day: 6000000
+    reason: "4 requests (~2.8 MB) per run, one retry"
+  - source_key: cfr.cyber_operations
+    # atlas.cfr_cyber: tracker page (~1.1 MB) + terms page (~0.1 MB) + incidents CSV (~0.6 MB).
+    daily_requests: 6
+    expected_bytes_per_day: 4000000
+    reason: "3 requests (~1.8 MB) per run, one retry"
+daily_totals_increase:
+  http_requests_total: "+14"
+  http_bytes_total: "+10_000_000"
+notes: >-
+  Raw archive of one full run of both sources: ~4.6 MB (well under the 100 MB V6 cap).

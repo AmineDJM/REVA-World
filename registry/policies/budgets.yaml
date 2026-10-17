@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.35"
+policy_version: "budgets-1.3.36"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -15,6 +15,8 @@ per_source_daily_requests:
   # --- V3 atlas/KG sources ---
   # Merged by ATLASCORE (src/reva/atlas/budget_merge.py) from registry/atlas/budget_requests/*.yaml:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
+  # accessnow.stop: requested by V6DIGITAL (v6digital.yaml)
+  accessnow.stop: 8
   # archigos.leaders: requested by A-COUPS (a_coups.yaml), AUDFIX (audfix.yaml)
   archigos.leaders: 30
   # bis.bulk: requested by PRED-HF (pred_hf.yaml), V6FINDATA (v6findata.yaml)
@@ -39,6 +41,8 @@ per_source_daily_requests:
   cdpd.dataverse: 6
   # cepii.baci: requested by A-TRADE (a_trade.yaml)
   cepii.baci: 40
+  # cfr.cyber_operations: requested by V6DIGITAL (v6digital.yaml)
+  cfr.cyber_operations: 6
   # chebi.release: requested by V4CHEM (v4chem.yaml)
   chebi.release: 8
   # chembl.api: requested by V6DRUGS (v6drugs.yaml)

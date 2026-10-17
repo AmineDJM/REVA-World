@@ -1,0 +1,30 @@
+# V6 (agent V6DIGITAL): Access Now #KeepItOn STOP (Shutdown Tracker Optimization Project), internet shutdowns
+# 2016-2025. Connector src/reva/adapters/connectors/atlas_keepiton.py (atlas keepiton.shutdowns_cy,
+# keepiton.shutdowns; KG keepiton:shutdown:<id>). Report docs/dev/v6_digital.md.
+source_key: accessnow.stop
+title: "Access Now #KeepItOn STOP -- internet shutdown instances 2016-2025 (public Google Sheet)"
+provider_url: https://www.accessnow.org/guide/shutdown-tracker-optimization-project/
+lineage_family: keepiton
+rights:
+  licence: >-
+    No dataset licence stated. Access Now's media-usage page licenses original "Media Material" (images, symbols,
+    icons, graphics, logos) under CC BY 4.0; the website Terms of Use otherwise permit "personal, non-commercial use
+    only". Not an open licence: redistribution and commercial use not granted (owner to ask Access Now).
+  licence_url: https://www.accessnow.org/trademarks-copyright-and-media-usage/
+  terms_url: https://www.accessnow.org/access-nows-website-terms-of-use/
+  attribution: "Access Now, #KeepItOn STOP data 2016-2025"
+  commercial_use: not_granted
+  redistribution: not_granted
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [docs.google.com, www.accessnow.org]
+  files:
+    methodology: https://www.accessnow.org/guide/shutdown-tracker-optimization-project/
+    media_usage: https://www.accessnow.org/trademarks-copyright-and-media-usage/
+    sheet: "https://docs.google.com/spreadsheets/d/1DvPAuHNLp5BXGb0nnZDGNoiIwEeu2ogdXEIDvT4Hyfk (tab Combined (2016-2025), gid 1484157943)"
+    read_as: "Google Visualization endpoint /gviz/tq?tqx=out:csv (+ out:json header); /export answers 307 to a per-request googleusercontent.com host"
+  authentication: none
+  cadence: "annual release (methodology page LAST UPDATED 30 March 2026); tab Data updates (2026) not read"
+  caveat: >-
+    The visualization endpoint serves text cells of columns it types as date/number (start_date, end_date, duration,
+    econ_impact, count_year) as empty; econ_impact is not loaded.
