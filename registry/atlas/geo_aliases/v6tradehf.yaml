@@ -1,0 +1,21 @@
+# Geography scheme of agent V6TRADEHF: Eurostat Comext reporter / partner codes (code list ESTAT CXT_FREE_ISO,
+# dataset DS-045409). Comext uses ISO 3166-1 alpha-2 codes (Greece "GR", United Kingdom "GB" -- not the Eurostat
+# "EL"/"UK" of the main database), plus aggregates (WORLD, EXT_EU27_2020, INT_EU27_2020 ...) and Comext-only
+# codes. Only one Comext-only code is added: XK, labelled "Kosovo" in the code list (crosswalk key XKX, the same
+# user-assigned convention as GeoNames XK). Everything else outside ISO alpha-2 stays unmapped (e.g. XS
+# "Serbia" is an obsolete Comext code, not mapped; QP "High seas", QR/QS stores and provisions, QV/QW/QY
+# "not specified", XC "Ceuta", XL "Melilla").
+scheme: comext
+base: iso2
+aliases:
+  - code: XK
+    iso3: XKX
+    source: >-
+      Eurostat Comext code list ESTAT:CXT_FREE_ISO (https://ec.europa.eu/eurostat/api/comext/dissemination/sdmx/2.1/
+      codelist/ESTAT/CXT_FREE_ISO/latest, retrieved 2026-10-17, sha256
+      6a50e5f9b58eb37a7212ce7e887a1a0db4468689815d332a0929423b1cb374f3; also archived by every
+      atlas.eurostat_comext run): code "XK" name "Kosovo". XKX is the crosswalk key of Kosovo.
+source:
+  kind: provider_data
+  url: https://ec.europa.eu/eurostat/api/comext/dissemination/sdmx/2.1/codelist/ESTAT/CXT_FREE_ISO/latest
+  retrieved_at: "2026-10-17T21:00:00Z"

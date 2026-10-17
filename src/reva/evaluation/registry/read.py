@@ -192,6 +192,8 @@ def questions(
 def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
     for b in batches(conn, None):
         m = CACHE.get(store, b["batch_sha256"])
+        if m.get("supplement_of"):  # merged below into the original batch's answer
+            continue
         q = next((x for x in m["questions"] if x["question_id"] == question_id), None)
         if q is None:
             continue
