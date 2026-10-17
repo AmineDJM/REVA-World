@@ -37,13 +37,13 @@ ISO country codes) or by **labelled** REVA coordinate computations; never by nam
 
 | Table | Rows (live) | Content |
 |---|---|---|
-| `unlocode.locations` | LIVE_UNLO_ROWS | per country (ISO2): `LOCATIONS`, `LOCATIONS\|function=<0-7,B>` (labels from the release's SKOS file, e.g. `1` "Maritime transport (sea port)", `4` "Air transport (airport)", `B` "Cross Border (deprecated)"); edition 2025-1; 116,086 codes, 249 countries (`XZ` international waters unmapped) |
-| `portwatch.chokepoints_daily` | LIVE_CHOKE_ROWS | 28 chokepoints × UTC day (2019-01-01 → LAST_CHOKE_DAY): `TRANSITS\|vessel_type=<container,dry_bulk,general_cargo,roro,tanker,cargo,total>` and `TRADE_VOLUME_EST\|vessel_type=…` (metric tons, model estimates) |
-| `portwatch.country_monthly` | LIVE_PWM_ROWS | 180 economies × month 2019-01 → 2026-10 (October partial, flagged): `PORT_CALLS`, `IMPORT_VOLUME_EST`, `EXPORT_VOLUME_EST`, summed by the provider's ArcGIS query service over its daily port layer (5.86 M rows, not downloaded); `flags.port_days` |
+| `unlocode.locations` | 1,655 (dry build; live deferred) | per country (ISO2): `LOCATIONS`, `LOCATIONS\|function=<0-7,B>` (labels from the release's SKOS file, e.g. `1` "Maritime transport (sea port)", `4` "Air transport (airport)", `B` "Cross Border (deprecated)"); edition 2025-1; 116,086 codes, 249 countries (`XZ` international waters unmapped) |
+| `portwatch.chokepoints_daily` | 1,113,672 (dry build; live deferred) | 28 chokepoints × UTC day (2019-01-01 → 2026-10): `TRANSITS\|vessel_type=<container,dry_bulk,general_cargo,roro,tanker,cargo,total>` and `TRADE_VOLUME_EST\|vessel_type=…` (metric tons, model estimates) |
+| `portwatch.country_monthly` | 50,760 (dry build; live deferred) | 180 economies × month 2019-01 → 2026-10 (October partial, flagged): `PORT_CALLS`, `IMPORT_VOLUME_EST`, `EXPORT_VOLUME_EST`, summed by the provider's ArcGIS query service over its daily port layer (5.86 M rows, not downloaded); `flags.port_days` |
 | `eurostat.transport_rail_goods` / `_rail_pass` / `_road_goods` / `_iww_goods` | 1,334 / 1,322 / 2,436 / 790 | annual, EU + EFTA + candidates (2004/1999–2025) |
 | `eurostat.transport_air_pass_m` | 29,389 | monthly passengers carried, total / national / international, 1993-01 → 2026-09 |
 | `eurostat.transport_nuts2_sea_goods` / `_nuts2_air_pass` | 16,657 / 28,487 | NUTS 2 regions (codes verbatim; V4ECON `nuts:<code>` entities) |
-| `nga.wpi`, `ourairports.airports` | unchanged definitions | country counts (A-INFRA); new versions registered by the 1.1.0 runs |
+| `nga.wpi`, `ourairports.airports` | 548 / 1,531 (live, new `ourairports.airports` version 2026-10-17) | country counts (A-INFRA); new versions registered by the 1.1.0 runs |
 
 Honesty rules: values verbatim; a provider zero is kept as a reported zero, a blank is no row; PortWatch tonnages
 are `estimate_kind: model_estimate` with the provider's definition quoted; monthly sums say who computed them
@@ -53,10 +53,10 @@ are `estimate_kind: model_estimate` with the provider's definition quoted; month
 
 | Source key | Entities | Statements (live) |
 |---|---|---|
-| `unece.unlocode` | LIVE_UNLO_ENT `trade_location` (`unlocode:<CC><LLL>`, locations with function 1 port or 4 airport) | LIVE_UNLO_ST: `P17`, `P625`, `unlocode:function` (raw code + labels), `unlocode:status`, `unlocode:subdivision_code`, `unlocode:iata`, `unlocode:in_adm1` |
-| `nga.wpi` | LIVE_WPI_ENT `port` (`wpi:<portNumber>`) | LIVE_WPI_ST: `P17`, `P625`, `wpi:harbor_size`, `wpi:harbor_type`, `wpi:unlocode`, `wpi:at_unlocode`, `wpi:in_adm1` |
-| `imf.portwatch` | LIVE_PW_ENT: 28 `maritime_chokepoint`, 2,065 `port` (`portwatch:port<n>`, incl. 181 offshore `fso<n>` units of the ports database), 1 `data_series` | LIVE_PW_ST: `P625`, `P17`, `portwatch:locode`, `portwatch:at_unlocode`, `portwatch:in_adm1`, `infra:measured_by` |
-| `ourairports.data` | LIVE_OA_ENT `airport` (`ourairports:<id>`: open large/medium airports or scheduled service) | LIVE_OA_ST: `P17`, `P625`, type, scheduled service, ident/ICAO/IATA, `ourairports:iso_region`, `ourairports:in_adm1` |
+| `unece.unlocode` | 24,767 `trade_location` (`unlocode:<CC><LLL>`, locations with function 1 port or 4 airport) | 126,763 (dry build): `P17`, `P625`, `unlocode:function` (raw code + labels), `unlocode:status`, `unlocode:subdivision_code`, `unlocode:iata`, `unlocode:in_adm1` |
+| `nga.wpi` | 2,951 `port` (`wpi:<portNumber>`) | 19,572 (dry build): `P17`, `P625`, `wpi:harbor_size`, `wpi:harbor_type`, `wpi:unlocode`, `wpi:at_unlocode`, `wpi:in_adm1` |
+| `imf.portwatch` | 2,094: 28 `maritime_chokepoint`, 2,065 `port` (`portwatch:port<n>`, incl. 181 offshore `fso<n>` units of the ports database), 1 `data_series` | ~8,800 (dry build): `P625`, `P17`, `portwatch:locode`, `portwatch:at_unlocode`, `portwatch:in_adm1`, `infra:measured_by` |
+| `ourairports.data` | **6,339 (live)** `airport` (`ourairports:<id>`: open large/medium airports or scheduled service) | **54,954 (live, 0 rejected)**: `P17`, `P625`, type, scheduled service, ident/ICAO/IATA, `ourairports:iso_region`, `ourairports:in_adm1` |
 
 **Families** (`registry/kg/relations_v4.d/v6infra.yaml`): `unlocode:in_adm1`, `wpi:in_adm1`, `portwatch:in_adm1`,
 `ourairports:in_adm1` → `located_in` (facility → `region_adm1`); `wpi:at_unlocode`, `portwatch:at_unlocode` →
@@ -79,7 +79,7 @@ Natural Earth raw sha256, distance for `nearest_polygon`). A subdivision of anot
 never linked (border generalisation, disputed areas: e.g. ports listed under one country falling in a neighbour's
 polygon at 1:10m).
 
-**Example paths** (ids as loaded):
+**Example paths** (from the dry builds of the live files with the committed code; OurAirports ids are loaded):
 
 * `wpi:48430` Abadan —`wpi:at_unlocode`→ `unlocode:IRABD` —`unlocode:in_adm1`→ … ; `wpi:48430` —`wpi:in_adm1`
   (point in polygon)→ `iso3166_2:IR-10` Khuzestan —P17→ Q794 Iran.
@@ -92,10 +92,21 @@ polygon at 1:10m).
 
 ## 5. Live runs (dev DB `reva`, every write under `flock /tmp/reva-devdb.lock`)
 
-LIVE_TABLE
+| Source | Status | Requests / bytes | Result |
+|---|---|---|---|
+| `atlas.eurostat_transport` 1.0.0 | **completed** | 7 / 1.2 MB | 7 tables, 80,415 rows |
+| `atlas.ourairports` 1.1.1 | **completed** (licence basis: repository LICENSE, the terms page was still in maintenance) | 5 / 27.7 MB (NE admin-1 bytes identical to V4CLIMATE's, stored once) | `ourairports.airports` 1,531 rows (new version); KG 6,339 airports, 54,954 statements, 0 rejected (load 479) |
+| `atlas.nga_wpi` 1.1.0, `atlas.unlocode` 1.0.0, `atlas.imf_portwatch` 1.0.0 | refused before any request: "registered with different code; bump the version" — their digest includes `atlas_ghcnm`, which FIX4C changed (Natural Earth archived under its own spec) between my seed and the runs | 0 | versions bumped (1.1.1 / 1.0.1 / 1.0.1), my Natural Earth fetch now archives under `naturalearth.admin1_10m` like GHCN; a re-seed was queued behind ~7 seeds on the DB lock |
+| `atlas.rcs_dem` (retry) | OSF back (HTTP 200) at ~20:30 UTC; **not run**: free disk fell to 4.3–4.6 GB (< 5 GB rule) | 0 | queued (§8) |
+| re-runs of WPI / UN/LOCODE / PortWatch | **not run**: free disk < 5 GB | 0 | dry builds on the full live files (numbers in §3/§4) passed the atlas validator |
 
-Raw archive added by V6INFRA: LIVE_BYTES (Natural Earth admin-1 bytes identical to V4CLIMATE's archived copy, stored
-once).
+Raw archive added by V6INFRA so far: ~16 MB (Eurostat 1.2 MB, OurAirports 12.8 MB + licence files; Natural Earth
+admin-1 identical to V4CLIMATE's archived copy, stored once). The deferred runs add ~13.5 MB (UN/LOCODE), ~12 MB
+(PortWatch), 1.3 MB (WPI) and 40 MB (RCS-Dem): ~83 MB in total, within the 100 MB V6 cap.
+
+Shared-file notes: `registry/sources/openfda_api.yaml` (V6DRUGS) had an unquoted `:` that broke the budget merge;
+quoted (no content change). Budgets merged as budgets-1.3.30 (digest re-pinned); later merges by other agents
+superseded it (budgets-1.3.36 at the OurAirports run).
 
 ## 6. Missing, and why
 
@@ -121,12 +132,11 @@ once).
 ## 8. Commands to finish later
 
 ```
-# remaining / repeat live runs (disk >= 5 GB free)
+# remaining live runs (disk >= 5 GB free); seed first so the bumped versions are registered
+flock /tmp/reva-devdb.lock uv run reva seed
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.unlocode
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf_portwatch
-flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ourairports
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.nga_wpi
-flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_transport
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.rcs_dem
 # fixtures (maintainer): capture the provider files, then
 uv run python -I tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py <capture_dir> .
