@@ -77,8 +77,8 @@ RIGHTS = {
 }
 UNII_RE = re.compile(r"^[A-Z0-9]{10}$")
 ISO2_RE = re.compile(r"^[A-Z]{2}$")
-#: Fixture mode: aspirin, imatinib, metformin, nicotine UNIIs (UniChem src14 rows of the fixture ChEMBL ids).
-FIXTURE_SUBSTANCES = ("R16CO5Y76E", "BKJ8M8G5HI", "9100L32L2N", "6M3C89ZY6R")
+#: Fixture mode: aspirin, imatinib, imatinib mesylate, metformin UNIIs (UniChem src14 rows of the fixture ChEMBL ids).
+FIXTURE_SUBSTANCES = ("R16CO5Y76E", "BKJ8M8G5HI", "8A1O1M485B", "9100L32L2N")
 FIXTURE_YEARS = (2023, 2024)
 SERIOUS = {1: "serious", 2: "non_serious"}
 

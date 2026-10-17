@@ -9,7 +9,7 @@ of a univariate AR(p) fitted on the same sample:
 * mean: own first lag ``delta_i`` (0 for growth rates: white-noise prior; 1 for persistent levels such as the
   unemployment rate: random-walk prior), every other coefficient 0;
 * standard deviation of the coefficient on variable j at lag l in equation i:
-  ``lambda1 / lag**lambda3`` if j == i, ``lambda1 * lambda2 * sigma_i / (l**lambda3 * sigma_j)`` otherwise;
+  ``lambda1 / l**lambda3`` if j == i, ``lambda1 * lambda2 * sigma_i / (l**lambda3 * sigma_j)`` otherwise;
   the intercept is diffuse (``100 * sigma_i``).
 
 With a fixed diagonal residual scale in the prior the posterior of each equation is Gaussian (Theil mixed
@@ -76,7 +76,7 @@ def fit_bvar(
     s = np.array([_ar_scale(Y[:, j], p) for j in range(n)])
     if np.any(s <= 0) or not np.all(np.isfinite(s)):
         return Abstain("degenerate univariate scale")
-    X = np.column_stack([np.ones(T - p)] + [Y[p - l : T - l, :] for lag in range(1, p + 1)])
+    X = np.column_stack([np.ones(T - p)] + [Y[p - lag : T - lag, :] for lag in range(1, p + 1)])
     XtX = X.T @ X
     coef = np.zeros((k, n))
     chols = []

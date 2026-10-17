@@ -125,7 +125,6 @@ RIGHTS: dict[str, dict[str, Any]] = {
         "pub_lag": "not_stated",
         "revision_policy": "meetings can be rescheduled, added or cancelled by the banks; each fetch is a new "
         "version when the calendar changed",
-        "licence_review": "Bank of England rows: website content licensed for non-commercial internal use only",
         "policy_quotes": {
             "fed_public_domain": ("fed_terms", _Q_FED),
             "ecb_copyright": ("ecb_terms", _Q_ECB),
@@ -209,9 +208,7 @@ def parse_fomc(html_text: str) -> tuple[list[dict[str, Any]], Counter[str]]:
                 skipped[f"not a scheduled meeting day range: {days_text}"] += 1
                 continue
             first, last = int(m.group(1)), int(m.group(2) or m.group(1))
-            mon = months[-1] if (len(months) > 1 and last < first) else months[0]
-            if len(months) > 1 and last >= first:
-                mon = months[-1]
+            mon = months[-1] if last < first else months[0]  # "Jan/Feb" "31-1": decision on 1 February
             try:
                 d = date(year, mon, last)
             except ValueError as e:
