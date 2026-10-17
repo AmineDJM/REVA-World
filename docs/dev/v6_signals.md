@@ -168,9 +168,10 @@ archived raw bytes) inside the cap. §7 lists the owner options for full volume.
 * A first live attempt, while free disk was 5.3 GB, was refused by `_check_registered`. Another agent's
   `reva seed` had registered 1.0.0 from an earlier draft of this module. The connector was then bumped to 1.0.1
   and re-seeded.
-* A guarded run is queued on the dev-DB lock:
+* A guarded run waited on the dev-DB lock:
   `flock /tmp/reva-devdb.lock sh -c '<free disk >= 5120 MB> && uv run reva atlas ingest atlas.gdelt_events --option days=730 --option end=2026-10-16'`.
-  It re-checks free disk *after* it gets the lock and skips the run below 5 GB. Its log is
+  It re-checks free disk *after* it gets the lock. When it got the lock, 4,312 MB was free, so it **skipped the
+  ingest** and nothing was loaded. Re-run the §8 commands when at least 5 GB is free. Its log is
   `/tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/ingest_events.log`.
 * `atlas.gdelt_doc` was not run live.
 
