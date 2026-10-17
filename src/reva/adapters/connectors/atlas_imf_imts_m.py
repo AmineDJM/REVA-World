@@ -83,9 +83,9 @@ TITLES = {
     "imts_m": "IMF IMTS monthly bilateral goods exports FOB / imports CIF, every reporter x partner",
 }
 #: offline fixtures: small real responses (captured 2026-10-17)
-FIXTURE_REPORTERS = ("DEU", "FRA", "KOS", "USA")
+FIXTURE_REPORTERS = ("FRA", "KOS")
 FIXTURE_WORLD_START = "2025-01"
-FIXTURE_START = "2026-04"
+FIXTURE_START = "2026-05"
 _MONTH = re.compile(r"^[0-9]{4}-(0[1-9]|1[0-2])$")
 
 

@@ -1,0 +1,22 @@
+# Budget request from agent V6TRADEHF (V6, 2026-10-17; docs/dev/v6_trade_hf.md). Merged by
+# `python -m reva.atlas.budget_merge --write` (max per source, never the sum).
+agent: V6TRADEHF
+requests:
+  - source_key: imf.sdmx
+    # atlas.imf_imts_m: 1 all-reporter world-total request (~10 MB from 2000-01) + ceil(~229 reporters / 30) = 8
+    # bilateral chunks (~37 MB for 2026-01..2026-08). 9 per run, one retry -> 18 on top of the existing 80.
+    daily_requests: 98
+    expected_bytes_per_day: 620000000
+    reason: "existing 80 (A-IMF, PRED-VINTAGE, V4ECON, V6FINDATA) + V6TRADEHF 9 per run, one retry"
+  - source_key: eurostat.comext
+    # atlas.eurostat_comext: CXT_FREE_ISO code list (90 kB) + 27 EU reporters x (4 HS-chapter groups ~200 kB +
+    # 1 partner request ~150 kB) = 136 per run (~25 MB); each failed request is retried once in-run.
+    daily_requests: 300
+    expected_bytes_per_day: 60000000
+    reason: "136 requests per run (~25 MB), in-run retry of each failed request, one rerun"
+daily_totals_increase:
+  http_requests_total: "+320"
+  http_bytes_total: "+0"
+notes: >-
+  Disk: raw ~75 MB per full run (IMF ~47 MB, Comext ~25 MB); a longer IMF bilateral history (--option start=...)
+  is ~3.5-4 MB per extra month.

@@ -1,0 +1,26 @@
+[
+ {
+  "request_fingerprint": "425fdca1e94c8d1803a9ea4cc781a6710e9d7fcc602260eaf0c44cab7e28245e",
+  "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.STA,IMTS/FRA+KOS.XG_FOB_USD+MG_CIF_USD.G001.M?startPeriod=2025-01",
+  "file": "425fdca1e94c8d18.xml",
+  "sha256": "e644391109ccf25452a17130ab6cd5878afd4825b67a6e3b86ac4eed12250ef5",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.structurespecificdata+xml;version=2.1"
+  },
+  "retrieved_at": "2026-10-17T21:08:59.471240+00:00",
+  "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>"
+ },
+ {
+  "request_fingerprint": "fdcc4d08966d61f3a50ef3aec7236789806804c7397bdd2913fc6648262c4d4d",
+  "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.STA,IMTS/FRA+KOS.XG_FOB_USD+MG_CIF_USD..M?startPeriod=2026-05",
+  "file": "fdcc4d08966d61f3.xml",
+  "sha256": "c6b6917f9d5711dbae597fd027296b8117b099c0eae2e2c0b98f2899d3d756ed",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.structurespecificdata+xml;version=2.1"
+  },
+  "retrieved_at": "2026-10-17T21:09:02.009165+00:00",
+  "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>"
+ }
+]

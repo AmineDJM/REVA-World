@@ -1,0 +1,15 @@
+source_key: eurostat.comext
+title: Eurostat Comext dissemination API (SDMX 2.1; international trade in goods, DS-045409)
+provider_url: https://ec.europa.eu/eurostat/api/comext/dissemination/
+lineage_family: eurostat
+rights:
+  licence: Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)
+  licence_url: https://ec.europa.eu/eurostat/about-us/policies/copyright
+  attribution: "Source: Eurostat Comext"
+metadata:
+  api_docs: https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-detailed-guidelines/sdmx2-1
+  dataflows: https://ec.europa.eu/eurostat/api/comext/dissemination/sdmx/2.1/dataflow/ESTAT/all/latest
+  cadence: monthly (Comext monthly release)
+  notes: >-
+    Large multi-reporter queries are queued asynchronously by the provider (SOAP 'syncResponse' with a queue id);
+    atlas.eurostat_comext keeps every request small enough to be answered synchronously.

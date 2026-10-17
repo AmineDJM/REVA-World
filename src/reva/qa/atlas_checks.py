@@ -283,6 +283,8 @@ class AtlasScan:
                     continue
                 if b.get("unit_exempt_regex") and re.search(b["unit_exempt_regex"], eff or ""):
                     continue
+                if b.get("indicator_exempt_regex") and re.search(b["indicator_exempt_regex"], g["indicator"]):
+                    continue
                 if b.get("concept_regex"):
                     if concept is None or not re.search(b["concept_regex"], concept):
                         continue
