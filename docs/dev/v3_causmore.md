@@ -33,7 +33,7 @@ sets a User-Agent (test). All four sources are KG-only (a declared dataset gates
 | Source | Access (no account) | Licence | Claims |
 |---|---|---|---|
 | **COW War Data v4**: Inter-State 4.0, Extra-State 4.0, Intra-State **4.1**, Non-State 4.0 + 4 codebook PDFs | `correlatesofwar.org/wp-content/uploads/…` (8 requests, 0.5 MB) | COW terms: cite, no charging for access (not open) — as `atlas.cow` | yes |
-| **PA-X v10** (2,257 agreements 1990-2025) + codebook v10 | `www.peaceagreements.org/cms/documents/…` (2 requests, 4.5 MB) | **CC BY-NC-SA 4.0** (Terms_of_Use.pdf; "commercial use is strictly prohibited"; notify peacerep@ed.ac.uk) — `open_licence: false`, flagged | yes |
+| **PA-X v10** (2,257 agreements 1990-2025) + codebook v10 | `www.peaceagreements.org/cms/documents/…` (2 requests, 4.5 MB) | **CC BY-NC-SA 4.0** (Terms_of_Use.pdf; "commercial use is strictly prohibited"; notify peacerep@ed.ac.uk) — `open_licence: false`, flagged | no (context + identity) |
 | **IDMC GIDD – Disasters** (event-level internal displacements 2008-2024) | HDX `package_show` + the resource it names (302 to HDX's S3 store) (2 requests, 1.7 MB). IDMC's own API needs a registered client: not used | README sheet: **CC BY-NC**; HDX record: CC BY. The more restrictive provider statement is applied, both recorded, flagged | yes |
 | **UCDP Conflict Termination v4-2024, dyad file** + the pinned codebook | `ucdp.uu.se/downloads/monadterm/…` (2 requests, 1 MB) | CC BY 4.0 | yes |
 
@@ -50,7 +50,6 @@ references did not resolve and 7 PA-X numbers would have pointed at a different 
 |---|---|---|---|---|
 | COW inter-state | `cow:war:<n>` -> `cowwar:outcome:<n>:<ccode>:<k>` (one per state record) | `coded_outcome` | `Outcome` ("1 = Winner 2 = Loser … 8 = changed sides") | the codebook codes the war's outcome per state participant record (as ICB2 / MID) |
 | COW extra/intra/non-state | `cow:war:<n>` -> `cowwar:outcome:<n>` | `coded_outcome` | `Outcome` ("1 – Side A wins 2 - Side B wins …") | war-level outcome; identical on every record of a war (checked; a disagreement would withhold it) |
-| PA-X | `ucdp:conflict:<UcdpCon>` -> `pax:agt:<AgtId>`; `cow:war:<CowWar>` -> `pax:agt:<AgtId>` | `reaction_to` | `peace_agreement` ("… addressing conflict with a view to ending it") + `UcdpCon`, `CowWar` | same mapping as CAUSDATA's UCDP peace agreements; the conflict provoked the agreement that addresses it |
 | IDMC | `idmc:event:<id>` -> `idmc:displacement:<id>:<ISO3>:<Year>` | `has_effect`, polarity `promotes` | `disaster_displacement` ("forced to leave their homes … as a result, or in anticipation of the negative impact of natural hazards"); the figure is displacements "as a result of disasters" | the source attributes the displacement to the event; the preventive-evacuation flag travels in the claim scope |
 | UCDP dyad termination | `ucdp:dyadepisode:<d_epid>` -> `…:termination` | `coded_outcome` | `d_outcome=<k>` (same category texts as CAUSDATA's `c_outcome=<k>`, incl. the outcome-5 caveat) | how each warring dyad's episode ended |
 
@@ -63,6 +62,13 @@ references did not resolve and 7 PA-X numbers would have pointed at a different 
   (`followed_by` / `follows`). 45 pairs, 41 coded by both wars' files.
 * COW outcome 5 ("ongoing as of 12/31/2007") is an attribute, no outcome record; `Initiator` is a participant role
   (string / qualifier); intra-state state participants -> `P710` (`cow:<ccode>`, side).
+* **PA-X conflict / war -> agreement** (`UcdpCon`, `CowWar`) -> `pax:ucdp_conflict` / `pax:cow_war` context
+  statements. The codebook defines a peace agreement as a document "addressing conflict with a view to ending it":
+  what it addresses, not that it is a reaction to (or caused by) the conflict. `atlas.pax` 1.0.0 delivered these as
+  3,334 `reaction_to` claims (the mapping CAUSDATA had used for UCDP agreements); the causal audit's M6
+  (`docs/dev/review_v3_causal_audit.md`) then judged that mapping an association made causal and AUDFIX turned the
+  UCDP agreements into context. `atlas.pax` 1.1.0 applies the same reading: no claim, and its empty complete delivery
+  retracts the 1.0.0 claims through the loader.
 * PA-X `UcdpAgr` -> identifier `pax:ucdp_agreement_id` (same_as evidence), `PamAgr` identifier, `PP` -> `P361` part of
   `pax:process:<PP>`, `Contp` -> `causdata:coded_issue`, `Stage` verbatim. **No agreement -> agreement link**: "Imp:
   Aiming to implement an earlier agreement" names no agreement, `OthAgr` lists names "as found in the text" and
@@ -76,7 +82,7 @@ references did not resolve and 7 PA-X numbers would have pointed at a different 
 | Source | Rows | KG entities / statements | T1 claims |
 |---|---|---|---|
 | COW wars | 337 + 198 + 442 + 62 records; 95 + 163 + 334 + 62 = 654 wars | 1,288 (396 new intra/non-state wars, 892 outcomes) / 7,701 | 892 `coded_outcome` (337 inter per state, 161 extra, 332 intra, 62 non-state) |
-| PA-X v10 | 2,257 agreements, 183 processes | 2,440 / 24,440 | 3,334 `reaction_to` (2,045 from UCDP conflicts, 1,289 from COW wars) |
+| PA-X v10 | 2,257 agreements, 183 processes | 2,440 / 24,440 | none (2,045 conflict and 1,289 war links as context) |
 | IDMC GIDD | 22,119 rows -> 21,678 events | 43,786 / 156,002 | 22,108 `has_effect` |
 | UCDP dyad term. | 3,432 dyad-years -> 985 episodes | 1,900 / 10,209 | 915 `coded_outcome` (d_outcome 5: 395, 3: 149, 1: 109, 2: 101, 6: 88, 4: 73) |
 

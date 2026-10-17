@@ -3,7 +3,7 @@
  "built_by": "agent SAMEAS, 2026-10-17",
  "method": "Full-text search of the Wikidata property namespace (ns 120) through Special:Search page views (https://www.wikidata.org/w/index.php?search=<term>&title=Special:Search&profile=advanced&fulltext=1&ns120=1&limit=100), then Special:EntityData snapshots of the candidate properties; all through the budget-metered wikidata.wbapi client (reva.events.verify.wbapi_client, machine-wide lock). The action API (wbsearchentities / list=search) answered HTTP 429 to the shared egress during the run. Raw bodies are archived content-addressed in var/kg/objects (raw_sha256, var/kg/archive_index.jsonl).",
  "control": "'Global Volcanism Program' finds P1886 (Global Volcanism Program ID), the property NCEI volcano records are already linked by.",
- "finding": "No Wikidata property holds identifiers of Correlates of War wars, UCDP conflicts/agreements, ICB crises, MID disputes, Archigos, NAVCO, Mass Mobilization, TIES or PRIO records (searches return no property). Earthquake identifier properties exist (P3196 USGS earthquake ID, P6419 GEOFON, P4207 INGV, P5182 JMA) and P14355 EM-DAT disaster number, but the NCEI hazard records REVA loads carry none of these identifiers (checked in the archived NCEI API responses: fields id, earthquakeEventId, tsunamiEventId, volcanoLocationNum, ...), so no NCEI event can be linked to a Wikidata item by a shared identifier.",
+ "finding": "No Wikidata property holds identifiers of Correlates of War wars, UCDP conflicts/agreements, ICB crises, MID disputes, Archigos, NAVCO, Mass Mobilization, TIES or PRIO records (searches return no property). Earthquake identifier properties exist (P3196 USGS earthquake ID, P6419 GEOFON, P4207 INGV, P5182 JMA) and P14355 EM-DAT disaster number, but the NCEI hazard records REVA loads carry none of these identifiers (checked in the archived NCEI API responses: fields id, earthquakeEventId, tsunamiEventId, volcanoLocationNum, ...), so no NCEI event can be linked to a Wikidata item by a shared identifier. No Wikidata property holds GLIDE numbers or ReliefWeb disaster ids (searches 'GLIDE number', 'ReliefWeb', 'Global Identifier Number', 'Internal Displacement Monitoring'), so IDMC GIDD events (which carry GLIDE numbers) cannot be linked to Wikidata items either.",
  "searches": {
   "Correlates of War": {
    "hits": [],
@@ -444,6 +444,65 @@
    "no_results": false,
    "raw_sha256": "2fd38d3a51402a36b9be10597415c144caecdda95b0f16238cd10fceb136857c",
    "retrieved_at": "2026-10-17T01:52:32.311797+00:00"
+  },
+  "ReliefWeb": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "42b76a0777d6c6b4ae061e2666155589410fb34a65adafebcf11893e26c74eca",
+   "retrieved_at": "2026-10-17T02:21:09.634816+00:00"
+  },
+  "GLIDE number": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "19d40c56fb6f3ee3e800fcd922b2cf52364c8c9953a521053d9a5be8ae8e5490",
+   "retrieved_at": "2026-10-17T02:21:11.855681+00:00"
+  },
+  "Global Identifier Number": {
+   "hits": [
+    "P3962",
+    "P3642",
+    "P9270",
+    "P698",
+    "P227"
+   ],
+   "no_results": false,
+   "raw_sha256": "ff0c6af73efca8beeb9938e2b4562f3036e0769b05d3e513ddf4105666b2329d",
+   "retrieved_at": "2026-10-17T02:21:14.105855+00:00"
+  },
+  "IFRC": {
+   "hits": [
+    "P9079",
+    "P9077"
+   ],
+   "no_results": false,
+   "raw_sha256": "4def0871a6a1afc6f0f848d01fe8219d86e98acec653e9b34ad9624d18a12320",
+   "retrieved_at": "2026-10-17T02:21:16.450809+00:00"
+  },
+  "disaster identifier": {
+   "hits": [
+    "P10099",
+    "P14355",
+    "P14356",
+    "P12537"
+   ],
+   "no_results": false,
+   "raw_sha256": "f8067e817a0be56364007ce235905402986432db6153d7d0eb6d70ae67d244cf",
+   "retrieved_at": "2026-10-17T02:21:18.818931+00:00"
+  },
+  "Internal Displacement Monitoring": {
+   "hits": [],
+   "no_results": true,
+   "raw_sha256": "2052837efcd8bca67e748b3cc43d60ccbfbace347da2eff060a357606601f351",
+   "retrieved_at": "2026-10-17T02:21:21.141537+00:00"
+  },
+  "DesInventar": {
+   "hits": [
+    "P1799",
+    "P14838"
+   ],
+   "no_results": false,
+   "raw_sha256": "f628e5d41de2548e365b7aef6739ad2a30b33b7a8d19652f7065a264a2c7267d",
+   "retrieved_at": "2026-10-17T02:21:23.613797+00:00"
   }
  },
  "properties": {

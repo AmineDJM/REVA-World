@@ -1,8 +1,8 @@
 """A-COUPS sources end to end on a throwaway database through the atlas platform (fixture mode: no network).
 
-Powell & Thyne coups, Archigos 4.1 leaders (with the exact coup join and its coded claims) and the REIGN-format
-leader list: raw slices archived as evidence acquisitions, atlas tables registered, KG records loaded without
-rejection, the T1 ``coded_outcome`` claims loaded when CAUSCORE's schema exists; re-running is a no-op.
+Powell & Thyne coups, Archigos 4.1 leaders (with the exact coup join as context edges; since connector 1.1.0 no
+causal claim, audit M5) and the REIGN-format leader list: raw slices archived as evidence acquisitions, atlas tables
+registered, KG records loaded without rejection; re-running is a no-op.
 """
 
 from __future__ import annotations
@@ -78,27 +78,62 @@ async def test_coups_atlas_rows(db: Any) -> None:
     assert ussr["iso3"].null_count() == ussr.height and set(ussr["entity_qid"]) == {"Q15180"}
 
 
+def _seed_v100_records(db: Any) -> tuple[str, str]:
+    """What connector 1.0.0 left in a database: one coup statement and one coup -> removal claim (audit M5)."""
+    from datetime import UTC, datetime, timedelta
+
+    from reva.causal import Codebook, DatasetClaim, load_dataset_claims
+    from reva.kg.model import KgProperty, KgStatement, load_batch, register_properties
+
+    when = datetime.now(UTC) - timedelta(days=1)
+    raw = db.store.put_bytes(b"archigos 1.0.0 run (test)", "raw", "application/octet-stream").sha256
+    register_properties(db.worker, [KgProperty("coup:event_type", "string", "coup_event_type", "coup event type")])
+    st = KgStatement("archigos:coup:OLD-1", "coup:event_type", value={"type": "string", "value": "coup"},
+                     statement_id="coup:OLD-1:type", source_revision="archigos-4.1")  # fmt: skip
+    rep = load_batch(db.worker, db.store, statements=[st], source_key="archigos.leaders", raw_sha256s=[raw],
+                     retrieved_at=when, origin="test_fixture")  # fmt: skip
+    assert rep.rejected_total == 0
+    cb = Codebook("Archigos 4.1 (codebook)", "4.1", None, {"exitcode_military": "the classic “military coup.”"})
+    claim = DatasetClaim(cause_id="archigos:coup:OLD-1", effect_id="archigos:exit:OLD-1", relation="coded_outcome",
+                         selector={"row": 1}, raw_sha256=raw, codebook_term="exitcode_military",
+                         source_claim_id="coup_removal:OLD-1")  # fmt: skip
+    r = load_dataset_claims(db.worker, db.store, source_key="archigos.leaders", dataset="coup_removals",
+                            dataset_revision="archigos-4.1", codebook=cb, raw_sha256s=[raw], retrieved_at=when,
+                            origin="test_fixture", claims=[claim])  # fmt: skip
+    assert r.inserted == 1
+    return "archigos.leaders:coup:OLD-1:type", "ds:archigos.leaders:coup_removals:coup_removal:OLD-1"
+
+
 async def test_archigos_ingest_with_coup_links(db: Any) -> None:
     await _run(db, atlas_coups.CONNECTOR_NAME)  # coup event entities (the links point at them)
+    old_statement, old_claim = _seed_v100_records(db)
     s = await _run(db, atlas_leaders.ARCHIGOS_NAME)
+    # the 1.0.0 records are retracted by the 1.1.0 run, append-only (audit M5; retraction exercised, L8)
+    assert s["kg_retracted"]["retracted"] >= 1 and s["causal"]["retracted"] == 1
+    assert _scalar(db, "SELECT count(*) FROM kg.statement_current WHERE statement_key = :k", k=old_statement) == 0
+    assert _scalar(db, "SELECT count(*) FROM kg.statement WHERE statement_key = :k", k=old_statement) == 1
+    assert (
+        _scalar(db, "SELECT reason FROM kg.causal_claim_retraction WHERE claim_key = :k", k=old_claim)
+        == "removed_at_source"
+    )
     assert s["archigos"]["rows"] == 165
     assert s["archigos"]["encoding_fallbacks"], "the Honduras row is Windows-1252 in Archigos 4.1"
     assert s["atlas"]["leaders_cy"]["created"]
     assert not s["kg"]["rejected"], s["kg"]
     join = s["join"]
     assert join["coup_removals"] >= 20 and join["pt_events_with_several_matches"] == {}
-    # Allende, 1973-09-11: Archigos codes his removal by the military; its own coup event names him, and a context
-    # edge (same state, same day) points at the P&T event
-    cid = _scalar(
+    # Allende, 1973-09-11: Archigos codes his removal by the military; a context edge (same state, same day) links
+    # the Archigos removal event to the P&T event. No coup event, no causal claim (audit M5, AUDFIX).
+    xid = _scalar(
         db,
         "SELECT subject_qid FROM kg.statement_current WHERE property_pid = 'coup:same_state_and_day_as' "
         "AND object_qid = 'ptcoup:155:1973-09-11'",
     )
-    assert cid.startswith("archigos:coup:CHL-")
+    assert xid.startswith("archigos:exit:CHL-")
     leader = _scalar(
         db,
-        "SELECT object_qid FROM kg.statement_current WHERE subject_qid = :c AND property_pid = 'coup:leader_removed'",
-        c=cid,
+        "SELECT object_qid FROM kg.statement_current WHERE subject_qid = :c AND property_pid = 'archigos:removal_of'",
+        c=xid,
     )
     assert leader.startswith("archigos:leader:")
     assert (
@@ -110,27 +145,17 @@ async def test_archigos_ingest_with_coup_links(db: Any) -> None:
         )
         == "Removed by Military, without Foreign Support"
     )
+    assert _scalar(db, "SELECT count(*) FROM kg.statement_current WHERE subject_qid LIKE 'archigos:coup:%'") == 0
     causal = s["causal"]
     if causal["status"] == "loaded":
-        assert causal["inserted"] == join["coup_removals"], causal
-        row = (
-            db.owner.connect()
-            .execute(
-                text(
-                    "SELECT relation, effect_id FROM kg.causal_claim_current WHERE source_key = 'archigos.leaders' "
-                    "AND cause_id = :c"
-                ),
-                {"c": cid},
-            )
-            .one()
+        assert causal["inserted"] == 0, causal
+        assert (
+            _scalar(db, "SELECT count(*) FROM kg.causal_claim_current WHERE source_key = 'archigos.leaders'") == 0
         )
-        assert row[0] == "coded_outcome" and row[1] == cid.replace(":coup:", ":exit:")
     else:
         assert causal["reason"]
     again = await _run(db, atlas_leaders.ARCHIGOS_NAME)
     assert again["kg"]["statements_inserted"] == 0
-    if again["causal"]["status"] == "loaded":
-        assert again["causal"]["inserted"] == 0
 
 
 async def test_leaderlist_ingest(db: Any) -> None:

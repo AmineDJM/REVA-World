@@ -189,43 +189,59 @@ def test_archigos_atlas_table() -> None:
     assert still and all(("LEADER_EXITS", None, 2015) != k for k in cells)
 
 
-def test_coup_removals_claims_rest_on_archigos_alone() -> None:
+def test_archigos_removal_is_one_event_without_causal_claim() -> None:
+    """Audit M5 (AUDFIX): Archigos codes one removal (exit + exitcode), not a coup followed by a removal."""
     out = L.build_archigos(DTA, crosswalk=_crosswalk(), qid_for_iso3=load_qid_for_iso3(), pt_csv=PT,
                            pt_file="pt_20260829.csv", strict=False)  # fmt: skip
     removals = out["removals"]
     allende = next(r for r in removals if r.spell.ccode == 155 and r.spell.end == date(1973, 9, 11))
     assert allende.pt_event is not None and allende.pt_event.event_id == "ptcoup:155:1973-09-11"
-    assert allende.perpetrator == "military" and not allende.foreign_support
-    claims = out["claims"]
-    assert len(claims) == len(removals) == out["join"]["coup_removals"]
-    c = next(x for x in claims if x["cause_id"] == allende.event_id)
-    assert c["effect_id"] == f"archigos:exit:{allende.spell.obsid}" and c["relation"] == "coded_outcome"
-    assert c["raw_sha256"] == out["sha256"] and c["tier"] == "T1"
-    assert c["codebook_term"] in L.CODEBOOK_DEFINITIONS and c["mechanism"] == allende.spell.exitcode
-    assert "joined_event" not in c["selector"] and "ptcoup" not in json.dumps(c)  # no join inside a claim
-    # the P&T event is reached only through a context edge
+    assert out["claims"] == []  # no coded_outcome coup -> removal
+    # no coup event, no coup statement: the 1.0.0 coup record is re-emitted as a superseded record only
+    assert not any(s.subject.startswith("archigos:coup:") for s in out["statements"])
+    sup = [e for e in out["entities"] if e.qid.startswith("archigos:coup:")]
+    assert sup and all(e.kind == "superseded_record" for e in sup)
+    assert not any(s.property in ("coup:event_type", "coup:leader_removed") for s in out["statements"])
+    # the P&T event is reached only through a context edge from the Archigos removal event
     ctx = [s for s in out["statements"] if s.property == "coup:same_state_and_day_as"]
     assert len(ctx) == out["join"]["same_state_and_day_as_successful_pt_coup"] > 0
-    assert all(s.subject.startswith("archigos:coup:") and s.object_qid.startswith("ptcoup:") for s in ctx)
-    # the leader removed hangs off Archigos's own coup event
-    lr = [s for s in out["statements"] if s.property == "coup:leader_removed"]
-    assert {s.subject for s in lr} == {r.event_id for r in removals}
+    assert all(s.subject.startswith("archigos:exit:") and s.object_qid.startswith("ptcoup:") for s in ctx)
     keys = [s.key for s in out["statements"]]
     assert len(keys) == len(set(keys))
     assert out["join"]["pt_events_with_several_matches"] == {}
+    # the exit-manner statement carries the passage of ITS exitcode only
+    manner = {s.subject: s.qualifiers for s in out["statements"] if s.property == "archigos:exit_manner"}
+    q = manner[allende.spell.exit_event_id]
+    assert q["exitcode"] == "Removed by Military, without Foreign Support"
+    assert q["removed_by"] == "Removed by Military" and q["foreign_support"] is False
+    assert "classic “military coup.”" in q["codebook_definition"] and q["codebook_definition_scope"] == "this exitcode"
+    for subj, mq in manner.items():
+        if mq["exitcode"].endswith("with Foreign Support") and not mq["exitcode"].endswith("without Foreign Support"):
+            assert "without" not in mq["codebook_definition"], subj  # never the without-support passage (M5)
+            assert mq["foreign_support"] is True
+        if "Other Government Actors" in mq["exitcode"]:
+            assert "military coup" not in mq["codebook_definition"]
 
 
-def test_codebook_passages_and_claim_kwargs() -> None:
+def test_exit_detail_parts_are_verbatim() -> None:
+    assert L.exit_detail("Removed by Other Government Actors, with Foreign Support") == {
+        "removed_by": "Removed by Other Government Actors",
+        "foreign_support": True,
+    }
+    assert L.exit_detail("Popular Protest, without Foreign Support") == {
+        "removed_by": "Popular Protest",
+        "foreign_support": False,
+    }
+    assert L.exit_detail("Assassination by Unsupported Individual") == {}
+
+
+def test_codebook_passages_and_sources() -> None:
     cb = L.codebook()
-    assert cb["version"] == "4.1" and "classic “military coup.”" in cb["definitions"]["exitcode_military"]
-    try:
-        from reva.causal import Codebook, DatasetClaim
-    except ImportError:  # CAUSCORE not merged yet: the dicts are still checked above
-        return
-    Codebook(**cb)
-    out = L.build_archigos(DTA, crosswalk=_crosswalk(), qid_for_iso3={}, strict=False)
-    for c in out["claims"][:5]:
-        DatasetClaim(**c)
+    assert cb["version"].startswith("4.1") and "classic “military coup.”" in cb["definitions"]["exitcode_military"]
+    assert "sources" not in cb
+    fetched = {"sha256": L.ARCHIGOS_CODEBOOK_SHA256, "matches": True, "archived": True}
+    src = L.codebook(fetched)["sources"]
+    assert src["exitcode_military"]["pages"] == [10] and src["exitcode"]["sha256"] == L.ARCHIGOS_CODEBOOK_SHA256
 
 
 # ----------------------------------------------------------------------------- same_as (Wikidata)

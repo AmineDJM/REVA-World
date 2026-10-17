@@ -27,16 +27,23 @@ Outputs
   ``archigos:exit:<obsid>`` (``P585`` day, ``archigos:removal_of``, ``archigos:removed_from``,
   ``archigos:exit_manner``).
 * KG (``reign.leaderlist``): ``reign:leader:<leadid>`` + ``reign:leader_of`` spells.
-* **Coups as Archigos codes them** -- every spell whose exit is Irregular with exitcode "Removed by Military,
-  ..." ("the classic military coup", codebook p. 3) or "Removed by Other Government Actors, ..." becomes a coup
-  event ``archigos:coup:<obsid>`` (P585 day, state, leader removed, perpetrator type) and one **T1 dataset claim**
-  ``coded_outcome`` (cause = that coup, effect = the removal event ``archigos:exit:<obsid>``) through
-  ``reva.causal.load_dataset_claims``, with the codebook passages quoted verbatim. The claim rests on one Archigos
-  row and one codebook: no other dataset takes part (CAUSDATA convention ``no_join_claims``).
+* **No causal claim** (connector 1.1.0, AUDFIX audit M5): Archigos codes ONE fact per removal -- the exit and its
+  ``exitcode`` -- not a coup followed by a removal. Until 1.0.0 REVA split it into a coup event
+  ``archigos:coup:<obsid>`` and a ``coded_outcome`` claim coup -> removal (327 claims, dated by copying the exit
+  day, labelling "other government actors" removals as coups and quoting the "without foreign support" passage for
+  removals with foreign support). Now the removal event ``archigos:exit:<obsid>`` carries the exitcode verbatim,
+  ``removed_by`` / ``foreign_support`` (the two parts of that label, verbatim) and the codebook passage *of that
+  exact exitcode* when the codebook has one (only "Removed by Military, without Foreign Support" -- "the classic
+  military coup" -- and "Removed by Other Government Actors, without Foreign Support"); the claims are retracted
+  through the loader (empty complete delivery), the ``archigos:coup:*`` statements are retracted and their entities
+  re-emitted as ``superseded_record``.
+* **Codebook** (audit M4): ``Archigos_4.1.pdf`` is fetched, archived and compared with its pinned sha256; the quoted
+  passages carry the archived sha256 and the physical PDF page.
 * **Context link to Powell & Thyne** (P&T list fetched in the same run): when a *successful* P&T coup has the same
-  COW state code and the same calendar day as an Archigos coup removal, a context statement
-  ``coup:same_state_and_day_as`` links the two events -- never ``same_as``, never causal, never by name or by
-  near dates; near misses (1-31 days apart) are counted in the summary, not linked. P&T do not code leaders.
+  COW state code and the same calendar day as an Archigos removal by the military or other government actors, a
+  context statement ``coup:same_state_and_day_as`` links the P&T event to the Archigos removal event -- never
+  ``same_as``, never causal, never by name or by near dates; near misses (1-31 days apart) are counted in the
+  summary, not linked. P&T do not code leaders.
 * **Wikidata ``same_as``** (run option ``wikidata=1``): Archigos's DBpedia URI is an English-Wikipedia title;
   one WDQS query per 250 titles maps the exact article IRI (sitelink) to its item and reads P31/P569. A link is
   kept only when the item is a human (Q5) and, when both are known, Wikidata's birth year equals Archigos's
@@ -248,7 +255,7 @@ def _read_strls(body: bytes, off: int, release: int, e: str) -> dict[tuple[int, 
 # ============================================================================= Archigos 4.1
 ARCHIGOS_SOURCE_KEY = "archigos.leaders"
 ARCHIGOS_NAME = "atlas.archigos"
-ARCHIGOS_VERSION_CONNECTOR = "1.0.0"
+ARCHIGOS_VERSION_CONNECTOR = "1.1.0"  # 1.1.0 (AUDFIX M3/M4/M5): no coup -> removal claim; codebook archived
 ARCHIGOS_PARSER = "atlas-archigos-1"
 ARCHIGOS_RELEASE = "4.1"
 ARCHIGOS_HOST = "www.rochester.edu"
@@ -347,7 +354,7 @@ COUP_LINK_EXITCODES = {
 REMOVAL_EXITS = frozenset({"Irregular", "Foreign"})
 CENSOR_DATE = date(2015, 12, 31)
 
-#: Verbatim passages of the Archigos 4.1 codebook (pp. 2-3, PDF sha256 above) the coded relations rest on.
+#: Verbatim passages of the Archigos 4.1 codebook (PDF sha256 above; physical pages in CODEBOOK_PAGES).
 CODEBOOK_DEFINITIONS: dict[str, str] = {
     "exit_irregular": "Removal from office is coded as Irregular when the leader was removed in contravention of "
     "explicit rules and established conventions. Most Irregular removals from office are done by domestic forces "
@@ -361,10 +368,52 @@ CODEBOOK_DEFINITIONS: dict[str, str] = {
     "exitcode_other_government_actors": "Next in order of frequency are the 42 leaders who were removed by other "
     "government actors, without direct foreign support;",
 }
+#: physical page(s) of each passage in the pinned codebook PDF (checked by tests/unit/test_audfix_codebooks.py)
+CODEBOOK_PAGES: dict[str, list[int]] = {
+    "exit_irregular": [9],
+    "exitcode": [9],
+    "exitcode_military": [10],
+    "exitcode_other_government_actors": [10],
+}
+#: the exitcodes the codebook describes in words (its own label, not the "with Foreign Support" variants): M5
+EXITCODE_PASSAGE = {
+    "Removed by Military, without Foreign Support": "exitcode_military",
+    "Removed by Other Government Actors, without Foreign Support": "exitcode_other_government_actors",
+}
 CONTEXT_METHOD = (
-    "context only (not identity, not causal): the Archigos coup removal and a successful Powell & Thyne coup share "
-    "the Correlates of War state code and the calendar day (Archigos enddate == P&T event day)"
+    "context only (not identity, not causal): an Archigos irregular removal by the military or other government "
+    "actors and a successful Powell & Thyne coup share the Correlates of War state code and the calendar day "
+    "(Archigos enddate == P&T event day)"
 )
+SUPERSEDED_NOTE = (
+    "superseded record (Archigos connector 1.1.0): until 1.0.0 REVA split one Archigos exitcode into a coup event "
+    "and a removal; Archigos codes a single removal, see the removal event"
+)
+
+
+def archigos_codebook() -> Any:
+    from reva.adapters.connectors.causdata_common import PinnedCodebook
+
+    return PinnedCodebook(
+        key="archigos_codebook",
+        title=f"Archigos {ARCHIGOS_RELEASE} codebook (Archigos_4.1.pdf)",
+        url=ARCHIGOS_CODEBOOK_URL,
+        sha256=ARCHIGOS_CODEBOOK_SHA256,
+        media_types=("application/pdf", "application/octet-stream"),
+        max_bytes=5_000_000,
+        extraction="poppler pdftotext -layout, whitespace normalised",
+        quotes={k: {"pages": v} for k, v in CODEBOOK_PAGES.items()},
+    )
+
+
+def exit_detail(exitcode: str) -> dict[str, Any]:
+    """The two parts of an Archigos exitcode label, verbatim (``Removed by <who>, with[out] Foreign Support``)."""
+    out: dict[str, Any] = {}
+    m = re.fullmatch(r"(Removed by .+?|Popular Protest), (with|without) Foreign Support", exitcode)
+    if m:
+        out["removed_by"] = m.group(1)
+        out["foreign_support"] = m.group(2) == "with"
+    return out
 
 
 @dataclass(frozen=True)
@@ -590,7 +639,8 @@ def archigos_cy_rows(
 
 @dataclass(frozen=True)
 class CoupRemoval:
-    """A leader removal Archigos codes as done by the military or other government actors (exit Irregular)."""
+    """A leader removal Archigos codes as done by the military or other government actors (exit Irregular): the
+    population of the Powell & Thyne context link (not an event of its own, not a claim)."""
 
     spell: Spell
     codebook_term: str
@@ -599,6 +649,7 @@ class CoupRemoval:
 
     @property
     def event_id(self) -> str:
+        """The superseded 1.0.0 coup record id (re-emitted as ``superseded_record`` only)."""
         return f"archigos:coup:{self.spell.obsid}"
 
     @property
@@ -765,7 +816,11 @@ def archigos_kg_records(
     pt_sha256: str | None = None,
     pt_file: str | None = None,
     same_as: Mapping[str, Mapping[str, Any]] | None = None,
+    codebook_fetch: Mapping[str, Any] | None = None,
 ) -> tuple[list[KgEntity], list[KgStatement]]:
+    from reva.adapters.connectors.causdata_common import codebook_sources
+
+    cb_src = codebook_sources(archigos_codebook(), codebook_fetch)
     ents: dict[str, KgEntity] = {}
     sts: list[KgStatement] = []
     by_leader: dict[str, list[Spell]] = defaultdict(list)
@@ -896,7 +951,13 @@ def archigos_kg_records(
                 },
                 descriptions={"en": f"leader removal as coded by Archigos {ARCHIGOS_RELEASE}: {s.exitcode}"},
             )
-            xq = {"obsid": s.obsid, "exit": s.exit, "exitcode": s.exitcode, "posttenurefate": s.fate}
+            xq: dict[str, Any] = {
+                "obsid": s.obsid,
+                "exit": s.exit,
+                "exitcode": s.exitcode,
+                "posttenurefate": s.fate,
+                **exit_detail(s.exitcode),
+            }
             day = s.end.isoformat()
             sts += [
                 KgStatement(
@@ -935,53 +996,28 @@ def archigos_kg_records(
                     subject=xid,
                     property="archigos:exit_manner",
                     value={"type": "string", "value": s.exitcode},
-                    qualifiers=xq,
+                    qualifiers=manner_qualifiers(xq, s.exitcode, cb_src),
                     raw_sha256=raw_sha256,
                     selector=sel,
                 ),
             ]
     for r in removals:
         s = r.spell
-        cid = r.event_id
-        day = s.end.isoformat()
-        ents[cid] = KgEntity(
-            qid=cid,
-            kind="event",
-            labels={
-                "en": f"Coup removing {s.leader} ({s.idacr}), {day} (Archigos)",
-                "fr": f"Coup d’État renversant {s.leader} ({s.idacr}), {day} (Archigos)",
-            },
-            descriptions={"en": f"leader removal coded by Archigos {ARCHIGOS_RELEASE} as '{s.exitcode}'"},
+        # the 1.0.0 coup record: re-emitted as superseded (its statements are retracted at load), never an event
+        ents[r.event_id] = KgEntity(
+            qid=r.event_id,
+            kind="superseded_record",
+            labels={"en": f"Superseded record: Archigos removal {s.obsid} (see {s.exit_event_id})"},
+            descriptions={"en": SUPERSEDED_NOTE},
         )
-        cq = {"obsid": s.obsid, "exitcode": s.exitcode, "basis": "Archigos exit = Irregular with this exitcode"}
-        sel = {
-            "file": ARCHIGOS_FILE,
-            "row": s.row,
-            "obsid": s.obsid,
-            "columns": ["ccode", "enddate", "exit", "exitcode"],
-        }
-        sts += [
-            KgStatement(key=f"coup:{s.obsid}:type", subject=cid, property="coup:event_type",
-                        value={"type": "string", "value": "coup"}, qualifiers=cq, raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"coup:{s.obsid}:date", subject=cid, property="P585",
-                        value={"type": "time", "time": day, "precision": 11}, qualifiers=cq, raw_sha256=raw_sha256,
-                        selector=sel),
-            KgStatement(key=f"coup:{s.obsid}:state", subject=cid, property="coup:against_state",
-                        object_qid=resolver.entity("cow", s.ccode, s.end, s.idacr), point_in_time=day,
-                        pit_precision=11, qualifiers=cq, raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"coup:{s.obsid}:leader", subject=cid, property="coup:leader_removed",
-                        object_qid=s.leader_id, point_in_time=day, pit_precision=11,
-                        qualifiers={**cq, "removal_event": s.exit_event_id}, raw_sha256=raw_sha256, selector=sel),
-            KgStatement(key=f"coup:{s.obsid}:perpetrator", subject=cid, property="coup:perpetrator_type",
-                        value={"type": "string", "value": r.perpetrator},
-                        qualifiers={**cq, "foreign_support": r.foreign_support}, raw_sha256=raw_sha256, selector=sel),
-        ]  # fmt: skip
         e = r.pt_event
         if e is not None:
+            day = s.end.isoformat()
+            sel = {"file": ARCHIGOS_FILE, "row": s.row, "obsid": s.obsid, "columns": ["ccode", "enddate", "exit", "exitcode"]}
             sts.append(
-                KgStatement(key=f"coup:{s.obsid}:pt", subject=cid, property="coup:same_state_and_day_as",
+                KgStatement(key=f"exit:{s.obsid}:pt", subject=s.exit_event_id, property="coup:same_state_and_day_as",
                             object_qid=e.event_id, point_in_time=day, pit_precision=11,
-                            qualifiers={"method": CONTEXT_METHOD, "pt_dataset_version": e.version,
+                            qualifiers={"method": CONTEXT_METHOD, "exitcode": s.exitcode, "pt_dataset_version": e.version,
                                         "pt_selector": {"file": pt_file, "row": e.row}, "pt_raw_sha256": pt_sha256,
                                         "pt_outcome": e.outcome},
                             raw_sha256=raw_sha256, selector=sel)
@@ -992,41 +1028,32 @@ def archigos_kg_records(
 # ----------------------------------------------------------------------------- coded relations (CAUSCORE T1)
 
 
-def coded_claims(
-    removals: Sequence[CoupRemoval], *, archigos_sha256: str, resolver: StateEntityResolver
-) -> list[dict[str, Any]]:
-    """One T1 ``coded_outcome`` claim per Archigos coup removal (cause: the coup as Archigos codes it, effect: the
-    leader's removal from office), as keyword arguments of ``reva.causal.DatasetClaim``. Archigos alone asserts
-    it (one row, one codebook); no other dataset takes part (CAUSDATA convention ``no_join_claims``)."""
-    out = []
-    for r in removals:
-        s = r.spell
-        out.append(
-            {
-                "cause_id": r.event_id,
-                "effect_id": s.exit_event_id,
-                "relation": "coded_outcome",
-                "selector": {"file": ARCHIGOS_FILE, "row": s.row, "obsid": s.obsid,
-                             "columns": ["ccode", "enddate", "exit", "exitcode"]},
-                "raw_sha256": archigos_sha256,
-                "codebook_term": r.codebook_term,
-                "source_claim_id": f"coup_removal:{s.obsid}",
-                "mechanism": s.exitcode,
-                "scope": {"period": {"date": s.end.isoformat()},
-                          "place": [resolver.entity("cow", s.ccode, s.end, s.idacr)]},
-                "tier": "T1",
-            }
-        )  # fmt: skip
-    return out
+def manner_qualifiers(xq: Mapping[str, Any], exitcode: str, cb_src: Mapping[str, Any]) -> dict[str, Any]:
+    """Qualifiers of the exit-manner statement: the codebook passage of THIS exitcode when the codebook has one (else
+    the general EXITCODE passage, said so), with where it sits in the archived codebook (audit M5 / M4)."""
+    term = EXITCODE_PASSAGE.get(exitcode)
+    q = dict(xq)
+    q["codebook_definition"] = CODEBOOK_DEFINITIONS[term or "exitcode"]
+    q["codebook_definition_scope"] = "this exitcode" if term else "the EXITCODE variable (no passage for this value)"
+    src = cb_src.get(term or "exitcode")
+    if src:
+        q["codebook_quote_source"] = dict(src)
+    return q
 
 
-def codebook() -> dict[str, Any]:
-    return {
+def codebook(fetched: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    from reva.adapters.connectors.causdata_common import codebook_sources
+
+    out = {
         "name": f"Archigos: A Data Set on Leaders 1875-2015, Version {ARCHIGOS_RELEASE} (codebook)",
-        "version": ARCHIGOS_RELEASE,
+        "version": f"{ARCHIGOS_RELEASE} (Archigos_4.1.pdf sha256 {ARCHIGOS_CODEBOOK_SHA256[:12]})",
         "url": ARCHIGOS_CODEBOOK_URL,
         "definitions": dict(CODEBOOK_DEFINITIONS),
     }
+    src = codebook_sources(archigos_codebook(), fetched)
+    if src:
+        out["sources"] = src
+    return out
 
 
 def load_claims(
@@ -1038,7 +1065,8 @@ def load_claims(
     retrieved_at: Any,
     origin: str,
 ) -> dict[str, Any]:
-    """Load through CAUSCORE's ``reva.causal.load_dataset_claims`` when it and its tables exist."""
+    """Load through CAUSCORE's ``reva.causal.load_dataset_claims`` when it and its tables exist. Since 1.1.0 the
+    delivery is empty and complete: it retracts the coup -> removal claims of 1.0.0 (audit M5)."""
     try:
         from reva.causal import Codebook, DatasetClaim, load_dataset_claims
     except ImportError:
@@ -1478,14 +1506,14 @@ def atlas_source() -> list[Any]:
                 f"countrycode-{COUNTRYCODE_VERSION}",
             ),
             cadence_seconds=90 * 86400,
-            planned_requests=10,
+            planned_requests=11,  # + the codebook PDF (AUDFIX)
             max_response_bytes=10_000_000,
             min_interval_seconds=2.0,
             parser_version=ARCHIGOS_PARSER,
             field_mappings={
                 "geo": "Correlates of War ccode",
                 "time": "leader spells, day precision",
-                "kg": "archigos:leader:<leadid>, archigos:exit:<obsid>; coded_outcome claims",
+                "kg": "archigos:leader:<leadid>, archigos:exit:<obsid> (one removal event, exitcode verbatim; no claim)",
             },
             notes="Also fetches the Powell & Thyne coup list (exact coup join) and countrycode (CRAN); option "
             "wikidata=1 adds WDQS sitelink lookups (machine-wide Wikidata lock) for same_as.",
@@ -1526,6 +1554,7 @@ def build_archigos(
     countrycode_sha256: str | None = None,
     same_as_responses: Sequence[tuple[bytes, str]] = (),
     strict: bool = True,
+    codebook_fetch: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     sha = hashlib.sha256(dta_body).hexdigest()
     spells, report = parse_archigos(dta_body, strict=strict)
@@ -1535,9 +1564,16 @@ def build_archigos(
     same_as, same_as_report = resolve_same_as(spells, same_as_responses) if same_as_responses else ({}, {})
     resolver = StateEntityResolver(crosswalk, qid_for_iso3)
     ents, sts = archigos_kg_records(
-        spells, raw_sha256=sha, resolver=resolver, removals=removals, pt_sha256=pt_sha, pt_file=pt_file, same_as=same_as
+        spells,
+        raw_sha256=sha,
+        resolver=resolver,
+        removals=removals,
+        pt_sha256=pt_sha,
+        pt_file=pt_file,
+        same_as=same_as,
+        codebook_fetch=codebook_fetch,
     )
-    claims = coded_claims(removals, archigos_sha256=sha, resolver=resolver)
+    claims: list[dict[str, Any]] = []  # Archigos codes one removal, not a cause and an effect (audit M5)
     ents = ents + resolver.code_entities()
     if countrycode_sha256:
         sts = sts + code_correspondence(resolver, raw_sha256=countrycode_sha256)
@@ -1620,6 +1656,10 @@ async def _ingest_archigos(run: Any) -> dict[str, Any]:
             wd = await fetch_same_as(run, spells)
         except SourceResponseError as e:  # WDQS throttled or down: no same_as this run, everything else goes on
             wd, wd_error = [], {"status": "wdqs_unavailable", "error": str(e)[:300], "details": dict(e.details)}
+    sha = run.archive(dta)
+    from reva.adapters.connectors.causdata_common import fetch_codebook
+
+    book = await fetch_codebook(run, archigos_codebook())  # archived as evidence (audit M4)
     out = build_archigos(
         dta.body,
         crosswalk=crosswalk,
@@ -1629,8 +1669,8 @@ async def _ingest_archigos(run: Any) -> dict[str, Any]:
         countrycode_sha256=cc_sha,
         same_as_responses=[(raw.body, hashlib.sha256(raw.body).hexdigest()) for raw, _b in wd],
         strict=run.origin == "live",
+        codebook_fetch=book,
     )
-    sha = run.archive(dta)
     pt_sha = None
     if page_raw is not None and csv_raw is not None:
         run.archive(page_raw)
@@ -1642,6 +1682,7 @@ async def _ingest_archigos(run: Any) -> dict[str, Any]:
         "same_as": wd_error or out["same_as_report"],
         "atlas": {},
         "pt_csv": page.csv_url if page else None,
+        "codebook": {k: book.get(k) for k in ("sha256", "pinned_sha256", "matches", "archived", "status")},
     }
     if run.wants("leaders_cy"):
         r = run.register(
@@ -1671,6 +1712,20 @@ async def _ingest_archigos(run: Any) -> dict[str, Any]:
             raw_sha256s=raws,
             retrieved_at=dta.retrieved_at,
             origin=run.origin,
+        )
+        from reva.adapters.connectors.causdata_common import retract_statements
+
+        # the 1.0.0 coup records (archigos:coup:*) are no longer emitted: retract their statements (append-only)
+        res["kg_retracted"] = retract_statements(
+            run.engine,
+            run.store,
+            source_key=ARCHIGOS_SOURCE_KEY,
+            origin=run.origin,
+            like_patterns=[f"{ARCHIGOS_SOURCE_KEY}:coup:%"],
+            keep=(),
+            raw_sha256s=[sha],
+            retrieved_at=dta.retrieved_at,
+            parameters={"connector": ARCHIGOS_NAME, "reason": "AUDFIX M5: coup records superseded"},
         )
         res["causal"] = load_claims(
             run.engine,
