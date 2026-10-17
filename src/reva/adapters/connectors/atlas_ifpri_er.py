@@ -54,7 +54,8 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.ifpri_er"
-CONNECTOR_VERSION = "1.0.0"
+# 1.0.1: 1.0.0 was registered in the dev DB by a concurrent `reva seed` from a pre-`ruff format` working copy (other digest).
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas_ifpri_er/1"
 SOURCE_KEY = "ifpri.export_restrictions"
 SOURCE = "ifpri_er"

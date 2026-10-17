@@ -25,10 +25,10 @@ adds what was missing for prediction:
 
 | Source (connector, source_key) | URL | Licence | Fetched per full run | Bytes |
 |---|---|---|---|---|
-| USDA FAS PSD Online (`atlas.usda_psd` 1.0.0, `usda.psd`) | `https://apps.fas.usda.gov/psdonline/downloads/psd_grains_pulses_csv.zip`, `.../psd_oilseeds_csv.zip` | Public domain (U.S. Government work, 17 U.S.C. 105); attribution kept | 2 zips | 2,873,599 + 3,844,435 |
+| USDA FAS PSD Online (`atlas.usda_psd` 1.0.1, `usda.psd`) | `https://apps.fas.usda.gov/psdonline/downloads/psd_grains_pulses_csv.zip`, `.../psd_oilseeds_csv.zip` | Public domain (U.S. Government work, 17 U.S.C. 105); attribution kept | 2 zips | 2,873,599 + 3,844,435 |
 | USDA WASDE, OCE "Historical WASDE Report Data" (`atlas.usda_wasde` 1.0.0, `usda.wasde`) | `https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-<YYYY>-<MM>[-V2].csv` | Public domain | one CSV per report 2021-01..current (~69 files + a 404 probe for the 2 `-V2` months and October 2025, which has no report) | ~1 MB each, ~70 MB fetched; ~3 MB on disk after DISKZ zstd (25× on CSV) |
-| FAOSTAT TM detailed trade matrix (`atlas.fao_tm` 1.0.0, `fao.faostat_tm`) | `https://bulks-faostat.fao.org/production/Trade_DetailedTradeMatrix_E_Asia.zip` | CC BY 4.0 (FAO database terms) | 2 HTTP byte ranges: tail 64 KiB (central directory + code lists) and the wide member only | 65,536 + 57,766,824 (already deflated; the 554 MB inflated CSV is streamed, never stored) |
-| IFPRI Food Export Restrictions Tracker (`atlas.ifpri_er` 1.0.0, `ifpri.export_restrictions`) | tool page `https://www.foodsecurityportal.org/node/25` + the two workbooks it links (`…PublicVersion_IFPRI_ExpRestrictions_Covid19_0.xlsx`, `…_UKRRUS.xlsx`) | **ODC-By** ("License: ODC-By" cell B1 of each workbook, checked every run; page: "The Food Export Restrictions Tracker data is made available under the Open Data Commons Attribution License" and "… is licensed under a Creative Commons Attribution 4.0 International License") | 3 GETs | 91,092 + 31,925 + 24,342 |
+| FAOSTAT TM detailed trade matrix (`atlas.fao_tm` 1.0.1, `fao.faostat_tm`) | `https://bulks-faostat.fao.org/production/Trade_DetailedTradeMatrix_E_Asia.zip` | CC BY 4.0 (FAO database terms) | 2 HTTP byte ranges: tail 64 KiB (central directory + code lists) and the wide member only | 65,536 + 57,766,824 (already deflated; the 554 MB inflated CSV is streamed, never stored) |
+| IFPRI Food Export Restrictions Tracker (`atlas.ifpri_er` 1.0.1, `ifpri.export_restrictions`) | tool page `https://www.foodsecurityportal.org/node/25` + the two workbooks it links (`…PublicVersion_IFPRI_ExpRestrictions_Covid19_0.xlsx`, `…_UKRRUS.xlsx`) | **ODC-By** ("License: ODC-By" cell B1 of each workbook, checked every run; page: "The Food Export Restrictions Tracker data is made available under the Open Data Commons Attribution License" and "… is licensed under a Creative Commons Attribution 4.0 International License") | 3 GETs | 91,092 + 31,925 + 24,342 |
 
 Raw archive of one full run ≈ 137 MB fetched, ≈ 70 MB on disk (the TM member dominates). Budgets: request file
 `registry/atlas/budget_requests/v6agri.yaml` merged into budgets-1.3.35 (usda.psd 6/day, usda.wasde 100/day,
@@ -189,7 +189,7 @@ behind the dev-DB lock (see "Commands"). What is verified:
 
 ```bash
 df -h /                                                             # >= 5 GB free
-flock /tmp/reva-devdb.lock uv run reva seed                         # registers atlas.usda_psd / usda_wasde / fao_tm / ifpri_er 1.0.0
+flock /tmp/reva-devdb.lock uv run reva seed                         # registers atlas.usda_psd / fao_tm / ifpri_er 1.0.1, atlas.usda_wasde 1.0.0
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ifpri_er  # 3 requests, ~0.15 MB; KG events
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_psd  # 2 requests, ~7 MB
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_wasde  # ~72 requests, ~72 MB (2021-01..now)

@@ -15,6 +15,7 @@ import re
 from typing import Any
 
 from reva.nlqa.catalog import QaCatalog, fold
+from reva.nlqa.domains import domain_plan
 from reva.nlqa.plan import detect_language
 
 _RANK_DESC = re.compile(
@@ -377,6 +378,16 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
     lang = detect_language(question)
     years = [int(y) for y in _YEAR.findall(question)]
     ops: list[dict[str, Any]] = []
+    countries_early = countries_in(question, catalog)
+    domain = domain_plan(
+        question,
+        catalog,
+        concept_matched=bool(_tied(question, catalog)),
+        countries=countries_early,
+    )
+    if domain is not None:
+        numbered = [{"id": f"s{i + 1}", **o} for i, o in enumerate(domain)]
+        return {"input_language": lang, "restatement": "", "operations": numbered, "unsupported": [], "ambiguities": []}
     causal = causal_plan(question)
     if causal is not None:
         return {"input_language": lang, "restatement": "", "operations": causal, "unsupported": [], "ambiguities": []}

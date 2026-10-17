@@ -174,6 +174,8 @@ _CAUSED_BY = (
     re.compile(r"\b(?:diseases?|infections?|illness(?:es)?)\s+(?:are\s+)?caused\s+by\s+(?P<x>.+?)" + _END, re.I),
     re.compile(r"\bwhat\s+does\s+(?P<x>.+?)\s+cause" + _END, re.I),
 )
+#: a proper name (capital then lower case: "Première Guerre"); acronyms such as "BCE" are not
+_PROPER = re.compile(r"(?:^|[\s'’-])[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]")
 #: causes of death in a country: atlas concepts of the catalog sub-domain ``causes_of_death`` (WHO GHE)
 _DEATH_CAUSES = re.compile(
     r"\bcauses?\s+(?:de\s+|des\s+|du\s+)?(?:d[ée]c[èe]s|mortalit[ée]|morts?)\b|\bcauses?\s+of\s+(?:death|mortality)\b",
@@ -259,7 +261,7 @@ def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, cou
         return [{"op": "decision", "text": text, "magnitude": v, "unit": unit}]
     for rx in _EFFECT:
         m = rx.search(q)
-        if m:
+        if m and not _PROPER.search(m.group("c")):  # "conséquences de la Première Guerre mondiale sur …": causal
             cause, effect = _x(m.group("c")), m.group("e").strip()
             country = countries[0] if countries else None
             if country:  # "sur l'inflation en France": the country is the scope, not part of the effect words
@@ -295,8 +297,6 @@ def domain_plan(question: str, catalog: QaCatalog, *, concept_matched: bool, cou
             if m:
                 ops = _family_ops(_x(m.group("x")), families, reading, count, catalog)
                 if ops:
-                    if families == ("owned_by",) or families == ("owns",):
-                        pass
                     return ops
     if concept_matched:
         return None

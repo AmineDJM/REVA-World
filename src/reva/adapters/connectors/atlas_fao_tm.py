@@ -49,7 +49,8 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.fao_tm"
-CONNECTOR_VERSION = "1.0.0"
+# 1.0.1: 1.0.0 was registered in the dev DB by a concurrent `reva seed` from a pre-`ruff format` working copy (other digest).
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas_fao_tm/1"
 SOURCE_KEY = "fao.faostat_tm"
 SOURCE = "fao_tm"

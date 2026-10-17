@@ -1,0 +1,56 @@
+# Is an atlas cell an observation? One vocabulary for every reader (FIX5, QA-DATA D1/D2).
+#
+# Read ONLY through reva.atlas.projection (PROJECTION_SQL / projection_sql(), is_projection(), kind_class()),
+# which every reader imports: the atlas query layer (headline answers, consulted sources), the decision engine's
+# baseline (reva.predict.db), the forecast registries (reva.evaluation.registry, health_registry), the energy
+# backtests, NLQA (reva.nlqa.ports) and the QA checks (reva.qa.atlas_checks). The API/UI show what those return.
+#
+# A cell is NOT an observation (never answers an observation question; still readable when projections are
+# explicitly allowed, with its flags) when ANY of these holds:
+#   1. flags.estimate_kind is in class `projection`;
+#   2. flags.estimate_kind is set but listed in no class (unknown -> treated as not observed, fail-safe; the
+#      unit test tests/unit/test_fix5_projection_kinds.py lists every value present in the dev DB);
+#   3. a flag in `truthy_flags` is truthy, or a flag in `true_flags` is "true";
+#   4. its period starts after a provider release date carried in the cell (`release_date_flags`);
+#   5. its period starts after the date its table was recorded (fetched) — or, for readers that do not know
+#      that date, after the reader's as-of date: no provider can have observed a period that had not begun.
+#      Kinds in `date_rule_exempt_kinds` and tables in `date_rule_exempt_tables` (announced future dates, a
+#      fact as announced, not a value of a future period) are exempt from 4 and 5.
+version: 1
+classes:
+  # an observed value as published (incl. provisional / revisable releases and vintage history)
+  observation:
+    - observation
+    - actual
+    - published_history
+    - provisional
+    - observation_gridded      # CRU TS station interpolation
+    - announced_schedule       # cbcal: a meeting date as announced (the announcement is the observation)
+  # a provider estimate of a PAST period: answers observation questions, labelled "estimate"
+  estimate:
+    - estimate
+    - estimated
+    - imputed
+    - model_estimate
+    - modelled
+    - modeled
+    - nowcast
+    - reanalysis               # ERA5: model-assimilated reconstruction of observed weather
+  # never an observation
+  projection:
+    - projection
+    - projected
+    - forecast                 # FAOSTAT flag "F" = "Forecast value" (fao.gt 2030 / 2050) — QA-DATA D1
+    - model_simulation         # CMIP6 "historical" experiment: model output, not observed climate
+    - unknown_boundary         # provider series without a history/forecast boundary (EIA STEO, WEO PPP)
+    - published_history_boundary_unknown   # vintage values whose actual/projection boundary is unknown
+truthy_flags: [projection]
+true_flags: [period_after_vintage]
+# provider release timestamps carried in the cell flags (ISO date prefix): EIA STEO `series_last_updated`.
+# The EIA bulk file declares lastHistoricalPeriod 202712 / 2027 on some series of the 2026-10 release
+# (QA-DATA D2: 354 cells 2026-11..2027-12 stored in steo_observed): a period after the release is a forecast.
+release_date_flags: [series_last_updated]
+date_rule_exempt_kinds: [announced_schedule]
+date_rule_exempt_tables:
+  - cbcal.meetings            # scheduled central-bank meetings (dates announced in advance)
+  - untc.treaty_status        # depositary notifications: the date a notified withdrawal / entry into force takes effect
