@@ -1,0 +1,328 @@
+# Universal relation families (REVA V4, owner: V4CORE). Spec: docs/roadmap/v4_world_model.md section 2;
+# format and how to append mappings: docs/dev/v4_v4core.md (top of the file).
+#
+# Every source property (a Wikidata P-id or a namespaced dataset predicate such as `chebi:has_part`) that links
+# two entities maps to ONE family, so that any entity of any kind can be explored by family ("Neurones",
+# /v1/kg/entities/{id}/families, family-constrained paths).
+#
+# Rules (checked by reva.kg.families.validate and tests/unit/test_kg_families.py):
+# * NO family is causal (`causal: false` is a schema constant). A property a source asserts as causal
+#   (Wikidata P828/P1542/P1478/P1479/P1536/P1537, a disease ontology "has material basis in", a pathogen
+#   "causes", an expert "event -> effect") is never mapped here: it goes through the causal loader as an
+#   attributed claim with tier and grade (docs/roadmap/v3_causality.md) and is read through /v1/causal.
+# * `associated_with` is association / co-occurrence, never causation.
+# * A mapped Wikidata property must be in the KG allow-list (registry/kg/properties.yaml) or requested in
+#   registry/kg/property_requests/*.yaml (then its statements simply do not exist until it is allow-listed);
+#   a namespaced predicate must match the KG pid pattern `<ns>:<name>` and be registered by its loader
+#   (reva.kg.model.register_properties) before statements use it.
+# * A property maps to one family only (across this file and every relations_v4.d/*.yaml).
+# * direction: `forward` = "subject <family> object" (P361 part of: wheel part_of car); `reverse` = "object
+#   <family> subject" (rarely needed: prefer mapping to the paired family, e.g. P527 -> has_part forward).
+# * Mappings never merge entities and never map by name similarity: they only say how to read an edge the
+#   source itself published.
+#
+# Agents append their own mappings in registry/kg/relations_v4.d/<agent>.yaml (never edit this file).
+
+version: 1
+owner: V4CORE
+
+families:
+  - id: is_a
+    label: {en: "is a", fr: "est un(e)"}
+    inverse_label: {en: "has instance or subclass", fr: "a pour instance ou sous-classe"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: classification
+    path_cost: 3.0
+    description:
+      en: "Classification: instance of a class or subclass of a class, as the source classifies it."
+      fr: "Classement : instance ou sous-classe d'une classe, selon la source."
+  - id: part_of
+    share_allowed: true
+    label: {en: "is part of", fr: "fait partie de"}
+    inverse_label: {en: "has part", fr: "comprend"}
+    inverse_family: has_part
+    symmetric: false
+    causal: false
+    group: structure
+    path_cost: 1.0
+    description:
+      en: "Mereology: the subject is a component, member or subdivision of the object."
+      fr: "Méréologie : le sujet est un composant, un membre ou une subdivision de l'objet."
+  - id: has_part
+    share_allowed: true
+    label: {en: "has part", fr: "comprend"}
+    inverse_label: {en: "is part of", fr: "fait partie de"}
+    inverse_family: part_of
+    symmetric: false
+    causal: false
+    group: structure
+    path_cost: 1.0
+    description:
+      en: "Mereology: the object is a component, member or subdivision of the subject."
+      fr: "Méréologie : l'objet est un composant, un membre ou une subdivision du sujet."
+  - id: made_of
+    label: {en: "is made of", fr: "est composé de"}
+    inverse_label: {en: "is a constituent of", fr: "est un constituant de"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: structure
+    share_allowed: true
+    path_cost: 1.0
+    description:
+      en: >-
+        Composition: the subject is made of (or from) the object (material, compound, element). When the source
+        gives a share (mass/volume/mole fraction, percentage), it is kept with its unit; otherwise the share is
+        Missing, never zero.
+      fr: >-
+        Composition : le sujet est fait de l'objet (matériau, composé, élément). La part est conservée avec son
+        unité quand la source la donne ; sinon elle est manquante, jamais zéro.
+  - id: located_in
+    label: {en: "is located in", fr: "est situé(e) dans"}
+    inverse_label: {en: "contains (location)", fr: "contient (lieu)"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: space
+    path_cost: 1.0
+    description:
+      en: "Space: the subject is located in, endemic to, or has its range in the object (a place, region, organ)."
+      fr: "Espace : le sujet est situé dans l'objet (lieu, région, organe), y est endémique ou y a son aire."
+  - id: occurs_during
+    label: {en: "occurs during", fr: "a lieu pendant"}
+    inverse_label: {en: "is the period of", fr: "est la période de"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: time
+    path_cost: 1.5
+    description:
+      en: "Time: the subject occurs during or belongs to the object period (era, epoch, reign, quarter)."
+      fr: "Temps : le sujet a lieu pendant la période objet (ère, époque, règne, trimestre)."
+  - id: produces
+    label: {en: "produces", fr: "produit"}
+    inverse_label: {en: "is produced by", fr: "est produit par"}
+    inverse_family: produced_by
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Production: the subject (firm, facility, country, organism) produces the object (product, commodity, compound)."
+      fr: "Production : le sujet (entreprise, site, pays, organisme) produit l'objet (produit, matière, composé)."
+  - id: produced_by
+    label: {en: "is produced by", fr: "est produit par"}
+    inverse_label: {en: "produces", fr: "produit"}
+    inverse_family: produces
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Production seen from the product: the subject is produced (manufactured, extracted, secreted) by the object."
+      fr: "Production vue du produit : le sujet est produit (fabriqué, extrait, sécrété) par l'objet."
+  - id: owns
+    share_allowed: true
+    label: {en: "owns or controls", fr: "possède ou contrôle"}
+    inverse_label: {en: "is owned or controlled by", fr: "est possédé ou contrôlé par"}
+    inverse_family: owned_by
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Ownership or control as the source states it (owner of, parent of a subsidiary); a share is kept when given."
+      fr: "Propriété ou contrôle selon la source (propriétaire, société mère) ; la part est conservée si donnée."
+  - id: owned_by
+    share_allowed: true
+    label: {en: "is owned or controlled by", fr: "est possédé ou contrôlé par"}
+    inverse_label: {en: "owns or controls", fr: "possède ou contrôle"}
+    inverse_family: owns
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Ownership or control seen from the owned entity (owned by, parent organization)."
+      fr: "Propriété ou contrôle vu de l'entité possédée (propriétaire, organisation mère)."
+  - id: supplies
+    label: {en: "supplies", fr: "fournit"}
+    inverse_label: {en: "buys from", fr: "achète à"}
+    inverse_family: buys_from
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Supply chain: the subject supplies goods or services to the object, as a source records it."
+      fr: "Chaîne d'approvisionnement : le sujet fournit des biens ou services à l'objet, selon une source."
+  - id: buys_from
+    label: {en: "buys from", fr: "achète à"}
+    inverse_label: {en: "supplies", fr: "fournit"}
+    inverse_family: supplies
+    symmetric: false
+    causal: false
+    group: economy
+    path_cost: 1.0
+    description:
+      en: "Supply chain seen from the buyer."
+      fr: "Chaîne d'approvisionnement vue de l'acheteur."
+  - id: trades_with
+    label: {en: "trades with", fr: "commerce avec"}
+    inverse_label: {en: "trades with", fr: "commerce avec"}
+    inverse_family: null
+    symmetric: true
+    causal: false
+    group: economy
+    path_cost: 1.5
+    description:
+      en: "Trade relation (flows recorded by a trade source); values stay in the atlas, not in the edge."
+      fr: "Relation commerciale (flux enregistrés par une source) ; les valeurs restent dans l'atlas."
+  - id: eats
+    label: {en: "eats", fr: "mange"}
+    inverse_label: {en: "is eaten by", fr: "est mangé par"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: ecology
+    path_cost: 1.0
+    description:
+      en: "Trophic interaction recorded by an ecology source (eats, preys on, main food source)."
+      fr: "Interaction trophique enregistrée par une source écologique (mange, chasse, source principale de nourriture)."
+  - id: interacts_with
+    label: {en: "interacts with", fr: "interagit avec"}
+    inverse_label: {en: "interacts with", fr: "interagit avec"}
+    inverse_family: null
+    symmetric: true
+    causal: false
+    group: ecology
+    path_cost: 1.5
+    description:
+      en: "Other recorded biological interaction (parasite of, pollinates, host of, protein-protein interaction)."
+      fr: "Autre interaction biologique enregistrée (parasite de, pollinise, hôte de, interaction protéine-protéine)."
+  - id: associated_with
+    label: {en: "is associated with", fr: "est associé à"}
+    inverse_label: {en: "is associated with", fr: "est associé à"}
+    inverse_family: null
+    symmetric: true
+    causal: false
+    group: association
+    path_cost: 2.0
+    description:
+      en: "Association or co-occurrence reported by a source (gene-disease, symptom, use). An association is not a cause."
+      fr: "Association ou co-occurrence rapportée par une source (gène-maladie, symptôme, usage). Une association n'est pas une cause."
+  - id: measured_by
+    label: {en: "is measured by", fr: "est mesuré par"}
+    inverse_label: {en: "measures", fr: "mesure"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: data
+    path_cost: 2.0
+    description:
+      en: "The object is a data series (atlas table/indicator) about the subject; values are read from the atlas."
+      fr: "L'objet est une série de données (table/indicateur de l'atlas) portant sur le sujet ; valeurs lues dans l'atlas."
+  - id: discovered_by
+    label: {en: "was discovered by", fr: "a été découvert par"}
+    inverse_label: {en: "discovered", fr: "a découvert"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: history
+    path_cost: 1.0
+    description:
+      en: "Discovery attribution as the source states it (discoverer or inventor when the source does not separate them)."
+      fr: "Attribution d'une découverte selon la source (découvreur, ou inventeur quand la source ne les distingue pas)."
+  - id: invented_by
+    label: {en: "was invented or developed by", fr: "a été inventé ou développé par"}
+    inverse_label: {en: "invented or developed", fr: "a inventé ou développé"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: history
+    path_cost: 1.0
+    description:
+      en: "Invention or development attribution as the source states it."
+      fr: "Attribution d'une invention ou d'un développement selon la source."
+  - id: regulates
+    label: {en: "regulates", fr: "régule"}
+    inverse_label: {en: "is regulated by", fr: "est régulé par"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: governance
+    path_cost: 1.5
+    description:
+      en: >-
+        Regulation as named by the source (a gene product regulating a process, an authority regulating a sector).
+        A recorded regulatory relation, not an estimated causal effect.
+      fr: >-
+        Régulation nommée par la source (un produit de gène régulant un processus, une autorité régulant un
+        secteur). Une relation de régulation enregistrée, pas un effet causal estimé.
+  - id: context
+    label: {en: "has context", fr: "a pour contexte"}
+    inverse_label: {en: "is context of", fr: "est le contexte de"}
+    inverse_family: null
+    symmetric: false
+    causal: false
+    group: context
+    path_cost: 3.0
+    description:
+      en: "Weak contextual link (main subject, industry, field, significant event): useful for exploring, nothing more."
+      fr: "Lien de contexte faible (sujet principal, secteur, domaine, événement marquant) : utile pour explorer, rien de plus."
+
+# Properties that must NEVER be mapped to a family (source-asserted causal claims: /v1/causal only).
+# Namespaced predicates whose name contains one of `causal_name_markers` are refused too.
+never_map:
+  properties: [P828, P1542, P1478, P1479, P1536, P1537]
+  causal_name_markers: [cause, causes, caused, causal, effect, material_basis, risk_factor, induces, leads_to]
+
+mappings:
+  # ---------------------------------------------------------------- classification
+  - {property: P31, family: is_a, subtype: instance_of, source: wikidata}
+  - {property: P279, family: is_a, subtype: subclass_of, source: wikidata}
+  # ---------------------------------------------------------------- structure
+  - {property: P361, family: part_of, source: wikidata}
+  - {property: P527, family: has_part, source: wikidata, share: {qualifier: P1107, scale: fraction}}
+  - {property: P186, family: made_of, subtype: made_from_material, source: wikidata, share: {qualifier: P1107, scale: fraction}}
+  # ---------------------------------------------------------------- space
+  - {property: P131, family: located_in, subtype: administrative_territorial_entity, source: wikidata}
+  - {property: P276, family: located_in, subtype: location, source: wikidata}
+  - {property: P17, family: located_in, subtype: country, source: wikidata}
+  - {property: P30, family: located_in, subtype: continent, source: wikidata}
+  - {property: P706, family: located_in, subtype: terrain_feature, source: wikidata}
+  - {property: P159, family: located_in, subtype: headquarters, source: wikidata}
+  - {property: P2541, family: located_in, subtype: operating_area, source: wikidata}
+  - {property: P927, family: located_in, subtype: anatomical_location, source: wikidata}
+  - {property: P183, family: located_in, subtype: endemic_to, source: wikidata}
+  - {property: P9714, family: located_in, subtype: taxon_range, source: wikidata}
+  # ---------------------------------------------------------------- time
+  - {property: P2348, family: occurs_during, subtype: time_period, source: wikidata}
+  # ---------------------------------------------------------------- production / ownership
+  - {property: P1056, family: produces, subtype: product_or_material_produced, source: wikidata}
+  - {property: P176, family: produced_by, subtype: manufacturer, source: wikidata}
+  - {property: P1582, family: produced_by, subtype: natural_product_of_taxon, source: wikidata}
+  - {property: P127, family: owned_by, subtype: owned_by, source: wikidata, share: {qualifier: P1107, scale: fraction}}
+  - {property: P1830, family: owns, subtype: owner_of, source: wikidata}
+  - {property: P749, family: owned_by, subtype: parent_organization, source: wikidata,
+     note: "parent organization: control as Wikidata states it, not necessarily an equity share"}
+  - {property: P355, family: owns, subtype: has_subsidiary, source: wikidata,
+     note: "subsidiary: control as Wikidata states it, not necessarily an equity share"}
+  # ---------------------------------------------------------------- ecology
+  - {property: P1034, family: eats, subtype: main_food_source, source: wikidata}
+  # ---------------------------------------------------------------- association (never causation)
+  - {property: P2293, family: associated_with, subtype: genetic_association, source: wikidata}
+  - {property: P780, family: associated_with, subtype: symptoms_and_signs, source: wikidata,
+     note: "a listed symptom is an association reported by Wikidata, not a causal claim"}
+  - {property: P2283, family: associated_with, subtype: uses, source: wikidata}
+  # ---------------------------------------------------------------- discovery / invention
+  - {property: P61, family: discovered_by, subtype: discoverer_or_inventor, source: wikidata}
+  - {property: P178, family: invented_by, subtype: developer, source: wikidata}
+  # ---------------------------------------------------------------- regulation
+  - {property: P128, family: regulates, subtype: regulates_molecular_biology, source: wikidata}
+  # ---------------------------------------------------------------- context
+  - {property: P921, family: context, subtype: main_subject, source: wikidata}
+  - {property: P452, family: context, subtype: industry, source: wikidata}
+  - {property: P793, family: context, subtype: significant_event, source: wikidata}

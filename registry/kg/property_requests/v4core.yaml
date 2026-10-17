@@ -1,0 +1,84 @@
+# Property requests from V4CORE (universal relation families, registry/kg/relations_v4.yaml). Each is mapped to a
+# family; until it is allow-listed (python -m reva.kg.harvest merge-property-requests, which checks id, datatype
+# and the en/fr labels against the property entity itself) no statement uses it and the family simply has no
+# such edge. Labels below are the expected ones; the merge takes the property's own labels.
+- property: P186
+  why: made from material (object -> material), e.g. bronze -> copper, tin; composition with proportion (P1107).
+  reva_predicate: made_from_material
+  inverse: material_of
+  kind: entity
+  group: structure
+  label_en: made from material
+  label_fr: matériau
+- property: P927
+  why: anatomical location (anatomical structure / disease -> body part), e.g. hepatitis -> liver.
+  reva_predicate: anatomical_location
+  inverse: anatomical_location_of
+  kind: entity
+  group: health
+  label_en: anatomical location
+  label_fr: localisation anatomique
+- property: P183
+  why: endemic to (taxon -> place), e.g. a lemur species -> Madagascar.
+  reva_predicate: endemic_to
+  inverse: has_endemic_taxon
+  kind: entity
+  group: nature
+  label_en: endemic to
+  label_fr: endémique de
+- property: P9714
+  why: taxon range (taxon -> geographic area where it occurs).
+  reva_predicate: taxon_range
+  inverse: range_of_taxon
+  kind: entity
+  group: nature
+  label_en: taxon range
+  label_fr: aire de répartition du taxon
+- property: P1582
+  why: natural product of taxon (substance -> producing taxon), e.g. caffeine -> Coffea arabica.
+  reva_predicate: natural_product_of_taxon
+  inverse: taxon_produces_natural_product
+  kind: entity
+  group: nature
+  label_en: natural product of taxon
+  label_fr: produit naturel du taxon
+- property: P1034
+  why: main food source (taxon -> food taxon or material), e.g. koala -> Eucalyptus.
+  reva_predicate: main_food_source
+  inverse: main_food_source_of
+  kind: entity
+  group: nature
+  label_en: main food source
+  label_fr: source principale de nourriture
+- property: P2293
+  why: genetic association (disease -> gene); an association reported by Wikidata, never a cause.
+  reva_predicate: genetic_association
+  inverse: genetically_associated_with
+  kind: entity
+  group: health
+  label_en: genetic association
+  label_fr: association génétique
+- property: P780
+  why: symptoms and signs (disease -> symptom); association, not a causal claim.
+  reva_predicate: symptoms_and_signs
+  inverse: symptom_of
+  kind: entity
+  group: health
+  label_en: symptoms and signs
+  label_fr: symptômes et signes
+- property: P2283
+  why: uses (item -> item it uses), e.g. a process -> a catalyst, a power plant -> a fuel.
+  reva_predicate: uses
+  inverse: used_by
+  kind: entity
+  group: structure
+  label_en: uses
+  label_fr: utilise
+- property: P128
+  why: regulates (molecular biology) (gene product -> biological process).
+  reva_predicate: regulates_molecular_biology
+  inverse: regulated_by_molecular_biology
+  kind: entity
+  group: science
+  label_en: regulates (molecular biology)
+  label_fr: régule (biologie moléculaire)

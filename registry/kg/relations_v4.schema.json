@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reva.world/schema/kg/relations_v4.v1.json",
+  "title": "REVA V4 universal relation families (registry/kg/relations_v4.yaml) and agent mapping drop-ins (registry/kg/relations_v4.d/<agent>.yaml)",
+  "description": "Validate relations_v4.yaml against #/$defs/core and each relations_v4.d/*.yaml against #/$defs/dropin (reva.kg.families does both).",
+  "$ref": "#/$defs/core",
+  "$defs": {
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "en",
+        "fr"
+      ],
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "fr": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z_]{1,31}$"
+    },
+    "pid": {
+      "type": "string",
+      "pattern": "^(P[1-9][0-9]{0,9}|[a-z][a-z0-9_]{1,31}:[a-z][a-z0-9_]{0,63})$"
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "inverse_label",
+        "inverse_family",
+        "symmetric",
+        "causal",
+        "group",
+        "path_cost",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/family_id"
+        },
+        "label": {
+          "$ref": "#/$defs/labels"
+        },
+        "inverse_label": {
+          "$ref": "#/$defs/labels"
+        },
+        "inverse_family": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/family_id"
+            }
+          ]
+        },
+        "symmetric": {
+          "type": "boolean"
+        },
+        "causal": {
+          "const": false,
+          "description": "No relation family is causal; causal claims go through the causal loader (/v1/causal)."
+        },
+        "group": {
+          "type": "string",
+          "pattern": "^[a-z][a-z_]{1,31}$"
+        },
+        "share_allowed": {
+          "type": "boolean"
+        },
+        "path_cost": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "description": {
+          "$ref": "#/$defs/texts"
+        }
+      }
+    },
+    "share": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qualifier",
+        "scale"
+      ],
+      "properties": {
+        "qualifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Qualifier key holding the share in kg.statement.qualifiers (Wikidata P1107, or the dataset's own key such as 'share')."
+        },
+        "scale": {
+          "enum": [
+            "fraction",
+            "percent",
+            "per_mille",
+            "ppm",
+            "source_unit"
+          ]
+        }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "property",
+        "family"
+      ],
+      "properties": {
+        "property": {
+          "$ref": "#/$defs/pid"
+        },
+        "family": {
+          "$ref": "#/$defs/family_id"
+        },
+        "direction": {
+          "enum": [
+            "forward",
+            "reverse"
+          ],
+          "default": "forward"
+        },
+        "subtype": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "share": {
+          "$ref": "#/$defs/share"
+        },
+        "subject_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "uniqueItems": true
+        },
+        "object_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "uniqueItems": true
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "owner",
+        "families",
+        "never_map",
+        "mappings"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "owner": {
+          "const": "V4CORE"
+        },
+        "families": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/family"
+          }
+        },
+        "never_map": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "properties",
+            "causal_name_markers"
+          ],
+          "properties": {
+            "properties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/pid"
+              }
+            },
+            "causal_name_markers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z_]{3,32}$"
+              }
+            }
+          }
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapping"
+          }
+        }
+      }
+    },
+    "dropin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "agent",
+        "mappings"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "agent": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{1,31}$"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapping"
+          }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "en",
+        "fr"
+      ],
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "fr": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    }
+  }
+}

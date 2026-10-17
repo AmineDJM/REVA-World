@@ -1,0 +1,13 @@
+# V4CORE mappings of V3 namespaced dataset predicates already in the KG allow-list (see docs/dev/v4_v4core.md).
+version: 1
+agent: V4CORE
+note: >-
+  V3 dataset predicates read as families. Only entity-valued predicates are mapped. Derived overlays
+  (geo:covered_territory_of) stay unmapped: a computed area overlap is not a located_in statement.
+mappings:
+  - {property: "glottolog:parent", family: part_of, subtype: languoid_parent, source: glottolog}
+  - {property: "glottolog:family", family: part_of, subtype: language_family, source: glottolog}
+  - {property: "glottolog:spoken_in", family: located_in, subtype: spoken_in, source: glottolog}
+  - {property: "cliopatria:member_of", family: part_of, subtype: polity_member_of, source: cliopatria}
+  - {property: "ucdp:location", family: located_in, subtype: conflict_location, source: ucdp}
+  - {property: "unpk:mission_country", family: located_in, subtype: mission_country, source: unpk}
