@@ -15,6 +15,7 @@ const RelationPage = lazy(() => import("./pages/RelationPage"));
 const CausesPage = lazy(() => import("./causal/CausesPage"));
 const FichePage = lazy(() => import("./pages/FichePage"));
 const PrevisionsPage = lazy(() => import("./pages/PrevisionsPage"));
+const DecisionPage = lazy(() => import("../v5/decision/DecisionPage")); // V5 decision engine (PRED-ENGINE)
 
 /** All V3 screens under /v3/* (one lazy chunk per screen), with their own sub-navigation. */
 export default function V3App() {
@@ -62,6 +63,7 @@ export default function V3App() {
           <Route path="relation" element={<RelationPage />} />
           <Route path="causes" element={<CausesPage />} />
           <Route path="demander" element={<DemanderPage />} />
+          <Route path="decision" element={<DecisionPage />} />
           <Route path="previsions" element={<PrevisionsPage />} />
           <Route
             path="*"

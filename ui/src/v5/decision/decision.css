@@ -1,0 +1,163 @@
+.v5-decision {
+  --v5-band-outer: #c9dcf5;
+  --v5-band-inner: #8db6ea;
+  --v5-median: #1f4e8c;
+  --v5-warn-bg: #fff3df;
+  --v5-warn: #7a4a00;
+  --v5-missing: #8a8a8a;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 72rem;
+}
+
+.v5-head h1 {
+  margin-bottom: 0.25rem;
+}
+
+.v5-label {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+  background: var(--v5-warn-bg);
+  color: var(--v5-warn);
+  font-weight: 600;
+}
+
+.v5-form {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border: 1px solid #d6dbe4;
+  border-radius: 0.5rem;
+}
+
+.v5-form fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  border: 1px solid #e3e7ee;
+  border-radius: 0.4rem;
+}
+
+.v5-form label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.92rem;
+}
+
+.v5-assumptions,
+.v5-disclaimers {
+  font-size: 0.9rem;
+}
+
+.v5-problems {
+  color: #8a1c1c;
+}
+
+.v5-validation.is-unvalidated {
+  border-left: 4px solid var(--v5-warn);
+  padding-left: 0.8rem;
+}
+
+.v5-validation.is-validated {
+  border-left: 4px solid #2e7d32;
+  padding-left: 0.8rem;
+}
+
+.v5-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1rem;
+}
+
+.v5-card {
+  border: 1px solid #d6dbe4;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  min-width: 0;
+}
+
+.v5-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.v5-warn {
+  background: var(--v5-warn-bg);
+  color: var(--v5-warn);
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.3rem;
+  font-size: 0.88rem;
+}
+
+.v5-fan {
+  margin: 0.4rem 0;
+}
+
+.v5-fan svg {
+  width: 100%;
+  height: auto;
+}
+
+.v5-band-outer {
+  fill: var(--v5-band-outer);
+}
+
+.v5-band-inner {
+  fill: var(--v5-band-inner);
+}
+
+.v5-band-outer-line {
+  stroke: var(--v5-band-inner);
+  stroke-width: 6;
+}
+
+.v5-median {
+  fill: none;
+  stroke: var(--v5-median);
+  stroke-width: 2;
+}
+
+.v5-median-dot {
+  fill: var(--v5-median);
+}
+
+.v5-zero {
+  stroke: #555;
+  stroke-dasharray: 3 3;
+}
+
+.v5-axis {
+  font-size: 10px;
+  fill: #444;
+}
+
+.v5-missing-mark line {
+  stroke: var(--v5-missing);
+  stroke-dasharray: 2 4;
+}
+
+.v5-missing {
+  color: var(--v5-missing);
+  font-style: italic;
+}
+
+.v5-values {
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+
+.v5-values td,
+.v5-values th {
+  padding: 0.1rem 0.5rem;
+  text-align: right;
+}
+
+.v5-path li {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.v5-empty {
+  font-style: italic;
+}

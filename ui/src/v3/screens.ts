@@ -75,6 +75,13 @@ export const V3_SCREENS: V3Screen[] = [
       "Questions datées, prévisions de référence gelées avant la résolution, scores et calibration ; pas un conseil.",
   },
   {
+    to: "/v3/decision",
+    short: "Décision",
+    label: "Décision — que se passerait-il si… ?",
+    description:
+      "Composer une décision et la propager par des estimations d’effet sourcées et les modèles REVA : éventails, chemin causal, liens non chiffrés ; scénario non validé, pas une probabilité.",
+  },
+  {
     to: "/v3/demander",
     short: "Demander",
     label: "Demander — question en langage naturel",
