@@ -21,7 +21,8 @@ async def _run(db: Any, name: str) -> dict[str, Any]:
     ensure_registered(db.owner, db.store, get_source(name).spec)
     out = await run_atlas_ingest(db.settings, db.worker, db.store, name, mode="fixture")
     assert out["status"] == "completed", out
-    return out["summary"]
+    summary: dict[str, Any] = out["summary"]
+    return summary
 
 
 def _scalar(db: Any, sql: str, **kw: Any) -> Any:
@@ -36,8 +37,11 @@ async def test_parlgov_cabinets_ingest(db: Any) -> None:
     assert not kg["rejected"], kg
     assert kg["statements_inserted"] == s["report"]["kg_statements"]
     # a German cabinet: start day, country, coalition parties
-    cab = _scalar(db, """SELECT subject_qid FROM kg.statement_current WHERE property_pid = 'P580'
-                         AND value->>'time' LIKE '2005-11-22%' AND subject_qid LIKE 'parlgov:cabinet:%'""")
+    cab = _scalar(
+        db,
+        """SELECT subject_qid FROM kg.statement_current WHERE property_pid = 'P580'
+                         AND value->>'time' LIKE '2005-11-22%' AND subject_qid LIKE 'parlgov:cabinet:%'""",
+    )
     n = _scalar(db, "SELECT count(*) FROM kg.statement_current WHERE subject_qid = :c AND property_pid = "
                 "'parlgov:cabinet_party'", c=cab)  # fmt: skip
     assert n == 2

@@ -32,6 +32,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from itertools import pairwise
 from typing import Any
 
 from reva.adapters.connectors import v6politics_common as vc
@@ -129,7 +130,7 @@ def cit_changes(frame: Any, *, input_sha: str) -> tuple[Any, dict[str, Any]]:
         rows_by[(r[0], r[1])].append(r)
     for (ind, geo), rows in sorted(rows_by.items()):
         rep["series"] += 1
-        for prev, new in zip(rows, rows[1:], strict=False):
+        for prev, new in pairwise(rows):
             delta = Decimal(new[5]) - Decimal(prev[5])
             if delta == 0:
                 continue

@@ -34,7 +34,7 @@ def _fixture(conn: str, url_end: str) -> bytes:
             body = (FIX / conn / e["file"]).read_bytes()
             assert hashlib.sha256(body).hexdigest() == e["sha256"]
             assert e["licence"]
-            return body
+            return bytes(body)
     raise AssertionError(f"no fixture {conn} {url_end}")
 
 
@@ -44,7 +44,10 @@ def _sha(b: bytes) -> str:
 
 # ----------------------------------------------------------------------------- ParlGov
 def _parlgov() -> tuple[dict[str, bytes], dict[str, str]]:
-    bodies = {k: _fixture("atlas.parlgov_cabinets", f"{fid}?format=original") for k, (fid, _) in atlas_parlgov_kg.FILES.items()}
+    bodies = {
+        k: _fixture("atlas.parlgov_cabinets", f"{fid}?format=original")
+        for k, (fid, _) in atlas_parlgov_kg.FILES.items()
+    }
     return bodies, {k: _sha(v) for k, v in bodies.items()}
 
 
@@ -207,7 +210,7 @@ def test_bis_rate_changes_from_excerpt() -> None:
 
 def test_cit_rate_changes_from_excerpt() -> None:
     f = _excerpt("oecd_cts_cit_usa_excerpt.csv")
-    out, rep = atlas_politics_derived.cit_changes(f, input_sha="b" * 64)
+    out, _ = atlas_politics_derived.cit_changes(f, input_sha="b" * 64)
     validate_atlas_frame(out, source="oecd", dataset="cts_cit_changes", raw_sha256s=sorted(set(f["raw_sha256"])))
     cit = out.filter(pl.col("indicator") == "CIT_CHANGE|targeting=ST|sector=S1311|unit_measure=PT_INC_TAX")
     assert cit.height == 1 and cit["period_start"][0] == date(2018, 1, 1) and cit["value"][0] == "21"

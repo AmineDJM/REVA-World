@@ -38,7 +38,7 @@ import csv
 import io
 import re
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Any
@@ -89,6 +89,8 @@ RIGHTS: dict[str, Any] = {
     "114(4): 1366-1374.",
     "source_key": SOURCE_KEY,
 }
+
+
 def unit_of(var: str) -> str:
     if var == "n_party":
         return "parties"
@@ -103,6 +105,7 @@ def unit_of(var: str) -> str:
     return "years"
 
 
+_MISSING: dict[str, Any] = {"missing": "not_reported"}
 _NUM = re.compile(r"^-?[0-9]+(\.[0-9]+)?([eE]-?[0-9]+)?$")
 _DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -174,7 +177,9 @@ def build_frames(rows: list[tuple[int, dict[str, str]]], *, raw_sha256: str) -> 
         gstart = _day(r["govern_start_date"], f"{CS_FILE} line {i} govern_start_date")
         gname = _na(r["govern_name"])
         if gstart is not None:
-            g = govs.setdefault((geo, gstart), {"names": [], "ends": [], "years": [], "lines": [], "country": r["country_name"]})
+            g = govs.setdefault(
+                (geo, gstart), {"names": [], "ends": [], "years": [], "lines": [], "country": r["country_name"]}
+            )
             if gname and gname not in g["names"]:
                 g["names"].append(gname)
             end = _day(r["govern_end_date"], f"{CS_FILE} line {i} govern_end_date")
@@ -204,7 +209,7 @@ def build_frames(rows: list[tuple[int, dict[str, str]]], *, raw_sha256: str) -> 
         gs.add(indicator="GOVERNMENT_START", provider_geo=geo, period=(d, date.fromordinal(d.toordinal() + 1)),
                value=None, value_text=g["names"][0] if g["names"] else None, unit="event",
                flags=canon(names=g["names"], end_dates=[e.isoformat() for e in g["ends"]], snapshot_years=g["years"],
-                           based_on=ATTRIBUTION_NOTES["govern"], **({} if g["names"] else {"missing": "not_reported"})),
+                           based_on=ATTRIBUTION_NOTES["govern"], **({} if g["names"] else _MISSING)),
                raw_sha256=raw_sha256, selector=canon(file=CS_FILE, rows=g["lines"], column="govern_start_date"))  # fmt: skip
     for (geo, d), ld in sorted(leaders.items()):
         if len(ld["names"]) > 1:
@@ -213,7 +218,7 @@ def build_frames(rows: list[tuple[int, dict[str, str]]], *, raw_sha256: str) -> 
                value=None, value_text=ld["names"][0] if ld["names"] else None, unit="event",
                flags=canon(names=ld["names"], end_dates=[e.isoformat() for e in ld["ends"]], parties=ld["parties"],
                            snapshot_years=ld["years"], based_on=ATTRIBUTION_NOTES["leader"],
-                           **({} if ld["names"] else {"missing": "not_reported"})),
+                           **({} if ld["names"] else _MISSING)),
                raw_sha256=raw_sha256, selector=canon(file=CS_FILE, rows=ld["lines"], column="leader_start_date"))  # fmt: skip
     rep.update(governments=len(govs), leader_starts=len(leaders), cy_cells=len(cy))
     return cy.frame(), gs.frame(), {**dict(rep), "_govs": govs}

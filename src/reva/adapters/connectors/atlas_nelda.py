@@ -404,8 +404,11 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         code_digest=vc.code_digest(sys.modules[__name__]),
-        field_mappings={"geo": "Gleditsch-Ward ccode (date-aware crosswalk at the round's day)",
-                        "kg": "nelda:election:<electionID>", "predicates": "registry/kg/predicates_politics.yaml"},  # fmt: skip
+        field_mappings={
+            "geo": "Gleditsch-Ward ccode (date-aware crosswalk at the round's day)",
+            "kg": "nelda:election:<electionID>",
+            "predicates": "registry/kg/predicates_politics.yaml",
+        },
         notes="Dataverse record (terms 'public', tab size, codebook MD5) + tab export + codebook PDF + countrycode.",
     )
 

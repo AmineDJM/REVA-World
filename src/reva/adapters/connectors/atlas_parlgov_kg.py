@@ -285,7 +285,10 @@ def cabinet_frames(cabs: Mapping[str, Cabinet], *, raw_sha256: str) -> tuple[Any
                     raw_sha256=raw_sha256, selector=sel)  # fmt: skip
         rep["cabinets"] += 1
     for (iso3, year), cs in sorted(per_year.items()):
-        for ind, sub in (("CABINETS_STARTED", cs), ("CARETAKER_CABINETS_STARTED", [c for c in cs if c.caretaker == "1"])):
+        for ind, sub in (
+            ("CABINETS_STARTED", cs),
+            ("CARETAKER_CABINETS_STARTED", [c for c in cs if c.caretaker == "1"]),
+        ):
             if not sub:
                 continue
             cy.add(
@@ -449,13 +452,18 @@ def atlas_source() -> AtlasSourceSpec:
         min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
         code_digest=vc.code_digest(sys.modules[__name__]),
-        field_mappings={"geo_scheme": "iso3", "kg": "parlgov:party|election|cabinet:<id>",
-                        "predicates": "registry/kg/predicates_politics.yaml"},  # fmt: skip
+        field_mappings={
+            "geo_scheme": "iso3",
+            "kg": "parlgov:party|election|cabinet:<id>",
+            "predicates": "registry/kg/predicates_politics.yaml",
+        },
         notes="Dataverse record (licence CC0 + MD5 of 3 files) checked on every run; KG events + cabinet tables.",
     )
 
 
-def build(bodies: Mapping[str, bytes], shas: Mapping[str, str], *, qids: Mapping[str, str], live: bool) -> dict[str, Any]:
+def build(
+    bodies: Mapping[str, bytes], shas: Mapping[str, str], *, qids: Mapping[str, str], live: bool
+) -> dict[str, Any]:
     mins = MIN_ROWS if live else dict.fromkeys(MIN_ROWS, 1)
     parties = parse_parties(bodies["party"], min_rows=mins["party"])
     cabs = parse_cabinets(bodies["cabinet"], min_rows=mins["cabinet"])

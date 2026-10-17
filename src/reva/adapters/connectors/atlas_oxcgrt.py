@@ -269,7 +269,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     live = run.origin == "live"
     media = {"readme": ("text/plain", "text/markdown"), "licence": ("text/plain",), "codebook": ("text/plain", "text/markdown"),
              "compact": ("text/plain", "text/csv", "application/octet-stream")}  # fmt: skip
-    raws = {k: await run.get(u, key=f"oxcgrt.{k}", media_types=media[k], max_bytes=MAX_BYTES[k]) for k, u in URLS.items()}
+    raws = {
+        k: await run.get(u, key=f"oxcgrt.{k}", media_types=media[k], max_bytes=MAX_BYTES[k]) for k, u in URLS.items()
+    }
     lic = check_licence(raws["readme"].body, raws["licence"].body)
     codebook = parse_codebook(raws["codebook"].body)
     shas = {k: run.archive(r) for k, r in raws.items()}
