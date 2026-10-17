@@ -249,6 +249,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/atlas/tables/{source}/{dataset}/cells": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Table Cells */
+        get: operations["table_cells_v1_atlas_tables__source___dataset__cells_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/belief-releases": {
         parameters: {
             query?: never;
@@ -2510,12 +2527,46 @@ export interface components {
         AtlasHint: {
             /**
              * Concept
-             * @description Atlas catalog concept the series belongs to (GET /v1/atlas/series)
+             * @description Atlas catalog concept (kind concept); null for a table entity
              */
-            concept: string;
+            concept: string | null;
+            /**
+             * Dataset
+             * @description kind table: atlas dataset key
+             */
+            dataset: string | null;
+            /**
+             * Indicator Contains
+             * @description kind table: indicator substring selecting the subject's cells (e.g. classif1=OCU_ISCO08_2)
+             */
+            indicator_contains: string | null;
+            /**
+             * Indicators
+             * @description kind table: exact indicator ids of the subject
+             */
+            indicators: string[];
             /** Iso3 */
             iso3: string | null;
-            /** Table */
+            /**
+             * Kind
+             * @description concept: object atlas:<catalog concept> (GET /v1/atlas/series); table: object atlas:<source>.<dataset> table entity (GET /v1/atlas/tables/{source}/{dataset}/cells)
+             * @enum {string}
+             */
+            kind: "concept" | "table";
+            /**
+             * Provider Geo
+             * @description kind table: the provider's geography code of the subject's cells (regions are not countries)
+             */
+            provider_geo: string | null;
+            /**
+             * Source
+             * @description kind table: atlas source key
+             */
+            source: string | null;
+            /**
+             * Table
+             * @description Atlas table key <source>.<dataset> when the statement names one
+             */
             table: string | null;
         };
         /** AtlasLicence */
@@ -2545,6 +2596,11 @@ export interface components {
             non_commercial: boolean;
             /** Open Licence */
             open_licence: boolean | null;
+            /**
+             * Required Notice
+             * @description Notice the provider's terms require with any presentation or distribution of the values (verbatim; e.g. New York Fed reference rates): show it wherever these values are shown
+             */
+            required_notice: string | null;
             /**
              * Restricted
              * @description Any non-commercial, share-alike, no-derivatives or not-open term
@@ -2652,6 +2708,11 @@ export interface components {
             non_commercial: boolean;
             /** Open Licence */
             open_licence: boolean | null;
+            /**
+             * Required Notice
+             * @description Notice the provider's terms require with any presentation or distribution of the values (verbatim; e.g. New York Fed reference rates): show it wherever these values are shown
+             */
+            required_notice: string | null;
             /**
              * Restricted
              * @description Any non-commercial, share-alike, no-derivatives or not-open term
@@ -2776,6 +2837,100 @@ export interface components {
             year_max: number | null;
             /** Year Min */
             year_min: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AtlasTableCells */
+        AtlasTableCells: {
+            /**
+             * Cells
+             * @description Only when a geography (provider_geo or iso3) is given
+             */
+            cells: components["schemas"]["AtlasCell"][];
+            /**
+             * Concepts
+             * @description Catalog concepts whose source order reads this table
+             */
+            concepts: string[];
+            /** Dataset */
+            dataset: string;
+            /** Filters */
+            filters: {
+                [key: string]: unknown;
+            };
+            /**
+             * In Snapshot
+             * @description false: the table is not pinned by this atlas snapshot (absent, not empty)
+             */
+            in_snapshot: boolean;
+            /** Indicators */
+            indicators: components["schemas"]["AtlasTableIndicator"][];
+            /**
+             * Licences
+             * @default []
+             */
+            licences: components["schemas"]["AtlasLicence"][];
+            /** Source */
+            source: string;
+            /**
+             * Table
+             * @description <source>.<dataset>
+             */
+            table: string;
+            /** Truncated */
+            truncated: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AtlasTableCellsResponse */
+        AtlasTableCellsResponse: {
+            data: components["schemas"]["AtlasTableCells"];
+            /** Notes */
+            notes: string[];
+            snapshot: components["schemas"]["AtlasSnapshotRef"];
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings: components["schemas"]["ApiWarning"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** AtlasTableIndicator */
+        AtlasTableIndicator: {
+            /** Cells */
+            cells: number;
+            /**
+             * Countries
+             * @description Distinct ISO3 countries among them
+             */
+            countries: number;
+            /**
+             * Geographies
+             * @description Distinct provider geographies (regions are never countries)
+             */
+            geographies: number;
+            /** Indicator */
+            indicator: string;
+            /** Period First */
+            period_first: string;
+            /**
+             * Period Last
+             * @description Exclusive end of the last period
+             */
+            period_last: string;
+            /**
+             * Series
+             * @description <source>.<dataset>.<indicator>
+             */
+            series: string;
+            /** Unit */
+            unit: string | null;
+            /**
+             * Values
+             * @description Cells with a value (the others are flagged missing rows)
+             */
+            values: number;
         } & {
             [key: string]: unknown;
         };
@@ -5621,6 +5776,11 @@ export interface components {
             shock: {
                 [key: string]: unknown;
             } | null;
+            /**
+             * Shock Profile
+             * @description How the cause moves in the experiment: one_time_impulse, sustained, permanent_level_shift, state_indicator, contemporaneous_relation, cross_sectional or unspecified (lag profiles are responses to it)
+             */
+            shock_profile: string;
             /**
              * Sign
              * @enum {string}
@@ -12382,6 +12542,11 @@ export interface components {
             non_commercial: boolean;
             /** Open Licence */
             open_licence: boolean | null;
+            /**
+             * Required Notice
+             * @description Notice the provider's terms require next to any presentation of the value (verbatim)
+             */
+            required_notice: string | null;
             /** Restricted */
             restricted: boolean;
             /** Restriction */
@@ -13125,6 +13290,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AtlasSeriesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    table_cells_v1_atlas_tables__source___dataset__cells_get: {
+        parameters: {
+            query?: {
+                /** @description Provider geography code */
+                provider_geo?: string | null;
+                iso3?: string | null;
+                /** @description Exact indicator ids (repeatable) */
+                indicator?: string[] | null;
+                /** @description Indicator substring */
+                indicator_contains?: string | null;
+                limit?: number;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path: {
+                source: string;
+                dataset: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AtlasTableCellsResponse"];
                 };
             };
             /** @description Validation Error */

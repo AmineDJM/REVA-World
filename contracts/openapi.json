@@ -2100,9 +2100,48 @@
         "additionalProperties": false,
         "properties": {
           "concept": {
-            "description": "Atlas catalog concept the series belongs to (GET /v1/atlas/series)",
-            "title": "Concept",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Atlas catalog concept (kind concept); null for a table entity",
+            "title": "Concept"
+          },
+          "dataset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "kind table: atlas dataset key",
+            "title": "Dataset"
+          },
+          "indicator_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "kind table: indicator substring selecting the subject's cells (e.g. classif1=OCU_ISCO08_2)",
+            "title": "Indicator Contains"
+          },
+          "indicators": {
+            "description": "kind table: exact indicator ids of the subject",
+            "items": {
+              "type": "string"
+            },
+            "title": "Indicators",
+            "type": "array"
           },
           "iso3": {
             "anyOf": [
@@ -2115,6 +2154,39 @@
             ],
             "title": "Iso3"
           },
+          "kind": {
+            "description": "concept: object atlas:<catalog concept> (GET /v1/atlas/series); table: object atlas:<source>.<dataset> table entity (GET /v1/atlas/tables/{source}/{dataset}/cells)",
+            "enum": [
+              "concept",
+              "table"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "provider_geo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "kind table: the provider's geography code of the subject's cells (regions are not countries)",
+            "title": "Provider Geo"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "kind table: atlas source key",
+            "title": "Source"
+          },
           "table": {
             "anyOf": [
               {
@@ -2124,13 +2196,20 @@
                 "type": "null"
               }
             ],
+            "description": "Atlas table key <source>.<dataset> when the statement names one",
             "title": "Table"
           }
         },
         "required": [
+          "kind",
           "concept",
           "iso3",
-          "table"
+          "table",
+          "source",
+          "dataset",
+          "provider_geo",
+          "indicators",
+          "indicator_contains"
         ],
         "title": "AtlasHint",
         "type": "object"
@@ -2194,6 +2273,18 @@
             ],
             "title": "Open Licence"
           },
+          "required_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Notice the provider's terms require with any presentation or distribution of the values (verbatim; e.g. New York Fed reference rates): show it wherever these values are shown",
+            "title": "Required Notice"
+          },
           "restricted": {
             "description": "Any non-commercial, share-alike, no-derivatives or not-open term",
             "title": "Restricted",
@@ -2231,6 +2322,7 @@
           "restricted",
           "basis",
           "restriction",
+          "required_notice",
           "source"
         ],
         "title": "AtlasLicence",
@@ -2446,6 +2538,18 @@
             ],
             "title": "Open Licence"
           },
+          "required_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Notice the provider's terms require with any presentation or distribution of the values (verbatim; e.g. New York Fed reference rates): show it wherever these values are shown",
+            "title": "Required Notice"
+          },
           "restricted": {
             "description": "Any non-commercial, share-alike, no-derivatives or not-open term",
             "title": "Restricted",
@@ -2478,7 +2582,8 @@
           "open_licence",
           "restricted",
           "basis",
-          "restriction"
+          "restriction",
+          "required_notice"
         ],
         "title": "AtlasRights",
         "type": "object"
@@ -2806,6 +2911,183 @@
           "year_max"
         ],
         "title": "AtlasSourceCoverage",
+        "type": "object"
+      },
+      "AtlasTableCells": {
+        "additionalProperties": true,
+        "properties": {
+          "cells": {
+            "description": "Only when a geography (provider_geo or iso3) is given",
+            "items": {
+              "$ref": "#/components/schemas/AtlasCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "concepts": {
+            "description": "Catalog concepts whose source order reads this table",
+            "items": {
+              "type": "string"
+            },
+            "title": "Concepts",
+            "type": "array"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "filters": {
+            "additionalProperties": true,
+            "title": "Filters",
+            "type": "object"
+          },
+          "in_snapshot": {
+            "description": "false: the table is not pinned by this atlas snapshot (absent, not empty)",
+            "title": "In Snapshot",
+            "type": "boolean"
+          },
+          "indicators": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasTableIndicator"
+            },
+            "title": "Indicators",
+            "type": "array"
+          },
+          "licences": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AtlasLicence"
+            },
+            "title": "Licences",
+            "type": "array"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "table": {
+            "description": "<source>.<dataset>",
+            "title": "Table",
+            "type": "string"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "table",
+          "source",
+          "dataset",
+          "in_snapshot",
+          "filters",
+          "concepts",
+          "indicators",
+          "cells",
+          "truncated",
+          "licences"
+        ],
+        "title": "AtlasTableCells",
+        "type": "object"
+      },
+      "AtlasTableCellsResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AtlasTableCells"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasTableCellsResponse",
+        "type": "object"
+      },
+      "AtlasTableIndicator": {
+        "additionalProperties": true,
+        "properties": {
+          "cells": {
+            "title": "Cells",
+            "type": "integer"
+          },
+          "countries": {
+            "description": "Distinct ISO3 countries among them",
+            "title": "Countries",
+            "type": "integer"
+          },
+          "geographies": {
+            "description": "Distinct provider geographies (regions are never countries)",
+            "title": "Geographies",
+            "type": "integer"
+          },
+          "indicator": {
+            "title": "Indicator",
+            "type": "string"
+          },
+          "period_first": {
+            "title": "Period First",
+            "type": "string"
+          },
+          "period_last": {
+            "description": "Exclusive end of the last period",
+            "title": "Period Last",
+            "type": "string"
+          },
+          "series": {
+            "description": "<source>.<dataset>.<indicator>",
+            "title": "Series",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "values": {
+            "description": "Cells with a value (the others are flagged missing rows)",
+            "title": "Values",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "indicator",
+          "series",
+          "cells",
+          "values",
+          "geographies",
+          "countries",
+          "period_first",
+          "period_last",
+          "unit"
+        ],
+        "title": "AtlasTableIndicator",
         "type": "object"
       },
       "Backtest": {
@@ -31955,6 +32237,18 @@
             ],
             "title": "Open Licence"
           },
+          "required_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Notice the provider's terms require next to any presentation of the value (verbatim)",
+            "title": "Required Notice"
+          },
           "restricted": {
             "title": "Restricted",
             "type": "boolean"
@@ -31986,7 +32280,8 @@
           "open_licence",
           "restricted",
           "basis",
-          "restriction"
+          "restriction",
+          "required_notice"
         ],
         "title": "ValueRights",
         "type": "object"
@@ -33925,6 +34220,187 @@
           }
         },
         "summary": "Concept Series",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/tables/{source}/{dataset}/cells": {
+      "get": {
+        "operationId": "table_cells_v1_atlas_tables__source___dataset__cells_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,23}$",
+              "title": "Source",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "dataset",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,38}$",
+              "title": "Dataset",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Provider geography code",
+            "in": "query",
+            "name": "provider_geo",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9_.-]{1,40}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Provider geography code",
+              "title": "Provider Geo"
+            }
+          },
+          {
+            "in": "query",
+            "name": "iso3",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z]{3}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Iso3"
+            }
+          },
+          {
+            "description": "Exact indicator ids (repeatable)",
+            "in": "query",
+            "name": "indicator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exact indicator ids (repeatable)",
+              "title": "Indicator"
+            }
+          },
+          {
+            "description": "Indicator substring",
+            "in": "query",
+            "name": "indicator_contains",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Indicator substring",
+              "title": "Indicator Contains"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 2000,
+              "maximum": 5000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: live in production, else the latest snapshot of any origin)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasTableCellsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Table Cells",
         "tags": [
           "atlas"
         ]
