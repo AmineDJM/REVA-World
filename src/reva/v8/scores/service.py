@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -61,7 +61,9 @@ def page(doc: Mapping[str, Any], *, sealed: Mapping[str, int] | None = None, roo
     tgt_order = [t["id"] for t in doc["targets"]]
     used_targets = {c["target"] for c in cs.values()} | {n["target"] for n in doc["no_track"]}
     official = [f for f in doc["forecasters"]]
-    used_f = {c["forecaster"] for c in cs.values() if c["forecaster"]} | {n["forecaster"] for n in doc["no_track"] if n["forecaster"]}
+    used_f = {c["forecaster"] for c in cs.values() if c["forecaster"]} | {
+        n["forecaster"] for n in doc["no_track"] if n["forecaster"]
+    }
     no_track = {f"{n['target']}~{n['forecaster'] or 'none'}": n for n in doc["no_track"]}
     matrix_rows = []
     for d in doc["domains"]:
@@ -113,7 +115,9 @@ def page(doc: Mapping[str, Any], *, sealed: Mapping[str, int] | None = None, roo
         "matrix": matrix_rows,
         "tracks": tracks,
         "calendar": _calendar(doc, sealed),
-        "vocab": {k: doc[k] for k in ("verdicts", "evaluations", "benchmark_kinds", "candidate_kinds", "metrics", "caveats")},
+        "vocab": {
+            k: doc[k] for k in ("verdicts", "evaluations", "benchmark_kinds", "candidate_kinds", "metrics", "caveats")
+        },
         "sources": doc["sources"],
         "stale_sources": stale_sources(doc, root),
         "sealed_models": dict(sealed) if sealed is not None else None,
@@ -152,7 +156,7 @@ def track_detail(doc: Mapping[str, Any], tid: str, *, sealed: Mapping[str, int] 
     }
 
 
-def charts(tid: str, rows: list[Mapping[str, Any]], root: Path = REPO) -> list[dict[str, Any]]:
+def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> list[dict[str, Any]]:
     """Chart-ready series copied from the track's result files (nothing computed beyond selection)."""
     f = _Files(root)
     out: list[dict[str, Any]] = []

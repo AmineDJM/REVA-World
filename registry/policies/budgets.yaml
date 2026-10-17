@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.39"
+policy_version: "budgets-1.3.40"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -199,6 +199,8 @@ per_source_daily_requests:
   nist.codata: 4
   # noaa.ghcnm: requested by V4CLIMATE (v4climate.yaml)
   noaa.ghcnm: 10
+  # noaa.ncei_cag: requested by BEAT-AGRI (beat_agri.yaml)
+  noaa.ncei_cag: 12
   # noaa.ncei_hazards: requested by A-HAZARDS (a_hazards.yaml), AUDFIX (audfix.yaml)
   noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
@@ -307,6 +309,8 @@ per_source_daily_requests:
   usda.psd: 6
   # usda.wasde: requested by V6AGRI (v6agri.yaml)
   usda.wasde: 100
+  # usda.wasde_esmis: requested by BEAT-AGRI (beat_agri.yaml)
+  usda.wasde_esmis: 450
   # usgs.sciencebase: requested by A-RESOURCES (a_resources.yaml)
   usgs.sciencebase: 20
   # ustreasury.rates: requested by PRED-HF (pred_hf.yaml)

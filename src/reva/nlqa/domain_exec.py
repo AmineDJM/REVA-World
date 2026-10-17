@@ -502,6 +502,20 @@ class DomainOps:
         consulted = _consulted(res, order, atlas.name)
         data: dict[str, Any] = {"concept": concept, "from_year": a["from_year"], "to_year": a["to_year"]}
         groups = _by_source(res.cells, order)
+        tables = getattr(self.b, "tables", None)
+        if not groups and tables is not None:
+            # V8ASK: the declared series may sit in a table registered after the atlas snapshot
+            # (reva.nlqa.registered_tables); every cell names its table version and "outside_snapshot"
+            try:
+                cells, pins = tables.period_cells(
+                    concept.id, [(s.source, s.dataset, s.indicator) for s in order], a["from_year"], a["to_year"]
+                )
+            except Exception:  # a table read failure leaves the snapshot's absence as the answer
+                cells, pins = [], []
+            consulted = [*consulted, tables.name]
+            groups = _by_source(cells, order)
+            if groups:
+                data["registered_tables"] = pins
         if not groups:
             data["absence"] = ev.absence(
                 "atlas_period", consulted, concept=concept.id, from_year=a["from_year"], to_year=a["to_year"]

@@ -1,0 +1,1258 @@
+# REVA V8 — queued loads and owner decisions (agent V8COUVERTURE, transcribed 2026-10-17 from the agents' reports and
+# the lead's integration todo). Machine-readable; validated by tests/unit/v8/test_v8_coverage_registry.py and
+# `uv run reva v8 coverage check-pending`. Served by /v1/v8/coverage/pending and /decisions; the console
+# (/v8/couverture) shows the queued loads with a live check against the database (connector acquisitions and atlas
+# tables), so a load done later is shown "constaté chargé" without editing this file.
+#
+# type: load (a command the lead runs) | decision (something only the owner can decide or obtain)
+# kind: licence | account_key | permission | disk | bigger_machine | attribution_contact | policy_choice
+# status (as written in the report): open | queued | blocked | done | dropped
+# disk_mb: the report's estimate of raw + stored growth (null when the report gives none). The dev box keeps a
+# 5 GB free-disk floor for any ingest (docs/dev/HANDOFF_V3.md); loads are blocked by that floor, not by their size.
+# No e-mail address and no personal data in this file (the validator refuses them).
+schema: reva-v8-coverage-pending/1
+updated: "2026-10-17"
+note: "Statuses are those of the reports at transcription time; the live check of each load is computed by the API."
+items:
+  # ------------------------------------------------------------------------------------------- queued loads (disk)
+  - id: load.v6politics
+    type: load
+    kind: disk
+    title: Politique — cabinets ParlGov, NELDA, WhoGov, OxCGRT, changements de taux directeurs et d’IS
+    unlocks:
+      domains: [politics, finance]
+      atlas_sources: [parlgov, nelda, whogov, oxcgrt, bis, oecd]
+      tables: [atlas.parlgov.cabinets, atlas.parlgov.cabinets_cy, atlas.bis.cbpol_d_changes, atlas.oecd.cts_cit_changes]
+      text: Gouvernements et coalitions (ParlGov), élections (NELDA), composition des gouvernements (WhoGov), mesures Covid (OxCGRT), séries d’annonces de taux et d’impôt sur les sociétés.
+    action: Lancer les ingestions sous le verrou quand au moins 5 Go sont libres (seed d’abord).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.parlgov_cabinets
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.nelda
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.whogov
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.oxcgrt
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.bis_cbpol_changes
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.oecd_cit_changes
+    who: lead
+    status: queued
+    disk_mb: 55
+    source_docs: [docs/dev/v6_politics.md, lead:final4_todo]
+    check:
+      - {connector: atlas.parlgov_cabinets}
+      - {connector: atlas.nelda}
+      - {connector: atlas.whogov}
+      - {connector: atlas.oxcgrt}
+      - {connector: atlas.bis_cbpol_changes, tables: [atlas.bis.cbpol_d_changes]}
+      - {connector: atlas.oecd_cit_changes, tables: [atlas.oecd.cts_cit_changes]}
+  - id: load.v6signals.gdelt
+    type: load
+    kind: disk
+    title: Signaux GDELT — 730 jours d’événements (échantillon 1/96) et chronologies DOC
+    unlocks:
+      domains: [conflict]
+      atlas_sources: [gdelt]
+      tables: [atlas.gdelt.events_cd]
+      tracks: [pred-conflict:signals, pred-fin:signals]
+      text: Comptes quotidiens d’événements par pays (CAMEO) et tonalité médiatique par thème, candidats signaux pour les prévisions de conflits et de finance.
+    action: Lancer le rattrapage de 730 jours puis les chronologies DOC (lentes sous limitation 429).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gdelt_events --option days=730 --option end=2026-10-16
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gdelt_doc
+    who: lead
+    status: queued
+    disk_mb: 95
+    source_docs: [docs/dev/v6_signals.md, lead:final4_todo]
+    check:
+      - {connector: atlas.gdelt_events}
+      - {connector: atlas.gdelt_doc}
+  - id: load.v4eco.pending
+    type: load
+    kind: disk
+    title: Écologie — occurrences GBIF par pays, ODD (Red List Index), OWID (Living Planet Index), FAO QCL (cheptels)
+    unlocks:
+      domains: [environment, agriculture]
+      atlas_sources: [gbif_occ, un_sdg, owid, fao]
+      tables: [atlas.owid.g_living_planet_index, atlas.fao.qcl]
+      text: Où vivent les espèces (comptes d’occurrences GBIF par pays et règne), indice Liste rouge, tendances Living Planet, 9 cheptels de plus.
+    action: Lancer les quatre ingestions (OPSLOAD les avait en file).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gbif_occ
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.un_sdg
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.owid
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.fao --dataset qcl
+    who: lead
+    status: queued
+    disk_mb: 20
+    source_docs: [docs/dev/v4_v4eco.md, docs/dev/v6_opsload.md, lead:final4_todo]
+    check:
+      - {connector: atlas.gbif_occ}
+      - {connector: atlas.un_sdg, min_version: 1.1.1}
+      - {connector: atlas.owid, min_version: 1.1.1, tables: [atlas.owid.g_living_planet_index]}
+      - {connector: atlas.fao, min_version: 1.0.3, tables: [atlas.fao.qcl]}
+  - id: load.opsload.belief_inputs
+    type: load
+    kind: disk
+    title: Entrées du modèle de retraite (démographie Eurostat, marché du travail) et publication de la release
+    unlocks:
+      domains: [population, macro]
+      tracks: [pred-engine:retirement, pred-engine:io]
+      text: La release de croyances épingle FIGARO 2024 et les entrées retraite ; la France n’est pas encore couverte (le moteur de décision refuse la France tant que manquant).
+    action: Terminer la démographie (≈2 runs, curseur reprenable), lancer labour_pensions, puis publier la release.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva ingest --live --connector eurostat.demography
+      - flock /tmp/reva-devdb.lock uv run reva ingest --live --connector eurostat.labour_pensions
+      - flock /tmp/reva-devdb.lock uv run reva beliefs publish --origin live
+      - uv run python -m reva.predict.run --reference all --draws 2000 --seed 0 --out var/predict/reference.json
+    who: lead
+    status: queued
+    disk_mb: 10
+    source_docs: [docs/dev/v6_opsload.md, docs/dev/v5_pred_engine.md, lead:final4_todo]
+    check:
+      - {connector: eurostat.demography}
+      - {connector: eurostat.labour_pensions}
+  - id: load.v6migration
+    type: load
+    kind: disk
+    title: Migrations — IDMC national, demandes d’asile UNHCR et Eurostat, migrants disparus (OIM)
+    unlocks:
+      domains: [migration]
+      atlas_sources: [idmc, unhcr, iom, eurostat]
+      tables: [atlas.eurostat.asylum_applicants_m]
+      text: Déplacements internes par pays, flux de demandes d’asile origine→destination, décès de migrants ; liens pays↔pays refugee_flow et asylum_applications.
+    action: Lancer les quatre ingestions puis l’instantané atlas et la matérialisation des liens.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.idmc_national
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.unhcr_asylum
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.iom_mmp
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_asylum
+    who: lead
+    status: queued
+    disk_mb: 20
+    source_docs: [docs/dev/v6_migration.md, lead:final4_todo]
+    check:
+      - {connector: atlas.idmc_national}
+      - {connector: atlas.unhcr_asylum}
+      - {connector: atlas.iom_mmp}
+      - {connector: atlas.eurostat_asylum, tables: [atlas.eurostat.asylum_applicants_m]}
+  - id: load.v6infra
+    type: load
+    kind: disk
+    title: Infrastructures — UN/LOCODE, ports (NGA WPI 1.1), IMF PortWatch, RCS-Dem
+    unlocks:
+      domains: [infrastructure, culture]
+      atlas_sources: [unlocode, nga, portwatch, rcs]
+      text: Ports et lieux de transport codés, trafic portuaire mensuel par pays et points de passage, religions par pays (RCS-Dem 2.0).
+    action: "Lancer les ingestions (seed d’abord : versions relevées)."
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.unlocode
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf_portwatch
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.nga_wpi
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.rcs_dem
+    who: lead
+    status: queued
+    disk_mb: 67
+    source_docs: [docs/dev/v6_infra.md, lead:final4_todo]
+    check:
+      - {connector: atlas.unlocode}
+      - {connector: atlas.imf_portwatch}
+      - {connector: atlas.nga_wpi, min_version: 1.1.1}
+      - {connector: atlas.rcs_dem}
+  - id: load.v6culture
+    type: load
+    kind: disk
+    title: Culture — sujets Open Library, statistiques culturelles UIS, médailles olympiques
+    unlocks:
+      domains: [culture]
+      atlas_sources: [openlibrary, uis, olympics]
+      text: Livres par sujet, indicateurs culturels de l’UNESCO, tableaux de médailles ; puis la moisson Wikidata culture (WDOPS).
+    action: Lancer les trois ingestions restantes, puis fusionner les demandes de propriétés et moissonner les specs culture.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.openlibrary_subjects
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.uis_culture
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.olympics_medals
+      - uv run python -m reva.kg.harvest merge-property-requests
+      - uv run python -m reva.kg.harvest run registry/kg/queries/culture/v6 --via api
+    who: lead
+    status: queued
+    disk_mb: 6
+    source_docs: [docs/dev/v6_culture.md, lead:final4_todo]
+    check:
+      - {connector: atlas.openlibrary_subjects}
+      - {connector: atlas.uis_culture}
+      - {connector: atlas.olympics_medals}
+  - id: load.v6digital
+    type: load
+    kind: disk
+    title: Numérique — coupures d’Internet (Access Now STOP) et cyber-opérations (CFR)
+    unlocks:
+      domains: [digital]
+      atlas_sources: [keepiton, cfr_cyber]
+      text: Coupures d’Internet par pays et année, cyber-opérations attribuées ; licences restrictives (usage privé, signalé).
+    action: Lancer les deux ingestions (licences restrictives — usage interne seulement tant que les décisions licence ne sont pas prises).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.keepiton
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.cfr_cyber
+    who: lead
+    status: queued
+    disk_mb: 5
+    source_docs: [docs/dev/v6_digital.md, lead:final4_todo]
+    check:
+      - {connector: atlas.keepiton}
+      - {connector: atlas.cfr_cyber}
+  - id: load.fix4a.reruns
+    type: load
+    kind: disk
+    title: Corrections FIX4A — ClinGen (courbes négatives), Carbon Brief et écorégions (identités), puis rafraîchissement causal
+    unlocks:
+      domains: [health, climate, environment]
+      atlas_sources: [clingen, attribution_cb, ecoregions]
+      text: 296 curations ClinGen négatives sorties de « associé à », règles d’identité des entités Carbon Brief / RESOLVE, 0 affirmation causale non notée.
+    action: Relancer les trois connecteurs puis le rafraîchissement causal et la QA causale.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.clingen
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.attribution_cb
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ecoregions
+      - flock /tmp/reva-devdb.lock uv run reva causal refresh --origin live
+      - uv run reva qa run --domain causal --domain kg
+    who: lead
+    status: queued
+    disk_mb: 2
+    source_docs: [docs/dev/v6_fix4a.md, lead:final4_todo]
+    check:
+      - {connector: atlas.clingen, min_version: 1.1.1}
+      - {connector: atlas.attribution_cb, min_version: 1.1.0}
+      - {connector: atlas.ecoregions, min_version: 1.1.0}
+  - id: load.v6agri
+    type: load
+    kind: disk
+    title: Agriculture — restrictions d’exportation IFPRI, USDA PSD et WASDE, flux FAO (TM)
+    unlocks:
+      domains: [agriculture]
+      atlas_sources: [ifpri_er, usda_psd, usda_wasde, fao_tm]
+      tracks: [beat-agri:wasde]
+      text: Bilans offre/utilisation par pays et produit, prévisions WASDE (référence officielle pour BEAT-AGRI), matrices de commerce agricole, événements de restriction d’exportation.
+    action: Lancer les quatre ingestions (≈137 Mo téléchargés, ≈70 Mo stockés).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ifpri_er
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_psd
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_wasde
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.fao_tm
+    who: lead
+    status: queued
+    disk_mb: 137
+    source_docs: [docs/dev/v6_agri.md, lead:final4_todo]
+    check:
+      - {connector: atlas.ifpri_er}
+      - {connector: atlas.usda_psd}
+      - {connector: atlas.usda_wasde}
+      - {connector: atlas.fao_tm}
+  - id: load.v6findata
+    type: load
+    kind: disk
+    title: Finance — statistiques financières BRI (API et fichiers), BCE, bilan de la Fed (H.4.1)
+    unlocks:
+      domains: [finance]
+      atlas_sources: [bis, ecb, frb]
+      text: Crédit, prix immobiliers, positions bancaires, bilans des banques centrales (Fed), courbes de la BCE.
+    action: Lancer les ingestions restantes (BoE, Fama/French et IMF fin sont déjà chargés).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.bis_fin
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.bis_fin_bulk
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ecb_fin
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.frb_h41
+    who: lead
+    status: queued
+    disk_mb: 59
+    source_docs: [docs/dev/v6_findata.md, lead:final4_todo]
+    check:
+      - {connector: atlas.bis_fin}
+      - {connector: atlas.bis_fin_bulk}
+      - {connector: atlas.ecb_fin}
+      - {connector: atlas.frb_h41}
+  - id: load.fix6.ucdp
+    type: load
+    kind: disk
+    title: Conflits — réingestion UCDP GED 1.0.1 (règle de frontière) et UCDP (GW 260 → Allemagne)
+    unlocks:
+      domains: [conflict]
+      atlas_sources: [ucdp_ged, ucdp]
+      tracks: [pred-conflict]
+      text: 2 651 événements frontaliers non placés au lieu d’être attribués à un autre pays, 215 liens located_in rétractés ; l’Allemagne 1991-2025 dans orgvio_cy (questions de prévision pour DEU).
+    action: Seed puis réingérer les deux connecteurs.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ucdp_ged
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ucdp
+    who: lead
+    status: queued
+    disk_mb: 10
+    source_docs: [docs/dev/v6_fix6.md, lead:final4_todo]
+    check:
+      - {connector: atlas.ucdp_ged, min_version: 1.0.1}
+  - id: load.fix4b.weo
+    type: load
+    kind: disk
+    title: FMI WEO — connecteur 1.3.0 (correction exercice fiscal)
+    unlocks:
+      domains: [macro]
+      atlas_sources: [imf]
+      tables: [atlas.imf.weo]
+      tracks: [pred-registry:weo]
+      text: Fenêtres d’exercice fiscal correctes pour les séries WEO ; puis re-calcul des décisions de référence.
+    action: Seed puis réingérer le WEO ; corriger tests/integration/test_forecast_registry_db.py::test_01 (30 modèles).
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf --dataset weo
+      - uv run python -m reva.predict.run --reference all --draws 2000 --seed 0
+    who: lead
+    status: queued
+    disk_mb: null
+    source_docs: [docs/dev/v6_fix4b.md, lead:final4_todo]
+    check:
+      - {connector: atlas.imf, min_version: 1.3.0, tables: [atlas.imf.weo]}
+  - id: load.fix4c.reruns
+    type: load
+    kind: disk
+    title: Corrections FIX4C — GLEIF (enregistrements de relations), FishStat, How’s Life, indices climatiques, USGS
+    unlocks:
+      domains: [industry, agriculture, society, climate, energy]
+      atlas_sources: [gleif, fishstat, oecd, climind, usgs_myb_fac]
+      text: Qualificatifs des liens de propriété GLEIF, drapeaux « non significatif » FAO, réserve de licence par cellule OCDE, pays des installations USGS par identifiant.
+    action: Lancer le script préparé ou les commandes ci-dessous.
+    commands:
+      - /tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/fix4c_live.sh
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gleif_wikidata
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gleif --dataset entities
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.fishstat
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.oecd.wellbeing
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.climate_indices
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usgs_myb_facilities
+    who: lead
+    status: queued
+    disk_mb: 24
+    source_docs: [docs/dev/v6_fix4c.md, lead:final4_todo]
+    check:
+      - {connector: atlas.gleif, min_version: 1.0.3}
+      - {connector: atlas.fishstat, min_version: 1.0.2}
+      - {connector: atlas.oecd.wellbeing, min_version: 1.0.2}
+      - {connector: atlas.climate_indices, min_version: 1.0.1}
+      - {connector: atlas.usgs_myb_facilities, min_version: 1.0.2}
+  - id: load.v6drugs.ctgov
+    type: load
+    kind: disk
+    title: Médicaments — agrégats ClinicalTrials.gov par pays et MeSH
+    unlocks:
+      domains: [drugs]
+      atlas_sources: [ctgov]
+      text: Nombre d’essais par pays, condition et intervention (~1 910 requêtes de comptage, < 1 Mo, ~45 min).
+    action: Lancer l’ingestion.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ctgov
+    who: lead
+    status: queued
+    disk_mb: 1
+    source_docs: [docs/dev/v6_drugs.md, lead:final4_todo]
+    check:
+      - {connector: atlas.ctgov}
+  - id: load.v6tradehf
+    type: load
+    kind: disk
+    title: Commerce mensuel — IMF IMTS bilatéral et Eurostat Comext
+    unlocks:
+      domains: [trade]
+      atlas_sources: [imf, eurostat]
+      text: Commerce bilatéral mensuel (FMI) et commerce UE par chapitre SH et partenaire (Comext).
+    action: Lancer les deux ingestions.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf_imts_m
+      - REVA_HTTP_TIMEOUT_SECONDS=300 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_comext
+    who: lead
+    status: queued
+    disk_mb: 70
+    source_docs: [docs/dev/v6_trade_hf.md]
+    check:
+      - {connector: atlas.imf_imts_m}
+      - {connector: atlas.eurostat_comext}
+  - id: load.v4bio.vertebrates
+    type: load
+    kind: disk
+    title: Biologie — listes d’espèces des vertébrés (oiseaux, amphibiens, reptiles, poissons) et ponts Wikidata
+    unlocks:
+      domains: [biology]
+      atlas_sources: [bio]
+      text: "Espèces au-delà des mammifères (taxon_scope.yaml load: true) ; ponts Wikidata des taxons (bio_wikidata)."
+    action: "Passer les classes à load: true dans registry/bio/taxon_scope.yaml (+80 Mo d’archive brute), puis lancer les connecteurs bio."
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva seed
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.col_checklist
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gbif_backbone
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.bio_wikidata
+    who: lead
+    status: queued
+    disk_mb: 80
+    source_docs: [docs/dev/v4_v4bio.md, lead:final4_todo]
+    check:
+      - {connector: atlas.bio_wikidata}
+  - id: load.beathealth.h2
+    type: load
+    kind: disk
+    title: Santé — FluSight 2023-24 (hypothèse H2 de BEAT-HEALTH) et ingestions hebdomadaires des hubs CDC
+    unlocks:
+      domains: [health]
+      atlas_sources: [cdc]
+      tracks: [beat-health:H1, beat-health:H2]
+      text: H2 compare REVA aux ensembles CDC sur la saison 2023-24 ; H1 (prospectif) a besoin des ingestions hebdomadaires jusqu’en 2027-06.
+    action: Abaisser FIRST_REFERENCE_DATE à 2023-10-01 dans atlas_cdc_resp_hubs.py, réingérer FluSight (~25 Mo) ; ingestions hebdomadaires des deux hubs.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.cdc_flusight
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.cdc_covidhub
+      - uv run python -m reva.cli.beat_health holdout
+    who: lead
+    status: queued
+    disk_mb: 25
+    source_docs: [docs/dev/v7_beat_health.md, lead:final4_todo]
+  - id: load.lead.final_pass
+    type: load
+    kind: disk
+    title: Passe finale du lead — instantané atlas chaud, liens, rafraîchissement causal, balayage, sauvegarde
+    unlocks:
+      domains: [other]
+      text: Le fichier de requête atlas de l’instantané courant (~7 Go + spill) et la matérialisation des liens (~1,4 Go) ; sans eux, les tables chargées après l’instantané ne répondent pas dans l’atlas.
+    action: Libérer ~9 Go (anciens fichiers de requête, refs reva-data-*), puis enchaîner les commandes.
+    commands:
+      - uv run reva atlas snapshot --origin live --warm --skip-unchanged
+      - uv run reva links materialise --atlas-origin live --kg-origin live
+      - uv run reva links prune
+      - uv run reva causal refresh --origin live
+    who: lead
+    status: queued
+    disk_mb: 9000
+    source_docs: [docs/dev/HANDOFF_V3.md, lead:final4_todo]
+  # ------------------------------------------------------------------------------------------- bigger machine
+  - id: load.bigmachine.fullres
+    type: load
+    kind: bigger_machine
+    title: Pleine résolution — GDELT complet, WhoGov individuel, STEO mensuel + .xls, occurrences GBIF, ERA5
+    unlocks:
+      domains: [conflict, politics, energy, environment, climate]
+      tracks: [beat-energy:monthly-steo]
+      text: Événements GDELT au complet (pas un échantillon 1/96), ministres par portefeuille, tous les numéros STEO (×3 origines), occurrences d’espèces, réanalyse climatique.
+    action: Sur une machine plus grande (disque, RAM) — options documentées par connecteur.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gdelt_events --option days=1095 --option end=2026-10-16
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.whogov
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.vintage_steo
+    who: lead
+    status: blocked
+    disk_mb: null
+    source_docs: [docs/dev/v6_signals.md, docs/dev/v6_politics.md, docs/dev/v6_pred_energy.md, lead:final4_todo]
+  - id: load.bigmachine.trade_history
+    type: load
+    kind: bigger_machine
+    title: Commerce — historique bilatéral mensuel long (FMI depuis 2015, Comext depuis 2015), FAO TM hors Asie, FAOSTAT SUA
+    unlocks:
+      domains: [trade, agriculture]
+      text: Séries bilatérales longues (~3,5–4 Mo bruts par mois FMI), exportateurs agricoles des Amériques et d’Europe, sous-produits (SUA 87 Mo).
+    action: Sur une machine plus grande.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf_imts_m --dataset imts_m --option start=2015-01
+      - REVA_HTTP_TIMEOUT_SECONDS=300 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_comext --option hs2_start=2015-01 --option partner_start=2015-01
+    who: lead
+    status: blocked
+    disk_mb: null
+    source_docs: [docs/dev/v6_trade_hf.md, docs/dev/v6_agri.md]
+  - id: load.bigmachine.ecoregion_overlay
+    type: load
+    kind: bigger_machine
+    title: Écorégions × pays (superposition dérivée) et séries pays Berkeley Earth
+    unlocks:
+      domains: [environment, climate]
+      text: Quelle écorégion couvre quel pays (table dérivée étiquetée REVA, polygones 243 Mo) ; ~200 fichiers pays Berkeley Earth (~65 Mo, CC BY-NC).
+    action: Sur une machine plus grande, après les décisions licence correspondantes.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ecoregions
+    who: lead
+    status: blocked
+    disk_mb: 310
+    source_docs: [docs/dev/v4_v4eco.md, docs/dev/v4_v4climate.md]
+  - id: load.wikidata.harvest
+    type: load
+    kind: bigger_machine
+    title: Moisson Wikidata des specs de domaine (≈120 specs écrites, non moissonnées ; WDQS limité)
+    unlocks:
+      domains: [industry, energy, health, chemistry, environment, society, culture]
+      text: Entreprises et usines (≈3 100 + 3 600), champs pétroliers et mines, médicaments, éléments chimiques, phénomènes psychologiques — depuis une sortie réseau moins partagée.
+    action: Exécuter les specs sur plusieurs jours (budgets wikidata.wdqs 1 500/j, wbapi 4 000/j).
+    commands:
+      - uv run python -m reva.kg.harvest merge-property-requests
+      - uv run python -m reva.kg.harvest run registry/kg/queries/industry --via api
+      - uv run python -m reva.kg.harvest run registry/kg/queries/energy --via api
+      - uv run python -m reva.kg.harvest run registry/kg/queries/health --via api
+      - uv run python -m reva.kg.harvest run registry/kg/queries/chemistry --via api
+    who: lead
+    status: blocked
+    disk_mb: null
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v4_v4industry.md, docs/dev/v4_v4energy.md, docs/dev/v4_v4mind.md]
+  # ------------------------------------------------------------------------------------------- owner: accounts / keys
+  - id: key.openfda
+    type: decision
+    kind: account_key
+    title: Clé API openFDA
+    unlocks:
+      domains: [drugs]
+      atlas_sources: [openfda]
+      text: Comptes FAERS des 1 000 premières substances et de toutes les substances approuvées (au lieu du top 100).
+    action: Créer une clé openFDA (inscription avec une adresse du projet, pas une adresse personnelle) et la fournir comme secret d’environnement.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_drugs.md, lead:final4_todo]
+  - id: key.fred
+    type: decision
+    kind: account_key
+    title: Clé API FRED / ALFRED
+    unlocks:
+      domains: [macro]
+      tracks: [pred-models:nowcast, pred-vintage]
+      text: Millésimes exacts des séries FRED (ALFRED) — panel mensuel temps réel plus riche pour battre l’AR en prévision immédiate.
+    action: Fournir une clé FRED (ou autoriser un autre chemin réseau).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_vintage.md, docs/dev/v6_pred_models.md]
+  - id: key.comtrade
+    type: decision
+    kind: account_key
+    title: Clé d’abonnement UN Comtrade
+    unlocks:
+      domains: [trade]
+      text: Commerce bilatéral mensuel par code SH au-delà de l’aperçu public de 500 lignes.
+    action: Souscrire et fournir la clé.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_trade_hf.md, docs/dev/HANDOFF_V3.md]
+  - id: key.census_trade
+    type: decision
+    kind: account_key
+    title: Clé API US Census (commerce international)
+    unlocks:
+      domains: [trade]
+      text: Exportations/importations mensuelles des États-Unis par SH2 × pays (domaine public).
+    action: Inscription gratuite (api.census.gov), puis un connecteur.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_trade_hf.md]
+  - id: key.wto
+    type: decision
+    kind: account_key
+    title: Clé API WTO Timeseries
+    unlocks:
+      domains: [trade]
+      text: Séries tarifaires et commerciales de l’OMC (401 sans clé).
+    action: Fournir une clé.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_trade_hf.md]
+  - id: key.apidatagov
+    type: decision
+    kind: account_key
+    title: Clé api.data.gov (USDA PSD)
+    unlocks:
+      domains: [agriculture]
+      atlas_sources: [usda_psd]
+      text: Codes pays GENC de l’API PSD → 31 codes PSD (Birmanie, Corées, UE…) rattachés par identifiant.
+    action: Créer une clé gratuite.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_agri.md]
+  - id: key.openalex
+    type: decision
+    kind: account_key
+    title: Clé API OpenAlex
+    unlocks:
+      domains: [education, society]
+      atlas_sources: [openalex]
+      text: Publications par pays × sous-domaine (psychologie, sociologie) ; le budget gratuit par IP est épuisé.
+    action: Fournir une clé (demande une adresse du projet).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4mind.md, docs/dev/HANDOFF_V3.md]
+  - id: key.iucn
+    type: decision
+    kind: account_key
+    title: Jeton IUCN Red List (et revue de licence non commerciale)
+    unlocks:
+      domains: [environment, biology]
+      text: Statuts de menace, habitats et tendances de population par espèce ; classification des menaces comme affirmations causales T1.
+    action: Demander un jeton IUCN et accepter (ou non) les conditions non commerciales.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4eco.md]
+  - id: key.icd11
+    type: decision
+    kind: account_key
+    title: Identifiants OAuth de l’API ICD-11 (OMS)
+    unlocks:
+      domains: [health]
+      text: Linéarisation ICD-11 (MMS) complète au lieu des seuls renvois Mondo.
+    action: Inscription à l’API ICD de l’OMS.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4health.md]
+  - id: key.cds_era5
+    type: decision
+    kind: account_key
+    title: Compte Copernicus CDS (ERA5 direct) / Earthdata (PO.DAAC)
+    unlocks:
+      domains: [climate]
+      text: Réanalyse ERA5 et niveau de la mer PO.DAAC directement (aujourd’hui ERA5 seulement via les agrégats CCKP).
+    action: Créer les comptes si souhaité.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4climate.md]
+  - id: key.gdl
+    type: decision
+    kind: account_key
+    title: Compte Global Data Lab (indices infranationaux) — licence non commerciale
+    unlocks:
+      domains: [society, macro]
+      text: IDH, revenu, éducation et santé infranationaux.
+    action: Créer le compte et accepter la licence non commerciale, ou laisser hors champ.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4econ.md]
+  - id: key.wvs_gps
+    type: decision
+    kind: account_key
+    title: World Values Survey / EVS et Global Preference Survey
+    unlocks:
+      domains: [society]
+      text: Valeurs, confiance, préférences (risque, patience, altruisme) par pays — formulaire d’inscription ; GPS CC BY-NC-SA avec clause de non-transfert.
+    action: S’inscrire (compte + conditions) ou laisser hors champ.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4mind.md]
+  - id: key.open_supply_hub
+    type: decision
+    kind: account_key
+    title: Jeton Open Supply Hub (fournisseurs, CC BY-SA)
+    unlocks:
+      domains: [industry]
+      text: Relations fournisseur→acheteur au niveau des entreprises (familles supplies / buys_from), aujourd’hui vides.
+    action: Créer un compte et revoir le partage à l’identique.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4industry.md, docs/dev/v4_v4core.md]
+  - id: key.seshat
+    type: decision
+    kind: account_key
+    title: Compte Seshat (données historiques CC BY-SA derrière conditions)
+    unlocks:
+      domains: [history]
+      text: Variables sociales et politiques des sociétés anciennes.
+    action: Créer un compte.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md]
+  - id: key.gcp_bigquery
+    type: decision
+    kind: account_key
+    title: Compte de facturation Google Cloud pour GDELT BigQuery
+    unlocks:
+      domains: [conflict]
+      text: Événements GDELT au complet par jour (au lieu de l’échantillon 1/96).
+    action: Décider d’un compte de facturation (le CLI bq préconfiguré n’a pas été utilisé comme contournement).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_signals.md]
+  - id: key.llm_credits
+    type: decision
+    kind: account_key
+    title: Crédits LLM (OpenAI / Gemini) épuisés
+    unlocks:
+      domains: [other]
+      tracks: [nlqa:planner]
+      text: Brouillons en langage naturel et planificateur LLM de Demander (repli actuel sur les mots-clés).
+    action: Recharger des crédits ou désactiver ces chemins.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v6_nlqa.md]
+  - id: key.cloudflare_radar
+    type: decision
+    kind: account_key
+    title: Cloudflare Radar (jeton de compte, CC BY-NC)
+    unlocks:
+      domains: [digital]
+      text: Pannes et trafic Internet par pays.
+    action: Décider si une source non commerciale avec compte est acceptable.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_digital.md]
+  # ------------------------------------------------------------------------------------------- owner: permissions
+  - id: perm.sipri
+    type: decision
+    kind: permission
+    title: Autorisation SIPRI (dépenses militaires, transferts d’armes)
+    unlocks:
+      domains: [conflict]
+      text: Servir MS.MIL.XPND.* et MS.MIL.XPRT/MPRT.KD (copies WDI sous conditions SIPRI) au-delà de l’usage équitable ; une demande nominative est requise.
+    action: Demander l’autorisation à SIPRI, ou restreindre ces séries (non commercial, < 10 %) ; marquer la licence par valeur dans les lignes WDI.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_conflict.md, docs/dev/HANDOFF_V3.md]
+  - id: perm.gem
+    type: decision
+    kind: permission
+    title: Global Energy Monitor — formulaire de téléchargement (CC BY)
+    unlocks:
+      domains: [energy, industry]
+      text: Trackers extraction pétrole et gaz, mines de charbon, centrales intégrées, avec identifiants d’unités et de propriétaires.
+    action: Accepter le formulaire (coordonnées du projet) ou demander une URL stable ; convenir de l’encodage des clés gem_wiki.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4energy.md, docs/dev/v4_v4link.md]
+  - id: perm.energy_institute
+    type: decision
+    kind: permission
+    title: Energy Institute Statistical Review (site bloqué aux clients non navigateurs)
+    unlocks:
+      domains: [energy]
+      text: Unités physiques, capacité de raffinage, uranium, minerais critiques (aujourd’hui seulement la redistribution OWID en TWh).
+    action: Obtenir une URL autorisée / une permission, ou garder OWID.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4energy.md]
+  - id: perm.imf_downloads
+    type: decision
+    kind: permission
+    title: Téléchargements www.imf.org (millésimes WEO, prévisions historiques, documents de travail)
+    unlocks:
+      domains: [macro]
+      tracks: [pred-vintage:weo, beat-macro]
+      text: Fichiers de millésimes WEO de l’FMI et « Historical WEO forecasts » (Akamai 403) ; documents de travail pour les estimations d’effets.
+    action: Capture manuelle dans l’archive ou accord d’accès ; décider si DBnomics reste le redistributeur.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_vintage.md, docs/dev/v5_pred_effect.md]
+  - id: perm.blocked_hosts
+    type: decision
+    kind: permission
+    title: Hôtes qui refusent les clients non navigateurs (coups d’État, Cline Center, NORMLEX, UNODA, CITES/Ramsar, ITU, IAEA, ILO ISCO, CCKP ADM1)
+    unlocks:
+      domains: [politics, digital, chemistry, climate, society]
+      text: Coups d’État Powell & Thyne, droit du travail, désarmement, conventions environnementales, données TIC de l’UIT, isotopes IAEA, ISCO-08 détaillé, séries climatiques infranationales.
+    action: Demander aux fournisseurs une liste d’autorisation ou un accès API.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v6_digital.md, docs/dev/v4_v4chem.md, docs/dev/v4_v4climate.md, docs/dev/v4_v4mind.md]
+  - id: perm.peeringdb
+    type: decision
+    kind: permission
+    title: PeeringDB — approbation selon l’AUP
+    unlocks:
+      domains: [digital, infrastructure]
+      text: Points d’échange Internet et centres de données par pays (2 requêtes).
+    action: Demander l’approbation avant d’archiver.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_digital.md]
+  - id: perm.ifpri_tracker
+    type: decision
+    kind: permission
+    title: Extrait IFPRI des restrictions d’exportation après avril 2022 (ODC-By)
+    unlocks:
+      domains: [agriculture]
+      tracks: [pred-engine:rice-ban]
+      text: Mesures après 2022 dont l’Inde 2022-2023 (riz, blé) — analogue historique de la décision de référence riz.
+    action: Demander à IFPRI l’extrait courant ou une URL CSV stable.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_agri.md]
+  - id: perm.wasde_history
+    type: decision
+    kind: permission
+    title: WASDE 2010-2020 (www.usda.gov 403)
+    unlocks:
+      domains: [agriculture]
+      tracks: [beat-agri]
+      text: Millésimes WASDE 2010-04 … 2020-12 pour l’évaluation contre l’USDA.
+    action: Autoriser l’hôte CDN usda.azureedge.us ou financer un lecteur XML ESMIS.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_agri.md]
+  - id: perm.nelda_clea
+    type: decision
+    kind: permission
+    title: Élections — NELDA 2011-2020 (demande aux chercheurs), CLEA (inscription), IFES
+    unlocks:
+      domains: [politics]
+      atlas_sources: [nelda]
+      text: Élections nationales récentes et résultats par circonscription.
+    action: Demander l’accès et une licence aux auteurs ; NELDA sans licence reste signalé usage interne.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_politics.md]
+  - id: perm.musicbrainz_ip
+    type: decision
+    kind: permission
+    title: MusicBrainz /ws/2 depuis une IP dédiée (ou accord MetaBrainz)
+    unlocks:
+      domains: [culture]
+      text: Sorties musicales par pays × année.
+    action: Fournir une sortie réseau dédiée ou un accord de réplication.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_culture.md]
+  - id: perm.lpi_agreement
+    type: decision
+    kind: permission
+    title: Living Planet Database — accord d’utilisation des données
+    unlocks:
+      domains: [environment]
+      text: Séries de populations animales (aujourd’hui seulement les tendances publiées).
+    action: Signer l’accord (redistribution et usage commercial interdits) ou laisser hors champ.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4eco.md]
+  - id: perm.remittance_matrix
+    type: decision
+    kind: permission
+    title: Matrice bilatérale des envois de fonds (Banque mondiale 2021 ou CGD 2024)
+    unlocks:
+      domains: [migration]
+      text: Envois de fonds pays→pays — allocations modélisées, à étiqueter « modélisé, non observé ».
+    action: Fournir le fichier et sa licence.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_migration.md]
+  - id: perm.respicast
+    type: decision
+    kind: permission
+    title: Accès GitHub API pour l’ensemble RespiCast (ECDC)
+    unlocks:
+      domains: [health]
+      tracks: [beat-health:ecdc]
+      text: Référence officielle pour ERVISS (Europe) ; sans elle aucun test « battre » n’est possible.
+    action: Autoriser l’API GitHub pour la lecture des sorties de modèles.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v7_beat_health.md]
+  # ------------------------------------------------------------------------------------------- owner: attribution contacts
+  - id: contact.sec_edgar
+    type: decision
+    kind: attribution_contact
+    title: Adresse de contact du projet pour SEC EDGAR (User-Agent)
+    unlocks:
+      domains: [industry]
+      text: Comptes des entreprises cotées aux États-Unis (chiffre d’affaires, actifs, effectifs) par CIK.
+    action: Créer une boîte de rôle du projet et la mettre dans REVA_HTTP_CONTACT_EMAIL (jamais l’adresse personnelle du propriétaire).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4industry.md]
+  - id: contact.cdc_hubs
+    type: decision
+    kind: attribution_contact
+    title: Demande d’attribution des hubs CDC avant publication des comparaisons
+    unlocks:
+      domains: [health]
+      tracks: [beat-health, v8:scores]
+      text: "Publier les comparaisons REVA vs ensembles FluSight / COVID (aujourd’hui : 0 victoire en développement)."
+    action: Contacter les hubs FluSight et COVID (adresses dans les dépôts des hubs) ; décider de la ligne « REVA ne bat pas les ensembles CDC ».
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_pred_health.md, docs/dev/v7_beat_health.md, lead:final4_todo]
+  - id: contact.views
+    type: decision
+    kind: attribution_contact
+    title: Licence ViEWS non déclarée — confirmer avant tout affichage public
+    unlocks:
+      domains: [conflict]
+      atlas_sources: [views]
+      tracks: [pred-conflict]
+      text: Montrer les prévisions ViEWS hors de REVA (tout est marqué licence_review).
+    action: Écrire à ViEWS pour confirmer la licence.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_pred_conflict.md]
+  - id: contact.gdelt_doc
+    type: decision
+    kind: attribution_contact
+    title: GDELT DOC API — contact pour usage à volume élevé
+    unlocks:
+      domains: [conflict]
+      text: Chronologies DOC complètes sans limitation 429.
+    action: Contacter GDELT à l’adresse donnée dans la réponse 429, ou sortie réseau moins partagée.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_signals.md]
+  # ------------------------------------------------------------------------------------------- owner: licences
+  - id: licence.nc_sources
+    type: decision
+    kind: licence
+    title: Sources non commerciales chargées et signalées (IPU, CShapes, JST, Constitute/CCP, Berkeley Earth, Carbon Brief, FAO FFPI, GBIF NC)
+    unlocks:
+      domains: [politics, history, finance, climate, prices, environment]
+      atlas_sources: [ipu, cshapes, jst, constitute, ccp, attribution_cb, fao_ffpi]
+      text: Toute réutilisation commerciale ou publication des valeurs ; aujourd’hui chaque cellule porte « licence non commerciale ».
+    action: Décider de l’usage (interne / publication non commerciale) ou retirer ces tables des exports.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v4_v4climate.md, docs/dev/v4_v4econ.md, docs/dev/v4_v4eco.md]
+  - id: licence.un_terms
+    type: decision
+    kind: licence
+    title: Conditions ONU / sans redistribution (ICOW, UN Treaty Collection, HCDH, UN/LOCODE)
+    unlocks:
+      domains: [history, politics, infrastructure]
+      atlas_sources: [icow, untc, ohchr, unlocode]
+      text: Garder et exposer ces tables (sinon rétracter unece.unlocode et retirer unlocode.locations).
+    action: Décider de les garder (usage interne) ou de les retirer.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v6_infra.md]
+  - id: licence.unclear
+    type: decision
+    kind: licence
+    title: Licences peu claires (WHR, BaTIS, SPC, INFORM, Laeven-Valencia, Reinhart-Rogoff, ICB, Archigos, COW)
+    unlocks:
+      domains: [society, trade, population, hazards, finance, conflict, politics]
+      atlas_sources: [whr, oecd, spc, inform, laeven_valencia, reinhart_rogoff, icb, archigos, cow]
+      text: Lever le drapeau « licence non ouverte / à revoir » sur ces cellules.
+    action: Revue de licence par un mainteneur.
+    who: owner
+    status: open
+    source_docs: [docs/dev/HANDOFF_V3.md, docs/dev/v5_pred_eventstudy.md]
+  - id: licence.imf_terms
+    type: decision
+    kind: licence
+    title: Conditions d’utilisation FMI (WEO, COFER, GDD, HPD, PortWatch, IMTS)
+    unlocks:
+      domains: [macro, finance, trade, infrastructure]
+      atlas_sources: [imf, vintage_weo, portwatch]
+      text: Redistribution des valeurs FMI (aujourd’hui « non ouverte », attribution requise, flags.licence_review).
+    action: Revue des conditions FMI (registry/sources/imf.yaml).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_findata.md, docs/dev/v4_v4econ.md, docs/dev/v6_trade_hf.md]
+  - id: licence.fama_french
+    type: decision
+    kind: licence
+    title: Facteurs Fama/French (droit d’auteur, dérivés CRSP) — chargés en restreint
+    unlocks:
+      domains: [finance]
+      atlas_sources: [kfrench]
+      text: Publication ou export de kfrench.* (aujourd’hui étalonnage interne seulement).
+    action: Demander aux auteurs (et vérifier CRSP) ou retirer kfrench.* des exports.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_findata.md, lead:final4_todo]
+  - id: licence.eia_spot
+    type: decision
+    kind: licence
+    title: Prix spot EIA (source Refinitiv/LSEG)
+    unlocks:
+      domains: [energy, prices]
+      atlas_sources: [eia]
+      tracks: [beat-energy, pred-registry:brent]
+      text: Redistribuer les valeurs eia.spot_d et les prévisions Brent dérivées.
+    action: Décider de la redistribution (ou affichage interne seulement).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_hf.md, docs/dev/v7_beat_energy.md, lead:final4_todo]
+  - id: licence.philfed
+    type: decision
+    kind: licence
+    title: Philadelphia Fed RTDSM / SPF (« tous droits réservés »)
+    unlocks:
+      domains: [macro]
+      atlas_sources: [vintage_us]
+      tracks: [pred-models:spf]
+      text: Republier des nombres dérivés et les densités conformes WEO/SPF (aujourd’hui scores internes seulement).
+    action: Confirmer l’usage permis.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_vintage.md, docs/dev/v6_pred_models.md]
+  - id: licence.digital
+    type: decision
+    kind: licence
+    title: Access Now STOP et CFR Cyber Operations Tracker
+    unlocks:
+      domains: [digital]
+      atlas_sources: [keepiton, cfr_cyber]
+      text: Usage public des coupures d’Internet et cyber-opérations (CFR interdit tout usage public ou commercial).
+    action: Demander une licence explicite à Access Now et une permission à CFR.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_digital.md, lead:final4_todo]
+  - id: licence.drugs
+    type: decision
+    kind: licence
+    title: Médicaments — MedDRA, UniChem, ClinicalTrials.gov, ChEMBL (SA), ATC (WHOCC non commercial)
+    unlocks:
+      domains: [drugs]
+      atlas_sources: [unichem, ctgov, chembl, openfda]
+      text: Comptes par réaction indésirable (MedDRA), redistribution des données dérivées ChEMBL, noms et DDD ATC.
+    action: Licence MedDRA (MSSO) et revues de licence.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_drugs.md, lead:final4_todo]
+  - id: licence.health_ontologies
+    type: decision
+    kind: licence
+    title: Santé — GBD (non commercial), HPO, annexe GHE de l’OMS (CC BY-NC-SA), tables ICD-10↔ICD-11 (ND)
+    unlocks:
+      domains: [health]
+      text: Charge de morbidité IHME, ontologie des phénotypes, pont ICD-10 ↔ causes GHE, correspondances ICD officielles.
+    action: Décider de chaque licence.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4health.md, docs/dev/v4_v4link.md]
+  - id: licence.chem_reviews
+    type: decision
+    kind: licence
+    title: Chimie — NIST SRD, AMDC/IAEA, CIAAW, Jefferson Lab, ChEBI (BY vs BY-SA), IUPAC (BY-NC-ND)
+    unlocks:
+      domains: [chemistry]
+      atlas_sources: [codata, chebi]
+      text: Lever les drapeaux licence_review des constantes et des éléments.
+    action: Revue des licences.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4chem.md]
+  - id: licence.culture
+    type: decision
+    kind: licence
+    title: Open Library (« aucun nouveau droit revendiqué »), IMDb (non commercial — non chargé)
+    unlocks:
+      domains: [culture]
+      atlas_sources: [openlibrary]
+      text: Comptes, noms et identifiants Open Library ; films par pays (IMDb seulement avec licence commerciale).
+    action: Confirmer l’usage Open Library ; garder IMDb hors champ sauf licence.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_culture.md]
+  - id: licence.mind
+    type: decision
+    kind: licence
+    title: Hofstede (recherche seulement) et How’s Life (amont Gallup)
+    unlocks:
+      domains: [society]
+      atlas_sources: [hofstede, oecd]
+      text: Garder les scores Hofstede dans les instantanés ; redistribuer les mesures How’s Life d’amont Gallup.
+    action: Garder (recherche) ou retirer ; revue de licence OCDE par mesure.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4mind.md, docs/dev/v6_fix4c.md]
+  - id: licence.ecology_reviews
+    type: decision
+    kind: licence
+    title: GloBI par jeu de données, GBIF (part CC BY-NC), GADM (niveau 1 non commercial)
+    unlocks:
+      domains: [environment]
+      atlas_sources: [globi, gbif_occ]
+      text: Interactions écologiques sans drapeau « licence incertaine » ; comptes GBIF par région ADM1.
+    action: Revue de licence des jeux GloBI ; décision GADM.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4eco.md]
+  - id: licence.boe_calendar
+    type: decision
+    kind: licence
+    title: Calendrier de la Banque d’Angleterre (usage interne non commercial)
+    unlocks:
+      domains: [finance]
+      tracks: [pred-fin:boe-meetings]
+      text: Publier les questions de réunions BoE.
+    action: Garder privé ou demander à la Banque.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_pred_fin.md]
+  - id: licence.market_benchmarks
+    type: decision
+    kind: licence
+    title: Références de marché sous licence (contrats à terme, OIS, LBMA/CME, indices boursiers, notations)
+    unlocks:
+      domains: [finance, prices, energy]
+      tracks: [pred-fin, beat-energy]
+      text: Comparer REVA à la référence la plus forte (prix implicites des marchés) ; or/argent quotidiens.
+    action: Acheter une licence ou garder ces comparaisons hors champ.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_pred_fin.md, docs/dev/v5_pred_hf.md, docs/dev/v6_findata.md]
+  - id: licence.nyfed_notice
+    type: decision
+    kind: licence
+    title: Avis obligatoire NY Fed partout où nyfed.rates_d est affiché
+    unlocks:
+      domains: [finance]
+      atlas_sources: [nyfed]
+      text: Conformité aux conditions de la NY Fed (avis affiché verbatim par l’API et l’UI).
+    action: Vérifier l’affichage de l’avis sur chaque page et export V8.
+    who: lead
+    status: open
+    source_docs: [docs/dev/v5_pred_hf.md, lead:final4_todo]
+  - id: licence.ourairports_basis
+    type: decision
+    kind: licence
+    title: OurAirports — base de licence (Unlicense du dépôt) et règle « polygone le plus proche »
+    unlocks:
+      domains: [infrastructure]
+      atlas_sources: [ourairports]
+      text: Confirmer la preuve de licence et le calcul REVA pour les ports côtiers.
+    action: Accepter ou retirer.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_infra.md]
+  # ------------------------------------------------------------------------------------------- owner: policy choices
+  - id: policy.publish_registry
+    type: decision
+    kind: policy_choice
+    title: Publier le registre de prévisions (pré-enregistrement public) ou le garder privé
+    unlocks:
+      domains: [other]
+      tracks: [pred-registry, v8:scores]
+      text: Crédibilité par pré-enregistrement public ; publication éventuelle des scores agrégés seulement (finance).
+    action: Décider pour les registres V5, santé et finance.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_registry.md, docs/dev/v6_pred_health.md, docs/dev/v6_pred_fin.md]
+  - id: policy.territories
+    type: decision
+    kind: policy_choice
+    title: Exceptions territoriales des conflits (ISR→PSE…) et publication d’une part PSE
+    unlocks:
+      domains: [conflict]
+      tracks: [pred-conflict]
+      text: Placement ADM1 des événements de Gaza / Cisjordanie et liste registry/conflict/territory_exceptions.yaml (revue en attente).
+    action: Revoir la liste et la règle de placement.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_fix6.md, docs/dev/v6_conflict.md, lead:final4_todo]
+  - id: policy.forecast_gates
+    type: decision
+    kind: policy_choice
+    title: Seuils du juge (30 questions, α 0,05, grappes pays), une famille Holm finance+santé, classement sur ensembles communs
+    unlocks:
+      domains: [other]
+      tracks: [v8:scores, beat-*]
+      text: Règles de décision avant la première admission d’un modèle REVA.
+    action: Confirmer ou modifier les seuils FIX7 ; relancer run_backtest des conflits (grappes bidirectionnelles).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_fix7.md, lead:final4_todo]
+  - id: policy.ensemble
+    type: decision
+    kind: policy_choice
+    title: Ensemble REVA comme prévision principale ; pondération par source d’information ; minima (20 résolutions)
+    unlocks:
+      domains: [other]
+      tracks: [beat-ensemble]
+      text: Formulation des victoires « la combinaison REVA bat X seul ».
+    action: Décider des trois points.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v7_beat_ensemble.md]
+  - id: policy.decision_engine
+    type: decision
+    kind: policy_choice
+    title: Moteur de décision — lecture des IRF, portées de groupe, une estimation par arête vs ensemble, hypothèse prix du pétrole
+    unlocks:
+      domains: [other]
+      tracks: [pred-engine, v8:decision]
+      text: Hypothèses déclarées de la propagation (réponse à un changement durable, horizons comonotones).
+    action: Garder les hypothèses déclarées ou changer de règle.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_engine.md, docs/dev/v6_fix4b.md]
+  - id: policy.effects_evidence
+    type: decision
+    kind: policy_choice
+    title: Effets — preuves secondaires, simulations vs économétrie, mesures relative_risk / contribution_share
+    unlocks:
+      domains: [health, agriculture, macro]
+      tracks: [pred-effect]
+      text: Risques relatifs (santé) et parts de contribution (crises alimentaires) dans la couche effets (migration nécessaire).
+    action: Décider des trois points ; revue mainteneur avant usage par le moteur.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_effects_more.md, docs/dev/v5_pred_effect.md]
+  - id: policy.fao_estimates
+    type: decision
+    kind: policy_choice
+    title: Cellules FAOSTAT estimées (E) comme résultats de questions de prévision
+    unlocks:
+      domains: [agriculture, prices]
+      tracks: [pred-registry:fao]
+      text: Résoudre ou annuler les questions dont la valeur observée est une estimation FAO.
+    action: Accepter ou annuler ces questions.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v5_pred_registry.md]
+  - id: policy.projection_classes
+    type: decision
+    kind: policy_choice
+    title: Classes de projection (réanalyse = estimation, CMIP6 historique = projection) et sévérité CI
+    unlocks:
+      domains: [climate]
+      text: Ce qui répond comme observation dans l’atlas.
+    action: Confirmer les classes FIX5.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_fix5.md]
+  - id: policy.disk_retention
+    type: decision
+    kind: policy_choice
+    title: Rétention des archives brutes (2,2 Go de zip non recompressibles) et capture d’instantané
+    unlocks:
+      domains: [other]
+      text: Disque libre pour les chargements en file (plancher 5 Go) ; exclure de l’archive les octets MusicBrainz contenant un jeton Mapbox tiers.
+    action: Décider d’une règle (garder seulement les membres extraits analysés) ; scanner tout tar avant publication.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_diskz.md, docs/dev/v6_culture.md, lead:final4_todo]
+  - id: policy.curated_mappings
+    type: decision
+    kind: policy_choice
+    title: Revue humaine des correspondances par nom (alias pays, ISO3 de curateur, 23 noms de pays ClinicalTrials.gov)
+    unlocks:
+      domains: [drugs, society, other]
+      text: Lever « en attente de revue mainteneur » sur registry/curation/name_based_mappings.yaml.
+    action: Revue par un mainteneur.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_fix4c.md, docs/dev/v6_drugs.md, docs/dev/v5_pred_effect.md]
+  - id: policy.gbif_backbone
+    type: decision
+    kind: policy_choice
+    title: Nouvelle épine dorsale GBIF 2026 — garder les clés héritées ou ré-identifier
+    unlocks:
+      domains: [biology, environment]
+      text: Identité des taxons quand l’API GBIF bascule (P14607).
+    action: Choisir le schéma de clés.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v4_v4bio.md, docs/dev/v4_v4link.md, lead:final4_todo]
+  - id: policy.events_films
+    type: decision
+    kind: policy_choice
+    title: Films par pays × année depuis Wikidata (agrégat attribué, édition communautaire)
+    unlocks:
+      domains: [culture]
+      text: Une série « films » marquée community_edited_counts.
+    action: Oui / non.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_culture.md]
+  - id: policy.xls_reader
+    type: decision
+    kind: policy_choice
+    title: Nouvelle dépendance pour lire les .xls (STEO 2004-2013, spots EIA)
+    unlocks:
+      domains: [energy]
+      tracks: [beat-energy]
+      text: Numéros STEO anciens et classeurs EIA.
+    action: Accepter ou refuser une dépendance (xlrd).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_pred_energy.md]

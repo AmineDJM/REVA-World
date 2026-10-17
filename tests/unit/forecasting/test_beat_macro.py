@@ -130,3 +130,29 @@ def test_seal_supplement_only_g7_family_and_attributes_the_imf_input() -> None:
     f = sup["forecasts"][0]
     assert f["status"] == "issued" and "USES THE IMF FORECAST AS AN INPUT" in f["claim"]
     assert f["inputs"]["imf_weo_projection"] == 4.0
+    assert f["display"] == "point_only" and "non affiché" in f["interval_status"]
+
+
+def test_monthly_plan_is_idempotent_and_never_backdated() -> None:
+    from reva.evaluation.beat_macro import seal as SE
+
+    t = datetime(2026, 12, 3, 9, tzinfo=UTC)
+    assert SE.plan_month(t, set()) == ("2026-12", datetime(2026, 12, 1, tzinfo=UTC))
+    assert SE.plan_month(t, {"2026-12"}) == "already sealed for 2026-12"
+    early = datetime(2026, 10, 17, 22, tzinfo=UTC)
+    assert SE.plan_month(early, set(), "2026-11") == ("2026-11", early)  # next month: cutoff = issue time
+    assert isinstance(SE.plan_month(t, set(), "2026-11"), str)  # past month: refused
+    assert isinstance(SE.plan_month(early, set(), "2027-01"), str)
+
+
+def test_point_only_display_keeps_the_sealed_interval() -> None:
+    from reva.evaluation.beat_macro import seal as SE
+
+    f = {"model": "forecast.bm_stack", "point": 4.1, "quantiles": {"0.1": 3.9}, "predictive": {"family": "empirical"},
+         "display": SE.DISPLAY, "interval_status": SE.INTERVAL_LABEL}  # fmt: skip
+    v = SE.mask_for_display(f)
+    assert v["point"] == 4.1 and "quantiles" not in v and "predictive" not in v
+    assert v["interval_status"].startswith("intervalle non calibré")
+    assert "quantiles" in f  # the sealed record itself is unchanged
+    other = {"model": "x", "quantiles": {"0.1": 1.0}}
+    assert SE.mask_for_display(other) == other

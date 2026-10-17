@@ -290,7 +290,7 @@ tracks:
   label_fr: BEAT-MACRO — nowcasts et combinaisons vs FMI / SPF BCE
   agent: BEAT-MACRO
   version: V7
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol:
     file: registry/forecasts/beat_macro/protocol.yaml
     sha256: 2ed5574cbaa65d6d06ba8861c4b0d808b34443aeaaeaf8cd42695214a1cf9855
@@ -506,7 +506,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/0
@@ -515,7 +514,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: &id001
     file: registry/forecasts/beat_macro/protocol.yaml
     sha256: 2ed5574cbaa65d6d06ba8861c4b0d808b34443aeaaeaf8cd42695214a1cf9855
@@ -553,7 +552,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/1
@@ -562,7 +560,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.holdout.g7rt.unemployment_rate.cy.bm_bridge.imf_weo_errfan.crps
   track: beat_macro
@@ -598,7 +596,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/2
@@ -607,7 +604,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.holdout.g7rt.unemployment_rate.cy.bm_stack.imf_weo_errfan.crps
   track: beat_macro
@@ -644,7 +641,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/3
@@ -653,7 +649,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_stack.imf_weo.ae
   track: beat_macro
@@ -689,7 +685,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/4
@@ -698,7 +693,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_bridge.imf_weo_errfan.crps
   track: beat_macro
@@ -734,7 +729,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/5
@@ -743,7 +737,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_stack.imf_weo_errfan.crps
   track: beat_macro
@@ -780,7 +774,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - targets_seen
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout.json
     pointer: /results/6
@@ -789,7 +782,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 6fd528cfc9e52eb61d483061d2f8dfe04d3fc93651aa840a0601d6aeeefb18a0
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.cpi_inflation.cy.bm_bridge.imf_weo_errfan.crps
   track: beat_macro
@@ -824,7 +817,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/9
@@ -833,7 +825,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.cpi_inflation.cy.bm_stack.imf_weo_errfan.crps
   track: beat_macro
@@ -869,7 +861,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/11
@@ -878,7 +869,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.cpi_inflation.cy.bm_bridge_oil.imf_weo_errfan.crps
   track: beat_macro
@@ -913,7 +904,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/13
@@ -922,7 +912,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.cpi_inflation.cy.bm_stack_oil.imf_weo_errfan.crps
   track: beat_macro
@@ -958,7 +948,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/15
@@ -967,7 +956,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.real_gdp_growth.cy.bm_bridge.imf_weo.ae
   track: beat_macro
@@ -1002,7 +991,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/16
@@ -1011,7 +999,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.real_gdp_growth.cy.bm_bridge.imf_weo_errfan.crps
   track: beat_macro
@@ -1046,7 +1034,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/17
@@ -1055,7 +1042,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.real_gdp_growth.cy.bm_stack.imf_weo.ae
   track: beat_macro
@@ -1091,7 +1078,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/18
@@ -1100,7 +1086,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.g7rt.real_gdp_growth.cy.bm_stack.imf_weo_errfan.crps
   track: beat_macro
@@ -1136,7 +1122,6 @@ rows:
   - lagged_final_inputs
   - same_institution_outcome
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/19
@@ -1145,7 +1130,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_bridge.ecb_spf.ae
   track: beat_macro
@@ -1179,7 +1164,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/24
@@ -1188,7 +1172,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_bridge.ecb_spf_errfan.crps
   track: beat_macro
@@ -1222,7 +1206,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/25
@@ -1231,7 +1214,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack.ecb_spf.ae
   track: beat_macro
@@ -1266,7 +1249,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/26
@@ -1275,7 +1257,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack.ecb_spf_errfan.crps
   track: beat_macro
@@ -1310,7 +1292,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/27
@@ -1319,7 +1300,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_bridge_oil.ecb_spf.ae
   track: beat_macro
@@ -1353,7 +1334,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/28
@@ -1362,7 +1342,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_bridge_oil.ecb_spf_errfan.crps
   track: beat_macro
@@ -1396,7 +1376,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/29
@@ -1405,7 +1384,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack_oil.ecb_spf.ae
   track: beat_macro
@@ -1440,7 +1419,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/30
@@ -1449,7 +1427,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack_oil.ecb_spf_errfan.crps
   track: beat_macro
@@ -1484,7 +1462,6 @@ rows:
   - timeliness_edge
   - lagged_final_inputs
   - development_only
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/development.json
     pointer: /tests/31
@@ -1493,7 +1470,7 @@ rows:
       p: p_better
       win: holm_rejected
     sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_macro.prospective.g7rt.unemployment_rate.cy.bm_stack.imf_weo.ae
   track: beat_macro
@@ -1516,7 +1493,6 @@ rows:
   caveats:
   - uses_official_forecast
   - timeliness_edge
-  - report_pending
   source:
     file: registry/forecasts/beat_macro/holdout_ledger.yaml
     pointer: /openings/1/confirmed/0
@@ -1529,7 +1505,7 @@ rows:
       file: registry/forecasts/beat_macro/protocol.yaml
       text: targets 2026 resolve with the October 2027 WEO
   registry_model: forecast.bm_stack
-  report: null
+  report: docs/dev/v7_beat_macro.md
   protocol: *id001
 - id: beat_energy.W1.BREPUUS.h0.daily_rw.steo.ae
   track: beat_energy

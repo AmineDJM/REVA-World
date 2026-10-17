@@ -1,0 +1,92 @@
+[
+ {
+  "request_fingerprint": "e507a14255b063f296608acfc9236db7d85b308ffe43e0dbd4476954601eab43",
+  "url": "https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates?page=13",
+  "file": "listing_page_13.html",
+  "sha256": "c9d3fc68fc9e933ff821af35f97a68a6425f492fc580ea717b1bf142050031cb",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "e7c25523c67868eb3813f66fe6ce169ee9551d28edb56b7a7cfb143b0415282d",
+  "live_bytes": 88184,
+  "excerpt": "the 13 <tr> rows of the live listing page, verbatim (page chrome removed)"
+ },
+ {
+  "request_fingerprint": "c2127a15af861eb2f57c2ce255f10072217d4e21b47511e321bf93773d191560",
+  "url": "https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates?page=19",
+  "file": "listing_page_19.html",
+  "sha256": "4699267b1ae23d3f84e833931d5a80342142541953829393a6876ffe691c7df2",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "36c105711449225565d11df11a9a0158c5061f1dfbdda5607f4df388c2be2228",
+  "live_bytes": 88187,
+  "excerpt": "the 13 <tr> rows of the live listing page, verbatim (page chrome removed)"
+ },
+ {
+  "request_fingerprint": "849eb812bcf224f45681ab28b7b0450ecbd41c3cdbc0ca4b2a7663a348da292c",
+  "url": "https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates?page=26",
+  "file": "listing_page_26.html",
+  "sha256": "bfba91a2d4a977a0011787c415dbeb3879e829ca4adb01d81375f473258d28d4",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "a1fe11fbcc77a39fc2dc5b7a966fc9101a16b3ae6c6e915b230734e8ff4a57ec",
+  "live_bytes": 85745,
+  "excerpt": "the 13 <tr> rows of the live listing page, verbatim (page chrome removed)"
+ },
+ {
+  "request_fingerprint": "05fa43ae10fbf8c4e46a91d05119f669bf4d3d2a7afcf12ea3c292878b6675ed",
+  "url": "https://esmis.nal.usda.gov/sites/default/release-files/3t945q76s/q524jp142/nc580n00z/wasde-07-10-2015.xml",
+  "file": "wasde-07-10-2015.xml",
+  "sha256": "1e9c84c41fcbab4bc58f5b2ccb5d27bd1e73258bfe8dca752593895be168aed9",
+  "status": 200,
+  "headers": {
+   "content-type": "application/xml"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "c7ad8395e8faf4d66308bc363aa8a95983f12de5f76f490a64103f8fa6a6e29f",
+  "live_bytes": 2049484,
+  "excerpt": "the 11 sub-reports holding the headline tables (U.S. wheat, feed grain and corn, rice, soybeans; World wheat, corn, rice, soybean), verbatim; region groups other than World removed (ElementTree re-serialisation, cell values unchanged)"
+ },
+ {
+  "request_fingerprint": "e18ac6b2e0bccf499cd10feda07d819971640f4140ee7ae763ee7d6fb09bb44c",
+  "url": "https://esmis.nal.usda.gov/sites/default/release-files/3t945q76s/hh63sw29w/n009w264b/wasde-08-12-2010.xml",
+  "file": "wasde-08-12-2010.xml",
+  "sha256": "355b01b76e8f865d471e1d61cb960a739005e2b2f802fbae08eb1a8ce12d54af",
+  "status": 200,
+  "headers": {
+   "content-type": "application/xml"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "ca73a81d35aede57a63cc03825b4f3e2e48570df5954b011dba86842e5cfe105",
+  "live_bytes": 3718176,
+  "excerpt": "the 11 sub-reports holding the headline tables (U.S. wheat, feed grain and corn, rice, soybeans; World wheat, corn, rice, soybean), verbatim; region groups other than World removed (ElementTree re-serialisation, cell values unchanged)"
+ },
+ {
+  "request_fingerprint": "fefffc13b3a7c650b37ef5969d96c5ae79e9120525cb205f491acf2d36e95b69",
+  "url": "https://esmis.nal.usda.gov/sites/default/release-files/3t945q76s/hd76s3705/1831cp907/wasde-07-12-2005.txt",
+  "file": "wasde-07-12-2005.txt",
+  "sha256": "dc12653bc2b805398896bfa59f960cbf2dbddd581567757be18595b9714d35f5",
+  "status": 200,
+  "headers": {
+   "content-type": "text/plain"
+  },
+  "retrieved_at": "2026-10-17T22:15:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "dc12653bc2b805398896bfa59f960cbf2dbddd581567757be18595b9714d35f5",
+  "live_bytes": 152005,
+  "excerpt": "complete file"
+ }
+]

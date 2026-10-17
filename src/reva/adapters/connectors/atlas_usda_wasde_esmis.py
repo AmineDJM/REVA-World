@@ -7,7 +7,8 @@ and Demand Estimates report with its release date and the files published for it
 complements ``atlas.usda_wasde`` (OCE CSV, 2021 -> now; the 2010-2020 zips answer 403) with the history needed to
 evaluate WASDE's projections at every release date.
 
-* **Which reports.** Every release listed with a release date in ``[first, last]`` (defaults 1998-01-01 -> today).
+* **Which reports.** Every release listed with a release date in ``[first, last]`` (defaults 1998-01-01 -> today;
+  the listing is read newest first until a page reaches ``first``; option ``pages`` = explicit page numbers).
   Per release one report file: the XML (``wasde-MM-DD-YYYY.xml`` / ``wasdeMMYY[vN].xml``) for releases from
   :data:`XML_FROM` (2010-07, the first XML), else the plain-text report (``.txt``). Announcements, ``.doc``,
   revision workbooks and ``ORIG``/``R1`` copies are never read. A release without such a file (or whose file does
@@ -630,10 +631,11 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     first = _date_opt(run.options.get("first"), "first", FIRST_RELEASE)
     last = _date_opt(run.options.get("last"), "last", datetime.now(UTC).date())
     max_pages = int(run.options.get("max_pages") or MAX_PAGES)
+    explicit = [int(x) for x in str(run.options.get("pages") or "").split(",") if x.strip()]
     shas: list[str] = []
     releases: dict[date, Release] = {}
     pages = 0
-    for page in range(max_pages):
+    for page in explicit or range(max_pages):
         try:
             raw = await run.get(LISTING_URL.format(page=page), key=f"esmis:wasde:page={page}", media_types=HTML_MEDIA)
         except SourceResponseError as e:
@@ -648,7 +650,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         for r in got:
             prev = releases.get(r.release)
             releases[r.release] = r if prev is None else Release(r.release, tuple(dict.fromkeys(prev.files + r.files)), prev.view)
-        if min(r.release for r in got) < first:
+        if not explicit and min(r.release for r in got) < first:
             break
     rows = Rows()
     per: list[dict[str, Any]] = []

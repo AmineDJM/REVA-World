@@ -1378,3 +1378,29 @@ table.heatmap thead th {
 .backtest-error {
   font-weight: 600;
 }
+
+/* ------------------------------------------------------------- V8 entry (old nav) + boot frame */
+.v8-entry-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #3653d3, #7c3fc4);
+  white-space: nowrap;
+}
+.v8-entry-link:hover {
+  filter: brightness(1.08);
+}
+.v8-boot {
+  min-height: 100vh;
+  background: #f7f7f8;
+}
+@media (prefers-color-scheme: dark) {
+  .v8-boot {
+    background: #0e1013;
+  }
+}

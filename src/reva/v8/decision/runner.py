@@ -114,7 +114,9 @@ class MemoClaims:
         return self._m[k]
 
 
-def memo_runner(run: Callable[[dict[str, Any]], dict[str, Any]] | None) -> Callable[[dict[str, Any]], dict[str, Any]] | None:
+def memo_runner(
+    run: Callable[[dict[str, Any]], dict[str, Any]] | None,
+) -> Callable[[dict[str, Any]], dict[str, Any]] | None:
     if run is None:
         return None
     cache: dict[str, dict[str, Any]] = {}
@@ -150,7 +152,7 @@ def static_contexts(effects: Any, claims: Any, baseline: Any, plugin_data: Plugi
         return {k: estimates.get(k) for k in keys}
 
     def near(node: str, mode: str) -> list[dict[str, Any]]:
-        kind, _, rest = node.partition(":")
+        _kind, _, rest = node.partition(":")
         ident = rest.rpartition("@")[0]
         out = []
         for e in estimates.values():
@@ -189,9 +191,7 @@ def data_fingerprint(conn: Connection) -> str:
     parts: list[str] = []
     try:
         with conn.begin_nested():
-            row = conn.execute(
-                text("SELECT count(*), coalesce(max(id), 0) FROM kg.effect_estimate_current")
-            ).one()
+            row = conn.execute(text("SELECT count(*), coalesce(max(id), 0) FROM kg.effect_estimate_current")).one()
         parts.append(f"fx{row[0]}:{row[1]}")
     except Exception:
         parts.append("fx-absent")
@@ -242,7 +242,7 @@ def db_contexts(
         return out
 
     def near(node: str, mode: str) -> list[dict[str, Any]]:
-        kind, _, rest = node.partition(":")
+        _kind, _, rest = node.partition(":")
         ident = rest.rpartition("@")[0]
         if not ident:
             return []
@@ -348,7 +348,9 @@ def _values(v: Mapping[str, Any]) -> dict[str, float | None]:
 
 
 def _path_keys(v: Mapping[str, Any], hops: Mapping[str, Mapping[str, Any]]) -> list[str]:
-    return [str(hops[h]["estimate_key"]) for h in v.get("path") or [] if h in hops and hops[h].get("kind") == "estimate"]
+    return [
+        str(hops[h]["estimate_key"]) for h in v.get("path") or [] if h in hops and hops[h].get("kind") == "estimate"
+    ]
 
 
 def _r2(y: np.ndarray, z: np.ndarray) -> float | None:
@@ -397,7 +399,8 @@ def sensitivity(
         periods = list(cv)
         done = [p for p in periods if cv.get(p) is not None]
         head = done[-1] if done else None
-        bars, flat = [], []
+        bars: list[dict[str, Any]] = []
+        flat: list[dict[str, Any]] = []
         for k in _path_keys(v, hops):
             lv, hv = lo_vals[k].get(vid, {}), hi_vals[k].get(vid, {})
             swing = {
@@ -417,7 +420,9 @@ def sensitivity(
                     r2[p] = _r2(y, zk)
                 else:
                     r2[p] = _r2(y[:, i], zk) if i < y.shape[1] else None
-            bars.append({"estimate_key": k, "short": labels.get(k) or k, "low": lv, "high": hv, "swing": swing, "mc_r2": r2})
+            bars.append(
+                {"estimate_key": k, "short": labels.get(k) or k, "low": lv, "high": hv, "swing": swing, "mc_r2": r2}
+            )
         if head is not None:
             bars.sort(key=lambda b: -(b["swing"].get(head) or 0.0))
         out_vars.append(
@@ -497,8 +502,12 @@ def compare(a: Computed, b: Computed) -> dict[str, Any]:
                 qa, qb = pa.get(p) or {}, pb.get(p) or {}
                 ent: dict[str, Any] = {
                     "period": p,
-                    "a": None if qa.get("missing_reason") or qa.get("p50") is None else {k: qa.get(k) for k in ("p05", "p50", "p95", "degenerate")},
-                    "b": None if qb.get("missing_reason") or qb.get("p50") is None else {k: qb.get(k) for k in ("p05", "p50", "p95", "degenerate")},
+                    "a": None
+                    if qa.get("missing_reason") or qa.get("p50") is None
+                    else {k: qa.get(k) for k in ("p05", "p50", "p95", "degenerate")},
+                    "b": None
+                    if qb.get("missing_reason") or qb.get("p50") is None
+                    else {k: qb.get(k) for k in ("p05", "p50", "p95", "degenerate")},
                     "a_missing": qa.get("missing_reason"),
                     "b_missing": qb.get("missing_reason"),
                     "diff": None,
@@ -520,7 +529,11 @@ def compare(a: Computed, b: Computed) -> dict[str, Any]:
     ga = {(g.get("code"), g.get("node")) for g in a.result.get("gaps") or []}
     gb = {(g.get("code"), g.get("node")) for g in b.result.get("gaps") or []}
     da_doc, db_doc = a.result.get("decision") or {}, b.result.get("decision") or {}
-    changed = sorted(k for k in set(da_doc) | set(db_doc) if k not in ("id", "label_fr", "label_en") and da_doc.get(k) != db_doc.get(k))
+    changed = sorted(
+        k
+        for k in set(da_doc) | set(db_doc)
+        if k not in ("id", "label_fr", "label_en") and da_doc.get(k) != db_doc.get(k)
+    )
     return {
         "paired": paired_ok,
         "paired_fr": (

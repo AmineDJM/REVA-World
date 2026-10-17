@@ -23,6 +23,10 @@ const ComposerPage = lazy(() => import('./pages/ComposerPage'));
 const RunsPage = lazy(() => import('./pages/RunsPage'));
 const RunPage = lazy(() => import('./pages/RunPage'));
 const V3App = lazy(() => import('./v3/V3App'));
+// V8 console: its own frame (no V1 header), own chunk; features are discovered under src/v8/features/.
+const V8Root = lazy(() => import('./v8/shell/V8Root'));
+
+const isV8 = (pathname: string) => pathname === '/v8' || pathname.startsWith('/v8/');
 
 const NAV = [
   { to: '/world', label: 'World' },
@@ -60,11 +64,12 @@ export function App() {
   }, [check]);
 
   useEffect(() => {
+    if (isV8(location.pathname)) return; // the V8 shell names its own pages
     const page = NAV.find((n) => location.pathname.startsWith(n.to.split('/').slice(0, 2).join('/')));
     document.title = page ? `${page.label} · REVA World` : 'REVA World';
   }, [location.pathname]);
 
-  if (state.status === 'checking') return <Loading what="session" />;
+  if (state.status === 'checking') return isV8(location.pathname) ? <div className="v8-boot" aria-busy="true" /> : <Loading what="session" />;
   if (state.status === 'error') {
     return (
       <main id="main">
@@ -84,6 +89,16 @@ export function App() {
       setState({ status: 'anonymous' });
     }
   };
+
+  if (isV8(location.pathname)) {
+    return (
+      <ProvenanceProvider>
+        <Suspense fallback={<div className="v8-boot" aria-busy="true" />}>
+          <V8Root username={state.session.username} onLogout={doLogout} />
+        </Suspense>
+      </ProvenanceProvider>
+    );
+  }
 
   return (
     <ProvenanceProvider>
@@ -108,7 +123,10 @@ export function App() {
             ))}
           </ul>
         </nav>
-        <CommandPalette screens={[...NAV, ...V3_PALETTE]} />
+        <NavLink className="v8-entry-link" to="/v8" title="La nouvelle console : recherche Ctrl-K, fiches, carte, scores…">
+          Nouvelle console V8 →
+        </NavLink>
+        <CommandPalette screens={[...NAV, ...V3_PALETTE, { to: '/v8', label: 'Nouvelle console V8' }]} />
         <div className="session">
           <span>
             Signed in as <strong>{state.session.username}</strong>

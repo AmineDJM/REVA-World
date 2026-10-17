@@ -212,8 +212,21 @@ class TransformRule:
     reason: str | None = None
 
 
+_PER_CAPITA = re.compile(
+    r"per ?capita|par habitant|per (?:person|inhabitant|head|1 ?000|100|10 ?000|100 ?000|million)|pcap|_pc\b|\.pc\b|"
+    r"per_capita|percap|density|densit|/\s*(?:capita|hab|person|km)",
+    re.I,
+)
+
+
 def transform_rules(
-    *, unit: str | None, precision: str | None, numeric: bool, min_value: float | None, countries: bool
+    *,
+    unit: str | None,
+    precision: str | None,
+    numeric: bool,
+    min_value: float | None,
+    countries: bool,
+    context: str = "",
 ) -> dict[str, TransformRule]:
     """Which Comparer transforms the inputs allow (French reasons when not).
 
@@ -221,7 +234,8 @@ def transform_rules(
     * ``yoy`` (variation sur un an, %): numeric, regular precision (year/semester/quarter/month), strictly positive,
       not already a percentage or rate.
     * ``percap`` (par habitant, REVA computation): annual numeric amounts or counts (extensive unit) of ISO3
-      countries, divided by the atlas population of the same country and year."""
+      countries, divided by the atlas population of the same country and year; never for a series whose label,
+      code or unit (``context``) says it is already per capita, per 1000, per km²…"""
     kind = unit_kind(unit)
     out: dict[str, TransformRule] = {}
     if not numeric:
@@ -246,6 +260,8 @@ def transform_rules(
         out["percap"] = TransformRule(False, "population annuelle seulement : série non annuelle")
     elif not countries:
         out["percap"] = TransformRule(False, "lieux qui ne sont pas des pays : pas de population atlas")
+    elif _PER_CAPITA.search(f"{context} {unit or ''}"):
+        out["percap"] = TransformRule(False, "déjà rapporté à la population (ou à une surface) : pas de second calcul")
     elif kind != "extensive":
         out["percap"] = TransformRule(False, f"unité « {unit or '?'} » non additive ou inconnue : pas de calcul par habitant")
     else:

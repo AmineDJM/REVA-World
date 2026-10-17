@@ -106,7 +106,10 @@ TARGETS: dict[str, dict[str, str]] = {
     "energy.henry_hub": {"domain": "energy", "label_fr": "Gaz Henry Hub — moyenne mensuelle"},
     "energy.us_crude_production": {"domain": "energy", "label_fr": "Production de brut — États-Unis"},
     "energy.us_crude_stocks": {"domain": "energy", "label_fr": "Stocks de brut hors SPR — États-Unis"},
-    "energy.quantities_w2": {"domain": "energy", "label_fr": "8 séries de quantités STEO (production, consommation, stocks)"},
+    "energy.quantities_w2": {
+        "domain": "energy",
+        "label_fr": "8 séries de quantités STEO (production, consommation, stocks)",
+    },
     "energy.steo_v6": {"domain": "energy", "label_fr": "7 séries STEO de V6 (prix, production)"},
     "energy.registry_steo": {"domain": "energy", "label_fr": "Questions EIA du registre"},
     "health.flu_hosp": {"domain": "health", "label_fr": "Hospitalisations grippe — NHSN (US + États)"},

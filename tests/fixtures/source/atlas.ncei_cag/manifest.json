@@ -1,0 +1,86 @@
+[
+ {
+  "request_fingerprint": "35be32333b895c025ce26b23792348bbd5340c296ab74dd3b999fa3f58d32895",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/260/tavg/1/0/1990-2026/data.csv",
+  "file": "cag_260_tavg.csv",
+  "sha256": "76889d82851800bb835b76e609210ba1bbf64ee42183881982c4a29e31d8ebb7",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5325,
+  "excerpt": "complete file"
+ },
+ {
+  "request_fingerprint": "c4a1e6b1fff2af991d7892a205456d998b0359ada1e1c1ac0ca2108eb1fd8e70",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/260/pcp/1/0/1990-2026/data.csv",
+  "file": "cag_260_pcp.csv",
+  "sha256": "1c48a68aee7d8aaaeaa309b6f3a84d75702235330a57008ba29af979bf426306",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5348,
+  "excerpt": "complete file"
+ },
+ {
+  "request_fingerprint": "a127b66be1258f7b446fc04e7d72d48922289006fad0bed2a81968101437a0a6",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/261/tavg/1/0/1990-2026/data.csv",
+  "file": "cag_261_tavg.csv",
+  "sha256": "6990b976a773cce114088aaf0228342080f93dd5dfdada74edd7e9d58e79f1e4",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5301,
+  "excerpt": "complete file"
+ },
+ {
+  "request_fingerprint": "59ee5910a541918a50c1cb687aad8b53aae483856898d3a9a4fac7c2ad758ae6",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/261/pcp/1/0/1990-2026/data.csv",
+  "file": "cag_261_pcp.csv",
+  "sha256": "8ff65fa25a86d196357ed5377045414a87cf8c5a163c7fa7189608a2c04e6203",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5306,
+  "excerpt": "complete file"
+ },
+ {
+  "request_fingerprint": "a8a6700e4a4bfc9fe04ab0824c2d8173ac2395c99d9476fccffc7a09e0883c86",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/262/tavg/1/0/1990-2026/data.csv",
+  "file": "cag_262_tavg.csv",
+  "sha256": "90a796295f8cc1b549676a238a9936751d7ff3d2cba3edbd796906dbb60f8580",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5306,
+  "excerpt": "complete file"
+ },
+ {
+  "request_fingerprint": "4848b768c2e65f50a7d9635170897f34e3eff939e0936e02b9c50dc721b53ecb",
+  "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/262/pcp/1/0/1990-2026/data.csv",
+  "file": "cag_262_pcp.csv",
+  "sha256": "cbe04538118c187e3ad173672a015a85d6e03e7952f169d6f6ba882c4b754570",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv;charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T22:40:00+00:00",
+  "licence": "Public domain (U.S. Government work, NOAA)",
+  "live_bytes": 5315,
+  "excerpt": "complete file"
+ }
+]

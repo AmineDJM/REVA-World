@@ -61,27 +61,89 @@ HORIZON_FR: dict[str, str] = {
 HORIZON_UNIT_FR: dict[str, str] = {"year": "an(s)", "quarter": "trim.", "month": "mois", "week": "sem.", "day": "j"}
 
 NOTE_FR: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"^annual lag profile read on quarters.*"), "profil annuel lu par trimestre : la réponse de l'année h s'applique à ses quatre trimestres"),
-    (re.compile(r"^monthly lag profile read on quarters.*"), "profil mensuel lu par trimestre : moyenne des mois publiés de chaque trimestre"),
-    (re.compile(r"^single published horizon.*"), "un seul horizon publié : les autres horizons ne sont pas calculés (jamais interpolés)"),
-    (re.compile(r"^horizon of (\d+) months read as quarter offset (\d+)"), r"horizon de \1 mois lu comme le trimestre +\2"),
-    (re.compile(r"^sd derived from the published interval assuming symmetry.*"), "écart-type déduit de l'intervalle publié (symétrie supposée, approximation normale)"),
-    (re.compile(r"^uncertainty from a published range only.*"), "incertitude tirée d'une simple fourchette publiée (heuristique, étiquetée)"),
-    (re.compile(r"^sd = dispersion across the published estimates.*"), "écart-type = dispersion entre estimations publiées (hétérogénéité, pas erreur d'échantillonnage)"),
-    (re.compile(r"^estimated on data up to (\d{4}); the decision starts in (\d{4}) \(more than (\d+) years.*"), r"estimée sur des données jusqu'en \1 ; la décision commence en \2 (plus de \3 ans d'écart)"),
-    (re.compile(r"^estimated on data up to (\d{4}); applied to (\d{4}) \(out-of-sample period\)"), r"estimée sur des données jusqu'en \1 ; appliquée à \2 (hors période d'estimation)"),
-    (re.compile(r"^pooled panel \((\d+) countries; (\w{3}) is in the listed sample\).*"), r"panel groupé (\1 pays, \2 dans l'échantillon) : une moyenne du panel, pas une estimation propre à \2"),
-    (re.compile(r"^pooled panel \('(.+)', verbatim\); (\w{3}) membership not checked"), r"panel groupé (« \1 ») : appartenance de \2 non vérifiée"),
-    (re.compile(r"^estimate from a world-level scope applied to (\w{3}).*"), r"estimation de portée mondiale appliquée à \1 (moyenne transposée)"),
+    (
+        re.compile(r"^annual lag profile read on quarters.*"),
+        "profil annuel lu par trimestre : la réponse de l'année h s'applique à ses quatre trimestres",
+    ),
+    (
+        re.compile(r"^monthly lag profile read on quarters.*"),
+        "profil mensuel lu par trimestre : moyenne des mois publiés de chaque trimestre",
+    ),
+    (
+        re.compile(r"^single published horizon.*"),
+        "un seul horizon publié : les autres horizons ne sont pas calculés (jamais interpolés)",
+    ),
+    (
+        re.compile(r"^horizon of (\d+) months read as quarter offset (\d+)"),
+        r"horizon de \1 mois lu comme le trimestre +\2",
+    ),
+    (
+        re.compile(r"^sd derived from the published interval assuming symmetry.*"),
+        "écart-type déduit de l'intervalle publié (symétrie supposée, approximation normale)",
+    ),
+    (
+        re.compile(r"^uncertainty from a published range only.*"),
+        "incertitude tirée d'une simple fourchette publiée (heuristique, étiquetée)",
+    ),
+    (
+        re.compile(r"^sd = dispersion across the published estimates.*"),
+        "écart-type = dispersion entre estimations publiées (hétérogénéité, pas erreur d'échantillonnage)",
+    ),
+    (
+        re.compile(r"^estimated on data up to (\d{4}); the decision starts in (\d{4}) \(more than (\d+) years.*"),
+        r"estimée sur des données jusqu'en \1 ; la décision commence en \2 (plus de \3 ans d'écart)",
+    ),
+    (
+        re.compile(r"^estimated on data up to (\d{4}); applied to (\d{4}) \(out-of-sample period\)"),
+        r"estimée sur des données jusqu'en \1 ; appliquée à \2 (hors période d'estimation)",
+    ),
+    (
+        re.compile(r"^pooled panel \((\d+) countries; (\w{3}) is in the listed sample\).*"),
+        r"panel groupé (\1 pays, \2 dans l'échantillon) : une moyenne du panel, pas une estimation propre à \2",
+    ),
+    (
+        re.compile(r"^pooled panel \('(.+)', verbatim\); (\w{3}) membership not checked"),
+        r"panel groupé (« \1 ») : appartenance de \2 non vérifiée",
+    ),
+    (
+        re.compile(r"^estimate from a world-level scope applied to (\w{3}).*"),
+        r"estimation de portée mondiale appliquée à \1 (moyenne transposée)",
+    ),
     (re.compile(r"^the estimate states no geographic scope"), "l'estimation ne précise pas sa portée géographique"),
-    (re.compile(r"^published response to a shock of (.+) scaled linearly to the decision's change.*"), r"réponse publiée à un choc de \1, mise à l'échelle linéairement (linéarité supposée)"),
-    (re.compile(r"^the change reaching this estimate \(([^)]+)\) is ([\d.]+) times the published shock \(([^)]+)\).*"), r"le changement qui atteint cette estimation (\1) vaut \2 fois le choc publié (\3) : extrapolation linéaire hors du domaine estimé"),
-    (re.compile(r"^undated estimate applied to the decided change.*"), "estimation non datée appliquée au changement décidé (la durée de la décision n'est pas utilisée)"),
-    (re.compile(r"^undated estimate applied to the upstream value at (\S+) \(last available\)"), r"estimation non datée appliquée à la valeur amont de \1 (dernière disponible)"),
-    (re.compile(r"^undated upstream change treated as a step.*"), "changement amont non daté traité comme une marche au début de la décision"),
-    (re.compile(r"^approximation: log points ≈ percent.*"), "approximation : points log ≈ % (valable pour de petites variations)"),
-    (re.compile(r"^occurrence at the start quarter.*"), "survenue au trimestre de départ : les réponses publiées à une survenue sont lues telles quelles"),
-    (re.compile(r"^target level, not a change.*"), "niveau cible, pas une variation : seuls les modèles qui lisent un niveau l'utilisent"),
+    (
+        re.compile(r"^published response to a shock of (.+) scaled linearly to the decision's change.*"),
+        r"réponse publiée à un choc de \1, mise à l'échelle linéairement (linéarité supposée)",
+    ),
+    (
+        re.compile(
+            r"^the change reaching this estimate \(([^)]+)\) is ([\d.]+) times the published shock \(([^)]+)\).*"
+        ),
+        r"le changement qui atteint cette estimation (\1) vaut \2 fois le choc publié (\3) : extrapolation linéaire hors du domaine estimé",
+    ),
+    (
+        re.compile(r"^undated estimate applied to the decided change.*"),
+        "estimation non datée appliquée au changement décidé (la durée de la décision n'est pas utilisée)",
+    ),
+    (
+        re.compile(r"^undated estimate applied to the upstream value at (\S+) \(last available\)"),
+        r"estimation non datée appliquée à la valeur amont de \1 (dernière disponible)",
+    ),
+    (
+        re.compile(r"^undated upstream change treated as a step.*"),
+        "changement amont non daté traité comme une marche au début de la décision",
+    ),
+    (
+        re.compile(r"^approximation: log points ≈ percent.*"),
+        "approximation : points log ≈ % (valable pour de petites variations)",
+    ),
+    (
+        re.compile(r"^occurrence at the start quarter.*"),
+        "survenue au trimestre de départ : les réponses publiées à une survenue sont lues telles quelles",
+    ),
+    (
+        re.compile(r"^target level, not a change.*"),
+        "niveau cible, pas une variation : seuls les modèles qui lisent un niveau l'utilisent",
+    ),
 ]
 
 
@@ -142,7 +204,7 @@ def short_source(ev: Mapping[str, Any] | None, estimate_key: str) -> str:
         kind = ev.get("source_kind")
         if kind == "reva_run":
             run = ev.get("run") or {}
-            rid = str(run.get("run_id") or (estimate_key.split(":") + ["?"])[1])
+            rid = str(run.get("run_id") or ([*estimate_key.split(":"), "?"])[1])
             return f"REVA · calcul {rid[:14]}"
         if kind == "identity":
             ident = ev.get("identity") or {}
@@ -152,7 +214,9 @@ def short_source(ev: Mapping[str, Any] | None, estimate_key: str) -> str:
         toks = parts[2].split("_")
         year = toks[-1] if toks and re.fullmatch(r"\d{4}", toks[-1]) else ""
         names = [t for t in toks if not re.fullmatch(r"\d{4}", t)]
-        who = names[0].capitalize() + (" et al." if len(names) > 2 else (f" & {names[1].capitalize()}" if len(names) == 2 else ""))
+        who = names[0].capitalize() + (
+            " et al." if len(names) > 2 else (f" & {names[1].capitalize()}" if len(names) == 2 else "")
+        )
         return f"{who} {year}".strip()
     if parts[0] == "run" and len(parts) >= 2:
         return f"REVA · calcul {parts[1][:14]}"
@@ -268,13 +332,37 @@ def _flags(v: Mapping[str, Any]) -> list[dict[str, str]]:
         )
     notes = " ".join(v.get("notes") or [])
     if "linear extrapolation" in notes:
-        out.append({"code": "extrapolation", "label_fr": "extrapolation", "title_fr": "choc bien plus grand que le choc publié"})
+        out.append(
+            {
+                "code": "extrapolation",
+                "label_fr": "extrapolation",
+                "title_fr": "choc bien plus grand que le choc publié",
+            }
+        )
     if "more than 20 years" in notes or re.search(r"more than \d+ years", notes):
-        out.append({"code": "old", "label_fr": "estimation ancienne", "title_fr": "données d'estimation antérieures de plus de 20 ans"})
+        out.append(
+            {
+                "code": "old",
+                "label_fr": "estimation ancienne",
+                "title_fr": "données d'estimation antérieures de plus de 20 ans",
+            }
+        )
     if "membership not checked" in notes:
-        out.append({"code": "group", "label_fr": "groupe non vérifié", "title_fr": "appartenance du pays au panel non vérifiée"})
+        out.append(
+            {
+                "code": "group",
+                "label_fr": "groupe non vérifié",
+                "title_fr": "appartenance du pays au panel non vérifiée",
+            }
+        )
     if v.get("kind") == "plugin_output":
-        out.append({"code": "model", "label_fr": "modèle REVA", "title_fr": f"sortie du modèle {v.get('model')} sous hypothèses énoncées"})
+        out.append(
+            {
+                "code": "model",
+                "label_fr": "modèle REVA",
+                "title_fr": f"sortie du modèle {v.get('model')} sous hypothèses énoncées",
+            }
+        )
     return out
 
 
@@ -324,7 +412,10 @@ def headline(result: Mapping[str, Any], evidence: Mapping[str, Mapping[str, Any]
                 "n_periods": len(periods),
                 "n_missing": sum(1 for p in periods if p.get("missing_reason")),
                 "flags": _flags(v),
-                "sources": [{"estimate_key": k, "short": (evidence.get(k) or {}).get("short") or short_source(None, k)} for k in keys],
+                "sources": [
+                    {"estimate_key": k, "short": (evidence.get(k) or {}).get("short") or short_source(None, k)}
+                    for k in keys
+                ],
                 "models": models,
                 "notes_fr": [note_fr(n) for n in v.get("notes") or []],
             }
@@ -334,7 +425,7 @@ def headline(result: Mapping[str, Any], evidence: Mapping[str, Mapping[str, Any]
 
 
 # ------------------------------------------------------------------------------------------- graph
-def _node_label(nid: str, labels: Mapping[str, str]) -> str:
+def node_label(nid: str, labels: Mapping[str, str]) -> str:
     kind, ident, geo = split_node(nid)
     base = labels.get(f"{kind}:{ident}") or ident
     return f"{base} · {geo_fr(geo)}" if geo else base
@@ -382,7 +473,13 @@ def graph(
     def node(nid: str, kind: str, **kw: Any) -> dict[str, Any]:
         if nid not in nodes:
             _, _, geo = split_node(nid) if "@" in nid else ("", "", kw.get("geo", ""))
-            nodes[nid] = {"id": nid, "kind": kind, "label": kw.pop("label", None) or _node_label(nid, labels), "geo": geo, **kw}
+            nodes[nid] = {
+                "id": nid,
+                "kind": kind,
+                "label": kw.pop("label", None) or node_label(nid, labels),
+                "geo": geo,
+                **kw,
+            }
         return nodes[nid]
 
     node("decision", "decision", label=d.get("label_fr") or "Décision", depth=-1, geo="")
@@ -429,12 +526,36 @@ def graph(
             )
         elif h["kind"] == "plugin":
             pid = f"plugin:{h['model']}@{split_node(h['from'])[2]}"
-            node(pid, "plugin", label=h.get("label_fr") or h["model"], depth=None, model=h["model"], blocked=not h.get("to"))
-            edges.append({"id": h["id"], "from": h["from"], "to": pid, "kind": "plugin", "label": h["model"], "assumption_fr": h.get("assumption_fr")})
+            node(
+                pid,
+                "plugin",
+                label=h.get("label_fr") or h["model"],
+                depth=None,
+                model=h["model"],
+                blocked=not h.get("to"),
+            )
+            edges.append(
+                {
+                    "id": h["id"],
+                    "from": h["from"],
+                    "to": pid,
+                    "kind": "plugin",
+                    "label": h["model"],
+                    "assumption_fr": h.get("assumption_fr"),
+                }
+            )
             for out in h.get("to") or []:
                 v = vars_by_id.get(out) or {}
                 node(out, "variable", depth=v.get("depth"), value=headline_value(v) if v else None, unit=v.get("unit"))
-                edges.append({"id": f"{h['id']}>{out}", "from": pid, "to": out, "kind": "model_output", "label": "sortie du modèle"})
+                edges.append(
+                    {
+                        "id": f"{h['id']}>{out}",
+                        "from": pid,
+                        "to": out,
+                        "kind": "model_output",
+                        "label": "sortie du modèle",
+                    }
+                )
 
     # stops: where the chain ends, and why
     for i, g in enumerate(result.get("gaps") or []):
@@ -444,15 +565,25 @@ def graph(
             if nid in direct_ids or nid not in nodes:
                 node(nid, "direct" if nid in direct_ids else "variable", depth=0)
                 sid = f"stop:{nid}"
-                stop = node(sid, "stop", label="aucune estimation chiffrée", depth=None, geo=split_node(nid)[2], reasons=[])
+                stop = node(
+                    sid, "stop", label="aucune estimation chiffrée", depth=None, geo=split_node(nid)[2], reasons=[]
+                )
                 stop["reasons"].append(gap_fr(g))
                 if not any(e["id"] == f"gap>{sid}" for e in edges):
-                    edges.append({"id": f"gap>{sid}", "from": nid, "to": sid, "kind": "missing", "label": "lien manquant"})
+                    edges.append(
+                        {"id": f"gap>{sid}", "from": nid, "to": sid, "kind": "missing", "label": "lien manquant"}
+                    )
             else:
                 nodes[nid]["chain_end"] = True
         elif code == "unresolved_tie" and nid:
             src = _tie_source(nid, g, evidence, nodes)
-            node(nid, "tie", label=f"{_node_label(nid, labels)} — égalité non résolue", depth=None, keys=g.get("estimate_keys"))
+            node(
+                nid,
+                "tie",
+                label=f"{node_label(nid, labels)} — égalité non résolue",
+                depth=None,
+                keys=g.get("estimate_keys"),
+            )
             edges.append(
                 {
                     "id": f"tie{i}",
@@ -465,12 +596,19 @@ def graph(
             )
         elif code in ("plugin_input_missing", "plugin_data_missing", "missing_input") and g.get("plugin"):
             model = str(g["plugin"])
-            base = nid or next((h["from"] for h in result.get("hops") or [] if h.get("kind") == "plugin" and h.get("model") == model), None)
+            base = nid or next(
+                (h["from"] for h in result.get("hops") or [] if h.get("kind") == "plugin" and h.get("model") == model),
+                None,
+            )
             if base is None:
                 continue
             pid = f"plugin:{model}@{split_node(base)[2]}"
             if pid not in nodes:
-                hit = [p for p in nodes if p.startswith(f"plugin:{model.split('@')[0]}") and p.endswith(f"@{split_node(base)[2]}")]
+                hit = [
+                    p
+                    for p in nodes
+                    if p.startswith(f"plugin:{model.split('@')[0]}") and p.endswith(f"@{split_node(base)[2]}")
+                ]
                 pid = hit[0] if hit else pid
             p = node(pid, "plugin", label=model, depth=None, model=model, blocked=True)
             p["blocked"] = True
@@ -485,12 +623,27 @@ def graph(
         to = u.get("to") or {}
         tid = f"{to.get('kind')}:{to.get('id')}@{split_node(u['from'])[2]}"
         node(tid, "unquantified", depth=None)
-        edges.append({"id": f"sign{j}", "from": u["from"], "to": tid, "kind": "sign_only", "label": f"signe {u.get('sign') or '?'} (non chiffré)", "estimate_key": u.get("estimate_key")})
+        edges.append(
+            {
+                "id": f"sign{j}",
+                "from": u["from"],
+                "to": tid,
+                "kind": "sign_only",
+                "label": f"signe {u.get('sign') or '?'} (non chiffré)",
+                "estimate_key": u.get("estimate_key"),
+            }
+        )
 
-    return {"nodes": list(nodes.values()), "edges": edges, "geos": sorted({n["geo"] for n in nodes.values() if n["geo"]})}
+    return {
+        "nodes": list(nodes.values()),
+        "edges": edges,
+        "geos": sorted({n["geo"] for n in nodes.values() if n["geo"]}),
+    }
 
 
-def _tie_source(nid: str, g: Mapping[str, Any], evidence: Mapping[str, Mapping[str, Any]], nodes: Mapping[str, Any]) -> str:
+def _tie_source(
+    nid: str, g: Mapping[str, Any], evidence: Mapping[str, Mapping[str, Any]], nodes: Mapping[str, Any]
+) -> str:
     geo = split_node(nid)[2]
     for k in g.get("estimate_keys") or []:
         cause = (evidence.get(k) or {}).get("cause") or {}
@@ -642,7 +795,7 @@ def diagnosis(
         item: dict[str, Any] = {
             "code": code,
             "node": nid,
-            "node_label": _node_label(nid, labels) if nid else None,
+            "node_label": node_label(nid, labels) if nid else None,
             "title_fr": GAP_TITLE_FR.get(code, code),
             "detail_fr": gap_fr(g),
         }
@@ -697,7 +850,7 @@ def diagnosis(
             {
                 "code": "level_target",
                 "node": nid,
-                "node_label": _node_label(nid, labels),
+                "node_label": node_label(nid, labels),
                 "title_fr": "Niveau cible, pas une variation",
                 "detail_fr": (
                     f"La décision fixe un niveau de « {labels.get(f'{kind}:{ident}') or ident} » : seul un modèle qui "
@@ -779,7 +932,9 @@ def estimate_keys(result: Mapping[str, Any]) -> list[str]:
     return list(dict.fromkeys(keys))
 
 
-def evidence_map(result: Mapping[str, Any], lookup: Mapping[str, Mapping[str, Any] | None]) -> dict[str, dict[str, Any]]:
+def evidence_map(
+    result: Mapping[str, Any], lookup: Mapping[str, Mapping[str, Any] | None]
+) -> dict[str, dict[str, Any]]:
     prov: dict[str, Mapping[str, Any]] = {}
     for h in result.get("hops") or []:
         if h.get("kind") == "estimate":

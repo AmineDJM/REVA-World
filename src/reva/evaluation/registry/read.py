@@ -190,6 +190,13 @@ def questions(
     return out[offset : offset + limit], len(out)
 
 
+def _display(f: dict[str, Any]) -> dict[str, Any]:
+    """Records sealed with ``display: point_only`` (V7 BEAT-MACRO) show the point only; the interval stays sealed."""
+    from reva.evaluation.beat_macro.seal import mask_for_display
+
+    return mask_for_display(f)
+
+
 def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
     for b in batches(conn, None):
         m = CACHE.get(store, b["batch_sha256"])
@@ -219,7 +226,7 @@ def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
                     if f["question_id"] == question_id]  # fmt: skip
         return {
             "question": q,
-            "forecasts": [{**f, "score": scores.get((f["model"], f.get("model_version")))} for f in fcs],
+            "forecasts": [{**_display(f), "score": scores.get((f["model"], f.get("model_version")))} for f in fcs],
             "outcome": oc,
             "status": (oc or {}).get("status", "pending"),
             "seal": {

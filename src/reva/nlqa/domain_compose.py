@@ -597,6 +597,23 @@ class DomainComposer:
 
         d, op = res.data, res.op
         c = d["concept"]
+        for pin in d.get("registered_tables") or []:
+            eids = [eid for _s, _n, picks, _y in d["period_groups"] for _c, eid in picks.values()]
+            when = str(pin.get("recorded_at") or "")[:10]
+            sha = str(pin.get("artifact_sha256") or "")[:12]
+            self.add(
+                self._t(
+                    f"Lu hors de l'instantané atlas courant : la table {pin.get('dataset_key')} a été enregistrée après "
+                    f"lui ; valeurs lues dans sa dernière version enregistrée (le {when}, artefact {sha}…), comme le "
+                    f"fait le registre de prévisions.",
+                    f"Read outside the current atlas snapshot: table {pin.get('dataset_key')} was registered after it; "
+                    f"values read in its latest registered version ({when}, artifact {sha}…), as the forecast registry "
+                    f"does.",
+                ),
+                eids[:1],
+                "note",
+                op.id,
+            )
         for src, n, picks, years in d["period_groups"]:
             span = f"{years[0]}–{years[-1]}" if years and years[0] != years[-1] else (str(years[0]) if years else "")
             names = {

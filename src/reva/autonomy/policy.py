@@ -128,9 +128,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   write of the same merge): 1.3.36 plus v6tradehf.yaml (new eurostat.comext 300/day; imf.sdmx 80 -> 98); same caps.
 # * budgets.yaml -> budgets-1.3.39 (2026-10-17, merge run and pinned by V6DRUGS): 1.3.38 plus v6drugs.yaml update
 #   (who.eeml 2000 -> 4000/day: a re-run after a failed run must fit the same day); same caps.
+# * budgets.yaml -> budgets-1.3.40 (2026-10-17, merge run and pinned by BEAT-AGRI): 1.3.39 plus beat_agri.yaml (new
+#   usda.wasde_esmis 450/day, noaa.ncei_cag 12/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "10acd8d384af0139cce233c009858da69349f2150ca44165e5fe3ae8ebeb1a5c",
+    "budgets.yaml": "1979f83c8201036d6f2e5e36dc0a70afec8c413379b54219ef87e24bf414de61",
 }
 
 

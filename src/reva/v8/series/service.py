@@ -156,6 +156,13 @@ def _proj_sql(q: AtlasQuery, source: str, dataset: str) -> str:
     )
 
 
+def _context(indicator: str, concept: Any) -> str:
+    """Text the per-capita rule reads besides the unit: the indicator code and the concept's labels and id."""
+    if concept is None:
+        return indicator
+    return " ".join([indicator, concept.id, *concept.labels.values()])
+
+
 def series_meta(q: AtlasQuery, idx: SeriesIndex, sid: int) -> dict[str, Any]:
     key = (q.snapshot.sha256, sid)
     hit = _cache_get(_META, key)
@@ -231,7 +238,12 @@ def series_meta(q: AtlasQuery, idx: SeriesIndex, sid: int) -> dict[str, Any]:
         "transforms": {
             k: {"ok": r.ok, "reason": r.reason}
             for k, r in transform_rules(
-                unit=unit, precision=prec, numeric=n_num > 0, min_value=vmin, countries=bool(countries)
+                unit=unit,
+                precision=prec,
+                numeric=n_num > 0,
+                min_value=vmin,
+                countries=bool(countries),
+                context=_context(ind, concept),
             ).items()
         },
     }
@@ -560,8 +572,8 @@ def multi_series(
     isos = [g for g in geos if re.fullmatch(r"[A-Z]{3}", g)]
     rows = (
         q._rows(  # noqa: SLF001
-            f"""SELECT {CELL_SELECT} FROM cells x
-                WHERE x.iso3 IN ({",".join("?" for _ in isos)}) AND x.sid IN ({",".join(str(int(s)) for s in sids)})
+            f"""SELECT {CELL_SELECT} FROM cells_s x
+                WHERE x.sid IN ({",".join(str(int(s)) for s in sids)}) AND x.iso3 IN ({",".join("?" for _ in isos)})
                 ORDER BY x.iso3, x.sid, x.period_start""",
             isos,
         )
@@ -585,6 +597,7 @@ def multi_series(
             numeric=bool(nums),
             min_value=min(nums) if nums else None,
             countries=bool(isos),
+            context=_context(meta["indicator"], idx.concept_for(meta["series"])),
         )
         out_series.append(
             {
@@ -614,7 +627,11 @@ def population_series(q: AtlasQuery, headlines: Any, isos: list[str]) -> dict[st
     if concept is None:
         return {"concept": None, "places": {}, "licences": [], "note": "concept de population absent du registre"}
     for g in isos:
-        h = q.headline_series(headlines, POPULATION_HEADLINE, g, projections="exclude")
+        ck = (q.snapshot.sha256, -1, f"pop:{g}")
+        h = _cache_get(_PERIODS, ck)
+        if h is None:
+            h = q.headline_series(headlines, POPULATION_HEADLINE, g, projections="exclude")
+            _cache_put(_PERIODS, ck, h)
         per[g] = [
             {
                 "year": c["year"],

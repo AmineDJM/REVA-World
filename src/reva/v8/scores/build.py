@@ -40,7 +40,11 @@ class Sources:
         if tracked_only:
             try:
                 out = subprocess.run(
-                    ["git", "ls-files"], cwd=root, capture_output=True, text=True, check=True
+                    ["git", "ls-files"],  # noqa: S607 - developer CLI, git from PATH
+                    cwd=root,
+                    capture_output=True,
+                    text=True,
+                    check=True,
                 ).stdout
                 self._tracked = set(out.splitlines())
             except (OSError, subprocess.CalledProcessError):
@@ -421,13 +425,17 @@ def beat_health(src: Sources) -> list[Row]:
         for i, key in enumerate(fam_list):
             hz, fam, cand = key.split("|")
             if hz == "H1":
-                res = {"date": str(h1["evaluate_not_before"]),
-                       "note_fr": "lecture unique du holdout H1 (saison 2026-27) au plus tôt à cette date",
-                       "quote": quote(prel, f"evaluate_not_before: \"{h1['evaluate_not_before']}\"")}
+                res = {
+                    "date": str(h1["evaluate_not_before"]),
+                    "note_fr": "lecture unique du holdout H1 (saison 2026-27) au plus tôt à cette date",
+                    "quote": quote(prel, f'evaluate_not_before: "{h1["evaluate_not_before"]}"'),
+                }
             else:
-                res = {"note_fr": "ingestion FluSight 2023-24 en attente (disque) ; sans vintages archivés, "
-                       "les 2 tests H2 comptent p = 1",
-                       "quote": quote(C.track("beat_health")["report"], "its 2 tests count as p = 1")}
+                res = {
+                    "note_fr": "ingestion FluSight 2023-24 en attente (disque) ; sans vintages archivés, "
+                    "les 2 tests H2 comptent p = 1",
+                    "quote": quote(C.track("beat_health")["report"], "its 2 tests count as p = 1"),
+                }
             rows.append({
                 **_health_base(fam, cand), "id": f"beat_health.{hz}.{fam}.{cand}", "window": hz,
                 "evaluation": "preregistered_holdout", "verdict": "en_attente",
@@ -709,7 +717,14 @@ EVENTS: list[dict[str, Any]] = [
 ]  # fmt: skip
 
 GENERATORS: tuple[Callable[[Sources], list[Row]], ...] = (
-    beat_macro, beat_energy, beat_health, beat_conflict, pred_models, fix7_fair, pred_energy_v6, ensemble,
+    beat_macro,
+    beat_energy,
+    beat_health,
+    beat_conflict,
+    pred_models,
+    fix7_fair,
+    pred_energy_v6,
+    ensemble,
 )
 
 
@@ -718,7 +733,10 @@ def build(src: Sources | None = None) -> dict[str, Any]:
     rows: list[Row] = []
     for g in GENERATORS:
         rows.extend(g(src))
-    files = sorted({r["source"]["file"] for r in rows} | {(r.get("protocol") or {}).get("file") for r in rows} - {None})
+    files = sorted(
+        {r["source"]["file"] for r in rows}
+        | {str(p["file"]) for r in rows if (p := r.get("protocol")) and p.get("file")}
+    )
     tracks = []
     for t in C.TRACKS:
         tracks.append({**t, "report": t["report"] if src.has(t["report"]) else None,

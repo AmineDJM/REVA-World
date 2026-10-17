@@ -716,4 +716,6 @@ class Backends:
     effects: EffectsPort | None = None
     forecasts: ForecastPort | None = None
     decisions: DecisionPort | None = None
+    #: registered atlas table versions read outside the snapshot (V8ASK, reva.nlqa.registered_tables)
+    tables: Any = None
     notes: list[str] = field(default_factory=list)

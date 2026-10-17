@@ -118,7 +118,7 @@ kinds:
       - {literal: "gleif:entity_creation_date", label_fr: Création}
       - {literal: "gleif:headquarters_city", label_fr: Siège}
       - {family_count: owns, label_fr: Filiales déclarées}
-      - {relation: "gleif:direct_parent", direction: in, label_fr: Société mère directe}
+      - {relation: "gleif:direct_parent", label_fr: Société mère directe, missing_from_literal: "gleif:parent_reporting_exception"}
     expected_facts:
       - {property: "gleif:legal_jurisdiction", label_fr: Juridiction}
       - {property: "gleif:direct_parent", label_fr: Société mère (ou exception déclarée)}
@@ -201,6 +201,23 @@ anchors:
 
 # Labels of KG kinds without a profile (fallback: the kind id with underscores as spaces).
 kind_labels_fr:
+  chemical_class: Classe chimique
+  chemical_role: Rôle chimique
+  mineral: Minéral
+  chemical_element: Élément chimique
+  disease_or_phenotype: Maladie ou phénotype
+  phenotype: Phénotype
+  drug_substance: Substance médicamenteuse
+  energy_source: Source d’énergie
+  non_state_conflict: Conflit non étatique
+  one_sided_violence: Violence unilatérale
+  armed_conflict_episode: Épisode de conflit armé
+  war: Guerre
+  government_entity: Entité publique
+  fund: Fonds
+  international_organisation: Organisation internationale
+  icd11_category: Catégorie CIM-11
+  mesh_descriptor: Descripteur MeSH
   protein: Protéine
   weather_station: Station météo
   disaster_event: Catastrophe

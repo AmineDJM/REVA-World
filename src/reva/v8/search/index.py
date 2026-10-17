@@ -19,7 +19,8 @@ from typing import Any
 
 import numpy as np
 
-from reva.v8.search.build import GROUP_ORDER, SEARCH_KINDS, index_path
+from reva.v8.search import hrefs
+from reva.v8.search.build import GROUP_ORDER, GROUPS, SEARCH_KINDS, index_path, kind_fr
 from reva.v8.search.normalize import norm_code, norm_text, trigrams
 
 TIER_BASE = {"id": 0.85, "exact": 0.75, "prefix": 0.55, "word": 0.45, "trigram": 0.25}
@@ -137,17 +138,21 @@ class SearchIndex:
 
         # 1. identifiers / codes, 2. exact labels
         for key in {qc, qn.replace(" ", "")} - {""}:
-            for rid, raw in db.execute("SELECT rid, raw FROM name WHERE norm = ? AND code = 1 LIMIT 100", (key,)):
+            for rid, raw in db.execute(
+                "SELECT rid, COALESCE(raw, upper(norm)) FROM name WHERE norm = ? AND code = 1 LIMIT 100", (key,)
+            ):
                 put(rid, "id", raw)
         if qn:
-            for rid, raw in db.execute("SELECT rid, raw FROM name WHERE norm = ? AND code = 0 LIMIT 300", (qn,)):
+            for rid, raw in db.execute(
+                "SELECT rid, COALESCE(raw, norm) FROM name WHERE norm = ? AND code = 0 LIMIT 300", (qn,)
+            ):
                 put(rid, "exact", raw)
         if qn:
             self._pop_prefix_word(qn, put)
             # long tail: alphabetical prefix range + FTS substring
             hi = qn + "\U0010ffff"
             for rid, raw in db.execute(
-                "SELECT rid, raw FROM name WHERE norm > ? AND norm < ? AND code = 0 LIMIT ?",
+                "SELECT rid, COALESCE(raw, norm) FROM name WHERE norm > ? AND norm < ? AND code = 0 LIMIT ?",
                 (qn, hi, SQL_PREFIX_LIMIT),
             ):
                 put(rid, "prefix", raw)
@@ -156,7 +161,7 @@ class SearchIndex:
             if fts_words:
                 expr = " AND ".join('"' + w.replace('"', "") + '"' for w in fts_words)
                 for rid, norm, raw in db.execute(
-                    "SELECT n.rid, n.norm, n.raw FROM name_fts f JOIN name n ON n.nid = f.rowid "
+                    "SELECT n.rid, n.norm, COALESCE(n.raw, n.norm) FROM name_fts f JOIN name n ON n.nid = f.rowid "
                     "WHERE name_fts MATCH ? LIMIT ?",
                     (expr, SQL_FTS_LIMIT),
                 ):
@@ -237,7 +242,7 @@ class SearchIndex:
         for i in range(0, len(rids), 900):
             chunk = rids[i : i + 900]
             for row in db.execute(
-                f"SELECT rid, kind, id, label_fr, label_en, sublabel, href, grp, entity_kind, source, origin, prior, "
+                f"SELECT rid, kind, id, label_fr, label_en, sublabel, href, entity_kind, source, origin, prior, "
                 f"extra FROM doc WHERE rid IN ({','.join('?' * len(chunk))})",
                 chunk,
             ):
@@ -249,32 +254,15 @@ class SearchIndex:
                 continue
             if kindset and d[1] not in kindset:
                 continue
-            if origin and d[10] != origin:
+            if origin and d[9] != origin:
                 continue
             label = (d[3] if lang == "fr" else d[4]) or d[4] or d[3] or d[2]
-            h.score = _score(h.tier, d[11], len(norm_text(h.matched)), len(qn), h.score if h.tier == "trigram" else 1.0)
+            h.score = _score(h.tier, d[10], len(norm_text(h.matched)), len(qn), h.score if h.tier == "trigram" else 1.0)
             out.append((h, d, label))
         out.sort(key=lambda x: (-x[0].score, TIER_RANK[x[0].tier], len(x[2]), x[1][2]))
         n_match = len(out)
         out = out[:limit]
-        result_hits = [
-            {
-                "id": d[2],
-                "kind": d[1],
-                "label": label,
-                "sublabel": d[5],
-                "href": d[6],
-                "score": h.score,
-                "group": d[7],
-                "match": h.tier,
-                "matched": h.matched,
-                "entity_kind": d[8],
-                "source": d[9],
-                "origin": d[10],
-                "extra": json.loads(d[12]) if d[12] else {},
-            }
-            for h, d, label in out
-        ]
+        result_hits = [_hit_json(h, d, label) for h, d, label in out]
         counts: dict[str, int] = {}
         for x in result_hits:
             counts[x["group"]] = counts.get(x["group"], 0) + 1
@@ -287,6 +275,28 @@ class SearchIndex:
             "truncated": n_match > limit,
             "matches": n_match,
         }
+
+
+def _hit_json(h: Hit, d: tuple[Any, ...], label: str) -> dict[str, Any]:
+    _rid, kind, id_, _lf, _le, sub, href, ek, source, origin, _prior, extra = d
+    if href is None:  # compact KG record
+        sub = " · ".join(x for x in (kind_fr(ek), id_, sub) if x)
+        href = hrefs.entity(ek or "entity", id_)
+    return {
+        "id": id_,
+        "kind": kind,
+        "label": label,
+        "sublabel": sub or "",
+        "href": href,
+        "score": h.score,
+        "group": GROUPS[kind],
+        "match": h.tier,
+        "matched": h.matched,
+        "entity_kind": ek,
+        "source": source,
+        "origin": origin,
+        "extra": json.loads(extra) if extra else {},
+    }
 
 
 _LOCK = threading.Lock()

@@ -17,14 +17,14 @@ from reva.atlas.query import AtlasQuery
 from reva.v8.series.core import Dims, default_score, fold, parse_indicator, tokens
 
 
-@dataclass
+@dataclass(slots=True)
 class Variant:
     sid: int
     indicator: str
     dims: Dims
 
 
-@dataclass
+@dataclass(slots=True)
 class Measure:
     table: str
     measure: str

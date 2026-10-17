@@ -9,15 +9,18 @@ and recomputed only when the registry's fingerprint (row counts, latest ``record
 
 from __future__ import annotations
 
+import logging
 import time
 from collections import Counter, defaultdict
-from collections.abc import Callable, Mapping
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
 from datetime import UTC, date, datetime
-from threading import Lock
+from threading import Lock, Thread
 from typing import Any
 
 from sqlalchemy import text
 
+LOG = logging.getLogger(__name__)
 SCOPES = ("forecast_registry", "forecast_registry_health")
 FINGERPRINT_TTL_S = 30.0
 OFFICIAL_REFERENCES = {
@@ -189,7 +192,7 @@ def _ensemble_summary(conn: Any, store: Any, origin: str | None) -> dict[str, An
         from reva.evaluation.registry.ensemble import scoreboard
 
         b = scoreboard(conn, store, origin)
-    except Exception as e:  # noqa: BLE001 - the scoreboard is another agent's module; never break this page
+    except Exception as e:  # another agent's module: never break this page
         return {"available": False, "reason": f"{type(e).__name__}: {e}"[:200]}
     cells = b.get("cells", [])
     by_official: dict[str, Counter[str]] = defaultdict(Counter)
@@ -210,60 +213,99 @@ def _ensemble_summary(conn: Any, store: Any, origin: str | None) -> dict[str, An
     }
 
 
-class LiveCache:
+def compute_live(conn: Any, store: Any, origin: str | None, *, today: date | None = None) -> dict[str, Any]:
+    """Registry counts, upcoming resolutions and the ensemble summary (reads every sealed manifest: seconds)."""
+    t0 = time.perf_counter()
+    d = today or datetime.now(UTC).date()
+    regs = [_summarise(_main_registry(conn, store, origin), d), _summarise(_health_registry(conn, store, origin), d)]
+    upcoming = sorted((u for r in regs for u in r["upcoming"]), key=lambda e: (e["date"], e["registry"], e["family"]))
+    for r in regs:
+        r.pop("upcoming")
+    return {
+        "computed_at": datetime.now(UTC).isoformat(),
+        "compute_ms": round((time.perf_counter() - t0) * 1000, 1),
+        "origin": origin,
+        "registries": regs,
+        "totals": {
+            "sealed_batches": sum(r["batches"] for r in regs),
+            "questions": sum(r["questions"] for r in regs),
+            "forecasts": sum(r["forecasts"] for r in regs),
+            **{k: sum(r["status"][k] for r in regs) for k in ("pending", "resolved", "void", "not_prospective")},
+        },
+        "next_resolution": next((u["date"] for u in upcoming if not u["overdue"]), None),
+        "overdue_groups": sum(1 for u in upcoming if u["overdue"]),
+        "upcoming": upcoming[:200],
+        "upcoming_total": len(upcoming),
+        "ensemble": _ensemble_summary(conn, store, origin),
+        "refreshing": False,
+    }
+
+
+@contextmanager
+def _ro(engine: Any) -> Iterator[Any]:
+    with engine.connect() as conn:
+        with conn.begin():
+            conn.execute(text("SET TRANSACTION READ ONLY"))
+            yield conn
+
+
+class LiveService:
+    """Per-origin cache with stale-while-revalidate: a changed registry is recomputed in a background thread
+    while the previous state is served (marked ``refreshing``); only a cold cache blocks."""
+
     def __init__(self) -> None:
         self._lock = Lock()
         self._d: dict[str | None, tuple[tuple[Any, ...], float, dict[str, Any]]] = {}
+        self._running: set[str | None] = set()
 
-    def get(self, key: str | None, fp: Callable[[], tuple[Any, ...]], compute: Callable[[], dict[str, Any]]) -> dict[str, Any]:
+    def _recompute(self, engine: Any, store: Any, origin: str | None) -> dict[str, Any]:
+        with _ro(engine) as conn:
+            fp = fingerprint(conn, origin)
+            val = compute_live(conn, store, origin)
+        with self._lock:
+            self._d[origin] = (fp, time.monotonic(), val)
+        return val
+
+    def _background(self, engine: Any, store: Any, origin: str | None) -> None:
+        with self._lock:
+            if origin in self._running:
+                return
+            self._running.add(origin)
+
+        def run() -> None:
+            try:
+                self._recompute(engine, store, origin)
+            except Exception:  # keep serving the previous state; next request retries
+                LOG.warning("v8 scores: live registry refresh failed", exc_info=True)
+            finally:
+                with self._lock:
+                    self._running.discard(origin)
+
+        Thread(target=run, name=f"v8-scores-live-{origin}", daemon=True).start()
+
+    def get(self, engine: Any, store: Any, origin: str | None, *, wait: bool = True) -> dict[str, Any] | None:
         now = time.monotonic()
         with self._lock:
-            hit = self._d.get(key)
+            hit = self._d.get(origin)
         if hit and now - hit[1] < FINGERPRINT_TTL_S:
             return hit[2]
-        f = fp()
-        if hit and hit[0] == f:
-            with self._lock:
-                self._d[key] = (f, now, hit[2])
-            return hit[2]
-        val = compute()
-        with self._lock:
-            self._d[key] = (f, now, val)
-        return val
+        if hit:
+            with _ro(engine) as conn:
+                fp = fingerprint(conn, origin)
+            if fp == hit[0]:
+                with self._lock:
+                    self._d[origin] = (fp, now, hit[2])
+                return hit[2]
+            self._background(engine, store, origin)
+            return {**hit[2], "refreshing": True}
+        if not wait:
+            self._background(engine, store, origin)
+            return None
+        return self._recompute(engine, store, origin)
 
     def clear(self) -> None:
         with self._lock:
             self._d.clear()
 
 
-CACHE = LiveCache()
-
-
-def live_state(conn: Any, store: Any, origin: str | None, *, today: date | None = None) -> dict[str, Any]:
-    """Registry counts, upcoming resolutions and the ensemble summary (cached on the registry fingerprint)."""
-
-    def compute() -> dict[str, Any]:
-        t0 = time.perf_counter()
-        d = today or datetime.now(UTC).date()
-        regs = [_summarise(_main_registry(conn, store, origin), d), _summarise(_health_registry(conn, store, origin), d)]
-        upcoming = sorted((u for r in regs for u in r["upcoming"]), key=lambda e: (e["date"], e["registry"], e["family"]))
-        for r in regs:
-            r.pop("upcoming")
-        return {
-            "computed_at": datetime.now(UTC).isoformat(),
-            "compute_ms": round((time.perf_counter() - t0) * 1000, 1),
-            "origin": origin,
-            "registries": regs,
-            "totals": {
-                "sealed_batches": sum(r["batches"] for r in regs),
-                "questions": sum(r["questions"] for r in regs),
-                "forecasts": sum(r["forecasts"] for r in regs),
-                **{k: sum(r["status"][k] for r in regs) for k in ("pending", "resolved", "void", "not_prospective")},
-            },
-            "next_resolution": upcoming[0]["date"] if upcoming else None,
-            "upcoming": upcoming[:200],
-            "upcoming_total": len(upcoming),
-            "ensemble": _ensemble_summary(conn, store, origin),
-        }
-
-    return CACHE.get(origin, lambda: fingerprint(conn, origin), compute)
+SERVICE = LiveService()

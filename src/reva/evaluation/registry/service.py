@@ -1142,6 +1142,10 @@ def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any
         from reva.evaluation.registry.ensemble import issue_ensemble
 
         res["ensemble"] = issue_ensemble(ctx.worker_engine, ctx.store, origin=origin)
+        if not fams:  # V7 BEAT-MACRO: monthly batch of the holdout-confirmed combination (idempotent per month)
+            from reva.evaluation.beat_macro.seal import issue_monthly
+
+            res["beat_macro"] = issue_monthly(ctx.worker_engine, ctx.store, origin=origin)
         return res
     if action == "resolve":
         return resolve_due(ctx.worker_engine, ctx.store, origin=origin)

@@ -175,6 +175,7 @@ class Doc:
     origin: str = "live"
     prior: float = 0.3
     extra: dict[str, Any] = field(default_factory=dict)
+    compact: bool = False  # KG record: sublabel holds the description only, href/extra rebuilt at query time
     texts: list[str] = field(default_factory=list)  # labels / aliases (searched as text)
     codes: list[str] = field(default_factory=list)  # identifiers / codes (searched exactly)
 
@@ -193,10 +194,10 @@ SCHEMA = """
 CREATE TABLE meta (k TEXT PRIMARY KEY, v TEXT NOT NULL);
 CREATE TABLE doc (
   rid INTEGER PRIMARY KEY, kind TEXT NOT NULL, id TEXT NOT NULL, label_fr TEXT, label_en TEXT,
-  sublabel TEXT NOT NULL, href TEXT NOT NULL, grp TEXT NOT NULL, entity_kind TEXT, source TEXT,
-  origin TEXT NOT NULL, prior REAL NOT NULL, extra TEXT
+  sublabel TEXT, href TEXT, entity_kind TEXT, source TEXT, origin TEXT NOT NULL, prior REAL NOT NULL,
+  extra TEXT
 );
-CREATE TABLE name (nid INTEGER PRIMARY KEY, rid INTEGER NOT NULL, norm TEXT NOT NULL, raw TEXT NOT NULL,
+CREATE TABLE name (nid INTEGER PRIMARY KEY, rid INTEGER NOT NULL, norm TEXT NOT NULL, raw TEXT,
   code INTEGER NOT NULL, pop INTEGER NOT NULL);
 """
 
@@ -219,21 +220,21 @@ class IndexWriter:
     def add(self, d: Doc) -> None:
         self.rid += 1
         pop = 1 if d.prior >= POP_PRIOR else 0
+        label_fr = None if d.compact and d.label_fr == d.label_en else d.label_fr
         self._docs.append(
             (
                 self.rid,
                 d.kind,
                 d.id,
-                d.label_fr,
+                label_fr,
                 d.label_en,
-                d.sublabel,
-                d.href,
-                d.group,
+                d.sublabel or None,
+                None if d.compact else d.href,
                 d.entity_kind,
                 d.source,
                 d.origin,
                 round(d.prior, 4),
-                json.dumps(d.extra, ensure_ascii=False, separators=(",", ":")) if d.extra else None,
+                None if d.compact or not d.extra else json.dumps(d.extra, ensure_ascii=False, separators=(",", ":")),
             )
         )
         seen: set[tuple[str, int]] = set()
@@ -244,19 +245,19 @@ class IndexWriter:
             if n and (n, 0) not in seen:
                 seen.add((n, 0))
                 self.nid += 1
-                self._names.append((self.nid, self.rid, n, raw[:MAX_NAME], 0, pop))
+                self._names.append((self.nid, self.rid, n, raw[:MAX_NAME] if pop else None, 0, pop))
         for raw in d.codes:
             n = norm_code(raw)[:MAX_NAME] if raw else ""
             if n and (n, 1) not in seen:
                 seen.add((n, 1))
                 self.nid += 1
-                self._names.append((self.nid, self.rid, n, raw[:MAX_NAME], 1, pop))
+                self._names.append((self.nid, self.rid, n, None if raw.lower() == n else raw[:MAX_NAME], 1, pop))
         self.counts[d.kind] = self.counts.get(d.kind, 0) + 1
         if len(self._docs) >= 20000:
             self.flush()
 
     def flush(self) -> None:
-        self.db.executemany("INSERT INTO doc VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", self._docs)
+        self.db.executemany("INSERT INTO doc VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", self._docs)
         self.db.executemany("INSERT INTO name VALUES (?,?,?,?,?,?)", self._names)
         self._docs.clear()
         self._names.clear()
@@ -267,7 +268,6 @@ class IndexWriter:
         db.executescript(
             """
             CREATE INDEX name_norm ON name(norm, code);
-            CREATE INDEX name_rid ON name(rid);
             CREATE VIRTUAL TABLE name_fts USING fts5(norm, content='', tokenize='trigram', detail='full');
             INSERT INTO name_fts(rowid, norm) SELECT nid, norm FROM name WHERE code = 0;
             INSERT INTO name_fts(name_fts) VALUES ('optimize');
@@ -437,28 +437,23 @@ def kg_entities(conn: Connection, origin: str | None, skip: set[str]) -> Iterato
         label_fr, label_en = c["fr"], c["en"]
         desc = c["d_fr"] or c["d_en"]
         search_kind = "region" if kind in REGION_KINDS else "entity"
-        sub = [kind_fr(kind), qid]
-        if desc:
-            sub.append(_short(desc, 90))
         return Doc(
             kind=search_kind,
             id=qid,
             label_fr=label_fr,
             label_en=label_en,
-            sublabel=" · ".join(sub),
-            href=hrefs.entity(kind, qid),
+            sublabel=_short(desc, 70) if desc else "",
+            href="",
             entity_kind=kind,
             source=c["source_key"],
             origin=c["origin"],
             prior=_entity_prior(kind, c["sitelinks"]) + (0.1 if search_kind == "region" else 0.0),
-            extra={"sitelinks": c["sitelinks"]} if c["sitelinks"] else {},
+            compact=True,
             texts=c["aliases"],
             codes=_qid_codes(qid) + ids.get(qid, []),
         )
 
-    result = conn.execute(
-        sql.execution_options(stream_results=True, yield_per=20000), {"o": origin} if origin else {}
-    )
+    result = conn.execute(sql.execution_options(stream_results=True, yield_per=20000), {"o": origin} if origin else {})
     for r in result:
         if r.qid in skip:
             continue

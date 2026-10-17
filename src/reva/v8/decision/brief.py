@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from reva.v8.decision.bundle import _node_label, fmt_num, geo_fr, unit_fr
+from reva.v8.decision.bundle import fmt_num, geo_fr, node_label, unit_fr
 
 
 def _md(s: Any) -> str:
@@ -43,7 +43,10 @@ def brief_markdown(
     w = out.append
     w(f"# {d.get('label_fr') or d.get('id')}")
     w("")
-    w(f"**{hon.get('label') or r.get('label')}**" + ("" if hon.get("validated") else " — ni une prévision, ni une probabilité."))
+    w(
+        f"**{hon.get('label') or r.get('label')}**"
+        + ("" if hon.get("validated") else " — ni une prévision, ni une probabilité.")
+    )
     w(f"*{hon.get('not_advice_fr') or 'Recherche, pas un conseil financier ni une recommandation.'}*")
     w("")
     if url:
@@ -54,15 +57,27 @@ def brief_markdown(
     w("## Décision (hypothèses énoncées)")
     w("")
     mag = d.get("magnitude") or {}
-    w(f"- Acteur : {d.get('actor', {}).get('label_fr')}" + (f" ({d['actor']['geo']})" if (d.get("actor") or {}).get("geo") else ""))
+    w(
+        f"- Acteur : {d.get('actor', {}).get('label_fr')}"
+        + (f" ({d['actor']['geo']})" if (d.get("actor") or {}).get("geo") else "")
+    )
     w(f"- Instrument : `{d.get('instrument')}` — grandeur {mag.get('value')} {mag.get('unit')}")
     w(f"- Cible : {(d.get('target') or {}).get('label_fr')}")
-    dur = "maintenue sur tout l'horizon" if d.get("duration_quarters") is None else f"{d.get('duration_quarters')} trimestre(s)"
+    dur = (
+        "maintenue sur tout l'horizon"
+        if d.get("duration_quarters") is None
+        else f"{d.get('duration_quarters')} trimestre(s)"
+    )
     w(f"- Début : {d.get('start')}, durée : {dur}, horizon : {d.get('horizon_quarters')} trimestres")
     if d.get("countries"):
-        w(f"- Pays d'intérêt : {', '.join(d['countries'])}" + (f" — {d['countries_note_fr']}" if d.get("countries_note_fr") else ""))
+        w(
+            f"- Pays d'intérêt : {', '.join(d['countries'])}"
+            + (f" — {d['countries_note_fr']}" if d.get("countries_note_fr") else "")
+        )
     for dc in r.get("direct_changes") or []:
-        w(f"- Changement direct supposé : `{(dc.get('variable') or {}).get('id')}` @ {dc.get('geo')} = {dc.get('change')} {unit_fr(dc.get('unit'))} — {dc.get('basis_fr')}")
+        w(
+            f"- Changement direct supposé : `{(dc.get('variable') or {}).get('id')}` @ {dc.get('geo')} = {dc.get('change')} {unit_fr(dc.get('unit'))} — {dc.get('basis_fr')}"
+        )
     w("")
 
     w("## Résultat")
@@ -79,7 +94,9 @@ def brief_markdown(
             per = (v or {}).get("period_label_fr") or "manquant"
             src = ", ".join(s["short"] for s in h.get("sources") or []) or ", ".join(h.get("models") or []) or "—"
             flags = ", ".join(f["label_fr"] for f in h.get("flags") or [])
-            w(f"| {_md(h['label_fr'])} | {_md(h['geo_fr'])} | {_md(_range(v))} | {_md(h['unit_fr'])} | {_md(per)} | {_md(src)} | {_md(flags)} |")
+            w(
+                f"| {_md(h['label_fr'])} | {_md(h['geo_fr'])} | {_md(_range(v))} | {_md(h['unit_fr'])} | {_md(per)} | {_md(src)} | {_md(flags)} |"
+            )
         w("")
         w("Les intervalles ne reflètent que l'incertitude publiée par les estimations utilisées.")
         w("")
@@ -98,9 +115,19 @@ def brief_markdown(
         w("")
         eff = e.get("effect") or {}
         w(f"- Estimation : {x.get('published_fr') or '—'} ; {x.get('published_uncertainty_fr') or ''}")
-        w(f"- Coefficient appliqué : {eff.get('beta_label_fr')}" + (f", écart-type {fmt_num(eff.get('beta_sd')).lstrip('+')}" if eff.get("beta_sd") is not None else " (sans incertitude publiée)"))
+        w(
+            f"- Coefficient appliqué : {eff.get('beta_label_fr')}"
+            + (
+                f", écart-type {fmt_num(eff.get('beta_sd')).lstrip('+')}"
+                if eff.get("beta_sd") is not None
+                else " (sans incertitude publiée)"
+            )
+        )
         if e.get("applicability_notes_fr"):
-            w(f"- Applicabilité : {(e.get('applicability') or {}).get('status')} — " + " ; ".join(e["applicability_notes_fr"]))
+            w(
+                f"- Applicabilité : {(e.get('applicability') or {}).get('status')} — "
+                + " ; ".join(e["applicability_notes_fr"])
+            )
         if k not in seen:
             seen.add(k)
             _cite(w, x)
@@ -113,12 +140,16 @@ def brief_markdown(
         w("## Estimations concurrentes (côte à côte, jamais moyennées)")
         w("")
         for c in conf:
-            w(f"**{c['title_fr']}** — liens : {', '.join(_node(n, labels) for n in dict.fromkeys(c.get('nodes') or []))}")
+            w(
+                f"**{c['title_fr']}** — liens : {', '.join(_node(n, labels) for n in dict.fromkeys(c.get('nodes') or []))}"
+            )
             w("")
             w("| Estimation | Retenue | Taille publiée | Incertitude | Méthode |")
             w("|---|---|---|---|---|")
             for x in c.get("estimates") or []:
-                w(f"| {_md(x['short'])} (`{_md(x['estimate_key'])}`) | {'oui' if x.get('chosen') else 'non'} | {_md(x.get('published_fr') or fmt_num(x.get('point_used')))} | {_md(x.get('published_uncertainty_fr'))} | {_md(x.get('method'))} |")
+                w(
+                    f"| {_md(x['short'])} (`{_md(x['estimate_key'])}`) | {'oui' if x.get('chosen') else 'non'} | {_md(x.get('published_fr') or fmt_num(x.get('point_used')))} | {_md(x.get('published_uncertainty_fr'))} | {_md(x.get('method'))} |"
+                )
             w("")
             for x in c.get("estimates") or []:
                 if not x.get("chosen") and x["estimate_key"] not in seen:
@@ -138,7 +169,12 @@ def brief_markdown(
 
     w("## Où la chaîne s'arrête, et pourquoi")
     w("")
-    for b in [*(diag.get("blocking") or []), *(diag.get("plugins") or []), *(diag.get("ties") or []), *(diag.get("other") or [])]:
+    for b in [
+        *(diag.get("blocking") or []),
+        *(diag.get("plugins") or []),
+        *(diag.get("ties") or []),
+        *(diag.get("other") or []),
+    ]:
         w(f"- **{b['title_fr']}** — {b.get('node_label') or b.get('plugin') or ''} : {b.get('detail_fr')}")
         if b.get("missing_fr"):
             w(f"  - Il manque : {b['missing_fr']}")
@@ -152,7 +188,9 @@ def brief_markdown(
     if ends:
         w(f"- Fin de chaîne (aucune estimation ne part de ces variables) : {', '.join(_md(e['label']) for e in ends)}")
     for m in diag.get("missing_periods") or []:
-        w(f"- Périodes non calculées pour {m['label']} ({geo_fr(m['geo'])}) : {', '.join(m['periods'])} — {m['reason_fr']}")
+        w(
+            f"- Périodes non calculées pour {m['label']} ({geo_fr(m['geo'])}) : {', '.join(m['periods'])} — {m['reason_fr']}"
+        )
     w("")
 
     if sensitivity:
@@ -168,7 +206,9 @@ def brief_markdown(
             w("")
             for b in v.get("bars") or []:
                 lo, hi = (b.get("low") or {}).get(head or ""), (b.get("high") or {}).get(head or "")
-                w(f"- {b['short']} : de {fmt_num(lo)} à {fmt_num(hi)} {unit_fr(v.get('unit'))} (écart {fmt_num((b.get('swing') or {}).get(head or '')).lstrip('+')}, r² MC {(b.get('mc_r2') or {}).get(head or '')})")
+                w(
+                    f"- {b['short']} : de {fmt_num(lo)} à {fmt_num(hi)} {unit_fr(v.get('unit'))} (écart {fmt_num((b.get('swing') or {}).get(head or '')).lstrip('+')}, r² MC {(b.get('mc_r2') or {}).get(head or '')})"
+                )
             for f in v.get("no_uncertainty") or []:
                 w(f"- {f['short']} : incertitude non publiée — pas de barre")
             w("")
@@ -202,7 +242,7 @@ def brief_markdown(
 
 
 def _node(nid: str, labels: Mapping[str, str]) -> str:
-    return _node_label(nid, labels)
+    return node_label(nid, labels)
 
 
 def _cite(w: Any, x: Mapping[str, Any], indent: str = "") -> None:
@@ -217,7 +257,9 @@ def _cite(w: Any, x: Mapping[str, Any], indent: str = "") -> None:
         w(f"{indent}- Citation verbatim : « {x['quote']} »")
     run = x.get("run")
     if isinstance(run, Mapping) and run.get("run_id"):
-        w(f"{indent}- Calcul REVA : run `{run.get('run_id')}`, données au {run.get('as_of')}, code `{run.get('code_version')}`")
+        w(
+            f"{indent}- Calcul REVA : run `{run.get('run_id')}`, données au {run.get('as_of')}, code `{run.get('code_version')}`"
+        )
     if x.get("method"):
         w(f"{indent}- Méthode : {x['method']}" + (f" — {x['identification']}" if x.get("identification") else ""))
     if x.get("applicability_note"):
@@ -231,4 +273,3 @@ def _cite(w: Any, x: Mapping[str, Any], indent: str = "") -> None:
         w(f"{indent}- Connue au : {x['as_of']}")
     if x.get("wording_fr"):
         w(f"{indent}- Formulation : {x['wording_fr']}")
-

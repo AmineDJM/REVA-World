@@ -371,3 +371,6 @@ def wire_domains(b: Any, engine: Engine, settings: Any, store: Any) -> None:
     b.effects = EffectsDbAdapter(engine, origin="live" if live else "any")
     b.forecasts = ForecastRegistryAdapter(engine, get_store, origin="live" if live else None)
     b.decisions = DecisionEngineAdapter(engine, get_store, origin="live" if live else "any")
+    from reva.nlqa.registered_tables import RegisteredTablesAdapter  # V8ASK
+
+    b.tables = RegisteredTablesAdapter(engine, settings, store)
