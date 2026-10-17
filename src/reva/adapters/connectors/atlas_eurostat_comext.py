@@ -151,8 +151,13 @@ def requests_for(reporter: str, hs2_start: str, partner_start: str) -> list[tupl
         )
         for g in CHAPTER_GROUPS
     ]
-    out.append(("comext_partner_m", f"partner:{reporter}", data_url(reporter, (), ("TOTAL",), PARTNER_INDICATORS,
-                                                                     partner_start)))
+    out.append(
+        (
+            "comext_partner_m",
+            f"partner:{reporter}",
+            data_url(reporter, (), ("TOTAL",), PARTNER_INDICATORS, partner_start),
+        )
+    )
     return out
 
 
@@ -284,8 +289,9 @@ def parse_tsv(
             cols["unit"].append(unit)
             cols["flags"].append(fc.canon(flags))
             cols["raw_sha256"].append(sha)
-            cols["selector"].append(fc.canon({"file": label, "dataset": DATAFLOW, "series": series_key,
-                                              "time_period": tp}))
+            cols["selector"].append(
+                fc.canon({"file": label, "dataset": DATAFLOW, "series": series_key, "time_period": tp})
+            )
 
 
 def frame(cols: Mapping[str, list[Any]], dataset: str, rep: ComextReport) -> pl.DataFrame:
@@ -341,8 +347,11 @@ def coverage_note(dataset: str, rep: ComextReport, start: str) -> str:
         f" {len(rep.products)}; periods {d['periods']}; provider flags {dict(rep.flags)}. Units from the indicator"
         " code (VALUE_IN_EUROS euro, QUANTITY_IN_100KG 100 kg). Seasonal adjustment not stated by the provider."
         " HS chapters 01..97 from 2022-01 link to hs2022:<CC> by code (flags.hs_chapter_kg)."
-        + (f" INCOMPLETE: failed requests {', '.join(rep.failed)}; reporters without cells: {', '.join(missing)}."
-           if rep.failed or missing else "")
+        + (
+            f" INCOMPLETE: failed requests {', '.join(rep.failed)}; reporters without cells: {', '.join(missing)}."
+            if rep.failed or missing
+            else ""
+        )
         + f" Licence: {LICENCE}."
     )[:4000]
 
@@ -377,8 +386,9 @@ def atlas_source() -> AtlasSourceSpec:
 
 
 async def _fetch(run: Any, url: str, key: str, media: tuple[str, ...]) -> tuple[bytes, str]:
-    raw = await run.get(url, key=key, media_types=media, max_bytes=MAX_BYTES, params={"kind": "comext",
-                                                                                      "dataset": DATAFLOW})
+    raw = await run.get(
+        url, key=key, media_types=media, max_bytes=MAX_BYTES, params={"kind": "comext", "dataset": DATAFLOW}
+    )
     if not raw.body:
         raise SourceResponseError("Comext: empty response body", retryable=True)
     return raw.body, run.archive(raw)
@@ -390,13 +400,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     fixture = run.origin == "test_fixture"
     opts = run.options or {}
     hs2_start = FIXTURE_START if fixture else check_month(opts.get("hs2_start", HS2_START), "hs2_start")
-    partner_start = FIXTURE_START if fixture else check_month(opts.get("partner_start", PARTNER_START),
-                                                              "partner_start")
+    partner_start = FIXTURE_START if fixture else check_month(opts.get("partner_start", PARTNER_START), "partner_start")
     reporters = FIXTURE_REPORTERS if fixture else REPORTERS
     out: dict[str, Any] = {"fetched": [], "errors": [], "tables": [], "reports": {}}
     try:
-        body, cl_sha = await _fetch(run, codelist_url(), "codelist:CXT_FREE_ISO",
-                                    ("application/vnd.sdmx.structure+xml", "application/xml"))
+        body, cl_sha = await _fetch(
+            run, codelist_url(), "codelist:CXT_FREE_ISO", ("application/vnd.sdmx.structure+xml", "application/xml")
+        )
         out["fetched"].append({"item": "codelist:CXT_FREE_ISO", "bytes": len(body), "sha256": cl_sha})
         partner_labels = imf.parse_codelist(body)
     except BudgetExhausted:
@@ -409,8 +419,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     cols: dict[str, dict[str, list[Any]]] = {d: {c: [] for c in fc._COLS} for d in DATASETS}
     shas: dict[str, list[str]] = {d: [cl_sha] for d in DATASETS}
     expect = {
-        "comext_hs2_m": {"partner": PARTNER_AGGREGATES, "flow": tuple(FLOWS), "indicators": HS2_INDICATORS,
-                         "product": ("TOTAL", *CHAPTERS)},
+        "comext_hs2_m": {
+            "partner": PARTNER_AGGREGATES,
+            "flow": tuple(FLOWS),
+            "indicators": HS2_INDICATORS,
+            "product": ("TOTAL", *CHAPTERS),
+        },
         "comext_partner_m": {"flow": tuple(FLOWS), "indicators": PARTNER_INDICATORS, "product": ("TOTAL",)},
     }
     for r in reporters:
@@ -422,8 +436,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 try:
                     body, sha = await _fetch(run, url, key, ("text/tab-separated-values", "text/plain"))
                     out["fetched"].append({"item": key, "bytes": len(body), "sha256": sha})
-                    parse_tsv(body, sha, f"{DATAFLOW}_{key.replace(':', '_')}.tsv", reps[dataset], cols[dataset],
-                              partner_labels, expect={**expect[dataset], "reporter": (r,)})
+                    parse_tsv(
+                        body,
+                        sha,
+                        f"{DATAFLOW}_{key.replace(':', '_')}.tsv",
+                        reps[dataset],
+                        cols[dataset],
+                        partner_labels,
+                        expect={**expect[dataset], "reporter": (r,)},
+                    )
                     shas[dataset].append(sha)
                     last = None
                     break
@@ -433,8 +454,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                     last = e
             if last is not None:
                 reps[dataset].failed.append(key)
-                out["errors"].append({"dataset": dataset, "item": key, "error": type(last).__name__,
-                                      "message": str(last)[:300]})
+                out["errors"].append(
+                    {"dataset": dataset, "item": key, "error": type(last).__name__, "message": str(last)[:300]}
+                )
     for dataset in DATASETS:
         if not run.wants(dataset) or len(shas[dataset]) < 2:
             continue
@@ -453,20 +475,27 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             raise
         except Exception as e:
             details = getattr(e, "details", None)
-            out["errors"].append({
-                "dataset": dataset, "stage": "parse/register", "error": type(e).__name__, "message": str(e)[:500],
-                "details": json.loads(json.dumps(details, default=str)) if details else None,
-            })
+            out["errors"].append(
+                {
+                    "dataset": dataset,
+                    "stage": "parse/register",
+                    "error": type(e).__name__,
+                    "message": str(e)[:500],
+                    "details": json.loads(json.dumps(details, default=str)) if details else None,
+                }
+            )
             continue
         out["reports"][dataset] = rep.as_dict()
-        out["tables"].append({
-            "table": f"{SOURCE}.{dataset}",
-            "dataset_key": reg.get("dataset_key"),
-            "created": reg.get("created"),
-            "rows": reg.get("row_count"),
-            "countries": (reg.get("coverage") or {}).get("countries"),
-            "artifact_sha256": reg.get("artifact_sha256"),
-        })
+        out["tables"].append(
+            {
+                "table": f"{SOURCE}.{dataset}",
+                "dataset_key": reg.get("dataset_key"),
+                "created": reg.get("created"),
+                "rows": reg.get("row_count"),
+                "countries": (reg.get("coverage") or {}).get("countries"),
+                "artifact_sha256": reg.get("artifact_sha256"),
+            }
+        )
     out["ok"] = not out["errors"]
     return out
 

@@ -19,3 +19,13 @@ dimensions:
     evidence: >-
       BACI sections (I..XXI) are atlas_baci's grouping of HS chapters (its HS_SECTIONS table); UNSD's HS code list has
       no section rows, so no KG entity is claimed for them (chapters are reached through hs2 instead).
+  - atlas: eurostat.comext_hs2_m
+    dimension: product
+    kg_prefix: "hs2022:"
+    level: chapter
+    added_by: V6TRADEHF
+    evidence: >-
+      Eurostat Comext DS-045409 "EU trade since 1988 by HS2-4-6 and CN8": a 2-digit product code is the chapter of
+      the Combined Nomenclature, which keeps the HS chapters; from 2022 the CN is built on HS 2022. Valid only for
+      codes 01..97 in periods from 2022-01 (atlas_eurostat_comext writes flags.hs_chapter_kg = "hs2022:<CC>" on
+      exactly those cells). TOTAL and chapter 99 (CN special codes, not an HS chapter) name no KG entity.

@@ -1,0 +1,84 @@
+# Atlas catalog 'trade_hf' (agent V6TRADEHF, 2026-10-17). Provider-declared concepts (not human-reviewed): one source
+# per concept (no cross-provider equivalence asserted; IMF US dollars and Eurostat euros are never mixed).
+# Monthly cells; not attached to the atlas year view. See docs/dev/v6_trade_hf.md.
+domain: trade_hf
+labels:
+  fr: Commerce de marchandises infra-annuel
+  en: Sub-annual merchandise trade
+maintainer: V6TRADEHF
+concepts:
+- id: trade_hf.goods_exports_world_usd_m
+  labels:
+    fr: Exportations de marchandises vers le monde (mensuel, FMI IMTS, dollars US)
+    en: Merchandise exports to the world (monthly, IMF IMTS, US dollars)
+  definition: 'IMF IMTS series name "Exports of goods, Free on board (FOB), US dollar", counterpart G001 World, monthly.'
+  unit: US dollars
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - imf.imts_world_m.XG_FOB_USD|partner=G001
+  provider_declared: true
+  notes: Bilateral monthly cells are in atlas imf.imts_m (flags.partner_iso3); annual cells in imf.imts.
+- id: trade_hf.goods_imports_world_usd_m
+  labels:
+    fr: Importations de marchandises du monde (mensuel, FMI IMTS, dollars US)
+    en: Merchandise imports from the world (monthly, IMF IMTS, US dollars)
+  definition: 'IMF IMTS series name "Imports of goods, Cost insurance freight (CIF), US dollar", counterpart G001 World, monthly.'
+  unit: US dollars
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - imf.imts_world_m.MG_CIF_USD|partner=G001
+  provider_declared: true
+  notes: Exports FOB and imports CIF; their difference is not the BOP goods balance.
+- id: trade_hf.eu_exports_extra_eu_eur_m
+  labels:
+    fr: Exportations extra-UE d'un État membre, toutes marchandises (mensuel, Eurostat Comext, euros)
+    en: Extra-EU exports of a member state, all products (monthly, Eurostat Comext, euro)
+  definition: 'Eurostat Comext DS-045409 "EU trade since 1988 by HS2-4-6 and CN8": flow 2 (EXPORT), partner EXT_EU27_2020 "Extra-EU27 (from 2020)", product TOTAL, indicator VALUE_IN_EUROS.'
+  unit: euro
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - eurostat.comext_hs2_m.VALUE_IN_EUROS|flow=2|partner=EXT_EU27_2020|product=TOTAL
+  provider_declared: true
+  notes: HS-chapter cells (product=<CC>, flags.hs_chapter_kg) and partner WORLD / INT_EU27_2020 in the same table.
+- id: trade_hf.eu_imports_extra_eu_eur_m
+  labels:
+    fr: Importations extra-UE d'un État membre, toutes marchandises (mensuel, Eurostat Comext, euros)
+    en: Extra-EU imports of a member state, all products (monthly, Eurostat Comext, euro)
+  definition: 'Eurostat Comext DS-045409: flow 1 (IMPORT), partner EXT_EU27_2020 "Extra-EU27 (from 2020)", product TOTAL, indicator VALUE_IN_EUROS.'
+  unit: euro
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - eurostat.comext_hs2_m.VALUE_IN_EUROS|flow=1|partner=EXT_EU27_2020|product=TOTAL
+  provider_declared: true
+- id: trade_hf.eu_exports_world_eur_m
+  labels:
+    fr: Exportations d'un État membre vers le monde, toutes marchandises (mensuel, Eurostat Comext, euros)
+    en: Exports of a member state to the world, all products (monthly, Eurostat Comext, euro)
+  definition: 'Eurostat Comext DS-045409: flow 2 (EXPORT), partner WORLD "All countries of the world", product TOTAL, indicator VALUE_IN_EUROS.'
+  unit: euro
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - eurostat.comext_hs2_m.VALUE_IN_EUROS|flow=2|partner=WORLD|product=TOTAL
+  provider_declared: true
+- id: trade_hf.eu_imports_world_eur_m
+  labels:
+    fr: Importations d'un État membre du monde, toutes marchandises (mensuel, Eurostat Comext, euros)
+    en: Imports of a member state from the world, all products (monthly, Eurostat Comext, euro)
+  definition: 'Eurostat Comext DS-045409: flow 1 (IMPORT), partner WORLD "All countries of the world", product TOTAL, indicator VALUE_IN_EUROS.'
+  unit: euro
+  domain: trade_hf
+  subdomain: goods
+  theme: trade
+  source_order:
+  - eurostat.comext_hs2_m.VALUE_IN_EUROS|flow=1|partner=WORLD|product=TOTAL
+  provider_declared: true

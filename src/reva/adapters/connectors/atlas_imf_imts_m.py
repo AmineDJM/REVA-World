@@ -66,8 +66,11 @@ GEO_SCHEME = imf.GEO_SCHEME
 MEDIA = ih.MEDIA
 MAX_BYTES = 60_000_000
 LICENCE = imf.LICENCE
-RIGHTS: dict[str, Any] = {**ih.RIGHTS, "attribution": "International Monetary Fund, International Trade in Goods "
-                          "(by partner country) (IMTS), https://data.imf.org/en/datasets/IMF.STA:IMTS"}
+RIGHTS: dict[str, Any] = {
+    **ih.RIGHTS,
+    "attribution": "International Monetary Fund, International Trade in Goods "
+    "(by partner country) (IMTS), https://data.imf.org/en/datasets/IMF.STA:IMTS",
+}
 
 FLOW = "IMTS"
 INDICATORS = {"XG_FOB_USD": "exports of goods, FOB", "MG_CIF_USD": "imports of goods, CIF"}
@@ -363,8 +366,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 raise
             except Exception as e:
                 failed.append(part)
-                out["errors"].append({"dataset": "imts_m", "chunk": key, "error": type(e).__name__,
-                                      "message": str(e)[:300]})
+                out["errors"].append(
+                    {"dataset": "imts_m", "chunk": key, "error": type(e).__name__, "message": str(e)[:300]}
+                )
         if shas:
             try:
                 df = frame(cols_b, "imts_m", rep_b)
@@ -387,20 +391,27 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             raise
         except Exception as e:
             details = getattr(e, "details", None)
-            out["errors"].append({
-                "dataset": dataset, "stage": "register", "error": type(e).__name__, "message": str(e)[:500],
-                "details": json.loads(json.dumps(details, default=str)) if details else None,
-            })
+            out["errors"].append(
+                {
+                    "dataset": dataset,
+                    "stage": "register",
+                    "error": type(e).__name__,
+                    "message": str(e)[:500],
+                    "details": json.loads(json.dumps(details, default=str)) if details else None,
+                }
+            )
             continue
         out["reports"][dataset] = rep.as_dict()
-        out["tables"].append({
-            "table": f"{SOURCE}.{dataset}",
-            "dataset_key": reg.get("dataset_key"),
-            "created": reg.get("created"),
-            "rows": reg.get("row_count"),
-            "countries": (reg.get("coverage") or {}).get("countries"),
-            "artifact_sha256": reg.get("artifact_sha256"),
-        })
+        out["tables"].append(
+            {
+                "table": f"{SOURCE}.{dataset}",
+                "dataset_key": reg.get("dataset_key"),
+                "created": reg.get("created"),
+                "rows": reg.get("row_count"),
+                "countries": (reg.get("coverage") or {}).get("countries"),
+                "artifact_sha256": reg.get("artifact_sha256"),
+            }
+        )
     out["ok"] = not out["errors"]
     return out
 
