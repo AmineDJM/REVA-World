@@ -87,7 +87,7 @@ benchmarks:
   never: CRPS of a point forecast (X2); WASDE is compared on AE as a point and on CRPS only through its fair fan.
 
 scores_and_tests:
-  losses: {points: "AE % of truth", densities: "CRPS % of truth (closed form)"; descriptive: 80% coverage, PIT}
+  losses: {points: "AE % of truth", densities: "CRPS % of truth (closed form)", descriptive: "80% coverage, PIT"}
   cells: >-
     group x window. groups: us_yield, us_production, us_ending_stocks, world_production, world_ending_stocks
     (4 crops each) for bc and rev (15 cells each); us_cornsoy_yield, us_cornsoy_production x {mid, late} for wx
