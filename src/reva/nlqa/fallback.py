@@ -344,6 +344,34 @@ def _spans(question: str) -> list[str]:
     return list(dict.fromkeys(spans))[:4]
 
 
+def countries_in(question: str, catalog: QaCatalog) -> list[str]:
+    """ISO3 codes of the countries the question names (crosswalk names in English and French, ISO3 codes), in
+    order of appearance; a name inside a longer matched name of another country is not a mention."""
+    q = fold(question)
+    # countries: crosswalk names (English and French, ASK-8) / ISO3 codes, in order of appearance; a name inside a
+    # longer matched name of another country ("Guinée" in "Guinée-Bissau") is not a mention
+    name_spans: list[tuple[int, int, str]] = []
+    for c in catalog.countries.values():
+        best: tuple[int, int, str] | None = None
+        for n in c.names:
+            m = re.search(r"(?<!\w)" + re.escape(fold(n)) + r"(?!\w)", q)
+            if m and len(n) >= 4 and (best is None or m.end() - m.start() > best[1] - best[0]):
+                best = (m.start(), m.end(), c.iso3)
+        if best is None:
+            m = re.search(r"(?<![A-Za-z])" + c.iso3 + r"(?![A-Za-z])", question)
+            if m:
+                best = (m.start(), m.end(), c.iso3)  # question offsets; ISO3 codes never overlap names
+        if best is not None:
+            name_spans.append(best)
+    found = [
+        (a, iso)
+        for a, z, iso in name_spans
+        if not any(a2 <= a and z <= z2 and (z2 - a2) > (z - a) and iso2 != iso for a2, z2, iso2 in name_spans)
+    ]
+    countries = [iso for _, iso in sorted(set(found))]
+    return countries
+
+
 def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> dict[str, Any]:
     q = fold(question)
     lang = detect_language(question)
@@ -368,27 +396,7 @@ def keyword_plan(question: str, catalog: QaCatalog, headlines: Any = _UNSET) -> 
             concept = hb[0]
             ambiguity.update(resolution="headline", chosen=hb[0], headline=hb[1])
     ambiguous = [] if concept else ambiguous
-    # countries: crosswalk names (English and French, ASK-8) / ISO3 codes, in order of appearance; a name inside a
-    # longer matched name of another country ("Guinée" in "Guinée-Bissau") is not a mention
-    name_spans: list[tuple[int, int, str]] = []
-    for c in catalog.countries.values():
-        best: tuple[int, int, str] | None = None
-        for n in c.names:
-            m = re.search(r"(?<!\w)" + re.escape(fold(n)) + r"(?!\w)", q)
-            if m and len(n) >= 4 and (best is None or m.end() - m.start() > best[1] - best[0]):
-                best = (m.start(), m.end(), c.iso3)
-        if best is None:
-            m = re.search(r"(?<![A-Za-z])" + c.iso3 + r"(?![A-Za-z])", question)
-            if m:
-                best = (m.start(), m.end(), c.iso3)  # question offsets; ISO3 codes never overlap names
-        if best is not None:
-            name_spans.append(best)
-    found = [
-        (a, iso)
-        for a, z, iso in name_spans
-        if not any(a2 <= a and z <= z2 and (z2 - a2) > (z - a) and iso2 != iso for a2, z2, iso2 in name_spans)
-    ]
-    countries = [iso for _, iso in sorted(set(found))]
+    countries = countries_in(question, catalog)
     if _PAIR.search(question):
         # links between two countries: crosswalk names / ISO3 codes, else the capitalised names (resolved by the
         # server to countries through the KG; a name that is not a country leaves the operation unresolved)

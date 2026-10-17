@@ -146,6 +146,7 @@ def test_views_annual_sums_and_run_choice() -> None:
     assert set(runs) == {"fatalities002_2024_12_t01", "fatalities003_2025_12_t01"}
     vr = runs["fatalities002_2024_12_t01"]
     assert vr.annual("gw:100", 2025) == pytest.approx(126.0)
+    assert vr.prob[("gw:100", 2025, 12)] == pytest.approx(0.3)  # main_dich kept apart from the fatalities
     assert vr.annual("gw:100", 2026) is None
     assert annual_table(vr) == {("gw:100", 2025): pytest.approx(126.0)}
     assert december_runs(runs)[2024].run == "fatalities002_2024_12_t01"
