@@ -238,3 +238,63 @@ the newer allow-list. Then the dev DB, WDHARVEST first so the 17 entities both h
 The 242 entity conflicts of the WDHARVEST import are the same as in the source: countries reloaded by
 `core.sovereign_states` with another kind at the same revision. 995 `whatlinkshere` candidates were rejected
 on P31, as in the harvest. A re-run of both imports skipped all 152 loads.
+
+**Second CAUSWD import (2026-10-17 00:45 UTC).** CAUSWD's 00:02 run had added 98 loads. The re-run skipped
+the 39 already imported and imported the 98 new ones: 731 raw objects copied, 750 entities inserted (64
+conflicting with WDHARVEST entities at the same revision), 6,787 statements inserted, 526 unchanged.
+Verification over all 10,238 current CAUSWD statements: 10,235 identical, 3 differing (as above), 0 missing.
+`reva causal refresh --origin live` then loaded 1,002 Wikidata causal claims: 235 T3, 766 T4 and 1 T2
+(ISBN/DOI reference), graded C 182, D 746, E 53, B 21 (`docs/dev/v3_causops_live.md`). The CAUSWD run
+continues until about 03:50 UTC. Re-run the import, then the causal refresh, to bring in its later loads.
+
+## Harvest run 2026-10-17 (agent WDRUN)
+
+**Preparation (2026-10-16 23:05–23:30 UTC, no requests).**
+* `reva_kg_wdharvest` failed the drift check (0016 revision ids, `kg.causal_claim` constraints differ). It was
+  renamed to `reva_kg_wdharvest_drift1016` (kept for audit: Oct 15/16 ledger + data, 109 MB) and recreated from
+  the migrations by `ensure_database` (fingerprint `e254bd6e…` = contract, no drift).
+* The detached core run (pid 9617) had already finished: `core.historical_states` done (4,382 WhatLinksHere
+  candidates, 3,913 accepted, 3,881 requests).
+* `core.*` re-loaded from the archive only (offline replay of the recorded seeds; 5,591 archived snapshots,
+  0 requests, 0 missing): countries 249 entities / 61,371 statements; sovereign_states 442 / 65,178 (still
+  > `max_rows` 400, reported, not raised); historical_states 3,913 / 42,594; 4 `end_before_start` rejects.
+* **Ledger bug fixed** (`harvest.budgeted_client`): both reservations used the same operation id, so the
+  wbapi row was dropped (`ON CONFLICT DO NOTHING`) and all Wikibase traffic was booked to `wikidata.wdqs`
+  (settlement overwrote one count with the other: Oct 16 shows 5,056 "wdqs" requests). Now `<run>-wdqs` /
+  `<run>-wbapi` (same scheme as CAUSWD).
+* **Archive reuse across specs** (`WikidataClient.get_entities`, `Archive.recent_snapshot`): with
+  `--reuse-hours > 0` any entity archived recently (EntityData, or a `wbgetentities` response whose props cover
+  the request) is served from the archive in every mode, citing the archived sha and original retrieval time;
+  only the rest is requested. Test `test_archived_snapshots_are_reused_across_specs`. First effect:
+  `history.empires` 120 entities, 101 from the archive.
+
+**Run (from 00:00 UTC).** `merge-property-requests`: 7 EVENTS properties accepted (P1923, P8031, P8032, P726,
+P991, P1590, P1339); P642 (qualifier, a_law) rejected (deleted on Wikidata). Two drivers (one process each,
+machine lock shared): `--via api --api-mode auto` for specs with `api_search`, `--via wdqs --api-mode auto` for
+the others, both `--no-expand --reuse-hours 48`, watchdog stopping at 80 % of a budget or < 6 GB disk.
+
+| spec | path | status | rows | entities | statements | rejects | requests |
+|---|---|---|---:|---:|---:|---:|---:|
+| history.empires | api (CirrusSearch, subclass depth 3) | done | 120 | 120 | 2,844 (221 new) | 0 | 25 |
+| history.colonies | api | failed `wikidata_rate_limited` (search 429 × 13) | 0 | 0 | 0 | 0 | 22 |
+| history.treaties | wdqs (9 chunks) | interrupted, resumable (state: 4,058 rows of the first chunks) | 4,058 | 0 | 0 | 0 | 3 |
+| all others | | not reached | | | | | |
+
+**Conditions.** WDQS answered once per ban window: every success was followed by `429 Retry-After: 1000`
+(≈ 3–4 answers/hour). The action API answered 429 (Retry-After 25–30 s) to almost every call (search and
+wbgetentities); CAUSWD's EntityData stream ran in parallel (≈ 950 wbapi requests by 01:00). Ledger at stop
+(01:07 UTC, all agents): wbapi 1,061 requests (WDRUN ≈ 60), wdqs 11, bytes 192 MB — far below the budgets.
+
+**Stopped at 01:05 UTC: disk < 6 GB** (6.4 → 5.5 GB free in minutes), caused by other work: the dev DB `reva`
+grew 0.8 → 3.9 GB (LOADALL import, `kg.statement` 2.2 GB, `kg.link_row` 1.4 GB, WAL 1.1 GB), `var/objects`
+4.3 GB and a 7.1 GB atlas DuckDB cache in `/tmp/reva-atlas-cache-0`. The harvest DB is 113 MB, the archive
+109 MB. Both harvest processes were stopped with SIGINT (budget settled, state saved per batch).
+
+**Resume** (when ≥ 7 GB free): `python <scratch>/driver.py groups_wdqs.json` and `groups_api.json`, or directly
+`uv run python -m reva.kg.harvest run <paths> --via wdqs --api-mode auto --no-expand --reuse-hours 48`
+(treaties resumes from its state; colonies moved to the WDQS path; then `core/historical_states.yaml --force`
+for the subclass instances the WhatLinksHere path misses, geopolitics, events, people (country_heads,
+state_leaders, monarchs, colonial_officials, leader_positions first), culture, society, economy, science,
+nature). `causal/*` and `places/*` are `enabled: false` (driven by `reva.causal_harvest` / A-CITIES).
+Per-entity throughput is the binding limit, not the budgets: with the API throttled, EntityData costs one
+request per entity (≈ 3,000 entities/day at 80 % of `wikidata.wbapi`).
