@@ -19,6 +19,32 @@ conventions:
     context family, never a claim (roadmap principle 3).'
   no_join_claims: 'REVA never creates a causal claim by joining two datasets: when one codebook says ''terminated by a peace
     agreement'' and another lists agreements, the pairing is a context statement, not a claim.'
+source_validity:
+  # AUDFIX (audit H4): the source's own certainty / validity codes of a coded event or link, carried verbatim on each
+  # claim as scope.source_validity (docs/dev/v3_audfix.md). `label` is the source's label, checked against the archived
+  # code list at run time (a changed label -> certainty "unclassified"); `certainty` is the registry reading used by the
+  # grading rules: doubtful | definite_or_probable. `exclude: true` = no claim at all (the source says it is not a real
+  # record).
+  noaa_tsunami:
+    eventValidity:
+      codelist: NCEI descriptor tsunami/validity
+      codes:
+        -1: {label: Erroneous entry, exclude: true}
+        0: {label: Event that only caused a seiche, certainty: doubtful}
+        1: {label: Very Doubtful Tsunami, certainty: doubtful}
+        2: {label: Questionable Tsunami, certainty: doubtful}
+        3: {label: Probable Tsunami, certainty: definite_or_probable}
+        4: {label: Definite Tsunami, certainty: definite_or_probable}
+    causeCode:
+      codelist: NCEI descriptor tsunami/causes
+      codes:
+        1: {label: Earthquake, certainty: definite_or_probable}
+        2: {label: Questionable Earthquake, certainty: doubtful}
+        3: {label: Earthquake and Landslide, certainty: definite_or_probable}
+        4: {label: Volcano and Earthquake, certainty: definite_or_probable}
+        5: {label: Volcano, Earthquake and Landslide, certainty: definite_or_probable}
+        6: {label: Volcano, certainty: definite_or_probable}
+        7: {label: Volcano and Landslide, certainty: definite_or_probable}
 documents:
   icb1_codebook:
     title: International Crisis Behavior Data Codebook, Version 16 - Dataset ICB 1 (System Level)

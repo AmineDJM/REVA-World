@@ -350,6 +350,70 @@ def test_no_claim_for_erroneous_entries_or_other_causes() -> None:
     assert rep == {"earthquake_link_skipped_erroneous_entry": 1, "volcano_link_context_only_cause_code_8": 1}
 
 
+def test_claims_carry_ncei_validity_codes_verbatim() -> None:
+    """Audit H4 (AUDFIX): every claim carries NCEI's eventValidity and causeCode with the archived descriptor label
+    and the registry's certainty reading; "Erroneous entry" gives no claim; doubtful codes stay claims."""
+    eqs = [{"id": 10 + i, "year": 1900, "tsunamiEventId": 20 + i, "country": "JAPAN"} for i in range(5)]
+    ts = [
+        {"id": 20, "year": 1900, "earthquakeEventId": 10, "causeCode": 1, "eventValidity": 0, "country": "JAPAN"},
+        {"id": 21, "year": 1900, "earthquakeEventId": 11, "causeCode": 2, "eventValidity": 1, "country": "JAPAN"},
+        {"id": 22, "year": 1900, "earthquakeEventId": 12, "causeCode": 1, "eventValidity": 2, "country": "JAPAN"},
+        {"id": 23, "year": 1900, "earthquakeEventId": 13, "causeCode": 3, "eventValidity": 4, "country": "JAPAN"},
+        {"id": 24, "year": 1900, "earthquakeEventId": 14, "causeCode": 1, "eventValidity": -1, "country": "JAPAN"},
+    ]
+    d = hz.assemble(
+        {
+            "earthquakes": [_page("earthquakes", eqs)],
+            "tsunamis": [_page("tsunamis", ts)],
+            "runups": [_page("runups", [])],
+            "volcanoes": [_page("volcanoes", [])],
+        },
+        _descriptors(),
+        strict=False,
+    )
+    links, rep = hz.coded_links(d)
+    by = {lk.effect_id: {e["field"]: e for e in lk.source_validity} for lk in links}
+    assert hz.ts_qid(24) not in by and rep["earthquake_link_skipped_erroneous_entry"] == 1
+    assert by[hz.ts_qid(20)]["eventValidity"]["label"] == "Event that only caused a seiche"
+    assert by[hz.ts_qid(21)]["eventValidity"] == {
+        "field": "eventValidity",
+        "code": "1",
+        "label": "Very Doubtful Tsunami",
+        "codelist": "NCEI descriptor tsunami/validity",
+        "codelist_sha256": d.descriptor_shas["tsunami_validity"],
+        "certainty": "doubtful",
+    }
+    assert by[hz.ts_qid(21)]["causeCode"]["label"] == "Questionable Earthquake"
+    assert by[hz.ts_qid(21)]["causeCode"]["certainty"] == "doubtful"
+    assert by[hz.ts_qid(22)]["eventValidity"]["certainty"] == "doubtful"
+    assert by[hz.ts_qid(23)]["eventValidity"]["certainty"] == "definite_or_probable"
+    assert by[hz.ts_qid(23)]["causeCode"]["certainty"] == "definite_or_probable"
+    assert rep["claims_eventValidity_doubtful"] == 3 and rep["claims_causeCode_doubtful"] == 1
+    # the definitions are the archived descriptor labels only (audit L5: no typed help-page prefix)
+    defs = hz.codebook_definitions(d)
+    assert defs["cause_code:2"] == 'causeCode 2 = "Questionable Earthquake" (NCEI descriptor tsunami/causes)'
+
+
+def test_changed_validity_label_is_unclassified_not_guessed() -> None:
+    eq = {"id": 10, "year": 1900, "tsunamiEventId": 20, "country": "JAPAN"}
+    ts = [{"id": 20, "year": 1900, "earthquakeEventId": 10, "causeCode": 1, "eventValidity": 3, "country": "JAPAN"}]
+    desc = _descriptors()
+    desc["tsunami_validity"] = desc["tsunami_validity"].replace(b"Probable Tsunami", b"Likely Tsunami")
+    d = hz.assemble(
+        {
+            "earthquakes": [_page("earthquakes", [eq])],
+            "tsunamis": [_page("tsunamis", ts)],
+            "runups": [_page("runups", [])],
+            "volcanoes": [_page("volcanoes", [])],
+        },
+        desc,
+        strict=False,
+    )
+    links, _ = hz.coded_links(d)
+    sv = {e["field"]: e for e in links[0].source_validity}
+    assert sv["eventValidity"]["label"] == "Likely Tsunami" and sv["eventValidity"]["certainty"] == "unclassified"
+
+
 # ------------------------------------------------------------------------------------------------- geography
 def test_geo_alias_file_is_evidenced_and_covers_the_fixture(data: hz.HazardData) -> None:
     doc = yaml.safe_load((REPO / "registry/atlas/geo_aliases/a_hazards.yaml").read_text())

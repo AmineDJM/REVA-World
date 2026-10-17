@@ -43,6 +43,12 @@ Outputs
   tsunami and eruption -> tsunami, **only** where the NCEI tsunami record identifies the source event by its id
   (``earthquakeEventId`` / ``volcanoEventId``) *and* its cause code names that hazard (earthquake: codes 1-5;
   volcano: 4-7). Other associations stay context. Records NCEI marks "Erroneous entry" (validity -1) give no claim.
+  Every claim carries NCEI's own certainty codes verbatim as ``scope.source_validity`` (audit H4,
+  ``docs/dev/v3_audfix.md``): the tsunami's ``eventValidity`` (0 "Event that only caused a seiche", 1 "Very Doubtful
+  Tsunami", 2 "Questionable Tsunami", 3 "Probable", 4 "Definite") and its ``causeCode`` (2 "Questionable
+  Earthquake"), each with the label from the archived NCEI descriptor and the registry's certainty reading
+  (``registry/causal/relations_datasets.yaml`` ``source_validity.noaa_tsunami``); the grading rules read it.
+  The quoted definitions are only the archived descriptor labels (no help-page text typed here).
   Deaths and damage are attributes of the events, never separate claims.
 * ``atlas.noaa_hazards_wikidata`` (budget key ``wikidata.wdqs``): one WDQS query for Wikidata ``P1886`` (Global
   Volcanism Program ID). NCEI's "Volcano Number" is the GVP volcano number (HazEL help: "Smithsonian Global
@@ -69,7 +75,7 @@ from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.noaa_hazards"
 WD_NAME = "atlas.noaa_hazards_wikidata"
-VERSION = "1.0.0"
+VERSION = "1.1.0"  # 1.1.0 (AUDFIX): source_validity on claims, codebook text from archived bytes only
 SOURCE_KEY = "noaa.ncei_hazards"
 WD_SOURCE_KEY = "wikidata.wdqs"
 ATLAS_SOURCE = "ncei_hazards"
@@ -166,9 +172,6 @@ _CAUSE_WORDS = {"earthquake": "earthquake", "volcano": "volcano"}
 
 CODEBOOK_URL = "https://doi.org/10.7289/V5PN93H7"
 CODEBOOK_NAME = "NCEI/WDS Global Historical Tsunami Database: tsunami source event record (HazEL hazard-service v1)"
-#: Verbatim NCEI help text (HazEL application, help "Tsunami Cause Code"); the code labels come from the archived
-#: ``descriptors/tsunami/causes`` response.
-CAUSE_CODE_HELP = "Tsunami Cause Code. Valid values: 0 to 11. The source of the tsunami:"
 
 
 class NoaaHazardsError(SourceResponseError):
@@ -1295,12 +1298,16 @@ class CodedLink:
     codebook_term: str
     selector: Mapping[str, Any]
     raw_sha256: str
+    #: NCEI's certainty codes of this record (``scope.source_validity``, see :func:`source_validity`)
+    source_validity: tuple[Mapping[str, Any], ...] = ()
 
 
 def codebook_definitions(data: HazardData) -> dict[str, str]:
+    """Term -> definition. The cause-code labels are copied from the archived NCEI descriptor response
+    ``descriptors/tsunami/causes`` (its sha256 is in the claims' raw objects); no other text is typed here."""
     causes = data.descriptors.get("tsunami_causes", {})
     defs = {
-        f"cause_code:{c}": f'{CAUSE_CODE_HELP} {c} = "{causes[str(c)]}" (NCEI descriptor tsunami/causes)'
+        f"cause_code:{c}": f'causeCode {c} = "{causes[str(c)]}" (NCEI descriptor tsunami/causes)'
         for c in sorted(EQ_CAUSE_CODES | VOLCANO_CAUSE_CODES)
         if str(c) in causes
     }
@@ -1312,6 +1319,46 @@ def codebook_definitions(data: HazardData) -> dict[str, str]:
     return defs
 
 
+#: descriptor key of each NCEI certainty field carried as ``source_validity``
+VALIDITY_FIELDS = {"eventValidity": "tsunami_validity", "causeCode": "tsunami_causes"}
+
+
+def validity_registry() -> dict[str, Any]:
+    from reva.adapters.connectors.causdata_common import relations
+
+    out: dict[str, Any] = relations()["source_validity"]["noaa_tsunami"]
+    return out
+
+
+def source_validity(data: HazardData, rec: Mapping[str, Any]) -> tuple[list[dict[str, Any]], bool]:
+    """NCEI's certainty codes of one tsunami record as ``scope.source_validity`` entries (code and label verbatim
+    from the archived descriptor, certainty from the registry), and whether the registry says the record gives no
+    claim at all (``exclude``: "Erroneous entry"). A label that differs from the registry's -> ``unclassified``."""
+    reg = validity_registry()
+    out: list[dict[str, Any]] = []
+    exclude = False
+    for fld, desc_key in VALIDITY_FIELDS.items():
+        code = rec.get(fld)
+        if code is None:
+            continue
+        label = data.descriptors.get(desc_key, {}).get(str(code))
+        entry = (reg.get(fld, {}).get("codes") or {}).get(int(code)) or {}
+        same = label is not None and label == entry.get("label")
+        if same and entry.get("exclude"):
+            exclude = True
+        out.append(
+            {
+                "field": fld,
+                "code": str(code),
+                "label": label,
+                "codelist": reg.get(fld, {}).get("codelist", f"NCEI descriptor {DESCRIPTORS[desc_key]}"),
+                "codelist_sha256": data.descriptor_shas.get(desc_key),
+                "certainty": (entry.get("certainty") or "excluded") if same else "unclassified",
+            }
+        )
+    return out, exclude
+
+
 def coded_links(data: HazardData) -> tuple[list[CodedLink], dict[str, Any]]:
     """Earthquake -> tsunami and eruption -> tsunami triggers coded by NCEI (see module doc for the rules)."""
     eqs, vol = data.by_id("earthquakes"), data.by_id("volcanoes")
@@ -1321,6 +1368,7 @@ def coded_links(data: HazardData) -> tuple[list[CodedLink], dict[str, Any]]:
         d = r.data
         code = d.get("causeCode")
         validity = d.get("eventValidity")
+        sv, excluded = source_validity(data, d)
         for fld, target, codes, word in (
             ("earthquakeEventId", eqs, EQ_CAUSE_CODES, "earthquake"),
             ("volcanoEventId", vol, VOLCANO_CAUSE_CODES, "volcano"),
@@ -1328,7 +1376,7 @@ def coded_links(data: HazardData) -> tuple[list[CodedLink], dict[str, Any]]:
             src = d.get(fld)
             if src is None:
                 continue
-            if validity == -1:
+            if validity == -1 or excluded:
                 rep[f"{word}_link_skipped_erroneous_entry"] += 1
                 continue
             if code not in codes:
@@ -1364,9 +1412,12 @@ def coded_links(data: HazardData) -> tuple[list[CodedLink], dict[str, Any]]:
                         },
                     },
                     raw_sha256=r.sha256,
+                    source_validity=tuple(sv),
                 )
             )
             rep[f"{word}_to_tsunami_claims"] += 1
+            for e in sv:
+                rep[f"claims_{e['field']}_{e['certainty']}"] += 1
     return out, dict(rep)
 
 
@@ -1401,8 +1452,9 @@ def load_claims(
     Codebook, DatasetClaim, load_dataset_claims = api.Codebook, api.DatasetClaim, api.load_dataset_claims
 
     used = {link.raw_sha256 for link in links} | {str(link.selector["reciprocal"]["raw_sha256"]) for link in links}
-    if "tsunami_causes" in data.descriptor_shas:  # the codebook terms are decoded from this response
-        used.add(data.descriptor_shas["tsunami_causes"])
+    for k in VALIDITY_FIELDS.values():  # codebook terms and source_validity labels are decoded from these responses
+        if k in data.descriptor_shas:
+            used.add(data.descriptor_shas[k])
     shas = sorted(used) or sorted(data.page_shas.get("tsunamis", []))[:1]
     claims = [
         DatasetClaim(
@@ -1413,6 +1465,7 @@ def load_claims(
             raw_sha256=link.raw_sha256,
             codebook_term=link.codebook_term,
             source_claim_id=link.source_claim_id,
+            scope={"source_validity": [dict(e) for e in link.source_validity]} if link.source_validity else {},
             tier="T1",
         )
         for link in links

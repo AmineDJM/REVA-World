@@ -226,6 +226,133 @@ def coded_stmt(
     )
 
 
+# ----------------------------------------------------------------------------- archived codebooks (audit M4)
+
+
+@dataclass(frozen=True)
+class PinnedCodebook:
+    """A codebook file whose text the T1 claims quote: fetched through the metered run, archived as evidence and
+    compared with the pinned sha256 (``docs/dev/v3_audfix.md``). ``quotes`` maps each quoted term to where the
+    quote sits in the pinned bytes (``{"page": n}`` for a PDF -- 1-based physical page --, ``{"paragraph": n}`` for
+    a docx); the quotes themselves stay in the connector, checked verbatim against these bytes by the tests."""
+
+    key: str
+    title: str
+    url: str
+    sha256: str
+    media_types: tuple[str, ...]
+    max_bytes: int
+    extraction: str
+    quotes: Mapping[str, Mapping[str, Any]]
+
+
+async def fetch_codebook(run: Any, book: PinnedCodebook) -> dict[str, Any]:
+    """GET + archive one pinned codebook. Returns ``{"sha256", "pinned_sha256", "matches", "archived"}``.
+
+    In fixture mode a codebook without a captured fixture is reported (``fixture_missing``), never invented; live,
+    any fetch error propagates (the run fails rather than quoting an unarchived codebook)."""
+    from reva.kernel.errors import SourceResponseError
+
+    try:
+        raw = await run.get(
+            book.url, key=f"codebook:{book.key}", media_types=book.media_types, max_bytes=book.max_bytes
+        )
+    except SourceResponseError as e:
+        if run.origin == "live" or getattr(e, "kind", None) != "fixture_missing":
+            raise
+        return {"document": book.key, "sha256": None, "pinned_sha256": book.sha256, "matches": False,
+                "archived": False, "status": "fixture_missing"}  # fmt: skip
+    sha = hashlib.sha256(raw.body).hexdigest()
+    archived = run.archive(raw) if getattr(run, "engine", None) is not None else None
+    return {
+        "document": book.key,
+        "sha256": sha,
+        "pinned_sha256": book.sha256,
+        "matches": sha == book.sha256,
+        "archived": archived is not None,
+        "archived_sha256": archived,
+        "bytes": len(raw.body),
+    }
+
+
+def codebook_sources(book: PinnedCodebook, fetched: Mapping[str, Any] | None) -> dict[str, dict[str, Any]]:
+    """``Codebook.sources`` entries (term -> archived document sha256 + page/paragraph) for a fetched codebook whose
+    sha256 equals the pinned one; ``{}`` otherwise (nothing is claimed about bytes that were not archived)."""
+    if not fetched or not fetched.get("matches") or not fetched.get("archived"):
+        return {}
+    return {
+        term: {"document": book.title, "url": book.url, "sha256": book.sha256, "extraction": book.extraction, **loc}
+        for term, loc in book.quotes.items()
+    }
+
+
+# ----------------------------------------------------------------------------- typed missing dates (audit M3)
+
+#: A date the source does not code for an event REVA records (e.g. a state response coded without its own date):
+#: a Wikidata "unknown value" (somevalue) time statement with the typed-missing reason. The causal temporal check
+#: then reads no date for that endpoint (``undetermined``), instead of a date copied from another event.
+MISSING_DATE_VALUE: dict[str, Any] = {"type": "somevalue"}
+
+
+def missing_date_qualifiers(note: str, reason: str = "not_collected") -> dict[str, Any]:
+    from reva.kernel.values import MissingReason
+
+    return {"missing": {"kind": "missing", "reason": MissingReason(reason).value}, "note": note}
+
+
+def retract_statements(
+    engine: Any,
+    store: Any,
+    *,
+    source_key: str,
+    origin: str,
+    like_patterns: Sequence[str],
+    keep: Iterable[str],
+    raw_sha256s: Sequence[str],
+    retrieved_at: Any,
+    parameters: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Retract (append-only, ``removed_at_source``) the current statements of ``source_key`` whose key matches one
+    of the SQL LIKE ``like_patterns`` and that this delivery no longer has (``keep``: the statement keys it has).
+
+    Used when a connector version stops emitting a family of statements (e.g. dates copied from another event):
+    the KG loader only retracts keys it is told about, so the dropped ones must be named."""
+    from sqlalchemy import text
+
+    from reva.kg.model import MAX_RETRACTIONS_PER_BATCH, load_batch
+
+    keep_set = set(keep)
+    gone: set[str] = set()
+    with engine.connect() as c:
+        for pat in like_patterns:
+            gone |= set(
+                c.execute(
+                    text(
+                        "SELECT statement_key FROM kg.statement_current "
+                        "WHERE source_key = :s AND origin = :o AND statement_key LIKE :p"
+                    ),
+                    {"s": source_key, "o": origin, "p": pat},
+                ).scalars()
+            )
+    todo = sorted(gone - keep_set)
+    inserted = 0
+    for i in range(0, len(todo), MAX_RETRACTIONS_PER_BATCH):
+        rep = load_batch(
+            engine,
+            store,
+            entities=[],
+            statements=[],
+            source_key=source_key,
+            raw_sha256s=sorted(set(raw_sha256s)),
+            retrieved_at=retrieved_at,
+            origin=origin,
+            retract_keys=todo[i : i + MAX_RETRACTIONS_PER_BATCH],
+            parameters=dict(parameters or {}),
+        )
+        inserted += int(rep.retractions_inserted)
+    return {"matched": len(gone), "kept": len(gone & keep_set), "retracted": inserted}
+
+
 # ----------------------------------------------------------------------------- claims (CAUSCORE interface)
 
 

@@ -74,9 +74,20 @@ class Codebook:
     version: str
     url: str | None = None
     definitions: Mapping[str, str] = field(default_factory=dict)
+    #: per term, where the quote sits in the ARCHIVED codebook bytes (AUDFIX, audit M4): ``{"document", "sha256",
+    #: "page" or "paragraph", "extraction"}``. A T1 claim carries the entry of its term as ``codebook.quote_source``.
+    sources: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
-        return {"name": self.name, "version": self.version, "url": self.url, "definitions": dict(self.definitions)}
+        out: dict[str, Any] = {
+            "name": self.name,
+            "version": self.version,
+            "url": self.url,
+            "definitions": dict(self.definitions),
+        }
+        if self.sources:
+            out["sources"] = {k: dict(v) for k, v in self.sources.items()}
+        return out
 
 
 @dataclass(frozen=True)
@@ -124,6 +135,12 @@ class ClaimLoadReport:
     stale: int = 0
     retracted: int = 0
     unknown_entities: int = 0
+    #: claims whose cause or effect has no ``kg.entity`` row and no statement (audit M2), with a sample of keys
+    unknown_endpoint_claims: int = 0
+    unknown_endpoint_sample: list[dict[str, Any]] = field(default_factory=list)
+    #: retracted claims by reason detail (e.g. ``value_not_an_item``: the statement still exists, its value
+    #: became somevalue/novalue), kept beside the stored retraction reason (audit L8)
+    retraction_details: dict[str, int] = field(default_factory=dict)
     rejected_counts: dict[str, int] = field(default_factory=dict)
     rejected_sample: list[dict[str, Any]] = field(default_factory=list)
     #: statements not turned into claims yet, by reason (e.g. ``references_unknown``: WDQS row, tier pending)
@@ -148,6 +165,12 @@ class ClaimLoadReport:
         for k in ("scanned", "inserted", "new", "new_revision", "unchanged", "reinstated", "stale", "retracted"):
             setattr(self, k, getattr(self, k) + getattr(other, k))
         self.unknown_entities += other.unknown_entities
+        self.unknown_endpoint_claims += other.unknown_endpoint_claims
+        self.unknown_endpoint_sample += other.unknown_endpoint_sample[
+            : MAX_REPORTED - len(self.unknown_endpoint_sample)
+        ]
+        for r, n in other.retraction_details.items():
+            self.retraction_details[r] = self.retraction_details.get(r, 0) + n
         self.load_ids += other.load_ids
         for r, n in other.rejected_counts.items():
             self.rejected_counts[r] = self.rejected_counts.get(r, 0) + n
@@ -418,17 +441,36 @@ def _insert_claims(
         setattr(rep, kind, getattr(rep, kind) + 1)
 
 
-def _unknown_entities(conn: Connection, ids: Iterable[str]) -> int:
+def _unknown_ids(conn: Connection, ids: Iterable[str]) -> set[str]:
+    """Ids with no ``kg.entity`` row and no statement about them."""
     qs = sorted(set(ids))
     if not qs:
-        return 0
-    known = conn.execute(
-        text("""SELECT count(*) FROM unnest(CAST(:q AS text[])) q(id)
-                 WHERE EXISTS (SELECT 1 FROM kg.entity e WHERE e.qid = q.id)
-                    OR EXISTS (SELECT 1 FROM kg.statement s WHERE s.subject_qid = q.id)"""),
-        {"q": qs},
-    ).scalar_one()
-    return len(qs) - int(known)
+        return set()
+    return set(
+        conn.execute(
+            text("""SELECT q.id FROM unnest(CAST(:q AS text[])) q(id)
+                     WHERE NOT EXISTS (SELECT 1 FROM kg.entity e WHERE e.qid = q.id)
+                       AND NOT EXISTS (SELECT 1 FROM kg.statement s WHERE s.subject_qid = q.id)"""),
+            {"q": qs},
+        ).scalars()
+    )
+
+
+def _unknown_entities(conn: Connection, ids: Iterable[str]) -> int:
+    return len(_unknown_ids(conn, ids))
+
+
+def _count_unknown_endpoints(conn: Connection, rows: Sequence[Mapping[str, Any]], rep: ClaimLoadReport) -> None:
+    """Count the claims whose cause or effect is not in the KG (audit M2): such a claim has no label, kind or
+    dates (its temporal check can only be ``undetermined``). Counted and sampled, never dropped or invented."""
+    unknown = _unknown_ids(conn, [r["cause_id"] for r in rows] + [r["effect_id"] for r in rows])
+    rep.unknown_entities = len(unknown)
+    for r in rows:
+        sides = [s for s, x in (("cause", r["cause_id"]), ("effect", r["effect_id"])) if x in unknown]
+        if sides:
+            rep.unknown_endpoint_claims += 1
+            if len(rep.unknown_endpoint_sample) < MAX_REPORTED:
+                rep.unknown_endpoint_sample.append({"claim_key": r["claim_key"], "missing": sides})
 
 
 # ---------------------------------------------------------------------------------------------- KG loader
@@ -564,8 +606,32 @@ def load_kg_claims(
                 except ValueError as e:
                     rep.reject(i, str(e)[:100], st["statement_key"])
             current_stmt = {r["statement_key"] for r in rows_db}
+            _count_unknown_endpoints(conn, rows, rep)
+            # Current causal statements whose value is no longer an item (somevalue / novalue): the statement still
+            # exists, so their claim is retracted as "no_longer_causal", never "source_statement_retracted" (L8).
+            not_item = set(
+                conn.execute(
+                    text(
+                        "SELECT s.statement_key FROM kg.statement_current s WHERE s.property_pid = ANY(:pids) "
+                        "AND s.object_qid IS NULL AND s.origin = :o "
+                        "AND (s.source_key = 'wikidata' OR starts_with(s.source_key, 'wikidata.'))"
+                        + (" AND s.source_key = ANY(:sks)" if sks else "")
+                    ),
+                    {"pids": list(CAUSAL_PIDS), "o": o, "sks": sks},
+                ).scalars()
+            )
 
-            def reason(lt: Mapping[str, Any], _cur: set[str] = current_stmt) -> str:
+            def reason(
+                lt: Mapping[str, Any],
+                _cur: set[str] = current_stmt,
+                _ni: set[str] = not_item,
+                _rep: ClaimLoadReport = rep,
+            ) -> str:
+                if lt["statement_key"] in _ni:
+                    _rep.retraction_details["value_not_an_item"] = (
+                        _rep.retraction_details.get("value_not_an_item", 0) + 1
+                    )
+                    return "no_longer_causal"
                 return "no_longer_causal" if lt["statement_key"] in _cur else "source_statement_retracted"
 
             if sks is None:
@@ -574,7 +640,13 @@ def load_kg_claims(
                 prefixes = [f"kg:{s}:" for s in sks]
             loaded: list[int] = []
 
-            def mk(_o: str = o, _wm: int | None = wm, _loaded: list[int] = loaded) -> int:
+            def mk(
+                _o: str = o,
+                _wm: int | None = wm,
+                _loaded: list[int] = loaded,
+                _ni: int = len(not_item),
+                _unk: int = rep.unknown_endpoint_claims,
+            ) -> int:
                 if not _loaded:
                     _loaded.append(
                         _new_load(
@@ -587,6 +659,8 @@ def load_kg_claims(
                                 "source_keys": sks,
                                 "properties": list(CAUSAL_PIDS),
                                 "relations_sha256": vocab.sha256,
+                                "unknown_endpoint_claims": _unk,
+                                "statements_value_not_an_item": _ni,
                             },
                         )
                     )
@@ -694,6 +768,10 @@ def _dataset_row(
             raise _Reject("codebook_term_not_defined")
         cb = {**codebook.as_dict(), "term": c.codebook_term, "definition": codebook.definitions[c.codebook_term]}
         cb.pop("definitions")
+        cb.pop("sources", None)
+        src = (codebook.sources or {}).get(c.codebook_term)
+        if src:
+            cb["quote_source"] = dict(src)
     citation = _citation(c.citation)
     if c.tier == "T2" and citation is None:
         raise _Reject("t2_requires_citation")
@@ -802,6 +880,7 @@ def load_dataset_claims(
         seen[row["claim_key"]] = row["content_sha256"]
         rows.append(row)
     rep.scanned = len(items)
+    complete_requested = complete
     if complete and rep.rejected_total:
         # A partly rejected "complete" delivery must not retract the claims of the rejected rows.
         complete = False
@@ -812,7 +891,7 @@ def load_dataset_claims(
             {"k": f"reva:causal:ds:{source_key}:{dataset}:{origin}"},
         )
         _ensure_raw_artifacts(conn, store, raws, source_key)
-        rep.unknown_entities = _unknown_entities(conn, [r["cause_id"] for r in rows] + [r["effect_id"] for r in rows])
+        _count_unknown_endpoints(conn, rows, rep)
         loaded: list[int] = []
         sp = conn.begin_nested()  # dropped when every row was refused: no empty load row
 
@@ -832,6 +911,15 @@ def load_dataset_claims(
                             "dataset_revision": dataset_revision,
                             "codebook": codebook.as_dict() if codebook else None,
                             "complete": complete,
+                            # the caller's flag and the one applied (a partly rejected delivery is downgraded) (L8)
+                            "complete_requested": complete_requested,
+                            "complete_effective": complete,
+                            "complete_downgrade_reason": (
+                                f"{rep.rejected_total - 1} row(s) rejected"
+                                if complete_requested and not complete
+                                else None
+                            ),
+                            "unknown_endpoint_claims": rep.unknown_endpoint_claims,
                             "relations_sha256": vocab.sha256,
                         },
                     )
