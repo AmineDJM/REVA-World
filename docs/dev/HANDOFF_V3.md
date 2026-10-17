@@ -11,6 +11,8 @@ Everything written by the lead and the agents is committed and pushed on `claude
 * **Archived raw provider bytes** `var/objects` (~3.8 GB) and the Wikidata archive `var/kg/objects`.
 * **Throwaway DBs** (`reva_test_*`, `reva_kg_wdharvest`, `reva_kg_causwd`, `reva_causcand`, …).
 
+**Latest data snapshot on GitHub (2026-10-17, after the full dev-DB load — atlas snapshot 1d9b950f…, 220 tables / 93.5 M rows, 1.15 M links, 27,791 causal claims):** branches `reva-data-20261017-b1` … `-b12` (`PARTS.txt` on b1 says which branch holds which part; dumps are split — concatenate before `pg_restore`; restore steps in `RESTORE.md`). Earlier snapshot, kept for reference:
+
 **Saved on GitHub (2026-10-16):** branches `reva-data-20261016-b1` … `-b4` hold pg_dumps of `reva`,
 `reva_kg_wdharvest`, `reva_kg_causwd`, `reva_causcand`, a tar of `var/objects` + `var/kg` (95 MB parts) and the
 agents' scratch scripts; restore steps in `RESTORE.md` and checksums in `MANIFEST.sha256` on branch `-b1`.
