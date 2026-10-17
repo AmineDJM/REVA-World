@@ -1,0 +1,157 @@
+# Industry and companies concepts of the atlas (agent V4INDUSTRY). Provider-declared definitions, not human-reviewed.
+# Tables: oecd.tiva_principal / oecd.tiva_fdva (src/reva/adapters/connectors/atlas_tiva.py, OECD TiVA 2025 edition,
+# model-based ICIO estimates) and gleif.lei_counts / gleif.legal_form_counts (atlas_gleif.py, GLEIF API pagination
+# totals, CC0). Bilateral FDVA series (fd_area in the indicator) are link-layer tables, not country concepts.
+# Measure names are the OECD code-list labels verbatim (CL_TIVA_MEASURE). Every series string is checked against the
+# fixture tables by tests/unit/test_v4industry.py.
+domain: industry
+labels:
+  fr: Industrie, chaînes de valeur et entreprises
+  en: Industry, value chains and companies
+maintainer: V4INDUSTRY
+concepts:
+- id: industry.tiva.prod
+  labels:
+    fr: Production brute, toutes activités (TiVA)
+    en: Production, gross output - all activities (TiVA)
+  definition: '"Production, gross output" (OECD TiVA 2025 measure PROD), total of all activities (_T), from the OECD
+    Inter-Country Input-Output tables; current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.PROD|activity=_T
+  provider_declared: true
+  notes: Model-based ICIO estimates (flags.estimate = oecd_icio_model_based), 80 economies + aggregates, 2010-2022 loaded.
+- id: industry.tiva.valu
+  labels:
+    fr: Valeur ajoutée, toutes activités (TiVA)
+    en: Value added - all activities (TiVA)
+  definition: '"Value added" (OECD TiVA 2025 measure VALU), total of all activities (_T); current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.VALU|activity=_T
+  provider_declared: true
+- id: industry.tiva.valu.manufacturing
+  labels:
+    fr: Valeur ajoutée de l'industrie manufacturière (TiVA, CITI C)
+    en: Value added of manufacturing (TiVA, ISIC C)
+  definition: '"Value added" (OECD TiVA 2025 measure VALU) of activity C "Manufacturing" (ISIC Rev.4 section C);
+    current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.VALU|activity=C
+  provider_declared: true
+- id: industry.tiva.exgr
+  labels:
+    fr: Exportations brutes (TiVA)
+    en: Gross exports (TiVA)
+  definition: '"Gross exports" (OECD TiVA 2025 measure EXGR), all activities, to the world (partner W); current US
+    dollars, millions. ICIO-balanced, not the same statistic as customs trade (BACI, IMF IMTS).'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.EXGR|activity=_T
+  provider_declared: true
+- id: industry.tiva.exgr_dva
+  labels:
+    fr: Valeur ajoutée nationale contenue dans les exportations brutes (TiVA)
+    en: Domestic value added in gross exports (TiVA)
+  definition: '"Domestic value added in gross exports" (OECD TiVA 2025 measure EXGR_DVA), all activities, partner
+    World; current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.EXGR_DVA|activity=_T
+  provider_declared: true
+- id: industry.tiva.exgr_fva
+  labels:
+    fr: Valeur ajoutée étrangère contenue dans les exportations brutes (TiVA)
+    en: Foreign value added in gross exports (TiVA)
+  definition: '"Foreign value added in gross exports" (OECD TiVA 2025 measure EXGR_FVA), all activities, partner World:
+    the imported inputs embodied in a country''s exports (backward participation in global value chains); current US
+    dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.EXGR_FVA|activity=_T
+  provider_declared: true
+- id: industry.tiva.ffd_dva
+  labels:
+    fr: Valeur ajoutée nationale dans la demande finale étrangère (TiVA)
+    en: Domestic value added in foreign final demand (TiVA)
+  definition: '"Domestic value added in foreign final demand" (OECD TiVA 2025 measure FFD_DVA), all activities, partner
+    World; current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.FFD_DVA|activity=_T
+  provider_declared: true
+- id: industry.tiva.dfd_fva
+  labels:
+    fr: Valeur ajoutée étrangère dans la demande finale intérieure (TiVA)
+    en: Foreign value added in domestic final demand (TiVA)
+  definition: '"Foreign value added in domestic final demand" (OECD TiVA 2025 measure DFD_FVA), all activities, partner
+    World; current US dollars, millions.'
+  unit: million US dollars (current)
+  domain: industry
+  subdomain: value_chains
+  theme: industry
+  source_order:
+  - oecd.tiva_principal.DFD_FVA|activity=_T
+  provider_declared: true
+- id: companies.gleif.lei_records.all
+  labels:
+    fr: Entités juridiques dotées d'un LEI (adresse légale dans le pays)
+    en: Legal entities with an LEI (legal address in the country)
+  definition: Number of LEI records in the GLEIF Global LEI Index whose legal address is in the country (all
+    registration statuses), at the Golden Copy publish date. Counts entities that obtained a Legal Entity Identifier
+    (mostly financial-market participants, their groups and funds) -- not the number of firms.
+  unit: LEI records
+  domain: industry
+  subdomain: companies
+  theme: companies
+  source_order:
+  - gleif.lei_counts.lei_records|filter=all
+  provider_declared: true
+- id: companies.gleif.lei_records.issued
+  labels:
+    fr: LEI actifs (statut ISSUED) par pays de l'adresse légale
+    en: Issued (maintained) LEIs by legal-address country
+  definition: Number of LEI records with registration status ISSUED (LEIs currently maintained by their issuer) whose
+    legal address is in the country, at the Golden Copy publish date (GLEIF API pagination total).
+  unit: LEI records
+  domain: industry
+  subdomain: companies
+  theme: companies
+  source_order:
+  - gleif.lei_counts.lei_records|filter=issued
+  provider_declared: true
+- id: companies.gleif.lei_records.fund
+  labels:
+    fr: Fonds dotés d'un LEI par pays de l'adresse légale
+    en: Funds with an LEI by legal-address country
+  definition: Number of LEI records of entity category FUND whose legal address is in the country, at the Golden Copy
+    publish date (GLEIF API pagination total).
+  unit: LEI records
+  domain: industry
+  subdomain: companies
+  theme: companies
+  source_order:
+  - gleif.lei_counts.lei_records|filter=fund
+  provider_declared: true

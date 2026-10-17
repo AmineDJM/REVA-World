@@ -256,3 +256,22 @@ def test_tiva_xml_envelope_is_typed():
     with pytest.raises(SourceResponseError) as e:
         t.parse_csv(b"<?xml version='1.0'?><message:Error/>", t.MAIN_COLS)
     assert e.value.details["kind"] == "not_csv"
+
+
+def test_catalog_series_exist_in_fixture_tables():
+    import yaml
+
+    cat = yaml.safe_load((Path(__file__).resolve().parents[2] / "registry/atlas/catalog/industry.yaml").read_text())
+    m = t.parse_codelist(tv(t.codelist_url(t.AGENCY, "CL_TIVA_MEASURE")))
+    a = t.parse_codelist(tv(t.codelist_url("OECD", "CL_ACTIVITY_ISIC4")))
+    have: set[str] = set()
+    for meas in t.MEASURES:
+        u = t.main_url(meas, areas=AREAS, start=2021, end=2022)
+        recs, _ = t.parse_csv(tv(u), t.MAIN_COLS)
+        have |= {
+            f"oecd.tiva_principal.{r['indicator']}"
+            for r in t.main_rows(recs, raw_sha256=SHA, request_url=u, measures=m, activities=a)
+        }
+    have |= {f"gleif.lei_counts.lei_records|filter={k}" for k in g.COUNT_FILTERS}
+    series = {s for c in cat["concepts"] for s in c["source_order"]}
+    assert series <= have, series - have
