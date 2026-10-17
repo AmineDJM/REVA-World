@@ -62,7 +62,7 @@ from reva.atlas.tables import ATLAS_SCHEMA
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.wb_pinksheet"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas_pinksheet/1"
 SOURCE_KEY = "worldbank.cmo"
 SOURCE = "wb_cmo"

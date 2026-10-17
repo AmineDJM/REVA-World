@@ -48,7 +48,7 @@ from reva.atlas.tables import ATLAS_SCHEMA, country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.eia_steo"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas_eia_steo/1"
 SOURCE_KEY = "eia.opendata_bulk"
 SOURCE = "eia_steo"
