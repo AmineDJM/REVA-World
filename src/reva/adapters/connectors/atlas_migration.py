@@ -77,7 +77,7 @@ import polars as pl
 
 from reva.kernel.errors import SourceResponseError
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.1: 1.0.0 was registered in the dev DB from an earlier working-tree state (before the run options)
 PARSER_VERSION = "atlas_migration/1"
 MAX_TEXT = 4000
 

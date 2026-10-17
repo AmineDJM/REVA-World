@@ -125,7 +125,7 @@ during development (counts in the table above), and the fixture-mode ingest pass
 Commands (bigger machine or once ≥ 5 GB are free; ~20 MB raw, ~10 MB Parquet in total):
 
 ```
-flock /tmp/reva-devdb.lock uv run reva seed                      # registers atlas_migration 1.0.0 (4 sources)
+flock /tmp/reva-devdb.lock uv run reva seed                      # registers atlas_migration 1.0.1 (4 sources)
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.idmc_national
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.unhcr_asylum
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.iom_mmp
