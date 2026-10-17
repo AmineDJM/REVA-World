@@ -50,6 +50,7 @@ from reva.evaluation.registry.questions import (
     generate_meeting_questions,
     generate_questions,
     period_ended,
+    provider_published_on,
     resolution_value,
 )
 from reva.evaluation.registry.scores import aggregate, calibration, relative_to, score_forecast
@@ -228,7 +229,12 @@ def build_batch(
             )
         else:
             qs, sk = generate_questions(
-                fam, series, cycle=cycle, interval_level=specs.interval_level, source_pin=_short_pin(pin)
+                fam,
+                series,
+                cycle=cycle,
+                interval_level=specs.interval_level,
+                source_pin=_short_pin(pin),
+                issued_on=issued_at.date(),
             )
         skipped.extend(sk)
         fam_used = False
@@ -502,7 +508,14 @@ def resolve_batch(
     """Pure: outcomes and scores of the pending questions of one sealed batch.
 
     ``issue_series``: family -> series of the pinned issue version; ``later``: family -> [(version pin, series)]
-    of versions registered after the seal, oldest first."""
+    of versions registered after the seal, oldest first.
+
+    Prospectivity (FIX7, QA-PRED X10) is checked against the issue date AND the provider's publication date, not
+    only against REVA's pinned table: ``not_prospective`` when (a) the reference period had ended at issue (unless
+    the family is declared a nowcast), (b) the pinned issue version already held the value, or (c) the outcome
+    cell's provider publication date (``questions.PUBLICATION_FLAGS``) is at or before the seal date."""
+    issued_day = datetime.fromisoformat(str(manifest["issued_at"])).date()
+    fam_docs: Mapping[str, Any] = manifest.get("families") or {}
     outcomes: list[dict[str, Any]] = []
     by_q = defaultdict(list)
     for f in manifest["forecasts"]:
@@ -513,6 +526,15 @@ def resolve_batch(
         if qid in handled or not period_ended(q, today):
             continue
         fam = q["family"]
+        if date.fromisoformat(str(q["period_end"])) <= issued_day and not (fam_docs.get(fam) or {}).get("nowcast"):
+            outcomes.append(
+                {
+                    "question_id": qid,
+                    "status": "not_prospective",
+                    "reason": "the reference period had ended at issue (family not declared a nowcast)",
+                }
+            )
+            continue
         if resolution_value(q, issue_series.get(fam, {})) is not None:
             outcomes.append(
                 {
@@ -535,6 +557,17 @@ def resolve_batch(
                 )
             continue
         pin, cell = found
+        pub = provider_published_on(cell.refs)
+        if pub is not None and pub[1] <= issued_day:
+            outcomes.append(
+                {
+                    "question_id": qid,
+                    "status": "not_prospective",
+                    "reason": f"the provider published this value on or before the seal (flags.{pub[0]} = "
+                    f"{pub[1].isoformat()}, issued {issued_day.isoformat()})",
+                }
+            )
+            continue
         outcomes.append(
             {
                 "question_id": qid,
@@ -581,6 +614,7 @@ def _record_resolution(
         **(extra or {}),
     }
     qids = sorted(o["question_id"] for o in res["outcomes"])
+    cf_scores: list[dict[str, Any]] = list((extra or {}).get("counterfactual_scores") or [])
     with engine.begin() as conn:
         sha = repo.store_json_artifact(conn, store, doc, "evaluation", schema_version="forecast-registry-resolution/1")
         act = repo.simple_activity(
@@ -634,10 +668,31 @@ def _record_resolution(
                     "n_not_prospective": counts["not_prospective"],
                     "summary": aggregate(mine),
                     "scores": mine,
+                    **(
+                        {
+                            "counterfactual_scores": (cfm := [s for s in cf_scores if s["model"] == mk]),
+                            "counterfactual_summary": aggregate(cfm),
+                        }
+                        if cf_scores
+                        else {}
+                    ),
                 },
                 act.id,
             )
     return sha, dict(counts)
+
+
+def _series_for(
+    manifest: Mapping[str, Any], versions: Mapping[str, Sequence[Mapping[str, Any]]], cache: FrameCache
+) -> tuple[dict[str, dict[str, Series]], dict[str, list[tuple[Mapping[str, Any], Mapping[str, Series]]]]]:
+    issue_series: dict[str, dict[str, Series]] = {}
+    later: dict[str, list[tuple[Mapping[str, Any], Mapping[str, Series]]]] = {}
+    for fk, vs in versions.items():
+        fam = _family_of(manifest["families"][fk])
+        pin = manifest["data"]["tables"][fam.dataset_key]
+        issue_series[fk] = extract_series(cache.get(pin["artifact_sha256"]), fam, pin.get("recorded_at"))[0]
+        later[fk] = [(v, extract_series(cache.get(v["artifact_sha256"]), fam, v.get("recorded_at"))[0]) for v in vs]
+    return issue_series, later
 
 
 def resolve_due(
@@ -674,15 +729,7 @@ def resolve_due(
                 )
                 for fk in fams
             }
-        issue_series: dict[str, dict[str, Series]] = {}
-        later: dict[str, list[tuple[Mapping[str, Any], Mapping[str, Series]]]] = {}
-        for fk in fams:
-            fam = _family_of(manifest["families"][fk])
-            pin = manifest["data"]["tables"][fam.dataset_key]
-            issue_series[fk] = extract_series(cache.get(pin["artifact_sha256"]), fam, pin.get("recorded_at"))[0]
-            later[fk] = [
-                (v, extract_series(cache.get(v["artifact_sha256"]), fam, v.get("recorded_at"))[0]) for v in versions[fk]
-            ]
+        issue_series, later = _series_for(manifest, versions, cache)
         res = resolve_batch(manifest, handled, issue_series, later, today=now.date())
         if not res["outcomes"]:
             out.append({"batch_sha256": b["sha"], "status": "awaiting_outcomes", "due": len(due)})
@@ -697,6 +744,11 @@ VOID_RULE = (
     "contradicts the provider's metadata); the sealed manifest is never edited or re-sealed, the question is closed "
     "with this appended resolution (status void, reason) and no forecast is scored"
 )
+VOID_AFTER_END_RULE = (
+    "void after the reference period ended (FIX7, QA-PRED X11): allowed only with counterfactual scores - what every "
+    "model's score would have been against the first value published after the seal - recorded in this resolution "
+    "and in each model's registry_score row (metrics.counterfactual_scores) for the leaderboard audit"
+)
 
 
 def void_questions(
@@ -706,8 +758,14 @@ def void_questions(
     *,
     origin: str = "live",
     actor: str = "worker:forecast_registry",
+    counterfactual: bool = False,
 ) -> dict[str, Any]:
     """Close sealed, not yet handled questions as ``void`` with a stated reason (append-only).
+
+    FIX7 (QA-PRED X11, no selective deletion of bad forecasts): a question whose reference period has **ended** may
+    be voided only with ``counterfactual=True``; its counterfactual scores (against the first observed value
+    published after the seal) are then computed and logged. If no such value is published yet, the void is refused
+    (void before the period end, or wait for the outcome). All checks run before anything is written.
 
     ``voids``: question_id -> {"reason": <code>, "detail": <text>, ...evidence}. A question already handled
     (resolved / void / not prospective) is left alone and reported; an unknown id is refused. Nothing in the
@@ -732,13 +790,43 @@ def void_questions(
     unknown = sorted(set(voids) - {q["question_id"] for _, _, m in hits for q in m})
     if unknown:  # checked before anything is written
         raise ValueError(f"question ids not in any sealed batch of origin {origin}: {unknown}")
-    out: list[dict[str, Any]] = []
+    plans: list[tuple[dict[str, Any], dict[str, Any], list[Mapping[str, Any]], list[str], dict[str, Any] | None]] = []
+    cache = FrameCache(store, size=4)
     for hb, hman, mine in hits:
         b, manifest = dict(hb), dict(hman)
         with engine.connect() as conn:
             handled = handled_questions(conn, b["sha"])
         todo = [q for q in mine if q["question_id"] not in handled]
         skipped = sorted(q["question_id"] for q in mine if q["question_id"] in handled)
+        ended = [q for q in todo if period_ended(q, now.date())]
+        cf: dict[str, Any] | None = None
+        if ended:
+            if not counterfactual:
+                raise ValueError(
+                    "void after the reference period ended requires counterfactual=True (scores logged): "
+                    + ", ".join(sorted(q["question_id"] for q in ended))
+                )
+            issued_at = datetime.fromisoformat(manifest["issued_at"])
+            with engine.connect() as conn:
+                versions = {
+                    fk: versions_between(
+                        conn, manifest["families"][fk]["dataset_key"], origin=origin, after=issued_at, until=now
+                    )
+                    for fk in {q["family"] for q in ended}
+                }
+            issue_series, later = _series_for(manifest, versions, cache)
+            sub = {**manifest, "questions": ended}
+            cf = resolve_batch(sub, set(), issue_series, later, today=now.date())
+            got = {o["question_id"] for o in cf["outcomes"]}
+            missing = sorted(q["question_id"] for q in ended if q["question_id"] not in got)
+            if missing:
+                raise ValueError(
+                    "no outcome published yet for questions whose period ended: counterfactual scores cannot be "
+                    "logged - void before the period end or wait for the outcome: " + ", ".join(missing)
+                )
+        plans.append((b, manifest, todo, skipped, cf))
+    out: list[dict[str, Any]] = []
+    for b, manifest, todo, skipped, cf in plans:
         if not todo:
             out.append({"batch_sha256": b["sha"], "status": "already_handled", "question_ids": skipped})
             continue
@@ -748,14 +836,59 @@ def void_questions(
             ],
             "scores": [],
         }
-        sha, counts = _record_resolution(
-            engine, store, b, manifest, res, now, mv, origin, actor, extra={"rule": VOID_RULE}
-        )
+        extra: dict[str, Any] = {"rule": VOID_RULE}
+        if cf is not None:
+            extra = {
+                "rule": VOID_RULE + "; " + VOID_AFTER_END_RULE,
+                "counterfactual_outcomes": cf["outcomes"],
+                "counterfactual_scores": cf["scores"],
+            }
+        sha, counts = _record_resolution(engine, store, b, manifest, res, now, mv, origin, actor, extra=extra)
         out.append(
             {"batch_sha256": b["sha"], "status": "voided", "resolution_sha256": sha, "already_handled": skipped}
             | dict(counts)
         )
     return {"origin": origin, "checked_at": now.isoformat(), "batches": out}
+
+
+ANNOTATION_SCHEMA = "reva-forecast-registry-annotation/1"
+
+
+def annotate_batch(
+    engine: Engine,
+    store: Any,
+    batch_sha256: str,
+    annotation: Mapping[str, Any],
+    *,
+    actor: str = "worker:forecast_registry",
+) -> str:
+    """Append an annotation to a sealed batch (FIX7): a content-addressed artifact whose provenance activity takes
+    the sealed batch as input. The batch itself is verified (``load_frozen_manifest``) and never edited or
+    re-sealed; scoring is unchanged. ``annotation`` needs a ``kind`` and a ``note``; returns the artifact sha256."""
+    from reva.adapters.postgres import repositories as repo
+
+    if not str(annotation.get("kind") or "").strip() or not str(annotation.get("note") or "").strip():
+        raise ValueError("an annotation needs a kind and a note")
+    load_frozen_manifest(store, batch_sha256)  # integrity check of the sealed batch (raises if tampered/missing)
+    with engine.begin() as conn:
+        now = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+        doc = {
+            "schema": ANNOTATION_SCHEMA,
+            "batch_sha256": batch_sha256,
+            "annotated_at": now.isoformat(),
+            "statement": "Appended annotation: the sealed batch, its questions and frozen forecasts are unchanged; "
+            "the annotation qualifies how their scores may be described.",
+            **dict(annotation),
+        }
+        sha = repo.store_json_artifact(conn, store, doc, "evaluation", schema_version="forecast-registry-annotation/1")
+        act = repo.simple_activity(
+            "evaluation.forecast_registry_annotate",
+            "evaluation",
+            actor,
+            {"batch_sha256": batch_sha256, "kind": str(annotation["kind"]), "annotation_sha256": sha},
+        )
+        repo.record_activity(conn, act, inputs=[(batch_sha256, {"role": "sealed_batch"})], outputs=[sha])
+    return sha
 
 
 # --------------------------------------------------------------------------- pseudo-real-time back-test

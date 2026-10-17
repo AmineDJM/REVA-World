@@ -377,7 +377,10 @@ class Executor(DomainOps):
                 if op.op == "entity_lookup":
                     lookups[op.id] = Resolved(text=op.args["text"], kind=op.args.get("kind"), status="unavailable")
                     lookups[op.id].evidence_id = ev.absence(
-                        "entity", ["time budget exceeded"], query=op.args["text"], kind=op.args.get("kind") or "any"
+                        "entity",
+                        ["time budget exceeded"],
+                        query=op.args["text"],
+                        entity_kind=op.args.get("kind") or "any",
                     )
                 else:
                     results.append(OpResult(op, "error", message="time_budget_exceeded"))
@@ -438,7 +441,7 @@ class Executor(DomainOps):
             if self.b.kg is None and self.b.search is None:
                 r.status = "unavailable"
             r.evidence_id = ev.absence(
-                "entity", r.consulted or ["no entity index available"], query=text, kind=kind or "any"
+                "entity", r.consulted or ["no entity index available"], query=text, entity_kind=kind or "any"
             )
         return r
 
@@ -528,7 +531,7 @@ class Executor(DomainOps):
         if op.op == "causal_chain":
             return self._causal_chain(op, lookups, ev)
         if op.op in ("kg_families", "kg_cross", "effects", "forecast", "decision", "atlas_period"):
-            return getattr(self, f"_{op.op}")(op, lookups, ev)  # type: ignore[no-any-return]
+            return getattr(self, f"_{op.op}")(op, lookups, ev)  # type: ignore[no-any-return,unused-ignore]
         raise CapabilityUnavailable(f"operation {op.op} has no executor", backend="plan")
 
     # ------------------------------------------------------------------ causality (claims only, never candidates)
@@ -543,11 +546,30 @@ class Executor(DomainOps):
         if r.entity is None:
             return OpResult(op, "unresolved", data={"lookup": a["entity"]})
         port = self._need_causal()
-        res = port.explain(r.entity.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
         consulted = [port.name]
-        claims = [c for c in res.claims if _is_claim(c)]
-        dissent = [c for c in res.dissent if _is_claim(c) and c.claim_key not in {x.claim_key for x in claims}]
-        data: dict[str, Any] = {"entity": r.entity, "direction": a["direction"], "truncated": res.truncated}
+        answered_by = None
+        # the chosen record first, then the records with the same label match (one taxon published by several
+        # sources under one exact label: the claims may sit on another record); the answer names it (NLQA6)
+        for cand in [r.entity, *r.alternatives[:3]]:
+            res = port.explain(cand.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
+            claims = [c for c in res.claims if _is_claim(c)]
+            dissent = [c for c in res.dissent if _is_claim(c) and c.claim_key not in {x.claim_key for x in claims}]
+            if claims or dissent:
+                answered_by = cand if cand is not r.entity else None
+                break
+            if r.match not in ("label_exact", "alias_exact"):
+                break
+        data: dict[str, Any] = {
+            "entity": answered_by or r.entity,
+            "direction": a["direction"],
+            "truncated": res.truncated,
+        }
+        if answered_by is not None:
+            data["answered_by"] = answered_by
+            data["chosen"] = r.entity
+            data["answered_by_eid"] = ev.entity(answered_by, query=r.text, match=r.match or "")
+        if not claims and not dissent:
+            data["entity"] = r.entity
         if not claims and not dissent:
             data["absence"] = ev.absence(
                 f"causal_{a['direction']}", consulted, event=r.entity.qid, note="no sourced causal claim"

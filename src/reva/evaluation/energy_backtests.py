@@ -22,9 +22,11 @@ Pairwise comparisons per (variable, horizon) on the origins where both forecaste
 Harvey-Leybourne-Newbold small-sample correction (rectangular HAC with ``k - 1`` lags, ``k`` = overlap of the
 ``h``-month forecasts in origin steps; Bartlett weights if that variance is not positive), Student-t with ``n - 1``
 degrees of freedom; one-sided p-value for "the challenger has the lower expected loss". **Winners**: a REVA
-candidate whose CRPS advantage over the random walk is significant at 5 % after a Holm-Bonferroni correction over
-every (candidate, horizon) test of that variable. Only winners (per variable and horizon) may be issued to the
-registry besides the baselines and the attributed STEO projection.
+candidate whose CRPS advantage over the random walk is significant at 5 % after ONE Holm-Bonferroni correction over
+every (variable, candidate, horizon) test of the run (FIX7, QA-PRED X3; was one family per variable). EIA-derived
+candidates (``energy_models.NOT_ISSUABLE``: the STEO + random-walk combination) are tested and reported but never
+winners. Each winner carries its family size, 80 % coverage and its point comparison with STEO. Only winners (per
+variable and horizon) may be issued to the registry besides the baselines and the attributed STEO projection.
 """
 
 from __future__ import annotations
@@ -268,8 +270,10 @@ def _summaries(
     summary: list[dict[str, Any]] = []
     tests: list[dict[str, Any]] = []
     winners: list[dict[str, Any]] = []
+    # FIX7 (QA-PRED X3): ONE Holm family per run = every (variable, issuable candidate, horizon) CRPS-vs-RW test
+    # that can lead to an issuance; EIA-derived candidates (em.NOT_ISSUABLE) are tested and reported, never winners.
+    cand_p: dict[tuple[str, str, int], float] = {}
     for code in codes:
-        cand_p: dict[tuple[str, int], float] = {}
         for h in horizons:
             bench = by.get((code, h, em.BENCHMARK), {})
             for m in em.models_for(code):
@@ -318,24 +322,35 @@ def _summaries(
                             bname == em.BENCHMARK
                             and loss == "crps"
                             and m not in (em.REFERENCE,)
+                            and m not in em.NOT_ISSUABLE
                             and "p_challenger_better" in t
                         ):
-                            cand_p[(m, h)] = t["p_challenger_better"]
-        sig = holm(cand_p)
-        for (m, h), ok in sorted(sig.items(), key=lambda kv: (kv[0][1], kv[0][0])):
-            if ok:
-                winners.append(
-                    {
-                        "code": code,
-                        "h": h,
-                        "model": m,
-                        "model_key": em.MODEL_KEYS[m],
-                        "p_challenger_better": cand_p[(m, h)],
-                        "holm_family_size": len(cand_p),
-                        "loss": "crps",
-                        "benchmark": em.BENCHMARK,
-                    }
-                )
+                            cand_p[(code, m, h)] = t["p_challenger_better"]
+    sig = holm(cand_p)
+    srow = {(r["code"], r["h"], r["model"]): r for r in summary}
+    steo_ae = {
+        (t["code"], t["h"], t["challenger"]): t for t in tests if t["benchmark"] == em.REFERENCE and t["loss"] == "ae"
+    }
+    for (code, m, h), ok in sorted(sig.items(), key=lambda kv: (codes.index(kv[0][0]), kv[0][2], kv[0][1])):
+        if ok:
+            vs_steo = steo_ae.get((code, h, m), {})
+            winners.append(
+                {
+                    "code": code,
+                    "h": h,
+                    "model": m,
+                    "model_key": em.MODEL_KEYS[m],
+                    "p_challenger_better": cand_p[(code, m, h)],
+                    "holm_family_size": len(cand_p),
+                    "holm_family": "run (every variable x issuable candidate x horizon, CRPS vs random walk)",
+                    "loss": "crps",
+                    "benchmark": em.BENCHMARK,
+                    "crps_ratio_vs_rw": srow.get((code, h, m), {}).get("crps_ratio_vs_rw"),
+                    "coverage_80": srow.get((code, h, m), {}).get("coverage_80"),
+                    "ae_vs_steo_mean_diff": vs_steo.get("mean_diff"),
+                    "ae_vs_steo_p_challenger_better": vs_steo.get("p_challenger_better"),
+                }
+            )
     return summary, tests, winners
 
 

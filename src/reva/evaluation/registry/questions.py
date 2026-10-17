@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
@@ -347,11 +348,18 @@ def generate_questions(
     cycle: str,
     interval_level: float,
     source_pin: Mapping[str, Any],
+    issued_on: date | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Questions of one family for one quarterly cycle; skipped (geo, reason) listed."""
+    """Questions of one family for one quarterly cycle; skipped (geo, reason) listed.
+
+    ``issued_on`` (the seal date; FIX7, QA-PRED X10): a target period that has **ended** at issue is refused
+    unless the family declares ``nowcast: true``; each question records its horizon counted from the issue period
+    (``issue_horizon``) and the share of the target period elapsed at issue (``timing``) besides the cycle-anchored
+    ``cycle_horizon``."""
     freq = family.frequency
     anchor = P.cycle_anchor(cycle)
     anchor_idx = P.index_of(freq, anchor)
+    allow_ended = bool(family.raw.get("nowcast"))
     questions: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     geos = [g.key for g in family.geos] if family.geos else list(family.countries or sorted(series))
@@ -384,6 +392,17 @@ def generate_questions(
                     )
                     continue
                 pend = P.end_of(freq, target)
+                if issued_on is not None and pend <= issued_on and not allow_ended:
+                    skipped.append(
+                        {
+                            "family": family.key,
+                            "geo": geo,
+                            "period": P.label_of(freq, target),
+                            "reason": "reference period had ended at issue (no question on an ended period; the "
+                            "family is not declared a nowcast)",
+                        }
+                    )
+                    continue
                 q: dict[str, Any] = {
                     "schema": QUESTION_SCHEMA,
                     "question_key": f"{cycle}|{family.key}|{geo}|{P.label_of(freq, target)}|{rule.type}",
@@ -426,12 +445,64 @@ def generate_questions(
                         "issue_table": dict(source_pin),
                     },
                 }
+                if issued_on is not None:
+                    q["issue_horizon"] = target - P.index_of(freq, issued_on)
+                    q["timing"] = issue_timing(P.start_of(freq, target), pend, issued_on)
                 if family.finance is not None:
                     q["disclaimer"] = _disclaimer()
                 q["text_fr"], q["text_en"] = question_text(q)
                 q["question_id"] = question_id(q)
                 questions.append(q)
     return questions, skipped
+
+
+def issue_timing(start: date, end: date, issued_on: date) -> dict[str, Any]:
+    """Where the issue date falls in the target period ``[start, end)`` (FIX7, QA-PRED X10 / §3.F).
+
+    ``kind``: ``forecast`` (period not started), ``nowcast`` (started, < half elapsed), ``near_nowcast`` (at least
+    half elapsed), ``ended`` (period over at issue). Scores of nowcasts are reported separately from forecasts."""
+    span = (end - start).days or 1
+    frac = min(1.0, max(0.0, (issued_on - start).days / span))
+    kind = (
+        "ended"
+        if issued_on >= end
+        else "forecast"
+        if issued_on < start
+        else "near_nowcast"
+        if frac >= 0.5
+        else "nowcast"
+    )
+    return {"issued_on": issued_on.isoformat(), "elapsed_fraction_at_issue": round(frac, 4), "kind": kind}
+
+
+#: cell flags that carry the PROVIDER's publication date of the table/series holding the cell (an upper bound of
+#: the cell's first publication): if one is at/before the seal, the value was public at issue (FIX7, QA-PRED X10)
+PUBLICATION_FLAGS = ("release_date", "publication_date", "published_at", "last_updated", "data_update")
+_ISO_DAY = re.compile(r"^(\d{4})-(\d{2})-(\d{2})")
+
+
+def provider_published_on(refs: Sequence[Mapping[str, Any]]) -> tuple[str, date] | None:
+    """Earliest provider publication date found in the cells' flags (``(flag, day)``), or None when no cell
+    declares one (then only the table-relative check applies). Non-ISO values (e.g. a 'release' label) are
+    ignored, never guessed."""
+    best: tuple[str, date] | None = None
+    for r in refs:
+        fl = r.get("flags")
+        if isinstance(fl, str):
+            fl = _flags(fl)
+        if not isinstance(fl, Mapping):
+            continue
+        for k in PUBLICATION_FLAGS:
+            m = _ISO_DAY.match(str(fl.get(k) or ""))
+            if not m:
+                continue
+            try:
+                d = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            except ValueError:
+                continue
+            if best is None or d < best[1]:
+                best = (k, d)
+    return best
 
 
 def _disclaimer() -> dict[str, str]:
@@ -576,6 +647,7 @@ def history_until(s: Series, max_idx: int) -> list[tuple[int, float]]:
 
 
 __all__ = [
+    "PUBLICATION_FLAGS",
     "QUESTION_SCHEMA",
     "RESOLUTION_RULE",
     "Cell",
@@ -586,7 +658,9 @@ __all__ = [
     "generate_meeting_questions",
     "generate_questions",
     "history_until",
+    "issue_timing",
     "period_ended",
+    "provider_published_on",
     "question_id",
     "question_text",
     "resolution_value",

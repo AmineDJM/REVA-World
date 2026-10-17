@@ -466,8 +466,9 @@ class Composer(DomainComposer):
                 "rejected",
             )
         self.licences()
-        self.sources()
-        if not any(s.kind in ("fact", "path", "causal", "estimate", "forecast", "scenario") for s in self.out.sentences):
+        if not any(
+            s.kind in ("fact", "path", "causal", "estimate", "forecast", "scenario") for s in self.out.sentences
+        ):
             eid = self.x.evidence.absence(
                 "answer", sorted({c for r in self.x.results for c in r.consulted}) or ["no source"]
             )
@@ -479,6 +480,7 @@ class Composer(DomainComposer):
                 "missing",
                 "summary",
             )
+        self.sources()
         return self.out
 
     # -- licences (review V3b LIC-1): restricted terms of the atlas sources cited, once per licence
@@ -1192,6 +1194,18 @@ class Composer(DomainComposer):
         fr = self.fr()
         d = res.data
         e = d["entity"]
+        if d.get("answered_by") is not None:
+            ch = d["chosen"]
+            self.add(
+                f"Aucune affirmation sur {self.entity(ch)} ({ch.qid}) ; affirmations lues sur {self.entity(e)} "
+                f"({e.qid}), autre fiche au même libellé dans l'index du graphe (fiches non fusionnées)."
+                if fr
+                else f"No claim on {self.entity(ch)} ({ch.qid}); claims read on {self.entity(e)} ({e.qid}), another "
+                f"record with the same label in the graph index (records not merged).",
+                [d.get("answered_by_eid") or ""],
+                "identification",
+                res.op.id,
+            )
         rows = sorted(
             d["claims"],
             key=lambda r: (LANE_ORDER.index(claim_lane(r[0])), _grade_rank(r[0].grade), int(r[1][1:])),
