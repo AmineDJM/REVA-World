@@ -79,7 +79,7 @@ The connector already keeps them out of `steo_observed`; no connector change or 
   calendar wording, the FY basis and the reporting year (`scripts/fix4b/void_fiscal_questions.py` →
   `service.void_questions`). The sealed manifest is untouched; the void resolution is an appended artifact
   (`39b404b0…`) plus one `registry_score` row per model; no forecast is scored.
-* WEO re-ingest: `flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf --dataset weo` (connector 1.3.0 seeded) was queued behind the shared dev-DB lock (disk 5.1 GB free, check inside the lock); until it lands, the live `atlas.imf.weo` version `708ea329…` still holds the 6,956 calendar-placed FY cells, but the registry no longer uses them (`is_fiscal_year_cell`) and the 5 affected questions are void.
+* WEO re-ingest: `flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf --dataset weo` (connector 1.3.0 seeded) was **not run**: when the shared dev-DB lock came free, disk was 4.5 GB (< 5 GB rule, checked inside the lock). Run it on a bigger machine; until then, the live `atlas.imf.weo` version `708ea329…` still holds the 6,956 calendar-placed FY cells, but the registry no longer uses them (`is_fiscal_year_cell`) and the 5 affected questions are void.
 
 ## Tests (all passing)
 

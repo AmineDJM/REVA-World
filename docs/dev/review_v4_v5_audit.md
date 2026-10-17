@@ -327,7 +327,7 @@ appended resolutions — nothing edited).
 | M4 | **fixed** (declared variant preference `registry/predict/estimate_preferences.yaml`; residual ties → gap `unresolved_tie`, never alphabetical) | FIX4B | `v6_fix4b.md` §M4, `v5_pred_engine.md` §7c |
 | M5 | **fixed** (a: h = 0 = onset year, profile estimate; b: growth variable `output.real_gdp_per_capita_growth`; c: `panel_member` / "membership not checked") | FIX4B | `v6_fix4b.md` §M5 |
 | M6 | **fixed** (`PROJECTION_SQL` + engine baseline: `unknown_boundary` never an observation; 1,978 cells / 16 series) | FIX4B | `v6_fix4b.md` §M6 |
-| M7 | **fixed in code; 5 sealed questions void** (`fiscal_year_basis_mismatch`, appended resolution `39b404b0…`); `atlas.imf` 1.3.0 parser keeps the fiscal basis; live WEO re-ingest with the new parser queued behind the dev-DB lock (see report) | FIX4B | `v6_fix4b.md` §M7 |
+| M7 | **fixed in code; 5 sealed questions void** (`fiscal_year_basis_mismatch`, appended resolution `39b404b0…`); `atlas.imf` 1.3.0 parser keeps the fiscal basis; live WEO re-ingest with the new parser not run (disk 4.5 GB < 5 GB) — queued command in the report | FIX4B | `v6_fix4b.md` §M7 |
 | M8 | open | — | |
 | M9 | open | — | |
 | L1 | open | — | |
