@@ -251,9 +251,17 @@ def select_hypotheses(dev: Mapping[str, Any]) -> list[dict[str, Any]]:
         if k not in best or t["relative"] < best[k]["relative"]:
             best[k] = t
     return [
-        {"task": t["task"], "variable": t["variable"], "horizon": "cy", "candidate": t["candidate"],
-         "benchmark": t["benchmark"], "loss": t["loss"], "uses_official_forecast": t["uses_official_forecast"],
-         "dev_relative": round(t["relative"], 6), "dev_p_better": float(f"{t['p_better']:.6g}")}  # fmt: skip
+        {
+            "task": t["task"],
+            "variable": t["variable"],
+            "horizon": "cy",
+            "candidate": t["candidate"],
+            "benchmark": t["benchmark"],
+            "loss": t["loss"],
+            "uses_official_forecast": t["uses_official_forecast"],
+            "dev_relative": round(t["relative"], 6),
+            "dev_p_better": float(f"{t['p_better']:.6g}"),
+        }
         for _k, t in sorted(best.items())
     ]
 
@@ -289,7 +297,9 @@ def holdout(inp: Inputs, hyp_doc: Mapping[str, Any]) -> dict[str, Any]:
     for r in results:
         ok = bool(r["holm_rejected"]) and r["relative"] is not None and r["relative"] < 1
         if r["loss"] == "crps":
-            ok = ok and r["cov80_candidate"] is not None and COVERAGE_BAND[0] <= r["cov80_candidate"] <= COVERAGE_BAND[1]
+            ok = (
+                ok and r["cov80_candidate"] is not None and COVERAGE_BAND[0] <= r["cov80_candidate"] <= COVERAGE_BAND[1]
+            )
         r["confirmed"] = ok
     desc: dict[str, Any] = {"summaries": [], "all_comparisons": [], "by_month": [], "per_series": []}
     for task in TASKS:
@@ -304,8 +314,14 @@ def holdout(inp: Inputs, hyp_doc: Mapping[str, Any]) -> dict[str, Any]:
                     desc["by_month"].append({"task": task, "candidate": cand, "benchmark": bench, "loss": loss,
                                              "rows": [r for r in by_month(task, sc, cand, bench, loss)
                                                       if r["variable"] == var]})  # fmt: skip
-                desc["per_series"].append({"task": task, "variable": var, "candidate": cand,
-                                           "ae_vs_official": per_series_median_ratio(sc, cand, off, "ae").get(var)})  # fmt: skip
+                desc["per_series"].append(
+                    {
+                        "task": task,
+                        "variable": var,
+                        "candidate": cand,
+                        "ae_vs_official": per_series_median_ratio(sc, cand, off, "ae").get(var),
+                    }
+                )
     desc["cpi_revision_check"] = cpi_revision_check(scored_by["weo_cpi"], scored_by["g7rt"])
     return {
         "schema": SCHEMA,
@@ -363,10 +379,10 @@ def now_utc() -> datetime:
 
 
 __all__ = [
-    "Inputs",
     "REGISTRY_DIR",
     "SPLIT",
     "TASKS",
+    "Inputs",
     "append_ledger",
     "build",
     "canonical_sha256",

@@ -146,7 +146,7 @@ def add_second_pass(cases: Sequence[Case], rules: Rules) -> None:
                 c.preds[fan_key(off)] = Abstain("too few past official errors known at the origin")
             ov, _ = own[(*b, c.geo)].window(ts, 10_000)
             if len(ov) >= MIN_OWN:
-                rms = math.sqrt(math.fsum(float(e) ** 2 for e in ov) / len(ov))
+                rms = math.sqrt(math.fsum(float(e) ** 2 for e in ov) / len(ov))  # type: ignore[arg-type]
                 if rms > 0:
                     c.preds[own_fan_key(off)] = Predictive("normal", w, mu=w, sigma=rms)
         for c in batch:  # this origin's errors become usable once the outcome is published

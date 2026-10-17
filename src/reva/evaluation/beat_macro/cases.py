@@ -29,7 +29,7 @@ from __future__ import annotations
 import math
 import statistics
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import UTC, date, datetime
 from typing import Any
 
@@ -109,7 +109,7 @@ def cpi_bridge_index(idx: dict[int, float], year: int, oil: dict[int, float] | N
     }
 
 
-def calendar_avg_inflation(idx: dict[int, float], year: int) -> float | None:
+def calendar_avg_inflation(idx: Mapping[int, float], year: int) -> float | None:
     ms = range(year * 12 - 12, year * 12 + 12)
     if any(m not in idx for m in ms):
         return None
