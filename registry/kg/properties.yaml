@@ -2278,6 +2278,139 @@ properties:
     wikidata_datatype: wikibase-item
     requested_by: V4MIND
     why: "field of this occupation (occupation -> field), read as the context family."
+# merged property requests (wbgetentities labels|datatype 2026-10-17T14:19:22.640955+00:00 raw 637ac7bb1a72,77d9e1eb2044,695a1856b1aa,4a3318075aa5,62e09566205e,f4b44f2d8d3b,501f132ab4aa,21a172f4e06b,44ee945a27aa,3153bbc1806b,19adfcebb78e,871ea0c08e9c,5e48e12399bb)
+  - property: P2109
+    reva_predicate: nominal_power_output
+    inverse: null
+    kind: quantity
+    group: energy
+    expected_en: "nominal power output"
+    label_en: "nominal power output"
+    label_fr: "puissance nominale"
+    wikidata_datatype: quantity
+    requested_by: V4ENERGY
+    why: "nominal power output of power stations / generating units (installed capacity as Wikidata states it, with unit)."
+  - property: P2197
+    reva_predicate: production_rate
+    inverse: null
+    kind: quantity
+    group: energy
+    expected_en: "production rate"
+    label_en: "production rate"
+    label_fr: "volume de production"
+    wikidata_datatype: quantity
+    requested_by: V4ENERGY
+    why: "production rate of fields and mines (quantity per time unit, with point-in-time qualifiers)."
+  - property: P729
+    reva_predicate: service_entry
+    inverse: null
+    kind: time
+    group: energy
+    expected_en: "service entry"
+    label_en: "service entry"
+    label_fr: "date de mise en service"
+    wikidata_datatype: time
+    requested_by: V4ENERGY
+    why: "service entry (first production / commissioning of plants, fields, mines)."
+  - property: P730
+    reva_predicate: service_retirement
+    inverse: null
+    kind: time
+    group: energy
+    expected_en: "service retirement"
+    label_en: "service retirement"
+    label_fr: "date de mise hors service"
+    wikidata_datatype: time
+    requested_by: V4ENERGY
+    why: "service retirement (decommissioning of plants, end of production)."
+  - property: P13333
+    reva_predicate: gem_wiki_id
+    inverse: null
+    kind: external_id
+    group: energy
+    expected_en: "Global Energy Monitor Wiki ID"
+    label_en: "Global Energy Monitor Wiki ID"
+    label_fr: null
+    wikidata_datatype: external-id
+    requested_by: V4ENERGY
+    why: "Global Energy Monitor Wiki ID (external id on ~13.8k facilities and companies): the identifier through which GEM tracker rows (which carry the wiki URL) can be bridged to Wikidata items, never by name."
+  - property: P699
+    reva_predicate: disease_ontology_id
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "Disease Ontology ID"
+    label_en: "Disease Ontology ID"
+    label_fr: "identifiant de Disease Ontology"
+    wikidata_datatype: external-id
+    requested_by: V4HEALTH
+    why: "Disease Ontology ID (external id) -- identifier bridge Wikidata item <-> doid:<n> (science.health_disease_ontology_ids)"
+  - property: P5270
+    reva_predicate: mondo_id
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "MonDO ID"
+    label_en: "Mondo ID"
+    label_fr: "identifiant Monarch Disease Ontology"
+    wikidata_datatype: external-id
+    requested_by: V4HEALTH
+    why: "MonDO ID (external id) -- identifier bridge Wikidata item <-> mondo:<n> (science.health_mondo_ids)"
+  - property: P1554
+    reva_predicate: uberon_id
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "UBERON ID"
+    label_en: "UBERON ID"
+    label_fr: "identifiant Uberon"
+    wikidata_datatype: external-id
+    requested_by: V4HEALTH
+    why: "UBERON ID (external id) -- identifier bridge Wikidata item <-> uberon:<n> (science.health_uberon_ids)"
+  - property: P2176
+    reva_predicate: drug_used_for_treatment
+    inverse: "treats_condition"
+    kind: entity
+    group: health
+    expected_en: "drug or therapy used for treatment"
+    label_en: "drug or therapy used for treatment"
+    label_fr: "médicament ou thérapie de traitement"
+    wikidata_datatype: wikibase-item
+    requested_by: V4HEALTH
+    why: "drug or therapy used for treatment (disease -> drug); a use, not a causal claim (science.health_disease_treatments_symptoms)"
+  - property: P2175
+    reva_predicate: medical_condition_treated
+    inverse: "treated_by_drug"
+    kind: entity
+    group: health
+    expected_en: "medical condition treated"
+    label_en: "medical condition treated"
+    label_fr: "maladie traitée"
+    wikidata_datatype: wikibase-item
+    requested_by: V4HEALTH
+    why: "medical condition treated (drug -> disease), inverse view of P2176 on drug items (science.health_essential_medicines)"
+  - property: P494
+    reva_predicate: icd10_code
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "ICD-10"
+    label_en: "ICD-10 ID"
+    label_fr: "identifiant CIM-10"
+    wikidata_datatype: external-id
+    requested_by: V4HEALTH
+    why: "ICD-10 code (external id) on disease items -- bridge to WHO causes of death and DOID/Mondo ICD-10 xrefs"
+  - property: P7807
+    reva_predicate: icd11_foundation_id
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "ICD-11 (foundation)"
+    label_en: "ICD-11 ID (Foundation)"
+    label_fr: "identifiant CIM-11 (Fondation)"
+    wikidata_datatype: external-id
+    requested_by: V4HEALTH
+    why: "ICD-11 (foundation) id on disease items -- bridge to Mondo icd11.foundation xrefs"
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:

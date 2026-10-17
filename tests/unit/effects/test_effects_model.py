@@ -7,6 +7,8 @@ import dataclasses
 import hashlib
 import importlib.util
 from pathlib import Path
+from types import ModuleType
+from typing import Any
 
 import numpy as np
 import pytest
@@ -30,7 +32,7 @@ FIXTURE_DOC = ROOT / "tests" / "fixtures" / "effects" / "synthetic_paper.txt"
 SHA = "a" * 64
 
 
-def _migration():  # type: ignore[no-untyped-def]
+def _migration() -> ModuleType:
     p = ROOT / "migrations" / "versions" / "0019_effect_estimates.py"
     spec = importlib.util.spec_from_file_location("m0019", p)
     assert spec and spec.loader
@@ -97,7 +99,7 @@ def _est(**kw) -> EffectEstimateIn:  # type: ignore[no-untyped-def]
     return EffectEstimateIn(**base)  # type: ignore[arg-type]
 
 
-def _ok(e: EffectEstimateIn, kind: str = "publication") -> dict:
+def _ok(e: EffectEstimateIn, kind: str = "publication") -> dict[str, Any]:
     return validate_estimate(e, source_kind=kind, source_key="effects.literature", raws={SHA}, resolver=RES)
 
 
@@ -126,13 +128,19 @@ def test_valid_publication_row_and_key() -> None:
         ({"uncertainty": Uncertainty(se=-1.0, status="reported")}, "se_not_positive"),
         ({"uncertainty": Uncertainty(se=0.03, se_as_printed="0.024", status="reported")}, "se_differs_from_as_printed"),
         (
-            {"uncertainty": Uncertainty(ci_low=-0.3, ci_high=-0.1, ci_level=0.95, interval_kind="confidence",
-                                        status="reported")},
+            {
+                "uncertainty": Uncertainty(
+                    ci_low=-0.3, ci_high=-0.1, ci_level=0.95, interval_kind="confidence", status="reported"
+                )
+            },
             "point_outside_interval",
         ),
         (
-            {"uncertainty": Uncertainty(ci_low=-0.5, ci_high=-0.3, ci_level=95, interval_kind="confidence",
-                                        status="reported")},
+            {
+                "uncertainty": Uncertainty(
+                    ci_low=-0.5, ci_high=-0.3, ci_level=95, interval_kind="confidence", status="reported"
+                )
+            },
             "ci_level_out_of_range",
         ),
         (

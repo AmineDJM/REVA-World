@@ -34,7 +34,7 @@ pytestmark = pytest.mark.db
 
 
 def _raw(db, tag: str) -> str:  # type: ignore[no-untyped-def]
-    return db.store.put_bytes(f"effects-test {tag} {uuid.uuid4()}".encode(), "raw", "text/plain").sha256
+    return str(db.store.put_bytes(f"effects-test {tag} {uuid.uuid4()}".encode(), "raw", "text/plain").sha256)
 
 
 def _est(raw: str, i: int, **kw: Any) -> EffectEstimateIn:
@@ -89,8 +89,9 @@ def _current(db, ds: str) -> dict[str, dict[str, Any]]:  # type: ignore[no-untyp
     with db.api.connect() as c:
         return {
             r["estimate_key"]: dict(r)
-            for r in c.execute(text("SELECT * FROM kg.effect_estimate_current WHERE dataset = :d"), {"d": ds})
-            .mappings()
+            for r in c.execute(
+                text("SELECT * FROM kg.effect_estimate_current WHERE dataset = :d"), {"d": ds}
+            ).mappings()
         }
 
 
