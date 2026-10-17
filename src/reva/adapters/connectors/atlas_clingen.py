@@ -45,7 +45,7 @@ from reva.adapters.connectors.health_obo_common import digest, drift, kg_availab
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.clingen"
-VERSION = "1.1.0"  # 1.1.0 (FIX4A, AUDIT3 H2): negative classifications under their own unmapped predicate
+VERSION = "1.1.1"  # 1.1.1: formatting only; 1.1.0 (FIX4A, AUDIT3 H2): negative classifications under their own unmapped predicate
 PARSER_VERSION = "atlas_clingen/2"
 SOURCE_KEY = "clingen.gene_validity"
 HOST = "search.clinicalgenome.org"
