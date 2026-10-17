@@ -96,7 +96,9 @@ def test_equal_weights_labelled_when_no_resolution() -> None:
     assert loc["history"] == [] and loc["n_resolved_questions"] == 0
     f1 = b["forecasts"][0]
     assert f1["model"] == E.ENSEMBLE_KEY and f1["status"] == "issued"
-    assert float(f1["point"]) == pytest.approx((2.0 + 3.0 + 2.6) / 3)  # equal-weight mean of the three points (WEO included)
+    assert float(f1["point"]) == pytest.approx(
+        (2.0 + 3.0 + 2.6) / 3
+    )  # equal-weight mean of the three points (WEO included)
     assert f1["predictive"]["family"] == "empirical" and len(f1["predictive"]["sample"]) == 50
     assert f1["ensemble"]["weights"]["shape"] == {"forecast.registry_ar": "0.5", "forecast.registry_persistence": "0.5"}
     assert {c["model"] for c in f1["ensemble"]["components"]} == {
