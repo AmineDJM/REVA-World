@@ -68,6 +68,13 @@ ingests sequentially (several sources peak at 3–5 GB RAM).
 
 ## Open technical items
 
+0. **Causal grading.yaml version 2 (CAUSFIX + SAMEAS + AUDFIX interface, 2026-10-17)** applied to the dev DB
+   (55,710 grade rows, load 32): non-source Wikidata references → T4, WDQS rows deferred (references unknown),
+   per-statement DB rejection instead of aborted loads, entities dated by inception compared by existence span,
+   P3680/P5102/doubtful-source caps at D with attributed wording, cycles/self-loops/class items/coded outcomes
+   kept out of chains. Wikidata claims B/C/D/E 22/311/1,280/59 → 9/154/1,482/27; inconsistent 54 → 22. Re-run
+   `reva causal refresh --origin live` after AUDFIX re-delivers NOAA (doubtful → D). `docs/dev/v3_causfix.md`.
+
 1. **Wikidata harvest** is the biggest remaining gap (WDQS throttled; budget `wikidata.wdqs` 1,500/day,
    `wikidata.wbapi` 4,000/day). Run domain specs over several days: `uv run python -m reva.kg.harvest run
    registry/kg/queries/<domain> --via api` (or WDQS when it answers). Merge pending property requests:

@@ -54,8 +54,8 @@ Self-loops are stored (they exist in sources) and reported by `/consistency`.
 |---|---|---|
 | T1 | expert-coded research dataset, with a codebook definition | `load_dataset_claims` (CAUSDATA, A-*) |
 | T2 | scholarly reference with a verbatim DOI/ISBN citation, only when it arrives through a source's own references | `load_dataset_claims(tier="T2", citation=...)`; the KG loader when a Wikidata reference carries a DOI (P356) or ISBN (P212/P957) |
-| T3 | Wikidata causal statement with references | `load_kg_claims` |
-| T4 | Wikidata causal statement without references | `load_kg_claims` |
+| T3 | Wikidata causal statement with at least one source reference | `load_kg_claims` |
+| T4 | Wikidata causal statement without a source reference: none, or only non-source pointers (P143 / P4656 imported from Wikimedia, P3452 inferred from, P887 heuristic; grading.yaml v2). WDQS rows (`wikidata.wdqs`, references never read) get no tier: the loader defers them (`deferred_counts["references_unknown"]`) | `load_kg_claims` |
 | T5 / T6 | candidate space only: text-mined (T5) / model-proposed (T6) | `insert_candidates` (CAUSCAND) |
 
 ## Python API (`reva.causal`)
@@ -145,7 +145,8 @@ or agent can change it. Candidates never appear in claim answers.
   statement key/id/row id, revision, raw sha256 and references verbatim; T3 with references, T4 without
   (T2 if a reference carries a DOI/ISBN). Idempotent; a statement that left the KG current view retracts its
   claim (`source_statement_retracted`). The qualifier P1310 (*statement disputed by*) marks the claim as
-  contested by a source.
+  contested by a source. A row the database refuses is rejected per statement (`rejected_counts`
+  `db_refused:<constraint>`), never aborting the load (CAUSFIX, `docs/dev/v3_causfix.md`).
 * `grade_claims(engine, *, origin=None) -> GradeReport` — applies `registry/causal/grading.yaml`.
 * `refresh(engine, store=None, *, origin=None)` — `load_kg_claims` then `grade_claims`.
 
@@ -165,7 +166,14 @@ Dataset agents call `grade_claims` (or `refresh`) after their loads, or leave it
   "Wikidata editors" group, and not at all when a referenced Wikidata group exists.
 * **Contestation**: `denies` claims on the same (cause, effect, family), claims whose `contests` names it,
   and P1310 qualifiers.
-* **Grade**, first matching rule: E (temporal inconsistent) · E (contested, not corroborated) · A (T1/T2 +
+* **Version 2** (CAUSFIX / SAMEAS, `docs/dev/v3_causfix.md`): an endpoint dated only by P571 inception is an
+  entity compared through its existence span (`undetermined` unless the whole span decides the order);
+  P3680 (*statement supported by*), P5102 (*nature of statement*) and `scope.source_validity[].certainty =
+  doubtful` cap the grade at D and are worded (claim JSON `attribution`); self-loops and cycle members carry
+  `consistency.self_loop` / `consistency.cycle`; chains skip those, class items (P279 / P31-only targets) and
+  `coded_outcome` (relations.yaml `chain_excluded`).
+* **Grade**, first matching rule: E (temporal inconsistent) · E (contested, not corroborated) · D (attributed,
+  nature-qualified, source-doubtful; v2) · A (T1/T2 +
   consistent + corroborated) · B (T1/T2) · B (T3 corroborated) · C (T3) · D (T4). Every grade row carries
   the rule ids (tier, temporal, corroboration, contest, grade rule) and en/fr reasons.
 

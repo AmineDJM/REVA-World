@@ -190,7 +190,11 @@ def _wording(
     if att.get("supported_by"):
         who_en = _and([x["label"] for x in att["supported_by"]], False)
         who_fr = _and([x["label_fr"] or x["label"] for x in att["supported_by"]], True)
-        verb_en, verb_fr = ("denies", "nie") if r["stance"] == "denies" else ("asserts", "affirme")
+        many = len(att["supported_by"]) > 1
+        if r["stance"] == "denies":
+            verb_en, verb_fr = ("deny", "nient") if many else ("denies", "nie")
+        else:
+            verb_en, verb_fr = ("assert", "affirment") if many else ("asserts", "affirme")
         return (
             f"{src} ({ref}) records that {who_en} {verb_en} that {en}{note_en}; {src} does not assert it itself, "
             "and REVA does not establish causation.",
