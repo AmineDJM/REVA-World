@@ -104,6 +104,10 @@ function ChainList({ r, onOpen }: { r: ChainResult; onOpen: (c: CausalClaim) => 
         </p>
         {r.notFoundReason && <p className="muted">Raison donnée par le serveur : {r.notFoundReason}</p>}
         <SkippedNote r={r} />
+        <p className="field-hint" data-testid="chain-none-exclusions">
+          Ne sont jamais composés : les relations de contexte, les issues codées (une issue dit comment un événement s’est terminé ; elle figure sur la page de l’événement, pas dans une
+          chaîne), les affirmations attribuées à un tiers ou qualifiées par la source, et celles prises dans une boucle.
+        </p>
       </V3Empty>
     );
   }

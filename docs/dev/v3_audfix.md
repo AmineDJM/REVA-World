@@ -56,3 +56,54 @@ NOAA codes:
 | causeCode | 2 | Questionable Earthquake | doubtful | claim with qualifier |
 | causeCode | 1, 3–7 | (descriptor label) | definite_or_probable | claim with qualifier |
 
+
+## Defects fixed (dataset / loader side)
+
+| # | What was wrong (audit) | Fix | Where | Connector |
+|---|---|---|---|---|
+| H4 (data) | NCEI's validity / cause-certainty codes were dropped: 788 + 23 doubtful tsunamis looked definite | Every NOAA claim carries `scope.source_validity` (above). "Erroneous entry" (−1) stays excluded: it is the only code NCEI's code list defines as not a real record; 0 "only caused a seiche" is kept with `certainty: doubtful` because NCEI still names the source event of that record. The CAUSFIX rule `grade.D.source_doubtful` reads it. | `atlas_noaa_hazards.source_validity`, `relations_datasets.yaml` `source_validity` | `atlas.noaa_hazards` 1.1.0 |
+| M2 | `load_kg_claims` did not count claims whose cause/effect is not in the KG | Both loaders count and sample them (`unknown_endpoint_claims`, `unknown_endpoint_sample`, also in the load parameters). Nothing is dropped or invented. | `model._count_unknown_endpoints` | — |
+| M3 | MMP state responses, MEC and NAVCO 1.2 regime violence were dated with the protest's / campaign's dates, Archigos coups with the exit day, then reported `overlapping` | The source codes no date for these effects: their `P580`/`P582` are now Wikidata "unknown value" (`{"type": "somevalue"}`) with the typed-missing qualifier `{"missing": {"kind": "missing", "reason": "not_collected"}, "note": …}`; the claim scope carries `effect_time` (same typed missing). The temporal check is `undetermined` with `undated: ["effect"]`, a reason and `effect_time_missing`. Archigos: no claim any more (M5). | `causdata_common.missing_date_qualifiers`, `atlas_navco.Kg.missing_time`, `temporal.temporal_detail`, `grader.compute` | navco/mec/massmob 1.1.1 |
+| M4 | Codebooks of NAVCO, MEC, MMP, TIES, Archigos, ESRB never archived; quotes unverifiable | See "Codebooks archived" below | `causdata_common.PinnedCodebook/fetch_codebook/codebook_sources`, `Codebook.sources` → `codebook.quote_source` | navco/mec/massmob/archigos/ecrises/ties |
+| M5 | Archigos: one coded attribute (exit + exitcode) turned into coup event + removal + `coded_outcome` claim; "other government actors" called coups; "without foreign support" passage quoted for removals with foreign support | One removal event `archigos:exit:<obsid>` with the exitcode verbatim, `removed_by` / `foreign_support` (the two parts of that label), and the codebook passage of **that exact exitcode** when the codebook has one (else the general EXITCODE passage, said so). No claim (empty complete delivery retracts the 327). The 1.0.0 `archigos:coup:*` statements (1,635) are retracted; the entities are re-emitted as `superseded_record`; the taxonomy no longer types `archigos:coup:` as an event. The Powell & Thyne context link now starts from the removal event (the P&T host answered 403 to the platform client in both runs of the day, so no link exists yet). | `atlas_leaders` | `atlas.archigos` 1.1.1 |
+| M6 | UCDP PA "conflicts related to the dyads signing" turned into `reaction_to` | Context only: the existing statement `ucdppa:conflict` (agreement → conflict); the `peace_agreements` delivery stays, empty and complete, so the 382 claims are retracted | `atlas_ucdp_term`, `relations_datasets.yaml` | `atlas.ucdp_term` 1.1.1 |
+| M7 | ESRB claims regex-extracted from a "Format: text" field; mechanism cut at 4,000 characters without a mark | A cell gives claims only when its first paragraph is exactly a comma-separated list of the five objective names. 13 cells (27 claims) that name objectives inside narrative, abbreviate them ("excessive credit growth", "mismatches in balance sheets") or number them give no claim and are listed (`accelerator_not_a_list`). Mechanism = the raw cell, byte-equal (no strip); a cell over the 4,000-character column is stored as its first 4,000 characters with `scope.mechanism_truncated {stored_chars, full_chars, full_text_cell}` (4 claims). | `atlas_ecrises.accelerator_objectives`, `relations_ecrises.yaml` | `atlas.ecrises.*` 1.1.0 |
+| L1 | NAVCO 2.1 `success = 0` outcomes cited the `success` definition | `codebook_term = progress` when success = 0 (180 claims) | `atlas_navco.n21_claims` | navco 1.1.1 |
+| L2 | `coded_outcome` asserted for campaigns coded ONGOING | No outcome claim for them (the coded "failure" is censoring); the KG keeps the coded outcome with its `as_of` | `navco1_claims`, `mec_claims` | navco/mec 1.1.1 |
+| L3 | ICB "No response-inaction" worded as a provoked reaction; MMP "ignore" silently dropped | One policy: inaction is coded but is never `reaction_to`. ICB MAJRES = 1 keeps its `icb:response_type` attribute, no claim (5 retracted); MMP claims keep the full coded response list verbatim (`selector.coded_responses`, `inaction_not_a_reaction: ["ignore"]`, 296 claims), protests with only "ignore" still give no claim | `atlas_icb`, `atlas_massmob.mmp_claims` | `atlas.icb` 1.1.0, massmob 1.1.1 |
+| L4 | KG import keeps only allow-listed reference / qualifier properties, so 11 claims were T4 despite a reference and 20 lost qualifiers (P1001, P1011, P1012…) | `load_kg_claims(store=…)` (used by `reva causal refresh`) reads each statement's references and qualifiers verbatim from the archived raw entity JSON (compacted like the harvester, every property; temporal qualifiers stay the claim period) and tiers on them; `selector.refs_qualifiers` says so; a raw that cannot be read falls back to the KG copy, counted (`refs_source_counts`) | `model._RawStatements` | — |
+| L5 | MID `outcome` quote ended "…the status quo took"; NOAA definitions began with a help-page sentence typed in the connector | MID quote completed ("took place."); NOAA definitions are only the archived descriptor labels (`causeCode 2 = "Questionable Earthquake" (NCEI descriptor tsunami/causes)`) | `relations_datasets.yaml`, `atlas_noaa_hazards.codebook_definitions` | `atlas.mid` 1.0.1, noaa 1.1.0 |
+| L8 | Retraction never exercised live; somevalue/novalue mislabelled `source_statement_retracted`; complete → partial downgrade silent | Retraction exercised in the dev DB through the loader (below) and in throwaway-DB tests; a statement whose value stopped being an item is retracted `no_longer_causal` with the detail `value_not_an_item` (report + load parameters; no migration); loads record `complete_requested`, `complete_effective`, `complete_downgrade_reason` | `model.load_kg_claims`, `load_dataset_claims` | — |
+
+KG revisions: the KG loader treats "same statement key, same source revision, different content" as a conflicting
+source and does not store it. The first 1.1.0 runs of NAVCO and UCDP hit that (5,285 and 382 statements not stored),
+because REVA re-wrote statements of an unchanged provider file. From 1.1.1 the KG source revision of NAVCO, MEC, MMP and
+Archigos names the REVA representation too (`…+reva-1.1.1`): unchanged content is not re-stored, changed content is a
+new revision. UCDP 1.1.1 keeps the 1.0.0 `ucdppa:conflict` content instead (the context reading lives in the registry).
+## Codebooks archived (M4)
+
+Each codebook is now fetched through the run's metered client (`causdata_common.fetch_codebook`), archived as an
+`evidence.acquisition` of the connector version, and compared with its pinned sha256. A changed codebook withholds
+that file's claims (`claims_withheld`), as `atlas_icb` / `atlas_mid` / `atlas_ucdp_term` already did. Each T1 claim
+carries `codebook.quote_source`: the archived document, its sha256, the page(s) (PDF, 1-based physical page) or
+paragraph (docx body), and the extraction used. The sha256 is also one of the load's raw objects.
+
+| source | codebook (pinned sha256) | quotes | verbatim check against the archived bytes |
+|---|---|---|---|
+| NAVCO 1.2 | `NAVCO 1.2 Codebook.pdf`, Dataverse 3621197 (`6743dc61…`) | 9 | **4 fixed**: SUCCESS, DEFECT and EYEAR were cut short (SUCCESS lost "Note that where information was available regarding the campaign’s outcome in 2014, the most current information was used."); FAILURE and DEFECT had ASCII quotes for the printed “ ” ’ |
+| NAVCO 1.3 | `NAVCO 1.3 Codebook List.pdf`, 3769105 (`8a265f00…`) | 6 | **1 fixed**: EYEAR cut before "(i.e. if the regime changed in 2002, the peak is 2002)." |
+| NAVCO 2.1 | `NAVCO_2.1_codebook.pdf`, 3648624 (`6fe8faa4…`) | 5 + 3 repression levels | **5 fixed**: the three repression-level texts replaced the printed bullets "●" by ";" and level 1 / 3 dropped items ("maintain the status quo during conflict", "mass violence"); start_date / end_date completed with their printed format notes |
+| MEC v3.0 | `MEC_Codebook_2024.docx`, 11543083 (`3d5b0133…`) | 6 | **1 fixed**: ONGOING lost "Note that campaigns that were coded as ongoing as of December 31, 2018 were also coded 1 for failure." |
+| MMP v5.1 | `MM_users_manual_0515.pdf`, 2775560 (`03541007…`) | 5 | all verbatim |
+| TIES 4.1 | `tiesusersmanualv4.pdf` (`862fe788…`) | 1 | verbatim once the PDF's ligature glyphs are read as the letters they print (the text layer maps "fi" to U+2026 and "ff" to U+00A4); pages 12–13 |
+| Archigos 4.1 | `Archigos_4.1.pdf` (`6be0ec5c…`) | 4 | all verbatim (pages 9–10) |
+| ESRB | ESRB Occasional Paper 13, `esrb.op13.en.pdf` (`18a5343d…`) | 1 | **fixed**: the quote added a colon after the field name, wrote "-" for the printed "–", and appended REVA's own "(ESRB Occasional Paper 13, Annex A)" inside the quote; page 44 |
+
+The CAUSDATA quotes (ICB1, ICB2, MID, UCDP termination, UCDP PA) were re-checked the same way: 52 of 52 verbatim at
+their declared pages, after the MID `outcome` completion (L5).
+
+Fixtures: the CC0 codebooks (NAVCO, MEC, MMP) and ESRB OP13 ("free use with citation") are captured byte for byte in
+`tests/fixtures/source/atlas.{navco,mec,massmob,ecrises.esrb}/`; `tests/unit/test_audfix_codebooks.py` re-checks
+every quote against them (poppler `pdftotext`; docx parsed in Python). The TIES and Archigos files state no
+redistribution grant, so they have no fixture; in fixture mode a codebook without a captured fixture is reported
+(`fixture_missing`) and the claims carry no `quote_source`. Live, a missing or changed codebook stops the claims.
