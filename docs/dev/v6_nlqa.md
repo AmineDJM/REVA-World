@@ -97,7 +97,41 @@ Fixed on the way: an absence record of an unresolved lookup had its `kind` overw
 
 ## 5. Live check on the dev DB (read-only) and latency
 
-LIVE_RESULTS
+The 47 golden questions were run through the real adapters on the dev DB (`build_backends`, read-only
+connections, keyword planner), twice in one process after `atlas.warm()` (38 s: snapshot verification).
+**Warm latency: median 0.59 s, p90 1.47 s, max 2.1 s** (causes of death, 8 atlas reads); decision scenarios
+1.4–1.6 s warm (cold first engine call measured separately: 31–49 s). 21/47 get a sourced answer on today's data;
+the others say precisely why (no exact label, no data loaded, table not in snapshot). Examples:
+
+* "Que mange le loup ?" → loup (Q18498) — « mange » : 36 Wikidata P1034 statements (12 shown), qlever.wikidata CC0,
+  "donnée communautaire".
+* "What is methane made of?" → chebi:16183 — made_of carbon (element:6, mass share 74.87 %) and hydrogen
+  (25.13 %), formula "CH4" (chebi.release, CC-BY-4.0). The French "méthane" has no fr label in the KG → "aucune
+  entité".
+* "Qui possède la mine KOV ?" → KOV Mine (usgs_myb:COD0007, label words) — equity owners published as text by
+  USGS: « Glencore plc », « Société Générale des Carrières et des Mines SA (Gécamines) » (U.S. public domain).
+* "Which coal power plants are in India?" → gppd:fuel:coal × India (Q668): 253 GPPD plants (12 listed with
+  « primary fuel (GPPD) » and « country » statements, wri.gppd CC BY 4.0). French "charbon" → refused (only a
+  prefix match on an anthrax record).
+* "Quelles maladies causées par Mycobacterium tuberculosis ?" → claims read on ncbitaxon:1773 (same exact label as
+  the col: record chosen first): "Selon doid.obo/doid (T1, jeu de données codé par des experts), Mycobacterium
+  tuberculosis a pour effet tuberculosis … preuve B" + 4 MONDO T1 claims; GloBI host/parasite records worded
+  "interaction enregistrée, pas une cause" (licence_unclear flagged).
+* "Causes de décès en France" → WHO GHE shares 2021 (cancers 28.06 %, cardiovascular 23.26 %, …), who/gho
+  CC BY 4.0.
+* "Quelle est la prévision d'inflation pour la France ?" → weo.cpi_inflation FRA 2026 (persistence 0.926
+  [−2.02, 3.87], AR 1.7 [−0.64, 4.05], …, methods named, "en attente … aucun score encore") and
+  eurostat.hicp_inflation FRA 2026-11.
+* "Que se passe-t-il si la BCE monte ses taux de 50 pb ?" → reference `ecb_plus_50bp_2027q1`, "Scénario non
+  validé — pas une probabilité", e.g. PIB réel (niveau) — FRA −0.14 % en 2028Q4, inflation (IMF CPI) −0.06 pp
+  undated, estimate keys of Bobasu et al. 2025 / van Els et al. 2001; 25 bp → applied to a copy.
+* "Quel est l'effet d'une hausse du pétrole sur l'inflation ?" → terms oil_price.global → imf.inflation_cpi_avg /
+  prices.inflation_rate / …: **no published estimate for that pair in the effect layer** → "Pas de donnée
+  chargée …", then neighbouring estimates (Caldara et al. 2016 oil elasticities; ECB OP 377 policy-rate → inflation)
+  labelled non-equivalent. (The loaded energy-price → consumer-price estimates use "Prix de l'énergie", which the
+  words "pétrole"/"oil" do not match; no synonym table by design.)
+* "Quel est l'impact d'une hausse des taux directeurs sur le PIB ?" → imf.policy_rate → GDP estimates listed one by
+  one, attributed.
 
 ## 6. Limits / owner decisions
 
