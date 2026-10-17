@@ -98,7 +98,7 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   (effects.literature 40/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "7a71abd9fedf05f8b144269546ff070c4bc22f57cc6a4a18412278dbe56e0926",
+    "budgets.yaml": "22edc7088671673c61ba23a6f3d3c670a616aa2bc58a31c1227c02fcb2086a87",
 }
 
 

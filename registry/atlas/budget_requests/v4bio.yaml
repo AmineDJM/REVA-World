@@ -1,0 +1,47 @@
+# Budget request from agent V4BIO (V4: tree of life, genes, proteins, genomes). Merged into
+# registry/policies/budgets.yaml by python -m reva.atlas.budget_merge --write. Provider aggregations / field-selected
+# streams only (no bulk dumps). The Wikidata bridges (atlas.bio_wikidata) use WDHARVEST's existing wikidata.wdqs
+# budget: 5 per-rank queries + VALUES chunks (<= 150 per run, option max_queries); no new Wikidata budget requested.
+agent: V4BIO
+requests:
+  - source_key: gbif.backbone
+    # api.checklistbank.org (dataset 53147 = GBIF backbone): rank listings (kingdom..family ~34 pages of 1,000),
+    # species of the scope groups (Mammalia 22 + Aves 15 pages); api.gbif.org: 178 scope species records, the
+    # dataset record and ~30-80 higherTaxonKey facet partitions (<= 1.5 MB each). CC BY 4.0.
+    daily_requests: 800
+    expected_bytes_per_day: 130000000
+    reason: "one full run ~330 requests (~100 MB); 800/day allows one retried run"
+  - source_key: col.checklistbank
+    # api.checklistbank.org: COL latest release record, import metrics, 5 rank listings, 2 TAXON_ID facets. CC BY 4.0.
+    daily_requests: 30
+    expected_bytes_per_day: 15000000
+    reason: "one run = 9 requests (~5 MB)"
+  - source_key: hgnc.complete_set
+    # storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt (17 MB). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 40000000
+    reason: "one run = 1 request (17 MB); allow one retry"
+  - source_key: uniprot.rest
+    # rest.uniprot.org: reviewed organism-id stream (3.7 MB), ~75 taxonomy chunks (200 ids, ~15 kB each), human
+    # reviewed stream with fields (~15 MB); ftp.uniprot.org reldate.txt twice. CC BY 4.0.
+    daily_requests: 200
+    expected_bytes_per_day: 50000000
+    reason: "one run ~80 requests (~20 MB); 200/day allows one retried run"
+  - source_key: ensembl.rest
+    # rest.ensembl.org: info/species (vertebrates, ~0.3 MB) + info/assembly for 2 karyotype species.
+    daily_requests: 15
+    expected_bytes_per_day: 3000000
+    reason: "one run = 3 requests"
+  - source_key: ncbi.datasets
+    # api.ncbi.nlm.nih.gov/datasets/v2 genome dataset reports (reference + annotated; vertebrates 1,364 and green
+    # plants 558 reports, pages of 500, ~4 kB per report).
+    daily_requests: 30
+    expected_bytes_per_day: 20000000
+    reason: "one run = 5 requests (~8 MB)"
+daily_totals_increase:
+  http_requests_total: "+1081"
+  http_bytes_total: "+258_000_000"
+notes: >-
+  GBIF / ChecklistBank / WDQS reset connections intermittently through the egress proxy (seen 2026-10-17);
+  SafeHttpClient retries transport failures. WDQS was answering 429 "1 req / min during active wdqs outage" on
+  2026-10-17: the WikidataClient's machine-wide cool-down paces it.

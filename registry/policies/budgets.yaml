@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.21"
+policy_version: "budgets-1.3.22"
 daily:
-  http_requests_total: 18562
+  http_requests_total: 19643
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -41,6 +41,8 @@ per_source_daily_requests:
   clio_infra.dataverse: 250
   # cliopatria.github: requested by KGPOLITY (kgpolity.yaml)
   cliopatria.github: 6
+  # col.checklistbank: requested by V4BIO (v4bio.yaml)
+  col.checklistbank: 30
   # constitute.service: requested by A-LAW (a_law.yaml)
   constitute.service: 5
   # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml), CAUSDATA (causdata.yaml), CAUSMORE (causmore.yaml), FIXB (fixb.yaml)
@@ -59,6 +61,8 @@ per_source_daily_requests:
   effects.literature: 40
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)
   eia.opendata_bulk: 12
+  # ensembl.rest: requested by V4BIO (v4bio.yaml)
+  ensembl.rest: 15
   # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml), AUDFIX (audfix.yaml)
   esrb.fcdb: 8
   # eu.sanctionsmap: requested by A-SANCTIONS (a_sanctions.yaml)
@@ -75,6 +79,8 @@ per_source_daily_requests:
   fao.fishstat: 4
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
+  # gbif.backbone: requested by V4BIO (v4bio.yaml)
+  gbif.backbone: 800
   # gbif.occurrence: requested by V4ECO (v4eco.yaml)
   gbif.occurrence: 600
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
@@ -101,6 +107,8 @@ per_source_daily_requests:
   harvard.dataverse.navco: 40
   # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
   harvard.dataverse.unvotes: 12
+  # hgnc.complete_set: requested by V4BIO (v4bio.yaml)
+  hgnc.complete_set: 6
   # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
   hief.dataverse: 6
   # hofstede.dimensions: requested by V4MIND (v4mind.yaml)
@@ -137,6 +145,8 @@ per_source_daily_requests:
   naturalearth.admin0_10m: 12
   # naturalearth.admin1_10m: requested by V4CLIMATE (v4climate.yaml)
   naturalearth.admin1_10m: 2
+  # ncbi.datasets: requested by V4BIO (v4bio.yaml)
+  ncbi.datasets: 30
   # nga.wpi: requested by A-INFRA (a_infra.yaml)
   nga.wpi: 3
   # nist.codata: requested by V4CHEM (v4chem.yaml)
@@ -219,6 +229,8 @@ per_source_daily_requests:
   unesco.whc: 4
   # unhcr.population: requested by A-UN (a_un.yaml)
   unhcr.population: 150
+  # uniprot.rest: requested by V4BIO (v4bio.yaml)
+  uniprot.rest: 200
   # unsd.ama: requested by A-FACTBOOK (a_factbook.yaml)
   unsd.ama: 20
   # unsd.classifications: requested by V4LINK (v4link.yaml)
