@@ -71,7 +71,11 @@ from reva.adapters.connectors.atlas_history_common import canon, decimal_text, f
 from reva.adapters.connectors.atlas_xlsx import Cell, Workbook, XlsxError, col_letters
 from reva.kernel.errors import SourceResponseError
 
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"
+# 1.1.0 (AUDFIX, docs/dev/v3_audfix.md, audit M7/M4): ESRB claims only from an accelerator cell whose first paragraph
+# is a comma-separated list of the five objective names (no pattern search in narrative text); mechanism stored as
+# the verbatim cell, a cell over the 4,000-character column is marked truncated with its full length; the ESRB OP13
+# codebook PDF is fetched, archived and sha256-pinned, the quote is verbatim with its page
 KG_SOURCE_PREFIX = "ecrises"
 ACTOR = "worker:atlas_ingest"
 MAX_XLSX_BYTES = 20_000_000
@@ -225,7 +229,7 @@ SOURCES: dict[str, SourceDef] = {
         "European Systemic Risk Board (ESRB/ECB), European financial crises database",
         "esrb.fcdb20220120",
         "atlas_ecrises_esrb/1",
-        1,
+        2,  # + the OP13 codebook PDF (AUDFIX)
         90,
     ),
 }
@@ -1625,25 +1629,52 @@ ESRB_OBJECTIVES: dict[str, tuple[str, str]] = {
     "misaligned_incentives": ("misaligned incentives", r"misaligned incentives"),
     "infrastructure_resilience": ("infrastructure resilience", r"infrastructure resilience"),
 }
+#: ESRB Occasional Paper 13, Annex A (field name cell + description cell), verbatim from the pinned PDF page 44
 ESRB_ACCELERATOR_DEFINITION = (
-    "Accelerator and motivation: Indicator of one or more of the five ESRB intermediate macroprudential "
+    "Accelerator and motivation Indicator of one or more of the five ESRB intermediate macroprudential "
     "objectives (excessive credit growth and leverage, mismatches and market illiquidity, exposure "
-    "concentration, misaligned incentives, infrastructure resilience) - see the Recommendation of the ESRB of "
+    "concentration, misaligned incentives, infrastructure resilience) – see the Recommendation of the ESRB of "
     "4 April 2013 on intermediate objectives and instruments of macroprudential policy (ESRB/2013/1) (OJ 2013/C "
-    "170/01). Format: text. (ESRB Occasional Paper 13, Annex A)"
+    "170/01). Format: text."
 )
+ESRB_OP13_URL = "https://www.esrb.europa.eu/pub/pdf/occasional/esrb.op13.en.pdf"
+#: sha256 of the OP13 PDF the definition is quoted from (Annex A on physical page 44)
+ESRB_OP13_SHA256 = "18a5343d72c111734f220b4cfce63e7adc322ddfe1b2f647a313423f0d494c76"
+ESRB_OP13_PAGES = {"accelerator": {"pages": [44]}}
+#: the database's text column limit in kg.causal_claim.mechanism (characters)
+MECHANISM_MAX = 4000
+
+
+def esrb_codebook() -> Any:
+    from reva.adapters.connectors.causdata_common import PinnedCodebook
+
+    return PinnedCodebook(
+        key="esrb_op13",
+        title="ESRB Occasional Paper No 13 (2017), Annex A (esrb.op13.en.pdf)",
+        url=ESRB_OP13_URL,
+        sha256=ESRB_OP13_SHA256,
+        media_types=("application/pdf", "application/octet-stream"),
+        max_bytes=5_000_000,
+        extraction="poppler pdftotext -layout, whitespace normalised",
+        quotes=ESRB_OP13_PAGES,
+    )
 ESRB_NOTE_PREFIX = "Notes:"
 
 
 def accelerator_objectives(text: str) -> list[str]:
-    """Objective keys named in the accelerator part (before 'Motivation') of an ESRB field, in text order."""
-    head = re.split(r"motivation\s*:", text, maxsplit=1, flags=re.IGNORECASE)[0].lower()
-    found = []
-    for key, (_label, pat) in ESRB_OBJECTIVES.items():
-        m = re.search(pat, head)
-        if m:
-            found.append((m.start(), key))
-    return [k for _p, k in sorted(found)]
+    """Objective keys of an accelerator cell -- only when the cell's first paragraph (before "Motivation:" and before
+    the first blank line) is exactly a comma-separated list of the five objective NAMES (case and final full stop
+    aside). Anything else (narrative, abbreviations such as "excessive credit growth", "mismatches in balance
+    sheets", numbered lists) gives no objective: REVA does not extract causes from free text (audit M7)."""
+    head = re.split(r"motivation\s*:", text, maxsplit=1, flags=re.IGNORECASE)[0]
+    first = re.split(r"\n\s*\n", head.strip(), maxsplit=1)[0].strip()
+    if first.endswith("."):
+        first = first[:-1]
+    by_name = {label: key for key, (label, _pat) in ESRB_OBJECTIVES.items()}
+    items = [re.sub(r"\s+", " ", x).strip().lower() for x in first.split(",")]
+    if not items or any(x not in by_name for x in items):
+        return []
+    return list(dict.fromkeys(by_name[x] for x in items))
 
 
 def condition_id(key: str) -> str:
@@ -1663,7 +1694,12 @@ def parse_esrb(body: bytes, raw_sha: str) -> Build:
     events: list[CrisisEvent] = []
     relations: list[CodedRelation] = []
     conditions: dict[str, dict[str, str]] = {}
-    rep: dict[str, Any] = {"omitted_cells": Counter(), "accelerator_not_coded": [], "notes": []}
+    rep: dict[str, Any] = {
+        "omitted_cells": Counter(),
+        "accelerator_not_coded": [],
+        "accelerator_not_a_list": [],
+        "notes": [],
+    }
     used_keys: set[tuple[str, str, int]] = set()
     for sheet, kind in ESRB_SHEETS.items():
         rows_in = _sheet_rows(wb, sheet)
@@ -1812,7 +1848,12 @@ def parse_esrb(body: bytes, raw_sha: str) -> Build:
             if acc is not None and acc.text.strip() and acc.text.strip().lower() not in ("n.a.", "none."):
                 objs = accelerator_objectives(acc.text)
                 if not objs:
-                    rep["accelerator_not_coded"].append(f"{sheet}:{geo}:{st[0]}-{st[1]:02d}")
+                    named = [k for k, (_l, pat) in ESRB_OBJECTIVES.items() if re.search(pat, acc.text.lower())]
+                    # an objective named only inside narrative text: no claim, listed (audit M7)
+                    rep["accelerator_not_a_list" if named else "accelerator_not_coded"].append(
+                        f"{sheet}:{geo}:{st[0]}-{st[1]:02d}"
+                    )
+                mech = acc.text if len(acc.text) <= MECHANISM_MAX else acc.text[:MECHANISM_MAX]
                 for okey in objs:
                     cid = condition_id(okey)
                     conditions[cid] = {
@@ -1830,11 +1871,22 @@ def parse_esrb(body: bytes, raw_sha: str) -> Build:
                             rule_id="esrb_fcdb_accelerator",
                             coded_as="Accelerator and motivation",
                             polarity="promotes",
-                            mechanism=acc.text.strip()[:4000],
+                            mechanism=mech,
                             qualifiers={
                                 "codebook_definition": ESRB_ACCELERATOR_DEFINITION,
                                 "objective": ESRB_OBJECTIVES[okey][0],
-                                "matched_in": "text before 'Motivation'",
+                                "matched_in": "first paragraph: a comma-separated list of the objective names",
+                                **(
+                                    {
+                                        "mechanism_truncated": {
+                                            "stored_chars": MECHANISM_MAX,
+                                            "full_chars": len(acc.text),
+                                            "full_text_cell": ref(6, rnum),
+                                        }
+                                    }
+                                    if len(acc.text) > MECHANISM_MAX
+                                    else {}
+                                ),
                                 "assessed_by": "national authorities (ESRB database contributors)",
                                 "provider_geo": geo,
                                 "event_sheet": sheet,
@@ -2196,8 +2248,8 @@ CODEBOOKS: dict[str, dict[str, Any]] = {
     ESRB: {
         "name": "ESRB European financial crises database - fields of the crises database (ESRB Occasional Paper "
         "No 13, Annex A)",
-        "version": "OP13 (July 2017); data file fcdb20220120",
-        "url": "https://www.esrb.europa.eu/pub/pdf/occasional/esrb.op13.en.pdf",
+        "version": f"OP13 (July 2017; esrb.op13.en.pdf sha256 {ESRB_OP13_SHA256[:12]}); data file fcdb20220120",
+        "url": ESRB_OP13_URL,
         "definitions": {"accelerator": ESRB_ACCELERATOR_DEFINITION},
     },
 }
@@ -2223,7 +2275,14 @@ def dataset_claims(build: Build) -> list[Any]:
                 source_claim_id=r.rid.split(":", 1)[1].replace("*", ""),
                 polarity=r.polarity,
                 mechanism=r.mechanism,
-                scope={"place": [r.qualifiers.get("provider_geo")]} if r.qualifiers.get("provider_geo") else {},
+                scope={
+                    **({"place": [r.qualifiers.get("provider_geo")]} if r.qualifiers.get("provider_geo") else {}),
+                    **(
+                        {"mechanism_truncated": r.qualifiers["mechanism_truncated"]}
+                        if r.qualifiers.get("mechanism_truncated")
+                        else {}
+                    ),
+                },
                 tier=r.tier,
             )
         )
@@ -2241,12 +2300,22 @@ def causal_available(engine: Any) -> bool:
         return bool(conn.execute(text("SELECT to_regclass('kg.causal_claim') IS NOT NULL")).scalar_one())
 
 
-def deliver_claims(run: Any, build: Build, retrieved_at: Any) -> dict[str, Any]:
+def deliver_claims(
+    run: Any, build: Build, retrieved_at: Any, codebook_fetch: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
     """Load the build's T1 claims with CAUSCORE's ``load_dataset_claims`` (complete delivery), then grade.
-    Without the causal schema the claims stay in the ``ecrises.<source>.coded_relations`` dataset only."""
+    Without the causal schema the claims stay in the ``ecrises.<source>.coded_relations`` dataset only. A source with
+    a codebook (ESRB) delivers only when the archived codebook equals the pinned one (in fixture mode also when it has
+    no captured fixture); its delivery is complete even when empty, so claims a new version no longer makes are
+    retracted."""
+    from reva.adapters.connectors.causdata_common import codebook_sources
+
     n = sum(1 for r in build.relations if r.family == "causal")
-    if n == 0:
-        return {"status": "no_coded_causal_relations"}
+    if build.src.key not in CODEBOOKS:
+        return {"status": "no_coded_causal_relations"} if n == 0 else {"status": "no_codebook", "claims": n}
+    fetched = dict(codebook_fetch or {})
+    if not (fetched.get("matches") or (run.origin != "live" and fetched.get("status") == "fixture_missing")):
+        return {"status": "claims_withheld", "reason": "codebook differs from the pinned sha256", "codebook": fetched}
     if not causal_available(run.engine):
         return {
             "status": "causal_unavailable",
@@ -2255,14 +2324,17 @@ def deliver_claims(run: Any, build: Build, retrieved_at: Any) -> dict[str, Any]:
         }
     from reva.causal.model import Codebook, load_dataset_claims
 
+    cb = dict(CODEBOOKS[build.src.key])
+    sources = codebook_sources(esrb_codebook(), fetched) if build.src.key == ESRB else {}
+    raws = [build.raw_sha256] + ([str(fetched["sha256"])] if sources else [])
     rep = load_dataset_claims(
         run.engine,
         run.store,
         source_key=build.src.source_key,
         dataset=build.src.dataset,
         dataset_revision=build.src.dataset_id,
-        codebook=Codebook(**CODEBOOKS[build.src.key]),
-        raw_sha256s=[build.raw_sha256],
+        codebook=Codebook(**cb, sources=sources),
+        raw_sha256s=raws,
         retrieved_at=retrieved_at,
         origin=run.origin,
         claims=dataset_claims(build),
@@ -2343,7 +2415,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     if str(run.options.get("kg", "true")).lower() != "false" and kg_available(run.engine):
         out["kg"] = load_kg(run, build, raw.retrieved_at)
         out["datasets"] = register_side_datasets(run, build)
-        out["causal"] = deliver_claims(run, build, raw.retrieved_at)
+        book = None
+        if src.key == ESRB:
+            from reva.adapters.connectors.causdata_common import fetch_codebook
+
+            book = await fetch_codebook(run, esrb_codebook())  # archived as evidence (audit M4)
+            out["codebook"] = {k: book.get(k) for k in ("sha256", "pinned_sha256", "matches", "archived", "status")}
+        out["causal"] = deliver_claims(run, build, raw.retrieved_at, book)
     return out
 
 

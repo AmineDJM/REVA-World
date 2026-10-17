@@ -77,7 +77,7 @@ EVENT_KINDS = {
 NON_EVENT_KINDS = {
     "crisis_outcome", "dispute_outcome", "conflict_termination", "coded_outcome", "campaign_outcome", "volcano",
     "person", "armed_group", "organization", "place_name", "sanction_regime", "sanction_program", "condition",
-    "protracted_conflict", "state_code", "territory",
+    "protracted_conflict", "state_code", "territory", "superseded_record",
 }  # fmt: skip
 
 #: record family -> the types its records may get (every family must be present in the fixtures).
@@ -89,7 +89,6 @@ EXPECTED = {
     "mid:dispute": {"militarized_interstate_dispute"},
     "mid:incident": {"militarized_incident"},
     "ptcoup": {"coup"},
-    "archigos:coup": {"coup"},
     "archigos:exit": {"leader_removal"},
     "ncei_hazards:earthquake": {"earthquake"},
     "ncei_hazards:tsunami": {"tsunami"},
@@ -236,10 +235,11 @@ def test_causal_claims_attach_to_typed_events(loaded: Any, classified: dict[str,
                 assert cl["is_event"], (src, qid, kind)
         per_source[src] += 1
     assert set(per_source) >= {
-        "icb.data", "cow.data", "ucdp.downloads", "archigos.leaders", "noaa.ncei_hazards", "ties.unc",
+        "icb.data", "cow.data", "ucdp.downloads", "noaa.ncei_hazards", "ties.unc",
         "eusanct.kondata", "harvard.dataverse.navco", "harvard.dataverse.mec", "harvard.dataverse.massmob",
         "esrb.fcdb",
     }, per_source  # fmt: skip
+    assert "archigos.leaders" not in per_source  # one coded removal, no causal claim (audit M5, AUDFIX)
 
 
 def test_cards_and_listing_of_dataset_events(loaded: Any) -> None:

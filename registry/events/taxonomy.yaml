@@ -705,20 +705,16 @@ dataset_kinds:
     label_en: coup (Powell & Thyne)
     coded_properties: ["coup:outcome", "coup:event_type"]
     note: A-COUPS (docs/dev/v3_a_coups.md); successful and failed attempts, outcome coded verbatim.
-  - id_prefix: "archigos:coup:"
-    source_key: archigos.leaders
-    type: coup
-    label_en: coup (Archigos 4.1 irregular removal by the military or other government actors)
-    coded_properties: ["coup:event_type", "coup:perpetrator_type"]
-    note: >-
-      A-COUPS; the coup Archigos codes behind an irregular exit. A successful Powell & Thyne coup of the same state
-      and day is linked by `coup:same_state_and_day_as` (context), not by `same_as`.
   - id_prefix: "archigos:exit:"
     source_key: archigos.leaders
     type: leader_removal
     label_en: removal of a leader (Archigos 4.1 exit Irregular or Foreign)
     coded_properties: ["archigos:exit_manner"]
-    note: A-COUPS; the effect end of Archigos' coded coup -> removal claims.
+    note: >-
+      A-COUPS; one Archigos removal, exitcode verbatim (since atlas.archigos 1.1.0 there is no separate
+      `archigos:coup:` event and no coup -> removal claim: Archigos codes one fact, AUDFIX audit M5; the old
+      `archigos:coup:*` records are `superseded_record` entities). A successful Powell & Thyne coup of the same
+      state and day is linked from the removal by `coup:same_state_and_day_as` (context), not by `same_as`.
   - id_prefix: "ncei_hazards:earthquake:"
     source_key: noaa.ncei_hazards
     type: earthquake
