@@ -170,6 +170,21 @@ uv run python -m reva.kg.harvest run registry/kg/queries/energy --db reva_kg_v4e
 flock /tmp/reva-devdb.lock uv run reva kg import-harvest --from-db reva_kg_v4energy --sources 'wikidata*'
 ```
 
-## 8. Live load results
+## 8. Live load results (dev DB `reva`, 2026-10-17, each under `flock /tmp/reva-devdb.lock`)
 
-(filled in below after the loads)
+| connector | result | budget consumed |
+|---|---|---|
+| `atlas.wb_pinksheet` 1.0.1 | 6 tables created: monthly_prices 50,455 · monthly_indices 12,816 · annual_prices_nominal 4,116 · annual_indices_nominal 1,056 · annual_prices_real 4,184 · annual_indices_real 1,122 | 3 req / 3.82 MB |
+| `atlas.eia_steo` 1.0.2 | steo_observed 718,234 cells (43 countries) · steo_forecast 35,213 cells (42 countries); 16 no-boundary series kept in the forecast table | 2 req / 5.48 MB |
+| `atlas.wri_gppd` 1.0.1 | KG: 34,951 entities and 291,312 statements inserted (2 batches, 0 rejected); 34,933 plants located in a country QID, 3 in `iso3:` nodes | 3 req / 11.98 MB |
+| `atlas.usgs_myb_facilities` 1.0.1 | KG: 12,134 entities and 116,354 statements inserted (0 rejected, 0 retractions) | 3 req / 7.84 MB |
+
+Checked in the DB: `usgs_myb:COD0007` → `usgs_myb:country` → Q974; → `usgs_myb:produces` → `usgs_myb:commodity:cobalt`
+and `…:copper`; equity owners "Glencore plc", "Société Générale des Carrières et des Mines SA (Gécamines)".
+
+Disk: free space was 6.6–6.7 GB at the Pink Sheet, STEO and GPPD loads. The USGS facilities load waited ~1 h for the
+shared DB lock, and when it started free space had fallen to 4.8 GB because of other agents' writes. That is below the
+5 GB rule; the load added ~8 MB of raw data plus ~116k KG rows. A first Pink Sheet attempt at 4.7 GB was stopped
+before it registered anything. Connector versions 1.0.0 were registered from in-flight working-tree snapshots with
+different code, so each connector was bumped to 1.0.1 (STEO to 1.0.2 after the geography-length fix). Not done here:
+`reva atlas snapshot`, `links materialise` and `links prune` (the lead runs them), and the Wikidata harvest (§7).
