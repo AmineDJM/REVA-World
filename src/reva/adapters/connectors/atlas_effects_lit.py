@@ -13,7 +13,7 @@ Fixture mode (``origin = test_fixture``) reads the synthetic entries of ``tests/
 small text document served by the fixture client), never the registry ones: the source PDFs are all-rights-reserved
 and are not committed to the repository.
 
-Hosts: www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu (open downloads, no account). No atlas table is
+Hosts: see ``HOSTS`` (open downloads of working papers, no account). No atlas table is
 registered: the deliverable is the estimates layer.
 """
 
@@ -31,19 +31,34 @@ from reva.effects import model as effects_model
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.effects_lit"
-CONNECTOR_VERSION = "1.0.3"  # 1.0.3: a refused document (e.g. HTTP 403) no longer aborts the other entries
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (V6 EFFECTS-MORE): more publication hosts; 1.0.3: a refused document no longer aborts the run
 PARSER_VERSION = "atlas_effects_lit/1"
 SOURCE_KEY = "effects.literature"
 ATLAS_SOURCE = "effects"
 DATASET = "literature_estimates"
-HOSTS = ("www.nber.org", "www.cepii.fr", "www.imf.org", "www.ecb.europa.eu", "www.uni-trier.de")
+HOSTS = (
+    "www.nber.org",
+    "www.cepii.fr",
+    "www.imf.org",
+    "www.ecb.europa.eu",
+    "www.uni-trier.de",
+    # V6 EFFECTS-MORE: open working papers of central banks, research institutes and preprint servers
+    "www.federalreserve.gov",
+    "www.bankofengland.co.uk",
+    "docs.iza.org",
+    "ifs.org.uk",
+    "www.wto.org",
+    "arxiv.org",
+)
 MAX_BYTES = 20_000_000
 REPO_ROOT = Path(__file__).resolve().parents[4]
 FIXTURE_LITERATURE_DIR = REPO_ROOT / "tests" / "fixtures" / "effects" / "literature"
 LICENCE = (
     "Per publication (each entry's rights): NBER working papers (c) authors, short quotations allowed with credit; "
-    "IMF and ECB papers (c) IMF / ECB; CEPII working paper (no licence statement). Raw PDFs archived for provenance "
-    "only, not redistributed; REVA stores the numbers with verbatim quotes and citations."
+    "IMF, ECB, Federal Reserve Board, Bank of England, IZA, IFS and WTO papers (c) their publishers or authors; arXiv "
+    "preprints under the licence the authors chose; some documents carry no licence statement (treated as all rights "
+    "reserved). Raw PDFs archived for provenance only, not redistributed; REVA stores the numbers with verbatim "
+    "quotes and citations."
 )
 
 
@@ -61,7 +76,7 @@ def atlas_source() -> AtlasSourceSpec:
         source_key=SOURCE_KEY,
         budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
-        provider="Published research (NBER, CEPII, IMF and ECB working / occasional papers)",
+        provider="Published research (open working / occasional / discussion papers: NBER, CEPII, IMF, ECB, Federal Reserve Board, Bank of England, IZA, IFS, WTO, arXiv, universities)",
         licence=LICENCE,
         allowed_hosts=HOSTS,
         datasets=(DATASET,),
@@ -76,7 +91,7 @@ def atlas_source() -> AtlasSourceSpec:
             "estimates": "registry/effects/literature/<entry>.yaml -> kg.effect_estimate (pub:effects.literature:<entry>:<id>)",
             "variables": "registry/effects/variables.yaml",
         },
-        notes="One PDF per curated publication (~7.4 MB in all); quotes re-checked against the archived bytes.",
+        notes="One PDF per curated publication; quotes re-checked against the archived bytes.",
     )
 
 

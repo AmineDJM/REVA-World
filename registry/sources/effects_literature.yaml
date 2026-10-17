@@ -6,7 +6,7 @@ title: Published effect estimates (curated transcriptions of open-access working
 provider_url: https://www.nber.org/papers
 lineage_family: effects_literature
 rights:
-  licence: "Per publication, recorded on each estimate: NBER working papers (c) the authors (short quotations allowed with full credit and (c) notice); IMF working papers (c) IMF; ECB occasional papers (c) ECB, all rights reserved; CEPII working paper without licence statement. Not an open licence."
+  licence: "Per publication, recorded on each estimate: NBER working papers (c) the authors (short quotations allowed with full credit and (c) notice); IMF working papers (c) IMF; ECB occasional papers (c) ECB, all rights reserved; CEPII working paper without licence statement; V6 (EFFECTS-MORE) adds Federal Reserve Board IFDP, Bank of England, IZA, IFS and WTO working papers ((c) publishers/authors) and arXiv preprints (licence chosen by the authors). Not an open licence."
   licence_url: null
   attribution: "Each estimate carries its citation, locator and verbatim quote."
   licence_evidence: "Copyright notices read in the archived PDFs (2026-10-17)."
@@ -16,7 +16,7 @@ rights:
     store for provenance only and must not be redistributed. A maintainer should confirm this use before any public
     release.
 metadata:
-  allowed_hosts: [www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu, www.uni-trier.de]
+  allowed_hosts: [www.nber.org, www.cepii.fr, www.imf.org, www.ecb.europa.eu, www.uni-trier.de, www.federalreserve.gov, www.bankofengland.co.uk, docs.iza.org, ifs.org.uk, www.wto.org, arxiv.org]
   files: "document.url of each registry/effects/literature/<entry>.yaml"
   authentication: none
   cadence: static publications; re-fetch only when an entry is added or changed
