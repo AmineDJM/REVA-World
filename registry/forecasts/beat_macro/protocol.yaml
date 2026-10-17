@@ -1,0 +1,125 @@
+# BEAT-MACRO pre-registration (V7, agent BEAT-MACRO). Committed BEFORE any evaluation window below was opened
+# (no development or holdout case of this protocol had been built or scored when this file was committed).
+# Binding rules: docs/roadmap/v7_beat_official.md; standard: docs/dev/review_v6_predictions.md.
+# Do not edit after commit: the development stage writes hypotheses.yaml from the mechanical rule below; the
+# holdout ledger keys on the canonical sha256 of hypotheses.yaml (which records this file's sha256).
+schema: reva-beat-macro-protocol/1
+written_at: '2026-10-17T22:30:00+00:00'
+agent: BEAT-MACRO
+goal: >-
+  Beat the IMF WEO and the ECB Survey of Professional Forecasters on point (AE) and density (CRPS) forecasts of
+  annual inflation, real GDP growth and unemployment, using same-date comparisons (on date t REVA vs the latest
+  official forecast published on or before t), nowcasting from monthly/quarterly data published by t, and
+  combination with the official forecast (weights from past errors only, shrunk toward equal weights).
+
+comparison_rule: >-
+  On origin t (00:00 UTC on the 1st of a month) REVA's forecast uses only information published by t; the
+  benchmark is the latest official forecast published by t (WEO: vintage in force under the PRED-VINTAGE
+  availability rules; ECB SPF: round in force). REVA issues monthly; the WEO is published twice a year (stale in
+  between), the ECB SPF quarterly.
+
+targets:
+  - {task: weo_cpi, variable: cpi_inflation, target: calendar year of the origin (cy), scale: "z = 100 ln(1 + pi/100)",
+     countries: every ISO3 country with a WEO CPI projection in the vintage in force and a usable IMF CPI index that passes the consistency check,
+     outcome: "the target year in the first WEO vintage available on/after 1 Oct of the next year (PRED-MODELS rule)"}
+  - {task: g7rt, variables: [real_gdp_growth, cpi_inflation (z), unemployment_rate], target: cy, countries: [USA, JPN, DEU, FRA, GBR, ITA, CAN],
+     inputs: OECD MEI real-time editions in force (VintageAccessor, available_then) + Brent, outcome: same WEO rule}
+  - {task: ecb_hicp, variable: hicp_inflation (z), geo: euro area (Eurostat EA, changing composition), target: cy,
+     benchmark: ECB SPF average point of the round in force, outcome: "annual average of the Eurostat HICP index (final; known 1 Feb of the next year)"}
+
+origins:
+  development: "weo_cpi, g7rt: 1st of every month 2008-05-01 .. 2018-12-01; ecb_hicp: 1 Jan/Apr/Jul/Oct 2000 .. 2018"
+  holdout: >-
+    weo_cpi, g7rt: 1st of every month 2019-01-01 .. 2025-12-01 EXCEPT June and December (PRED-MODELS evaluated
+    WEO origins on 1 June / 1 December only: these information dates were never evaluated); ecb_hicp: 1 Jan/Apr/Jul/
+    Oct 2019 .. 2025 (no V6 work used the ECB SPF). Targets 2019-2025 coincide with V6 holdout targets (their WEO
+    errors were reported in V6); the information dates, REVA's nowcasts and the ECB SPF comparison are new.
+  gdp_restriction: >-
+    real_gdp_growth (g7rt) only at origins in January, May, July, November (excluding 2011-07 and 2020-07): WEO
+    Updates (Jan/Jul, GDP for ~30 economies incl. the G7) are not in REVA's vintages, so at other months the full
+    WEO in force is not the IMF's latest GDP projection. CPI and unemployment country projections are only in full
+    WEO releases.
+  prospective: origins from 2026 onward (registry, sealed) - targets 2026 resolve with the October 2027 WEO.
+
+inputs:
+  vintages: [IMF WEO (DBnomics copies + IMF portal), ECB SPF, OECD MEI real-time editions] - VintageAccessor + LeakageGuard
+  lagged_final_vintage: >-
+    IMF CPI database headline index (month m usable from the 1st of m + max(3, gap+2), gap = months between the
+    table's recording month and the country's last published month; gap > 12 excluded); Eurostat HICP index
+    (m + max(2, gap+1)); EIA Brent spot daily -> monthly mean (m + 1). Label final_vintage_with_publication_lag;
+    justification: headline CPI/HICP and market prices are not revised by convention; checked on the G7 by
+    cpi_revision_check (final IMF CPI vs MEI real-time editions, same targets and origins).
+  attributed_effect: >-
+    oil pass-through 0.04 pp of headline inflation per pp of oil-price inflation in the year of the shock
+    (registry/effects/literature/choi_furceri_loungani_mishra_poplawski_ribeiro_2017.yaml#headline_inflation_impact_10pct_oil),
+    used as a fixed structural prior (not re-estimated).
+
+candidates:
+  forecast.bm_bridge: >-
+    pure REVA (no official input). CPI: calendar-year average implied by the published monthly index, unpublished
+    months by holding the last y/y ratio; MEI CPI: mean of monthly y/y (same fill); unemployment: mean of monthly
+    rates (unpublished = last) + level gap WEO-observed vs MEI in the last common year; GDP: annual-average growth
+    from published q/q, unpublished quarters = median of last 8 q/q. Panel CPI cases are dropped (abstain) when the
+    calendar-year CPI does not match the WEO's observed inflation (median |diff| > 0.5 over >= 3 of the last years
+    known at t: fiscal-year / definition mismatch).
+  forecast.bm_bridge_oil: pure REVA; CPI bridges with the attributed oil pass-through on the filled y/y rate.
+  forecast.bm_stack: >-
+    USES THE OFFICIAL FORECAST AS AN INPUT: official + lambda (bridge - official), lambda = clipped least squares on
+    past errors of the same bucket (variable x calendar month of the origin; last 10 past origins; outcomes
+    published by t), shrunk toward 0.5 with a prior worth 3 origins; >= 3 past origins.
+  forecast.bm_stack_oil: same with bridge_oil.
+  densities: >-
+    each candidate = point + series scale x past normalised errors of the same model, bucket and window (empirical);
+    min 3 past origins and 15 errors (ecb_hicp: 8 and 8); otherwise point only (AE only).
+
+benchmarks:
+  point: official point (WEO projection / ECB SPF average point) - loss AE.
+  density_fair: >-
+    N(official point, series scale x RMS of the official forecaster's own past normalised errors in the same bucket
+    and window, outcomes published by t) - the fair error-fan benchmark of QA-PRED X1 (NOT the persistence-spread
+    strawman of V6) - loss CRPS. Descriptive: the series' own past official errors (>= 8).
+  naive: persistence (last observed year in the official vintage / index) - descriptive only.
+
+scores_and_tests:
+  losses: {points: AE, densities: CRPS (primary); log score, PIT, 80% coverage, interval score descriptive}
+  inference: >-
+    loss differential averaged across series within each origin; Diebold-Mariano with HLN correction, one-sided
+    (candidate better); horizon argument 12 for monthly origins (rectangular HAC lag 11 spans the origins sharing
+    a target year), 4 for quarter-start origins and for GDP (4 origins a year); >= 6 origins.
+  development_family: one Holm (alpha 0.05) over every development comparison (all candidates x {AE vs official
+    point, CRPS vs fair fan} x every task-variable cell).
+  selection_rule: >-
+    per (task, variable, loss): among development tests Holm-rejected with relative loss < 1, the best (lowest
+    relative) combination candidate (uses the official forecast) and the best pure-REVA candidate -> at most two
+    holdout hypotheses per cell; written to hypotheses.yaml with this file's sha256 and the code sha256; committed
+    before the holdout is opened.
+  holdout_family: ONE Holm (alpha 0.05) over all hypotheses jointly (family size printed next to every result).
+  confirmation: >-
+    Holm-rejected AND relative < 1 AND, for densities, holdout 80% central interval coverage within [0.70, 0.90].
+  holdout_opened_once: ledger holdout_ledger.yaml refuses a second opening of the same hypotheses or changed code.
+  descriptive_only: per-month ratios, per-country median ratios, persistence, own-series fan, cpi_revision_check.
+
+wording_rules:
+  - A confirmed stack is reported as "REVA's combination of the IMF WEO (or ECB SPF) with REVA's nowcast beats the
+    WEO (SPF) alone on the same date" - never "REVA beats the IMF" without saying it uses the IMF forecast.
+  - A confirmed bridge (pure REVA) is reported with its timeliness edge stated (it uses months published after the
+    official forecast).
+  - Wins and losses are reported exactly, with family size, n, origins and coverage.
+
+prospective:
+  rule: >-
+    only confirmed (task, variable, candidate) scopes issue sealed forecasts in the registry (supplementary batch on
+    the matching registry family, under flock); scored on the registry's resolution rule. Unconfirmed: nothing sealed.
+
+not_tested_here_and_why:
+  us_spf: >-
+    no real-time monthly data with vintages between SPF releases (ALFRED blocked; RTDSM and MEI editions are
+    quarterly and give REVA no information edge over SPF panellists at between-release dates) - no hypothesis.
+  weo_bias_correction_next_year: >-
+    a WEO-only transform does not change between releases, so between-release origins would re-score V6's holdout
+    cases (spent) - prospective registry only.
+  next_year_targets: monthly data barely inform next year's annual outcome; not in this family.
+  broad_gdp_unemployment_panels: >-
+    quarterly GDP / monthly unemployment beyond the G7 exist only as final vintages (revised series) - not eligible.
+  gradient_boosting: not built (no dependency in the stack); the pooled cross-country element is the stacking
+    weight (pooled over countries per bucket) and the attributed oil pass-through.
