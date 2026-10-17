@@ -21,7 +21,7 @@ uv run reva qa run [--domain cross_source|units|time|graph|licence|provenance|ca
     [--json out.json] [--md out.md] [--table <regex>] [--verify-all] [--as-of YYYY-MM-DD] [--fail-on fail|warn]
 ```
 
-Dev DB full run: 327 atlas tables / 107.5 M cells, 4.92 M current KG statements, 61,680 current causal claims,
+Dev DB full run: 331 atlas tables / 108.2 M cells, 4.98 M current KG statements, 61,680 current causal claims,
 13.5 k archived objects in **~5.5 min**, peak RSS ≈ 1 GB, no disk written except the reports. No DB write, no flock
 needed (read-only). `--verify-all` re-hashes all 4.7 GB of objects (default: seeded sample of 200 objects ≤ 200 MB +
 existence of every object).
@@ -61,8 +61,8 @@ existence of every object).
 
 ## 2. Results on the dev DB (2026-10-17, see `qa_report_latest.md` for counts + examples)
 
-**Clean (population, not sampled):** 0 atlas tables without a licence (327/327); 0 KG statements / causal claims
-without a raw object or with an unarchived raw; 0 of 107.5 M atlas cells citing a raw object outside their table
+**Clean (population, not sampled):** 0 atlas tables without a licence (331/331); 0 KG statements / causal claims
+without a raw object or with an unarchived raw; 0 of 108.2 M atlas cells citing a raw object outside their table
 manifest; 0 missing or corrupt objects among 13.5 k (200 re-hashed); 0 forecast cells dated at/after their
 availability; 0 unflagged cells in the 7 declared projection tables; 0 period-length mismatches against `_d/_m/_q/_a`
 tables (5.9 M cells); 0 part_of cycles (119,874 edges); 0 KG statements dated after today outside the declared
