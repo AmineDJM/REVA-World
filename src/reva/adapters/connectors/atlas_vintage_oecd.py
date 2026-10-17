@@ -44,7 +44,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.vintage_oecd_rt"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered by another seed from an in-flight snapshot (different code)
 PARSER_VERSION = "atlas_vintage_oecd/1"
 SOURCE_KEY = "oecd.sdmx"
 ATLAS_SOURCE = "vintage_oecd"
