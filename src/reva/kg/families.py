@@ -162,9 +162,9 @@ class FamilyRegistry:
         out: set[tuple[str, Direction]] = set()
         for pid in self.mappings:
             for d in ("out", "in"):
-                ef = self.edge_family(pid, d)  # type: ignore[arg-type]
+                ef = self.edge_family(pid, d)
                 if ef is not None and ef.family in wanted:
-                    out.add((pid, d))  # type: ignore[arg-type]
+                    out.add((pid, d))
         return out
 
     def pids_for(self, family_ids: Iterable[str]) -> set[str]:
@@ -174,8 +174,12 @@ class FamilyRegistry:
         counts: dict[str, int] = {f: 0 for f in self.families}
         for m in self.mappings.values():
             counts[m.family] += 1
-        return {"families": len(self.families), "mappings": len(self.mappings), "per_family": counts,
-                "files": list(self.files)}
+        return {
+            "families": len(self.families),
+            "mappings": len(self.mappings),
+            "per_family": counts,
+            "files": list(self.files),
+        }
 
 
 # ---------------------------------------------------------------------------------------------- share
@@ -216,8 +220,13 @@ def share_of(mapping: Mapping_, qualifiers: Mapping[str, Any] | None) -> dict[st
     dimensionless = unit in (None, "", "1") or (scale == "percent" and unit == WIKIDATA_PERCENT_UNIT)
     if scale in _SCALE and dimensionless:
         frac = str((dec / _SCALE[scale]).normalize())
-    return {"value": text.lstrip("+"), "fraction": frac, "unit": unit, "scale": scale,
-            "qualifier": mapping.share_qualifier}
+    return {
+        "value": text.lstrip("+"),
+        "fraction": frac,
+        "unit": unit,
+        "scale": scale,
+        "qualifier": mapping.share_qualifier,
+    }
 
 
 # ---------------------------------------------------------------------------------------------- loading
@@ -228,7 +237,8 @@ def _load_yaml(path: Path) -> Any:
 
 @lru_cache(maxsize=1)
 def _schema() -> dict[str, Any]:
-    return json.loads(RELATIONS_SCHEMA.read_text(encoding="utf-8"))
+    doc: dict[str, Any] = json.loads(RELATIONS_SCHEMA.read_text(encoding="utf-8"))
+    return doc
 
 
 def _schema_problems(doc: Any, part: str, where: str) -> list[str]:
