@@ -101,6 +101,16 @@ const ROUTES = {
   },
   'GET /v1/forecasts/questions': { body: env({ total: 1, offset: 0, questions: [Q] }) },
   'GET /v1/forecasts/backtests': { body: env([]) },
+  'GET /v1/forecasts/ensemble': {
+    body: env({
+      label: 'REVA ENSEMBLE', model: 'reva.ensemble', rule: 'r', alpha: 0.05, holm_family_size: 0, n_ensemble_forecasts: 434, n_ensemble_scored: 0,
+      weights_by_family: { 'weo.cpi_inflation': { equal_weights_insufficient_history: 434 } },
+      cells: [
+        { family: 'weo.cpi_inflation', type: 'quantity', metric: 'crps', n_ensemble_issued: 434, n_ensemble_scored: 0, min_pairs: 20, competitors: [],
+          best_single: null, test: null, status: 'awaiting_resolutions', p_holm: null, holm_family_size: 0, verdict: 'awaiting_resolutions' },
+      ],
+    }),
+  },
 };
 
 function at(path: string) {
@@ -128,6 +138,9 @@ describe('Prévisions', () => {
     expect(lb).toHaveTextContent('source externe');
     expect(within(lb).getAllByText('n. a.').length).toBeGreaterThan(0);
     expect(await screen.findByTestId('previsions-counts')).toHaveTextContent('Aucune question n’est encore résolue');
+    const ens = await screen.findByTestId('previsions-ensemble');
+    expect(ens).toHaveTextContent('poids égaux (historique insuffisant)');
+    expect(ens).toHaveTextContent('en attente de résolutions');
     const fam = await screen.findByTestId('previsions-families');
     expect(fam).toHaveTextContent('source à créer');
     const qs = await screen.findByTestId('previsions-questions');

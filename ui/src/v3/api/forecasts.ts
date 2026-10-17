@@ -89,7 +89,7 @@ const Relative = z.looseObject({ n_common: z.number(), ratio: NumOrNull, skill: 
 export const LeaderboardRow = z.looseObject({
   model: z.string(),
   description: z.string(),
-  kind: z.enum(['baseline', 'external_reference']),
+  kind: z.enum(['baseline', 'external_reference', 'reva_ensemble']),
   n_issued: z.number(),
   n_abstained: z.number(),
   n_scored: z.number(),
@@ -133,6 +133,35 @@ export const Calibration = z.looseObject({
   interval_coverage: z.looseObject({ nominal: z.number(), empirical: NumOrNull, n: z.number() }),
 });
 
+const EnsembleCompetitor = z.looseObject({ model: z.string(), n_common: z.number(), ratio: NumOrNull });
+export const EnsembleCell = z.looseObject({
+  family: z.string(),
+  type: z.string(),
+  metric: z.string(),
+  n_ensemble_issued: z.number(),
+  n_ensemble_scored: z.number(),
+  min_pairs: z.number(),
+  competitors: z.array(EnsembleCompetitor),
+  best_single: EnsembleCompetitor.nullable(),
+  test: z.looseObject({ mean_diff: NumOrNull, p_two_sided: NumOrNull, n: z.number() }).nullable(),
+  status: z.string(),
+  p_holm: NumOrNull,
+  holm_family_size: z.number(),
+  verdict: z.string(),
+});
+export type EnsembleCell = z.output<typeof EnsembleCell>;
+export const EnsembleBoard = z.looseObject({
+  label: z.string(),
+  model: z.string(),
+  rule: z.string(),
+  alpha: z.number(),
+  holm_family_size: z.number(),
+  n_ensemble_forecasts: z.number(),
+  n_ensemble_scored: z.number(),
+  weights_by_family: z.record(z.string(), z.record(z.string(), z.number())),
+  cells: z.array(EnsembleCell),
+});
+
 export const getForecastFamilies = (s?: AbortSignal) => v3get('/v1/forecasts/families', envelopeOf(z.array(ForecastFamily)), undefined, s);
 export const getForecastBatches = (s?: AbortSignal) => v3get('/v1/forecasts/batches', envelopeOf(z.array(Batch)), undefined, s);
 export const getForecastQuestions = (q: { family?: string; type?: string; status?: string; geo?: string; limit?: number; offset?: number }, s?: AbortSignal) =>
@@ -142,3 +171,4 @@ export const getForecastQuestion = (id: string, s?: AbortSignal) =>
 export const getLeaderboard = (s?: AbortSignal) => v3get('/v1/forecasts/leaderboard', envelopeOf(Leaderboard), undefined, s);
 export const getBacktests = (s?: AbortSignal) => v3get('/v1/forecasts/backtests', envelopeOf(z.array(Backtest)), undefined, s);
 export const getCalibration = (model: string, s?: AbortSignal) => v3get('/v1/forecasts/calibration', envelopeOf(Calibration), { model }, s);
+export const getEnsembleBoard = (s?: AbortSignal) => v3get('/v1/forecasts/ensemble', envelopeOf(EnsembleBoard), undefined, s);

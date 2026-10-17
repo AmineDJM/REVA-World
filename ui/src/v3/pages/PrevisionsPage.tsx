@@ -5,6 +5,7 @@ import { warningsFr } from '../api/common';
 import {
   getBacktests,
   getCalibration,
+  getEnsembleBoard,
   getForecastBatches,
   getForecastFamilies,
   getForecastQuestion,
@@ -41,6 +42,7 @@ export function modelFr(key: string): string {
     'forecast.weo_bias_corrected': 'Intervalle calibré autour du point FMI (WEO), pas une meilleure prévision ponctuelle',
     'forecast.weo_error_fan': 'Référence équitable : éventail des erreurs passées du FMI (WEO)',
     'forecast.spf_conformal': 'Intervalle calibré autour de la médiane SPF, pas une meilleure prévision ponctuelle',
+    'reva.ensemble': 'Ensemble REVA (combinaison en ligne, prévisions officielles incluses)',
   };
   return m[key.split('@')[0]!] ?? key;
 }
@@ -183,6 +185,8 @@ export default function PrevisionsPage() {
           <CalibrationBlock />
         </>
       )}
+
+      <EnsembleBlock />
 
       <h2>Questions</h2>
       <div className="v3-toolbar">
@@ -472,6 +476,90 @@ function BacktestBlock() {
             </tbody>
           </table>
         ))}
+    </>
+  );
+}
+
+const VERDICT_FR: Record<string, string> = {
+  awaiting_resolutions: 'en attente de résolutions',
+  no_comparable_competitor: 'aucun concurrent comparable',
+  not_testable: 'non testable',
+  no_significant_difference: 'pas de différence significative',
+  ensemble_better: 'ensemble meilleur (Holm)',
+  best_single_better: 'meilleur prévisionniste seul meilleur (Holm)',
+};
+const WEIGHT_FR: Record<string, string> = {
+  equal_weights_insufficient_history: 'poids égaux (historique insuffisant)',
+  online_weights: 'poids appris des résolutions',
+  abstained: 'abstention',
+  other: 'autre',
+};
+const METRIC_FR: Record<string, string> = { crps: 'CRPS', abs_error: 'erreur absolue', interval_score: 'score d’intervalle', brier: 'Brier' };
+
+function EnsembleBlock() {
+  const eb = useApi((s) => getEnsembleBoard(s), []);
+  return (
+    <>
+      <h2>Ensemble REVA vs meilleur prévisionniste seul</h2>
+      <p className="v3-lede">
+        Combinaison en ligne de toutes les prévisions scellées sur chaque question (prévisions officielles comprises, attribuées). Les poids ne viennent
+        que des questions <strong>résolues prospectivement</strong> ; tant qu’il y en a trop peu, ils sont égaux et affichés comme tels. Ce tableau ne se
+        remplit qu’au fil des résolutions : aucun résultat rétroactif. Une victoire se lit « la combinaison de REVA bat ce prévisionniste seul », jamais
+        « REVA bat » l’institution.
+      </p>
+      {eb.status === 'loading' && <V3Loading what="de l’ensemble" />}
+      {eb.status === 'error' && <V3Error error={eb.error} what="Le tableau de l’ensemble" onRetry={eb.reload} />}
+      {eb.status === 'ok' && (
+        <div data-testid="previsions-ensemble">
+          <p>
+            Prévisions d’ensemble scellées : {eb.data.data.n_ensemble_forecasts} · notées : {eb.data.data.n_ensemble_scored} · tests dans la famille de
+            Holm : {eb.data.data.holm_family_size}.
+          </p>
+          {Object.keys(eb.data.data.weights_by_family).length > 0 && (
+            <ul>
+              {Object.entries(eb.data.data.weights_by_family).map(([fam, st]) => (
+                <li key={fam}>
+                  {fam} : {Object.entries(st).map(([k, n]) => `${n} ${WEIGHT_FR[k] ?? k}`).join(', ')}
+                </li>
+              ))}
+            </ul>
+          )}
+          {eb.data.data.cells.length === 0 ? (
+            <V3Empty>
+              <p>Aucune prévision d’ensemble n’est encore scellée.</p>
+            </V3Empty>
+          ) : (
+            <table className="v3-table">
+              <thead>
+                <tr>
+                  <th>Famille</th>
+                  <th>Type</th>
+                  <th>Mesure</th>
+                  <th>Notées</th>
+                  <th>Meilleur seul</th>
+                  <th>Ratio ensemble / meilleur</th>
+                  <th>p (Holm)</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                {eb.data.data.cells.map((c) => (
+                  <tr key={`${c.family}|${c.type}|${c.metric}`}>
+                    <td>{c.family}</td>
+                    <td>{TYPE_FR[c.type] ?? c.type}</td>
+                    <td>{METRIC_FR[c.metric] ?? c.metric}</td>
+                    <td>{c.n_ensemble_scored}</td>
+                    <td>{c.best_single ? modelFr(c.best_single.model) : 'n. a.'}</td>
+                    <td>{fr(c.best_single?.ratio ?? null)}</td>
+                    <td>{fr(c.p_holm, 4)}</td>
+                    <td>{VERDICT_FR[c.verdict] ?? c.verdict}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </>
   );
 }

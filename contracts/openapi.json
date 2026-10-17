@@ -3624,6 +3624,18 @@
             "format": "date-time",
             "title": "Recorded At",
             "type": "string"
+          },
+          "supplement_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Original batch of a supplementary batch (registered models, REVA ensemble); else null",
+            "title": "Supplement Of"
           }
         },
         "required": [
@@ -3636,6 +3648,7 @@
           "n_questions",
           "by_type",
           "label",
+          "supplement_of",
           "models"
         ],
         "title": "Batch",
@@ -12875,6 +12888,437 @@
           "next_cursor"
         ],
         "title": "EffectVariablesResponse",
+        "type": "object"
+      },
+      "EnsembleBoard": {
+        "additionalProperties": false,
+        "properties": {
+          "alpha": {
+            "title": "Alpha",
+            "type": "number"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/EnsembleCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "holm_family_size": {
+            "title": "Holm Family Size",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "n_ensemble_forecasts": {
+            "title": "N Ensemble Forecasts",
+            "type": "integer"
+          },
+          "n_ensemble_scored": {
+            "title": "N Ensemble Scored",
+            "type": "integer"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "weights_by_family": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "description": "Ensemble forecasts per family by weight status (equal_weights_insufficient_history, online_weights, abstained)",
+            "title": "Weights By Family",
+            "type": "object"
+          }
+        },
+        "required": [
+          "label",
+          "model",
+          "rule",
+          "alpha",
+          "holm_family_size",
+          "n_ensemble_forecasts",
+          "n_ensemble_scored",
+          "weights_by_family",
+          "cells"
+        ],
+        "title": "EnsembleBoard",
+        "type": "object"
+      },
+      "EnsembleCell": {
+        "additionalProperties": false,
+        "properties": {
+          "best_single": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Eligible competitor the ensemble does worst against",
+            "title": "Best Single"
+          },
+          "competitors": {
+            "description": "Ensemble vs each forecaster it combined, common questions",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Competitors",
+            "type": "array"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "holm_family_size": {
+            "title": "Holm Family Size",
+            "type": "integer"
+          },
+          "metric": {
+            "description": "Loss compared (lower is better): crps, abs_error, interval_score or brier",
+            "title": "Metric",
+            "type": "string"
+          },
+          "min_pairs": {
+            "title": "Min Pairs",
+            "type": "integer"
+          },
+          "n_ensemble_issued": {
+            "title": "N Ensemble Issued",
+            "type": "integer"
+          },
+          "n_ensemble_scored": {
+            "title": "N Ensemble Scored",
+            "type": "integer"
+          },
+          "p_holm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Holm"
+          },
+          "status": {
+            "enum": [
+              "awaiting_resolutions",
+              "no_comparable_competitor",
+              "tested"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "test": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DM test (two-way clustered), null until enough resolutions",
+            "title": "Test"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "verdict": {
+            "description": "awaiting_resolutions, no_comparable_competitor, not_testable, no_significant_difference, ensemble_better or best_single_better",
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "type",
+          "metric",
+          "n_ensemble_issued",
+          "n_ensemble_scored",
+          "min_pairs",
+          "competitors",
+          "best_single",
+          "test",
+          "status",
+          "p_holm",
+          "holm_family_size",
+          "verdict"
+        ],
+        "title": "EnsembleCell",
+        "type": "object"
+      },
+      "EnsembleResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/EnsembleBoard"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "EnsembleResponse",
         "type": "object"
       },
       "EntityComponent": {
@@ -22161,7 +22605,8 @@
           "kind": {
             "enum": [
               "baseline",
-              "external_reference"
+              "external_reference",
+              "reva_ensemble"
             ],
             "title": "Kind",
             "type": "string"
@@ -37521,6 +37966,63 @@
           }
         },
         "summary": "Get Calibration",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/v1/forecasts/ensemble": {
+      "get": {
+        "description": "REVA ensemble vs the best single forecaster it combined, per family, from resolved prospective scores only\n(fills in as questions resolve; nothing is backfilled). DM tests, Holm across every tested cell.",
+        "operationId": "get_ensemble_v1_forecasts_ensemble_get",
+        "parameters": [
+          {
+            "description": "Rows of this origin only; 'any' = both. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = both. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnsembleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Ensemble",
         "tags": [
           "forecasts"
         ]

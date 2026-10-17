@@ -967,3 +967,51 @@ models:
     output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: probability}]
     applicability: {min_components: 1, min_resolved_for_online_weights: 20}
     assumptions: [past relative performance of a component in a family informative about its next one; components' sealed forecasts available at issue]
+  # V7 BEAT-ENERGY (src/reva/evaluation/beat_energy.py, beat_energy_seal.py; registry/forecasts/beat_energy/protocol.yaml):
+  # issued only for the pre-registered Holm winners (W1 h0 Brent/WTI timeliness nowcasts) with their benchmarks.
+  - model_key: forecast.beat_energy_daily_nowcast
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Timeliness nowcast of a month's mean spot price: known trading-day EIA daily spot prices of the month (days up to
+      the issue day minus 9, weekly-release availability) plus the last known price for each remaining weekday.
+      Pre-registered W1 winner vs the EIA STEO issue in force (current month, 1-4 weeks after a STEO release).
+    input_ports: [{name: daily_spot_prices, kind: atlas_eia_spot_d}]
+    output_ports: [{name: point_forecast}]
+    applicability: {frequencies: [M], question_types: [quantity], horizon_months_after_steo_issue: [0]}
+    assumptions: [daily spot prices not revised; no-change for the rest of the month]
+  - model_key: forecast.beat_energy_combo_steo_daily
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Combination with EIA's STEO: exp(w log STEO + (1-w) log daily nowcast), w inverse-MSE from both forecasters'
+      past log errors (<= 20 past STEO issues, same horizon and offset, target months fully known at issue). A win
+      reads "REVA's combination with STEO beats STEO alone".
+    input_ports: [{name: steo_projection_cell, kind: atlas_vintage_steo}, {name: daily_spot_prices, kind: atlas_eia_spot_d}]
+    output_ports: [{name: point_forecast}]
+    applicability: {frequencies: [M], question_types: [quantity], min_past_errors: 8}
+    assumptions: [past relative accuracy informative about the next]
+  - model_key: forecast.beat_energy_daily_nowcast_ln
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Log-normal predictive with median = the daily nowcast and sigma = RMS of its own past log errors (same window and
+      rule as the combination). Compared with forecast.eia_steo_fair_ln on CRPS (density vs density).
+    input_ports: [{name: daily_spot_prices, kind: atlas_eia_spot_d}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {frequencies: [M], question_types: [quantity], min_past_errors: 8}
+    assumptions: [log errors centred, exchangeable over past issues]
+  - model_key: forecast.eia_steo_fair_ln
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      BENCHMARK (not a REVA forecast): log-normal with median = EIA's STEO projection (attributed) and sigma = RMS of
+      STEO's own past log errors (same window and rule as REVA's density) - the fair density of the official forecast.
+    input_ports: [{name: official_point, kind: point}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {frequencies: [M], question_types: [quantity], min_past_errors: 8}
+    assumptions: [log errors centred, exchangeable over past issues]

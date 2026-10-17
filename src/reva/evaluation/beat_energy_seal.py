@@ -70,7 +70,7 @@ def seal_records(
         rows.append(
             be.W1Row(
                 code, inforce.vintage, inforce.issue_idx, OFFSET, now, 0, s, be.daily_point(kn, inforce.issue_idx), None
-            )  # fmt: skip
+            )
         )
     recs = be.w1_forecasts(rows, daily)
     out = {r["code"]: r for r in recs if r["t"] == now.isoformat()}
@@ -103,7 +103,7 @@ def build_batch(
         doc["beat_energy"] = {"protocol": be.PROTOCOL_PATH, "window": "W1", "h": 0}
         fam = _family_of(doc)
         fam_docs[fam_key] = doc
-        pin = pins[fam.dataset_key]
+        pin = pins[str(fam.dataset_key)]
         qs, skipped = generate_questions(
             fam, series_by_family[fam_key], cycle=cycle, interval_level=0.8, source_pin=pin, issued_on=now.date()
         )

@@ -855,6 +855,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/forecasts/ensemble": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Ensemble
+         * @description REVA ensemble vs the best single forecaster it combined, per family, from resolved prospective scores only
+         *     (fills in as questions resolve; nothing is backfilled). DM tests, Holm across every tested cell.
+         */
+        get: operations["get_ensemble_v1_forecasts_ensemble_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/forecasts/families": {
         parameters: {
             query?: never;
@@ -3109,6 +3130,11 @@ export interface components {
              * Format: date-time
              */
             recorded_at: string;
+            /**
+             * Supplement Of
+             * @description Original batch of a supplementary batch (registered models, REVA ensemble); else null
+             */
+            supplement_of: string | null;
         };
         /** BatchModel */
         BatchModel: {
@@ -6199,6 +6225,162 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** EnsembleBoard */
+        EnsembleBoard: {
+            /** Alpha */
+            alpha: number;
+            /** Cells */
+            cells: components["schemas"]["EnsembleCell"][];
+            /** Holm Family Size */
+            holm_family_size: number;
+            /** Label */
+            label: string;
+            /** Model */
+            model: string;
+            /** N Ensemble Forecasts */
+            n_ensemble_forecasts: number;
+            /** N Ensemble Scored */
+            n_ensemble_scored: number;
+            /** Rule */
+            rule: string;
+            /**
+             * Weights By Family
+             * @description Ensemble forecasts per family by weight status (equal_weights_insufficient_history, online_weights, abstained)
+             */
+            weights_by_family: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+        };
+        /** EnsembleCell */
+        EnsembleCell: {
+            /**
+             * Best Single
+             * @description Eligible competitor the ensemble does worst against
+             */
+            best_single: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Competitors
+             * @description Ensemble vs each forecaster it combined, common questions
+             */
+            competitors: {
+                [key: string]: unknown;
+            }[];
+            /** Family */
+            family: string;
+            /** Holm Family Size */
+            holm_family_size: number;
+            /**
+             * Metric
+             * @description Loss compared (lower is better): crps, abs_error, interval_score or brier
+             */
+            metric: string;
+            /** Min Pairs */
+            min_pairs: number;
+            /** N Ensemble Issued */
+            n_ensemble_issued: number;
+            /** N Ensemble Scored */
+            n_ensemble_scored: number;
+            /** P Holm */
+            p_holm: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "awaiting_resolutions" | "no_comparable_competitor" | "tested";
+            /**
+             * Test
+             * @description DM test (two-way clustered), null until enough resolutions
+             */
+            test: {
+                [key: string]: unknown;
+            } | null;
+            /** Type */
+            type: string;
+            /**
+             * Verdict
+             * @description awaiting_resolutions, no_comparable_competitor, not_testable, no_significant_difference, ensemble_better or best_single_better
+             */
+            verdict: string;
+        };
+        /** EnsembleResponse */
+        EnsembleResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["EnsembleBoard"];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /**
          * EntityComponent
          * @description A data facet available for the entity (a concept with source records or
@@ -9136,7 +9318,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "baseline" | "external_reference";
+            kind: "baseline" | "external_reference" | "reva_ensemble";
             /** Log Score */
             log_score: number | null;
             /** Mae */
@@ -14557,6 +14739,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CalibrationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_ensemble_v1_forecasts_ensemble_get: {
+        parameters: {
+            query?: {
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnsembleResponse"];
                 };
             };
             /** @description Validation Error */

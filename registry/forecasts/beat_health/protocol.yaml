@@ -10,7 +10,7 @@ question: >-
   alone"; it is never a claim that REVA beats the hub's member models without the ensemble.
 frozen_code:
   module: src/reva/evaluation/health_registry/beat.py
-  module_sha256: PENDING
+  module_sha256: 19578136de476b7052499f4d912fe61fc07a5709135efd234a235cf5442170d3
   cli: src/reva/cli/beat_health.py
   note: the holdout run refuses to execute when the module's sha256 differs from this value
 candidates:

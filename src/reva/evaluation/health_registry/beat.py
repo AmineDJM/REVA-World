@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
@@ -128,8 +128,9 @@ def past_scored(p: Panel, i: int) -> tuple[np.ndarray, np.ndarray]:
     return np.array(keep, dtype=int), np.array(ys, dtype=float)
 
 
-def _argmin_grid(grid: Sequence[float], loss: Callable[[float], float]) -> float:
-    best = min(range(len(grid)), key=lambda k: (loss(grid[k]), k))
+def _argmin_grid(grid: Sequence[float], losses: Sequence[float]) -> float:
+    """Grid value with the smallest loss (first one on ties)."""
+    best = min(range(len(grid)), key=lambda k: (losses[k], k))
     return float(grid[best])
 
 
@@ -146,8 +147,8 @@ def run_candidates(p: Panel) -> tuple[dict[str, np.ndarray], list[dict[str, Any]
             pp, yp = pj[sel], py[sel]
             if len(pp) >= MIN_PAST:
                 e, b = p.ens[pp], p.blend[pp]
-                w = _argmin_grid(QA_GRID, lambda w: float(wis_rows(w * e + (1 - w) * b, yp).sum()))
-                s = _argmin_grid(WIDTH_GRID, lambda s: float(wis_rows(stretch(e, s), yp).sum()))
+                w = _argmin_grid(QA_GRID, [float(wis_rows(g * e + (1 - g) * b, yp).sum()) for g in QA_GRID])
+                s = _argmin_grid(WIDTH_GRID, [float(wis_rows(stretch(e, g), yp).sum()) for g in WIDTH_GRID])
             else:
                 w, s = 1.0, 1.0
             out["beat.qa_blend"][c] = w * p.ens[c] + (1 - w) * p.blend[c]
@@ -175,7 +176,9 @@ def _cov(q: np.ndarray, y: np.ndarray, central: float) -> float:
     return float(np.mean((lo <= y) & (y <= hi)))
 
 
-def compare(p: Panel, forecasts: Mapping[str, np.ndarray], truth: str, rounds: set[str] | None = None) -> dict[str, Any]:
+def compare(
+    p: Panel, forecasts: Mapping[str, np.ndarray], truth: str, rounds: set[str] | None = None
+) -> dict[str, Any]:
     """Every forecast vs the hub ensemble on rows with a known truth (optionally restricted to ``rounds``)."""
     y = p.truth[truth]
     mask = np.isfinite(y)
@@ -185,8 +188,8 @@ def compare(p: Panel, forecasts: Mapping[str, np.ndarray], truth: str, rounds: s
     base = wis_rows(p.ens[idx], y[idx])
     res: dict[str, Any] = {
         "truth": truth,
-        "n_tasks": int(len(idx)),
-        "n_rounds": int(len({int(p.r[j]) for j in idx})),
+        "n_tasks": len(idx),
+        "n_rounds": len({int(p.r[j]) for j in idx}),
         "ensemble": {
             "mean_wis": float(base.mean()) if len(idx) else None,
             "coverage50": _cov(p.ens[idx], y[idx], 0.5) if len(idx) else None,
@@ -232,11 +235,7 @@ def verdicts(results: Mapping[str, Mapping[str, Any]], alpha: float) -> dict[str
         dm = r.get("dm_vs_ensemble") or {}
         rel = r.get("relative_wis_vs_ensemble")
         win = bool(
-            rel is not None
-            and rel < 1
-            and dm.get("status") == "ok"
-            and dm["mean_diff"] < 0
-            and (adj[k] or 1.0) < alpha
+            rel is not None and rel < 1 and dm.get("status") == "ok" and dm["mean_diff"] < 0 and (adj[k] or 1.0) < alpha
         )
         out[k] = {"relative_wis": rel, "p_value": pv[k], "holm_p": adj[k], "win": win}
     return {"family_size": len(results), "alpha": alpha, "tests": out}
