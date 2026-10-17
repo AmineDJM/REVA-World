@@ -1,0 +1,305 @@
+# Atlas catalog 'macro_hf' (agent V4ECON, 2026-10-17). Provider-declared concepts (not human-reviewed): one source
+# per concept (no cross-provider equivalence asserted). See docs/dev/v4_v4econ.md.
+domain: macro_hf
+labels:
+  fr: Macroéconomie infra-annuelle et niveaux de prix
+  en: Sub-annual macroeconomics and price levels
+maintainer: V4ECON
+concepts:
+- id: macro_hf.cpi_index_m
+  labels:
+    fr: Indice des prix à la consommation, ensemble (mensuel, FMI)
+    en: Consumer price index, all items (monthly, IMF)
+  definition: 'IMF CPI dataset: national consumer price index, all items (COICOP 1999 ''_T''), index; the reference period
+    differs by country (flags.reference_period / common_reference_period).'
+  unit: index
+  domain: macro_hf
+  subdomain: prices
+  theme: prices
+  source_order:
+  - imf.cpi_m.CPI|coicop_1999=_T|type_of_transformation=IX
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.cpi_yoy_m
+  labels:
+    fr: Inflation des prix à la consommation sur un an (mensuel, FMI)
+    en: Consumer price inflation, year-over-year (monthly, IMF)
+  definition: 'IMF CPI dataset: ''Period average, Year-over-year (YOY) percent change'' of the national CPI, all items.'
+  unit: '%'
+  domain: macro_hf
+  subdomain: prices
+  theme: prices
+  source_order:
+  - imf.cpi_m.CPI|coicop_1999=_T|type_of_transformation=YOY_PCH_PA_PT
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.hicp_index_m
+  labels:
+    fr: IPCH ensemble, indice 2025=100 (mensuel, Eurostat)
+    en: HICP all items, index 2025=100 (monthly, Eurostat)
+  definition: 'Eurostat prc_hicp_minr: Harmonised index of consumer prices, ECOICOP ver. 2 ''TOTAL'', ''Index, 2025=100''.'
+  unit: index (2025=100)
+  domain: macro_hf
+  subdomain: prices
+  theme: prices
+  source_order:
+  - eurostat.hicp_m.prc_hicp_minr|unit=I25|coicop18=TOTAL
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.hicp_annual_rate_m
+  labels:
+    fr: IPCH ensemble, taux de variation annuel (mensuel, Eurostat)
+    en: HICP all items, annual rate of change (monthly, Eurostat)
+  definition: 'Eurostat prc_hicp_minr: Harmonised index of consumer prices, ECOICOP ver. 2 ''TOTAL'', ''Annual rate of change''.'
+  unit: '%'
+  domain: macro_hf
+  subdomain: prices
+  theme: prices
+  source_order:
+  - eurostat.hicp_m.prc_hicp_minr|unit=RCH_A|coicop18=TOTAL
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gdp_real_dc_q_sa
+  labels:
+    fr: PIB à prix constants, CVS (trimestriel, FMI)
+    en: GDP at constant prices, seasonally adjusted (quarterly, IMF)
+  definition: 'IMF QNEA: Gross domestic product (GDP), constant prices, domestic currency, S_ADJUSTMENT ''Seasonally adjusted
+    (SA)''.'
+  unit: domestic currency
+  domain: macro_hf
+  subdomain: national_accounts
+  theme: economy
+  source_order:
+  - imf.qnea_q.B1GQ|price_type=Q|s_adjustment=SA|type_of_transformation=XDC
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gdp_nominal_dc_q_nsa
+  labels:
+    fr: PIB à prix courants, non CVS (trimestriel, FMI)
+    en: GDP at current prices, not seasonally adjusted (quarterly, IMF)
+  definition: 'IMF QNEA: Gross domestic product (GDP), current prices, domestic currency, S_ADJUSTMENT ''Not seasonally adjusted
+    (NSA)''.'
+  unit: domestic currency
+  domain: macro_hf
+  subdomain: national_accounts
+  theme: economy
+  source_order:
+  - imf.qnea_q.B1GQ|price_type=V|s_adjustment=NSA|type_of_transformation=XDC
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gdp_volume_qoq_sca
+  labels:
+    fr: PIB en volume, % de variation trimestrielle, CVS-CJO (Eurostat)
+    en: GDP volume, % change on previous quarter, seasonally and calendar adjusted (Eurostat)
+  definition: 'Eurostat namq_10_gdp: GDP at market prices, ''Chain linked volumes, percentage change on previous period'',
+    ''Seasonally and calendar adjusted data''.'
+  unit: '%'
+  domain: macro_hf
+  subdomain: national_accounts
+  theme: economy
+  source_order:
+  - eurostat.gdp_q.namq_10_gdp|unit=CLV_PCH_PRE|s_adj=SCA|na_item=B1GQ
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gdp_volume_qoq_oecd
+  labels:
+    fr: PIB en volume, croissance trimestrielle, CVS-CJO (OCDE KEI)
+    en: GDP volume, growth rate period on period, calendar and seasonally adjusted (OECD KEI)
+  definition: 'OECD Key short-term economic indicators: ''Gross domestic product, volume'', ''Growth rate'', ''Calendar and
+    seasonally adjusted'', ''Growth rate, period on period''.'
+  unit: '%'
+  domain: macro_hf
+  subdomain: national_accounts
+  theme: economy
+  source_order:
+  - oecd.kei_mq.B1GQ_Q|unit_measure=GR|activity=_T|adjustment=Y|transformation=G1|freq=Q
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.unemployment_rate_m_imf
+  labels:
+    fr: Taux de chômage (mensuel, FMI)
+    en: Unemployment rate (monthly, IMF Labor Statistics)
+  definition: 'IMF LS: ''Unemployment rate'', ''Percent'', monthly; the IMF states no seasonal adjustment.'
+  unit: '%'
+  domain: macro_hf
+  subdomain: labour
+  theme: economy
+  source_order:
+  - imf.ls_mq.U|type_of_transformation=PT|freq=M
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.unemployment_rate_m_sa_eurostat
+  labels:
+    fr: Taux de chômage CVS (mensuel, Eurostat)
+    en: Unemployment rate, seasonally adjusted (monthly, Eurostat)
+  definition: 'Eurostat une_rt_m: total, ''Percentage of population in the labour force'', ''Seasonally adjusted data, not
+    calendar adjusted data''.'
+  unit: '% of labour force'
+  domain: macro_hf
+  subdomain: labour
+  theme: economy
+  source_order:
+  - eurostat.une_m.une_rt_m|s_adj=SA|age=TOTAL|unit=PC_ACT|sex=T
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.unemployment_rate_m_oecd
+  labels:
+    fr: Taux de chômage harmonisé CVS-CJO (mensuel, OCDE KEI)
+    en: Harmonised unemployment rate, calendar and seasonally adjusted (monthly, OECD KEI)
+  definition: 'OECD Key short-term economic indicators: ''Unemployment'', ''Percentage of labour force'', ''Calendar and seasonally
+    adjusted'', monthly.'
+  unit: '% of labour force'
+  domain: macro_hf
+  subdomain: labour
+  theme: economy
+  source_order:
+  - oecd.kei_mq.UNEMP|unit_measure=PT_LF|activity=_T|adjustment=Y|freq=M
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.industrial_production_m_sa
+  labels:
+    fr: Indice de la production industrielle CVS (mensuel, FMI)
+    en: Industrial production index, seasonally adjusted (monthly, IMF)
+  definition: 'IMF PI: ''Industrial Production'', ''Seasonally adjusted (SA) Index''; reference period in flags.reference_period.'
+  unit: index
+  domain: macro_hf
+  subdomain: production
+  theme: economy
+  source_order:
+  - imf.pi_m.IND|type_of_transformation=SA_IX
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.industrial_production_m_sca_eurostat
+  labels:
+    fr: Production industrielle (B-D), CVS-CJO, indice 2021=100 (mensuel, Eurostat)
+    en: Production in industry (B-D), seasonally and calendar adjusted, index 2021=100 (monthly, Eurostat)
+  definition: 'Eurostat sts_inpr_m: ''Production (volume)'', NACE B-D, ''Seasonally and calendar adjusted data'', ''Index,
+    2021=100''.'
+  unit: index (2021=100)
+  domain: macro_hf
+  subdomain: production
+  theme: economy
+  source_order:
+  - eurostat.ip_m.sts_inpr_m|indic_bt=PRD|nace_r2=B-D|s_adj=SCA|unit=I21
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.exchange_rate_usd_m
+  labels:
+    fr: Taux de change, monnaie nationale par dollar US, moyenne (mensuel, FMI)
+    en: Exchange rate, national currency per US dollar, period average (monthly, IMF)
+  definition: 'IMF ER: ''Domestic currency per US Dollar'', ''Period average'', monthly.'
+  unit: national currency per US dollar
+  domain: macro_hf
+  subdomain: exchange_rates
+  theme: economy
+  source_order:
+  - imf.er_m.XDC_USD|type_of_transformation=PA_RT
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.policy_rate_m_imf
+  labels:
+    fr: Taux d'intérêt de politique monétaire (mensuel, FMI)
+    en: Monetary policy-related interest rate (monthly, IMF)
+  definition: 'IMF MFS_IR: ''Monetary policy-related, Rate, Percent per annum'', monthly.'
+  unit: '% per annum'
+  domain: macro_hf
+  subdomain: interest_rates
+  theme: economy
+  source_order:
+  - imf.mfs_ir_m.MFS166_RT_PT_A_PT
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.long_term_rate_m_oecd
+  labels:
+    fr: Taux d'intérêt à long terme (mensuel, OCDE KEI)
+    en: Long-term interest rate (monthly, OECD KEI)
+  definition: 'OECD Key short-term economic indicators: ''Long-term interest rates'', ''Percent per annum'', monthly.'
+  unit: '% per annum'
+  domain: macro_hf
+  subdomain: interest_rates
+  theme: economy
+  source_order:
+  - oecd.kei_mq.IRLT|unit_measure=PA|freq=M
+  provider_declared: true
+  notes: Monthly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.current_account_q_usd
+  labels:
+    fr: Solde courant (trimestriel, dollars US, FMI)
+    en: Current account balance (quarterly, US dollars, IMF BOP)
+  definition: 'IMF BOP (BPM6): ''Current account balance (credit less debit)'', ''Net (credits less debits)'', US dollar,
+    quarterly.'
+  unit: US dollars
+  domain: macro_hf
+  subdomain: balance_of_payments
+  theme: economy
+  source_order:
+  - imf.bop_q.CAB|bop_accounting_entry=NETCD_T|unit=USD
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gov_gross_debt_q_dc
+  labels:
+    fr: Dette brute des administrations publiques en valeur de marché (trimestriel, FMI)
+    en: General government gross debt at market value (quarterly, IMF QGFS)
+  definition: 'IMF QGFS: ''Gross debt at market value, Liabilities, Stock positions'', General government, domestic currency,
+    end of quarter.'
+  unit: domestic currency
+  domain: macro_hf
+  subdomain: public_finance
+  theme: economy
+  source_order:
+  - imf.qgfs_q.G63GMV_L_SP_XDC|accounts=BS|sector=S13
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.gov_gross_debt_q_gdp
+  labels:
+    fr: Dette brute consolidée des APU, % du PIB (trimestriel, Eurostat)
+    en: General government consolidated gross debt, % of GDP (quarterly, Eurostat)
+  definition: 'Eurostat gov_10q_ggdebt: ''Government consolidated gross debt'', General government, ''Percentage of gross
+    domestic product (GDP)''.'
+  unit: '% of GDP'
+  domain: macro_hf
+  subdomain: public_finance
+  theme: economy
+  source_order:
+  - eurostat.gov_debt_q.gov_10q_ggdebt|na_item=GD|sector=S13|unit=PC_GDP
+  provider_declared: true
+  notes: Quarterly cells (per-source series); not attached to the atlas year view.
+- id: macro_hf.icp_price_level_gdp
+  labels:
+    fr: Indice du niveau des prix du PIB, monde = 100 (PCI 2021)
+    en: Price level index of GDP, World = 100 (ICP 2021)
+  definition: 'World Bank ICP 2021: ''1000000:GROSS DOMESTIC PRODUCT'', ''Price level index (World = 100)''.'
+  unit: index (World = 100)
+  domain: macro_hf
+  subdomain: price_levels
+  theme: prices
+  source_order:
+  - wb.icp2021.1000000|classification=PX.WL
+  provider_declared: true
+  notes: Benchmark years 2017 (revised) and 2021.
+- id: macro_hf.icp_price_level_food
+  labels:
+    fr: Indice du niveau des prix alimentaires, monde = 100 (PCI 2021)
+    en: Price level index of food and non-alcoholic beverages, World = 100 (ICP 2021)
+  definition: 'World Bank ICP 2021: ''1101000:FOOD AND NON-ALCOHOLIC BEVERAGES'', ''Price level index (World = 100)''.'
+  unit: index (World = 100)
+  domain: macro_hf
+  subdomain: price_levels
+  theme: prices
+  source_order:
+  - wb.icp2021.1101000|classification=PX.WL
+  provider_declared: true
+  notes: Benchmark years 2017 (revised) and 2021.
+- id: macro_hf.icp_ppp_gdp
+  labels:
+    fr: Parité de pouvoir d'achat du PIB, $ US = 1 (PCI 2021)
+    en: Purchasing power parity for GDP, US$ = 1 (ICP 2021)
+  definition: 'World Bank ICP 2021: ''1000000:GROSS DOMESTIC PRODUCT'', ''Purchasing power parity (PPP) (US$ = 1)''.'
+  unit: national currency per US dollar (PPP)
+  domain: macro_hf
+  subdomain: price_levels
+  theme: prices
+  source_order:
+  - wb.icp2021.1000000|classification=PPPGlob
+  provider_declared: true
+  notes: Benchmark years 2017 (revised) and 2021.

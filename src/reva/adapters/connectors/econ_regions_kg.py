@@ -249,7 +249,7 @@ def build(
         elif r.country_iso3:
             info["country_qid_missing"] += 1
         for t in sorted(r.tables):
-            st("econ:measured_by", obj=f"atlas:{t}", atlas_table=t)
+            st("econ:measured_by", obj=f"atlas:{t}", table=t, provider_geo=r.code)
             info["measured_by"] += 1
             tables.add(t)
     for t in sorted(tables):

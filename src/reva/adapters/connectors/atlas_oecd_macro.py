@@ -387,6 +387,8 @@ def parse_csvfile(
         start, end = fc.sdmx_period(freq, get(r, "TIME_PERIOD"))
         geo = get(r, "REF_AREA")
         parts = [get(r, fl.fold[0])] + [f"{d.lower()}={get(r, d)}" for d in fl.fold[1:] if get(r, d) not in ("", "_Z")]
+        if len(fl.freqs) > 1:  # monthly and quarterly cells of one measure are distinct series
+            parts.append(f"freq={freq}")
         indicator = "|".join(parts)
         unit = fl.labels[fl.unit_dim][get(r, fl.unit_dim)]
         flags: dict[str, Any] = {}

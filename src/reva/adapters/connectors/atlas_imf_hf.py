@@ -424,6 +424,8 @@ def parse_flow(fl: HfFlow, body: bytes, sha: str, label: str) -> tuple[pl.DataFr
                 raise ImfHfError(f"IMF {fl.flow}: code not in the quoted codelist", dimension=d, code=sattrs[d][:40])
         geo = sattrs["COUNTRY"]
         parts = [sattrs[fl.fold[0]]] + [f"{d.lower()}={sattrs[d]}" for d in fl.fold[1:]]
+        if len(fl.freqs) > 1:  # monthly and quarterly cells of one measure are distinct series
+            parts.append(f"freq={freq}")
         indicator = "|".join(parts)
         unit = fl.fixed_unit or ", ".join(fl.labels[d][sattrs[d]] for d in fl.unit_dims)
         base: dict[str, Any] = {"frequency": freq}
